@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace CssUI
 {
     /// <summary>
-    /// Describes all of the events for UI element's
+    /// Describes all of the events for CSS elements
     /// </summary>
-    public interface UIEvents
+    public interface DomEvents
     {
         #region Mouse Event Delegates
         /// <summary>
@@ -71,7 +71,7 @@ namespace CssUI
         /// <summary>
         /// Called whenever the user presses a character key while the element has input-focus
         /// </summary>
-        event Action<cssElement, uiCancellableEvent<DomKeyboardKeyEventArgs>> KeyPress;
+        event Action<cssElement, DomCancellableEvent<DomKeyboardKeyEventArgs>> KeyPress;
         /// <summary>
         /// Called whenever a keyboard key is depressed while the element has input-focus
         /// </summary>
@@ -165,7 +165,7 @@ namespace CssUI
     /// Allows event receivers to prevent elements from responding to certain events.
     /// </summary>
     /// <typeparam name="Ty"></typeparam>
-    public class uiCancellableEvent<Ty>
+    public class DomCancellableEvent<Ty>
     {
         public readonly Ty Args;
         /// <summary>
@@ -173,7 +173,7 @@ namespace CssUI
         /// </summary>
         public bool Cancel = false;
 
-        public uiCancellableEvent(Ty args)
+        public DomCancellableEvent(Ty args)
         {
             Args = args;
         }

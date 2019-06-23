@@ -1,7 +1,7 @@
 ﻿
 namespace CssUI
 {
-    public class uiVScrollBar : uiScrollBar
+    public class uiVScrollBar : cssScrollBarElement
     {
         public override string Default_CSS_TypeName { get { return "VertScrollBar"; } }
 

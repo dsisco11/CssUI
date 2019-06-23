@@ -3,10 +3,10 @@ using CssUI.CSS;
 
 namespace CssUI
 {
-    public abstract class uiScrollBar : cssCompoundElement
+    public abstract class cssScrollBarElement : cssCompoundElement
     {
         #region Events
-        public event Action<uiScrollBar> ValueChanged;
+        public event Action<cssScrollBarElement> ValueChanged;
         #endregion
 
         #region Components
@@ -108,7 +108,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public uiScrollBar(string ID = null, ESliderDirection Dir = ESliderDirection.Unset) : base(ID)
+        public cssScrollBarElement(string ID = null, ESliderDirection Dir = ESliderDirection.Unset) : base(ID)
         {
             Flags_Remove(EElementFlags.DoubleClickable);
             Layout = ELayoutMode.None;

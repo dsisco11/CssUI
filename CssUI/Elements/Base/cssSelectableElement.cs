@@ -8,19 +8,19 @@ namespace CssUI
     /// <summary>
     /// An element which can receive input focus and tracks a 'Selected' state
     /// </summary>
-    public abstract class Selectable : cssCompoundElement, ISelectableElement
+    public abstract class cssSelectableElement : cssCompoundElement, ISelectableElement
     {
         public override string Default_CSS_TypeName { get { return "Selectable"; } }
 
         #region Constructors
-        public Selectable(string ID = null) : base(ID)
+        public cssSelectableElement(string ID = null) : base(ID)
         {
             Flags_Add(EElementFlags.Focusable);
         }
         #endregion
 
         #region Selection Events
-        public event Action<Selectable> onSelectedChanged;
+        public event Action<cssSelectableElement> onSelectedChanged;
         #endregion
 
         #region Selection State

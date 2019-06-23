@@ -95,7 +95,7 @@ namespace CssUI
         /// <summary>
         /// Occurs when the element is being scrolled.
         /// </summary>
-        public event Action<cssScrollableElement, uiScrollBar> onScroll;
+        public event Action<cssScrollableElement, cssScrollBarElement> onScroll;
         #endregion
 
         #region Scroll Translations
@@ -248,7 +248,7 @@ namespace CssUI
                 SB_Vertical.Style.Default.Right.Set(0);
                 
                 SB_Vertical.IsVisible = false;
-                SB_Vertical.ValueChanged += delegate (uiScrollBar Sender) 
+                SB_Vertical.ValueChanged += delegate (cssScrollBarElement Sender) 
                 {
                     Update_ScrollViewport_Y();
                     Handle_Scrolled();
@@ -284,7 +284,7 @@ namespace CssUI
                 SB_Horizontal.Style.Default.Bottom.Set(0);
 
                 SB_Horizontal.IsVisible = false;
-                SB_Horizontal.ValueChanged += delegate (uiScrollBar Sender) 
+                SB_Horizontal.ValueChanged += delegate (cssScrollBarElement Sender) 
                 {
                     Update_ScrollViewport_X();
                     Handle_Scrolled();

@@ -14,7 +14,7 @@ namespace CssUI
     /// The basis for all OpenGL based UI elements.
     /// <para>NOTE: All OpenGL UI elements inheriting from this base class makes the assumption that texturing is disabled by default when drawing.</para>
     /// </summary>
-    public abstract class cssElement : IDisposable, UIEvents
+    public abstract class cssElement : IDisposable, DomEvents
     {
         /// <summary>
         /// Current UID tracker for UI elements
@@ -261,7 +261,7 @@ namespace CssUI
 
         #region Display
         public DebugOpts Debug = new DebugOpts();
-        public Viewport Viewport { get; protected set; } = null;
+        public cssViewport Viewport { get; protected set; } = null;
         
         /// <summary>
         /// Returns whether or not LayoutDirectors ignore this element, so it's position will not be altered by them.
@@ -360,8 +360,8 @@ namespace CssUI
         
                 
         #region Aligners Position
-        public uiAligner xAligner;
-        public uiAligner yAligner;
+        public cssElementAligner xAligner;
+        public cssElementAligner yAligner;
         #endregion
         
 
@@ -1695,7 +1695,7 @@ namespace CssUI
         /// <summary>
         /// Called whenever the user presses a character key while the element has input-focus
         /// </summary>
-        public event Action<cssElement, uiCancellableEvent<DomKeyboardKeyEventArgs>> KeyPress;
+        public event Action<cssElement, DomCancellableEvent<DomKeyboardKeyEventArgs>> KeyPress;
         /// <summary>
         /// Called whenever a keyboard key is depressed while the element has input-focus
         /// </summary>
@@ -2040,7 +2040,7 @@ namespace CssUI
         /// <returns>Continue</returns>
         public virtual bool Handle_KeyPress(cssElement Sender, DomKeyboardKeyEventArgs Args)
         {
-            var e = new uiCancellableEvent<DomKeyboardKeyEventArgs>(Args);
+            var e = new DomCancellableEvent<DomKeyboardKeyEventArgs>(Args);
             KeyPress?.Invoke(this, e);
             if (e.Cancel) return false;
 

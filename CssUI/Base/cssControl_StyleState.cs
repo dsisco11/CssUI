@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace CssUI
@@ -37,14 +35,14 @@ namespace CssUI
     /// <summary>
     /// Holds the style data for a <see cref="cssElement"/>
     /// </summary>
-    public class eStyle
+    public class cssStyle
     {
     }
 
     /// <summary>
     /// Holds all the style related data for an individual state
     /// </summary>
-    public class eStyle_State
+    public class cssStyle_State
     {
         #region Color
         /// <summary>
@@ -64,13 +62,13 @@ namespace CssUI
         uiBorderStyle Border = new uiBorderStyle();
         #endregion
 
-        public eStyle_State() { }
+        public cssStyle_State() { }
 
-        public static eStyle_State Default
+        public static cssStyle_State Default
         {
             get
             {
-                return new eStyle_State()
+                return new cssStyle_State()
                 {
                     Color = cssColor.White,
                 };

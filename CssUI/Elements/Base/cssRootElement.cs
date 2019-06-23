@@ -17,7 +17,7 @@ namespace CssUI
     {
 
         #region Viewport
-        public Viewport Get_Viewport() { return this.Viewport; }
+        public cssViewport Get_Viewport() { return this.Viewport; }
         public void Set_Viewport(int X, int Y, int Width, int Height)
         {
             Viewport.Set(X, Y, Width, Height);
@@ -88,7 +88,7 @@ namespace CssUI
                 Handle_MouseHover(this);
             });
 
-            Viewport = new Viewport();
+            Viewport = new cssViewport();
             Viewport.Resized += Viewport_Resized;
             Viewport.Moved += Viewport_Moved;
 

@@ -7,7 +7,7 @@ namespace CssUI
     /// <summary>
     /// Represents the rendering bounds for a set of controls.
     /// </summary>
-    public class Viewport
+    public class cssViewport
     {
         #region Properties
         public ePos Origin { get; } = new ePos();

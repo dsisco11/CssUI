@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace CssUI
@@ -9,9 +8,9 @@ namespace CssUI
     public enum cPosDir { NONE = 0, ABOVE, BELOW, LEFT, RIGHT, TOP_OF, BOTTOM_OF, LEFT_SIDE_OF, RIGHT_SIDE_OF, CENTER_X, CENTER_Y }
 
     /// <summary>
-    /// Applys positioning logic to a control everytime it's Layout is performed
+    /// Applys positioning logic to a control everytime it's Layout is altered/refreshed
     /// </summary>
-    public class uiAligner
+    public class cssElementAligner
     {
         #region Values
         private cPosDir Dir;
@@ -20,7 +19,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public uiAligner(cssElement Owner, cssElement Target, int Offset, cPosDir Dir)
+        public cssElementAligner(cssElement Owner, cssElement Target, int Offset, cPosDir Dir)
         {
             this.Owner = new WeakReference<cssElement>(Owner);
             this.Target = new WeakReference<cssElement>(Target);
@@ -30,7 +29,7 @@ namespace CssUI
             if (Target != null) Target.onMoved += onTargetMoved;
         }
 
-        ~uiAligner()
+        ~cssElementAligner()
         {
             Unhook();
         }
@@ -129,7 +128,7 @@ namespace CssUI
 
         public override string ToString()
         {
-            return string.Format("[" + nameof(uiAligner) + "] DIR: {0}  OFFSET: {1}  TARGET: {2}", Enum.GetName(typeof(cPosDir), Dir), Offset, Target);
+            return string.Format("[" + nameof(cssElementAligner) + "] DIR: {0}  OFFSET: {1}  TARGET: {2}", Enum.GetName(typeof(cPosDir), Dir), Offset, Target);
         }
     }
 
