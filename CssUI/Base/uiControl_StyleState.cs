@@ -50,11 +50,11 @@ namespace CssUI
         /// <summary>
         /// Forecolor of the control
         /// </summary>
-        public uiColor Color = null;
+        public cssColor Color = null;
         /// <summary>
         /// Background color of the control, if <c>Null</c> then no background will be drawn
         /// </summary>
-        public uiColor ColorBackground = null;
+        public cssColor ColorBackground = null;
         #endregion
 
         #region Border Style
@@ -72,7 +72,7 @@ namespace CssUI
             {
                 return new eStyle_State()
                 {
-                    Color = uiColor.White,
+                    Color = cssColor.White,
                 };
             }
         }

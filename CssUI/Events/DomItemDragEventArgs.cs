@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace CssUI
 {
-    public class ItemDragEventArgs
+    public class DomItemDragEventArgs
     {
         /// <summary>
         /// Location when the dragging process began
@@ -29,7 +24,7 @@ namespace CssUI
         /// </summary>
         public bool Abort = false;
 
-        public ItemDragEventArgs(ePos Origin, ePos Current)
+        public DomItemDragEventArgs(ePos Origin, ePos Current)
         {
             this.Origin = Origin;
             this.Location = Current;

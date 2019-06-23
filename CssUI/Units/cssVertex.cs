@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CssUI
 {
-    public struct uiVertex
+    public struct cssVertex
     {
         #region Properties
         /// <summary>
@@ -20,10 +20,10 @@ namespace CssUI
         /// <summary>
         /// Color of the vertex
         /// </summary>
-        public uiColor Color;
+        public cssColor Color;
         #endregion
 
-        public uiVertex(uiColor Color, int X, int Y)
+        public cssVertex(cssColor Color, int X, int Y)
         {
             this.X = X;
             this.Y = Y;

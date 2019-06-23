@@ -82,12 +82,12 @@ namespace CssUI
 
             Thumb = new uiBox("Thumb");
             Thumb.Flags_Add(EElementFlags.Draggable);
-            Thumb.Color = new uiColor(0.4f, 0.4f, 0.4f, 1.0f);
+            Thumb.Color = new cssColor(0.4f, 0.4f, 0.4f, 1.0f);
             Thumb.DraggingStart += Thumb_DraggingStart;
             Thumb.DraggingUpdate += Thumb_DraggingUpdate;
             Thumb.DraggingEnd += Thumb_DraggingEnd;
             // Do not allow (left) mouse click events to tunnel past the thumb element to the trackbar, or else it loses dragging functionality
-            Thumb.PreviewMouseClick += (uiElement e, PreviewMouseButtonEventArgs args) =>
+            Thumb.PreviewMouseClick += (uiElement e, DomPreviewMouseButtonEventArgs args) =>
             {
                 if (args.Button.HasFlag(EMouseButton.Left))
                 {
@@ -235,16 +235,16 @@ namespace CssUI
         /// Offset from the thumb's block origin where the mouse initially started dragging it from.
         /// </summary>
         ePos Thumb_Pos_At_DragStart = null;
-        private void Thumb_DraggingStart(uiElement Sender, ItemDragEventArgs Args)
+        private void Thumb_DraggingStart(uiElement Sender, DomItemDragEventArgs Args)
         {
             Thumb_Pos_At_DragStart = Thumb.Block.Get_Pos();
         }
-        private void Thumb_DraggingEnd(uiElement Sender, ItemDragEventArgs Args)
+        private void Thumb_DraggingEnd(uiElement Sender, DomItemDragEventArgs Args)
         {
             Thumb_Pos_At_DragStart = null;
         }
 
-        private void Thumb_DraggingUpdate(uiElement Sender, ItemDragEventArgs Args)
+        private void Thumb_DraggingUpdate(uiElement Sender, DomItemDragEventArgs Args)
         {
             // okay we want to move the thumb such that the point the user clicked on to initiate the drag coincides with the current mouse location
             ePos Delta = new ePos(Args.XDelta, Args.YDelta);

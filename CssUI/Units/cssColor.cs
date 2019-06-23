@@ -9,14 +9,14 @@ namespace CssUI
     /// <summary>
     /// Encapsulates an RGBA color.
     /// </summary>
-    public class uiColor
+    public class cssColor
     {
         #region Static members
-        public static readonly uiColor White = new uiColor(1.0, 1.0, 1.0, 1.0);
-        public static readonly uiColor Red = new uiColor(1.0, 0.0, 0.0, 1.0);
-        public static readonly uiColor Green = new uiColor(0.0, 1.0, 0.0, 1.0);
-        public static readonly uiColor Blue = new uiColor(0.0, 0.0, 1.0, 1.0);
-        public static readonly uiColor Transparent = new uiColor(1.0, 1.0, 1.0, 0.0);
+        public static readonly cssColor White = new cssColor(1.0, 1.0, 1.0, 1.0);
+        public static readonly cssColor Red = new cssColor(1.0, 0.0, 0.0, 1.0);
+        public static readonly cssColor Green = new cssColor(0.0, 1.0, 0.0, 1.0);
+        public static readonly cssColor Blue = new cssColor(0.0, 0.0, 1.0, 1.0);
+        public static readonly cssColor Transparent = new cssColor(1.0, 1.0, 1.0, 0.0);
         #endregion
 
         #region Accessors
@@ -40,7 +40,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public uiColor()
+        public cssColor()
         {
         }
         /// <summary>
@@ -49,7 +49,7 @@ namespace CssUI
         /// <param name="R">Value in the range [0.0 - 1.0]</param>
         /// <param name="G">Value in the range [0.0 - 1.0]</param>
         /// <param name="B">Value in the range [0.0 - 1.0]</param>
-        public uiColor(double R, double G, double B)
+        public cssColor(double R, double G, double B)
         {
             this.R = R;
             this.G = G;
@@ -63,7 +63,7 @@ namespace CssUI
         /// <param name="G">Value in the range [0.0 - 1.0]</param>
         /// <param name="B">Value in the range [0.0 - 1.0]</param>
         /// <param name="A">Value in the range [0.0 - 1.0]</param>
-        public uiColor(double R, double G, double B, double A)
+        public cssColor(double R, double G, double B, double A)
         {
             this.R = R;
             this.G = G;
@@ -74,7 +74,7 @@ namespace CssUI
 
         #region Helpers
 
-        public uiColor Scale(double r, double g, double b, double a)
+        public cssColor Scale(double r, double g, double b, double a)
         {
             this.R *= r;
             this.G *= g;
@@ -83,7 +83,7 @@ namespace CssUI
             return this;
         }
 
-        public uiColor Scale(double rgb, double a)
+        public cssColor Scale(double rgb, double a)
         {
             this.R *= rgb;
             this.G *= rgb;
@@ -92,13 +92,13 @@ namespace CssUI
             return this;
         }
 
-        public uiColor ScaleAlpha(double a)
+        public cssColor ScaleAlpha(double a)
         {
             this.A *= a;
             return this;
         }
 
-        public uiColor ScaleRGB(double x)
+        public cssColor ScaleRGB(double x)
         {
             this.R *= x;
             this.G *= x;
@@ -106,7 +106,7 @@ namespace CssUI
             return this;
         }
 
-        public uiColor ScaleRGBA(double x)
+        public cssColor ScaleRGBA(double x)
         {
             this.R *= x;
             this.G *= x;
@@ -123,18 +123,18 @@ namespace CssUI
             return (x*(1.0-i)) + (y*i);
         }
 
-        public uiColor Mix(uiColor c, double blend)
+        public cssColor Mix(cssColor c, double blend)
         {
             double R = Interp(this.R, c.R, blend);
             double B = Interp(this.B, c.B, blend);
             double G = Interp(this.G, c.G, blend);
             double A = Interp(this.A, c.A, blend);
-            return new uiColor(R, G, B, A);
+            return new cssColor(R, G, B, A);
         }
 
-        public uiColor MixAlpha(double Alpha)
+        public cssColor MixAlpha(double Alpha)
         {
-            return new uiColor(R, G, B, A * Alpha);
+            return new cssColor(R, G, B, A * Alpha);
         }
         #endregion
 
@@ -180,46 +180,46 @@ namespace CssUI
         #region ToString
         public override string ToString()
         {
-            return string.Concat(nameof(uiColor), "<", R.ToString("0.##"), ", ", G.ToString("0.##"), ", ", B.ToString("0.##"), ", ", A.ToString("0.##"), ">");
+            return string.Concat(nameof(cssColor), "<", R.ToString("0.##"), ", ", G.ToString("0.##"), ", ", B.ToString("0.##"), ", ", A.ToString("0.##"), ">");
         }
         #endregion
 
         #region Operators
 
-        public static uiColor operator *(uiColor a, uiColor b)
+        public static cssColor operator *(cssColor a, cssColor b)
         {
             double R = a.R * b.R;
             double B = a.B * b.B;
             double G = a.G * b.G;
             double A = a.A * b.A;
-            return new uiColor(R, G, B, A);
+            return new cssColor(R, G, B, A);
         }
 
-        public static uiColor operator /(uiColor a, uiColor b)
+        public static cssColor operator /(cssColor a, cssColor b)
         {
             double R = a.R / b.R;
             double B = a.B / b.B;
             double G = a.G / b.G;
             double A = a.A / b.A;
-            return new uiColor(R, G, B, A);
+            return new cssColor(R, G, B, A);
         }
 
-        public static uiColor operator +(uiColor a, uiColor b)
+        public static cssColor operator +(cssColor a, cssColor b)
         {
             double R = a.R + b.R;
             double B = a.B + b.B;
             double G = a.G + b.G;
             double A = a.A + b.A;
-            return new uiColor(R, G, B, A);
+            return new cssColor(R, G, B, A);
         }
 
-        public static uiColor operator -(uiColor a, uiColor b)
+        public static cssColor operator -(cssColor a, cssColor b)
         {
             double R = a.R - b.R;
             double B = a.B - b.B;
             double G = a.G - b.G;
             double A = a.A - b.A;
-            return new uiColor(R, G, B, A);
+            return new cssColor(R, G, B, A);
         }
         #endregion
     }

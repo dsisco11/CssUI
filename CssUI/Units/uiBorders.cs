@@ -41,12 +41,12 @@ namespace CssUI
     /// </summary>
     public class uiBorder_Propertys
     {
-        public static uiBorder_Propertys Default { get { return new uiBorder_Propertys(uiColor.White, 2, EBorderStyle.None); } }
+        public static uiBorder_Propertys Default { get { return new uiBorder_Propertys(cssColor.White, 2, EBorderStyle.None); } }
 
         #region Properties
         public bool Dirty { get; set; } = true;
 
-        private uiColor color = null;
+        private cssColor color = null;
         private int width = 2;
         private EBorderStyle? style = null;
         #endregion
@@ -55,7 +55,7 @@ namespace CssUI
         /// <summary>
         /// Color of the border
         /// </summary>
-        public uiColor Color { get { return color; } set { Dirty = true; color = value; } }
+        public cssColor Color { get { return color; } set { Dirty = true; color = value; } }
         /// <summary>
         /// Returns the 'Used' width for the border.
         /// <para>if the Style is set to 'none' then the returned value will always be 0</para>
@@ -74,7 +74,7 @@ namespace CssUI
         #region Constructors
         public uiBorder_Propertys() { }
 
-        public uiBorder_Propertys(uiColor Color, int Width, EBorderStyle? Style)
+        public uiBorder_Propertys(cssColor Color, int Width, EBorderStyle? Style)
         {
             this.Color = Color;
             this.Size = Width;

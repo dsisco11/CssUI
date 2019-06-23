@@ -5,9 +5,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Advanced;
-using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.PixelFormats;
+using System.Threading.Tasks;
 
 namespace CssUI
 {
@@ -37,14 +37,14 @@ namespace CssUI
         /// <summary>
         /// All frames for this (possibly animated) image texture...
         /// </summary>
-        public readonly List<uiTextureFrame> FrameAtlas = new List<uiTextureFrame>(1);
+        public readonly List<cssTextureFrame> FrameAtlas = new List<cssTextureFrame>(1);
         #endregion
 
         #region Accessors
         /// <summary>
         /// Returns the frame object which should be currently displayed for this texture.
         /// </summary>
-        public uiTextureFrame Frame { get { return FrameAtlas[CurrentFrame]; } }
+        public cssTextureFrame Frame { get { return FrameAtlas[CurrentFrame]; } }
         /// <summary>
         /// Size of the current texture
         /// </summary>
@@ -52,11 +52,21 @@ namespace CssUI
         #endregion
 
         #region Constructors
+        public cssTexture(byte[] imgData) : this(SixLabors.ImageSharp.Image.Load<Rgba32>(imgData))
+        {
+        }
+
         public cssTexture(MemoryStream imgData) : this(SixLabors.ImageSharp.Image.Load<Rgba32>(imgData.ToArray()))
         {
         }
 
-        public cssTexture(Image<Rgba32> image)
+        public cssTexture(byte[] Data, eSize Size, EPixelFormat Format)
+        {
+            this.Size = Size;
+            Push_Frame(Data, Size, Format);
+        }
+
+        internal cssTexture(Image<Rgba32> image)
         {
             this.Size = new eSize(image.Width, image.Height);
 
@@ -88,11 +98,16 @@ namespace CssUI
                 Push_Frame(rgbaBytes, new eSize(image.Width, image.Height), EPixelFormat.RGBA);
             }
         }
+        #endregion
 
-        public cssTexture(byte[] Data, eSize Size, EPixelFormat Format)
+        #region Image Loading
+        public static async Task<cssTexture> fromFile(string path)
         {
-            this.Size = Size;
-            Push_Frame(Data, Size, Format);
+            return await Task.Factory.StartNew(() =>
+            {
+                var img = SixLabors.ImageSharp.Image.Load<Rgba32>(path);
+                return new cssTexture(img);
+            });
         }
         #endregion
 
@@ -109,7 +124,7 @@ namespace CssUI
         #region Frame Pushing
         public void Push_Frame(byte[] Data, eSize Size, EPixelFormat Format, float Time = 0f)
         {
-            FrameAtlas.Add(new uiTextureFrame(Data, Size, Format) { Duration = Time });
+            FrameAtlas.Add(new cssTextureFrame(Data, Size, Format) { Duration = Time });
             Build_Timeline();
         }
         #endregion
@@ -193,7 +208,7 @@ namespace CssUI
     /// Effectively just serves as a convenient pass-through between RGBA pixel-data and the UI's current <see cref="IRenderEngine"/> implementation, which actually does all the handling/uploading of image data
     /// For example; an OpenGL rendering engine implementation would store a texture ID as an integer within a frame's <see cref="Instance"/> instance, while some other engine might store something else which it uses to draw the image.
     /// </summary>
-    public class uiTextureFrame : IDisposable
+    public class cssTextureFrame : IDisposable
     {
         #region Accessors
         /// <summary>
@@ -213,7 +228,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public uiTextureFrame(byte[] Data, eSize Size, EPixelFormat Format)
+        public cssTextureFrame(byte[] Data, eSize Size, EPixelFormat Format)
         {
             this.Format = Format;
             this.Data = Data;

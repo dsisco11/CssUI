@@ -54,14 +54,14 @@ namespace CssUI
         /// The 'tint' color refers to the color which the base color multiplies against itsself to obtain the final color value to be used when rendering verticies.
         /// </summary>
         /// <param name="color">The tint color to multiply the base color by.</param>
-        void Set_Blending_Color(uiColor color);
+        void Set_Blending_Color(cssColor color);
         #endregion
         
         #region Color
         /// <summary>
         /// Sets the current color.
         /// </summary>
-        void Set_Color(uiColor color);
+        void Set_Color(cssColor color);
         /// <summary>
         /// Sets the current color.
         /// </summary>
@@ -70,7 +70,7 @@ namespace CssUI
         /// <summary>
         /// Uploads the final, blended, color value to whatever system is doing the rendering, be it DirectX, OpenGL, Vulkan, D3D, etc.
         /// </summary>
-        void Upload_Color(uiColor Color);
+        void Upload_Color(cssColor Color);
         #endregion
 
         #region Texturing
@@ -107,7 +107,7 @@ namespace CssUI
         /// <param name="LineThickness">Thickness of the line in pixels</param>
         /// <param name="v1">First vertex</param>
         /// <param name="v2">Second vertex</param>
-        void Draw_Line(int LineThickness, uiVertex v1, uiVertex v2);
+        void Draw_Line(int LineThickness, cssVertex v1, cssVertex v2);
         /// <summary>
         /// Outlines a rectangular area with the currently set color
         /// </summary>
@@ -139,7 +139,7 @@ namespace CssUI
         /// <param name="v2">Top-Right vertex</param>
         /// <param name="v3">Bottom-Right vertex</param>
         /// <param name="v4">Bottom-Left vertex</param>
-        void Draw_Rect(int LineThickness, uiVertex v1, uiVertex v2, uiVertex v3, uiVertex v4);
+        void Draw_Rect(int LineThickness, cssVertex v1, cssVertex v2, cssVertex v3, cssVertex v4);
         /// <summary>
         /// Outlines a triangular area with the currently set color
         /// <para>Clockwise winding assumed for all verticies</para>
@@ -161,7 +161,7 @@ namespace CssUI
         /// <param name="v1">First vertex</param>
         /// <param name="v2">Second vertex</param>
         /// <param name="v3">Third vertex</param>
-        void Draw_Tri(int LineThickness, uiVertex v1, uiVertex v2, uiVertex v3);
+        void Draw_Tri(int LineThickness, cssVertex v1, cssVertex v2, cssVertex v3);
         #endregion
 
         #region Filling
@@ -193,7 +193,7 @@ namespace CssUI
         /// <param name="v2">Top-Right vertex</param>
         /// <param name="v3">Bottom-Right vertex</param>
         /// <param name="v4">Bottom-Left vertex</param>
-        void Fill_Rect(uiVertex v1, uiVertex v2, uiVertex v3, uiVertex v4);
+        void Fill_Rect(cssVertex v1, cssVertex v2, cssVertex v3, cssVertex v4);
         /// <summary>
         /// Fills a triangular area with the currently set color
         /// </summary>
@@ -211,7 +211,7 @@ namespace CssUI
         /// <param name="v1">First vertex</param>
         /// <param name="v2">Second vertex</param>
         /// <param name="v3">Third vertex</param>
-        void Fill_Tri(uiVertex v1, uiVertex v2, uiVertex v3);
+        void Fill_Tri(cssVertex v1, cssVertex v2, cssVertex v3);
         #endregion
     }
 }

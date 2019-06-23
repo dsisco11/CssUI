@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace CssUI
 {
-    public class RoutedEventArgs
+    public class DomRoutedEventArgs
     {
         #region Properties
         /// <summary>
@@ -23,7 +18,7 @@ namespace CssUI
         public object Source;
         #endregion
 
-        public RoutedEventArgs(object Source)
+        public DomRoutedEventArgs(object Source)
         {
             this.OriginSource = Source;
             this.Source = Source;

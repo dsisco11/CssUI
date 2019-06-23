@@ -13,13 +13,13 @@ namespace CssUI
     {
         #region Stacks
         Stack<eMatrix> MatrixStack = new Stack<eMatrix>();
-        Stack<uiColor> ColorStack = new Stack<uiColor>();
-        Stack<uiColor> BlendingStack = new Stack<uiColor>();
+        Stack<cssColor> ColorStack = new Stack<cssColor>();
+        Stack<cssColor> BlendingStack = new Stack<cssColor>();
         #endregion
 
         #region Properties
-        public uiColor Color { get { return ColorStack.DefaultIfEmpty(uiColor.White).First() ?? uiColor.White; } private set { } }
-        public uiColor Blend_Color { get { return BlendingStack.DefaultIfEmpty(uiColor.White).First() ?? uiColor.White; } private set { } }
+        public cssColor Color { get { return ColorStack.DefaultIfEmpty(cssColor.White).First() ?? cssColor.White; } private set { } }
+        public cssColor Blend_Color { get { return BlendingStack.DefaultIfEmpty(cssColor.White).First() ?? cssColor.White; } private set { } }
         public eMatrix Matrix { get { return MatrixStack.FirstOrDefault(); } private set { } }
         #endregion
 
@@ -33,7 +33,7 @@ namespace CssUI
         /// Sets the current color for the most recent stack item (this color is NOT blended by the stack)
         /// </summary>
         /// <param name="value"></param>
-        public void Set_Color(uiColor value, bool FireChangedEvent = true)
+        public void Set_Color(cssColor value, bool FireChangedEvent = true)
         {
             // Remove old value from the top of the stack
             if (ColorStack.Count > 0) ColorStack.Pop();
@@ -49,7 +49,7 @@ namespace CssUI
         /// Sets the current blend color for the most recent stack item (this color is blended with all the blending colors before it)
         /// </summary>
         /// <param name="value"></param>
-        public void Set_Blend(uiColor value, bool FireChangedEvent = true)
+        public void Set_Blend(cssColor value, bool FireChangedEvent = true)
         {
             /*
             // 06-23-2017
@@ -70,7 +70,7 @@ namespace CssUI
             // Remove old value from the top of the stack
             if (BlendingStack.Count > 0) BlendingStack.Pop();
             // Find the value we need to stack the incoming one ontop of (so we can combine them)
-            uiColor clr = BlendingStack.FirstOrDefault();
+            cssColor clr = BlendingStack.FirstOrDefault();
             // Combine the incoming value with the one before it(if any) in the stack
             if (clr != null) clr *= value;
             else clr = value;

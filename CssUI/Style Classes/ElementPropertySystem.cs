@@ -175,7 +175,7 @@ namespace CssUI
 
         public int LineHeight { get; private set; }
         public double Opacity { get; private set; } = 1.0f;
-        public uiColor Blend_Color { get; private set; } = null;
+        public cssColor Blend_Color { get; private set; } = null;
         #endregion
 
         #region Getters
@@ -651,7 +651,7 @@ namespace CssUI
 
             if (Opacity != 1.0)
             {// We have a useful blend color to set
-                Blend_Color = new uiColor(1, 1, 1, Opacity);
+                Blend_Color = new cssColor(1, 1, 1, Opacity);
             }
             else// We DONT have a useful blend color
             {

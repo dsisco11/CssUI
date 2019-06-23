@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace CssUI
 {
     /// <summary>
@@ -12,7 +7,7 @@ namespace CssUI
     /// <para>Preview events are basically used to find the starting point for a bubbling event sequence</para>
     /// <para>In addition preview events allow higher level elements to prevent certain events from reaching controls within them if they need to</para>
     /// </summary>
-    public class PreviewEventArgs
+    public class DomPreviewEventArgs
     {
         #region Properties
         /// <summary>
@@ -25,11 +20,11 @@ namespace CssUI
         public object Handler = null;
         #endregion
         
-        public PreviewEventArgs()
+        public DomPreviewEventArgs()
         {
         }
 
-        public PreviewEventArgs(PreviewEventArgs e)
+        public DomPreviewEventArgs(DomPreviewEventArgs e)
         {
             Handled = e.Handled;
             Handler = e.Handler;

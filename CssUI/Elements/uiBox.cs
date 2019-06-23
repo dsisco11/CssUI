@@ -16,7 +16,7 @@ namespace CssUI
         #region Constuctors
         public uiBox(string ID = null) : base(ID)
         {
-            Color = new uiColor(1f, 0f, 1f, 1f);
+            Color = new cssColor(1f, 0f, 1f, 1f);
         }
         #endregion
 

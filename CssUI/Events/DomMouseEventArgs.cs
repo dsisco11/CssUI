@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace CssUI
 {
 
-    public abstract class RoutedMouseEventArgs : RoutedEventArgs
+    public abstract class DomRoutedMouseEventArgs : DomRoutedEventArgs
     {
         #region Properties
         /// <summary>
@@ -24,14 +24,14 @@ namespace CssUI
         public ePos Position { get; }
         #endregion
 
-        public RoutedMouseEventArgs(object Source, int X, int Y) : base(Source)
+        public DomRoutedMouseEventArgs(object Source, int X, int Y) : base(Source)
         {
             this.X = X;
             this.Y = Y;
             this.Position = new ePos(X, Y);
         }
 
-        public RoutedMouseEventArgs(object Source, PreviewMouseEventArgs e) : base(Source)
+        public DomRoutedMouseEventArgs(object Source, DomPreviewMouseEventArgs e) : base(Source)
         {
             this.X = e.X;
             this.Y = e.Y;
@@ -39,7 +39,7 @@ namespace CssUI
         }
     }
 
-    public abstract class PreviewMouseEventArgs : PreviewEventArgs
+    public abstract class DomPreviewMouseEventArgs : DomPreviewEventArgs
     {
         #region Properties
         /// <summary>
@@ -56,14 +56,14 @@ namespace CssUI
         public ePos Position { get; }
         #endregion
 
-        public PreviewMouseEventArgs(PreviewMouseEventArgs e)
+        public DomPreviewMouseEventArgs(DomPreviewMouseEventArgs e)
         {
             this.X = e.X;
             this.Y = e.Y;
             this.Position = new ePos(X, Y);
         }
 
-        public PreviewMouseEventArgs(int X, int Y)
+        public DomPreviewMouseEventArgs(int X, int Y)
         {
             this.X = X;
             this.Y = Y;

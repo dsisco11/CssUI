@@ -5,11 +5,11 @@ namespace CssUI
     /// <summary>
     /// Provides an implementation of a basic render engine with a stack.
     /// </summary>
-    public abstract class RenderEngine : IRenderEngine
+    public abstract class RenderEngineBase : IRenderEngine
     {
         RenderStack Stack = new RenderStack();
 
-        public RenderEngine()
+        public RenderEngineBase()
         {
             Stack.Stack_Changed += onStack_Value_Change;
         }
@@ -90,14 +90,14 @@ namespace CssUI
         #endregion
         
         #region Blending
-        public uiColor Blending_Color { get { return Stack.Blend_Color; } }
+        public cssColor Blending_Color { get { return Stack.Blend_Color; } }
 
         /// <summary>
         /// Sets the value of the latest tint color value in the blending stack.
         /// The 'tint' color refers to the color which the base color multiplies against itsself to obtain the final color value to be used when rendering verticies.
         /// </summary>
         /// <param name="color">The tint color to multiply the base color by.</param>
-        public virtual void Set_Blending_Color(uiColor color)
+        public virtual void Set_Blending_Color(cssColor color)
         {
             Stack.Set_Blend(color);
             Finalize_Color();
@@ -105,12 +105,12 @@ namespace CssUI
         #endregion
 
         #region Color
-        public uiColor Color { get { return Stack.Color; } }
+        public cssColor Color { get { return Stack.Color; } }
 
         /// <summary>
         /// Sets the current color
         /// </summary>
-        public virtual void Set_Color(uiColor Color)
+        public virtual void Set_Color(cssColor Color)
         {
             Stack.Set_Color(Color, false);
             Finalize_Color();
@@ -118,14 +118,14 @@ namespace CssUI
 
         public virtual void Set_Color(float R, float G, float B, float A)
         {
-            Stack.Set_Color(new uiColor(R, G, B, A), false);
+            Stack.Set_Color(new cssColor(R, G, B, A), false);
             Finalize_Color();
         }
 
         /// <summary>
         /// Uploads the final, blended, color value to whatever system is doing the rendering, be it DirectX, OpenGL, Vulkan, D3D, etc.
         /// </summary>
-        public abstract void Upload_Color(uiColor Color);
+        public abstract void Upload_Color(cssColor Color);
 
         /// <summary>
         /// Performs blending on the base color and then uploads it.
@@ -137,7 +137,7 @@ namespace CssUI
             double B = (Color.B * Stack.Blend_Color.B);
             double A = (Color.A * Stack.Blend_Color.A);
 
-            Upload_Color(new uiColor(R, G, B, A));
+            Upload_Color(new cssColor(R, G, B, A));
         }
         #endregion
 
@@ -175,7 +175,7 @@ namespace CssUI
         /// <param name="LineThickness">Thickness of the line in pixels</param>
         /// <param name="v1">First vertex</param>
         /// <param name="v2">Second vertex</param>
-        public abstract void Draw_Line(int LineThickness, uiVertex v1, uiVertex v2);
+        public abstract void Draw_Line(int LineThickness, cssVertex v1, cssVertex v2);
         /// <summary>
         /// Outlines a rectangular area with the currently set color
         /// </summary>
@@ -207,7 +207,7 @@ namespace CssUI
         /// <param name="v2">Top-Right vertex</param>
         /// <param name="v3">Bottom-Right vertex</param>
         /// <param name="v4">Bottom-Left vertex</param>
-        public abstract void Draw_Rect(int LineThickness, uiVertex v1, uiVertex v2, uiVertex v3, uiVertex v4);
+        public abstract void Draw_Rect(int LineThickness, cssVertex v1, cssVertex v2, cssVertex v3, cssVertex v4);
         /// <summary>
         /// Outlines a triangular area with the currently set color
         /// <para>Clockwise winding assumed for all verticies</para>
@@ -229,7 +229,7 @@ namespace CssUI
         /// <param name="v1">First vertex</param>
         /// <param name="v2">Second vertex</param>
         /// <param name="v3">Third vertex</param>
-        public abstract void Draw_Tri(int LineThickness, uiVertex v1, uiVertex v2, uiVertex v3);
+        public abstract void Draw_Tri(int LineThickness, cssVertex v1, cssVertex v2, cssVertex v3);
         #endregion
 
         #region Filling
@@ -261,7 +261,7 @@ namespace CssUI
         /// <param name="v2">Top-Right vertex</param>
         /// <param name="v3">Bottom-Right vertex</param>
         /// <param name="v4">Bottom-Left vertex</param>
-        public abstract void Fill_Rect(uiVertex v1, uiVertex v2, uiVertex v3, uiVertex v4);
+        public abstract void Fill_Rect(cssVertex v1, cssVertex v2, cssVertex v3, cssVertex v4);
         /// <summary>
         /// Fills a triangular area with the currently set color
         /// </summary>
@@ -279,7 +279,7 @@ namespace CssUI
         /// <param name="v1">First vertex</param>
         /// <param name="v2">Second vertex</param>
         /// <param name="v3">Third vertex</param>
-        public abstract void Fill_Tri(uiVertex v1, uiVertex v2, uiVertex v3);
+        public abstract void Fill_Tri(cssVertex v1, cssVertex v2, cssVertex v3);
         #endregion
     }
 }

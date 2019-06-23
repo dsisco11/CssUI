@@ -237,12 +237,12 @@ namespace CssUI
         struct LastClickData { public long Time; public ePos Pos; };
         Dictionary<EMouseButton, LastClickData> LastClick = new Dictionary<EMouseButton, LastClickData>();
 
-        protected void Fire_MouseUp(PreviewMouseButtonEventArgs e)
+        protected void Fire_MouseUp(DomPreviewMouseButtonEventArgs e)
         {
             uiElement Origin = Resolve_ScreenSpace_HitTest(e.Position);
             Halt_ItemDrag_Operation(e.Position);
             // Perform the tunneling event sequence
-            var PreviewArgs = new PreviewMouseButtonEventArgs(e);
+            var PreviewArgs = new DomPreviewMouseButtonEventArgs(e);
             uiElement pE = this;
             do
             {
@@ -256,7 +256,7 @@ namespace CssUI
             if (PreviewArgs.Handled) return;
 
             // Perform the bubbling event sequence
-            var Args = new MouseButtonEventArgs(Origin, PreviewArgs) { Source = PreviewArgs.Handler };
+            var Args = new DomMouseButtonEventArgs(Origin, PreviewArgs) { Source = PreviewArgs.Handler };
             uiElement E = (uiElement)PreviewArgs.Handler;
             do
             {
@@ -266,7 +266,7 @@ namespace CssUI
             while (E != null && !Args.Handled);
         }
 
-        protected void Fire_MouseDown(PreviewMouseButtonEventArgs e)
+        protected void Fire_MouseDown(DomPreviewMouseButtonEventArgs e)
         {
             List<uiElement> Path = new List<uiElement>();
             uiElement Origin = Resolve_ScreenSpace_HitTest(e.Position, ref Path);
@@ -283,7 +283,7 @@ namespace CssUI
             }
 
             // Perform the tunneling event sequence
-            var PreviewArgs = new PreviewMouseButtonEventArgs(e);
+            var PreviewArgs = new DomPreviewMouseButtonEventArgs(e);
             uiElement pE = this;
             do
             {
@@ -297,7 +297,7 @@ namespace CssUI
             if (PreviewArgs.Handled) return;
 
             // Perform the bubbling event sequence
-            var Args = new MouseButtonEventArgs(Origin, PreviewArgs) { Source = PreviewArgs.Handler };
+            var Args = new DomMouseButtonEventArgs(Origin, PreviewArgs) { Source = PreviewArgs.Handler };
             uiElement E = (uiElement)PreviewArgs.Handler;
             do
             {
@@ -340,7 +340,7 @@ namespace CssUI
             }
         }
 
-        protected void Fire_MouseMove(PreviewMouseMoveEventArgs e)
+        protected void Fire_MouseMove(DomPreviewMouseMoveEventArgs e)
         {
             Mouse.Location.X = e.X;
             Mouse.Location.Y = e.Y;
@@ -348,7 +348,7 @@ namespace CssUI
             List<uiElement> Path = new List<uiElement>();
             uiElement Origin = Resolve_ScreenSpace_HitTest(e.Position, ref Path);
             // Perform the tunneling event sequence
-            var PreviewArgs = new PreviewMouseMoveEventArgs(e);
+            var PreviewArgs = new DomPreviewMouseMoveEventArgs(e);
             uiElement pE = this;
             do
             {
@@ -363,7 +363,7 @@ namespace CssUI
             if (PreviewArgs.Handled) return;
 
             // Perform the bubbling event sequence
-            var Args = new MouseMoveEventArgs(Origin, PreviewArgs) { Source = PreviewArgs.Handler };
+            var Args = new DomMouseMoveEventArgs(Origin, PreviewArgs) { Source = PreviewArgs.Handler };
             uiElement E = (uiElement)PreviewArgs.Handler;
             do
             {
@@ -403,7 +403,7 @@ namespace CssUI
             {
                 if (!MouseDragTarget.IsBeingDragged)
                 {
-                    var dArgs = new ItemDragEventArgs(MouseDragStart, new ePos(Args.Position));
+                    var dArgs = new DomItemDragEventArgs(MouseDragStart, new ePos(Args.Position));
                     if (Math.Abs(dArgs.XDelta) > UI_CONSTANTS.DRAG_START_THRESHOLD || Math.Abs(dArgs.YDelta) > UI_CONSTANTS.DRAG_START_THRESHOLD)
                     {
                         Root.Mouse.Start_Dragging(MouseDragTarget, MouseDragTarget, dArgs);
@@ -411,7 +411,7 @@ namespace CssUI
                 }
                 else
                 {
-                    var dArgs = new ItemDragEventArgs(MouseDragStart, new ePos(Args.Position));
+                    var dArgs = new DomItemDragEventArgs(MouseDragStart, new ePos(Args.Position));
                     MouseDragTarget.Handle_DraggingUpdate(MouseDragTarget, dArgs);
                     if (dArgs.Abort)
                     {
@@ -428,12 +428,12 @@ namespace CssUI
         /// <param name="e"></param>
         internal void Fire_Dummy_MouseMove()
         {
-            Fire_MouseMove(new PreviewMouseMoveEventArgs(Mouse.Location.X, Mouse.Location.Y, 0, 0));
+            Fire_MouseMove(new DomPreviewMouseMoveEventArgs(Mouse.Location.X, Mouse.Location.Y, 0, 0));
         }
 
         void Halt_ItemDrag_Operation(ePos MousePos, bool Aborted=false)
         {
-            var Args = new ItemDragEventArgs(MouseDragStart, MousePos) { Abort = Aborted };
+            var Args = new DomItemDragEventArgs(MouseDragStart, MousePos) { Abort = Aborted };
 
             Root.Mouse.Stop_Dragging(MouseDragTarget, Args);
             MouseDragTarget = null;
@@ -453,11 +453,11 @@ namespace CssUI
             EnteredElements.Clear();
         }
         
-        protected void Fire_MouseWheel(PreviewMouseWheelEventArgs e)
+        protected void Fire_MouseWheel(DomPreviewMouseWheelEventArgs e)
         {
             uiElement Origin = Resolve_ScreenSpace_HitTest(e.Position);
             // Perform the tunneling event sequence
-            var PreviewArgs = new PreviewMouseWheelEventArgs(e);
+            var PreviewArgs = new DomPreviewMouseWheelEventArgs(e);
             uiElement pE = this;
             do
             {
@@ -471,7 +471,7 @@ namespace CssUI
             // The Routed event methodology dictates that when a preview event gets intercepted and handled the corrosponding bubbling event is not fired!
             if (PreviewArgs.Handled) return;
             // Perform the bubbling event sequence
-            var Args = new MouseWheelEventArgs(Origin, PreviewArgs) { Source = PreviewArgs.Handler };
+            var Args = new DomMouseWheelEventArgs(Origin, PreviewArgs) { Source = PreviewArgs.Handler };
             uiElement E = (uiElement)PreviewArgs.Handler;
             do
             {
@@ -481,11 +481,11 @@ namespace CssUI
             while (E != null && !Args.Handled);
         }
         
-        protected void Fire_MouseClick(PreviewMouseButtonEventArgs e)
+        protected void Fire_MouseClick(DomPreviewMouseButtonEventArgs e)
         {
             uiElement Origin = Resolve_ScreenSpace_HitTest(e.Position);
             // Perform the tunneling event sequence
-            var PreviewArgs = new PreviewMouseButtonEventArgs(e);
+            var PreviewArgs = new DomPreviewMouseButtonEventArgs(e);
             uiElement pE = this;
             do
             {
@@ -503,7 +503,7 @@ namespace CssUI
             if (PreviewArgs.Handled) return;
 
             // Perform the bubbling event sequence
-            var Args = new MouseButtonEventArgs(Origin, PreviewArgs) { Source = PreviewArgs.Handler };
+            var Args = new DomMouseButtonEventArgs(Origin, PreviewArgs) { Source = PreviewArgs.Handler };
             uiElement E = (uiElement)PreviewArgs.Handler;
             do
             {
@@ -516,11 +516,11 @@ namespace CssUI
             while (E != null && !Args.Handled);
         }
 
-        protected void Fire_MouseDoubleClick(PreviewMouseButtonEventArgs e)
+        protected void Fire_MouseDoubleClick(DomPreviewMouseButtonEventArgs e)
         {
             uiElement Origin = Resolve_ScreenSpace_HitTest(e.Position);
             // Perform the tunneling event sequence
-            var PreviewArgs = new PreviewMouseButtonEventArgs(e);
+            var PreviewArgs = new DomPreviewMouseButtonEventArgs(e);
             uiElement pE = this;
             do
             {
@@ -544,7 +544,7 @@ namespace CssUI
             if (PreviewArgs.Handled) return;
 
             // Perform the bubbling event sequence
-            var Args = new MouseButtonEventArgs(Origin, PreviewArgs) { Source = PreviewArgs.Handler };
+            var Args = new DomMouseButtonEventArgs(Origin, PreviewArgs) { Source = PreviewArgs.Handler };
             uiElement E = (uiElement)PreviewArgs.Handler;
             do
             {
@@ -567,7 +567,7 @@ namespace CssUI
         {
             Stack<uiElement> eStack = new Stack<uiElement>(Path.Count);
             // Perform the tunneling event sequence
-            var PreviewArgs = new PreviewEventArgs();
+            var PreviewArgs = new DomPreviewEventArgs();
             foreach(uiElement E in Path)
             {
                 eStack.Push(E);
@@ -581,7 +581,7 @@ namespace CssUI
             if (PreviewArgs.Handled) return;
 
             // Perform the bubbling event sequence
-            var Args = new RoutedEventArgs(Origin) { Source = PreviewArgs.Handler };
+            var Args = new DomRoutedEventArgs(Origin) { Source = PreviewArgs.Handler };
             while (eStack.Count > 0 && !Args.Handled)
             {
                 var E = eStack.Pop();
@@ -595,7 +595,7 @@ namespace CssUI
         {
             Stack<uiElement> eStack = new Stack<uiElement>(Path.Count);
             // Perform the tunneling event sequence
-            var PreviewArgs = new PreviewEventArgs();
+            var PreviewArgs = new DomPreviewEventArgs();
             foreach (uiElement E in Path)
             {
                 eStack.Push(E);
@@ -609,7 +609,7 @@ namespace CssUI
             if (PreviewArgs.Handled) return;
 
             // Perform the bubbling event sequence
-            var Args = new RoutedEventArgs(Origin) { Source = PreviewArgs.Handler };
+            var Args = new DomRoutedEventArgs(Origin) { Source = PreviewArgs.Handler };
             while (eStack.Count > 0 && !Args.Handled)
             {
                 var E = eStack.Pop();
@@ -677,7 +677,7 @@ namespace CssUI
             base.Handle_MouseLeave(Sender);
         }
 
-        public override void Handle_MouseMove(uiElement Sender, MouseMoveEventArgs Args)
+        public override void Handle_MouseMove(uiElement Sender, DomMouseMoveEventArgs Args)
         {
             if (Mouse.Dragging_Target != null)
             {
@@ -691,7 +691,7 @@ namespace CssUI
         #endregion
 
         #region Keyboard Event Handlers
-        public override bool Handle_KeyUp(uiElement Sender, KeyboardKeyEventArgs Args)
+        public override bool Handle_KeyUp(uiElement Sender, DomKeyboardKeyEventArgs Args)
         {
         #if DEBUG == true
             if (Args.Key == EKey.F11)

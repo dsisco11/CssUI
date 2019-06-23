@@ -31,7 +31,7 @@ namespace CssUI
         /// Starts a dragging operation for the given element
         /// </summary>
         /// <returns>Success</returns>
-        public bool Start_Dragging(uiElement Sender, uiElement Targ, ItemDragEventArgs Args)
+        public bool Start_Dragging(uiElement Sender, uiElement Targ, DomItemDragEventArgs Args)
         {
             if (IsDragging) return false;
             Dragging_Target = Targ;
@@ -47,7 +47,7 @@ namespace CssUI
         /// </summary>
         /// <param name="Sender">The element that is stopping the operation</param>
         /// <returns>Success</returns>
-        public bool Stop_Dragging(uiElement Sender, ItemDragEventArgs Args)
+        public bool Stop_Dragging(uiElement Sender, DomItemDragEventArgs Args)
         {
             if (!IsDragging) return false;
 

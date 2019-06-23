@@ -539,7 +539,7 @@ namespace CssUI
         /// Called whenever the mouse wheel scrolls whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public override void Handle_MouseWheel(uiElement Sender, MouseWheelEventArgs Args)
+        public override void Handle_MouseWheel(uiElement Sender, DomMouseWheelEventArgs Args)
         {
             if (SB_Vertical != null) SB_Vertical.Value = (SB_Vertical.Value - Args.Delta);
             base.Handle_MouseWheel(Sender, Args);

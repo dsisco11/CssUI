@@ -1004,11 +1004,11 @@ namespace CssUI
         /// <summary>
         /// Forecolor of the control
         /// </summary>
-        public uiColor Color = uiColor.White;
+        public cssColor Color = cssColor.White;
         /// <summary>
         /// Background color of the control, if <c>Null</c> then no background will be drawn
         /// </summary>
-        public uiColor ColorBackground = null;
+        public cssColor ColorBackground = null;
 #endregion
 
 #region Borders
@@ -1282,7 +1282,7 @@ namespace CssUI
             if (Border.Top.IsVisible)
             {
                 Root.Engine.Set_Color(Border.Top.Color);
-                Root.Engine.Set_Color(uiColor.White);
+                Root.Engine.Set_Color(cssColor.White);
                 Root.Engine.Fill_Rect(hLeft, Block_Border.Top, hWidth, Border.Top.Size);
             }
             if (Border.Bottom.IsVisible)
@@ -1661,14 +1661,14 @@ namespace CssUI
         public void Click()
         {
             if (!HasFlags(EElementFlags.Clickable)) return;
-            Handle_Click(this, new RoutedEventArgs(this));
+            Handle_Click(this, new DomRoutedEventArgs(this));
         }
 
         public void DoubleClick()
         {
             if (!HasFlags(EElementFlags.DoubleClickable)) return;
             
-            Handle_DoubleClick(this, new RoutedEventArgs(this));
+            Handle_DoubleClick(this, new DomRoutedEventArgs(this));
         }
 #endregion
         
@@ -1676,35 +1676,35 @@ namespace CssUI
         /// <summary>
         /// Called at the start of the dragging process
         /// </summary>
-        public event Action<uiElement, ItemDragEventArgs> DraggingStart;
+        public event Action<uiElement, DomItemDragEventArgs> DraggingStart;
         /// <summary>
         /// Called as the element is being dragged
         /// </summary>
-        public event Action<uiElement, ItemDragEventArgs> DraggingUpdate;
+        public event Action<uiElement, DomItemDragEventArgs> DraggingUpdate;
         /// <summary>
         /// Called when the dragging operation ends (including being cancelled)
         /// Occurs AFTER <see cref="Handle_DraggingConfirm"/>
         /// </summary>
-        public event Action<uiElement, ItemDragEventArgs> DraggingEnd;
+        public event Action<uiElement, DomItemDragEventArgs> DraggingEnd;
         /// <summary>
         /// Called when the dragging operation is confirmed (ended without cancelling)
         /// </summary>
-        public event Action<uiElement, ItemDragEventArgs> DraggingConfirm;
+        public event Action<uiElement, DomItemDragEventArgs> DraggingConfirm;
 #endregion
 
 #region Keyboard Event Delegates
         /// <summary>
         /// Called whenever the user presses a character key while the element has input-focus
         /// </summary>
-        public event Action<uiElement, uiCancellableEvent<KeyboardKeyEventArgs>> KeyPress;
+        public event Action<uiElement, uiCancellableEvent<DomKeyboardKeyEventArgs>> KeyPress;
         /// <summary>
         /// Called whenever a keyboard key is depressed while the element has input-focus
         /// </summary>
-        public event Action<uiElement, KeyboardKeyEventArgs> KeyUp;
+        public event Action<uiElement, DomKeyboardKeyEventArgs> KeyUp;
         /// <summary>
         /// Called whenever a keyboard key is pressed while the element has input-focus
         /// </summary>
-        public event Action<uiElement, KeyboardKeyEventArgs> KeyDown;
+        public event Action<uiElement, DomKeyboardKeyEventArgs> KeyDown;
 #endregion
 
 #region Routed Events
@@ -1714,42 +1714,42 @@ namespace CssUI
         /// Called whenever the mouse releases a button whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<uiElement, MouseButtonEventArgs> MouseUp;
+        public event Action<uiElement, DomMouseButtonEventArgs> MouseUp;
         /// <summary>
         /// Called whenever the mouse presses a button whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<uiElement, MouseButtonEventArgs> MouseDown;
+        public event Action<uiElement, DomMouseButtonEventArgs> MouseDown;
         /// <summary>
         /// Called whenever the element is 'clicked' by the mouse or by keyboard input (pressing ENTER)
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<uiElement, RoutedEventArgs> Clicked;
+        public event Action<uiElement, DomRoutedEventArgs> Clicked;
         /// <summary>
         /// Called whenever the element is 'double clicked' by the mouse or by keyboard input (pressing ENTER)
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<uiElement, RoutedEventArgs> DoubleClicked;
+        public event Action<uiElement, DomRoutedEventArgs> DoubleClicked;
         /// <summary>
         /// Called whenever the mouse clicks the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<uiElement, MouseButtonEventArgs> MouseClick;
+        public event Action<uiElement, DomMouseButtonEventArgs> MouseClick;
         /// <summary>
         /// Called whenever the mouse double clicks the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<uiElement, MouseButtonEventArgs> MouseDoubleClick;
+        public event Action<uiElement, DomMouseButtonEventArgs> MouseDoubleClick;
         /// <summary>
         /// Called whenever the mouse wheel scrolls whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<uiElement, MouseWheelEventArgs> MouseWheel;
+        public event Action<uiElement, DomMouseWheelEventArgs> MouseWheel;
         /// <summary>
         /// Called whenever the mouse moves whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<uiElement, MouseMoveEventArgs> MouseMove;
+        public event Action<uiElement, DomMouseMoveEventArgs> MouseMove;
         /// <summary>
         /// Called whenever the mouse pauses for longer than <see cref="UI_CONSTANTS.HOVER_TIME"/> over the element
         /// </summary>
@@ -1772,7 +1772,7 @@ namespace CssUI
         /// Called whenever the mouse releases a button whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_MouseUp(uiElement Sender, MouseButtonEventArgs Args)
+        public virtual void Handle_MouseUp(uiElement Sender, DomMouseButtonEventArgs Args)
         {
             if (Args.Button == EMouseButton.Left) IsActive = false;
             MouseUp?.Invoke(this, Args);
@@ -1781,7 +1781,7 @@ namespace CssUI
         /// Called whenever the mouse presses a button whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_MouseDown(uiElement Sender, MouseButtonEventArgs Args)
+        public virtual void Handle_MouseDown(uiElement Sender, DomMouseButtonEventArgs Args)
         {
             if (Args.Button == EMouseButton.Left) IsActive = true;
             MouseDown?.Invoke(this, Args);
@@ -1791,7 +1791,7 @@ namespace CssUI
         /// Called whenever the mouse wheel scrolls whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_MouseWheel(uiElement Sender, MouseWheelEventArgs Args)
+        public virtual void Handle_MouseWheel(uiElement Sender, DomMouseWheelEventArgs Args)
         {
             MouseWheel?.Invoke(this, Args);
         }
@@ -1800,7 +1800,7 @@ namespace CssUI
         /// <para>Fires after MouseEnter</para>
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_MouseMove(uiElement Sender, MouseMoveEventArgs Args)
+        public virtual void Handle_MouseMove(uiElement Sender, DomMouseMoveEventArgs Args)
         {
             MouseMove?.Invoke(this, Args);
         }
@@ -1840,7 +1840,7 @@ namespace CssUI
         /// Called whenever the element is 'clicked' by the mouse or by keyboard input (pressing ENTER)
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_Click(uiElement Sender, RoutedEventArgs Args)
+        public virtual void Handle_Click(uiElement Sender, DomRoutedEventArgs Args)
         {
             Clicked?.Invoke(this, Args);
         }
@@ -1848,7 +1848,7 @@ namespace CssUI
         /// Called whenever the element is 'double clicked' by the mouse or by keyboard input (pressing ENTER)
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_DoubleClick(uiElement Sender, RoutedEventArgs Args)
+        public virtual void Handle_DoubleClick(uiElement Sender, DomRoutedEventArgs Args)
         {
             DoubleClicked?.Invoke(this, Args);
         }
@@ -1858,7 +1858,7 @@ namespace CssUI
         /// Two single clicks that occur close enough in time, as determined by the mouse settings of the user's operating system, will generate a MouseDoubleClick event instead of the second MouseClick event.
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_MouseClick(uiElement Sender, MouseButtonEventArgs Args)
+        public virtual void Handle_MouseClick(uiElement Sender, DomMouseButtonEventArgs Args)
         {
             MouseClick?.Invoke(this, Args);
         }
@@ -1866,7 +1866,7 @@ namespace CssUI
         /// Called whenever the mouse double clicks the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_MouseDoubleClick(uiElement Sender, MouseButtonEventArgs Args)
+        public virtual void Handle_MouseDoubleClick(uiElement Sender, DomMouseButtonEventArgs Args)
         {
             MouseDoubleClick?.Invoke(this, Args);
         }
@@ -1878,21 +1878,21 @@ namespace CssUI
         /// <summary>
         /// Fires at the start of the dragging process
         /// </summary>
-        public virtual void Handle_DraggingStart(uiElement Sender, ItemDragEventArgs Args)
+        public virtual void Handle_DraggingStart(uiElement Sender, DomItemDragEventArgs Args)
         {
             DraggingStart?.Invoke(this, Args);
         }
         /// <summary>
         /// Fired as the element is being dragged
         /// </summary>
-        public virtual void Handle_DraggingUpdate(uiElement Sender, ItemDragEventArgs Args)
+        public virtual void Handle_DraggingUpdate(uiElement Sender, DomItemDragEventArgs Args)
         {
             DraggingUpdate?.Invoke(this, Args);
         }
         /// <summary>
         /// Fires when the dragging operation is confirmed (ended without cancelling)
         /// </summary>
-        public virtual void Handle_DraggingConfirm(uiElement Sender, ItemDragEventArgs Args)
+        public virtual void Handle_DraggingConfirm(uiElement Sender, DomItemDragEventArgs Args)
         {
             DraggingConfirm?.Invoke(this, Args);
         }
@@ -1900,7 +1900,7 @@ namespace CssUI
         /// Fires when the dragging operation ends (including being cancelled)
         /// Called AFTER <see cref="Handle_DraggingConfirm"/>
         /// </summary>
-        public virtual void Handle_DraggingEnd(uiElement Sender, ItemDragEventArgs Args)
+        public virtual void Handle_DraggingEnd(uiElement Sender, DomItemDragEventArgs Args)
         {
             DraggingEnd?.Invoke(this, Args);
         }
@@ -1913,42 +1913,42 @@ namespace CssUI
         /// Called whenever the mouse releases a button whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<uiElement, PreviewMouseButtonEventArgs> PreviewMouseUp;
+        public event Action<uiElement, DomPreviewMouseButtonEventArgs> PreviewMouseUp;
         /// <summary>
         /// Called whenever the mouse presses a button whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<uiElement, PreviewMouseButtonEventArgs> PreviewMouseDown;
+        public event Action<uiElement, DomPreviewMouseButtonEventArgs> PreviewMouseDown;
         /// <summary>
         /// Called whenever the element is 'clicked' by the mouse or by keyboard input (pressing ENTER)
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<uiElement, PreviewEventArgs> PreviewClicked;
+        public event Action<uiElement, DomPreviewEventArgs> PreviewClicked;
         /// <summary>
         /// Called whenever the element is 'double clicked' by the mouse or by keyboard input (pressing ENTER)
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<uiElement, PreviewEventArgs> PreviewDoubleClicked;
+        public event Action<uiElement, DomPreviewEventArgs> PreviewDoubleClicked;
         /// <summary>
         /// Called whenever the mouse clicks the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<uiElement, PreviewMouseButtonEventArgs> PreviewMouseClick;
+        public event Action<uiElement, DomPreviewMouseButtonEventArgs> PreviewMouseClick;
         /// <summary>
         /// Called whenever the mouse double clicks the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<uiElement, PreviewMouseButtonEventArgs> PreviewMouseDoubleClick;
+        public event Action<uiElement, DomPreviewMouseButtonEventArgs> PreviewMouseDoubleClick;
         /// <summary>
         /// Called whenever the mouse wheel scrolls whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<uiElement, PreviewMouseWheelEventArgs> PreviewMouseWheel;
+        public event Action<uiElement, DomPreviewMouseWheelEventArgs> PreviewMouseWheel;
         /// <summary>
         /// Called whenever the mouse moves whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<uiElement, PreviewMouseMoveEventArgs> PreviewMouseMove;
+        public event Action<uiElement, DomPreviewMouseMoveEventArgs> PreviewMouseMove;
 #endregion
 
 #region Handlers
@@ -1957,7 +1957,7 @@ namespace CssUI
         /// Called whenever the mouse releases a button whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_PreviewMouseUp(uiElement Sender, PreviewMouseButtonEventArgs Args)
+        public virtual void Handle_PreviewMouseUp(uiElement Sender, DomPreviewMouseButtonEventArgs Args)
         {
             Args.Handler = this;
             PreviewMouseUp?.Invoke(this, Args);
@@ -1966,7 +1966,7 @@ namespace CssUI
         /// Called whenever the mouse presses a button whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_PreviewMouseDown(uiElement Sender, PreviewMouseButtonEventArgs Args)
+        public virtual void Handle_PreviewMouseDown(uiElement Sender, DomPreviewMouseButtonEventArgs Args)
         {
             Args.Handler = this;
             PreviewMouseDown?.Invoke(this, Args);
@@ -1976,7 +1976,7 @@ namespace CssUI
         /// Called whenever the mouse wheel scrolls whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_PreviewMouseWheel(uiElement Sender, PreviewMouseWheelEventArgs Args)
+        public virtual void Handle_PreviewMouseWheel(uiElement Sender, DomPreviewMouseWheelEventArgs Args)
         {
             Args.Handler = this;
             PreviewMouseWheel?.Invoke(this, Args);
@@ -1986,7 +1986,7 @@ namespace CssUI
         /// <para>Fires after MouseEnter</para>
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_PreviewMouseMove(uiElement Sender, PreviewMouseMoveEventArgs Args)
+        public virtual void Handle_PreviewMouseMove(uiElement Sender, DomPreviewMouseMoveEventArgs Args)
         {
             Args.Handler = this;
             PreviewMouseMove?.Invoke(this, Args);
@@ -1996,7 +1996,7 @@ namespace CssUI
         /// Called whenever the element is 'clicked' by mouse input or otherwise
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_PreviewClick(uiElement Sender, PreviewEventArgs Args)
+        public virtual void Handle_PreviewClick(uiElement Sender, DomPreviewEventArgs Args)
         {
             Args.Handler = this;
             PreviewClicked?.Invoke(this, Args);
@@ -2005,7 +2005,7 @@ namespace CssUI
         /// Called whenever the element is 'double clicked' by mouse input or otherwise
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_PreviewDoubleClick(uiElement Sender, PreviewEventArgs Args)
+        public virtual void Handle_PreviewDoubleClick(uiElement Sender, DomPreviewEventArgs Args)
         {
             Args.Handler = this;
             PreviewDoubleClicked?.Invoke(this, Args);
@@ -2016,7 +2016,7 @@ namespace CssUI
         /// Two single clicks that occur close enough in time, as determined by the mouse settings of the user's operating system, will generate a MouseDoubleClick event instead of the second MouseClick event.
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_PreviewMouseClick(uiElement Sender, PreviewMouseButtonEventArgs Args)
+        public virtual void Handle_PreviewMouseClick(uiElement Sender, DomPreviewMouseButtonEventArgs Args)
         {
             Args.Handler = this;
             PreviewMouseClick?.Invoke(this, Args);
@@ -2025,7 +2025,7 @@ namespace CssUI
         /// Called whenever the mouse double clicks the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_PreviewMouseDoubleClick(uiElement Sender, PreviewMouseButtonEventArgs Args)
+        public virtual void Handle_PreviewMouseDoubleClick(uiElement Sender, DomPreviewMouseButtonEventArgs Args)
         {
             Args.Handler = this;
             PreviewMouseDoubleClick?.Invoke(this, Args);
@@ -2039,9 +2039,9 @@ namespace CssUI
         /// Called whenever the user presses a character key while the element has input-focus
         /// </summary>
         /// <returns>Continue</returns>
-        public virtual bool Handle_KeyPress(uiElement Sender, KeyboardKeyEventArgs Args)
+        public virtual bool Handle_KeyPress(uiElement Sender, DomKeyboardKeyEventArgs Args)
         {
-            var e = new uiCancellableEvent<KeyboardKeyEventArgs>(Args);
+            var e = new uiCancellableEvent<DomKeyboardKeyEventArgs>(Args);
             KeyPress?.Invoke(this, e);
             if (e.Cancel) return false;
 
@@ -2050,7 +2050,7 @@ namespace CssUI
         /// <summary>
         /// Called whenever a keyboard key is depressed while the element has input-focus
         /// </summary>
-        public virtual bool Handle_KeyUp(uiElement Sender, KeyboardKeyEventArgs Args)
+        public virtual bool Handle_KeyUp(uiElement Sender, DomKeyboardKeyEventArgs Args)
         {
             KeyUp?.Invoke(this, Args);
 
@@ -2059,7 +2059,7 @@ namespace CssUI
         /// <summary>
         /// Called whenever a keyboard key is pressed while the element has input-focus
         /// </summary>
-        public virtual bool Handle_KeyDown(uiElement Sender, KeyboardKeyEventArgs Args)
+        public virtual bool Handle_KeyDown(uiElement Sender, DomKeyboardKeyEventArgs Args)
         {
             KeyDown?.Invoke(this, Args);
 

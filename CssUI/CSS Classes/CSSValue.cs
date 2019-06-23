@@ -173,7 +173,7 @@ namespace CssUI.CSS
         
 
         /// <summary>Create an RGBA color value</summary>
-        public static CSSValue From_Color(uiColor value) { return new CSSValue(EStyleDataType.COLOR, value); }
+        public static CSSValue From_Color(cssColor value) { return new CSSValue(EStyleDataType.COLOR, value); }
 
         /// <summary>Create a string value</summary>
         public static CSSValue From_String(string value) { return new CSSValue(EStyleDataType.STRING, value); }
@@ -571,12 +571,12 @@ namespace CssUI.CSS
         /// Returns the value as a Color4 if possible, or NULL if not possible.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public uiColor AsColor()
+        public cssColor AsColor()
         {
             switch (Type)
             {
                 case EStyleDataType.COLOR:
-                    return ((uiColor)Value);
+                    return ((cssColor)Value);
                 default:
                     return null;
             }
@@ -606,7 +606,7 @@ namespace CssUI.CSS
                 case EStyleDataType.PERCENT:
                     return string.Concat((double)Value, "%");
                 case EStyleDataType.COLOR:
-                    return ((uiColor)Value).ToCssString();
+                    return ((cssColor)Value).ToCssString();
                 case EStyleDataType.STRING:
                     return ((string)Value);
                 default:

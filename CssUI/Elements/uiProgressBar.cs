@@ -9,7 +9,7 @@ namespace CssUI
         #region Values
         float value = 0f;
         public float Value { get { return value; } set { this.value = value; update_bar(); } }
-        public uiColor clrProgBar { get { return bar.ColorBackground; } set { bar.ColorBackground = value; } }
+        public cssColor clrProgBar { get { return bar.ColorBackground; } set { bar.ColorBackground = value; } }
         #endregion
 
         #region Controls
@@ -28,7 +28,7 @@ namespace CssUI
 
             bar = new uiBox("Bar");
             bar.Style.User.Height.Set(CSSValue.Pct_OneHundred);
-            bar.Color = new uiColor(1f, 1f, 1f, 1f);
+            bar.Color = new cssColor(1f, 1f, 1f, 1f);
             Add(bar);
         }
         #endregion

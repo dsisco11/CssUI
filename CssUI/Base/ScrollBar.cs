@@ -116,24 +116,24 @@ namespace CssUI
             // Just so our scrollbars dont have scrollbars by some chance.
             Style.Default.Overflow_X.Value = EOverflowMode.Clip;
             Style.Default.Overflow_Y.Value = EOverflowMode.Clip;
-            ColorBackground = new uiColor(0.1f, 0.1f, 0.1f, 1.0f);
+            ColorBackground = new cssColor(0.1f, 0.1f, 0.1f, 1.0f);
 
 
             Track = new uiTrackBar(Dir, "Track")
             {
-                ColorBackground = new uiColor(0f, 0f, 0f, 0.1f)
+                ColorBackground = new cssColor(0f, 0f, 0f, 0.1f)
             };
             Track.ValueChanged += Slider_ValueChanged;
             Track.MouseClick += Track_onMouseClick;
 
             Btn_dec = new uiButton("Btn_Dec");
             Btn_dec.Style.User.Set_Padding_Implicit(3, 3);
-            Btn_dec.Clicked += (uiElement Sender, RoutedEventArgs Args) => { Value = (Value - StepSize); };
+            Btn_dec.Clicked += (uiElement Sender, DomRoutedEventArgs Args) => { Value = (Value - StepSize); };
             Btn_dec.Set_Svg(CssIcons.close);
 
             Btn_inc = new uiButton("Btn_Inc");
             Btn_inc.Style.User.Set_Padding_Implicit(3, 3);
-            Btn_inc.Clicked += (uiElement Sender, RoutedEventArgs Args) => { Value = (Value + StepSize); };
+            Btn_inc.Clicked += (uiElement Sender, DomRoutedEventArgs Args) => { Value = (Value + StepSize); };
             Btn_inc.Set_Svg(CssIcons.close);
 
             this.Direction = Dir;
@@ -222,7 +222,7 @@ namespace CssUI
 
         #region Events
 
-        private void Track_onMouseClick(uiElement Sender, MouseButtonEventArgs Args)
+        private void Track_onMouseClick(uiElement Sender, DomMouseButtonEventArgs Args)
         {// Whenever the track of the scrollbar is clicked we want to scroll a page-length toward the clicked location on the track
             int rcPos = Track.Get_Major_Dimension(Track.PointToLocal(new ePos(Args.Position)));
             int rtPos = Track.Get_Major_Dimension(Track.PointToLocal(Track.Thumb.Block.Get_Center_Pos()));

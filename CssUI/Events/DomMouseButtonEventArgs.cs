@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CssUI
+﻿namespace CssUI
 {
-    public class MouseButtonEventArgs : RoutedMouseEventArgs
+    public class DomMouseButtonEventArgs : DomRoutedMouseEventArgs
     {
         #region Properties
         /// <summary>
@@ -19,20 +13,20 @@ namespace CssUI
         public readonly bool IsPressed;
         #endregion
 
-        public MouseButtonEventArgs(object Source, int X, int Y, EMouseButton Button, bool IsPressed) : base(Source, X, Y)
+        public DomMouseButtonEventArgs(object Source, int X, int Y, EMouseButton Button, bool IsPressed) : base(Source, X, Y)
         {
             this.Button = Button;
             this.IsPressed = IsPressed;
         }
 
-        public MouseButtonEventArgs(object Source, PreviewMouseButtonEventArgs e) : base(Source, e)
+        public DomMouseButtonEventArgs(object Source, DomPreviewMouseButtonEventArgs e) : base(Source, e)
         {
             this.Button = e.Button;
             this.IsPressed = e.IsPressed;
         }
     }
 
-    public class PreviewMouseButtonEventArgs : PreviewMouseEventArgs
+    public class DomPreviewMouseButtonEventArgs : DomPreviewMouseEventArgs
     {
         #region Properties
         /// <summary>
@@ -45,13 +39,13 @@ namespace CssUI
         public readonly bool IsPressed;
         #endregion
 
-        public PreviewMouseButtonEventArgs(PreviewMouseButtonEventArgs e) : base(e)
+        public DomPreviewMouseButtonEventArgs(DomPreviewMouseButtonEventArgs e) : base(e)
         {
             this.Button = e.Button;
             this.IsPressed = e.IsPressed;
         }
 
-        public PreviewMouseButtonEventArgs(int X, int Y, EMouseButton Button, bool IsPressed) : base(X, Y)
+        public DomPreviewMouseButtonEventArgs(int X, int Y, EMouseButton Button, bool IsPressed) : base(X, Y)
         {
             this.Button = Button;
             this.IsPressed = IsPressed;

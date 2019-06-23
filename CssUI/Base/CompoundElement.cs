@@ -537,7 +537,7 @@ namespace CssUI
         /// <summary>
         /// Called whenever the user presses a character key while the element has input-focus
         /// </summary>
-        public override bool Handle_KeyPress(uiElement Sender, KeyboardKeyEventArgs Args)
+        public override bool Handle_KeyPress(uiElement Sender, DomKeyboardKeyEventArgs Args)
         {
             if (!base.Handle_KeyPress(Sender, Args)) return false;// Abort
             // Pass the event to all applicable child-elements
@@ -553,7 +553,7 @@ namespace CssUI
         /// <summary>
         /// Called whenever a keyboard key is depressed while the element has input-focus
         /// </summary>
-        public override bool Handle_KeyUp(uiElement Sender, KeyboardKeyEventArgs Args)
+        public override bool Handle_KeyUp(uiElement Sender, DomKeyboardKeyEventArgs Args)
         {
             if (!base.Handle_KeyUp(Sender, Args)) return false;// Abort
             // Pass the event to all applicable child-elements
@@ -569,7 +569,7 @@ namespace CssUI
         /// <summary>
         /// Called whenever a keyboard key is pressed while the element has input-focus
         /// </summary>
-        public override bool Handle_KeyDown(uiElement Sender, KeyboardKeyEventArgs Args)
+        public override bool Handle_KeyDown(uiElement Sender, DomKeyboardKeyEventArgs Args)
         {
             if (!base.Handle_KeyDown(Sender, Args)) return false;// Abort
             // Pass the event to all applicable child-elements
