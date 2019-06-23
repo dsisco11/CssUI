@@ -16,70 +16,70 @@ namespace CssUI
         /// Called whenever the mouse releases a button whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        event Action<uiElement, DomMouseButtonEventArgs> MouseUp;
+        event Action<cssElement, DomMouseButtonEventArgs> MouseUp;
         /// <summary>
         /// Called whenever the mouse presses a button whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        event Action<uiElement, DomMouseButtonEventArgs> MouseDown;
+        event Action<cssElement, DomMouseButtonEventArgs> MouseDown;
         /// <summary>
         /// Called whenever the mouse wheel scrolls whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        event Action<uiElement, DomMouseWheelEventArgs> MouseWheel;
+        event Action<cssElement, DomMouseWheelEventArgs> MouseWheel;
         /// <summary>
         /// Called whenever the element is 'clicked' by the mouse or by keyboard input (pressing ENTER)
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        event Action<uiElement, DomRoutedEventArgs> Clicked;
+        event Action<cssElement, DomRoutedEventArgs> Clicked;
         /// <summary>
         /// Called whenever the element is 'double-clicked' by the mouse or by keyboard input (pressing ENTER)
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        event Action<uiElement, DomRoutedEventArgs> DoubleClicked;
+        event Action<cssElement, DomRoutedEventArgs> DoubleClicked;
         /// <summary>
         /// Called whenever the mouse clicks the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        event Action<uiElement, DomMouseButtonEventArgs> MouseClick;
+        event Action<cssElement, DomMouseButtonEventArgs> MouseClick;
         /// <summary>
         /// Called whenever the mouse double clicks the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        event Action<uiElement, DomMouseButtonEventArgs> MouseDoubleClick;
+        event Action<cssElement, DomMouseButtonEventArgs> MouseDoubleClick;
         /// <summary>
         /// Called whenever the mouse moves whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        event Action<uiElement, DomMouseMoveEventArgs> MouseMove;
+        event Action<cssElement, DomMouseMoveEventArgs> MouseMove;
         /// <summary>
         /// Called whenever the mouse pauses for longer than <see cref="UI_CONSTANTS.HOVER_TIME"/> over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        event Action<uiElement> MouseHover;
+        event Action<cssElement> MouseHover;
         /// <summary>
         /// Called whenever the mouse first moves overtop the element
         /// </summary>
-        event Action<uiElement> MouseEnter;
+        event Action<cssElement> MouseEnter;
         /// <summary>
         /// Called whenever the mouse moves off the element
         /// </summary>
-        event Action<uiElement> MouseLeave;
+        event Action<cssElement> MouseLeave;
         #endregion
 
         #region Keyboard Event Delegates
         /// <summary>
         /// Called whenever the user presses a character key while the element has input-focus
         /// </summary>
-        event Action<uiElement, uiCancellableEvent<DomKeyboardKeyEventArgs>> KeyPress;
+        event Action<cssElement, uiCancellableEvent<DomKeyboardKeyEventArgs>> KeyPress;
         /// <summary>
         /// Called whenever a keyboard key is depressed while the element has input-focus
         /// </summary>
-        event Action<uiElement, DomKeyboardKeyEventArgs> KeyUp;
+        event Action<cssElement, DomKeyboardKeyEventArgs> KeyUp;
         /// <summary>
         /// Called whenever a keyboard key is pressed while the element has input-focus
         /// </summary>
-        event Action<uiElement, DomKeyboardKeyEventArgs> KeyDown;
+        event Action<cssElement, DomKeyboardKeyEventArgs> KeyDown;
         #endregion
 
 
@@ -88,76 +88,76 @@ namespace CssUI
         /// Called whenever the mouse releases a button whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        void Handle_MouseUp(uiElement Sender, DomMouseButtonEventArgs Args);
+        void Handle_MouseUp(cssElement Sender, DomMouseButtonEventArgs Args);
         /// <summary>
         /// Called whenever the mouse presses a button whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        void Handle_MouseDown(uiElement Sender, DomMouseButtonEventArgs Args);
+        void Handle_MouseDown(cssElement Sender, DomMouseButtonEventArgs Args);
 
         /// <summary>
         /// Called whenever the element is 'clicked' by the mouse or by keyboard input (pressing ENTER)
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        void Handle_Click(uiElement Sender, DomRoutedEventArgs Args);
+        void Handle_Click(cssElement Sender, DomRoutedEventArgs Args);
 
         /// <summary>
         /// Called whenever the element is 'double-clicked' by the mouse or by keyboard input (pressing ENTER)
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        void Handle_DoubleClick(uiElement Sender, DomRoutedEventArgs Args);
+        void Handle_DoubleClick(cssElement Sender, DomRoutedEventArgs Args);
         /// <summary>
         /// Called whenever the mouse clicks the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        void Handle_MouseClick(uiElement Sender, DomMouseButtonEventArgs Args);
+        void Handle_MouseClick(cssElement Sender, DomMouseButtonEventArgs Args);
         /// <summary>
         /// Called whenever the mouse double clicks the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        void Handle_MouseDoubleClick(uiElement Sender, DomMouseButtonEventArgs Args);
+        void Handle_MouseDoubleClick(cssElement Sender, DomMouseButtonEventArgs Args);
 
         /// <summary>
         /// Called whenever the mouse wheel scrolls whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        void Handle_MouseWheel(uiElement Sender, DomMouseWheelEventArgs Args);
+        void Handle_MouseWheel(cssElement Sender, DomMouseWheelEventArgs Args);
         /// <summary>
         /// Called whenever the mouse moves whilst over the element.
         /// <para>Fires after MouseEnter</para>
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        void Handle_MouseMove(uiElement Sender, DomMouseMoveEventArgs Args);
+        void Handle_MouseMove(cssElement Sender, DomMouseMoveEventArgs Args);
         /// <summary>
         /// Called whenever the mouse rests on the element
         /// <para>Rest delay dictated by <see cref="UI_CONSTANTS.HOVER_TIME"/></para>
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        void Handle_MouseHover(uiElement Sender);
+        void Handle_MouseHover(cssElement Sender);
         /// <summary>
         /// Called whenever the mouse first moves overtop the element.
         /// <para>Fires before MouseMove</para>
         /// </summary>
-        void Handle_MouseEnter(uiElement Sender);
+        void Handle_MouseEnter(cssElement Sender);
         /// <summary>
         /// Called whenever the mouse moves off the element.
         /// </summary>
-        void Handle_MouseLeave(uiElement Sender);
+        void Handle_MouseLeave(cssElement Sender);
         #endregion
 
         #region Keyboard Event Handlers
         /// <summary>
         /// Called whenever the user presses a character key while the element has input-focus
         /// </summary>
-        bool Handle_KeyPress(uiElement Sender, DomKeyboardKeyEventArgs Args);
+        bool Handle_KeyPress(cssElement Sender, DomKeyboardKeyEventArgs Args);
         /// <summary>
         /// Called whenever a keyboard key is depressed while the element has input-focus
         /// </summary>
-        bool Handle_KeyUp(uiElement Sender, DomKeyboardKeyEventArgs Args);
+        bool Handle_KeyUp(cssElement Sender, DomKeyboardKeyEventArgs Args);
         /// <summary>
         /// Called whenever a keyboard key is pressed while the element has input-focus
         /// </summary>
-        bool Handle_KeyDown(uiElement Sender, DomKeyboardKeyEventArgs Args);
+        bool Handle_KeyDown(cssElement Sender, DomKeyboardKeyEventArgs Args);
         #endregion
     }
 

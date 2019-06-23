@@ -13,7 +13,7 @@ namespace CssUI
     /// Represents a Root DOM element which does all the rendering and updating of elements within it.
     /// As well as passing input events to UI elements.
     /// </summary>
-    public abstract class RootElement : ContainerElement
+    public abstract class cssRootElement : cssContainerElement
     {
 
         #region Viewport
@@ -48,13 +48,13 @@ namespace CssUI
         /// <summary>
         /// UI Element that currently has input focus.
         /// </summary>
-        public uiElement FocusedElement { get; private set; } = null;
+        public cssElement FocusedElement { get; private set; } = null;
 
         /// <summary>
         /// Sets the input focus to a specified element
         /// </summary>
         /// <param name="E"></param>
-        public void SetFocus(uiElement E)
+        public void SetFocus(cssElement E)
         {
             if (object.ReferenceEquals(E, FocusedElement)) return;
             if (E.HasFlags(EElementFlags.Focusable))
@@ -67,7 +67,7 @@ namespace CssUI
         /// Removes input focus from a specified element
         /// </summary>
         /// <param name="E"></param>
-        public void Unfocus(uiElement E)
+        public void Unfocus(cssElement E)
         {
             if (object.ReferenceEquals(FocusedElement, E))
             {
@@ -78,7 +78,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public RootElement(IRenderEngine Engine) : base("#Root")
+        public cssRootElement(IRenderEngine Engine) : base("#Root")
         {
             this.Logs = new Logging.LogModule(() => { return Frame.ToString(); });
             this.Engine = Engine;
@@ -124,7 +124,7 @@ namespace CssUI
         }
         #endregion
 
-        private void RootElement_onControl_Removed(uiElement Sender, uiElement E)
+        private void RootElement_onControl_Removed(cssElement Sender, cssElement E)
         {
             if (EnteredElements.ContainsKey(E.UID)) EnteredElements.Remove(E.UID);
         }
@@ -134,12 +134,12 @@ namespace CssUI
         /// <summary>
         /// Maps unique element ID strings to the elements which currently own that ID string
         /// </summary>
-        protected readonly Dictionary<string, uiElement> ID_MAP = new Dictionary<string, uiElement>();
+        protected readonly Dictionary<string, cssElement> ID_MAP = new Dictionary<string, cssElement>();
 
         /// <summary>
         /// Registers an element and it's unique ID in the Root's ID map
         /// </summary>
-        public void Register_Element_ID(string ID, uiElement E)
+        public void Register_Element_ID(string ID, cssElement E)
         {
             if (!ID.StartsWith("#")) ID = string.Concat("#", ID);
             if (ID_MAP.ContainsKey(ID))
@@ -154,7 +154,7 @@ namespace CssUI
         /// <summary>
         /// Unregisters an element and it's unique ID from the Root's ID map
         /// </summary>
-        public void Unregister_Element(uiElement E)
+        public void Unregister_Element(cssElement E)
         {
             string ID = E.ID;
             if (string.IsNullOrEmpty(ID)) return;
@@ -168,11 +168,11 @@ namespace CssUI
         /// </summary>
         /// <param name="ID"></param>
         /// <returns></returns>
-        public uiElement Find_ID(string ID)
+        public cssElement Find_ID(string ID)
         {
             if (!ID.StartsWith("#")) ID = string.Concat("#", ID);
 
-            uiElement e = null;
+            cssElement e = null;
             ID_MAP.TryGetValue(ID, out e);
 
             return e;
@@ -183,7 +183,7 @@ namespace CssUI
         /// </summary>
         /// <param name="ID"></param>
         /// <returns></returns>
-        public Ty Find_ID<Ty>(string ID) where Ty : uiElement
+        public Ty Find_ID<Ty>(string ID) where Ty : cssElement
         {
             return (Ty)Find_ID(ID);
         }
@@ -194,12 +194,12 @@ namespace CssUI
         /// Performs recursive hit tests against a screen-space point until the deepest element intersecting said point is found.
         /// </summary>
         /// <param name="pos">Screen-space point to perform hit testing against</param>
-        uiElement Resolve_ScreenSpace_HitTest(ePos pos)
+        cssElement Resolve_ScreenSpace_HitTest(ePos pos)
         {
-            uiElement last = this;
+            cssElement last = this;
             do
             {
-                uiElement E = last.Get_Hit_Element(pos);
+                cssElement E = last.Get_Hit_Element(pos);
                 if (E == last) return E;
                 last = E;
             }
@@ -211,12 +211,12 @@ namespace CssUI
         /// Performs recursive hit tests against a screen-space point until the deepest element intersecting said point is found.
         /// </summary>
         /// <param name="pos">Screen-space point to perform hit testing against</param>
-        uiElement Resolve_ScreenSpace_HitTest(ePos pos, ref List<uiElement> Path)
+        cssElement Resolve_ScreenSpace_HitTest(ePos pos, ref List<cssElement> Path)
         {
-            uiElement last = this;
+            cssElement last = this;
             do
             {
-                uiElement E = last.Get_Hit_Element(pos);
+                cssElement E = last.Get_Hit_Element(pos);
                 if (E == last) return E;
                 Path.Add(last);
                 last = E;
@@ -229,21 +229,21 @@ namespace CssUI
 
         #region Mouse Handlers
         ePos MouseDragStart = ePos.Zero;
-        uiElement MouseDragTarget = null;
+        cssElement MouseDragTarget = null;
         /// <summary>
         /// Tracks the UID of elements for which the MouseEnter event has fired. Used for determining when to fire the MouseLeave event
         /// </summary>
-        Dictionary<uint, uiElement> EnteredElements = new Dictionary<uint, uiElement>();
+        Dictionary<uint, cssElement> EnteredElements = new Dictionary<uint, cssElement>();
         struct LastClickData { public long Time; public ePos Pos; };
         Dictionary<EMouseButton, LastClickData> LastClick = new Dictionary<EMouseButton, LastClickData>();
 
         protected void Fire_MouseUp(DomPreviewMouseButtonEventArgs e)
         {
-            uiElement Origin = Resolve_ScreenSpace_HitTest(e.Position);
+            cssElement Origin = Resolve_ScreenSpace_HitTest(e.Position);
             Halt_ItemDrag_Operation(e.Position);
             // Perform the tunneling event sequence
             var PreviewArgs = new DomPreviewMouseButtonEventArgs(e);
-            uiElement pE = this;
+            cssElement pE = this;
             do
             {
                 pE.Handle_PreviewMouseUp(pE, PreviewArgs);
@@ -257,7 +257,7 @@ namespace CssUI
 
             // Perform the bubbling event sequence
             var Args = new DomMouseButtonEventArgs(Origin, PreviewArgs) { Source = PreviewArgs.Handler };
-            uiElement E = (uiElement)PreviewArgs.Handler;
+            cssElement E = (cssElement)PreviewArgs.Handler;
             do
             {
                 E.Handle_MouseUp(E, Args);
@@ -268,8 +268,8 @@ namespace CssUI
 
         protected void Fire_MouseDown(DomPreviewMouseButtonEventArgs e)
         {
-            List<uiElement> Path = new List<uiElement>();
-            uiElement Origin = Resolve_ScreenSpace_HitTest(e.Position, ref Path);
+            List<cssElement> Path = new List<cssElement>();
+            cssElement Origin = Resolve_ScreenSpace_HitTest(e.Position, ref Path);
             if (Origin == null)
             {
                 Halt_ItemDrag_Operation(e.Position, true);
@@ -284,7 +284,7 @@ namespace CssUI
 
             // Perform the tunneling event sequence
             var PreviewArgs = new DomPreviewMouseButtonEventArgs(e);
-            uiElement pE = this;
+            cssElement pE = this;
             do
             {
                 pE.Handle_PreviewMouseDown(pE, PreviewArgs);
@@ -298,7 +298,7 @@ namespace CssUI
 
             // Perform the bubbling event sequence
             var Args = new DomMouseButtonEventArgs(Origin, PreviewArgs) { Source = PreviewArgs.Handler };
-            uiElement E = (uiElement)PreviewArgs.Handler;
+            cssElement E = (cssElement)PreviewArgs.Handler;
             do
             {
                 E.Handle_MouseDown(E, Args);
@@ -345,11 +345,11 @@ namespace CssUI
             Mouse.Location.X = e.X;
             Mouse.Location.Y = e.Y;
 
-            List<uiElement> Path = new List<uiElement>();
-            uiElement Origin = Resolve_ScreenSpace_HitTest(e.Position, ref Path);
+            List<cssElement> Path = new List<cssElement>();
+            cssElement Origin = Resolve_ScreenSpace_HitTest(e.Position, ref Path);
             // Perform the tunneling event sequence
             var PreviewArgs = new DomPreviewMouseMoveEventArgs(e);
-            uiElement pE = this;
+            cssElement pE = this;
             do
             {
                 pE.Handle_PreviewMouseMove(pE, PreviewArgs);
@@ -364,7 +364,7 @@ namespace CssUI
 
             // Perform the bubbling event sequence
             var Args = new DomMouseMoveEventArgs(Origin, PreviewArgs) { Source = PreviewArgs.Handler };
-            uiElement E = (uiElement)PreviewArgs.Handler;
+            cssElement E = (cssElement)PreviewArgs.Handler;
             do
             {
                 if (!EnteredElements.ContainsKey(E.UID))
@@ -380,9 +380,9 @@ namespace CssUI
 
             // Perform mouse leave events
             List<uint> Trash = new List<uint>();
-            foreach (KeyValuePair<uint, uiElement> kv in EnteredElements)
+            foreach (KeyValuePair<uint, cssElement> kv in EnteredElements)
             {
-                uiElement tE = kv.Value;
+                cssElement tE = kv.Value;
                 if (object.ReferenceEquals(MouseDragTarget, tE)) continue;
                 if (tE.IsMouseOver)
                 {
@@ -445,9 +445,9 @@ namespace CssUI
         /// </summary>
         protected void Fire_MouseLeave()
         {
-            foreach(KeyValuePair<uint, uiElement> kv in EnteredElements)
+            foreach(KeyValuePair<uint, cssElement> kv in EnteredElements)
             {
-                uiElement E = kv.Value;
+                cssElement E = kv.Value;
                 if (E.IsMouseOver) E.Handle_MouseLeave(E);
             }
             EnteredElements.Clear();
@@ -455,10 +455,10 @@ namespace CssUI
         
         protected void Fire_MouseWheel(DomPreviewMouseWheelEventArgs e)
         {
-            uiElement Origin = Resolve_ScreenSpace_HitTest(e.Position);
+            cssElement Origin = Resolve_ScreenSpace_HitTest(e.Position);
             // Perform the tunneling event sequence
             var PreviewArgs = new DomPreviewMouseWheelEventArgs(e);
-            uiElement pE = this;
+            cssElement pE = this;
             do
             {
                 pE.Handle_PreviewMouseWheel(pE, PreviewArgs);
@@ -472,7 +472,7 @@ namespace CssUI
             if (PreviewArgs.Handled) return;
             // Perform the bubbling event sequence
             var Args = new DomMouseWheelEventArgs(Origin, PreviewArgs) { Source = PreviewArgs.Handler };
-            uiElement E = (uiElement)PreviewArgs.Handler;
+            cssElement E = (cssElement)PreviewArgs.Handler;
             do
             {
                 E.Handle_MouseWheel(E, Args);
@@ -483,10 +483,10 @@ namespace CssUI
         
         protected void Fire_MouseClick(DomPreviewMouseButtonEventArgs e)
         {
-            uiElement Origin = Resolve_ScreenSpace_HitTest(e.Position);
+            cssElement Origin = Resolve_ScreenSpace_HitTest(e.Position);
             // Perform the tunneling event sequence
             var PreviewArgs = new DomPreviewMouseButtonEventArgs(e);
-            uiElement pE = this;
+            cssElement pE = this;
             do
             {
                 if (pE.HasFlags(EElementFlags.Clickable))
@@ -504,7 +504,7 @@ namespace CssUI
 
             // Perform the bubbling event sequence
             var Args = new DomMouseButtonEventArgs(Origin, PreviewArgs) { Source = PreviewArgs.Handler };
-            uiElement E = (uiElement)PreviewArgs.Handler;
+            cssElement E = (cssElement)PreviewArgs.Handler;
             do
             {
                 if (E.HasFlags(EElementFlags.Clickable))
@@ -518,10 +518,10 @@ namespace CssUI
 
         protected void Fire_MouseDoubleClick(DomPreviewMouseButtonEventArgs e)
         {
-            uiElement Origin = Resolve_ScreenSpace_HitTest(e.Position);
+            cssElement Origin = Resolve_ScreenSpace_HitTest(e.Position);
             // Perform the tunneling event sequence
             var PreviewArgs = new DomPreviewMouseButtonEventArgs(e);
-            uiElement pE = this;
+            cssElement pE = this;
             do
             {
                 if (pE.HasFlags(EElementFlags.Clickable))
@@ -545,7 +545,7 @@ namespace CssUI
 
             // Perform the bubbling event sequence
             var Args = new DomMouseButtonEventArgs(Origin, PreviewArgs) { Source = PreviewArgs.Handler };
-            uiElement E = (uiElement)PreviewArgs.Handler;
+            cssElement E = (cssElement)PreviewArgs.Handler;
             do
             {
                 if (E.HasFlags(EElementFlags.Clickable))
@@ -563,12 +563,12 @@ namespace CssUI
             }
             while (E != null && !Args.Handled);
         }
-        protected void Fire_Click(uiElement Origin, List<uiElement> Path)
+        protected void Fire_Click(cssElement Origin, List<cssElement> Path)
         {
-            Stack<uiElement> eStack = new Stack<uiElement>(Path.Count);
+            Stack<cssElement> eStack = new Stack<cssElement>(Path.Count);
             // Perform the tunneling event sequence
             var PreviewArgs = new DomPreviewEventArgs();
-            foreach(uiElement E in Path)
+            foreach(cssElement E in Path)
             {
                 eStack.Push(E);
                 if (E.HasFlags(EElementFlags.Clickable))
@@ -591,12 +591,12 @@ namespace CssUI
                 }
             }
         }
-        protected void Fire_DoubleClick(uiElement Origin, List<uiElement> Path)
+        protected void Fire_DoubleClick(cssElement Origin, List<cssElement> Path)
         {
-            Stack<uiElement> eStack = new Stack<uiElement>(Path.Count);
+            Stack<cssElement> eStack = new Stack<cssElement>(Path.Count);
             // Perform the tunneling event sequence
             var PreviewArgs = new DomPreviewEventArgs();
-            foreach (uiElement E in Path)
+            foreach (cssElement E in Path)
             {
                 eStack.Push(E);
                 if (E.HasFlags(EElementFlags.Clickable) && E.HasFlags(EElementFlags.DoubleClickable))
@@ -660,7 +660,7 @@ namespace CssUI
         /// <para>Fires before MouseMove</para>
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public override void Handle_MouseEnter(uiElement Sender)
+        public override void Handle_MouseEnter(cssElement Sender)
         {
             MouseEnterTime = Environment.TickCount;
             MouseHover_TMR?.Start();
@@ -671,13 +671,13 @@ namespace CssUI
         /// Called whenever the mouse moves off the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public override void Handle_MouseLeave(uiElement Sender)
+        public override void Handle_MouseLeave(cssElement Sender)
         {
             MouseHover_TMR?.Stop();
             base.Handle_MouseLeave(Sender);
         }
 
-        public override void Handle_MouseMove(uiElement Sender, DomMouseMoveEventArgs Args)
+        public override void Handle_MouseMove(cssElement Sender, DomMouseMoveEventArgs Args)
         {
             if (Mouse.Dragging_Target != null)
             {
@@ -691,7 +691,7 @@ namespace CssUI
         #endregion
 
         #region Keyboard Event Handlers
-        public override bool Handle_KeyUp(uiElement Sender, DomKeyboardKeyEventArgs Args)
+        public override bool Handle_KeyUp(cssElement Sender, DomKeyboardKeyEventArgs Args)
         {
         #if DEBUG == true
             if (Args.Key == EKey.F11)

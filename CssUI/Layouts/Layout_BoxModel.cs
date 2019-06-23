@@ -15,7 +15,7 @@ namespace CssUI
         public Layout_BoxModel() { }
         #endregion
         
-        public override eBlock Handle(ICompoundElement Owner, uiElement[] controls)
+        public override eBlock Handle(ICompoundElement Owner, cssElement[] controls)
         {
             eSize MaxArea = Owner.Get_Layout_Area();
             Reset();
@@ -50,7 +50,7 @@ namespace CssUI
 
             if (Line.Count > 0) Start_New_Line();// Make sure our line in progress is added
 
-            Perform_Alignment((Owner as uiElement).Style.TextAlign);
+            Perform_Alignment((Owner as cssElement).Style.TextAlign);
             Finalize_Positions();
 
             return layoutBlock;

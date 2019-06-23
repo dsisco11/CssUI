@@ -21,7 +21,7 @@ namespace CssUI.CSS
         /// <summary>
         /// Returns whether the selector matches a specified element or index
         /// </summary>
-        abstract public bool Matches(uiElement E);
+        abstract public bool Matches(cssElement E);
     }
 
     /// <summary>
@@ -37,14 +37,14 @@ namespace CssUI.CSS
         /// <summary>
         /// Returns whether the selector matches a specified element or index
         /// </summary>
-        override public bool Matches(uiElement E)
+        override public bool Matches(cssElement E)
         {
             return true;
         }
     }
 
     /// <summary>
-    /// A type-selector matches an elements <see cref="uiElement.TypeName"/>
+    /// A type-selector matches an elements <see cref="cssElement.TypeName"/>
     /// </summary>
     public class CssTypeSelector : CssSimpleSelector
     {
@@ -78,7 +78,7 @@ namespace CssUI.CSS
         /// <summary>
         /// Returns whether the selector matches a specified element or index
         /// </summary>
-        override public bool Matches(uiElement E)
+        override public bool Matches(cssElement E)
         {
             // Note: not even sure the UI system will ever HAVE the concept of "namespaces" as those are really for web domain names
             if (Namespace != null)
@@ -179,7 +179,7 @@ namespace CssUI.CSS
         /// <summary>
         /// Returns whether the selector matches a specified element or index
         /// </summary>
-        override public bool Matches(uiElement E)
+        override public bool Matches(cssElement E)
         {
             switch (Operator)
             {
@@ -244,7 +244,7 @@ namespace CssUI.CSS
         /// <summary>
         /// Returns whether the selector matches a specified element or index
         /// </summary>
-        override public bool Matches(uiElement E)
+        override public bool Matches(cssElement E)
         {
             return E.Has_Class(ClassName);
         }
@@ -262,7 +262,7 @@ namespace CssUI.CSS
         /// <summary>
         /// Returns whether the selector matches a specified element or index
         /// </summary>
-        override public bool Matches(uiElement E)
+        override public bool Matches(cssElement E)
         {
             return string.Compare(E.ID.ToLowerInvariant(), MatchID) == 0;
         }
@@ -294,7 +294,7 @@ namespace CssUI.CSS
         /// <summary>
         /// Returns whether the selector matches a specified element or index
         /// </summary>
-        override public bool Matches(uiElement E)
+        override public bool Matches(cssElement E)
         {
             switch (Name)
             {
@@ -338,7 +338,7 @@ namespace CssUI.CSS
         /// <summary>
         /// Returns whether the selector matches a specified element or index
         /// </summary>
-        override public bool Matches(uiElement E)
+        override public bool Matches(cssElement E)
         {
             switch (Name)
             {

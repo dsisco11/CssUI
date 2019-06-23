@@ -23,7 +23,7 @@ namespace CssUI
         #region Values
         public FBlockFlags Flags { get; private set; } = 0;
         /// <summary>
-        /// Tracks whether the block needs to be recalculated, this isnt for this block instance in particular though, more so for removing variable clutter from the <see cref="uiElement"/> class.
+        /// Tracks whether the block needs to be recalculated, this isnt for this block instance in particular though, more so for removing variable clutter from the <see cref="cssElement"/> class.
         /// </summary>
         public bool IsDirty { get { return Flags.HasFlag(FBlockFlags.Dirty); } }
         public bool IsLocked { get { return Flags.HasFlag(FBlockFlags.Locked); } }

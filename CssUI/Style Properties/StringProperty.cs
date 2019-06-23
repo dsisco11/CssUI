@@ -40,7 +40,7 @@ namespace CssUI.CSS
         {
         }
 
-        public StringProperty(string CssName, uiElement Owner, bool Locked, bool Unset, PropertyOptions Options) : base(CssName, Locked, Unset, Owner, new PropertyOptions(Options) { AllowPercentage = false })
+        public StringProperty(string CssName, cssElement Owner, bool Locked, bool Unset, PropertyOptions Options) : base(CssName, Locked, Unset, Owner, new PropertyOptions(Options) { AllowPercentage = false })
         {
         }
 

@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
 namespace CssUI
 {
     /// <summary>
     /// Implements a UI element which allows external code to add elements to it
     /// </summary>
-    public abstract class ContainerElement : ScrollableElement
+    public abstract class cssContainerElement : cssScrollableElement
     {
         #region Constructors
-        public ContainerElement(string ID) : base(ID)
+        public cssContainerElement(string ID) : base(ID)
         {
         }
         #endregion
@@ -21,7 +17,7 @@ namespace CssUI
         /// <summary>
         /// Adds an element to this one
         /// </summary>
-        new public void Add(uiElement element)
+        new public void Add(cssElement element)
         {
             base.Add(element);
         }
@@ -32,7 +28,7 @@ namespace CssUI
         /// <param name="element">The element to be removed</param>
         /// <param name="preserve">If TRUE then the element will not be disposed of immediately</param>
         /// <returns>Success</returns>
-        new public bool Remove(uiElement element, bool preserve = false)
+        new public bool Remove(cssElement element, bool preserve = false)
         {
             return base.Remove(element);
         }
@@ -59,7 +55,7 @@ namespace CssUI
         /// <summary>
         /// Fetches the first child-element matching a given CSS selector
         /// </summary>
-        new public uiElement Get(string Selector)
+        new public cssElement Get(string Selector)
         {
             return Find(Selector).SingleOrDefault();
         }
@@ -67,7 +63,7 @@ namespace CssUI
         /// <summary>
         /// Fetches the first child-element matching a given CSS selector
         /// </summary>
-        new public Ty Get<Ty>(string Selector) where Ty : uiElement
+        new public Ty Get<Ty>(string Selector) where Ty : cssElement
         {
             return (Ty)Find(Selector).SingleOrDefault();
         }

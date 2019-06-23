@@ -15,7 +15,7 @@ namespace CssUI
         const double Ratio_DegToRad = (Math.PI / 180.0);
         const double Ratio_GradToRad = (Math.PI / 200.0);
         const double Ratio_TurnToRad = (Math.PI / 0.5);
-        public static double Get_Scale(uiElement Owner, EStyleUnit Unit)
+        public static double Get_Scale(cssElement Owner, EStyleUnit Unit)
         {
             switch (Unit)
             {

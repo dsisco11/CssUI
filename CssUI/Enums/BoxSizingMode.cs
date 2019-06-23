@@ -3,7 +3,7 @@
 namespace CssUI
 {
     /// <summary>
-    /// Describes all of the box sizing modes <see cref="uiElement"/>'s can use
+    /// Describes all of the box sizing modes <see cref="cssElement"/>'s can use
     /// </summary>
     public enum EBoxSizingMode : int
     {

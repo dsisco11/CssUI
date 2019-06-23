@@ -19,19 +19,19 @@ namespace CssUI
         /// <summary>
         /// Fires at the start of the dragging process
         /// </summary>
-        void Handle_DraggingStart(uiElement Sender, DomItemDragEventArgs Args);
+        void Handle_DraggingStart(cssElement Sender, DomItemDragEventArgs Args);
         /// <summary>
         /// Fired as the element is being dragged
         /// </summary>
-        void Handle_DraggingUpdate(uiElement Sender, DomItemDragEventArgs Args);
+        void Handle_DraggingUpdate(cssElement Sender, DomItemDragEventArgs Args);
         /// <summary>
         /// Fires when the dragging operation is confirmed (ended without cancelling)
         /// </summary>
-        void Handle_DraggingConfirm(uiElement Sender, DomItemDragEventArgs Args);
+        void Handle_DraggingConfirm(cssElement Sender, DomItemDragEventArgs Args);
         /// <summary>
         /// Fires when the dragging operation ends (including being cancelled)
         /// Called AFTER <see cref="Handle_DraggingConfirm"/>
         /// </summary>
-        void Handle_DraggingEnd(uiElement Sender, DomItemDragEventArgs Args);
+        void Handle_DraggingEnd(cssElement Sender, DomItemDragEventArgs Args);
     }
 }

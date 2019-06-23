@@ -9,12 +9,12 @@ namespace CssUI
     /// <summary>
     /// A block level container which displays a title text at the top of itself.
     /// </summary>
-    public class uiHeaderGroup : ContainerElement
+    public class uiHeaderGroup : cssContainerElement
     {
         public override string Default_CSS_TypeName { get { return "GroupBox"; } }
 
         #region Components
-        uiText text;
+        cssTextElement text;
         #endregion
 
         #region Accessors
@@ -31,7 +31,7 @@ namespace CssUI
             Style.User.Display.Set(EDisplayMode.BLOCK);
             Layout = ELayoutMode.Default;
 
-            text = new uiText("Title");
+            text = new cssTextElement("Title");
             text.Style.User.Display.Set(EDisplayMode.BLOCK);
             //text.TextFont = new System.Drawing.Font(text.TextFont.FontFamily, 20);
             Add(text);

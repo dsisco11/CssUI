@@ -18,13 +18,13 @@ namespace CssUI
         /// <summary>
         /// The logical element which should recieve active input focus when it is available for this scope
         /// </summary>
-        public uiElement FocusedElement { get; private set; } = null;
+        public cssElement FocusedElement { get; private set; } = null;
         /// <summary>
         /// Attempts to set logical focus to a specified element
         /// </summary>
         /// <param name="E">The element to set logical focus to</param>
         /// <returns>Focused element</returns>
-        public uiElement Set(uiElement E)
+        public cssElement Set(cssElement E)
         {
             if (E.HasFlags(EElementFlags.Focusable))
             {

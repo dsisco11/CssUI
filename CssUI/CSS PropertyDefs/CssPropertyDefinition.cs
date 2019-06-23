@@ -7,7 +7,7 @@ namespace CssUI.CSS
     public class CssPropertyDefinition
     {// SEE  : https://www.w3.org/TR/CSS2/about.html#property-defs
 
-        public delegate double StyleValuePercentageResolver(uiElement E, double Percent);
+        public delegate double StyleValuePercentageResolver(cssElement E, double Percent);
         #region Properties
         /// <summary>
         /// CSS Name of the property

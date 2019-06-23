@@ -21,7 +21,7 @@ namespace CssUI
         /// <summary>
         /// The UI element which contains this property
         /// </summary>
-        public uiElement Owner { get; protected set; } = null;
+        public cssElement Owner { get; protected set; } = null;
         /// <summary>
         /// The propertys field-name in whatever class is holding it.
         /// <para>If FullName were "Margins.Left" then this would be "Left"</para>
@@ -215,7 +215,7 @@ namespace CssUI
                             break;
                         case EStyleDataType.INHERIT:// SEE:  https://www.w3.org/TR/CSS2/cascade.html#value-def-inherit
                             {
-                                if (Owner is RootElement)// If 'inherit' is set on the root element the property is assigned it's initial value
+                                if (Owner is cssRootElement)// If 'inherit' is set on the root element the property is assigned it's initial value
                                 {
                                     value = Def.Initial;
                                 }
@@ -352,7 +352,7 @@ namespace CssUI
             Update();
         }
 
-        public StyleProperty(string CssName, bool Locked, bool Unset, uiElement Owner, PropertyOptions Options)
+        public StyleProperty(string CssName, bool Locked, bool Unset, cssElement Owner, PropertyOptions Options)
         {
             this.CssName = new AtomicString(CssName);
             this.Owner = Owner;
@@ -411,7 +411,7 @@ namespace CssUI
             Update();
         }
 
-        public StyleProperty(CSSValue initial, uiElement Owner, bool Locked, PropertyOptions Options) : base()
+        public StyleProperty(CSSValue initial, cssElement Owner, bool Locked, PropertyOptions Options) : base()
         {
             this.Owner = Owner;
             this.Options = Options;

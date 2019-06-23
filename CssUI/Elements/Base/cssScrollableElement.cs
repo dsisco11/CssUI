@@ -7,13 +7,13 @@ using CssUI.CSS;
 namespace CssUI
 {
     // TO BE CLEAR: I've kept the implementation of child-controls in a seperate class from the base control class so it is more clear which controls actually support having child-controls
-    // For instance; it wouldnt make sense if a TextArea element could have children now would it?
+    // For instance; it wouldnt make sense if a TextArea element could have children
 
     /// <summary>
     /// Provides the basis for elements that can contain other elements and CAN handle scrolling
-    /// <para>For elements which allow external sources to add child-elements to them use <see cref="ContainerElement"/> instead</para>
+    /// <para>For elements which allow external sources to add child-elements to them use <see cref="cssContainerElement"/> instead</para>
     /// </summary>
-    public abstract class ScrollableElement : CompoundElement
+    public abstract class cssScrollableElement : cssCompoundElement
     {
         #region Blocks
         void Update_ScrollViewport_X()
@@ -78,7 +78,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public ScrollableElement(string ID) : base(ID)
+        public cssScrollableElement(string ID) : base(ID)
         {
         }
         #endregion
@@ -95,7 +95,7 @@ namespace CssUI
         /// <summary>
         /// Occurs when the element is being scrolled.
         /// </summary>
-        public event Action<ScrollableElement, uiScrollBar> onScroll;
+        public event Action<cssScrollableElement, uiScrollBar> onScroll;
         #endregion
 
         #region Scroll Translations
@@ -311,7 +311,7 @@ namespace CssUI
         /// Scrolls the viewport so the specified element is within it.
         /// </summary>
         /// <param name="E"></param>
-        public void ScrollIntoView(uiElement E)
+        public void ScrollIntoView(cssElement E)
         {// TODO: FINISH ScrollIntoView(uiElement) function!
             if (!E.IsChildOf(this)) return;
 
@@ -539,7 +539,7 @@ namespace CssUI
         /// Called whenever the mouse wheel scrolls whilst over the element
         /// </summary>
         /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public override void Handle_MouseWheel(uiElement Sender, DomMouseWheelEventArgs Args)
+        public override void Handle_MouseWheel(cssElement Sender, DomMouseWheelEventArgs Args)
         {
             if (SB_Vertical != null) SB_Vertical.Value = (SB_Vertical.Value - Args.Delta);
             base.Handle_MouseWheel(Sender, Args);

@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 namespace CssUI.Layout
 {
     /// <summary>
-    /// Holds a <see cref="uiElement"/> and it's proposed layout position
+    /// Holds a <see cref="cssElement"/> and it's proposed layout position
     /// </summary>
     public class LineBox_Element
     {
         public ePos Pos;
-        public uiElement Element;
+        public cssElement Element;
 
-        public LineBox_Element(uiElement Element, ePos Pos)
+        public LineBox_Element(cssElement Element, ePos Pos)
         {
             this.Pos = Pos;
             this.Element = Element;

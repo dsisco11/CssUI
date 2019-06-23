@@ -19,7 +19,7 @@ namespace CssUI
         /// <summary>
         /// The element currently being dragged by the mouse
         /// </summary>
-        public uiElement Dragging_Target { get; private set; } = null;
+        public cssElement Dragging_Target { get; private set; } = null;
         public ePos Drag_Start { get; private set; } = null;
         /// <summary>
         /// Tracks the current location the mouse
@@ -31,7 +31,7 @@ namespace CssUI
         /// Starts a dragging operation for the given element
         /// </summary>
         /// <returns>Success</returns>
-        public bool Start_Dragging(uiElement Sender, uiElement Targ, DomItemDragEventArgs Args)
+        public bool Start_Dragging(cssElement Sender, cssElement Targ, DomItemDragEventArgs Args)
         {
             if (IsDragging) return false;
             Dragging_Target = Targ;
@@ -47,7 +47,7 @@ namespace CssUI
         /// </summary>
         /// <param name="Sender">The element that is stopping the operation</param>
         /// <returns>Success</returns>
-        public bool Stop_Dragging(uiElement Sender, DomItemDragEventArgs Args)
+        public bool Stop_Dragging(cssElement Sender, DomItemDragEventArgs Args)
         {
             if (!IsDragging) return false;
 

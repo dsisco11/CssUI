@@ -60,7 +60,7 @@ namespace CssUI
         /// <summary>
         /// The UI element this block belongs to
         /// </summary>
-        public readonly uiElement Element = null;
+        public readonly cssElement Element = null;
         /// <summary>
         /// Specifies what kind of block this is.
         /// </summary>
@@ -97,7 +97,7 @@ namespace CssUI
             this.Width = Width;
             this.Height = Height;
         }
-        public ElementBlock(EBlockType Type, uiElement Owner, ElementPropertySystem Style)
+        public ElementBlock(EBlockType Type, cssElement Owner, ElementPropertySystem Style)
         {
             this.Type = Type;
             this.Element = Owner;

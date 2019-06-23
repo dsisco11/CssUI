@@ -39,7 +39,7 @@ namespace CssUI.CSS
         {
         }
 
-        public NumberProperty(string CssName, uiElement Owner, bool Locked, bool Unset, PropertyOptions Options) : base(CssName, Locked, Unset, Owner, Options)
+        public NumberProperty(string CssName, cssElement Owner, bool Locked, bool Unset, PropertyOptions Options) : base(CssName, Locked, Unset, Owner, Options)
         {
         }
 

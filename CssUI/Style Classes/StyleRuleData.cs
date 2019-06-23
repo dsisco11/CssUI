@@ -243,7 +243,7 @@ namespace CssUI
         /// Creates a new set of element styling properties
         /// </summary>
         /// <param name="Locked">If TRUE then none of this instances property values may be set directly.</param>
-        public StyleRuleData(string Name, uiElement Owner, bool Locked = false) : this(Name, null, Owner, Locked)
+        public StyleRuleData(string Name, cssElement Owner, bool Locked = false) : this(Name, null, Owner, Locked)
         {
         }
 
@@ -251,16 +251,7 @@ namespace CssUI
         /// Creates a new set of element styling properties
         /// </summary>
         /// <param name="Locked">If TRUE then none of this instances property values may be set directly.</param>
-        public StyleRuleData(CssSelector Selector, uiElement Owner, bool Locked = false) : this(null, Selector, Owner, Locked)
-        {
-        }
-
-        /// <summary>
-        /// Creates a new set of element styling properties
-        /// </summary>
-        /// <param name="Locked">If TRUE then none of this instances property values may be set directly.</param>
-        /// <param name="Unset">If TRUE then property values will all be set to <see cref="CSSValue.Null"/>.</param>
-        public StyleRuleData(CssSelector Selector, uiElement Owner, bool Locked = false, bool Unset = false) : this(null, Selector, Owner, Locked, Unset)
+        public StyleRuleData(CssSelector Selector, cssElement Owner, bool Locked = false) : this(null, Selector, Owner, Locked)
         {
         }
 
@@ -269,7 +260,16 @@ namespace CssUI
         /// </summary>
         /// <param name="Locked">If TRUE then none of this instances property values may be set directly.</param>
         /// <param name="Unset">If TRUE then property values will all be set to <see cref="CSSValue.Null"/>.</param>
-        public StyleRuleData(string Name, CssSelector Selector, uiElement Owner, bool Locked = false, bool Unset = false)
+        public StyleRuleData(CssSelector Selector, cssElement Owner, bool Locked = false, bool Unset = false) : this(null, Selector, Owner, Locked, Unset)
+        {
+        }
+
+        /// <summary>
+        /// Creates a new set of element styling properties
+        /// </summary>
+        /// <param name="Locked">If TRUE then none of this instances property values may be set directly.</param>
+        /// <param name="Unset">If TRUE then property values will all be set to <see cref="CSSValue.Null"/>.</param>
+        public StyleRuleData(string Name, CssSelector Selector, cssElement Owner, bool Locked = false, bool Unset = false)
         {
             this.Name = Name;
             this.Selector = Selector;

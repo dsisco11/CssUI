@@ -15,7 +15,7 @@ namespace CssUI.CSS
         /// <summary>
         /// The UI element which contains this property
         /// </summary>
-        public uiElement Owner
+        public cssElement Owner
         {
             set { owner = value; }
             get
@@ -25,7 +25,7 @@ namespace CssUI.CSS
                 return owner;
             }
         }
-        uiElement owner = null;
+        cssElement owner = null;
         public Func<NamedProperty, CSSValue> Inheritance_Resolver;
 
         /// <summary>

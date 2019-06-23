@@ -28,7 +28,7 @@ namespace CssUI.CSS
         {
         }
 
-        public IntProperty(string CssName, uiElement Owner, bool Locked, bool Unset, PropertyOptions Options) : base(CssName, Locked, Unset, Owner, Options)
+        public IntProperty(string CssName, cssElement Owner, bool Locked, bool Unset, PropertyOptions Options) : base(CssName, Locked, Unset, Owner, Options)
         {
         }
 

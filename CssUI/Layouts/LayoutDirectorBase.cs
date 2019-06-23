@@ -24,10 +24,10 @@ namespace CssUI
         /// Historical list of all controls which have been positioned so far
         /// </summary>
         protected List<LineBox> Lines;
-        protected uiElement Previous = null;
+        protected cssElement Previous = null;
         #endregion
 
-        public abstract eBlock Handle(ICompoundElement Owner, uiElement[] controls);
+        public abstract eBlock Handle(ICompoundElement Owner, cssElement[] controls);
 
         protected virtual void Reset()
         {
@@ -56,7 +56,7 @@ namespace CssUI
             Previous = null;
         }
 
-        protected virtual void Add_To_Line(uiElement E, eBlock cBlock, eSize cSize)
+        protected virtual void Add_To_Line(cssElement E, eBlock cBlock, eSize cSize)
         {
             Line.Add(new LineBox_Element(E, new ePos(layoutPos)));
             Previous = E;

@@ -21,7 +21,7 @@ namespace CssUI
         /// <summary>
         /// The UI element which contains this property
         /// </summary>
-        public uiElement Owner { get; protected set; } = null;
+        public cssElement Owner { get; protected set; } = null;
         /// <summary>
         /// The propertys field-name in whatever class is holding it.
         /// </summary>
@@ -193,7 +193,7 @@ namespace CssUI
 
         #region Constructors
         // TODO: Finish the logic for when 'Unset' = TRUE
-        public TransformListProperty(string CssName, uiElement Owner, bool Locked, bool Unset)
+        public TransformListProperty(string CssName, cssElement Owner, bool Locked, bool Unset)
         {
             this.CssName = new AtomicString(CssName);
             this.Owner = Owner;

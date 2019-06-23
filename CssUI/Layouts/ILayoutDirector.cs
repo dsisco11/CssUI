@@ -11,6 +11,6 @@ namespace CssUI
     /// </summary>
     public interface ILayoutDirector
     {
-        eBlock Handle(ICompoundElement parent, uiElement[] list);
+        eBlock Handle(ICompoundElement parent, cssElement[] list);
     }
 }

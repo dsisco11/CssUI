@@ -29,7 +29,7 @@ namespace CssUI
         #endregion
 
         #region Controls
-        IEnumerable<uiElement> Items { get; }
+        IEnumerable<cssElement> Items { get; }
         #endregion
     }
 }

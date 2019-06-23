@@ -13,7 +13,7 @@ namespace CssUI
     /// </summary>
     public interface IStyleProperty
     {
-        uiElement Owner { get; }
+        cssElement Owner { get; }
         /// <summary>
         /// The propertys field-name in whatever class is holding it.
         /// <para>If FullName were "Margins.Left" then this would be "Left"</para>

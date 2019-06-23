@@ -3,7 +3,7 @@ using CssUI.CSS;
 
 namespace CssUI
 {
-    public abstract class uiScrollBar : CompoundElement
+    public abstract class uiScrollBar : cssCompoundElement
     {
         #region Events
         public event Action<uiScrollBar> ValueChanged;
@@ -17,11 +17,11 @@ namespace CssUI
         /// <summary>
         /// Button that increments our value
         /// </summary>
-        protected uiButton Btn_inc;
+        protected cssButtonElement Btn_inc;
         /// <summary>
         /// Button that decrements our value
         /// </summary>
-        protected uiButton Btn_dec;
+        protected cssButtonElement Btn_dec;
         #endregion
 
         #region Variables
@@ -126,14 +126,14 @@ namespace CssUI
             Track.ValueChanged += Slider_ValueChanged;
             Track.MouseClick += Track_onMouseClick;
 
-            Btn_dec = new uiButton("Btn_Dec");
+            Btn_dec = new cssButtonElement("Btn_Dec");
             Btn_dec.Style.User.Set_Padding_Implicit(3, 3);
-            Btn_dec.Clicked += (uiElement Sender, DomRoutedEventArgs Args) => { Value = (Value - StepSize); };
+            Btn_dec.Clicked += (cssElement Sender, DomRoutedEventArgs Args) => { Value = (Value - StepSize); };
             Btn_dec.Set_Svg(CssIcons.close);
 
-            Btn_inc = new uiButton("Btn_Inc");
+            Btn_inc = new cssButtonElement("Btn_Inc");
             Btn_inc.Style.User.Set_Padding_Implicit(3, 3);
-            Btn_inc.Clicked += (uiElement Sender, DomRoutedEventArgs Args) => { Value = (Value + StepSize); };
+            Btn_inc.Clicked += (cssElement Sender, DomRoutedEventArgs Args) => { Value = (Value + StepSize); };
             Btn_inc.Set_Svg(CssIcons.close);
 
             this.Direction = Dir;
@@ -222,7 +222,7 @@ namespace CssUI
 
         #region Events
 
-        private void Track_onMouseClick(uiElement Sender, DomMouseButtonEventArgs Args)
+        private void Track_onMouseClick(cssElement Sender, DomMouseButtonEventArgs Args)
         {// Whenever the track of the scrollbar is clicked we want to scroll a page-length toward the clicked location on the track
             int rcPos = Track.Get_Major_Dimension(Track.PointToLocal(new ePos(Args.Position)));
             int rtPos = Track.Get_Major_Dimension(Track.PointToLocal(Track.Thumb.Block.Get_Center_Pos()));

@@ -8,7 +8,7 @@ namespace CssUI
 {
     /// <summary>
     /// Holds ratio values for both Width/Height and Height/Width
-    /// <para>Used to cause a <see cref="uiElement"/> to maintain a certain aspect ratio</para>
+    /// <para>Used to cause a <see cref="cssElement"/> to maintain a certain aspect ratio</para>
     /// </summary>
     public class SizeRatio
     {

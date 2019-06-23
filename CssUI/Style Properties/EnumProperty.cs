@@ -43,7 +43,7 @@ namespace CssUI.CSS
         {
         }
 
-        public EnumProperty(string CssName, uiElement Owner, bool Locked, bool Unset, PropertyOptions Options) : base(CssName, Locked, Unset, Owner, new PropertyOptions(Options) { AllowPercentage = false })
+        public EnumProperty(string CssName, cssElement Owner, bool Locked, bool Unset, PropertyOptions Options) : base(CssName, Locked, Unset, Owner, new PropertyOptions(Options) { AllowPercentage = false })
         {
         }
 

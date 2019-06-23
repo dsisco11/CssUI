@@ -2,7 +2,7 @@
 
 namespace CssUI
 {
-    public class uiProgressBar : ScrollableElement
+    public class cssProgressBarElement : cssScrollableElement
     {
         public override string Default_CSS_TypeName { get { return "ProgressBar"; } }
 
@@ -13,11 +13,11 @@ namespace CssUI
         #endregion
 
         #region Controls
-        uiBox bar;
+        cssBox bar;
         #endregion
 
         #region Constructors
-        public uiProgressBar(string ID = null) : base(ID)
+        public cssProgressBarElement(string ID = null) : base(ID)
         {
             Style.User.Padding_Top.Set(3);
             Style.User.Padding_Right.Set(3);
@@ -26,7 +26,7 @@ namespace CssUI
 
             Border = new uiBorderStyle(2, 2, 2, 2);
 
-            bar = new uiBox("Bar");
+            bar = new cssBox("Bar");
             bar.Style.User.Height.Set(CSSValue.Pct_OneHundred);
             bar.Color = new cssColor(1f, 1f, 1f, 1f);
             Add(bar);

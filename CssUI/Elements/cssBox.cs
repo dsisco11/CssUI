@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace CssUI
 {
     /// <summary>
     /// Represents a box-control that is used for rendering a solid color.
     /// </summary>
-    public sealed class uiBox : uiElement
+    public sealed class cssBox : cssElement
     {
         public override string Default_CSS_TypeName { get { return "Box"; } }
 
         #region Constuctors
-        public uiBox(string ID = null) : base(ID)
+        public cssBox(string ID = null) : base(ID)
         {
             Color = new cssColor(1f, 0f, 1f, 1f);
         }

@@ -35,7 +35,7 @@ namespace CssUI
     }
 
     /// <summary>
-    /// Holds the style data for a <see cref="uiElement"/>
+    /// Holds the style data for a <see cref="cssElement"/>
     /// </summary>
     public class eStyle
     {

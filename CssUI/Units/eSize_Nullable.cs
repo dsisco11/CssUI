@@ -2,7 +2,7 @@
 namespace CssUI
 {
     /// <summary>
-    /// Holds Nullable Sizing dimensions for a <see cref="uiElement"/>
+    /// Holds Nullable Sizing dimensions for a <see cref="cssElement"/>
     /// </summary>
     public class eSize_Nullable
     {

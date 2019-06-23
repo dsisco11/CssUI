@@ -18,7 +18,7 @@ namespace CssUI.CSS
         /// <summary>
         /// Returns whether the selector matches a specified element or index
         /// </summary>
-        override public bool Matches(uiElement E)
+        override public bool Matches(cssElement E)
         {
             switch (Name)
             {

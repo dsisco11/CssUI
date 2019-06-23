@@ -14,7 +14,7 @@ namespace CssUI
         /// <summary>
         /// The UI element which contains this property
         /// </summary>
-        public uiElement Owner { get; protected set; } = null;
+        public cssElement Owner { get; protected set; } = null;
         /// <summary>
         /// The propertys field-name in whatever class is holding it.
         /// <para>If FullName were "Margins.Left" then this would be "Left"</para>

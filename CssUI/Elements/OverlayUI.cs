@@ -5,7 +5,7 @@ namespace CssUI
     /// <summary>
     /// An CSS element container intended for use in displaying css elements in an isolated container which can be used as an overlay rendered overtop non CSSUI media.
     /// </summary>
-    public class OverlayUI : RootElement
+    public class OverlayUI : cssRootElement
     {
         public override string Default_CSS_TypeName { get { return "OverlayUI"; } }
 

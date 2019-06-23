@@ -12,7 +12,7 @@ namespace CssUI
     /// <summary>
     /// Draws lines of text
     /// </summary>
-    public class uiText : uiElement, ITextElement
+    public class cssTextElement : cssElement, ITextElement
     {
         public override string Default_CSS_TypeName { get { return "Text"; } }
 
@@ -43,7 +43,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public uiText(string ID = null) : base(ID)
+        public cssTextElement(string ID = null) : base(ID)
         {
             Style.User.BoxSizing.Set(EBoxSizingMode.CONTENT);// If the box-sizing mode isn't content then our borders & padding will warp our text because they change the content-area block size and it is no longer the same size as the rendered text!
             Style.User.Display.Set(EDisplayMode.INLINE_BLOCK);

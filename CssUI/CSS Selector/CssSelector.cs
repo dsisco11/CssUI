@@ -14,7 +14,7 @@ namespace CssUI.CSS
     /// <para>
     /// The way we organize our selector hierarchy:
     /// Rather then being forced to wrap a compound-selector within a complex-selector even when the complex one has no combinator,
-    /// We instead define compound and complex selectors as "SelectorFilters" because each of those types is fundamentally just altering a list of <see cref="uiElement"/>s passed to them, removing any items which they don't match.
+    /// We instead define compound and complex selectors as "SelectorFilters" because each of those types is fundamentally just altering a list of <see cref="cssElement"/>s passed to them, removing any items which they don't match.
     /// By doing this we can instead just store a list of those filter objects and simplify things a little bit more.
     /// </para>
     /// </summary>
@@ -27,7 +27,7 @@ namespace CssUI.CSS
         /// <param name="MatchList">A linked-list of all the elements we want to query, we use a linked list because non-matches are removed mid-iteration</param>
         /// <param name="Dir">The order in which matching will be executed</param>
         /// <returns>Matches</returns>
-        public abstract bool Query(LinkedList<uiElement> MatchList, ESelectorMatchingOrder Dir);
+        public abstract bool Query(LinkedList<cssElement> MatchList, ESelectorMatchingOrder Dir);
 
         public abstract List<CssSimpleSelector> Get_Selectors();
     }
@@ -60,10 +60,10 @@ namespace CssUI.CSS
         #endregion
 
         public override List<CssSimpleSelector> Get_Selectors() { return Selectors; }
-        public override bool Query(LinkedList<uiElement> MatchList, ESelectorMatchingOrder Order)
+        public override bool Query(LinkedList<cssElement> MatchList, ESelectorMatchingOrder Order)
         {
             // Filter the matchlist with our simple selectors first
-            LinkedListNode<uiElement> node = MatchList.First;
+            LinkedListNode<cssElement> node = MatchList.First;
             do
             {
                 bool bad = false;// if True then we remove the node from our list
@@ -134,7 +134,7 @@ namespace CssUI.CSS
             this.Combinator = Combinator;
         }
 
-        public override bool Query(LinkedList<uiElement> MatchList, ESelectorMatchingOrder Order)
+        public override bool Query(LinkedList<cssElement> MatchList, ESelectorMatchingOrder Order)
         {
             switch (Order)
             {
@@ -155,7 +155,7 @@ namespace CssUI.CSS
             return true;
         }
 
-        void Apply_Combinator(LinkedList<uiElement> MatchList, ESelectorMatchingOrder Dir)
+        void Apply_Combinator(LinkedList<cssElement> MatchList, ESelectorMatchingOrder Dir)
         {
             // Transform the matchlist using our combinator
             switch (Combinator)
@@ -180,7 +180,7 @@ namespace CssUI.CSS
         {
         }
 
-        public bool Query(LinkedList<uiElement> MatchList, ESelectorMatchingOrder Dir)
+        public bool Query(LinkedList<cssElement> MatchList, ESelectorMatchingOrder Dir)
         {
             foreach(CssComplexSelector Sequence in this)
             {
@@ -230,39 +230,39 @@ namespace CssUI.CSS
     /// </summary>
     public class CssSelectorList : List<SelectorFilterSet>
     {
-        public bool Query(uiElement E)
+        public bool Query(cssElement E)
         {
-            LinkedList<uiElement> List = new LinkedList<uiElement>();
+            LinkedList<cssElement> List = new LinkedList<cssElement>();
             List.AddFirst(E);
 
-            List<uiElement> res = Query(List, ESelectorMatchingOrder.LTR);
+            List<cssElement> res = Query(List, ESelectorMatchingOrder.LTR);
 
             return res.Contains(E);
         }
 
-        public List<uiElement> Query(LinkedList<uiElement> MatchList, ESelectorMatchingOrder Dir)
+        public List<cssElement> Query(LinkedList<cssElement> MatchList, ESelectorMatchingOrder Dir)
         {
             if (this.Count == 1)// Most selectors will just have a single instance
             {
                 this[0].Query(MatchList, Dir);
-                return new List<uiElement>(MatchList);
+                return new List<cssElement>(MatchList);
             }
             else if (this.Count > 1)
             {
                 // If we contain more than a single filter set then the list of matching items we return becomes a collection of any items that were matches by any of our filter sets
-                HashSet<uiElement> retVal = new HashSet<uiElement>();
+                HashSet<cssElement> retVal = new HashSet<cssElement>();
                 foreach (SelectorFilterSet FilterSet in this)
                 {
                     // Create a clone of our initial list that this filter set can alter
-                    var tmpMatchList = new LinkedList<uiElement>(MatchList);
+                    var tmpMatchList = new LinkedList<cssElement>(MatchList);
                     if (!FilterSet.Query(tmpMatchList, Dir)) continue;
-                    foreach (uiElement E in tmpMatchList)
+                    foreach (cssElement E in tmpMatchList)
                     {
                         retVal.Add(E);
                     }
                 }
 
-                return new List<uiElement>(retVal);
+                return new List<cssElement>(retVal);
             }
 
             return null;
@@ -309,10 +309,10 @@ namespace CssUI.CSS
         #endregion
         
         /// <summary>
-        /// Querys the selector against a single <see cref="uiElement"/> to determine if it matches it
+        /// Querys the selector against a single <see cref="cssElement"/> to determine if it matches it
         /// </summary>
         /// <returns>True/False Match</returns>
-        public bool QuerySingle(uiElement E)
+        public bool QuerySingle(cssElement E)
         {
             return Selectors.Query(E);
         }
@@ -320,19 +320,19 @@ namespace CssUI.CSS
         /// <summary>
         /// Querys the selector against all of the elements within the given root elements tree to determine which ones it matches
         /// </summary>
-        public List<uiElement> Query(CompoundElement Root)
+        public List<cssElement> Query(cssCompoundElement Root)
         {
-            LinkedList<uiElement> MatchList = Root.Get_All_Descendants();
+            LinkedList<cssElement> MatchList = Root.Get_All_Descendants();
             return Selectors.Query(MatchList, ESelectorMatchingOrder.LTR).ToList();
         }
 
         /// <summary>
         /// Querys the selector against all of the elements within all of the given root elements trees to determijne which ones it matches
         /// </summary>
-        public List<uiElement> Query(List<CompoundElement> Roots)
+        public List<cssElement> Query(List<cssCompoundElement> Roots)
         {// SEE:  https://drafts.csswg.org/selectors-4/#evaluating-selectors
-            LinkedList<uiElement> MatchList = new LinkedList<uiElement>();
-            foreach(RootElement Root in Roots)
+            LinkedList<cssElement> MatchList = new LinkedList<cssElement>();
+            foreach(cssRootElement Root in Roots)
             {
                 if (Root.Root != Roots[0].Root) throw new Exception("All element trees must belong to the same root element!");
                 Root.Get_All_Descendants(MatchList);

@@ -1,22 +1,15 @@
-﻿using KeyPic.Benchmarking;
-using Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace CssUI
 {
     /// <summary>
     /// CSSUI root container element to which CSS elements may be added.
     /// </summary>
-    public class Document : RootElement
+    public class cssDocument : cssRootElement
     {
         public override string Default_CSS_TypeName { get { return "Document"; } }
 
         #region Constructors
-        public Document(IRenderEngine Engine) : base(Engine)
+        public cssDocument(IRenderEngine Engine) : base(Engine)
         {
             Style.User.Overflow_X.Value = EOverflowMode.Auto;
             Style.User.Overflow_Y.Value = EOverflowMode.Scroll;

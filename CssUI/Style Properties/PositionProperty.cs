@@ -49,7 +49,7 @@ namespace CssUI
             base.onChanged += this.Update;
         }
 
-        public PositionProperty(string CssName, uiElement Owner, bool Locked, bool Unset, PropertyOptions Options) : base(CssName, Locked, Unset, Owner, Options)
+        public PositionProperty(string CssName, cssElement Owner, bool Locked, bool Unset, PropertyOptions Options) : base(CssName, Locked, Unset, Owner, Options)
         {
             base.onChanged += this.Update;
         }

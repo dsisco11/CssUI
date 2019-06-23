@@ -8,9 +8,9 @@ namespace CssUI
 {
     /// <summary>
     /// Describes the basis for an element that contains other elements. This is an abstract class
-    /// PLEASE USE <see cref="ScrollableElement"/> INSTEAD
+    /// PLEASE USE <see cref="cssScrollableElement"/> INSTEAD
     /// </summary>
-    public abstract class CompoundElement : uiElement, ICompoundElement
+    public abstract class cssCompoundElement : cssElement, ICompoundElement
     {
         #region Display
         protected override void Handle_Display_Changed()
@@ -76,7 +76,7 @@ namespace CssUI
         #endregion
 
         #region Set Root
-        public override void Set_Root(RootElement root)
+        public override void Set_Root(cssRootElement root)
         {
             base.Set_Root(root);
             foreach (var C in Children)
@@ -87,7 +87,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public CompoundElement(string ID) : base(ID)
+        public cssCompoundElement(string ID) : base(ID)
         {
             Layout = ELayoutMode.Default;
         }
@@ -143,8 +143,8 @@ namespace CssUI
         #endregion
 
         #region Event Handlers
-        public event Action<uiElement, uiElement> onControl_Added;
-        public event Action<uiElement, uiElement> onControl_Removed;
+        public event Action<cssElement, cssElement> onControl_Added;
+        public event Action<cssElement, cssElement> onControl_Removed;
         #endregion
 
         #region Handle Layout
@@ -201,7 +201,7 @@ namespace CssUI
         {
             int? Left = null, Top = null;
             int? Right = null, Bottom = null;
-            foreach (uiElement C in Children)
+            foreach (cssElement C in Children)
             {
                 if (!Left.HasValue) Left = C.Block.Left;
                 if (!Top.HasValue) Top = C.Block.Top;
@@ -224,36 +224,36 @@ namespace CssUI
 
         #region Children
         public override bool IsEmpty { get { return (Children.Count == 0); } }
-        protected List<uiElement> Children = new List<uiElement>(0);
-        public IEnumerable<uiElement> Items { get { return Children.ToArray(); } }
+        protected List<cssElement> Children = new List<cssElement>(0);
+        public IEnumerable<cssElement> Items { get { return Children.ToArray(); } }
 
         /// <summary>
         /// Appends every element within this element's hierarchy to the given list
         /// </summary>
         /// <returns></returns>
-        internal void Get_All_Descendants(LinkedList<uiElement> List)
+        internal void Get_All_Descendants(LinkedList<cssElement> List)
         {
             // Queue of elements we need to itterate on
-            LinkedList<CompoundElement> Queue = new LinkedList<CompoundElement>();// new LinkedList<CompoundElement>(Children.Where(o => o is CompoundElement) as IEnumerable<CompoundElement>);
+            LinkedList<cssCompoundElement> Queue = new LinkedList<cssCompoundElement>();// new LinkedList<CompoundElement>(Children.Where(o => o is CompoundElement) as IEnumerable<CompoundElement>);
 
             for(int i=0; i<Children.Count; i++)
             {
-                uiElement child = Children[i];
-                if (child is CompoundElement) Queue.AddLast(child as CompoundElement);
+                cssElement child = Children[i];
+                if (child is cssCompoundElement) Queue.AddLast(child as cssCompoundElement);
 
                 List.AddLast(child);
             }
 
 
-            LinkedListNode<CompoundElement> node = Queue.First;
+            LinkedListNode<cssCompoundElement> node = Queue.First;
             do
             {
-                IEnumerable<uiElement> items = node.Value.Items;
-                foreach (uiElement o in items)
+                IEnumerable<cssElement> items = node.Value.Items;
+                foreach (cssElement o in items)
                 {
                     List.AddLast(o);
 
-                    if (o is CompoundElement) Queue.AddLast(o as CompoundElement);
+                    if (o is cssCompoundElement) Queue.AddLast(o as cssCompoundElement);
                 }
                 node = node.Next;
             }
@@ -264,30 +264,30 @@ namespace CssUI
         /// Builds and returns a complete list of every element which descends from this one.
         /// </summary>
         /// <returns></returns>
-        internal LinkedList<uiElement> Get_All_Descendants()
+        internal LinkedList<cssElement> Get_All_Descendants()
         {
-            LinkedList<uiElement> List = new LinkedList<uiElement>();
+            LinkedList<cssElement> List = new LinkedList<cssElement>();
             // Queue of elements we need to itterate on
-            LinkedList<CompoundElement> Queue = new LinkedList<CompoundElement>();// new LinkedList<CompoundElement>(Children.Where(o => o is CompoundElement) as IEnumerable<CompoundElement>);
+            LinkedList<cssCompoundElement> Queue = new LinkedList<cssCompoundElement>();// new LinkedList<CompoundElement>(Children.Where(o => o is CompoundElement) as IEnumerable<CompoundElement>);
 
             for (int i = 0; i < Children.Count; i++)
             {
-                uiElement child = Children[i];
-                if (child is CompoundElement) Queue.AddLast(child as CompoundElement);
+                cssElement child = Children[i];
+                if (child is cssCompoundElement) Queue.AddLast(child as cssCompoundElement);
 
                 List.AddLast(child);
             }
 
 
-            LinkedListNode<CompoundElement> node = Queue.First;
+            LinkedListNode<cssCompoundElement> node = Queue.First;
             do
             {
-                IEnumerable<uiElement> items = node.Value.Items;
-                foreach (uiElement o in items)
+                IEnumerable<cssElement> items = node.Value.Items;
+                foreach (cssElement o in items)
                 {
                     List.AddLast(o);
 
-                    if (o is CompoundElement) Queue.AddLast(o as CompoundElement);
+                    if (o is cssCompoundElement) Queue.AddLast(o as cssCompoundElement);
                 }
                 node = node.Next;
             }
@@ -300,8 +300,8 @@ namespace CssUI
         /// Finds all elements in our hierarchy that match the given selector
         /// </summary>
         /// <param name="Selector_String">CSS selector string</param>
-        /// <returns><see cref="uiElement"/> or <c>NULL</c></returns>
-        public IEnumerable<uiElement> Find(string Selector_String)
+        /// <returns><see cref="cssElement"/> or <c>NULL</c></returns>
+        public IEnumerable<cssElement> Find(string Selector_String)
         {
             if (string.IsNullOrEmpty(Selector_String)) throw new ArgumentNullException("Selector cannot be NULL!");
             // TODO: Implement a full CSS selector parsing system
@@ -311,18 +311,18 @@ namespace CssUI
         /// <summary>
         /// Finds all elements in our hierarchy that match the given selector
         /// </summary>
-        /// <returns><see cref="uiElement"/> or <c>NULL</c></returns>
-        public IEnumerable<uiElement> Find(CssSelector Selector)
+        /// <returns><see cref="cssElement"/> or <c>NULL</c></returns>
+        public IEnumerable<cssElement> Find(CssSelector Selector)
         {
             if (Selector == null) throw new ArgumentNullException("Selector cannot be NULL!");
-            List<uiElement> list = new List<uiElement>();
+            List<cssElement> list = new List<cssElement>();
 
             foreach (var C in Children)
             {
                 if (Selector.QuerySingle(C)) list.Add(C);
-                if (C is CompoundElement)
+                if (C is cssCompoundElement)
                 {
-                    list.AddRange(((CompoundElement)C).Find(Selector));
+                    list.AddRange(((cssCompoundElement)C).Find(Selector));
                 }
             }
 
@@ -332,7 +332,7 @@ namespace CssUI
         /// <summary>
         /// Adds an element to this one
         /// </summary>
-        protected void Add(uiElement element)
+        protected void Add(cssElement element)
         {
             if (Children.Contains(element)) throw new Exception("Cannot add element which is already present!");
             if (Root != null && !string.IsNullOrEmpty(element.ID) && Root.Find_ID(element.ID) != null) throw new Exception("Cannot add element, another element with the same ID already exists!");
@@ -348,7 +348,7 @@ namespace CssUI
         /// <param name="element">The element to be removed</param>
         /// <param name="preserve">If TRUE then the element will not be disposed of immediately</param>
         /// <returns>Success</returns>
-        protected bool Remove(uiElement element, bool preserve = false)
+        protected bool Remove(cssElement element, bool preserve = false)
         {
             if (element == null) return false;
             if (!Children.Contains(element)) return false;
@@ -397,7 +397,7 @@ namespace CssUI
         /// <summary>
         /// Fetches the first child-element matching a given CSS selector
         /// </summary>
-        protected uiElement Get(string Selector)
+        protected cssElement Get(string Selector)
         {
             return Find(Selector).SingleOrDefault();
         }
@@ -405,7 +405,7 @@ namespace CssUI
         /// <summary>
         /// Fetches the first child-element matching a given CSS selector
         /// </summary>
-        protected Ty Get<Ty>(string Selector) where Ty : uiElement
+        protected Ty Get<Ty>(string Selector) where Ty : cssElement
         {
             return (Ty)Find(Selector).SingleOrDefault();
         }
@@ -496,7 +496,7 @@ namespace CssUI
         /// Returns the element which intersects the given screen-space point or NULL if none
         /// </summary>
         /// <param name="pos">Screen-Space point to test for intersection with</param>
-        public override uiElement Get_Hit_Element(ePos pos)
+        public override cssElement Get_Hit_Element(ePos pos)
         {
             for (int i = Children.Count; i > 0; i--)// Traverse backwards to obey drawing order
             {
@@ -515,9 +515,9 @@ namespace CssUI
         /// </summary>
         /// <param name="pos"></param>
         /// <returns></returns>
-        List<uiElement> Get_Children_Hit(ePos pos)
+        List<cssElement> Get_Children_Hit(ePos pos)
         {
-            List<uiElement> list = new List<uiElement>();
+            List<cssElement> list = new List<cssElement>();
             for (int i = Children.Count; i > 0; i--)// Traverse backwards to obey drawing order
             {
                 var C = Children[i - 1];
@@ -537,7 +537,7 @@ namespace CssUI
         /// <summary>
         /// Called whenever the user presses a character key while the element has input-focus
         /// </summary>
-        public override bool Handle_KeyPress(uiElement Sender, DomKeyboardKeyEventArgs Args)
+        public override bool Handle_KeyPress(cssElement Sender, DomKeyboardKeyEventArgs Args)
         {
             if (!base.Handle_KeyPress(Sender, Args)) return false;// Abort
             // Pass the event to all applicable child-elements
@@ -553,7 +553,7 @@ namespace CssUI
         /// <summary>
         /// Called whenever a keyboard key is depressed while the element has input-focus
         /// </summary>
-        public override bool Handle_KeyUp(uiElement Sender, DomKeyboardKeyEventArgs Args)
+        public override bool Handle_KeyUp(cssElement Sender, DomKeyboardKeyEventArgs Args)
         {
             if (!base.Handle_KeyUp(Sender, Args)) return false;// Abort
             // Pass the event to all applicable child-elements
@@ -569,7 +569,7 @@ namespace CssUI
         /// <summary>
         /// Called whenever a keyboard key is pressed while the element has input-focus
         /// </summary>
-        public override bool Handle_KeyDown(uiElement Sender, DomKeyboardKeyEventArgs Args)
+        public override bool Handle_KeyDown(cssElement Sender, DomKeyboardKeyEventArgs Args)
         {
             if (!base.Handle_KeyDown(Sender, Args)) return false;// Abort
             // Pass the event to all applicable child-elements

@@ -1,11 +1,8 @@
 ﻿#if ENABLE_SVG
 using Svg;
 #endif
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using CssUI.Extensions;
 
@@ -14,7 +11,7 @@ namespace CssUI
     /// <summary>
     /// Represents an SVG image element
     /// </summary>
-    public class uiSvg : ReplacedElement
+    public class cssSvgElement : cssReplacedElement
     {
         public override string Default_CSS_TypeName { get { return "Svg"; } }
 
@@ -93,7 +90,7 @@ namespace CssUI
 #endregion
 
 #region Constructors
-        public uiSvg(string ID = null) : base(EReplacedElementType.SVG, ID)
+        public cssSvgElement(string ID = null) : base(EReplacedElementType.SVG, ID)
         {
             Style.Final.ObjectFit.Value = EObjectFit.Contain;
         }

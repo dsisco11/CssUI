@@ -18,7 +18,7 @@ namespace CssUI.CSS
         /// <summary>
         /// Returns whether the selector matches a specified element or index
         /// </summary>
-        override public bool Matches(uiElement E)
+        override public bool Matches(cssElement E)
         {
             switch (Name)
             {
@@ -48,7 +48,7 @@ namespace CssUI.CSS
         /// <summary>
         /// Returns whether the selector matches a specified element or index
         /// </summary>
-        override public bool Matches(uiElement E)
+        override public bool Matches(cssElement E)
         {
             switch (Name)
             {
@@ -76,7 +76,7 @@ namespace CssUI.CSS
         /// <summary>
         /// Returns whether the selector matches a specified element or index
         /// </summary>
-        override public bool Matches(uiElement E)
+        override public bool Matches(cssElement E)
         {
             return false == Selector.Query(E);
         }
@@ -88,7 +88,7 @@ namespace CssUI.CSS
         /// Performs matching against the 'drop' function
         /// </summary>
         /// <returns></returns>
-        public static bool Drop(uiElement E, List<CssToken> Args)
+        public static bool Drop(cssElement E, List<CssToken> Args)
         {
             if (Args == null || Args.Count <= 0)
             {// :drop

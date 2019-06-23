@@ -17,14 +17,14 @@ namespace CssUI
     /// <summary>
     /// Represents a UI element which functions as a clickable button and can have an image, text, or both
     /// </summary>
-    public class uiButton : ScrollableElement, IGenericGraphic, ITextElement
+    public class cssButtonElement : cssScrollableElement, IGenericGraphic, ITextElement
     {
         public override string Default_CSS_TypeName { get { return "Button"; } }
         public EReplacedElementType ImageType { get { return (gfx!=null ? gfx.Kind : EReplacedElementType.NONE); } }
 
         #region Components
-        uiText txt;
-        ReplacedElement gfx;
+        cssTextElement txt;
+        cssReplacedElement gfx;
         #endregion
 
         #region Text Accessors
@@ -38,7 +38,7 @@ namespace CssUI
         {
             if (txt == null)
             {
-                txt = new uiText("Text");
+                txt = new cssTextElement("Text");
                 Add(txt);
                 update_component_order();
             }
@@ -72,7 +72,7 @@ namespace CssUI
             if (gfx != null && gfx.Kind != EReplacedElementType.IMAGE) { Remove(gfx); gfx = null; }
             if (gfx == null)
             {
-                gfx = new uiImage("Image");
+                gfx = new cssImageElement("Image");
                 gfx.Style.User.Set_SizeMax_Implicit(CSSValue.Pct_OneHundred, CSSValue.Pct_OneHundred);
                 Add(gfx);
                 update_component_order();
@@ -88,7 +88,7 @@ namespace CssUI
         public void Set_Svg(string markup)
         {
             ensure_svg();
-            ((uiSvg)gfx).Set_SVG(markup);
+            ((cssSvgElement)gfx).Set_SVG(markup);
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace CssUI
         public void Set_Svg(byte[] bytes)
         {
             ensure_svg();
-            ((uiSvg)gfx).Set_SVG(bytes);
+            ((cssSvgElement)gfx).Set_SVG(bytes);
         }
 
         /// <summary>
@@ -106,13 +106,13 @@ namespace CssUI
         public void Set_Svg(Stream stream)
         {
             ensure_svg();
-            ((uiSvg)gfx).Set_SVG(stream);
+            ((cssSvgElement)gfx).Set_SVG(stream);
         }
 
         public void Clear_Svg()
         {
             ensure_svg();
-            ((uiSvg)gfx).Clear_SVG();
+            ((cssSvgElement)gfx).Clear_SVG();
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace CssUI
             if (gfx!=null && gfx.Kind != EReplacedElementType.SVG) { Remove(gfx); gfx = null; }
             if (gfx == null)
             {
-                gfx = new uiSvg("Svg");
+                gfx = new cssSvgElement("Svg");
                 gfx.Style.User.Set_SizeMax_Implicit(CSSValue.Pct_OneHundred, CSSValue.Pct_OneHundred);
                 Add(gfx);
                 update_component_order();
@@ -161,7 +161,7 @@ namespace CssUI
         }
         
         #region Constructors
-        public uiButton(string ID = null) : base(ID)
+        public cssButtonElement(string ID = null) : base(ID)
         {
             Flags_Remove(EElementFlags.DoubleClickable);// Button elements cannot process double click events, we just want normal click events instead.
         }

@@ -2,7 +2,7 @@
 namespace CssUI
 {
     /// <summary>
-    /// Holds Sizing dimensions for a <see cref="uiElement"/>
+    /// Holds Sizing dimensions for a <see cref="cssElement"/>
     /// </summary>
     public class eSize
     {

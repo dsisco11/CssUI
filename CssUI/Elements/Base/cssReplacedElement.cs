@@ -6,7 +6,7 @@ namespace CssUI
     /// A replaced element is one whose content has intrinsic dimensions and thus needs to be drawn and sized differently.
     /// <para>Intrinsic dimensions here means that the Width/Height is defined by the content itself and not what the element imposes, Eg: images</para>
     /// </summary>
-    public abstract class ReplacedElement : uiElement
+    public abstract class cssReplacedElement : cssElement
     {
         static eSize Default_Object_Size = new eSize(255, 255);
         public readonly EReplacedElementType Kind = EReplacedElementType.NONE;
@@ -34,7 +34,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public ReplacedElement(EReplacedElementType Kind, string ID = null) : base(ID)
+        public cssReplacedElement(EReplacedElementType Kind, string ID = null) : base(ID)
         {
             this.Kind = Kind;
         }

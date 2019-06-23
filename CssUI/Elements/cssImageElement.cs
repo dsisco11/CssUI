@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace CssUI
 {
     /// <summary>
     /// Represents an image rendered by the OpenGL UI system
     /// </summary>
-    public class uiImage : ReplacedElement, IImageElement
+    public class cssImageElement : cssReplacedElement, IImageElement
     {
         public override string Default_CSS_TypeName { get { return "Image"; } }
         public override bool IsEmpty { get { return (Texture == null); } }
@@ -44,7 +39,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public uiImage(string Name = null) : base(EReplacedElementType.IMAGE, Name)
+        public cssImageElement(string Name = null) : base(EReplacedElementType.IMAGE, Name)
         {
             Style.User.ObjectFit.Value = EObjectFit.Contain;
         }

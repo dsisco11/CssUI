@@ -2,7 +2,7 @@
 namespace CssUI
 {
     /// <summary>
-    /// Holds the Positioning coordinates for a <see cref="uiElement"/>
+    /// Holds the Positioning coordinates for a <see cref="cssElement"/>
     /// </summary>
     public class ePos
     {

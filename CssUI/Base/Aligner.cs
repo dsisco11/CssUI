@@ -16,14 +16,14 @@ namespace CssUI
         #region Values
         private cPosDir Dir;
         private int Offset = 0;
-        private WeakReference<uiElement> Owner, Target;
+        private WeakReference<cssElement> Owner, Target;
         #endregion
 
         #region Constructors
-        public uiAligner(uiElement Owner, uiElement Target, int Offset, cPosDir Dir)
+        public uiAligner(cssElement Owner, cssElement Target, int Offset, cPosDir Dir)
         {
-            this.Owner = new WeakReference<uiElement>(Owner);
-            this.Target = new WeakReference<uiElement>(Target);
+            this.Owner = new WeakReference<cssElement>(Owner);
+            this.Target = new WeakReference<cssElement>(Target);
             this.Offset = Offset;
             this.Dir = Dir;
 
@@ -42,7 +42,7 @@ namespace CssUI
         {
             if (Target != null)
             {
-                uiElement targ;
+                cssElement targ;
                 if (Target.TryGetTarget(out targ))
                 {
                     targ.onMoved -= onTargetMoved;
@@ -50,27 +50,27 @@ namespace CssUI
             }
         }
 
-        uiElement Get_Owner()
+        cssElement Get_Owner()
         {
-            uiElement C = null;
+            cssElement C = null;
             if (Owner == null) return null;
             if (!Owner.TryGetTarget(out C)) return null;
 
             return C;
         }
 
-        uiElement Get_Target()
+        cssElement Get_Target()
         {
-            uiElement C = null;
+            cssElement C = null;
             if (Target == null) return null;
             if (!Target.TryGetTarget(out C)) return null;
 
             return C;
         }
 
-        void onTargetMoved(uiElement Target, ePos oPos, ePos nPos)
+        void onTargetMoved(cssElement Target, ePos oPos, ePos nPos)
         {
-            uiElement Owner = Get_Owner();
+            cssElement Owner = Get_Owner();
             if (Owner == null) throw new ArgumentNullException("Owning control has dissapeared!");
 
             /*
@@ -94,7 +94,7 @@ namespace CssUI
 
         public void Apply_Relative()
         {
-            uiElement Owner = Get_Owner();
+            cssElement Owner = Get_Owner();
             if (Owner == null) throw new ArgumentNullException("Owning control has dissapeared!");
 
             /*
@@ -122,7 +122,7 @@ namespace CssUI
             */
         }
 
-        public bool Equals(uiElement targ, float off, cPosDir d)
+        public bool Equals(cssElement targ, float off, cPosDir d)
         {
             return (Get_Target() == targ && MathExt.floatEq(this.Offset, off) && this.Dir == d);
         }

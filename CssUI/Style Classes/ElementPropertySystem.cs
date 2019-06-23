@@ -38,7 +38,7 @@ namespace CssUI
         /// </summary>
         public void Flag() { NeedsResolving = true; }
 
-        private readonly uiElement Owner;
+        private readonly cssElement Owner;
         #endregion
 
         #region Current Values
@@ -282,7 +282,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public ElementPropertySystem(uiElement Owner)
+        public ElementPropertySystem(cssElement Owner)
         {
             this.Owner = Owner;
             Default = NewProperties("Default", "", Owner, false);// Holds the values assigned to properties by default for the owning element...
@@ -299,7 +299,7 @@ namespace CssUI
         }
         #endregion
 
-        private StyleRuleData NewProperties(string Name, string Selector, uiElement Owner, bool Unset)
+        private StyleRuleData NewProperties(string Name, string Selector, cssElement Owner, bool Unset)
         {
             var retVal = new StyleRuleData(Name, new CssSelector(false, Selector), Owner, false, Unset);
             // Capture all update events.
@@ -467,7 +467,7 @@ namespace CssUI
         /// </summary>
         /// <param name="Sender"></param>
         /// <param name="Target"></param>
-        internal void Update_Inherited(uiElement Sender, IStyleProperty Target)
+        internal void Update_Inherited(cssElement Sender, IStyleProperty Target)
         {
             IStyleProperty prop = Final.Get(Target);
             if (prop.IsInherited)
@@ -517,7 +517,7 @@ namespace CssUI
         #endregion
 
 
-        public void Resolve(uiElement E = null)
+        public void Resolve(cssElement E = null)
         {
             if (E == null)
             {
@@ -675,7 +675,7 @@ namespace CssUI
             if (lh.HasValue) LineHeight = lh.Value;
         }
 
-        public void Resolve_Border_Size(uiElement E, CSSValue Top, CSSValue Right, CSSValue Bottom, CSSValue Left, out int outTop, out int outRight, out int outBottom, out int outLeft)
+        public void Resolve_Border_Size(cssElement E, CSSValue Top, CSSValue Right, CSSValue Bottom, CSSValue Left, out int outTop, out int outRight, out int outBottom, out int outLeft)
         {
             outTop = (Final.Border_Top_Style.Computed == CSSValue.None ? 0 : (int)Top.Resolve_Or_Default(0));
             outRight = (Final.Border_Right_Style.Computed == CSSValue.None ? 0 : (int)Right.Resolve_Or_Default(0));
@@ -705,7 +705,7 @@ namespace CssUI
         /// <param name="Margin_Right"></param>
         /// <param name="Margin_Bottom"></param>
         /// <param name="Margin_Left"></param>
-        public void Resolve_Margin(uiElement E, CSSValue Top, CSSValue Right, CSSValue Bottom, CSSValue Left, out int Margin_Top, out int Margin_Right, out int Margin_Bottom, out int Margin_Left)
+        public void Resolve_Margin(cssElement E, CSSValue Top, CSSValue Right, CSSValue Bottom, CSSValue Left, out int Margin_Top, out int Margin_Right, out int Margin_Bottom, out int Margin_Left)
         {
             int? left = 0, top = 0, right = 0, bottom = 0;
             
@@ -776,7 +776,7 @@ namespace CssUI
         /// <param name="Padding_Right"></param>
         /// <param name="Padding_Bottom"></param>
         /// <param name="Padding_Left"></param>
-        public void Resolve_Padding(uiElement E, CSSValue Top, CSSValue Right, CSSValue Bottom, CSSValue Left, out int Padding_Top, out int Padding_Right, out int Padding_Bottom, out int Padding_Left)
+        public void Resolve_Padding(cssElement E, CSSValue Top, CSSValue Right, CSSValue Bottom, CSSValue Left, out int Padding_Top, out int Padding_Right, out int Padding_Bottom, out int Padding_Left)
         {
             /*
             int? left = 0, top = 0, right = 0, bottom = 0;
@@ -811,7 +811,7 @@ namespace CssUI
         /// <param name="minHeight"></param>
         /// <param name="Min_Width"></param>
         /// <param name="Min_Height"></param>
-        public void Resolve_MinSize(uiElement E, CSSValue minWidth, CSSValue minHeight, out int Min_Width, out int Min_Height)
+        public void Resolve_MinSize(cssElement E, CSSValue minWidth, CSSValue minHeight, out int Min_Width, out int Min_Height)
         {
             int? width = 0, height = 0;
 
@@ -833,7 +833,7 @@ namespace CssUI
         /// </summary>
         /// <param name="E"></param>
         /// <param name="minWidth"></param>
-        public int Resolve_MinSize_Width(uiElement E, CSSValue minWidth)
+        public int Resolve_MinSize_Width(cssElement E, CSSValue minWidth)
         {
             int? width = 0;
             width = (int?)minWidth.Resolve(E.Block_Containing.Width);
@@ -846,7 +846,7 @@ namespace CssUI
         /// </summary>
         /// <param name="E"></param>
         /// <param name="minHeight"></param>
-        public int Resolve_MinSize_Height(uiElement E, CSSValue minHeight)
+        public int Resolve_MinSize_Height(cssElement E, CSSValue minHeight)
         {
             int? height = 0;
 
@@ -863,7 +863,7 @@ namespace CssUI
         /// <param name="maxHeight"></param>
         /// <param name="Max_Width"></param>
         /// <param name="Max_Height"></param>
-        public void Resolve_MaxSize(uiElement E, CSSValue maxWidth, CSSValue maxHeight, out int? Max_Width, out int? Max_Height)
+        public void Resolve_MaxSize(cssElement E, CSSValue maxWidth, CSSValue maxHeight, out int? Max_Width, out int? Max_Height)
         {
             int? width = 0, height = 0;
 
@@ -906,7 +906,7 @@ namespace CssUI
         /// </summary>
         /// <param name="E"></param>
         /// <param name="maxWidth"></param>
-        public int? Resolve_MaxSize_Width(uiElement E, CSSValue maxWidth)
+        public int? Resolve_MaxSize_Width(cssElement E, CSSValue maxWidth)
         {
             int? width = 0;
 
@@ -937,7 +937,7 @@ namespace CssUI
         /// </summary>
         /// <param name="E"></param>
         /// <param name="maxWidth"></param>
-        public int? Resolve_MaxSize_Height(uiElement E, CSSValue maxHeight)
+        public int? Resolve_MaxSize_Height(cssElement E, CSSValue maxHeight)
         {
             int? height = 0;
             
@@ -971,7 +971,7 @@ namespace CssUI
         /// <param name="weight"></param>
         /// <param name="Width"></param>
         /// <param name="Height"></param>
-        public void Resolve_Size(uiElement E, CSSValue Width, CSSValue Height, out int outWidth, out int outHeight)
+        public void Resolve_Size(cssElement E, CSSValue Width, CSSValue Height, out int outWidth, out int outHeight)
         {// SEE: https://www.w3.org/TR/css3-box/#width
             outWidth = Resolve_Size_Width(E, Width);
             outHeight = Resolve_Size_Height(E, Height);
@@ -981,7 +981,7 @@ namespace CssUI
         /// Resolves the given Width style value to an absolute value for a specified element
         /// </summary>
         /// <param name="E">The UI element to resolve for</param>
-        public int Resolve_Size_Width(uiElement E, CSSValue Width)
+        public int Resolve_Size_Width(cssElement E, CSSValue Width)
         {// SEE: https://www.w3.org/TR/css3-box/#width
             int? width = Resolve_Size_Width_Nullable(E, Width);
             return (width.HasValue ? Math.Max(0, width.Value) : 0);
@@ -991,7 +991,7 @@ namespace CssUI
         /// Resolves the given Height style value to an absolute value for a specified element
         /// </summary>
         /// <param name="E">The UI element to resolve for</param>
-        public int Resolve_Size_Height(uiElement E, CSSValue Height)
+        public int Resolve_Size_Height(cssElement E, CSSValue Height)
         {
             int? height = Resolve_Size_Height_Nullable(E, Height);
             return (height.HasValue ? Math.Max(0, height.Value) : 0);
@@ -1001,7 +1001,7 @@ namespace CssUI
         /// Resolves the given (INTRINSIC) Width and Height style values to absolute values for a specified element
         /// </summary>
         /// <param name="E">The UI element to resolve for</param>
-        public void Resolve_Intrinsic_Size(uiElement E, CSSValue Width, CSSValue Height, out int? outWidth, out int? outHeight)
+        public void Resolve_Intrinsic_Size(cssElement E, CSSValue Width, CSSValue Height, out int? outWidth, out int? outHeight)
         {
             //Percentage intrinsic widths are first evaluated with respect to the containing block's width, 
             // if that width doesn't itself depend on the replaced element's width. 
@@ -1021,7 +1021,7 @@ namespace CssUI
         /// Resolves the given (INTRINSIC) Width style value to an absolute value for a specified element
         /// </summary>
         /// <param name="E">The UI element to resolve for</param>
-        public int? Resolve_Intrinsic_Width(uiElement E, CSSValue Width)
+        public int? Resolve_Intrinsic_Width(cssElement E, CSSValue Width)
         {
             //Percentage intrinsic widths are first evaluated with respect to the containing block's width, 
             // if that width doesn't itself depend on the replaced element's width. 
@@ -1038,7 +1038,7 @@ namespace CssUI
         /// Resolves the given (INTRINSIC) Height style value to an absolute value for a specified element
         /// </summary>
         /// <param name="E">The UI element to resolve for</param>
-        public int? Resolve_Intrinsic_Height(uiElement E, CSSValue Height)
+        public int? Resolve_Intrinsic_Height(cssElement E, CSSValue Height)
         {
             int? height = (int?)Height.Resolve(E.Block_Containing.Height);
             return height;
@@ -1050,7 +1050,7 @@ namespace CssUI
         /// Resolves the given Width style value to an absolute value for a specified element
         /// </summary>
         /// <param name="E">The UI element to resolve for</param>
-        public int? Resolve_Size_Width_Nullable(uiElement E, CSSValue Width)
+        public int? Resolve_Size_Width_Nullable(cssElement E, CSSValue Width)
         {// SEE: https://www.w3.org/TR/css3-box/#width
             int? width = (int?)Width.Resolve(E.Block_Containing.Width);
             // Resolve all AUTO values
@@ -1069,7 +1069,7 @@ namespace CssUI
         /// Resolves the given Height style value to an absolute value for a specified element
         /// </summary>
         /// <param name="E">The UI element to resolve for</param>
-        public int? Resolve_Size_Height_Nullable(uiElement E, CSSValue Height)
+        public int? Resolve_Size_Height_Nullable(cssElement E, CSSValue Height)
         {
             return (int?)Height.Resolve(E.Block_Containing.Height);
         }
@@ -1087,7 +1087,7 @@ namespace CssUI
         /// <param name="Pos_Right"></param>
         /// <param name="Pos_Bottom"></param>
         /// <param name="Pos_Left"></param>
-        public void Resolve_Offsets(uiElement E, CSSValue Top, CSSValue Right, CSSValue Bottom, CSSValue Left, out int Pos_Top, out int Pos_Right, out int Pos_Bottom, out int Pos_Left)
+        public void Resolve_Offsets(cssElement E, CSSValue Top, CSSValue Right, CSSValue Bottom, CSSValue Left, out int Pos_Top, out int Pos_Right, out int Pos_Bottom, out int Pos_Left)
         {
             int top, right, bottom, left;
             switch (Positioning)
@@ -1177,7 +1177,7 @@ namespace CssUI
         /// <param name="tentative_Height"></param>
         /// <param name="Width"></param>
         /// <param name="Height"></param>
-        internal void Finalize_Element_Size(uiElement E, int tentative_Width, int tentative_Height, out int outWidth, out int outHeight)
+        internal void Finalize_Element_Size(cssElement E, int tentative_Width, int tentative_Height, out int outWidth, out int outHeight)
         {
             // Resolve our Size to absolute integer values
             int resolvedWidth = 0;
@@ -1186,11 +1186,11 @@ namespace CssUI
             if (Display == EDisplayMode.INLINE)
             {
                 // 'auto' values are interpreted differently for a ReplacedElement's size
-                if (E is ReplacedElement)
+                if (E is cssReplacedElement)
                 {
                     if (!E.isChild) throw new Exception("All 'ReplacedElements' MUST be the child of another element!");
                     int? Width = null, Height = null;
-                    var rE = (E as ReplacedElement);
+                    var rE = (E as cssReplacedElement);
                     bool auto_width = (Final.Width.Computed == CSSValue.Auto);
                     bool auto_height = (Final.Height.Computed == CSSValue.Auto);
 
@@ -1278,7 +1278,7 @@ namespace CssUI
         /// <summary>
         /// Resolves the X and Y offset values for a specified element by accounting for the current 'positioning' value and the assigned layout offset
         /// </summary>
-        internal void Resolve_XY(uiElement E, int Top, int Right, int Bottom, int Left, out int X, out int Y)
+        internal void Resolve_XY(cssElement E, int Top, int Right, int Bottom, int Left, out int X, out int Y)
         {
             int x = 0;
             int y = 0;
@@ -1332,14 +1332,14 @@ namespace CssUI
         #endregion
 
         #region Tentative Block Calculation Methods
-        internal static void Get_Tentative_Block(uiElement E, BlockProperties Block)
+        internal static void Get_Tentative_Block(cssElement E, BlockProperties Block)
         {
             switch(E.Style.Positioning)
             {
                 case EPositioning.Fixed:
                 case EPositioning.Absolute:
                     {
-                        if (E is ReplacedElement)
+                        if (E is cssReplacedElement)
                         {
                             Get_Tentative_Abs_Replaced(E, Block);
                         }
@@ -1357,7 +1357,7 @@ namespace CssUI
                         {
                             case EDisplayMode.INLINE:
                                 {
-                                    if (E is ReplacedElement)
+                                    if (E is cssReplacedElement)
                                     {
                                         Get_Tentative_Inline_Or_InlineBlock_Or_Floating_Replaced(E, Block);
                                     }
@@ -1369,7 +1369,7 @@ namespace CssUI
                                 break;
                             case EDisplayMode.INLINE_BLOCK:
                                 {
-                                    if (E is ReplacedElement)
+                                    if (E is cssReplacedElement)
                                     {
                                         Get_Tentative_Inline_Or_InlineBlock_Or_Floating_Replaced(E, Block);
                                     }
@@ -1381,7 +1381,7 @@ namespace CssUI
                                 break;
                             case EDisplayMode.BLOCK:
                                 {
-                                    if (E is ReplacedElement)
+                                    if (E is cssReplacedElement)
                                     {
                                         Get_Tentative_Block_Level_Replaced(E, Block);
                                     }
@@ -1397,12 +1397,12 @@ namespace CssUI
             }
         }
 
-        internal static int Solve_Block_Level_Width_Equality(uiElement E, BlockProperties Block, CSSValue Width, CSSValue Left_Margin, CSSValue Right_Margin)
+        internal static int Solve_Block_Level_Width_Equality(cssElement E, BlockProperties Block, CSSValue Width, CSSValue Left_Margin, CSSValue Right_Margin)
         {
             return (int)(Left_Margin.Resolve_Or_Default(0) + Block.Border_Left + Block.Padding_Left.Resolve_Or_Default(0) + Width.Resolve_Or_Default(0) + Block.Padding_Right.Resolve_Or_Default(0) + Block.Border_Right + Right_Margin.Resolve_Or_Default(0) + E.Scrollbar_Offset.Horizontal);
         }
 
-        internal static int Solve_Abs_Block_Equation(uiElement E, BlockProperties Block, params string[] Targets)
+        internal static int Solve_Abs_Block_Equation(cssElement E, BlockProperties Block, params string[] Targets)
         {
             // Solving following equation dynamically
             // 'left' + 'margin-left' + 'border-left-width' + 'padding-left' + 'width' + 'padding-right' + 'border-right-width' + 'margin-right' + 'right' = width of containing block
@@ -1426,7 +1426,7 @@ namespace CssUI
         /// <summary>
         /// Calculates the used Width and Margin values for an Inline, Non-Replaced element.
         /// </summary>
-        internal static void Get_Tentative_Inline_NonReplaced(uiElement E, BlockProperties Block)
+        internal static void Get_Tentative_Inline_NonReplaced(cssElement E, BlockProperties Block)
         {// SEE:  https://www.w3.org/TR/css3-box/#inline-non-replaced
             
             Block.Width = (Block.Content_Width.HasValue ? CSSValue.From_Int(Block.Content_Width.Value) : CSSValue.Zero);
@@ -1445,7 +1445,7 @@ namespace CssUI
         /// <summary>
         /// Calculates the used Width and Margin values for an Inline, Replaced element.
         /// </summary>
-        internal static void Get_Tentative_Inline_Or_InlineBlock_Or_Floating_Replaced(uiElement E, BlockProperties Block)
+        internal static void Get_Tentative_Inline_Or_InlineBlock_Or_Floating_Replaced(cssElement E, BlockProperties Block)
         {// SEE:  https://www.w3.org/TR/css3-box/#inline-replaced
 
             if (Block.Margin_Left == CSSValue.Auto) Block.Margin_Left = CSSValue.Zero;
@@ -1489,7 +1489,7 @@ namespace CssUI
         /// <summary>
         /// Calculates the used Width and Margin values for a Block-level, Non-Replaced element.
         /// </summary>
-        internal static void Get_Tentative_Block_Level_NonReplaced(uiElement E, BlockProperties Block)
+        internal static void Get_Tentative_Block_Level_NonReplaced(cssElement E, BlockProperties Block)
         {// SEE:  https://www.w3.org/TR/css3-box/#blockwidth
 
             /*
@@ -1549,7 +1549,7 @@ namespace CssUI
         /// <summary>
         /// Calculates the used Width and Margin values for a Block-level, Replaced element.
         /// </summary>
-        internal static void Get_Tentative_Block_Level_Replaced(uiElement E, BlockProperties Block)
+        internal static void Get_Tentative_Block_Level_Replaced(cssElement E, BlockProperties Block)
         {// SEE:  https://www.w3.org/TR/css3-box/#block-level1
 
             BlockProperties orig = new BlockProperties(Block);
@@ -1563,7 +1563,7 @@ namespace CssUI
         /// <summary>
         /// Calculates the used Width and Margin values for a floating, Non-Replaced element.
         /// </summary>
-        internal static void Get_Tentative_Floating_NonReplaced(uiElement E, BlockProperties Block)
+        internal static void Get_Tentative_Floating_NonReplaced(cssElement E, BlockProperties Block)
         {// SEE:  https://www.w3.org/TR/css3-box/#floating
 
             if (Block.Width == CSSValue.Auto) Block.Width = CSSValue.From_Int(Find_Shrink_To_Fit_Width(E, Block));
@@ -1572,7 +1572,7 @@ namespace CssUI
         /// <summary>
         /// Calculates the used Width and Margin values for an Absolutely positioned, Non-Replaced element.
         /// </summary>
-        internal static void Get_Tentative_Abs_NonReplaced(uiElement E, BlockProperties Block)
+        internal static void Get_Tentative_Abs_NonReplaced(cssElement E, BlockProperties Block)
         {// SEE:  https://www.w3.org/TR/css3-box/#abs-non-replaced-width
 
             if (Block.Left == CSSValue.Auto && Block.Width == CSSValue.Auto && Block.Right == CSSValue.Auto)
@@ -1662,7 +1662,7 @@ namespace CssUI
         /// <summary>
         /// Calculates the used Width and Margin values for an Absolutely positioned, Replaced element.
         /// </summary>
-        internal static void Get_Tentative_Abs_Replaced(uiElement E, BlockProperties Block)
+        internal static void Get_Tentative_Abs_Replaced(cssElement E, BlockProperties Block)
         {
             // Width determined using same method as for inline-replaced elements
             BlockProperties tmp = new BlockProperties(Block);
@@ -1718,7 +1718,7 @@ namespace CssUI
         /// <summary>
         /// Calculates the used Width and Margin values for an Inline-Block, Non-Replaced element.
         /// </summary>
-        internal static void Get_Tentative_Inline_Block_NonReplaced(uiElement E, BlockProperties Block)
+        internal static void Get_Tentative_Inline_Block_NonReplaced(cssElement E, BlockProperties Block)
         {// SEE:  https://www.w3.org/TR/css3-box/#lsquo
 
             if (Block.Width == CSSValue.Auto) Block.Width = CSSValue.From_Int(Find_Shrink_To_Fit_Width(E, Block));
@@ -1734,7 +1734,7 @@ namespace CssUI
         #region Standard Sizing Constraints
 
 
-        internal static int Find_Shrink_To_Fit_Width(uiElement E, BlockProperties Block)
+        internal static int Find_Shrink_To_Fit_Width(cssElement E, BlockProperties Block)
         {// SEE:  https://www.w3.org/TR/css3-box/#shrink-to-fit
 
             int width_preferred_min = 0;
