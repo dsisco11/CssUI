@@ -5,7 +5,12 @@ VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSSUI", "CSSUI\CSSUI.csproj", "{0C66602D-0FD6-4D70-826F-07EAFFE6AAC3}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Logging", "C:\CODE\CSharp-XTERM-Logger\Logger\Logging.shproj", "{753BDDAE-60AB-42B6-AECC-CADC369F1B16}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		C:\CODE\CSharp-XTERM-Logger\Logger\Logger.projitems*{753bddae-60ab-42b6-aecc-cadc369f1b16}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
