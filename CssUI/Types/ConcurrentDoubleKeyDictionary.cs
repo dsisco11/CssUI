@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Vault
+namespace CssUI
 {
     public class ConcurrentDoubleKeyDictionary<Key1, Key2, Vty>
     {

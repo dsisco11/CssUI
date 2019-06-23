@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 
-namespace Vault
+namespace CssUI
 {
     public sealed class ConcurrentHashSet<T> : IReadOnlyCollection<T>, ISet<T>
     {

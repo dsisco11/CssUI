@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Vault
+namespace CssUI
 {
     public class AsyncManualResetEvent
     {

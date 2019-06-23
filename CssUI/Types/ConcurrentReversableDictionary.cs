@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 
-namespace Vault
+namespace CssUI
 {
     public class ConcurrentReversableDictionary<Key, Value> : ConcurrentDictionary<Key, Value>
     {

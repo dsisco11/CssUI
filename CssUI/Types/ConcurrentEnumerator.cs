@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Vault
+namespace CssUI
 {
     public sealed class ConcurrentEnumerator<T> : IEnumerator<T>
     {
