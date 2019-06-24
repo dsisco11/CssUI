@@ -635,8 +635,8 @@ namespace CssUI
         #region Font Updating
         void Update_Font(IStyleProperty Sender, StackTrace Stack)
         {
-            DpiX = Final.DpiX.Computed.Value;
-            DpiY = Final.DpiY.Computed.Value;
+            DpiX = (float)Final.DpiX.Computed.Value;
+            DpiY = (float)Final.DpiY.Computed.Value;
             // Resolve 'FontStyle'
             if (Final.FontStyle.Computed.Type == EStyleDataType.INTEGER)
             {
