@@ -161,8 +161,8 @@ namespace CssUI
         public int Border_Bottom_Width { get; private set; } = 0;
         public int Border_Left_Width { get; private set; } = 0;
 
-        public float DpiX { get; private set; }
-        public float DpiY { get; private set; }
+        public float? DpiX { get; private set; }
+        public float? DpiY { get; private set; }
         public UInt16 FontWeight { get; private set; }
         public EFontStyle FontStyle { get; private set; }
         public double FontSize { get; private set; }
@@ -539,6 +539,10 @@ namespace CssUI
         #endregion
 
 
+        /// <summary>
+        /// Resolves the block values
+        /// </summary>
+        /// <param name="E"></param>
         public void Resolve(cssElement E = null)
         {
             if (E == null)
@@ -635,8 +639,8 @@ namespace CssUI
         #region Font Updating
         void Update_Font(IStyleProperty Sender, StackTrace Stack)
         {
-            DpiX = (float)Final.DpiX.Computed.Value;
-            DpiY = (float)Final.DpiY.Computed.Value;
+            DpiX = (float?)Final.DpiX.Computed.Value;
+            DpiY = (float?)Final.DpiY.Computed.Value;
             // Resolve 'FontStyle'
             if (Final.FontStyle.Computed.Type == EStyleDataType.INTEGER)
             {

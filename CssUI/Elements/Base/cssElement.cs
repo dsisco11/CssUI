@@ -1,5 +1,5 @@
 ﻿//#define PRINT_BLOCK_CHANGE_SOURCE
-using Logging;
+using xLog;
 using SixLabors.Fonts;
 using System;
 using System.Collections.Generic;
@@ -44,12 +44,12 @@ namespace CssUI
         /// </summary>
         CacheableValue<string> Cached_FullPath = new CacheableValue<string>();
 
-        protected LogModule Logs
+        protected LogSource Logs
         {
             get
             {
                 if (Root != null) return Root.Logs;
-                else return new LogModule("-");
+                else return new LogSource("-");
             }
         }
 
@@ -459,9 +459,9 @@ namespace CssUI
             if (Debug.Log_Block_Changes)
             {
                 if (Reason == ECssBlockInvalidationReason.Unknown)
-                    Logs.Info(Logging.XTERM.magenta("[Block Change] {0} (UNKNOWN SOURCE!)"), this);
+                    Logs.Info(xLog.XTERM.magenta("[Block Change] {0} (UNKNOWN SOURCE!)"), this);
                 else
-                    Logs.Info(Logging.XTERM.magenta("[Block Change] {0} {1}"), this, Enum.GetName(typeof(ECssBlockInvalidationReason), Reason).ToUpper());
+                    Logs.Info(xLog.XTERM.magenta("[Block Change] {0} {1}"), this, Enum.GetName(typeof(ECssBlockInvalidationReason), Reason).ToUpper());
             }
 #endif
         }
@@ -472,7 +472,7 @@ namespace CssUI
         {
             Block.Flag_Dirty();
 #if DEBUG
-            if (Debug.Log_Block_Changes) Logs.Info(Logging.XTERM.magenta("[Block Change] {0}.{1} => {2}"), this, sender.CssName, sender);
+            if (Debug.Log_Block_Changes) Logs.Info(xLog.XTERM.magenta("[Block Change] {0}.{1} => {2}"), this, sender.CssName, sender);
 #endif
         }
 
@@ -509,7 +509,7 @@ namespace CssUI
                 // if (was_moved || was_resized) Parent?.Flag_Layout_Dirty();
                 Block.Flag_Clean();
 #if DEBUG
-                if (Debug.Log_Block_Changes) Logs.Info(Logging.XTERM.magentaBright("[Block Resolved] {0} <{1}>"), this, Block);
+                if (Debug.Log_Block_Changes) Logs.Info(xLog.XTERM.magentaBright("[Block Resolved] {0} <{1}>"), this, Block);
 #endif
 
                 // Handle resizing and moving events before handling the layout as they might further change it...
@@ -801,9 +801,9 @@ namespace CssUI
             if (Debug.Log_Layout_Changes)
             {
                 if (Reason == ECssBlockInvalidationReason.Unknown)
-                    Logs.Info(Logging.XTERM.cyan("[Layout Flagged] {0} (UNKNOWN SOURCE!)"), this);
+                    Logs.Info(xLog.XTERM.cyan("[Layout Flagged] {0} (UNKNOWN SOURCE!)"), this);
                 else
-                    Logs.Info(Logging.XTERM.cyan("[Layout Flagged] {0} {1}"), this, Enum.GetName(typeof(ECssBlockInvalidationReason), Reason).ToUpper());
+                    Logs.Info(xLog.XTERM.cyan("[Layout Flagged] {0} {1}"), this, Enum.GetName(typeof(ECssBlockInvalidationReason), Reason).ToUpper());
                      
             }
 #endif
@@ -813,7 +813,7 @@ namespace CssUI
         {
             Flag_Layout(ELayoutBit.Dirty);
 #if DEBUG
-            if (Debug.Log_Layout_Changes) Logs.Info(Logging.XTERM.cyan("[Layout Flagged] {0}.{1} => {2}"), this, sender.CssName, sender);
+            if (Debug.Log_Layout_Changes) Logs.Info(xLog.XTERM.cyan("[Layout Flagged] {0}.{1} => {2}"), this, sender.CssName, sender);
 #endif
         }
 
@@ -852,7 +852,7 @@ namespace CssUI
             onLayoutPost?.Invoke(this);
 
 #if DEBUG
-            if (Debug.Log_Layout_Changes) Logs.Info(Logging.XTERM.cyanBright("[Layout Resolved] {0}"), this);
+            if (Debug.Log_Layout_Changes) Logs.Info(xLog.XTERM.cyanBright("[Layout Resolved] {0}"), this);
 #endif
             //Timing.Stop(TMR);
         }
@@ -879,7 +879,14 @@ namespace CssUI
             Indice = (parent!=null ? index : 0);
             if (parent != null) Set_Root(parent.Root);// Passed down from generation to generation!
             Element_Hierarchy_Changed(0);
-            Flag_Containing_Block_Dirty();// Our parent element has been changed, so logically our containing-block is not different from what it was.
+            this.Flag_Containing_Block_Dirty();// Our parent element has been changed, so logically our containing-block is now different from what it was.
+
+            // XXX: Update all style properties marked as 'Inherited'
+            if (this is cssTextElement)
+            {
+                float? value = this.Style.Default.DpiX.Computed.Value;
+                xLog.Log.Debug($"cssTextElement.Style.Default.DpiX.Computed.Value: {value}");
+            }
         }
 
         private ePos last_containerPos = new ePos();
@@ -1127,6 +1134,7 @@ namespace CssUI
 
             Scrollbar_Offset.onChanged += () => { Flag_Block_Dirty(ECssBlockInvalidationReason.Scroll_Offset_Change); };
 
+            // We resolve the style once this element is parented, if we do it before, then it cant access it's parents block for layout and causes a null exception
             Style = new ElementPropertySystem(this);
             Style.Property_Changed += Style_Property_Changed;
 
@@ -1158,7 +1166,7 @@ namespace CssUI
 
             if ((Flags & EPropertyFlags.Visual) != 0)
             {
-                Dirt &= EElementDirtyBit.Visuals;
+                Dirt |= EElementDirtyBit.Visuals;
             }
 
             if ((Flags & EPropertyFlags.Block) != 0)
@@ -1169,7 +1177,7 @@ namespace CssUI
 
             if ((Flags & EPropertyFlags.Font) != 0)
             {
-                Dirt &= EElementDirtyBit.Font;
+                Dirt |= EElementDirtyBit.Font;
                 // Q: Why update the font immediately? Why not wait until next frame when our parent will do it?
                 // A: When a font property changes it means the user is most likely about to change other properties which depend on the font's current values (character dimensions and whatnot)
                 //   In the future immediate font updates can be avoided because the system will naturally handle propogating updates to properties expressed in font based units(ex/ex/ch)
@@ -1219,6 +1227,11 @@ namespace CssUI
                 PerformLayout();
             }
 
+            if (Style.NeedsResolving)
+            {
+                Style.Resolve();
+            }
+
             return retVal;
         }
 #endregion
@@ -1240,7 +1253,7 @@ namespace CssUI
         {
             if(value)
             {
-                Dirt &= EElementDirtyBit.Visuals;
+                Dirt |= EElementDirtyBit.Visuals;
             }
             else
             {

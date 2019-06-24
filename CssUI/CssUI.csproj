@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -15,8 +15,6 @@
     <DefineConstants>TRACE;WINDOWS</DefineConstants>
   </PropertyGroup>
 
-  <Import Project="C:\CODE\CSharp-XTERM-Logger\Logger\Logger.projitems" Label="Shared" />
-
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
     <PackageReference Include="SixLabors.Core" Version="1.0.0-beta0007" />
@@ -26,6 +24,10 @@
 
   <ItemGroup>
     <Folder Include="Types\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\xLog\xLog\xLog.csproj" />
   </ItemGroup>
 
 </Project>

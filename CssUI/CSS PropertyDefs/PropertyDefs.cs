@@ -15,10 +15,11 @@ namespace CssUI.CSS
             new CssPropertyDefinition("display", false, EPropertyFlags.Block, CssValue.From_Enum(EDisplayMode.INLINE_BLOCK));// We differ from the spec because our implementation is for a UI
             new CssPropertyDefinition("box-sizing", false, EPropertyFlags.Block, CssValue.From_Enum(EBoxSizingMode.BORDER));// We differ from the spec because our implementation is for a UI
 
-            new CssPropertyDefinition("opacity", false, EPropertyFlags.Visual, CssValue.From_Number(1));
+            new CssPropertyDefinition("opacity", false, EPropertyFlags.Visual, CssValue.From_Number(1.0));
 
-            new CssPropertyDefinition("dpi-x", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.From_Number(-1.0), (cssElement E, double Pct) => { return (Pct * 72.0); });
-            new CssPropertyDefinition("dpi-y", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.From_Number(-1.0), (cssElement E, double Pct) => { return (Pct * 72.0); });
+            new CssPropertyDefinition("dpi-x", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.Inherit, (cssElement E, double Pct) => { return (Pct * 72.0); });
+            new CssPropertyDefinition("dpi-y", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.Inherit, (cssElement E, double Pct) => { return (Pct * 72.0); });
+
             new CssPropertyDefinition("font-family", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.Null);
             new CssPropertyDefinition("font-weight", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.From_Int(400));
             new CssPropertyDefinition("font-style", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.From_Enum(EFontStyle.Normal));

@@ -44,9 +44,14 @@ namespace CssUI
         #region Constructors
         public cssTextElement(string ID = null) : base(ID)
         {
-            Style.User.BoxSizing.Set(EBoxSizingMode.CONTENT);// If the box-sizing mode isn't content then our borders & padding will warp our text because they change the content-area block size and it is no longer the same size as the rendered text!
-            Style.User.Display.Set(EDisplayMode.INLINE_BLOCK);
+            // If the box-sizing mode isn't content then our borders & padding will warp our text because they change the content-area block size and it is no longer the same size as the rendered text!
+            /*Style.User.BoxSizing.Set(EBoxSizingMode.CONTENT);
+            Style.User.Display.Set(EDisplayMode.INLINE_BLOCK);*/
+            Style.Default.BoxSizing.Set(EBoxSizingMode.CONTENT);
+            Style.Default.Display.Set(EDisplayMode.INLINE_BLOCK);
+
             Style.Property_Changed += Style_Property_Change;
+            Invalidate_Text();
         }
 
         private void Style_Property_Change(IStyleProperty Sender, EPropertyFlags Flags, System.Diagnostics.StackTrace Origin)
@@ -67,15 +72,16 @@ namespace CssUI
         #region Drawing
         protected override void Draw()
         {
-            if (Dirt > 0)
+            if (Dirt != 0)
             {
-                if ((Dirt & EElementDirtyBit.Text) > 0)
+                if ((Dirt & EElementDirtyBit.Text) != 0)
                     Update_Text();
 
-                Dirt = EElementDirtyBit.None;
+                Dirt &= ~EElementDirtyBit.Text;
             }
 
-            if (Texture == null) return;
+            if (Texture == null)
+                return;
             
             Root.Engine.Set_Color(Color);
             Root.Engine.Set_Texture(Texture);
@@ -88,7 +94,7 @@ namespace CssUI
 
         private void Invalidate_Text()
         {
-            Dirt &= EElementDirtyBit.Text;
+            Dirt |= EElementDirtyBit.Text;
         }
         #endregion
 
@@ -104,7 +110,8 @@ namespace CssUI
                 Texture.Dispose();
                 Texture = null;
             }
-            if (Font == null) return;
+            if (Font == null)
+                return;
 
 
             Texture = From_Text_String(text, Font);
@@ -145,7 +152,7 @@ namespace CssUI
 
             GlyphBuilder glyphBuilder = new GlyphBuilder();
             TextRenderer renderer = new TextRenderer(glyphBuilder);
-            RendererOptions style = new RendererOptions(textFont, Style.DpiX, Style.DpiY, PointF.Empty)
+            RendererOptions style = new RendererOptions(textFont, Style.DpiX??0, Style.DpiY??0, PointF.Empty)
             {
                 ApplyKerning = true,
                 TabWidth = 5,

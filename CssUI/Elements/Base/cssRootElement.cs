@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using KeyPic.Benchmarking;
 using CssUI.CSS;
@@ -40,7 +38,7 @@ namespace CssUI
         public readonly IRenderEngine Engine;
         private ulong Frame = 0;
         internal ulong FrameNo { get { return Frame; } }
-        internal readonly Logging.LogModule Logs;
+        internal readonly xLog.LogSource Logs;
         public long MouseEnterTime;
         ScheduledFunction MouseHover_TMR;
         #endregion
@@ -81,7 +79,7 @@ namespace CssUI
         #region Constructors
         public cssRootElement(IRenderEngine Engine) : base("#Root")
         {
-            this.Logs = new Logging.LogModule(() => { return Frame.ToString(); });
+            this.Logs = new xLog.LogSource(() => { return Frame.ToString(); });
             this.Engine = Engine;
 
             MouseHover_TMR = new ScheduledFunction(TimeSpan.FromMilliseconds(UI_CONSTANTS.HOVER_TIME), () =>
@@ -100,12 +98,13 @@ namespace CssUI
             Style.Default.Width.Assigned = CssValue.From_Percent(100.0);// Always match the viewport size
             Style.Default.Height.Assigned = CssValue.From_Percent(100.0);// Always match the viewport size
 
+
             // The root element should always set and maintain the DPI values for it's style so it's children will all use the correct DPI.
             IntPtr hwnd = Platform.Factory.SystemWindows.Get_Window();
             Vector2 dpi = Platform.Factory.SystemMetrics.Get_DPI(hwnd);
 
-            Style.Default.DpiX.Assigned = CssValue.From_Number(dpi.X);
-            Style.Default.DpiY.Assigned = CssValue.From_Number(dpi.Y);
+            Style.Default.DpiX.Set(CssValue.From_Number(dpi.X));
+            Style.Default.DpiY.Set(CssValue.From_Number(dpi.Y));
 
             Set_Root(this);
             

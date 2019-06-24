@@ -15,8 +15,8 @@ namespace CssUI.Platform.Windows
             int dX = 0;
             int dY = 0;
 
-            dX = Platform.Win32.User32.GetSystemMetrics((int)Platform.Win32.SYSTEM_METRICS.SM_CXDRAG);
-            dY = Platform.Win32.User32.GetSystemMetrics((int)Platform.Win32.SYSTEM_METRICS.SM_CYDRAG);
+            dX = Win32.User32.GetSystemMetrics((int)Win32.SYSTEM_METRICS.SM_CXDRAG);
+            dY = Win32.User32.GetSystemMetrics((int)Win32.SYSTEM_METRICS.SM_CYDRAG);
             return new Vector2(dX, dY);
         }
 
@@ -24,9 +24,9 @@ namespace CssUI.Platform.Windows
         {
             return new ScrollBar_Params()
             {
-                Size = Platform.Win32.User32.GetSystemMetrics((int)Platform.Win32.SYSTEM_METRICS.SM_CXVSCROLL),
-                ThumbSize = Platform.Win32.User32.GetSystemMetrics((int)Platform.Win32.SYSTEM_METRICS.SM_CYVTHUMB),
-                BtnArrowSize = Platform.Win32.User32.GetSystemMetrics((int)Platform.Win32.SYSTEM_METRICS.SM_CYVSCROLL),
+                Size = Win32.User32.GetSystemMetrics((int)Win32.SYSTEM_METRICS.SM_CXVSCROLL),
+                ThumbSize = Win32.User32.GetSystemMetrics((int)Win32.SYSTEM_METRICS.SM_CYVTHUMB),
+                BtnArrowSize = Win32.User32.GetSystemMetrics((int)Win32.SYSTEM_METRICS.SM_CYVSCROLL),
             };
         }
 
@@ -34,9 +34,9 @@ namespace CssUI.Platform.Windows
         {
             return new ScrollBar_Params()
             {
-                Size = Platform.Win32.User32.GetSystemMetrics((int)Platform.Win32.SYSTEM_METRICS.SM_CYHSCROLL),
-                ThumbSize = Platform.Win32.User32.GetSystemMetrics((int)Platform.Win32.SYSTEM_METRICS.SM_CXHTHUMB),
-                BtnArrowSize = Platform.Win32.User32.GetSystemMetrics((int)Platform.Win32.SYSTEM_METRICS.SM_CXHSCROLL),
+                Size = Win32.User32.GetSystemMetrics((int)Win32.SYSTEM_METRICS.SM_CYHSCROLL),
+                ThumbSize = Win32.User32.GetSystemMetrics((int)Win32.SYSTEM_METRICS.SM_CXHTHUMB),
+                BtnArrowSize = Win32.User32.GetSystemMetrics((int)Win32.SYSTEM_METRICS.SM_CXHSCROLL),
             };
         }
 
@@ -45,8 +45,8 @@ namespace CssUI.Platform.Windows
             int dX = 0;
             int dY = 0;
 
-            dX = Platform.Win32.User32.GetSystemMetrics((int)Platform.Win32.SYSTEM_METRICS.SM_CXDOUBLECLK);
-            dY = Platform.Win32.User32.GetSystemMetrics((int)Platform.Win32.SYSTEM_METRICS.SM_CYDOUBLECLK);
+            dX = Win32.User32.GetSystemMetrics((int)Win32.SYSTEM_METRICS.SM_CXDOUBLECLK);
+            dY = Win32.User32.GetSystemMetrics((int)Win32.SYSTEM_METRICS.SM_CYDOUBLECLK);
             return new Vector2(dX, dY);
         }
 
@@ -63,16 +63,16 @@ namespace CssUI.Platform.Windows
             {
                 if (window == null) throw new ArgumentNullException();
 
-                int winDpi = Platform.Win32.User32.GetDpiForWindow((IntPtr)window);
+                int winDpi = Win32.User32.GetDpiForWindow((IntPtr)window);
                 return new Vector2(winDpi);
             }
             catch
             {// Ok we couldnt get screen specific dpi, we will settle for system-wide dpi
 
-                IntPtr desktop = Platform.Win32.User32.GetDesktopWindow();
-                int LogicalScreenHeight = Platform.Win32.Gdi32.GetDeviceCaps(desktop, (int)Platform.Win32.DeviceCap.VERTRES);
-                int PhysicalScreenHeight = Platform.Win32.Gdi32.GetDeviceCaps(desktop, (int)Platform.Win32.DeviceCap.DESKTOPVERTRES);
-                int logpixelsy = Platform.Win32.Gdi32.GetDeviceCaps(desktop, (int)Platform.Win32.DeviceCap.LOGPIXELSY);
+                IntPtr desktop = Win32.User32.GetDesktopWindow();
+                int LogicalScreenHeight = Win32.Gdi32.GetDeviceCaps(desktop, (int)Win32.DeviceCap.VERTRES);
+                int PhysicalScreenHeight = Win32.Gdi32.GetDeviceCaps(desktop, (int)Win32.DeviceCap.DESKTOPVERTRES);
+                int logpixelsy = Win32.Gdi32.GetDeviceCaps(desktop, (int)Win32.DeviceCap.LOGPIXELSY);
 
                 float screenScalingFactor = (float)PhysicalScreenHeight / (float)LogicalScreenHeight;
                 float dpiScalingFactor = (float)logpixelsy / (float)96;

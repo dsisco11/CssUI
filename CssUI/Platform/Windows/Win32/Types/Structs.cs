@@ -1,13 +1,11 @@
 ﻿#if WINDOWS
-using CssUI.Platform;
 using System;
 using System.Drawing;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 
-namespace CssUI.Platform.Win32
+namespace CssUI.Platform.Windows.Win32
 {
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto, Pack = 4)]
     public class MONITORINFOEX
@@ -37,16 +35,7 @@ namespace CssUI.Platform.Win32
             this.y = y;
         }
     }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct RECT
-    {
-        public int left;
-        public int top;
-        public int right;
-        public int bottom;
-    }
-
+    
     [StructLayout(LayoutKind.Sequential)]
     internal struct PSIZE
     {

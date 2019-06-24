@@ -214,7 +214,7 @@ namespace CssUI
                             }
                             break;
                         case EStyleDataType.INHERIT:// SEE:  https://www.w3.org/TR/CSS2/cascade.html#value-def-inherit
-                            {
+                            {// XXX: issue with inherited values atm is that they dont compute immediately once theyre parented
                                 if (Owner is cssRootElement)// If 'inherit' is set on the root element the property is assigned it's initial value
                                 {
                                     value = Def.Initial;
@@ -498,6 +498,7 @@ namespace CssUI
         protected void Update()
         {
             _specified = null;// unset our specified value so it gets updated...
+            _computed = null;// it only makes sense to update the computed value aswell
 
             if (oldValue == null || oldValue != Assigned)
             {

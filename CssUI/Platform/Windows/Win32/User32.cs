@@ -2,7 +2,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace CssUI.Platform.Win32
+namespace CssUI.Platform.Windows.Win32
 {
     public static class User32
     {
@@ -44,7 +44,7 @@ namespace CssUI.Platform.Win32
         public static extern IntPtr GetForegroundWindow();
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern int GetWindowThreadProcessId(IntPtr handle, out int processId);
+        public static extern uint GetWindowThreadProcessId(IntPtr handle, out int processId);
 
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true, ExactSpelling = true)]
@@ -59,6 +59,10 @@ namespace CssUI.Platform.Win32
         /// <returns></returns>
         [DllImport("user32.dll", ExactSpelling = true)]
         public static extern IntPtr MonitorFromWindow(IntPtr hWnd, MONITOR_FLAG flags);
+
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true, ExactSpelling = true)]
+        public static extern bool GetGUIThreadInfo(UInt32 threadId, [In, Out]GUITHREADINFO pgui);
 
 
 

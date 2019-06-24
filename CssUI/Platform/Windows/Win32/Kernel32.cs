@@ -2,7 +2,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace CssUI.Platform.Win32
+namespace CssUI.Platform.Windows.Win32
 {
     public static class Kernel32
     {

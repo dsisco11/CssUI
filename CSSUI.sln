@@ -4,13 +4,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CssUI", "CssUI\CssUI.csproj", "{0C66602D-0FD6-4D70-826F-07EAFFE6AAC3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{686BB281-DFA0-4FF4-9007-A8DDB8BFFAE1} = {686BB281-DFA0-4FF4-9007-A8DDB8BFFAE1}
+	EndProjectSection
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Logging", "C:\CODE\CSharp-XTERM-Logger\Logger\Logging.shproj", "{753BDDAE-60AB-42B6-AECC-CADC369F1B16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xLog", "..\xLog\xLog\xLog.csproj", "{686BB281-DFA0-4FF4-9007-A8DDB8BFFAE1}"
 EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		C:\CODE\CSharp-XTERM-Logger\Logger\Logger.projitems*{753bddae-60ab-42b6-aecc-cadc369f1b16}*SharedItemsImports = 13
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -20,6 +20,10 @@ Global
 		{0C66602D-0FD6-4D70-826F-07EAFFE6AAC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C66602D-0FD6-4D70-826F-07EAFFE6AAC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C66602D-0FD6-4D70-826F-07EAFFE6AAC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{686BB281-DFA0-4FF4-9007-A8DDB8BFFAE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{686BB281-DFA0-4FF4-9007-A8DDB8BFFAE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{686BB281-DFA0-4FF4-9007-A8DDB8BFFAE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{686BB281-DFA0-4FF4-9007-A8DDB8BFFAE1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
