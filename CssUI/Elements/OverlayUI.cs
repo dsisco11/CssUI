@@ -14,8 +14,8 @@ namespace CssUI
         {
             Style.User.Overflow_X.Value = EOverflowMode.Clip;
             Style.User.Overflow_Y.Value = EOverflowMode.Clip;
-            Style.User.Width.Set(CSSValue.Pct_OneHundred);// Always match the viewport size
-            Style.User.Height.Set(CSSValue.Pct_OneHundred);// Always match the viewport size
+            Style.User.Width.Set(CssValue.Pct_OneHundred);// Always match the viewport size
+            Style.User.Height.Set(CssValue.Pct_OneHundred);// Always match the viewport size
         }
         #endregion
     }

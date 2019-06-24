@@ -20,10 +20,10 @@ namespace CssUI.CSS
             }
             set
             {
-                base.Assigned = CSSValue.From_Int(Convert.ToInt32(value));
+                base.Assigned = CssValue.From_Int(Convert.ToInt32(value));
             }
         }
-        internal CSSValue ExplicitValue { get { return base.Assigned; } }
+        internal CssValue ExplicitValue { get { return base.Assigned; } }
         #endregion
 
         #region Constructors
@@ -47,27 +47,27 @@ namespace CssUI.CSS
         {
         }
 
-        public EnumProperty(CSSValue initial) : base(initial, null, DefaultOptions)
+        public EnumProperty(CssValue initial) : base(initial, null, DefaultOptions)
         {
         }
 
-        public EnumProperty(CSSValue initial, bool Locked) : base(initial, Locked, DefaultOptions)
+        public EnumProperty(CssValue initial, bool Locked) : base(initial, Locked, DefaultOptions)
         {
         }
 
-        public EnumProperty(CSSValue initial, bool Locked, PropertyOptions Options) : base(initial, Locked, new PropertyOptions(Options) { AllowPercentage = false })
+        public EnumProperty(CssValue initial, bool Locked, PropertyOptions Options) : base(initial, Locked, new PropertyOptions(Options) { AllowPercentage = false })
         {
         }
 
-        public EnumProperty(Ty initial) : base(CSSValue.From_Int(Convert.ToInt32(initial)), null, DefaultOptions)
+        public EnumProperty(Ty initial) : base(CssValue.From_Int(Convert.ToInt32(initial)), null, DefaultOptions)
         {
         }
 
-        public EnumProperty(Ty initial, bool Locked) : base(CSSValue.From_Int(Convert.ToInt32(initial)), Locked, DefaultOptions)
+        public EnumProperty(Ty initial, bool Locked) : base(CssValue.From_Int(Convert.ToInt32(initial)), Locked, DefaultOptions)
         {
         }
 
-        public EnumProperty(Ty initial, bool Locked, PropertyOptions Options) : base(CSSValue.From_Int(Convert.ToInt32(initial)), Locked, new PropertyOptions(Options) { AllowPercentage=false })
+        public EnumProperty(Ty initial, bool Locked, PropertyOptions Options) : base(CssValue.From_Int(Convert.ToInt32(initial)), Locked, new PropertyOptions(Options) { AllowPercentage=false })
         {
         }
         #endregion
@@ -75,7 +75,7 @@ namespace CssUI.CSS
         #region Setters
         public void Set(Ty value)
         {
-            base.Assigned = CSSValue.From_Int(Convert.ToInt32(value));
+            base.Assigned = CssValue.From_Int(Convert.ToInt32(value));
         }
         #endregion
 

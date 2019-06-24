@@ -7,7 +7,7 @@ namespace CssUI.CSS
     /// <summary>
     /// Represents a CSS Value
     /// </summary>
-    public class CSSValue
+    public class CssValue
     {
         #region Delegates
         public delegate double StyleUnitResolver(EStyleUnit unit);
@@ -17,30 +17,30 @@ namespace CssUI.CSS
         /// <summary>
         /// Value depends on other properties
         /// </summary>
-        public static CSSValue Auto = new CSSValue(EStyleDataType.AUTO);
+        public static CssValue Auto = new CssValue(EStyleDataType.AUTO);
         /// <summary>
         /// (Non-Cascadeable)
         /// Treat as if no value were given. Eg; The element might as well not have this property at all.
         /// Properties using this value will be ignored during cascade logic.
         /// </summary>
-        public static CSSValue Null = new CSSValue(EStyleDataType.UNSET);
+        public static CssValue Null = new CssValue(EStyleDataType.UNSET);
         /// <summary>
         /// Value should resolve to it's default
         /// </summary>
-        public static CSSValue Initial = new CSSValue(EStyleDataType.INITIAL);
+        public static CssValue Initial = new CssValue(EStyleDataType.INITIAL);
         /// <summary>
         /// Value is inherited from the owning elements parent peoperty of the same name
         /// </summary>
-        public static CSSValue Inherit = new CSSValue(EStyleDataType.INHERIT);
+        public static CssValue Inherit = new CssValue(EStyleDataType.INHERIT);
         /// <summary>
         /// (Cascades)
         /// Value is purposly nothing, No value is assigned, some properties use this state to be ignored.
         /// </summary>
-        public static CSSValue None = new CSSValue(EStyleDataType.NONE);
-        public static CSSValue Zero = CSSValue.From_Int(0);
-        public static CSSValue CurrentColor = CSSValue.From_String("currentColor");
+        public static CssValue None = new CssValue(EStyleDataType.NONE);
+        public static CssValue Zero = CssValue.From_Int(0);
+        public static CssValue CurrentColor = CssValue.From_String("currentColor");
         /// <summary> 100% </summary>
-        public static CSSValue Pct_OneHundred = CSSValue.From_Percent(100.0);
+        public static CssValue Pct_OneHundred = CssValue.From_Percent(100.0);
         #endregion
 
         #region Properties
@@ -84,7 +84,7 @@ namespace CssUI.CSS
         }
 
         #region Constructors
-        private CSSValue(EStyleDataType Type)
+        private CssValue(EStyleDataType Type)
         {
             this.Type = Type;
 
@@ -105,13 +105,13 @@ namespace CssUI.CSS
             }
         }
 
-        public CSSValue(EStyleDataType Type, dynamic Value, EStyleUnit Unit) : this(Type)
+        public CssValue(EStyleDataType Type, dynamic Value, EStyleUnit Unit) : this(Type)
         {
             this.Unit = Unit;
             this.Value = Value;
         }
 
-        public CSSValue(EStyleDataType Type, dynamic Value = null, bool parseUnitType = false) : this(Type)
+        public CssValue(EStyleDataType Type, dynamic Value = null, bool parseUnitType = false) : this(Type)
         {
             this.Value = Value;
             if (parseUnitType && Type != EStyleDataType.STRING && Value is string)
@@ -129,9 +129,9 @@ namespace CssUI.CSS
         }
 
         /// <summary>
-        /// Clones an already existing <see cref="CSSValue"/>
+        /// Clones an already existing <see cref="CssValue"/>
         /// </summary>
-        public CSSValue(CSSValue sv)
+        public CssValue(CssValue sv)
         {
             Type = sv.Type;
             Value = sv.Value;
@@ -141,42 +141,42 @@ namespace CssUI.CSS
 
         
         /// <summary>Create an integer value from an enum</summary>
-        public static CSSValue From_Enum(object value) { return new CSSValue(EStyleDataType.INTEGER, (int)value); }
+        public static CssValue From_Enum(object value) { return new CssValue(EStyleDataType.INTEGER, (int)value); }
 
         /// <summary>Create an absolute integer value</summary>
-        public static CSSValue From_Int(int value) { return new CSSValue(EStyleDataType.INTEGER, value); }
+        public static CssValue From_Int(int value) { return new CssValue(EStyleDataType.INTEGER, value); }
 
         /// <summary>Create an absolute integer value if not null, or return the given default value</summary>
-        public static CSSValue From_Int(int? value, CSSValue defaultValue) { return (!value.HasValue ? defaultValue : new CSSValue(EStyleDataType.INTEGER, value.Value)); }
+        public static CssValue From_Int(int? value, CssValue defaultValue) { return (!value.HasValue ? defaultValue : new CssValue(EStyleDataType.INTEGER, value.Value)); }
         
         /// <summary>Create an absolute number value</summary>
-        public static CSSValue From_Number(double value) { return new CSSValue(EStyleDataType.NUMBER, (double)value); }
+        public static CssValue From_Number(double value) { return new CssValue(EStyleDataType.NUMBER, (double)value); }
 
         /// <summary>Create an absolute number value if not null, or return the given default value</summary>
-        public static CSSValue From_Number(double? value, CSSValue defaultValue) { return (!value.HasValue ? defaultValue : new CSSValue(EStyleDataType.NUMBER, (double)value.Value)); }
+        public static CssValue From_Number(double? value, CssValue defaultValue) { return (!value.HasValue ? defaultValue : new CssValue(EStyleDataType.NUMBER, (double)value.Value)); }
         
         /// <summary>Create a percentage value</summary>
         /// <param name="value">Floating-point value in the range [0 - 100]</param>
-        public static CSSValue From_Percent(double value) { return new CSSValue(EStyleDataType.PERCENT, (double)value); }
+        public static CssValue From_Percent(double value) { return new CssValue(EStyleDataType.PERCENT, (double)value); }
 
 
 
         /// <summary>Create an absolute length value</summary>
-        public static CSSValue From_Length(string value) { return new CSSValue(EStyleDataType.DIMENSION, (string)value, true); }
+        public static CssValue From_Length(string value) { return new CssValue(EStyleDataType.DIMENSION, (string)value, true); }
 
         /// <summary>Create an absolute length value</summary>
-        public static CSSValue From_Length(double value, EStyleUnit Unit) { return new CSSValue(EStyleDataType.DIMENSION, (double)value, Unit); }
+        public static CssValue From_Length(double value, EStyleUnit Unit) { return new CssValue(EStyleDataType.DIMENSION, (double)value, Unit); }
 
         /// <summary>Create an absolute length value if not null, or return the given default value</summary>
-        public static CSSValue From_Length(double? value, EStyleUnit Unit, CSSValue defaultValue) { return (!value.HasValue ? defaultValue : new CSSValue(EStyleDataType.DIMENSION, (double)value.Value, Unit)); }
+        public static CssValue From_Length(double? value, EStyleUnit Unit, CssValue defaultValue) { return (!value.HasValue ? defaultValue : new CssValue(EStyleDataType.DIMENSION, (double)value.Value, Unit)); }
 
         
 
         /// <summary>Create an RGBA color value</summary>
-        public static CSSValue From_Color(cssColor value) { return new CSSValue(EStyleDataType.COLOR, value); }
+        public static CssValue From_Color(cssColor value) { return new CssValue(EStyleDataType.COLOR, value); }
 
         /// <summary>Create a string value</summary>
-        public static CSSValue From_String(string value) { return new CSSValue(EStyleDataType.STRING, value); }
+        public static CssValue From_String(string value) { return new CssValue(EStyleDataType.STRING, value); }
 
         #endregion
 
@@ -257,7 +257,7 @@ namespace CssUI.CSS
         /// If this instance matches the given Predicate then resolves the value to a decimal and returns it, returns NULL otherwise
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public double? Resolve(StyleUnitResolver UnitResolver, Func<CSSValue, bool> Predicate)
+        public double? Resolve(StyleUnitResolver UnitResolver, Func<CssValue, bool> Predicate)
         {
             if (Predicate(this))
             {
@@ -281,7 +281,7 @@ namespace CssUI.CSS
         /// If this instance matches the given Predicate then resolves the value to a decimal and returns it, returns defaultValue otherwise
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public double Resolve_Or_Default(StyleUnitResolver UnitResolver, double defaultValue, Func<CSSValue, bool> Predicate)
+        public double Resolve_Or_Default(StyleUnitResolver UnitResolver, double defaultValue, Func<CssValue, bool> Predicate)
         {
             double? num = Resolve(UnitResolver, Predicate);
             return (num.HasValue ? num.Value : defaultValue);
@@ -360,7 +360,7 @@ namespace CssUI.CSS
         /// If this instance matches the given Predicate then resolves the value to an integer and returns it, returns defaultValue otherwise
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Resolve_Or_Default(StyleUnitResolver UnitResolver, int defaultValue, Func<CSSValue, bool> Predicate)
+        public int Resolve_Or_Default(StyleUnitResolver UnitResolver, int defaultValue, Func<CssValue, bool> Predicate)
         {
             int? num = (int?)Resolve(UnitResolver, Predicate);
             return (num.HasValue ? num.Value : defaultValue);
@@ -442,7 +442,7 @@ namespace CssUI.CSS
         /// If this instance matches the given Predicate then resolves the value to a decimal and returns it, returns NULL otherwise
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public double? Resolve(Func<CSSValue, bool> Predicate)
+        public double? Resolve(Func<CssValue, bool> Predicate)
         {
             if (Predicate(this))
             {
@@ -464,7 +464,7 @@ namespace CssUI.CSS
         /// If this instance matches the given Predicate then resolves the value to a decimal and returns it, returns defaultValue otherwise
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public double Resolve_Or_Default(double defaultValue, Func<CSSValue, bool> Predicate)
+        public double Resolve_Or_Default(double defaultValue, Func<CssValue, bool> Predicate)
         {
             double? num = Resolve(Predicate);
             return (num.HasValue ? num.Value : defaultValue);
@@ -537,7 +537,7 @@ namespace CssUI.CSS
         /// If this instance matches the given Predicate then resolves the value to an integer and returns it, returns defaultValue otherwise
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Resolve_Or_Default(int defaultValue, Func<CSSValue, bool> Predicate)
+        public int Resolve_Or_Default(int defaultValue, Func<CssValue, bool> Predicate)
         {
             int? num = (int?)Resolve(Predicate);
             return (num.HasValue ? num.Value : defaultValue);
@@ -623,7 +623,7 @@ namespace CssUI.CSS
         #endregion
 
         #region Operators
-        public static bool operator ==(CSSValue A, CSSValue B)
+        public static bool operator ==(CssValue A, CssValue B)
         {
             if (object.ReferenceEquals(A, null) || object.ReferenceEquals(B, null)) return (object.ReferenceEquals(A, null) && object.ReferenceEquals(B, null));
             if (A.Type != B.Type) return false;
@@ -651,7 +651,7 @@ namespace CssUI.CSS
             }
         }
 
-        public static bool operator !=(CSSValue A, CSSValue B)
+        public static bool operator !=(CssValue A, CssValue B)
         {
             if (object.ReferenceEquals(A, null) || object.ReferenceEquals(B, null)) return !(object.ReferenceEquals(A, null) && object.ReferenceEquals(B, null));
             if (A.Type != B.Type) return true;
@@ -683,9 +683,9 @@ namespace CssUI.CSS
         public override bool Equals(object o)
         {
 
-            if (o is CSSValue)
+            if (o is CssValue)
             {
-                return this == (CSSValue)o;
+                return this == (CssValue)o;
             }
 
             return false;
@@ -701,12 +701,12 @@ namespace CssUI.CSS
 
     public static class StyleValue_Ext
     {
-        public static bool IsNull(this CSSValue SV)
+        public static bool IsNull(this CssValue SV)
         {
             return object.ReferenceEquals(SV, null);
         }
 
-        public static bool IsNullOrUnset(this CSSValue SV)
+        public static bool IsNullOrUnset(this CssValue SV)
         {
             if (object.ReferenceEquals(SV, null)) return true;
             return (SV.Type == EStyleDataType.UNSET);

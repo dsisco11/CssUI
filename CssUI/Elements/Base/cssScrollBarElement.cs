@@ -143,7 +143,7 @@ namespace CssUI
                     {
                         var p = Platform.Factory.SystemMetrics.Get_Vertical_Scrollbar_Params();
                         Style.User.Width.Set(p.Size);
-                        Track.Style.User.Width.Set(CSSValue.Pct_OneHundred);
+                        Track.Style.User.Width.Set(CssValue.Pct_OneHundred);
                         Track.Style.User.Set_Padding(3, 0);
 
                         Btn_dec.Style.User.Width.Set(p.BtnArrowSize);
@@ -160,7 +160,7 @@ namespace CssUI
                     {
                         var p = Platform.Factory.SystemMetrics.Get_Horizontal_Scrollbar_Params();
                         Style.User.Height.Set(p.Size);
-                        Track.Style.User.Height.Set(CSSValue.Pct_OneHundred);
+                        Track.Style.User.Height.Set(CssValue.Pct_OneHundred);
                         Track.Style.User.Set_Padding(0, 3);
 
                         Btn_dec.Style.User.Width.Set(p.BtnArrowSize);

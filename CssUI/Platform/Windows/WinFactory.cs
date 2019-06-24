@@ -1,4 +1,4 @@
-﻿
+﻿#if WINDOWS
 namespace CssUI.Platform.Windows
 {
     /// <summary>
@@ -9,8 +9,11 @@ namespace CssUI.Platform.Windows
 
         public WinFactory()
         {
-            SystemMetrics = new WinMetrics();
+            SystemMetrics = new WindowsMetricsHandler();
+            SystemScreens = new WindowsScreensHandler();
+            SystemWindows = new WindowsWindowHandler();
         }
 
     }
 }
+#endif

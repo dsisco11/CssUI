@@ -8,8 +8,8 @@ namespace CssUI.CSS
 {
     public class StyleSize
     {
-        public CSSValue Width = CSSValue.Null;
-        public CSSValue Height = CSSValue.Null;
+        public CssValue Width = CssValue.Null;
+        public CssValue Height = CssValue.Null;
 
         #region Constructors
         public StyleSize()
@@ -21,7 +21,7 @@ namespace CssUI.CSS
             Height = size.Height;
         }
 
-        public StyleSize(CSSValue Width, CSSValue Height)
+        public StyleSize(CssValue Width, CssValue Height)
         {
             this.Width = Width;
             this.Height = Height;

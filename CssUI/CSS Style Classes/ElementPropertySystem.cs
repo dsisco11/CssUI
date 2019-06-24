@@ -3,18 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using CssUI.CSS;
 
 namespace CssUI
 {
-    public enum EElementStyleState
-    {
-        Normal,
-        Hover,
-        Focus,
-    }
     /// <summary>
     /// Holds all of the resolved styling values for an element
     /// Manages cascading and accessing all of the different properties for each of an elements style states
@@ -168,7 +161,9 @@ namespace CssUI
         public int Border_Bottom_Width { get; private set; } = 0;
         public int Border_Left_Width { get; private set; } = 0;
 
-        public int FontWeight { get; private set; }
+        public float DpiX { get; private set; }
+        public float DpiY { get; private set; }
+        public UInt16 FontWeight { get; private set; }
         public EFontStyle FontStyle { get; private set; }
         public double FontSize { get; private set; }
         public string FontFamily { get; private set; }
@@ -193,10 +188,10 @@ namespace CssUI
         {
             eBlockOffset retVal = new eBlockOffset();
 
-            if (Final.Margin_Top.Computed == CSSValue.Auto) retVal.Top = autoValue;
-            if (Final.Margin_Right.Computed == CSSValue.Auto) retVal.Right = autoValue;
-            if (Final.Margin_Bottom.Computed == CSSValue.Auto) retVal.Bottom = autoValue;
-            if (Final.Margin_Left.Computed == CSSValue.Auto) retVal.Left = autoValue;
+            if (Final.Margin_Top.Computed == CssValue.Auto) retVal.Top = autoValue;
+            if (Final.Margin_Right.Computed == CssValue.Auto) retVal.Right = autoValue;
+            if (Final.Margin_Bottom.Computed == CssValue.Auto) retVal.Bottom = autoValue;
+            if (Final.Margin_Left.Computed == CssValue.Auto) retVal.Left = autoValue;
 
             return retVal;
         }
@@ -237,9 +232,9 @@ namespace CssUI
             NeedsResolving = true;
             // These 'Layout_Pos_' vars have the same effect as any other styling property in that WHENEVER they change it will effect how the owning uiElement's BLOCK placement.
             //Property_Changed?.Invoke(null, EPropertyFlags.Block | EPropertyFlags.Flow, Stack);// Replaced with the lines below on 06-19-2017
-            Owner.Flag_Block_Dirty(EUIInvalidationReason.Layout_Pos_Changed);
+            Owner.Flag_Block_Dirty(ECssBlockInvalidationReason.Layout_Pos_Changed);
             // TODO: SHOULD we be invalidating Flow(layout) whenever an element's layout pos changes?
-            Owner.Invalidate_Layout(EUIInvalidationReason.Layout_Pos_Changed);
+            Owner.Invalidate_Layout(ECssBlockInvalidationReason.Layout_Pos_Changed);
 
         }
 
@@ -374,6 +369,7 @@ namespace CssUI
         /// <summary>
         /// Re-Cascades all active style states with the default one to produce a set of 'Final' style properties to be used.
         /// </summary>
+        [Obsolete("Non-asynchronous functions are now depreciated, please use RecompileAsync() instead.")]
         private void Recompile()
         {
             StyleRuleData Compiled = new StyleRuleData(null, null, Owner);
@@ -395,6 +391,32 @@ namespace CssUI
 
             // Go through each property within "Current" and if it doesnt equal the compiled property OR it's source doesnt match then update it...
             Final.Overwrite(Compiled);
+        }
+
+        /// <summary>
+        /// Re-Cascades all active style states with the default one to produce a set of 'Final' style properties to be used.
+        /// </summary>
+        private async Task RecompileAsync()
+        {
+            StyleRuleData Compiled = new StyleRuleData(null, null, Owner);
+            await Compiled.CascadeAsync(Default);
+            await Compiled.CascadeAsync(User);
+
+            if (ActiveStates.Contains(STATE_FOCUS))
+                await Compiled.CascadeAsync(Focus);
+            if (ActiveStates.Contains(STATE_HOVER))
+                await Compiled.CascadeAsync(Hover);
+
+            foreach (KeyValuePair<AtomicString, StyleRuleData> kv in Custom)
+            {
+                if (ActiveStates.Contains(kv.Key))
+                {
+                    await Compiled.CascadeAsync(kv.Value);
+                }
+            }
+
+            // Go through each property within "Current" and if it doesnt equal the compiled property OR it's source doesnt match then update it...
+            await Final.OverwriteAsync(Compiled);
         }
         #endregion
 
@@ -427,7 +449,7 @@ namespace CssUI
         #region State Setting
         private HashSet<AtomicString> ActiveStates = new HashSet<AtomicString>();
 
-        public void Set_State(AtomicString StateName, bool Status)
+        public async void Set_State(AtomicString StateName, bool Status)
         {
             bool changes = false;
             if (Status && !ActiveStates.Contains(StateName))
@@ -442,7 +464,7 @@ namespace CssUI
             }
 
             if (changes)
-                Recompile();
+                await RecompileAsync();
         }
         #endregion
         
@@ -613,6 +635,8 @@ namespace CssUI
         #region Font Updating
         void Update_Font(IStyleProperty Sender, StackTrace Stack)
         {
+            DpiX = Final.DpiX.Computed.Value;
+            DpiY = Final.DpiY.Computed.Value;
             // Resolve 'FontStyle'
             if (Final.FontStyle.Computed.Type == EStyleDataType.INTEGER)
             {
@@ -624,7 +648,7 @@ namespace CssUI
                 FontFamily = (string)Final.FontFamily.Computed.Value;
             }
             // Resolve 'FontWeight'
-            FontWeight = (int)Final.FontWeight.Computed.Resolve_Or_Default(400);
+            FontWeight = (UInt16)Final.FontWeight.Computed.Resolve_Or_Default(400);
             // Resolve 'FontSize'
             /*
             double? fsz = Current.FontSize.Computed?.Resolve(Owner.Style.FontSize);
@@ -675,12 +699,12 @@ namespace CssUI
             if (lh.HasValue) LineHeight = lh.Value;
         }
 
-        public void Resolve_Border_Size(cssElement E, CSSValue Top, CSSValue Right, CSSValue Bottom, CSSValue Left, out int outTop, out int outRight, out int outBottom, out int outLeft)
+        public void Resolve_Border_Size(cssElement E, CssValue Top, CssValue Right, CssValue Bottom, CssValue Left, out int outTop, out int outRight, out int outBottom, out int outLeft)
         {
-            outTop = (Final.Border_Top_Style.Computed == CSSValue.None ? 0 : (int)Top.Resolve_Or_Default(0));
-            outRight = (Final.Border_Right_Style.Computed == CSSValue.None ? 0 : (int)Right.Resolve_Or_Default(0));
-            outBottom = (Final.Border_Bottom_Style.Computed == CSSValue.None ? 0 : (int)Bottom.Resolve_Or_Default(0));
-            outLeft = (Final.Border_Left_Style.Computed == CSSValue.None ? 0 : (int)Left.Resolve_Or_Default(0));
+            outTop = (Final.Border_Top_Style.Computed == CssValue.None ? 0 : (int)Top.Resolve_Or_Default(0));
+            outRight = (Final.Border_Right_Style.Computed == CssValue.None ? 0 : (int)Right.Resolve_Or_Default(0));
+            outBottom = (Final.Border_Bottom_Style.Computed == CssValue.None ? 0 : (int)Bottom.Resolve_Or_Default(0));
+            outLeft = (Final.Border_Left_Style.Computed == CssValue.None ? 0 : (int)Left.Resolve_Or_Default(0));
         }
 
         public void Resolve_Object_Position(eSize ObjectArea, eSize ObjectSize)
@@ -705,7 +729,7 @@ namespace CssUI
         /// <param name="Margin_Right"></param>
         /// <param name="Margin_Bottom"></param>
         /// <param name="Margin_Left"></param>
-        public void Resolve_Margin(cssElement E, CSSValue Top, CSSValue Right, CSSValue Bottom, CSSValue Left, out int Margin_Top, out int Margin_Right, out int Margin_Bottom, out int Margin_Left)
+        public void Resolve_Margin(cssElement E, CssValue Top, CssValue Right, CssValue Bottom, CssValue Left, out int Margin_Top, out int Margin_Right, out int Margin_Bottom, out int Margin_Left)
         {
             int? left = 0, top = 0, right = 0, bottom = 0;
             
@@ -720,17 +744,17 @@ namespace CssUI
                 case EDisplayMode.INLINE:
                 case EDisplayMode.INLINE_BLOCK:
                     {
-                        if (Top == CSSValue.Auto) top = 0;
-                        if (Right == CSSValue.Auto) right = 0;
-                        if (Bottom == CSSValue.Auto) bottom = 0;
-                        if (Left == CSSValue.Auto) left = 0;
+                        if (Top == CssValue.Auto) top = 0;
+                        if (Right == CssValue.Auto) right = 0;
+                        if (Bottom == CssValue.Auto) bottom = 0;
+                        if (Left == CssValue.Auto) left = 0;
                     }
                     break;
                 default:
                     {
-                        if (E.Style.Final.Width.Computed != CSSValue.Auto)// Margin left/right auto values are 0 if the elements Width is set to auto
+                        if (E.Style.Final.Width.Computed != CssValue.Auto)// Margin left/right auto values are 0 if the elements Width is set to auto
                         {
-                            if (Left == CSSValue.Auto || Right == CSSValue.Auto)
+                            if (Left == CssValue.Auto || Right == CssValue.Auto)
                             {
                                 /*
                                     The following constraints must hold among the used values of the properties.
@@ -746,11 +770,11 @@ namespace CssUI
 
                                 int freeSpace = Math.Max(0, E.Block_Containing.Width - W);
 
-                                if (Left == CSSValue.Auto && Right == CSSValue.Auto)
+                                if (Left == CssValue.Auto && Right == CssValue.Auto)
                                     left = right = (freeSpace / 2);
-                                else if (Left == CSSValue.Auto)
+                                else if (Left == CssValue.Auto)
                                     left = freeSpace;
-                                else if (Right == CSSValue.Auto)
+                                else if (Right == CssValue.Auto)
                                     right = freeSpace;
                             }
                         }
@@ -776,7 +800,7 @@ namespace CssUI
         /// <param name="Padding_Right"></param>
         /// <param name="Padding_Bottom"></param>
         /// <param name="Padding_Left"></param>
-        public void Resolve_Padding(cssElement E, CSSValue Top, CSSValue Right, CSSValue Bottom, CSSValue Left, out int Padding_Top, out int Padding_Right, out int Padding_Bottom, out int Padding_Left)
+        public void Resolve_Padding(cssElement E, CssValue Top, CssValue Right, CssValue Bottom, CssValue Left, out int Padding_Top, out int Padding_Right, out int Padding_Bottom, out int Padding_Left)
         {
             /*
             int? left = 0, top = 0, right = 0, bottom = 0;
@@ -811,7 +835,7 @@ namespace CssUI
         /// <param name="minHeight"></param>
         /// <param name="Min_Width"></param>
         /// <param name="Min_Height"></param>
-        public void Resolve_MinSize(cssElement E, CSSValue minWidth, CSSValue minHeight, out int Min_Width, out int Min_Height)
+        public void Resolve_MinSize(cssElement E, CssValue minWidth, CssValue minHeight, out int Min_Width, out int Min_Height)
         {
             int? width = 0, height = 0;
 
@@ -833,7 +857,7 @@ namespace CssUI
         /// </summary>
         /// <param name="E"></param>
         /// <param name="minWidth"></param>
-        public int Resolve_MinSize_Width(cssElement E, CSSValue minWidth)
+        public int Resolve_MinSize_Width(cssElement E, CssValue minWidth)
         {
             int? width = 0;
             width = (int?)minWidth.Resolve(E.Block_Containing.Width);
@@ -846,7 +870,7 @@ namespace CssUI
         /// </summary>
         /// <param name="E"></param>
         /// <param name="minHeight"></param>
-        public int Resolve_MinSize_Height(cssElement E, CSSValue minHeight)
+        public int Resolve_MinSize_Height(cssElement E, CssValue minHeight)
         {
             int? height = 0;
 
@@ -863,7 +887,7 @@ namespace CssUI
         /// <param name="maxHeight"></param>
         /// <param name="Max_Width"></param>
         /// <param name="Max_Height"></param>
-        public void Resolve_MaxSize(cssElement E, CSSValue maxWidth, CSSValue maxHeight, out int? Max_Width, out int? Max_Height)
+        public void Resolve_MaxSize(cssElement E, CssValue maxWidth, CssValue maxHeight, out int? Max_Width, out int? Max_Height)
         {
             int? width = 0, height = 0;
 
@@ -871,11 +895,11 @@ namespace CssUI
             height = (int?)maxHeight.Resolve(E.Block_Containing.Height);
 
             if (width.HasValue) width = Math.Max(0, width.Value);
-            else if (maxWidth == CSSValue.None) width = null;
+            else if (maxWidth == CssValue.None) width = null;
             else width = 0;
 
             if (height.HasValue) height = Math.Max(0, height.Value);
-            else if (maxHeight == CSSValue.None) height = null;
+            else if (maxHeight == CssValue.None) height = null;
             else height = 0;
 
             // Resolve AUTO
@@ -884,13 +908,13 @@ namespace CssUI
             // Act like our computed value is 100% ONLY IF our parent's size isn't affected by us.
             if (E.Parent != null)
             {
-                if (maxWidth == CSSValue.Auto)
+                if (maxWidth == CssValue.Auto)
                 {
                     if (!E.Parent.Style.Final.Width.Assigned.IsNullOrUnset())
                         width = E.Block_Containing.Width;
                 }
 
-                if (maxHeight == CSSValue.Auto)
+                if (maxHeight == CssValue.Auto)
                 {
                     if (!E.Parent.Style.Final.Height.Assigned.IsNullOrUnset())
                         height = E.Block_Containing.Height;
@@ -906,14 +930,14 @@ namespace CssUI
         /// </summary>
         /// <param name="E"></param>
         /// <param name="maxWidth"></param>
-        public int? Resolve_MaxSize_Width(cssElement E, CSSValue maxWidth)
+        public int? Resolve_MaxSize_Width(cssElement E, CssValue maxWidth)
         {
             int? width = 0;
 
             width = (int?)maxWidth.Resolve(E.Block_Containing.Width);
 
             if (width.HasValue) width = Math.Max(0, width.Value);
-            else if (maxWidth == CSSValue.None) width = null;
+            else if (maxWidth == CssValue.None) width = null;
             else width = 0;
 
             // Resolve AUTO
@@ -922,7 +946,7 @@ namespace CssUI
             // Act like our computed value is 100% ONLY IF our parent has an explicit value set!
             if (E.Parent != null)
             {
-                if (maxWidth == CSSValue.Auto)
+                if (maxWidth == CssValue.Auto)
                 {
                     if (!E.Parent.Style.Final.Width.Assigned.IsNullOrUnset())
                         width = E.Block_Containing.Width;
@@ -937,14 +961,14 @@ namespace CssUI
         /// </summary>
         /// <param name="E"></param>
         /// <param name="maxWidth"></param>
-        public int? Resolve_MaxSize_Height(cssElement E, CSSValue maxHeight)
+        public int? Resolve_MaxSize_Height(cssElement E, CssValue maxHeight)
         {
             int? height = 0;
             
             height = (int?)maxHeight.Resolve(E.Block_Containing.Height);
             
             if (height.HasValue) height = Math.Max(0, height.Value);
-            else if (maxHeight == CSSValue.None) height = null;
+            else if (maxHeight == CssValue.None) height = null;
             else height = 0;
 
             // Resolve AUTO
@@ -953,7 +977,7 @@ namespace CssUI
             // Act like our computed value is 100% ONLY IF our parent has an explicit value set!
             if (E.Parent != null)
             {
-                if (maxHeight == CSSValue.Auto)
+                if (maxHeight == CssValue.Auto)
                 {
                     if (!E.Parent.Style.Final.Height.Assigned.IsNullOrUnset())
                         height = E.Block_Containing.Height;
@@ -971,7 +995,7 @@ namespace CssUI
         /// <param name="weight"></param>
         /// <param name="Width"></param>
         /// <param name="Height"></param>
-        public void Resolve_Size(cssElement E, CSSValue Width, CSSValue Height, out int outWidth, out int outHeight)
+        public void Resolve_Size(cssElement E, CssValue Width, CssValue Height, out int outWidth, out int outHeight)
         {// SEE: https://www.w3.org/TR/css3-box/#width
             outWidth = Resolve_Size_Width(E, Width);
             outHeight = Resolve_Size_Height(E, Height);
@@ -981,7 +1005,7 @@ namespace CssUI
         /// Resolves the given Width style value to an absolute value for a specified element
         /// </summary>
         /// <param name="E">The UI element to resolve for</param>
-        public int Resolve_Size_Width(cssElement E, CSSValue Width)
+        public int Resolve_Size_Width(cssElement E, CssValue Width)
         {// SEE: https://www.w3.org/TR/css3-box/#width
             int? width = Resolve_Size_Width_Nullable(E, Width);
             return (width.HasValue ? Math.Max(0, width.Value) : 0);
@@ -991,7 +1015,7 @@ namespace CssUI
         /// Resolves the given Height style value to an absolute value for a specified element
         /// </summary>
         /// <param name="E">The UI element to resolve for</param>
-        public int Resolve_Size_Height(cssElement E, CSSValue Height)
+        public int Resolve_Size_Height(cssElement E, CssValue Height)
         {
             int? height = Resolve_Size_Height_Nullable(E, Height);
             return (height.HasValue ? Math.Max(0, height.Value) : 0);
@@ -1001,7 +1025,7 @@ namespace CssUI
         /// Resolves the given (INTRINSIC) Width and Height style values to absolute values for a specified element
         /// </summary>
         /// <param name="E">The UI element to resolve for</param>
-        public void Resolve_Intrinsic_Size(cssElement E, CSSValue Width, CSSValue Height, out int? outWidth, out int? outHeight)
+        public void Resolve_Intrinsic_Size(cssElement E, CssValue Width, CssValue Height, out int? outWidth, out int? outHeight)
         {
             //Percentage intrinsic widths are first evaluated with respect to the containing block's width, 
             // if that width doesn't itself depend on the replaced element's width. 
@@ -1021,7 +1045,7 @@ namespace CssUI
         /// Resolves the given (INTRINSIC) Width style value to an absolute value for a specified element
         /// </summary>
         /// <param name="E">The UI element to resolve for</param>
-        public int? Resolve_Intrinsic_Width(cssElement E, CSSValue Width)
+        public int? Resolve_Intrinsic_Width(cssElement E, CssValue Width)
         {
             //Percentage intrinsic widths are first evaluated with respect to the containing block's width, 
             // if that width doesn't itself depend on the replaced element's width. 
@@ -1038,7 +1062,7 @@ namespace CssUI
         /// Resolves the given (INTRINSIC) Height style value to an absolute value for a specified element
         /// </summary>
         /// <param name="E">The UI element to resolve for</param>
-        public int? Resolve_Intrinsic_Height(cssElement E, CSSValue Height)
+        public int? Resolve_Intrinsic_Height(cssElement E, CssValue Height)
         {
             int? height = (int?)Height.Resolve(E.Block_Containing.Height);
             return height;
@@ -1050,11 +1074,11 @@ namespace CssUI
         /// Resolves the given Width style value to an absolute value for a specified element
         /// </summary>
         /// <param name="E">The UI element to resolve for</param>
-        public int? Resolve_Size_Width_Nullable(cssElement E, CSSValue Width)
+        public int? Resolve_Size_Width_Nullable(cssElement E, CssValue Width)
         {// SEE: https://www.w3.org/TR/css3-box/#width
             int? width = (int?)Width.Resolve(E.Block_Containing.Width);
             // Resolve all AUTO values
-            if (Width == CSSValue.Auto)
+            if (Width == CssValue.Auto)
             {// If ‘width’ is set to ‘auto’, any other ‘auto’ values become ‘0’ and ‘width’ follows from the resulting equality.
              // ‘margin-left’ + ‘border-left-width’ + ‘padding-left’ + ‘width’ + ‘padding-right’ + ‘border-right-width’ + ‘margin-right’ + scrollbar width (if any) = width of containing block
                 int W = 0, H = 0;
@@ -1069,7 +1093,7 @@ namespace CssUI
         /// Resolves the given Height style value to an absolute value for a specified element
         /// </summary>
         /// <param name="E">The UI element to resolve for</param>
-        public int? Resolve_Size_Height_Nullable(cssElement E, CSSValue Height)
+        public int? Resolve_Size_Height_Nullable(cssElement E, CssValue Height)
         {
             return (int?)Height.Resolve(E.Block_Containing.Height);
         }
@@ -1087,7 +1111,7 @@ namespace CssUI
         /// <param name="Pos_Right"></param>
         /// <param name="Pos_Bottom"></param>
         /// <param name="Pos_Left"></param>
-        public void Resolve_Offsets(cssElement E, CSSValue Top, CSSValue Right, CSSValue Bottom, CSSValue Left, out int Pos_Top, out int Pos_Right, out int Pos_Bottom, out int Pos_Left)
+        public void Resolve_Offsets(cssElement E, CssValue Top, CssValue Right, CssValue Bottom, CssValue Left, out int Pos_Top, out int Pos_Right, out int Pos_Bottom, out int Pos_Left)
         {
             int top, right, bottom, left;
             switch (Positioning)
@@ -1095,17 +1119,17 @@ namespace CssUI
                 case EPositioning.Relative:// SEE:  https://www.w3.org/TR/CSS2/visuren.html#relative-positioning
                     {
                         // Left & Right
-                        if (Left == CSSValue.Auto && Right == CSSValue.Auto)
+                        if (Left == CssValue.Auto && Right == CssValue.Auto)
                         {
                             left = 0;
                             right = 0;
                         }
-                        else if (Left == CSSValue.Auto)
+                        else if (Left == CssValue.Auto)
                         {
                             right = (int)Right.Resolve();
                             left = -right;
                         }
-                        else if (Right == CSSValue.Auto)
+                        else if (Right == CssValue.Auto)
                         {
                             left = (int)Left.Resolve();
                             right = -left;
@@ -1118,14 +1142,14 @@ namespace CssUI
                         }
 
                         // Top & Bottom
-                        if (Top == CSSValue.Auto && Bottom == CSSValue.Auto)
+                        if (Top == CssValue.Auto && Bottom == CssValue.Auto)
                         {
                             top = 0;
                             bottom = 0;
                         }
-                        else if (Top == CSSValue.Auto ^ Bottom == CSSValue.Auto)
+                        else if (Top == CssValue.Auto ^ Bottom == CssValue.Auto)
                         {
-                            if (Top == CSSValue.Auto)
+                            if (Top == CssValue.Auto)
                             {
                                 bottom = (int)Bottom.Resolve();
                                 top = -bottom;
@@ -1191,8 +1215,8 @@ namespace CssUI
                     if (!E.isChild) throw new Exception("All 'ReplacedElements' MUST be the child of another element!");
                     int? Width = null, Height = null;
                     var rE = (E as cssReplacedElement);
-                    bool auto_width = (Final.Width.Computed == CSSValue.Auto);
-                    bool auto_height = (Final.Height.Computed == CSSValue.Auto);
+                    bool auto_width = (Final.Width.Computed == CssValue.Auto);
+                    bool auto_height = (Final.Height.Computed == CssValue.Auto);
 
                     eSize tempRes = null;
                     if (!auto_width || !auto_height)
@@ -1312,7 +1336,7 @@ namespace CssUI
         /// <param name="ObjectSize"></param>
         /// <param name="outX"></param>
         /// <param name="outY"></param>
-        public void Resolve_As_Position(CSSValue X, CSSValue Y, eSize ObjectArea, eSize ObjectSize, out int outX, out int outY)
+        public void Resolve_As_Position(CssValue X, CssValue Y, eSize ObjectArea, eSize ObjectSize, out int outX, out int outY)
         {// SEE: https://www.w3.org/TR/2011/CR-css3-background-20110215/#background-position
 
             int? x = (int?)X.Resolve(delegate (double pct)
@@ -1397,7 +1421,7 @@ namespace CssUI
             }
         }
 
-        internal static int Solve_Block_Level_Width_Equality(cssElement E, BlockProperties Block, CSSValue Width, CSSValue Left_Margin, CSSValue Right_Margin)
+        internal static int Solve_Block_Level_Width_Equality(cssElement E, BlockProperties Block, CssValue Width, CssValue Left_Margin, CssValue Right_Margin)
         {
             return (int)(Left_Margin.Resolve_Or_Default(0) + Block.Border_Left + Block.Padding_Left.Resolve_Or_Default(0) + Width.Resolve_Or_Default(0) + Block.Padding_Right.Resolve_Or_Default(0) + Block.Border_Right + Right_Margin.Resolve_Or_Default(0) + E.Scrollbar_Offset.Horizontal);
         }
@@ -1429,18 +1453,18 @@ namespace CssUI
         internal static void Get_Tentative_Inline_NonReplaced(cssElement E, BlockProperties Block)
         {// SEE:  https://www.w3.org/TR/css3-box/#inline-non-replaced
             
-            Block.Width = (Block.Content_Width.HasValue ? CSSValue.From_Int(Block.Content_Width.Value) : CSSValue.Zero);
-            Block.Height = (Block.Content_Height.HasValue ? CSSValue.From_Int(Block.Content_Height.Value) : CSSValue.Zero);
+            Block.Width = (Block.Content_Width.HasValue ? CssValue.From_Int(Block.Content_Width.Value) : CssValue.Zero);
+            Block.Height = (Block.Content_Height.HasValue ? CssValue.From_Int(Block.Content_Height.Value) : CssValue.Zero);
             
-            if (Block.Top == CSSValue.Auto) Block.Top = CSSValue.Zero;
-            if (Block.Right == CSSValue.Auto) Block.Right = CSSValue.Zero;
-            if (Block.Bottom == CSSValue.Auto) Block.Bottom = CSSValue.Zero;
-            if (Block.Left == CSSValue.Auto) Block.Left = CSSValue.Zero;
+            if (Block.Top == CssValue.Auto) Block.Top = CssValue.Zero;
+            if (Block.Right == CssValue.Auto) Block.Right = CssValue.Zero;
+            if (Block.Bottom == CssValue.Auto) Block.Bottom = CssValue.Zero;
+            if (Block.Left == CssValue.Auto) Block.Left = CssValue.Zero;
 
-            if (Block.Margin_Top == CSSValue.Auto) Block.Margin_Top = CSSValue.Zero;
-            if (Block.Margin_Right == CSSValue.Auto) Block.Margin_Right = CSSValue.Zero;
-            if (Block.Margin_Bottom == CSSValue.Auto) Block.Margin_Bottom = CSSValue.Zero;
-            if (Block.Margin_Left == CSSValue.Auto) Block.Margin_Left = CSSValue.Zero;
+            if (Block.Margin_Top == CssValue.Auto) Block.Margin_Top = CssValue.Zero;
+            if (Block.Margin_Right == CssValue.Auto) Block.Margin_Right = CssValue.Zero;
+            if (Block.Margin_Bottom == CssValue.Auto) Block.Margin_Bottom = CssValue.Zero;
+            if (Block.Margin_Left == CssValue.Auto) Block.Margin_Left = CssValue.Zero;
         }
         /// <summary>
         /// Calculates the used Width and Margin values for an Inline, Replaced element.
@@ -1448,14 +1472,14 @@ namespace CssUI
         internal static void Get_Tentative_Inline_Or_InlineBlock_Or_Floating_Replaced(cssElement E, BlockProperties Block)
         {// SEE:  https://www.w3.org/TR/css3-box/#inline-replaced
 
-            if (Block.Margin_Left == CSSValue.Auto) Block.Margin_Left = CSSValue.Zero;
-            if (Block.Margin_Right == CSSValue.Auto) Block.Margin_Right = CSSValue.Zero;
+            if (Block.Margin_Left == CssValue.Auto) Block.Margin_Left = CssValue.Zero;
+            if (Block.Margin_Right == CssValue.Auto) Block.Margin_Right = CssValue.Zero;
 
             int? width = null;
             int? height = null;
 
-            bool auto_width = (Block.Width == CSSValue.Auto);
-            bool auto_height = (Block.Height == CSSValue.Auto);
+            bool auto_width = (Block.Width == CssValue.Auto);
+            bool auto_height = (Block.Height == CssValue.Auto);
 
             if (auto_width && auto_height && Block.Intrinsic_Width.HasValue)
                 width = Block.Intrinsic_Width.Value;
@@ -1483,8 +1507,8 @@ namespace CssUI
             if (auto_height && !height.HasValue) height = Math.Max(150, (int)(0.5 * (double)width.Value));
 
 
-            if (width.HasValue) Block.Width = CSSValue.From_Int(width.Value);
-            if (height.HasValue) Block.Height = CSSValue.From_Int(height.Value);
+            if (width.HasValue) Block.Width = CssValue.From_Int(width.Value);
+            if (height.HasValue) Block.Height = CssValue.From_Int(height.Value);
         }
         /// <summary>
         /// Calculates the used Width and Margin values for a Block-level, Non-Replaced element.
@@ -1497,21 +1521,21 @@ namespace CssUI
                 ‘margin-left’ + ‘border-left-width’ + ‘padding-left’ + ‘width’ + ‘padding-right’ + ‘border-right-width’ + ‘margin-right’ + scrollbar width (if any) = width of containing block
             */
 
-            if (Block.Margin_Left != CSSValue.Auto && Block.Width != CSSValue.Auto && Block.Margin_Right != CSSValue.Auto)
+            if (Block.Margin_Left != CssValue.Auto && Block.Width != CssValue.Auto && Block.Margin_Right != CssValue.Auto)
             {// Over-constrained, ignore right margin
-                Block.Margin_Right = CSSValue.From_Int(0);
+                Block.Margin_Right = CssValue.From_Int(0);
             }
 
-            if (Block.Width == CSSValue.Auto)
+            if (Block.Width == CssValue.Auto)
             {// If width is 'auto' then all other 'auto' values are treated as 0
-                if (Block.Margin_Left == CSSValue.Auto) Block.Margin_Left = CSSValue.From_Int(0);
-                if (Block.Margin_Right == CSSValue.Auto) Block.Margin_Right = CSSValue.From_Int(0);
-                int outter = Solve_Block_Level_Width_Equality(E, Block, CSSValue.Null, Block.Margin_Left, Block.Margin_Right);
-                Block.Width = CSSValue.From_Int(Math.Max(0, E.Block_Containing.Width - outter));
+                if (Block.Margin_Left == CssValue.Auto) Block.Margin_Left = CssValue.From_Int(0);
+                if (Block.Margin_Right == CssValue.Auto) Block.Margin_Right = CssValue.From_Int(0);
+                int outter = Solve_Block_Level_Width_Equality(E, Block, CssValue.Null, Block.Margin_Left, Block.Margin_Right);
+                Block.Width = CssValue.From_Int(Math.Max(0, E.Block_Containing.Width - outter));
             }
             else
             {
-                if (Block.Margin_Left == CSSValue.Auto || Block.Margin_Right == CSSValue.Auto)
+                if (Block.Margin_Left == CssValue.Auto || Block.Margin_Right == CssValue.Auto)
                 {
                     int W = (int)Block.Width.Resolve_Or_Default(0);
                     // Add everything to this content-block size EXCEPT our margins, because our margins are what we are calculating
@@ -1519,32 +1543,32 @@ namespace CssUI
                     // to a border-edge block so we can tell how much free space our margins can auto-consume
                     if (E.Style.BoxSizing == EBoxSizingMode.CONTENT)
                     {
-                        W = Solve_Block_Level_Width_Equality(E, Block, Block.Width, CSSValue.Zero, CSSValue.Zero);
+                        W = Solve_Block_Level_Width_Equality(E, Block, Block.Width, CssValue.Zero, CssValue.Zero);
                         //W += (Style.Padding.Horizontal + Scrollbar_Offset.Horizontal + (Border.Left.Size + Border.Right.Size));
                     }
 
                     int freeSpace = Math.Max(0, E.Block_Containing.Width - W);
 
-                    if (Block.Margin_Left == CSSValue.Auto && Block.Margin_Right == CSSValue.Auto)
+                    if (Block.Margin_Left == CssValue.Auto && Block.Margin_Right == CssValue.Auto)
                     {
                         int x = (freeSpace / 2);
-                        Block.Margin_Left = CSSValue.From_Int(x);
-                        Block.Margin_Right = CSSValue.From_Int(x);
+                        Block.Margin_Left = CssValue.From_Int(x);
+                        Block.Margin_Right = CssValue.From_Int(x);
                     }
-                    else if (Block.Margin_Left == CSSValue.Auto)
+                    else if (Block.Margin_Left == CssValue.Auto)
                     {
-                        Block.Margin_Left = CSSValue.From_Int(freeSpace);
+                        Block.Margin_Left = CssValue.From_Int(freeSpace);
                     }
-                    else if (Block.Margin_Right == CSSValue.Auto)
+                    else if (Block.Margin_Right == CssValue.Auto)
                     {
-                        Block.Margin_Right = CSSValue.From_Int(freeSpace);
+                        Block.Margin_Right = CssValue.From_Int(freeSpace);
                     }
                 }
             }
 
-            if (Block.Margin_Top == CSSValue.Auto) Block.Margin_Top = CSSValue.Zero;
-            if (Block.Margin_Bottom == CSSValue.Auto) Block.Margin_Bottom = CSSValue.Zero;
-            if (Block.Height == CSSValue.Auto) Block.Height = CSSValue.From_Int((Block.Content_Height.HasValue ? Block.Content_Height.Value : 0));
+            if (Block.Margin_Top == CssValue.Auto) Block.Margin_Top = CssValue.Zero;
+            if (Block.Margin_Bottom == CssValue.Auto) Block.Margin_Bottom = CssValue.Zero;
+            if (Block.Height == CssValue.Auto) Block.Height = CssValue.From_Int((Block.Content_Height.HasValue ? Block.Content_Height.Value : 0));
         }
         /// <summary>
         /// Calculates the used Width and Margin values for a Block-level, Replaced element.
@@ -1566,8 +1590,8 @@ namespace CssUI
         internal static void Get_Tentative_Floating_NonReplaced(cssElement E, BlockProperties Block)
         {// SEE:  https://www.w3.org/TR/css3-box/#floating
 
-            if (Block.Width == CSSValue.Auto) Block.Width = CSSValue.From_Int(Find_Shrink_To_Fit_Width(E, Block));
-            if (Block.Height == CSSValue.Auto) Block.Height = CSSValue.From_Int((Block.Content_Height.HasValue ? Block.Content_Height.Value : 0));
+            if (Block.Width == CssValue.Auto) Block.Width = CssValue.From_Int(Find_Shrink_To_Fit_Width(E, Block));
+            if (Block.Height == CssValue.Auto) Block.Height = CssValue.From_Int((Block.Content_Height.HasValue ? Block.Content_Height.Value : 0));
         }
         /// <summary>
         /// Calculates the used Width and Margin values for an Absolutely positioned, Non-Replaced element.
@@ -1575,87 +1599,87 @@ namespace CssUI
         internal static void Get_Tentative_Abs_NonReplaced(cssElement E, BlockProperties Block)
         {// SEE:  https://www.w3.org/TR/css3-box/#abs-non-replaced-width
 
-            if (Block.Left == CSSValue.Auto && Block.Width == CSSValue.Auto && Block.Right == CSSValue.Auto)
+            if (Block.Left == CssValue.Auto && Block.Width == CssValue.Auto && Block.Right == CssValue.Auto)
             {
-                if (Block.Margin_Left == CSSValue.Auto) Block.Margin_Left = CSSValue.Zero;
-                if (Block.Margin_Right == CSSValue.Auto) Block.Margin_Right = CSSValue.Zero;
+                if (Block.Margin_Left == CssValue.Auto) Block.Margin_Left = CssValue.Zero;
+                if (Block.Margin_Right == CssValue.Auto) Block.Margin_Right = CssValue.Zero;
 
                 // Set Left to the static position | SEE:  https://www.w3.org/TR/CSS2/visudet.html#static-position
-                Block.Left = CSSValue.From_Number(E.Block_Containing.Left);
+                Block.Left = CssValue.From_Number(E.Block_Containing.Left);
                 // Apply rule 3
-                if (Block.Width == CSSValue.Auto && Block.Right == CSSValue.Auto && Block.Left != CSSValue.Auto)
+                if (Block.Width == CssValue.Auto && Block.Right == CssValue.Auto && Block.Left != CssValue.Auto)
                 {
                     // To find the shrink-to-fit width we need to use 0 for 'left' during it's calculation
-                    CSSValue oleft = Block.Left;
-                    Block.Left = CSSValue.Zero;
-                    Block.Width = CSSValue.From_Int(Find_Shrink_To_Fit_Width(E, Block));
-                    Block.Right = CSSValue.From_Int(Solve_Abs_Block_Equation(E, Block, "Right"));
+                    CssValue oleft = Block.Left;
+                    Block.Left = CssValue.Zero;
+                    Block.Width = CssValue.From_Int(Find_Shrink_To_Fit_Width(E, Block));
+                    Block.Right = CssValue.From_Int(Solve_Abs_Block_Equation(E, Block, "Right"));
                 }
             }
-            else if (Block.Left != CSSValue.Auto && Block.Width != CSSValue.Auto && Block.Right != CSSValue.Auto)
+            else if (Block.Left != CssValue.Auto && Block.Width != CssValue.Auto && Block.Right != CssValue.Auto)
             {// None of the three are Auto
-                if (Block.Margin_Left == CSSValue.Auto && Block.Margin_Right == CSSValue.Auto)
+                if (Block.Margin_Left == CssValue.Auto && Block.Margin_Right == CssValue.Auto)
                 {
                     int margin = Solve_Abs_Block_Equation(E, Block, "margin_left", "margin_right");
                     if (margin > 0)
                     {
                         int mval = (margin / 2);
-                        Block.Margin_Left = CSSValue.From_Int(mval);
-                        Block.Margin_Right = CSSValue.From_Int(mval);
+                        Block.Margin_Left = CssValue.From_Int(mval);
+                        Block.Margin_Right = CssValue.From_Int(mval);
                     }
                     else// equal margins would be zero, solve for just one
                     {
-                        Block.Margin_Left = CSSValue.Zero;
-                        Block.Margin_Right = CSSValue.From_Int(Solve_Abs_Block_Equation(E, Block));
+                        Block.Margin_Left = CssValue.Zero;
+                        Block.Margin_Right = CssValue.From_Int(Solve_Abs_Block_Equation(E, Block));
                     }
                 }
-                else if (Block.Margin_Left == CSSValue.Auto)
+                else if (Block.Margin_Left == CssValue.Auto)
                 {
-                    Block.Margin_Left = CSSValue.From_Int(Solve_Abs_Block_Equation(E, Block));
+                    Block.Margin_Left = CssValue.From_Int(Solve_Abs_Block_Equation(E, Block));
                 }
-                else if (Block.Margin_Right == CSSValue.Auto)
+                else if (Block.Margin_Right == CssValue.Auto)
                 {
-                    Block.Margin_Right = CSSValue.From_Int(Solve_Abs_Block_Equation(E, Block));
+                    Block.Margin_Right = CssValue.From_Int(Solve_Abs_Block_Equation(E, Block));
                 }
                 else// Overconstrained (all values that affect block width are set to an absolute value)
                 {// We need to ignore one of the set property values that affect block width and act like it's 'Auto', eg solve for it.
                     // Only support LTR direction, so ignore the 'Right' value
-                    Block.Right = CSSValue.From_Int(Solve_Abs_Block_Equation(E, Block, "right"));
+                    Block.Right = CssValue.From_Int(Solve_Abs_Block_Equation(E, Block, "right"));
                 }
             }
             else
             {// If all else fails we set margin left/right to 0 and do some rule matching
-                Block.Margin_Left = CSSValue.Zero;
-                Block.Margin_Right = CSSValue.Zero;
+                Block.Margin_Left = CssValue.Zero;
+                Block.Margin_Right = CssValue.Zero;
                 
-                if (Block.Right != CSSValue.Auto && Block.Left == CSSValue.Auto && Block.Width == CSSValue.Auto)
+                if (Block.Right != CssValue.Auto && Block.Left == CssValue.Auto && Block.Width == CssValue.Auto)
                 {// Left and Width are 'Auto'
-                    Block.Left = CSSValue.Zero;
-                    Block.Width = CSSValue.From_Int(Find_Shrink_To_Fit_Width(E, Block));
-                    Block.Left = CSSValue.From_Int(Solve_Abs_Block_Equation(E, Block, "left"));
+                    Block.Left = CssValue.Zero;
+                    Block.Width = CssValue.From_Int(Find_Shrink_To_Fit_Width(E, Block));
+                    Block.Left = CssValue.From_Int(Solve_Abs_Block_Equation(E, Block, "left"));
                 }
-                else if (Block.Width != CSSValue.Auto && Block.Left == CSSValue.Auto && Block.Right == CSSValue.Auto)
+                else if (Block.Width != CssValue.Auto && Block.Left == CssValue.Auto && Block.Right == CssValue.Auto)
                 {// Left and Right are 'Auto', we can only solve for one though
                     // Left gets the static position
-                    Block.Left = CSSValue.From_Number(E.Block_Containing.Left);
-                    Block.Right = CSSValue.From_Int(Solve_Abs_Block_Equation(E, Block));
+                    Block.Left = CssValue.From_Number(E.Block_Containing.Left);
+                    Block.Right = CssValue.From_Int(Solve_Abs_Block_Equation(E, Block));
                 }
-                else if (Block.Left != CSSValue.Auto && Block.Width == CSSValue.Auto && Block.Right == CSSValue.Auto)
+                else if (Block.Left != CssValue.Auto && Block.Width == CssValue.Auto && Block.Right == CssValue.Auto)
                 {// Width and Right are 'Auto'
-                    Block.Width = CSSValue.From_Int(Find_Shrink_To_Fit_Width(E, Block));
-                    Block.Right = CSSValue.From_Int(Solve_Abs_Block_Equation(E, Block));
+                    Block.Width = CssValue.From_Int(Find_Shrink_To_Fit_Width(E, Block));
+                    Block.Right = CssValue.From_Int(Solve_Abs_Block_Equation(E, Block));
                 }
-                else if (Block.Left == CSSValue.Auto && Block.Width != CSSValue.Auto && Block.Right != CSSValue.Auto)
+                else if (Block.Left == CssValue.Auto && Block.Width != CssValue.Auto && Block.Right != CssValue.Auto)
                 {// Solve for Left
-                    Block.Left = CSSValue.From_Int(Solve_Abs_Block_Equation(E, Block));
+                    Block.Left = CssValue.From_Int(Solve_Abs_Block_Equation(E, Block));
                 }
-                else if (Block.Width == CSSValue.Auto && Block.Left != CSSValue.Auto && Block.Right != CSSValue.Auto)
+                else if (Block.Width == CssValue.Auto && Block.Left != CssValue.Auto && Block.Right != CssValue.Auto)
                 {// Solve for Width
-                    Block.Width = CSSValue.From_Int(Solve_Abs_Block_Equation(E, Block));
+                    Block.Width = CssValue.From_Int(Solve_Abs_Block_Equation(E, Block));
                 }
-                else if (Block.Right == CSSValue.Auto && Block.Left != CSSValue.Auto && Block.Width != CSSValue.Auto)
+                else if (Block.Right == CssValue.Auto && Block.Left != CssValue.Auto && Block.Width != CssValue.Auto)
                 {// Solve for Right
-                    Block.Right = CSSValue.From_Int(Solve_Abs_Block_Equation(E, Block));
+                    Block.Right = CssValue.From_Int(Solve_Abs_Block_Equation(E, Block));
                 }
             }
         }
@@ -1667,51 +1691,51 @@ namespace CssUI
             // Width determined using same method as for inline-replaced elements
             BlockProperties tmp = new BlockProperties(Block);
             Get_Tentative_Inline_Or_InlineBlock_Or_Floating_Replaced(E, tmp);
-            Block.Width = CSSValue.From_Number(tmp.Width.Resolve_Or_Default(0));
+            Block.Width = CssValue.From_Number(tmp.Width.Resolve_Or_Default(0));
 
-            if (Block.Margin_Left == CSSValue.Auto || Block.Margin_Right == CSSValue.Auto)
+            if (Block.Margin_Left == CssValue.Auto || Block.Margin_Right == CssValue.Auto)
             {
-                if (Block.Left == CSSValue.Auto && Block.Right == CSSValue.Auto)
+                if (Block.Left == CssValue.Auto && Block.Right == CssValue.Auto)
                 {
-                    Block.Left = CSSValue.From_Int(E.Block_Containing.Left);
+                    Block.Left = CssValue.From_Int(E.Block_Containing.Left);
                 }
 
-                if (Block.Left == CSSValue.Auto || Block.Right == CSSValue.Auto)
+                if (Block.Left == CssValue.Auto || Block.Right == CssValue.Auto)
                 {
-                    if (Block.Margin_Left == CSSValue.Auto) Block.Margin_Left = CSSValue.Zero;
-                    if (Block.Margin_Right == CSSValue.Auto) Block.Margin_Right = CSSValue.Zero;
+                    if (Block.Margin_Left == CssValue.Auto) Block.Margin_Left = CssValue.Zero;
+                    if (Block.Margin_Right == CssValue.Auto) Block.Margin_Right = CssValue.Zero;
                 }
 
-                if (Block.Margin_Left == CSSValue.Auto && Block.Margin_Right == CSSValue.Auto)
+                if (Block.Margin_Left == CssValue.Auto && Block.Margin_Right == CssValue.Auto)
                 {
                     int margin = Solve_Abs_Block_Equation(E, Block, "margin_left", "margin_right");
                     if (margin > 0)
                     {
                         int mval = (margin / 2);
-                        Block.Margin_Left = CSSValue.From_Int(mval);
-                        Block.Margin_Right = CSSValue.From_Int(mval);
+                        Block.Margin_Left = CssValue.From_Int(mval);
+                        Block.Margin_Right = CssValue.From_Int(mval);
                     }
                     else
                     {
-                        Block.Margin_Left = CSSValue.Zero;
-                        Block.Margin_Right = CSSValue.From_Number(Solve_Abs_Block_Equation(E, Block));
+                        Block.Margin_Left = CssValue.Zero;
+                        Block.Margin_Right = CssValue.From_Number(Solve_Abs_Block_Equation(E, Block));
                     }
                 }
 
                 // If at this point there is an 'Auto' value left, solve for it
                 // Width was already solved, margin-left/right HAVE to be solved now, padding cannot have AUTO values, nor can border-widths. so we just have to check on Left and Right
-                if (Block.Left == CSSValue.Auto)
+                if (Block.Left == CssValue.Auto)
                 {
-                    Block.Left = CSSValue.From_Number(Solve_Abs_Block_Equation(E, Block));
+                    Block.Left = CssValue.From_Number(Solve_Abs_Block_Equation(E, Block));
                 }
-                if (Block.Right == CSSValue.Auto)
+                if (Block.Right == CssValue.Auto)
                 {
-                    Block.Right = CSSValue.From_Number(Solve_Abs_Block_Equation(E, Block));
+                    Block.Right = CssValue.From_Number(Solve_Abs_Block_Equation(E, Block));
                 }
 
-                if (Block.Left != CSSValue.Auto && Block.Margin_Left != CSSValue.Auto && Block.Padding_Left != CSSValue.Auto && Block.Width != CSSValue.Auto && Block.Padding_Right != CSSValue.Auto && Block.Margin_Right != CSSValue.Auto && Block.Right != CSSValue.Auto)
+                if (Block.Left != CssValue.Auto && Block.Margin_Left != CssValue.Auto && Block.Padding_Left != CssValue.Auto && Block.Width != CssValue.Auto && Block.Padding_Right != CssValue.Auto && Block.Margin_Right != CssValue.Auto && Block.Right != CssValue.Auto)
                 {// Over-constrained
-                    Block.Right = CSSValue.From_Number(Solve_Abs_Block_Equation(E, Block, "right"));
+                    Block.Right = CssValue.From_Number(Solve_Abs_Block_Equation(E, Block, "right"));
                 }
             }
         }
@@ -1721,13 +1745,13 @@ namespace CssUI
         internal static void Get_Tentative_Inline_Block_NonReplaced(cssElement E, BlockProperties Block)
         {// SEE:  https://www.w3.org/TR/css3-box/#lsquo
 
-            if (Block.Width == CSSValue.Auto) Block.Width = CSSValue.From_Int(Find_Shrink_To_Fit_Width(E, Block));
-            if (Block.Height == CSSValue.Auto) Block.Height = CSSValue.From_Int((Block.Content_Height.HasValue ? Block.Content_Height.Value : 0));
+            if (Block.Width == CssValue.Auto) Block.Width = CssValue.From_Int(Find_Shrink_To_Fit_Width(E, Block));
+            if (Block.Height == CssValue.Auto) Block.Height = CssValue.From_Int((Block.Content_Height.HasValue ? Block.Content_Height.Value : 0));
             
-            if (Block.Margin_Top == CSSValue.Auto) Block.Margin_Top = CSSValue.Zero;
-            if (Block.Margin_Right == CSSValue.Auto) Block.Margin_Right = CSSValue.Zero;
-            if (Block.Margin_Bottom == CSSValue.Auto) Block.Margin_Bottom = CSSValue.Zero;
-            if (Block.Margin_Left == CSSValue.Auto) Block.Margin_Left = CSSValue.Zero;
+            if (Block.Margin_Top == CssValue.Auto) Block.Margin_Top = CssValue.Zero;
+            if (Block.Margin_Right == CssValue.Auto) Block.Margin_Right = CssValue.Zero;
+            if (Block.Margin_Bottom == CssValue.Auto) Block.Margin_Bottom = CssValue.Zero;
+            if (Block.Margin_Left == CssValue.Auto) Block.Margin_Left = CssValue.Zero;
         }
         #endregion
 

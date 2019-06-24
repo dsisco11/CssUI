@@ -52,7 +52,7 @@ namespace CssUI.CSS
         /// <param name="value"></param>
         public void Set(double? value)
         {
-            var newValue = CSSValue.From_Number(value, CSSValue.Null);
+            var newValue = CssValue.From_Number(value, CssValue.Null);
             if (Assigned != newValue)
             {
                 Assigned = newValue;

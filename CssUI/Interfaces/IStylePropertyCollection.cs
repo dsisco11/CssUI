@@ -14,7 +14,7 @@ namespace CssUI.CSS
         /// </summary>
         bool IsDependent { get; }
         /// <summary>
-        /// Return TRUE if any values are set to <see cref="CSSValue.Auto"/>
+        /// Return TRUE if any values are set to <see cref="CssValue.Auto"/>
         /// </summary>
         bool IsAuto { get; }
     }

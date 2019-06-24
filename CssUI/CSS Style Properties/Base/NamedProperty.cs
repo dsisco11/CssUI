@@ -26,7 +26,7 @@ namespace CssUI.CSS
             }
         }
         cssElement owner = null;
-        public Func<NamedProperty, CSSValue> Inheritance_Resolver;
+        public Func<NamedProperty, CssValue> Inheritance_Resolver;
 
         /// <summary>
         /// If non-null then this named property is a sub-property Eg: the property "Left" within "Margins"
@@ -88,7 +88,7 @@ namespace CssUI.CSS
         /// </summary>
         /// <param name="e"></param>
         /// <param name="FieldName"></param>
-        protected CSSValue Get_Inherited()
+        protected CssValue Get_Inherited()
         {
             return Inheritance_Resolver?.Invoke(this);
         }

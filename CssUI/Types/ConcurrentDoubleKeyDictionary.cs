@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Logging;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Text;
 
 namespace CssUI
 {
@@ -48,7 +47,7 @@ namespace CssUI
             {
                 if ( !MapInverse[key2].TryAdd(key1, value) )
                 {
-                    Logger.Error(nameof(ConcurrentDoubleKeyDictionary<Key1, Key2, Vty>), $"Failed to add entry to inverse map!");
+                    Log.Error(nameof(ConcurrentDoubleKeyDictionary<Key1, Key2, Vty>), $"Failed to add entry to inverse map!");
                 }
 
                 return true;

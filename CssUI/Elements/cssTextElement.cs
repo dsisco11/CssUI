@@ -1,4 +1,6 @@
-﻿using CssUI.Fonts;
+﻿
+using System;
+using CssUI.Fonts;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -9,6 +11,7 @@ using System.Numerics;
 
 namespace CssUI
 {
+
     /// <summary>
     /// Draws lines of text
     /// </summary>
@@ -36,10 +39,6 @@ namespace CssUI
                 Invalidate_Text();
             }
         }
-        /// <summary>
-        /// If true then next time the control goes to draw it will call <see cref="Update_Text"/> first
-        /// </summary>
-        bool Dirty_Text = true;
         #endregion
 
         #region Constructors
@@ -52,7 +51,8 @@ namespace CssUI
 
         private void Style_Property_Change(IStyleProperty Sender, EPropertyFlags Flags, System.Diagnostics.StackTrace Origin)
         {
-            if ((Flags & EPropertyFlags.Font) != 0) Invalidate_Text();
+            if ((Flags & EPropertyFlags.Font) != 0)
+                Invalidate_Text();
         }
         #endregion
 
@@ -67,7 +67,14 @@ namespace CssUI
         #region Drawing
         protected override void Draw()
         {
-            if (Dirty_Text) Update_Text();
+            if (Dirt > 0)
+            {
+                if ((Dirt & EElementDirtyBit.Text) > 0)
+                    Update_Text();
+
+                Dirt = EElementDirtyBit.None;
+            }
+
             if (Texture == null) return;
             
             Root.Engine.Set_Color(Color);
@@ -77,12 +84,15 @@ namespace CssUI
         }
         #endregion
 
-        #region Text Handling
+        #region Invalidation
 
         private void Invalidate_Text()
         {
-            Dirty_Text = true;
+            Dirt &= EElementDirtyBit.Text;
         }
+        #endregion
+
+        #region Text Handling
 
         /// <summary>
         /// Renders our text to a GL texture
@@ -106,11 +116,11 @@ namespace CssUI
                 //Style.Default.Width.Set(Texture.Size.Width);
                 //Style.Default.Height.Set(Texture.Size.Height);
             }
-            Dirty_Text = false;
+
+            // unset the text flag
+            Dirt &= ~EElementDirtyBit.Text;
         }
-
-
-
+        
 
         /*internal static void Setup_Text_Options(ref Graphics g)
         {
@@ -129,13 +139,13 @@ namespace CssUI
         /// <param name="Text"></param>
         /// <param name="textFont"></param>
         /// <returns></returns>
-        public static cssTexture From_Text_String(string Text, Font textFont)
+        public cssTexture From_Text_String(string Text, Font textFont)
         {
             if (string.IsNullOrEmpty(Text)) return null;
 
             GlyphBuilder glyphBuilder = new GlyphBuilder();
             TextRenderer renderer = new TextRenderer(glyphBuilder);
-            RendererOptions style = new RendererOptions(textFont, 72, PointF.Empty)
+            RendererOptions style = new RendererOptions(textFont, Style.DpiX, Style.DpiY, PointF.Empty)
             {
                 ApplyKerning = true,
                 TabWidth = 5,
@@ -154,6 +164,52 @@ namespace CssUI
             cssTexture retVal = null;
             // Create a bitmap to render the text to and grab a graphics object
             using (Image<Rgba32> img = new Image<Rgba32>(Configuration.Default, 1 +(int)sz.Width, 1+(int)sz.Height, Rgba32.Transparent))
+            {
+                // Form the glyph path list
+                renderer.RenderText(Text, style);
+                // Render the text
+                img.Mutate(x => x.Fill(Rgba32.White, glyphBuilder.Paths));
+                // Upload bitmap to our texture
+                retVal = new cssTexture(img);
+            }
+            return retVal;
+        }
+
+        /// <summary>
+        /// Returns a new texture with text rendered to it
+        /// </summary>
+        /// <param name="Text"></param>
+        /// <param name="textFont"></param>
+        /// <returns></returns>
+        public static cssTexture Render_Text_String(string Text, string fontFamily, float fontSize, FontStyle fontStyle = FontStyle.Regular)
+        {
+            if (string.IsNullOrEmpty(Text)) return null;
+
+            Font textFont = SystemFonts.CreateFont(fontFamily, fontSize, fontStyle);
+            IntPtr window = Platform.Factory.SystemWindows.Get_Window();
+            Vector2 Dpi = Platform.Factory.SystemMetrics.Get_DPI(window);
+
+            GlyphBuilder glyphBuilder = new GlyphBuilder();
+            TextRenderer renderer = new TextRenderer(glyphBuilder);
+            RendererOptions style = new RendererOptions(textFont, Dpi.X, Dpi.Y, PointF.Empty)
+            {
+                ApplyKerning = true,
+                TabWidth = 5,
+                WrappingWidth = 0,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Bottom,
+            };
+
+            // Measure the text, make sure its a valid size
+            SizeF sz = SizeF.Empty;
+            sz = TextMeasurer.Measure(Text, style);
+
+            if (sz.Width <= 0 || sz.Height <= 0)
+                return null;
+
+            cssTexture retVal = null;
+            // Create a bitmap to render the text to and grab a graphics object
+            using (Image<Rgba32> img = new Image<Rgba32>(Configuration.Default, 1 + (int)sz.Width, 1 + (int)sz.Height, Rgba32.Transparent))
             {
                 // Form the glyph path list
                 renderer.RenderText(Text, style);

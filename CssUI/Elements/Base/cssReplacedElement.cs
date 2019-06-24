@@ -23,8 +23,8 @@ namespace CssUI
         {
             //IntrinsicRatio = null;
             Style.Default.Intrinsic_Ratio.Set((double?)null);
-            Style.Default.Intrinsic_Width.Set(CSSValue.From_Int(width.Value, CSSValue.Null));
-            Style.Default.Intrinsic_Height.Set(CSSValue.From_Int(height.Value, CSSValue.Null));
+            Style.Default.Intrinsic_Width.Set(CssValue.From_Int(width.Value, CssValue.Null));
+            Style.Default.Intrinsic_Height.Set(CssValue.From_Int(height.Value, CssValue.Null));
             if (width.HasValue && height.HasValue)
                 Style.Default.Intrinsic_Ratio.Set((double)height.Value / (double)width.Value);
                 //IntrinsicRatio = new SizeRatio(width.Value, height.Value);
@@ -110,7 +110,7 @@ namespace CssUI
             switch (Style.ObjectFit)
             {
                 case EObjectFit.None:
-                    return Apply_Default_Sizing_Algorithm(new StyleSize(CSSValue.Null, CSSValue.Null), Size);
+                    return Apply_Default_Sizing_Algorithm(new StyleSize(CssValue.Null, CssValue.Null), Size);
                 case EObjectFit.Fill:
                     return Size;// Apply_Default_Sizing_Algorithm(new StyleSize(StyleValue.Unset, StyleValue.Unset), );
                 case EObjectFit.Contain:
@@ -119,7 +119,7 @@ namespace CssUI
                     return Apply_Cover_Constraint(Size);
                 case EObjectFit.Scale_Down:
                     {
-                        var sz = Apply_Default_Sizing_Algorithm(new StyleSize(CSSValue.Null, CSSValue.Null), Size);
+                        var sz = Apply_Default_Sizing_Algorithm(new StyleSize(CssValue.Null, CssValue.Null), Size);
                         if (sz.Width < Size.Width || sz.Height < Size.Height) return Size;
                         return sz;
                     }

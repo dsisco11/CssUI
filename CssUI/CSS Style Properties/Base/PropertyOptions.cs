@@ -10,11 +10,11 @@ namespace CssUI.CSS
     {
         #region Options
         /// <summary>
-        /// Whether or not the property can be set to <see cref="CSSValue.Auto"/>
+        /// Whether or not the property can be set to <see cref="CssValue.Auto"/>
         /// </summary>
         public bool AllowAuto = true;
         /// <summary>
-        /// Whether or not the property can be set to <see cref="CSSValue.Inherit"/>
+        /// Whether or not the property can be set to <see cref="CssValue.Inherit"/>
         /// </summary>
         public bool AllowInherited = true;
         /// <summary>
@@ -22,7 +22,7 @@ namespace CssUI.CSS
         /// </summary>
         public bool AllowPercentage = true;
         /// <summary>
-        /// Whether or not both Implicit and Explicit values start out as <see cref="CSSValue.Null"/>
+        /// Whether or not both Implicit and Explicit values start out as <see cref="CssValue.Null"/>
         /// </summary>
         public bool UnsetAll = false;
         #endregion
@@ -47,7 +47,7 @@ namespace CssUI.CSS
         /// </summary>
         /// <param name="Value"></param>
         /// <returns></returns>
-        public bool IsValid(CSSValue Value)
+        public bool IsValid(CssValue Value)
         {
             switch (Value.Type)
             {
@@ -67,7 +67,7 @@ namespace CssUI.CSS
         /// </summary>
         /// <param name="Value"></param>
         /// <returns></returns>
-        public void CheckAndThrow(IStyleProperty Owner, CSSValue Value)
+        public void CheckAndThrow(IStyleProperty Owner, CssValue Value)
         {
             switch (Value.Type)
             {

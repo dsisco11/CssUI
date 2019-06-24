@@ -1,12 +1,9 @@
-﻿
+﻿#if WINDOWS
 using CssUI.Platform;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 
 
@@ -68,3 +65,4 @@ namespace CssUI.Platform.Win32
     #endregion
         
 }
+#endif

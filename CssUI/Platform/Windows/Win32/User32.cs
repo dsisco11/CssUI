@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if WINDOWS
+using System;
 using System.Runtime.InteropServices;
 
 namespace CssUI.Platform.Win32
@@ -12,6 +13,16 @@ namespace CssUI.Platform.Win32
 
         [DllImport("user32.dll")]
         public static extern int GetSystemMetrics(int ID);
+
+        [DllImport("user32.dll")]
+        public static extern int GetDpiForWindow(IntPtr hWnd);
+
+        /// <summary>
+        /// Returns a handle to the desktop window
+        /// </summary>
+        /// <returns></returns>
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern IntPtr GetDesktopWindow();
 
         /// <summary>
         /// Retrieves the current double-click time for the mouse. A double-click is a series of two clicks of the mouse button, the second occurring within a specified time after the first. The double-click time is the maximum number of milliseconds that may occur between the first and second click of a double-click. The maximum double-click time is 5000 milliseconds.
@@ -27,13 +38,17 @@ namespace CssUI.Platform.Win32
         public static extern bool GetMonitorInfo(IntPtr hmonitor, [In, Out]MONITORINFOEX info);
 
         [DllImport("User32.dll", ExactSpelling = true)]
-        public static extern IntPtr MonitorFromPoint(POINTSTRUCT pt, int flags);
+        public static extern IntPtr MonitorFromPoint(POINTSTRUCT pt, MONITOR_FLAG flags);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
         public static extern IntPtr GetForegroundWindow();
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern int GetWindowThreadProcessId(IntPtr handle, out int processId);
+
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true, ExactSpelling = true)]
+        public static extern IntPtr GetActiveWindow();
 
         /// <summary>
         /// https://msdn.microsoft.com/en-us/library/dd145064(v=vs.85).aspx
@@ -43,7 +58,7 @@ namespace CssUI.Platform.Win32
         /// <param name="info"></param>
         /// <returns></returns>
         [DllImport("user32.dll", ExactSpelling = true)]
-        public static extern IntPtr MonitorFromWindow(IntPtr hWnd, int flags);
+        public static extern IntPtr MonitorFromWindow(IntPtr hWnd, MONITOR_FLAG flags);
 
 
 
@@ -60,7 +75,7 @@ namespace CssUI.Platform.Win32
     /// Windows system-metrics item ID's.
     /// (Used with <see cref="User32.GetSystemMetrics(int)"/>)
     /// </summary>
-    enum SYSTEM_METRICS : int
+    public enum SYSTEM_METRICS : int
     {
         /// <summary>The width of a vertical scroll bar, in pixels.</summary>
         SM_CXVSCROLL = 2,
@@ -90,9 +105,12 @@ namespace CssUI.Platform.Win32
 
 
     [Flags]
-    enum MONITOR_FLAG : uint
+    public enum MONITOR_FLAG : int
     {
-        DEFAULTTOPRIMARY = 0x00000001,
-        DEFAULTTONEAREST = 0x00000002
+
+        MONITOR_DEFAULTTONULL    = 0x00000000,
+        MONITOR_DEFAULTTOPRIMARY = 0x00000001,
+        MONITOR_DEFAULTTONEAREST = 0x00000002
     }
 }
+#endif

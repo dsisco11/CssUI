@@ -1,12 +1,10 @@
 ﻿
-
-
 namespace CssUI
 {
     /// <summary>
-    /// Specifies all of the reasons for which a uiElement's block may be flagged as dirty.
+    /// Specifies all of the reasons for which a cssElement's block may be flagged as dirty.
     /// </summary>
-    public enum EUIInvalidationReason
+    public enum ECssBlockInvalidationReason
     {
         /// <summary>
         /// </summary>

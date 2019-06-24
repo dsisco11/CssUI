@@ -41,22 +41,34 @@ namespace CssUI
         bool HasValue { get; }
 
         /// <summary>
-        /// Returns TRUE if the assigned value is <see cref="CSSValue.Inherit"/>
+        /// Returns TRUE if the assigned value is <see cref="CssValue.Inherit"/>
         /// </summary>
         bool IsInherited { get; }
 
         /// <summary>
-        /// Overwrites the values of this instance with any values from another which aren't <see cref="CSSValue.Null"/>
+        /// Overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
         /// </summary>
         /// <returns>Success</returns>
         bool Cascade(IStyleProperty value);
+
+        /// <summary>
+        /// Asynchronously overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
+        /// </summary>
+        /// <returns>Success</returns>
+        Task<bool> CascadeAsync(IStyleProperty value);
 
         /// <summary>
         /// Overwrites the assigned value of this instance with values from another if they are different
         /// </summary>
         /// <returns>Success</returns>
         bool Overwrite(IStyleProperty value);
-        
+
+        /// <summary>
+        /// Asynchronously overwrites the assigned value of this instance with values from another if they are different
+        /// </summary>
+        /// <returns>Success</returns>
+        Task<bool> OverwriteAsync(IStyleProperty value);
+
 
         /// <summary>
         /// Allows external code to notify this property that a certain unit type has changed scale and if we have a value which uses that unit-type we need to fire our Changed event because our Computed value will be different

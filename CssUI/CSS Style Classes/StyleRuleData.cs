@@ -11,7 +11,7 @@ using CssUI.CSS;
 namespace CssUI
 {
     /// <summary>
-    /// Holds all of the styling propertys that a UI element uses
+    /// Holds all of the styling propertys that a css element uses
     /// Each different styling state of an element gets it's own instance of this class which 
     /// are then all cascaded together to determine the current value when the elements active state changes.
     /// </summary>
@@ -215,6 +215,8 @@ namespace CssUI
         #endregion
 
         #region Font
+        public readonly NumberProperty DpiX;
+        public readonly NumberProperty DpiY;
         public readonly IntProperty FontWeight;
         public readonly EnumProperty<EFontStyle> FontStyle;
         public readonly NumberProperty FontSize;
@@ -259,7 +261,7 @@ namespace CssUI
         /// Creates a new set of element styling properties
         /// </summary>
         /// <param name="Locked">If TRUE then none of this instances property values may be set directly.</param>
-        /// <param name="Unset">If TRUE then property values will all be set to <see cref="CSSValue.Null"/>.</param>
+        /// <param name="Unset">If TRUE then property values will all be set to <see cref="CssValue.Null"/>.</param>
         public StyleRuleData(CssSelector Selector, cssElement Owner, bool Locked = false, bool Unset = false) : this(null, Selector, Owner, Locked, Unset)
         {
         }
@@ -268,7 +270,7 @@ namespace CssUI
         /// Creates a new set of element styling properties
         /// </summary>
         /// <param name="Locked">If TRUE then none of this instances property values may be set directly.</param>
-        /// <param name="Unset">If TRUE then property values will all be set to <see cref="CSSValue.Null"/>.</param>
+        /// <param name="Unset">If TRUE then property values will all be set to <see cref="CssValue.Null"/>.</param>
         public StyleRuleData(string Name, CssSelector Selector, cssElement Owner, bool Locked = false, bool Unset = false)
         {
             this.Name = Name;
@@ -327,6 +329,8 @@ namespace CssUI
 
             TextAlign = new EnumProperty<ETextAlign>("text-align", Owner, this.Locked, Unset, new PropertyOptions() { });
 
+            DpiX = new NumberProperty("dpi-x", Owner, this.Locked, Unset, new PropertyOptions() { });
+            DpiY = new NumberProperty("dpi-y", Owner, this.Locked, Unset, new PropertyOptions() { });
             FontWeight = new IntProperty("font-weight", Owner, this.Locked, Unset, new PropertyOptions() { AllowPercentage = false });
             FontStyle = new EnumProperty<EFontStyle>("font-style", Owner, this.Locked, Unset, new PropertyOptions() { });
             FontSize = new NumberProperty("font-size", Owner, this.Locked, Unset, new PropertyOptions() { });
@@ -437,12 +441,13 @@ namespace CssUI
         #endregion
 
         #region Value Management
-        // TODO: Don't do cascading/overwriting on ALL properties, just a list of the ones that we know are set...
+        // XXX: Don't do cascading/overwriting on ALL properties, just a list of the ones that we know are set...
 
         /// <summary>
         /// Overwrites the property values of this instance with those of any set property values from another instance.
         /// </summary>
         /// <param name="props"></param>
+        [Obsolete("Please use CascadeAsync instead.")]
         internal void Cascade(StyleRuleData props)
         {
             //var tid = Timing.Start("Cascade");
@@ -458,9 +463,33 @@ namespace CssUI
         }
 
         /// <summary>
+        /// Overwrites the property values of this instance with those of any set property values from another instance.
+        /// </summary>
+        /// <param name="props"></param>
+        internal async Task CascadeAsync(StyleRuleData props)
+        {
+            //var tid = Timing.Start("Cascade");
+            AsyncCountdownEvent ctdn = new AsyncCountdownEvent(props.SetProperties.Count);
+            Parallel.ForEach<AtomicString>(props.SetProperties, async (name) =>
+            {
+                FieldInfo Field = PropertyMap[name];
+                var val = (IStyleProperty)Field.GetValue(props);
+                var mv = (IStyleProperty)Field.GetValue(this);
+
+                await mv.CascadeAsync(val);
+                // Signal our original thread that we are 1 step closer to being done
+                ctdn.Signal();
+            });
+
+            await ctdn.WaitAsync();
+            //Timing.Stop(tid);
+        }
+
+        /// <summary>
         /// Overwrites any differing property values
         /// </summary>
         /// <param name="props"></param>
+        [Obsolete("Please use OverwriteAsync instead.")]
         internal void Overwrite(StyleRuleData props)
         {
             for (int i = 0; i < PropertyList.Count; i++)
@@ -471,6 +500,26 @@ namespace CssUI
                 
                 mv.Overwrite(val);
             }
+        }
+
+        /// <summary>
+        /// Overwrites any differing property values
+        /// </summary>
+        /// <param name="props"></param>
+        internal async Task OverwriteAsync(StyleRuleData props)
+        {
+            AsyncCountdownEvent ctdn = new AsyncCountdownEvent(PropertyList.Count);
+            Parallel.For(0, PropertyList.Count, async (i) =>
+            {
+                FieldInfo Field = PropertyList[i];
+                var val = (IStyleProperty)Field.GetValue(props);
+                var mv = (IStyleProperty)Field.GetValue(this);
+
+                await mv.OverwriteAsync(val);
+                ctdn.Signal();
+            });
+
+            await ctdn.WaitAsync();
         }
         #endregion
 
@@ -483,7 +532,7 @@ namespace CssUI
             Padding_Bottom.Set(vertical);
             Padding_Left.Set(horizontal);
         }
-        public void Set_Padding(CSSValue horizontal, CSSValue vertical)
+        public void Set_Padding(CssValue horizontal, CssValue vertical)
         {
             Padding_Top.Set(vertical);
             Padding_Right.Set(horizontal);
@@ -497,7 +546,7 @@ namespace CssUI
             Padding_Bottom.Set(bottom);
             Padding_Left.Set(left);
         }
-        public void Set_Padding(CSSValue top, CSSValue right, CSSValue bottom, CSSValue left)
+        public void Set_Padding(CssValue top, CssValue right, CssValue bottom, CssValue left)
         {
             Padding_Top.Set(top);
             Padding_Right.Set(right);
@@ -511,7 +560,7 @@ namespace CssUI
             Padding_Bottom.Set(vertical);
             Padding_Left.Set(horizontal);
         }
-        public void Set_Padding_Implicit(CSSValue horizontal, CSSValue vertical)
+        public void Set_Padding_Implicit(CssValue horizontal, CssValue vertical)
         {
             Padding_Top.Set(vertical);
             Padding_Right.Set(horizontal);
@@ -525,7 +574,7 @@ namespace CssUI
             Padding_Bottom.Set(bottom);
             Padding_Left.Set(left);
         }
-        public void Set_Padding_Implicit(CSSValue top, CSSValue right, CSSValue bottom, CSSValue left)
+        public void Set_Padding_Implicit(CssValue top, CssValue right, CssValue bottom, CssValue left)
         {
             Padding_Top.Set(top);
             Padding_Right.Set(right);
@@ -543,7 +592,7 @@ namespace CssUI
             Margin_Bottom.Set(vertical);
             Margin_Left.Set(horizontal);
         }
-        public void Set_Margin(CSSValue horizontal, CSSValue vertical)
+        public void Set_Margin(CssValue horizontal, CssValue vertical)
         {
             Margin_Top.Set(vertical);
             Margin_Right.Set(horizontal);
@@ -557,7 +606,7 @@ namespace CssUI
             Margin_Bottom.Set(bottom);
             Margin_Left.Set(left);
         }
-        public void Set_Margin(CSSValue top, CSSValue right, CSSValue bottom, CSSValue left)
+        public void Set_Margin(CssValue top, CssValue right, CssValue bottom, CssValue left)
         {
             Margin_Top.Set(top);
             Margin_Right.Set(right);
@@ -571,7 +620,7 @@ namespace CssUI
             Margin_Bottom.Set(vertical);
             Margin_Left.Set(horizontal);
         }
-        public void Set_Margin_Implicit(CSSValue horizontal, CSSValue vertical)
+        public void Set_Margin_Implicit(CssValue horizontal, CssValue vertical)
         {
             Margin_Top.Set(vertical);
             Margin_Right.Set(horizontal);
@@ -585,7 +634,7 @@ namespace CssUI
             Margin_Bottom.Set(bottom);
             Margin_Left.Set(left);
         }
-        public void Set_Margin_Implicit(CSSValue top, CSSValue right, CSSValue bottom, CSSValue left)
+        public void Set_Margin_Implicit(CssValue top, CssValue right, CssValue bottom, CssValue left)
         {
             Margin_Top.Set(top);
             Margin_Right.Set(right);
@@ -601,7 +650,7 @@ namespace CssUI
             Left.Set(x);
             Top.Set(y);
         }
-        public void Set_Position(CSSValue x, CSSValue y)
+        public void Set_Position(CssValue x, CssValue y)
         {
             Left.Set(x);
             Top.Set(y);
@@ -611,7 +660,7 @@ namespace CssUI
             Left.Set(x);
             Top.Set(y);
         }
-        internal void Set_Position_Implicit(CSSValue x, CSSValue y)
+        internal void Set_Position_Implicit(CssValue x, CssValue y)
         {
             Left.Set(x);
             Top.Set(y);
@@ -625,7 +674,7 @@ namespace CssUI
             Width.Set(width);
             Height.Set(height);
         }
-        public void Set_Size(CSSValue width, CSSValue height)
+        public void Set_Size(CssValue width, CssValue height)
         {
             Width.Set(width);
             Height.Set(height);
@@ -635,7 +684,7 @@ namespace CssUI
             Width.Set(width);
             Height.Set(height);
         }
-        public void Set_Size_Implicit(CSSValue width, CSSValue height)
+        public void Set_Size_Implicit(CssValue width, CssValue height)
         {
             Width.Set(width);
             Height.Set(height);
@@ -649,7 +698,7 @@ namespace CssUI
             Min_Width.Set(width);
             Min_Height.Set(height);
         }
-        public void Set_SizeMin(CSSValue width, CSSValue height)
+        public void Set_SizeMin(CssValue width, CssValue height)
         {
             Min_Width.Set(width);
             Min_Height.Set(height);
@@ -659,7 +708,7 @@ namespace CssUI
             Min_Width.Set(width);
             Min_Height.Set(height);
         }
-        public void Set_SizeMin_Implicit(CSSValue width, CSSValue height)
+        public void Set_SizeMin_Implicit(CssValue width, CssValue height)
         {
             Min_Width.Set(width);
             Min_Height.Set(height);
@@ -673,7 +722,7 @@ namespace CssUI
             Max_Width.Set(width);
             Max_Height.Set(height);
         }
-        public void Set_SizeMax(CSSValue width, CSSValue height)
+        public void Set_SizeMax(CssValue width, CssValue height)
         {
             Max_Width.Set(width);
             Max_Height.Set(height);
@@ -683,7 +732,7 @@ namespace CssUI
             Max_Width.Set(width);
             Max_Height.Set(height);
         }
-        public void Set_SizeMax_Implicit(CSSValue width, CSSValue height)
+        public void Set_SizeMax_Implicit(CssValue width, CssValue height)
         {
             Max_Width.Set(width);
             Max_Height.Set(height);

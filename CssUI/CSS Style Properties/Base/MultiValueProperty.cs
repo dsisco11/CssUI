@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CssUI.CSS;
 
 namespace CssUI
 {
     /// <summary>
-    /// Represents a style property which consists of multiple <see cref="CSSValue"/>s
+    /// Represents a style property which consists of multiple <see cref="CssValue"/>s
     /// </summary>
     public abstract class MultiValueProperty : IStyleProperty
     {
@@ -46,17 +48,17 @@ namespace CssUI
         /// <summary>
         /// List of all our values
         /// </summary>
-        protected List<CSSValue> Values = new List<CSSValue>(0);        
+        protected List<CssValue> Values = new List<CssValue>(0);        
         #endregion
 
         #region Accessors
 
         /// <summary>
-        /// Return TRUE if the assigned value is set to <see cref="CSSValue.Auto"/>
+        /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// </summary>
         public virtual bool IsAuto { get { return Specified.FirstOrDefault().Type == EStyleDataType.AUTO; } }
         /// <summary>
-        /// Returns TRUE if the assigned value is <see cref="CSSValue.Inherit"/>
+        /// Returns TRUE if the assigned value is <see cref="CssValue.Inherit"/>
         /// </summary>
         public virtual bool IsInherited { get { return Specified.FirstOrDefault().Type == EStyleDataType.INHERIT; } }
         /// <summary>
@@ -64,12 +66,12 @@ namespace CssUI
         /// </summary>
         public virtual bool HasDependent { get { return Specified.FirstOrDefault(o => o.Has_Flags(StyleValueFlags.Depends)) != null; } }
         /// <summary>
-        /// Return TRUE if the assigned value is set to <see cref="CSSValue.Auto"/>
+        /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if the assigned value has the <see cref="StyleValueFlags.Depends"/> flag
         /// </summary>
         public virtual bool HasDependentOrAuto { get { return (Specified.FirstOrDefault().Type == EStyleDataType.AUTO || Specified.FirstOrDefault(o => o.Has_Flags(StyleValueFlags.Depends)) != null); } }
         /// <summary>
-        /// Return TRUE if the assigned value is set to <see cref="CSSValue.Auto"/>
+        /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if the assigned value type is a percentage
         /// </summary>
         public virtual bool HasPercentageOrAuto { get { return (Specified.FirstOrDefault().Type == EStyleDataType.AUTO || Specified.FirstOrDefault(o => o.Type == EStyleDataType.PERCENT) != null); } }
@@ -83,40 +85,63 @@ namespace CssUI
         /// <summary>
         /// List of all the currently assigned values
         /// </summary>
-        public List<CSSValue> Assigned { get { return Values; } }
+        public List<CssValue> Assigned { get { return Values; } }
         /// <summary>
         /// Values we USE for the property, which can differ from assigned values.
         /// Eg: If no values are Assigned then the propertys defined initial value will be used.
         /// </summary>
-        public abstract List<CSSValue> Specified { get; }
+        public abstract List<CssValue> Specified { get; }
         /// <summary>
         /// The Specified values after being resolved to an absolute values, if possible
         /// </summary>
-        public abstract List<CSSValue> Computed { get; }
+        public abstract List<CssValue> Computed { get; }
         #endregion
 
 
 
         #region Cascade
         /// <summary>
-        /// Overwrites the values of this instance with any values from another which aren't <see cref="CSSValue.Null"/>
+        /// Overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
         /// </summary>
         /// <returns>Success</returns>
+        [Obsolete("Non-asynchronous function are now obsolete, please use CascadeAsync instead.")]
         public bool Cascade(IStyleProperty prop)
         {// Circumvents locking
             MultiValueProperty o = prop as MultiValueProperty;
             bool changes = false;
             var fval = o.Assigned.FirstOrDefault();
-            if (fval != CSSValue.Null && fval != CSSValue.None)
+            if (fval != CssValue.Null && fval != CssValue.None)
             {
                 changes = true;
-                Values = new List<CSSValue>(o.Assigned);
+                Values = new List<CssValue>(o.Assigned);
                 this.Source = o.Source;
                 this.Selector = o.Selector;
             }
 
             if (changes) onChanged?.Invoke(this);
             return changes;
+        }
+
+        /// <summary>
+        /// Overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
+        /// </summary>
+        /// <returns>Success</returns>
+        public async Task<bool> CascadeAsync(IStyleProperty prop)
+        {
+            MultiValueProperty o = prop as MultiValueProperty;
+            bool changes = false;
+            var fval = o.Assigned.FirstOrDefault();
+            if (fval != CssValue.Null && fval != CssValue.None)
+            {
+                changes = true;
+                Values = new List<CssValue>(o.Assigned);
+                this.Source = o.Source;
+                this.Selector = o.Selector;
+            }
+
+            if (changes) onChanged?.Invoke(this);
+
+            return await Task.FromResult(changes);
         }
         #endregion
 
@@ -125,6 +150,7 @@ namespace CssUI
         /// Overwrites the assigned values of this instance with values from another if they are different
         /// </summary>
         /// <returns>Success</returns>
+        [Obsolete("Non-asynchronous function are now obsolete, please use OverwriteAsync instead.")]
         public bool Overwrite(IStyleProperty prop)
         {// Circumvents locking
             MultiValueProperty o = prop as MultiValueProperty;
@@ -132,7 +158,7 @@ namespace CssUI
             if (o.Assigned != Assigned)
             {
                 changes = true;
-                Values = new List<CSSValue>(o.Assigned);
+                Values = new List<CssValue>(o.Assigned);
 
                 this.Source = o.Source;
                 this.Selector = o.Selector;
@@ -140,6 +166,27 @@ namespace CssUI
 
             if (changes) onChanged?.Invoke(this);
             return changes;
+        }
+
+        /// <summary>
+        /// Overwrites the assigned values of this instance with values from another if they are different
+        /// </summary>
+        /// <returns>Success</returns>
+        public async Task<bool> OverwriteAsync(IStyleProperty prop)
+        {// Circumvents locking
+            MultiValueProperty o = prop as MultiValueProperty;
+            bool changes = false;
+            if (o.Assigned != Assigned)
+            {
+                changes = true;
+                Values = new List<CssValue>(o.Assigned);
+
+                this.Source = o.Source;
+                this.Selector = o.Selector;
+            }
+
+            if (changes) onChanged?.Invoke(this);
+            return await Task.FromResult(changes);
         }
         #endregion
 

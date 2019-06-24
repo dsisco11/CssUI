@@ -1,4 +1,4 @@
-﻿using KeyPic.CSSUI.Enums;
+﻿using CssUI.Enums;
 
 namespace CssUI
 {

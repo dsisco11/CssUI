@@ -8,7 +8,7 @@ using CssUI.CSS;
 namespace CssUI
 {
     /// <summary>
-    /// Holds a function name and a set of <see cref="CSSValue"/> arguments
+    /// Holds a function name and a set of <see cref="CssValue"/> arguments
     /// </summary>
     public class StyleFunction
     {
@@ -20,10 +20,10 @@ namespace CssUI
         /// <summary>
         /// Arguments
         /// </summary>
-        public readonly CSSValue[] Args = null;
+        public readonly CssValue[] Args = null;
         #endregion
 
-        public StyleFunction(AtomicString Name, params CSSValue[] Args)
+        public StyleFunction(AtomicString Name, params CssValue[] Args)
         {
             this.Name = Name;
             this.Args = Args.ToArray();

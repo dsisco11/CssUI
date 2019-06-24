@@ -27,7 +27,7 @@ namespace CssUI
             Border = new uiBorderStyle(2, 2, 2, 2);
 
             bar = new cssBox("Bar");
-            bar.Style.User.Height.Set(CSSValue.Pct_OneHundred);
+            bar.Style.User.Height.Set(CssValue.Pct_OneHundred);
             bar.Color = new cssColor(1f, 1f, 1f, 1f);
             Add(bar);
         }

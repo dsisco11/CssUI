@@ -1,9 +1,6 @@
-﻿using CssUI.Platform;
+﻿#if WINDOWS
 using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+using System.Numerics;
 using System.Threading.Tasks;
 
 namespace CssUI.Platform.Windows
@@ -11,19 +8,19 @@ namespace CssUI.Platform.Windows
     /// <summary>
     /// Windows system metrics implementation
     /// </summary>
-    class WinMetrics : SystemMetricsBase
+    public class WindowsMetricsHandler : ISystemMetricsHandler
     {
-        public override Point Get_Drag_Event_Distance()
+        public Vector2 Get_Drag_Event_Distance()
         {
             int dX = 0;
             int dY = 0;
 
             dX = Platform.Win32.User32.GetSystemMetrics((int)Platform.Win32.SYSTEM_METRICS.SM_CXDRAG);
             dY = Platform.Win32.User32.GetSystemMetrics((int)Platform.Win32.SYSTEM_METRICS.SM_CYDRAG);
-            return new Point(dX, dY);
+            return new Vector2(dX, dY);
         }
 
-        public override ScrollBar_Params Get_Vertical_Scrollbar_Params()
+        public ScrollBar_Params Get_Vertical_Scrollbar_Params()
         {
             return new ScrollBar_Params()
             {
@@ -33,7 +30,7 @@ namespace CssUI.Platform.Windows
             };
         }
 
-        public override ScrollBar_Params Get_Horizontal_Scrollbar_Params()
+        public ScrollBar_Params Get_Horizontal_Scrollbar_Params()
         {
             return new ScrollBar_Params()
             {
@@ -43,20 +40,46 @@ namespace CssUI.Platform.Windows
             };
         }
 
-        public override Point Get_DoubleClick_Distance_Threshold()
+        public Vector2 Get_DoubleClick_Distance_Threshold()
         {
             int dX = 0;
             int dY = 0;
 
             dX = Platform.Win32.User32.GetSystemMetrics((int)Platform.Win32.SYSTEM_METRICS.SM_CXDOUBLECLK);
             dY = Platform.Win32.User32.GetSystemMetrics((int)Platform.Win32.SYSTEM_METRICS.SM_CYDOUBLECLK);
-            return new Point(dX, dY);
+            return new Vector2(dX, dY);
         }
 
-        public override float Get_Double_Click_Time()
+        public float Get_Double_Click_Time()
         {
             uint ms = Win32.User32.GetDoubleClickTime();
             return ((float)ms / 1000.0f);
         }
+
+        public Vector2 Get_DPI(IntPtr window)
+        {
+            // First try and use the fancy new windows 10 function for screen-specific dpi
+            try
+            {
+                if (window == null) throw new ArgumentNullException();
+
+                int winDpi = Platform.Win32.User32.GetDpiForWindow((IntPtr)window);
+                return new Vector2(winDpi);
+            }
+            catch
+            {// Ok we couldnt get screen specific dpi, we will settle for system-wide dpi
+
+                IntPtr desktop = Platform.Win32.User32.GetDesktopWindow();
+                int LogicalScreenHeight = Platform.Win32.Gdi32.GetDeviceCaps(desktop, (int)Platform.Win32.DeviceCap.VERTRES);
+                int PhysicalScreenHeight = Platform.Win32.Gdi32.GetDeviceCaps(desktop, (int)Platform.Win32.DeviceCap.DESKTOPVERTRES);
+                int logpixelsy = Platform.Win32.Gdi32.GetDeviceCaps(desktop, (int)Platform.Win32.DeviceCap.LOGPIXELSY);
+
+                float screenScalingFactor = (float)PhysicalScreenHeight / (float)LogicalScreenHeight;
+                float dpiScalingFactor = (float)logpixelsy / (float)96;
+
+                return new Vector2(dpiScalingFactor);
+            }
+        }
     }
 }
+#endif

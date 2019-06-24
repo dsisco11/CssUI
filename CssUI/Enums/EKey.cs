@@ -1,5 +1,5 @@
 ﻿
-namespace KeyPic.CSSUI.Enums
+namespace CssUI.Enums
 {
     //
     // Summary:

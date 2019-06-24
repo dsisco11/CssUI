@@ -11,9 +11,9 @@ namespace CssUI.CSS
     /// </summary>
     public class DummyProperty : NamedProperty
     {
-        public readonly CSSValue Value = null;
+        public readonly CssValue Value = null;
 
-        public DummyProperty(string Name, CSSValue value) : base(Name)
+        public DummyProperty(string Name, CssValue value) : base(Name)
         {
             Value = value;
         }

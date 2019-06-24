@@ -5,7 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using KeyPic.Benchmarking;
 using CssUI.CSS;
-using KeyPic.CSSUI.Enums;
+using CssUI.Enums;
+using System.Numerics;
 
 namespace CssUI
 {
@@ -96,8 +97,16 @@ namespace CssUI
 
             Style.Default.BoxSizing.Set(EBoxSizingMode.BORDER);
             Style.Default.Display.Set(EDisplayMode.BLOCK);
-            Style.Default.Width.Assigned = CSSValue.From_Percent(100.0);// Always match the viewport size
-            Style.Default.Height.Assigned = CSSValue.From_Percent(100.0);// Always match the viewport size
+            Style.Default.Width.Assigned = CssValue.From_Percent(100.0);// Always match the viewport size
+            Style.Default.Height.Assigned = CssValue.From_Percent(100.0);// Always match the viewport size
+
+            // The root element should always set and maintain the DPI values for it's style so it's children will all use the correct DPI.
+            IntPtr hwnd = Platform.Factory.SystemWindows.Get_Window();
+            Vector2 dpi = Platform.Factory.SystemMetrics.Get_DPI(hwnd);
+
+            Style.Default.DpiX.Assigned = CssValue.From_Number(dpi.X);
+            Style.Default.DpiY.Assigned = CssValue.From_Number(dpi.Y);
+
             Set_Root(this);
             
             Style.Default.Set_Padding_Implicit(2, 2);
@@ -318,7 +327,7 @@ namespace CssUI
                 // if the time between now and the last click is less than the systems set double click threshold then this is a double click
                 if (deltaTime <= Platform.Factory.SystemMetrics.Get_Double_Click_Time())
                 {
-                    System.Drawing.Point mx = Platform.Factory.SystemMetrics.Get_DoubleClick_Distance_Threshold();
+                    Vector2 mx = Platform.Factory.SystemMetrics.Get_DoubleClick_Distance_Threshold();
                     if (mx.X > dX && mx.Y > dY)
                     {
                         isDoubleClick = true;
@@ -404,7 +413,9 @@ namespace CssUI
                 if (!MouseDragTarget.IsBeingDragged)
                 {
                     var dArgs = new DomItemDragEventArgs(MouseDragStart, new ePos(Args.Position));
-                    if (Math.Abs(dArgs.XDelta) > UI_CONSTANTS.DRAG_START_THRESHOLD || Math.Abs(dArgs.YDelta) > UI_CONSTANTS.DRAG_START_THRESHOLD)
+                    Vector2 DragThreshold = Platform.Factory.SystemMetrics.Get_Drag_Event_Distance();
+
+                    if (Math.Abs(dArgs.XDelta) > DragThreshold.X || Math.Abs(dArgs.YDelta) > DragThreshold.Y)
                     {
                         Root.Mouse.Start_Dragging(MouseDragTarget, MouseDragTarget, dArgs);
                     }

@@ -73,7 +73,7 @@ namespace CssUI
             if (gfx == null)
             {
                 gfx = new cssImageElement("Image");
-                gfx.Style.User.Set_SizeMax_Implicit(CSSValue.Pct_OneHundred, CSSValue.Pct_OneHundred);
+                gfx.Style.User.Set_SizeMax_Implicit(CssValue.Pct_OneHundred, CssValue.Pct_OneHundred);
                 Add(gfx);
                 update_component_order();
             }
@@ -124,7 +124,7 @@ namespace CssUI
             if (gfx == null)
             {
                 gfx = new cssSvgElement("Svg");
-                gfx.Style.User.Set_SizeMax_Implicit(CSSValue.Pct_OneHundred, CSSValue.Pct_OneHundred);
+                gfx.Style.User.Set_SizeMax_Implicit(CssValue.Pct_OneHundred, CssValue.Pct_OneHundred);
                 Add(gfx);
                 update_component_order();
             }

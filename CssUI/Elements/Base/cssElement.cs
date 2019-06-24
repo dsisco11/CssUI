@@ -74,18 +74,23 @@ namespace CssUI
         #endregion
 
         #region Flags
+        /// <summary>
+        /// Tracks what factors of this element need to be updated.
+        /// </summary>
+        protected EElementDirtyBit Dirt = EElementDirtyBit.None;
+
         private EElementFlags Flags = EElementFlags.Clickable | EElementFlags.DoubleClickable;// By default all elements will process click and doubleclick events
 
         /// <summary>
         /// Add flags to the element
         /// </summary>
         /// <param name="flags">Set of flags to add</param>
-        public void Flags_Add(EElementFlags flags) { Flags = (Flags | flags); }
+        public void Flags_Add(EElementFlags flags) { Flags |= flags; }
         /// <summary>
         /// Remove flags from the element
         /// </summary>
         /// <param name="flags">Set of flags to remove</param>
-        public void Flags_Remove(EElementFlags flags) { Flags = (Flags ^ flags); }
+        public void Flags_Remove(EElementFlags flags) { Flags &= ~flags; }
         /// <summary>
         /// Check if element has a set of flags
         /// </summary>
@@ -111,7 +116,7 @@ namespace CssUI
         private Dictionary<string, object> Attributes = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
-        /// Attempts to set the value of a specified attribute, returning whether or not the operation succeeded
+        /// Attempts to set the value of a specified DOM element attribute, returning whether or not the operation succeeded
         /// </summary>
         /// <param name="Attrib">Name of the attribute to set</param>
         /// <param name="Value">Value to set</param>
@@ -133,9 +138,20 @@ namespace CssUI
 
             if (result)
             {
-                // TODO: recascade rules from the stylesheet and update our Style accordingly
+                // XXX: recascade rules from the stylesheet and update our Style accordingly
             }
             return true;
+        }
+
+        /// <summary>
+        /// Attempts to set the value of a specified DOM element attribute, returning whether or not the operation succeeded
+        /// </summary>
+        /// <param name="Attrib">Name of the attribute to set</param>
+        /// <param name="Value">Value to set</param>
+        /// <returns>Success</returns>
+        public async Task<bool> Set_Attribute_Async(string Attrib, object Value)
+        {
+            return await Task.Factory.StartNew(() => { return this.Set_Attribute(Attrib, Value); });
         }
 
         /// <summary>
@@ -340,7 +356,7 @@ namespace CssUI
         protected virtual void Handle_Resized(eSize oldSize, eSize newSize)
         {
             if (Parent != null) Parent.Flag_Layout(ELayoutBit.Dirty_Children);
-            if (dbg_size != null) dbg_size = cssTextElement.From_Text_String(string.Format("{0}x{1}", Block.Width, Block.Height), null);
+            update_debug_text();
             onResized?.Invoke(this, oldSize, newSize);
         }
         
@@ -428,7 +444,7 @@ namespace CssUI
         {
             if (Style.Depends_On_ContainingBlock)
             {
-                Flag_Block_Dirty(EUIInvalidationReason.Containing_Block_Changed);
+                Flag_Block_Dirty(ECssBlockInvalidationReason.Containing_Block_Changed);
                 Style.Flag();
             }
         }
@@ -436,16 +452,16 @@ namespace CssUI
         /// <summary>
         /// Flags this elements block as dirty, meaning it needs to be updated when next convenient
         /// </summary>
-        public virtual void Flag_Block_Dirty(EUIInvalidationReason Reason = EUIInvalidationReason.Unknown)
+        public virtual void Flag_Block_Dirty(ECssBlockInvalidationReason Reason = ECssBlockInvalidationReason.Unknown)
         {
             Block.Flag_Dirty();
 #if DEBUG
             if (Debug.Log_Block_Changes)
             {
-                if (Reason == EUIInvalidationReason.Unknown)
+                if (Reason == ECssBlockInvalidationReason.Unknown)
                     Logs.Info(Logging.XTERM.magenta("[Block Change] {0} (UNKNOWN SOURCE!)"), this);
                 else
-                    Logs.Info(Logging.XTERM.magenta("[Block Change] {0} {1}"), this, Enum.GetName(typeof(EUIInvalidationReason), Reason).ToUpper());
+                    Logs.Info(Logging.XTERM.magenta("[Block Change] {0} {1}"), this, Enum.GetName(typeof(ECssBlockInvalidationReason), Reason).ToUpper());
             }
 #endif
         }
@@ -500,7 +516,7 @@ namespace CssUI
                 if (was_moved) Handle_Moved(oPos, nPos);
                 if (was_resized) Handle_Resized(oSize, nSize);
 
-                Invalidate_Layout(EUIInvalidationReason.Block_Changed);
+                Invalidate_Layout(ECssBlockInvalidationReason.Block_Changed);
             }
         }
 
@@ -778,16 +794,16 @@ namespace CssUI
         protected ELayoutBit LayoutBit = ELayoutBit.Dirty;
         public void Flag_Layout(ELayoutBit Flags) { LayoutBit |= Flags; }
 
-        public void Invalidate_Layout(EUIInvalidationReason Reason = EUIInvalidationReason.Unknown)
+        public void Invalidate_Layout(ECssBlockInvalidationReason Reason = ECssBlockInvalidationReason.Unknown)
         {
             Flag_Layout(ELayoutBit.Dirty);
 #if DEBUG
             if (Debug.Log_Layout_Changes)
             {
-                if (Reason == EUIInvalidationReason.Unknown)
+                if (Reason == ECssBlockInvalidationReason.Unknown)
                     Logs.Info(Logging.XTERM.cyan("[Layout Flagged] {0} (UNKNOWN SOURCE!)"), this);
                 else
-                    Logs.Info(Logging.XTERM.cyan("[Layout Flagged] {0} {1}"), this, Enum.GetName(typeof(EUIInvalidationReason), Reason).ToUpper());
+                    Logs.Info(Logging.XTERM.cyan("[Layout Flagged] {0} {1}"), this, Enum.GetName(typeof(ECssBlockInvalidationReason), Reason).ToUpper());
                      
             }
 #endif
@@ -940,10 +956,10 @@ namespace CssUI
                 if (!string.IsNullOrEmpty(ID)) Root.Register_Element_ID(ID, this);
             }
         }
-#endregion
-        
+        #endregion
+
 #region Font
-        protected bool Dirty_Font = false;
+
         Font font = null;
         public Font Font
         {
@@ -992,10 +1008,10 @@ namespace CssUI
             }
 
             if (Style.FontWeight >= 600) fontStyle = FontStyle.Bold;
-
             font = SystemFonts.CreateFont(fontFamily, (float)fontSize, fontStyle);
 
-            Dirty_Font = false;
+            // clear the font bit from our dirt flags
+            Dirt &= ~EElementDirtyBit.Font;
         }
 #endregion
 
@@ -1109,7 +1125,7 @@ namespace CssUI
             IsMouseOver = false;
             AcceptsDragDrop = false;
 
-            Scrollbar_Offset.onChanged += () => { Flag_Block_Dirty(EUIInvalidationReason.Scroll_Offset_Change); };
+            Scrollbar_Offset.onChanged += () => { Flag_Block_Dirty(ECssBlockInvalidationReason.Scroll_Offset_Change); };
 
             Style = new ElementPropertySystem(this);
             Style.Property_Changed += Style_Property_Changed;
@@ -1142,7 +1158,7 @@ namespace CssUI
 
             if ((Flags & EPropertyFlags.Visual) != 0)
             {
-                Dirty_Visuals = true;
+                Dirt &= EElementDirtyBit.Visuals;
             }
 
             if ((Flags & EPropertyFlags.Block) != 0)
@@ -1153,7 +1169,7 @@ namespace CssUI
 
             if ((Flags & EPropertyFlags.Font) != 0)
             {
-                Dirty_Font = true;
+                Dirt &= EElementDirtyBit.Font;
                 // Q: Why update the font immediately? Why not wait until next frame when our parent will do it?
                 // A: When a font property changes it means the user is most likely about to change other properties which depend on the font's current values (character dimensions and whatnot)
                 //   In the future immediate font updates can be avoided because the system will naturally handle propogating updates to properties expressed in font based units(ex/ex/ch)
@@ -1185,7 +1201,7 @@ namespace CssUI
         {
             bool retVal = false;
 
-            if (Dirty_Font)
+            if ((Dirt & EElementDirtyBit.Font) != 0)
             {
                 retVal = true;
                 Update_Font();
@@ -1217,11 +1233,20 @@ namespace CssUI
         /// </summary>
         public bool ShouldRender { get { return (IsVisible && Style.Display != EDisplayMode.NONE); } }
 
-
         /// <summary>
         /// Do our visuals need to be updated? (if this element renders to an image buffer instead of directly to the screen)
         /// </summary>
-        public bool Dirty_Visuals { get; protected set; } = true;
+        public void Set_Visuals_Dirty(bool value)
+        {
+            if(value)
+            {
+                Dirt &= EElementDirtyBit.Visuals;
+            }
+            else
+            {
+                Dirt &= ~EElementDirtyBit.Visuals;
+            }
+        }
         /// <summary>
         /// Attempts to render the element
         /// </summary>
@@ -1234,7 +1259,7 @@ namespace CssUI
             if (Style.TransformMatrix != null) Root.Engine.Set_Matrix(Style.TransformMatrix);
             //Root.Engine.Set_Blend(new uiColor(1, 1, 1, 0.5));
 
-            Dirty_Visuals = false;
+            Dirt &= ~EElementDirtyBit.Visuals;
             Draw_Background();
             Draw_Borders();
             // ReplacedElements always clip their rendered content to the area of their content block
@@ -1366,9 +1391,18 @@ namespace CssUI
         }
 
         private cssTexture dbg_size = null;
+
+        internal void update_debug_text()
+        {
+            if (dbg_size != null)
+            {
+                string dbgTxt = string.Format("{0}x{1}", Block.Width, Block.Height);
+                dbg_size = cssTextElement.Render_Text_String(dbgTxt, "Arial", 18);
+            }
+        }
         internal void Draw_Debug_Size()
         {
-            if (dbg_size == null) dbg_size = cssTextElement.From_Text_String(string.Format("{0}x{1}", Block.Width, Block.Height), null);
+            update_debug_text();
 
             Root.Engine.Set_Color(1f, 1f, 1f, 1f);
             Root.Engine.Set_Texture(dbg_size);

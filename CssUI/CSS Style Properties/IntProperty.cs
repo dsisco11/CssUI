@@ -32,7 +32,7 @@ namespace CssUI.CSS
         {
         }
 
-        public IntProperty(string CssName, bool Locked, CSSValue Initial, PropertyOptions Options) : base(CssName, Locked, Initial, Options)
+        public IntProperty(string CssName, bool Locked, CssValue Initial, PropertyOptions Options) : base(CssName, Locked, Initial, Options)
         {
         }
         #endregion
@@ -44,7 +44,7 @@ namespace CssUI.CSS
         /// <param name="value"></param>
         public void Set(int? value)
         {
-            var newValue = CSSValue.From_Int(value, CSSValue.Null);
+            var newValue = CssValue.From_Int(value, CssValue.Null);
             if (Assigned != newValue)
             {
                 Assigned = newValue;

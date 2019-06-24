@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿#if WINDOWS
+using System;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CssUI.Platform.Win32
 {
@@ -24,3 +21,4 @@ namespace CssUI.Platform.Win32
         ES_CONTINUOUS = 0x80000000,
     }
 }
+#endif

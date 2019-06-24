@@ -57,9 +57,10 @@ namespace CssUI
 
         #region Cascade
         /// <summary>
-        /// Overwrites the values of this instance with any values from another which aren't <see cref="CSSValue.Null"/>
+        /// Overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
         /// </summary>
         /// <returns>Success</returns>
+        [Obsolete("Non-asynchronous methods are now obsolete, please use CascadeAsync instead.")]
         public bool Cascade(IStyleProperty prop)
         {// Circumvents locking
             TransformListProperty o = prop as TransformListProperty;
@@ -75,6 +76,27 @@ namespace CssUI
             if (changes) onChanged?.Invoke(this);
             return changes;
         }
+
+        /// <summary>
+        /// Overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
+        /// </summary>
+        /// <returns>Success</returns>
+        public async Task<bool> CascadeAsync(IStyleProperty prop)
+        {// Circumvents locking
+            TransformListProperty o = prop as TransformListProperty;
+            bool changes = false;
+            if (o.HasValue)
+            {
+                changes = true;
+                Transforms = new Dictionary<AtomicString, StyleFunction>(o.Transforms);
+                this.Source = o.Source;
+                this.Selector = o.Selector;
+            }
+
+            if (changes) onChanged?.Invoke(this);
+            return await Task.FromResult(changes);
+        }
+
         #endregion
 
         #region Overwrite
@@ -82,6 +104,7 @@ namespace CssUI
         /// Overwrites the assigned value of this instance with values from another if they are different
         /// </summary>
         /// <returns>Success</returns>
+        [Obsolete("Non-asynchronous methods are now obsolete, please use OverwriteAsync instead.")]
         public bool Overwrite(IStyleProperty prop)
         {// Circumvents locking
             // TODO: Finish the overwrite logic for TransformsList properties
@@ -134,6 +157,63 @@ namespace CssUI
             if (changes) onChanged?.Invoke(this);
             return changes;
         }
+
+        /// <summary>
+        /// Overwrites the assigned value of this instance with values from another if they are different
+        /// </summary>
+        /// <returns>Success</returns>
+        public async Task<bool> OverwriteAsync(IStyleProperty prop)
+        {// Circumvents locking
+
+            TransformListProperty o = prop as TransformListProperty;
+            bool changes = false;
+
+            // XXX: Finish the overwrite logic for TransformsList properties
+            /*
+            if (o.HasValue)
+            {
+                // Check if any of the functions present in the other property 
+                foreach(StyleFunction func in o.Transforms.Values)
+                {
+                    if (!Transforms.ContainsKey(func.Name))
+                    {
+                        changes = true;
+                        break;
+                    }
+                }
+
+                if (!changes)
+                {
+                    foreach (StyleFunction func in Transforms.Values)
+                    {
+                        if (!o.Transforms.ContainsKey(func.Name))
+                        {
+                            changes = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (changes)
+                {
+                    Transforms = new Dictionary<AtomicString, StyleFunction>(o.Transforms);
+                    this.Source = o.Source;
+                    this.Selector = o.Selector;
+                }
+            }
+
+            if (changes) onChanged?.Invoke(this);
+            return changes;
+            */
+            if (o.HasValue || this.HasValue != o.HasValue)
+            {
+                changes = true;
+            }
+
+            if (changes) onChanged?.Invoke(this);
+            return await Task.FromResult(changes);
+        }
+
         #endregion
 
 
@@ -146,7 +226,7 @@ namespace CssUI
             bool change = false;
             foreach(StyleFunction func in Transforms.Values)
             {
-                foreach(CSSValue arg in func.Args)
+                foreach(CssValue arg in func.Args)
                 {
                     if (arg.Unit == Unit)
                     {

@@ -101,12 +101,12 @@ namespace CssUI
             {
                 case ESliderDirection.Vertical:
                     {
-                        Thumb.Style.User.Width.Set(CSSValue.Pct_OneHundred);
+                        Thumb.Style.User.Width.Set(CssValue.Pct_OneHundred);
                     }
                     break;
                 case ESliderDirection.Horizontal:
                     {
-                        Thumb.Style.User.Height.Set(CSSValue.Pct_OneHundred);
+                        Thumb.Style.User.Height.Set(CssValue.Pct_OneHundred);
                     }
                     break;
             }
@@ -253,7 +253,7 @@ namespace CssUI
                 var nPos = (Delta + Thumb_Pos_At_DragStart);// this is where our thumb should be now
                 Value = Calculate_Value_For_Thumb_Pos(nPos);
             }
-            else
+            else// if the users mouse gets too far away from the control then we kind of cancel the action by returning to our previous position
             {
                 Value = Calculate_Value_For_Thumb_Pos(Thumb_Pos_At_DragStart);
             }

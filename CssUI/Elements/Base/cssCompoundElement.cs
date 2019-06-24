@@ -429,7 +429,7 @@ namespace CssUI
         /// <summary>
         /// Flags the blocks of all children who are dependent on us, as dirty
         /// </summary>
-        protected void Flag_All_Children(EUIInvalidationReason Reason)
+        protected void Flag_All_Children(ECssBlockInvalidationReason Reason)
         {
             for (int i = 0; i < Children.Count; i++)
             {
@@ -459,7 +459,7 @@ namespace CssUI
         }
         */
 
-        public override void Flag_Block_Dirty(EUIInvalidationReason Reason)
+        public override void Flag_Block_Dirty(ECssBlockInvalidationReason Reason)
         {
             base.Flag_Block_Dirty(Reason);
             Flag_Dependent_Children();

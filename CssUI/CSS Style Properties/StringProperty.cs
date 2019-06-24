@@ -44,15 +44,15 @@ namespace CssUI.CSS
         {
         }
 
-        public StringProperty(CSSValue initial) : base(initial, null, DefaultOptions)
+        public StringProperty(CssValue initial) : base(initial, null, DefaultOptions)
         {
         }
 
-        public StringProperty(CSSValue initial, bool Locked) : base(initial, Locked, DefaultOptions)
+        public StringProperty(CssValue initial, bool Locked) : base(initial, Locked, DefaultOptions)
         {
         }
 
-        public StringProperty(CSSValue initial, bool Locked, PropertyOptions Options) : base(initial, Locked, new PropertyOptions(Options) { AllowPercentage = false })
+        public StringProperty(CssValue initial, bool Locked, PropertyOptions Options) : base(initial, Locked, new PropertyOptions(Options) { AllowPercentage = false })
         {
         }
         #endregion
@@ -60,7 +60,7 @@ namespace CssUI.CSS
         #region Setters
         public void Set(string value)
         {
-            var newValue = CSSValue.From_String(value);
+            var newValue = CssValue.From_String(value);
             if (base.Assigned != newValue)
             {
                 base.Assigned = newValue;

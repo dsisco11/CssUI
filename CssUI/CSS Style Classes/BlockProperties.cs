@@ -12,23 +12,23 @@ namespace CssUI.CSS
         public int? Intrinsic_Height;
         public double? Intrinsic_Ratio;
 
-        public CSSValue Width;
-        public CSSValue Height;
+        public CssValue Width;
+        public CssValue Height;
 
-        public CSSValue Top;
-        public CSSValue Right;
-        public CSSValue Bottom;
-        public CSSValue Left;
+        public CssValue Top;
+        public CssValue Right;
+        public CssValue Bottom;
+        public CssValue Left;
 
-        public CSSValue Margin_Top;
-        public CSSValue Margin_Right;
-        public CSSValue Margin_Bottom;
-        public CSSValue Margin_Left;
+        public CssValue Margin_Top;
+        public CssValue Margin_Right;
+        public CssValue Margin_Bottom;
+        public CssValue Margin_Left;
 
-        public CSSValue Padding_Top;
-        public CSSValue Padding_Right;
-        public CSSValue Padding_Bottom;
-        public CSSValue Padding_Left;
+        public CssValue Padding_Top;
+        public CssValue Padding_Right;
+        public CssValue Padding_Bottom;
+        public CssValue Padding_Left;
 
         public int Border_Top;
         public int Border_Right;

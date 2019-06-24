@@ -14,8 +14,8 @@ namespace CssUI
     public class PositionProperty : StyleProperty
     {
         #region Propertys
-        CSSValue Computed_X = CSSValue.Null;// Stores our currently computed X coordinate value
-        CSSValue Computed_Y = CSSValue.Null;// Stores our currently computed Y coordinate value
+        CssValue Computed_X = CssValue.Null;// Stores our currently computed X coordinate value
+        CssValue Computed_Y = CssValue.Null;// Stores our currently computed Y coordinate value
         #endregion
 
         #region Accessors
@@ -24,11 +24,11 @@ namespace CssUI
         /// </summary>
         public override bool IsDependent { get { return (Computed_X.Has_Flags(StyleValueFlags.Depends) || Computed_Y.Has_Flags(StyleValueFlags.Depends)); } }
         /// <summary>
-        /// Return TRUE if any values are set to <see cref="CSSValue.Auto"/>
+        /// Return TRUE if any values are set to <see cref="CssValue.Auto"/>
         /// </summary>
         public override bool IsAuto { get { return (Computed_X.Type == EStyleDataType.AUTO || Computed_Y.Type == EStyleDataType.AUTO); } }
         /// <summary>
-        /// Return TRUE if any values are set to <see cref="CSSValue.Auto"/>
+        /// Return TRUE if any values are set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if any values have the <see cref="StyleValueFlags.Depends"/> flag
         /// </summary>
         public override bool IsDependentOrAuto { get { return (Computed_X.Type == EStyleDataType.AUTO || Computed_X.Has_Flags(StyleValueFlags.Depends) || Computed_Y.Type == EStyleDataType.AUTO || Computed_Y.Has_Flags(StyleValueFlags.Depends)); } }
@@ -44,7 +44,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public PositionProperty() : base(CSSValue.Null, null)
+        public PositionProperty() : base(CssValue.Null, null)
         {
             base.onChanged += this.Update;
         }
@@ -66,11 +66,11 @@ namespace CssUI
         /// <summary>
         /// Translates the given X and Y style values to a valid string representation for this property type
         /// </summary>
-        string Translate_From_XY(CSSValue X, CSSValue Y)
+        string Translate_From_XY(CssValue X, CssValue Y)
         {
             string strX = "center";
             string strY = "center";
-            if (X != CSSValue.Null)
+            if (X != CssValue.Null)
             {
             }
 
@@ -80,7 +80,7 @@ namespace CssUI
         /// <summary>
         /// Translates the given string to X and Y style values
         /// </summary>
-        void Translate_From_String(string str, out CSSValue X, out CSSValue Y)
+        void Translate_From_String(string str, out CssValue X, out CssValue Y)
         {
             CssTokenizer Parser = new CssTokenizer(Specified.AsString());
 
@@ -96,14 +96,14 @@ namespace CssUI
         /// </summary>
         public void Set(string str)
         {
-            base.Assigned = CSSValue.From_String(str);
+            base.Assigned = CssValue.From_String(str);
         }
         /// <summary>
         /// Set the explicit values
         /// </summary>
-        public void Set(CSSValue x, CSSValue y)
+        public void Set(CssValue x, CssValue y)
         {
-            base.Assigned = CSSValue.From_String(Translate_From_XY(x, y));
+            base.Assigned = CssValue.From_String(Translate_From_XY(x, y));
         }
 
         /// <summary>
@@ -111,9 +111,9 @@ namespace CssUI
         /// </summary>
         public void Set(int? x, int? y)
         {
-            var X = CSSValue.From_Int(x, CSSValue.Null);
-            var Y = CSSValue.From_Int(y, CSSValue.Null);
-            base.Assigned = CSSValue.From_String(Translate_From_XY(X, Y));
+            var X = CssValue.From_Int(x, CssValue.Null);
+            var Y = CssValue.From_Int(y, CssValue.Null);
+            base.Assigned = CssValue.From_String(Translate_From_XY(X, Y));
         }
 
         /// <summary>
@@ -123,9 +123,9 @@ namespace CssUI
         /// <param name="y">Percentage in the range [0 - 100]</param>
         public void Set(float? x, float? y)
         {
-            var X = CSSValue.From_Int((int?)x, CSSValue.Null);
-            var Y = CSSValue.From_Int((int?)y, CSSValue.Null);
-            base.Assigned = CSSValue.From_String(Translate_From_XY(X, Y));
+            var X = CssValue.From_Int((int?)x, CssValue.Null);
+            var Y = CssValue.From_Int((int?)y, CssValue.Null);
+            base.Assigned = CssValue.From_String(Translate_From_XY(X, Y));
         }
         #endregion
 

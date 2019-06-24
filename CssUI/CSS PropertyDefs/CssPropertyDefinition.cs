@@ -16,7 +16,7 @@ namespace CssUI.CSS
         /// <summary>
         /// List of all the style values this property can be assigned or NULL to ignore
         /// </summary>
-        public readonly CSSValue[] LegalValues = null;
+        public readonly CssValue[] LegalValues = null;
         /// <summary>
         /// Syntax for assigning to this property within a style sheet
         /// </summary>
@@ -24,7 +24,7 @@ namespace CssUI.CSS
         /// <summary>
         /// Value for this property which is treated as the 'specified' value if the property definition does not have 'Inherited' (inherited by default) set to true or if the owning elements has no parent elements.
         /// </summary>
-        public readonly CSSValue Initial = CSSValue.Null;
+        public readonly CssValue Initial = CssValue.Null;
         /// <summary>
         /// If TRUE then this property will be inherited by default, meaning it's value is passed down to child elements rather then their matching property using it's 'initial' value
         /// </summary>
@@ -60,7 +60,7 @@ namespace CssUI.CSS
         /// <param name="Inherited">Do child elements inherit this value if they are unset?</param>
         /// <param name="Initial">Default value for the property</param>
         /// <param name="IsPrivate">If TRUE then this property cannot be set from style-sheets</param>
-        public CssPropertyDefinition(string Name, bool Inherited, EPropertyFlags Flags, CSSValue Initial, bool IsPrivate) : this(Name, Flags)
+        public CssPropertyDefinition(string Name, bool Inherited, EPropertyFlags Flags, CssValue Initial, bool IsPrivate) : this(Name, Flags)
         {
             this.Inherited = Inherited;
             this.Initial = Initial;
@@ -73,7 +73,7 @@ namespace CssUI.CSS
         /// <param name="Inherited">Do child elements inherit this value if they are unset?</param>
         /// <param name="Initial">Default value for the property</param>
         /// <param name="Percentage_Resolver">Method used to resolve a percentage value into an absolute one</param>
-        public CssPropertyDefinition(string Name, bool Inherited, EPropertyFlags Flags, CSSValue Initial, StyleValuePercentageResolver Percentage_Resolver) : this(Name, Flags)
+        public CssPropertyDefinition(string Name, bool Inherited, EPropertyFlags Flags, CssValue Initial, StyleValuePercentageResolver Percentage_Resolver) : this(Name, Flags)
         {
             this.Inherited = Inherited;
             this.Initial = Initial;
@@ -88,7 +88,7 @@ namespace CssUI.CSS
         /// <param name="Initial">Default value for the property</param>
         /// <param name="Percentage_Resolver">Method used to resolve a percentage value into an absolute one</param>
         /// <param name="Percentage_Dependent">Whether percentage values for this property depend on other values an thus cannot be resolved at the cascading stage</param>
-        public CssPropertyDefinition(string Name, bool Inherited, EPropertyFlags Flags, CSSValue Initial, StyleValuePercentageResolver Percentage_Resolver, bool Percentage_Dependent) : this(Name, Flags)
+        public CssPropertyDefinition(string Name, bool Inherited, EPropertyFlags Flags, CssValue Initial, StyleValuePercentageResolver Percentage_Resolver, bool Percentage_Dependent) : this(Name, Flags)
         {
             this.Inherited = Inherited;
             this.Initial = Initial;
@@ -102,7 +102,7 @@ namespace CssUI.CSS
         /// <param name="Name">CSS property name</param>
         /// <param name="Inherited">Do child elements inherit this value if they are unset?</param>
         /// <param name="Initial">Default value for the property</param>
-        public CssPropertyDefinition(string Name, bool Inherited, EPropertyFlags Flags, CSSValue Initial) : this(Name, Flags)
+        public CssPropertyDefinition(string Name, bool Inherited, EPropertyFlags Flags, CssValue Initial) : this(Name, Flags)
         {
             this.Inherited = Inherited;
             this.Initial = Initial;
@@ -115,7 +115,7 @@ namespace CssUI.CSS
         /// <param name="Inherited">Do child elements inherit this value if they are unset?</param>
         /// <param name="Initial">Default value for the property</param>
         /// <param name="LegalValues">List of values this property can be set to</param>
-        public CssPropertyDefinition(string Name, bool Inherited, EPropertyFlags Flags, CSSValue Initial, CSSValue[] LegalValues) : this(Name, Flags)
+        public CssPropertyDefinition(string Name, bool Inherited, EPropertyFlags Flags, CssValue Initial, CssValue[] LegalValues) : this(Name, Flags)
         {
             this.Inherited = Inherited;
             this.Initial = Initial;
@@ -130,7 +130,7 @@ namespace CssUI.CSS
         /// <param name="Initial">Default value for the property</param>
         /// <param name="LegalValues">List of values this property can be set to</param>
         /// <param name="Percentage_Resolver">Method used to resolve a percentage value into an absolute one</param>
-        public CssPropertyDefinition(string Name, bool Inherited, EPropertyFlags Flags, CSSValue Initial, CSSValue[] LegalValues, StyleValuePercentageResolver Percentage_Resolver) : this(Name, Inherited, Flags, Initial, Percentage_Resolver)
+        public CssPropertyDefinition(string Name, bool Inherited, EPropertyFlags Flags, CssValue Initial, CssValue[] LegalValues, StyleValuePercentageResolver Percentage_Resolver) : this(Name, Inherited, Flags, Initial, Percentage_Resolver)
         {
             this.LegalValues = LegalValues;
         }
@@ -144,7 +144,7 @@ namespace CssUI.CSS
         /// <param name="LegalValues">List of values this property can be set to</param>
         /// <param name="Percentage_Resolver">Method used to resolve a percentage value into an absolute one</param>
         /// <param name="Percentage_Dependent">Whether percentage values for this property depend on other values an thus cannot be resolved at the cascading stage</param>
-        public CssPropertyDefinition(string Name, bool Inherited, EPropertyFlags Flags, CSSValue Initial, CSSValue[] LegalValues, StyleValuePercentageResolver Percentage_Resolver, bool Percentage_Dependent) : this(Name, Inherited, Flags, Initial, Percentage_Resolver, Percentage_Dependent)
+        public CssPropertyDefinition(string Name, bool Inherited, EPropertyFlags Flags, CssValue Initial, CssValue[] LegalValues, StyleValuePercentageResolver Percentage_Resolver, bool Percentage_Dependent) : this(Name, Inherited, Flags, Initial, Percentage_Resolver, Percentage_Dependent)
         {
             this.LegalValues = LegalValues;
             this.Percentage_Dependent = Percentage_Dependent;
