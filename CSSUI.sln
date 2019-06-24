@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CssUI", "CSSUI\CssUI.csproj", "{0C66602D-0FD6-4D70-826F-07EAFFE6AAC3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CssUI", "CssUI\CssUI.csproj", "{0C66602D-0FD6-4D70-826F-07EAFFE6AAC3}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Logging", "C:\CODE\CSharp-XTERM-Logger\Logger\Logging.shproj", "{753BDDAE-60AB-42B6-AECC-CADC369F1B16}"
 EndProject
