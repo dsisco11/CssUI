@@ -241,7 +241,7 @@ namespace CssUI
 
         private double Get_Unit_Scale(EStyleUnit Unit)
         {
-            return StyleUnitResolver.Get_Scale(Owner, Unit);
+            return StyleUnitResolver.Get_Scale(Owner, this, Unit);
         }
         #endregion
 

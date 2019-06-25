@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace CssUI.CSS
 {
@@ -23,12 +24,24 @@ namespace CssUI.CSS
             new CssPropertyDefinition("font-family", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.Null);
             new CssPropertyDefinition("font-weight", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.From_Int(400));
             new CssPropertyDefinition("font-style", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.From_Enum(EFontStyle.Normal));
-            new CssPropertyDefinition("font-size", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.From_Length(1.0, EStyleUnit.EM), (cssElement E, double Pct) => { return (Pct * E.Parent.Style.FontSize); });
+            new CssPropertyDefinition("font-size", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.From_Number(12), 
+                (cssElement E, double Pct) => {
+                    if (E.Parent != null)
+                    {
+                        return (Pct * E.Parent.Style.FontSize);
+                    }
+                    else
+                    {// fallback to definition
+                        var def = CssProperties.Definitions[new AtomicString("font-size")];
+                        double r = def.Initial.Resolve() ?? throw new Exception("Failed to resolve default value from 'font-size' definition");
+                        return Pct * r;
+                    }
+                });
 
             new CssPropertyDefinition("text-align", true, EPropertyFlags.Flow, CssValue.From_Enum(ETextAlign.Start));
 
             // SEE: https://www.w3.org/TR/CSS2/visudet.html#propdef-line-height
-            new CssPropertyDefinition("line-height", true, EPropertyFlags.Flow, CssValue.From_Percent(100.0), (cssElement E, double Pct) => { return (Pct * E.Style.FontSize); });
+            new CssPropertyDefinition("line-height", true, EPropertyFlags.Flow, CssValue.From_Number(1.0), (cssElement E, double Pct) => { return (Pct * E.Style.FontSize); });
 
             new CssPropertyDefinition("transform", false, EPropertyFlags.Visual, CssValue.None);
 

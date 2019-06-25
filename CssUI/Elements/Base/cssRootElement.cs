@@ -82,6 +82,7 @@ namespace CssUI
         {
             this.Logs = new xLog.LogSource(() => { return Frame.ToString(); });
             this.Engine = Engine;
+            Set_Root(this);
 
             MouseHover_TMR = new ScheduledFunction(TimeSpan.FromMilliseconds(UI_CONSTANTS.HOVER_TIME), () =>
             {
@@ -94,11 +95,12 @@ namespace CssUI
 
             FocusScope = new FocusScope();
 
+            onControl_Removed += RootElement_onControl_Removed;
+
             Style.ImplicitRules.BoxSizing.Set(EBoxSizingMode.BORDER);
             Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
             Style.ImplicitRules.Width.Assigned = CssValue.From_Percent(100.0);// Always match the viewport size
             Style.ImplicitRules.Height.Assigned = CssValue.From_Percent(100.0);// Always match the viewport size
-
 
             // The root element should always set and maintain the DPI values for it's style so it's children will all use the correct DPI.
             IntPtr hwnd = Platform.Factory.SystemWindows.Get_Window();
@@ -107,10 +109,8 @@ namespace CssUI
             Style.ImplicitRules.DpiX.Set(CssValue.From_Number(dpi.X));
             Style.ImplicitRules.DpiY.Set(CssValue.From_Number(dpi.Y));
 
-            Set_Root(this);
             
             Style.ImplicitRules.Set_Padding_Implicit(2, 2);
-            onControl_Removed += RootElement_onControl_Removed;
 
             // Setup the default font.
             Style.ImplicitRules.FontSize.Set(14);
