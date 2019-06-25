@@ -24,12 +24,15 @@ namespace CssUI
         /// <summary>
         /// Tracks which styling rule block this property came from
         /// </summary>
-        WeakReference<CssPropertySet> Source { get; set; }
+        WeakReference<CssPropertySet> SourcePtr { get; set; }
         /// <summary>
         /// Tracks which styling rule block this property came from
         /// </summary>
         CssSelector Selector { get; set; }
 
+        /// <summary>
+        /// The assigned value of this property has changed
+        /// </summary>
         event PropertyChangeDelegate onChanged;
 
         /// <summary>
@@ -42,7 +45,16 @@ namespace CssUI
         /// </summary>
         bool IsInherited { get; }
 
-        CssPropertySet Get_Source();
+        /// <summary>
+        /// The property we belong to
+        /// </summary>
+        /// <returns></returns>
+        CssPropertySet Source { get; }
+        /// <summary>
+        /// Returns the definition for this property
+        /// </summary>
+        /// <returns></returns>
+        CssPropertyDefinition Definition { get; }
 
         /// <summary>
         /// Asynchronously overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
@@ -56,6 +68,10 @@ namespace CssUI
         /// <returns>Success</returns>
         Task<bool> OverwriteAsync(ICssProperty value);
 
+        /// <summary>
+        /// Calculates the 'Assigned' and 'Computed' values
+        /// </summary>
+        void Update();
 
         /// <summary>
         /// Allows external code to notify this property that a certain unit type has changed scale and if we have a value which uses that unit-type we need to fire our Changed event because our Computed value will be different

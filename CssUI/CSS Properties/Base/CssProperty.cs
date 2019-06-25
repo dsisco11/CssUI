@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CssUI.CSS;
 
@@ -36,7 +37,7 @@ namespace CssUI
         /// <summary>
         /// Tracks which styling rule block this property came from
         /// </summary>
-        public WeakReference<CssPropertySet> Source { get; set; } = null;
+        public WeakReference<CssPropertySet> SourcePtr { get; set; } = null;
         /// <summary>
         /// Tracks which styling rule block this property came from
         /// </summary>
@@ -67,7 +68,7 @@ namespace CssUI
             {
                 if (_initial.IsNullOrUnset())
                 {
-                    CssPropertyDefinition Def = Get_Definition();
+                    CssPropertyDefinition Def = Definition;
                     if (Def != null)
                     {
                         if (Def.Initial == null) throw new Exception("Property definition has no initial value defined!");
@@ -116,10 +117,25 @@ namespace CssUI
         /// </summary>
         public virtual bool IsPercentageOrAuto { get { return (Specified.Type == EStyleDataType.AUTO || Specified.Type == EStyleDataType.PERCENT); } }
 
-        public CssPropertySet Get_Source()
+        public CssPropertySet Source
         {
-            this.Source.TryGetTarget(out CssPropertySet src);
-            return src;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                this.SourcePtr.TryGetTarget(out CssPropertySet src);
+                return src;
+            }
+        }
+
+        public CssPropertyDefinition Definition
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (string.IsNullOrEmpty(this.CssName))
+                    return null;
+                return CssProperties.Definitions[this.CssName];
+            }
         }
         #endregion
 
@@ -140,13 +156,14 @@ namespace CssUI
                 Update();
             }
         }
-        
+
         /// <summary>
         /// Value we USE for the property, which can differ from assigned value.
         /// Eg: If no value is Assigned then the properties defined initial value will be used.
         /// </summary>
         public CssValue Specified
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
                 if (_specified == null)
@@ -164,6 +181,7 @@ namespace CssUI
         /// </summary>
         public CssValue Computed
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
                 if (_computed == null)
@@ -176,9 +194,10 @@ namespace CssUI
         }
 
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private CssValue Calculate_Specified()
         {// SEE:  https://www.w3.org/TR/CSS2/cascade.html#specified-value
-            CssPropertyDefinition Def = Get_Definition();
+            CssPropertyDefinition Def = Definition;
 
             // CSS specs say if the cascade (assigned) resulted in a value, use it.
             if (!Assigned.IsNull())
@@ -210,6 +229,7 @@ namespace CssUI
                     return new CssValue( Def.Initial );
                 }
 
+                return Assigned;
             }
             else// Assigned is null
             {
@@ -237,9 +257,10 @@ namespace CssUI
             throw new Exception($"Failed to resolve a Specified value in {nameof(CssProperty)}");
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private CssValue Calculate_Computed()
         {// SEE:  https://www.w3.org/TR/CSS22/cascade.html#computed-value
-            CssPropertyDefinition Def = Get_Definition();
+            CssPropertyDefinition Def = Definition;
 
             switch (Specified.Type)
             {
@@ -309,12 +330,13 @@ namespace CssUI
         {// Circumvents locking
             CssProperty o = prop as CssProperty;
             bool changes = false;
-            if (o.Assigned != CssValue.Null)
+            //if (o.Assigned != CssValue.Null)
+            if (!o.Assigned.IsNullOrUnset())
             {
                 changes = true;
                 _value = new CssValue(o.Assigned);
 
-                this.Source = o.Source;
+                this.SourcePtr = o.SourcePtr;
                 this.Selector = o.Selector;
             }
 
@@ -338,7 +360,7 @@ namespace CssUI
                 changes = true;
                 _value = new CssValue(o.Assigned);
 
-                this.Source = o.Source;
+                this.SourcePtr = o.SourcePtr;
                 this.Selector = o.Selector;
             }
 
@@ -414,7 +436,7 @@ namespace CssUI
         {
             this.CssName = new AtomicString(CssName);
             this.Owner = Owner;
-            this.Source = Source;
+            this.SourcePtr = Source;
             this.Options = Options;
             this.Locked = Locked;
             if (Unset) Assigned = CssValue.Null;
@@ -495,26 +517,22 @@ namespace CssUI
         #region ToString
         public override string ToString() { return Specified.ToString(); }
         #endregion
-        
-        /// <summary>
-        /// Gets the definition for this property
-        /// </summary>
-        CssPropertyDefinition Get_Definition()
-        {
-            if (this.CssName == null) return null;
-            return CssProperties.Definitions[this.CssName];
-        }
+
 
         /// <summary>
-        /// Calculates the 'Assigned' value
+        /// Calculates the 'Assigned' and 'Computed' values
         /// </summary>
-        protected void Update()
+        public void Update()
         {
             _specified = null;// unset our specified value so it gets updated...
             _computed = null;// it only makes sense to update the computed value aswell
 
-            _specified = Calculate_Specified();
-            _computed = Calculate_Computed();
+            // XXX: if we move to the new parenting system this check will not be necessary
+            if ( Owner.HasFlags(EElementFlags.ReadyForStyle) )
+            {
+                _specified = Calculate_Specified();
+                _computed = Calculate_Computed();
+            }
 
             if (oldValue == null || oldValue != Assigned)
             {
