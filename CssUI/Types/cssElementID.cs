@@ -51,7 +51,11 @@ namespace CssUI.Types
         public cssElementID()
         {
             this.SequenceNumber = ++Sequence;
+            this.factor2 = 0;
+            this.factor3 = 0;
+            this.factor4 = 0;
         }
+
         public cssElementID(ulong id) : base(id)
         {
         }
