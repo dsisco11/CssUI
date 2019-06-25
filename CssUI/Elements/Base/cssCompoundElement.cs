@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CssUI.CSS;
 using xLog;
 
@@ -106,15 +107,15 @@ namespace CssUI
         /// Updates the Block and Layout if needed and returns True if any updates occured
         /// </summary>
         /// <returns>True/False updates occured</returns>
-        public override bool Update()
+        public override async Task<bool> Update()
         {
             bool retVal = false;
-            if (base.Update()) retVal = true;
+            if (await base.Update()) retVal = true;
 
             for (int i = 0; i < Children.Count; i++)
             {
                 var C = Children[i];
-                if (C.Update()) retVal = true;
+                if (await C.Update()) retVal = true;
             }
             
             return retVal;

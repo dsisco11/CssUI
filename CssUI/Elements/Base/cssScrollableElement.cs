@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using xLog;
 using CssUI.CSS;
+using System.Threading.Tasks;
 
 namespace CssUI
 {
@@ -324,10 +325,10 @@ namespace CssUI
         /// Updates the Block and Layout if needed and returns True if any updates occured
         /// </summary>
         /// <returns>True/False updates occured</returns>
-        public override bool Update()
+        public override async Task<bool> Update()
         {
             bool retVal = false;
-            if (base.Update()) retVal = true;
+            if (await base.Update()) retVal = true;
             // Our base Update() function already handles calling Update() on our child-elements
             /*
             for (int i = 0; i < Children.Count; i++)

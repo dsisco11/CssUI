@@ -3,8 +3,6 @@ using System.Collections.Generic;
 
 namespace CssUI.CSS
 {
-
-
     /// <summary>
     /// A Complex selector consists of a Compound selector followed by a Combinator
     /// </summary>
@@ -25,18 +23,18 @@ namespace CssUI.CSS
             this.Combinator = Combinator;
         }
 
-        public override bool Query(LinkedList<cssElement> MatchList, ESelectorMatchingOrder Order)
+        public bool Query(LinkedList<cssElement> MatchList, ESelectorMatchingOrder Order)
         {
             switch (Order)
             {
                 case ESelectorMatchingOrder.LTR:
-                    {
+                    {// Going from left-to-right means we modify our MatchList with the combinator AFTER we examine it
                         base.Query(MatchList, Order);
                         Apply_Combinator(MatchList, Order);
                     }
                     break;
                 case ESelectorMatchingOrder.RTL:
-                    {
+                    {// Going from right-to-left means we modify our MatchList with the combinator BEFORE we examine it
                         Apply_Combinator(MatchList, Order);
                         base.Query(MatchList, Order);
                     }

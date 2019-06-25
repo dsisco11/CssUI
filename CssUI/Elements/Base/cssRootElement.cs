@@ -456,7 +456,7 @@ namespace CssUI
         /// </summary>
         protected void Fire_MouseLeave()
         {
-            foreach(KeyValuePair<uint, cssElement> kv in EnteredElements)
+            foreach(KeyValuePair<cssElementID, cssElement> kv in EnteredElements)
             {
                 cssElement E = kv.Value;
                 if (E.IsMouseOver) E.Handle_MouseLeave(E);

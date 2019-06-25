@@ -2140,7 +2140,7 @@ namespace CssUI
         /// <summary>
         /// Indicates whether the element currently has input focus
         /// </summary>
-        public bool HasFocus { get { return object.ReferenceEquals(this, Root.FocusedElement); } }
+        public bool HasFocus { get { if (Root == null) return false; else return object.ReferenceEquals(this, Root.FocusedElement); } }
         public event Action<cssElement> onFocusGain;
         public event Action<cssElement> onFocusLose;
 

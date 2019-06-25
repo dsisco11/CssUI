@@ -11,7 +11,7 @@ namespace CssUI.CSS
     /// By doing this we can instead just store a list of those filter objects and simplify things a little bit more.
     /// </para>
     /// </summary>
-    public abstract class CssSelectorFilter
+    public interface ICssSelectorFilter
     {
 
         /// <summary>
@@ -20,8 +20,8 @@ namespace CssUI.CSS
         /// <param name="MatchList">A linked-list of all the elements we want to query, we use a linked list because non-matches are removed mid-iteration</param>
         /// <param name="Dir">The order in which matching will be executed</param>
         /// <returns>Matches</returns>
-        public abstract bool Query(LinkedList<cssElement> MatchList, ESelectorMatchingOrder Dir);
+        bool Query(LinkedList<cssElement> MatchList, ESelectorMatchingOrder Dir);
 
-        public abstract List<CssSimpleSelector> Get_Selectors();
+        List<CssSimpleSelector> Get_Selectors();
     }
 }

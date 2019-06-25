@@ -50,11 +50,26 @@ namespace CssUI.CSS
         #endregion
         
         /// <summary>
+        /// Returns the greatest specificity value that matches the given element
+        /// </summary>
+        /// <returns></returns>
+        public long Get_Specificity(cssElement E)
+        {
+            if (Selectors == null)
+                return 0;
+
+            return Selectors.Get_Specificity(E, IsFromStylesheet).Max();
+        }
+
+        /// <summary>
         /// Returns a list of all selector specificitys that match the given element
         /// </summary>
         /// <returns></returns>
-        public IList<long> Get_Specificity(cssElement E)
+        public IList<long> Get_Specificity_List(cssElement E)
         {
+            if (Selectors == null)
+                return null;
+
             return Selectors.Get_Specificity(E, IsFromStylesheet);
         }
 

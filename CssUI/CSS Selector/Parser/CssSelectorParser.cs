@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace CssUI.CSS.Selector
+namespace CssUI.CSS
 {
     /// <summary>
     /// Parses low-level <see cref="CssComponent"/>s into higher-level <see cref="CSSSelectorComponent"/> objects
@@ -247,7 +247,7 @@ namespace CssUI.CSS.Selector
         {// SEE:  https://www.w3.org/TR/2011/REC-css3-selectors-20110929/#selectors
             CssSelectorList List = null;
 
-            SelectorFilterSet Selector = null;
+            CssSelectorFilterSet Selector = null;
             do
             {
                 Selector = Consume_Selector_FilterSet(Stream);
@@ -264,16 +264,16 @@ namespace CssUI.CSS.Selector
         /// <summary>
         /// Consumes a list of Compound/Complex selectors
         /// </summary>
-        public static SelectorFilterSet Consume_Selector_FilterSet(CssTokenStream Stream)
+        public static CssSelectorFilterSet Consume_Selector_FilterSet(CssTokenStream Stream)
         {
-            SelectorFilterSet List = null;
-            CssSelectorFilter Filter;
+            CssSelectorFilterSet List = null;
+            ICssSelectorFilter Filter;
             do
             {
                 Filter = Consume_Filter(Stream);
                 if (Filter != null)
                 {
-                    if (List == null) List = new SelectorFilterSet();
+                    if (List == null) List = new CssSelectorFilterSet();
                     List.Add(Filter);
                 }
 
@@ -295,16 +295,16 @@ namespace CssUI.CSS.Selector
         /// <summary>
         /// Consumes a list of Compound/Complex selectors
         /// </summary>
-        public static SelectorFilterSet Consume_Complex_Selector_List(CssTokenStream Stream)
+        public static CssSelectorFilterSet Consume_Complex_Selector_List(CssTokenStream Stream)
         {
-            SelectorFilterSet List = null;
+            CssSelectorFilterSet List = null;
             CssComplexSelector Complex;
             do
             {
                 Complex = Consume_Complex_Selector(Stream);
                 if (Complex != null)
                 {
-                    if (List == null) List = new SelectorFilterSet();
+                    if (List == null) List = new CssSelectorFilterSet();
                     List.Add(Complex);
                 }
 
@@ -327,7 +327,7 @@ namespace CssUI.CSS.Selector
         /// Consumes a new selector-filter item
         /// </summary>
         /// <returns></returns>
-        static CssSelectorFilter Consume_Filter(CssTokenStream Stream)
+        static ICssSelectorFilter Consume_Filter(CssTokenStream Stream)
         {
             Stream.Consume_While(tok => tok.Type == ECssTokenType.Whitespace);// Consume all of the prefixing whitespace
             CssCompoundSelector Compound = Consume_Compound_Selector(Stream);

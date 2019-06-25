@@ -34,7 +34,7 @@ namespace CssUI
         /// <summary>
         /// Tracks which styling rule block this property came from
         /// </summary>
-        public AtomicString Source { get; set; } = null;
+        public WeakReference<CssPropertySet> Source { get; set; } = null;
         /// <summary>
         /// Tracks which styling rule block this property came from
         /// </summary>
@@ -95,6 +95,12 @@ namespace CssUI
         /// The Specified values after being resolved to an absolute values, if possible
         /// </summary>
         public abstract List<CssValue> Computed { get; }
+
+        public CssPropertySet Get_Source()
+        {
+            this.Source.TryGetTarget(out CssPropertySet src);
+            return src;
+        }
         #endregion
 
 

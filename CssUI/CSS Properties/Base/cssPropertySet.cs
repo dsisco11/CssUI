@@ -40,10 +40,10 @@ namespace CssUI
 
             // To allow for quick lookup of propertys by their name, map each property in our PropertyList
             PropertyMap = new ConcurrentDictionary<AtomicString, FieldInfo>();
-            Parallel.ForEach(PropertyList, (FieldInfo field) =>
+            foreach(FieldInfo field in PropertyList)
             {
                 PropertyMap.TryAdd(new AtomicString(field.Name), field);
-            });
+            }
         }
         #endregion
 
@@ -459,9 +459,14 @@ namespace CssUI
         #endregion
 
         #region Setters
-        internal async void Set(ICssProperty Property, ICssProperty Value, AtomicString SourceState)
+        internal async Task Set(ICssProperty Property, ICssProperty Value, AtomicString SourceState)
         {
             AtomicString FieldName = Property.FieldName;
+            await Set(FieldName, Value, SourceState);
+        }
+
+        internal async Task Set(AtomicString FieldName, ICssProperty Value, AtomicString SourceState)
+        {
             FieldInfo Field = typeof(CssPropertySet).GetField(FieldName.ToString());
             if (!typeof(ICssProperty).IsAssignableFrom(Field.FieldType)) throw new Exception(string.Format("Unable find style property with the field name: {0}", FieldName));
             

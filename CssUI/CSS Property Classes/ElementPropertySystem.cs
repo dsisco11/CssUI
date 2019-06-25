@@ -356,7 +356,7 @@ namespace CssUI
         /// </summary>
         private async void Property_Change(ICssProperty Property, EPropertyFlags Flags, StackTrace Origin)
         {
-            await CascadeSingle(Property);
+            await CascadeProperty(Property);
         }
 
         private void Current_Property_Changed(ICssProperty Prop, EPropertyFlags Flags, StackTrace Stack)
@@ -379,28 +379,7 @@ namespace CssUI
 
 
         #region Cascading
-
-        /// <summary>
-        /// Gets a list of all our <see cref="CssPropertySet"/>s from <see cref="CssRules"/>, ordered according to how they should cascade.
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<CssPropertySet> Get_Cascade_Ordered_PropertySets()
-        {// DOCS: https://www.w3.org/TR/CSS22/cascade.html#cascading-order
-
-            List<CssPropertySet> OrderedSet = CssRules.Values.ToList();
-
-            OrderedSet.Sort(new CssPropertySetComparator());
-
-            // Because cascading overwrites an existing value with the one from the next propertyset we need to reverse this list.
-            OrderedSet.Reverse();
-            return OrderedSet;
-        }
-
-        private async Task CascadeProperty()
-        {
-
-        }
-
+        
         /// <summary>
         /// Resolves all Css properties to their specified values by cascading
         ///     Re-Cascades all properties that are specified by the User and Element
@@ -411,6 +390,7 @@ namespace CssUI
         public async Task Cascade()
         {
             // Get a list of all the properties we are going to need to work with
+            CssPropertyComparator cm = new CssPropertyComparator();
             HashSet<AtomicString> targetFields = new HashSet<AtomicString>();
             var allFields = CssRules.Values.Select(x => { return x.SetProperties; });
 
@@ -419,31 +399,40 @@ namespace CssUI
                 targetFields.UnionWith(fields);
             }
 
+            AsyncCountdownEvent ctdn = new AsyncCountdownEvent(targetFields.Count);
+
             // Loop over all target properties
-            foreach(AtomicString field in targetFields)
+            Parallel.ForEach(targetFields, async (AtomicString propName) =>
             {
-                // Extract this property from every CssPropertySet that has a value for it
-                var propertyList = CssRules.Values.Select(x => { return x.Get(field); });
-
-                // Order these properties according to CSS 3.0 specifications
-
-            }
-
-            CssPropertySet Cascaded = new CssPropertySet(null, null, Owner);
-            var orderedRules = Get_Cascade_Ordered_PropertySets();
-
-            foreach (CssPropertySet ruleSet in orderedRules)
-            {
-                // We use selector matching so we can be sure the rule CURRENTLY applies
-                if(ruleSet.Selector.QuerySingle(this.Owner))
+                try
                 {
-                    await Cascaded.CascadeAsync(ruleSet);
-                }
-            }
-            
-            // Go through each property within "Current" and if it doesnt equal the compiled property OR it's source doesnt match then update it...
-            await Specified.OverwriteAsync(Cascaded);
+                    // Extract this property from every CssPropertySet that has a value for it
+                    var propertyList = CssRules.Values.Select(x => { return x.Get(propName); }).ToList();
 
+                    // Order these properties according to CSS 3.0 specifications
+                    propertyList.Sort(cm);
+
+                    // Because cascading overwrites an existing value with the one from the next propertyset we need to reverse this list.
+                    propertyList.Reverse();
+
+                    // Cascade this list and get what CSS calls the 'Specified' value
+                    ICssProperty Value = Specified.Get(propName);
+                    foreach (ICssProperty o in propertyList)
+                    {
+                        bool b = await Value.CascadeAsync(o);
+                        if (b) break;// stop cascading the instant we find a set value
+                    }
+
+                    string SourceState = Value.Get_Source().ToString();
+                    await Specified.Set(propName, Value, new AtomicString(SourceState));
+                }
+                finally
+                {
+                    ctdn.Signal();
+                }
+            });
+
+            await ctdn.WaitAsync();
             Dirt &= ~EPropertySystemDirtFlags.Cascade;
         }
 
@@ -452,54 +441,27 @@ namespace CssUI
         /// </summary>
         /// <param name="Property"></param>
         /// <returns></returns>
-        private async Task CascadeSingle(ICssProperty Property)
+        private async Task CascadeProperty(ICssProperty Property)
         {
-            AtomicString SourceState = null;
-            var orderedRules = Get_Cascade_Ordered_PropertySets();
+            // Extract this property from every CssPropertySet that has a value for it
+            var propertyList = CssRules.Values.Select(x => { return x.Get(Property.FieldName); }).ToList();
 
-            foreach (CssPropertySet ruleSet in orderedRules)
+            // Order these properties according to CSS 3.0 specifications
+            propertyList.Sort(new CssPropertyComparator());
+
+            // Because cascading overwrites an existing value with the one from the next propertyset we need to reverse this list.
+            propertyList.Reverse();
+
+            // Cascade this list and get what CSS calls the 'Specified' value
+            ICssProperty Value = Property;
+            foreach (ICssProperty o in propertyList)
             {
-                // We use selector matching so we can be sure the rule CURRENTLY applies
-                if (ruleSet.Selector.QuerySingle(this.Owner))
-                {
-                    await Cascaded.CascadeAsync(ruleSet);
-                }
+                bool b = await Value.CascadeAsync(o);
+                if (b) break;// stop cascading the instant we find a set value
             }
 
-            ICssProperty Value = ImplicitRules.Get(Property.FieldName);
-            // Override implicitly set values with default ones when set
-            ICssProperty dv = UserRules.Get(Property.FieldName);
-            if (dv.HasValue)
-            {
-                Value = dv;
-                SourceState = STATE_USER;
-            }
-
-            if (ActiveStates.Contains(STATE_FOCUS))
-            {
-                SourceState = STATE_FOCUS;
-                var v = FocusRules.Get(Property.FieldName);
-                if (v.HasValue) Value = v;
-            }
-
-            if (ActiveStates.Contains(STATE_HOVER))
-            {
-                SourceState = STATE_HOVER;
-                var v = HoverRules.Get(Property.FieldName);
-                if (v.HasValue) Value = v;
-            }
-
-            foreach (KeyValuePair<AtomicString, CssPropertySet> kv in StateRules)
-            {
-                if (ActiveStates.Contains(kv.Key))
-                {
-                    SourceState = kv.Key;
-                    var v = kv.Value.Get(Property.FieldName);
-                    if (v.HasValue) Value = v;
-                }
-            }
-
-            Specified.Set(Property, Value, SourceState);
+            string SourceState = Value.Get_Source().ToString();
+            await Specified.Set(Property.FieldName, Value, new AtomicString(SourceState));
         }
         #endregion
 

@@ -8,7 +8,7 @@ namespace CssUI.CSS
     /// A Compound selector is one that consists of multiple simple selectors
     /// In addition a Compound selector can contain at most ONE type-selector and if it does, that must be the first selector within it.
     /// </summary>
-    public class CssCompoundSelector : CssSelectorFilter
+    public class CssCompoundSelector : ICssSelectorFilter
     {// SEE:  https://drafts.csswg.org/selectors-4/#typedef-compound-selector
 
         public readonly List<CssSimpleSelector> Selectors = null;
@@ -31,9 +31,11 @@ namespace CssUI.CSS
         }
         #endregion
 
-        public override List<CssSimpleSelector> Get_Selectors() { return Selectors; }
-        public override bool Query(LinkedList<cssElement> MatchList, ESelectorMatchingOrder Order)
+        public List<CssSimpleSelector> Get_Selectors() { return Selectors; }
+        public bool Query(LinkedList<cssElement> MatchList, ESelectorMatchingOrder Order)
         {
+            if (MatchList.Count <= 0)
+                return false;
             // Filter the matchlist with our simple selectors first
             LinkedListNode<cssElement> node = MatchList.First;
             do
@@ -80,7 +82,7 @@ namespace CssUI.CSS
                     node = node.Next;
                 }
             }
-            while (node.Next != null);
+            while (node != null);
 
             return true;
         }

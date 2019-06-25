@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using CssUI.CSS;
 
 namespace CssUI
@@ -182,7 +183,7 @@ namespace CssUI
         #endregion
 
         #region Drawing
-        public override bool Update()
+        public override async Task<bool> Update()
         {
             bool retVal = false;
             if (Dirty_Thumb)
@@ -190,7 +191,7 @@ namespace CssUI
                 retVal = true;
                 Update_Thumb();
             }
-            if (base.Update()) retVal = true;
+            if (await base.Update()) retVal = true;
 
             return retVal;
         }

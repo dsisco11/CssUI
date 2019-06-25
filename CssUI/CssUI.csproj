@@ -23,10 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Types\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\xLog\xLog\xLog.csproj" />
   </ItemGroup>
 

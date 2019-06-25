@@ -489,5 +489,11 @@ namespace CssUI
         }
         #endregion
         
+        public CssPropertySet Get_Source()
+        {
+            this.Source.TryGetTarget(out CssPropertySet src);
+            return src;
+        }
+
     }
 }

@@ -42,6 +42,7 @@ namespace CssUI
         /// </summary>
         bool IsInherited { get; }
 
+        CssPropertySet Get_Source();
 
         /// <summary>
         /// Asynchronously overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
