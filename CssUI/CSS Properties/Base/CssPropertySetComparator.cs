@@ -31,6 +31,7 @@ namespace CssUI
                     return -1;// this set is of greater origin so we go behind it
             }
 
+            //if (x.Selector.Get_Specificity(x.Owner)
 
             return 0;
         }

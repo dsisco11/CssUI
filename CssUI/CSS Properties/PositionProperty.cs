@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CssUI.CSS;
 
 namespace CssUI
@@ -49,7 +45,13 @@ namespace CssUI
             base.onChanged += this.Update;
         }
 
+        [Obsolete("Please specify the properties Source")]
         public PositionProperty(string CssName, cssElement Owner, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Owner, Options)
+        {
+            base.onChanged += this.Update;
+        }
+
+        public PositionProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Source, Owner, Options)
         {
             base.onChanged += this.Update;
         }

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using CssUI.CSS;
 
@@ -27,7 +24,7 @@ namespace CssUI
         /// <summary>
         /// Tracks which styling rule block this property came from
         /// </summary>
-        AtomicString Source { get; set; }
+        WeakReference<CssPropertySet> Source { get; set; }
         /// <summary>
         /// Tracks which styling rule block this property came from
         /// </summary>

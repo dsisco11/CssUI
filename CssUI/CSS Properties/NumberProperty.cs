@@ -39,7 +39,12 @@ namespace CssUI.CSS
         {
         }
 
+        [Obsolete("Please specify the properties Source")]
         public NumberProperty(string CssName, cssElement Owner, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Owner, Options)
+        {
+        }
+
+        public NumberProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Source, Owner, Options)
         {
         }
 

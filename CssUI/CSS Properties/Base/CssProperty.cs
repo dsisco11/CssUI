@@ -36,7 +36,7 @@ namespace CssUI
         /// <summary>
         /// Tracks which styling rule block this property came from
         /// </summary>
-        public AtomicString Source { get; set; } = null;
+        public WeakReference<CssPropertySet> Source { get; set; } = null;
         /// <summary>
         /// Tracks which styling rule block this property came from
         /// </summary>
@@ -353,10 +353,22 @@ namespace CssUI
             Update();
         }
 
+        [Obsolete("Please specify the properties Source")]
         public CssProperty(string CssName, bool Locked, bool Unset, cssElement Owner, CssPropertyOptions Options)
         {
             this.CssName = new AtomicString(CssName);
             this.Owner = Owner;
+            this.Options = Options;
+            this.Locked = Locked;
+            if (Unset) Assigned = CssValue.Null;
+            Update();
+        }
+
+        public CssProperty(string CssName, bool Locked, bool Unset, WeakReference<CssPropertySet> Source, cssElement Owner, CssPropertyOptions Options)
+        {
+            this.CssName = new AtomicString(CssName);
+            this.Owner = Owner;
+            this.Source = Source;
             this.Options = Options;
             this.Locked = Locked;
             if (Unset) Assigned = CssValue.Null;

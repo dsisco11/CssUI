@@ -43,7 +43,12 @@ namespace CssUI.CSS
         {
         }
 
+        [Obsolete("Please specify the properties Source")]
         public EnumProperty(string CssName, cssElement Owner, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Owner, new CssPropertyOptions(Options) { AllowPercentage = false })
+        {
+        }
+        
+        public EnumProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Source, Owner, new CssPropertyOptions(Options) { AllowPercentage = false })
         {
         }
 

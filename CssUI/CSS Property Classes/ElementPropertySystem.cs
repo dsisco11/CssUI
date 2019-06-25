@@ -396,6 +396,11 @@ namespace CssUI
             return OrderedSet;
         }
 
+        private async Task CascadeProperty()
+        {
+
+        }
+
         /// <summary>
         /// Resolves all Css properties to their specified values by cascading
         ///     Re-Cascades all properties that are specified by the User and Element
@@ -405,6 +410,25 @@ namespace CssUI
         /// </summary>
         public async Task Cascade()
         {
+            // Get a list of all the properties we are going to need to work with
+            HashSet<AtomicString> targetFields = new HashSet<AtomicString>();
+            var allFields = CssRules.Values.Select(x => { return x.SetProperties; });
+
+            foreach(HashSet<AtomicString> fields in allFields)
+            {
+                targetFields.UnionWith(fields);
+            }
+
+            // Loop over all target properties
+            foreach(AtomicString field in targetFields)
+            {
+                // Extract this property from every CssPropertySet that has a value for it
+                var propertyList = CssRules.Values.Select(x => { return x.Get(field); });
+
+                // Order these properties according to CSS 3.0 specifications
+
+            }
+
             CssPropertySet Cascaded = new CssPropertySet(null, null, Owner);
             var orderedRules = Get_Cascade_Ordered_PropertySets();
 
