@@ -11,7 +11,7 @@ namespace CssUI
         #region Constructors
         public cssPanelElement(string ID = null) : base(ID)
         {
-            Style.User.Display.Set(EDisplayMode.BLOCK);
+            Style.UserRules.Display.Set(EDisplayMode.BLOCK);
             Layout = ELayoutMode.Default;
         }
         #endregion

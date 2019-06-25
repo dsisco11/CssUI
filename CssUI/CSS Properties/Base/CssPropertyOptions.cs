@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CssUI.CSS
 {
-    public class PropertyOptions
+    /// <summary>
+    /// Stores data for a Css property about what kinds of values it can be set to.
+    /// </summary>
+    public class CssPropertyOptions
     {
         #region Options
         /// <summary>
@@ -28,11 +27,11 @@ namespace CssUI.CSS
         #endregion
 
         #region Constructors
-        public PropertyOptions()
+        public CssPropertyOptions()
         {
         }
 
-        public PropertyOptions(PropertyOptions o)
+        public CssPropertyOptions(CssPropertyOptions o)
         {
             this.AllowAuto = o.AllowAuto;
             this.AllowInherited = o.AllowInherited;
@@ -67,7 +66,7 @@ namespace CssUI.CSS
         /// </summary>
         /// <param name="Value"></param>
         /// <returns></returns>
-        public void CheckAndThrow(IStyleProperty Owner, CssValue Value)
+        public void CheckAndThrow(ICssProperty Owner, CssValue Value)
         {
             switch (Value.Type)
             {

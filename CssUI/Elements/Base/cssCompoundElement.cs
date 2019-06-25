@@ -18,7 +18,7 @@ namespace CssUI
             if (Style.Display == EDisplayMode.INLINE)
             {
                 Log.Error(new Exception("Complex elements containing other elements cannot use Display: inline, use Inline-Block instead."));
-                Style.Default.Display.Set(EDisplayMode.INLINE_BLOCK);
+                Style.ImplicitRules.Display.Set(EDisplayMode.INLINE_BLOCK);
             }
         }
         #endregion

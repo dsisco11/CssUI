@@ -7,35 +7,43 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using CssUI.CSS;
+using System.Collections.Concurrent;
+using CssUI.Enums;
 
 namespace CssUI
 {
+    // XXX: This class could be MUCH more performant if we didnt have to create an instance of every defined css property during creation, 
+    //      if we could just instantiate the properties when they are needed it would save a lot.
+
     /// <summary>
-    /// Holds all of the styling propertys that a css element uses
+    /// Holds an instance of all the defined css propertys that a css element can have
     /// Each different styling state of an element gets it's own instance of this class which 
     /// are then all cascaded together to determine the current value when the elements active state changes.
     /// </summary>
-    public class StyleRuleData
+    public class CssPropertySet
     {
-        #region Property List
+        #region Static Property List
+
         /// <summary>
-        /// List of FieldInfo for all <see cref="IStyleProperty"/> variables
+        /// List of FieldInfo for all <see cref="ICssProperty"/> variables
         /// </summary>
         public static readonly List<FieldInfo> PropertyList;
         /// <summary>
-        /// Map of all <see cref="IStyleProperty"/> variable names to their FieldInfo
+        /// Map of all <see cref="ICssProperty"/> variable names to their FieldInfo
         /// </summary>
-        public static readonly Dictionary<AtomicString, FieldInfo> PropertyMap;
+        public static readonly ConcurrentDictionary<AtomicString, FieldInfo> PropertyMap;
 
-        static StyleRuleData()
+        static CssPropertySet()
         {
-            PropertyList = typeof(StyleRuleData).GetFields().Where(o => (o.Attributes.HasFlag(FieldAttributes.InitOnly) && typeof(IStyleProperty).IsAssignableFrom(o.FieldType))).ToList();
+            // For each defined cssProperty create an instance of said property and store it in our PropertyList
+            PropertyList = typeof(CssPropertySet).GetFields().Where(o => (o.Attributes.HasFlag(FieldAttributes.InitOnly) && typeof(ICssProperty).IsAssignableFrom(o.FieldType))).ToList();
 
-            PropertyMap = new Dictionary<AtomicString, FieldInfo>();
-            foreach(FieldInfo field in PropertyList)
+            // To allow for quick lookup of propertys by their name, map each property in our PropertyList
+            PropertyMap = new ConcurrentDictionary<AtomicString, FieldInfo>();
+            Parallel.ForEach(PropertyList, (FieldInfo field) =>
             {
-                PropertyMap.Add(new AtomicString(field.Name), field);
-            }
+                PropertyMap.TryAdd(new AtomicString(field.Name), field);
+            });
         }
         #endregion
 
@@ -48,16 +56,34 @@ namespace CssUI
         /// <summary>
         /// List of Field-Names for all our properties which have a set value
         /// </summary>
-        private HashSet<AtomicString> SetProperties = new HashSet<AtomicString>();
+        public HashSet<AtomicString> SetProperties { get; private set; }  = new HashSet<AtomicString>();
 
         /// <summary>
-        /// Optional name of the rule block, for debug visualization
+        /// Sequence tracker for <see cref="CssPropertySet"/>s
         /// </summary>
-        private readonly string Name = null;
+        private static ulong SEQ = 0;
+        /// <summary>
+        /// Id number for this <see cref="CssPropertySet"/>, unique among all <see cref="CssPropertySet"/>s
+        /// </summary>
+        public readonly UniqueID ID;
+
+        /// <summary>
+        /// Name of the rule block, for identification
+        /// </summary>
+        public string Name { get { return _name ?? defaultName; } set { _name = value; } }
+
+        private string _name = null;
+        private string defaultName {
+            get {
+                return (string)($"{nameof(CssPropertySet)} - {this.ID.Value}").Concat(string.IsNullOrEmpty(this.Selector.ToString()) ? "" : this.Selector.ToString());
+            }
+        }
         /// <summary>
         /// The CSS selector for this rule block
         /// </summary>
         public readonly CssSelector Selector = null;
+
+        public readonly EPropertySetOrigin Origin;
         #endregion
 
         public override string ToString()
@@ -245,7 +271,7 @@ namespace CssUI
         /// Creates a new set of element styling properties
         /// </summary>
         /// <param name="Locked">If TRUE then none of this instances property values may be set directly.</param>
-        public StyleRuleData(string Name, cssElement Owner, bool Locked = false) : this(Name, null, Owner, Locked)
+        public CssPropertySet(string Name, cssElement Owner, bool Locked = false) : this(Name, null, Owner, Locked)
         {
         }
 
@@ -253,16 +279,7 @@ namespace CssUI
         /// Creates a new set of element styling properties
         /// </summary>
         /// <param name="Locked">If TRUE then none of this instances property values may be set directly.</param>
-        public StyleRuleData(CssSelector Selector, cssElement Owner, bool Locked = false) : this(null, Selector, Owner, Locked)
-        {
-        }
-
-        /// <summary>
-        /// Creates a new set of element styling properties
-        /// </summary>
-        /// <param name="Locked">If TRUE then none of this instances property values may be set directly.</param>
-        /// <param name="Unset">If TRUE then property values will all be set to <see cref="CssValue.Null"/>.</param>
-        public StyleRuleData(CssSelector Selector, cssElement Owner, bool Locked = false, bool Unset = false) : this(null, Selector, Owner, Locked, Unset)
+        public CssPropertySet(CssSelector Selector, cssElement Owner, bool Locked = false) : this(null, Selector, Owner, Locked)
         {
         }
 
@@ -271,85 +288,96 @@ namespace CssUI
         /// </summary>
         /// <param name="Locked">If TRUE then none of this instances property values may be set directly.</param>
         /// <param name="Unset">If TRUE then property values will all be set to <see cref="CssValue.Null"/>.</param>
-        public StyleRuleData(string Name, CssSelector Selector, cssElement Owner, bool Locked = false, bool Unset = false)
+        public CssPropertySet(CssSelector Selector, cssElement Owner, bool Locked = false, bool Unset = false) : this(null, Selector, Owner, Locked, Unset)
         {
+        }
+
+        /// <summary>
+        /// Creates a new set of element styling properties
+        /// </summary>
+        /// <param name="Locked">If TRUE then none of this instances property values may be set directly.</param>
+        /// <param name="Unset">If TRUE then property values will all be set to <see cref="CssValue.Null"/>.</param>
+        public CssPropertySet(string Name, CssSelector Selector, cssElement Owner, bool Locked = false, bool Unset = false, EPropertySetOrigin Origin = EPropertySetOrigin.Author)
+        {
+            this.ID = new UniqueID(++SEQ);
             this.Name = Name;
             this.Selector = Selector;
+            this.Origin = Origin;
 
-            Top = new IntProperty("top", Owner, this.Locked, Unset, new PropertyOptions() { });
-            Right = new IntProperty("right", Owner, this.Locked, Unset, new PropertyOptions() { });
-            Bottom = new IntProperty("bottom", Owner, this.Locked, Unset, new PropertyOptions() { });
-            Left = new IntProperty("left", Owner, this.Locked, Unset, new PropertyOptions() { });
+            Top = new IntProperty("top", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Right = new IntProperty("right", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Bottom = new IntProperty("bottom", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Left = new IntProperty("left", Owner, this.Locked, Unset, new CssPropertyOptions() { });
 
-            Display = new EnumProperty<EDisplayMode>("display", Owner, this.Locked, Unset, new PropertyOptions() { AllowInherited = false });
-            BoxSizing = new EnumProperty<EBoxSizingMode>("box-sizing", Owner, this.Locked, Unset, new PropertyOptions() { });
-            Positioning = new EnumProperty<EPositioning>("positioning", Owner, this.Locked, Unset, new PropertyOptions() { });
-            Overflow_X = new EnumProperty<EOverflowMode>("overflow-x", Owner, this.Locked, Unset, new PropertyOptions() { });
-            Overflow_Y = new EnumProperty<EOverflowMode>("overflow-y", Owner, this.Locked, Unset, new PropertyOptions() { });
+            Display = new EnumProperty<EDisplayMode>("display", Owner, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false });
+            BoxSizing = new EnumProperty<EBoxSizingMode>("box-sizing", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Positioning = new EnumProperty<EPositioning>("positioning", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Overflow_X = new EnumProperty<EOverflowMode>("overflow-x", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Overflow_Y = new EnumProperty<EOverflowMode>("overflow-y", Owner, this.Locked, Unset, new CssPropertyOptions() { });
 
-            ObjectFit = new EnumProperty<EObjectFit>("object-fit", Owner, this.Locked, Unset, new PropertyOptions() { AllowInherited = false, AllowAuto = false });
-            ObjectPosition_X = new IntProperty("object-position-x", Owner, this.Locked, Unset, new PropertyOptions() { AllowInherited = false });
-            ObjectPosition_Y = new IntProperty("object-position-y", Owner, this.Locked, Unset, new PropertyOptions() { AllowInherited = false });
-            Intrinsic_Width = new IntProperty("intrinsic-width", Owner, this.Locked, Unset, new PropertyOptions() { AllowInherited = false, AllowAuto = false });
-            Intrinsic_Height = new IntProperty("intrinsic-height", Owner, this.Locked, Unset, new PropertyOptions() { AllowInherited = false, AllowAuto = false });
-            Intrinsic_Ratio = new NumberProperty("intrinsic-ratio", Owner, this.Locked, Unset, new PropertyOptions() { AllowInherited = false, AllowAuto = false });
+            ObjectFit = new EnumProperty<EObjectFit>("object-fit", Owner, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false, AllowAuto = false });
+            ObjectPosition_X = new IntProperty("object-position-x", Owner, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false });
+            ObjectPosition_Y = new IntProperty("object-position-y", Owner, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false });
+            Intrinsic_Width = new IntProperty("intrinsic-width", Owner, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false, AllowAuto = false });
+            Intrinsic_Height = new IntProperty("intrinsic-height", Owner, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false, AllowAuto = false });
+            Intrinsic_Ratio = new NumberProperty("intrinsic-ratio", Owner, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false, AllowAuto = false });
 
-            Width = new IntProperty("width", Owner, this.Locked, Unset, new PropertyOptions() { });
-            Height = new IntProperty("height", Owner, this.Locked, Unset, new PropertyOptions() { });
+            Width = new IntProperty("width", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Height = new IntProperty("height", Owner, this.Locked, Unset, new CssPropertyOptions() { });
 
-            Content_Width = new IntProperty("content-width", Owner, this.Locked, Unset, new PropertyOptions() { AllowAuto = false, AllowPercentage = false, AllowInherited = false });
-            Content_Height = new IntProperty("content-height", Owner, this.Locked, Unset, new PropertyOptions() { AllowAuto = false, AllowPercentage = false, AllowInherited = false });
+            Content_Width = new IntProperty("content-width", Owner, this.Locked, Unset, new CssPropertyOptions() { AllowAuto = false, AllowPercentage = false, AllowInherited = false });
+            Content_Height = new IntProperty("content-height", Owner, this.Locked, Unset, new CssPropertyOptions() { AllowAuto = false, AllowPercentage = false, AllowInherited = false });
 
-            Min_Width = new IntProperty("min-width", Owner, this.Locked, Unset, new PropertyOptions() { });
-            Min_Height = new IntProperty("min-height", Owner, this.Locked, Unset, new PropertyOptions() { });
+            Min_Width = new IntProperty("min-width", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Min_Height = new IntProperty("min-height", Owner, this.Locked, Unset, new CssPropertyOptions() { });
 
-            Max_Width = new IntProperty("max-width", Owner, this.Locked, Unset, new PropertyOptions() { });
-            Max_Height = new IntProperty("max-height", Owner, this.Locked, Unset, new PropertyOptions() { });
+            Max_Width = new IntProperty("max-width", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Max_Height = new IntProperty("max-height", Owner, this.Locked, Unset, new CssPropertyOptions() { });
 
-            Margin_Top = new IntProperty("margin-top", Owner, this.Locked, Unset, new PropertyOptions() { });
-            Margin_Right = new IntProperty("margin-right", Owner, this.Locked, Unset, new PropertyOptions() { });
-            Margin_Bottom = new IntProperty("margin-bottom", Owner, this.Locked, Unset, new PropertyOptions() { });
-            Margin_Left = new IntProperty("margin-left", Owner, this.Locked, Unset, new PropertyOptions() { });
+            Margin_Top = new IntProperty("margin-top", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Margin_Right = new IntProperty("margin-right", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Margin_Bottom = new IntProperty("margin-bottom", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Margin_Left = new IntProperty("margin-left", Owner, this.Locked, Unset, new CssPropertyOptions() { });
 
-            Padding_Top = new IntProperty("padding-top", Owner, this.Locked, Unset, new PropertyOptions() { });
-            Padding_Right = new IntProperty("padding-right", Owner, this.Locked, Unset, new PropertyOptions() { });
-            Padding_Bottom = new IntProperty("padding-bottom", Owner, this.Locked, Unset, new PropertyOptions() { });
-            Padding_Left = new IntProperty("padding-left", Owner, this.Locked, Unset, new PropertyOptions() { });
+            Padding_Top = new IntProperty("padding-top", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Padding_Right = new IntProperty("padding-right", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Padding_Bottom = new IntProperty("padding-bottom", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Padding_Left = new IntProperty("padding-left", Owner, this.Locked, Unset, new CssPropertyOptions() { });
             
 
-            Border_Top_Style = new EnumProperty<EBorderStyle>("border-top-style", Owner, this.Locked, Unset, new PropertyOptions() { });
-            Border_Right_Style = new EnumProperty<EBorderStyle>("border-right-style", Owner, this.Locked, Unset, new PropertyOptions() { });
-            Border_Bottom_Style = new EnumProperty<EBorderStyle>("border-bottom-style", Owner, this.Locked, Unset, new PropertyOptions() { });
-            Border_Left_Style = new EnumProperty<EBorderStyle>("border-left-style", Owner, this.Locked, Unset, new PropertyOptions() { });
+            Border_Top_Style = new EnumProperty<EBorderStyle>("border-top-style", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Border_Right_Style = new EnumProperty<EBorderStyle>("border-right-style", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Border_Bottom_Style = new EnumProperty<EBorderStyle>("border-bottom-style", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Border_Left_Style = new EnumProperty<EBorderStyle>("border-left-style", Owner, this.Locked, Unset, new CssPropertyOptions() { });
 
-            Border_Top_Width = new IntProperty("border-top-width", Owner, this.Locked, Unset, new PropertyOptions() { });
-            Border_Right_Width = new IntProperty("border-right-width", Owner, this.Locked, Unset, new PropertyOptions() { });
-            Border_Bottom_Width = new IntProperty("border-bottom-width", Owner, this.Locked, Unset, new PropertyOptions() { });
-            Border_Left_Width = new IntProperty("border-left-width", Owner, this.Locked, Unset, new PropertyOptions() { });
+            Border_Top_Width = new IntProperty("border-top-width", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Border_Right_Width = new IntProperty("border-right-width", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Border_Bottom_Width = new IntProperty("border-bottom-width", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Border_Left_Width = new IntProperty("border-left-width", Owner, this.Locked, Unset, new CssPropertyOptions() { });
 
-            TextAlign = new EnumProperty<ETextAlign>("text-align", Owner, this.Locked, Unset, new PropertyOptions() { });
+            TextAlign = new EnumProperty<ETextAlign>("text-align", Owner, this.Locked, Unset, new CssPropertyOptions() { });
 
-            DpiX = new NumberProperty("dpi-x", Owner, this.Locked, Unset, new PropertyOptions() { });
-            DpiY = new NumberProperty("dpi-y", Owner, this.Locked, Unset, new PropertyOptions() { });
-            FontWeight = new IntProperty("font-weight", Owner, this.Locked, Unset, new PropertyOptions() { AllowPercentage = false });
-            FontStyle = new EnumProperty<EFontStyle>("font-style", Owner, this.Locked, Unset, new PropertyOptions() { });
-            FontSize = new NumberProperty("font-size", Owner, this.Locked, Unset, new PropertyOptions() { });
-            FontFamily = new StringProperty("font-family", Owner, this.Locked, Unset, new PropertyOptions() { });
+            DpiX = new NumberProperty("dpi-x", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            DpiY = new NumberProperty("dpi-y", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            FontWeight = new IntProperty("font-weight", Owner, this.Locked, Unset, new CssPropertyOptions() { AllowPercentage = false });
+            FontStyle = new EnumProperty<EFontStyle>("font-style", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            FontSize = new NumberProperty("font-size", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            FontFamily = new StringProperty("font-family", Owner, this.Locked, Unset, new CssPropertyOptions() { });
 
-            LineHeight = new IntProperty("line-height", Owner, this.Locked, Unset, new PropertyOptions() { });
+            LineHeight = new IntProperty("line-height", Owner, this.Locked, Unset, new CssPropertyOptions() { });
 
-            Opacity = new NumberProperty("opacity", Owner, this.Locked, Unset, new PropertyOptions() { AllowPercentage = false });
+            Opacity = new NumberProperty("opacity", Owner, this.Locked, Unset, new CssPropertyOptions() { AllowPercentage = false });
 
             Transform = new TransformListProperty("transform", Owner, this.Locked, Unset);
 
             // Name each of our properties
-            foreach(FieldInfo Field in PropertyList)
+            Parallel.ForEach(PropertyList, (FieldInfo Field) =>
             {
-                var property = (IStyleProperty)Field.GetValue(this);
+                var property = (ICssProperty)Field.GetValue(this);
                 property.FieldName = new AtomicString(Field.Name);
                 property.Selector = Selector;
                 property.onChanged += Property_onChanged;
-            }
+            });
         }
         #endregion
 
@@ -357,13 +385,13 @@ namespace CssUI
         /// <summary>
         /// A property which affects the elements block changed
         /// </summary>
-        public event Action<IStyleProperty, EPropertyFlags, StackTrace> Property_Changed;
+        public event Action<ICssProperty, EPropertyFlags, StackTrace> Property_Changed;
         #endregion
 
         #region Change Handlers
         const int STACK_FRAME_OFFSET = 3;
 
-        private void Property_onChanged(IStyleProperty property)
+        private void Property_onChanged(ICssProperty property)
         {
             if (!property.HasValue) SetProperties.Remove(property.FieldName);
             else SetProperties.Add(property.FieldName);
@@ -383,31 +411,31 @@ namespace CssUI
         #endregion
 
         #region Getters
-        internal IStyleProperty Get(AtomicString FieldName)
+        internal ICssProperty Get(AtomicString FieldName)
         {
             FieldInfo Field = PropertyMap[FieldName];
-            if (!typeof(IStyleProperty).IsAssignableFrom(Field.FieldType)) throw new Exception(string.Format("Unable find style property with the field name: {0}", FieldName));
-            return (IStyleProperty)Field.GetValue(this);
+            if (!typeof(ICssProperty).IsAssignableFrom(Field.FieldType)) throw new Exception($"Unable find style property with the field name: {FieldName}");
+            return (ICssProperty)Field.GetValue(this);
         }
 
-        internal IStyleProperty Get(IStyleProperty Property)
+        internal ICssProperty Get(ICssProperty Property)
         {
             AtomicString FieldName = Property.FieldName;
             FieldInfo Field = PropertyMap[FieldName];
-            if (!typeof(IStyleProperty).IsAssignableFrom(Field.FieldType)) throw new Exception(string.Format("Unable find style property with the field name: {0}", FieldName));
-            return (IStyleProperty)Field.GetValue(this);
+            if (!typeof(ICssProperty).IsAssignableFrom(Field.FieldType)) throw new Exception($"Unable find style property with the field name: {FieldName}");
+            return (ICssProperty)Field.GetValue(this);
         }
 
         /// <summary>
         /// Returns all of the properties matching a given predicate
         /// </summary>
-        internal IStyleProperty[] GetAll(Func<IStyleProperty, bool> Predicate)
+        internal ICssProperty[] GetAll(Func<ICssProperty, bool> Predicate)
         {
-            List<IStyleProperty> Ret = new List<IStyleProperty>();
+            List<ICssProperty> Ret = new List<ICssProperty>();
             for (int i = 0; i < PropertyList.Count; i++)
             {
                 FieldInfo Field = PropertyList[i];
-                IStyleProperty val = (IStyleProperty)Field.GetValue(this);
+                ICssProperty val = (ICssProperty)Field.GetValue(this);
                 if (Predicate(val))
                 {
                     Ret.Add(val);
@@ -417,9 +445,9 @@ namespace CssUI
             return Ret.ToArray();
         }
 
-        internal List<IStyleProperty> Get_Set_Properties()
+        internal List<ICssProperty> Get_Set_Properties()
         {
-            List<IStyleProperty> List = new List<IStyleProperty>();
+            List<ICssProperty> List = new List<ICssProperty>();
             foreach (AtomicString fieldName in SetProperties)
             {
                 List.Add(Get(fieldName));
@@ -430,13 +458,13 @@ namespace CssUI
         #endregion
 
         #region Setters
-        internal void Set(IStyleProperty Property, IStyleProperty Value, AtomicString SourceState)
+        internal async void Set(ICssProperty Property, ICssProperty Value, AtomicString SourceState)
         {
             AtomicString FieldName = Property.FieldName;
-            FieldInfo Field = typeof(StyleRuleData).GetField(FieldName.ToString());
-            if (!typeof(IStyleProperty).IsAssignableFrom(Field.FieldType)) throw new Exception(string.Format("Unable find style property with the field name: {0}", FieldName));
+            FieldInfo Field = typeof(CssPropertySet).GetField(FieldName.ToString());
+            if (!typeof(ICssProperty).IsAssignableFrom(Field.FieldType)) throw new Exception(string.Format("Unable find style property with the field name: {0}", FieldName));
             
-            ((IStyleProperty)Field.GetValue(this)).Overwrite(Value);
+            await ((ICssProperty)Field.GetValue(this)).OverwriteAsync(Value);
         }
         #endregion
 
@@ -447,34 +475,15 @@ namespace CssUI
         /// Overwrites the property values of this instance with those of any set property values from another instance.
         /// </summary>
         /// <param name="props"></param>
-        [Obsolete("Please use CascadeAsync instead.")]
-        internal void Cascade(StyleRuleData props)
-        {
-            //var tid = Timing.Start("Cascade");
-            foreach(var name in props.SetProperties)
-            {
-                FieldInfo Field = PropertyMap[name];
-                var val = (IStyleProperty)Field.GetValue(props);
-                var mv = (IStyleProperty)Field.GetValue(this);
-
-                mv.Cascade(val);
-            }
-            //Timing.Stop(tid);
-        }
-
-        /// <summary>
-        /// Overwrites the property values of this instance with those of any set property values from another instance.
-        /// </summary>
-        /// <param name="props"></param>
-        internal async Task CascadeAsync(StyleRuleData props)
+        internal async Task CascadeAsync(CssPropertySet props)
         {
             //var tid = Timing.Start("Cascade");
             AsyncCountdownEvent ctdn = new AsyncCountdownEvent(props.SetProperties.Count);
             Parallel.ForEach<AtomicString>(props.SetProperties, async (name) =>
             {
                 FieldInfo Field = PropertyMap[name];
-                var val = (IStyleProperty)Field.GetValue(props);
-                var mv = (IStyleProperty)Field.GetValue(this);
+                var val = (ICssProperty)Field.GetValue(props);
+                var mv = (ICssProperty)Field.GetValue(this);
 
                 await mv.CascadeAsync(val);
                 // Signal our original thread that we are 1 step closer to being done
@@ -489,31 +498,14 @@ namespace CssUI
         /// Overwrites any differing property values
         /// </summary>
         /// <param name="props"></param>
-        [Obsolete("Please use OverwriteAsync instead.")]
-        internal void Overwrite(StyleRuleData props)
-        {
-            for (int i = 0; i < PropertyList.Count; i++)
-            {
-                FieldInfo Field = PropertyList[i];
-                var val = (IStyleProperty)Field.GetValue(props);
-                var mv = (IStyleProperty)Field.GetValue(this);
-                
-                mv.Overwrite(val);
-            }
-        }
-
-        /// <summary>
-        /// Overwrites any differing property values
-        /// </summary>
-        /// <param name="props"></param>
-        internal async Task OverwriteAsync(StyleRuleData props)
+        internal async Task OverwriteAsync(CssPropertySet props)
         {
             AsyncCountdownEvent ctdn = new AsyncCountdownEvent(PropertyList.Count);
             Parallel.For(0, PropertyList.Count, async (i) =>
             {
                 FieldInfo Field = PropertyList[i];
-                var val = (IStyleProperty)Field.GetValue(props);
-                var mv = (IStyleProperty)Field.GetValue(this);
+                var val = (ICssProperty)Field.GetValue(props);
+                var mv = (ICssProperty)Field.GetValue(this);
 
                 await mv.OverwriteAsync(val);
                 ctdn.Signal();

@@ -77,8 +77,8 @@ namespace CssUI
             Flags_Remove(EElementFlags.DoubleClickable);// Trackbars cannot fire double-click events.
             this.Direction = Dir;
             // So we don't get scrollbars
-            Style.User.Overflow_X.Value = EOverflowMode.Visible;
-            Style.User.Overflow_Y.Value = EOverflowMode.Visible;
+            Style.UserRules.Overflow_X.Value = EOverflowMode.Visible;
+            Style.UserRules.Overflow_Y.Value = EOverflowMode.Visible;
 
             Thumb = new cssBox("Thumb");
             Thumb.Flags_Add(EElementFlags.Draggable);
@@ -101,12 +101,12 @@ namespace CssUI
             {
                 case ESliderDirection.Vertical:
                     {
-                        Thumb.Style.User.Width.Set(CssValue.Pct_OneHundred);
+                        Thumb.Style.UserRules.Width.Set(CssValue.Pct_OneHundred);
                     }
                     break;
                 case ESliderDirection.Horizontal:
                     {
-                        Thumb.Style.User.Height.Set(CssValue.Pct_OneHundred);
+                        Thumb.Style.UserRules.Height.Set(CssValue.Pct_OneHundred);
                     }
                     break;
             }
@@ -326,9 +326,9 @@ namespace CssUI
                         int size = (int)(ratio * (float)Block_Content.Height);
                         int pos = Calculate_Thumb_Pos(Block_Content.Height - Thumb.Block.Height);
                         
-                        Thumb.Style.User.X.Set(0);
-                        Thumb.Style.User.Y.Set(pos);
-                        Thumb.Style.User.Height.Set(size);
+                        Thumb.Style.UserRules.X.Set(0);
+                        Thumb.Style.UserRules.Y.Set(pos);
+                        Thumb.Style.UserRules.Height.Set(size);
                     }
                     break;
                 case ESliderDirection.Horizontal:
@@ -337,9 +337,9 @@ namespace CssUI
                         int size = (int)(ratio * (float)Block_Content.Width);
                         int pos = Calculate_Thumb_Pos(Block_Content.Width - Thumb.Block.Width);
                         
-                        Thumb.Style.User.X.Set(pos);
-                        Thumb.Style.User.Y.Set(0);
-                        Thumb.Style.User.Width.Set(size);
+                        Thumb.Style.UserRules.X.Set(pos);
+                        Thumb.Style.UserRules.Y.Set(0);
+                        Thumb.Style.UserRules.Width.Set(size);
                     }
                     break;
             }

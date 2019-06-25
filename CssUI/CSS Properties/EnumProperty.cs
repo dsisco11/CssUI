@@ -6,9 +6,9 @@ namespace CssUI.CSS
     /// Represents a styling property which holds an enum value
     /// </summary>
     /// <typeparam name="Ty">The enum type this property stores</typeparam>
-    public class EnumProperty<Ty> : StyleProperty where Ty : struct, IConvertible
+    public class EnumProperty<Ty> : CssProperty where Ty : struct, IConvertible
     {
-        static PropertyOptions DefaultOptions = new PropertyOptions() { AllowPercentage = false };
+        static CssPropertyOptions DefaultOptions = new CssPropertyOptions() { AllowPercentage = false };
         #region Accessors
         public Ty Value
         {
@@ -35,15 +35,15 @@ namespace CssUI.CSS
         {
         }
 
-        public EnumProperty(bool Locked, PropertyOptions Options) : base(Locked, new PropertyOptions(Options) { AllowPercentage = false })
+        public EnumProperty(bool Locked, CssPropertyOptions Options) : base(Locked, new CssPropertyOptions(Options) { AllowPercentage = false })
         {
         }
 
-        public EnumProperty(string CssName, bool Locked, PropertyOptions Options) : base(CssName, Locked, new PropertyOptions(Options) { AllowPercentage = false })
+        public EnumProperty(string CssName, bool Locked, CssPropertyOptions Options) : base(CssName, Locked, new CssPropertyOptions(Options) { AllowPercentage = false })
         {
         }
 
-        public EnumProperty(string CssName, cssElement Owner, bool Locked, bool Unset, PropertyOptions Options) : base(CssName, Locked, Unset, Owner, new PropertyOptions(Options) { AllowPercentage = false })
+        public EnumProperty(string CssName, cssElement Owner, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Owner, new CssPropertyOptions(Options) { AllowPercentage = false })
         {
         }
 
@@ -55,7 +55,7 @@ namespace CssUI.CSS
         {
         }
 
-        public EnumProperty(CssValue initial, bool Locked, PropertyOptions Options) : base(initial, Locked, new PropertyOptions(Options) { AllowPercentage = false })
+        public EnumProperty(CssValue initial, bool Locked, CssPropertyOptions Options) : base(initial, Locked, new CssPropertyOptions(Options) { AllowPercentage = false })
         {
         }
 
@@ -67,7 +67,7 @@ namespace CssUI.CSS
         {
         }
 
-        public EnumProperty(Ty initial, bool Locked, PropertyOptions Options) : base(CssValue.From_Int(Convert.ToInt32(initial)), Locked, new PropertyOptions(Options) { AllowPercentage=false })
+        public EnumProperty(Ty initial, bool Locked, CssPropertyOptions Options) : base(CssValue.From_Int(Convert.ToInt32(initial)), Locked, new CssPropertyOptions(Options) { AllowPercentage=false })
         {
         }
         #endregion

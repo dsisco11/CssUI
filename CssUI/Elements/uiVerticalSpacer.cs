@@ -16,8 +16,8 @@ namespace CssUI
         #region Constructors
         public uiVerticalSpacer(string ID = null) : base(ID)
         {
-            Style.User.Display.Set(EDisplayMode.BLOCK);
-            Style.User.BoxSizing.Set(EBoxSizingMode.CONTENT);
+            Style.UserRules.Display.Set(EDisplayMode.BLOCK);
+            Style.UserRules.BoxSizing.Set(EBoxSizingMode.CONTENT);
         }
         #endregion
     }

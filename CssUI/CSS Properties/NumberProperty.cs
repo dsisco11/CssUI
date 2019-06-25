@@ -9,7 +9,7 @@ namespace CssUI.CSS
     /// <summary>
     /// Represents a styling property which always resolves to an floating point number
     /// </summary>
-    public class NumberProperty : StyleProperty
+    public class NumberProperty : CssProperty
     {
         #region Properties
         /// <summary>
@@ -31,15 +31,15 @@ namespace CssUI.CSS
         {
         }
 
-        public NumberProperty(bool Locked, PropertyOptions Options) : base(Locked, Options)
+        public NumberProperty(bool Locked, CssPropertyOptions Options) : base(Locked, Options)
         {
         }
 
-        public NumberProperty(string CssName, bool Locked, PropertyOptions Options) : base(CssName, Locked, Options)
+        public NumberProperty(string CssName, bool Locked, CssPropertyOptions Options) : base(CssName, Locked, Options)
         {
         }
 
-        public NumberProperty(string CssName, cssElement Owner, bool Locked, bool Unset, PropertyOptions Options) : base(CssName, Locked, Unset, Owner, Options)
+        public NumberProperty(string CssName, cssElement Owner, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Owner, Options)
         {
         }
 

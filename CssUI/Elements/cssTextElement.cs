@@ -47,14 +47,14 @@ namespace CssUI
             // If the box-sizing mode isn't content then our borders & padding will warp our text because they change the content-area block size and it is no longer the same size as the rendered text!
             /*Style.User.BoxSizing.Set(EBoxSizingMode.CONTENT);
             Style.User.Display.Set(EDisplayMode.INLINE_BLOCK);*/
-            Style.Default.BoxSizing.Set(EBoxSizingMode.CONTENT);
-            Style.Default.Display.Set(EDisplayMode.INLINE_BLOCK);
+            Style.ImplicitRules.BoxSizing.Set(EBoxSizingMode.CONTENT);
+            Style.ImplicitRules.Display.Set(EDisplayMode.INLINE_BLOCK);
 
             Style.Property_Changed += Style_Property_Change;
             Invalidate_Text();
         }
 
-        private void Style_Property_Change(IStyleProperty Sender, EPropertyFlags Flags, System.Diagnostics.StackTrace Origin)
+        private void Style_Property_Change(ICssProperty Sender, EPropertyFlags Flags, System.Diagnostics.StackTrace Origin)
         {
             if ((Flags & EPropertyFlags.Font) != 0)
                 Invalidate_Text();

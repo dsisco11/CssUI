@@ -10,7 +10,7 @@ namespace CssUI
     /// <summary>
     /// Represents a property which is a collection of multiple transform function properties
     /// </summary>
-    public class TransformListProperty : IStyleProperty
+    public class TransformListProperty : ICssProperty
     {
         #region Properties
         /// <summary>
@@ -61,7 +61,7 @@ namespace CssUI
         /// </summary>
         /// <returns>Success</returns>
         [Obsolete("Non-asynchronous methods are now obsolete, please use CascadeAsync instead.")]
-        public bool Cascade(IStyleProperty prop)
+        public bool Cascade(ICssProperty prop)
         {// Circumvents locking
             TransformListProperty o = prop as TransformListProperty;
             bool changes = false;
@@ -81,7 +81,7 @@ namespace CssUI
         /// Overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
         /// </summary>
         /// <returns>Success</returns>
-        public async Task<bool> CascadeAsync(IStyleProperty prop)
+        public async Task<bool> CascadeAsync(ICssProperty prop)
         {// Circumvents locking
             TransformListProperty o = prop as TransformListProperty;
             bool changes = false;
@@ -105,7 +105,7 @@ namespace CssUI
         /// </summary>
         /// <returns>Success</returns>
         [Obsolete("Non-asynchronous methods are now obsolete, please use OverwriteAsync instead.")]
-        public bool Overwrite(IStyleProperty prop)
+        public bool Overwrite(ICssProperty prop)
         {// Circumvents locking
             // TODO: Finish the overwrite logic for TransformsList properties
 
@@ -162,7 +162,7 @@ namespace CssUI
         /// Overwrites the assigned value of this instance with values from another if they are different
         /// </summary>
         /// <returns>Success</returns>
-        public async Task<bool> OverwriteAsync(IStyleProperty prop)
+        public async Task<bool> OverwriteAsync(ICssProperty prop)
         {// Circumvents locking
 
             TransformListProperty o = prop as TransformListProperty;

@@ -7,11 +7,11 @@ using CssUI.CSS;
 
 namespace CssUI
 {
-    public delegate void PropertyChangeDelegate(IStyleProperty Property);
+    public delegate void PropertyChangeDelegate(ICssProperty Property);
     /// <summary>
-    /// Interface for styling properties held within an styling rule block
+    /// Interface for css properties held within an styling rule block
     /// </summary>
-    public interface IStyleProperty
+    public interface ICssProperty
     {
         cssElement Owner { get; }
         /// <summary>
@@ -45,29 +45,18 @@ namespace CssUI
         /// </summary>
         bool IsInherited { get; }
 
-        /// <summary>
-        /// Overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
-        /// </summary>
-        /// <returns>Success</returns>
-        bool Cascade(IStyleProperty value);
 
         /// <summary>
         /// Asynchronously overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
         /// </summary>
         /// <returns>Success</returns>
-        Task<bool> CascadeAsync(IStyleProperty value);
-
-        /// <summary>
-        /// Overwrites the assigned value of this instance with values from another if they are different
-        /// </summary>
-        /// <returns>Success</returns>
-        bool Overwrite(IStyleProperty value);
-
+        Task<bool> CascadeAsync(ICssProperty value);
+        
         /// <summary>
         /// Asynchronously overwrites the assigned value of this instance with values from another if they are different
         /// </summary>
         /// <returns>Success</returns>
-        Task<bool> OverwriteAsync(IStyleProperty value);
+        Task<bool> OverwriteAsync(ICssProperty value);
 
 
         /// <summary>

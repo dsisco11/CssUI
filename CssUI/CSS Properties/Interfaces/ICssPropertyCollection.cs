@@ -6,7 +6,7 @@ namespace CssUI.CSS
     /// Interface for styling property types which consist of multiple components
     /// EG: Position, and Color property types
     /// </summary>
-    public interface IStylePropertyCollection
+    public interface ICssPropertyCollection
     {
         Action<NamedProperty> onChange { get; }
         /// <summary>

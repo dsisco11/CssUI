@@ -4,6 +4,7 @@ using SixLabors.Fonts;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CssUI.Types;
 
 namespace CssUI
 {
@@ -16,15 +17,11 @@ namespace CssUI
     /// </summary>
     public abstract class cssElement : IDisposable, DomEvents
     {
-        /// <summary>
-        /// Current UID tracker for UI elements
-        /// </summary>
-        static uint CUID = 0;
         #region Identity
         /// <summary>
         /// An ID number, unique among all UI elements, assigned to this element.
         /// </summary>
-        public readonly uint UID;
+        public readonly cssElementID UID;
 
         /// <summary>
         /// The DEFAULT type-name used when referencing this element from within a StyleSheet, this is set by all element classes which inherit from the uiElement type (they have to, so all of them)
@@ -468,7 +465,7 @@ namespace CssUI
         /// <summary>
         /// Flags this elements block as dirty, meaning it needs to be updated when next convenient
         /// </summary>
-        protected void Flag_Block_Dirty(IStyleProperty sender)
+        protected void Flag_Block_Dirty(ICssProperty sender)
         {
             Block.Flag_Dirty();
 #if DEBUG
@@ -530,7 +527,7 @@ namespace CssUI
                 return this.Block;
             }
 
-            Style.Resolve();// 06-18-2017  WAS => Style.Resolve(this);
+            Style.Cascade();// 06-18-2017  WAS => Style.Resolve(this);
             if (Style.Display == EDisplayMode.NONE) return eBlock.FromTRBL(0, 0, 0, 0);
 
             ePos cPos = Style.Get_Offset() + Block_Containing.Get_Pos();
@@ -571,11 +568,11 @@ namespace CssUI
 
             Block_Resize_Content_To_Margin_Only_Absolute(ref size.Width, ref size.Height);
 
-            if (Style.Final.Width.Has_Flags(StyleValueFlags.Absolute)) size.Width += Style.Resolve_Size_Width(this, Style.Final.Width.Computed);
-            else if (Style.Final.Min_Width.Has_Flags(StyleValueFlags.Absolute)) size.Width += Style.Resolve_MinSize_Width(this, Style.Final.Min_Width.Computed);
+            if (Style.Specified.Width.Has_Flags(StyleValueFlags.Absolute)) size.Width += Style.Resolve_Size_Width(this, Style.Specified.Width.Computed);
+            else if (Style.Specified.Min_Width.Has_Flags(StyleValueFlags.Absolute)) size.Width += Style.Resolve_MinSize_Width(this, Style.Specified.Min_Width.Computed);
 
-            if (Style.Final.Height.Has_Flags(StyleValueFlags.Absolute)) size.Height += Style.Resolve_Size_Height(this, Style.Final.Height.Computed);
-            else if (Style.Final.Min_Height.Has_Flags(StyleValueFlags.Absolute)) size.Height += Style.Resolve_MinSize_Height(this, Style.Final.Min_Height.Computed);
+            if (Style.Specified.Height.Has_Flags(StyleValueFlags.Absolute)) size.Height += Style.Resolve_Size_Height(this, Style.Specified.Height.Computed);
+            else if (Style.Specified.Min_Height.Has_Flags(StyleValueFlags.Absolute)) size.Height += Style.Resolve_MinSize_Height(this, Style.Specified.Min_Height.Computed);
 
             return size;
         }
@@ -751,8 +748,8 @@ namespace CssUI
         /// </summary>
         public void Set_Size(int? Width, int? Height)
         {
-            Style.User.Width.Set(Width);
-            Style.User.Height.Set(Height);
+            Style.UserRules.Width.Set(Width);
+            Style.UserRules.Height.Set(Height);
         }
 
         /// <summary>
@@ -760,8 +757,8 @@ namespace CssUI
         /// </summary>
         public void Set_Pos(int? X, int? Y)
         {
-            Style.User.Left.Set(X);
-            Style.User.Top.Set(Y);
+            Style.UserRules.Left.Set(X);
+            Style.UserRules.Top.Set(Y);
         }
 
         /// <summary>
@@ -769,10 +766,10 @@ namespace CssUI
         /// </summary>
         public void Set_Margin(int? T, int? R, int? B, int? L)
         {
-            Style.User.Margin_Top.Set(T);
-            Style.User.Margin_Right.Set(R);
-            Style.User.Margin_Bottom.Set(B);
-            Style.User.Margin_Left.Set(L);
+            Style.UserRules.Margin_Top.Set(T);
+            Style.UserRules.Margin_Right.Set(R);
+            Style.UserRules.Margin_Bottom.Set(B);
+            Style.UserRules.Margin_Left.Set(L);
         }
 
         /// <summary>
@@ -780,10 +777,10 @@ namespace CssUI
         /// </summary>
         public void Set_Padding(int? T, int? R, int? B, int? L)
         {
-            Style.User.Padding_Top.Set(T);
-            Style.User.Padding_Right.Set(R);
-            Style.User.Padding_Bottom.Set(B);
-            Style.User.Padding_Left.Set(L);
+            Style.UserRules.Padding_Top.Set(T);
+            Style.UserRules.Padding_Right.Set(R);
+            Style.UserRules.Padding_Bottom.Set(B);
+            Style.UserRules.Padding_Left.Set(L);
         }
 #endregion
 
@@ -809,7 +806,7 @@ namespace CssUI
 #endif
         }
 
-        public void Invalidate_Layout(IStyleProperty sender)
+        public void Invalidate_Layout(ICssProperty sender)
         {
             Flag_Layout(ELayoutBit.Dirty);
 #if DEBUG
@@ -822,7 +819,7 @@ namespace CssUI
         /// </summary>
         public void PerformLayout()
         {
-            Style.Resolve();
+            Style.Cascade();
             //Guid TMR = Timing.Start("PerformLayout()");
             // We still need to apply the positioners ourselves here just incase they arent linked to a target control and are a "relative" positioner.
             xAligner?.Apply_Relative();
@@ -878,13 +875,14 @@ namespace CssUI
             Parent = parent;
             Indice = (parent!=null ? index : 0);
             if (parent != null) Set_Root(parent.Root);// Passed down from generation to generation!
-            Element_Hierarchy_Changed(0);
+            this.Element_Hierarchy_Changed(0);
             this.Flag_Containing_Block_Dirty();// Our parent element has been changed, so logically our containing-block is now different from what it was.
 
             // XXX: Update all style properties marked as 'Inherited'
+            this.Style.Dirt |= EPropertySystemDirtFlags.Cascade;
             if (this is cssTextElement)
             {
-                float? value = this.Style.Default.DpiX.Computed.Value;
+                float? value = this.Style.ImplicitRules.DpiX.Computed.Value;
                 xLog.Log.Debug($"cssTextElement.Style.Default.DpiX.Computed.Value: {value}");
             }
         }
@@ -978,16 +976,16 @@ namespace CssUI
             set
             {
                 font = value;
-                Style.User.FontFamily.Set(font.Family.Name);
-                Style.User.FontSize.Set((double?)font.Size);
+                Style.UserRules.FontFamily.Set(font.Family.Name);
+                Style.UserRules.FontSize.Set((double?)font.Size);
 
                 if(font.Italic)
                 {
-                    Style.User.FontStyle.Set(EFontStyle.Italic);
+                    Style.UserRules.FontStyle.Set(EFontStyle.Italic);
                 }
                 else
                 {
-                    Style.User.FontStyle.Set(EFontStyle.Normal);
+                    Style.UserRules.FontStyle.Set(EFontStyle.Normal);
                 }
             }
         }
@@ -1116,7 +1114,7 @@ namespace CssUI
         /// <param name="Name">A unique ID or classname, ID's must be prefixed with '#' or else the string is considered a classname</param>
         public cssElement(string Name)
         {
-            UID = ++CUID;
+            UID = new cssElementID();
             if (this is cssRootElement) Root = (cssRootElement)this;
             if (!string.IsNullOrEmpty(Name))
             {
@@ -1148,7 +1146,7 @@ namespace CssUI
 
 #region Property Change Handlers
 
-        private void Style_Property_Changed(IStyleProperty Sender, EPropertyFlags Flags, System.Diagnostics.StackTrace Source)
+        private void Style_Property_Changed(ICssProperty Sender, EPropertyFlags Flags, System.Diagnostics.StackTrace Source)
         {
 
 #if DEBUG
@@ -1205,7 +1203,7 @@ namespace CssUI
         /// Updates the Block and Layout if needed and returns True if any updates occured
         /// </summary>
         /// <returns>True/False updates occured</returns>
-        public virtual bool Update()
+        public virtual async Task<bool> Update()
         {
             bool retVal = false;
 
@@ -1227,9 +1225,14 @@ namespace CssUI
                 PerformLayout();
             }
 
-            if (Style.NeedsResolving)
+            if (0 != (Style.Dirt & EPropertySystemDirtFlags.Cascade))
             {
-                Style.Resolve();
+                await Style.Cascade();
+            }
+
+            if (0 != (Style.Dirt & EPropertySystemDirtFlags.Resolve))
+            {
+                await Style.Resolve();
             }
 
             return retVal;

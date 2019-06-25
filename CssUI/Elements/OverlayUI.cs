@@ -12,10 +12,10 @@ namespace CssUI
         #region Constructors
         public OverlayUI(IRenderEngine Engine) : base(Engine)
         {
-            Style.User.Overflow_X.Value = EOverflowMode.Clip;
-            Style.User.Overflow_Y.Value = EOverflowMode.Clip;
-            Style.User.Width.Set(CssValue.Pct_OneHundred);// Always match the viewport size
-            Style.User.Height.Set(CssValue.Pct_OneHundred);// Always match the viewport size
+            Style.UserRules.Overflow_X.Value = EOverflowMode.Clip;
+            Style.UserRules.Overflow_Y.Value = EOverflowMode.Clip;
+            Style.UserRules.Width.Set(CssValue.Pct_OneHundred);// Always match the viewport size
+            Style.UserRules.Height.Set(CssValue.Pct_OneHundred);// Always match the viewport size
         }
         #endregion
     }

@@ -9,9 +9,9 @@ namespace CssUI.CSS
     /// <summary>
     /// Represents a styling property which always resolves to a string
     /// </summary>
-    public class StringProperty : StyleProperty
+    public class StringProperty : CssProperty
     {
-        static PropertyOptions DefaultOptions = new PropertyOptions() { AllowPercentage = false };
+        static CssPropertyOptions DefaultOptions = new CssPropertyOptions() { AllowPercentage = false };
         #region Accessors
         public string Value
         {
@@ -32,15 +32,15 @@ namespace CssUI.CSS
         {
         }
 
-        public StringProperty(bool Locked, PropertyOptions Options) : base(Locked, new PropertyOptions(Options) { AllowPercentage = false })
+        public StringProperty(bool Locked, CssPropertyOptions Options) : base(Locked, new CssPropertyOptions(Options) { AllowPercentage = false })
         {
         }
 
-        public StringProperty(string CssName, bool Locked, PropertyOptions Options) : base(CssName, Locked, new PropertyOptions(Options) { AllowPercentage = false })
+        public StringProperty(string CssName, bool Locked, CssPropertyOptions Options) : base(CssName, Locked, new CssPropertyOptions(Options) { AllowPercentage = false })
         {
         }
 
-        public StringProperty(string CssName, cssElement Owner, bool Locked, bool Unset, PropertyOptions Options) : base(CssName, Locked, Unset, Owner, new PropertyOptions(Options) { AllowPercentage = false })
+        public StringProperty(string CssName, cssElement Owner, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Owner, new CssPropertyOptions(Options) { AllowPercentage = false })
         {
         }
 
@@ -52,7 +52,7 @@ namespace CssUI.CSS
         {
         }
 
-        public StringProperty(CssValue initial, bool Locked, PropertyOptions Options) : base(initial, Locked, new PropertyOptions(Options) { AllowPercentage = false })
+        public StringProperty(CssValue initial, bool Locked, CssPropertyOptions Options) : base(initial, Locked, new CssPropertyOptions(Options) { AllowPercentage = false })
         {
         }
         #endregion

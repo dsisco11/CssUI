@@ -241,11 +241,11 @@ namespace CssUI
             if (SB_Vertical == null)
             {
                 SB_Vertical = new uiVScrollBar();
-                SB_Vertical.Style.Default.Height.Set(CssValue.From_Percent(100f));
+                SB_Vertical.Style.ImplicitRules.Height.Set(CssValue.From_Percent(100f));
                 
-                SB_Vertical.Style.Default.Top.Set(0);
-                SB_Vertical.Style.Default.Bottom.Set(0);
-                SB_Vertical.Style.Default.Right.Set(0);
+                SB_Vertical.Style.ImplicitRules.Top.Set(0);
+                SB_Vertical.Style.ImplicitRules.Bottom.Set(0);
+                SB_Vertical.Style.ImplicitRules.Right.Set(0);
                 
                 SB_Vertical.IsVisible = false;
                 SB_Vertical.ValueChanged += delegate (cssScrollBarElement Sender) 
@@ -277,11 +277,11 @@ namespace CssUI
             if (SB_Horizontal == null)
             {
                 SB_Horizontal = new uiHScrollBar();
-                SB_Horizontal.Style.Default.Width.Set(CssValue.From_Percent(100f));
+                SB_Horizontal.Style.ImplicitRules.Width.Set(CssValue.From_Percent(100f));
 
-                SB_Horizontal.Style.Default.Left.Set(0);
-                SB_Horizontal.Style.Default.Right.Set(0);
-                SB_Horizontal.Style.Default.Bottom.Set(0);
+                SB_Horizontal.Style.ImplicitRules.Left.Set(0);
+                SB_Horizontal.Style.ImplicitRules.Right.Set(0);
+                SB_Horizontal.Style.ImplicitRules.Bottom.Set(0);
 
                 SB_Horizontal.IsVisible = false;
                 SB_Horizontal.ValueChanged += delegate (cssScrollBarElement Sender) 

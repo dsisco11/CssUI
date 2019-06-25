@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace CssUI
 {
     /// <summary>
-    /// Defines the basic functionality which all properties defined in an <see cref="StyleRuleData"/> instance should have
+    /// Defines the basic functionality which all properties defined in an <see cref="CssPropertySet"/> instance should have
     /// </summary>
     public interface IElementProperty
     {

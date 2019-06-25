@@ -28,11 +28,11 @@ namespace CssUI
         #region Constructors
         public uiHeaderGroup(string ID = null) : base(ID)
         {
-            Style.User.Display.Set(EDisplayMode.BLOCK);
+            Style.UserRules.Display.Set(EDisplayMode.BLOCK);
             Layout = ELayoutMode.Default;
 
             text = new cssTextElement("Title");
-            text.Style.User.Display.Set(EDisplayMode.BLOCK);
+            text.Style.UserRules.Display.Set(EDisplayMode.BLOCK);
             //text.TextFont = new System.Drawing.Font(text.TextFont.FontFamily, 20);
             Add(text);
         }

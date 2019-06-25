@@ -90,14 +90,14 @@ namespace CssUI
                     {
                         int size = Calculate_Thumb_Size(Track.ValueMax, Viewport.Block.Height, Track.Block.Height);
                         //Track.Thumb.Style.User.Width.Set(null);
-                        Track.Thumb.Style.User.Height.Set(size);
+                        Track.Thumb.Style.UserRules.Height.Set(size);
                         PageLength = (int)(Track.ValuePerPixel * size);
                     }
                     break;
                 case ESliderDirection.Horizontal:
                     {
                         int size = Calculate_Thumb_Size(Track.ValueMax, Viewport.Block.Width, Track.Block.Width);
-                        Track.Thumb.Style.User.Width.Set(size);
+                        Track.Thumb.Style.UserRules.Width.Set(size);
                         //Track.Thumb.Style.User.Height.Set(null);
                         PageLength = (int)(Track.ValuePerPixel * size);
                     }
@@ -112,10 +112,10 @@ namespace CssUI
         {
             Flags_Remove(EElementFlags.DoubleClickable);
             Layout = ELayoutMode.None;
-            Style.Default.Positioning.Value = EPositioning.Fixed;
+            Style.ImplicitRules.Positioning.Value = EPositioning.Fixed;
             // Just so our scrollbars dont have scrollbars by some chance.
-            Style.Default.Overflow_X.Value = EOverflowMode.Clip;
-            Style.Default.Overflow_Y.Value = EOverflowMode.Clip;
+            Style.ImplicitRules.Overflow_X.Value = EOverflowMode.Clip;
+            Style.ImplicitRules.Overflow_Y.Value = EOverflowMode.Clip;
             ColorBackground = new cssColor(0.1f, 0.1f, 0.1f, 1.0f);
 
 
@@ -127,12 +127,12 @@ namespace CssUI
             Track.MouseClick += Track_onMouseClick;
 
             Btn_dec = new cssButtonElement("Btn_Dec");
-            Btn_dec.Style.User.Set_Padding_Implicit(3, 3);
+            Btn_dec.Style.UserRules.Set_Padding_Implicit(3, 3);
             Btn_dec.Clicked += (cssElement Sender, DomRoutedEventArgs Args) => { Value = (Value - StepSize); };
             Btn_dec.Set_Svg(CssIcons.close);
 
             Btn_inc = new cssButtonElement("Btn_Inc");
-            Btn_inc.Style.User.Set_Padding_Implicit(3, 3);
+            Btn_inc.Style.UserRules.Set_Padding_Implicit(3, 3);
             Btn_inc.Clicked += (cssElement Sender, DomRoutedEventArgs Args) => { Value = (Value + StepSize); };
             Btn_inc.Set_Svg(CssIcons.close);
 
@@ -142,35 +142,35 @@ namespace CssUI
                 case ESliderDirection.Vertical:
                     {
                         var p = Platform.Factory.SystemMetrics.Get_Vertical_Scrollbar_Params();
-                        Style.User.Width.Set(p.Size);
-                        Track.Style.User.Width.Set(CssValue.Pct_OneHundred);
-                        Track.Style.User.Set_Padding(3, 0);
+                        Style.UserRules.Width.Set(p.Size);
+                        Track.Style.UserRules.Width.Set(CssValue.Pct_OneHundred);
+                        Track.Style.UserRules.Set_Padding(3, 0);
 
-                        Btn_dec.Style.User.Width.Set(p.BtnArrowSize);
-                        Btn_dec.Style.User.Height.Set(p.BtnArrowSize);
+                        Btn_dec.Style.UserRules.Width.Set(p.BtnArrowSize);
+                        Btn_dec.Style.UserRules.Height.Set(p.BtnArrowSize);
                         Btn_dec.Set_Svg(CssIcons.arrow_up);
 
-                        Btn_inc.Style.User.Width.Set(p.BtnArrowSize);
-                        Btn_inc.Style.User.Height.Set(p.BtnArrowSize);
+                        Btn_inc.Style.UserRules.Width.Set(p.BtnArrowSize);
+                        Btn_inc.Style.UserRules.Height.Set(p.BtnArrowSize);
                         Btn_inc.Set_Svg(CssIcons.arrow_down);
-                        Track.Thumb.Style.User.Min_Height.Set(p.ThumbSize);
+                        Track.Thumb.Style.UserRules.Min_Height.Set(p.ThumbSize);
                     }
                     break;
                 case ESliderDirection.Horizontal:
                     {
                         var p = Platform.Factory.SystemMetrics.Get_Horizontal_Scrollbar_Params();
-                        Style.User.Height.Set(p.Size);
-                        Track.Style.User.Height.Set(CssValue.Pct_OneHundred);
-                        Track.Style.User.Set_Padding(0, 3);
+                        Style.UserRules.Height.Set(p.Size);
+                        Track.Style.UserRules.Height.Set(CssValue.Pct_OneHundred);
+                        Track.Style.UserRules.Set_Padding(0, 3);
 
-                        Btn_dec.Style.User.Width.Set(p.BtnArrowSize);
-                        Btn_dec.Style.User.Height.Set(p.BtnArrowSize);
+                        Btn_dec.Style.UserRules.Width.Set(p.BtnArrowSize);
+                        Btn_dec.Style.UserRules.Height.Set(p.BtnArrowSize);
                         Btn_dec.Set_Svg(CssIcons.arrow_left);
 
-                        Btn_inc.Style.User.Width.Set(p.BtnArrowSize);
-                        Btn_inc.Style.User.Height.Set(p.BtnArrowSize);
+                        Btn_inc.Style.UserRules.Width.Set(p.BtnArrowSize);
+                        Btn_inc.Style.UserRules.Height.Set(p.BtnArrowSize);
                         Btn_inc.Set_Svg(CssIcons.arrow_right);
-                        Track.Thumb.Style.User.Min_Width.Set(p.ThumbSize);
+                        Track.Thumb.Style.UserRules.Min_Width.Set(p.ThumbSize);
                     }
                     break;
             }
@@ -255,14 +255,14 @@ namespace CssUI
                     {
                         int h = Block_Content.Height - (Btn_dec.Block.Height + Btn_inc.Block.Height);
                         //Track.Size.Set(null, h);
-                        Track.Style.User.Height.Set(h);
+                        Track.Style.UserRules.Height.Set(h);
                     }
                     break;
                 case ESliderDirection.Horizontal:
                     {
                         int w = Block_Content.Width - (Btn_dec.Block.Width + Btn_inc.Block.Width);
                         //Track.Size.Set(w, null);
-                        Track.Style.User.Width.Set(w);
+                        Track.Style.UserRules.Width.Set(w);
                     }
                     break;
             }
@@ -277,16 +277,16 @@ namespace CssUI
             {
                 case ESliderDirection.Vertical:
                     {
-                        Btn_dec.Style.User.Set_Position(0, 0);
-                        Track.Style.User.Set_Position(0, Btn_dec.Block.Height);
-                        Btn_inc.Style.User.Set_Position(0, Track.Block.Bottom);
+                        Btn_dec.Style.UserRules.Set_Position(0, 0);
+                        Track.Style.UserRules.Set_Position(0, Btn_dec.Block.Height);
+                        Btn_inc.Style.UserRules.Set_Position(0, Track.Block.Bottom);
                     }
                     break;
                 case ESliderDirection.Horizontal:
                     {
-                        Btn_dec.Style.User.Set_Position(0, 0);
-                        Track.Style.User.Set_Position(Btn_dec.Block.Width, 0);
-                        Btn_inc.Style.User.Set_Position(Track.Block.Right, 0);
+                        Btn_dec.Style.UserRules.Set_Position(0, 0);
+                        Track.Style.UserRules.Set_Position(Btn_dec.Block.Width, 0);
+                        Btn_inc.Style.UserRules.Set_Position(Track.Block.Right, 0);
                     }
                     break;
             }

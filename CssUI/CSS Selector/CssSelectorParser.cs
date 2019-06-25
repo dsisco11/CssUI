@@ -267,7 +267,7 @@ namespace CssUI.CSS.Selector
         public static SelectorFilterSet Consume_Selector_FilterSet(CssTokenStream Stream)
         {
             SelectorFilterSet List = null;
-            SelectorFilter Filter;
+            CssSelectorFilter Filter;
             do
             {
                 Filter = Consume_Filter(Stream);
@@ -327,7 +327,7 @@ namespace CssUI.CSS.Selector
         /// Consumes a new selector-filter item
         /// </summary>
         /// <returns></returns>
-        static SelectorFilter Consume_Filter(CssTokenStream Stream)
+        static CssSelectorFilter Consume_Filter(CssTokenStream Stream)
         {
             Stream.Consume_While(tok => tok.Type == ECssTokenType.Whitespace);// Consume all of the prefixing whitespace
             CssCompoundSelector Compound = Consume_Compound_Selector(Stream);

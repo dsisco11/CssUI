@@ -11,8 +11,8 @@ namespace CssUI
         #region Constructors
         public cssDocument(IRenderEngine Engine) : base(Engine)
         {
-            Style.User.Overflow_X.Value = EOverflowMode.Auto;
-            Style.User.Overflow_Y.Value = EOverflowMode.Scroll;
+            Style.UserRules.Overflow_X.Value = EOverflowMode.Auto;
+            Style.UserRules.Overflow_Y.Value = EOverflowMode.Scroll;
         }
         /*
         public Document(GLPanel gl, IRenderEngine Engine) : this(Engine)

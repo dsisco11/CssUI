@@ -12,8 +12,8 @@ namespace CssUI
     public sealed class AtomicString
     {
         #region Properties
-        int? Hash = null;
-        readonly string String = string.Empty;
+        private int? Hash = null;
+        private readonly string String = string.Empty;
         #endregion
 
         #region Constructors
@@ -25,6 +25,8 @@ namespace CssUI
         #endregion
 
         public override string ToString() { return this.String; }
+
+        public static implicit operator string(AtomicString atom) { return atom.String; }
 
 
         public override int GetHashCode()

@@ -17,8 +17,8 @@ namespace CssUI.CSS
 
             new CssPropertyDefinition("opacity", false, EPropertyFlags.Visual, CssValue.From_Number(1.0));
 
-            new CssPropertyDefinition("dpi-x", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.Inherit, (cssElement E, double Pct) => { return (Pct * 72.0); });
-            new CssPropertyDefinition("dpi-y", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.Inherit, (cssElement E, double Pct) => { return (Pct * 72.0); });
+            new CssPropertyDefinition("dpi-x", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.None, (cssElement E, double Pct) => { return (Pct * 72.0); });
+            new CssPropertyDefinition("dpi-y", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.None, (cssElement E, double Pct) => { return (Pct * 72.0); });
 
             new CssPropertyDefinition("font-family", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.Null);
             new CssPropertyDefinition("font-weight", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.From_Int(400));

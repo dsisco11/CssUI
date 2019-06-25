@@ -11,7 +11,7 @@ namespace CssUI
     /// Specifies the position of a object area (e.g. background image) inside a positioning area (e.g. background positioning area).
     /// SEE:  https://www.w3.org/TR/2012/WD-css3-values-20120308/#position
     /// </summary>
-    public class PositionProperty : StyleProperty
+    public class PositionProperty : CssProperty
     {
         #region Propertys
         CssValue Computed_X = CssValue.Null;// Stores our currently computed X coordinate value
@@ -49,7 +49,7 @@ namespace CssUI
             base.onChanged += this.Update;
         }
 
-        public PositionProperty(string CssName, cssElement Owner, bool Locked, bool Unset, PropertyOptions Options) : base(CssName, Locked, Unset, Owner, Options)
+        public PositionProperty(string CssName, cssElement Owner, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Owner, Options)
         {
             base.onChanged += this.Update;
         }
@@ -58,7 +58,7 @@ namespace CssUI
         /// <summary>
         /// Whenever this propertys value changes this is called so we can update our <see cref="Computed_X"/> and <see cref="Computed_Y"/> values
         /// </summary>
-        void Update(IStyleProperty Sender)
+        void Update(ICssProperty Sender)
         {
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -8,6 +9,22 @@ using CssUI.CSS;
 
 namespace CssUI
 {
+    public enum EPropertySystemDirtFlags : UInt16
+    {
+        /// <summary>
+        /// Not dirty
+        /// </summary>
+        Clean = 0,
+        /// <summary>
+        /// The property system needs to re-cascade its properties
+        /// </summary>
+        Cascade = (1 << 0),
+        /// <summary>
+        /// The property system needs to resolve its property values
+        /// </summary>
+        Resolve = (1 << 1)
+    }
+
     /// <summary>
     /// Holds all of the resolved styling values for an element
     /// Manages cascading and accessing all of the different properties for each of an elements style states
@@ -15,15 +32,16 @@ namespace CssUI
     public class ElementPropertySystem
     {
         #region State Names
-        public static AtomicString STATE_DEFAULT = new AtomicString("Implicit");
+        public static AtomicString STATE_IMPLICIT = new AtomicString("Implicit");
         public static AtomicString STATE_USER = new AtomicString("Default");
         public static AtomicString STATE_FOCUS = new AtomicString("Focus");
         public static AtomicString STATE_HOVER = new AtomicString("Hover");
         #endregion
 
         #region Properties
+        public EPropertySystemDirtFlags Dirt = EPropertySystemDirtFlags.Clean;
         /// <summary>
-        /// Whether or not this style has changes and needs to update
+        /// Whether or not there have been property changes and need to update
         /// </summary>
         public bool NeedsResolving { get; private set; } = true;
         /// <summary>
@@ -38,7 +56,7 @@ namespace CssUI
         /// <summary>
         /// DO NOT MODIFY THE PROPERTIES OF THIS INSTANCE, TREAT THEM AS READONLY!!!
         /// </summary>
-        public readonly StyleRuleData Final;
+        public readonly CssPropertySet Specified;
         #endregion
 
         #region States
@@ -46,30 +64,30 @@ namespace CssUI
         /// Default values set/preferred by the element itself
         /// (DO NOT SET THESE PROPERTIES FROM CODE OUTSIDE THE UI ELEMENT CLASS THAT OWNS THIS <see cref="ElementPropertySystem"/> INSTANCE!)
         /// </summary>
-        internal readonly StyleRuleData Default;
+        internal CssPropertySet ImplicitRules { get { return CssRules[STATE_IMPLICIT]; } }
         /// <summary>
         /// Values set by code external to the element's class definition.
         /// EG: A user stylesheet, or whatever UI element instantiates and uses the element.
         /// </summary>
-        public readonly StyleRuleData User;
+        public CssPropertySet UserRules { get { return CssRules[STATE_USER]; } }
         /// <summary>
         /// Values that take precedence when the mouse is overtop the element
         /// </summary>
-        public readonly StyleRuleData Hover;
+        public CssPropertySet HoverRules { get { return CssRules[STATE_HOVER]; } }
         /// <summary>
         /// Values that take precedence when the element is currently targeted by the keyboard or activated by the mouse
         /// </summary>
-        public readonly StyleRuleData Focus;
+        public CssPropertySet FocusRules { get { return CssRules[STATE_FOCUS]; } }
         /// <summary>
-        /// Values that take precedence under custom conditions defined by certain element types
+        /// Contains all <see cref="CssPropertySet"/>s that apply to the element
         /// </summary>
-        private readonly Dictionary<AtomicString, StyleRuleData> Custom = new Dictionary<AtomicString, StyleRuleData>(0);
+        private readonly ConcurrentDictionary<AtomicString, CssPropertySet> CssRules = new ConcurrentDictionary<AtomicString, CssPropertySet>();
         #endregion
 
         #region Values
-        public EDisplayMode Display { get { return Final.Display.Computed.AsEnum<EDisplayMode>(); } }
-        public EBoxSizingMode BoxSizing { get { return Final.BoxSizing.Computed.AsEnum<EBoxSizingMode>(); } }
-        public EPositioning Positioning { get { return Final.Positioning.Computed.AsEnum<EPositioning>(); } }
+        public EDisplayMode Display { get { return Specified.Display.Computed.AsEnum<EDisplayMode>(); } }
+        public EBoxSizingMode BoxSizing { get { return Specified.BoxSizing.Computed.AsEnum<EBoxSizingMode>(); } }
+        public EPositioning Positioning { get { return Specified.Positioning.Computed.AsEnum<EPositioning>(); } }
 
         /// <summary>
         /// Returns the positioning 'scheme', which defines whether the element follows the normal flow logic.
@@ -89,11 +107,11 @@ namespace CssUI
             }
         }
 
-        public EOverflowMode Overflow_X { get { return Final.Overflow_X.Computed.AsEnum<EOverflowMode>(); } }
-        public EOverflowMode Overflow_Y { get { return Final.Overflow_Y.Computed.AsEnum<EOverflowMode>(); } }
-        public ETextAlign TextAlign { get { return Final.TextAlign.Computed.AsEnum<ETextAlign>(); } }
+        public EOverflowMode Overflow_X { get { return Specified.Overflow_X.Computed.AsEnum<EOverflowMode>(); } }
+        public EOverflowMode Overflow_Y { get { return Specified.Overflow_Y.Computed.AsEnum<EOverflowMode>(); } }
+        public ETextAlign TextAlign { get { return Specified.TextAlign.Computed.AsEnum<ETextAlign>(); } }
 
-        public EObjectFit ObjectFit { get { return Final.ObjectFit.Computed.AsEnum<EObjectFit>(); } }
+        public EObjectFit ObjectFit { get { return Specified.ObjectFit.Computed.AsEnum<EObjectFit>(); } }
         public int ObjectPosition_X { get; private set; } = 0;
         public int ObjectPosition_Y { get; private set; } = 0;
 
@@ -151,10 +169,10 @@ namespace CssUI
         public int Padding_Bottom { get; private set; } = 0;
         public int Padding_Left { get; private set; } = 0;
 
-        public EBorderStyle Border_Top_Style { get { return Final.Border_Top_Style.Computed.AsEnum<EBorderStyle>(); } }
-        public EBorderStyle Border_Right_Style { get { return Final.Border_Right_Style.Computed.AsEnum<EBorderStyle>(); } }
-        public EBorderStyle Border_Bottom_Style { get { return Final.Border_Bottom_Style.Computed.AsEnum<EBorderStyle>(); } }
-        public EBorderStyle Border_Left_Style { get { return Final.Border_Left_Style.Computed.AsEnum<EBorderStyle>(); } }
+        public EBorderStyle Border_Top_Style { get { return Specified.Border_Top_Style.Computed.AsEnum<EBorderStyle>(); } }
+        public EBorderStyle Border_Right_Style { get { return Specified.Border_Right_Style.Computed.AsEnum<EBorderStyle>(); } }
+        public EBorderStyle Border_Bottom_Style { get { return Specified.Border_Bottom_Style.Computed.AsEnum<EBorderStyle>(); } }
+        public EBorderStyle Border_Left_Style { get { return Specified.Border_Left_Style.Computed.AsEnum<EBorderStyle>(); } }
 
         public int Border_Top_Width { get; private set; } = 0;
         public int Border_Right_Width { get; private set; } = 0;
@@ -188,10 +206,10 @@ namespace CssUI
         {
             eBlockOffset retVal = new eBlockOffset();
 
-            if (Final.Margin_Top.Computed == CssValue.Auto) retVal.Top = autoValue;
-            if (Final.Margin_Right.Computed == CssValue.Auto) retVal.Right = autoValue;
-            if (Final.Margin_Bottom.Computed == CssValue.Auto) retVal.Bottom = autoValue;
-            if (Final.Margin_Left.Computed == CssValue.Auto) retVal.Left = autoValue;
+            if (Specified.Margin_Top.Computed == CssValue.Auto) retVal.Top = autoValue;
+            if (Specified.Margin_Right.Computed == CssValue.Auto) retVal.Right = autoValue;
+            if (Specified.Margin_Bottom.Computed == CssValue.Auto) retVal.Bottom = autoValue;
+            if (Specified.Margin_Left.Computed == CssValue.Auto) retVal.Left = autoValue;
 
             return retVal;
         }
@@ -199,10 +217,10 @@ namespace CssUI
         public eBlockOffset Get_Padding_OnlyAbsolute(int autoValue)
         {
             eBlockOffset retVal = new eBlockOffset();
-            retVal.Top = Final.Padding_Top.Computed.Resolve_Or_Default(autoValue, (o => o.Has_Flags(StyleValueFlags.Absolute)));
-            retVal.Right = Final.Padding_Right.Computed.Resolve_Or_Default(autoValue, (o => o.Has_Flags(StyleValueFlags.Absolute)));
-            retVal.Bottom = Final.Padding_Bottom.Computed.Resolve_Or_Default(autoValue, (o => o.Has_Flags(StyleValueFlags.Absolute)));
-            retVal.Left = Final.Padding_Left.Computed.Resolve_Or_Default(autoValue, (o => o.Has_Flags(StyleValueFlags.Absolute)));
+            retVal.Top = Specified.Padding_Top.Computed.Resolve_Or_Default(autoValue, (o => o.Has_Flags(StyleValueFlags.Absolute)));
+            retVal.Right = Specified.Padding_Right.Computed.Resolve_Or_Default(autoValue, (o => o.Has_Flags(StyleValueFlags.Absolute)));
+            retVal.Bottom = Specified.Padding_Bottom.Computed.Resolve_Or_Default(autoValue, (o => o.Has_Flags(StyleValueFlags.Absolute)));
+            retVal.Left = Specified.Padding_Left.Computed.Resolve_Or_Default(autoValue, (o => o.Has_Flags(StyleValueFlags.Absolute)));
 
             return retVal;
         }
@@ -210,10 +228,10 @@ namespace CssUI
         public eBlockOffset Get_Margin_OnlyAbsolute(int autoValue)
         {
             eBlockOffset retVal = new eBlockOffset();
-            retVal.Top = Final.Margin_Top.Computed.Resolve_Or_Default(autoValue, (o => o.Has_Flags(StyleValueFlags.Absolute)));
-            retVal.Right = Final.Margin_Right.Computed.Resolve_Or_Default(autoValue, (o => o.Has_Flags(StyleValueFlags.Absolute)));
-            retVal.Bottom = Final.Margin_Bottom.Computed.Resolve_Or_Default(autoValue, (o => o.Has_Flags(StyleValueFlags.Absolute)));
-            retVal.Left = Final.Margin_Left.Computed.Resolve_Or_Default(autoValue, (o => o.Has_Flags(StyleValueFlags.Absolute)));
+            retVal.Top = Specified.Margin_Top.Computed.Resolve_Or_Default(autoValue, (o => o.Has_Flags(StyleValueFlags.Absolute)));
+            retVal.Right = Specified.Margin_Right.Computed.Resolve_Or_Default(autoValue, (o => o.Has_Flags(StyleValueFlags.Absolute)));
+            retVal.Bottom = Specified.Margin_Bottom.Computed.Resolve_Or_Default(autoValue, (o => o.Has_Flags(StyleValueFlags.Absolute)));
+            retVal.Left = Specified.Margin_Left.Computed.Resolve_Or_Default(autoValue, (o => o.Has_Flags(StyleValueFlags.Absolute)));
 
             return retVal;
         }
@@ -229,7 +247,7 @@ namespace CssUI
             Stack = new StackTrace(1);
 #endif
             // We need to be resolved again because the 'Layout_Pos_' values directly determine our finalized X/Y property values.
-            NeedsResolving = true;
+            Dirt |= EPropertySystemDirtFlags.Resolve;
             // These 'Layout_Pos_' vars have the same effect as any other styling property in that WHENEVER they change it will effect how the owning uiElement's BLOCK placement.
             //Property_Changed?.Invoke(null, EPropertyFlags.Block | EPropertyFlags.Flow, Stack);// Replaced with the lines below on 06-19-2017
             Owner.Flag_Block_Dirty(ECssBlockInvalidationReason.Layout_Pos_Changed);
@@ -250,7 +268,7 @@ namespace CssUI
                     break;
             }
 
-            User.Content_Width.Set(Width);
+            UserRules.Content_Width.Set(Width);
         }
         
         internal void Set_Content_Height(int Height)
@@ -265,7 +283,7 @@ namespace CssUI
                     break;
             }
 
-            User.Content_Height.Set(Height);
+            UserRules.Content_Height.Set(Height);
         }
         #endregion
 
@@ -273,32 +291,60 @@ namespace CssUI
         /// <summary>
         /// A property which affects the elements block changed
         /// </summary>
-        public event Action<IStyleProperty, EPropertyFlags, StackTrace> Property_Changed;
+        public event Action<ICssProperty, EPropertyFlags, StackTrace> Property_Changed;
         #endregion
 
         #region Constructors
         public ElementPropertySystem(cssElement Owner)
         {
             this.Owner = Owner;
-            Default = NewProperties("Default", "", Owner, false);// Holds the values assigned to properties by default for the owning element...
-            User = NewProperties("User", "", Owner, true);
-            Hover = NewProperties("Hover", ":hover", Owner, true);
-            Focus = NewProperties("Focus", ":focus", Owner, true);
 
-            Final = new StyleRuleData(null, null, Owner, true);
-            Final.Property_Changed += Current_Property_Changed;
+            // Populate our rules with a few different common states
+            CssRules.TryAdd(STATE_IMPLICIT, NewPropertySet(STATE_IMPLICIT, "", Owner, false, EPropertySetOrigin.UserAgent));
+            CssRules.TryAdd(STATE_USER, NewPropertySet(STATE_USER, "", Owner, true, EPropertySetOrigin.Author));
+            CssRules.TryAdd(STATE_HOVER, NewPropertySet(STATE_HOVER, ":hover", Owner, true, EPropertySetOrigin.Author));
+            CssRules.TryAdd(STATE_FOCUS, NewPropertySet(STATE_FOCUS, ":focus", Owner, true, EPropertySetOrigin.Author));
+
+            Specified = new CssPropertySet(null, null, Owner, true);
+            Specified.Property_Changed += Current_Property_Changed;
             // Blending
-            Final.Opacity.onChanged += Update_Blend_Color;
+            Specified.Opacity.onChanged += Update_Blend_Color;
             // Transformations
-            Final.Transform.onChanged += Transform_onChanged;
+            Specified.Transform.onChanged += Transform_onChanged;
         }
         #endregion
 
-        private StyleRuleData NewProperties(string Name, string Selector, cssElement Owner, bool Unset)
+        /// <summary>
+        /// Creates a new property set under the specified name and binds to it to detect when a value changes.
+        /// </summary>
+        /// <param name="Name"></param>
+        /// <param name="Selector"></param>
+        /// <param name="Owner"></param>
+        /// <param name="Unset"></param>
+        /// <returns></returns>
+        private CssPropertySet NewPropertySet(string Name, string Selector, cssElement Owner, bool Unset, EPropertySetOrigin Origin)
         {
-            var retVal = new StyleRuleData(Name, new CssSelector(false, Selector), Owner, false, Unset);
+            var retVal = new CssPropertySet(Name, new CssSelector(false, Selector), Owner, false, Unset, Origin);
             // Capture all update events.
             retVal.Property_Changed += Property_Change;
+            return retVal;
+        }
+
+        /// <summary>
+        /// Adds a new <see cref="CssPropertySet"/> to the list of styling rules and binds to it to detect when a value changes.
+        /// </summary>
+        /// <param name="Selector"></param>
+        /// <param name="Owner"></param>
+        /// <param name="Unset"></param>
+        /// <returns>Success</returns>
+        internal bool Add_PropertySet(CssPropertySet prop)
+        {
+            var retVal = this.CssRules.TryAdd(new AtomicString(prop.Name), prop);
+            // Capture all update events.
+            prop.Property_Changed += Property_Change;
+            // We just took on another group of proerties, we should recascade
+            Dirt |= EPropertySystemDirtFlags.Cascade;
+
             return retVal;
         }
 
@@ -306,14 +352,99 @@ namespace CssUI
         #region Property Change Handlers
 
         /// <summary>
-        /// A state-specific property changed
+        /// A state-specific property changed, we need to resolve this single property
         /// </summary>
-        private void Property_Change(IStyleProperty Property, EPropertyFlags Flags, StackTrace Origin)
+        private async void Property_Change(ICssProperty Property, EPropertyFlags Flags, StackTrace Origin)
         {
-            AtomicString SourceState = STATE_DEFAULT;
-            IStyleProperty Value = Default.Get(Property.FieldName);
+            await CascadeSingle(Property);
+        }
+
+        private void Current_Property_Changed(ICssProperty Prop, EPropertyFlags Flags, StackTrace Stack)
+        {
+            Update_Depends_Flag();// A property changed, update our depends flag
+
+            bool IsFlow = ((Flags & EPropertyFlags.Flow) != 0);// Layout
+            bool IsBlock = ((Flags & EPropertyFlags.Block) != 0);
+            bool IsVisual = ((Flags & EPropertyFlags.Visual) != 0);
+            bool IsFont = ((Flags & EPropertyFlags.Font) != 0);
+
+            if (IsBlock || IsFlow || IsVisual) Dirt |= EPropertySystemDirtFlags.Resolve;
+
+            if (IsFont) Update_Font(Prop, Stack);
+            
+            //Logging.Log.Info("[PropertChanged]: {0}", Prop.FieldName);
+            Property_Changed?.Invoke(Prop, Flags, Stack);
+        }
+        #endregion
+
+
+        #region Cascading
+
+        /// <summary>
+        /// Gets a list of all our <see cref="CssPropertySet"/>s from <see cref="CssRules"/>, ordered according to how they should cascade.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<CssPropertySet> Get_Cascade_Ordered_PropertySets()
+        {// DOCS: https://www.w3.org/TR/CSS22/cascade.html#cascading-order
+
+            List<CssPropertySet> OrderedSet = CssRules.Values.ToList();
+
+            OrderedSet.Sort(new CssPropertySetComparator());
+
+            // Because cascading overwrites an existing value with the one from the next propertyset we need to reverse this list.
+            OrderedSet.Reverse();
+            return OrderedSet;
+        }
+
+        /// <summary>
+        /// Resolves all Css properties to their specified values by cascading
+        ///     Re-Cascades all properties that are specified by the User and Element
+        ///     Cascades the element 'state' rules(hover, focus, etc) overtop that
+        ///     Cascades element override rules overtop that(for special cases where an element must override a rule)
+        /// 
+        /// </summary>
+        public async Task Cascade()
+        {
+            CssPropertySet Cascaded = new CssPropertySet(null, null, Owner);
+            var orderedRules = Get_Cascade_Ordered_PropertySets();
+
+            foreach (CssPropertySet ruleSet in orderedRules)
+            {
+                // We use selector matching so we can be sure the rule CURRENTLY applies
+                if(ruleSet.Selector.QuerySingle(this.Owner))
+                {
+                    await Cascaded.CascadeAsync(ruleSet);
+                }
+            }
+            
+            // Go through each property within "Current" and if it doesnt equal the compiled property OR it's source doesnt match then update it...
+            await Specified.OverwriteAsync(Cascaded);
+
+            Dirt &= ~EPropertySystemDirtFlags.Cascade;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Property"></param>
+        /// <returns></returns>
+        private async Task CascadeSingle(ICssProperty Property)
+        {
+            AtomicString SourceState = null;
+            var orderedRules = Get_Cascade_Ordered_PropertySets();
+
+            foreach (CssPropertySet ruleSet in orderedRules)
+            {
+                // We use selector matching so we can be sure the rule CURRENTLY applies
+                if (ruleSet.Selector.QuerySingle(this.Owner))
+                {
+                    await Cascaded.CascadeAsync(ruleSet);
+                }
+            }
+
+            ICssProperty Value = ImplicitRules.Get(Property.FieldName);
             // Override implicitly set values with default ones when set
-            IStyleProperty dv = User.Get(Property.FieldName);
+            ICssProperty dv = UserRules.Get(Property.FieldName);
             if (dv.HasValue)
             {
                 Value = dv;
@@ -323,18 +454,18 @@ namespace CssUI
             if (ActiveStates.Contains(STATE_FOCUS))
             {
                 SourceState = STATE_FOCUS;
-                var v = Focus.Get(Property.FieldName);
+                var v = FocusRules.Get(Property.FieldName);
                 if (v.HasValue) Value = v;
             }
 
             if (ActiveStates.Contains(STATE_HOVER))
             {
                 SourceState = STATE_HOVER;
-                var v = Hover.Get(Property.FieldName);
+                var v = HoverRules.Get(Property.FieldName);
                 if (v.HasValue) Value = v;
             }
 
-            foreach (KeyValuePair<AtomicString, StyleRuleData> kv in Custom)
+            foreach (KeyValuePair<AtomicString, CssPropertySet> kv in StateRules)
             {
                 if (ActiveStates.Contains(kv.Key))
                 {
@@ -344,104 +475,21 @@ namespace CssUI
                 }
             }
 
-            Final.Set(Property, Value, SourceState);
-        }
-
-        private void Current_Property_Changed(IStyleProperty Prop, EPropertyFlags Flags, StackTrace Stack)
-        {
-            Update_Depends_Flag();// A property changed, update our depends flag
-
-            bool IsFlow = ((Flags & EPropertyFlags.Flow) != 0);// Layout
-            bool IsBlock = ((Flags & EPropertyFlags.Block) != 0);
-            bool IsVisual = ((Flags & EPropertyFlags.Visual) != 0);
-            bool IsFont = ((Flags & EPropertyFlags.Font) != 0);
-
-            if (IsBlock || IsFlow || IsVisual) NeedsResolving = true;
-
-            if (IsFont) Update_Font(Prop, Stack);
-            
-            //Logging.Log.Info("[PropertyChanged]: {0}", Prop.FieldName);
-            Property_Changed?.Invoke(Prop, Flags, Stack);
-        }
-        #endregion
-
-        #region Compiling
-        /// <summary>
-        /// Re-Cascades all active style states with the default one to produce a set of 'Final' style properties to be used.
-        /// </summary>
-        [Obsolete("Non-asynchronous functions are now depreciated, please use RecompileAsync() instead.")]
-        private void Recompile()
-        {
-            StyleRuleData Compiled = new StyleRuleData(null, null, Owner);
-            Compiled.Cascade(Default);
-            Compiled.Cascade(User);
-
-            if (ActiveStates.Contains(STATE_FOCUS))
-                Compiled.Cascade(Focus);
-            if (ActiveStates.Contains(STATE_HOVER))
-                Compiled.Cascade(Hover);
-
-            foreach (KeyValuePair<AtomicString, StyleRuleData> kv in Custom)
-            {
-                if (ActiveStates.Contains(kv.Key))
-                {
-                    Compiled.Cascade(kv.Value);
-                }
-            }
-
-            // Go through each property within "Current" and if it doesnt equal the compiled property OR it's source doesnt match then update it...
-            Final.Overwrite(Compiled);
-        }
-
-        /// <summary>
-        /// Re-Cascades all active style states with the default one to produce a set of 'Final' style properties to be used.
-        /// </summary>
-        private async Task RecompileAsync()
-        {
-            StyleRuleData Compiled = new StyleRuleData(null, null, Owner);
-            await Compiled.CascadeAsync(Default);
-            await Compiled.CascadeAsync(User);
-
-            if (ActiveStates.Contains(STATE_FOCUS))
-                await Compiled.CascadeAsync(Focus);
-            if (ActiveStates.Contains(STATE_HOVER))
-                await Compiled.CascadeAsync(Hover);
-
-            foreach (KeyValuePair<AtomicString, StyleRuleData> kv in Custom)
-            {
-                if (ActiveStates.Contains(kv.Key))
-                {
-                    await Compiled.CascadeAsync(kv.Value);
-                }
-            }
-
-            // Go through each property within "Current" and if it doesnt equal the compiled property OR it's source doesnt match then update it...
-            await Final.OverwriteAsync(Compiled);
+            Specified.Set(Property, Value, SourceState);
         }
         #endregion
 
         #region Custom States
-        public StyleRuleData this[AtomicString State]
+        public CssPropertySet this[AtomicString State]
         {
             get
             {
-                StyleRuleData prop;
-                if (!Custom.TryGetValue(State, out prop))
+                CssPropertySet prop;
+                if (!CssRules.TryGetValue(State, out prop))
                 {
                     throw new Exception(string.Format("The styling state \"{0}\" is invalid!", State));
                 }
                 return prop;
-            }
-        }
-        /// <summary>
-        /// Allows elements to register custom styling states
-        /// </summary>
-        /// <param name="State"></param>
-        internal void RegisterState(AtomicString State)
-        {
-            if (!Custom.ContainsKey(State))
-            {
-                Custom.Add(State, NewProperties(State.ToString(), "", Owner, true));
             }
         }
         #endregion
@@ -455,16 +503,20 @@ namespace CssUI
             if (Status && !ActiveStates.Contains(StateName))
             {
                 ActiveStates.Add(StateName);
-                changes = NeedsResolving = true;
+                changes = true;
             }
             else if (!Status && ActiveStates.Contains(StateName))
             {
                 ActiveStates.Remove(StateName);
-                changes = NeedsResolving = true;
+                changes = true;
             }
 
             if (changes)
-                await RecompileAsync();
+            {
+                // The element state has changed, we will need to re-cascade and then resolve the properties
+                Dirt |= EPropertySystemDirtFlags.Resolve;
+                await Cascade();
+            }
         }
         #endregion
         
@@ -476,7 +528,7 @@ namespace CssUI
         public void Notify_Unit_Scale_Change(EStyleUnit Unit)
         {
             if (Unit == EStyleUnit.None) return;
-            foreach(IStyleProperty Property in this.Final.Get_Set_Properties())
+            foreach(ICssProperty Property in this.Specified.Get_Set_Properties())
             {
                 Property.Notify_Unit_Change(Unit);
             }
@@ -489,9 +541,9 @@ namespace CssUI
         /// </summary>
         /// <param name="Sender"></param>
         /// <param name="Target"></param>
-        internal void Update_Inherited(cssElement Sender, IStyleProperty Target)
+        internal void Update_Inherited(cssElement Sender, ICssProperty Target)
         {
-            IStyleProperty prop = Final.Get(Target);
+            ICssProperty prop = Specified.Get(Target);
             if (prop.IsInherited)
             {
             }
@@ -510,31 +562,31 @@ namespace CssUI
         {
             Depends_On_ContainingBlock = false;
             // Width / Height
-            if (Final.Width.IsPercentageOrAuto || Final.Height.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            if (Specified.Width.IsPercentageOrAuto || Specified.Height.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
             // Size-Max
-            else if (Final.Max_Width.IsPercentageOrAuto || Final.Max_Height.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Specified.Max_Width.IsPercentageOrAuto || Specified.Max_Height.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
             // Size-Min
-            else if (Final.Min_Width.IsPercentageOrAuto || Final.Min_Height.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Specified.Min_Width.IsPercentageOrAuto || Specified.Min_Height.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
             // Margin
-            else if (Final.Margin_Top.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Final.Margin_Right.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Final.Margin_Bottom.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Final.Margin_Left.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Specified.Margin_Top.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Specified.Margin_Right.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Specified.Margin_Bottom.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Specified.Margin_Left.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
             // Padding
-            else if (Final.Padding_Top.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Final.Padding_Right.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Final.Padding_Bottom.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Final.Padding_Left.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Specified.Padding_Top.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Specified.Padding_Right.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Specified.Padding_Bottom.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Specified.Padding_Left.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
             // Border
-            else if (Final.Border_Top_Width.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Final.Border_Right_Width.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Final.Border_Bottom_Width.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Final.Border_Left_Width.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Specified.Border_Top_Width.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Specified.Border_Right_Width.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Specified.Border_Bottom_Width.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Specified.Border_Left_Width.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
             // Positioning
-            else if (Final.Top.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Final.Right.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Final.Bottom.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Final.Left.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Specified.Top.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Specified.Right.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Specified.Bottom.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Specified.Left.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
         }
         #endregion
 
@@ -543,7 +595,7 @@ namespace CssUI
         /// Resolves the block values
         /// </summary>
         /// <param name="E"></param>
-        public void Resolve(cssElement E = null)
+        public async Task Resolve(cssElement E = null)
         {
             if (E == null)
             {
@@ -551,27 +603,30 @@ namespace CssUI
                 if (E == null) throw new Exception("Cannot resolve style values without an owning element specified!");
             }
 
-            if (!NeedsResolving) return;
+            if (0 == (Dirt & EPropertySystemDirtFlags.Resolve)) return;
 
-            this.Intrinsic_Ratio = Final.Intrinsic_Ratio.Specified.Resolve();
-            this.Intrinsic_Width = Resolve_Intrinsic_Width(E, Final.Intrinsic_Width.Specified);
-            this.Intrinsic_Height = Resolve_Intrinsic_Height(E, Final.Intrinsic_Height.Specified);
+            // XXX: Compute all 3 of these async
+            this.Intrinsic_Ratio = Specified.Intrinsic_Ratio.Specified.Resolve();
+            this.Intrinsic_Width = Resolve_Intrinsic_Width(E, Specified.Intrinsic_Width.Specified);
+            this.Intrinsic_Height = Resolve_Intrinsic_Height(E, Specified.Intrinsic_Height.Specified);
 
+            // XXX: Compute content width/height async
             // Content size values are intended to ALWAYS be given in absolute values
-            this.Content_Width = (int?)Final.Content_Width.Specified.Resolve();
-            this.Content_Height = (int?)Final.Content_Height.Specified.Resolve();
+            this.Content_Width = (int?)Specified.Content_Width.Specified.Resolve();
+            this.Content_Height = (int?)Specified.Content_Height.Specified.Resolve();
+
             Resolve_Line_Height();
 
-            this.Min_Width = (int)Final.Min_Width.Computed.Resolve_Or_Default(0);
-            this.Min_Height = (int)Final.Min_Height.Computed.Resolve_Or_Default(0);
+            this.Min_Width = (int)Specified.Min_Width.Computed.Resolve_Or_Default(0);
+            this.Min_Height = (int)Specified.Min_Height.Computed.Resolve_Or_Default(0);
             
-            this.Max_Width = (int?)Final.Max_Width.Computed.Resolve();
-            this.Max_Height = (int?)Final.Max_Height.Computed.Resolve();
+            this.Max_Width = (int?)Specified.Max_Width.Computed.Resolve();
+            this.Max_Height = (int?)Specified.Max_Height.Computed.Resolve();
 
-            this.Border_Top_Width = (int)Final.Border_Top_Width.Computed.Resolve_Or_Default(0);
-            this.Border_Right_Width = (int)Final.Border_Right_Width.Computed.Resolve_Or_Default(0);
-            this.Border_Bottom_Width = (int)Final.Border_Bottom_Width.Computed.Resolve_Or_Default(0);
-            this.Border_Left_Width = (int)Final.Border_Left_Width.Computed.Resolve_Or_Default(0);
+            this.Border_Top_Width = (int)Specified.Border_Top_Width.Computed.Resolve_Or_Default(0);
+            this.Border_Right_Width = (int)Specified.Border_Right_Width.Computed.Resolve_Or_Default(0);
+            this.Border_Bottom_Width = (int)Specified.Border_Bottom_Width.Computed.Resolve_Or_Default(0);
+            this.Border_Left_Width = (int)Specified.Border_Left_Width.Computed.Resolve_Or_Default(0);
 
             if ((this.Border_Top_Style & (EBorderStyle.None | EBorderStyle.Hidden)) != 0) this.Border_Top_Width = 0;
             if ((this.Border_Right_Style & (EBorderStyle.None | EBorderStyle.Hidden)) != 0) this.Border_Right_Width = 0;
@@ -579,7 +634,7 @@ namespace CssUI
             if ((this.Border_Left_Style & (EBorderStyle.None | EBorderStyle.Hidden)) != 0) this.Border_Left_Width = 0;
 
             // Get the tentative values that define our elements blocks
-            BlockProperties Block = new BlockProperties(this, Final);
+            BlockProperties Block = new BlockProperties(this, Specified);
             Get_Tentative_Block(E, Block);
 
             // Update our used values with the results
@@ -615,14 +670,14 @@ namespace CssUI
             this.Width = Width;
             this.Height = Height;
 
-            NeedsResolving = false;
+            Dirt &= ~EPropertySystemDirtFlags.Resolve;
         }
 
         void Resolve_Transform_Matrix()
         {// SEE:  https://www.w3.org/TR/css-transforms-1/#typedef-transform-function
             TransformMatrix = new eMatrix();
 
-            var Transforms = Final.Transform.Get_All();
+            var Transforms = Specified.Transform.Get_All();
             foreach (StyleFunction Func in Transforms)
             {
                 switch (Func.Name.ToString().ToLower())
@@ -637,29 +692,29 @@ namespace CssUI
         }
 
         #region Font Updating
-        void Update_Font(IStyleProperty Sender, StackTrace Stack)
+        void Update_Font(ICssProperty Sender, StackTrace Stack)
         {
-            DpiX = (float?)Final.DpiX.Computed.Value;
-            DpiY = (float?)Final.DpiY.Computed.Value;
+            DpiX = (float?)Specified.DpiX.Computed.Value;
+            DpiY = (float?)Specified.DpiY.Computed.Value;
             // Resolve 'FontStyle'
-            if (Final.FontStyle.Computed.Type == EStyleDataType.INTEGER)
+            if (Specified.FontStyle.Computed.Type == EStyleDataType.INTEGER)
             {
-                FontStyle = (EFontStyle)Final.FontStyle.Computed.Value;
+                FontStyle = (EFontStyle)Specified.FontStyle.Computed.Value;
             }
             // Resolve 'FontFamily'
-            if (Final.FontFamily.Computed.Type == EStyleDataType.STRING)
+            if (Specified.FontFamily.Computed.Type == EStyleDataType.STRING)
             {
-                FontFamily = (string)Final.FontFamily.Computed.Value;
+                FontFamily = (string)Specified.FontFamily.Computed.Value;
             }
             // Resolve 'FontWeight'
-            FontWeight = (UInt16)Final.FontWeight.Computed.Resolve_Or_Default(400);
+            FontWeight = (UInt16)Specified.FontWeight.Computed.Resolve_Or_Default(400);
             // Resolve 'FontSize'
             /*
             double? fsz = Current.FontSize.Computed?.Resolve(Owner.Style.FontSize);
             if (fsz.HasValue) FontSize = fsz.Value;
             */
             double oldFontSize = FontSize;
-            FontSize = Final.FontSize.Computed.Resolve_Or_Default(Owner.Style.FontSize, 0.0);
+            FontSize = Specified.FontSize.Computed.Resolve_Or_Default(Owner.Style.FontSize, 0.0);
             if (FontSize != oldFontSize)
             {// We ACTUALLY want to be doing these checks by calling UnitResolver(Unit) to get the old value and then calling it again after updating the font instance and checking the first and second returned values
                 Notify_Unit_Scale_Change(EStyleUnit.EM);
@@ -673,9 +728,9 @@ namespace CssUI
         #endregion
 
         #region Update_Blend_Color
-        void Update_Blend_Color(IStyleProperty Sender)
+        void Update_Blend_Color(ICssProperty Sender)
         {
-            Opacity = Final.Opacity.Computed.Resolve_Or_Default(1.0);
+            Opacity = Specified.Opacity.Computed.Resolve_Or_Default(1.0);
 
             if (Opacity != 1.0)
             {// We have a useful blend color to set
@@ -690,7 +745,7 @@ namespace CssUI
 
         #region Transform_Changed
 
-        private void Transform_onChanged(IStyleProperty o)
+        private void Transform_onChanged(ICssProperty o)
         {
             Resolve_Transform_Matrix();
         }
@@ -699,23 +754,23 @@ namespace CssUI
         #region Resolving
         void Resolve_Line_Height()
         {
-            int? lh = (int?)Final.LineHeight.Computed?.Resolve((float)FontSize);
+            int? lh = (int?)Specified.LineHeight.Computed?.Resolve((float)FontSize);
             if (lh.HasValue) LineHeight = lh.Value;
         }
 
         public void Resolve_Border_Size(cssElement E, CssValue Top, CssValue Right, CssValue Bottom, CssValue Left, out int outTop, out int outRight, out int outBottom, out int outLeft)
         {
-            outTop = (Final.Border_Top_Style.Computed == CssValue.None ? 0 : (int)Top.Resolve_Or_Default(0));
-            outRight = (Final.Border_Right_Style.Computed == CssValue.None ? 0 : (int)Right.Resolve_Or_Default(0));
-            outBottom = (Final.Border_Bottom_Style.Computed == CssValue.None ? 0 : (int)Bottom.Resolve_Or_Default(0));
-            outLeft = (Final.Border_Left_Style.Computed == CssValue.None ? 0 : (int)Left.Resolve_Or_Default(0));
+            outTop = (Specified.Border_Top_Style.Computed == CssValue.None ? 0 : (int)Top.Resolve_Or_Default(0));
+            outRight = (Specified.Border_Right_Style.Computed == CssValue.None ? 0 : (int)Right.Resolve_Or_Default(0));
+            outBottom = (Specified.Border_Bottom_Style.Computed == CssValue.None ? 0 : (int)Bottom.Resolve_Or_Default(0));
+            outLeft = (Specified.Border_Left_Style.Computed == CssValue.None ? 0 : (int)Left.Resolve_Or_Default(0));
         }
 
         public void Resolve_Object_Position(eSize ObjectArea, eSize ObjectSize)
         {
             int X;
             int Y;
-            Resolve_As_Position(Final.ObjectPosition_X.Computed, Final.ObjectPosition_Y.Computed, ObjectArea, ObjectSize, out X, out Y);
+            Resolve_As_Position(Specified.ObjectPosition_X.Computed, Specified.ObjectPosition_Y.Computed, ObjectArea, ObjectSize, out X, out Y);
 
             ObjectPosition_X = X;
             ObjectPosition_Y = Y;
@@ -756,7 +811,7 @@ namespace CssUI
                     break;
                 default:
                     {
-                        if (E.Style.Final.Width.Computed != CssValue.Auto)// Margin left/right auto values are 0 if the elements Width is set to auto
+                        if (E.Style.Specified.Width.Computed != CssValue.Auto)// Margin left/right auto values are 0 if the elements Width is set to auto
                         {
                             if (Left == CssValue.Auto || Right == CssValue.Auto)
                             {
@@ -914,13 +969,13 @@ namespace CssUI
             {
                 if (maxWidth == CssValue.Auto)
                 {
-                    if (!E.Parent.Style.Final.Width.Assigned.IsNullOrUnset())
+                    if (!E.Parent.Style.Specified.Width.Assigned.IsNullOrUnset())
                         width = E.Block_Containing.Width;
                 }
 
                 if (maxHeight == CssValue.Auto)
                 {
-                    if (!E.Parent.Style.Final.Height.Assigned.IsNullOrUnset())
+                    if (!E.Parent.Style.Specified.Height.Assigned.IsNullOrUnset())
                         height = E.Block_Containing.Height;
                 }
             }
@@ -952,7 +1007,7 @@ namespace CssUI
             {
                 if (maxWidth == CssValue.Auto)
                 {
-                    if (!E.Parent.Style.Final.Width.Assigned.IsNullOrUnset())
+                    if (!E.Parent.Style.Specified.Width.Assigned.IsNullOrUnset())
                         width = E.Block_Containing.Width;
                 }
             }
@@ -983,7 +1038,7 @@ namespace CssUI
             {
                 if (maxHeight == CssValue.Auto)
                 {
-                    if (!E.Parent.Style.Final.Height.Assigned.IsNullOrUnset())
+                    if (!E.Parent.Style.Specified.Height.Assigned.IsNullOrUnset())
                         height = E.Block_Containing.Height;
                 }
             }
@@ -1038,7 +1093,7 @@ namespace CssUI
             int? width = (int?)Width.Resolve(E.Block_Containing.Width);
             int? height = (int?)Height.Resolve(E.Block_Containing.Height);
 
-            if (Width.Type == EStyleDataType.PERCENT && E.Parent.Style.Final.Width.Assigned.IsNullOrUnset())
+            if (Width.Type == EStyleDataType.PERCENT && E.Parent.Style.Specified.Width.Assigned.IsNullOrUnset())
                 width = null;// Containing block's width depends on our size, so we cant actually resolve this percentage
 
             outWidth = width;
@@ -1057,7 +1112,7 @@ namespace CssUI
             // and the element is assumed to have no intrinsic width.
             int? width = (int?)Width.Resolve(E.Block_Containing.Width);
 
-            if (Width.Type == EStyleDataType.PERCENT && E.Parent.Style.Final.Width.Assigned.IsNullOrUnset())
+            if (Width.Type == EStyleDataType.PERCENT && E.Parent.Style.Specified.Width.Assigned.IsNullOrUnset())
                 width = null;// Containing block's width depends on our size, so we cant actually resolve this percentage
 
             return width;
@@ -1219,8 +1274,8 @@ namespace CssUI
                     if (!E.isChild) throw new Exception("All 'ReplacedElements' MUST be the child of another element!");
                     int? Width = null, Height = null;
                     var rE = (E as cssReplacedElement);
-                    bool auto_width = (Final.Width.Computed == CssValue.Auto);
-                    bool auto_height = (Final.Height.Computed == CssValue.Auto);
+                    bool auto_width = (Specified.Width.Computed == CssValue.Auto);
+                    bool auto_height = (Specified.Height.Computed == CssValue.Auto);
 
                     eSize tempRes = null;
                     if (!auto_width || !auto_height)
@@ -1253,7 +1308,7 @@ namespace CssUI
                         if (auto_width && auto_height && !has_Intrinsic_Height && has_Intrinsic_Width) Height = (int)((double)Width.Value * Intrinsic_Ratio.Value);// We can use Width.Value here because if this condition is met then is has definately been given a value
                         if (auto_height && !auto_width) Height = (int)((double)tempRes.Width * Intrinsic_Ratio.Value);
 
-                        if (auto_width && auto_height && !has_Intrinsic_Width && !has_Intrinsic_Height && !E.Parent.Style.Final.Width.Assigned.IsNullOrUnset())
+                        if (auto_width && auto_height && !has_Intrinsic_Width && !has_Intrinsic_Height && !E.Parent.Style.Specified.Width.Assigned.IsNullOrUnset())
                         {
                             Width = tentative_Width;
                             Height = (int)((double)Width.Value / Intrinsic_Ratio.Value);
@@ -1273,8 +1328,8 @@ namespace CssUI
             }
             else if (Display == EDisplayMode.INLINE_BLOCK)
             {
-                int? rw = Resolve_Size_Width_Nullable(E, Final.Width.Computed);
-                int? rh = Resolve_Size_Height_Nullable(E, Final.Height.Computed);
+                int? rw = Resolve_Size_Width_Nullable(E, Specified.Width.Computed);
+                int? rh = Resolve_Size_Height_Nullable(E, Specified.Height.Computed);
                 //Resolve_Size(E, Current.Width.Computed, Current.Height.Computed, out resolvedWidth, out resolvedHeight);
 
                 if (rw.HasValue)
@@ -1292,7 +1347,7 @@ namespace CssUI
                 // Block elements size to fill up the entire width of their containing-block
                 resolvedWidth = E.Block_Containing.Width;
 
-                int? rh = Resolve_Size_Height_Nullable(E, Final.Height.Computed);
+                int? rh = Resolve_Size_Height_Nullable(E, Specified.Height.Computed);
                 if (rh.HasValue)
                     resolvedHeight = rh.Value;
                 else if (Content_Height.HasValue)
@@ -1491,7 +1546,7 @@ namespace CssUI
                 width = (int)(Block.Intrinsic_Ratio.Value * Block.Intrinsic_Height.Value);
             else if (auto_width && !auto_height && Block.Intrinsic_Ratio.HasValue)
                 width = (int)(Block.Intrinsic_Ratio.Value * Block.Height.Resolve());
-            if (auto_width && auto_height && Block.Intrinsic_Ratio.HasValue && !Block.Intrinsic_Height.HasValue && !Block.Intrinsic_Width.HasValue && !E.Parent.Style.Final.Width.Assigned.IsNullOrUnset())
+            if (auto_width && auto_height && Block.Intrinsic_Ratio.HasValue && !Block.Intrinsic_Height.HasValue && !Block.Intrinsic_Width.HasValue && !E.Parent.Style.Specified.Width.Assigned.IsNullOrUnset())
             {
                 BlockProperties tmp = new BlockProperties(Block);
                 Get_Tentative_Block_Level_NonReplaced(E, tmp);
@@ -1769,14 +1824,14 @@ namespace CssUI
             int width_available = E.Block_Containing.Width - (int)(Block.Margin_Left.Resolve_Or_Default(0) + Block.Border_Left + Block.Padding_Left.Resolve_Or_Default(0) + Block.Padding_Right.Resolve_Or_Default(0) + Block.Border_Right + Block.Margin_Right.Resolve_Or_Default(0) + E.Scrollbar_Offset.Horizontal);
             int width_preferred = 0;
             //Roughly: calculate the preferred width by formatting the content without breaking lines other than where explicit line breaks occur, and also calculate the preferred minimum width, e.g., by trying all possible line breaks.
-            int? pref = (int?)E.Style.Final.Content_Width.Specified.Resolve();
+            int? pref = (int?)E.Style.Specified.Content_Width.Specified.Resolve();
             switch(pref.HasValue)
             {
                 case true:
                     width_preferred = pref.Value;
                     break;
                 case false:
-                    width_preferred = (int)E.Style.Default.Width.Computed.Resolve_Or_Default(0);
+                    width_preferred = (int)E.Style.ImplicitRules.Width.Computed.Resolve_Or_Default(0);
                     break;
             }
 

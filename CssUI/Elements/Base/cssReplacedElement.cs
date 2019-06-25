@@ -22,14 +22,14 @@ namespace CssUI
         protected void Set_Intrinsic_Size(int? width, int? height)
         {
             //IntrinsicRatio = null;
-            Style.Default.Intrinsic_Ratio.Set((double?)null);
-            Style.Default.Intrinsic_Width.Set(CssValue.From_Int(width.Value, CssValue.Null));
-            Style.Default.Intrinsic_Height.Set(CssValue.From_Int(height.Value, CssValue.Null));
+            Style.ImplicitRules.Intrinsic_Ratio.Set((double?)null);
+            Style.ImplicitRules.Intrinsic_Width.Set(CssValue.From_Int(width.Value, CssValue.Null));
+            Style.ImplicitRules.Intrinsic_Height.Set(CssValue.From_Int(height.Value, CssValue.Null));
             if (width.HasValue && height.HasValue)
-                Style.Default.Intrinsic_Ratio.Set((double)height.Value / (double)width.Value);
+                Style.ImplicitRules.Intrinsic_Ratio.Set((double)height.Value / (double)width.Value);
                 //IntrinsicRatio = new SizeRatio(width.Value, height.Value);
             else
-                Style.Default.Intrinsic_Ratio.Set((double?)null);
+                Style.ImplicitRules.Intrinsic_Ratio.Set((double?)null);
         }
         #endregion
 
@@ -174,7 +174,7 @@ namespace CssUI
             }
             
             // Neither of the dimensions are specified
-            if (!Style.Intrinsic_Width.HasValue || !Style.Intrinsic_Height.HasValue) return Apply_Default_Sizing_Algorithm(new StyleSize(Style.Final.Intrinsic_Width.Computed, Style.Final.Intrinsic_Height.Computed), Size_Default);
+            if (!Style.Intrinsic_Width.HasValue || !Style.Intrinsic_Height.HasValue) return Apply_Default_Sizing_Algorithm(new StyleSize(Style.Specified.Intrinsic_Width.Computed, Style.Specified.Intrinsic_Height.Computed), Size_Default);
 
             return Apply_Contain_Constraint(Default_Object_Size);
         }

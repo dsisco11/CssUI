@@ -5,6 +5,7 @@ using KeyPic.Benchmarking;
 using CssUI.CSS;
 using CssUI.Enums;
 using System.Numerics;
+using CssUI.Types;
 
 namespace CssUI
 {
@@ -93,28 +94,28 @@ namespace CssUI
 
             FocusScope = new FocusScope();
 
-            Style.Default.BoxSizing.Set(EBoxSizingMode.BORDER);
-            Style.Default.Display.Set(EDisplayMode.BLOCK);
-            Style.Default.Width.Assigned = CssValue.From_Percent(100.0);// Always match the viewport size
-            Style.Default.Height.Assigned = CssValue.From_Percent(100.0);// Always match the viewport size
+            Style.ImplicitRules.BoxSizing.Set(EBoxSizingMode.BORDER);
+            Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
+            Style.ImplicitRules.Width.Assigned = CssValue.From_Percent(100.0);// Always match the viewport size
+            Style.ImplicitRules.Height.Assigned = CssValue.From_Percent(100.0);// Always match the viewport size
 
 
             // The root element should always set and maintain the DPI values for it's style so it's children will all use the correct DPI.
             IntPtr hwnd = Platform.Factory.SystemWindows.Get_Window();
             Vector2 dpi = Platform.Factory.SystemMetrics.Get_DPI(hwnd);
 
-            Style.Default.DpiX.Set(CssValue.From_Number(dpi.X));
-            Style.Default.DpiY.Set(CssValue.From_Number(dpi.Y));
+            Style.ImplicitRules.DpiX.Set(CssValue.From_Number(dpi.X));
+            Style.ImplicitRules.DpiY.Set(CssValue.From_Number(dpi.Y));
 
             Set_Root(this);
             
-            Style.Default.Set_Padding_Implicit(2, 2);
+            Style.ImplicitRules.Set_Padding_Implicit(2, 2);
             onControl_Removed += RootElement_onControl_Removed;
 
             // Setup the default font.
-            Style.Default.FontSize.Set(14);
-            Style.Default.FontFamily.Set("Arial");
-            Style.Default.FontWeight.Set(700);
+            Style.ImplicitRules.FontSize.Set(14);
+            Style.ImplicitRules.FontFamily.Set("Arial");
+            Style.ImplicitRules.FontWeight.Set(700);
             
         }
 
@@ -241,7 +242,7 @@ namespace CssUI
         /// <summary>
         /// Tracks the UID of elements for which the MouseEnter event has fired. Used for determining when to fire the MouseLeave event
         /// </summary>
-        Dictionary<uint, cssElement> EnteredElements = new Dictionary<uint, cssElement>();
+        Dictionary<cssElementID, cssElement> EnteredElements = new Dictionary<cssElementID, cssElement>();
         struct LastClickData { public long Time; public ePos Pos; };
         Dictionary<EMouseButton, LastClickData> LastClick = new Dictionary<EMouseButton, LastClickData>();
 
@@ -387,8 +388,8 @@ namespace CssUI
             while (E != null && !Args.Handled);
 
             // Perform mouse leave events
-            List<uint> Trash = new List<uint>();
-            foreach (KeyValuePair<uint, cssElement> kv in EnteredElements)
+            var Trash = new List<cssElementID>();
+            foreach (KeyValuePair<cssElementID, cssElement> kv in EnteredElements)
             {
                 cssElement tE = kv.Value;
                 if (object.ReferenceEquals(MouseDragTarget, tE)) continue;
@@ -402,7 +403,7 @@ namespace CssUI
                 }
             }
 
-            foreach(uint UID in Trash)
+            foreach(var UID in Trash)
             {
                 EnteredElements.Remove(UID);
             }

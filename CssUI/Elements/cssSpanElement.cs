@@ -11,7 +11,7 @@ namespace CssUI
         #region Constructors
         public cssSpanElement(string ID = null) : base(ID)
         {
-            Style.User.Display.Set(EDisplayMode.INLINE);
+            Style.UserRules.Display.Set(EDisplayMode.INLINE);
             Layout = ELayoutMode.None;
         }
         #endregion

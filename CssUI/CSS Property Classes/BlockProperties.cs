@@ -39,7 +39,7 @@ namespace CssUI.CSS
         {
         }
 
-        public BlockProperties(ElementPropertySystem Style, StyleRuleData Props)
+        public BlockProperties(ElementPropertySystem Style, CssPropertySet Props)
         {
             this.Content_Width = Style.Content_Width;
             this.Content_Height = Style.Content_Height;

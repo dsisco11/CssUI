@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using CssUI.CSS;
 
 namespace CssUI
 {
     /// <summary>
-    /// Represents a CSS style property value which holds Assigned, Specified, and Computed values.
+    /// Represents a CSS property value which holds Assigned, Specified, and Computed values.
     /// </summary>
-    public class StyleProperty : IStyleProperty
-    {
+    public class CssProperty : ICssProperty
+    {// DOCS: https://www.w3.org/TR/CSS22/cascade.html#usedValue
         #region Properties
         CssValue _initial = CssValue.Null;// The CSS-defined default(initial) value
         CssValue _value = CssValue.Initial;// A properties assigned value starts out as it's CSS-defined default.
@@ -90,7 +87,7 @@ namespace CssUI
         /// <summary>
         /// Options which dictate how this property acts and what values it can accept
         /// </summary>
-        protected readonly PropertyOptions Options = new PropertyOptions();
+        protected readonly CssPropertyOptions Options = new CssPropertyOptions();
         #endregion
 
         #region Accessors
@@ -118,7 +115,9 @@ namespace CssUI
         /// Returns TRUE if the assigned value type is a percentage
         /// </summary>
         public virtual bool IsPercentageOrAuto { get { return (Specified.Type == EStyleDataType.AUTO || Specified.Type == EStyleDataType.PERCENT); } }
-        
+        #endregion
+
+        #region Values
         /// <summary>
         /// Raw value assigned to the property from code.
         /// </summary>
@@ -159,8 +158,8 @@ namespace CssUI
                         //{// Fallback on more direct methods if needed
                         if (FieldName != null)
                         {
-                            IStyleProperty prop = Owner?.Parent?.Style.Final.Get(FieldName);
-                            if (prop != null) value = (prop as StyleProperty).Computed;
+                            ICssProperty prop = Owner?.Parent?.Style.Specified.Get(FieldName);
+                            if (prop != null) value = (prop as CssProperty).Computed;
                         }
                         //}
                         
@@ -221,8 +220,8 @@ namespace CssUI
                                 }
                                 else
                                 {
-                                    var prop = Owner?.Parent?.Style.Final.Get(FieldName);
-                                    if (prop != null) value = (prop as StyleProperty).Specified;
+                                    var prop = Owner?.Parent?.Style.Specified.Get(FieldName);
+                                    if (prop != null) value = (prop as CssProperty).Specified;
                                 }
                             }
                             break;
@@ -260,31 +259,9 @@ namespace CssUI
         /// Overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
         /// </summary>
         /// <returns>Success</returns>
-        [Obsolete("Non - asynchronous function are now obsolete, please use CascadeAsync instead.")]
-        public bool Cascade(IStyleProperty prop)
+        public async Task<bool> CascadeAsync(ICssProperty prop)
         {// Circumvents locking
-            StyleProperty o = prop as StyleProperty;
-            bool changes = false;
-            if (o.Assigned != CssValue.Null)
-            {
-                changes = true;
-                _value = new CssValue(o.Assigned);
-
-                this.Source = o.Source;
-                this.Selector = o.Selector;
-            }
-
-            if (changes) Update();
-            return changes;
-        }
-
-        /// <summary>
-        /// Overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
-        /// </summary>
-        /// <returns>Success</returns>
-        public async Task<bool> CascadeAsync(IStyleProperty prop)
-        {// Circumvents locking
-            StyleProperty o = prop as StyleProperty;
+            CssProperty o = prop as CssProperty;
             bool changes = false;
             if (o.Assigned != CssValue.Null)
             {
@@ -306,31 +283,9 @@ namespace CssUI
         /// Overwrites the assigned value of this instance with values from another if they are different
         /// </summary>
         /// <returns>Success</returns>
-        [Obsolete("Non - asynchronous function are now obsolete, please use OverwriteAsync instead.")]
-        public bool Overwrite(IStyleProperty prop)
+        public async Task<bool> OverwriteAsync(ICssProperty prop)
         {// Circumvents locking
-            StyleProperty o = prop as StyleProperty;
-            bool changes = false;
-            if (o.Assigned != Assigned)
-            {
-                changes = true;
-                _value = new CssValue(o.Assigned);
-
-                this.Source = o.Source;
-                this.Selector = o.Selector;
-            }
-
-            if (changes) Update();
-            return changes;
-        }
-
-        /// <summary>
-        /// Overwrites the assigned value of this instance with values from another if they are different
-        /// </summary>
-        /// <returns>Success</returns>
-        public async Task<bool> OverwriteAsync(IStyleProperty prop)
-        {// Circumvents locking
-            StyleProperty o = prop as StyleProperty;
+            CssProperty o = prop as CssProperty;
             bool changes = false;
             if (o.Assigned != Assigned)
             {
@@ -349,32 +304,32 @@ namespace CssUI
 
         #region Constructors
 
-        public StyleProperty(string CssName = null)
+        public CssProperty(string CssName = null)
         {
             this.CssName = new AtomicString(CssName);
             Update();
         }
 
-        public StyleProperty(bool Locked)
+        public CssProperty(bool Locked)
         {
             this.Locked = Locked;
             Update();
         }
 
-        public StyleProperty(PropertyOptions Options)
+        public CssProperty(CssPropertyOptions Options)
         {
             this.Options = Options;
             Update();
         }
 
-        public StyleProperty(string CssName, PropertyOptions Options)
+        public CssProperty(string CssName, CssPropertyOptions Options)
         {
             this.CssName = new AtomicString(CssName);
             this.Options = Options;
             Update();
         }
 
-        public StyleProperty(bool Locked, PropertyChangeDelegate onChange)
+        public CssProperty(bool Locked, PropertyChangeDelegate onChange)
         {
             this.Locked = Locked;
             this.onChanged += onChange;
@@ -382,7 +337,7 @@ namespace CssUI
             Update();
         }
 
-        public StyleProperty(bool Locked, PropertyOptions Options)
+        public CssProperty(bool Locked, CssPropertyOptions Options)
         {
             this.Options = Options;
             this.Locked = Locked;
@@ -390,7 +345,7 @@ namespace CssUI
             Update();
         }
 
-        public StyleProperty(string CssName, bool Locked, PropertyOptions Options)
+        public CssProperty(string CssName, bool Locked, CssPropertyOptions Options)
         {
             this.CssName = new AtomicString(CssName);
             this.Options = Options;
@@ -398,7 +353,7 @@ namespace CssUI
             Update();
         }
 
-        public StyleProperty(string CssName, bool Locked, bool Unset, cssElement Owner, PropertyOptions Options)
+        public CssProperty(string CssName, bool Locked, bool Unset, cssElement Owner, CssPropertyOptions Options)
         {
             this.CssName = new AtomicString(CssName);
             this.Owner = Owner;
@@ -408,7 +363,7 @@ namespace CssUI
             Update();
         }
 
-        public StyleProperty(string CssName, bool Locked, CssValue Initial, PropertyOptions Options)
+        public CssProperty(string CssName, bool Locked, CssValue Initial, CssPropertyOptions Options)
         {
             this.CssName = new AtomicString(CssName);
             this.Options = Options;
@@ -417,14 +372,14 @@ namespace CssUI
             Update();
         }
 
-        public StyleProperty(CssValue initial, PropertyChangeDelegate onChange) : base()
+        public CssProperty(CssValue initial, PropertyChangeDelegate onChange) : base()
         {
             this.onChanged += onChange;
             Initial = (initial == null ? CssValue.Null : initial);
             Update();
         }
 
-        public StyleProperty(CssValue initial, PropertyChangeDelegate onChange, PropertyOptions Options) : base()
+        public CssProperty(CssValue initial, PropertyChangeDelegate onChange, CssPropertyOptions Options) : base()
         {
             this.onChanged += onChange;
             Initial = (initial == null ? CssValue.Null : initial);
@@ -432,7 +387,7 @@ namespace CssUI
             Update();
         }
 
-        public StyleProperty(CssValue initial, PropertyChangeDelegate onChange, bool Locked) : base()
+        public CssProperty(CssValue initial, PropertyChangeDelegate onChange, bool Locked) : base()
         {
             this.Locked = Locked;
             this.onChanged += onChange;
@@ -440,7 +395,7 @@ namespace CssUI
             Update();
         }
 
-        public StyleProperty(CssValue initial, bool Locked, PropertyOptions Options) : base()
+        public CssProperty(CssValue initial, bool Locked, CssPropertyOptions Options) : base()
         {
             this.Options = Options;
             this.Locked = Locked;
@@ -448,7 +403,7 @@ namespace CssUI
             Update();
         }
 
-        public StyleProperty(CssValue initial, PropertyChangeDelegate onChange, bool Locked, PropertyOptions Options) : base()
+        public CssProperty(CssValue initial, PropertyChangeDelegate onChange, bool Locked, CssPropertyOptions Options) : base()
         {
             this.Options = Options;
             this.Locked = Locked;
@@ -457,7 +412,7 @@ namespace CssUI
             Update();
         }
 
-        public StyleProperty(CssValue initial, cssElement Owner, bool Locked, PropertyOptions Options) : base()
+        public CssProperty(CssValue initial, cssElement Owner, bool Locked, CssPropertyOptions Options) : base()
         {
             this.Owner = Owner;
             this.Options = Options;
@@ -466,7 +421,7 @@ namespace CssUI
             Update();
         }
 
-        public StyleProperty(CssValue initial, PropertyChangeDelegate onChange, NamedProperty Parent, string Name)
+        public CssProperty(CssValue initial, PropertyChangeDelegate onChange, NamedProperty Parent, string Name)
         {
             this.FieldName = new AtomicString(Name);
             this.onChanged += onChange;

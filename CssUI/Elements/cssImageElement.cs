@@ -19,8 +19,8 @@ namespace CssUI
             if (Texture == null)
             {
                 Set_Intrinsic_Size(0, 0);
-                Style.User.Content_Width.Set(0);
-                Style.User.Content_Height.Set(0);
+                Style.UserRules.Content_Width.Set(0);
+                Style.UserRules.Content_Height.Set(0);
                 Style.Set_Content_Width(0);
                 Style.Set_Content_Height(0);
             }
@@ -41,7 +41,7 @@ namespace CssUI
         #region Constructors
         public cssImageElement(string Name = null) : base(EReplacedElementType.IMAGE, Name)
         {
-            Style.User.ObjectFit.Value = EObjectFit.Contain;
+            Style.UserRules.ObjectFit.Value = EObjectFit.Contain;
         }
         #endregion
         

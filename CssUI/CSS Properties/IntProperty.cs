@@ -4,7 +4,7 @@ namespace CssUI.CSS
     /// <summary>
     /// Represents a styling property which always resolves to an integer
     /// </summary>
-    public class IntProperty : StyleProperty
+    public class IntProperty : CssProperty
     {
         #region Accessors
         //public Action<NamedProperty> onChanged { get { return this.onChanged; } set { this.onChanged = value; } }
@@ -24,15 +24,15 @@ namespace CssUI.CSS
         {
         }
 
-        public IntProperty(string CssName, bool Locked, PropertyOptions Options) : base(CssName, Locked, Options)
+        public IntProperty(string CssName, bool Locked, CssPropertyOptions Options) : base(CssName, Locked, Options)
         {
         }
 
-        public IntProperty(string CssName, cssElement Owner, bool Locked, bool Unset, PropertyOptions Options) : base(CssName, Locked, Unset, Owner, Options)
+        public IntProperty(string CssName, cssElement Owner, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Owner, Options)
         {
         }
 
-        public IntProperty(string CssName, bool Locked, CssValue Initial, PropertyOptions Options) : base(CssName, Locked, Initial, Options)
+        public IntProperty(string CssName, bool Locked, CssValue Initial, CssPropertyOptions Options) : base(CssName, Locked, Initial, Options)
         {
         }
         #endregion

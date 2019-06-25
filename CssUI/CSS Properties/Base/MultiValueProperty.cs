@@ -9,7 +9,7 @@ namespace CssUI
     /// <summary>
     /// Represents a style property which consists of multiple <see cref="CssValue"/>s
     /// </summary>
-    public abstract class MultiValueProperty : IStyleProperty
+    public abstract class MultiValueProperty : ICssProperty
     {
         #region Properties
 
@@ -105,7 +105,7 @@ namespace CssUI
         /// </summary>
         /// <returns>Success</returns>
         [Obsolete("Non-asynchronous function are now obsolete, please use CascadeAsync instead.")]
-        public bool Cascade(IStyleProperty prop)
+        public bool Cascade(ICssProperty prop)
         {// Circumvents locking
             MultiValueProperty o = prop as MultiValueProperty;
             bool changes = false;
@@ -126,7 +126,7 @@ namespace CssUI
         /// Overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
         /// </summary>
         /// <returns>Success</returns>
-        public async Task<bool> CascadeAsync(IStyleProperty prop)
+        public async Task<bool> CascadeAsync(ICssProperty prop)
         {
             MultiValueProperty o = prop as MultiValueProperty;
             bool changes = false;
@@ -151,7 +151,7 @@ namespace CssUI
         /// </summary>
         /// <returns>Success</returns>
         [Obsolete("Non-asynchronous function are now obsolete, please use OverwriteAsync instead.")]
-        public bool Overwrite(IStyleProperty prop)
+        public bool Overwrite(ICssProperty prop)
         {// Circumvents locking
             MultiValueProperty o = prop as MultiValueProperty;
             bool changes = false;
@@ -172,7 +172,7 @@ namespace CssUI
         /// Overwrites the assigned values of this instance with values from another if they are different
         /// </summary>
         /// <returns>Success</returns>
-        public async Task<bool> OverwriteAsync(IStyleProperty prop)
+        public async Task<bool> OverwriteAsync(ICssProperty prop)
         {// Circumvents locking
             MultiValueProperty o = prop as MultiValueProperty;
             bool changes = false;
