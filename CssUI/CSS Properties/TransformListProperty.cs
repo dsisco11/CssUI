@@ -37,7 +37,7 @@ namespace CssUI
         /// <summary>
         /// Tracks which styling rule block this property came from
         /// </summary>
-        public AtomicString Source { get; set; } = null;
+        public WeakReference<CssPropertySet> Source { get; set; } = null;
         /// <summary>
         /// Tracks which styling rule block this property came from
         /// </summary>
@@ -273,10 +273,11 @@ namespace CssUI
 
         #region Constructors
         // TODO: Finish the logic for when 'Unset' = TRUE
-        public TransformListProperty(string CssName, cssElement Owner, bool Locked, bool Unset)
+        public TransformListProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked, bool Unset)
         {
             this.CssName = new AtomicString(CssName);
             this.Owner = Owner;
+            this.Source = Source;
             this.Locked = Locked;
         }
         #endregion
