@@ -303,72 +303,73 @@ namespace CssUI
             this.Name = Name;
             this.Selector = Selector;
             this.Origin = Origin;
+            var selfRef = new WeakReference<CssPropertySet>(this);
 
-            Top = new IntProperty("top", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            Right = new IntProperty("right", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            Bottom = new IntProperty("bottom", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            Left = new IntProperty("left", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Top = new IntProperty("top", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            Right = new IntProperty("right", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            Bottom = new IntProperty("bottom", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            Left = new IntProperty("left", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
 
-            Display = new EnumProperty<EDisplayMode>("display", Owner, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false });
-            BoxSizing = new EnumProperty<EBoxSizingMode>("box-sizing", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            Positioning = new EnumProperty<EPositioning>("positioning", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            Overflow_X = new EnumProperty<EOverflowMode>("overflow-x", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            Overflow_Y = new EnumProperty<EOverflowMode>("overflow-y", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Display = new EnumProperty<EDisplayMode>("display", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false });
+            BoxSizing = new EnumProperty<EBoxSizingMode>("box-sizing", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            Positioning = new EnumProperty<EPositioning>("positioning", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            Overflow_X = new EnumProperty<EOverflowMode>("overflow-x", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            Overflow_Y = new EnumProperty<EOverflowMode>("overflow-y", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
 
-            ObjectFit = new EnumProperty<EObjectFit>("object-fit", Owner, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false, AllowAuto = false });
-            ObjectPosition_X = new IntProperty("object-position-x", Owner, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false });
-            ObjectPosition_Y = new IntProperty("object-position-y", Owner, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false });
-            Intrinsic_Width = new IntProperty("intrinsic-width", Owner, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false, AllowAuto = false });
-            Intrinsic_Height = new IntProperty("intrinsic-height", Owner, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false, AllowAuto = false });
-            Intrinsic_Ratio = new NumberProperty("intrinsic-ratio", Owner, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false, AllowAuto = false });
+            ObjectFit = new EnumProperty<EObjectFit>("object-fit", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false, AllowAuto = false });
+            ObjectPosition_X = new IntProperty("object-position-x", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false });
+            ObjectPosition_Y = new IntProperty("object-position-y", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false });
+            Intrinsic_Width = new IntProperty("intrinsic-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false, AllowAuto = false });
+            Intrinsic_Height = new IntProperty("intrinsic-height", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false, AllowAuto = false });
+            Intrinsic_Ratio = new NumberProperty("intrinsic-ratio", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false, AllowAuto = false });
 
-            Width = new IntProperty("width", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            Height = new IntProperty("height", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Width = new IntProperty("width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            Height = new IntProperty("height", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
 
-            Content_Width = new IntProperty("content-width", Owner, this.Locked, Unset, new CssPropertyOptions() { AllowAuto = false, AllowPercentage = false, AllowInherited = false });
-            Content_Height = new IntProperty("content-height", Owner, this.Locked, Unset, new CssPropertyOptions() { AllowAuto = false, AllowPercentage = false, AllowInherited = false });
+            Content_Width = new IntProperty("content-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowAuto = false, AllowPercentage = false, AllowInherited = false });
+            Content_Height = new IntProperty("content-height", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowAuto = false, AllowPercentage = false, AllowInherited = false });
 
-            Min_Width = new IntProperty("min-width", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            Min_Height = new IntProperty("min-height", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Min_Width = new IntProperty("min-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            Min_Height = new IntProperty("min-height", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
 
-            Max_Width = new IntProperty("max-width", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            Max_Height = new IntProperty("max-height", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Max_Width = new IntProperty("max-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            Max_Height = new IntProperty("max-height", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
 
-            Margin_Top = new IntProperty("margin-top", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            Margin_Right = new IntProperty("margin-right", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            Margin_Bottom = new IntProperty("margin-bottom", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            Margin_Left = new IntProperty("margin-left", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Margin_Top = new IntProperty("margin-top", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            Margin_Right = new IntProperty("margin-right", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            Margin_Bottom = new IntProperty("margin-bottom", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            Margin_Left = new IntProperty("margin-left", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
 
-            Padding_Top = new IntProperty("padding-top", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            Padding_Right = new IntProperty("padding-right", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            Padding_Bottom = new IntProperty("padding-bottom", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            Padding_Left = new IntProperty("padding-left", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Padding_Top = new IntProperty("padding-top", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            Padding_Right = new IntProperty("padding-right", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            Padding_Bottom = new IntProperty("padding-bottom", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            Padding_Left = new IntProperty("padding-left", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
             
 
-            Border_Top_Style = new EnumProperty<EBorderStyle>("border-top-style", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            Border_Right_Style = new EnumProperty<EBorderStyle>("border-right-style", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            Border_Bottom_Style = new EnumProperty<EBorderStyle>("border-bottom-style", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            Border_Left_Style = new EnumProperty<EBorderStyle>("border-left-style", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Border_Top_Style = new EnumProperty<EBorderStyle>("border-top-style", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            Border_Right_Style = new EnumProperty<EBorderStyle>("border-right-style", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            Border_Bottom_Style = new EnumProperty<EBorderStyle>("border-bottom-style", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            Border_Left_Style = new EnumProperty<EBorderStyle>("border-left-style", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
 
-            Border_Top_Width = new IntProperty("border-top-width", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            Border_Right_Width = new IntProperty("border-right-width", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            Border_Bottom_Width = new IntProperty("border-bottom-width", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            Border_Left_Width = new IntProperty("border-left-width", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            Border_Top_Width = new IntProperty("border-top-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            Border_Right_Width = new IntProperty("border-right-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            Border_Bottom_Width = new IntProperty("border-bottom-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            Border_Left_Width = new IntProperty("border-left-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
 
-            TextAlign = new EnumProperty<ETextAlign>("text-align", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            TextAlign = new EnumProperty<ETextAlign>("text-align", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
 
-            DpiX = new NumberProperty("dpi-x", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            DpiY = new NumberProperty("dpi-y", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            FontWeight = new IntProperty("font-weight", Owner, this.Locked, Unset, new CssPropertyOptions() { AllowPercentage = false });
-            FontStyle = new EnumProperty<EFontStyle>("font-style", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            FontSize = new NumberProperty("font-size", Owner, this.Locked, Unset, new CssPropertyOptions() { });
-            FontFamily = new StringProperty("font-family", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            DpiX = new NumberProperty("dpi-x", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            DpiY = new NumberProperty("dpi-y", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            FontWeight = new IntProperty("font-weight", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowPercentage = false });
+            FontStyle = new EnumProperty<EFontStyle>("font-style", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            FontSize = new NumberProperty("font-size", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
+            FontFamily = new StringProperty("font-family", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
 
-            LineHeight = new IntProperty("line-height", Owner, this.Locked, Unset, new CssPropertyOptions() { });
+            LineHeight = new IntProperty("line-height", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
 
-            Opacity = new NumberProperty("opacity", Owner, this.Locked, Unset, new CssPropertyOptions() { AllowPercentage = false });
+            Opacity = new NumberProperty("opacity", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowPercentage = false });
 
-            Transform = new TransformListProperty("transform", Owner, this.Locked, Unset);
+            Transform = new TransformListProperty("transform", Owner, selfRef, this.Locked, Unset);
 
             // Name each of our properties
             Parallel.ForEach(PropertyList, (FieldInfo Field) =>
