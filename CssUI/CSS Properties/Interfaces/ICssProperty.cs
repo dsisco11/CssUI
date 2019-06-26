@@ -71,7 +71,7 @@ namespace CssUI
         /// <summary>
         /// Calculates the 'Assigned' and 'Computed' values
         /// </summary>
-        void Update();
+        Task Update();
 
         /// <summary>
         /// Allows external code to notify this property that a certain unit type has changed scale and if we have a value which uses that unit-type we need to fire our Changed event because our Computed value will be different

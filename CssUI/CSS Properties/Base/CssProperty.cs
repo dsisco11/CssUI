@@ -97,25 +97,25 @@ namespace CssUI
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// </summary>
-        public virtual bool IsAuto { get { return Specified.Type == EStyleDataType.AUTO; } }
+        public virtual bool IsAuto { get { return Assigned.Type == EStyleDataType.AUTO; } }
         /// <summary>
         /// Returns TRUE if the assigned value is <see cref="CssValue.Inherit"/>
         /// </summary>
-        public virtual bool IsInherited { get { return Specified.Type == EStyleDataType.INHERIT; } }
+        public virtual bool IsInherited { get { return Assigned.Type == EStyleDataType.INHERIT; } }
         /// <summary>
         /// Returns TRUE if the assigned value has the <see cref="StyleValueFlags.Depends"/> flag
         /// </summary>
-        public virtual bool IsDependent { get { return Specified.Has_Flags(StyleValueFlags.Depends); } }
+        public virtual bool IsDependent { get { return Assigned.Has_Flags(StyleValueFlags.Depends); } }
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if the assigned value has the <see cref="StyleValueFlags.Depends"/> flag
         /// </summary>
-        public virtual bool IsDependentOrAuto { get { return (Specified.Type == EStyleDataType.AUTO || Specified.Has_Flags(StyleValueFlags.Depends)); } }
+        public virtual bool IsDependentOrAuto { get { return (Assigned.Type == EStyleDataType.AUTO || Assigned.Has_Flags(StyleValueFlags.Depends)); } }
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if the assigned value type is a percentage
         /// </summary>
-        public virtual bool IsPercentageOrAuto { get { return (Specified.Type == EStyleDataType.AUTO || Specified.Type == EStyleDataType.PERCENT); } }
+        public virtual bool IsPercentageOrAuto { get { return (Assigned.Type == EStyleDataType.AUTO || Assigned.Type == EStyleDataType.PERCENT); } }
 
         public CssPropertySet Source
         {
@@ -168,7 +168,7 @@ namespace CssUI
             {
                 if (_specified == null)
                 {
-                    _specified = Calculate_Specified();
+                    _specified = Calculate_Specified().Result;
                 }
 
                 return _specified;
@@ -186,7 +186,7 @@ namespace CssUI
             {
                 if (_computed == null)
                 {
-                    _computed = Calculate_Computed();
+                    _computed = Calculate_Computed().Result;
                 }
 
                 return _computed;
@@ -195,7 +195,7 @@ namespace CssUI
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private CssValue Calculate_Specified()
+        private async Task<CssValue> Calculate_Specified()
         {// SEE:  https://www.w3.org/TR/CSS2/cascade.html#specified-value
             CssPropertyDefinition Def = Definition;
 
@@ -216,7 +216,7 @@ namespace CssUI
                     }
                     else
                     {// Take our parents computed value
-                        ICssProperty prop = Owner.Parent.Style.Specified.Get(FieldName);
+                        ICssProperty prop = Owner.Parent.Style.Cascaded.Get(FieldName);
                         if (prop != null)
                             return new CssValue((prop as CssProperty).Computed);
                         else
@@ -239,7 +239,7 @@ namespace CssUI
                 */
                 if (!(Owner is cssRootElement) && Def != null && Def.Inherited)
                 {
-                    ICssProperty prop = Owner.Parent.Style.Specified.Get(FieldName);
+                    ICssProperty prop = Owner.Parent.Style.Cascaded.Get(FieldName);
                     if (prop != null)
                         return new CssValue((prop as CssProperty).Computed);
                 }
@@ -258,7 +258,7 @@ namespace CssUI
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private CssValue Calculate_Computed()
+        private async Task<CssValue> Calculate_Computed()
         {// SEE:  https://www.w3.org/TR/CSS22/cascade.html#computed-value
             CssPropertyDefinition Def = Definition;
 
@@ -291,7 +291,7 @@ namespace CssUI
                         }
                         else
                         {
-                            var prop = Owner.Parent.Style.Specified.Get(FieldName);
+                            var prop = Owner.Parent.Style.Cascaded.Get(FieldName);
                             if (prop != null)
                                 return new CssValue( (prop as CssProperty).Computed );
                         }
@@ -501,13 +501,6 @@ namespace CssUI
             Update();
         }
 
-        public CssProperty(CssValue initial, PropertyChangeDelegate onChange, NamedProperty Parent, string Name)
-        {
-            this.FieldName = new AtomicString(Name);
-            this.onChanged += onChange;
-            Initial = (initial == null ? CssValue.Null : initial);
-            Update();
-        }
         #endregion
 
         #region Has Flags
@@ -522,7 +515,7 @@ namespace CssUI
         /// <summary>
         /// Calculates the 'Assigned' and 'Computed' values
         /// </summary>
-        public void Update()
+        public async Task Update()
         {
             _specified = null;// unset our specified value so it gets updated...
             _computed = null;// it only makes sense to update the computed value aswell
@@ -530,8 +523,8 @@ namespace CssUI
             // XXX: if we move to the new parenting system this check will not be necessary
             if ( Owner.HasFlags(EElementFlags.ReadyForStyle) )
             {
-                _specified = Calculate_Specified();
-                _computed = Calculate_Computed();
+                _specified = await Calculate_Specified();
+                _computed = await Calculate_Computed();
             }
 
             if (oldValue == null || oldValue != Assigned)

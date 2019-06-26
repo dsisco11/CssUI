@@ -174,7 +174,7 @@ namespace CssUI
             }
             
             // Neither of the dimensions are specified
-            if (!Style.Intrinsic_Width.HasValue || !Style.Intrinsic_Height.HasValue) return Apply_Default_Sizing_Algorithm(new StyleSize(Style.Specified.Intrinsic_Width.Computed, Style.Specified.Intrinsic_Height.Computed), Size_Default);
+            if (!Style.Intrinsic_Width.HasValue || !Style.Intrinsic_Height.HasValue) return Apply_Default_Sizing_Algorithm(new StyleSize(Style.Cascaded.Intrinsic_Width.Computed, Style.Cascaded.Intrinsic_Height.Computed), Size_Default);
 
             return Apply_Contain_Constraint(Default_Object_Size);
         }

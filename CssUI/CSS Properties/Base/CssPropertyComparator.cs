@@ -8,9 +8,9 @@ namespace CssUI.CSS
         public int Compare(ICssProperty x, ICssProperty y)
         {
             // XXX: We do not take into account the '!important' flag atm
-            if (x.Get_Source().Origin != y.Get_Source().Origin)
+            if (x.Source.Origin != y.Source.Origin)
             {
-                if (x.Get_Source().Origin > y.Get_Source().Origin)
+                if (x.Source.Origin > y.Source.Origin)
                     return 1;// this set is of lesser origin, it belongs behind us
                 else
                     return -1;// this set is of greater origin, so we go behind it
@@ -26,8 +26,8 @@ namespace CssUI.CSS
                     return -1;// this set ismore specific than us, so we go behind it
             }
 
-            ulong xAge = x.Get_Source().ID;
-            ulong yAge = y.Get_Source().ID;
+            ulong xAge = x.Source.ID;
+            ulong yAge = y.Source.ID;
             if (xAge != yAge)
             {
                 if (xAge > yAge)

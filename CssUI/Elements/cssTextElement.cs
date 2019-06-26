@@ -50,7 +50,7 @@ namespace CssUI
             Style.ImplicitRules.BoxSizing.Set(EBoxSizingMode.CONTENT);
             Style.ImplicitRules.Display.Set(EDisplayMode.INLINE_BLOCK);
 
-            Style.Property_Changed += Style_Property_Change;
+            Style.onProperty_Change += Style_Property_Change;
             Invalidate_Text();
         }
 
@@ -165,7 +165,7 @@ namespace CssUI
             SizeF sz = SizeF.Empty;
             sz = TextMeasurer.Measure(Text, style);
 
-            if (sz.Width <= 0 || sz.Height <= 0)
+            if (sz.Width <= 0 || sz.Height <= 0 || float.IsNaN(sz.Width) || float.IsNaN(sz.Height))
                 return null;
 
             cssTexture retVal = null;

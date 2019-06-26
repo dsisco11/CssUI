@@ -428,9 +428,24 @@ namespace CssUI
         }
 
         /// <summary>
+        /// Returns all of the properties
+        /// </summary>
+        internal IEnumerable<ICssProperty> GetAll()
+        {
+            List<ICssProperty> Ret = new List<ICssProperty>();
+            for (int i = 0; i < PropertyList.Count; i++)
+            {
+                FieldInfo Field = PropertyList[i];
+                Ret.Add( (ICssProperty)Field.GetValue(this) );
+            }
+
+            return Ret.ToArray();
+        }
+
+        /// <summary>
         /// Returns all of the properties matching a given predicate
         /// </summary>
-        internal ICssProperty[] GetAll(Func<ICssProperty, bool> Predicate)
+        internal IEnumerable<ICssProperty> GetAll(Func<ICssProperty, bool> Predicate)
         {
             List<ICssProperty> Ret = new List<ICssProperty>();
             for (int i = 0; i < PropertyList.Count; i++)
@@ -475,7 +490,6 @@ namespace CssUI
         #endregion
 
         #region Value Management
-        // XXX: Don't do cascading/overwriting on ALL properties, just a list of the ones that we know are set...
 
         /// <summary>
         /// Overwrites the property values of this instance with those of any set property values from another instance.
@@ -484,6 +498,9 @@ namespace CssUI
         internal async Task CascadeAsync(CssPropertySet props)
         {
             //var tid = Timing.Start("Cascade");
+            if (props.SetProperties.Count <= 0)
+                return;
+
             AsyncCountdownEvent ctdn = new AsyncCountdownEvent(props.SetProperties.Count);
             Parallel.ForEach<AtomicString>(props.SetProperties, async (name) =>
             {

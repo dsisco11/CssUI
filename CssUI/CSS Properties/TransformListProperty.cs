@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CssUI.CSS;
 
@@ -37,7 +37,7 @@ namespace CssUI
         /// <summary>
         /// Tracks which styling rule block this property came from
         /// </summary>
-        public WeakReference<CssPropertySet> Source { get; set; } = null;
+        public WeakReference<CssPropertySet> SourcePtr { get; set; } = null;
         /// <summary>
         /// Tracks which styling rule block this property came from
         /// </summary>
@@ -52,31 +52,31 @@ namespace CssUI
         #region Accessors
         public bool HasValue { get { return (Transforms.Count > 0); } }
         public bool IsInherited { get { return false; } }// This property CANNOT be inherited.
+
+        public CssPropertySet Source
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                this.SourcePtr.TryGetTarget(out CssPropertySet src);
+                return src;
+            }
+        }
+
+        public CssPropertyDefinition Definition
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (string.IsNullOrEmpty(this.CssName))
+                    return null;
+                return CssProperties.Definitions[this.CssName];
+            }
+        }
         #endregion
 
 
         #region Cascade
-        /// <summary>
-        /// Overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
-        /// </summary>
-        /// <returns>Success</returns>
-        [Obsolete("Non-asynchronous methods are now obsolete, please use CascadeAsync instead.")]
-        public bool Cascade(ICssProperty prop)
-        {// Circumvents locking
-            TransformListProperty o = prop as TransformListProperty;
-            bool changes = false;
-            if (o.HasValue)
-            {
-                changes = true;
-                Transforms = new Dictionary<AtomicString, StyleFunction>(o.Transforms);
-                this.Source = o.Source;
-                this.Selector = o.Selector;
-            }
-
-            if (changes) onChanged?.Invoke(this);
-            return changes;
-        }
-
         /// <summary>
         /// Overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
         /// </summary>
@@ -89,7 +89,7 @@ namespace CssUI
             {
                 changes = true;
                 Transforms = new Dictionary<AtomicString, StyleFunction>(o.Transforms);
-                this.Source = o.Source;
+                this.SourcePtr = o.SourcePtr;
                 this.Selector = o.Selector;
             }
 
@@ -216,6 +216,10 @@ namespace CssUI
 
         #endregion
 
+        public async Task Update()
+        {
+        }
+
 
         #region Unit Resolver
         /// <summary>
@@ -277,7 +281,7 @@ namespace CssUI
         {
             this.CssName = new AtomicString(CssName);
             this.Owner = Owner;
-            this.Source = Source;
+            this.SourcePtr = Source;
             this.Locked = Locked;
         }
         #endregion
@@ -290,12 +294,6 @@ namespace CssUI
             {
                 this.Transforms[func.Name] = func;
             }
-        }
-
-        public CssPropertySet Get_Source()
-        {
-            this.Source.TryGetTarget(out CssPropertySet src);
-            return src;
         }
     }
 }
