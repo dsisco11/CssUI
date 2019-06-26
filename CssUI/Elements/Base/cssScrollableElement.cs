@@ -173,7 +173,7 @@ namespace CssUI
             }
 
             SB_Vertical.ValueMax = (Block_Scroll.Height - Viewport.Block.Height) + 1;// Set how many pixels we can scroll
-            SB_Vertical.StepSize = Style.LineHeight;
+            SB_Vertical.StepSize = (int)Style.LineHeight;
             // We sit the vertical scrollbar at the padding block's right edge because the ScrollBar_Offset is set to it's width and is accounted for when calculating the padding block's size. So there is already room for us between the padding and border blocks!
             /*
             SB_Vertical.Style.Default.X.Set(Block_Padding.Right);
@@ -218,7 +218,7 @@ namespace CssUI
             }
 
             SB_Horizontal.ValueMax = (Block_Scroll.Width - Viewport.Block.Width) + 1;// Set how many pixels we can scroll
-            SB_Horizontal.StepSize = Style.LineHeight;
+            SB_Horizontal.StepSize = (int)Style.LineHeight;
             /*
             SB_Horizontal.Style.Default.X.Set(Block_Padding.Left);
             SB_Horizontal.Style.Default.Y.Set(Block_Padding.Bottom);
@@ -309,7 +309,7 @@ namespace CssUI
         /// </summary>
         /// <param name="E"></param>
         public void ScrollIntoView(cssElement E)
-        {// TODO: FINISH ScrollIntoView(uiElement) function!
+        {// XXX: FINISH ScrollIntoView(uiElement) function!
             if (!E.IsChildOf(this)) return;
 
 

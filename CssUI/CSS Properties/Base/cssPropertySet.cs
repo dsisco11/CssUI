@@ -414,6 +414,9 @@ namespace CssUI
         #region Getters
         internal ICssProperty Get(AtomicString FieldName)
         {
+            if (object.ReferenceEquals(FieldName, null))
+                throw new ArgumentNullException($"{nameof(FieldName)} cannot be null!");
+
             FieldInfo Field = PropertyMap[FieldName];
             if (!typeof(ICssProperty).IsAssignableFrom(Field.FieldType))
                 throw new Exception($"Unable find style property with the field name: {FieldName}");
@@ -427,6 +430,9 @@ namespace CssUI
         /// <returns></returns>
         internal ICssProperty Get(ICssProperty Property)
         {
+            if (object.ReferenceEquals(Property, null))
+                throw new ArgumentNullException($"{nameof(Property)} cannot be null!");
+
             AtomicString FieldName = Property.FieldName;
             return Get(FieldName);
         }

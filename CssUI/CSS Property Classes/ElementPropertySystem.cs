@@ -20,9 +20,13 @@ namespace CssUI
         /// </summary>
         Cascade = (1 << 0),
         /// <summary>
-        /// The property system needs to resolve its property values
+        /// The property system needs to resolve its block property values
         /// </summary>
-        Resolve = (1 << 1)
+        Block = (1 << 1),
+        /// <summary>
+        /// The property system needs to resolve its font values
+        /// </summary>
+        Font = (1 << 2)
     }
 
     // DOCS: https://www.w3.org/TR/css-cascade-3/#value-stages
@@ -42,15 +46,11 @@ namespace CssUI
         #endregion
 
         #region Properties
-        public EPropertySystemDirtFlags Dirt = EPropertySystemDirtFlags.Clean;
+        public EPropertySystemDirtFlags Dirt = EPropertySystemDirtFlags.Cascade;
         /// <summary>
-        /// Whether or not there have been property changes and need to update
+        /// Flags this style as dirty, meaning it needs to recascade
         /// </summary>
-        public bool NeedsResolving { get; private set; } = true;
-        /// <summary>
-        /// Flags this style as dirty, meaning it's property values need to be re-resolved
-        /// </summary>
-        public void Flag() { NeedsResolving = true; }
+        public void Flag() { Dirt |= EPropertySystemDirtFlags.Cascade; }
 
         private readonly cssElement Owner;
         #endregion
@@ -191,7 +191,7 @@ namespace CssUI
         public double FontSize { get; private set; }
         public string FontFamily { get; private set; }
 
-        public int LineHeight { get; private set; }
+        public double LineHeight { get; private set; }
         public double Opacity { get; private set; } = 1.0f;
         public cssColor Blend_Color { get; private set; } = null;
         #endregion
@@ -252,7 +252,7 @@ namespace CssUI
             Stack = new StackTrace(1);
 #endif
             // We need to be resolved again because the 'Layout_Pos_' values directly determine our finalized X/Y property values.
-            Dirt |= EPropertySystemDirtFlags.Resolve;
+            Dirt |= EPropertySystemDirtFlags.Block;
             // These 'Layout_Pos_' vars have the same effect as any other styling property in that WHENEVER they change it will effect how the owning uiElement's BLOCK placement.
             //Property_Changed?.Invoke(null, EPropertyFlags.Block | EPropertyFlags.Flow, Stack);// Replaced with the lines below on 06-19-2017
             Owner.Flag_Block_Dirty(ECssBlockInvalidationReason.Layout_Pos_Changed);
@@ -372,10 +372,10 @@ namespace CssUI
         /// <summary>
         /// A post-cascade property has changed assigned values
         /// </summary>
-        /// <param name="Prop"></param>
+        /// <param name="Property"></param>
         /// <param name="Flags"></param>
         /// <param name="Stack"></param>
-        private void Handle_Specified_Property_Change(ICssProperty Prop, EPropertyFlags Flags, StackTrace Stack)
+        private void Handle_Specified_Property_Change(ICssProperty Property, EPropertyFlags Flags, StackTrace Stack)
         {
             Update_Depends_Flag();// A property changed, update our depends flag
 
@@ -385,13 +385,14 @@ namespace CssUI
             bool IsFont = ((Flags & EPropertyFlags.Font) != 0);
 
             if (IsBlock || IsFlow || IsVisual)
-                Dirt |= EPropertySystemDirtFlags.Resolve;
+                Dirt |= EPropertySystemDirtFlags.Block;
 
-            if (IsFont)
-                Update_Font(Prop, Stack);
+            if (IsFont)// flag our font values to be resolved
+                Dirt |= EPropertySystemDirtFlags.Font;
+                //Update_Font(Prop, Stack);
             
             //Logging.Log.Info("[Property Changed]: {0}", Prop.FieldName);
-            onProperty_Change?.Invoke(Prop, Flags, Stack);
+            onProperty_Change?.Invoke(Property, Flags, Stack);
         }
 
         /// <summary>
@@ -423,54 +424,57 @@ namespace CssUI
             //  Actually we just need to make sure those propertis in our Specified list update their computed values
 
             // Get a list of all the properties we are going to need to work with
+            AsyncCountdownEvent ctdn = null;
             CssPropertyComparator cm = new CssPropertyComparator();
             HashSet<AtomicString> targetFields = new HashSet<AtomicString>();
             List<HashSet<AtomicString>> allFields = CssRules.Values.Select(x => { return x.SetProperties; }).ToList();
 
+            // Remove duplicates
             foreach(HashSet<AtomicString> fields in allFields)
             {
                 targetFields.UnionWith(fields);
             }
 
-            if (targetFields.Count <= 0)
-                return;
-
-            AsyncCountdownEvent ctdn = new AsyncCountdownEvent(targetFields.Count);
-
-            // Loop over all target properties
-            Parallel.ForEach(targetFields, async (AtomicString propName) =>
+            if (targetFields.Count > 0)
             {
-                try
+                // Cascade all those set values
+                ctdn = new AsyncCountdownEvent(targetFields.Count);
+
+                // Loop over all target properties
+                Parallel.ForEach(targetFields, async (AtomicString propName) =>
                 {
-                    // Extract this property from every CssPropertySet that has a value for it
-                    var propertyList = CssRules.Values.Select(x => { return x.Get(propName); }).ToList();
-
-                    // Order these properties according to CSS 3.0 specifications
-                    propertyList.Sort(cm);
-
-                    /*
-                    // Because cascading overwrites an existing value with the one from the next propertyset we need to reverse this list.
-                    propertyList.Reverse();*/
-
-                    // Cascade this list and get what CSS calls the 'Specified' value
-                    ICssProperty Value = Cascaded.Get(propName);
-                    foreach (ICssProperty o in propertyList)
+                    try
                     {
-                        bool b = await Value.CascadeAsync(o);
-                        if (b) break;// stop cascading the instant we find a set value
+                        // Extract this property from every CssPropertySet that has a value for it
+                        var propertyList = CssRules.Values.Select(x => { return x.Get(propName); }).ToList();
+
+                        // Order these properties according to CSS 3.0 specifications
+                        propertyList.Sort(cm);
+
+                        /*
+                        // Because cascading overwrites an existing value with the one from the next propertyset we need to reverse this list.
+                        propertyList.Reverse();*/
+
+                        // Cascade this list and get what CSS calls the 'Specified' value
+                        ICssProperty Value = Cascaded.Get(propName);
+                        foreach (ICssProperty o in propertyList)
+                        {
+                            bool b = await Value.CascadeAsync(o);
+                            if (b) break;// stop cascading the instant we find a set value
+                        }
+
+                        string SourceState = Value.Source.ToString();
+                        await Cascaded.Set(propName, Value, new AtomicString(SourceState));
                     }
+                    finally
+                    {
+                        ctdn.Signal();
+                    }
+                });
 
-                    string SourceState = Value.Source.ToString();
-                    await Cascaded.Set(propName, Value, new AtomicString(SourceState));
-                }
-                finally
-                {
-                    ctdn.Signal();
-                }
-            });
+                await ctdn.WaitAsync();
+            }
 
-            await ctdn.WaitAsync();
-            Dirt &= ~EPropertySystemDirtFlags.Cascade;
 
             // Recalculate ALL properties
             var PropList = Cascaded.GetAll().ToList();
@@ -484,6 +488,11 @@ namespace CssUI
             });
 
             await ctdn.WaitAsync();
+
+            // Any values that changed due to this cascade should have thrown a property change event to let the style system know what it needs to update
+
+            // Remove cascade flag
+            Dirt &= ~EPropertySystemDirtFlags.Cascade;
         }
 
         /// <summary>
@@ -500,7 +509,7 @@ namespace CssUI
             propertyList.Sort(new CssPropertyComparator());
 
             // Because cascading overwrites an existing value with the one from the next propertyset we need to reverse this list.
-            propertyList.Reverse();
+            //propertyList.Reverse();
 
             // Cascade this list and get what CSS calls the 'Specified' value
             ICssProperty Value = Property;
@@ -550,7 +559,7 @@ namespace CssUI
             if (changes)
             {
                 // The element state has changed, we will need to re-cascade and then resolve the properties
-                Dirt |= EPropertySystemDirtFlags.Resolve;
+                Dirt |= EPropertySystemDirtFlags.Block;
                 await Cascade();
             }
         }
@@ -613,20 +622,14 @@ namespace CssUI
         /// Resolves the block values
         /// </summary>
         /// <param name="E"></param>
-        public async Task Resolve(cssElement E = null)
+        public async Task Resolve()
         {
-            if (E == null)
-            {
-                E = this.Owner;
-                if (E == null) throw new Exception("Cannot resolve style values without an owning element specified!");
-            }
-
-            if (0 == (Dirt & EPropertySystemDirtFlags.Resolve)) return;
+            if (0 == (Dirt & EPropertySystemDirtFlags.Block)) return;
 
             // XXX: Compute all 3 of these async
             this.Intrinsic_Ratio = Cascaded.Intrinsic_Ratio.Specified.Resolve();
-            this.Intrinsic_Width = Resolve_Intrinsic_Width(E, Cascaded.Intrinsic_Width.Specified);
-            this.Intrinsic_Height = Resolve_Intrinsic_Height(E, Cascaded.Intrinsic_Height.Specified);
+            this.Intrinsic_Width = Resolve_Intrinsic_Width(Owner, Cascaded.Intrinsic_Width.Specified);
+            this.Intrinsic_Height = Resolve_Intrinsic_Height(Owner, Cascaded.Intrinsic_Height.Specified);
 
             // XXX: Compute content width/height async
             // Content size values are intended to ALWAYS be given in absolute values
@@ -637,7 +640,7 @@ namespace CssUI
 
             this.Min_Width = (int)Cascaded.Min_Width.Computed.Resolve_Or_Default(0);
             this.Min_Height = (int)Cascaded.Min_Height.Computed.Resolve_Or_Default(0);
-            
+
             this.Max_Width = (int?)Cascaded.Max_Width.Computed.Resolve();
             this.Max_Height = (int?)Cascaded.Max_Height.Computed.Resolve();
 
@@ -653,7 +656,7 @@ namespace CssUI
 
             // Get the tentative values that define our elements blocks
             BlockProperties Block = new BlockProperties(this, Cascaded);
-            Get_Tentative_Block(E, Block);
+            Get_Tentative_Block(Owner, Block);
 
             // Update our used values with the results
             this.Margin_Top = (int)Block.Margin_Top.Resolve_Or_Default(0);
@@ -668,7 +671,7 @@ namespace CssUI
 
 
             int Top, Right, Bottom, Left;
-            Resolve_Offsets(E, Block.Top, Block.Right, Block.Bottom, Block.Left, out Top, out Right, out Bottom, out Left);
+            Resolve_Offsets(Owner, Block.Top, Block.Right, Block.Bottom, Block.Left, out Top, out Right, out Bottom, out Left);
             this.Top = Top;
             this.Right = Right;
             this.Bottom = Bottom;
@@ -676,10 +679,10 @@ namespace CssUI
 
             // Resolve the final position X/Y values
             int X, Y;
-            Resolve_XY(E, Top, Right, Bottom, Left, out X, out Y);
+            Resolve_XY(Owner, Top, Right, Bottom, Left, out X, out Y);
             this.X = X;
             this.Y = Y;
-            
+
             // Apply constraints to our size
             int tentative_Width = (int)Block.Width.Resolve_Or_Default(0);
             int tentative_Height = (int)Block.Height.Resolve_Or_Default(0);
@@ -688,7 +691,8 @@ namespace CssUI
             this.Width = Width;
             this.Height = Height;
 
-            Dirt &= ~EPropertySystemDirtFlags.Resolve;
+            // Remove flag from dirt
+            Dirt &= ~EPropertySystemDirtFlags.Block;
         }
 
         void Resolve_Transform_Matrix()
@@ -710,10 +714,10 @@ namespace CssUI
         }
 
         #region Font Updating
-        void Update_Font(ICssProperty Sender, StackTrace Stack)
+        public async Task Resolve_Font()
         {
-            DpiX = (float?)Cascaded.DpiX.Computed.Value;
-            DpiY = (float?)Cascaded.DpiY.Computed.Value;
+            DpiX = (float?)Cascaded.DpiX.Computed.Resolve();
+            DpiY = (float?)Cascaded.DpiY.Computed.Resolve();
             // Resolve 'FontStyle'
             if (Cascaded.FontStyle.Computed.Type == EStyleDataType.INTEGER)
             {
@@ -740,8 +744,10 @@ namespace CssUI
                 Notify_Unit_Scale_Change(EStyleUnit.CH);
             }
 
-            // Resolve 'LineHeight'
             Resolve_Line_Height();
+
+            // Remove font dirt flag
+            Dirt &= ~EPropertySystemDirtFlags.Font;
         }
         #endregion
 
@@ -772,8 +778,11 @@ namespace CssUI
         #region Resolving
         void Resolve_Line_Height()
         {
-            int? lh = (int?)Cascaded.LineHeight.Computed?.Resolve((float)FontSize);
-            if (lh.HasValue) LineHeight = lh.Value;
+            double? lh = Cascaded.LineHeight.Computed.Resolve((float)FontSize);
+            if (lh.HasValue)
+                LineHeight = lh.Value;
+            else
+                throw new Exception($"Unable to resolve LineHeight for {this.Owner}");
         }
 
         public void Resolve_Border_Size(cssElement E, CssValue Top, CssValue Right, CssValue Bottom, CssValue Left, out int outTop, out int outRight, out int outBottom, out int outLeft)

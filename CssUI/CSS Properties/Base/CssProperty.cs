@@ -171,62 +171,70 @@ namespace CssUI
         {// SEE:  https://www.w3.org/TR/css-cascade-3/#specified
             CssPropertyDefinition Def = Definition;
 
-            // CSS specs say if the cascade (assigned) resulted in a value, use it.
-            if (!Assigned.IsNull())
+            try
             {
-                if (Assigned == CssValue.Inherit)
+                // CSS specs say if the cascade (assigned) resulted in a value, use it.
+                if (!Assigned.IsNull())
                 {
-                    /*
-                     * CSS Specs: 
-                     * 1. Each property may also have a cascaded value of 'inherit', which means that, 
-                     *    for a given element, the property takes as specified value the computed value of the element's parent.
-                     *    If the 'inherit' value is set on the root element, the property is assigned its initial value.
-                    */
-                    if (Owner is cssRootElement)
-                    {// This is the Root element
+                    if (Assigned == CssValue.Inherit)
+                    {
+                        /*
+                         * CSS Specs: 
+                         * 1. Each property may also have a cascaded value of 'inherit', which means that, 
+                         *    for a given element, the property takes as specified value the computed value of the element's parent.
+                         *    If the 'inherit' value is set on the root element, the property is assigned its initial value.
+                        */
+                        if (Owner is cssRootElement)
+                        {// This is the Root element
+                            return new CssValue(Def.Initial);
+                        }
+                        else
+                        {// Take our parents computed value
+                            ICssProperty prop = Owner.Parent.Style.Cascaded.Get(FieldName);
+                            if (prop != null)
+                                return new CssValue((prop as CssProperty).Computed);
+                            else
+                                return null;
+                        }
+                    }
+
+                    if (Assigned == CssValue.Initial)
+                    {// If the Assigned value is the CssValue.Initial literal, then we use our definitions default
                         return new CssValue(Def.Initial);
                     }
-                    else
-                    {// Take our parents computed value
-                        ICssProperty prop = Owner.Parent.Style.Cascaded.Get(FieldName);
-                        if (prop != null)
-                            return new CssValue((prop as CssProperty).Computed);
-                        else
-                            return null;
-                    }
-                }
 
-                if (Assigned == CssValue.Initial)
-                {// If the Assigned value is the CssValue.Initial literal, then we use our definitions default
-                    return new CssValue( Def.Initial );
+                    return Assigned;
                 }
-
-                return Assigned;
-            }
-            // Assigned is null
-            /*
-            * CSS Specs:
-            * 2. if the property is inherited and the element is not the root of the document tree, use the computed value of the parent element.
-            */
-            if (!(Owner is cssRootElement) && Def != null && Def.Inherited)
-            {
-                ICssProperty prop = Owner.Parent.Style.Cascaded.Get(FieldName);
-                if (prop != null)
-                    return new CssValue((prop as CssProperty).Computed);
-                else
-                    throw new Exception($"CSS property '{CssName}' Cascaded value is null!");
-            }
-            else
-            {
+                // Assigned is null
                 /*
                 * CSS Specs:
-                * 3. Otherwise use the property's initial value. The initial value of each property is indicated in the property's definition.
+                * 2. if the property is inherited and the element is not the root of the document tree, use the computed value of the parent element.
                 */
-                return new CssValue(Def.Initial);
+                if (!(Owner is cssRootElement) && Def != null && Def.Inherited)
+                {
+                    ICssProperty prop = Owner.Parent.Style.Cascaded.Get(FieldName);
+                    if (prop != null)
+                        return new CssValue((prop as CssProperty).Computed);
+                    else
+                        throw new Exception($"CSS property '{CssName}' Cascaded value is null!");
+                }
+                else
+                {
+                    /*
+                    * CSS Specs:
+                    * 3. Otherwise use the property's initial value. The initial value of each property is indicated in the property's definition.
+                    */
+                    return new CssValue(Def.Initial);
+                }
+            }
+            catch(Exception ex)
+            {
+                xLog.Log.Error(ex);
+                throw;
             }
 
             // this sucks but its all we can do
-            throw new Exception($"Failed to resolve a Specified value in {nameof(CssProperty)}");
+            throw new Exception($"Failed to resolve the Specified value in {nameof(CssProperty)}");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -234,64 +242,74 @@ namespace CssUI
         {// SEE:  https://www.w3.org/TR/css-cascade-3/#computed
             CssPropertyDefinition Def = Definition;
 
-            switch (Specified.Type)
+            try
             {
-                case EStyleDataType.PERCENT:
-                    {
-                        if (Def.Percentage_Resolver != null)
+                switch (Specified.Type)
+                {
+                    case EStyleDataType.PERCENT:
                         {
-                            double resolved = Specified.Resolve(null, (double Pct) => Def.Percentage_Resolver(Owner, Pct)).Value;
-                            return CssValue.From_Number(resolved);
+                            if (Def.Percentage_Resolver != null)
+                            {
+                                double resolved = Specified.Resolve(null, (double Pct) => Def.Percentage_Resolver(Owner, Pct)).Value;
+                                return CssValue.From_Number(resolved);
+                            }
                         }
-                    }
-                    break;
-                case EStyleDataType.DIMENSION:
-                    {
-                        double? nv = Specified.Resolve(Get_Unit_Scale);
-                        if (nv.HasValue)
+                        break;
+                    case EStyleDataType.DIMENSION:
                         {
-                            return CssValue.From_Number(nv.Value);
+                            double? nv = Specified.Resolve(Get_Unit_Scale);
+                            if (nv.HasValue)
+                            {
+                                return CssValue.From_Number(nv.Value);
+                            }
                         }
-                    }
-                    break;
-                case EStyleDataType.INHERIT:// SEE:  https://www.w3.org/TR/CSS2/cascade.html#value-def-inherit
-                    {
-                        if (Owner is cssRootElement)// If 'inherit' is set on the root element the property is assigned it's initial value
+                        break;
+                    case EStyleDataType.INHERIT:// SEE:  https://www.w3.org/TR/CSS2/cascade.html#value-def-inherit
                         {
-                            return new CssValue( Def.Initial );
+                            if (Owner is cssRootElement)// If 'inherit' is set on the root element the property is assigned it's initial value
+                            {
+                                return new CssValue( Def.Initial );
+                            }
+                            else
+                            {
+                                var prop = Owner.Parent.Style.Cascaded.Get(FieldName);
+                                if (prop != null)
+                                    return new CssValue( (prop as CssProperty).Computed );
+                            }
                         }
-                        else
+                        break;
+                    case EStyleDataType.UNSET:// SEE:  https://www.w3.org/TR/css-cascade-4/#valdef-all-unset
                         {
-                            var prop = Owner.Parent.Style.Cascaded.Get(FieldName);
-                            if (prop != null)
-                                return new CssValue( (prop as CssProperty).Computed );
+                            /*
+                            * CSS Specs:
+                            * If the cascaded value of a property is the unset keyword, 
+                            * then if it is an inherited property, this is treated as inherit, and if it is not, this is treated as initial. 
+                            * This keyword effectively erases all declared values occurring earlier in the cascade, 
+                            * correctly inheriting or not as appropriate for the property (or all longhands of a shorthand).
+                            */
+                            if (!(Owner is cssRootElement) && Def != null && Def.Inherited)
+                            {
+                                ICssProperty prop = Owner.Parent.Style.Cascaded.Get(FieldName);
+                                if (prop != null)
+                                    return new CssValue((prop as CssProperty).Computed);
+                            }
+                            else
+                            {
+                                return new CssValue(Def.Initial);
+                            }
                         }
-                    }
-                    break;
-                case EStyleDataType.UNSET:// SEE:  https://www.w3.org/TR/css-cascade-4/#valdef-all-unset
-                    {
-                        /*
-                        * CSS Specs:
-                        * If the cascaded value of a property is the unset keyword, 
-                        * then if it is an inherited property, this is treated as inherit, and if it is not, this is treated as initial. 
-                        * This keyword effectively erases all declared values occurring earlier in the cascade, 
-                        * correctly inheriting or not as appropriate for the property (or all longhands of a shorthand).
-                        */
-                        if (!(Owner is cssRootElement) && Def != null && Def.Inherited)
-                        {
-                            ICssProperty prop = Owner.Parent.Style.Cascaded.Get(FieldName);
-                            if (prop != null)
-                                return new CssValue((prop as CssProperty).Computed);
-                        }
-                        else
-                        {
-                            return new CssValue(Def.Initial);
-                        }
-                    }
-                    break;
+                        break;
+                }
+
+                return new CssValue(Specified);
+            }
+            catch (Exception ex)
+            {
+                xLog.Log.Error(ex);
+                throw;
             }
 
-            return new CssValue(Specified);
+            throw new Exception($"Failed to resolve the Computed value in {nameof(CssProperty)}");
         }
         #endregion
 
@@ -322,7 +340,6 @@ namespace CssUI
         {// Circumvents locking
             CssProperty o = prop as CssProperty;
             bool changes = false;
-            //if (o.Assigned != CssValue.Null)
             if (o.Assigned.HasValue())
             {
                 changes = true;

@@ -133,7 +133,7 @@ namespace CssUI
         #endregion
 
         #region Display
-        public DebugOpts Debug = new DebugOpts();
+        public DebugOpts Debug = new DebugOpts() { Draw_Bounds = true, Draw_Child_Bounds = true  };
         public cssViewport Viewport { get; protected set; } = null;
         
         /// <summary>
@@ -415,15 +415,19 @@ namespace CssUI
                 Block = block;
                 Block.Flag_Clean();
                 Update_Cached_Blocks();
+#if DEBUG
                 if (Block.IsDirty)
                 {
-                    Log.Warn("{0} Update_Cached_Blocks() Changed the block!", this);
+                    if (Debug.Log_Block_Changes)
+                        Log.Warn("{0} Update_Cached_Blocks() Changed the block!", this);
                 }
+#endif
                 // Moved to the Handle_Resized and Handle_Moved functions
                 // if (was_moved || was_resized) Parent?.Flag_Layout_Dirty();
                 Block.Flag_Clean();
 #if DEBUG
-                if (Debug.Log_Block_Changes) Logs.Info(xLog.XTERM.magentaBright("[Block Resolved] {0} <{1}>"), this, Block);
+                if (Debug.Log_Block_Changes)
+                    Logs.Info(xLog.XTERM.magentaBright("[Block Resolved] {0} <{1}>"), this, Block);
 #endif
 
                 // Handle resizing and moving events before handling the layout as they might further change it...
@@ -787,7 +791,7 @@ namespace CssUI
         /// </summary>
         public int Indice { get; protected set; } = 0;
 
-        public void Set_Parent(cssCompoundElement parent, int index)
+        public async void Set_Parent(cssCompoundElement parent, int index)
         {
             Parent = parent;
             Indice = (parent!=null ? index : 0);
@@ -795,7 +799,9 @@ namespace CssUI
             this.Element_Hierarchy_Changed(0);
             this.Flag_Containing_Block_Dirty();// Our parent element has been changed, so logically our containing-block is now different from what it was.
 
-            this.Style.Dirt |= EPropertySystemDirtFlags.Cascade;
+            //this.Style.Dirt |= EPropertySystemDirtFlags.Cascade;
+            // just do it ourselves here and now
+            await this.Style.Cascade().ConfigureAwait(false);
         }
 
         private ePos last_containerPos = new ePos();
@@ -1092,7 +1098,7 @@ namespace CssUI
                 retVal = true;
                 PerformLayout();
             }
-
+/*
             // XXX: this check will be obsoleted by issue#10
             if (!HasFlags(EElementFlags.ReadyForStyle))
             {
@@ -1100,16 +1106,21 @@ namespace CssUI
                 Flags_Add(EElementFlags.ReadyForStyle);
                 await Style.Cascade();
                 await Style.Resolve();
-            }
+            }*/
 
             if (0 != (Style.Dirt & EPropertySystemDirtFlags.Cascade))
             {
                 await Style.Cascade();
             }
 
-            if (0 != (Style.Dirt & EPropertySystemDirtFlags.Resolve))
+            if (0 != (Style.Dirt & EPropertySystemDirtFlags.Block))
             {
                 await Style.Resolve();
+            }
+
+            if (0 != (Style.Dirt & EPropertySystemDirtFlags.Font))
+            {
+                await Style.Resolve_Font();
             }
 
             return retVal;

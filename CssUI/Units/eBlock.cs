@@ -278,8 +278,8 @@ namespace CssUI
         /// <returns></returns>
         public bool Intersects(eBlock block)
         {
-            return (Math.Abs(Center_X - block.Center_X) < (Half_Width + block.Half_Width)) &&
-                   (Math.Abs(Center_Y - block.Center_Y) < (Half_Height + block.Half_Height));
+            return (Math.Abs(Center_X - block.Center_X) <= (Half_Width + block.Half_Width)) &&
+                   (Math.Abs(Center_Y - block.Center_Y) <= (Half_Height + block.Half_Height));
         }
     }
 }

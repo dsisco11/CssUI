@@ -151,7 +151,10 @@ namespace CssUI
 
             GlyphBuilder glyphBuilder = new GlyphBuilder();
             TextRenderer renderer = new TextRenderer(glyphBuilder);
-            RendererOptions style = new RendererOptions(textFont, Style.DpiX??0, Style.DpiY??0, PointF.Empty)
+
+            double dpix = Style.Cascaded.DpiX.Computed.Resolve() ?? 0;
+            double dpiy = Style.Cascaded.DpiY.Computed.Resolve() ?? 0;
+            RendererOptions style = new RendererOptions(textFont, (float)dpix, (float)dpiy, PointF.Empty)
             {
                 ApplyKerning = true,
                 TabWidth = 5,
