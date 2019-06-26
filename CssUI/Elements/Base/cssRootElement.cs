@@ -78,7 +78,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public cssRootElement(IRenderEngine Engine) : base("#Root")
+        public cssRootElement(IRenderEngine Engine) : base(null, "#Root")
         {
             this.Logs = new xLog.LogSource(() => { return Frame.ToString(); });
             this.Engine = Engine;
@@ -192,7 +192,7 @@ namespace CssUI
         /// </summary>
         /// <param name="ID"></param>
         /// <returns></returns>
-        public Ty Find_ID<Ty>(string ID) where Ty : cssElement
+        public Ty Find_By_ID<Ty>(string ID) where Ty : cssElement
         {
             return (Ty)Find_ID(ID);
         }

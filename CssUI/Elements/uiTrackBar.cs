@@ -73,15 +73,15 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public uiTrackBar(ESliderDirection Dir, string ID = null) : base(ID)
+        public uiTrackBar(IParentElement Parent, ESliderDirection Dir, string ID = null) : base(Parent, ID)
         {
             Flags_Remove(EElementFlags.DoubleClickable);// Trackbars cannot fire double-click events.
             this.Direction = Dir;
             // So we don't get scrollbars
-            Style.UserRules.Overflow_X.Value = EOverflowMode.Visible;
-            Style.UserRules.Overflow_Y.Value = EOverflowMode.Visible;
+            Style.ImplicitRules.Overflow_X.Value = EOverflowMode.Visible;
+            Style.ImplicitRules.Overflow_Y.Value = EOverflowMode.Visible;
 
-            Thumb = new cssBox("Thumb");
+            Thumb = new cssBox(this);
             Thumb.Flags_Add(EElementFlags.Draggable);
             Thumb.Color = new cssColor(0.4f, 0.4f, 0.4f, 1.0f);
             Thumb.DraggingStart += Thumb_DraggingStart;
@@ -102,17 +102,15 @@ namespace CssUI
             {
                 case ESliderDirection.Vertical:
                     {
-                        Thumb.Style.UserRules.Width.Set(CssValue.Pct_OneHundred);
+                        Thumb.Style.ImplicitRules.Width.Set(CssValue.Pct_OneHundred);
                     }
                     break;
                 case ESliderDirection.Horizontal:
                     {
-                        Thumb.Style.UserRules.Height.Set(CssValue.Pct_OneHundred);
+                        Thumb.Style.ImplicitRules.Height.Set(CssValue.Pct_OneHundred);
                     }
                     break;
             }
-                   
-            Add(Thumb);
         }
         
         #endregion
@@ -327,9 +325,9 @@ namespace CssUI
                         int size = (int)(ratio * (float)Block_Content.Height);
                         int pos = Calculate_Thumb_Pos(Block_Content.Height - Thumb.Block.Height);
                         
-                        Thumb.Style.UserRules.X.Set(0);
-                        Thumb.Style.UserRules.Y.Set(pos);
-                        Thumb.Style.UserRules.Height.Set(size);
+                        Thumb.Style.ImplicitRules.X.Set(0);
+                        Thumb.Style.ImplicitRules.Y.Set(pos);
+                        Thumb.Style.ImplicitRules.Height.Set(size);
                     }
                     break;
                 case ESliderDirection.Horizontal:
@@ -338,9 +336,9 @@ namespace CssUI
                         int size = (int)(ratio * (float)Block_Content.Width);
                         int pos = Calculate_Thumb_Pos(Block_Content.Width - Thumb.Block.Width);
                         
-                        Thumb.Style.UserRules.X.Set(pos);
-                        Thumb.Style.UserRules.Y.Set(0);
-                        Thumb.Style.UserRules.Width.Set(size);
+                        Thumb.Style.ImplicitRules.X.Set(pos);
+                        Thumb.Style.ImplicitRules.Y.Set(0);
+                        Thumb.Style.ImplicitRules.Width.Set(size);
                     }
                     break;
             }

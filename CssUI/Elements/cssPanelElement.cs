@@ -9,9 +9,9 @@ namespace CssUI
         public override string Default_CSS_TypeName { get { return "Panel"; } }
 
         #region Constructors
-        public cssPanelElement(string ID = null) : base(ID)
+        public cssPanelElement(IParentElement Parent, string ID = null) : base(Parent, ID)
         {
-            Style.UserRules.Display.Set(EDisplayMode.BLOCK);
+            Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
             Layout = ELayoutMode.Default;
         }
         #endregion

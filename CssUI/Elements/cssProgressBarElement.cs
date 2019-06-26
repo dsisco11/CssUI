@@ -17,26 +17,25 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public cssProgressBarElement(string ID = null) : base(ID)
+        public cssProgressBarElement(IParentElement Parent, string ID = null) : base(Parent, ID)
         {
-            Style.UserRules.Padding_Top.Set(3);
-            Style.UserRules.Padding_Right.Set(3);
-            Style.UserRules.Padding_Bottom.Set(3);
-            Style.UserRules.Padding_Left.Set(3);
+            Style.ImplicitRules.Padding_Top.Set(3);
+            Style.ImplicitRules.Padding_Right.Set(3);
+            Style.ImplicitRules.Padding_Bottom.Set(3);
+            Style.ImplicitRules.Padding_Left.Set(3);
 
             Border = new uiBorderStyle(2, 2, 2, 2);
 
-            bar = new cssBox("Bar");
-            bar.Style.UserRules.Height.Set(CssValue.Pct_OneHundred);
+            bar = new cssBox(this);
+            bar.Style.ImplicitRules.Height.Set(CssValue.Pct_OneHundred);
             bar.Color = new cssColor(1f, 1f, 1f, 1f);
-            Add(bar);
         }
         #endregion
 
         void update_bar()
         {
             int bWidth = (int)((float)Block.Width * value);
-            bar.Style.UserRules.Width.Set(bWidth);
+            bar.Style.ImplicitRules.Width.Set(bWidth);
         }
         
     }

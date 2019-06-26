@@ -1,20 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace CssUI
 {
     /// <summary>
     /// Encapsulates everything needed for an element to hold other elements
     /// </summary>
-    public interface ICompoundElement
+    public interface IParentElement
     {
-        #region Events
-        #endregion
-        
         #region Content
         bool IsEmpty { get; }
 
@@ -28,7 +20,8 @@ namespace CssUI
         ELayoutMode Layout { get; }
         #endregion
 
-        #region Controls
+        #region Children
+        void Add(cssElement element);
         IEnumerable<cssElement> Items { get; }
         #endregion
     }

@@ -2,8 +2,6 @@
 using Svg;
 #endif
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using CssUI.Extensions;
 
 namespace CssUI
@@ -90,7 +88,7 @@ namespace CssUI
 #endregion
 
 #region Constructors
-        public cssSvgElement(string ID = null) : base(EReplacedElementType.SVG, ID)
+        public cssSvgElement(IParentElement Parent, string ID = null) : base(Parent, EReplacedElementType.SVG, ID)
         {
             Style.Cascaded.ObjectFit.Value = EObjectFit.Contain;
         }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace CssUI
 {
     /// <summary>
@@ -14,10 +9,10 @@ namespace CssUI
         public override string Default_CSS_TypeName { get { return "VerticalSpacer"; } }
 
         #region Constructors
-        public uiVerticalSpacer(string ID = null) : base(ID)
+        public uiVerticalSpacer(IParentElement Parent, string ID = null) : base(Parent, ID)
         {
-            Style.UserRules.Display.Set(EDisplayMode.BLOCK);
-            Style.UserRules.BoxSizing.Set(EBoxSizingMode.CONTENT);
+            Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
+            Style.ImplicitRules.BoxSizing.Set(EBoxSizingMode.CONTENT);
         }
         #endregion
     }

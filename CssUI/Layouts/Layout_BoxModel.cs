@@ -15,7 +15,7 @@ namespace CssUI
         public Layout_BoxModel() { }
         #endregion
         
-        public override eBlock Handle(ICompoundElement Owner, cssElement[] controls)
+        public override eBlock Handle(IParentElement Owner, cssElement[] controls)
         {
             eSize MaxArea = Owner.Get_Layout_Area();
             Reset();

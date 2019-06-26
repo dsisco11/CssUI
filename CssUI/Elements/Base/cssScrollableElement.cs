@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using xLog;
 using CssUI.CSS;
 using System.Threading.Tasks;
 
@@ -79,7 +77,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public cssScrollableElement(string ID) : base(ID)
+        public cssScrollableElement(IParentElement Parent, string ID) : base(Parent, ID)
         {
         }
         #endregion
@@ -241,7 +239,7 @@ namespace CssUI
         {
             if (SB_Vertical == null)
             {
-                SB_Vertical = new uiVScrollBar();
+                SB_Vertical = new uiVScrollBar(this);
                 SB_Vertical.Style.ImplicitRules.Height.Set(CssValue.From_Percent(100f));
                 
                 SB_Vertical.Style.ImplicitRules.Top.Set(0);
@@ -255,7 +253,6 @@ namespace CssUI
                     Handle_Scrolled();
                     onScroll?.Invoke(this, SB_Vertical);
                 };
-                Add(SB_Vertical);
             }
         }
         /// <summary>
@@ -277,7 +274,7 @@ namespace CssUI
         {
             if (SB_Horizontal == null)
             {
-                SB_Horizontal = new uiHScrollBar();
+                SB_Horizontal = new uiHScrollBar(this);
                 SB_Horizontal.Style.ImplicitRules.Width.Set(CssValue.From_Percent(100f));
 
                 SB_Horizontal.Style.ImplicitRules.Left.Set(0);
@@ -291,7 +288,6 @@ namespace CssUI
                     Handle_Scrolled();
                     onScroll?.Invoke(this, SB_Horizontal);
                 };
-                Add(SB_Horizontal);
             }
         }
         /// <summary>

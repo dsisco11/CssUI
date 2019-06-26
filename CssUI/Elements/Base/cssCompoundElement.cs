@@ -13,7 +13,7 @@ namespace CssUI
     /// Describes the basis for an element that contains other elements. This is an abstract class
     /// PLEASE USE <see cref="cssScrollableElement"/> INSTEAD
     /// </summary>
-    public abstract class cssCompoundElement : cssElement, ICompoundElement, ICollection<cssElement>
+    public abstract class cssCompoundElement : cssElement, IParentElement, ICollection<cssElement>
     {
         #region Display
         protected override void Handle_Display_Changed()
@@ -90,7 +90,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public cssCompoundElement(string ID) : base(ID)
+        public cssCompoundElement(IParentElement Parent, string ID) : base(Parent, ID)
         {
             Layout = ELayoutMode.Default;
         }
@@ -253,7 +253,7 @@ namespace CssUI
         /// </summary>
         public override bool IsEmpty { get { return (Children.Count == 0); } }
         protected List<cssElement> Children = new List<cssElement>(0);
-        public IEnumerable<cssElement> Items { get { return Children.ToArray(); } }
+        public IEnumerable<cssElement> Items { get { return Children.ToList(); } }
 
         public int Count => ((IList<cssElement>)Children).Count;
 

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace CssUI
 {
@@ -13,7 +10,7 @@ namespace CssUI
         public override string Default_CSS_TypeName { get { return "Selectable"; } }
 
         #region Constructors
-        public cssSelectableElement(string ID = null) : base(ID)
+        public cssSelectableElement(IParentElement Parent, string ID = null) : base(Parent, ID)
         {
             Flags_Add(EElementFlags.Focusable);
         }

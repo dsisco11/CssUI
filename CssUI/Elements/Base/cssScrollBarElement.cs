@@ -90,16 +90,16 @@ namespace CssUI
                 case ESliderDirection.Vertical:
                     {
                         int size = Calculate_Thumb_Size(Track.ValueMax, Viewport.Block.Height, Track.Block.Height);
-                        //Track.Thumb.Style.User.Width.Set(null);
-                        Track.Thumb.Style.UserRules.Height.Set(size);
+                        //Track.Thumb.Style.ImplicitRules.Width.Set(null);
+                        Track.Thumb.Style.ImplicitRules.Height.Set(size);
                         PageLength = (int)(Track.ValuePerPixel * size);
                     }
                     break;
                 case ESliderDirection.Horizontal:
                     {
                         int size = Calculate_Thumb_Size(Track.ValueMax, Viewport.Block.Width, Track.Block.Width);
-                        Track.Thumb.Style.UserRules.Width.Set(size);
-                        //Track.Thumb.Style.User.Height.Set(null);
+                        Track.Thumb.Style.ImplicitRules.Width.Set(size);
+                        //Track.Thumb.Style.ImplicitRules.Height.Set(null);
                         PageLength = (int)(Track.ValuePerPixel * size);
                     }
                     break;
@@ -109,7 +109,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public cssScrollBarElement(string ID = null, ESliderDirection Dir = ESliderDirection.Unset) : base(ID)
+        public cssScrollBarElement(IParentElement Parent, string ID = null, ESliderDirection Dir = ESliderDirection.Unset) : base(Parent, ID)
         {
             Flags_Remove(EElementFlags.DoubleClickable);
             Layout = ELayoutMode.None;
@@ -120,20 +120,20 @@ namespace CssUI
             ColorBackground = new cssColor(0.1f, 0.1f, 0.1f, 1.0f);
 
 
-            Track = new uiTrackBar(Dir, "Track")
+            Track = new uiTrackBar(this, Dir)
             {
                 ColorBackground = new cssColor(0f, 0f, 0f, 0.1f)
             };
             Track.ValueChanged += Slider_ValueChanged;
             Track.MouseClick += Track_onMouseClick;
 
-            Btn_dec = new cssButtonElement("Btn_Dec");
-            Btn_dec.Style.UserRules.Set_Padding_Implicit(3, 3);
+            Btn_dec = new cssButtonElement(this);
+            Btn_dec.Style.ImplicitRules.Set_Padding_Implicit(3, 3);
             Btn_dec.Clicked += (cssElement Sender, DomRoutedEventArgs Args) => { Value = (Value - StepSize); };
             Btn_dec.Set_Svg(CssIcons.close);
 
-            Btn_inc = new cssButtonElement("Btn_Inc");
-            Btn_inc.Style.UserRules.Set_Padding_Implicit(3, 3);
+            Btn_inc = new cssButtonElement(this);
+            Btn_inc.Style.ImplicitRules.Set_Padding_Implicit(3, 3);
             Btn_inc.Clicked += (cssElement Sender, DomRoutedEventArgs Args) => { Value = (Value + StepSize); };
             Btn_inc.Set_Svg(CssIcons.close);
 
@@ -143,42 +143,38 @@ namespace CssUI
                 case ESliderDirection.Vertical:
                     {
                         var p = Platform.Factory.SystemMetrics.Get_Vertical_Scrollbar_Params();
-                        Style.UserRules.Width.Set(p.Size);
-                        Track.Style.UserRules.Width.Set(CssValue.Pct_OneHundred);
-                        Track.Style.UserRules.Set_Padding(3, 0);
+                        Style.ImplicitRules.Width.Set(p.Size);
+                        Track.Style.ImplicitRules.Width.Set(CssValue.Pct_OneHundred);
+                        Track.Style.ImplicitRules.Set_Padding(3, 0);
 
-                        Btn_dec.Style.UserRules.Width.Set(p.BtnArrowSize);
-                        Btn_dec.Style.UserRules.Height.Set(p.BtnArrowSize);
+                        Btn_dec.Style.ImplicitRules.Width.Set(p.BtnArrowSize);
+                        Btn_dec.Style.ImplicitRules.Height.Set(p.BtnArrowSize);
                         Btn_dec.Set_Svg(CssIcons.arrow_up);
 
-                        Btn_inc.Style.UserRules.Width.Set(p.BtnArrowSize);
-                        Btn_inc.Style.UserRules.Height.Set(p.BtnArrowSize);
+                        Btn_inc.Style.ImplicitRules.Width.Set(p.BtnArrowSize);
+                        Btn_inc.Style.ImplicitRules.Height.Set(p.BtnArrowSize);
                         Btn_inc.Set_Svg(CssIcons.arrow_down);
-                        Track.Thumb.Style.UserRules.Min_Height.Set(p.ThumbSize);
+                        Track.Thumb.Style.ImplicitRules.Min_Height.Set(p.ThumbSize);
                     }
                     break;
                 case ESliderDirection.Horizontal:
                     {
                         var p = Platform.Factory.SystemMetrics.Get_Horizontal_Scrollbar_Params();
-                        Style.UserRules.Height.Set(p.Size);
-                        Track.Style.UserRules.Height.Set(CssValue.Pct_OneHundred);
-                        Track.Style.UserRules.Set_Padding(0, 3);
+                        Style.ImplicitRules.Height.Set(p.Size);
+                        Track.Style.ImplicitRules.Height.Set(CssValue.Pct_OneHundred);
+                        Track.Style.ImplicitRules.Set_Padding(0, 3);
 
-                        Btn_dec.Style.UserRules.Width.Set(p.BtnArrowSize);
-                        Btn_dec.Style.UserRules.Height.Set(p.BtnArrowSize);
+                        Btn_dec.Style.ImplicitRules.Width.Set(p.BtnArrowSize);
+                        Btn_dec.Style.ImplicitRules.Height.Set(p.BtnArrowSize);
                         Btn_dec.Set_Svg(CssIcons.arrow_left);
 
-                        Btn_inc.Style.UserRules.Width.Set(p.BtnArrowSize);
-                        Btn_inc.Style.UserRules.Height.Set(p.BtnArrowSize);
+                        Btn_inc.Style.ImplicitRules.Width.Set(p.BtnArrowSize);
+                        Btn_inc.Style.ImplicitRules.Height.Set(p.BtnArrowSize);
                         Btn_inc.Set_Svg(CssIcons.arrow_right);
-                        Track.Thumb.Style.UserRules.Min_Width.Set(p.ThumbSize);
+                        Track.Thumb.Style.ImplicitRules.Min_Width.Set(p.ThumbSize);
                     }
                     break;
             }
-            
-            Add(Track);
-            Add(Btn_dec);
-            Add(Btn_inc);
         }
         #endregion
 

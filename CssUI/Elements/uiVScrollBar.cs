@@ -6,7 +6,7 @@ namespace CssUI
         public override string Default_CSS_TypeName { get { return "VertScrollBar"; } }
 
         #region Constructors
-        public uiVScrollBar(string Name = "Y_Scrollbar") : base(Name, ESliderDirection.Vertical)
+        public uiVScrollBar(IParentElement Parent, string Name = "Y_Scrollbar") : base(Parent, Name, ESliderDirection.Vertical)
         {
         }
         #endregion

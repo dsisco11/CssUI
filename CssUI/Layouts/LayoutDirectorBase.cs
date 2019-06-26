@@ -27,7 +27,7 @@ namespace CssUI
         protected cssElement Previous = null;
         #endregion
 
-        public abstract eBlock Handle(ICompoundElement Owner, cssElement[] controls);
+        public abstract eBlock Handle(IParentElement Owner, cssElement[] controls);
 
         protected virtual void Reset()
         {

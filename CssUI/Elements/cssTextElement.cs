@@ -5,7 +5,6 @@ using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using SixLabors.ImageSharp.Processing.Processors;
 using SixLabors.Primitives;
 using System.Numerics;
 
@@ -42,7 +41,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public cssTextElement(string ID = null) : base(ID)
+        public cssTextElement(IParentElement Parent, string ID = null) : base(Parent, ID)
         {
             // If the box-sizing mode isn't content then our borders & padding will warp our text because they change the content-area block size and it is no longer the same size as the rendered text!
             /*Style.User.BoxSizing.Set(EBoxSizingMode.CONTENT);

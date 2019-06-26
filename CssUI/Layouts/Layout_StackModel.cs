@@ -18,7 +18,7 @@ namespace CssUI
         #endregion
 
 
-        public override eBlock Handle(ICompoundElement Owner, cssElement[] controls)
+        public override eBlock Handle(IParentElement Owner, cssElement[] controls)
         {
             Reset();
 

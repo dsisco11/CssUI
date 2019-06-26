@@ -9,7 +9,7 @@ namespace CssUI
         public override string Default_CSS_TypeName { get { return "Box"; } }
 
         #region Constuctors
-        public cssBox(string ID = null) : base(ID)
+        public cssBox(IParentElement Parent, string ID = null) : base(Parent, ID)
         {
             Color = new cssColor(1f, 0f, 1f, 1f);
         }

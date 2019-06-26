@@ -38,8 +38,7 @@ namespace CssUI
         {
             if (txt == null)
             {
-                txt = new cssTextElement("Text");
-                Add(txt);
+                txt = new cssTextElement(this);
                 update_component_order();
             }
         }
@@ -72,9 +71,8 @@ namespace CssUI
             if (gfx != null && gfx.Kind != EReplacedElementType.IMAGE) { Remove(gfx); gfx = null; }
             if (gfx == null)
             {
-                gfx = new cssImageElement("Image");
-                gfx.Style.UserRules.Set_SizeMax_Implicit(CssValue.Pct_OneHundred, CssValue.Pct_OneHundred);
-                Add(gfx);
+                gfx = new cssImageElement(this);
+                gfx.Style.ImplicitRules.Set_SizeMax_Implicit(CssValue.Pct_OneHundred, CssValue.Pct_OneHundred);
                 update_component_order();
             }
         }
@@ -123,9 +121,8 @@ namespace CssUI
             if (gfx!=null && gfx.Kind != EReplacedElementType.SVG) { Remove(gfx); gfx = null; }
             if (gfx == null)
             {
-                gfx = new cssSvgElement("Svg");
-                gfx.Style.UserRules.Set_SizeMax_Implicit(CssValue.Pct_OneHundred, CssValue.Pct_OneHundred);
-                Add(gfx);
+                gfx = new cssSvgElement(this);
+                gfx.Style.ImplicitRules.Set_SizeMax_Implicit(CssValue.Pct_OneHundred, CssValue.Pct_OneHundred);
                 update_component_order();
             }
         }
@@ -161,7 +158,7 @@ namespace CssUI
         }
         
         #region Constructors
-        public cssButtonElement(string ID = null) : base(ID)
+        public cssButtonElement(IParentElement Parent, string ID = null) : base(Parent, ID)
         {
             Flags_Remove(EElementFlags.DoubleClickable);// Button elements cannot process double click events, we just want normal click events instead.
         }

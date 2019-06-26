@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace CssUI
 {
     /// <summary>
@@ -26,15 +21,14 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public uiHeaderGroup(string ID = null) : base(ID)
+        public uiHeaderGroup(IParentElement Parent, string ID = null) : base(Parent, ID)
         {
-            Style.UserRules.Display.Set(EDisplayMode.BLOCK);
+            Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
             Layout = ELayoutMode.Default;
 
-            text = new cssTextElement("Title");
-            text.Style.UserRules.Display.Set(EDisplayMode.BLOCK);
+            text = new cssTextElement(this);
+            text.Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
             //text.TextFont = new System.Drawing.Font(text.TextFont.FontFamily, 20);
-            Add(text);
         }
         #endregion
     }

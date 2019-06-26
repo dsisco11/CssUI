@@ -1029,7 +1029,7 @@ namespace CssUI
         /// Initializes a new UI element
         /// </summary>
         /// <param name="Name">A unique ID or classname, ID's must be prefixed with '#' or else the string is considered a classname</param>
-        public cssElement(string Name)
+        public cssElement(IParentElement ParentElement, string Name)
         {
             UID = new cssElementID();
             ID = UID.ToString();
@@ -1053,6 +1053,8 @@ namespace CssUI
             // We resolve the style once this element is parented, if we do it before, then it cant access it's parents block for layout and causes a null exception
             Style = new ElementPropertySystem(this);
             Style.onProperty_Change += Handle_Style_Property_Change;
+
+            ParentElement?.Add(this);
 
 
             // TESTING
