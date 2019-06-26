@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using CssUI.CSS;
@@ -11,7 +13,7 @@ namespace CssUI
     /// Describes the basis for an element that contains other elements. This is an abstract class
     /// PLEASE USE <see cref="cssScrollableElement"/> INSTEAD
     /// </summary>
-    public abstract class cssCompoundElement : cssElement, ICompoundElement
+    public abstract class cssCompoundElement : cssElement, ICompoundElement, ICollection<cssElement>
     {
         #region Display
         protected override void Handle_Display_Changed()
@@ -106,7 +108,7 @@ namespace CssUI
         /// <summary>
         /// Updates the Block and Layout if needed and returns True if any updates occured
         /// </summary>
-        /// <returns>True/False updates occured</returns>
+        /// <returns>True/False whether updates occured</returns>
         public override async Task<bool> Update()
         {
             bool retVal = false;
@@ -146,6 +148,28 @@ namespace CssUI
         #region Event Handlers
         public event Action<cssElement, cssElement> onControl_Added;
         public event Action<cssElement, cssElement> onControl_Removed;
+
+        protected override async void Handle_Style_Property_Change(ICssProperty Property, EPropertyFlags Flags, StackTrace Source)
+        {
+            base.Handle_Style_Property_Change(Property, Flags, Source);
+
+            // If this property inherits by default then Let all of our children know
+            if (Property.Definition.Inherited)
+            {
+                if (!this.IsEmpty)
+                {
+                    AsyncCountdownEvent ctdn = new AsyncCountdownEvent(this.Count);
+                    // I dont think it will matter in what order the children update their own blocks or anything
+                    Parallel.For(0, this.Count, async (int i) =>
+                    {
+                        await this[i].Style.Handle_Inherited_Property_Change_In_Hierarchy(this, Property);
+                        ctdn.Signal();
+                    });
+
+                    await ctdn.WaitAsync();
+                }
+            }
+        }
         #endregion
 
         #region Handle Layout
@@ -224,9 +248,18 @@ namespace CssUI
         #endregion
 
         #region Children
+        /// <summary>
+        /// Returns True/False if this element has children
+        /// </summary>
         public override bool IsEmpty { get { return (Children.Count == 0); } }
         protected List<cssElement> Children = new List<cssElement>(0);
         public IEnumerable<cssElement> Items { get { return Children.ToArray(); } }
+
+        public int Count => ((IList<cssElement>)Children).Count;
+
+        public bool IsReadOnly => ((IList<cssElement>)Children).IsReadOnly;
+
+        public cssElement this[int index] { get => ((IList<cssElement>)Children)[index]; }
 
         /// <summary>
         /// Appends every element within this element's hierarchy to the given list
@@ -333,23 +366,63 @@ namespace CssUI
         /// <summary>
         /// Adds an element to this one
         /// </summary>
-        protected void Add(cssElement element)
+        public void Insert(int index, cssElement element)
         {
-            if (Children.Contains(element)) throw new Exception("Cannot add element which is already present!");
-            if (Root != null && !string.IsNullOrEmpty(element.ID) && Root.Find_ID(element.ID) != null) throw new Exception("Cannot add element, another element with the same ID already exists!");
+            if (Children.Contains(element))
+                throw new Exception("Cannot add element which is already present!");
+            if (Root != null && !string.IsNullOrEmpty(element.ID) && Root.Find_ID(element.ID) != null)
+                throw new Exception("Cannot add element, another element with the same ID already exists!");
 
-            Children.Add(element);
-            element.Set_Parent(this, Children.Count-1);
+            ((IList<cssElement>)Children).Insert(index, element);
+
+            element.Set_Parent(this, this.Count - 1);
             onControl_Added?.Invoke(this, element);
         }
 
         /// <summary>
-        /// Removes a given element from this one
+        /// Adds an element to this one as a child
+        /// </summary>
+        public void Add(cssElement element)
+        {
+            Insert(Count, element);
+        }
+
+        /// <summary>
+        /// Adds an element to this one as a child
+        /// </summary>
+        void ICollection<cssElement>.Add(cssElement element)
+        {
+            Insert(Count, element);
+        }
+
+
+        /// <summary>
+        /// Removes a given element from this one and destroys it.
+        /// </summary>
+        /// <param name="index">The indice of the element to be removed</param>
+        /// <returns>Success</returns>
+        public void RemoveAt(int index)
+        {
+            Remove(this[index]);
+        }
+
+        /// <summary>
+        /// Removes a given element from this one and destroys it.
+        /// </summary>
+        /// <param name="element">The element to be removed</param>
+        /// <returns>Success</returns>
+        public bool Remove(cssElement item)
+        {
+            return Remove(item, false);
+        }
+
+        /// <summary>
+        /// Removes a given element from this one, optionally preserving it.
         /// </summary>
         /// <param name="element">The element to be removed</param>
         /// <param name="preserve">If TRUE then the element will not be disposed of immediately</param>
         /// <returns>Success</returns>
-        protected bool Remove(cssElement element, bool preserve = false)
+        public bool Remove(cssElement element, bool preserve = false)
         {
             if (element == null) return false;
             if (!Children.Contains(element)) return false;
@@ -376,15 +449,15 @@ namespace CssUI
         /// <param name="ID">ID of the element to be removed</param>
         /// <param name="preserve">If TRUE then the element will not be disposed of immediately</param>
         /// <returns>Success</returns>
-        protected bool Remove(string ID, bool preserve = false)
+        public bool Remove(string ID, bool preserve = false)
         {
             return Remove(Get(ID), preserve);
         }
 
         /// <summary>
-        /// Clears and disposes of all controls
+        /// Clears and disposes of all child elements
         /// </summary>
-        protected void Clear()
+        public void Clear()
         {
             foreach (var C in Children)
             {
@@ -394,7 +467,15 @@ namespace CssUI
             }
             this.Children.Clear();
         }
-        
+
+        /// <summary>
+        /// Clears and disposes of all child elements
+        /// </summary>
+        void ICollection<cssElement>.Clear()
+        {
+            (this as cssCompoundElement).Clear();
+        }
+
         /// <summary>
         /// Fetches the first child-element matching a given CSS selector
         /// </summary>
@@ -410,7 +491,31 @@ namespace CssUI
         {
             return (Ty)Find(Selector).SingleOrDefault();
         }
+        
+        public int IndexOf(cssElement item)
+        {
+            return ((IList<cssElement>)Children).IndexOf(item);
+        }
+        
+        public bool Contains(cssElement item)
+        {
+            return ((IList<cssElement>)Children).Contains(item);
+        }
 
+        public void CopyTo(cssElement[] array, int arrayIndex)
+        {
+            ((IList<cssElement>)Children).CopyTo(array, arrayIndex);
+        }
+
+        public IEnumerator<cssElement> GetEnumerator()
+        {
+            return ((IList<cssElement>)Children).GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ((IList<cssElement>)Children).GetEnumerator();
+        }
         #endregion
 
         #region Propagation
@@ -583,7 +688,7 @@ namespace CssUI
             return true;
         }
         #endregion
-        
+
 
         #region Tunneling Events
 
