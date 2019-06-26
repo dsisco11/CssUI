@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CssUI.Types;
+using CssUI.CSS;
+using CssUI.DOM;
 
 namespace CssUI
 {
@@ -15,7 +17,7 @@ namespace CssUI
     /// The basis for all OpenGL based UI elements.
     /// <para>NOTE: All OpenGL UI elements inheriting from this base class makes the assumption that texturing is disabled by default when drawing.</para>
     /// </summary>
-    public abstract class cssElement : IDisposable, DomEvents
+    public abstract class cssElement : DomNode, IDisposable, IDomEvents
     {
         #region Identity
         /// <summary>
@@ -106,148 +108,6 @@ namespace CssUI
                 if (value == true) Flags_Add(EElementFlags.Draggable);
                 else Flags_Remove(EElementFlags.Draggable);
             }
-        }
-        #endregion
-        
-        #region Attributes
-        private Dictionary<string, object> Attributes = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-
-        /// <summary>
-        /// Attempts to set the value of a specified DOM element attribute, returning whether or not the operation succeeded
-        /// </summary>
-        /// <param name="Attrib">Name of the attribute to set</param>
-        /// <param name="Value">Value to set</param>
-        /// <returns>Success</returns>
-        public bool Set_Attribute(string Attrib, object Value)
-        {
-            bool result = false;
-            object old;
-            if (Attributes.TryGetValue(Attrib, out old))
-            {
-                if (!object.Equals(old, Value))
-                    result = true;
-            }
-            else
-            {
-                result = true;
-            }
-            Attributes[Attrib] = Value;
-
-            if (result)
-            {
-                // XXX: recascade rules from the stylesheet and update our Style accordingly
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Attempts to set the value of a specified DOM element attribute, returning whether or not the operation succeeded
-        /// </summary>
-        /// <param name="Attrib">Name of the attribute to set</param>
-        /// <param name="Value">Value to set</param>
-        /// <returns>Success</returns>
-        public async Task<bool> Set_Attribute_Async(string Attrib, object Value)
-        {
-            return await Task.Factory.StartNew(() => { return this.Set_Attribute(Attrib, Value); });
-        }
-
-        /// <summary>
-        /// Returns the value of a specified attribute
-        /// </summary>
-        /// <param name="Attrib">Name of the attribute to get</param>
-        public object Get_Attribute(string Attrib)
-        {
-            object Value;
-            if (Attributes.TryGetValue(Attrib, out Value))
-            {
-                return Value;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Returns the value of a specified attribute
-        /// </summary>
-        /// <param name="Attrib">Name of the attribute to get</param>
-        public Ty Get_Attribute<Ty>(string Attrib)
-        {
-            object Value;
-            if (Attributes.TryGetValue(Attrib, out Value))
-            {
-                return (Ty)Value;
-            }
-
-            return default(Ty);
-        }
-
-        /// <summary>
-        /// Returns whether or not a specified attribute is present
-        /// </summary>
-        /// <param name="Attrib">Name of the attribute to check</param>
-        public bool Has_Attribute(string Attrib)
-        {
-            return Attributes.ContainsKey(Attrib);
-        }
-
-        /// <summary>
-        /// Attempts to remove a specified attribute, returning whether or not the operation succeeded
-        /// </summary>
-        /// <param name="Attrib">Name of the attribute to clear</param>
-        /// <returns>Success</returns>
-        public bool Clear_Attribute(string Attrib)
-        {
-            bool result = Attributes.Remove(Attrib);
-            if (result)
-            {// Attribute changed (was removed)
-                // TODO: recascade rules from the stylesheet and update our Style accordingly
-            }
-
-            return result;
-        }
-
-        #endregion
-
-        #region ID
-        /// <summary>
-        /// functionally identical to an elements "ID" in HTML, a UNIQUE identifier for the element
-        /// </summary>
-        public string ID { get { return Get_Attribute<string>("id"); } private set { Set_Attribute("id", value); } }
-        #endregion
-
-        #region Classes
-        /// <summary>
-        /// Adds a styling class to the element
-        /// </summary>
-        /// <returns>Success</returns>
-        public bool Add_Class(string ClassName)
-        {
-            if (string.IsNullOrEmpty(ClassName)) return false;
-            var Classes = new List<string>(Get_Attribute<string>("class")?.Split(' '));
-            Classes.Add(ClassName);
-            return Set_Attribute("class", string.Join(" ", Classes));
-        }
-
-        /// <summary>
-        /// Removes a styling class from the element
-        /// </summary>
-        /// <returns>Success</returns>
-        public bool Remove_Class(string ClassName)
-        {
-            if (string.IsNullOrEmpty(ClassName)) return false;
-            var Classes = new List<string>(Get_Attribute<string>("class")?.Split(' '));
-            Classes.Remove(ClassName);
-            return Set_Attribute("class", string.Join(" ", Classes));
-        }
-
-        /// <summary>
-        /// Returns whether the element is assigned the specified styling class
-        /// </summary>
-        /// <returns></returns>
-        public bool Has_Class(string ClassName)
-        {
-            if (string.IsNullOrEmpty(ClassName)) return false;
-            return new List<string>(Get_Attribute<string>("class")?.Split(' ')).Contains(ClassName);
         }
         #endregion
 
@@ -366,12 +226,69 @@ namespace CssUI
             onMoved?.Invoke(this, oldPos, newPos);
         }
 
+        /// <summary>
+        /// The content block has changed dimensions
+        /// </summary>
         protected virtual void Handle_Content_Block_Change()
         {
         }
-        #endregion
+
+
+        #region Property Change Handlers
+
+        /// <summary>
+        /// A property used for our styling has changed its assigned value
+        /// </summary>
+        /// <param name="Sender"></param>
+        /// <param name="Flags"></param>
+        /// <param name="Source"></param>
+        protected virtual void Handle_Style_Property_Change(ICssProperty Sender, EPropertyFlags Flags, System.Diagnostics.StackTrace Source)
+        {
+
+#if DEBUG
+            if (Debug.Log_Property_Changes)
+            {
+                if (Sender != null)
+                {
+                    if (Flags.HasFlag(EPropertyFlags.Visual) || Flags.HasFlag(EPropertyFlags.Font))
+                    {
+                        Logs.Info("[Property Change] {0}.{1} => {2}", this.FullPath, Sender.CssName, Sender);
+                    }
+                }
+            }
+#endif
+
+            if ((Flags & EPropertyFlags.Visual) != 0)
+            {
+                Dirt |= EElementDirtyBit.Visuals;
+            }
+
+            if ((Flags & EPropertyFlags.Block) != 0)
+            {
+                if (Sender == null) Flag_Block_Dirty();
+                else Flag_Block_Dirty(Sender);
+            }
+
+            if ((Flags & EPropertyFlags.Font) != 0)
+            {
+                Dirt |= EElementDirtyBit.Font;
+                // Q: Why update the font immediately? Why not wait until next frame when our parent will do it?
+                // A: When a font property changes it means the user is most likely about to change other properties which depend on the font's current values (character dimensions and whatnot)
+                //   In the future immediate font updates can be avoided because the system will naturally handle propogating updates to properties expressed in font based units(ex/ex/ch)
+                Update_Font();
+            }
+
+            if ((Flags & EPropertyFlags.Flow) != 0)
+            {
+                if (Sender == null) Invalidate_Layout();
+                else Invalidate_Layout(Sender);
+            }
+        }
         
-                
+        #endregion
+        #endregion
+
+
         #region Aligners Position
         public cssElementAligner xAligner;
         public cssElementAligner yAligner;
@@ -568,11 +485,11 @@ namespace CssUI
 
             Block_Resize_Content_To_Margin_Only_Absolute(ref size.Width, ref size.Height);
 
-            if (Style.Specified.Width.Has_Flags(StyleValueFlags.Absolute)) size.Width += Style.Resolve_Size_Width(this, Style.Specified.Width.Computed);
-            else if (Style.Specified.Min_Width.Has_Flags(StyleValueFlags.Absolute)) size.Width += Style.Resolve_MinSize_Width(this, Style.Specified.Min_Width.Computed);
+            if (Style.Cascaded.Width.Has_Flags(StyleValueFlags.Absolute)) size.Width += Style.Resolve_Size_Width(this, Style.Cascaded.Width.Computed);
+            else if (Style.Cascaded.Min_Width.Has_Flags(StyleValueFlags.Absolute)) size.Width += Style.Resolve_MinSize_Width(this, Style.Cascaded.Min_Width.Computed);
 
-            if (Style.Specified.Height.Has_Flags(StyleValueFlags.Absolute)) size.Height += Style.Resolve_Size_Height(this, Style.Specified.Height.Computed);
-            else if (Style.Specified.Min_Height.Has_Flags(StyleValueFlags.Absolute)) size.Height += Style.Resolve_MinSize_Height(this, Style.Specified.Min_Height.Computed);
+            if (Style.Cascaded.Height.Has_Flags(StyleValueFlags.Absolute)) size.Height += Style.Resolve_Size_Height(this, Style.Cascaded.Height.Computed);
+            else if (Style.Cascaded.Min_Height.Has_Flags(StyleValueFlags.Absolute)) size.Height += Style.Resolve_MinSize_Height(this, Style.Cascaded.Min_Height.Computed);
 
             return size;
         }
@@ -1115,6 +1032,7 @@ namespace CssUI
         public cssElement(string Name)
         {
             UID = new cssElementID();
+            ID = UID.ToString();
             if (this is cssRootElement) Root = (cssRootElement)this;
             if (!string.IsNullOrEmpty(Name))
             {
@@ -1134,7 +1052,7 @@ namespace CssUI
 
             // We resolve the style once this element is parented, if we do it before, then it cant access it's parents block for layout and causes a null exception
             Style = new ElementPropertySystem(this);
-            Style.Property_Changed += Style_Property_Changed;
+            Style.onProperty_Change += Handle_Style_Property_Change;
 
 
             // TESTING
@@ -1143,53 +1061,7 @@ namespace CssUI
             //var C = new CSS.CssSelector("*:not(#Root)");
         }
 #endregion
-
-#region Property Change Handlers
-
-        private void Style_Property_Changed(ICssProperty Sender, EPropertyFlags Flags, System.Diagnostics.StackTrace Source)
-        {
-
-#if DEBUG
-            if (Debug.Log_Property_Changes)
-            {
-                if (Sender != null)
-                {
-                    if (Flags.HasFlag(EPropertyFlags.Visual) || Flags.HasFlag(EPropertyFlags.Font))
-                    {
-                        Logs.Info("[Property Change] {0}.{1} => {2}", this.FullPath, Sender.CssName, Sender);
-                    }
-                }
-            }
-#endif
-
-            if ((Flags & EPropertyFlags.Visual) != 0)
-            {
-                Dirt |= EElementDirtyBit.Visuals;
-            }
-
-            if ((Flags & EPropertyFlags.Block) != 0)
-            {
-                if (Sender == null) Flag_Block_Dirty();
-                else Flag_Block_Dirty(Sender);
-            }
-
-            if ((Flags & EPropertyFlags.Font) != 0)
-            {
-                Dirt |= EElementDirtyBit.Font;
-                // Q: Why update the font immediately? Why not wait until next frame when our parent will do it?
-                // A: When a font property changes it means the user is most likely about to change other properties which depend on the font's current values (character dimensions and whatnot)
-                //   In the future immediate font updates can be avoided because the system will naturally handle propogating updates to properties expressed in font based units(ex/ex/ch)
-                Update_Font();
-            }
-
-            if ((Flags & EPropertyFlags.Flow) != 0)
-            {
-                if (Sender == null) Invalidate_Layout();
-                else Invalidate_Layout(Sender);
-            }
-        }
-#endregion
-
+        
 #region Destructors
         ~cssElement()
         {
@@ -1223,6 +1095,15 @@ namespace CssUI
             {
                 retVal = true;
                 PerformLayout();
+            }
+
+            // XXX: this check will be obsoleted by issue#10
+            if (!HasFlags(EElementFlags.ReadyForStyle))
+            {
+                // We have now populated all the data our styling values will need
+                Flags_Add(EElementFlags.ReadyForStyle);
+                await Style.Cascade();
+                await Style.Resolve();
             }
 
             if (0 != (Style.Dirt & EPropertySystemDirtFlags.Cascade))
