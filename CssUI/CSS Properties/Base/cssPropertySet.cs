@@ -415,16 +415,20 @@ namespace CssUI
         internal ICssProperty Get(AtomicString FieldName)
         {
             FieldInfo Field = PropertyMap[FieldName];
-            if (!typeof(ICssProperty).IsAssignableFrom(Field.FieldType)) throw new Exception($"Unable find style property with the field name: {FieldName}");
+            if (!typeof(ICssProperty).IsAssignableFrom(Field.FieldType))
+                throw new Exception($"Unable find style property with the field name: {FieldName}");
             return (ICssProperty)Field.GetValue(this);
         }
 
+        /// <summary>
+        /// Finds the property within this style set that matches the given property
+        /// </summary>
+        /// <param name="Property"></param>
+        /// <returns></returns>
         internal ICssProperty Get(ICssProperty Property)
         {
             AtomicString FieldName = Property.FieldName;
-            FieldInfo Field = PropertyMap[FieldName];
-            if (!typeof(ICssProperty).IsAssignableFrom(Field.FieldType)) throw new Exception($"Unable find style property with the field name: {FieldName}");
-            return (ICssProperty)Field.GetValue(this);
+            return Get(FieldName);
         }
 
         /// <summary>

@@ -135,14 +135,14 @@ namespace CssUI
             Style.Resolve_Size(this, Size_Specified.Width, Size_Specified.Height, out rWidth, out rHeight);
             eSize ResolvedSize = new eSize(rWidth, rHeight);
 
-            if (!Size_Specified.Width.IsNullOrUnset() && !Size_Specified.Height.IsNullOrUnset())
+            if (Size_Specified.Width.HasValue() && Size_Specified.Height.HasValue())
             {// Both of the dimensions are specified, so this is the size we will use
                 return ResolvedSize;
             }
             
-            if (Size_Specified.Width.IsNullOrUnset() ^ Size_Specified.Height.IsNullOrUnset())
+            if (!Size_Specified.Width.HasValue() ^ !Size_Specified.Height.HasValue())
             {// Only one of the dimensions isn't specified, so we use our intrinsic aspect ratio
-                if (Size_Specified.Width.IsNullOrUnset())
+                if (!Size_Specified.Width.HasValue())
                 {// Height was specified
                     int Width = 0;
                     if (Style.Intrinsic_Ratio.HasValue) Width = (int)(Style.Intrinsic_Ratio.Value * (double)ResolvedSize.Height);

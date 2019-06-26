@@ -18,8 +18,8 @@ namespace CssUI.CSS
 
             new CssPropertyDefinition("opacity", false, EPropertyFlags.Visual, CssValue.From_Number(1.0));
 
-            new CssPropertyDefinition("dpi-x", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.None, (cssElement E, double Pct) => { return (Pct * 72.0); });
-            new CssPropertyDefinition("dpi-y", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.None, (cssElement E, double Pct) => { return (Pct * 72.0); });
+            new CssPropertyDefinition("dpi-x", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.Null, (cssElement E, double Pct) => { return (Pct * 72.0); });
+            new CssPropertyDefinition("dpi-y", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.Null, (cssElement E, double Pct) => { return (Pct * 72.0); });
 
             new CssPropertyDefinition("font-family", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.Null);
             new CssPropertyDefinition("font-weight", true, EPropertyFlags.Font | EPropertyFlags.Flow, CssValue.From_Int(400));
@@ -43,6 +43,8 @@ namespace CssUI.CSS
             // SEE: https://www.w3.org/TR/CSS2/visudet.html#propdef-line-height
             new CssPropertyDefinition("line-height", true, EPropertyFlags.Flow, CssValue.From_Number(1.0), (cssElement E, double Pct) => { return (Pct * E.Style.FontSize); });
 
+            // Was concerned about using CssValue.None as the initial value but that what the specs say
+            // SEE: https://www.w3.org/TR/css-transforms-1/#transform-property
             new CssPropertyDefinition("transform", false, EPropertyFlags.Visual, CssValue.None);
 
             new CssPropertyDefinition("top", false, EPropertyFlags.Block, CssValue.Auto, (cssElement E, double Pct) => { return (Pct * E.Block_Containing.Height); }, true);

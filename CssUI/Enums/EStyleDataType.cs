@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CssUI
+﻿namespace CssUI
 {
     /// <summary>
     /// Style value types
@@ -12,22 +6,30 @@ namespace CssUI
     public enum EStyleDataType : byte
     {
         /// <summary>
-        /// Placeholder for NULL
+        /// Nothing
         /// </summary>
-        UNSET = 0,
+        NULL = 0,
         /// <summary>
+        /// CSS Keyword Used to override declerations, forcing a value to resolve to its inherited or initial values
+        /// </summary>
+        UNSET,
+        /// <summary>
+        /// CSS Keyword
         /// Value should use whatever 'auto' logic is applicable to determine it's used value
         /// </summary>
         AUTO,
         /// <summary>
-        /// Value should resolve to it's default
+        /// CSS Keyword
+        /// Value should resolve to it's definitions default value
         /// </summary>
         INITIAL,
         /// <summary>
+        /// CSS Keyword
         /// Value is inherited from ancestor
         /// </summary>
         INHERIT,
         /// <summary>
+        /// CSS Keyword
         /// Used by specific properties, for instance; max-width & max-height use it to specify having no limit
         /// </summary>
         NONE,

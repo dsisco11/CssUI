@@ -20,23 +20,30 @@ namespace CssUI.CSS
         public static CssValue Auto = new CssValue(EStyleDataType.AUTO);
         /// <summary>
         /// (Non-Cascadeable)
-        /// Treat as if no value were given. Eg; The element might as well not have this property at all.
-        /// Properties using this value will be ignored during cascade logic.
+        /// Treat as nothing. Eg; The stylesheet didnt specify anything for this property.
         /// </summary>
-        public static CssValue Null = new CssValue(EStyleDataType.UNSET);
+        public static CssValue Null = new CssValue(EStyleDataType.NULL);
         /// <summary>
-        /// Value should resolve to it's default
+        /// (Non-Cascadeable)
+        /// Intentionally unsets a property, forcing it to resolve to either its inherited or initial value.
+        /// DOCS: https://www.w3.org/TR/css-cascade-3/#inherit-initial
+        /// </summary>
+        public static CssValue Unset = new CssValue(EStyleDataType.UNSET);
+        /// <summary>
+        /// Value should resolve to it's definitions default value
         /// </summary>
         public static CssValue Initial = new CssValue(EStyleDataType.INITIAL);
         /// <summary>
-        /// Value is inherited from the owning elements parent peoperty of the same name
+        /// Value is inherited from the parent element
         /// </summary>
         public static CssValue Inherit = new CssValue(EStyleDataType.INHERIT);
         /// <summary>
         /// (Cascades)
         /// Value is purposly nothing, No value is assigned, some properties use this state to be ignored.
+        /// As in they wont have an effect on the elements styling or block
         /// </summary>
         public static CssValue None = new CssValue(EStyleDataType.NONE);
+
         public static CssValue Zero = CssValue.From_Int(0);
         public static CssValue CurrentColor = CssValue.From_String("currentColor");
         /// <summary> 100% </summary>
@@ -45,7 +52,7 @@ namespace CssUI.CSS
 
         #region Properties
         public readonly StyleValueFlags Flags = StyleValueFlags.None;
-        public readonly EStyleDataType Type = EStyleDataType.UNSET;
+        public readonly EStyleDataType Type = EStyleDataType.NULL;
         public readonly dynamic Value = null;
         public readonly EStyleUnit Unit = EStyleUnit.None;
 
@@ -632,10 +639,11 @@ namespace CssUI.CSS
 
             switch (A.Type)
             {
+                case EStyleDataType.NULL:
+                case EStyleDataType.UNSET:
                 case EStyleDataType.AUTO:
                 case EStyleDataType.INITIAL:
                 case EStyleDataType.INHERIT:
-                case EStyleDataType.UNSET:
                 case EStyleDataType.NONE:
                     return true;
                 case EStyleDataType.INTEGER:
@@ -660,10 +668,11 @@ namespace CssUI.CSS
 
             switch (A.Type)
             {
+                case EStyleDataType.NULL:
+                case EStyleDataType.UNSET:
                 case EStyleDataType.AUTO:
                 case EStyleDataType.INITIAL:
                 case EStyleDataType.INHERIT:
-                case EStyleDataType.UNSET:
                 case EStyleDataType.NONE:
                     return false;
                 case EStyleDataType.INTEGER:
@@ -698,19 +707,24 @@ namespace CssUI.CSS
         }
 
         #endregion
-    }
 
-    public static class StyleValue_Ext
-    {
-        public static bool IsNull(this CssValue SV)
+        /// <summary>
+        /// Returns whether the value type is <see cref="EStyleDataType.NULL"/>
+        /// </summary>
+        public bool IsNull()
         {
-            return object.ReferenceEquals(SV, null);
+            return (this.Type == EStyleDataType.NULL);
         }
 
-        public static bool IsNullOrUnset(this CssValue SV)
+        /// <summary>
+        /// Returns whether there is actually a set value
+        /// </summary>
+        public bool HasValue()
         {
-            if (object.ReferenceEquals(SV, null)) return true;
-            return (SV.Type == EStyleDataType.UNSET);
+            if (this.Type == EStyleDataType.NULL)
+                return false;
+
+            return object.ReferenceEquals(this.Value, null);
         }
     }
 

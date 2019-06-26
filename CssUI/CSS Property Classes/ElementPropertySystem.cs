@@ -987,13 +987,13 @@ namespace CssUI
             {
                 if (maxWidth == CssValue.Auto)
                 {
-                    if (!E.Parent.Style.Cascaded.Width.Assigned.IsNullOrUnset())
+                    if (E.Parent.Style.Cascaded.Width.Assigned.HasValue())
                         width = E.Block_Containing.Width;
                 }
 
                 if (maxHeight == CssValue.Auto)
                 {
-                    if (!E.Parent.Style.Cascaded.Height.Assigned.IsNullOrUnset())
+                    if (E.Parent.Style.Cascaded.Height.Assigned.HasValue())
                         height = E.Block_Containing.Height;
                 }
             }
@@ -1025,7 +1025,7 @@ namespace CssUI
             {
                 if (maxWidth == CssValue.Auto)
                 {
-                    if (!E.Parent.Style.Cascaded.Width.Assigned.IsNullOrUnset())
+                    if (E.Parent.Style.Cascaded.Width.Assigned.HasValue())
                         width = E.Block_Containing.Width;
                 }
             }
@@ -1056,7 +1056,7 @@ namespace CssUI
             {
                 if (maxHeight == CssValue.Auto)
                 {
-                    if (!E.Parent.Style.Cascaded.Height.Assigned.IsNullOrUnset())
+                    if (E.Parent.Style.Cascaded.Height.Assigned.HasValue())
                         height = E.Block_Containing.Height;
                 }
             }
@@ -1111,7 +1111,7 @@ namespace CssUI
             int? width = (int?)Width.Resolve(E.Block_Containing.Width);
             int? height = (int?)Height.Resolve(E.Block_Containing.Height);
 
-            if (Width.Type == EStyleDataType.PERCENT && E.Parent.Style.Cascaded.Width.Assigned.IsNullOrUnset())
+            if (Width.Type == EStyleDataType.PERCENT && !E.Parent.Style.Cascaded.Width.Assigned.HasValue())
                 width = null;// Containing block's width depends on our size, so we cant actually resolve this percentage
 
             outWidth = width;
@@ -1130,7 +1130,7 @@ namespace CssUI
             // and the element is assumed to have no intrinsic width.
             int? width = (int?)Width.Resolve(E.Block_Containing.Width);
 
-            if (Width.Type == EStyleDataType.PERCENT && E.Parent.Style.Cascaded.Width.Assigned.IsNullOrUnset())
+            if (Width.Type == EStyleDataType.PERCENT && !E.Parent.Style.Cascaded.Width.Assigned.HasValue())
                 width = null;// Containing block's width depends on our size, so we cant actually resolve this percentage
 
             return width;
@@ -1326,7 +1326,7 @@ namespace CssUI
                         if (auto_width && auto_height && !has_Intrinsic_Height && has_Intrinsic_Width) Height = (int)((double)Width.Value * Intrinsic_Ratio.Value);// We can use Width.Value here because if this condition is met then is has definately been given a value
                         if (auto_height && !auto_width) Height = (int)((double)tempRes.Width * Intrinsic_Ratio.Value);
 
-                        if (auto_width && auto_height && !has_Intrinsic_Width && !has_Intrinsic_Height && !E.Parent.Style.Cascaded.Width.Assigned.IsNullOrUnset())
+                        if (auto_width && auto_height && !has_Intrinsic_Width && !has_Intrinsic_Height && E.Parent.Style.Cascaded.Width.Assigned.HasValue())
                         {
                             Width = tentative_Width;
                             Height = (int)((double)Width.Value / Intrinsic_Ratio.Value);
@@ -1564,7 +1564,7 @@ namespace CssUI
                 width = (int)(Block.Intrinsic_Ratio.Value * Block.Intrinsic_Height.Value);
             else if (auto_width && !auto_height && Block.Intrinsic_Ratio.HasValue)
                 width = (int)(Block.Intrinsic_Ratio.Value * Block.Height.Resolve());
-            if (auto_width && auto_height && Block.Intrinsic_Ratio.HasValue && !Block.Intrinsic_Height.HasValue && !Block.Intrinsic_Width.HasValue && !E.Parent.Style.Cascaded.Width.Assigned.IsNullOrUnset())
+            if (auto_width && auto_height && Block.Intrinsic_Ratio.HasValue && !Block.Intrinsic_Height.HasValue && !Block.Intrinsic_Width.HasValue && E.Parent.Style.Cascaded.Width.Assigned.HasValue())
             {
                 BlockProperties tmp = new BlockProperties(Block);
                 Get_Tentative_Block_Level_NonReplaced(E, tmp);

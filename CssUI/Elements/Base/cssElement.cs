@@ -795,13 +795,7 @@ namespace CssUI
             this.Element_Hierarchy_Changed(0);
             this.Flag_Containing_Block_Dirty();// Our parent element has been changed, so logically our containing-block is now different from what it was.
 
-            // XXX: Update all style properties marked as 'Inherited'
             this.Style.Dirt |= EPropertySystemDirtFlags.Cascade;
-            if (this is cssTextElement)
-            {
-                float? value = this.Style.ImplicitRules.DpiX.Computed.Value;
-                xLog.Log.Debug($"cssTextElement.Style.Default.DpiX.Computed.Value: {value}");
-            }
         }
 
         private ePos last_containerPos = new ePos();

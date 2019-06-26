@@ -11,7 +11,7 @@ namespace CssUI
     public class CssProperty : ICssProperty
     {// DOCS: https://www.w3.org/TR/CSS22/cascade.html#usedValue
         #region Properties
-        CssValue _value = CssValue.Initial;// A properties assigned value starts out as it's CSS-defined default.
+        CssValue _value = CssValue.Null;// A properties assigned value defaults to not being set
         CssValue _specified = null;
         CssValue _computed = null;
 
@@ -66,7 +66,7 @@ namespace CssUI
 
         #region Accessors
 
-        public bool HasValue { get { return !Assigned.IsNullOrUnset(); } }
+        public bool HasValue { get { return !Assigned.IsNull(); } }
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// </summary>
@@ -124,8 +124,8 @@ namespace CssUI
             {
                 if (Locked) throw new Exception("Cannot modify the value of a locked css property!");
                 Options.CheckAndThrow(this, value);
-                // Translate a value of NULL to CSSValue.Unset
-                _value = (value == null ? CssValue.Null : value);
+                // Translate a value of NULL to CSSValue.Null
+                _value = (object.ReferenceEquals(value, null) ? CssValue.Null : value);
                 //our assigned value has changed, this means our specified and computed valued are now incorrect.
                 Update();
             }
@@ -168,7 +168,7 @@ namespace CssUI
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private async Task<CssValue> Calculate_Specified()
-        {// SEE:  https://www.w3.org/TR/CSS2/cascade.html#specified-value
+        {// SEE:  https://www.w3.org/TR/css-cascade-3/#specified
             CssPropertyDefinition Def = Definition;
 
             // CSS specs say if the cascade (assigned) resulted in a value, use it.
@@ -203,26 +203,26 @@ namespace CssUI
 
                 return Assigned;
             }
-            else// Assigned is null
+            // Assigned is null
+            /*
+            * CSS Specs:
+            * 2. if the property is inherited and the element is not the root of the document tree, use the computed value of the parent element.
+            */
+            if (!(Owner is cssRootElement) && Def != null && Def.Inherited)
+            {
+                ICssProperty prop = Owner.Parent.Style.Cascaded.Get(FieldName);
+                if (prop != null)
+                    return new CssValue((prop as CssProperty).Computed);
+                else
+                    throw new Exception($"CSS property '{CssName}' Cascaded value is null!");
+            }
+            else
             {
                 /*
                 * CSS Specs:
-                * 2. if the property is inherited and the element is not the root of the document tree, use the computed value of the parent element.
+                * 3. Otherwise use the property's initial value. The initial value of each property is indicated in the property's definition.
                 */
-                if (!(Owner is cssRootElement) && Def != null && Def.Inherited)
-                {
-                    ICssProperty prop = Owner.Parent.Style.Cascaded.Get(FieldName);
-                    if (prop != null)
-                        return new CssValue((prop as CssProperty).Computed);
-                }
-                else
-                {
-                    /*
-                    * CSS Specs:
-                    * 3. Otherwise use the property's initial value. The initial value of each property is indicated in the property's definition.
-                    */
-                    return new CssValue(Def.Initial);
-                }
+                return new CssValue(Def.Initial);
             }
 
             // this sucks but its all we can do
@@ -231,7 +231,7 @@ namespace CssUI
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private async Task<CssValue> Calculate_Computed()
-        {// SEE:  https://www.w3.org/TR/CSS22/cascade.html#computed-value
+        {// SEE:  https://www.w3.org/TR/css-cascade-3/#computed
             CssPropertyDefinition Def = Definition;
 
             switch (Specified.Type)
@@ -243,7 +243,6 @@ namespace CssUI
                             double resolved = Specified.Resolve(null, (double Pct) => Def.Percentage_Resolver(Owner, Pct)).Value;
                             return CssValue.From_Number(resolved);
                         }
-                        //else throw new ArgumentNullException(string.Concat("CssPropertyDefinition[\'", this.CssName, "\'].Percentage_Resolver"));
                     }
                     break;
                 case EStyleDataType.DIMENSION:
@@ -256,7 +255,7 @@ namespace CssUI
                     }
                     break;
                 case EStyleDataType.INHERIT:// SEE:  https://www.w3.org/TR/CSS2/cascade.html#value-def-inherit
-                    {// XXX: issue with inherited values atm is that they dont compute immediately once theyre parented
+                    {
                         if (Owner is cssRootElement)// If 'inherit' is set on the root element the property is assigned it's initial value
                         {
                             return new CssValue( Def.Initial );
@@ -266,6 +265,27 @@ namespace CssUI
                             var prop = Owner.Parent.Style.Cascaded.Get(FieldName);
                             if (prop != null)
                                 return new CssValue( (prop as CssProperty).Computed );
+                        }
+                    }
+                    break;
+                case EStyleDataType.UNSET:// SEE:  https://www.w3.org/TR/css-cascade-4/#valdef-all-unset
+                    {
+                        /*
+                        * CSS Specs:
+                        * If the cascaded value of a property is the unset keyword, 
+                        * then if it is an inherited property, this is treated as inherit, and if it is not, this is treated as initial. 
+                        * This keyword effectively erases all declared values occurring earlier in the cascade, 
+                        * correctly inheriting or not as appropriate for the property (or all longhands of a shorthand).
+                        */
+                        if (!(Owner is cssRootElement) && Def != null && Def.Inherited)
+                        {
+                            ICssProperty prop = Owner.Parent.Style.Cascaded.Get(FieldName);
+                            if (prop != null)
+                                return new CssValue((prop as CssProperty).Computed);
+                        }
+                        else
+                        {
+                            return new CssValue(Def.Initial);
                         }
                     }
                     break;
@@ -303,10 +323,12 @@ namespace CssUI
             CssProperty o = prop as CssProperty;
             bool changes = false;
             //if (o.Assigned != CssValue.Null)
-            if (!o.Assigned.IsNullOrUnset())
+            if (o.Assigned.HasValue())
             {
                 changes = true;
-                _value = new CssValue(o.Assigned);
+                //_value = new CssValue(o.Assigned);
+                // Don't make a copy of the value, they are readonly anyhow
+                _value = o.Assigned;
 
                 this.SourcePtr = o.SourcePtr;
                 this.Selector = o.Selector;
@@ -330,7 +352,9 @@ namespace CssUI
             if (o.Assigned != Assigned)
             {
                 changes = true;
-                _value = new CssValue(o.Assigned);
+                //_value = new CssValue(o.Assigned);
+                // Don't make a copy of the value, they are readonly anyhow
+                _value = o.Assigned;
 
                 this.SourcePtr = o.SourcePtr;
                 this.Selector = o.Selector;
@@ -421,12 +445,10 @@ namespace CssUI
             _specified = null;// unset our specified value so it gets updated...
             _computed = null;// it only makes sense to update the computed value aswell
 
-            // XXX: if we move to the new parenting system this check will not be necessary
-            if ( Owner.HasFlags(EElementFlags.ReadyForStyle) )
-            {
+            /*
                 _specified = await Calculate_Specified();
                 _computed = await Calculate_Computed();
-            }
+            */
 
             if (oldValue == null || oldValue != Assigned)
             {

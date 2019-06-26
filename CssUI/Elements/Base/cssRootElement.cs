@@ -97,23 +97,27 @@ namespace CssUI
 
             onControl_Removed += RootElement_onControl_Removed;
 
-            Style.ImplicitRules.BoxSizing.Set(EBoxSizingMode.BORDER);
-            Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
-            Style.ImplicitRules.Width.Assigned = CssValue.From_Percent(100.0);// Always match the viewport size
-            Style.ImplicitRules.Height.Assigned = CssValue.From_Percent(100.0);// Always match the viewport size
-
             // The root element should always set and maintain the DPI values for it's style so it's children will all use the correct DPI.
             IntPtr hwnd = Platform.Factory.SystemWindows.Get_Window();
             Vector2 dpi = Platform.Factory.SystemMetrics.Get_DPI(hwnd);
-
             Style.ImplicitRules.DpiX.Set(CssValue.From_Number(dpi.X));
             Style.ImplicitRules.DpiY.Set(CssValue.From_Number(dpi.Y));
 
+
+            // Style ourself
+
+            Style.ImplicitRules.BoxSizing.Set(EBoxSizingMode.BORDER);
+            Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
+            Style.ImplicitRules.Width.Set( CssValue.From_Percent(100.0));// Always match the viewport size
+            Style.ImplicitRules.Height.Set( CssValue.From_Percent(100.0));// Always match the viewport size
             
             Style.ImplicitRules.Set_Padding_Implicit(2, 2);
 
             // Setup the default font.
-            Style.ImplicitRules.FontSize.Set(14);
+            // XXX: this should be done using the CSS 3 specified font matching method
+            // DOCS: 
+
+            //Style.ImplicitRules.FontSize.Set(14);
             Style.ImplicitRules.FontFamily.Set("Arial");
             Style.ImplicitRules.FontWeight.Set(700);
             

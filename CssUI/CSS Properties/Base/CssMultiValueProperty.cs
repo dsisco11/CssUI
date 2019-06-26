@@ -82,7 +82,7 @@ namespace CssUI
         /// <summary>
         /// Returns whether or not the property has a set value that should take affect during cascading.
         /// </summary>
-        public bool HasValue { get { return !Assigned.FirstOrDefault().IsNullOrUnset(); } }
+        public bool HasValue { get { return Assigned.FirstOrDefault().HasValue(); } }
 
         /// <summary>
         /// List of all the currently assigned values
