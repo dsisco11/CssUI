@@ -8,7 +8,7 @@ namespace CssUI.CSS
     /// </summary>
     public interface ICssPropertyCollection
     {
-        Action<NamedProperty> onChange { get; }
+        Action<CssProperty> onChange { get; }
         /// <summary>
         /// Returns TRUE if any values have the <see cref="StyleValueFlags.Depends"/> flag
         /// </summary>

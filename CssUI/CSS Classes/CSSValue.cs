@@ -214,6 +214,7 @@ namespace CssUI.CSS
         /// Gets the final resulting value for a dimension type by multiplying our current numeric value by the unit scale
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private double ResolveDimension(StyleUnitResolver Resolver)
         {
             if (Unit == EStyleUnit.None) return (double)Value;
