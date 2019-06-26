@@ -22,41 +22,19 @@ namespace CssUI
     /// </summary>
     public class CssPropertySet
     {
-        #region Static Property List
-
-        /// <summary>
-        /// List of FieldInfo for all <see cref="ICssProperty"/> variables
-        /// </summary>
-        public static readonly List<FieldInfo> PropertyList;
-        /// <summary>
-        /// Map of all <see cref="ICssProperty"/> variable names to their FieldInfo
-        /// </summary>
-        public static readonly ConcurrentDictionary<AtomicString, FieldInfo> PropertyMap;
-
-        static CssPropertySet()
-        {
-            // For each defined cssProperty create an instance of said property and store it in our PropertyList
-            PropertyList = typeof(CssPropertySet).GetFields().Where(o => (o.Attributes.HasFlag(FieldAttributes.InitOnly) && typeof(ICssProperty).IsAssignableFrom(o.FieldType))).ToList();
-
-            // To allow for quick lookup of propertys by their name, map each property in our PropertyList
-            PropertyMap = new ConcurrentDictionary<AtomicString, FieldInfo>();
-            foreach(FieldInfo field in PropertyList)
-            {
-                PropertyMap.TryAdd(new AtomicString(field.Name), field);
-            }
-        }
-        #endregion
-
         #region Properties
         /// <summary>
         /// If True then none of this instances property values can be altered by external code.
         /// </summary>
         public readonly bool Locked = false;
-        
+
         /// <summary>
         /// List of Field-Names for all our properties which have a set value
         /// </summary>
-        public HashSet<AtomicString> SetProperties { get; private set; }  = new HashSet<AtomicString>();
+        public HashSet<AtomicString> SetProperties { get; private set; } = new HashSet<AtomicString>();
+
+        private List<ICssProperty> CssProperties = null;
+        private ConcurrentDictionary<AtomicString, ICssProperty> CssPropertyMap = null;
 
         /// <summary>
         /// Sequence tracker for <see cref="CssPropertySet"/>s
@@ -94,100 +72,100 @@ namespace CssUI
 
         #region CSS Properties
         #region Display
-        public readonly EnumProperty<EDisplayMode> Display;
+        public EnumProperty<EDisplayMode> Display => (EnumProperty<EDisplayMode>)this["display"];
 
         /// <summary>
         /// Current BoxSizing mode for this element.
         /// (Defaults to <see cref="EBoxSizingMode.BORDER"/>)
         /// </summary>
-        public readonly EnumProperty<EBoxSizingMode> BoxSizing;
+        public EnumProperty<EBoxSizingMode> BoxSizing => (EnumProperty<EBoxSizingMode>)this["box-sizing"];
 
-        public readonly EnumProperty<EPositioning> Positioning;
+        public EnumProperty<EPositioning> Positioning => (EnumProperty<EPositioning>)this["positioning"];
         #endregion
 
         #region Replaced Element Properties
-        public readonly EnumProperty<EObjectFit> ObjectFit;
-        public readonly IntProperty ObjectPosition_X;
-        public readonly IntProperty ObjectPosition_Y;
-        public readonly IntProperty Intrinsic_Width;
-        public readonly IntProperty Intrinsic_Height;
-        public readonly NumberProperty Intrinsic_Ratio;
+        public EnumProperty<EObjectFit> ObjectFit => (EnumProperty<EObjectFit>)this["object-fit"];
+        public IntProperty ObjectPosition_X => (IntProperty)this["object-position-x"];
+        public IntProperty ObjectPosition_Y => (IntProperty)this["object-position-y"];
+        public IntProperty Intrinsic_Width => (IntProperty)this["intrinsic-width"];
+        public IntProperty Intrinsic_Height => (IntProperty)this["intrinsic-height"];
+        public NumberProperty Intrinsic_Ratio => (NumberProperty)this["intrinsic-ratio"];
         #endregion
 
         #region Overflow
-        public readonly EnumProperty<EOverflowMode> Overflow_X;
-        public readonly EnumProperty<EOverflowMode> Overflow_Y;
+        public EnumProperty<EOverflowMode> Overflow_X => (EnumProperty<EOverflowMode>)this["overflow-x"];
+        public EnumProperty<EOverflowMode> Overflow_Y => (EnumProperty<EOverflowMode>)this["overflow-y"];
         #endregion
 
         #region Size
-        public readonly IntProperty Width;
-        public readonly IntProperty Height;
+        public IntProperty Width => (IntProperty)this["width"];
+        public IntProperty Height => (IntProperty)this["height"];
 
-        public readonly IntProperty Content_Width;
-        public readonly IntProperty Content_Height;
+        public IntProperty Content_Width => (IntProperty)this["content-width"];
+        public IntProperty Content_Height => (IntProperty)this["content-height"];
         #endregion
 
         #region Borders
-        public readonly EnumProperty<EBorderStyle> Border_Top_Style;
-        public readonly EnumProperty<EBorderStyle> Border_Right_Style;
-        public readonly EnumProperty<EBorderStyle> Border_Bottom_Style;
-        public readonly EnumProperty<EBorderStyle> Border_Left_Style;
+        public EnumProperty<EBorderStyle> Border_Top_Style => (EnumProperty<EBorderStyle>)this["border-top-style"];
+        public EnumProperty<EBorderStyle> Border_Right_Style => (EnumProperty<EBorderStyle>)this["border-right-style"];
+        public EnumProperty<EBorderStyle> Border_Bottom_Style => (EnumProperty<EBorderStyle>)this["border-bottom-style"];
+        public EnumProperty<EBorderStyle> Border_Left_Style => (EnumProperty<EBorderStyle>)this["border-left-style"];
 
-        public readonly IntProperty Border_Top_Width;
-        public readonly IntProperty Border_Right_Width;
-        public readonly IntProperty Border_Bottom_Width;
-        public readonly IntProperty Border_Left_Width;
+        public IntProperty Border_Top_Width => (IntProperty)this["border-top-width"];
+        public IntProperty Border_Right_Width => (IntProperty)this["border-right-width"];
+        public IntProperty Border_Bottom_Width => (IntProperty)this["border-bottom-width"];
+        public IntProperty Border_Left_Width => (IntProperty)this["border-left-width"];
         #endregion
 
         #region Min Size
         /// <summary>
         /// The minimum Width of an elements content-area
         /// </summary>
-        public readonly IntProperty Min_Width;
+        public IntProperty Min_Width => (IntProperty)this["min-width"];
         /// <summary>
         /// The minimum Height of an elements content-area
         /// </summary>
-        public readonly IntProperty Min_Height;
+        public IntProperty Min_Height => (IntProperty)this["min-height"];
         #endregion
 
         #region Max Size
         /// <summary>
         /// The maximum Width of an elements content-area
         /// </summary>
-        public readonly IntProperty Max_Width;
+        public IntProperty Max_Width => (IntProperty)this["max-width"];
         /// <summary>
         /// The maximum Height of an elements content-area
         /// </summary>
-        public readonly IntProperty Max_Height;
+        public IntProperty Max_Height => (IntProperty)this["max-height"];
         #endregion
 
         #region Position
         /// <summary>
         /// Distance between the elements Left outter edge and the matching edge of its containing block.
         /// </summary>
-        public IntProperty X { get { return this.Left; } }
+        public IntProperty X => (IntProperty)this["left"];
         /// <summary>
         /// Distance between the elements Top outter edge and the matching edge of its containing block.
         /// </summary>
-        public IntProperty Y { get { return this.Top; } }
+        public IntProperty Y => (IntProperty)this["top"];
 
 
         /// <summary>
         /// Distance between the elements Top outter edge and the matching edge of its containing block.
         /// </summary>
-        public readonly IntProperty Top;
+        public IntProperty Top => (IntProperty)this["top"];
         /// <summary>
         /// Distance between the elements Right outter edge and the matching edge of its containing block.
         /// </summary>
-        public readonly IntProperty Right;
+        public IntProperty Right => (IntProperty)this["right"];
         /// <summary>
         /// Distance between the elements Bottom outter edge and the matching edge of its containing block.
         /// </summary>
-        public readonly IntProperty Bottom;
+        public IntProperty Bottom => (IntProperty)this["bottom"];
         /// <summary>
         /// Distance between the elements Left outter edge and the matching edge of its containing block.
         /// </summary>
-        public readonly IntProperty Left;
+        public IntProperty Left => (IntProperty)this["left"];
         #endregion
 
         #region Margins
@@ -195,22 +173,22 @@ namespace CssUI
         /// Distance between the elements Top edge and Top border (in pixels)
         /// <para>Clears an area outside the border. The margin is transparent</para>
         /// </summary>
-        public readonly IntProperty Margin_Top;
+        public IntProperty Margin_Top => (IntProperty)this["margin-top"];
         /// <summary>
         /// Distance between the elements Right edge and Right border (in pixels)
         /// <para>Clears an area outside the border. The margin is transparent</para>
         /// </summary>
-        public readonly IntProperty Margin_Right;
+        public IntProperty Margin_Right => (IntProperty)this["margin-right"];
         /// <summary>
         /// Distance between the elements Bottom edge and Bottom border (in pixels)
         /// <para>Clears an area outside the border. The margin is transparent</para>
         /// </summary>
-        public readonly IntProperty Margin_Bottom;
+        public IntProperty Margin_Bottom => (IntProperty)this["margin-bottom"];
         /// <summary>
         /// Distance between the elements Left edge and Left border (in pixels)
         /// <para>Clears an area outside the border. The margin is transparent</para>
         /// </summary>
-        public readonly IntProperty Margin_Left;
+        public IntProperty Margin_Left => (IntProperty)this["margin-left"];
         #endregion
 
         #region Padding
@@ -218,50 +196,50 @@ namespace CssUI
         /// Distance between this elements Top border and its content (in pixels)
         /// <para>Clears an area around the content. The padding can be thought of as extending the content area in that the controls background occupys it</para>
         /// </summary>
-        public readonly IntProperty Padding_Top;
+        public IntProperty Padding_Top => (IntProperty)this["padding-top"];
         /// <summary>
         /// Distance between this elements Right border and its content (in pixels)
         /// <para>Clears an area around the content. The padding can be thought of as extending the content area in that the controls background occupys it</para>
         /// </summary>
-        public readonly IntProperty Padding_Right;
+        public IntProperty Padding_Right => (IntProperty)this["padding-right"];
         /// <summary>
         /// Distance between this elements Bottom border and its content (in pixels)
         /// <para>Clears an area around the content. The padding can be thought of as extending the content area in that the controls background occupys it</para>
         /// </summary>
-        public readonly IntProperty Padding_Bottom;
+        public IntProperty Padding_Bottom => (IntProperty)this["padding-bottom"];
         /// <summary>
         /// Distance between this elements Left border and its content (in pixels)
         /// <para>Clears an area around the content. The padding can be thought of as extending the content area in that the controls background occupys it</para>
         /// </summary>
-        public readonly IntProperty Padding_Left;
+        public IntProperty Padding_Left => (IntProperty)this["padding-left"];
         #endregion
 
         #region Text
-        public readonly EnumProperty<ETextAlign> TextAlign;
+        public EnumProperty<ETextAlign> TextAlign => (EnumProperty<ETextAlign>)this["text-align"];
         #endregion
 
         #region Font
-        public readonly NumberProperty DpiX;
-        public readonly NumberProperty DpiY;
-        public readonly IntProperty FontWeight;
-        public readonly EnumProperty<EFontStyle> FontStyle;
-        public readonly NumberProperty FontSize;
-        public readonly StringProperty FontFamily;
+        public NumberProperty DpiX => (NumberProperty)this["dpi-x"];
+        public NumberProperty DpiY => (NumberProperty)this["dpi-y"];
+        public IntProperty FontWeight => (IntProperty)this["font-weight"];
+        public EnumProperty<EFontStyle> FontStyle => (EnumProperty<EFontStyle>)this["font-style"];
+        public NumberProperty FontSize => (NumberProperty)this["font-size"];
+        public StringProperty FontFamily => (StringProperty)this["font-family"];
         #endregion
 
         #region Lines
         /// <summary>
         /// 'line-height' specifies the minimal height of line boxes within the element.
         /// </summary>
-        public IntProperty LineHeight;
+        public IntProperty LineHeight => (IntProperty)this["line-height"];
         #endregion
 
         #region Opacity
-        public readonly NumberProperty Opacity;
+        public NumberProperty Opacity => (NumberProperty)this["opacity"];
         #endregion
 
         #region Transforms
-        public readonly TransformListProperty Transform;
+        public TransformListProperty Transform => (TransformListProperty)this["transform"];
         #endregion
         #endregion
 
@@ -305,80 +283,88 @@ namespace CssUI
             this.Origin = Origin;
             var selfRef = new WeakReference<CssPropertySet>(this);
 
-            Top = new IntProperty("top", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            Right = new IntProperty("right", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            Bottom = new IntProperty("bottom", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            Left = new IntProperty("left", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-
-            Display = new EnumProperty<EDisplayMode>("display", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false });
-            BoxSizing = new EnumProperty<EBoxSizingMode>("box-sizing", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            Positioning = new EnumProperty<EPositioning>("positioning", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            Overflow_X = new EnumProperty<EOverflowMode>("overflow-x", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            Overflow_Y = new EnumProperty<EOverflowMode>("overflow-y", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-
-            ObjectFit = new EnumProperty<EObjectFit>("object-fit", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false, AllowAuto = false });
-            ObjectPosition_X = new IntProperty("object-position-x", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false });
-            ObjectPosition_Y = new IntProperty("object-position-y", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false });
-            Intrinsic_Width = new IntProperty("intrinsic-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false, AllowAuto = false });
-            Intrinsic_Height = new IntProperty("intrinsic-height", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false, AllowAuto = false });
-            Intrinsic_Ratio = new NumberProperty("intrinsic-ratio", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false, AllowAuto = false });
-
-            Width = new IntProperty("width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            Height = new IntProperty("height", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-
-            Content_Width = new IntProperty("content-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowAuto = false, AllowPercentage = false, AllowInherited = false });
-            Content_Height = new IntProperty("content-height", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowAuto = false, AllowPercentage = false, AllowInherited = false });
-
-            Min_Width = new IntProperty("min-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            Min_Height = new IntProperty("min-height", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-
-            Max_Width = new IntProperty("max-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            Max_Height = new IntProperty("max-height", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-
-            Margin_Top = new IntProperty("margin-top", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            Margin_Right = new IntProperty("margin-right", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            Margin_Bottom = new IntProperty("margin-bottom", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            Margin_Left = new IntProperty("margin-left", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-
-            Padding_Top = new IntProperty("padding-top", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            Padding_Right = new IntProperty("padding-right", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            Padding_Bottom = new IntProperty("padding-bottom", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            Padding_Left = new IntProperty("padding-left", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            
-
-            Border_Top_Style = new EnumProperty<EBorderStyle>("border-top-style", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            Border_Right_Style = new EnumProperty<EBorderStyle>("border-right-style", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            Border_Bottom_Style = new EnumProperty<EBorderStyle>("border-bottom-style", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            Border_Left_Style = new EnumProperty<EBorderStyle>("border-left-style", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-
-            Border_Top_Width = new IntProperty("border-top-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            Border_Right_Width = new IntProperty("border-right-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            Border_Bottom_Width = new IntProperty("border-bottom-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            Border_Left_Width = new IntProperty("border-left-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-
-            TextAlign = new EnumProperty<ETextAlign>("text-align", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-
-            DpiX = new NumberProperty("dpi-x", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            DpiY = new NumberProperty("dpi-y", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            FontWeight = new IntProperty("font-weight", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowPercentage = false });
-            FontStyle = new EnumProperty<EFontStyle>("font-style", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            FontSize = new NumberProperty("font-size", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-            FontFamily = new StringProperty("font-family", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-
-            LineHeight = new IntProperty("line-height", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { });
-
-            Opacity = new NumberProperty("opacity", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowPercentage = false });
-
-            Transform = new TransformListProperty("transform", Owner, selfRef, this.Locked, Unset);
-
-            // Name each of our properties
-            Parallel.ForEach(PropertyList, (FieldInfo Field) =>
+            CssProperties = new List<ICssProperty>()
             {
-                var property = (ICssProperty)Field.GetValue(this);
-                property.FieldName = new AtomicString(Field.Name);
-                property.Selector = Selector;
-                property.onChanged += Property_onChanged;
-            });
+                new IntProperty("top", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new IntProperty("right", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new IntProperty("bottom", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new IntProperty("left", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+
+                new EnumProperty<EDisplayMode>("display", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false }),
+                new EnumProperty<EBoxSizingMode>("box-sizing", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new EnumProperty<EPositioning>("positioning", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new EnumProperty<EOverflowMode>("overflow-x", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new EnumProperty<EOverflowMode>("overflow-y", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+
+                new EnumProperty<EObjectFit>("object-fit", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false, AllowAuto = false }),
+                new IntProperty("object-position-x", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false }),
+                new IntProperty("object-position-y", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false }),
+                new IntProperty("intrinsic-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false, AllowAuto = false }),
+                new IntProperty("intrinsic-height", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false, AllowAuto = false }),
+                new NumberProperty("intrinsic-ratio", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowInherited = false, AllowAuto = false }),
+
+                new IntProperty("width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new IntProperty("height", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+
+                new IntProperty("content-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowAuto = false, AllowPercentage = false, AllowInherited = false }),
+                new IntProperty("content-height", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowAuto = false, AllowPercentage = false, AllowInherited = false }),
+
+                new IntProperty("min-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new IntProperty("min-height", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+
+                new IntProperty("max-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new IntProperty("max-height", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+
+                new IntProperty("margin-top", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new IntProperty("margin-right", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new IntProperty("margin-bottom", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new IntProperty("margin-left", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+
+                new IntProperty("padding-top", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new IntProperty("padding-right", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new IntProperty("padding-bottom", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new IntProperty("padding-left", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+
+
+                new EnumProperty<EBorderStyle>("border-top-style", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new EnumProperty<EBorderStyle>("border-right-style", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new EnumProperty<EBorderStyle>("border-bottom-style", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new EnumProperty<EBorderStyle>("border-left-style", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+
+                new IntProperty("border-top-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new IntProperty("border-right-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new IntProperty("border-bottom-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new IntProperty("border-left-width", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+
+                new EnumProperty<ETextAlign>("text-align", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+
+                new NumberProperty("dpi-x", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new NumberProperty("dpi-y", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new IntProperty("font-weight", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowPercentage = false }),
+                new EnumProperty<EFontStyle>("font-style", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new NumberProperty("font-size", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+                new StringProperty("font-family", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+
+                new IntProperty("line-height", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { }),
+
+                new NumberProperty("opacity", Owner, selfRef, this.Locked, Unset, new CssPropertyOptions() { AllowPercentage = false }),
+
+                new TransformListProperty("transform", Owner, selfRef, this.Locked, Unset)
+            };
+
+            CssPropertyMap = new ConcurrentDictionary<AtomicString, ICssProperty>(3, CssProperties.Count);
+
+            for (int i = 0; i < CssProperties.Count; i++)
+            {
+                ICssProperty p = CssProperties[i];
+                p.Selector = Selector;
+                p.onChanged += Property_onChanged;
+
+                bool success = CssPropertyMap.TryAdd(p.CssName, p);
+                if (!success)
+                    throw new Exception($"Failed to fully form {nameof(CssPropertyMap)} for {nameof(CssPropertySet)}. Failed on member: '{p.CssName}'");
+            }
+
         }
         #endregion
 
@@ -394,11 +380,11 @@ namespace CssUI
 
         private void Property_onChanged(ICssProperty property)
         {
-            if (!property.HasValue) SetProperties.Remove(property.FieldName);
-            else SetProperties.Add(property.FieldName);
+            if (!property.HasValue) SetProperties.Remove(property.CssName);
+            else SetProperties.Add(property.CssName);
 
-            if (property.CssName == null) throw new Exception(string.Concat("Cannot fire onChange events for unnamed property! (FieldName: ", property.FieldName, ")"));
-            var def = CssProperties.Definitions[property.CssName];
+            if (property.CssName == null) throw new Exception(string.Concat("Cannot fire onChange events for unnamed property! (Name: ", property.CssName, ")"));
+            var def = CSS.CssProperties.Definitions[property.CssName];
             if (def == null) throw new Exception(string.Concat("Cannot find a definition for Css property: \"", property.CssName, "\""));
 
             EPropertyFlags Flags = def.Flags;
@@ -408,20 +394,11 @@ namespace CssUI
 #endif
             Property_Changed?.Invoke(property, Flags, stack);
         }
-        
+
         #endregion
 
         #region Getters
-        internal ICssProperty Get(AtomicString FieldName)
-        {
-            if (object.ReferenceEquals(FieldName, null))
-                throw new ArgumentNullException($"{nameof(FieldName)} cannot be null!");
-
-            FieldInfo Field = PropertyMap[FieldName];
-            if (!typeof(ICssProperty).IsAssignableFrom(Field.FieldType))
-                throw new Exception($"Unable find style property with the field name: {FieldName}");
-            return (ICssProperty)Field.GetValue(this);
-        }
+        internal ICssProperty Get_ByIndex(int index) => this.CssProperties[index];
 
         /// <summary>
         /// Finds the property within this style set that matches the given property
@@ -433,50 +410,70 @@ namespace CssUI
             if (object.ReferenceEquals(Property, null))
                 throw new ArgumentNullException($"{nameof(Property)} cannot be null!");
 
-            AtomicString FieldName = Property.FieldName;
-            return Get(FieldName);
+            return Get(Property.CssName);
         }
+
+        internal ICssProperty Get(AtomicString CssName)
+        {
+            if (object.ReferenceEquals(CssName, null))
+                throw new ArgumentNullException($"{nameof(CssName)} cannot be null!");
+
+            if (this.CssPropertyMap.TryGetValue(CssName, out ICssProperty prop))
+                return prop;
+
+            throw new KeyNotFoundException($"Unable find style property: {CssName}");
+        }
+
+        public ICssProperty this[AtomicString CssName]
+        {
+            get
+            {
+                if (object.ReferenceEquals(CssName, null))
+                    throw new ArgumentNullException($"{nameof(CssName)} cannot be null!");
+
+                if (this.CssPropertyMap.TryGetValue(CssName, out ICssProperty prop))
+                    return prop;
+
+                throw new KeyNotFoundException($"Unable find style property: {CssName}");
+            }
+        }
+
+        public ICssProperty this[string CssName]
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(CssName))
+                    throw new ArgumentNullException($"{nameof(CssName)} cannot be null!");
+
+                if (this.CssPropertyMap.TryGetValue(new AtomicString(CssName), out ICssProperty prop))
+                    return prop;
+
+                throw new KeyNotFoundException($"Unable find style property: {CssName}");
+            }
+        }
+
+
 
         /// <summary>
         /// Returns all of the properties
         /// </summary>
-        internal IEnumerable<ICssProperty> GetAll()
-        {
-            List<ICssProperty> Ret = new List<ICssProperty>();
-            for (int i = 0; i < PropertyList.Count; i++)
-            {
-                FieldInfo Field = PropertyList[i];
-                Ret.Add( (ICssProperty)Field.GetValue(this) );
-            }
-
-            return Ret.ToArray();
-        }
+        internal IEnumerable<ICssProperty> GetAll() => CssProperties.AsEnumerable();
 
         /// <summary>
         /// Returns all of the properties matching a given predicate
         /// </summary>
-        internal IEnumerable<ICssProperty> GetAll(Func<ICssProperty, bool> Predicate)
-        {
-            List<ICssProperty> Ret = new List<ICssProperty>();
-            for (int i = 0; i < PropertyList.Count; i++)
-            {
-                FieldInfo Field = PropertyList[i];
-                ICssProperty val = (ICssProperty)Field.GetValue(this);
-                if (Predicate(val))
-                {
-                    Ret.Add(val);
-                }
-            }
+        internal IEnumerable<ICssProperty> GetAll(Func<ICssProperty, bool> Predicate) => CssProperties.Where(Predicate).AsEnumerable();
 
-            return Ret.ToArray();
-        }
-
-        internal List<ICssProperty> Get_Set_Properties()
+        /// <summary>
+        /// Returns all of the Css properties that have a value assigned to them
+        /// </summary>
+        /// <returns></returns>
+        internal IList<ICssProperty> Get_Set_Properties()
         {
             List<ICssProperty> List = new List<ICssProperty>();
-            foreach (AtomicString fieldName in SetProperties)
+            foreach (AtomicString name in SetProperties)
             {
-                List.Add(Get(fieldName));
+                List.Add(Get(name));
             }
 
             return List;
@@ -484,18 +481,26 @@ namespace CssUI
         #endregion
 
         #region Setters
-        internal async Task Set(ICssProperty Property, ICssProperty Value, AtomicString SourceState)
+        internal async Task Set(ICssProperty Property, ICssProperty Value)
         {
-            AtomicString FieldName = Property.FieldName;
-            await Set(FieldName, Value, SourceState);
+            if (object.ReferenceEquals(Property, null))
+                throw new ArgumentNullException($"{nameof(Property)} cannot be null!");
+
+            await Set(Property.CssName, Value);
         }
 
-        internal async Task Set(AtomicString FieldName, ICssProperty Value, AtomicString SourceState)
+        internal async Task Set(AtomicString CssName, ICssProperty Value)
         {
-            FieldInfo Field = typeof(CssPropertySet).GetField(FieldName.ToString());
-            if (!typeof(ICssProperty).IsAssignableFrom(Field.FieldType)) throw new Exception(string.Format("Unable find style property with the field name: {0}", FieldName));
-            
-            await ((ICssProperty)Field.GetValue(this)).OverwriteAsync(Value);
+            if (object.ReferenceEquals(CssName, null))
+                throw new ArgumentNullException($"{nameof(CssName)} cannot be null!");
+
+            if (this.CssPropertyMap.TryGetValue(CssName, out ICssProperty Property))
+            {
+                await Property.OverwriteAsync(Value);
+                return;
+            }
+
+            throw new KeyNotFoundException($"Unable find style property: {CssName}");
         }
         #endregion
 
@@ -512,11 +517,10 @@ namespace CssUI
                 return;
 
             AsyncCountdownEvent ctdn = new AsyncCountdownEvent(props.SetProperties.Count);
-            Parallel.ForEach<AtomicString>(props.SetProperties, async (name) =>
+            Parallel.ForEach<AtomicString>(props.SetProperties, async (cssName) =>
             {
-                FieldInfo Field = PropertyMap[name];
-                var val = (ICssProperty)Field.GetValue(props);
-                var mv = (ICssProperty)Field.GetValue(this);
+                ICssProperty val = props[cssName];
+                ICssProperty mv = this[cssName];
 
                 await mv.CascadeAsync(val);
                 // Signal our original thread that we are 1 step closer to being done
@@ -530,17 +534,16 @@ namespace CssUI
         /// <summary>
         /// Overwrites any differing property values
         /// </summary>
-        /// <param name="props"></param>
-        internal async Task OverwriteAsync(CssPropertySet props)
+        /// <param name="Target"></param>
+        internal async Task OverwriteAsync(CssPropertySet Target)
         {
-            AsyncCountdownEvent ctdn = new AsyncCountdownEvent(PropertyList.Count);
-            Parallel.For(0, PropertyList.Count, async (i) =>
+            AsyncCountdownEvent ctdn = new AsyncCountdownEvent(CssProperties.Count);
+            Parallel.For(0, CssProperties.Count, async (i) =>
             {
-                FieldInfo Field = PropertyList[i];
-                var val = (ICssProperty)Field.GetValue(props);
-                var mv = (ICssProperty)Field.GetValue(this);
+                ICssProperty prop = CssProperties[i];
+                ICssProperty mv = Target.Get_ByIndex(i);
 
-                await mv.OverwriteAsync(val);
+                await mv.OverwriteAsync(prop);
                 ctdn.Signal();
             });
 

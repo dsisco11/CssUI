@@ -31,7 +31,7 @@ namespace CssUI
                          * these units refer to the computed font metrics corresponding to the initial values of the font property.
                          */
 
-                        if (Property.FieldName == "font-size" && Property.Owner == Owner)
+                        if (Property.CssName == "font-size" && Property.Owner == Owner)
                         {// We are being called from the font-size property
 
                             if (Owner.Parent != null)
@@ -70,7 +70,7 @@ namespace CssUI
                          * The exception is when 'ex' occurs in the value of the 'font-size' property, 
                          * in which case it refers to the 'ex' of the parent element.
                          */
-                        if (Property.FieldName == "font-size" && Property.Owner == Owner)
+                        if (Property.CssName == "font-size" && Property.Owner == Owner)
                         {// We are being called from the font-size property
 
                             if (Owner.Parent != null)

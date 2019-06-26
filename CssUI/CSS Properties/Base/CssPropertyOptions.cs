@@ -71,13 +71,13 @@ namespace CssUI.CSS
             switch (Value.Type)
             {
                 case EStyleDataType.AUTO:
-                    if (!AllowAuto) throw new Exception(string.Concat("The property(", Owner.FieldName,") cannot be set to AUTO!"));
+                    if (!AllowAuto) throw new Exception(string.Concat("The property(", Owner.CssName,") cannot be set to AUTO!"));
                     break;
                 case EStyleDataType.INHERIT:
-                    if (!AllowInherited) throw new Exception(string.Concat("The property(", Owner.FieldName, ") cannot be set to INHERITED!"));
+                    if (!AllowInherited) throw new Exception(string.Concat("The property(", Owner.CssName, ") cannot be set to INHERITED!"));
                     break;
                 case EStyleDataType.PERCENT:
-                    if (!AllowPercentage) throw new Exception(string.Concat("The property(", Owner.FieldName, ") cannot be set to Percentages!"));
+                    if (!AllowPercentage) throw new Exception(string.Concat("The property(", Owner.CssName, ") cannot be set to Percentages!"));
                     break;
                 default:
                     break;

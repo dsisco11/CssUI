@@ -12,11 +12,6 @@ namespace CssUI
     {
         cssElement Owner { get; }
         /// <summary>
-        /// The propertys field-name in whatever class is holding it.
-        /// <para>If FullName were "Margins.Left" then this would be "Left"</para>
-        /// </summary>
-        AtomicString FieldName { get; set; }
-        /// <summary>
         /// The propertys identifier token in stylesheets.
         /// <para>EG; "box-sizing", "margin-left", "margin-top", etc </para>
         /// </summary>

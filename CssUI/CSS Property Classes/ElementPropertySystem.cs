@@ -464,7 +464,7 @@ namespace CssUI
                         }
 
                         string SourceState = Value.Source.ToString();
-                        await Cascaded.Set(propName, Value, new AtomicString(SourceState));
+                        Cascaded.Set(propName, Value);
                     }
                     finally
                     {
@@ -503,7 +503,13 @@ namespace CssUI
         private async Task CascadeProperty(ICssProperty Property)
         {
             // Extract this property from every CssPropertySet that has a value for it
-            var propertyList = CssRules.Values.Select(x => { return x.Get(Property.FieldName); }).ToList();
+            //var propertyList = CssRules.Values.Select(propSet => { return propSet[Property.CssName]; }).ToList();
+
+            List<ICssProperty> propertyList = new List<ICssProperty>();
+            foreach(var propSet in CssRules.Values)
+            {
+                propertyList.Add(propSet[Property.CssName]);
+            }
 
             // Order these properties according to CSS 3.0 specifications
             propertyList.Sort(new CssPropertyComparator());
@@ -520,7 +526,7 @@ namespace CssUI
             }
 
             string SourceState = Value.Source.ToString();
-            await Cascaded.Set(Property.FieldName, Value, new AtomicString(SourceState));
+            await Cascaded.Set(Property.CssName, Value);
         }
         #endregion
 

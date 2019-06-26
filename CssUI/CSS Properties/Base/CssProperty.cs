@@ -20,11 +20,6 @@ namespace CssUI
         /// </summary>
         public cssElement Owner { get; protected set; } = null;
         /// <summary>
-        /// The propertys field-name in whatever class is holding it.
-        /// <para>If FullName were "Margins.Left" then this would be "Left"</para>
-        /// </summary>
-        public AtomicString FieldName { get; set; } = null;
-        /// <summary>
         /// The propertys identifier token in stylesheets.
         /// <para>EG; "box-sizing", "margin-left", "margin-top", etc </para>
         /// </summary>
@@ -171,10 +166,13 @@ namespace CssUI
         {// SEE:  https://www.w3.org/TR/css-cascade-3/#specified
             CssPropertyDefinition Def = Definition;
 
+
+#if RELEASE
             try
             {
-                // CSS specs say if the cascade (assigned) resulted in a value, use it.
-                if (!Assigned.IsNull())
+#endif
+            // CSS specs say if the cascade (assigned) resulted in a value, use it.
+            if (!Assigned.IsNull())
                 {
                     if (Assigned == CssValue.Inherit)
                     {
@@ -190,7 +188,7 @@ namespace CssUI
                         }
                         else
                         {// Take our parents computed value
-                            ICssProperty prop = Owner.Parent.Style.Cascaded.Get(FieldName);
+                            ICssProperty prop = Owner.Parent.Style.Cascaded.Get(CssName);
                             if (prop != null)
                                 return new CssValue((prop as CssProperty).Computed);
                             else
@@ -212,7 +210,7 @@ namespace CssUI
                 */
                 if (!(Owner is cssRootElement) && Def != null && Def.Inherited)
                 {
-                    ICssProperty prop = Owner.Parent.Style.Cascaded.Get(FieldName);
+                    ICssProperty prop = Owner.Parent.Style.Cascaded.Get(CssName);
                     if (prop != null)
                         return new CssValue((prop as CssProperty).Computed);
                     else
@@ -226,12 +224,14 @@ namespace CssUI
                     */
                     return new CssValue(Def.Initial);
                 }
+#if RELEASE
             }
             catch(Exception ex)
             {
                 xLog.Log.Error(ex);
                 throw;
             }
+#endif
 
             // this sucks but its all we can do
             throw new Exception($"Failed to resolve the Specified value in {nameof(CssProperty)}");
@@ -242,8 +242,10 @@ namespace CssUI
         {// SEE:  https://www.w3.org/TR/css-cascade-3/#computed
             CssPropertyDefinition Def = Definition;
 
+#if RELEASE
             try
             {
+#endif
                 switch (Specified.Type)
                 {
                     case EStyleDataType.PERCENT:
@@ -272,7 +274,7 @@ namespace CssUI
                             }
                             else
                             {
-                                var prop = Owner.Parent.Style.Cascaded.Get(FieldName);
+                                var prop = Owner.Parent.Style.Cascaded.Get(CssName);
                                 if (prop != null)
                                     return new CssValue( (prop as CssProperty).Computed );
                             }
@@ -289,7 +291,7 @@ namespace CssUI
                             */
                             if (!(Owner is cssRootElement) && Def != null && Def.Inherited)
                             {
-                                ICssProperty prop = Owner.Parent.Style.Cascaded.Get(FieldName);
+                                ICssProperty prop = Owner.Parent.Style.Cascaded.Get(CssName);
                                 if (prop != null)
                                     return new CssValue((prop as CssProperty).Computed);
                             }
@@ -302,18 +304,20 @@ namespace CssUI
                 }
 
                 return new CssValue(Specified);
+#if RELEASE
             }
             catch (Exception ex)
             {
                 xLog.Log.Error(ex);
                 throw;
             }
+#endif
 
             throw new Exception($"Failed to resolve the Computed value in {nameof(CssProperty)}");
         }
-        #endregion
+#endregion
 
-        #region Unit Resolver
+#region Unit Resolver
         /// <summary>
         /// Allows external code to notify this property that a certain unit type has changed scale and if we have a value which uses that unit-type we need to fire our Changed event because our Computed value will be different
         /// </summary>
@@ -329,9 +333,9 @@ namespace CssUI
         {
             return StyleUnitResolver.Get_Scale(Owner, this, Unit);
         }
-        #endregion
+#endregion
 
-        #region Cascade
+#region Cascade
         /// <summary>
         /// Overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
         /// </summary>
@@ -355,9 +359,9 @@ namespace CssUI
             return await Task.FromResult(changes);
         }
 
-        #endregion
+#endregion
 
-        #region Overwrite
+#region Overwrite
         /// <summary>
         /// Overwrites the assigned value of this instance with values from another if they are different
         /// </summary>
@@ -381,9 +385,9 @@ namespace CssUI
             return await Task.FromResult(changes);
         }
 
-        #endregion
+#endregion
 
-        #region Constructors
+#region Constructors
 
         public CssProperty(string CssName = null)
         {
@@ -443,15 +447,15 @@ namespace CssUI
             Update();
         }
         
-        #endregion
+#endregion
 
-        #region Has Flags
+#region Has Flags
         public bool Has_Flags(StyleValueFlags Flags) { return (this.Flags & Flags) > 0; }
-        #endregion
+#endregion
 
-        #region ToString
+#region ToString
         public override string ToString() { return $"{CssName}: {Assigned.ToString()}"; }
-        #endregion
+#endregion
 
 
         /// <summary>
@@ -475,7 +479,7 @@ namespace CssUI
         }
 
 
-        #region Explicit
+#region Explicit
         /// <summary>
         /// Sets the <see cref="Assigned"/> value for this property
         /// </summary>
@@ -487,7 +491,7 @@ namespace CssUI
                 Assigned = newValue;
             }
         }
-        #endregion
+#endregion
 
     }
 }
