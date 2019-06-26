@@ -42,37 +42,8 @@ namespace CssUI.CSS
         public EnumProperty(string CssName, bool Locked, CssPropertyOptions Options) : base(CssName, Locked, new CssPropertyOptions(Options) { AllowPercentage = false })
         {
         }
-
-        [Obsolete("Please specify the properties Source")]
-        public EnumProperty(string CssName, cssElement Owner, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Owner, new CssPropertyOptions(Options) { AllowPercentage = false })
-        {
-        }
         
         public EnumProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Source, Owner, new CssPropertyOptions(Options) { AllowPercentage = false })
-        {
-        }
-
-        public EnumProperty(CssValue initial) : base(initial, null, DefaultOptions)
-        {
-        }
-
-        public EnumProperty(CssValue initial, bool Locked) : base(initial, Locked, DefaultOptions)
-        {
-        }
-
-        public EnumProperty(CssValue initial, bool Locked, CssPropertyOptions Options) : base(initial, Locked, new CssPropertyOptions(Options) { AllowPercentage = false })
-        {
-        }
-
-        public EnumProperty(Ty initial) : base(CssValue.From_Int(Convert.ToInt32(initial)), null, DefaultOptions)
-        {
-        }
-
-        public EnumProperty(Ty initial, bool Locked) : base(CssValue.From_Int(Convert.ToInt32(initial)), Locked, DefaultOptions)
-        {
-        }
-
-        public EnumProperty(Ty initial, bool Locked, CssPropertyOptions Options) : base(CssValue.From_Int(Convert.ToInt32(initial)), Locked, new CssPropertyOptions(Options) { AllowPercentage=false })
         {
         }
         #endregion

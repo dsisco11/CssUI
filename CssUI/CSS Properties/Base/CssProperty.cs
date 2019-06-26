@@ -11,7 +11,6 @@ namespace CssUI
     public class CssProperty : ICssProperty
     {// DOCS: https://www.w3.org/TR/CSS22/cascade.html#usedValue
         #region Properties
-        CssValue _initial = CssValue.Null;// The CSS-defined default(initial) value
         CssValue _value = CssValue.Initial;// A properties assigned value starts out as it's CSS-defined default.
         CssValue _specified = null;
         CssValue _computed = null;
@@ -58,33 +57,7 @@ namespace CssUI
         /// All flags which are present for all currently computed <see cref="CssValue"/>'s
         /// </summary>
         public StyleValueFlags Flags { get { return Specified.Flags; } }
-        /// <summary>
-        /// Value that is used if our Assigned value computes to <see cref="CssValue.Initial"/>
-        /// Meaning the property's default value according to the CSS documentation.
-        /// </summary>
-        public CssValue Initial
-        {
-            get
-            {
-                if (_initial.IsNullOrUnset())
-                {
-                    CssPropertyDefinition Def = Definition;
-                    if (Def != null)
-                    {
-                        if (Def.Initial == null) throw new Exception("Property definition has no initial value defined!");
-                        return Def?.Initial;
-                    }
 
-                    return CssValue.Null;// If the property has NO CSS-defined default value then return 'CSSValue.Unset'
-                }
-
-                return _initial;
-            }
-            private set
-            {
-                _initial = value;
-            }
-        }
         /// <summary>
         /// Options which dictate how this property acts and what values it can accept
         /// </summary>
@@ -142,6 +115,7 @@ namespace CssUI
         #region Values
         /// <summary>
         /// Raw value assigned to the property from the cascade process.
+        /// CSS standards call this the Cascaded value
         /// </summary>
         public CssValue Assigned
         {
@@ -158,8 +132,6 @@ namespace CssUI
         }
 
         /// <summary>
-        /// Value we USE for the property, which can differ from assigned value.
-        /// Eg: If no value is Assigned then the properties defined initial value will be used.
         /// </summary>
         public CssValue Specified
         {
@@ -401,7 +373,6 @@ namespace CssUI
         {
             this.Locked = Locked;
             this.onChanged += onChange;
-            Initial = CssValue.Null;
             Update();
         }
 
@@ -409,7 +380,6 @@ namespace CssUI
         {
             this.Options = Options;
             this.Locked = Locked;
-            Initial = CssValue.Null;
             Update();
         }
 
@@ -418,17 +388,6 @@ namespace CssUI
             this.CssName = new AtomicString(CssName);
             this.Options = Options;
             this.Locked = Locked;
-            Update();
-        }
-
-        [Obsolete("Please specify the properties Source")]
-        public CssProperty(string CssName, bool Locked, bool Unset, cssElement Owner, CssPropertyOptions Options)
-        {
-            this.CssName = new AtomicString(CssName);
-            this.Owner = Owner;
-            this.Options = Options;
-            this.Locked = Locked;
-            if (Unset) Assigned = CssValue.Null;
             Update();
         }
 
@@ -442,65 +401,7 @@ namespace CssUI
             if (Unset) Assigned = CssValue.Null;
             Update();
         }
-
-        public CssProperty(string CssName, bool Locked, CssValue Initial, CssPropertyOptions Options)
-        {
-            this.CssName = new AtomicString(CssName);
-            this.Options = Options;
-            this.Locked = Locked;
-            this.Initial = Initial;
-            Update();
-        }
-
-        public CssProperty(CssValue initial, PropertyChangeDelegate onChange) : base()
-        {
-            this.onChanged += onChange;
-            Initial = (initial == null ? CssValue.Null : initial);
-            Update();
-        }
-
-        public CssProperty(CssValue initial, PropertyChangeDelegate onChange, CssPropertyOptions Options) : base()
-        {
-            this.onChanged += onChange;
-            Initial = (initial == null ? CssValue.Null : initial);
-            this.Options = Options;
-            Update();
-        }
-
-        public CssProperty(CssValue initial, PropertyChangeDelegate onChange, bool Locked) : base()
-        {
-            this.Locked = Locked;
-            this.onChanged += onChange;
-            Initial = (initial == null ? CssValue.Null : initial);
-            Update();
-        }
-
-        public CssProperty(CssValue initial, bool Locked, CssPropertyOptions Options) : base()
-        {
-            this.Options = Options;
-            this.Locked = Locked;
-            Initial = (initial == null ? CssValue.Null : initial);
-            Update();
-        }
-
-        public CssProperty(CssValue initial, PropertyChangeDelegate onChange, bool Locked, CssPropertyOptions Options) : base()
-        {
-            this.Options = Options;
-            this.Locked = Locked;
-            this.onChanged += onChange;
-            Initial = (initial == null ? CssValue.Null : initial);
-            Update();
-        }
-
-        public CssProperty(CssValue initial, cssElement Owner, bool Locked, CssPropertyOptions Options) : base()
-        {
-            this.Owner = Owner;
-            this.Options = Options;
-            this.Locked = Locked;
-            Initial = (initial == null ? CssValue.Null : initial);
-            Update();
-        }
-
+        
         #endregion
 
         #region Has Flags
@@ -508,7 +409,7 @@ namespace CssUI
         #endregion
 
         #region ToString
-        public override string ToString() { return Specified.ToString(); }
+        public override string ToString() { return $"{CssName}: {Assigned.ToString()}"; }
         #endregion
 
 

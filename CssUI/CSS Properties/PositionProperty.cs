@@ -40,13 +40,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public PositionProperty() : base(CssValue.Null, null)
-        {
-            base.onChanged += this.Update;
-        }
-
-        [Obsolete("Please specify the properties Source")]
-        public PositionProperty(string CssName, cssElement Owner, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Owner, Options)
+        public PositionProperty() : base()
         {
             base.onChanged += this.Update;
         }

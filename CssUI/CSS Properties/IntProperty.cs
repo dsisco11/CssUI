@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 
 namespace CssUI.CSS
 {
@@ -30,18 +29,10 @@ namespace CssUI.CSS
         {
         }
 
-        [Obsolete("Please specify the properties Source")]
-        public IntProperty(string CssName, cssElement Owner, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Owner, Options)
-        {
-        }
-
         public IntProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Source, Owner, Options)
         {
         }
 
-        public IntProperty(string CssName, bool Locked, CssValue Initial, CssPropertyOptions Options) : base(CssName, Locked, Initial, Options)
-        {
-        }
         #endregion
 
         #region Setters

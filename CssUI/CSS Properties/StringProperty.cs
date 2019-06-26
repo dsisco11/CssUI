@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CssUI.CSS
 {
@@ -40,26 +36,10 @@ namespace CssUI.CSS
         {
         }
 
-        [Obsolete("Please specify the properties Source")]
-        public StringProperty(string CssName, cssElement Owner, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Owner, new CssPropertyOptions(Options) { AllowPercentage = false })
-        {
-        }
-
         public StringProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Source, Owner, new CssPropertyOptions(Options) { AllowPercentage = false })
         {
         }
 
-        public StringProperty(CssValue initial) : base(initial, null, DefaultOptions)
-        {
-        }
-
-        public StringProperty(CssValue initial, bool Locked) : base(initial, Locked, DefaultOptions)
-        {
-        }
-
-        public StringProperty(CssValue initial, bool Locked, CssPropertyOptions Options) : base(initial, Locked, new CssPropertyOptions(Options) { AllowPercentage = false })
-        {
-        }
         #endregion
 
         #region Setters
