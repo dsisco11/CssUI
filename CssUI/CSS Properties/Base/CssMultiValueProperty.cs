@@ -30,9 +30,9 @@ namespace CssUI
         /// </summary>
         public AtomicString CssName { get; protected set; } = null;
         /// <summary>
-        /// Callback for when the computed value of this property changes
+        /// Callback for when any value stage of this property changes
         /// </summary>
-        public event PropertyChangeDelegate onChanged;
+        public event Action<ECssPropertyStage, ICssProperty> onValueChange;
         /// <summary>
         /// Tracks which styling rule block this property came from
         /// </summary>
@@ -129,28 +129,6 @@ namespace CssUI
         /// Overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
         /// </summary>
         /// <returns>Success</returns>
-        [Obsolete("Non-asynchronous function are now obsolete, please use CascadeAsync instead.")]
-        public bool Cascade(ICssProperty prop)
-        {// Circumvents locking
-            CssMultiValueProperty o = prop as CssMultiValueProperty;
-            bool changes = false;
-            var fval = o.Assigned.FirstOrDefault();
-            if (fval != CssValue.Null && fval != CssValue.None)
-            {
-                changes = true;
-                Values = new List<CssValue>(o.Assigned);
-                this.SourcePtr = o.SourcePtr;
-                this.Selector = o.Selector;
-            }
-
-            if (changes) onChanged?.Invoke(this);
-            return changes;
-        }
-
-        /// <summary>
-        /// Overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
-        /// </summary>
-        /// <returns>Success</returns>
         public async Task<bool> CascadeAsync(ICssProperty prop)
         {
             CssMultiValueProperty o = prop as CssMultiValueProperty;
@@ -164,7 +142,7 @@ namespace CssUI
                 this.Selector = o.Selector;
             }
 
-            if (changes) onChanged?.Invoke(this);
+            if (changes) Update();
 
             return await Task.FromResult(changes);
         }
@@ -189,23 +167,62 @@ namespace CssUI
                 this.Selector = o.Selector;
             }
 
-            if (changes) onChanged?.Invoke(this);
-            return await Task.FromResult(changes);
+            if (changes) await Update();
+            return changes;
         }
         #endregion
 
-        public virtual async Task Update() { }
+        #region Updating
+        /// <summary>
+        /// Resets all values back to the Assigned and then recomputes them later
+        /// </summary>
+        /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
+        public async Task Update(bool ComputeNow = false)
+        {
+            throw new NotImplementedException();
+        }
 
+        /// <summary>
+        /// If the Assigned value is one that depends on another value for its final value then
+        /// Resets all values back to the Assigned and then recomputes them later
+        /// </summary>
+        /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
+        public async Task UpdateDependent(bool ComputeNow = false)
+        {
+            throw new NotImplementedException();
+        }
 
+        /// <summary>
+        /// If the Assigned value is one that depends on another value for its final value OR is <see cref="CssValue.Auto"/> then
+        /// Resets all values back to the Assigned and then recomputes them later
+        /// </summary>
+        /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
+        public async Task UpdateDependentOrAuto(bool ComputeNow = false)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// If the Assigned value is a percentage OR is <see cref="CssValue.Auto"/> then
+        /// Resets all values back to the Assigned and then recomputes them later
+        /// </summary>
+        /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
+        public async Task UpdatePercentageOrAuto(bool ComputeNow = false)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+        
         #region Unit Resolver
         /// <summary>
         /// Allows external code to notify this property that a certain unit type has changed scale and if we have a value which uses that unit-type we need to fire our Changed event because our Computed value will be different
         /// </summary>
-        public void Notify_Unit_Change(EStyleUnit Unit)
+        public void Handle_Unit_Change(EStyleUnit Unit)
         {
             if (Specified.FirstOrDefault(o => o.Unit == Unit) != null)
             {
-                onChanged.Invoke(this);
+                // This unit change will affect our computed value
+                onValueChange.Invoke(ECssPropertyStage.Computed, this);
             }
         }
 
@@ -215,15 +232,5 @@ namespace CssUI
         }
         #endregion
 
-
-        #region Notify_Change
-        /// <summary>
-        /// Allows external code to notify this property that its true value has changed without it knowing and it should be resolved again
-        /// </summary>
-        public void Notify_Change()
-        {
-            onChanged?.Invoke(this);
-        }
-        #endregion
     }
 }

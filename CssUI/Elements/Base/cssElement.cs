@@ -112,7 +112,7 @@ namespace CssUI
         {
             LayoutPos.X = (X.HasValue ? X.Value : 0);
             LayoutPos.Y = (Y.HasValue ? Y.Value : 0);
-            Flag_Block_Dirty();
+            Flag_Block_Dirty(EBlockInvalidationReason.Layout_Pos_Changed);
         }
         #endregion
 
@@ -121,7 +121,7 @@ namespace CssUI
         #endregion
 
         #region Display
-        public DebugOpts Debug = new DebugOpts() { Draw_Bounds = true, Draw_Child_Bounds = true  };
+        public DebugOpts Debug = new DebugOpts() { /*Draw_Bounds = true, Draw_Child_Bounds = true*/  };
         public cssViewport Viewport { get; protected set; } = null;
         
         /// <summary>
@@ -346,24 +346,24 @@ namespace CssUI
         {
             if (Style.Depends_On_ContainingBlock)
             {
-                Flag_Block_Dirty(ECssBlockInvalidationReason.Containing_Block_Changed);
-                Style.Flag();
+                Flag_Block_Dirty(EBlockInvalidationReason.Containing_Block_Changed);
+                Style.Handle_Parent_Block_Change();
             }
         }
 
         /// <summary>
         /// Flags this elements block as dirty, meaning it needs to be updated when next convenient
         /// </summary>
-        public virtual void Flag_Block_Dirty(ECssBlockInvalidationReason Reason = ECssBlockInvalidationReason.Unknown)
+        public virtual void Flag_Block_Dirty(EBlockInvalidationReason Reason = EBlockInvalidationReason.Unknown)
         {
-            Block.Flag_Dirty();
+            Block.Flag_Dirty(Reason);
 #if DEBUG
             if (Debug.Log_Block_Changes)
             {
-                if (Reason == ECssBlockInvalidationReason.Unknown)
+                if (Reason == EBlockInvalidationReason.Unknown)
                     Logs.Info(xLog.XTERM.magenta("[Block Change] {0} (UNKNOWN SOURCE!)"), this);
                 else
-                    Logs.Info(xLog.XTERM.magenta("[Block Change] {0} {1}"), this, Enum.GetName(typeof(ECssBlockInvalidationReason), Reason).ToUpper());
+                    Logs.Info(xLog.XTERM.magenta("[Block Change] {0} {1}"), this, Enum.GetName(typeof(EBlockInvalidationReason), Reason).ToUpper());
             }
 #endif
         }
@@ -372,7 +372,7 @@ namespace CssUI
         /// </summary>
         protected void Flag_Block_Dirty(ICssProperty sender)
         {
-            Block.Flag_Dirty();
+            Block.Flag_Dirty(EBlockInvalidationReason.Property_Changed);
 #if DEBUG
             if (Debug.Log_Block_Changes) Logs.Info(xLog.XTERM.magenta("[Block Change] {0}.{1} => {2}"), this, sender.CssName, sender);
 #endif
@@ -392,15 +392,43 @@ namespace CssUI
 
             if (CHANGED || Block.IsDirty)// A change occured
             {
+                // Sometimes the block gets forced to update but didnt really change, in that case we skip some computations
+                bool reallyChanged = (Block != block);
                 if (!Block.IsDirty)// Apparently our computed block and our current one dont match, but for some reason the block wasnt flagged as dirty?
                     Log.Warn("[{0}] Untracked block change, find the source and fix it! IsDependent: {1}", this, Style.Depends_On_ContainingBlock);
 
+                /*
                 bool was_moved = (Block.Get_Pos() != block.Get_Pos());
                 bool was_resized = (Block.Get_Size() != block.Get_Size());
-                ePos oPos = (was_moved? new ePos(block.Get_Pos()) : null), nPos = (was_moved ? new ePos(Block.Get_Pos()) : null);
+                ePos oPos = (was_moved ? new ePos(block.Get_Pos()) : null), nPos = (was_moved ? new ePos(Block.Get_Pos()) : null);
                 eSize oSize = (was_resized ? new eSize(block.Get_Size()) : null), nSize = (was_resized ? new eSize(Block.Get_Size()) : null);
+                 */
 
-                Block = block;
+                bool was_moved = false;
+                bool was_resized = false;
+                ePos oPos = null, nPos = null;
+                eSize oSize = null, nSize = null;
+
+                if (reallyChanged)
+                {
+                    was_moved = (Block.Get_Pos() != block.Get_Pos());
+                    was_resized = (Block.Get_Size() != block.Get_Size());
+
+                    if (was_moved)
+                    {
+                        oPos = new ePos(block.Get_Pos());
+                        nPos = new ePos(Block.Get_Pos());
+                    }
+
+                    if (was_resized)
+                    {
+                        oSize = new eSize(block.Get_Size());
+                        nSize = new eSize(Block.Get_Size());
+                    }
+
+                    Block = block;
+                }
+
                 Block.Flag_Clean();
                 Update_Cached_Blocks();
 #if DEBUG
@@ -412,6 +440,7 @@ namespace CssUI
 #endif
                 // Moved to the Handle_Resized and Handle_Moved functions
                 // if (was_moved || was_resized) Parent?.Flag_Layout_Dirty();
+                bool postChange = Block.IsDirty;
                 Block.Flag_Clean();
 #if DEBUG
                 if (Debug.Log_Block_Changes)
@@ -422,7 +451,9 @@ namespace CssUI
                 if (was_moved) Handle_Moved(oPos, nPos);
                 if (was_resized) Handle_Resized(oSize, nSize);
 
-                Invalidate_Layout(ECssBlockInvalidationReason.Block_Changed);
+                // If the block had really changed from the start OR if it changed after we updated the cache blocks then we invalidate our layout
+                if (reallyChanged || postChange)
+                    Invalidate_Layout(EBlockInvalidationReason.Block_Changed);
             }
         }
 
@@ -436,7 +467,7 @@ namespace CssUI
                 return this.Block;
             }
 
-            Style.Cascade();// 06-18-2017  WAS => Style.Resolve(this);
+            Style.Resolve().Wait();
             if (Style.Display == EDisplayMode.NONE) return eBlock.FromTRBL(0, 0, 0, 0);
 
             ePos cPos = Style.Get_Offset() + Block_Containing.Get_Pos();
@@ -700,16 +731,16 @@ namespace CssUI
         protected ELayoutBit LayoutBit = ELayoutBit.Dirty;
         public void Flag_Layout(ELayoutBit Flags) { LayoutBit |= Flags; }
 
-        public void Invalidate_Layout(ECssBlockInvalidationReason Reason = ECssBlockInvalidationReason.Unknown)
+        public void Invalidate_Layout(EBlockInvalidationReason Reason = EBlockInvalidationReason.Unknown)
         {
             Flag_Layout(ELayoutBit.Dirty);
 #if DEBUG
             if (Debug.Log_Layout_Changes)
             {
-                if (Reason == ECssBlockInvalidationReason.Unknown)
+                if (Reason == EBlockInvalidationReason.Unknown)
                     Logs.Info(xLog.XTERM.cyan("[Layout Flagged] {0} (UNKNOWN SOURCE!)"), this);
                 else
-                    Logs.Info(xLog.XTERM.cyan("[Layout Flagged] {0} {1}"), this, Enum.GetName(typeof(ECssBlockInvalidationReason), Reason).ToUpper());
+                    Logs.Info(xLog.XTERM.cyan("[Layout Flagged] {0} {1}"), this, Enum.GetName(typeof(EBlockInvalidationReason), Reason).ToUpper());
                      
             }
 #endif
@@ -728,7 +759,10 @@ namespace CssUI
         /// </summary>
         public async void PerformLayout()
         {
-            await Style.Cascade();
+            if (LayoutBit == ELayoutBit.Clean)
+                return;
+
+            // await Style.Cascade();
             //Guid TMR = Timing.Start("PerformLayout()");
             // We still need to apply the positioners ourselves here just incase they arent linked to a target control and are a "relative" positioner.
             xAligner?.Apply_Relative();
@@ -789,6 +823,7 @@ namespace CssUI
 
             //this.Style.Dirt |= EPropertySystemDirtFlags.Cascade;
             // just do it ourselves here and now
+            // XXX: if the new element code starts working fine see if we can remove this call, i think its unnecessary
             await this.Style.Cascade().ConfigureAwait(false);
         }
 
@@ -1056,7 +1091,7 @@ namespace CssUI
             IsMouseOver = false;
             AcceptsDragDrop = false;
 
-            Scrollbar_Offset.onChanged += () => { Flag_Block_Dirty(ECssBlockInvalidationReason.Scroll_Offset_Change); };
+            Scrollbar_Offset.onChanged += () => { Flag_Block_Dirty(EBlockInvalidationReason.Scroll_Offset_Change); };
 
             // We resolve the style once this element is parented, if we do it before, then it cant access it's parents block for layout and causes a null exception
             Style = new ElementPropertySystem(this);
@@ -1089,7 +1124,7 @@ namespace CssUI
         {
             bool retVal = false;
 
-            if (0 != (Style.Dirt & EPropertySystemDirtFlags.Cascade))
+            /*if (0 != (Style.Dirt & EPropertySystemDirtFlags.Cascade))
             {
                 await Style.Cascade();
             }
@@ -1102,7 +1137,7 @@ namespace CssUI
             if (0 != (Style.Dirt & EPropertySystemDirtFlags.Font))
             {
                 await Style.Resolve_Font();
-            }
+            }*/
 
             if (0 != (Dirt & EElementDirtyBit.Font))
             {

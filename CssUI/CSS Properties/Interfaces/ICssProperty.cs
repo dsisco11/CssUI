@@ -4,7 +4,6 @@ using CssUI.CSS;
 
 namespace CssUI
 {
-    public delegate void PropertyChangeDelegate(ICssProperty Property);
     /// <summary>
     /// Interface for css properties held within an styling rule block
     /// </summary>
@@ -12,7 +11,7 @@ namespace CssUI
     {
         cssElement Owner { get; }
         /// <summary>
-        /// The propertys identifier token in stylesheets.
+        /// The properties identifier token in stylesheets.
         /// <para>EG; "box-sizing", "margin-left", "margin-top", etc </para>
         /// </summary>
         AtomicString CssName { get; }
@@ -26,9 +25,9 @@ namespace CssUI
         CssSelector Selector { get; set; }
 
         /// <summary>
-        /// The assigned value of this property has changed
+        /// Callback for when any value stage of this property changes
         /// </summary>
-        event PropertyChangeDelegate onChanged;
+        event Action<ECssPropertyStage, ICssProperty> onValueChange;
 
         /// <summary>
         /// Returns whether or not the property has a set value that should take affect during cascading.
@@ -64,14 +63,36 @@ namespace CssUI
         Task<bool> OverwriteAsync(ICssProperty value);
 
         /// <summary>
-        /// Calculates the 'Assigned' and 'Computed' values
+        /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
-        Task Update();
+        /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
+        Task Update(bool ComputeNow = false);
+
+        /// <summary>
+        /// If the Assigned value is one that depends on another value for its final value then
+        /// Resets all values back to the Assigned and then recomputes them later
+        /// </summary>
+        /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
+        Task UpdateDependent(bool ComputeNow = false);
+
+        /// <summary>
+        /// If the Assigned value is one that depends on another value for its final value OR is <see cref="CssValue.Auto"/> then
+        /// Resets all values back to the Assigned and then recomputes them later
+        /// </summary>
+        /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
+        Task UpdateDependentOrAuto(bool ComputeNow = false);
+
+        /// <summary>
+        /// If the Assigned value is a percentage OR is <see cref="CssValue.Auto"/> then
+        /// Resets all values back to the Assigned and then recomputes them later
+        /// </summary>
+        /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
+        Task UpdatePercentageOrAuto(bool ComputeNow = false);
 
         /// <summary>
         /// Allows external code to notify this property that a certain unit type has changed scale and if we have a value which uses that unit-type we need to fire our Changed event because our Computed value will be different
         /// </summary>
-        void Notify_Unit_Change(EStyleUnit Unit);
+        void Handle_Unit_Change(EStyleUnit Unit);
 
     }
 

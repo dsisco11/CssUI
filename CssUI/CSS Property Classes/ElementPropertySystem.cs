@@ -255,9 +255,9 @@ namespace CssUI
             Dirt |= EPropertySystemDirtFlags.Block;
             // These 'Layout_Pos_' vars have the same effect as any other styling property in that WHENEVER they change it will effect how the owning uiElement's BLOCK placement.
             //Property_Changed?.Invoke(null, EPropertyFlags.Block | EPropertyFlags.Flow, Stack);// Replaced with the lines below on 06-19-2017
-            Owner.Flag_Block_Dirty(ECssBlockInvalidationReason.Layout_Pos_Changed);
+            Owner.Flag_Block_Dirty(EBlockInvalidationReason.Layout_Pos_Changed);
             // TODO: SHOULD we be invalidating Flow(layout) whenever an element's layout pos changes?
-            Owner.Invalidate_Layout(ECssBlockInvalidationReason.Layout_Pos_Changed);
+            Owner.Invalidate_Layout(EBlockInvalidationReason.Layout_Pos_Changed);
 
         }
 
@@ -305,9 +305,6 @@ namespace CssUI
             this.Owner = Owner;
 
             // Populate our rules with a few different common states
-            /*CssRules.TryAdd(STATE_IMPLICIT, NewPropertySet(STATE_IMPLICIT, "", Owner, false, EPropertySetOrigin.UserAgent));
-            CssRules.TryAdd(STATE_USER, NewPropertySet(STATE_USER, "", Owner, true, EPropertySetOrigin.Author));*/
-
             CssRules.TryAdd(STATE_IMPLICIT, NewPropertySet(STATE_IMPLICIT, $"#{Owner.ID}", Owner, false, EPropertySetOrigin.UserAgent));
             CssRules.TryAdd(STATE_USER, NewPropertySet(STATE_USER, $"#{Owner.ID}", Owner, true, EPropertySetOrigin.Author));
 
@@ -315,11 +312,11 @@ namespace CssUI
             CssRules.TryAdd(STATE_FOCUS, NewPropertySet(STATE_FOCUS, ":focus", Owner, true, EPropertySetOrigin.Author));
 
             Cascaded = new CssPropertySet(null, null, Owner, true);
-            Cascaded.Property_Changed += Handle_Specified_Property_Change;
+            Cascaded.Property_Changed += Handle_Cascaded_Property_Change;
             // Blending
-            Cascaded.Opacity.onChanged += Update_Blend_Color;
+            Cascaded.Opacity.onValueChange += Handle_Cascaded_Blend_Change;
             // Transformations
-            Cascaded.Transform.onChanged += Transform_onChanged;
+            Cascaded.Transform.onValueChange += Handle_Cascaded_Transform_Change;
         }
         #endregion
 
@@ -336,7 +333,7 @@ namespace CssUI
         {
             var retVal = new CssPropertySet(Name, new CssSelector(false, Selector), Owner, false, Unset, Origin);
             // Capture all update events.
-            retVal.Property_Changed += Handle_Property_Change;
+            retVal.Property_Changed += Handle_Declared_Property_Change;
             return retVal;
         }
 
@@ -351,7 +348,7 @@ namespace CssUI
         {
             var retVal = this.CssRules.TryAdd(new AtomicString(prop.Name), prop);
             // Capture all update events.
-            prop.Property_Changed += Handle_Property_Change;
+            prop.Property_Changed += Handle_Declared_Property_Change;
             // We just took on another group of proerties, we should recascade
             Dirt |= EPropertySystemDirtFlags.Cascade;
 
@@ -364,8 +361,13 @@ namespace CssUI
         /// <summary>
         /// A state-specific property changed, we need to resolve this single property
         /// </summary>
-        private async void Handle_Property_Change(ICssProperty Property, EPropertyFlags Flags, StackTrace Origin)
+        private async void Handle_Declared_Property_Change(ECssPropertyStage Stage, ICssProperty Property, EPropertyFlags Flags, StackTrace Origin)
         {
+            /* XXX:
+             * To be honest cascading here doesnt make sense
+             * if a declared property changes that wont always change the value of our cascaded property.
+             * We should check if this property IS the cascaded property and if so then just update that single property!
+             */
             await CascadeProperty(Property);
         }
 
@@ -375,21 +377,27 @@ namespace CssUI
         /// <param name="Property"></param>
         /// <param name="Flags"></param>
         /// <param name="Stack"></param>
-        private void Handle_Specified_Property_Change(ICssProperty Property, EPropertyFlags Flags, StackTrace Stack)
+        private void Handle_Cascaded_Property_Change(ECssPropertyStage Stage, ICssProperty Property, EPropertyFlags Flags, StackTrace Stack)
         {
-            Update_Depends_Flag();// A property changed, update our depends flag
-
             bool IsFlow = ((Flags & EPropertyFlags.Flow) != 0);// Layout
             bool IsBlock = ((Flags & EPropertyFlags.Block) != 0);
             bool IsVisual = ((Flags & EPropertyFlags.Visual) != 0);
             bool IsFont = ((Flags & EPropertyFlags.Font) != 0);
 
-            if (IsBlock || IsFlow || IsVisual)
-                Dirt |= EPropertySystemDirtFlags.Block;
+            if(IsBlock) Update_Depends_Flag();// A block property changed, update our depends flag
 
-            if (IsFont)// flag our font values to be resolved
-                Dirt |= EPropertySystemDirtFlags.Font;
-                //Update_Font(Prop, Stack);
+            // If the value that changed was a computed one and it affects the block then we need to update our block
+            if (IsBlock && Stage >= ECssPropertyStage.Specified)
+            {
+                // Flag us dirty so we can resolve next time its called
+                Dirt |= EPropertySystemDirtFlags.Block;
+                // Notify our parent by flagging them aswell
+                this.Owner.Flag_Block_Dirty(EBlockInvalidationReason.Property_Changed);
+            }
+
+            // Update our dirt flags appropriately
+            if (IsFlow || IsVisual) Dirt |= EPropertySystemDirtFlags.Block;
+            if (IsFont) Dirt |= EPropertySystemDirtFlags.Font;
             
             //Logging.Log.Info("[Property Changed]: {0}", Prop.FieldName);
             onProperty_Change?.Invoke(Property, Flags, Stack);
@@ -530,6 +538,17 @@ namespace CssUI
         }
         #endregion
 
+        #region Element Change Handlers
+
+        /// <summary>
+        /// Our elements block changed so we need to clear any calculated values for Css Properties related to the block
+        /// </summary>
+        public void Handle_Parent_Block_Change()
+        {
+            Force_Dependent_Block_Property_Updates();
+        }
+        #endregion
+
         #region Custom States
         public CssPropertySet this[AtomicString State]
         {
@@ -581,7 +600,7 @@ namespace CssUI
             if (Unit == EStyleUnit.None) return;
             foreach(ICssProperty Property in this.Cascaded.Get_Set_Properties())
             {
-                Property.Notify_Unit_Change(Unit);
+                Property.Handle_Unit_Change(Unit);
             }
         }
         #endregion
@@ -591,38 +610,80 @@ namespace CssUI
         /// Returns whether this style CURRENTLY has properties which depend on it's containing block
         /// </summary>
         public bool Depends_On_ContainingBlock { get; private set; } = false;
-        void Update_Depends_Flag()
+
+        /// <summary>
+        /// Checks if any of properties used to calculate the block will depend on our parent block
+        /// </summary>
+        private void Update_Depends_Flag()
         {
             Depends_On_ContainingBlock = false;
             // Width / Height
-            if (Cascaded.Width.IsPercentageOrAuto || Cascaded.Height.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            if (Cascaded.Width.IsPercentageOrAuto || Cascaded.Height.IsPercentageOrAuto) { Depends_On_ContainingBlock = true; return; }
             // Size-Max
-            else if (Cascaded.Max_Width.IsPercentageOrAuto || Cascaded.Max_Height.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Cascaded.Max_Width.IsPercentageOrAuto || Cascaded.Max_Height.IsPercentageOrAuto) { Depends_On_ContainingBlock = true; return; }
             // Size-Min
-            else if (Cascaded.Min_Width.IsPercentageOrAuto || Cascaded.Min_Height.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Cascaded.Min_Width.IsPercentageOrAuto || Cascaded.Min_Height.IsPercentageOrAuto) { Depends_On_ContainingBlock = true; return; }
             // Margin
-            else if (Cascaded.Margin_Top.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Cascaded.Margin_Right.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Cascaded.Margin_Bottom.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Cascaded.Margin_Left.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Cascaded.Margin_Top.IsPercentageOrAuto) { Depends_On_ContainingBlock = true; return; }
+            else if (Cascaded.Margin_Right.IsPercentageOrAuto) { Depends_On_ContainingBlock = true; return; }
+            else if (Cascaded.Margin_Bottom.IsPercentageOrAuto) { Depends_On_ContainingBlock = true; return; }
+            else if (Cascaded.Margin_Left.IsPercentageOrAuto) { Depends_On_ContainingBlock = true; return; }
             // Padding
-            else if (Cascaded.Padding_Top.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Cascaded.Padding_Right.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Cascaded.Padding_Bottom.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Cascaded.Padding_Left.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Cascaded.Padding_Top.IsPercentageOrAuto) { Depends_On_ContainingBlock = true; return; }
+            else if (Cascaded.Padding_Right.IsPercentageOrAuto) { Depends_On_ContainingBlock = true; return; }
+            else if (Cascaded.Padding_Bottom.IsPercentageOrAuto) { Depends_On_ContainingBlock = true; return; }
+            else if (Cascaded.Padding_Left.IsPercentageOrAuto) { Depends_On_ContainingBlock = true; return; }
             // Border
-            else if (Cascaded.Border_Top_Width.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Cascaded.Border_Right_Width.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Cascaded.Border_Bottom_Width.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Cascaded.Border_Left_Width.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Cascaded.Border_Top_Width.IsPercentageOrAuto) { Depends_On_ContainingBlock = true; return; }
+            else if (Cascaded.Border_Right_Width.IsPercentageOrAuto) { Depends_On_ContainingBlock = true; return; }
+            else if (Cascaded.Border_Bottom_Width.IsPercentageOrAuto) { Depends_On_ContainingBlock = true; return; }
+            else if (Cascaded.Border_Left_Width.IsPercentageOrAuto) { Depends_On_ContainingBlock = true; return; }
             // Positioning
-            else if (Cascaded.Top.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Cascaded.Right.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Cascaded.Bottom.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
-            else if (Cascaded.Left.IsPercentageOrAuto) Depends_On_ContainingBlock = true;
+            else if (Cascaded.Top.IsPercentageOrAuto) { Depends_On_ContainingBlock = true; return; }
+            else if (Cascaded.Right.IsPercentageOrAuto) { Depends_On_ContainingBlock = true; return; }
+            else if (Cascaded.Bottom.IsPercentageOrAuto) { Depends_On_ContainingBlock = true; return; }
+            else if (Cascaded.Left.IsPercentageOrAuto) { Depends_On_ContainingBlock = true; return; }
         }
         #endregion
 
+        #region Block Values
+        /// <summary>
+        /// Forces any properties which depend on a block value (ours or our parents) to update and recompute
+        /// </summary>
+        public async void Force_Dependent_Block_Property_Updates()
+        {
+            if (!Depends_On_ContainingBlock) return;
+
+            await this.Cascaded.Width.UpdateDependentOrAuto(true);
+            await this.Cascaded.Height.UpdateDependentOrAuto(true);
+
+            await this.Cascaded.Min_Width.UpdateDependentOrAuto(true);
+            await this.Cascaded.Min_Height.UpdateDependentOrAuto(true);
+
+            await this.Cascaded.Max_Width.UpdateDependentOrAuto(true);
+            await this.Cascaded.Max_Height.UpdateDependentOrAuto(true);
+
+
+            await this.Cascaded.Border_Top_Width.UpdateDependentOrAuto(true);
+            await this.Cascaded.Border_Right_Width.UpdateDependentOrAuto(true);
+            await this.Cascaded.Border_Bottom_Width.UpdateDependentOrAuto(true);
+            await this.Cascaded.Border_Left_Width.UpdateDependentOrAuto(true);
+
+            await this.Cascaded.Margin_Top.UpdateDependentOrAuto(true);
+            await this.Cascaded.Margin_Right.UpdateDependentOrAuto(true);
+            await this.Cascaded.Margin_Bottom.UpdateDependentOrAuto(true);
+            await this.Cascaded.Margin_Left.UpdateDependentOrAuto(true);
+
+            await this.Cascaded.Padding_Top.UpdateDependentOrAuto(true);
+            await this.Cascaded.Padding_Right.UpdateDependentOrAuto(true);
+            await this.Cascaded.Padding_Bottom.UpdateDependentOrAuto(true);
+            await this.Cascaded.Padding_Left.UpdateDependentOrAuto(true);
+
+            await this.Cascaded.Top.UpdateDependentOrAuto(true);
+            await this.Cascaded.Right.UpdateDependentOrAuto(true);
+            await this.Cascaded.Bottom.UpdateDependentOrAuto(true);
+            await this.Cascaded.Left.UpdateDependentOrAuto(true);
+        }
 
         /// <summary>
         /// Resolves the block values
@@ -704,6 +765,8 @@ namespace CssUI
             Benchmark.Stop(benchmark_id);
         }
 
+        #endregion
+
         void Resolve_Transform_Matrix()
         {// SEE:  https://www.w3.org/TR/css-transforms-1/#typedef-transform-function
             TransformMatrix = new eMatrix();
@@ -761,7 +824,7 @@ namespace CssUI
         #endregion
 
         #region Update_Blend_Color
-        void Update_Blend_Color(ICssProperty Sender)
+        void Handle_Cascaded_Blend_Change(ECssPropertyStage Stage, ICssProperty Property)
         {
             Opacity = Cascaded.Opacity.Computed.Resolve_Or_Default(1.0);
 
@@ -778,7 +841,7 @@ namespace CssUI
 
         #region Transform_Changed
 
-        private void Transform_onChanged(ICssProperty o)
+        private void Handle_Cascaded_Transform_Change(ECssPropertyStage Stage, ICssProperty Property)
         {
             Resolve_Transform_Matrix();
         }

@@ -28,7 +28,7 @@ namespace CssUI
         /// <para>If the control has an ancestor this will be said ancestors content-area block</para>
         /// <para>Otherwise, if the control is a root element, this should have the dimensions of the viewport</para>
         /// </summary>
-        public override eBlock Block_Containing { get { return Viewport.Block; } }
+        public override eBlock Block_Containing { get => Viewport.Block; }
 
         #region Properties
 

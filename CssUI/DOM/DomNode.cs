@@ -131,6 +131,7 @@ namespace CssUI.DOM
         #endregion
 
         #region ID
+        // XXX: we need events for when attributes change, im pretty sure the DOM spec covers that though
         /// <summary>
         /// functionally identical to an elements "ID" in HTML, a UNIQUE identifier for the element
         /// </summary>

@@ -138,10 +138,12 @@ namespace CssUI
 
         #region Position
         /// <summary>
+        /// Points to <see cref="Left"/>
         /// Distance between the elements Left outter edge and the matching edge of its containing block.
         /// </summary>
         public IntProperty X => (IntProperty)this["left"];
         /// <summary>
+        /// Points to <see cref="Top"/>
         /// Distance between the elements Top outter edge and the matching edge of its containing block.
         /// </summary>
         public IntProperty Y => (IntProperty)this["top"];
@@ -355,7 +357,7 @@ namespace CssUI
             {
                 ICssProperty p = CssProperties[i];
                 p.Selector = Selector;
-                p.onChanged += Property_onChanged;
+                p.onValueChange += Property_onChanged;
 
                 bool success = CssPropertyMap.TryAdd(p.CssName, p);
                 if (!success)
@@ -369,27 +371,32 @@ namespace CssUI
         /// <summary>
         /// A property which affects the elements block changed
         /// </summary>
-        public event Action<ICssProperty, EPropertyFlags, StackTrace> Property_Changed;
+        public event Action<ECssPropertyStage, ICssProperty, EPropertyFlags, StackTrace> Property_Changed;
         #endregion
 
         #region Change Handlers
         const int STACK_FRAME_OFFSET = 3;
 
-        private void Property_onChanged(ICssProperty property)
+        /// <summary>
+        /// The value of pre-cascade property has changed
+        /// </summary>
+        /// <param name="Stage"></param>
+        /// <param name="Property"></param>
+        private void Property_onChanged(ECssPropertyStage Stage, ICssProperty Property)
         {
-            if (!property.HasValue) SetProperties.Remove(property.CssName);
-            else SetProperties.Add(property.CssName);
+            if (!Property.HasValue) SetProperties.Remove(Property.CssName);
+            else SetProperties.Add(Property.CssName);
 
-            if (property.CssName == null) throw new Exception(string.Concat("Cannot fire onChange events for unnamed property! (Name: ", property.CssName, ")"));
-            var def = CSS.CssProperties.Definitions[property.CssName];
-            if (def == null) throw new Exception(string.Concat("Cannot find a definition for Css property: \"", property.CssName, "\""));
+            if (Property.CssName == null) throw new Exception(string.Concat("Cannot fire onChange events for unnamed property! (Name: ", Property.CssName, ")"));
+            var def = CSS.CssProperties.Definitions[Property.CssName];
+            if (def == null) throw new Exception(string.Concat("Cannot find a definition for Css property: \"", Property.CssName, "\""));
 
             EPropertyFlags Flags = def.Flags;
-            StackTrace stack = null;
+            StackTrace Stack = null;
 #if DEBUG
             //stack = new StackTrace(STACK_FRAME_OFFSET, true);
 #endif
-            Property_Changed?.Invoke(property, Flags, stack);
+            Property_Changed?.Invoke(Stage, Property, Flags, Stack);
         }
 
         #endregion

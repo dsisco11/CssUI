@@ -193,6 +193,7 @@ namespace CssUI
             {
                 var C = Children[i];
                 if (C.Style.Positioning == EPositioning.Fixed) Fixed_Element_Count++;
+
                 C.PerformLayout();
             }
 
@@ -539,7 +540,7 @@ namespace CssUI
         /// <summary>
         /// Flags the blocks of all children who are dependent on us, as dirty
         /// </summary>
-        protected void Flag_All_Children(ECssBlockInvalidationReason Reason)
+        protected void Flag_All_Children(EBlockInvalidationReason Reason)
         {
             for (int i = 0; i < Children.Count; i++)
             {
@@ -569,7 +570,7 @@ namespace CssUI
         }
         */
 
-        public override void Flag_Block_Dirty(ECssBlockInvalidationReason Reason)
+        public override void Flag_Block_Dirty(EBlockInvalidationReason Reason)
         {
             base.Flag_Block_Dirty(Reason);
             Flag_Dependent_Children();

@@ -31,9 +31,9 @@ namespace CssUI
         /// </summary>
         public AtomicString CssName { get; protected set; } = null;
         /// <summary>
-        /// Callback for when the computed value of this property changes
+        /// Callback for when any value stage of this property changes
         /// </summary>
-        public event PropertyChangeDelegate onChanged;
+        public event Action<ECssPropertyStage, ICssProperty> onValueChange;
         /// <summary>
         /// Tracks which styling rule block this property came from
         /// </summary>
@@ -93,70 +93,13 @@ namespace CssUI
                 this.Selector = o.Selector;
             }
 
-            if (changes) onChanged?.Invoke(this);
+            if (changes) await Update();
             return await Task.FromResult(changes);
         }
 
         #endregion
 
         #region Overwrite
-        /// <summary>
-        /// Overwrites the assigned value of this instance with values from another if they are different
-        /// </summary>
-        /// <returns>Success</returns>
-        [Obsolete("Non-asynchronous methods are now obsolete, please use OverwriteAsync instead.")]
-        public bool Overwrite(ICssProperty prop)
-        {// Circumvents locking
-            // TODO: Finish the overwrite logic for TransformsList properties
-
-            TransformListProperty o = prop as TransformListProperty;
-            bool changes = false;
-            /*
-            if (o.HasValue)
-            {
-                // Check if any of the functions present in the other property 
-                foreach(StyleFunction func in o.Transforms.Values)
-                {
-                    if (!Transforms.ContainsKey(func.Name))
-                    {
-                        changes = true;
-                        break;
-                    }
-                }
-
-                if (!changes)
-                {
-                    foreach (StyleFunction func in Transforms.Values)
-                    {
-                        if (!o.Transforms.ContainsKey(func.Name))
-                        {
-                            changes = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (changes)
-                {
-                    Transforms = new Dictionary<AtomicString, StyleFunction>(o.Transforms);
-                    this.Source = o.Source;
-                    this.Selector = o.Selector;
-                }
-            }
-
-            if (changes) onChanged?.Invoke(this);
-            return changes;
-            */
-            if (o.HasValue || this.HasValue != o.HasValue)
-            {
-                changes = true;
-            }
-
-            //onChanged?.Invoke(this);
-            //return true;
-            if (changes) onChanged?.Invoke(this);
-            return changes;
-        }
 
         /// <summary>
         /// Overwrites the assigned value of this instance with values from another if they are different
@@ -210,22 +153,54 @@ namespace CssUI
                 changes = true;
             }
 
-            if (changes) onChanged?.Invoke(this);
+            if (changes) Update();
             return await Task.FromResult(changes);
         }
 
         #endregion
 
-        public async Task Update()
+        #region Updating
+        /// <summary>
+        /// Resets all values back to the Assigned and then recomputes them later
+        /// </summary>
+        /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
+        public async Task Update(bool ComputeNow = false)
         {
         }
 
+        /// <summary>
+        /// If the Assigned value is one that depends on another value for its final value then
+        /// Resets all values back to the Assigned and then recomputes them later
+        /// </summary>
+        /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
+        public async Task UpdateDependent(bool ComputeNow = false)
+        {
+        }
+
+        /// <summary>
+        /// If the Assigned value is one that depends on another value for its final value OR is <see cref="CssValue.Auto"/> then
+        /// Resets all values back to the Assigned and then recomputes them later
+        /// </summary>
+        /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
+        public async Task UpdateDependentOrAuto(bool ComputeNow = false)
+        {
+        }
+
+        /// <summary>
+        /// If the Assigned value is a percentage OR is <see cref="CssValue.Auto"/> then
+        /// Resets all values back to the Assigned and then recomputes them later
+        /// </summary>
+        /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
+        public async Task UpdatePercentageOrAuto(bool ComputeNow = false)
+        {
+        }
+        #endregion
 
         #region Unit Resolver
         /// <summary>
         /// Allows external code to notify this property that a certain unit type has changed scale and if we have a value which uses that unit-type we need to fire our Changed event because our Computed value will be different
         /// </summary>
-        public void Notify_Unit_Change(EStyleUnit Unit)
+        public void Handle_Unit_Change(EStyleUnit Unit)
         {
             bool change = false;
             foreach(StyleFunction func in Transforms.Values)
@@ -240,7 +215,7 @@ namespace CssUI
                 }
             }
 
-            if (change) onChanged?.Invoke(this);
+            if (change) onValueChange?.Invoke(ECssPropertyStage.Computed, this);
         }
 
         private double Get_Unit_Scale(EStyleUnit Unit)

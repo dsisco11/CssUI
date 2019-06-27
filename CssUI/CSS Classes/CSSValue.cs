@@ -97,7 +97,9 @@ namespace CssUI.CSS
 
             switch (Type)
             {
-                //case SVType.AUTO:// Auto values get calculated in vastly different ways, sometimes this doesn't even indicate that a value depends on the value of other properties, so it shouldnt get the 'Depends' flag
+                // NOTE: Auto values get calculated in vastly different ways, sometimes this doesn't even indicate that a value depends on the value of other properties,
+                //so it should NOT get the 'Depends' flag
+                //case EStyleDataType.AUTO:
                 case EStyleDataType.INHERIT:// Inherited values function like redirects which compute to the current value of the matching property for the owning element's parent
                 case EStyleDataType.PERCENT:// Percentage values represent a percentage of another property's value
                     Flags = StyleValueFlags.Depends;
@@ -692,6 +694,8 @@ namespace CssUI.CSS
         
         public override bool Equals(object o)
         {
+            if (ReferenceEquals(o, null))
+                return false;
 
             if (o is CssValue)
             {
@@ -724,7 +728,10 @@ namespace CssUI.CSS
             if (this.Type == EStyleDataType.NULL)
                 return false;
 
-            return object.ReferenceEquals(this.Value, null);
+            if (ReferenceEquals(this.Value, null))
+                return false;
+
+            return true;
         }
     }
 

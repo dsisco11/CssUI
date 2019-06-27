@@ -42,19 +42,19 @@ namespace CssUI
         #region Constructors
         public PositionProperty() : base()
         {
-            base.onChanged += this.Update;
+            base.onValueChange += this.Handle_Value_Change;
         }
 
         public PositionProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Source, Owner, Options)
         {
-            base.onChanged += this.Update;
+            base.onValueChange += this.Handle_Value_Change;
         }
         #endregion
 
         /// <summary>
         /// Whenever this propertys value changes this is called so we can update our <see cref="Computed_X"/> and <see cref="Computed_Y"/> values
         /// </summary>
-        void Update(ICssProperty Sender)
+        void Handle_Value_Change(ECssPropertyStage Stage, ICssProperty Sender)
         {
         }
 

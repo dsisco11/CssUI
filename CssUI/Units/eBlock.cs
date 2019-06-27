@@ -2,18 +2,6 @@
 
 namespace CssUI
 {
-    [Flags]
-    public enum FBlockFlags : uint
-    {
-        /// <summary>
-        /// Block is locked and cannot be updated
-        /// </summary>
-        Locked = (1 << 1),
-        /// <summary>
-        /// Block is dirty and needs to be updated/resolved
-        /// </summary>
-        Dirty = (1 << 2),
-    }
     /// <summary>
     /// Holds a set of four integers which represent the Left, Top, Right, and Bottom boundaries of a rectangle
     /// Negative values for Width & Height are illegal
@@ -21,12 +9,13 @@ namespace CssUI
     public class eBlock
     {
         #region Values
-        public FBlockFlags Flags { get; private set; } = 0;
+        public EBlockFlags Flags { get; private set; } = EBlockFlags.Clean;
+        public EBlockInvalidationReason Dirt { get; private set; } = EBlockInvalidationReason.NotInvalid;
         /// <summary>
         /// Tracks whether the block needs to be recalculated, this isnt for this block instance in particular though, more so for removing variable clutter from the <see cref="cssElement"/> class.
         /// </summary>
-        public bool IsDirty { get { return Flags.HasFlag(FBlockFlags.Dirty); } }
-        public bool IsLocked { get { return Flags.HasFlag(FBlockFlags.Locked); } }
+        public bool IsDirty { get { return Flags.HasFlag(EBlockFlags.Dirty); } }
+        public bool IsLocked { get { return Flags.HasFlag(EBlockFlags.Locked); } }
 
         public int Left { get; private set; } = 0;
         public int Top { get; private set; } = 0;
@@ -88,22 +77,23 @@ namespace CssUI
         #endregion
 
         #region Flags
-        public void Set_Flag(FBlockFlags flag)
+        public void Set_Flag(EBlockFlags flag)
         {
-            Flags = (Flags | flag);
+            Flags |= flag;
         }
 
-        public void Unset_Flag(FBlockFlags flag)
+        public void Unset_Flag(EBlockFlags flag)
         {
-            Flags = (Flags ^ flag);
+            Flags &= ~flag;
         }
 
         /// <summary>
         /// Flags the block as dirty, indicating that it's values should be resolved.
         /// </summary>
-        public void Flag_Dirty()
+        public void Flag_Dirty(EBlockInvalidationReason Reason)
         {
-            Set_Flag(FBlockFlags.Dirty);
+            Set_Flag(EBlockFlags.Dirty);
+            Dirt |= Reason;
         }
 
         /// <summary>
@@ -111,7 +101,8 @@ namespace CssUI
         /// </summary>
         public void Flag_Clean()
         {
-            Unset_Flag(FBlockFlags.Dirty);
+            Unset_Flag(EBlockFlags.Dirty);
+            Dirt = EBlockInvalidationReason.NotInvalid;
         }
 
 
@@ -120,7 +111,7 @@ namespace CssUI
         /// </summary>
         public void Lock()
         {
-            Set_Flag(FBlockFlags.Locked | FBlockFlags.Dirty);
+            Set_Flag(EBlockFlags.Locked | EBlockFlags.Dirty);
         }
 
         /// <summary>
@@ -128,7 +119,7 @@ namespace CssUI
         /// </summary>
         public void Unlock()
         {
-            Unset_Flag(FBlockFlags.Locked);
+            Unset_Flag(EBlockFlags.Locked);
         }
         #endregion
 
