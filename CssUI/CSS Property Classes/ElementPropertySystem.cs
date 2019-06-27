@@ -6,29 +6,11 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using CssUI.CSS;
+using CssUI.Fonts;
+using SixLabors.Fonts;
 
 namespace CssUI
 {
-    public enum EPropertySystemDirtFlags : UInt16
-    {
-        /// <summary>
-        /// Not dirty
-        /// </summary>
-        Clean = 0,
-        /// <summary>
-        /// The property system needs to re-cascade its properties
-        /// </summary>
-        Cascade = (1 << 0),
-        /// <summary>
-        /// The property system needs to resolve its block property values
-        /// </summary>
-        Block = (1 << 1),
-        /// <summary>
-        /// The property system needs to resolve its font values
-        /// </summary>
-        Font = (1 << 2)
-    }
-
     // DOCS: https://www.w3.org/TR/css-cascade-3/#value-stages
 
     /// <summary>
@@ -45,18 +27,24 @@ namespace CssUI
         public static AtomicString STATE_HOVER = new AtomicString("Hover");
         #endregion
 
-        #region Properties
-        public EPropertySystemDirtFlags Dirt = EPropertySystemDirtFlags.Cascade;
-        /// <summary>
-        /// Flags this style as dirty, meaning it needs to recascade
-        /// </summary>
-        public void Flag() { Dirt |= EPropertySystemDirtFlags.Cascade; }
-
         private readonly cssElement Owner;
+
+        #region Dirty Flags
+        public EPropertySystemDirtFlags Dirt { get; private set; } = EPropertySystemDirtFlags.Cascade;
+        /// <summary>
+        /// Adds a flag to the dirty bit
+        /// </summary>
+        public void Flag(EPropertySystemDirtFlags flag) { Dirt |= flag; }
+        /// <summary>
+        /// Removes a flag for the dirty bit
+        /// </summary>
+        public void Unflag(EPropertySystemDirtFlags flag) { Dirt &= ~flag; }
+
         #endregion
 
         #region Current Values
         /// <summary>
+        /// The calculated useable property values for this element
         /// DO NOT MODIFY THE PROPERTIES OF THIS INSTANCE, TREAT THEM AS READONLY!!!
         /// </summary>
         public readonly CssPropertySet Cascaded;
@@ -117,6 +105,27 @@ namespace CssUI
         public ETextAlign TextAlign { get { return Cascaded.TextAlign.Computed.AsEnum<ETextAlign>(); } }
 
         public EObjectFit ObjectFit { get { return Cascaded.ObjectFit.Computed.AsEnum<EObjectFit>(); } }
+
+        public eMatrix TransformMatrix { get; private set; } = null;
+
+        public int Layout_Pos_X { get; private set; } = 0;
+        public int Layout_Pos_Y { get; private set; } = 0;
+
+        public float? DpiX { get; private set; }
+        public float? DpiY { get; private set; }
+        public UInt16 FontWeight { get; private set; }
+        public EFontStyle FontStyle { get; private set; }
+        public double FontSize { get; private set; }
+        public string FontFamily { get; private set; }
+        public Font Font { get; private set; }
+
+        public double LineHeight { get; private set; }
+        public double Opacity { get; private set; } = 1.0f;
+        public cssColor Blend_Color { get; private set; } = null;
+        #endregion
+
+
+        #region Block Values
         public int ObjectPosition_X { get; private set; } = 0;
         public int ObjectPosition_Y { get; private set; } = 0;
 
@@ -124,8 +133,6 @@ namespace CssUI
         public int? Intrinsic_Height { get; private set; } = null;
         /// <summary>The intrinsic ratio of  Height/Width </summary>
         public double? Intrinsic_Ratio { get; private set; } = null;
-
-        public eMatrix TransformMatrix { get; private set; } = null;
 
         /// <summary>
         /// X-Axis position of the owning element relative to it's container
@@ -135,9 +142,6 @@ namespace CssUI
         /// Y-Axis position of the owning element relative to it's container
         /// </summary>
         public int Y { get; private set; } = 0;
-
-        public int Layout_Pos_X { get; private set; } = 0;
-        public int Layout_Pos_Y { get; private set; } = 0;
 
         public int Top { get; private set; } = -1;
         public int Right { get; private set; } = -1;
@@ -183,17 +187,6 @@ namespace CssUI
         public int Border_Right_Width { get; private set; } = 0;
         public int Border_Bottom_Width { get; private set; } = 0;
         public int Border_Left_Width { get; private set; } = 0;
-
-        public float? DpiX { get; private set; }
-        public float? DpiY { get; private set; }
-        public UInt16 FontWeight { get; private set; }
-        public EFontStyle FontStyle { get; private set; }
-        public double FontSize { get; private set; }
-        public string FontFamily { get; private set; }
-
-        public double LineHeight { get; private set; }
-        public double Opacity { get; private set; } = 1.0f;
-        public cssColor Blend_Color { get; private set; } = null;
         #endregion
 
         #region Getters
@@ -252,7 +245,7 @@ namespace CssUI
             Stack = new StackTrace(1);
 #endif
             // We need to be resolved again because the 'Layout_Pos_' values directly determine our finalized X/Y property values.
-            Dirt |= EPropertySystemDirtFlags.Block;
+            this.Flag(EPropertySystemDirtFlags.Block);
             // These 'Layout_Pos_' vars have the same effect as any other styling property in that WHENEVER they change it will effect how the owning uiElement's BLOCK placement.
             //Property_Changed?.Invoke(null, EPropertyFlags.Block | EPropertyFlags.Flow, Stack);// Replaced with the lines below on 06-19-2017
             Owner.Flag_Block_Dirty(EBlockInvalidationReason.Layout_Pos_Changed);
@@ -296,7 +289,7 @@ namespace CssUI
         /// <summary>
         /// The assigned value of a property has changed
         /// </summary>
-        public event Action<ICssProperty, EPropertyFlags, StackTrace> onProperty_Change;
+        public event Action<ICssProperty, EPropertyAffects, StackTrace> onProperty_Change;
         #endregion
 
         #region Constructors
@@ -350,7 +343,7 @@ namespace CssUI
             // Capture all update events.
             prop.Property_Changed += Handle_Declared_Property_Change;
             // We just took on another group of proerties, we should recascade
-            Dirt |= EPropertySystemDirtFlags.Cascade;
+            this.Flag(EPropertySystemDirtFlags.Cascade);
 
             return retVal;
         }
@@ -361,7 +354,7 @@ namespace CssUI
         /// <summary>
         /// A state-specific property changed, we need to resolve this single property
         /// </summary>
-        private async void Handle_Declared_Property_Change(ECssPropertyStage Stage, ICssProperty Property, EPropertyFlags Flags, StackTrace Origin)
+        private async void Handle_Declared_Property_Change(ECssPropertyStage Stage, ICssProperty Property, EPropertyAffects Flags, StackTrace Origin)
         {
             /* XXX:
              * To be honest cascading here doesnt make sense
@@ -377,27 +370,27 @@ namespace CssUI
         /// <param name="Property"></param>
         /// <param name="Flags"></param>
         /// <param name="Stack"></param>
-        private void Handle_Cascaded_Property_Change(ECssPropertyStage Stage, ICssProperty Property, EPropertyFlags Flags, StackTrace Stack)
+        private void Handle_Cascaded_Property_Change(ECssPropertyStage Stage, ICssProperty Property, EPropertyAffects Flags, StackTrace Stack)
         {
-            bool IsFlow = ((Flags & EPropertyFlags.Flow) != 0);// Layout
-            bool IsBlock = ((Flags & EPropertyFlags.Block) != 0);
-            bool IsVisual = ((Flags & EPropertyFlags.Visual) != 0);
-            bool IsFont = ((Flags & EPropertyFlags.Font) != 0);
+            bool IsFlow = ((Flags & EPropertyAffects.Flow) != 0);// Layout
+            bool IsBlock = ((Flags & EPropertyAffects.Block) != 0);
+            bool IsVisual = ((Flags & EPropertyAffects.Visual) != 0);
+            bool IsFont = ((Flags & EPropertyAffects.Text) != 0);
 
             if(IsBlock) Update_Depends_Flag();// A block property changed, update our depends flag
 
-            // If the value that changed was a computed one and it affects the block then we need to update our block
+            // If the value that changed was a specified one and it affects the block then we need to update our block
             if (IsBlock && Stage >= ECssPropertyStage.Specified)
             {
                 // Flag us dirty so we can resolve next time its called
-                Dirt |= EPropertySystemDirtFlags.Block;
+                this.Flag(EPropertySystemDirtFlags.Block);
                 // Notify our parent by flagging them aswell
                 this.Owner.Flag_Block_Dirty(EBlockInvalidationReason.Property_Changed);
             }
 
             // Update our dirt flags appropriately
-            if (IsFlow || IsVisual) Dirt |= EPropertySystemDirtFlags.Block;
-            if (IsFont) Dirt |= EPropertySystemDirtFlags.Font;
+            if (IsFlow || IsVisual) this.Flag(EPropertySystemDirtFlags.Block);
+            if (IsFont) this.Flag(EPropertySystemDirtFlags.Font);
             
             //Logging.Log.Info("[Property Changed]: {0}", Prop.FieldName);
             onProperty_Change?.Invoke(Property, Flags, Stack);
@@ -430,7 +423,7 @@ namespace CssUI
         {
             var benchmark_id = Benchmark.Start("style-cascade");
 
-            // Get a list of all the properties we are going to need to work with
+            // Get a list of only the properties with an Assigned value
             AsyncCountdownEvent ctdn = null;
             CssPropertyComparator cm = new CssPropertyComparator();
             HashSet<AtomicString> targetFields = new HashSet<AtomicString>();
@@ -471,7 +464,7 @@ namespace CssUI
                         }
 
                         string SourceState = Value.Source.ToString();
-                        Cascaded.Set(propName, Value);
+                        await Cascaded.Set(propName, Value);
                     }
                     finally
                     {
@@ -485,21 +478,19 @@ namespace CssUI
 
             // Recalculate ALL properties
             var PropList = Cascaded.GetAll().ToList();
-            ctdn = new AsyncCountdownEvent(PropList.Count);
 
-            Parallel.For(0, PropList.Count, (int i) =>
+            for(int i=0; i<PropList.Count; i++)
             {
                 ICssProperty prop = PropList[i];
-                prop.Update();
-                ctdn.Signal();
-            });
+                // We always want to compute these now to get their values resolved. otherwise any with just assigned values will not interpret and output computed values.
+                await prop.Update(ComputeNow: true);
+            }
 
-            await ctdn.WaitAsync();
 
             // Any values that changed due to this cascade should have thrown a property change event to let the style system know what it needs to update
 
             // Remove cascade flag
-            Dirt &= ~EPropertySystemDirtFlags.Cascade;
+            this.Unflag(EPropertySystemDirtFlags.Cascade);
             Benchmark.Stop(benchmark_id);
         }
 
@@ -584,7 +575,7 @@ namespace CssUI
             if (changes)
             {
                 // The element state has changed, we will need to re-cascade and then resolve the properties
-                Dirt |= EPropertySystemDirtFlags.Block;
+                this.Flag(EPropertySystemDirtFlags.Block);
                 await Cascade();
             }
         }
@@ -689,7 +680,7 @@ namespace CssUI
         /// Resolves the block values
         /// </summary>
         /// <param name="E"></param>
-        public async Task Resolve()
+        public async Task Resolve_Block()
         {
             if (0 == (Dirt & EPropertySystemDirtFlags.Block)) return;
             var benchmark_id = Benchmark.Start("block-resolution");
@@ -760,7 +751,7 @@ namespace CssUI
             this.Height = Height;
 
             // Remove flag from dirt
-            Dirt &= ~EPropertySystemDirtFlags.Block;
+            this.Unflag(EPropertySystemDirtFlags.Block);
 
             Benchmark.Stop(benchmark_id);
         }
@@ -788,6 +779,9 @@ namespace CssUI
         #region Font Updating
         public async Task Resolve_Font()
         {
+            if (0 == (Dirt & EPropertySystemDirtFlags.Font)) return;
+
+            // Resolve DPI
             DpiX = (float?)Cascaded.DpiX.Computed.Resolve();
             DpiY = (float?)Cascaded.DpiY.Computed.Resolve();
             // Resolve 'FontStyle'
@@ -818,8 +812,15 @@ namespace CssUI
 
             Resolve_Line_Height();
 
+            // Get font from font factory, which will help cache identical fonts
+            FontOptions fontOptions = new FontOptions(FontFamily, FontSize, FontWeight, FontStyle);
+            this.Font = FontFactory.Get(fontOptions);
+
             // Remove font dirt flag
-            Dirt &= ~EPropertySystemDirtFlags.Font;
+            this.Unflag(EPropertySystemDirtFlags.Font);
+
+            // Flag our elements font dirty flag so it updates whatever is using it
+            Owner.Flag_Dirty(EElementDirtyFlags.Font);
         }
         #endregion
 

@@ -118,8 +118,7 @@ namespace CssUI
             // DOCS: 
 
             //Style.ImplicitRules.FontSize.Set(14);
-            Style.ImplicitRules.FontFamily.Set("Arial");
-            Style.ImplicitRules.FontWeight.Set(700);
+            //Style.ImplicitRules.FontWeight.Set(700);
             
         }
 

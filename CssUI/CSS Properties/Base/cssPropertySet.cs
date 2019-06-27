@@ -371,7 +371,7 @@ namespace CssUI
         /// <summary>
         /// A property which affects the elements block changed
         /// </summary>
-        public event Action<ECssPropertyStage, ICssProperty, EPropertyFlags, StackTrace> Property_Changed;
+        public event Action<ECssPropertyStage, ICssProperty, EPropertyAffects, StackTrace> Property_Changed;
         #endregion
 
         #region Change Handlers
@@ -391,7 +391,7 @@ namespace CssUI
             var def = CSS.CssProperties.Definitions[Property.CssName];
             if (def == null) throw new Exception(string.Concat("Cannot find a definition for Css property: \"", Property.CssName, "\""));
 
-            EPropertyFlags Flags = def.Flags;
+            EPropertyAffects Flags = def.Flags;
             StackTrace Stack = null;
 #if DEBUG
             //stack = new StackTrace(STACK_FRAME_OFFSET, true);

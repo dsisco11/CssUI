@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CssUI.CSS;
@@ -35,6 +36,7 @@ namespace CssUI
         /// Tracks the previous value for <see cref="Computed"/> so we can detect when changes occur
         /// </summary>
         CssValue oldComputedValue = null;
+        public int[] ChangeNotices = new int[6] { 0, 0, 0, 0, 0, 0 };
 
 
         /// <summary>
@@ -79,29 +81,33 @@ namespace CssUI
 
         #region Accessors
 
-        public bool HasValue { get { return !Assigned.IsNull(); } }
+        public bool HasValue { get => !Assigned.IsNull(); }
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// </summary>
-        public virtual bool IsAuto { get { return Assigned.Type == EStyleDataType.AUTO; } }
+        public virtual bool IsAuto { get => Assigned.Type == EStyleDataType.AUTO; }
         /// <summary>
         /// Returns TRUE if the assigned value is <see cref="CssValue.Inherit"/>
         /// </summary>
-        public virtual bool IsInherited { get { return Assigned.Type == EStyleDataType.INHERIT; } }
+        public virtual bool IsInherited { get => Assigned.Type == EStyleDataType.INHERIT; }
+        /// <summary>
+        /// Returns TRUE if this property is inheritable according to its definition
+        /// </summary>
+        public virtual bool IsInheritable { get => Definition.Inherited; }
         /// <summary>
         /// Returns TRUE if the assigned value has the <see cref="StyleValueFlags.Depends"/> flag
         /// </summary>
-        public virtual bool IsDependent { get { return Assigned.Has_Flags(StyleValueFlags.Depends); } }
+        public virtual bool IsDependent { get => Assigned.Has_Flags(StyleValueFlags.Depends); }
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if the assigned value has the <see cref="StyleValueFlags.Depends"/> flag
         /// </summary>
-        public virtual bool IsDependentOrAuto { get { return (Assigned.Type == EStyleDataType.AUTO || Assigned.Has_Flags(StyleValueFlags.Depends)); } }
+        public virtual bool IsDependentOrAuto { get => (Assigned.Type == EStyleDataType.AUTO || Assigned.Has_Flags(StyleValueFlags.Depends)); }
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if the assigned value type is a percentage
         /// </summary>
-        public virtual bool IsPercentageOrAuto { get { return (Assigned.Type == EStyleDataType.AUTO || Assigned.Type == EStyleDataType.PERCENT); } }
+        public virtual bool IsPercentageOrAuto { get => (Assigned.Type == EStyleDataType.AUTO || Assigned.Type == EStyleDataType.PERCENT); }
 
         public CssPropertySet Source
         {
@@ -191,57 +197,62 @@ namespace CssUI
 #endif
             // CSS specs say if the cascade (assigned) resulted in a value, use it.
             if (!Assigned.IsNull())
+            {
+                if (Assigned == CssValue.Inherit)
                 {
-                    if (Assigned == CssValue.Inherit)
-                    {
-                        /*
-                         * CSS Specs: 
-                         * 1. Each property may also have a cascaded value of 'inherit', which means that, 
-                         *    for a given element, the property takes as specified value the computed value of the element's parent.
-                         *    If the 'inherit' value is set on the root element, the property is assigned its initial value.
-                        */
-                        if (Owner is cssRootElement)
-                        {// This is the Root element
-                            return new CssValue(Def.Initial);
-                        }
-                        else
-                        {// Take our parents computed value
-                            ICssProperty prop = Owner.Parent.Style.Cascaded.Get(CssName);
-                            if (prop != null)
-                                return new CssValue((prop as CssProperty).Computed);
-                            else
-                                return null;
-                        }
-                    }
-
-                    if (Assigned == CssValue.Initial)
-                    {// If the Assigned value is the CssValue.Initial literal, then we use our definitions default
+                    /*
+                        * CSS Specs: 
+                        * 1. Each property may also have a cascaded value of 'inherit', which means that, 
+                        *    for a given element, the property takes as specified value the computed value of the element's parent.
+                        *    If the 'inherit' value is set on the root element, the property is assigned its initial value.
+                    */
+                    if (Owner is cssRootElement)
+                    {// This is the Root element
                         return new CssValue(Def.Initial);
                     }
-
-                    return Assigned;
-                }
-                // Assigned is null
-                /*
-                * CSS Specs:
-                * 2. if the property is inherited and the element is not the root of the document tree, use the computed value of the parent element.
-                */
-                if (!(Owner is cssRootElement) && Def != null && Def.Inherited)
-                {
-                    ICssProperty prop = Owner.Parent.Style.Cascaded.Get(CssName);
-                    if (prop != null)
-                        return new CssValue((prop as CssProperty).Computed);
                     else
-                        throw new Exception($"CSS property '{CssName}' Cascaded value is null!");
+                    {// Take our parents computed value
+                        ICssProperty prop = Owner.Parent.Style.Cascaded.Get(CssName);
+                        if (prop != null)
+                            return new CssValue((prop as CssProperty).Computed);
+                        else
+                            return null;
+                    }
+                }
+
+                if (Assigned == CssValue.Initial)
+                {// If the Assigned value is the CssValue.Initial literal, then we use our definitions default
+                    return new CssValue(Def.Initial);
+                }
+
+                return Assigned;
+            }
+            // Assigned is null
+            /*
+            * CSS Specs:
+            * 2. if the property is inherited and the element is not the root of the document tree, use the computed value of the parent element.
+            */
+            if (!(Owner is cssRootElement) && Def != null && Def.Inherited)
+            {
+                ICssProperty prop = Owner.Parent?.Style.Cascaded.Get(CssName);
+                if (prop != null)
+                {
+                    return new CssValue((prop as CssProperty).Computed);
                 }
                 else
                 {
-                    /*
-                    * CSS Specs:
-                    * 3. Otherwise use the property's initial value. The initial value of each property is indicated in the property's definition.
-                    */
-                    return new CssValue(Def.Initial);
+                    return null;
+                    //throw new Exception($"CSS property '{CssName}' Cascaded value is null!");
                 }
+            }
+            else
+            {
+                /*
+                * CSS Specs:
+                * 3. Otherwise use the property's initial value. The initial value of each property is indicated in the property's definition.
+                */
+                return new CssValue(Def.Initial);
+            }
 #if RELEASE
             }
             catch(Exception ex)
@@ -344,7 +355,9 @@ namespace CssUI
             if (ReferenceEquals(oldSpecifiedValue, null) || _specified != oldSpecifiedValue)
             {// the computed value changed
                 oldSpecifiedValue = _specified;
-                onValueChange.Invoke(ECssPropertyStage.Specified, this);
+
+                ChangeNotices[(int)ECssPropertyStage.Specified] += 1;
+                onValueChange?.Invoke(ECssPropertyStage.Specified, this);
 
                 // update the computed value
                 Reinterpret_Computed();
@@ -358,6 +371,8 @@ namespace CssUI
             if (ReferenceEquals(oldComputedValue, null) || oldComputedValue != Assigned)
             {
                 oldComputedValue = new CssValue(_computed);
+
+                ChangeNotices[(int)ECssPropertyStage.Computed] += 1;
                 onValueChange?.Invoke(ECssPropertyStage.Computed, this);
             }
         }
@@ -371,8 +386,9 @@ namespace CssUI
         {
             if (Specified.Unit == Unit)
             {
+                ChangeNotices[(int)ECssPropertyStage.Computed] += 1;
                 // This unit change will affect our computed value
-                onValueChange.Invoke(ECssPropertyStage.Computed, this);
+                onValueChange?.Invoke(ECssPropertyStage.Computed, this);
             }
         }
 
@@ -520,6 +536,8 @@ namespace CssUI
             if (ReferenceEquals(oldAssignedValue, null) || oldAssignedValue != Assigned)
             {
                 oldAssignedValue = new CssValue(Assigned);
+
+                ChangeNotices[(int)ECssPropertyStage.Assigned] += 1;
                 onValueChange?.Invoke(ECssPropertyStage.Assigned, this);
             }
 

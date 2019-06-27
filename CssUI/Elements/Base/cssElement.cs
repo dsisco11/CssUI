@@ -64,7 +64,17 @@ namespace CssUI
         /// <summary>
         /// Tracks what factors of this element need to be updated.
         /// </summary>
-        protected EElementDirtyBit Dirt = EElementDirtyBit.None;
+        protected EElementDirtyFlags Dirt = EElementDirtyFlags.Clean;
+        /// <summary>
+        /// Adds a flag from the dirty bit
+        /// </summary>
+        /// <param name="flags">Set of flags to add</param>
+        public void Flag_Dirty(EElementDirtyFlags flags) { Dirt |= flags; }
+        /// <summary>
+        /// Removes a flag from the dirty bit
+        /// </summary>
+        /// <param name="flags">Set of flags to remove</param>
+        public void Unflag_Dirty(EElementDirtyFlags flags) { Dirt &= ~flags; }
 
         private EElementFlags Flags = EElementFlags.Clickable | EElementFlags.DoubleClickable;// By default all elements will process click and doubleclick events
 
@@ -230,7 +240,7 @@ namespace CssUI
         /// <param name="Sender"></param>
         /// <param name="Flags"></param>
         /// <param name="Source"></param>
-        protected virtual void Handle_Style_Property_Change(ICssProperty Sender, EPropertyFlags Flags, System.Diagnostics.StackTrace Source)
+        protected virtual void Handle_Style_Property_Change(ICssProperty Sender, EPropertyAffects Flags, System.Diagnostics.StackTrace Source)
         {
 
 #if DEBUG
@@ -238,7 +248,7 @@ namespace CssUI
             {
                 if (Sender != null)
                 {
-                    if (Flags.HasFlag(EPropertyFlags.Visual) || Flags.HasFlag(EPropertyFlags.Font))
+                    if (Flags.HasFlag(EPropertyAffects.Visual) || Flags.HasFlag(EPropertyAffects.Text))
                     {
                         Logs.Info("[Property Change] {0}.{1} => {2}", this.FullPath, Sender.CssName, Sender);
                     }
@@ -246,27 +256,23 @@ namespace CssUI
             }
 #endif
 
-            if ((Flags & EPropertyFlags.Visual) != 0)
+            if ((Flags & EPropertyAffects.Visual) != 0)
             {
-                Dirt |= EElementDirtyBit.Visuals;
+                Dirt |= EElementDirtyFlags.Visuals;
             }
 
-            if ((Flags & EPropertyFlags.Block) != 0)
+            if ((Flags & EPropertyAffects.Block) != 0)
             {
                 if (Sender == null) Flag_Block_Dirty();
                 else Flag_Block_Dirty(Sender);
             }
 
-            if ((Flags & EPropertyFlags.Font) != 0)
+            if ((Flags & EPropertyAffects.Text) != 0)
             {
-                Dirt |= EElementDirtyBit.Font;
-                // Q: Why update the font immediately? Why not wait until next frame when our parent will do it?
-                // A: When a font property changes it means the user is most likely about to change other properties which depend on the font's current values (character dimensions and whatnot)
-                //   In the future immediate font updates can be avoided because the system will naturally handle propogating updates to properties expressed in font based units(ex/ex/ch)
-                Update_Font();
+                Flag_Dirty(EElementDirtyFlags.Font);
             }
 
-            if ((Flags & EPropertyFlags.Flow) != 0)
+            if ((Flags & EPropertyAffects.Flow) != 0)
             {
                 if (Sender == null) Invalidate_Layout();
                 else Invalidate_Layout(Sender);
@@ -467,7 +473,7 @@ namespace CssUI
                 return this.Block;
             }
 
-            Style.Resolve().Wait();
+            Style.Resolve_Block().Wait();
             if (Style.Display == EDisplayMode.NONE) return eBlock.FromTRBL(0, 0, 0, 0);
 
             ePos cPos = Style.Get_Offset() + Block_Containing.Get_Pos();
@@ -821,10 +827,10 @@ namespace CssUI
             this.Element_Hierarchy_Changed(0);
             this.Flag_Containing_Block_Dirty();// Our parent element has been changed, so logically our containing-block is now different from what it was.
 
-            //this.Style.Dirt |= EPropertySystemDirtFlags.Cascade;
+            this.Style.Flag(EPropertySystemDirtFlags.Cascade);
             // just do it ourselves here and now
             // XXX: if the new element code starts working fine see if we can remove this call, i think its unnecessary
-            await this.Style.Cascade().ConfigureAwait(false);
+            //await this.Style.Cascade().ConfigureAwait(false);
         }
 
         private ePos last_containerPos = new ePos();
@@ -902,63 +908,6 @@ namespace CssUI
             }
         }
         #endregion
-
-#region Font
-
-        Font font = null;
-        public Font Font
-        {
-            get
-            {
-                if (font == null) return Parent?.Font;
-                return font;
-            }
-            set
-            {
-                font = value;
-                Style.UserRules.FontFamily.Set(font.Family.Name);
-                Style.UserRules.FontSize.Set((double?)font.Size);
-
-                if(font.Italic)
-                {
-                    Style.UserRules.FontStyle.Set(EFontStyle.Italic);
-                }
-                else
-                {
-                    Style.UserRules.FontStyle.Set(EFontStyle.Normal);
-                }
-            }
-        }
-
-        void Update_Font()
-        {
-            font = null;
-
-            string fontFamily = Style.FontFamily;
-            if (fontFamily == null) return;
-
-            double fontSize = Style.FontSize;
-            if (fontSize <= 0) return;
-
-            var fontStyle = FontStyle.Regular;
-            switch (Style.FontStyle)
-            {
-                case EFontStyle.Normal:
-                    fontStyle = FontStyle.Regular;
-                    break;
-                case EFontStyle.Italic:
-                case EFontStyle.Oblique:
-                    fontStyle = FontStyle.Italic;
-                    break;
-            }
-
-            if (Style.FontWeight >= 600) fontStyle = FontStyle.Bold;
-            font = SystemFonts.CreateFont(fontFamily, (float)fontSize, fontStyle);
-
-            // clear the font bit from our dirt flags
-            Dirt &= ~EElementDirtyBit.Font;
-        }
-#endregion
 
 #region Colors
         /// <summary>
@@ -1124,27 +1073,10 @@ namespace CssUI
         {
             bool retVal = false;
 
-            /*if (0 != (Style.Dirt & EPropertySystemDirtFlags.Cascade))
+            if (0 != (Style.Dirt & EPropertySystemDirtFlags.Cascade))
             {
                 await Style.Cascade();
             }
-
-            if (0 != (Style.Dirt & EPropertySystemDirtFlags.Block))
-            {
-                await Style.Resolve();
-            }
-
-            if (0 != (Style.Dirt & EPropertySystemDirtFlags.Font))
-            {
-                await Style.Resolve_Font();
-            }*/
-
-            if (0 != (Dirt & EElementDirtyBit.Font))
-            {
-                retVal = true;
-                Update_Font();
-            }
-
 
             if (Block.IsDirty)
             {
@@ -1179,11 +1111,11 @@ namespace CssUI
         {
             if(value)
             {
-                Dirt |= EElementDirtyBit.Visuals;
+                Dirt |= EElementDirtyFlags.Visuals;
             }
             else
             {
-                Dirt &= ~EElementDirtyBit.Visuals;
+                Dirt &= ~EElementDirtyFlags.Visuals;
             }
         }
         /// <summary>
@@ -1198,7 +1130,7 @@ namespace CssUI
             if (Style.TransformMatrix != null) Root.Engine.Set_Matrix(Style.TransformMatrix);
             //Root.Engine.Set_Blend(new uiColor(1, 1, 1, 0.5));
 
-            Dirt &= ~EElementDirtyBit.Visuals;
+            Dirt &= ~EElementDirtyFlags.Visuals;
             Draw_Background();
             Draw_Borders();
             // ReplacedElements always clip their rendered content to the area of their content block

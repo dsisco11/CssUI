@@ -57,8 +57,8 @@ namespace CssUI
                             }
                         }
 
-                        if (Owner.Font != null)
-                            return Owner.Font.EmSize;
+                        if (Owner.Style.Font != null)
+                            return Owner.Style.Font.EmSize;
                         else
                             return Owner.Style.FontSize;
                     }
@@ -95,7 +95,7 @@ namespace CssUI
                             }
                         }
 
-                        if (Owner.Font != null)
+                        if (Owner.Style.Font != null)
                         {
                             // XXX: implement logic to measure the 'x' height for our font. SEE: https://www.w3.org/TR/css-values-3/#font-relative-lengths
                         }

@@ -44,18 +44,18 @@ namespace CssUI
         public cssTextElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
         {
             // If the box-sizing mode isn't content then our borders & padding will warp our text because they change the content-area block size and it is no longer the same size as the rendered text!
-            /*Style.User.BoxSizing.Set(EBoxSizingMode.CONTENT);
-            Style.User.Display.Set(EDisplayMode.INLINE_BLOCK);*/
+
             Style.ImplicitRules.BoxSizing.Set(EBoxSizingMode.CONTENT);
             Style.ImplicitRules.Display.Set(EDisplayMode.INLINE_BLOCK);
 
             Style.onProperty_Change += Style_Property_Change;
-            Invalidate_Text();
+            this.Debug.Draw_Bounds = true;
         }
 
-        private void Style_Property_Change(ICssProperty Sender, EPropertyFlags Flags, System.Diagnostics.StackTrace Origin)
+        private void Style_Property_Change(ICssProperty Sender, EPropertyAffects Flags, System.Diagnostics.StackTrace Origin)
         {
-            if ((Flags & EPropertyFlags.Font) != 0)
+            // If something that affects text has changed then we invalidate our text
+            if (0 != (Flags & EPropertyAffects.Text))
                 Invalidate_Text();
         }
         #endregion
@@ -71,13 +71,8 @@ namespace CssUI
         #region Drawing
         protected override void Draw()
         {
-            if (Dirt != 0)
-            {
-                if ((Dirt & EElementDirtyBit.Text) != 0)
-                    Update_Text();
-
-                Dirt &= ~EElementDirtyBit.Text;
-            }
+            if (0 != (Dirt & EElementDirtyFlags.Text))
+                Update_Text();
 
             if (Texture == null)
                 return;
@@ -93,7 +88,7 @@ namespace CssUI
 
         private void Invalidate_Text()
         {
-            Dirt |= EElementDirtyBit.Text;
+            Flag_Dirty(EElementDirtyFlags.Text);
         }
         #endregion
 
@@ -102,70 +97,64 @@ namespace CssUI
         /// <summary>
         /// Renders our text to a GL texture
         /// </summary>
-        private void Update_Text()
+        private async void Update_Text()
         {
+            if (0 != (Style.Dirt & EPropertySystemDirtFlags.Font))
+                await Style.Resolve_Font();
+
+            if (Style.Font == null) return;
+
             if (Texture != null)
             {
                 Texture.Dispose();
                 Texture = null;
             }
-            if (Font == null)
-                return;
 
+            if (string.IsNullOrEmpty(text)) return;
 
-            Texture = From_Text_String(text, Font);
+            Texture = From_Text_String(text, Style.Font);
             if (Texture != null)
             {
                 Style.Set_Content_Width(Texture.Size.Width);
                 Style.Set_Content_Height(Texture.Size.Height);
-
-                //Style.Default.Width.Set(Texture.Size.Width);
-                //Style.Default.Height.Set(Texture.Size.Height);
             }
 
             // unset the text flag
-            Dirt &= ~EElementDirtyBit.Text;
+            Unflag_Dirty(EElementDirtyFlags.Text);
         }
-        
-
-        /*internal static void Setup_Text_Options(ref Graphics g)
-        {
-            g.SmoothingMode = SmoothingMode.None;// SmoothingMode.AntiAlias;
-            g.PixelOffsetMode = PixelOffsetMode.None;// PixelOffsetMode.HighQuality
-            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            g.CompositingQuality = CompositingQuality.HighQuality;
-
-            //g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;// Use if outlining
-            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;// only use if not outlining
-        }*/
+       
 
         /// <summary>
         /// Returns a new texture with text rendered to it
         /// </summary>
         /// <param name="Text"></param>
-        /// <param name="textFont"></param>
+        /// <param name="font"></param>
         /// <returns></returns>
-        public cssTexture From_Text_String(string Text, Font textFont)
+        public cssTexture From_Text_String(string Text, Font font)
         {
             if (string.IsNullOrEmpty(Text)) return null;
+            if (font == null) return null;
+
 
             GlyphBuilder glyphBuilder = new GlyphBuilder();
             TextRenderer renderer = new TextRenderer(glyphBuilder);
 
-            double dpix = Style.Cascaded.DpiX.Computed.Resolve() ?? 0;
-            double dpiy = Style.Cascaded.DpiY.Computed.Resolve() ?? 0;
-            RendererOptions style = new RendererOptions(textFont, (float)dpix, (float)dpiy, PointF.Empty)
+            float dpix = Style.DpiX ?? 0;
+            float dpiy = Style.DpiY ?? 0;
+
+            RendererOptions style = new RendererOptions(font, (float)dpix, (float)dpiy, PointF.Empty)
             {
                 ApplyKerning = true,
                 TabWidth = 5,
                 WrappingWidth = 0,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Bottom,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
             };
 
             // Measure the text, make sure its a valid size
             SizeF sz = SizeF.Empty;
             sz = TextMeasurer.Measure(Text, style);
+            style.Origin = new PointF( sz.Width*0.5f, sz.Height*0.5f);
 
             if (sz.Width <= 0 || sz.Height <= 0 || float.IsNaN(sz.Width) || float.IsNaN(sz.Height))
                 return null;

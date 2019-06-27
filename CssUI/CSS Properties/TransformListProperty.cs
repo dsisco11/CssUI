@@ -50,8 +50,12 @@ namespace CssUI
         #endregion
 
         #region Accessors
-        public bool HasValue { get { return (Transforms.Count > 0); } }
-        public bool IsInherited { get { return false; } }// This property CANNOT be inherited.
+        public bool HasValue { get => (Transforms.Count > 0); }
+        public bool IsInherited { get => false; }// A transform property CANNOT be inherited.
+        /// <summary>
+        /// Returns TRUE if this property is inheritable according to its definition
+        /// </summary>
+        public virtual bool IsInheritable { get => Definition.Inherited; }
 
         public CssPropertySet Source
         {

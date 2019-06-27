@@ -38,6 +38,10 @@ namespace CssUI
         /// Returns TRUE if the assigned value is <see cref="CssValue.Inherit"/>
         /// </summary>
         bool IsInherited { get; }
+        /// <summary>
+        /// Returns TRUE if this property is inheritable according to its definition
+        /// </summary>
+        bool IsInheritable { get; }
 
         /// <summary>
         /// The property we belong to

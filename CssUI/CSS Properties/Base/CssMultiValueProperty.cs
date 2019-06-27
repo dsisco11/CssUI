@@ -58,25 +58,29 @@ namespace CssUI
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// </summary>
-        public virtual bool IsAuto { get { return Assigned.FirstOrDefault().Type == EStyleDataType.AUTO; } }
+        public virtual bool IsAuto { get => Assigned.FirstOrDefault().Type == EStyleDataType.AUTO; }
         /// <summary>
         /// Returns TRUE if the assigned value is <see cref="CssValue.Inherit"/>
         /// </summary>
-        public virtual bool IsInherited { get { return Assigned.FirstOrDefault().Type == EStyleDataType.INHERIT; } }
+        public virtual bool IsInherited { get => Assigned.FirstOrDefault().Type == EStyleDataType.INHERIT; }
+        /// <summary>
+        /// Returns TRUE if this property is inheritable according to its definition
+        /// </summary>
+        public virtual bool IsInheritable { get => Definition.Inherited; }
         /// <summary>
         /// Returns TRUE if the assigned value has the <see cref="StyleValueFlags.Depends"/> flag
         /// </summary>
-        public virtual bool HasDependent { get { return Assigned.FirstOrDefault(o => o.Has_Flags(StyleValueFlags.Depends)) != null; } }
+        public virtual bool HasDependent { get => Assigned.FirstOrDefault(o => o.Has_Flags(StyleValueFlags.Depends)) != null; }
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if the assigned value has the <see cref="StyleValueFlags.Depends"/> flag
         /// </summary>
-        public virtual bool HasDependentOrAuto { get { return (Assigned.FirstOrDefault().Type == EStyleDataType.AUTO || Assigned.FirstOrDefault(o => o.Has_Flags(StyleValueFlags.Depends)) != null); } }
+        public virtual bool HasDependentOrAuto { get => (Assigned.FirstOrDefault().Type == EStyleDataType.AUTO || Assigned.FirstOrDefault(o => o.Has_Flags(StyleValueFlags.Depends)) != null); }
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if the assigned value type is a percentage
         /// </summary>
-        public virtual bool HasPercentageOrAuto { get { return (Assigned.FirstOrDefault().Type == EStyleDataType.AUTO || Assigned.FirstOrDefault(o => o.Type == EStyleDataType.PERCENT) != null); } }
+        public virtual bool HasPercentageOrAuto { get => (Assigned.FirstOrDefault().Type == EStyleDataType.AUTO || Assigned.FirstOrDefault(o => o.Type == EStyleDataType.PERCENT) != null); }
 
 
         /// <summary>

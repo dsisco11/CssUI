@@ -153,7 +153,7 @@ namespace CssUI
         public event Action<cssElement, cssElement> onControl_Added;
         public event Action<cssElement, cssElement> onControl_Removed;
 
-        protected override async void Handle_Style_Property_Change(ICssProperty Property, EPropertyFlags Flags, StackTrace Source)
+        protected override async void Handle_Style_Property_Change(ICssProperty Property, EPropertyAffects Flags, StackTrace Source)
         {
             base.Handle_Style_Property_Change(Property, Flags, Source);
 
