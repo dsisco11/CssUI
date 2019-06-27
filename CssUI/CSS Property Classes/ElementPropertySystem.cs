@@ -826,6 +826,9 @@ namespace CssUI
         #region Update_Blend_Color
         void Handle_Cascaded_Blend_Change(ECssPropertyStage Stage, ICssProperty Property)
         {
+            if (Stage == ECssPropertyStage.Specified)// we will get the computed stage soon, its likely to autocompute
+                return;
+
             Opacity = Cascaded.Opacity.Computed.Resolve_Or_Default(1.0);
 
             if (Opacity != 1.0)
@@ -843,6 +846,9 @@ namespace CssUI
 
         private void Handle_Cascaded_Transform_Change(ECssPropertyStage Stage, ICssProperty Property)
         {
+            if (Stage == ECssPropertyStage.Specified)// we will get the computed stage soon, its likely to autocompute
+                return;
+
             Resolve_Transform_Matrix();
         }
         #endregion

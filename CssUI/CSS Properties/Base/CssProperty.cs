@@ -11,9 +11,31 @@ namespace CssUI
     public class CssProperty : ICssProperty
     {// DOCS: https://www.w3.org/TR/CSS22/cascade.html#usedValue
         #region Properties
+        /// <summary>
+        /// Backing value for <see cref="Assigned"/>
+        /// </summary>
         CssValue _value = CssValue.Null;// A properties assigned value defaults to not being set
+        /// <summary>
+        /// Backing value for <see cref="Specified"/>
+        /// </summary>
         CssValue _specified = null;
+        /// <summary>
+        /// Backing value for <see cref="Computed"/>
+        /// </summary>
         CssValue _computed = null;
+        /// <summary>
+        /// Tracks the previous value for <see cref="Assigned"/> so we can detect when changes occur
+        /// </summary>
+        CssValue oldAssignedValue = null;
+        /// <summary>
+        /// Tracks the previous value for <see cref="Specified"/> so we can detect when changes occur
+        /// </summary>
+        CssValue oldSpecifiedValue = null;
+        /// <summary>
+        /// Tracks the previous value for <see cref="Computed"/> so we can detect when changes occur
+        /// </summary>
+        CssValue oldComputedValue = null;
+
 
         /// <summary>
         /// The UI element which contains this property
@@ -43,15 +65,6 @@ namespace CssUI
         /// </summary>
         public readonly bool Locked = false;
 
-
-        /// <summary>
-        /// Tracks the previous value for <see cref="Assigned"/> so we can detect when changes occur
-        /// </summary>
-        CssValue oldAssignedValue = null;
-        /// <summary>
-        /// Tracks the previous value for <see cref="Computed"/> so we can detect when changes occur
-        /// </summary>
-        CssValue oldComputedValue = null;
 
         /// <summary>
         /// All flags which are present for all currently computed <see cref="CssValue"/>'s
@@ -140,7 +153,7 @@ namespace CssUI
             {
                 if (_specified == null)
                 {
-                    _specified = Calculate_Specified().Result;
+                    Reinterpret_Specified();
                 }
 
                 return _specified;
@@ -158,13 +171,7 @@ namespace CssUI
             {
                 if (_computed == null)
                 {
-                    _computed = Calculate_Computed().Result;
-
-                    if (ReferenceEquals(oldComputedValue, null) || oldComputedValue != Assigned)
-                    {
-                        oldComputedValue = new CssValue(_computed);
-                        onValueChange?.Invoke(ECssPropertyStage.Computed, this);
-                    }
+                    Reinterpret_Computed();
                 }
 
                 return _computed;
@@ -326,9 +333,37 @@ namespace CssUI
 
             throw new Exception($"Failed to resolve the Computed value in {nameof(CssProperty)}");
         }
-#endregion
+        #endregion
 
-#region Unit Resolver
+        #region Interpreting
+
+        private void Reinterpret_Specified()
+        {
+            _specified = Calculate_Specified().Result;
+            // detect changes, fire events
+            if (ReferenceEquals(oldSpecifiedValue, null) || _specified != oldSpecifiedValue)
+            {// the computed value changed
+                oldSpecifiedValue = _specified;
+                onValueChange.Invoke(ECssPropertyStage.Specified, this);
+
+                // update the computed value
+                Reinterpret_Computed();
+            }
+        }
+
+        private void Reinterpret_Computed()
+        {
+            _computed = Calculate_Computed().Result;
+            // detect changes, fire events
+            if (ReferenceEquals(oldComputedValue, null) || oldComputedValue != Assigned)
+            {
+                oldComputedValue = new CssValue(_computed);
+                onValueChange?.Invoke(ECssPropertyStage.Computed, this);
+            }
+        }
+        #endregion
+
+        #region Unit Resolver
         /// <summary>
         /// Allows external code to notify this property that a certain unit type has changed scale and if we have a value which uses that unit-type we need to fire our Changed event because our Computed value will be different
         /// </summary>
@@ -482,17 +517,18 @@ namespace CssUI
             _specified = null;// unset our specified value so it gets updated...
             _computed = null;// it only makes sense to update the computed value aswell
 
-            if (ComputeNow)
-            {
-                _specified = await Calculate_Specified();
-                _computed = await Calculate_Computed();
-            }
-
-
             if (ReferenceEquals(oldAssignedValue, null) || oldAssignedValue != Assigned)
             {
                 oldAssignedValue = new CssValue(Assigned);
                 onValueChange?.Invoke(ECssPropertyStage.Assigned, this);
+            }
+
+            if (ComputeNow)
+            {
+                Reinterpret_Specified();
+                // check if Reinterpret_Specified actually reinterpreted computed aswell
+                if (ReferenceEquals(_computed, null))
+                    Reinterpret_Computed();
             }
         }
 
