@@ -23,34 +23,20 @@ namespace CssUI
         /// <summary>
         /// An ID number, unique among all UI elements, assigned to this element.
         /// </summary>
-        public readonly cssElementID UID;
+        public readonly cssElementID UID = new cssElementID();
 
         /// <summary>
-        /// The DEFAULT type-name used when referencing this element from within a StyleSheet, this is set by all element classes which inherit from the uiElement type (they have to, so all of them)
+        /// The CSS type-name used when referencing this element from within a StyleSheet, 
+        /// this is set by all element classes which inherit from the uiElement type
         /// </summary>
-        public abstract string Default_CSS_TypeName { get; }
-        /// <summary>
-        /// If not NULL then this type-name is used when referencing this element from within a StyleSheet
-        /// </summary>
-        string TypeName_Override = null;
-        /// <summary>
-        /// The type-name used when referencing this element from within a StyleSheet
-        /// </summary>
-        public string TypeName { get { return (TypeName_Override != null ? TypeName_Override : Default_CSS_TypeName); } }
-        
+        public abstract string TypeName { get; }
+
         /// <summary>
         /// Allows us to resolve the fullpath just once.
         /// </summary>
         CacheableValue<string> Cached_FullPath = new CacheableValue<string>();
 
-        protected LogSource Logs
-        {
-            get
-            {
-                if (Root != null) return Root.Logs;
-                else return new LogSource("-");
-            }
-        }
+        protected ILogger Logs { get; }
 
         public string FullPath
         {
@@ -59,8 +45,10 @@ namespace CssUI
                 return Cached_FullPath.Get(() => 
                 {
                     string str = string.Empty;
-                    if (Parent?.FullPath != null) str += Parent?.FullPath + "/";
-                    str += (ID != null ? ID : TypeName);
+                    if (Parent?.FullPath != null)
+                        str += Parent?.FullPath + "/";
+                    //str += (ID != null ? ID : TypeName);
+                    str += string.Concat(TypeName, "-", UID);
                     return str;
                 });
             }
@@ -738,9 +726,9 @@ namespace CssUI
         /// <summary>
         /// Forces the element to apply layout logic to all of it's child elements.
         /// </summary>
-        public void PerformLayout()
+        public async void PerformLayout()
         {
-            Style.Cascade();
+            await Style.Cascade();
             //Guid TMR = Timing.Start("PerformLayout()");
             // We still need to apply the positioners ourselves here just incase they arent linked to a target control and are a "relative" positioner.
             xAligner?.Apply_Relative();
@@ -1021,28 +1009,48 @@ namespace CssUI
 
             return (AcceptsDragDrop);
         }
-        
-#endregion
 
-#region Constructors
+        #endregion
+
+        #region Constructors
         /// <summary>
         /// Initializes a new UI element
         /// </summary>
-        /// <param name="Name">A unique ID or classname, ID's must be prefixed with '#' or else the string is considered a classname</param>
-        public cssElement(IParentElement ParentElement, string Name)
+        /// <param name="id">A unique ID</param>
+        public cssElement(IParentElement ParentElement, string className, string id)
         {
-            UID = new cssElementID();
-            ID = UID.ToString();
-            if (this is cssRootElement) Root = (cssRootElement)this;
-            if (!string.IsNullOrEmpty(Name))
+            if (ReferenceEquals(ParentElement, null) && !(this is cssRootElement))
+                throw new ArgumentNullException($"{nameof(ParentElement)} cannot be null!");
+
+            //Setup our logs
+            Logs = LogFactory.GetLogger(() => { return id; }, ParentElement?.Logs);
+
+            // Go ahead and assign our ID
+            if (string.IsNullOrEmpty(id))
             {
-                if (Name.StartsWith("#"))
-                {
-                    if (Name.Length > 1) this.ID = Name.Remove(0, 1);
-                }
-                else TypeName_Override = Name;
+                ID = UID.ToString();
             }
+            else
+            {
+                if (id.StartsWith("#"))
+                {
+                    if (id.Length > 1)
+                        this.ID = id.Remove(0, 1);
+                }
+                else
+                {
+                    this.ID = id;
+                }
+            }
+
+            if (this is cssRootElement)
+                Root = (cssRootElement)this;
+
+            if (!string.IsNullOrEmpty(className))
+                this.Add_Class(className);
+
             // Set default pseudo-state values
+            // We do this in the constructor because these are all just accessor for the elements DOM attributes
             IsEnabled = true;
             IsActive = false;
             IsMouseOver = false;
@@ -1081,33 +1089,6 @@ namespace CssUI
         {
             bool retVal = false;
 
-            if ((Dirt & EElementDirtyBit.Font) != 0)
-            {
-                retVal = true;
-                Update_Font();
-            }
-
-            if (Block.IsDirty)
-            {
-                retVal = true;
-                Update_Block();
-            }
-
-            if (LayoutBit > 0)
-            {
-                retVal = true;
-                PerformLayout();
-            }
-/*
-            // XXX: this check will be obsoleted by issue#10
-            if (!HasFlags(EElementFlags.ReadyForStyle))
-            {
-                // We have now populated all the data our styling values will need
-                Flags_Add(EElementFlags.ReadyForStyle);
-                await Style.Cascade();
-                await Style.Resolve();
-            }*/
-
             if (0 != (Style.Dirt & EPropertySystemDirtFlags.Cascade))
             {
                 await Style.Cascade();
@@ -1121,6 +1102,25 @@ namespace CssUI
             if (0 != (Style.Dirt & EPropertySystemDirtFlags.Font))
             {
                 await Style.Resolve_Font();
+            }
+
+            if (0 != (Dirt & EElementDirtyBit.Font))
+            {
+                retVal = true;
+                Update_Font();
+            }
+
+
+            if (Block.IsDirty)
+            {
+                retVal = true;
+                Update_Block();
+            }
+
+            if (LayoutBit > 0)
+            {
+                retVal = true;
+                PerformLayout();
             }
 
             return retVal;

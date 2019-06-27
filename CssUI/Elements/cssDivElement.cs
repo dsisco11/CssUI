@@ -6,10 +6,10 @@ namespace CssUI
     /// </summary>
     public class cssDivElement : cssContainerElement
     {
-        public override string Default_CSS_TypeName { get { return "Div"; } }
+        public override string TypeName { get { return "Div"; } }
 
         #region Constructors
-        public cssDivElement(IParentElement Parent, string ID = null) : base(Parent, ID)
+        public cssDivElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
         {
             Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
             Layout = ELayoutMode.Default;

@@ -7,10 +7,10 @@ namespace CssUI
     /// </summary>
     public abstract class cssSelectableElement : cssCompoundElement, ISelectableElement
     {
-        public override string Default_CSS_TypeName { get { return "Selectable"; } }
+        public override string TypeName { get { return "Selectable"; } }
 
         #region Constructors
-        public cssSelectableElement(IParentElement Parent, string ID = null) : base(Parent, ID)
+        public cssSelectableElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
         {
             Flags_Add(EElementFlags.Focusable);
         }

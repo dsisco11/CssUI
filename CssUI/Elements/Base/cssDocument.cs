@@ -6,7 +6,7 @@ namespace CssUI
     /// </summary>
     public class cssDocument : cssRootElement
     {
-        public override string Default_CSS_TypeName { get { return "Document"; } }
+        public override string TypeName { get { return "Document"; } }
 
         #region Constructors
         public cssDocument(IRenderEngine Engine) : base(Engine)

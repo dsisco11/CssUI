@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using KeyPic.Benchmarking;
 using CssUI.CSS;
 using CssUI.Enums;
 using System.Numerics;
 using CssUI.Types;
+using xLog;
 
 namespace CssUI
 {
@@ -39,7 +39,7 @@ namespace CssUI
         public readonly IRenderEngine Engine;
         private ulong Frame = 0;
         internal ulong FrameNo { get { return Frame; } }
-        internal readonly xLog.LogSource Logs;
+        internal readonly ILogger Logs;
         public long MouseEnterTime;
         ScheduledFunction MouseHover_TMR;
         #endregion
@@ -80,7 +80,7 @@ namespace CssUI
         #region Constructors
         public cssRootElement(IRenderEngine Engine) : base(null, "#Root")
         {
-            this.Logs = new xLog.LogSource(() => { return Frame.ToString(); });
+            this.Logs = xLog.LogFactory.GetLogger(() => { return Frame.ToString(); });
             this.Engine = Engine;
             Set_Root(this);
 
@@ -725,7 +725,7 @@ namespace CssUI
         public void Present()
         {
             Frame++;
-            Update();
+            Update().Wait();
             Engine.Begin();
 
             Render();

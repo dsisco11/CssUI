@@ -6,10 +6,10 @@ namespace CssUI
     /// </summary>
     public sealed class cssBox : cssElement
     {
-        public override string Default_CSS_TypeName { get { return "Box"; } }
+        public override string TypeName { get { return "Box"; } }
 
         #region Constuctors
-        public cssBox(IParentElement Parent, string ID = null) : base(Parent, ID)
+        public cssBox(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
         {
             Color = new cssColor(1f, 0f, 1f, 1f);
         }

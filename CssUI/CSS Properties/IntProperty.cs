@@ -37,7 +37,7 @@ namespace CssUI.CSS
 
         #region Setters
         /// <summary>
-        /// Sets the <see cref="Explicit"/> value for this property
+        /// Sets the <see cref="Assigned"/> value for this property
         /// </summary>
         /// <param name="value"></param>
         public void Set(int? value)

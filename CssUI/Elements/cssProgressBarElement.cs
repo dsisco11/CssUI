@@ -4,7 +4,7 @@ namespace CssUI
 {
     public class cssProgressBarElement : cssScrollableElement
     {
-        public override string Default_CSS_TypeName { get { return "ProgressBar"; } }
+        public override string TypeName { get { return "ProgressBar"; } }
 
         #region Values
         float value = 0f;
@@ -17,7 +17,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public cssProgressBarElement(IParentElement Parent, string ID = null) : base(Parent, ID)
+        public cssProgressBarElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
         {
             Style.ImplicitRules.Padding_Top.Set(3);
             Style.ImplicitRules.Padding_Right.Set(3);

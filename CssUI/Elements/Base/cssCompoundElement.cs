@@ -15,6 +15,10 @@ namespace CssUI
     /// </summary>
     public abstract class cssCompoundElement : cssElement, IParentElement, ICollection<cssElement>
     {
+        #region Accessors
+        new public ILogger Logs { get; }
+        #endregion
+
         #region Display
         protected override void Handle_Display_Changed()
         {
@@ -90,7 +94,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public cssCompoundElement(IParentElement Parent, string ID) : base(Parent, ID)
+        public cssCompoundElement(IParentElement Parent, string className, string ID) : base(Parent, className, ID)
         {
             Layout = ELayoutMode.Default;
         }

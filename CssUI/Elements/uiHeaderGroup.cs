@@ -6,7 +6,7 @@ namespace CssUI
     /// </summary>
     public class uiHeaderGroup : cssContainerElement
     {
-        public override string Default_CSS_TypeName { get { return "GroupBox"; } }
+        public override string TypeName { get { return "GroupBox"; } }
 
         #region Components
         cssTextElement text;
@@ -21,7 +21,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public uiHeaderGroup(IParentElement Parent, string ID = null) : base(Parent, ID)
+        public uiHeaderGroup(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
         {
             Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
             Layout = ELayoutMode.Default;

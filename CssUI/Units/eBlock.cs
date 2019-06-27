@@ -202,6 +202,7 @@ namespace CssUI
             return FromTRBL(Top+off.Top, Right - off.Right, Bottom - off.Bottom, Left + off.Left);
         }
 
+        #region Operators
         /// <summary>
         /// Decreases the bounds area inwards by the given padding values
         /// <para>Keeps the block centered</para>
@@ -219,7 +220,6 @@ namespace CssUI
             return FromTRBL(bounds.Top, bounds.Right + off.Horizontal, bounds.Bottom + off.Vertical, bounds.Left);
         }
         
-        #region Operators
         public static bool operator ==(eBlock A, eBlock B)
         {
             if (object.ReferenceEquals(A, null) || object.ReferenceEquals(B, null)) return (object.ReferenceEquals(A, null) && object.ReferenceEquals(B, null));
@@ -251,6 +251,7 @@ namespace CssUI
         }
         #endregion
 
+        #region Intersection
         /// <summary>
         /// Returns True if the given point lies within this block
         /// </summary>
@@ -281,5 +282,7 @@ namespace CssUI
             return (Math.Abs(Center_X - block.Center_X) <= (Half_Width + block.Half_Width)) &&
                    (Math.Abs(Center_Y - block.Center_Y) <= (Half_Height + block.Half_Height));
         }
+
+        #endregion
     }
 }

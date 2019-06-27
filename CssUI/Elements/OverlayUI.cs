@@ -7,7 +7,7 @@ namespace CssUI
     /// </summary>
     public class OverlayUI : cssRootElement
     {
-        public override string Default_CSS_TypeName { get { return "OverlayUI"; } }
+        public override string TypeName { get { return "OverlayUI"; } }
 
         #region Constructors
         public OverlayUI(IRenderEngine Engine) : base(Engine)

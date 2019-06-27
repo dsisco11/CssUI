@@ -6,10 +6,10 @@ namespace CssUI
     /// </summary>
     public class cssSpanElement : cssContainerElement
     {
-        public override string Default_CSS_TypeName { get { return "Span"; } }
+        public override string TypeName { get { return "Span"; } }
 
         #region Constructors
-        public cssSpanElement(IParentElement Parent, string ID = null) : base(Parent, ID)
+        public cssSpanElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
         {
             Style.ImplicitRules.Display.Set(EDisplayMode.INLINE);
             Layout = ELayoutMode.None;

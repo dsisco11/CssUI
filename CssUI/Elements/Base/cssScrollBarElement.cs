@@ -109,7 +109,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public cssScrollBarElement(IParentElement Parent, string ID = null, ESliderDirection Dir = ESliderDirection.Unset) : base(Parent, ID)
+        public cssScrollBarElement(IParentElement Parent, ESliderDirection Dir = ESliderDirection.Unset, string className = null, string ID = null) : base(Parent, className, ID)
         {
             Flags_Remove(EElementFlags.DoubleClickable);
             Layout = ELayoutMode.None;

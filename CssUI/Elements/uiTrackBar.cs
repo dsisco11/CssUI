@@ -9,7 +9,7 @@ namespace CssUI
     /// </summary>
     public class uiTrackBar : cssScrollableElement
     {
-        public override string Default_CSS_TypeName { get { return "TrackBar"; } }
+        public override string TypeName { get { return "TrackBar"; } }
 
         #region Events
         public event Action<uiTrackBar> ValueChanged;
@@ -73,7 +73,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public uiTrackBar(IParentElement Parent, ESliderDirection Dir, string ID = null) : base(Parent, ID)
+        public uiTrackBar(IParentElement Parent, ESliderDirection Dir, string className = null, string ID = null) : base(Parent, className, ID)
         {
             Flags_Remove(EElementFlags.DoubleClickable);// Trackbars cannot fire double-click events.
             this.Direction = Dir;

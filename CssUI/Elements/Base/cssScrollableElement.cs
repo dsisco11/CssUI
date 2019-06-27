@@ -5,9 +5,6 @@ using System.Threading.Tasks;
 
 namespace CssUI
 {
-    // TO BE CLEAR: I've kept the implementation of child-controls in a seperate class from the base control class so it is more clear which controls actually support having child-controls
-    // For instance; it wouldnt make sense if a TextArea element could have children
-
     /// <summary>
     /// Provides the basis for elements that can contain other elements and CAN handle scrolling
     /// <para>For elements which allow external sources to add child-elements to them use <see cref="cssContainerElement"/> instead</para>
@@ -77,7 +74,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public cssScrollableElement(IParentElement Parent, string ID) : base(Parent, ID)
+        public cssScrollableElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
         {
         }
         #endregion

@@ -19,7 +19,7 @@ namespace CssUI
     /// </summary>
     public class cssButtonElement : cssScrollableElement, IGenericGraphic, ITextElement
     {
-        public override string Default_CSS_TypeName { get { return "Button"; } }
+        public override string TypeName { get { return "Button"; } }
         public EReplacedElementType ImageType { get { return (gfx!=null ? gfx.Kind : EReplacedElementType.NONE); } }
 
         #region Components
@@ -158,7 +158,7 @@ namespace CssUI
         }
         
         #region Constructors
-        public cssButtonElement(IParentElement Parent, string ID = null) : base(Parent, ID)
+        public cssButtonElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
         {
             Flags_Remove(EElementFlags.DoubleClickable);// Button elements cannot process double click events, we just want normal click events instead.
         }

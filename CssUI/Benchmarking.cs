@@ -1,9 +1,9 @@
-﻿using xLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
-namespace KeyPic.Benchmarking
+namespace CssUI
 {
 
     public struct Benchmark_Info
@@ -38,6 +38,12 @@ namespace KeyPic.Benchmarking
             return string.Format("[{0}]x{1} ({2:F4}s Total) Average: {3:F4}s | Low: {4:F4}s | High: {5:F4}", Name, Count, Total, Average, Low, High);
         }
     }
+
+    public struct Benchmark_Instance
+    {
+        public string Name;
+        public Stopwatch Timing;
+    }
     /// <summary>
     /// Makes gathering benchmark times en mass and computing their average, etc.
     /// </summary>
@@ -46,41 +52,58 @@ namespace KeyPic.Benchmarking
         /// <summary>
         /// Stores a list of timing operation names, for use in addressing history.
         /// </summary>
-        static Dictionary<Guid, string> Names = new Dictionary<Guid, string>();
+        //static Dictionary<Guid, string> Names = new Dictionary<Guid, string>();
         /// <summary>
         /// Stores a list of the ongoing timers
         /// </summary>
-        static Dictionary<Guid, Stopwatch> Timers = new Dictionary<Guid, Stopwatch>();
+        //static Dictionary<Guid, Stopwatch> Timers = new Dictionary<Guid, Stopwatch>();
+
         /// <summary>
-        /// History of elapsed time values in seconds
+        /// Stores a list of the ongoing benchmarks
+        /// </summary>
+        static IDictionary<Guid, Benchmark_Instance> Active = new Dictionary<Guid, Benchmark_Instance>();
+
+        /// <summary>
+        /// History of elapsed benchmark time values in seconds
         /// </summary>
         static Dictionary<string, List<double>> History = new Dictionary<string, List<double>>();
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Guid Start(string Name)
         {
             Guid ID = Guid.NewGuid();
-            Stopwatch sw = new Stopwatch();
-            Timers.Add(ID, sw);
-            Names.Add(ID, Name);
 
-            sw.Start();
+            var Info = new Benchmark_Instance()
+            {
+                Name = Name,
+                Timing = new Stopwatch()
+            };
+
+            Active.Add(ID, Info);
+
+            Info.Timing.Start();
             return ID;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Stop(Guid ID)
         {
-            Stopwatch sw;
-            if (!Timers.TryGetValue(ID, out sw)) return;
+            Benchmark_Instance Instance;
+            if (!Active.TryGetValue(ID, out Instance))
+                throw new KeyNotFoundException("Cannot stop benchmark timer, the specified ID does not exist!");
 
-            if (!sw.IsRunning) throw new InvalidOperationException("Benchmarking timer wasnt running!!!");
-            sw.Stop();
-            string Name;
-            if (!Names.TryGetValue(ID, out Name)) return;
-            if (!History.ContainsKey(Name)) History.Add(Name, new List<double>(0));
+            string Name = Instance.Name;
+            Stopwatch Timer = Instance.Timing;
 
-            History[Name].Add(sw.Elapsed.TotalSeconds);
-            Timers.Remove(ID);
-            Names.Remove(ID);
+            // Stop the timer
+            if (!Timer.IsRunning) throw new InvalidOperationException("Benchmarking timer wasnt running!!!");
+            Timer.Stop();
+            // Setup our list of times if it doesnt exist
+            if (!History.ContainsKey(Name))
+                History.Add(Name, new List<double>(100));
+
+            History[Name].Add(Timer.Elapsed.TotalSeconds);
+            Active.Remove(ID);
         }
 
         public static Benchmark_Info Get(string Name)
@@ -107,7 +130,7 @@ namespace KeyPic.Benchmarking
         {
             foreach (var kv in History)
             {
-                Log.Success(Get(kv.Key).ToString());
+                xLog.Log.Success(Get(kv.Key).ToString());
             }
         }
     }

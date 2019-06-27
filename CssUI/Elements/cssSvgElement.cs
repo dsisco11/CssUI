@@ -11,7 +11,7 @@ namespace CssUI
     /// </summary>
     public class cssSvgElement : cssReplacedElement
     {
-        public override string Default_CSS_TypeName { get { return "Svg"; } }
+        public override string TypeName { get { return "Svg"; } }
 
         #region Accessors
     #if ENABLE_SVG
@@ -88,7 +88,7 @@ namespace CssUI
 #endregion
 
 #region Constructors
-        public cssSvgElement(IParentElement Parent, string ID = null) : base(Parent, EReplacedElementType.SVG, ID)
+        public cssSvgElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, EReplacedElementType.SVG, className, ID)
         {
             Style.Cascaded.ObjectFit.Value = EObjectFit.Contain;
         }

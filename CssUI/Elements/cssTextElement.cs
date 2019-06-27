@@ -16,7 +16,7 @@ namespace CssUI
     /// </summary>
     public class cssTextElement : cssElement, ITextElement
     {
-        public override string Default_CSS_TypeName { get { return "Text"; } }
+        public override string TypeName { get { return "Text"; } }
 
         public override bool IsEmpty { get { return string.IsNullOrEmpty(text); } }
 
@@ -41,7 +41,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public cssTextElement(IParentElement Parent, string ID = null) : base(Parent, ID)
+        public cssTextElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
         {
             // If the box-sizing mode isn't content then our borders & padding will warp our text because they change the content-area block size and it is no longer the same size as the rendered text!
             /*Style.User.BoxSizing.Set(EBoxSizingMode.CONTENT);

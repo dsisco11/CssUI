@@ -8,7 +8,7 @@ namespace CssUI
     public abstract class cssContainerElement : cssScrollableElement
     {
         #region Constructors
-        public cssContainerElement(IParentElement Parent, string ID) : base(Parent, ID)
+        public cssContainerElement(IParentElement Parent, string className = null, string ID) : base(Parent, className, ID)
         {
         }
         #endregion

@@ -34,7 +34,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public cssReplacedElement(IParentElement Parent, EReplacedElementType Kind, string ID = null) : base(Parent, ID)
+        public cssReplacedElement(IParentElement Parent, EReplacedElementType Kind, string className = null, string ID = null) : base(Parent, className, ID)
         {
             this.Kind = Kind;
         }

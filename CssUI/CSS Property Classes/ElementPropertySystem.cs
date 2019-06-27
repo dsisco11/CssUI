@@ -420,8 +420,7 @@ namespace CssUI
         /// </summary>
         public async Task Cascade()
         {
-            // XXX: we HAVE to cascade ALL values, not just the set ones or else values that are inherited will never be because they never cascade due to not having a value set
-            //  Actually we just need to make sure those propertis in our Specified list update their computed values
+            var benchmark_id = Benchmark.Start("style-cascade");
 
             // Get a list of all the properties we are going to need to work with
             AsyncCountdownEvent ctdn = null;
@@ -493,6 +492,7 @@ namespace CssUI
 
             // Remove cascade flag
             Dirt &= ~EPropertySystemDirtFlags.Cascade;
+            Benchmark.Stop(benchmark_id);
         }
 
         /// <summary>
@@ -631,6 +631,7 @@ namespace CssUI
         public async Task Resolve()
         {
             if (0 == (Dirt & EPropertySystemDirtFlags.Block)) return;
+            var benchmark_id = Benchmark.Start("block-resolution");
 
             // XXX: Compute all 3 of these async
             this.Intrinsic_Ratio = Cascaded.Intrinsic_Ratio.Specified.Resolve();
@@ -699,6 +700,8 @@ namespace CssUI
 
             // Remove flag from dirt
             Dirt &= ~EPropertySystemDirtFlags.Block;
+
+            Benchmark.Stop(benchmark_id);
         }
 
         void Resolve_Transform_Matrix()

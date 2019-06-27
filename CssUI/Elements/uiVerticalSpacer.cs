@@ -6,10 +6,10 @@ namespace CssUI
     /// </summary>
     public class uiVerticalSpacer : cssElement
     {
-        public override string Default_CSS_TypeName { get { return "VerticalSpacer"; } }
+        public override string TypeName { get { return "VerticalSpacer"; } }
 
         #region Constructors
-        public uiVerticalSpacer(IParentElement Parent, string ID = null) : base(Parent, ID)
+        public uiVerticalSpacer(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
         {
             Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
             Style.ImplicitRules.BoxSizing.Set(EBoxSizingMode.CONTENT);

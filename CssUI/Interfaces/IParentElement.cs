@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using xLog;
+using System.Collections.Generic;
 
 namespace CssUI
 {
@@ -8,6 +9,7 @@ namespace CssUI
     public interface IParentElement
     {
         #region Content
+        ILogger Logs { get; }
         bool IsEmpty { get; }
 
         /// <summary>

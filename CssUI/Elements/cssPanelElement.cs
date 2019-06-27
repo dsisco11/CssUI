@@ -6,10 +6,10 @@ namespace CssUI
     /// </summary>
     public class cssPanelElement : cssContainerElement
     {
-        public override string Default_CSS_TypeName { get { return "Panel"; } }
+        public override string TypeName { get { return "Panel"; } }
 
         #region Constructors
-        public cssPanelElement(IParentElement Parent, string ID = null) : base(Parent, ID)
+        public cssPanelElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
         {
             Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
             Layout = ELayoutMode.Default;

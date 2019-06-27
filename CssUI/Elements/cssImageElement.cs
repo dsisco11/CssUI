@@ -6,7 +6,7 @@ namespace CssUI
     /// </summary>
     public class cssImageElement : cssReplacedElement, IImageElement
     {
-        public override string Default_CSS_TypeName { get { return "Image"; } }
+        public override string TypeName { get { return "Image"; } }
         public override bool IsEmpty { get { return (Texture == null); } }
 
         #region Accessors
@@ -39,7 +39,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public cssImageElement(IParentElement Parent, string Name = null) : base(Parent, EReplacedElementType.IMAGE, Name)
+        public cssImageElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, EReplacedElementType.IMAGE, className, ID)
         {
             Style.ImplicitRules.ObjectFit.Value = EObjectFit.Contain;
         }
