@@ -78,7 +78,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public cssRootElement(IRenderEngine Engine) : base(null, "#Root")
+        public cssRootElement(IRenderEngine Engine) : base(null, null, "#Root")
         {
             this.Logs = xLog.LogFactory.GetLogger(() => { return Frame.ToString(); });
             this.Engine = Engine;

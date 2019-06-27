@@ -138,6 +138,13 @@ namespace CssUI.DOM
         #endregion
 
         #region Classes
+
+        public IList<string> Get_ClassList()
+        {
+            string curClasses = Get_Attribute<string>("class") ?? string.Empty;
+            var Classes = new List<string>(curClasses.Split(' '));
+            return Classes;
+        }
         /// <summary>
         /// Adds a styling class to the element
         /// </summary>
@@ -145,7 +152,7 @@ namespace CssUI.DOM
         public bool Add_Class(string ClassName)
         {
             if (string.IsNullOrEmpty(ClassName)) return false;
-            var Classes = new List<string>(Get_Attribute<string>("class")?.Split(' '));
+            var Classes = Get_ClassList();
             Classes.Add(ClassName);
             return Set_Attribute("class", string.Join(" ", Classes));
         }
@@ -157,7 +164,7 @@ namespace CssUI.DOM
         public bool Remove_Class(string ClassName)
         {
             if (string.IsNullOrEmpty(ClassName)) return false;
-            var Classes = new List<string>(Get_Attribute<string>("class")?.Split(' '));
+            var Classes = Get_ClassList();
             Classes.Remove(ClassName);
             return Set_Attribute("class", string.Join(" ", Classes));
         }
@@ -169,7 +176,7 @@ namespace CssUI.DOM
         public bool Has_Class(string ClassName)
         {
             if (string.IsNullOrEmpty(ClassName)) return false;
-            return new List<string>(Get_Attribute<string>("class")?.Split(' ')).Contains(ClassName);
+            return this.Get_ClassList().Contains(ClassName);
         }
         #endregion
 
