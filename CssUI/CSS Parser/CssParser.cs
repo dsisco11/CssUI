@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CssUI.CSS
-{
+namespace CssUI.CSS.Parser
+{// DOCS: https://www.w3.org/TR/css-syntax-3/#consume-a-simple-block
 
     /// <summary>
     /// Parses a stream of <see cref="CssToken"/>s and returns 
@@ -51,7 +48,7 @@ namespace CssUI.CSS
             CssComponent Rule;
             Consume_All_Whitespace();// Consume all whitespace
 
-            if (Stream.Next.Type == ECssTokenType.EOF) throw new CssSyntaxError("Unexpected EOF");
+            if (Stream.Next.Type == ECssTokenType.EOF) throw new CssSyntaxErrorException("Unexpected EOF");
             else if (Stream.Next.Type == ECssTokenType.At_Keyword)
             {
                 Rule = Consume_AtRule();
@@ -59,23 +56,23 @@ namespace CssUI.CSS
             else
             {
                 Rule = Consume_QualifiedRule();
-                if (Rule == null) throw new CssSyntaxError("Unable to consume qualified rule!");
+                if (Rule == null) throw new CssSyntaxErrorException("Unable to consume qualified rule!");
             }
 
             Consume_All_Whitespace();// Consume all whitespace
             if (Stream.Next.Type == ECssTokenType.EOF)
                 return Rule;
             else
-                throw new CssSyntaxError("Expected EOF");
+                throw new CssSyntaxErrorException("Expected EOF");
         }
 
         public CssDecleration Parse_Decleration()
         {
             Consume_All_Whitespace();
-            if (Stream.Next.Type != ECssTokenType.Ident) throw new CssSyntaxError("Expected Ident token");
+            if (Stream.Next.Type != ECssTokenType.Ident) throw new CssSyntaxErrorException("Expected Ident token");
 
             CssDecleration Dec = Consume_Decleration();
-            if (Dec != null) throw new CssSyntaxError("Unable to consume a decleration!");
+            if (Dec != null) throw new CssSyntaxErrorException("Unable to consume a decleration!");
 
             return Dec;
         }
@@ -88,17 +85,17 @@ namespace CssUI.CSS
         public CssToken Parse_ComponentValue()
         {
             Consume_All_Whitespace();
-            if (Stream.Next.Type == ECssTokenType.EOF) throw new CssSyntaxError("Unexpected EOF!");
+            if (Stream.Next.Type == ECssTokenType.EOF) throw new CssSyntaxErrorException("Unexpected EOF!");
 
             CssToken Res;
             Res = Consume_ComponentValue();
-            if (Res == null) throw new CssSyntaxError("Unable to consume component value!");
+            if (Res == null) throw new CssSyntaxErrorException("Unable to consume component value!");
 
             Consume_All_Whitespace();
             if (Stream.Next.Type == ECssTokenType.EOF)
                 return Res;
             else
-                throw new CssSyntaxError("EOF expected");
+                throw new CssSyntaxErrorException("EOF expected");
         }
 
         public List<CssToken> Parse_ComponentValue_List()
@@ -295,7 +292,7 @@ namespace CssUI.CSS
             
             CssToken Token;
             do
-            {// Find all of the functions arguments
+            {// Find all of the decleration values
                 Token = Stream.Consume();
                 if (Token.Type == ECssTokenType.EOF) break;
                 //Decleration.Value.Add(new CssPreservedToken(Token));
@@ -367,7 +364,7 @@ namespace CssUI.CSS
                     EndToken = new SqBracketCloseToken();
                     break;
                 default:
-                    throw new Exception("Current input token is not a bracket type!");
+                    throw new CssSyntaxErrorException("Current input token is not a bracket type!");
             }
 
             CssSimpleBlock Block = new CssSimpleBlock(StartToken);

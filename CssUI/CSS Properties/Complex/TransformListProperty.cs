@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CssUI.CSS;
+using CssUI.Internal;
 
 namespace CssUI
 {
@@ -256,7 +257,7 @@ namespace CssUI
 
         #region Constructors
         // TODO: Finish the logic for when 'Unset' = TRUE
-        public TransformListProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked, bool Unset)
+        public TransformListProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked)
         {
             this.CssName = new AtomicString(CssName);
             this.Owner = Owner;
@@ -274,5 +275,14 @@ namespace CssUI
                 this.Transforms[func.Name] = func;
             }
         }
+
+
+        #region ToString
+        public override string ToString() { throw new NotImplementedException(); }
+        #endregion
+
+        #region Serialization
+        public string Serialize() { throw new NotImplementedException(); }
+        #endregion
     }
 }

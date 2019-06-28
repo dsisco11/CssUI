@@ -13,23 +13,8 @@ namespace CssUI.CSS
 
         #region Constructors
 
-        public IntProperty() : base()
-        {
-        }
-        
-        public IntProperty(string CssName) : base(CssName)
-        {
-        }
-
-        public IntProperty(bool Locked) : base(Locked)
-        {
-        }
-
-        public IntProperty(string CssName, bool Locked, CssPropertyOptions Options) : base(CssName, Locked, Options)
-        {
-        }
-
-        public IntProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Source, Owner, Options)
+        public IntProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked) 
+            : base(CssName, Locked, Source, Owner)
         {
         }
 

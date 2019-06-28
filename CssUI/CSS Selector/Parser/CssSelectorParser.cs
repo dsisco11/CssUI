@@ -50,19 +50,19 @@ namespace CssUI.CSS
             if (Starts_Combinator(Stream.Peek(0)))
             {
                 var o = Consume_Combinator(Stream);
-                if (o == null) throw new CssParserError("Unable to consume combinator!");
+                if (o == null) throw new CssParserException("Unable to consume combinator!");
                 return o;
             }
             else if (Starts_QualifiedName(Stream.Peek(0), Stream.Peek(1), Stream.Peek(2)))
             {
                 var o = Consume_QualifiedName(Stream);
-                if (o == null) throw new CssParserError("Unable to consume qualified name!");
+                if (o == null) throw new CssParserException("Unable to consume qualified name!");
                 return o;
             }
             else if (Starts_NamespacePrefix(Stream.Peek(0), Stream.Peek(1)))
             {
                 var o = Consume_NamespacePrefix(Stream);
-                if (o == null) throw new CssParserError("Unable to consume namespace prefix!");
+                if (o == null) throw new CssParserException("Unable to consume namespace prefix!");
                 return o;
             }
 
@@ -79,14 +79,14 @@ namespace CssUI.CSS
             if (Tok.Type == ECssTokenType.Ident)
             {
                 Name = (Tok as IdentToken).Value;
-                if (Stream.Next.Type != ECssTokenType.Column) throw new CssParserError("Namespace prefixes must be followed by a '|' token!");
+                if (Stream.Next.Type != ECssTokenType.Column) throw new CssParserException("Namespace prefixes must be followed by a '|' token!");
 
                 Stream.Consume();// Consume the next '|' token
             }
             else if (Tok.Type == ECssTokenType.Delim && (Tok as DelimToken).Value == '*')
             {
                 Name = "*";// Any namespace
-                if (Stream.Next.Type != ECssTokenType.Column) throw new CssParserError("Namespace prefixes must be followed by a '|' token!");
+                if (Stream.Next.Type != ECssTokenType.Column) throw new CssParserException("Namespace prefixes must be followed by a '|' token!");
 
                 Stream.Consume();// Consume the next '|' token
             }
@@ -354,7 +354,7 @@ namespace CssUI.CSS
                         Combinator = ESelectorCombinator.Sibling_General;
                         break;
                     default:
-                        throw new CssParserError(string.Concat("Unrecognized Combinator(", Comb.Value, ")"));
+                        throw new CssParserException(string.Concat("Unrecognized Combinator(", Comb.Value, ")"));
                 }
             }
 
@@ -392,7 +392,7 @@ namespace CssUI.CSS
                         Combinator = ESelectorCombinator.Sibling_General;
                         break;
                     default:
-                        throw new CssParserError(string.Concat("Unrecognized Combinator(", Comb.Value, ")"));
+                        throw new CssParserException(string.Concat("Unrecognized Combinator(", Comb.Value, ")"));
                 }
             }
 
@@ -464,7 +464,7 @@ namespace CssUI.CSS
         static CssIDSelector Consume_ID_Selector(CssTokenStream Stream)
         {
             HashToken Hash = (Stream.Consume() as HashToken);
-            if (Hash.HashType != EHashTokenType.ID) throw new CssParserError("Invalid Hash token, hash-type is not ID!");
+            if (Hash.HashType != EHashTokenType.ID) throw new CssParserException("Invalid Hash token, hash-type is not ID!");
             return new CssIDSelector(Hash.Value);
         }
 
@@ -560,7 +560,7 @@ namespace CssUI.CSS
                     }
                 case ECssTokenType.FunctionName:
                     {
-                        throw new CssParserError("Encountered unexpected 'FunctionNameToken' in parsed list (Should have been turned into a 'CssFunction' token already!)");
+                        throw new CssParserException("Encountered unexpected 'FunctionNameToken' in parsed list (Should have been turned into a 'CssFunction' token already!)");
                     }
                 case ECssTokenType.Function:
                     {
@@ -589,7 +589,7 @@ namespace CssUI.CSS
                     }
                 case ECssTokenType.FunctionName:
                     {
-                        throw new CssParserError("Encountered unexpected 'FunctionNameToken' in parsed list (Should have been turned into a 'CssFunction' token already!)");
+                        throw new CssParserException("Encountered unexpected 'FunctionNameToken' in parsed list (Should have been turned into a 'CssFunction' token already!)");
                     }
                 case ECssTokenType.Function:
                     {

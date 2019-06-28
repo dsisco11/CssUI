@@ -90,7 +90,7 @@ namespace CssUI
         }
 
         void ICollection<T>.Add(T item) => Add(item);
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        IEnumerator IEnumerable.Enumerator => GetEnumerator();
 
         // We use Count() and not Any() because we must ensure full loop pass
         internal bool AddRange(IEnumerable<T> items) => items.Count(Add) > 0;

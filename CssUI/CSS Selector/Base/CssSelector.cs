@@ -5,7 +5,7 @@ using System.Linq;
 namespace CssUI.CSS
 {
     // XXX: Alter the selector matching code to perform matching from right-to-left (way more efficient)
-
+    // DOCS: https://www.w3.org/TR/selectors-4
 
     /// <summary>
     /// Represents a CSS selector that can perform matching

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CssUI.CSS;
+using CssUI.Internal;
 
 namespace CssUI
 {
@@ -9,6 +10,32 @@ namespace CssUI
     /// </summary>
     public interface ICssProperty
     {
+
+        #region Events
+        /// <summary>
+        /// Callback for when any value stage of this property changes
+        /// </summary>
+        event Action<ECssPropertyStage, ICssProperty> onValueChange;
+        #endregion
+
+        #region Properties
+        /// <summary>
+        /// Tracks which styling rule block this property came from
+        /// </summary>
+        CssSelector Selector { get; set; }
+        /// <summary>
+        /// The property we belong to
+        /// </summary>
+        /// <returns></returns>
+        CssPropertySet Source { get; }
+        /// <summary>
+        /// Returns the definition for this property
+        /// </summary>
+        /// <returns></returns>
+        CssPropertyDefinition Definition { get; }
+        #endregion
+
+        #region Accessors
         cssElement Owner { get; }
         /// <summary>
         /// The properties identifier token in stylesheets.
@@ -19,15 +46,6 @@ namespace CssUI
         /// Tracks which styling rule block this property came from
         /// </summary>
         WeakReference<CssPropertySet> SourcePtr { get; set; }
-        /// <summary>
-        /// Tracks which styling rule block this property came from
-        /// </summary>
-        CssSelector Selector { get; set; }
-
-        /// <summary>
-        /// Callback for when any value stage of this property changes
-        /// </summary>
-        event Action<ECssPropertyStage, ICssProperty> onValueChange;
 
         /// <summary>
         /// Returns whether or not the property has a set value that should take affect during cascading.
@@ -42,30 +60,43 @@ namespace CssUI
         /// Returns TRUE if this property is inheritable according to its definition
         /// </summary>
         bool IsInheritable { get; }
+        #endregion
 
+        #region Inherited Value
         /// <summary>
-        /// The property we belong to
+        /// Returns the inherited value from the properties owners parent element
         /// </summary>
-        /// <returns></returns>
-        CssPropertySet Source { get; }
-        /// <summary>
-        /// Returns the definition for this property
-        /// </summary>
-        /// <returns></returns>
-        CssPropertyDefinition Definition { get; }
+        CssValue Find_Inherited_Value();
+        #endregion
 
+        #region Serialization
+        string Serialize();
+        #endregion
+
+        #region Unit Resolver
+        /// <summary>
+        /// Allows external code to notify this property that a certain unit type has changed scale and if we have a value which uses that unit-type we need to fire our Changed event because our Computed value will be different
+        /// </summary>
+        void Handle_Unit_Change(EStyleUnit Unit);
+        #endregion
+
+        #region Cascading
         /// <summary>
         /// Asynchronously overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
         /// </summary>
         /// <returns>Success</returns>
         Task<bool> CascadeAsync(ICssProperty value);
-        
+        #endregion
+
+        #region Overwriting
         /// <summary>
         /// Asynchronously overwrites the assigned value of this instance with values from another if they are different
         /// </summary>
         /// <returns>Success</returns>
         Task<bool> OverwriteAsync(ICssProperty value);
+        #endregion
 
+        #region Updating
         /// <summary>
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
@@ -93,10 +124,7 @@ namespace CssUI
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
         Task UpdatePercentageOrAuto(bool ComputeNow = false);
 
-        /// <summary>
-        /// Allows external code to notify this property that a certain unit type has changed scale and if we have a value which uses that unit-type we need to fire our Changed event because our Computed value will be different
-        /// </summary>
-        void Handle_Unit_Change(EStyleUnit Unit);
+        #endregion
 
     }
 

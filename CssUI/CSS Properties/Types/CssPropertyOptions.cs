@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CssUI.Internal;
+using System;
 
 namespace CssUI.CSS
 {
@@ -58,6 +59,19 @@ namespace CssUI.CSS
                     return AllowPercentage;
                 default:
                     return true;
+            }
+        }
+
+        /// <summary>
+        /// Throws an exception if any of the given values are invalid according to the currently set options
+        /// </summary>
+        /// <param name="Value"></param>
+        /// <returns></returns>
+        public void CheckAndThrow(ICssProperty Owner, CssValueList Values)
+        {
+            foreach (CssValue Value in Values)
+            {
+                CheckAndThrow(Owner, Value);
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using CssUI.CSS;
+using CssUI.CSS.Parser;
 
 namespace CssUI
 {
@@ -40,12 +41,9 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public PositionProperty() : base()
-        {
-            base.onValueChange += this.Handle_Value_Change;
-        }
 
-        public PositionProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Source, Owner, Options)
+        public PositionProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked, CssPropertyOptions Options) 
+            : base(CssName, Locked, Source, Owner, Options)
         {
             base.onValueChange += this.Handle_Value_Change;
         }

@@ -23,7 +23,7 @@ namespace CssUI.CSS
             this.Selectors = new List<CssSimpleSelector>(Collection);
             CssSimpleSelector ts = Selectors.FirstOrDefault(o => o is CssTypeSelector);
             if (ts != null && ts != Selectors[0] || Selectors.Count(o => o is CssTypeSelector) > 1)
-                throw new CssSyntaxError("Compound selectors can only contain a single type-selector and it MUST be the first selector in the list!");
+                throw new CssSyntaxErrorException("Compound selectors can only contain a single type-selector and it MUST be the first selector in the list!");
         }
 
         public CssCompoundSelector(CssCompoundSelector Compound) : this(Compound.Selectors)

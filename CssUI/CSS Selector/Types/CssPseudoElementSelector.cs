@@ -18,7 +18,7 @@ namespace CssUI.CSS
             switch (Name)
             {
                 default:
-                    throw new CssSelectorError("Selector pseudo-element (", Name, ") logic not implemented!");
+                    throw new CssSelectorException("Selector pseudo-element (", Name, ") logic not implemented!");
             }
         }
     }

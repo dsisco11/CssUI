@@ -1,160 +1,98 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CssUI.CSS;
+using CssUI.Internal;
 
 namespace CssUI
 {
+
     /// <summary>
-    /// Represents a CSS property value which holds Assigned, Specified, and Computed values.
+    /// Represents a CSS property and manages all of its value states: Assigned, Specified, and Computed values.
     /// </summary>
-    public class CssProperty : ICssProperty
-    {// DOCS: https://www.w3.org/TR/CSS22/cascade.html#usedValue
-        #region Properties
+    public class CssProperty : CssPropertyBase, ICssProperty
+    {// DOCS: https://www.w3.org/TR/css-cascade-3/#cascaded
+        
+        #region backing values
         /// <summary>
         /// Backing value for <see cref="Assigned"/>
+        /// <para> Docs: https://www.w3.org/TR/css-cascade-3/#cascaded </para>
         /// </summary>
-        CssValue _value = CssValue.Null;// A properties assigned value defaults to not being set
+        CssValue _assigned = CssValue.Null;
+
         /// <summary>
         /// Backing value for <see cref="Specified"/>
+        /// <para> Docs: https://www.w3.org/TR/css-cascade-3/#specified </para>
         /// </summary>
         CssValue _specified = null;
+
         /// <summary>
         /// Backing value for <see cref="Computed"/>
+        /// <para> Docs: https://www.w3.org/TR/css-cascade-3/#computed </para>
         /// </summary>
         CssValue _computed = null;
+
+        /// <summary>
+        /// Backing value for <see cref="Used"/>
+        /// <para> Docs: https://www.w3.org/TR/css-cascade-3/#used </para>
+        /// </summary>
+        CssValue _used = null;
+
+        /// <summary>
+        /// Backing value for <see cref="Actual"/>
+        /// <para> Docs: https://www.w3.org/TR/css-cascade-3/#actual </para>
+        /// </summary>
+        CssValue _actual = null;
+        #endregion
+
+        #region value trackers
         /// <summary>
         /// Tracks the previous value for <see cref="Assigned"/> so we can detect when changes occur
         /// </summary>
-        CssValue oldAssignedValue = null;
+        CssValueHash oldAssigned = null;
         /// <summary>
         /// Tracks the previous value for <see cref="Specified"/> so we can detect when changes occur
         /// </summary>
-        CssValue oldSpecifiedValue = null;
+        CssValueHash oldSpecified = null;
         /// <summary>
         /// Tracks the previous value for <see cref="Computed"/> so we can detect when changes occur
         /// </summary>
-        CssValue oldComputedValue = null;
-        public int[] ChangeNotices = new int[6] { 0, 0, 0, 0, 0, 0 };
-
-
+        CssValueHash oldComputed = null;
         /// <summary>
-        /// The UI element which contains this property
+        /// Tracks the previous value for <see cref="Used"/> so we can detect when changes occur
         /// </summary>
-        public cssElement Owner { get; protected set; } = null;
+        CssValueHash oldUsed = null;
         /// <summary>
-        /// The propertys identifier token in stylesheets.
-        /// <para>EG; "box-sizing", "margin-left", "margin-top", etc </para>
+        /// Tracks the previous value for <see cref="Actual"/> so we can detect when changes occur
         /// </summary>
-        public AtomicString CssName { get; protected set; } = null;
-        /// <summary>
-        /// Callback for when any value stage of this property changes
-        /// </summary>
-        public event Action<ECssPropertyStage, ICssProperty> onValueChange;
-
-        /// <summary>
-        /// Tracks which styling rule block this property came from
-        /// </summary>
-        public WeakReference<CssPropertySet> SourcePtr { get; set; } = null;
-        /// <summary>
-        /// Tracks which styling rule block this property came from
-        /// </summary>
-        public CssSelector Selector { get; set; } = null;
-
-        /// <summary>
-        /// If true then this propertys values cannot be set externally
-        /// </summary>
-        public readonly bool Locked = false;
-
-
-        /// <summary>
-        /// All flags which are present for all currently computed <see cref="CssValue"/>'s
-        /// </summary>
-        public StyleValueFlags Flags { get { return Specified.Flags; } }
-
-        /// <summary>
-        /// Options which dictate how this property acts and what values it can accept
-        /// </summary>
-        protected readonly CssPropertyOptions Options = new CssPropertyOptions();
-        #endregion
-
-        #region Accessors
-
-        public bool HasValue { get => !Assigned.IsNull(); }
-        /// <summary>
-        /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
-        /// </summary>
-        public virtual bool IsAuto { get => Assigned.Type == EStyleDataType.AUTO; }
-        /// <summary>
-        /// Returns TRUE if the assigned value is <see cref="CssValue.Inherit"/>
-        /// </summary>
-        public virtual bool IsInherited { get => Assigned.Type == EStyleDataType.INHERIT; }
-        /// <summary>
-        /// Returns TRUE if this property is inheritable according to its definition
-        /// </summary>
-        public virtual bool IsInheritable { get => Definition.Inherited; }
-        /// <summary>
-        /// Returns TRUE if the assigned value has the <see cref="StyleValueFlags.Depends"/> flag
-        /// </summary>
-        public virtual bool IsDependent { get => Assigned.Has_Flags(StyleValueFlags.Depends); }
-        /// <summary>
-        /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
-        /// Returns TRUE if the assigned value has the <see cref="StyleValueFlags.Depends"/> flag
-        /// </summary>
-        public virtual bool IsDependentOrAuto { get => (Assigned.Type == EStyleDataType.AUTO || Assigned.Has_Flags(StyleValueFlags.Depends)); }
-        /// <summary>
-        /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
-        /// Returns TRUE if the assigned value type is a percentage
-        /// </summary>
-        public virtual bool IsPercentageOrAuto { get => (Assigned.Type == EStyleDataType.AUTO || Assigned.Type == EStyleDataType.PERCENT); }
-
-        public CssPropertySet Source
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get
-            {
-                this.SourcePtr.TryGetTarget(out CssPropertySet src);
-                return src;
-            }
-        }
-
-        public CssPropertyDefinition Definition
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get
-            {
-                if (string.IsNullOrEmpty(this.CssName))
-                    return null;
-                return CssProperties.Definitions[this.CssName];
-            }
-        }
+        CssValueHash oldActual = null;
         #endregion
 
         #region Values
         /// <summary>
         /// Raw value assigned to the property from the cascade process.
         /// CSS standards call this the Cascaded value
+        /// This is the value that the stylesheet gave us(could be no value at all)
         /// </summary>
         public CssValue Assigned
         {
-            get { return _value; }
+            get { return _assigned; }
             set
             {
                 if (Locked) throw new Exception("Cannot modify the value of a locked css property!");
-                Options.CheckAndThrow(this, value);
+                Definition.CheckAndThrow(this, value);
                 // Translate a value of NULL to CSSValue.Null
-                _value = (object.ReferenceEquals(value, null) ? CssValue.Null : value);
+                _assigned = (object.ReferenceEquals(value, null) ? CssValue.Null : value);
                 //our assigned value has changed, this means our specified and computed valued are now incorrect.
                 Update();
             }
         }
 
         /// <summary>
+        /// The value we interpreted from <see cref="Assigned"/>
         /// </summary>
         public CssValue Specified
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
                 if (_specified == null)
@@ -172,7 +110,6 @@ namespace CssUI
         /// </summary>
         public CssValue Computed
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
                 if (_computed == null)
@@ -184,165 +121,76 @@ namespace CssUI
             }
         }
 
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private async Task<CssValue> Calculate_Specified()
-        {// SEE:  https://www.w3.org/TR/css-cascade-3/#specified
-            CssPropertyDefinition Def = Definition;
-
-
-#if RELEASE
-            try
+        /// <summary>
+        /// The final calculated value after applying a property specific resolution method to it
+        /// </summary>
+        public CssValue Used
+        {
+            get
             {
-#endif
-            // CSS specs say if the cascade (assigned) resulted in a value, use it.
-            if (!Assigned.IsNull())
-            {
-                if (Assigned == CssValue.Inherit)
+                if (_used == null)
                 {
-                    /*
-                        * CSS Specs: 
-                        * 1. Each property may also have a cascaded value of 'inherit', which means that, 
-                        *    for a given element, the property takes as specified value the computed value of the element's parent.
-                        *    If the 'inherit' value is set on the root element, the property is assigned its initial value.
-                    */
-                    if (Owner is cssRootElement)
-                    {// This is the Root element
-                        return new CssValue(Def.Initial);
-                    }
-                    else
-                    {// Take our parents computed value
-                        ICssProperty prop = Owner.Parent.Style.Cascaded.Get(CssName);
-                        if (prop != null)
-                            return new CssValue((prop as CssProperty).Computed);
-                        else
-                            return null;
-                    }
+                    Reinterpret_Used();
                 }
 
-                if (Assigned == CssValue.Initial)
-                {// If the Assigned value is the CssValue.Initial literal, then we use our definitions default
-                    return new CssValue(Def.Initial);
-                }
-
-                return Assigned;
+                return _used;
             }
-            // Assigned is null
-            /*
-            * CSS Specs:
-            * 2. if the property is inherited and the element is not the root of the document tree, use the computed value of the parent element.
-            */
-            if (!(Owner is cssRootElement) && Def != null && Def.Inherited)
-            {
-                ICssProperty prop = Owner.Parent?.Style.Cascaded.Get(CssName);
-                if (prop != null)
-                {
-                    return new CssValue((prop as CssProperty).Computed);
-                }
-                else
-                {
-                    return null;
-                    //throw new Exception($"CSS property '{CssName}' Cascaded value is null!");
-                }
-            }
-            else
-            {
-                /*
-                * CSS Specs:
-                * 3. Otherwise use the property's initial value. The initial value of each property is indicated in the property's definition.
-                */
-                return new CssValue(Def.Initial);
-            }
-#if RELEASE
-            }
-            catch(Exception ex)
-            {
-                xLog.Log.Error(ex);
-                throw;
-            }
-#endif
-
-            // this sucks but its all we can do
-            throw new Exception($"Failed to resolve the Specified value in {nameof(CssProperty)}");
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private async Task<CssValue> Calculate_Computed()
-        {// SEE:  https://www.w3.org/TR/css-cascade-3/#computed
-            CssPropertyDefinition Def = Definition;
-
-#if RELEASE
-            try
+        /// <summary>
+        /// The value that will be used by the element
+        /// <para>This is the <see cref="Used"/> value with system restrictions placed on it</para>
+        /// </summary>
+        public CssValue Actual
+        {
+            get
             {
-#endif
-                switch (Specified.Type)
+                if (_actual == null)
                 {
-                    case EStyleDataType.PERCENT:
-                        {
-                            if (Def.Percentage_Resolver != null)
-                            {
-                                double resolved = Specified.Resolve(null, (double Pct) => Def.Percentage_Resolver(Owner, Pct)).Value;
-                                return CssValue.From_Number(resolved);
-                            }
-                        }
-                        break;
-                    case EStyleDataType.DIMENSION:
-                        {
-                            double? nv = Specified.Resolve(Get_Unit_Scale);
-                            if (nv.HasValue)
-                            {
-                                return CssValue.From_Number(nv.Value);
-                            }
-                        }
-                        break;
-                    case EStyleDataType.INHERIT:// SEE:  https://www.w3.org/TR/CSS2/cascade.html#value-def-inherit
-                        {
-                            if (Owner is cssRootElement)// If 'inherit' is set on the root element the property is assigned it's initial value
-                            {
-                                return new CssValue( Def.Initial );
-                            }
-                            else
-                            {
-                                var prop = Owner.Parent.Style.Cascaded.Get(CssName);
-                                if (prop != null)
-                                    return new CssValue( (prop as CssProperty).Computed );
-                            }
-                        }
-                        break;
-                    case EStyleDataType.UNSET:// SEE:  https://www.w3.org/TR/css-cascade-4/#valdef-all-unset
-                        {
-                            /*
-                            * CSS Specs:
-                            * If the cascaded value of a property is the unset keyword, 
-                            * then if it is an inherited property, this is treated as inherit, and if it is not, this is treated as initial. 
-                            * This keyword effectively erases all declared values occurring earlier in the cascade, 
-                            * correctly inheriting or not as appropriate for the property (or all longhands of a shorthand).
-                            */
-                            if (!(Owner is cssRootElement) && Def != null && Def.Inherited)
-                            {
-                                ICssProperty prop = Owner.Parent.Style.Cascaded.Get(CssName);
-                                if (prop != null)
-                                    return new CssValue((prop as CssProperty).Computed);
-                            }
-                            else
-                            {
-                                return new CssValue(Def.Initial);
-                            }
-                        }
-                        break;
+                    Reinterpret_Actual();
                 }
 
-                return new CssValue(Specified);
-#if RELEASE
+                return _actual;
             }
-            catch (Exception ex)
-            {
-                xLog.Log.Error(ex);
-                throw;
-            }
-#endif
+        }
+        #endregion
 
-            throw new Exception($"Failed to resolve the Computed value in {nameof(CssProperty)}");
+        #region Accessors
+
+        public override bool HasValue { get => !Assigned.IsNull(); }
+        /// <summary>
+        /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
+        /// </summary>
+        public override bool IsAuto { get => Assigned.Type == EStyleDataType.AUTO; }
+        /// <summary>
+        /// Returns TRUE if the assigned value is <see cref="CssValue.Inherit"/>
+        /// </summary>
+        public override bool IsInherited { get => Assigned.Type == EStyleDataType.INHERIT; }
+        /// <summary>
+        /// Returns TRUE if the assigned value has the <see cref="StyleValueFlags.Depends"/> flag
+        /// </summary>
+        public override bool IsDependent { get => Assigned.Has_Flags(StyleValueFlags.Depends); }
+        /// <summary>
+        /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
+        /// Returns TRUE if the assigned value has the <see cref="StyleValueFlags.Depends"/> flag
+        /// </summary>
+        public override bool IsDependentOrAuto { get => (Assigned.Type == EStyleDataType.AUTO || Assigned.Has_Flags(StyleValueFlags.Depends)); }
+        /// <summary>
+        /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
+        /// Returns TRUE if the assigned value type is a percentage
+        /// </summary>
+        public override bool IsPercentageOrAuto { get => (Assigned.Type == EStyleDataType.AUTO || Assigned.Type == EStyleDataType.PERCENT); }
+
+        /// <summary>
+        /// All flags which are present for all currently computed <see cref="CssValue"/>'s
+        /// </summary>
+        public override StyleValueFlags Flags { get { return Specified.Flags; } }
+        #endregion
+
+        #region Constructor
+        public CssProperty(string CssName, bool Locked, WeakReference<CssPropertySet> Source, cssElement Owner) 
+            : base(CssName, Locked, Source, Owner)
+        {
         }
         #endregion
 
@@ -350,51 +198,90 @@ namespace CssUI
 
         private void Reinterpret_Specified()
         {
-            _specified = Calculate_Specified().Result;
+            _specified = Assigned.Derive_SpecifiedValue(this).Result;
             // detect changes, fire events
-            if (ReferenceEquals(oldSpecifiedValue, null) || _specified != oldSpecifiedValue)
+            if (ReferenceEquals(oldSpecified, null) || oldSpecified != _specified)
             {// the computed value changed
-                oldSpecifiedValue = _specified;
+                oldSpecified.Set(_specified);
+                FireValueChangeEvent(ECssPropertyStage.Specified);
 
-                ChangeNotices[(int)ECssPropertyStage.Specified] += 1;
-                onValueChange?.Invoke(ECssPropertyStage.Specified, this);
-
-                // update the computed value
+                // update the Computed value
                 Reinterpret_Computed();
             }
         }
 
         private void Reinterpret_Computed()
         {
-            _computed = Calculate_Computed().Result;
+            _computed = Specified.Derive_ComputedValue(this).Result;
             // detect changes, fire events
-            if (ReferenceEquals(oldComputedValue, null) || oldComputedValue != Assigned)
+            if (ReferenceEquals(oldComputed, null) || oldComputed != _computed)
             {
-                oldComputedValue = new CssValue(_computed);
+                oldComputed.Set(_computed);
+                FireValueChangeEvent(ECssPropertyStage.Computed);
 
-                ChangeNotices[(int)ECssPropertyStage.Computed] += 1;
-                onValueChange?.Invoke(ECssPropertyStage.Computed, this);
+                // Update the Used value
+                Reinterpret_Used();
+            }
+        }
+
+        private void Reinterpret_Used()
+        {
+            _used = Computed.Derive_UsedValue(this).Result;
+            // detect changes, fire events
+            if (ReferenceEquals(oldUsed, null) || oldUsed != _used)
+            {
+                oldUsed.Set(_used);
+                FireValueChangeEvent(ECssPropertyStage.Used);
+
+                // update the Actual value
+                Reinterpret_Actual();
+            }
+        }
+
+        private void Reinterpret_Actual()
+        {
+            _actual = Used.Derive_ActualValue(this).Result;
+            // detect changes, fire events
+            if (ReferenceEquals(oldActual, null) || oldActual != _actual)
+            {
+                oldActual.Set(_actual);
+                FireValueChangeEvent(ECssPropertyStage.Actual);
             }
         }
         #endregion
+
+        /*#region Inherited Value
+        /// <summary>
+        /// Returns the inherited value from the properties owners parent element
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override CssValue Find_Inherited_Value()
+        {
+            if (Owner is cssRootElement)
+            {// Root elements cannot inherit, they use the INITIAL value
+                return new CssValue(Definition.Initial);
+            }
+            else
+            {// Take our parents computed value
+                ICssProperty prop = Owner.Parent.Style.Cascaded.Get(CssName);
+                if (prop != null)
+                    return new CssValue((prop as CssProperty).Computed);
+                else
+                    return null;
+            }
+        }
+        #endregion*/
 
         #region Unit Resolver
         /// <summary>
         /// Allows external code to notify this property that a certain unit type has changed scale and if we have a value which uses that unit-type we need to fire our Changed event because our Computed value will be different
         /// </summary>
-        public void Handle_Unit_Change(EStyleUnit Unit)
+        public override void Handle_Unit_Change(EStyleUnit Unit)
         {
             if (Specified.Unit == Unit)
-            {
-                ChangeNotices[(int)ECssPropertyStage.Computed] += 1;
-                // This unit change will affect our computed value
-                onValueChange?.Invoke(ECssPropertyStage.Computed, this);
+            {// We are using this unit and its change will affect our computed value
+                FireValueChangeEvent(ECssPropertyStage.Computed);
             }
-        }
-
-        private double Get_Unit_Scale(EStyleUnit Unit)
-        {
-            return StyleUnitResolver.Get_Scale(Owner, this, Unit);
         }
         #endregion
 
@@ -404,7 +291,7 @@ namespace CssUI
         /// </summary>
         /// <returns>Success</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public async Task<bool> CascadeAsync(ICssProperty prop)
+        public override async Task<bool> CascadeAsync(ICssProperty prop)
         {// Circumvents locking
             CssProperty o = prop as CssProperty;
             bool changes = false;
@@ -413,7 +300,7 @@ namespace CssUI
                 changes = true;
                 // Don't make a copy of the value, they are readonly anyhow
                 //_value = new CssValue(o.Assigned);
-                _value = o.Assigned;
+                _assigned = o.Assigned;
 
                 this.SourcePtr = o.SourcePtr;
                 this.Selector = o.Selector;
@@ -422,7 +309,6 @@ namespace CssUI
             if (changes) Update();
             return await Task.FromResult(changes);
         }
-
         #endregion
 
         #region Overwrite
@@ -431,7 +317,7 @@ namespace CssUI
         /// </summary>
         /// <returns>Success</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public async Task<bool> OverwriteAsync(ICssProperty prop)
+        public override async Task<bool> OverwriteAsync(ICssProperty prop)
         {
             CssProperty o = prop as CssProperty;
             bool changes = false;
@@ -440,7 +326,7 @@ namespace CssUI
                 changes = true;
                 //_value = new CssValue(o.Assigned);
                 // Don't make a copy of the value, they are readonly anyhow
-                _value = o.Assigned;
+                _assigned = o.Assigned;
 
                 this.SourcePtr = o.SourcePtr;
                 this.Selector = o.Selector;
@@ -449,104 +335,53 @@ namespace CssUI
             if (changes) Update();
             return await Task.FromResult(changes);
         }
+        #endregion
 
-#endregion
+        #region Has Flags
+        public bool Has_Flags(StyleValueFlags Flags) { return (this.Flags & Flags) != 0; }
+        #endregion
 
-#region Constructors
-
-        public CssProperty(string CssName = null)
-        {
-            this.CssName = new AtomicString(CssName);
-            Update();
-        }
-
-        public CssProperty(bool Locked)
-        {
-            this.Locked = Locked;
-            Update();
-        }
-
-        public CssProperty(CssPropertyOptions Options)
-        {
-            this.Options = Options;
-            Update();
-        }
-
-        public CssProperty(string CssName, CssPropertyOptions Options)
-        {
-            this.CssName = new AtomicString(CssName);
-            this.Options = Options;
-            Update();
-        }
-
-        /*public CssProperty(bool Locked, PropertyChangeDelegate onChange)
-        {
-            this.Locked = Locked;
-            this.onValueChange += onChange;
-            Update();
-        }*/
-
-        public CssProperty(bool Locked, CssPropertyOptions Options)
-        {
-            this.Options = Options;
-            this.Locked = Locked;
-            Update();
-        }
-
-        public CssProperty(string CssName, bool Locked, CssPropertyOptions Options)
-        {
-            this.CssName = new AtomicString(CssName);
-            this.Options = Options;
-            this.Locked = Locked;
-            Update();
-        }
-
-        public CssProperty(string CssName, bool Locked, bool Unset, WeakReference<CssPropertySet> Source, cssElement Owner, CssPropertyOptions Options)
-        {
-            this.CssName = new AtomicString(CssName);
-            this.Owner = Owner;
-            this.SourcePtr = Source;
-            this.Options = Options;
-            this.Locked = Locked;
-            if (Unset) Assigned = CssValue.Null;
-            Update();
-        }
-        
-#endregion
-
-#region Has Flags
-        public bool Has_Flags(StyleValueFlags Flags) { return (this.Flags & Flags) > 0; }
-#endregion
-
-#region ToString
+        #region ToString
         public override string ToString() { return $"{CssName}: {Assigned.ToString()}"; }
         #endregion
 
+        #region Serialization
+        public override string Serialize() { return $"{CssName}: {Assigned.ToString()}"; }
+        #endregion
 
         #region Updating
         /// <summary>
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        public async Task Update(bool ComputeNow = false)
+        public override async Task Update(bool ComputeNow = false)
         {
-            _specified = null;// unset our specified value so it gets updated...
-            _computed = null;// it only makes sense to update the computed value aswell
+            // unset our backing values so they can be updated...
+            _specified = null;
+            _computed = null;
+            _used = null;
+            _actual = null;
 
-            if (ReferenceEquals(oldAssignedValue, null) || oldAssignedValue != Assigned)
+            if (ReferenceEquals(oldAssigned, null) || oldAssigned != Assigned)
             {
-                oldAssignedValue = new CssValue(Assigned);
-
-                ChangeNotices[(int)ECssPropertyStage.Assigned] += 1;
-                onValueChange?.Invoke(ECssPropertyStage.Assigned, this);
+                oldAssigned.Set(Assigned);
+                FireValueChangeEvent(ECssPropertyStage.Assigned);
             }
 
             if (ComputeNow)
             {
                 Reinterpret_Specified();
-                // check if Reinterpret_Specified actually reinterpreted computed aswell
+                // check if we should reinterpreted Computed aswell
                 if (ReferenceEquals(_computed, null))
                     Reinterpret_Computed();
+
+                // check if we should reinterpreted Used aswell
+                if (ReferenceEquals(_used, null))
+                    Reinterpret_Used();
+
+                // check if we should reinterpreted Actual aswell
+                if (ReferenceEquals(_actual, null))
+                    Reinterpret_Actual();
             }
         }
 
@@ -555,7 +390,7 @@ namespace CssUI
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        public async Task UpdateDependent(bool ComputeNow = false)
+        public override async Task UpdateDependent(bool ComputeNow = false)
         {
             if (this.IsDependent)
                 await Update(ComputeNow);
@@ -566,7 +401,7 @@ namespace CssUI
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        public async Task UpdateDependentOrAuto(bool ComputeNow = false)
+        public override async Task UpdateDependentOrAuto(bool ComputeNow = false)
         {
             if (this.IsDependentOrAuto)
                 await Update(ComputeNow);
@@ -577,7 +412,7 @@ namespace CssUI
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        public async Task UpdatePercentageOrAuto(bool ComputeNow = false)
+        public override async Task UpdatePercentageOrAuto(bool ComputeNow = false)
         {
             if (this.IsPercentageOrAuto)
                 await Update(ComputeNow);
@@ -589,14 +424,14 @@ namespace CssUI
         /// Sets the <see cref="Assigned"/> value for this property
         /// </summary>
         /// <param name="value"></param>
-        public void Set(CssValue newValue)
+        public void Set(CssValue DeclaredValue)
         {
-            if (Assigned != newValue)
+            if (Assigned != DeclaredValue)
             {
-                Assigned = newValue;
+                Assigned = DeclaredValue;
             }
         }
-#endregion
+        #endregion
 
     }
 }

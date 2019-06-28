@@ -2,8 +2,12 @@
 using System.IO;
 using System.Text;
 
-namespace CssUI.CSS
+namespace CssUI.CSS.Parser
 {
+    /// <summary>
+    /// Provides byte-stream filtering, correcting any faulty bytes so the <see cref="CssParser"/> may interpret it.
+    /// <para>Docs: https://www.w3.org/TR/css-syntax-3/#input-preprocessing </para>
+    /// </summary>
     public static class CssInput
     {
         #region Byte Order Mark
@@ -38,7 +42,6 @@ namespace CssUI.CSS
         /// <returns></returns>
         public static string PreProcess(string Text)
         {// SEE:  https://www.w3.org/TR/css-syntax-3/#input-preprocessing
-            // If we were given a string then we assume the input was defined directly in code so we use UTF-8
             byte[] buf = Encoding.Default.GetBytes(Text);
             string str = Encoding.UTF8.GetString(buf);
             return str.Replace('\r', '\n').Replace('\f', '\n').Replace('\0', '\uFFFD');

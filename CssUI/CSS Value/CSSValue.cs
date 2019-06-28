@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CssUI.CSS.Parser;
+using CssUI.Internal;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -7,10 +9,10 @@ namespace CssUI.CSS
     /// <summary>
     /// Represents a CSS Value
     /// </summary>
-    public class CssValue
+    public partial class CssValue
     {
         #region Delegates
-        public delegate double StyleUnitResolver(EStyleUnit unit);
+        public delegate double StyleUnitResolverDelegate(EStyleUnit unit);
         #endregion
 
         #region Static Declerations
@@ -55,11 +57,6 @@ namespace CssUI.CSS
         public readonly EStyleDataType Type = EStyleDataType.NULL;
         public readonly dynamic Value = null;
         public readonly EStyleUnit Unit = EStyleUnit.None;
-
-        /// <summary>
-        /// If this value was formed from a string representation then this is that original string
-        /// </summary>
-        string Str = null;
         #endregion
 
         /// <summary>
@@ -187,6 +184,9 @@ namespace CssUI.CSS
         /// <summary>Create a string value</summary>
         public static CssValue From_String(string value) { return new CssValue(EStyleDataType.STRING, value); }
 
+        /// <summary>Create a keyword value</summary>
+        public static CssValue From_Keyword(string value) { return new CssValue(EStyleDataType.KEYWORD, value); }
+
         #endregion
 
         #region ToString
@@ -206,7 +206,7 @@ namespace CssUI.CSS
                 case EStyleDataType.PERCENT:
                     return string.Concat(((double)Value).ToString("0.###"), "%");
                 case EStyleDataType.STRING:
-                    return Str;
+                    return Value as string;
                 default:
                     return string.Concat("[", Enum.GetName(typeof(EStyleDataType), Type), "]");
             }
@@ -224,7 +224,7 @@ namespace CssUI.CSS
         /// </summary>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private double ResolveDimension(StyleUnitResolver Resolver)
+        private double ResolveDimension(StyleUnitResolverDelegate Resolver)
         {
             if (Unit == EStyleUnit.None) return (double)Value;
             return (Resolver(Unit) * (double)Value);
@@ -237,7 +237,7 @@ namespace CssUI.CSS
         /// Resolves the value to a decimal and returns it if possible, returns NULL otherwise
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public double? Resolve(StyleUnitResolver UnitResolver)
+        public double? Resolve(StyleUnitResolverDelegate UnitResolver)
         {
             switch (Type)
             {
@@ -256,7 +256,7 @@ namespace CssUI.CSS
         /// Resolves the value to a decimal and returns it if possible, returns defaultValue otherwise
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public double Resolve_Or_Default(StyleUnitResolver UnitResolver, double defaultValue)
+        public double Resolve_Or_Default(StyleUnitResolverDelegate UnitResolver, double defaultValue)
         {
             double? num = Resolve(UnitResolver);
             return (num.HasValue ? num.Value : defaultValue);
@@ -267,7 +267,7 @@ namespace CssUI.CSS
         /// If this instance matches the given Predicate then resolves the value to a decimal and returns it, returns NULL otherwise
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public double? Resolve(StyleUnitResolver UnitResolver, Func<CssValue, bool> Predicate)
+        public double? Resolve(StyleUnitResolverDelegate UnitResolver, Func<CssValue, bool> Predicate)
         {
             if (Predicate(this))
             {
@@ -291,7 +291,7 @@ namespace CssUI.CSS
         /// If this instance matches the given Predicate then resolves the value to a decimal and returns it, returns defaultValue otherwise
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public double Resolve_Or_Default(StyleUnitResolver UnitResolver, double defaultValue, Func<CssValue, bool> Predicate)
+        public double Resolve_Or_Default(StyleUnitResolverDelegate UnitResolver, double defaultValue, Func<CssValue, bool> Predicate)
         {
             double? num = Resolve(UnitResolver, Predicate);
             return (num.HasValue ? num.Value : defaultValue);
@@ -302,7 +302,7 @@ namespace CssUI.CSS
         /// <para>Additionally takes an multiplier as input for resolving the value to a decimal if it's a percentage type</para>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public double? Resolve(StyleUnitResolver UnitResolver, double percentageMultiplier)
+        public double? Resolve(StyleUnitResolverDelegate UnitResolver, double percentageMultiplier)
         {
             switch (Type)
             {
@@ -324,7 +324,7 @@ namespace CssUI.CSS
         /// <para>Additionally takes an multiplier as input for resolving the value to a decimal if it's a percentage type</para>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public double Resolve_Or_Default(StyleUnitResolver UnitResolver, double percentageMultiplier, double defaultValue)
+        public double Resolve_Or_Default(StyleUnitResolverDelegate UnitResolver, double percentageMultiplier, double defaultValue)
         {
             double? num = Resolve(UnitResolver, percentageMultiplier);
             return (num.HasValue ? num.Value : defaultValue);
@@ -335,7 +335,7 @@ namespace CssUI.CSS
         /// <para>Additionally takes an action as input for resolving the value to a decimal if it's a percentage type</para>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public double? Resolve(StyleUnitResolver UnitResolver, Func<double, double> percentageResolver)
+        public double? Resolve(StyleUnitResolverDelegate UnitResolver, Func<double, double> percentageResolver)
         {
             switch (Type)
             {
@@ -357,7 +357,7 @@ namespace CssUI.CSS
         /// <para>Additionally takes an action as input for resolving the value to a decimal if it's a percentage type</para>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public double Resolve_Or_Default(StyleUnitResolver UnitResolver, Func<double, double> percentageResolver, double defaultValue)
+        public double Resolve_Or_Default(StyleUnitResolverDelegate UnitResolver, Func<double, double> percentageResolver, double defaultValue)
         {
             double? num = Resolve(UnitResolver, percentageResolver);
             return (num.HasValue ? num.Value : defaultValue);
@@ -370,7 +370,7 @@ namespace CssUI.CSS
         /// If this instance matches the given Predicate then resolves the value to an integer and returns it, returns defaultValue otherwise
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Resolve_Or_Default(StyleUnitResolver UnitResolver, int defaultValue, Func<CssValue, bool> Predicate)
+        public int Resolve_Or_Default(StyleUnitResolverDelegate UnitResolver, int defaultValue, Func<CssValue, bool> Predicate)
         {
             int? num = (int?)Resolve(UnitResolver, Predicate);
             return (num.HasValue ? num.Value : defaultValue);
@@ -381,7 +381,7 @@ namespace CssUI.CSS
         /// <para>Additionally takes an multiplier as input for resolving the value to a decimal if it's a percentage type</para>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Resolve_Or_Default(StyleUnitResolver UnitResolver, double percentageMultiplier, int defaultValue)
+        public int Resolve_Or_Default(StyleUnitResolverDelegate UnitResolver, double percentageMultiplier, int defaultValue)
         {
             int? num = (int?)Resolve(UnitResolver, percentageMultiplier);
             return (num.HasValue ? num.Value : defaultValue);
@@ -392,7 +392,7 @@ namespace CssUI.CSS
         /// <para>Additionally takes an action as input for resolving the value to a decimal if it's a percentage type</para>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Resolve_Or_Default(StyleUnitResolver UnitResolver, Func<double, double> percentageResolver, int defaultValue)
+        public int Resolve_Or_Default(StyleUnitResolverDelegate UnitResolver, Func<double, double> percentageResolver, int defaultValue)
         {
             int? num = (int?)Resolve(UnitResolver, percentageResolver);
             return (num.HasValue ? num.Value : defaultValue);
@@ -635,7 +635,10 @@ namespace CssUI.CSS
         #region Operators
         public static bool operator ==(CssValue A, CssValue B)
         {
-            if (object.ReferenceEquals(A, null) || object.ReferenceEquals(B, null)) return (object.ReferenceEquals(A, null) && object.ReferenceEquals(B, null));
+            // If either object is null return whether they are BOTH null
+            if (object.ReferenceEquals(A, null) || object.ReferenceEquals(B, null))
+                return (object.ReferenceEquals(A, null) && object.ReferenceEquals(B, null));
+
             if (A.Type != B.Type) return false;
             if (A.Unit != B.Unit) return false;
 
@@ -664,34 +667,10 @@ namespace CssUI.CSS
 
         public static bool operator !=(CssValue A, CssValue B)
         {
-            if (object.ReferenceEquals(A, null) || object.ReferenceEquals(B, null)) return !(object.ReferenceEquals(A, null) && object.ReferenceEquals(B, null));
-            if (A.Type != B.Type) return true;
-            if (A.Unit != B.Unit) return true;
-
-            switch (A.Type)
-            {
-                case EStyleDataType.NULL:
-                case EStyleDataType.UNSET:
-                case EStyleDataType.AUTO:
-                case EStyleDataType.INITIAL:
-                case EStyleDataType.INHERIT:
-                case EStyleDataType.NONE:
-                    return false;
-                case EStyleDataType.INTEGER:
-                case EStyleDataType.COLOR:
-                    return !EqualityComparer<int>.Default.Equals(A.Value, B.Value);
-                case EStyleDataType.NUMBER:
-                case EStyleDataType.DIMENSION:
-                case EStyleDataType.PERCENT:
-                    return !EqualityComparer<double>.Default.Equals(A.Value, B.Value);
-                case EStyleDataType.STRING:
-                    return !EqualityComparer<string>.Default.Equals(A.Value, B.Value);
-                default:
-                    throw new NotImplementedException(string.Concat("Inequality comparison logic not implemented for type: ", Enum.GetName(typeof(EStyleDataType), A.Type)));
-            }
+            return !(A == B);
         }
 
-        
+
         public override bool Equals(object o)
         {
             if (ReferenceEquals(o, null))

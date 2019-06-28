@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CssUI.CSS
+namespace CssUI.CSS.Parser
 {
     /// <summary>
     /// Handles parsing CSS text

@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using CssUI.CSS;
 using CssUI.Fonts;
+using CssUI.Internal;
 using SixLabors.Fonts;
 
 namespace CssUI

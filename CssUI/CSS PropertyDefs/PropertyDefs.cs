@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CssUI.Internal;
+using System;
 using System.Collections.Generic;
 
 namespace CssUI.CSS
@@ -13,16 +14,23 @@ namespace CssUI.CSS
         static CssProperties()
         {// Create all of the property definitions, setting up their initial values aswell as specifying the method they use to resolve a percentage value
             
-            new CssPropertyDefinition("display", false, EPropertyAffects.Block, CssValue.From_Enum(EDisplayMode.INLINE_BLOCK));// We differ from the spec because our implementation is for a UI
-            new CssPropertyDefinition("box-sizing", false, EPropertyAffects.Block, CssValue.From_Enum(EBoxSizingMode.BORDER));// We differ from the spec because our implementation is for a UI
+            new CssPropertyDefinition("display", false, EPropertyAffects.Block, CssValue.From_Enum(EDisplayMode.INLINE_BLOCK), DisallowedTypes: EStyleDataType.INHERIT);// We differ from the spec because our implementation is for a UI
+            new CssPropertyDefinition("box-sizing", false, EPropertyAffects.Block, CssValue.From_Enum(EBoxSizingMode.BORDER));
 
-            new CssPropertyDefinition("opacity", false, EPropertyAffects.Visual, CssValue.From_Number(1.0));
+            new CssPropertyDefinition("opacity", false, EPropertyAffects.Visual, CssValue.From_Number(1.0), DisallowedTypes: EStyleDataType.PERCENT);
 
             new CssPropertyDefinition("dpi-x", true, EPropertyAffects.Text | EPropertyAffects.Flow, CssValue.Null, (cssElement E, double Pct) => { return (Pct * 72.0); });
             new CssPropertyDefinition("dpi-y", true, EPropertyAffects.Text | EPropertyAffects.Flow, CssValue.Null, (cssElement E, double Pct) => { return (Pct * 72.0); });
 
-            new CssPropertyDefinition("font-family", true, EPropertyAffects.Text | EPropertyAffects.Flow, CssValue.Null);
-            new CssPropertyDefinition("font-weight", true, EPropertyAffects.Text | EPropertyAffects.Flow, CssValue.From_Int(400));
+            new CssPropertyDefinition("font-family", true, EPropertyAffects.Text | EPropertyAffects.Flow, CssValue.Null, 
+                Keywords: new string[]{ "serif", "sans-serif", "cursive", "fantasy", "monospace" }, 
+                AllowedTypes: EStyleDataType.STRING | EStyleDataType.KEYWORD);
+
+            new CssPropertyDefinition("font-weight", true, EPropertyAffects.Text | EPropertyAffects.Flow, CssValue.From_Keyword("normal"), 
+                DisallowedTypes: EStyleDataType.PERCENT,
+                AllowedTypes: EStyleDataType.KEYWORD | EStyleDataType.INTEGER,
+                Keywords: new string[] { "normal", "bold", "bolder", "lighter" });
+
             new CssPropertyDefinition("font-style", true, EPropertyAffects.Text | EPropertyAffects.Flow, CssValue.From_Enum(EFontStyle.Normal));
             new CssPropertyDefinition("font-size", true, EPropertyAffects.Text | EPropertyAffects.Flow, CssValue.From_Number(12), 
                 (cssElement E, double Pct) => {
@@ -97,18 +105,18 @@ namespace CssUI.CSS
 
             new CssPropertyDefinition("positioning", false, EPropertyAffects.Block, CssValue.From_Enum(EPositioning.Relative));
 
-            new CssPropertyDefinition("object-fit", false, EPropertyAffects.Block, CssValue.From_Enum(EObjectFit.Fill));
+            new CssPropertyDefinition("object-fit", false, EPropertyAffects.Block, CssValue.From_Enum(EObjectFit.Fill), DisallowedTypes: EStyleDataType.INHERIT | EStyleDataType.AUTO);
             
-            new CssPropertyDefinition("object-position-x", false, EPropertyAffects.Block, CssValue.From_Percent(50.0));
-            new CssPropertyDefinition("object-position-y", false, EPropertyAffects.Block, CssValue.From_Percent(50.0));
+            new CssPropertyDefinition("object-position-x", false, EPropertyAffects.Block, CssValue.From_Percent(50.0), DisallowedTypes: EStyleDataType.INHERIT);
+            new CssPropertyDefinition("object-position-y", false, EPropertyAffects.Block, CssValue.From_Percent(50.0), DisallowedTypes: EStyleDataType.INHERIT);
 
-            new CssPropertyDefinition("intrinsic-width", false, EPropertyAffects.Block, CssValue.Null, true);
-            new CssPropertyDefinition("intrinsic-height", false, EPropertyAffects.Block, CssValue.Null, true);
-            new CssPropertyDefinition("intrinsic-ratio", false, EPropertyAffects.Block, CssValue.Null, true);
+            new CssPropertyDefinition("intrinsic-width", false, EPropertyAffects.Block, CssValue.Null, IsPrivate: true, DisallowedTypes: EStyleDataType.INHERIT | EStyleDataType.AUTO);
+            new CssPropertyDefinition("intrinsic-height", false, EPropertyAffects.Block, CssValue.Null, IsPrivate: true, DisallowedTypes: EStyleDataType.INHERIT | EStyleDataType.AUTO);
+            new CssPropertyDefinition("intrinsic-ratio", false, EPropertyAffects.Block, CssValue.Null, IsPrivate: true, DisallowedTypes: EStyleDataType.INHERIT | EStyleDataType.AUTO);
 
 
-            new CssPropertyDefinition("content-width", false, EPropertyAffects.Block, CssValue.Null, true);
-            new CssPropertyDefinition("content-height", false, EPropertyAffects.Block, CssValue.Null, true);
+            new CssPropertyDefinition("content-width", false, EPropertyAffects.Block, CssValue.Null, IsPrivate: true, DisallowedTypes: EStyleDataType.AUTO | EStyleDataType.INHERIT | EStyleDataType.PERCENT);
+            new CssPropertyDefinition("content-height", false, EPropertyAffects.Block, CssValue.Null, IsPrivate: true, DisallowedTypes: EStyleDataType.AUTO | EStyleDataType.INHERIT | EStyleDataType.PERCENT);
         }
     }
 }

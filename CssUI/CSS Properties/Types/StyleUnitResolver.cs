@@ -51,7 +51,7 @@ namespace CssUI
                                 var def = CssProperties.Definitions[Property.CssName];
                                 if (def != null)
                                 {
-                                    return def.Initial.Resolve() ?? throw new Exception($"Failed to resolve the default value specified in the '{Property.CssName}' property decleration to a number!");
+                                    return def.Initial.Resolve() ?? throw new CssException($"Failed to resolve the default value specified in the '{Property.CssName}' property decleration to a number!");
                                 }
                                 
                             }
@@ -90,7 +90,7 @@ namespace CssUI
                                 var def = CssProperties.Definitions[Property.CssName];
                                 if (def != null)
                                 {
-                                    return def.Initial.Resolve() ?? throw new Exception($"Failed to resolve the default value specified in the '{Property.CssName}' property decleration to a number!");
+                                    return def.Initial.Resolve() ?? throw new CssException($"Failed to resolve the default value specified in the '{Property.CssName}' property decleration to a number!");
                                 }
                             }
                         }
@@ -98,6 +98,7 @@ namespace CssUI
                         if (Owner.Style.Font != null)
                         {
                             // XXX: implement logic to measure the 'x' height for our font. SEE: https://www.w3.org/TR/css-values-3/#font-relative-lengths
+                            throw new NotImplementedException();
                         }
                         /*
                          * CSS Specs:
@@ -106,7 +107,7 @@ namespace CssUI
                         return Get_Scale(Owner, Property, EStyleUnit.EM) * 0.5;
                     }
                 case EStyleUnit.CH:
-                    return 1.0;// TODO: Implement a system-independent 'FontMetrics' class for getting this kind of info...
+                    throw new NotImplementedException();
                 case EStyleUnit.REM:
                     return Owner.Root.Style.FontSize;
                 case EStyleUnit.VMAX:

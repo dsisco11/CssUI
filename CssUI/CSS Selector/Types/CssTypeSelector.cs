@@ -17,7 +17,7 @@ namespace CssUI.CSS
 
         public CssTypeSelector(string TypeName) : base(ECssSimpleSelectorType.TypeSelector)
         {
-            if (string.Compare("*", TypeName) == 0) throw new CssParserError("Caught attempt to create a TypeSelector with the UniversalSelector symbol(*)!");
+            if (string.Compare("*", TypeName) == 0) throw new CssParserException("Caught attempt to create a TypeSelector with the UniversalSelector symbol(*)!");
             this.Namespace = "*";// Match ANY namespace
             this.TypeName = TypeName;
         }

@@ -22,7 +22,7 @@ namespace CssUI.CSS
                 case "drop":
                     return PseudoClassFunctions.Drop(E, Args);
                 default:
-                    throw new CssSelectorError("[CSS] Selector pseudo-class (", Name, ") logic not implemented!");
+                    throw new CssSelectorException("[CSS] Selector pseudo-class (", Name, ") logic not implemented!");
             }
         }
     }
@@ -56,7 +56,7 @@ namespace CssUI.CSS
                         return false;
                     }
                 default:
-                    throw new CssSelectorError("Selector pseudo-class function (", Name, ") logic not implemented!");
+                    throw new CssSelectorException("Selector pseudo-class function (", Name, ") logic not implemented!");
             }
         }
     }
@@ -98,7 +98,7 @@ namespace CssUI.CSS
                 // TODO: test the ":drop(active|valid|invalid) pseudo-class
                 foreach (CssToken token in Args)
                 {
-                    if (token.Type != ECssTokenType.Ident) throw new CssSyntaxError("Expected Ident token!");
+                    if (token.Type != ECssTokenType.Ident) throw new CssSyntaxErrorException("Expected Ident token!");
                     IdentToken tok = Args[0] as IdentToken;
                     switch (tok.Value.ToLower())
                     {

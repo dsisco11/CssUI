@@ -8,7 +8,6 @@ namespace CssUI.CSS
     /// <typeparam name="Ty">The enum type this property stores</typeparam>
     public class EnumProperty<Ty> : CssProperty where Ty : struct, IConvertible
     {
-        static CssPropertyOptions DefaultOptions = new CssPropertyOptions() { AllowPercentage = false };
         #region Accessors
         public Ty Value
         {
@@ -27,23 +26,9 @@ namespace CssUI.CSS
         #endregion
 
         #region Constructors
-        public EnumProperty(string CssName) : base(CssName, DefaultOptions)
-        {
-        }
-
-        public EnumProperty(bool Locked) : base(Locked, DefaultOptions)
-        {
-        }
-
-        public EnumProperty(bool Locked, CssPropertyOptions Options) : base(Locked, new CssPropertyOptions(Options) { AllowPercentage = false })
-        {
-        }
-
-        public EnumProperty(string CssName, bool Locked, CssPropertyOptions Options) : base(CssName, Locked, new CssPropertyOptions(Options) { AllowPercentage = false })
-        {
-        }
         
-        public EnumProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Source, Owner, new CssPropertyOptions(Options) { AllowPercentage = false })
+        public EnumProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked) 
+            : base(CssName, Locked, Source, Owner)
         {
         }
         #endregion

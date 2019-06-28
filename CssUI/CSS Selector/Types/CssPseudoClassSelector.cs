@@ -56,7 +56,7 @@ namespace CssUI.CSS
                 case "root":
                     return (E.Root == null);
                 default:
-                    throw new CssSelectorError("Selector pseudo-class (", Name, ") logic not implemented!");
+                    throw new CssSelectorException("Selector pseudo-class (", Name, ") logic not implemented!");
             }
         }
     }

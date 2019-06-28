@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CssUI.CSS
 {
@@ -17,29 +13,11 @@ namespace CssUI.CSS
         /// </summary>
         public double? Resolved;
         #endregion
-
-        #region Accessors
-        //public event Action<NamedProperty> onChanged;// { get { return this.onChanged; } set { this.onChanged = value; } }
-        #endregion
-
+        
         #region Constructors
-        public NumberProperty() : base()
-        {
-        }
 
-        public NumberProperty(bool Locked) : base(Locked)
-        {
-        }
-
-        public NumberProperty(bool Locked, CssPropertyOptions Options) : base(Locked, Options)
-        {
-        }
-
-        public NumberProperty(string CssName, bool Locked, CssPropertyOptions Options) : base(CssName, Locked, Options)
-        {
-        }
-
-        public NumberProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked, bool Unset, CssPropertyOptions Options) : base(CssName, Locked, Unset, Source, Owner, Options)
+        public NumberProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked) 
+            : base(CssName, Locked,  Source, Owner)
         {
         }
 

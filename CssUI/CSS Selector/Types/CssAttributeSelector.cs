@@ -60,7 +60,7 @@ namespace CssUI.CSS
                         this.Operator = ECssAttributeOperator.Contains;
                         break;
                     default:
-                        throw new CssSelectorError("Attribute selector: operator token-to-enum translation not implemented for (", OperatorToken, ")!");
+                        throw new CssSelectorException("Attribute selector: operator token-to-enum translation not implemented for (", OperatorToken, ")!");
                 }
             }
         }
@@ -116,7 +116,7 @@ namespace CssUI.CSS
                         return E.Get_Attribute<string>(Attrib).Contains(Value);
                     }
                 default:
-                    throw new CssSelectorError("Attribute selector operator (", Enum.GetName(typeof(ECssAttributeOperator), Operator), ") logic not implemented!");
+                    throw new CssSelectorException("Attribute selector operator (", Enum.GetName(typeof(ECssAttributeOperator), Operator), ") logic not implemented!");
             }
         }
     }

@@ -38,7 +38,7 @@ namespace CssUI.CSS
                 IdentToken word = Stream.Consume<IdentToken>();
                 if (string.Compare("even", word.Value, true) == 0) return new CssAnBMatcher(2, 0);//{ A = 2; B = 0; }
                 else if (string.Compare("odd", word.Value, true) == 0) return new CssAnBMatcher(2, 1);//{ A = 2; B = 1; }
-                else throw new CssSyntaxError(string.Concat("Invalid identity token (", word.Value, ") within An+B syntax"));
+                else throw new CssSyntaxErrorException(string.Concat("Invalid identity token (", word.Value, ") within An+B syntax"));
 
                 // if (Stream.Next != Stream.EOF_ITEM) throw new CssSyntaxError("Expected EOF!");
                 // return null;
