@@ -42,8 +42,8 @@ namespace CssUI
 
         #region Constructors
 
-        public PositionProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked, CssPropertyOptions Options) 
-            : base(CssName, Locked, Source, Owner, Options)
+        public PositionProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked) 
+            : base(CssName, Locked, Source, Owner)
         {
             base.onValueChange += this.Handle_Value_Change;
         }

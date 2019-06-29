@@ -41,12 +41,13 @@ namespace CssUI.Internal
         #region Constructor
         static CssPropertyResolver()
         {
-            Map.TryAdd("font-weight", ECssPropertyStage.Computed, Font_Weight_Computed);
 
             Map.TryAdd("font-family", ECssPropertyStage.Used, Font_Family_Used);
-            Map.TryAdd("font-family", ECssPropertyStage.Actual, Font_Family_Restrict);
 
-            Map.TryAdd("font-size", ECssPropertyStage.Actual, Font_Size_Restrict);
+            Map.TryAdd("font-size", ECssPropertyStage.Computed, Font_Size_Actual);
+
+            Map.TryAdd("font-weight", ECssPropertyStage.Computed, Font_Weight_Computed);
+
         }
         #endregion
 

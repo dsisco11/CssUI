@@ -48,20 +48,25 @@ namespace CssUI.CSS
                 DimensionToken dim = Stream.Consume() as DimensionToken;
                 if (dim.DataType == ENumericTokenType.Integer && string.Compare(dim.Unit, "n", true) == 0)
                 {// <n-dimension>
+                    throw new NotImplementedException($"{nameof(CssAnBMatcher)} Has not implemented parsing support for {nameof(ECssTokenType.Dimension)}");
 
                 }
                 else if (dim.DataType == ENumericTokenType.Integer && string.Compare(dim.Unit, "n-", true) == 0)
                 {// <ndash-dimension>
+                    throw new NotImplementedException($"{nameof(CssAnBMatcher)} Has not implemented parsing support for {nameof(ECssTokenType.Dimension)}");
                 }
                 else if (dim.DataType == ENumericTokenType.Integer && dim.Unit.ToLower().StartsWith("n-"))
                 {// <ndashdigit-dimension>
+                    throw new NotImplementedException($"{nameof(CssAnBMatcher)} Has not implemented parsing support for {nameof(ECssTokenType.Dimension)}");
                 }
             }
             else if (Stream.Next.Type == ECssTokenType.Ident)
             {
+                throw new NotImplementedException($"{nameof(CssAnBMatcher)} Has not implemented parsing support for {nameof(ECssTokenType.Ident)}");
             }
             else if (Stream.Next.Type == ECssTokenType.Number)
             {
+                throw new NotImplementedException($"{nameof(CssAnBMatcher)} Has not implemented parsing support for {nameof(ECssTokenType.Number)}");
             }
 
             return new CssAnBMatcher(A, B);

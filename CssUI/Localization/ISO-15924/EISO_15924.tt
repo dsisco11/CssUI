@@ -1,0 +1,84 @@
+﻿<#@ template debug="true" hostspecific="true" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="Microsoft.VisualBasic.dll" #> 
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="Microsoft.VisualBasic.FileIO" #>
+
+// Generated code
+namespace CssUI.Enums
+{
+	/// <summary>
+    /// ISO 15924 language codes
+	/// </summary>
+    public static class EISO_15924
+    {
+
+<# 
+    // Setup text parser
+    string filename = this.Host.ResolvePath("iso-15924.txt"); 
+    TextFieldParser tfp = new TextFieldParser(filename)
+    {
+        TextFieldType = FieldType.Delimited,
+        Delimiters = new[] { ";" },
+        HasFieldsEnclosedInQuotes = true,
+        TrimWhiteSpace = true
+    };
+
+    // Read first row as header
+    string[] header = tfp.ReadFields();
+
+    // Read rows from file
+    // For debugging limit the row count
+    //int maxrows = 10;
+    int maxrows = int.MaxValue;
+    int rowcount = 0;
+    string term = "";
+    while (!tfp.EndOfData && rowcount < maxrows)
+    {
+        // Read row of data from the file
+        string[] row = tfp.ReadFields();
+        rowcount ++;
+		// if if the first character is a '#' then the line is commented out
+		if (row[0][0] == '#')
+			continue;
+
+
+        // Add "," on all but last line
+        term = tfp.EndOfData || rowcount >= maxrows ? "" : ",";
+		
+		// Replace all non-alphanumeric characters with an underscore
+		char prevChar = (char)0;
+        StringBuilder sb = new StringBuilder();
+        foreach(char c in row[2].ToCharArray())
+        {
+            if (c >= 'a' && c <= 'z') { sb.Append(c); prevChar = c; }
+            else if (c >= 'A' && c <= 'Z') { sb.Append(c); prevChar = c; }
+            else if (c >= '0' && c <= '9') { sb.Append(c); prevChar = c; }
+			else {
+				if (prevChar != '_') { sb.Append('_'); prevChar = '_'; }
+				else prevChar = (char)0;
+			}
+        }
+
+		string Language = sb.ToString().Trim('_');
+		// .Replace(" ", "_")
+		// .Replace("-", "_")
+		// .Replace(",", string.Empty)
+		// .Replace("(", string.Empty)
+		// .Replace(")", string.Empty);
+
+        // Add new item from row data
+#>
+		/// <summary>
+		/// <#=row[2]#>
+		/// </summary>
+        public const string <#=Language#> = "<#=row[0].ToLowerInvariant()#>";
+<# 
+    } 
+#>  
+    };
+}

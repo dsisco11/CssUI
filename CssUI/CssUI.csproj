@@ -16,6 +16,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Localization\ISO-639\Enum_ISO639.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Enum_ISO639.tt</DependentUpon>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
     <PackageReference Include="SixLabors.Core" Version="1.0.0-beta0007" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0006" />
@@ -24,6 +32,34 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\xLog\xLog\xLog.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Localization\ISO-639\Enum_ISO639.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Enum_ISO639.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Localization\ISO-15924\EISO_15924.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>EISO_15924.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Localization\ISO-639\Enum_ISO639.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Enum_ISO639.cs</LastGenOutput>
+    </None>
+    <None Update="Localization\ISO-15924\EISO_15924.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>EISO_15924.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 
 </Project>

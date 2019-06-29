@@ -1,6 +1,10 @@
 ﻿using CssUI.CSS;
+using CssUI.Enums;
+using CssUI.Fonts;
 using SixLabors.Fonts;
 using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace CssUI.Internal
 {
@@ -9,6 +13,20 @@ namespace CssUI.Internal
      */
     public static partial class CssPropertyResolver
     {
+        public static dynamic Font_Size_Actual(ICssProperty Property)
+        {// SEE: https://www.w3.org/TR/css-fonts-3/#font-size-prop
+            double? v = (Property as CssProperty).Used.Resolve();
+            if (!v.HasValue)
+                throw new CssException("Unable to resolve absolute length for Used value.");
+            double Size = v.Value;
+            if (Size < 9.0)// The specifications say we shouldnt render a font less than 9px in size
+                Size = 9.0;
+
+            // Round the size up to the nearest whole pixel value
+            Size = Math.Round(Size, MidpointRounding.AwayFromZero);
+
+            return CssValue.From_Number(Size);
+        }
 
         public static dynamic Font_Weight_Computed(ICssProperty Property)
         {// SEE: https://drafts.csswg.org/css-fonts-4/#valdef-font-weight-bolder
@@ -69,18 +87,62 @@ namespace CssUI.Internal
             return new CssValue(EStyleDataType.NUMBER, val);
         }
 
+        /// <summary>
+        /// Filters font family values
+        /// </summary>
+        /// <param name="Property"></param>
+        /// <returns></returns>
         public static dynamic Font_Family_Used(ICssProperty Property)
-        {// Replace generic family identifiers with a list of our fallback font for that family
-            CssValueList Values = (Property as CssMultiValueProperty).Specified;
-
-
-        }
-
-        public static dynamic Font_Family_Restrict(ICssProperty Property)
         {
-            string familyName = (Property as CssMultiValueProperty).Used;
-            // check if the font exhists
-            SystemFonts.TryFind(familyName, out FontFamily Family);
+            CssValueList curValues = (Property as CssMultiValueProperty).Computed;
+            List<CssValue> retValues = new List<CssValue>();
+
+            foreach(CssValue val in curValues)
+            {
+                switch(val.Type)
+                {
+                    case EStyleDataType.KEYWORD:
+                        {// Replace generic font-family keywords with a list of our fallback font-familys for that family
+                            switch (val.Value as string)
+                            {
+                                case ECssGenericFontFamily.Serif:
+                                case ECssGenericFontFamily.SansSerif:
+                                case ECssGenericFontFamily.Monospace:
+                                case ECssGenericFontFamily.Cursive:
+                                case ECssGenericFontFamily.Fantasy:
+                                    {
+                                        if (FontManager.GenericFamilyMap.TryGetValue(val.Value as string, out List<CssValue> GenericFontFamilys))
+                                            retValues.AddRange(GenericFontFamilys);
+                                    }
+                                    break;
+                                default:
+                                    throw new NotImplementedException($"Unknown font-family keyword '{val.Value.ToString()}'");
+                            }
+
+                        }
+                        break;
+                    case EStyleDataType.STRING:
+                        {// Remove any invalid font-familys
+                            foreach(FontFamily family in SystemFonts.Families)
+                            {
+                                if (0 == Unicode.CaselessCompare(val.Value, family.Name))
+                                {// Found it!
+                                    retValues.Add(val);
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    default:
+                        {
+                            retValues.Add(val);
+                        }
+                        break;
+                }
+            }
+
+            return (retValues.Count > 0) ? new CssValueList(retValues) : null;
         }
+
     }
 }

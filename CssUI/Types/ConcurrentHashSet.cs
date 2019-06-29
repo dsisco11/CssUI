@@ -5,6 +5,10 @@ using System.Collections.Concurrent;
 
 namespace CssUI
 {
+    /// <summary>
+    /// A concurrently accessible HashSet, thread safe.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public sealed class ConcurrentHashSet<T> : IReadOnlyCollection<T>, ISet<T>
     {
         public int Count => BackingCollection.Count;
@@ -90,7 +94,7 @@ namespace CssUI
         }
 
         void ICollection<T>.Add(T item) => Add(item);
-        IEnumerator IEnumerable.Enumerator => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         // We use Count() and not Any() because we must ensure full loop pass
         internal bool AddRange(IEnumerable<T> items) => items.Count(Add) > 0;

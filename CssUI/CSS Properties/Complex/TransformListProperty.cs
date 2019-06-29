@@ -283,6 +283,11 @@ namespace CssUI
 
         #region Serialization
         public string Serialize() { throw new NotImplementedException(); }
+
+        public CssValue Find_Inherited_Value()
+        {
+            throw new NotImplementedException();
+        }
         #endregion
     }
 }

@@ -517,7 +517,7 @@ namespace CssUI
             return ((IList<cssElement>)Children).GetEnumerator();
         }
 
-        IEnumerator IEnumerable.Enumerator => ((IList<cssElement>)Children).GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => ((IList<cssElement>)Children).GetEnumerator();
         #endregion
 
         #region Propagation
