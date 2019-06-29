@@ -28,7 +28,7 @@ namespace CssUI.CSS
                             //is this property inherited
                             if (Def != null && Def.Inherited)
                             {
-                                return new CssValue(Property.Find_Inherited_Value());
+                                return Property.Find_Inherited_Value();
                             }
                             // Not inherited, treat this situation like INITIAL
                             return new CssValue(Def.Initial);
@@ -36,17 +36,17 @@ namespace CssUI.CSS
                         break;
                     case EStyleDataType.INHERIT:
                         {
-                            return new CssValue(Property.Find_Inherited_Value());
+                            return Property.Find_Inherited_Value();
                         }
                         break;
                     case EStyleDataType.INITIAL:
                         {// If the Assigned value is the CssValue.Initial literal, then we use our definitions default
-                            return new CssValue(Def.Initial);
+                            return Def.Initial;
                         }
                         break;
                     default:
                         {
-                            return new CssValue(this);
+                            return this;
                         }
                         break;
                 }
@@ -63,16 +63,16 @@ namespace CssUI.CSS
             {
                 if (!(Property.Owner is cssRootElement))
                 {// Root elements cannot inherit, they use the INITIAL value
-                    return new CssValue(Def.Initial);
+                    return Def.Initial;
                 }
 
-                return new CssValue(Property.Find_Inherited_Value());
+                return Property.Find_Inherited_Value();
             }
             /*
             * CSS Specs:
             * 3. Otherwise use the property's initial value. The initial value of each property is indicated in the property's definition.
             */
-            return new CssValue(Def.Initial);
+            return Def.Initial;
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace CssUI.CSS
                     break;
                 case EStyleDataType.INHERIT:// SEE:  https://www.w3.org/TR/CSS2/cascade.html#value-def-inherit
                     {
-                        return new CssValue(Property.Find_Inherited_Value());
+                        return Property.Find_Inherited_Value();
                     }
                     break;
             }
@@ -121,7 +121,7 @@ namespace CssUI.CSS
             }
 
 
-            return new CssValue(this);
+            return this;
         }
 
         /// <summary>
