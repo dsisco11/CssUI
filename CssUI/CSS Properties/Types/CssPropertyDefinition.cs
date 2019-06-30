@@ -1,16 +1,15 @@
-﻿using CssUI.Internal;
+﻿using CssUI.CSS;
 using System;
 using System.Collections.Generic;
 
-namespace CssUI.CSS
+namespace CssUI.Internal
 {
     /// <summary>
-    /// Holds all of the information about a CSS property
+    /// Holds all, the specification defined, information about the valid values for a property and how to resolve said values into an absolute form.
     /// </summary>
     public class CssPropertyDefinition
-    {// SEE  : https://www.w3.org/TR/CSS2/about.html#property-defs
+    {
 
-        public delegate double StyleValuePercentageResolver(cssElement E, double Percent);
         #region Properties
         /// <summary>
         /// CSS Name of the property
@@ -35,11 +34,7 @@ namespace CssUI.CSS
         /// <summary>
         /// Method used to resolve percentage values to computed values for this property, or NULL if percentages are not accepted.
         /// </summary>
-        public readonly StyleValuePercentageResolver Percentage_Resolver = null;
-        /// <summary>
-        /// Whether percentage values for this property depend on another value which is not available at the cascading stage.
-        /// </summary>
-        public readonly bool Percentage_Dependent = false;
+        public readonly PercentageResolver Percentage_Resolver = null;
         /// <summary>
         /// If TRUE then this property cannot be set from style-sheets
         /// </summary>
@@ -62,72 +57,13 @@ namespace CssUI.CSS
         /// A list of all keywords that can be assigned to this property
         /// </summary>
         public readonly List<string> KeywordWhitelist = null;
+        /// <summary>
+        /// A map of resolution delegates to <see cref="ECssPropertyStage"/> which the defined property uses to resolve property values
+        /// </summary>
+        public readonly PropertyResolverFunc[] PropertyStageResolver = new PropertyResolverFunc[7];
         #endregion
 
         #region Constructors
-        private CssPropertyDefinition(string Name, EPropertyAffects Flags)
-        {
-            this.Name = new AtomicString(Name);
-            this.Flags = Flags;
-            CssProperties.Definitions.Add(this.Name, this);
-        }
-        /// <summary>
-        /// Define a new Css Styling property
-        /// </summary>
-        /// <param name="Name">CSS property name</param>
-        /// <param name="Inherited">Do child elements inherit this value if they are unset?</param>
-        /// <param name="Initial">Default value for the property</param>
-        /// <param name="IsPrivate">If TRUE then this property cannot be set from style-sheets</param>
-        public CssPropertyDefinition(string Name, bool Inherited, EPropertyAffects Flags, CssValue Initial, bool IsPrivate) : this(Name, Flags)
-        {
-            this.Inherited = Inherited;
-            this.Initial = Initial;
-            this.IsPrivate = IsPrivate;
-        }
-        /// <summary>
-        /// Define a new Css Styling property
-        /// </summary>
-        /// <param name="Name">CSS property name</param>
-        /// <param name="Inherited">Do child elements inherit this value if they are unset?</param>
-        /// <param name="Initial">Default value for the property</param>
-        /// <param name="Percentage_Resolver">Method used to resolve a percentage value into an absolute one</param>
-        public CssPropertyDefinition(string Name, bool Inherited, EPropertyAffects Flags, CssValue Initial, StyleValuePercentageResolver Percentage_Resolver) : this(Name, Flags)
-        {
-            this.Inherited = Inherited;
-            this.Initial = Initial;
-            this.Percentage_Resolver = Percentage_Resolver;
-        }
-
-        /// <summary>
-        /// Define a new Css Styling property
-        /// </summary>
-        /// <param name="Name">CSS property name</param>
-        /// <param name="Inherited">Do child elements inherit this value if they are unset?</param>
-        /// <param name="Initial">Default value for the property</param>
-        /// <param name="Percentage_Resolver">Method used to resolve a percentage value into an absolute one</param>
-        /// <param name="Percentage_Dependent">Whether percentage values for this property depend on other values an thus cannot be resolved at the cascading stage</param>
-        public CssPropertyDefinition(string Name, bool Inherited, EPropertyAffects Flags, CssValue Initial, StyleValuePercentageResolver Percentage_Resolver, bool Percentage_Dependent) : this(Name, Flags)
-        {
-            this.Inherited = Inherited;
-            this.Initial = Initial;
-            this.Percentage_Resolver = Percentage_Resolver;
-            this.Percentage_Dependent = Percentage_Dependent;
-        }
-
-        /// <summary>
-        /// Define a new Css Styling property
-        /// </summary>
-        /// <param name="Name">CSS property name</param>
-        /// <param name="Inherited">Do child elements inherit this value if they are unset?</param>
-        /// <param name="Flags">Indicates what aspects of an element this property affects</param>
-        /// <param name="Initial">Default value for the property</param>
-        public CssPropertyDefinition(string Name, bool Inherited, EPropertyAffects Flags, CssValue Initial) : this(Name, Flags)
-        {
-            this.Inherited = Inherited;
-            this.Initial = Initial;
-        }
-
-
         /// <summary>
         /// Define a new Css Styling property
         /// </summary>
@@ -138,22 +74,37 @@ namespace CssUI.CSS
         /// <param name="DisallowedTypes">Bitmask of all value data types which cannot be assigned to this property</param>
         /// <param name="Keywords">List of keywords which can be assigned to this property</param>
         /// <param name="IsPrivate">If TRUE then this property cannot be set from style-sheets</param>
-        public CssPropertyDefinition(string Name, bool Inherited, EPropertyAffects Flags, CssValue Initial, EStyleDataType DisallowedTypes = 0x0, string[] Keywords = null, bool IsPrivate = false, EStyleDataType AllowedTypes = 0x0) : this(Name, Flags)
+        public CssPropertyDefinition(string Name, bool Inherited, EPropertyAffects Flags, CssValue Initial, EStyleDataType DisallowedTypes = 0x0, string[] Keywords = null, bool IsPrivate = false, EStyleDataType AllowedTypes = 0x0, PercentageResolver Percentage_Resolver = null, params Tuple<ECssPropertyStage, PropertyResolverFunc>[] Resolvers)
         {
+            this.Name = new AtomicString(Name);
+            this.Flags = Flags;
             this.IsPrivate = IsPrivate;
             this.Inherited = Inherited;
             this.Initial = Initial;
-            this.KeywordWhitelist = new List<string>(Keywords);
-            this.DisallowedTypes = DisallowedTypes;
+            this.Percentage_Resolver = Percentage_Resolver;
 
+            if (ReferenceEquals(Keywords, null))
+                this.KeywordWhitelist = new List<string>();
+            else
+                this.KeywordWhitelist = new List<string>(Keywords);
+
+            this.DisallowedTypes = DisallowedTypes;
+            // Append the specified allowed types to our defaults
             this.AllowedTypes |= AllowedTypes;
-            // remove our disallowed types from our allowed ones
+            // Remove our disallowed types from our allowed ones
             this.AllowedTypes &= ~DisallowedTypes;
+
+            // Setup our resolver index
+            foreach(var o in Resolvers)
+            {
+                this.PropertyStageResolver[(int)o.Item1] = o.Item2;
+            }
+            
         }
 
         #endregion
 
-        #region Checking
+        #region Value Checking
 
         /// <summary>
         /// Returns whether the specified value is valid according to the currently set options
@@ -162,10 +113,10 @@ namespace CssUI.CSS
         /// <returns></returns>
         public bool IsValidDataType(EStyleDataType Type)
         {
-            if (AllowedTypes != 0)
-                return (0 != (AllowedTypes & Type));
+            if (AllowedTypes != 0x0)
+                return (0 == (AllowedTypes & Type));
             // Bitwise check against our disallowed types
-            return (0 == (DisallowedTypes & Type));
+            return (0 != (DisallowedTypes & Type));
         }
 
         /// <summary>
@@ -189,7 +140,7 @@ namespace CssUI.CSS
         public void CheckAndThrow(ICssProperty Owner, CssValue Value)
         {
             if (!this.IsValidDataType(Value.Type))
-                throw new CssException($"The property({Owner.CssName}) cannot be set to {Enum.GetName(typeof(EStyleDataType), Value.Type)}!");
+                throw new CssException($"The property({Owner.CssName}) cannot be set to an {Enum.GetName(typeof(EStyleDataType), Value.Type)}!");
 
             switch(Value.Type)
             {
