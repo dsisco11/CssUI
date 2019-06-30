@@ -11,13 +11,21 @@ namespace CssUI.CSS
         //public Action<NamedProperty> onChanged { get { return this.onChanged; } set { this.onChanged = value; } }
         #endregion
 
-        #region Constructors
+        #region Value Overrides
+        public new int Actual
+        {
+            get
+            {
+                return base.Actual.Value;
+            }
+        }
+        #endregion
 
+        #region Constructors
         public IntProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked) 
             : base(CssName, Locked, Source, Owner)
         {
         }
-
         #endregion
 
         #region Setters

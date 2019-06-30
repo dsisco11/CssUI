@@ -2,6 +2,7 @@
 using Svg;
 #endif
 using System.IO;
+using CssUI.Enums;
 using CssUI.Extensions;
 
 namespace CssUI

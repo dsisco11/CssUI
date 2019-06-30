@@ -1,5 +1,5 @@
 ﻿
-namespace CssUI
+namespace CssUI.Enums
 {
     /// <summary>
     /// All the different methods for applying size constraints to a UI element

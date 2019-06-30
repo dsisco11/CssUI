@@ -1,5 +1,5 @@
 ﻿
-namespace CssUI
+namespace CssUI.Enums
 {
     /// <summary>
     /// Describes all of the box sizing modes <see cref="cssElement"/>'s can use

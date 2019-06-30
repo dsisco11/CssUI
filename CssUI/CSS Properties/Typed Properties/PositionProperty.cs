@@ -6,7 +6,7 @@ namespace CssUI
 {
     /// <summary>
     /// Specifies the position of a object area (e.g. background image) inside a positioning area (e.g. background positioning area).
-    /// SEE:  https://www.w3.org/TR/2012/WD-css3-values-20120308/#position
+    /// SEE:  https://www.w3.org/TR/css-values-3/#position
     /// </summary>
     public class PositionProperty : CssProperty
     {
@@ -40,8 +40,19 @@ namespace CssUI
         public int Y { get; private set; }
         #endregion
 
-        #region Constructors
+        #region Value Overrides
+        /* XXX: Finish implementing this property type, correct this return value but still override the actual value
+         */
+        /*public new IEnumerable<string> Actual
+        {
+            get
+            {
+                return base.Actual.Select<string>((CssValue v) => { return (string)v.Value; });
+            }
+        }*/
+        #endregion
 
+        #region Constructors
         public PositionProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked) 
             : base(CssName, Locked, Source, Owner)
         {

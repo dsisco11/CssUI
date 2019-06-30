@@ -86,7 +86,7 @@ namespace CssUI
                 // Translate a value of NULL to CSSValue.Null
                 _assigned = (object.ReferenceEquals(value, null) ? null : value);
                 //our assigned value has changed, this means our specified and computed valued are now incorrect.
-                _ = Update();
+                Update();
             }
         }
 
@@ -143,7 +143,7 @@ namespace CssUI
         /// The value that will be used by the element
         /// <para>This is the <see cref="Used"/> value with system restrictions placed on it</para>
         /// </summary>
-        public CssValueList Actual
+        public virtual CssValueList Actual
         {
             get
             {
@@ -295,7 +295,7 @@ namespace CssUI
                 CssValue[] newValues = new CssValue[Total];
                 for (int i = 0; i < Total; i++)
                 {
-                    newValues[i] = Assigned[i].Derive_SpecifiedValue(this).Result;
+                    newValues[i] = Assigned[i].Derive_SpecifiedValue(this);
                 }
                 _specified = new CssValueList(newValues);
             }
@@ -326,7 +326,7 @@ namespace CssUI
                 }
                 else
                 {// our single value isnt inherit so we just let it resolve itself into a new list
-                    _computed = new CssValueList(Specified.First().Derive_ComputedValue(this).Result);
+                    _computed = new CssValueList(Specified.First().Derive_ComputedValue(this));
                 }
             }
             else
@@ -335,7 +335,7 @@ namespace CssUI
                 CssValue[] newValues = new CssValue[Total];
                 for (int i = 0; i < Total; i++)
                 {
-                    newValues[i] = Specified[i].Derive_ComputedValue(this).Result;
+                    newValues[i] = Specified[i].Derive_ComputedValue(this);
                 }
                 _computed = new CssValueList(newValues);
             }
@@ -354,7 +354,8 @@ namespace CssUI
         private void Reinterpret_Used()
         {
             _used = null;
-            var ResolutionDelegate = CssPropertyResolver.Get(CssName, ECssPropertyStage.Used);
+            //var ResolutionDelegate = CssPropertyResolver.Get(CssName, ECssPropertyStage.Used);
+            var ResolutionDelegate = Definition.PropertyStageResolver[(int)ECssPropertyStage.Used];
             if (!ReferenceEquals(ResolutionDelegate, null))
             {
                 _used = (CssValueList)ResolutionDelegate.Invoke(this);
@@ -378,7 +379,8 @@ namespace CssUI
         private void Reinterpret_Actual()
         {
             _actual = null;
-            var ResolutionDelegate = CssPropertyResolver.Get(CssName, ECssPropertyStage.Actual);
+            //var ResolutionDelegate = CssPropertyResolver.Get(CssName, ECssPropertyStage.Actual);
+            var ResolutionDelegate = Definition.PropertyStageResolver[(int)ECssPropertyStage.Actual];
             if (!ReferenceEquals(ResolutionDelegate, null))
             {
                 _actual = (CssValueList)ResolutionDelegate.Invoke(this);
@@ -415,7 +417,7 @@ namespace CssUI
             }
 
             if (changes)
-                await Update();
+                Update();
 
             return await Task.FromResult(changes);
         }
@@ -440,7 +442,7 @@ namespace CssUI
             }
 
             if (changes)
-                await Update();
+                Update();
             return changes;
         }
         #endregion
@@ -450,7 +452,7 @@ namespace CssUI
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        public override async Task Update(bool ComputeNow = false)
+        public override void Update(bool ComputeNow = false)
         {
             throw new NotImplementedException();
         }
@@ -460,7 +462,7 @@ namespace CssUI
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        public override async Task UpdateDependent(bool ComputeNow = false)
+        public override void UpdateDependent(bool ComputeNow = false)
         {
             throw new NotImplementedException();
         }
@@ -470,7 +472,7 @@ namespace CssUI
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        public override async Task UpdateDependentOrAuto(bool ComputeNow = false)
+        public override void UpdateDependentOrAuto(bool ComputeNow = false)
         {
             throw new NotImplementedException();
         }
@@ -480,7 +482,7 @@ namespace CssUI
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        public override async Task UpdatePercentageOrAuto(bool ComputeNow = false)
+        public override void UpdatePercentageOrAuto(bool ComputeNow = false)
         {
             throw new NotImplementedException();
         }

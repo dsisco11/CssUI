@@ -1,4 +1,5 @@
-﻿using SixLabors.Fonts;
+﻿using CssUI.Enums;
+using SixLabors.Fonts;
 using System.Collections.Generic;
 
 namespace CssUI.Fonts
@@ -8,7 +9,7 @@ namespace CssUI.Fonts
     /// </summary>
     public class FontOptions
     {
-        public readonly ICollection<string> Families = null;
+        public readonly IEnumerable<string> Families = null;
         public readonly double Size = 0;
         public readonly int Weight = 400;
         public readonly EFontStyle Style = EFontStyle.Normal;
@@ -22,7 +23,7 @@ namespace CssUI.Fonts
             this.Style = Style;
         }
 
-        public FontOptions(ICollection<string> Families, double Size, int Weight = 400, EFontStyle Style = EFontStyle.Normal)
+        public FontOptions(IEnumerable<string> Families, double Size, int Weight = 400, EFontStyle Style = EFontStyle.Normal)
         {
             this.Families = Families;
             this.Size = Size;

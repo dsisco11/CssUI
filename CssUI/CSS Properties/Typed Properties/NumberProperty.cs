@@ -7,20 +7,21 @@ namespace CssUI.CSS
     /// </summary>
     public class NumberProperty : CssProperty
     {
-        #region Properties
-        /// <summary>
-        /// Stores the resolved value of this property
-        /// </summary>
-        public double? Resolved;
+        #region Value Overrides
+        public new double Actual
+        {
+            get
+            {
+                return base.Actual.Value;
+            }
+        }
         #endregion
-        
-        #region Constructors
 
+        #region Constructors
         public NumberProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked) 
             : base(CssName, Locked,  Source, Owner)
         {
         }
-
         #endregion
 
         #region Setters

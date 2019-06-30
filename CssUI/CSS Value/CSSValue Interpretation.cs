@@ -13,7 +13,7 @@ namespace CssUI.CSS
         /// <param name="Property"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal async Task<CssValue> Derive_SpecifiedValue(ICssProperty Property)
+        internal CssValue Derive_SpecifiedValue(ICssProperty Property)
         {// SEE:  https://www.w3.org/TR/css-cascade-3/#specified
             CssPropertyDefinition Def = Property.Definition;
 
@@ -81,7 +81,7 @@ namespace CssUI.CSS
         /// <param name="Property"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal async Task<CssValue> Derive_ComputedValue(ICssProperty Property)
+        internal CssValue Derive_ComputedValue(ICssProperty Property)
         {// SEE:  https://www.w3.org/TR/css-cascade-3/#computed
             CssPropertyDefinition Def = Property.Definition;
 
@@ -114,7 +114,7 @@ namespace CssUI.CSS
             }
 
             // If we havent resolved a value yet that means this was meant to be handled by a custom handler
-            var ResolutionDelegate = CssPropertyResolver.Get(Property.CssName, ECssPropertyStage.Computed);
+            var ResolutionDelegate = Def.PropertyStageResolver[(int)ECssPropertyStage.Computed];
             if (!ReferenceEquals(ResolutionDelegate, null))
             {
                 return ResolutionDelegate.Invoke(Property);
@@ -130,10 +130,9 @@ namespace CssUI.CSS
         /// <param name="Computed"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal async Task<CssValue> Derive_UsedValue(ICssProperty Property)
+        internal CssValue Derive_UsedValue(ICssProperty Property)
         {// SEE:  https://www.w3.org/TR/css-cascade-3/#used
-
-            var ResolutionDelegate = CssPropertyResolver.Get(Property.CssName, ECssPropertyStage.Used);
+            var ResolutionDelegate = Property.Definition.PropertyStageResolver[(int)ECssPropertyStage.Used];
             if (!ReferenceEquals(ResolutionDelegate, null))
             {
                 return ResolutionDelegate.Invoke(Property);
@@ -148,11 +147,11 @@ namespace CssUI.CSS
         /// <param name="Used"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal async Task<CssValue> Derive_ActualValue(ICssProperty Property)
+        internal CssValue Derive_ActualValue(ICssProperty Property)
         {// SEE:  https://www.w3.org/TR/css-cascade-3/#actual
-            // the Actual value does not get 'resolved' it gets restricted.
+         // the Actual value does not get 'resolved' it gets restricted.
 
-            var ResolutionDelegate = CssPropertyResolver.Get(Property.CssName, ECssPropertyStage.Actual);
+            var ResolutionDelegate = Property.Definition.PropertyStageResolver[(int)ECssPropertyStage.Actual];
             if (!ReferenceEquals(ResolutionDelegate, null))
             {
                 return ResolutionDelegate(Property);

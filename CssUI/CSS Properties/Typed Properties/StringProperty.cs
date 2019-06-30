@@ -17,13 +17,21 @@ namespace CssUI.CSS
         }
         #endregion
 
-        #region Constructors
+        #region Value Overrides
+        public new string Actual
+        {
+            get
+            {
+                return base.Actual.Value;
+            }
+        }
+        #endregion
 
+        #region Constructors
         public StringProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked) 
             : base(CssName, Locked, Source, Owner)
         {
         }
-
         #endregion
 
         #region Setters

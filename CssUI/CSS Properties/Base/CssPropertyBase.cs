@@ -123,7 +123,7 @@ namespace CssUI.Internal
                 if (prop != null)
                     return new CssValue((prop as CssProperty).Computed);
                 else
-                    return null;
+                    throw new CssPropertyException($"Cannot read parent element property: {CssName}");
             }
         }
         #endregion
@@ -171,28 +171,28 @@ namespace CssUI.Internal
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        public abstract Task Update(bool ComputeNow = false);
+        public abstract void Update(bool ComputeNow = false);
 
         /// <summary>
         /// If the Assigned value is one that depends on another value for its final value then
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        public abstract Task UpdateDependent(bool ComputeNow = false);
+        public abstract void UpdateDependent(bool ComputeNow = false);
 
         /// <summary>
         /// If the Assigned value is one that depends on another value for its final value OR is <see cref="CssValue.Auto"/> then
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        public abstract Task UpdateDependentOrAuto(bool ComputeNow = false);
+        public abstract void UpdateDependentOrAuto(bool ComputeNow = false);
 
         /// <summary>
         /// If the Assigned value is a percentage OR is <see cref="CssValue.Auto"/> then
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        public abstract Task UpdatePercentageOrAuto(bool ComputeNow = false);
+        public abstract void UpdatePercentageOrAuto(bool ComputeNow = false);
 
         #endregion
 

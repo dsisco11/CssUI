@@ -13,9 +13,9 @@ namespace CssUI.Internal
      */
     public static partial class CssPropertyResolver
     {
-        public static dynamic Font_Size_Actual(ICssProperty Property)
+        public static dynamic Font_Size_Used(ICssProperty Property)
         {// SEE: https://www.w3.org/TR/css-fonts-3/#font-size-prop
-            double? v = (Property as CssProperty).Used.Resolve();
+            double? v = (Property as CssProperty).Computed.Resolve();
             if (!v.HasValue)
                 throw new CssException("Unable to resolve absolute length for Used value.");
             double Size = v.Value;

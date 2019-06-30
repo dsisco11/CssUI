@@ -6,6 +6,7 @@ using CssUI.Enums;
 using System.Numerics;
 using CssUI.Types;
 using xLog;
+using System.Threading;
 
 namespace CssUI
 {
@@ -44,6 +45,57 @@ namespace CssUI
         ScheduledFunction MouseHover_TMR;
         #endregion
 
+        #region Multithreaded Updater
+        private Task updaterTask;
+        CancellationTokenSource updaterCancel;
+        ManualResetEvent updaterFree;
+
+        private void Start_Updater()
+        {
+            // Create a new cancellation token
+            updaterCancel = new CancellationTokenSource();
+            updaterFree = new ManualResetEvent(false);
+            updaterTask = Task.Factory.StartNew(Threaded_Updater, updaterCancel.Token, TaskCreationOptions.LongRunning);
+        }
+        private void Stop_Updater()
+        {
+            if (updaterCancel != null)
+            {
+                updaterCancel.Cancel();
+                updaterFree.WaitOne();
+
+                if (updaterTask != null)
+                {
+                    updaterTask.Wait();
+                    updaterTask.Dispose();
+                    updaterTask = null;
+                }
+            }
+        }
+
+        private void Threaded_Updater(object state)
+        {
+            CancellationToken cancelToken = (CancellationToken)state;
+            if (Thread.CurrentThread.Name == null) Thread.CurrentThread.Name = "cssRoodElement Updater";
+
+            while (!cancelToken.IsCancellationRequested)
+            {
+                cancelToken.ThrowIfCancellationRequested();
+                Update();
+                xLog.Log.Info("- update - end");
+            }
+
+            // DIE
+            if (updaterCancel != null)
+            {
+                updaterCancel.Dispose();
+                updaterCancel = null;
+            }
+
+            updaterFree.Set();
+        }
+        #endregion
+
         #region Input Focus
         /// <summary>
         /// UI Element that currently has input focus.
@@ -80,6 +132,7 @@ namespace CssUI
         #region Constructors
         public cssRootElement(IRenderEngine Engine) : base(null, null, "#Root")
         {
+            Start_Updater();
             this.Logs = xLog.LogFactory.GetLogger(() => { return Frame.ToString(); });
             this.Engine = Engine;
             Set_Root(this);
@@ -113,13 +166,10 @@ namespace CssUI
             
             Style.ImplicitRules.Set_Padding_Implicit(2, 2);
 
-            // Setup the default font.
-            // XXX: this should be done using the CSS 3 specified font matching method
-            // DOCS: 
 
             //Style.ImplicitRules.FontSize.Set(14);
             //Style.ImplicitRules.FontWeight.Set(700);
-            
+
         }
 
         #region Event Handlers (Viewport)
@@ -724,11 +774,9 @@ namespace CssUI
         public void Present()
         {
             Frame++;
-            Update().Wait();
+            // Update();
             Engine.Begin();
-
             Render();
-
             Engine.End();
             //Viewport.Scissor_Safety_Check();
         }

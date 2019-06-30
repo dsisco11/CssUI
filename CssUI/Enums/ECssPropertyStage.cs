@@ -4,7 +4,7 @@ namespace CssUI
     /// <summary>
     /// Describes all of the different value stages for a Css property
     /// </summary>
-    public enum ECssPropertyStage : byte
+    public enum ECssPropertyStage : int
     {
         Invalid = 0,
         /// <summary>

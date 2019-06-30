@@ -18,6 +18,9 @@ namespace CssUI.Internal
 
 
         #region Constructors
+        public CssValueHash()
+        {
+        }
         public CssValueHash(CssValue Value)
         {
             this.Hash = Value.GetHashCode();

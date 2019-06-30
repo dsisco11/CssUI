@@ -224,7 +224,7 @@ namespace CssUI
         public IntProperty FontWeight => (IntProperty)this["font-weight"];
         public EnumProperty<EFontStyle> FontStyle => (EnumProperty<EFontStyle>)this["font-style"];
         public NumberProperty FontSize => (NumberProperty)this["font-size"];
-        public StringProperty FontFamily => (StringProperty)this["font-family"];
+        public MultiStringProperty FontFamily => (MultiStringProperty)this["font-family"];
         #endregion
 
         #region Lines
@@ -389,7 +389,7 @@ namespace CssUI
             else SetProperties.Add(Property.CssName);
 
             if (Property.CssName == null) throw new Exception(string.Concat("Cannot fire onChange events for unnamed property! (Name: ", Property.CssName, ")"));
-            var def = CSS.CssProperties.Definitions[Property.CssName];
+            var def = CssUI.Internal.CssProperties.Definitions[Property.CssName];
             if (def == null) throw new Exception(string.Concat("Cannot find a definition for Css property: \"", Property.CssName, "\""));
 
             EPropertyAffects Flags = def.Flags;

@@ -192,7 +192,7 @@ namespace CssUI.Fonts
         /// <param name="Style"></param>
         /// <param name="Weight"></param>
         /// <returns></returns>
-        public static FontFamily Select_From_List(ICollection<string> Familys, FontStyle Style, int Weight)
+        public static FontFamily Select_From_List(IEnumerable<string> Familys, FontStyle Style, int Weight)
         {
             // FIRST, we  prioritize the weight, and try to find a font that has a version for the desired weight
             string[] weights = Translate_Font_Weight_To_Name(Weight);

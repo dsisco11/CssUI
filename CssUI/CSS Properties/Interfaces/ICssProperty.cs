@@ -101,28 +101,28 @@ namespace CssUI
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        Task Update(bool ComputeNow = false);
+        void Update(bool ComputeNow = false);
 
         /// <summary>
         /// If the Assigned value is one that depends on another value for its final value then
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        Task UpdateDependent(bool ComputeNow = false);
+        void UpdateDependent(bool ComputeNow = false);
 
         /// <summary>
         /// If the Assigned value is one that depends on another value for its final value OR is <see cref="CssValue.Auto"/> then
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        Task UpdateDependentOrAuto(bool ComputeNow = false);
+        void UpdateDependentOrAuto(bool ComputeNow = false);
 
         /// <summary>
         /// If the Assigned value is a percentage OR is <see cref="CssValue.Auto"/> then
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        Task UpdatePercentageOrAuto(bool ComputeNow = false);
+        void UpdatePercentageOrAuto(bool ComputeNow = false);
 
         #endregion
 

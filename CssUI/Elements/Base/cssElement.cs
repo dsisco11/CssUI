@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CssUI.Types;
 using CssUI.CSS;
 using CssUI.DOM;
+using CssUI.Enums;
 
 namespace CssUI
 {
@@ -473,7 +474,7 @@ namespace CssUI
                 return this.Block;
             }
 
-            Style.Resolve_Block().Wait();
+            Style.Resolve_Block();
             if (Style.Display == EDisplayMode.NONE) return eBlock.FromTRBL(0, 0, 0, 0);
 
             ePos cPos = Style.Get_Offset() + Block_Containing.Get_Pos();
@@ -1069,13 +1070,13 @@ namespace CssUI
         /// Updates the Block and Layout if needed and returns True if any updates occured
         /// </summary>
         /// <returns>True/False updates occured</returns>
-        public virtual async Task<bool> Update()
+        public virtual bool Update()
         {
             bool retVal = false;
 
             if (0 != (Style.Dirt & EPropertySystemDirtFlags.Cascade))
             {
-                await Style.Cascade();
+                Style.Cascade();
             }
 
             if (Block.IsDirty)

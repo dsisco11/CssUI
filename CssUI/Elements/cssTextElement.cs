@@ -7,6 +7,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.Primitives;
 using System.Numerics;
+using CssUI.Enums;
 
 namespace CssUI
 {
@@ -100,7 +101,7 @@ namespace CssUI
         private async void Update_Text()
         {
             if (0 != (Style.Dirt & EPropertySystemDirtFlags.Font))
-                await Style.Resolve_Font();
+                Style.Resolve_Font();
 
             if (Style.Font == null) return;
 
@@ -139,10 +140,7 @@ namespace CssUI
             GlyphBuilder glyphBuilder = new GlyphBuilder();
             TextRenderer renderer = new TextRenderer(glyphBuilder);
 
-            float dpix = Style.DpiX ?? 0;
-            float dpiy = Style.DpiY ?? 0;
-
-            RendererOptions style = new RendererOptions(font, (float)dpix, (float)dpiy, PointF.Empty)
+            RendererOptions style = new RendererOptions(font, (float)Style.DpiX, (float)Style.DpiY, PointF.Empty)
             {
                 ApplyKerning = true,
                 TabWidth = 5,

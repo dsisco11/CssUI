@@ -1,6 +1,4 @@
-﻿
-
-namespace CssUI
+﻿namespace CssUI.Enums
 {
     public enum EDisplayMode : int
     {

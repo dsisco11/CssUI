@@ -1,6 +1,8 @@
-﻿using CssUI.CSS;
+﻿using System.Linq;
+using CssUI.CSS;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 namespace CssUI.Internal
 {
@@ -26,6 +28,7 @@ namespace CssUI.Internal
         {
             this.Items.Add(singleValue);
         }
+
         /// <summary>
         /// Creates a new <see cref="CssValueList"/> as a deep copy of another
         /// </summary>
@@ -37,15 +40,16 @@ namespace CssUI.Internal
                 this.Items.Add(new CssValue(cssValue));
             }
         }
+
         /// <summary>
         /// Creates a new <see cref="CssValueList"/> populated by a given set of <see cref="CssValue"/>s
         /// </summary>
         /// <param name="cssValues"></param>
-        public CssValueList(ICollection<CssValue> cssValues)
+        public CssValueList(IEnumerable<CssValue> cssValues)
         {
             foreach (CssValue cssValue in cssValues)
             {
-                this.Items.Add(new CssValue(cssValue));
+                this.Items.Add(cssValue);
             }
         }
         #endregion
@@ -79,6 +83,16 @@ namespace CssUI.Internal
             return ((IEnumerable<CssValue>)Items).GetEnumerator();
         }
 
+        #endregion
+
+        #region LINQ Implementation
+        public IEnumerable<T> Select<T>(Func<CssValue, T> predicate)
+        {
+            foreach(CssValue cssValue in this)
+            {
+                yield return predicate(cssValue);
+            }
+        }
         #endregion
 
         #region Operators

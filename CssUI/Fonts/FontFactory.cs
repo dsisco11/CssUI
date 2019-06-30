@@ -1,4 +1,5 @@
-﻿using SixLabors.Fonts;
+﻿using CssUI.Enums;
+using SixLabors.Fonts;
 using SixLabors.Fonts.Exceptions;
 using System;
 using System.Collections.Concurrent;

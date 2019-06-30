@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using CssUI.CSS;
 using System.Threading.Tasks;
+using CssUI.Enums;
 
 namespace CssUI
 {
@@ -318,10 +319,10 @@ namespace CssUI
         /// Updates the Block and Layout if needed and returns True if any updates occured
         /// </summary>
         /// <returns>True/False updates occured</returns>
-        public override async Task<bool> Update()
+        public override bool Update()
         {
             bool retVal = false;
-            if (await base.Update()) retVal = true;
+            if (base.Update()) retVal = true;
             // Our base Update() function already handles calling Update() on our child-elements
             /*
             for (int i = 0; i < Children.Count; i++)

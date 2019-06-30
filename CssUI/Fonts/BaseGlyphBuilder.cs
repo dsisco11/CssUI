@@ -5,6 +5,7 @@ using SixLabors.Fonts;
 using SixLabors.Primitives;
 using System.Linq;
 using SixLabors.Shapes;
+using CssUI.Internal;
 
 namespace CssUI.Fonts
 {
@@ -23,7 +24,11 @@ namespace CssUI.Fonts
         /// </summary>
         public BaseGlyphBuilder()
         {
-            // glyphs are renderd realative to bottom left so invert the Y axis to allow it to render on top left origin surface
+            // glyphs are renderd relative to bottom left so invert the Y axis to allow it to render on top left origin surface
+            Matrix4 mat = new Matrix4();
+            mat.Scale(1.0f, -1.0f, 0.0f);
+
+            //this.builder = new PathBuilder((Matrix3x2)mat);
             this.builder = new PathBuilder();
         }
 

@@ -21,7 +21,10 @@ namespace CssUI
         {
             get
             {
-                return Map[key1][key2];
+                if (Map.ContainsKey(key1) && MapInverse.ContainsKey(key2))
+                    return Map[key1][key2];
+                else
+                    return default(Vty);
             }
             set
             {

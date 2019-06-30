@@ -98,7 +98,7 @@ namespace CssUI
                 this.Selector = o.Selector;
             }
 
-            if (changes) await Update();
+            if (changes) Update();
             return await Task.FromResult(changes);
         }
 
@@ -169,7 +169,7 @@ namespace CssUI
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        public async Task Update(bool ComputeNow = false)
+        public void Update(bool ComputeNow = false)
         {
         }
 
@@ -178,7 +178,7 @@ namespace CssUI
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        public async Task UpdateDependent(bool ComputeNow = false)
+        public void UpdateDependent(bool ComputeNow = false)
         {
         }
 
@@ -187,7 +187,7 @@ namespace CssUI
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        public async Task UpdateDependentOrAuto(bool ComputeNow = false)
+        public void UpdateDependentOrAuto(bool ComputeNow = false)
         {
         }
 
@@ -196,7 +196,7 @@ namespace CssUI
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        public async Task UpdatePercentageOrAuto(bool ComputeNow = false)
+        public void UpdatePercentageOrAuto(bool ComputeNow = false)
         {
         }
         #endregion

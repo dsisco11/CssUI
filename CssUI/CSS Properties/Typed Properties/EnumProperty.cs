@@ -25,8 +25,18 @@ namespace CssUI.CSS
         internal CssValue ExplicitValue { get { return base.Assigned; } }
         #endregion
 
+        #region Value Overrides
+        public new Ty Actual
+        {
+            get
+            {
+                return (Ty)base.Actual.Value;
+            }
+        }
+        #endregion
+
         #region Constructors
-        
+
         public EnumProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked) 
             : base(CssName, Locked, Source, Owner)
         {

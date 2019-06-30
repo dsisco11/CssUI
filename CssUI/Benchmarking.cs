@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -61,12 +62,12 @@ namespace CssUI
         /// <summary>
         /// Stores a list of the ongoing benchmarks
         /// </summary>
-        static IDictionary<Guid, Benchmark_Instance> Active = new Dictionary<Guid, Benchmark_Instance>();
+        static ConcurrentDictionary<Guid, Benchmark_Instance> Active = new ConcurrentDictionary<Guid, Benchmark_Instance>();
 
         /// <summary>
         /// History of elapsed benchmark time values in seconds
         /// </summary>
-        static Dictionary<string, List<double>> History = new Dictionary<string, List<double>>();
+        static ConcurrentDictionary<string, List<double>> History = new ConcurrentDictionary<string, List<double>>();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Guid Start(string Name)
@@ -79,7 +80,7 @@ namespace CssUI
                 Timing = new Stopwatch()
             };
 
-            Active.Add(ID, Info);
+            Active.TryAdd(ID, Info);
 
             Info.Timing.Start();
             return ID;
@@ -100,37 +101,51 @@ namespace CssUI
             Timer.Stop();
             // Setup our list of times if it doesnt exist
             if (!History.ContainsKey(Name))
-                History.Add(Name, new List<double>(100));
+            {
+                if (!History.TryAdd(Name, new List<double>(100)))
+                    throw new Exception("Unable to add key to benchmark history!");
+            }
 
             History[Name].Add(Timer.Elapsed.TotalSeconds);
-            Active.Remove(ID);
+            Active.TryRemove(ID, out _);
         }
 
-        public static Benchmark_Info Get(string Name)
+        public static Benchmark_Info? Get(string Name)
         {
-            var hist = History[Name];
-
-            double sum = 0;
-            double? low = null, high = null;
-            foreach (double n in hist)
+            if (History.TryGetValue(Name, out List<double> hist))
             {
-                sum += n;
-                if (!low.HasValue) low = n;
-                if (!high.HasValue) high = n;
+                double sum = 0;
+                double? low = null, high = null;
+                foreach (double n in hist)
+                {
+                    sum += n;
+                    if (!low.HasValue) low = n;
+                    if (!high.HasValue) high = n;
 
-                if (n < low) low = n;
-                if (n > high) high = n;
+                    if (n < low) low = n;
+                    if (n > high) high = n;
+                }
+                double avg = (sum / (double)hist.Count);
+
+                return new Benchmark_Info() { Name = Name, Average = avg, Count = hist.Count, High = high.Value, Low = low.Value, Total = sum };
             }
-            double avg = (sum / (double)hist.Count);
+            return null;
+        }
 
-            return new Benchmark_Info() { Name = Name, Average = avg, Count = hist.Count, High = high.Value, Low = low.Value, Total = sum };
+        public static void Print(string name)
+        {
+            var info = Get(name);
+            if (info.HasValue)
+            {
+                xLog.Log.Success(info.Value.ToString());
+            }
         }
 
         public static void Print_All()
         {
             foreach (var kv in History)
             {
-                xLog.Log.Success(Get(kv.Key).ToString());
+                xLog.Log.Success(Get(kv.Key).Value.ToString());
             }
         }
     }

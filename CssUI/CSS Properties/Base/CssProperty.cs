@@ -49,23 +49,23 @@ namespace CssUI
         /// <summary>
         /// Tracks the previous value for <see cref="Assigned"/> so we can detect when changes occur
         /// </summary>
-        CssValueHash oldAssigned = null;
+        CssValueHash oldAssigned = new CssValueHash();
         /// <summary>
         /// Tracks the previous value for <see cref="Specified"/> so we can detect when changes occur
         /// </summary>
-        CssValueHash oldSpecified = null;
+        CssValueHash oldSpecified = new CssValueHash();
         /// <summary>
         /// Tracks the previous value for <see cref="Computed"/> so we can detect when changes occur
         /// </summary>
-        CssValueHash oldComputed = null;
+        CssValueHash oldComputed = new CssValueHash();
         /// <summary>
         /// Tracks the previous value for <see cref="Used"/> so we can detect when changes occur
         /// </summary>
-        CssValueHash oldUsed = null;
+        CssValueHash oldUsed = new CssValueHash();
         /// <summary>
         /// Tracks the previous value for <see cref="Actual"/> so we can detect when changes occur
         /// </summary>
-        CssValueHash oldActual = null;
+        CssValueHash oldActual = new CssValueHash();
         #endregion
 
         #region Values
@@ -196,14 +196,17 @@ namespace CssUI
 
         #region Interpreting
 
+        /// <summary>
+        /// Reinterprets our <see cref="Specified"/> value
+        /// </summary>
         private void Reinterpret_Specified()
         {
-            _specified = Assigned.Derive_SpecifiedValue(this).Result;
+            _specified = Assigned.Derive_SpecifiedValue(this);
             // detect changes, fire events
             if (ReferenceEquals(oldSpecified, null) || oldSpecified != _specified)
             {// the computed value changed
                 oldSpecified.Set(_specified);
-                FireValueChangeEvent(ECssPropertyStage.Specified);
+                // FireValueChangeEvent(ECssPropertyStage.Specified);
 
                 // update the Computed value
                 Reinterpret_Computed();
@@ -212,12 +215,12 @@ namespace CssUI
 
         private void Reinterpret_Computed()
         {
-            _computed = Specified.Derive_ComputedValue(this).Result;
+            _computed = Specified.Derive_ComputedValue(this);
             // detect changes, fire events
             if (ReferenceEquals(oldComputed, null) || oldComputed != _computed)
             {
                 oldComputed.Set(_computed);
-                FireValueChangeEvent(ECssPropertyStage.Computed);
+                // FireValueChangeEvent(ECssPropertyStage.Computed);
 
                 // Update the Used value
                 Reinterpret_Used();
@@ -226,12 +229,12 @@ namespace CssUI
 
         private void Reinterpret_Used()
         {
-            _used = Computed.Derive_UsedValue(this).Result;
+            _used = Computed.Derive_UsedValue(this);
             // detect changes, fire events
             if (ReferenceEquals(oldUsed, null) || oldUsed != _used)
             {
                 oldUsed.Set(_used);
-                FireValueChangeEvent(ECssPropertyStage.Used);
+                // FireValueChangeEvent(ECssPropertyStage.Used);
 
                 // update the Actual value
                 Reinterpret_Actual();
@@ -240,7 +243,7 @@ namespace CssUI
 
         private void Reinterpret_Actual()
         {
-            _actual = Used.Derive_ActualValue(this).Result;
+            _actual = Used.Derive_ActualValue(this);
             // detect changes, fire events
             if (ReferenceEquals(oldActual, null) || oldActual != _actual)
             {
@@ -354,7 +357,7 @@ namespace CssUI
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        public override async Task Update(bool ComputeNow = false)
+        public override void Update(bool ComputeNow = false)
         {
             // unset our backing values so they can be updated...
             _specified = null;
@@ -390,10 +393,10 @@ namespace CssUI
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        public override async Task UpdateDependent(bool ComputeNow = false)
+        public override void UpdateDependent(bool ComputeNow = false)
         {
             if (this.IsDependent)
-                await Update(ComputeNow);
+                Update(ComputeNow);
         }
 
         /// <summary>
@@ -401,10 +404,10 @@ namespace CssUI
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        public override async Task UpdateDependentOrAuto(bool ComputeNow = false)
+        public override void UpdateDependentOrAuto(bool ComputeNow = false)
         {
             if (this.IsDependentOrAuto)
-                await Update(ComputeNow);
+                Update(ComputeNow);
         }
 
         /// <summary>
@@ -412,10 +415,10 @@ namespace CssUI
         /// Resets all values back to the Assigned and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
-        public override async Task UpdatePercentageOrAuto(bool ComputeNow = false)
+        public override void UpdatePercentageOrAuto(bool ComputeNow = false)
         {
             if (this.IsPercentageOrAuto)
-                await Update(ComputeNow);
+                Update(ComputeNow);
         }
         #endregion
 
