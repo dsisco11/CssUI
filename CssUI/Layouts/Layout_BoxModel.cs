@@ -16,9 +16,9 @@ namespace CssUI
         public Layout_BoxModel() { }
         #endregion
         
-        public override eBlock Handle(IParentElement Owner, cssElement[] controls)
+        public override cssBoxArea Handle(IParentElement Owner, cssElement[] controls)
         {
-            eSize MaxArea = Owner.Get_Layout_Area();
+            Size2D MaxArea = Owner.Get_Layout_Area();
             Reset();
 
             for(int i=0; i<controls.Length; i++)
@@ -28,8 +28,8 @@ namespace CssUI
 
                 // Get the elements bounds
                 
-                var cBlock = E.Peek_Block();
-                var cSize = cBlock.Get_Size();// E.Get_Layout_Size();
+                var cArea = E.Box.Content;
+                var cSize = cArea.Get_Dimensions();
                 int cRight = (layoutPos.X + cSize.Width);
 
                 // If the last element we positioned was a block-level element then start a new row...
@@ -46,7 +46,7 @@ namespace CssUI
                 // ====[ BLOCK entitys get a row to themselves ]====
 
                 // Add the current element to our line
-                Add_To_Line(E, cBlock, cSize);
+                Add_To_Line(E, cArea, cSize);
             }
 
             if (Line.Count > 0) Start_New_Line();// Make sure our line in progress is added

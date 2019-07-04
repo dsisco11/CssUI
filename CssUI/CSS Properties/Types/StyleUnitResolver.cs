@@ -21,6 +21,11 @@ namespace CssUI
         {
             switch (Unit)
             {// SEE: https://www.w3.org/TR/css-values-3/#font-relative-lengths
+                case EStyleUnit.PX:
+                    {
+                        // Officially this is defined in the specifications as 1/96th of 1 inch
+                        return 1.0;
+                    }
                 case EStyleUnit.EM:
                     {
                         /*
@@ -108,29 +113,27 @@ namespace CssUI
                         return Get_Scale(Owner, Property, EStyleUnit.EM) * 0.5;
                     }
                 case EStyleUnit.CH:
-                    throw new NotImplementedException();
+                    throw new NotImplementedException($"CSS Unit type '{Enum.GetName(typeof(EStyleUnit), Unit)}' has not been implemented!");
                 case EStyleUnit.REM:
                     return Owner.Root.Style.FontSize;
                 case EStyleUnit.VMAX:
-                    return Math.Max(Owner.Root.Get_Viewport().Block.Width, Owner.Root.Get_Viewport().Block.Height);
+                    return Math.Max(Owner.Root.Get_Viewport().Area.Width, Owner.Root.Get_Viewport().Area.Height);
                 case EStyleUnit.VMIN:
-                    return Math.Min(Owner.Root.Get_Viewport().Block.Width, Owner.Root.Get_Viewport().Block.Height);
+                    return Math.Min(Owner.Root.Get_Viewport().Area.Width, Owner.Root.Get_Viewport().Area.Height);
                 case EStyleUnit.VW:
-                    return Owner.Root.Get_Viewport().Block.Width;
+                    return Owner.Root.Get_Viewport().Area.Width;
                 case EStyleUnit.VH:
-                    return Owner.Root.Get_Viewport().Block.Height;
-                case EStyleUnit.PX:
-                    return 1.0;
+                    return Owner.Root.Get_Viewport().Area.Height;
                 case EStyleUnit.DEG:// Translate degrees to radians
                     return Ratio_DegToRad;
                 case EStyleUnit.GRAD:
                     return Ratio_GradToRad;
                 case EStyleUnit.RAD:
-                    return 1.0;
+                    throw new NotImplementedException($"CSS Unit type '{Enum.GetName(typeof(EStyleUnit), Unit)}' has not been implemented!");
                 case EStyleUnit.TURN:
                     return Ratio_TurnToRad;
                 default:
-                    return 1.0;
+                    throw new NotImplementedException($"CSS Unit type '{Enum.GetName(typeof(EStyleUnit), Unit)}' has not been implemented!");
             }
         }
     }

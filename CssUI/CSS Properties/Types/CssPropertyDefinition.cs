@@ -42,7 +42,7 @@ namespace CssUI.Internal
         /// <summary>
         /// Which 
         /// </summary>
-        public readonly EPropertyAffects Flags = EPropertyAffects.Visual;
+        public readonly EPropertyDirtFlags Flags = EPropertyDirtFlags.Visual;
         /// <summary>
         /// All data types which are not allowed for this property
         /// </summary>
@@ -74,7 +74,7 @@ namespace CssUI.Internal
         /// <param name="DisallowedTypes">Bitmask of all value data types which cannot be assigned to this property</param>
         /// <param name="Keywords">List of keywords which can be assigned to this property</param>
         /// <param name="IsPrivate">If TRUE then this property cannot be set from style-sheets</param>
-        public CssPropertyDefinition(string Name, bool Inherited, EPropertyAffects Flags, CssValue Initial, EStyleDataType DisallowedTypes = 0x0, string[] Keywords = null, bool IsPrivate = false, EStyleDataType AllowedTypes = 0x0, PercentageResolver Percentage_Resolver = null, params Tuple<ECssPropertyStage, PropertyResolverFunc>[] Resolvers)
+        public CssPropertyDefinition(string Name, bool Inherited, EPropertyDirtFlags Flags, CssValue Initial, EStyleDataType AllowedTypes = 0x0, EStyleDataType DisallowedTypes = 0x0, string[] Keywords = null, bool IsPrivate = false, PercentageResolver Percentage_Resolver = null, params Tuple<ECssPropertyStage, PropertyResolverFunc>[] Resolvers)
         {
             this.Name = new AtomicString(Name);
             this.Flags = Flags;

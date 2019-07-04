@@ -13,6 +13,7 @@ namespace CssUI.Internal
      */
     public static partial class CssPropertyResolver
     {
+
         public static dynamic Font_Size_Used(ICssProperty Property)
         {// SEE: https://www.w3.org/TR/css-fonts-3/#font-size-prop
             double? v = (Property as CssProperty).Computed.Resolve();

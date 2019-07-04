@@ -112,6 +112,11 @@ namespace CssUI.Internal
 
             return A.GetHashCode() != B.GetHashCode();
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is CssValueList list && (GetHashCode() == list.GetHashCode());
+        }
         #endregion
 
         #region Hashing

@@ -20,676 +20,322 @@ namespace CssUI
     /// </summary>
     public abstract class cssElement : DomNode, IDisposable, IDomEvents
     {
-        #region Identity
-        /// <summary>
-        /// An ID number, unique among all UI elements, assigned to this element.
-        /// </summary>
-        public readonly cssElementID UID = new cssElementID();
+    #region Identity
+    /// <summary>
+    /// An ID number, unique among all UI elements, assigned to this element.
+    /// </summary>
+    public readonly cssElementID UID = new cssElementID();
 
-        /// <summary>
-        /// The CSS type-name used when referencing this element from within a StyleSheet, 
-        /// this is set by all element classes which inherit from the uiElement type
-        /// </summary>
-        public abstract string TypeName { get; }
+    /// <summary>
+    /// The CSS type-name used when referencing this element from within a StyleSheet, 
+    /// this is set by all element classes which inherit from the uiElement type
+    /// </summary>
+    public abstract string TypeName { get; }
 
-        /// <summary>
-        /// Allows us to resolve the fullpath just once.
-        /// </summary>
-        CacheableValue<string> Cached_FullPath = new CacheableValue<string>();
+    /// <summary>
+    /// Allows us to resolve the fullpath just once.
+    /// </summary>
+    CacheableValue<string> Cached_FullPath = new CacheableValue<string>();
 
-        protected ILogger Logs { get; }
+    protected ILogger Logs { get; }
 
-        public string FullPath
+    public string FullPath
+    {
+        get
         {
-            get
+            return Cached_FullPath.Get(() => 
             {
-                return Cached_FullPath.Get(() => 
-                {
-                    string str = string.Empty;
-                    if (Parent?.FullPath != null)
-                        str += Parent?.FullPath + "/";
-                    //str += (ID != null ? ID : TypeName);
-                    str += string.Concat(TypeName, "-", UID);
-                    return str;
-                });
-            }
+                string str = string.Empty;
+                if (Parent?.FullPath != null)
+                    str += Parent?.FullPath + "/";
+                //str += (ID != null ? ID : TypeName);
+                str += string.Concat(TypeName, "-", UID);
+                return str;
+            });
         }
+    }
 
-        public override string ToString()
+    public override string ToString()
+    {
+        return FullPath;
+    }
+    #endregion
+
+    #region Flags
+    /// <summary>
+    /// Tracks what factors of this element need to be updated.
+    /// </summary>
+    protected EElementDirtyFlags Dirt = EElementDirtyFlags.Clean;
+    /// <summary>
+    /// Adds a flag from the dirty bit
+    /// </summary>
+    /// <param name="flags">Set of flags to add</param>
+    public void Flag_Dirty(EElementDirtyFlags flags) { Dirt |= flags; }
+    /// <summary>
+    /// Removes a flag from the dirty bit
+    /// </summary>
+    /// <param name="flags">Set of flags to remove</param>
+    public void Unflag_Dirty(EElementDirtyFlags flags) { Dirt &= ~flags; }
+
+    private EElementFlags Flags = EElementFlags.Clickable | EElementFlags.DoubleClickable;// By default all elements will process click and doubleclick events
+
+    /// <summary>
+    /// Add flags to the element
+    /// </summary>
+    /// <param name="flags">Set of flags to add</param>
+    public void Flags_Add(EElementFlags flags) { Flags |= flags; }
+    /// <summary>
+    /// Remove flags from the element
+    /// </summary>
+    /// <param name="flags">Set of flags to remove</param>
+    public void Flags_Remove(EElementFlags flags) { Flags &= ~flags; }
+    /// <summary>
+    /// Check if element has a set of flags
+    /// </summary>
+    /// <param name="flags">Set of flags to check for</param>
+    /// <returns>Flags present</returns>
+    public bool HasFlags(EElementFlags flags) { return ((Flags & flags) != 0); }
+
+    /// <summary>
+    /// Whether or not this element can be dragged around by the user
+    /// </summary>
+    public bool IsDraggable
+    {
+        get { return HasFlags(EElementFlags.Draggable); }
+        set
         {
-            return FullPath;
+            if (value == true) Flags_Add(EElementFlags.Draggable);
+            else Flags_Remove(EElementFlags.Draggable);
         }
-        #endregion
+    }
+    #endregion
 
-        #region Flags
-        /// <summary>
-        /// Tracks what factors of this element need to be updated.
-        /// </summary>
-        protected EElementDirtyFlags Dirt = EElementDirtyFlags.Clean;
-        /// <summary>
-        /// Adds a flag from the dirty bit
-        /// </summary>
-        /// <param name="flags">Set of flags to add</param>
-        public void Flag_Dirty(EElementDirtyFlags flags) { Dirt |= flags; }
-        /// <summary>
-        /// Removes a flag from the dirty bit
-        /// </summary>
-        /// <param name="flags">Set of flags to remove</param>
-        public void Unflag_Dirty(EElementDirtyFlags flags) { Dirt &= ~flags; }
+    #region Layout Position
+    /// <summary>
+    /// This elements position according to the parent elements layout
+    /// </summary>
+    private ePos LayoutPos = new ePos(0, 0);
 
-        private EElementFlags Flags = EElementFlags.Clickable | EElementFlags.DoubleClickable;// By default all elements will process click and doubleclick events
+    /// <summary>
+    /// Sets the layout position for this element
+    /// </summary>
+    public void Set_Layout_Pos(int? X, int? Y)
+    {
+        LayoutPos.X = (X.HasValue ? X.Value : 0);
+        LayoutPos.Y = (Y.HasValue ? Y.Value : 0);
+        Flag_Box_Dirty(EBoxInvalidationReason.Layout_Pos_Changed);
+    }
+    #endregion
 
-        /// <summary>
-        /// Add flags to the element
-        /// </summary>
-        /// <param name="flags">Set of flags to add</param>
-        public void Flags_Add(EElementFlags flags) { Flags |= flags; }
-        /// <summary>
-        /// Remove flags from the element
-        /// </summary>
-        /// <param name="flags">Set of flags to remove</param>
-        public void Flags_Remove(EElementFlags flags) { Flags &= ~flags; }
-        /// <summary>
-        /// Check if element has a set of flags
-        /// </summary>
-        /// <param name="flags">Set of flags to check for</param>
-        /// <returns>Flags present</returns>
-        public bool HasFlags(EElementFlags flags) { return ((Flags & flags) != 0); }
+    #region Style
+    public ElementPropertySystem Style { get; private set; }
+    #endregion
 
-        /// <summary>
-        /// Whether or not this element can be dragged around by the user
-        /// </summary>
-        public bool IsDraggable
+    #region Display
+    public DebugOpts Debug = new DebugOpts() { /*Draw_Bounds = true, Draw_Child_Bounds = true*/  };
+    public cssViewport Viewport { get; protected set; } = null;
+        
+    /// <summary>
+    /// Returns whether or not LayoutDirectors ignore this element, so it's position will not be altered by them.
+    /// </summary>
+    public bool Affects_Layout { get { return (Style.Display != EDisplayMode.NONE && Style.PositioningScheme != EPositioningScheme.Absolute); } }
+
+    #endregion
+
+    #region Overflow
+
+    /// <summary>
+    /// Returns True if this element can scroll it's contents on the X axis
+    /// </summary>
+    protected bool Can_Scroll_X { get { return (Style.Overflow_X == EOverflowMode.Scroll || Style.Overflow_X == EOverflowMode.Auto); } }
+    /// <summary>
+    /// Returns True if this element can scroll it's contents on the Y axis
+    /// </summary>
+    protected bool Can_Scroll_Y { get { return (Style.Overflow_Y == EOverflowMode.Scroll || Style.Overflow_Y == EOverflowMode.Auto); } }
+
+    /// <summary>
+    /// Returns whether the element can be scrolled, either programmatically or via user input
+    /// </summary>
+    protected bool IsScrollContainer
+    {
+        get
         {
-            get { return HasFlags(EElementFlags.Draggable); }
-            set
+            switch (Style.Overflow_X)
             {
-                if (value == true) Flags_Add(EElementFlags.Draggable);
-                else Flags_Remove(EElementFlags.Draggable);
+                case EOverflowMode.Visible:
+                case EOverflowMode.Clip:
+                    return false;
             }
-        }
-        #endregion
 
-        #region Layout Position
-        /// <summary>
-        /// This elements position according to the parent elements layout
-        /// </summary>
-        private ePos LayoutPos = new ePos(0, 0);
-
-        /// <summary>
-        /// Sets the layout position for this element
-        /// </summary>
-        public void Set_Layout_Pos(int? X, int? Y)
-        {
-            LayoutPos.X = (X.HasValue ? X.Value : 0);
-            LayoutPos.Y = (Y.HasValue ? Y.Value : 0);
-            Flag_Block_Dirty(EBlockInvalidationReason.Layout_Pos_Changed);
-        }
-        #endregion
-
-        #region Style
-        public ElementPropertySystem Style { get; private set; }
-        #endregion
-
-        #region Display
-        public DebugOpts Debug = new DebugOpts() { /*Draw_Bounds = true, Draw_Child_Bounds = true*/  };
-        public cssViewport Viewport { get; protected set; } = null;
-        
-        /// <summary>
-        /// Returns whether or not LayoutDirectors ignore this element, so it's position will not be altered by them.
-        /// </summary>
-        public bool Affects_Layout { get { return (Style.Display != EDisplayMode.NONE && Style.PositioningScheme != EPositioningScheme.Absolute); } }
-
-        #endregion
-
-        #region Overflow
-
-        /// <summary>
-        /// Returns True if this element can scroll it's contents on the X axis
-        /// </summary>
-        protected bool Can_Scroll_X { get { return (Style.Overflow_X == EOverflowMode.Scroll || Style.Overflow_X == EOverflowMode.Auto); } }
-        /// <summary>
-        /// Returns True if this element can scroll it's contents on the Y axis
-        /// </summary>
-        protected bool Can_Scroll_Y { get { return (Style.Overflow_Y == EOverflowMode.Scroll || Style.Overflow_Y == EOverflowMode.Auto); } }
-
-        /// <summary>
-        /// Returns whether the element can be scrolled, either programmatically or via user input
-        /// </summary>
-        protected bool IsScrollContainer
-        {
-            get
+            switch (Style.Overflow_Y)
             {
-                switch (Style.Overflow_X)
-                {
-                    case EOverflowMode.Visible:
-                    case EOverflowMode.Clip:
-                        return false;
-                }
-
-                switch (Style.Overflow_Y)
-                {
-                    case EOverflowMode.Visible:
-                    case EOverflowMode.Clip:
-                        return false;
-                }
-
-                return true;
+                case EOverflowMode.Visible:
+                case EOverflowMode.Clip:
+                    return false;
             }
-        }
-        /// <summary>
-        /// Returns True if content will be clipped to the <see cref="Block_Padding"/> area
-        /// </summary>
-        protected bool Has_ScrollClipping { get { return (Style.Overflow_X != EOverflowMode.Visible || Style.Overflow_Y != EOverflowMode.Visible); } }
-        /// <summary>
-        /// Returns True/False whether or not the element has any clipping bounds at all
-        /// </summary>
-        protected bool HasClipping { get { return (Block_Clipping != null); } }
-        #endregion
 
-        #region Events
-        protected virtual void Handle_Display_Changed() { }
-        /// <summary>
-        /// Called each time the control is performing its layout logic.
-        /// </summary>
-        public event Action<cssElement> onLayout;
-        /// <summary>
-        /// Called after the control has performed its layout logic.
-        /// </summary>
-        public event Action<cssElement> onLayoutPost;
-        /// <summary>
-        /// Called each time the control's block size changes.
-        /// </summary>
-        public event Action<cssElement, eSize, eSize> onResized;
-        /// <summary>
-        /// Fires each time the controls Block position changes
-        /// </summary>
-        public event Action<cssElement, ePos, ePos> onMoved;
+            return true;
+        }
+    }
+    /// <summary>
+    /// Returns True if content will be clipped to the <see cref="Block_Padding"/> area
+    /// </summary>
+    protected bool Has_ScrollClipping { get { return (Style.Overflow_X != EOverflowMode.Visible || Style.Overflow_Y != EOverflowMode.Visible); } }
+    /// <summary>
+    /// Returns True/False whether or not the element has any clipping bounds at all
+    /// </summary>
+    protected bool HasClipping { get { return (ClippingArea != null); } }
+    #endregion
+
+    #region Events
+    protected virtual void Handle_Display_Changed() { }
+    /// <summary>
+    /// Called each time the control is performing its layout logic.
+    /// </summary>
+    public event Action<cssElement> onLayout;
+    /// <summary>
+    /// Called after the control has performed its layout logic.
+    /// </summary>
+    public event Action<cssElement> onLayoutPost;
+    /// <summary>
+    /// Called each time the control's block size changes.
+    /// </summary>
+    public event Action<cssElement, eSize, eSize> onResized;
+    /// <summary>
+    /// Fires each time the controls Block position changes
+    /// </summary>
+    public event Action<cssElement, ePos, ePos> onMoved;
         
-        /// <summary>
-        /// Occurs after <see cref="Update_Cached_Blocks"/>
-        /// </summary>
-        protected virtual void Handle_Resized(eSize oldSize, eSize newSize)
-        {
-            if (Parent != null) Parent.Flag_Layout(ELayoutBit.Dirty_Children);
-            update_debug_text();
-            onResized?.Invoke(this, oldSize, newSize);
-        }
+    /// <summary>
+    /// Occurs after <see cref="Update_Cached_Blocks"/>
+    /// </summary>
+    protected virtual void Handle_Resized(eSize oldSize, eSize newSize)
+    {
+        if (Parent != null) Parent.Flag_Layout(ELayoutBit.Dirty_Children);
+        update_debug_text();
+        onResized?.Invoke(this, oldSize, newSize);
+    }
         
-        /// <summary>
-        /// Occurs after <see cref="Update_Cached_Blocks"/>
-        /// </summary>
-        protected virtual void Handle_Moved(ePos oldPos, ePos newPos)
-        {
-            if (Parent != null) Parent.Flag_Layout(ELayoutBit.Dirty_Children);
-            onMoved?.Invoke(this, oldPos, newPos);
-        }
+    /// <summary>
+    /// Occurs after <see cref="Update_Cached_Blocks"/>
+    /// </summary>
+    protected virtual void Handle_Moved(ePos oldPos, ePos newPos)
+    {
+        if (Parent != null) Parent.Flag_Layout(ELayoutBit.Dirty_Children);
+        onMoved?.Invoke(this, oldPos, newPos);
+    }
 
-        /// <summary>
-        /// The content block has changed dimensions
-        /// </summary>
-        protected virtual void Handle_Content_Block_Change()
-        {
-        }
+    /// <summary>
+    /// The content block has changed dimensions
+    /// </summary>
+    protected virtual void Handle_Content_Block_Change()
+    {
+    }
 
 
-        #region Property Change Handlers
+    #region Property Change Handlers
 
-        /// <summary>
-        /// A property used for our styling has changed its assigned value
-        /// </summary>
-        /// <param name="Sender"></param>
-        /// <param name="Flags"></param>
-        /// <param name="Source"></param>
-        protected virtual void Handle_Style_Property_Change(ICssProperty Sender, EPropertyAffects Flags, System.Diagnostics.StackTrace Source)
-        {
+    /// <summary>
+    /// A property used for our styling has changed its assigned value
+    /// </summary>
+    /// <param name="Sender"></param>
+    /// <param name="Flags"></param>
+    /// <param name="Source"></param>
+    protected virtual void Handle_Style_Property_Change(ICssProperty Sender, EPropertyDirtFlags Flags, System.Diagnostics.StackTrace Source)
+    {
 
 #if DEBUG
-            if (Debug.Log_Property_Changes)
-            {
-                if (Sender != null)
-                {
-                    if (Flags.HasFlag(EPropertyAffects.Visual) || Flags.HasFlag(EPropertyAffects.Text))
-                    {
-                        Logs.Info("[Property Change] {0}.{1} => {2}", this.FullPath, Sender.CssName, Sender);
-                    }
-                }
-            }
-#endif
-
-            if ((Flags & EPropertyAffects.Visual) != 0)
-            {
-                Dirt |= EElementDirtyFlags.Visuals;
-            }
-
-            if ((Flags & EPropertyAffects.Block) != 0)
-            {
-                if (Sender == null) Flag_Block_Dirty();
-                else Flag_Block_Dirty(Sender);
-            }
-
-            if ((Flags & EPropertyAffects.Text) != 0)
-            {
-                Flag_Dirty(EElementDirtyFlags.Font);
-            }
-
-            if ((Flags & EPropertyAffects.Flow) != 0)
-            {
-                if (Sender == null) Invalidate_Layout();
-                else Invalidate_Layout(Sender);
-            }
-        }
-        
-        #endregion
-        #endregion
-
-
-        #region Aligners Position
-        public cssElementAligner xAligner;
-        public cssElementAligner yAligner;
-        #endregion
-        
-
-        #region Content
-        public virtual bool IsEmpty { get { return true; } }
-        #endregion
-
-        #region Blocks
-        /// <summary>
-        /// The margin-edge block for an element
-        /// <para>‘margin-left’ + ‘border-left-width’ + ‘padding-left’ + ‘width’ + ‘padding-right’ + scrollbar width (if any) + ‘border-right-width’ + ‘margin-right’ = width of containing block</para>
-        /// </summary>
-        public eBlock Block = new eBlock();
-        /// <summary>
-        /// The block for an element extending up to the edge of it's borders
-        /// <para>‘border-left-width’ + ‘padding-left’ + ‘width’ + ‘padding-right’ + scrollbar width (if any) + ‘border-right-width’ = width of border block</para>
-        /// </summary>
-        public eBlock Block_Border = new eBlock();
-        /// <summary>
-        /// Offset applied to the containing-block when calculating <see cref="Block_Content"/> to account for the presence of a scrollbar (if any)
-        /// </summary>
-        public readonly eBlockOffset Scrollbar_Offset = new eBlockOffset();//new OffsetProperty(null, StyleValue.Zero, StyleValue.Zero, StyleValue.Zero, StyleValue.Zero) { AutoResolve=true };
-        /// <summary>
-        /// The block for an element extending up to the edge of it's padding.
-        /// An elements background is contained within this block.
-        /// <para>‘padding-left’ + ‘width’ + ‘padding-right’ = width of padding block</para>
-        /// </summary>
-        public eBlock Block_Padding = new eBlock();
-        /// <summary>
-        /// The block for an element extending up to the edge of it's content-area
-        /// </summary>
-        public eBlock Block_Content = new eBlock();
-        /// <summary>
-        /// The block for an element that dictates the area it's content may be drawn in, or NULL if no clipping should be used
-        /// </summary>
-        public eBlock Block_Clipping = null;
-        /// <summary>
-        /// The block which represents the hitbox for mouse related input events
-        /// </summary>
-        public eBlock Block_ClickArea { get { return Block_Padding; } }
-        /// <summary>
-        /// The containing block of this element
-        /// <para>If the control has an ancestor this will be said ancestors content-area block</para>
-        /// <para>Otherwise, if the element is a root element, this should have the dimensions of the viewport</para>
-        /// </summary>
-        public virtual eBlock Block_Containing
+        if (Debug.Log_Property_Changes)
         {
-            get
+            if (Sender != null)
             {
-                switch (Style.Positioning)
+                if (Flags.HasFlag(EPropertyDirtFlags.Visual) || Flags.HasFlag(EPropertyDirtFlags.Text))
                 {
-                    case EPositioning.Fixed:
-                        return Viewport?.Block;
-                    default:
-                        return Parent?.Block_Content;
+                    Logs.Info("[Property Change] {0}.{1} => {2}", this.FullPath, Sender.CssName, Sender);
                 }
             }
         }
-
-        /// <summary>
-        /// Notifys this element that its containing block has changed, meaning it's style should be set to dirty
-        /// </summary>
-        public virtual void Flag_Containing_Block_Dirty()
-        {
-            if (Style.Depends_On_ContainingBlock)
-            {
-                Flag_Block_Dirty(EBlockInvalidationReason.Containing_Block_Changed);
-                Style.Handle_Parent_Block_Change();
-            }
-        }
-
-        /// <summary>
-        /// Flags this elements block as dirty, meaning it needs to be updated when next convenient
-        /// </summary>
-        public virtual void Flag_Block_Dirty(EBlockInvalidationReason Reason = EBlockInvalidationReason.Unknown)
-        {
-            Block.Flag_Dirty(Reason);
-#if DEBUG
-            if (Debug.Log_Block_Changes)
-            {
-                if (Reason == EBlockInvalidationReason.Unknown)
-                    Logs.Info(xLog.XTERM.magenta("[Block Change] {0} (UNKNOWN SOURCE!)"), this);
-                else
-                    Logs.Info(xLog.XTERM.magenta("[Block Change] {0} {1}"), this, Enum.GetName(typeof(EBlockInvalidationReason), Reason).ToUpper());
-            }
 #endif
-        }
-        /// <summary>
-        /// Flags this elements block as dirty, meaning it needs to be updated when next convenient
-        /// </summary>
-        protected void Flag_Block_Dirty(ICssProperty sender)
+
+        if ((Flags & EPropertyDirtFlags.Visual) != 0)
         {
-            Block.Flag_Dirty(EBlockInvalidationReason.Property_Changed);
-#if DEBUG
-            if (Debug.Log_Block_Changes) Logs.Info(xLog.XTERM.magenta("[Block Change] {0}.{1} => {2}"), this, sender.CssName, sender);
-#endif
+            Dirt |= EElementDirtyFlags.Visuals;
         }
 
+        if ((Flags & EPropertyDirtFlags.Box) != 0)
+        {
+            Box.Flag(EBoxInvalidationReason.Property_Changed);
+            Box.FlagProperty(Flags);
+        }
+
+        if ((Flags & EPropertyDirtFlags.Text) != 0)
+        {
+            Flag_Dirty(EElementDirtyFlags.Font);
+        }
+
+        if ((Flags & EPropertyDirtFlags.Flow) != 0)
+        {
+            if (Sender == null) Invalidate_Layout();
+            else Invalidate_Layout(Sender);
+        }
+    }
         
-        /// <summary>
-        /// Updates the controls block boundaries
-        /// </summary>
-        public void Update_Block()
-        {
-            if (Block.IsLocked) return;
-            var block = Peek_Block(true);
-            bool CHANGED = Block.IsDirty;
-            if (!CHANGED)
-                CHANGED = (block != Block);// Last resort safety check
-
-            if (CHANGED || Block.IsDirty)// A change occured
-            {
-                // Sometimes the block gets forced to update but didnt really change, in that case we skip some computations
-                bool reallyChanged = (Block != block);
-                if (!Block.IsDirty)// Apparently our computed block and our current one dont match, but for some reason the block wasnt flagged as dirty?
-                    Log.Warn("[{0}] Untracked block change, find the source and fix it! IsDependent: {1}", this, Style.Depends_On_ContainingBlock);
-
-                /*
-                bool was_moved = (Block.Get_Pos() != block.Get_Pos());
-                bool was_resized = (Block.Get_Size() != block.Get_Size());
-                ePos oPos = (was_moved ? new ePos(block.Get_Pos()) : null), nPos = (was_moved ? new ePos(Block.Get_Pos()) : null);
-                eSize oSize = (was_resized ? new eSize(block.Get_Size()) : null), nSize = (was_resized ? new eSize(Block.Get_Size()) : null);
-                 */
-
-                bool was_moved = false;
-                bool was_resized = false;
-                ePos oPos = null, nPos = null;
-                eSize oSize = null, nSize = null;
-
-                if (reallyChanged)
-                {
-                    was_moved = (Block.Get_Pos() != block.Get_Pos());
-                    was_resized = (Block.Get_Size() != block.Get_Size());
-
-                    if (was_moved)
-                    {
-                        oPos = new ePos(block.Get_Pos());
-                        nPos = new ePos(Block.Get_Pos());
-                    }
-
-                    if (was_resized)
-                    {
-                        oSize = new eSize(block.Get_Size());
-                        nSize = new eSize(Block.Get_Size());
-                    }
-
-                    Block = block;
-                }
-
-                Block.Flag_Clean();
-                Update_Cached_Blocks();
-#if DEBUG
-                if (Block.IsDirty)
-                {
-                    if (Debug.Log_Block_Changes)
-                        Log.Warn("{0} Update_Cached_Blocks() Changed the block!", this);
-                }
-#endif
-                // Moved to the Handle_Resized and Handle_Moved functions
-                // if (was_moved || was_resized) Parent?.Flag_Layout_Dirty();
-                bool postChange = Block.IsDirty;
-                Block.Flag_Clean();
-#if DEBUG
-                if (Debug.Log_Block_Changes)
-                    Logs.Info(xLog.XTERM.magentaBright("[Block Resolved] {0} <{1}>"), this, Block);
-#endif
-
-                // Handle resizing and moving events before handling the layout as they might further change it...
-                if (was_moved) Handle_Moved(oPos, nPos);
-                if (was_resized) Handle_Resized(oSize, nSize);
-
-                // If the block had really changed from the start OR if it changed after we updated the cache blocks then we invalidate our layout
-                if (reallyChanged || postChange)
-                    Invalidate_Layout(EBlockInvalidationReason.Block_Changed);
-            }
-        }
-
-        /// <summary>
-        /// Returns a newly calculated Block for the element without altering the one it has set currently
-        /// </summary>
-        public eBlock Peek_Block(bool Force=false)
-        {
-            if (!Force && !Block.IsDirty)
-            {// Minor optimization
-                return this.Block;
-            }
-
-            Style.Resolve_Block();
-            if (Style.Display == EDisplayMode.NONE) return eBlock.FromTRBL(0, 0, 0, 0);
-
-            ePos cPos = Style.Get_Offset() + Block_Containing.Get_Pos();
-            eBlock block;
-            switch (Style.BoxSizing)
-            {// SEE: https://drafts.csswg.org/css-ui-3/#box-sizing
-                case EBoxSizingMode.BORDER:
-                    {
-                        int W = Style.Width;
-                        int H = Style.Height;
-                        Block_Resize_Border_To_Margin(ref W, ref H);
-
-                        block = new eBlock(cPos, new eSize(W, H));
-                    }
-                    break;
-                case EBoxSizingMode.CONTENT:
-                default:
-                    {
-                        int W = Style.Width;
-                        int H = Style.Height;
-                        Block_Resize_Content_To_Margin(ref W, ref H);
-
-                        block = new eBlock(cPos, new eSize(W, H));
-                    }
-                    break;
-            }
-            
-            return block;
-        }
-
-        /// <summary>
-        /// Returns the GUARANTED size of the element with all available non-dependent values resolved, that is all of its padding, borders, and margins plus it's minimum size or its computed non-dependent absolute size.
-        /// </summary>
-        public eSize Get_Layout_Size()
-        {
-            eSize size = new eSize();
-            if (Style.Display == EDisplayMode.NONE) return size;
-
-            Block_Resize_Content_To_Margin_Only_Absolute(ref size.Width, ref size.Height);
-
-            if (Style.Cascaded.Width.Has_Flags(StyleValueFlags.Absolute)) size.Width += Style.Resolve_Size_Width(this, Style.Cascaded.Width.Computed);
-            else if (Style.Cascaded.Min_Width.Has_Flags(StyleValueFlags.Absolute)) size.Width += Style.Resolve_MinSize_Width(this, Style.Cascaded.Min_Width.Computed);
-
-            if (Style.Cascaded.Height.Has_Flags(StyleValueFlags.Absolute)) size.Height += Style.Resolve_Size_Height(this, Style.Cascaded.Height.Computed);
-            else if (Style.Cascaded.Min_Height.Has_Flags(StyleValueFlags.Absolute)) size.Height += Style.Resolve_MinSize_Height(this, Style.Cascaded.Min_Height.Computed);
-
-            return size;
-        }
+    #endregion
+    #endregion
         
+    #region Aligners Position
+    public cssElementAligner xAligner;
+    public cssElementAligner yAligner;
+    #endregion
+        
+    #region Content
+    public virtual bool IsEmpty { get { return true; } }
+    #endregion
 
-        /// <summary>
-        /// Updates the values for <see cref="Block_Content"/>, <see cref="Block_Padding"/>, <see cref="Block_Border"/>, and <see cref="Block_Margin"/>
-        /// </summary>
-        protected virtual void Update_Cached_Blocks()
-        {
-            Block_Border = Block_Margin_To_Border(Block);
-            Block_Padding = Block_Margin_To_Padding(Block);
+    #region Box
+    public readonly CssBox Box;
+    #endregion
 
-            var old = new eBlock(Block_Content);
-            Block_Content = Block_Margin_To_Content(Block);
-            if (old != Block_Content) Handle_Content_Block_Change();
-        }
+    #region Blocks
+    /// <summary>
+    /// The area for an element that dictates the area it's content may be drawn in, or NULL if no clipping should be used
+    /// </summary>
+    public cssBoxArea ClippingArea = null;
 
-#region Block Calculations
 
-        /// <summary>
-        /// Returns a margin-edge block when given a location and content size for an element by adding to it
-        /// the total Horizontal & Vertical sizes for all of the Padding, Margins, and Borders
-        /// as well as the width of the scrollbar (if any)
-        /// </summary>
-        public eBlock Block_Content_To_Margin(int X, int Y, int Width, int Height)
+    /// <summary>
+    /// Notifies this element that its containing block has changed, meaning it's style should be set to dirty
+    /// </summary>
+    public virtual void Handle_Containing_Block_Dirty()
+    {
+        if (Box.DependsOnContainer)
         {
-            //return block.Add(Padding.Value).Add(Scrollbar_Offset).Add(Border.Get_Offsets()).Add(Margin.Value);
-            int Top = Y;
-            int Right = ((X+Width) + Style.Padding_Horizontal + Scrollbar_Offset.Horizontal + (Border.Left.Size + Border.Right.Size) + Style.Margin_Horizontal);
-            int Bottom = ((Y+Height) + Style.Padding_Vertical + Scrollbar_Offset.Vertical + (Border.Top.Size + Border.Bottom.Size) + Style.Margin_Vertical);
-            int Left = X;
-            return eBlock.FromTRBL(Top, Right, Bottom, Left);
+            Flag_Box_Dirty(EBoxInvalidationReason.Containing_Block_Changed);
+            Style.Handle_Parent_Block_Change();
         }
-        /// <summary>
-        /// Returns the margin-edge block size when given a border-block size for an element by adding to it
-        /// the total Horizontal & Vertical sizes for the Margins
-        /// </summary>
-        public void Block_Resize_Border_To_Margin(ref int Width, ref int Height)
-        {
-            Width += Style.Margin_Horizontal;
-            Height += Style.Margin_Vertical;
-        }
-        /// <summary>
-        /// Returns the margin-edge block size when given a padding-block size for an element by adding to it
-        /// the total Horizontal & Vertical sizes for all of the Borders and Margins aswell as the width of the scrollbar(if any)
-        /// </summary>
-        public void Block_Resize_Padding_To_Margin(ref int Width, ref int Height)
-        {
-            Width += (Scrollbar_Offset.Horizontal + (Border.Left.Size + Border.Right.Size) + Style.Margin_Horizontal);
-            Height += (Scrollbar_Offset.Vertical + (Border.Left.Size + Border.Right.Size) + Style.Margin_Vertical);
-        }
-        /// <summary>
-        /// Returns the margin-edge block size when given a content-block size for an element by adding to the given Width/Height
-        /// the total Horizontal & Vertical sizes for all of the Padding, Borders, and Margins aswell as the width of the scrollbar(if any)
-        /// </summary>
-        public void Block_Resize_Content_To_Margin(ref int Width, ref int Height)
-        {
-            Width += (Style.Padding_Horizontal + Scrollbar_Offset.Horizontal + (Border.Left.Size + Border.Right.Size) + Style.Margin_Horizontal);
-            Height += (Style.Padding_Vertical + Scrollbar_Offset.Vertical + (Border.Left.Size + Border.Right.Size) + Style.Margin_Vertical);
-        }
+    }
 
-        /// <summary>
-        /// Returns the margin-edge block size when given a content-block size for an element by adding to the given Width/Height
-        /// the total Horizontal & Vertical sizes for all of the Padding, Borders, and Margins aswell as the width of the scrollbar(if any)
-        /// <para>In addition any 'auto' values for Padding, Borders, and Margins are replaced with the given default value</para>
-        /// </summary>
-        //TODO: Scrap this, it wont be needed soon.
-        public void Block_Resize_Content_To_Margin_NoAuto(ref int Width, ref int Height, int autoValue)
+    /// <summary>
+    /// Flags this elements block as dirty, meaning it needs to be updated when next convenient
+    /// </summary>
+    public virtual void Flag_Box_Dirty(EBoxInvalidationReason Reason = EBoxInvalidationReason.Unknown)
+    {
+        Box.Flag(Reason);
+#if DEBUG
+        if (Debug.Log_Block_Changes)
         {
-            eBlockOffset margin = Style.Get_Margin_NoAuto(autoValue);
-            Width += (Style.Padding_Horizontal + Scrollbar_Offset.Horizontal + (Border.Left.Size + Border.Right.Size) + margin.Horizontal);
-            Height += (Style.Padding_Vertical + Scrollbar_Offset.Vertical + (Border.Left.Size + Border.Right.Size) + margin.Vertical);
+            if (Reason == EBoxInvalidationReason.Unknown)
+                Logs.Info(xLog.XTERM.magenta("[Block Change] {0} (UNKNOWN SOURCE!)"), this);
+            else
+                Logs.Info(xLog.XTERM.magenta("[Block Change] {0} {1}"), this, Enum.GetName(typeof(EBoxInvalidationReason), Reason).ToUpper());
         }
+#endif
+    }
 
-        /// <summary>
-        /// Returns the margin-edge block size when given a content-block size for an element by adding to the given Width/Height
-        /// the total Horizontal & Vertical sizes for all of the Padding, Borders, and Margins aswell as the width of the scrollbar(if any)
-        /// <para>In addition only values with absolute definitions are used, meaning no percentage or Auto values</para>
-        /// </summary>
-        public void Block_Resize_Content_To_Margin_Only_Absolute(ref int Width, ref int Height)
-        {
-            eBlockOffset margin = Style.Get_Margin_OnlyAbsolute(0);
-            eBlockOffset padding = Style.Get_Padding_OnlyAbsolute(0);
-
-            Width += (padding.Horizontal + Scrollbar_Offset.Horizontal + (Border.Left.Size + Border.Right.Size) + margin.Horizontal);
-            Height += (padding.Vertical + Scrollbar_Offset.Vertical + (Border.Left.Size + Border.Right.Size) + margin.Vertical);
-        }
-
-        /// <summary>
-        /// Returns the content-edge block size when given a margin-block size for an element by subtracting from the given Width/Height
-        /// the total Horizontal & Vertical sizes for all of the Padding, Borders, and Margins aswell as the width of the scrollbar(if any)
-        /// </summary>
-        public void Block_Resize_Margin_To_Content(ref int Width, ref int Height)
-        {
-            Width -= (Style.Padding_Horizontal + Scrollbar_Offset.Horizontal + (Border.Left.Size + Border.Right.Size) + Style.Margin_Horizontal);
-            Height -= (Style.Padding_Vertical + Scrollbar_Offset.Vertical + (Border.Left.Size + Border.Right.Size) + Style.Margin_Vertical);
-        }
-
-        /// <summary>
-        /// Returns the content-edge block size when given a border-block size for an element by subtracting from the given Width/Height
-        /// the total Horizontal & Vertical sizes for all of the Padding, Borders, and Margins aswell as the width of the scrollbar(if any)
-        /// </summary>
-        public void Block_Resize_Border_To_Content(ref int Width, ref int Height)
-        {
-            Width -= (Style.Padding_Horizontal + Scrollbar_Offset.Horizontal + (Border.Left.Size + Border.Right.Size));
-            Height -= (Style.Padding_Vertical + Scrollbar_Offset.Vertical + (Border.Left.Size + Border.Right.Size));
-        }
-
-        /// <summary>
-        /// Returns the border-edge block size when given a content-block size for an element by adding to the given Width/Height
-        /// the total Horizontal & Vertical sizes for all of the Padding, Borders, and Margins aswell as the width of the scrollbar(if any)
-        /// </summary>
-        public void Block_Resize_Content_To_Border(ref int Width, ref int Height)
-        {
-            Width += (Style.Padding_Horizontal + Scrollbar_Offset.Horizontal + (Border.Left.Size + Border.Right.Size));
-            Height += (Style.Padding_Vertical + Scrollbar_Offset.Vertical + (Border.Left.Size + Border.Right.Size));
-        }
-
-        /// <summary>
-        /// Returns the content-edge block size when given a padding-block size for an element by adding to the given Width/Height
-        /// the total Horizontal & Vertical sizes for all of the Padding and Scrollbar offsets(if any)
-        /// </summary>
-        public void Block_Resize_Padding_To_Content(ref int Width, ref int Height)
-        {
-            Width -= (Style.Padding_Horizontal + Scrollbar_Offset.Horizontal);
-            Height -= (Style.Padding_Vertical + Scrollbar_Offset.Vertical);
-        }
-
-        /// <summary>
-        /// Collapses a given margin block so it represents the content-area block for a control.
-        /// </summary>
-        public eBlock Block_Margin_To_Content(eBlock b)
-        {
-            //return (((block - Padding.Value) - Scrollbar_Offset - Border.Get_Offsets()) - Margin.Value);
-            int Top = (b.Top + Style.Padding_Top + Scrollbar_Offset.Top + Border.Top.Size + Style.Margin_Top);
-            int Right = (b.Right - Style.Padding_Right - Scrollbar_Offset.Right - Border.Right.Size - Style.Margin_Right);
-            int Bottom = (b.Bottom - Style.Padding_Bottom - Scrollbar_Offset.Bottom - Border.Bottom.Size - Style.Margin_Bottom);
-            int Left = (b.Left + Style.Padding_Left + Scrollbar_Offset.Left + Border.Left.Size + Style.Margin_Left);
-            return eBlock.FromTRBL(Top, Right, Bottom, Left);
-        }
-        /// <summary>
-        /// Collapses a given margin-block so it represents the padding-area block for a control.
-        /// </summary>
-        public eBlock Block_Margin_To_Padding(eBlock b)
-        {
-            //return ((block - Scrollbar_Offset - Border.Get_Offsets()) - Margin.Value);
-            int Top = (b.Top + Scrollbar_Offset.Top + Border.Top.Size + Style.Margin_Top);
-            int Right = (b.Right - Scrollbar_Offset.Right - Border.Right.Size - Style.Margin_Right);
-            int Bottom = (b.Bottom - Scrollbar_Offset.Bottom - Border.Bottom.Size - Style.Margin_Bottom);
-            int Left = (b.Left + Scrollbar_Offset.Left + Border.Left.Size + Style.Margin_Left);
-            return eBlock.FromTRBL(Top, Right, Bottom, Left);
-        }
-        /// <summary>
-        /// Collapses a given containing block so it represents the border-area block for a control.
-        /// </summary>
-        public eBlock Block_Margin_To_Border(eBlock b)
-        {
-            //return (block - Margin.Value);
-            int Top = (b.Top + Style.Margin_Top);
-            int Right = (b.Right - Style.Margin_Right);
-            int Bottom = (b.Bottom - Style.Margin_Bottom);
-            int Left = (b.Left + Style.Margin_Left);
-            return eBlock.FromTRBL(Top, Right, Bottom, Left);
-        }
-#endregion
 
 #endregion
 
-#region Setters
+    #region Setters
         /// <summary>
         /// Sets the explicit Width and Height properties for this elements default style state
         /// </summary>
@@ -731,34 +377,34 @@ namespace CssUI
         }
 #endregion
 
-#region Layout
+    #region Layout
         /// <summary>
         /// Specifys something that affects the controls boundaries has changed, be it the pos, size, border, contents, etc.
         /// </summary>
         protected ELayoutBit LayoutBit = ELayoutBit.Dirty;
         public void Flag_Layout(ELayoutBit Flags) { LayoutBit |= Flags; }
 
-        public void Invalidate_Layout(EBlockInvalidationReason Reason = EBlockInvalidationReason.Unknown)
+        public void Invalidate_Layout(EBoxInvalidationReason Reason = EBoxInvalidationReason.Unknown)
         {
             Flag_Layout(ELayoutBit.Dirty);
-#if DEBUG
+        #if DEBUG
             if (Debug.Log_Layout_Changes)
             {
-                if (Reason == EBlockInvalidationReason.Unknown)
+                if (Reason == EBoxInvalidationReason.Unknown)
                     Logs.Info(xLog.XTERM.cyan("[Layout Flagged] {0} (UNKNOWN SOURCE!)"), this);
                 else
-                    Logs.Info(xLog.XTERM.cyan("[Layout Flagged] {0} {1}"), this, Enum.GetName(typeof(EBlockInvalidationReason), Reason).ToUpper());
+                    Logs.Info(xLog.XTERM.cyan("[Layout Flagged] {0} {1}"), this, Enum.GetName(typeof(EBoxInvalidationReason), Reason).ToUpper());
                      
             }
-#endif
+        #endif
         }
 
         public void Invalidate_Layout(ICssProperty sender)
         {
             Flag_Layout(ELayoutBit.Dirty);
-#if DEBUG
+        #if DEBUG
             if (Debug.Log_Layout_Changes) Logs.Info(xLog.XTERM.cyan("[Layout Flagged] {0}.{1} => {2}"), this, sender.CssName, sender);
-#endif
+        #endif
         }
 
         /// <summary>
@@ -775,14 +421,18 @@ namespace CssUI
             xAligner?.Apply_Relative();
             yAligner?.Apply_Relative();
             
-            if (Block_Containing.X != last_containerPos.X || Block_Containing.Y != last_containerPos.Y)
+            if (Box.Containing_Box.X != last_containerPos.X || Box.Containing_Box.Y != last_containerPos.Y)
             {
-                last_containerPos.X = Block_Containing.X;
-                last_containerPos.Y = Block_Containing.Y;
+                last_containerPos.X = Box.Containing_Box.X;
+                last_containerPos.Y = Box.Containing_Box.Y;
             }
 
             // If our block is dirty then we need to update it NOW before we update the layout and give useless block positions to our child-elements
-            Update_Block();
+            if (Box.IsDirty)
+            {
+                Box.Rebuild();
+            }
+
             int cycles = 0;
             const int MAX_LAYOUT_CYCLES = 100;
             do
@@ -794,7 +444,10 @@ namespace CssUI
             if (cycles >= MAX_LAYOUT_CYCLES) throw new Exception(string.Format("Aborted Handle_Layout() cycle loop after {0} passes!", cycles));
 
             onLayout?.Invoke(this);
-            if (Block.IsDirty) Update_Block();
+            if (Box.IsDirty)
+            {
+                Box.Rebuild();
+            }
             
             onLayoutPost?.Invoke(this);
 
@@ -808,9 +461,9 @@ namespace CssUI
         /// Does actual layout logic
         /// </summary>
         protected virtual void Handle_Layout() { }
-#endregion
+    #endregion
                 
-#region Parent
+    #region Parent
         /// <summary>
         /// The element that this one resides within, or NULL if this element is independent
         /// </summary>
@@ -826,7 +479,7 @@ namespace CssUI
             Indice = (parent!=null ? index : 0);
             if (parent != null) Set_Root(parent.Root);// Passed down from generation to generation!
             this.Element_Hierarchy_Changed(0);
-            this.Flag_Containing_Block_Dirty();// Our parent element has been changed, so logically our containing-block is now different from what it was.
+            this.Handle_Containing_Block_Dirty();// Our parent element has been changed, so logically our containing-block is now different from what it was.
 
             this.Style.Flag(EPropertySystemDirtFlags.Cascade);
             // just do it ourselves here and now
@@ -864,23 +517,23 @@ namespace CssUI
         }
 #endregion
 
-#region Scrolling
+    #region Scrolling
         
         /// <summary>
         /// Coordinate offsets for this elements own scroll values.
         /// </summary>
-        protected readonly ePos Scroll = new ePos(0, 0);
+        protected readonly Vec2i Scroll = new Vec2i(0, 0);
         /// <summary>
         /// Returns the total scroll translations for this element, including translations due to it's own scrolling
         /// </summary>
-        public virtual ePos Get_Scroll_Total()
+        public virtual Vec2i Get_Scroll_Total()
         {
-            ePos Total = new ePos();
+            Vec2i Total = new Vec2i();
             cssElement E = this;
             do
             {
                 Total += E.Scroll;
-                if (E.Style.IsAbsolutelyPositioned) break;
+                if (E.Box.IsAbsolutelyPositioned) break;
                 E = E.Parent;// Traverse upwards
             }
             while (E != null);
@@ -890,7 +543,7 @@ namespace CssUI
 
 #endregion
 
-#region Root
+    #region Root
 
         /// <summary>
         /// The Root UI Element
@@ -910,7 +563,7 @@ namespace CssUI
         }
         #endregion
 
-#region Colors
+    #region Colors
         /// <summary>
         /// Forecolor of the control
         /// </summary>
@@ -919,16 +572,16 @@ namespace CssUI
         /// Background color of the control, if <c>Null</c> then no background will be drawn
         /// </summary>
         public cssColor ColorBackground = null;
-#endregion
+    #endregion
 
-#region Borders
+    #region Borders
         /// <summary>
         /// Styling information for the controls borders
         /// </summary>
         public uiBorderStyle Border = uiBorderStyle.Default;
-#endregion
+    #endregion
         
-#region PSEUDO STATES
+    #region PSEUDO STATES
         /// <summary>
         /// If FALSE the element will not respond to input events
         /// </summary>
@@ -997,75 +650,73 @@ namespace CssUI
 
         #endregion
 
-        #region Constructors
-        /// <summary>
-        /// Initializes a new UI element
-        /// </summary>
-        /// <param name="id">A unique ID</param>
-        public cssElement(IParentElement ParentElement, string className, string id)
+    #region Constructors
+
+    private cssElement()
+    {
+        Box = new CssBox(this);
+
+        if (this is cssRootElement)
+            Root = (cssRootElement)this;
+
+        // Set default pseudo-state values
+        // We do this in the constructor because these are all just accessor for the elements DOM attributes
+        IsEnabled = true;
+        IsActive = false;
+        IsMouseOver = false;
+        AcceptsDragDrop = false;
+
+        Box.onChange += Box_onChange;
+    }
+    /// <summary>
+    /// Initializes a new UI element
+    /// </summary>
+    /// <param name="id">A unique ID</param>
+    public cssElement(IParentElement ParentElement, string className, string id) : this()
+    {
+        if (ReferenceEquals(ParentElement, null) && !(this is cssRootElement))
+            throw new ArgumentNullException($"{nameof(ParentElement)} cannot be null!");
+
+        //Setup our logs
+        Logs = LogFactory.GetLogger(() => { return id; }, ParentElement?.Logs);
+
+        // Go ahead and assign our ID
+        if (string.IsNullOrEmpty(id))
         {
-            if (ReferenceEquals(ParentElement, null) && !(this is cssRootElement))
-                throw new ArgumentNullException($"{nameof(ParentElement)} cannot be null!");
-
-            //Setup our logs
-            Logs = LogFactory.GetLogger(() => { return id; }, ParentElement?.Logs);
-
-            // Go ahead and assign our ID
-            if (string.IsNullOrEmpty(id))
+            ID = UID.ToString();
+        }
+        else
+        {
+            if (id.StartsWith("#"))
             {
-                ID = UID.ToString();
+                if (id.Length > 1)
+                    this.ID = id.Remove(0, 1);
             }
             else
             {
-                if (id.StartsWith("#"))
-                {
-                    if (id.Length > 1)
-                        this.ID = id.Remove(0, 1);
-                }
-                else
-                {
-                    this.ID = id;
-                }
+                this.ID = id;
             }
-
-            if (this is cssRootElement)
-                Root = (cssRootElement)this;
-
-            if (!string.IsNullOrEmpty(className))
-                this.Add_Class(className);
-
-            // Set default pseudo-state values
-            // We do this in the constructor because these are all just accessor for the elements DOM attributes
-            IsEnabled = true;
-            IsActive = false;
-            IsMouseOver = false;
-            AcceptsDragDrop = false;
-
-            Scrollbar_Offset.onChanged += () => { Flag_Block_Dirty(EBlockInvalidationReason.Scroll_Offset_Change); };
-
-            // We resolve the style once this element is parented, if we do it before, then it cant access it's parents block for layout and causes a null exception
-            Style = new ElementPropertySystem(this);
-            Style.onProperty_Change += Handle_Style_Property_Change;
-
-            ParentElement?.Add(this);
-
-
-            // TESTING
-            //var A = new CSS.CssSelector("#Root");
-            //var B = new CSS.CssSelector("*:hover");
-            //var C = new CSS.CssSelector("*:not(#Root)");
         }
-#endregion
+        if (!string.IsNullOrEmpty(className))
+            this.Add_Class(className);
         
-#region Destructors
+        // We resolve the style once this element is parented, if we do it before, then it cant access it's parents block for layout and causes a null exception
+        Style = new ElementPropertySystem(this);
+        Style.onProperty_Change += Handle_Style_Property_Change;
+
+        ParentElement?.Add(this);
+    }
+    #endregion
+        
+    #region Destructors
         ~cssElement()
         {
             if (Root != null) Root.Unregister_Element(this);
         }
         public virtual void Dispose() { }
-#endregion
+    #endregion
 
-#region Updating
+    #region Updating
         /// <summary>
         /// Updates the Block and Layout if needed and returns True if any updates occured
         /// </summary>
@@ -1079,10 +730,10 @@ namespace CssUI
                 Style.Cascade();
             }
 
-            if (Block.IsDirty)
+            if (Box.IsDirty)
             {
                 retVal = true;
-                Update_Block();
+                Box.Rebuild();
             }
 
             if (LayoutBit > 0)
@@ -1095,7 +746,7 @@ namespace CssUI
         }
 #endregion
 
-#region Drawing
+    #region Drawing
         /// <summary>
         /// If FALSE the element will not draw
         /// </summary>
@@ -1160,53 +811,53 @@ namespace CssUI
             if (ColorBackground != null)
             {
                 Root.Engine.Set_Color(ColorBackground);
-                Root.Engine.Fill_Rect(Block_Padding);
+                Root.Engine.Fill_Rect(Box.Padding.Edge);
             }
         }
 
         internal void Draw_Borders()
         {
-            //if (Border.Dirty) Border.Prepare_Texture(Block_Border.Get_Size());
+            //if (Border.Dirty) Border.Prepare_Texture(Box.Border.Get_Size());
 
             // The CSS3 docs dont specify how borders are to be joined at the corners.
             // But chromium joins adjacent corners by splitting the corner quad diagonally from its outtermost to its innermost corner and giving each border the closes triangle
             // Which is pretty fair so we'll do that too!
             
             // Draw the horizontal bars without join areas
-            int hLeft = this.Block_Border.Left + Border.Left.Size;// Starting point for horizontal border sides            
-            int hWidth = Block_Border.Width - (Border.Left.Size + Border.Right.Size);// Width for horizontal border sides
+            int hLeft = this.Box.Border.Left + Border.Left.Size;// Starting point for horizontal border sides            
+            int hWidth = Box.Border.Width - (Border.Left.Size + Border.Right.Size);// Width for horizontal border sides
             if (Border.Top.IsVisible)
             {
                 Root.Engine.Set_Color(Border.Top.Color);
                 Root.Engine.Set_Color(cssColor.White);
-                Root.Engine.Fill_Rect(hLeft, Block_Border.Top, hWidth, Border.Top.Size);
+                Root.Engine.Fill_Rect(hLeft, Box.Border.Top, hWidth, Border.Top.Size);
             }
             if (Border.Bottom.IsVisible)
             {
                 Root.Engine.Set_Color(Border.Bottom.Color);
-                Root.Engine.Fill_Rect(hLeft, Block_Border.Bottom-Border.Bottom.Size, hWidth, Border.Bottom.Size);
+                Root.Engine.Fill_Rect(hLeft, Box.Border.Bottom-Border.Bottom.Size, hWidth, Border.Bottom.Size);
             }
             // Draw the vertical bars without join areas
-            int vTop = Block_Border.Top + Border.Top.Size;// Starting point for vertical border sides
-            int vHeight = Block_Border.Height - (Border.Top.Size + Border.Bottom.Size);// Height for vertical border sides
+            int vTop = Box.Border.Top + Border.Top.Size;// Starting point for vertical border sides
+            int vHeight = Box.Border.Height - (Border.Top.Size + Border.Bottom.Size);// Height for vertical border sides
             if (Border.Left.IsVisible)
             {
                 Root.Engine.Set_Color(Border.Left.Color);
-                Root.Engine.Fill_Rect(Block_Border.Left, vTop, Border.Left.Size, vHeight);
+                Root.Engine.Fill_Rect(Box.Border.Left, vTop, Border.Left.Size, vHeight);
             }
             if (Border.Right.IsVisible)
             {
                 Root.Engine.Set_Color(Border.Right.Color);
-                Root.Engine.Fill_Rect(Block_Border.Right - Border.Right.Size, vTop, Border.Right.Size, vHeight);
+                Root.Engine.Fill_Rect(Box.Border.Right - Border.Right.Size, vTop, Border.Right.Size, vHeight);
             }
             
             // Draw the join areas
             if (Border.Top.IsVisible && Border.Left.IsVisible)
             {
-                int xo = Block_Border.Left;// x origin
-                int yo = Block_Border.Top;// y origin
-                int xi = Block_Border.Left + Border.Left.Size;// x inner
-                int yi = Block_Border.Top + Border.Top.Size;// y inner
+                int xo = Box.Border.Left;// x origin
+                int yo = Box.Border.Top;// y origin
+                int xi = Box.Border.Left + Border.Left.Size;// x inner
+                int yi = Box.Border.Top + Border.Top.Size;// y inner
 
                 // Top Triangle
                 Root.Engine.Set_Color(Border.Top.Color);
@@ -1218,10 +869,10 @@ namespace CssUI
 
             if (Border.Top.IsVisible && Border.Right.IsVisible)
             {
-                int xo = Block_Border.Right;// x origin
-                int yo = Block_Border.Top;// y origin
-                int xi = Block_Border.Right - Border.Right.Size;// x inner
-                int yi = Block_Border.Top + Border.Top.Size;// y inner
+                int xo = Box.Border.Right;// x origin
+                int yo = Box.Border.Top;// y origin
+                int xi = Box.Border.Right - Border.Right.Size;// x inner
+                int yi = Box.Border.Top + Border.Top.Size;// y inner
 
                 // Top Triangle
                 Root.Engine.Set_Color(Border.Top.Color);
@@ -1233,10 +884,10 @@ namespace CssUI
 
             if (Border.Bottom.IsVisible && Border.Left.IsVisible)
             {
-                int xo = Block_Border.Left;// x origin
-                int yo = Block_Border.Bottom;// y origin
-                int xi = Block_Border.Left + Border.Left.Size;// x inner
-                int yi = Block_Border.Bottom - Border.Bottom.Size;// y inner
+                int xo = Box.Border.Left;// x origin
+                int yo = Box.Border.Bottom;// y origin
+                int xi = Box.Border.Left + Border.Left.Size;// x inner
+                int yi = Box.Border.Bottom - Border.Bottom.Size;// y inner
 
                 // Bottom Triangle
                 Root.Engine.Set_Color(Border.Bottom.Color);
@@ -1248,10 +899,10 @@ namespace CssUI
 
             if (Border.Bottom.IsVisible && Border.Right.IsVisible)
             {
-                int xo = Block_Border.Right;// x origin
-                int yo = Block_Border.Bottom;// y origin
-                int xi = Block_Border.Right - Border.Right.Size;// x inner
-                int yi = Block_Border.Bottom - Border.Bottom.Size;// y inner
+                int xo = Box.Border.Right;// x origin
+                int yo = Box.Border.Bottom;// y origin
+                int xi = Box.Border.Right - Border.Right.Size;// x inner
+                int yi = Box.Border.Bottom - Border.Bottom.Size;// y inner
 
                 // Bottom Triangle
                 Root.Engine.Set_Color(Border.Bottom.Color);
@@ -1268,7 +919,7 @@ namespace CssUI
         {
             if (dbg_size != null)
             {
-                string dbgTxt = string.Format("{0}x{1}", Block.Width, Block.Height);
+                string dbgTxt = string.Format("{0}x{1}", Box.Width, Box.Height);
                 dbg_size = cssTextElement.Render_Text_String(dbgTxt, "Arial", 18);
             }
         }
@@ -1278,7 +929,7 @@ namespace CssUI
 
             Root.Engine.Set_Color(1f, 1f, 1f, 1f);
             Root.Engine.Set_Texture(dbg_size);
-            Root.Engine.Fill_Rect((Block.X + (Block.Width / 2)) - dbg_size.Size.Width, Block.Y, dbg_size.Size.Width, dbg_size.Size.Height);
+            Root.Engine.Fill_Rect((Box.X + (Box.Width / 2)) - dbg_size.Size.Width, Box.Y, dbg_size.Size.Width, dbg_size.Size.Height);
             Root.Engine.Set_Texture(null);
         }
 
@@ -1286,751 +937,758 @@ namespace CssUI
         {            
             // Draw the content bounds
             Root.Engine.Set_Color(1f, 0f, 0f, 1f);// Red
-            Root.Engine.Draw_Rect(1, Block_Content);
+            Root.Engine.Draw_Rect(1, Box.Content.Edge);
 
             // Draw the padding bounds
             Root.Engine.Set_Color(0f, 0f, 1f, 1f);// Blue
-            Root.Engine.Draw_Rect(1, Block_Padding);
+            Root.Engine.Draw_Rect(1, Box.Padding.Edge);
 
             // Draw the border bounds
             Root.Engine.Set_Color(0f, 1f, 0f, 1f);// Green
-            Root.Engine.Draw_Rect(1, Block_Border);
+            Root.Engine.Draw_Rect(1, Box.Border.Edge);
             
             // Draw the block bounds
             Root.Engine.Set_Color(1f, 0.5f, 0f, 1f);// Orange            
-            Root.Engine.Draw_Rect(1, Block);
+            Root.Engine.Draw_Rect(1, Box.Margin.Edge);
         }
-        
-#endregion
 
-#region Point Transformation
+        #endregion
+
+    #region Handlers
+    private void Box_onChange(ECssBoxArea obj)
+    {
+            this.Invalidate_Layout(EBoxInvalidationReason.Block_Changed);
+    }
+    #endregion
+
+    #region Point Transformation
 
         /// <summary>
         /// Transforms a point from absolute(screen) space to the elements local space relative to it's margin-block.
         /// </summary>
-        public ePos PointToLocal(ePos Point)
+        public Vec2i PointToLocal(Vec2i Point)
         {
-            return (Point - Block.Get_Pos());
+            return (Point - Box.Get_Position());
         }
 
         /// <summary>
         /// Transforms a point from local space relative to it's margin-block to absolute screen-space.
         /// </summary>
-        public ePos PointToScreen(ePos Point)
+        public Vec2i PointToScreen(Vec2i Point)
         {
-            return (Point + Block.Get_Pos());
+            return (Point + Box.Get_Position());
         }
 
         /// <summary>
         /// Transforms a point from absolute(screen) space into local space relative to the specified block.
         /// </summary>
-        public ePos PointToLocal(eBlock block, ePos Point)
+        public Vec2i PointToLocal(cssBoxArea area, Vec2i Point)
         {
-            return (Point - block.Get_Pos());
+            return (Point - area.Get_Pos());
         }
 
         /// <summary>
         /// Transforms a point from local space relative to the specified block into absolute screen-space.
         /// </summary>
-        public ePos PointToScreen(eBlock block, ePos Point)
+        public Vec2i PointToScreen(cssBoxArea area, Vec2i Point)
         {
-            return (Point + block.Get_Pos());
+            return (Point + area.Get_Pos());
         }
-#endregion
+    #endregion
 
-#region Hit Testing
-        /// <summary>
-        /// Returns true if the given screen-space point intersects this elements click-hitbox
-        /// </summary>
-        /// <param name="pos"></param>
-        /// <returns></returns>
-        public bool HitTest_ScreenPos(ePos pos)
-        {
-            return Block_ClickArea.Intersects(pos + Get_Scroll_Total() - Scroll);
-        }
+    #region Hit Testing
+            /// <summary>
+            /// Returns true if the given screen-space point intersects this elements click-hitbox
+            /// </summary>
+            /// <param name="pos"></param>
+            /// <returns></returns>
+            public bool HitTest_ScreenPos(Vec2i pos)
+            {
+                return Box.ClickArea.Intersects(pos + Get_Scroll_Total() - Scroll);
+            }
 
-        /// <summary>
-        /// Returns the element which intersects the given screen-space point or NULL if none
-        /// </summary>
-        /// <param name="pos">Screen-Space point to test for intersection with</param>
-        public virtual cssElement Get_Hit_Element(ePos pos)
-        {
-            if (HitTest_ScreenPos(pos)) return this;
-            return null;
-        }
-#endregion
+            /// <summary>
+            /// Returns the element which intersects the given screen-space point or NULL if none
+            /// </summary>
+            /// <param name="pos">Screen-Space point to test for intersection with</param>
+            public virtual cssElement Get_Hit_Element(Vec2i pos)
+            {
+                if (HitTest_ScreenPos(pos)) return this;
+                return null;
+            }
+    #endregion
 
-#region Sizing
-#endregion
+    #region Sizing
+    #endregion
 
-#region Positioning
-        /*
-        /// <summary>
-        /// Clears this elements positioners and sets both it's explicit and implicit positions to zero
-        /// </summary>
-        public void Clear_Pos()
-        {
-            Style.Default.Set_Position_Implicit(StyleValue.Unset, StyleValue.Unset);
+    #region Positioning
+            /*
+            /// <summary>
+            /// Clears this elements positioners and sets both it's explicit and implicit positions to zero
+            /// </summary>
+            public void Clear_Pos()
+            {
+                Style.Default.Set_Position_Implicit(StyleValue.Unset, StyleValue.Unset);
 
-            xAligner?.Unhook();
-            yAligner?.Unhook();
+                xAligner?.Unhook();
+                yAligner?.Unhook();
 
-            xAligner = null;
-            yAligner = null;
-        }
-        /// <summary>
-        /// Positions the control so it's top edge is yOff away below another given control once.
-        /// </summary>
-        public void moveBelow(uiElement targ, int yOff = 0)
-        {
-            if (targ == null) throw new ArgumentNullException(ID + " target cannot be NULL!");
-            if (targ.Parent != Parent) throw new ArgumentException(ID + " target control must be parented to the same control!");
+                xAligner = null;
+                yAligner = null;
+            }
+            /// <summary>
+            /// Positions the control so it's top edge is yOff away below another given control once.
+            /// </summary>
+            public void moveBelow(uiElement targ, int yOff = 0)
+            {
+                if (targ == null) throw new ArgumentNullException(ID + " target cannot be NULL!");
+                if (targ.Parent != Parent) throw new ArgumentException(ID + " target control must be parented to the same control!");
 
-            Style.Default.Set_Position(Block.Left, targ.Block.Bottom + yOff);
-        }
+                Style.Default.Set_Position(Block.Left, targ.Block.Bottom + yOff);
+            }
 
-        /// <summary>
-        /// Positions the control so it's bottom edge is yOff above the top edge of another given control once.
-        /// </summary>
-        public void moveAbove(uiElement targ, int yOff = 0)
-        {
-            if (targ == null) throw new ArgumentNullException(ID + " target cannot be NULL!");
-            if (targ.Parent != Parent) throw new ArgumentException(ID + " target control must be parented to the same control!");
+            /// <summary>
+            /// Positions the control so it's bottom edge is yOff above the top edge of another given control once.
+            /// </summary>
+            public void moveAbove(uiElement targ, int yOff = 0)
+            {
+                if (targ == null) throw new ArgumentNullException(ID + " target cannot be NULL!");
+                if (targ.Parent != Parent) throw new ArgumentException(ID + " target control must be parented to the same control!");
 
-            Style.Default.Set_Position(Block.Left, targ.Block.Top - Block.Height - yOff);
-        }
+                Style.Default.Set_Position(Block.Left, targ.Block.Top - Block.Height - yOff);
+            }
 
-        /// <summary>
-        /// Positions the control so it's right edge is xOff away from the right edge of another given control once.
-        /// </summary>
-        public void moveRightOf(uiElement targ, int xOff = 0)
-        {
-            if (targ == null) throw new ArgumentNullException(ID + " target cannot be NULL!");
-            if (targ.Parent != Parent) throw new ArgumentException(ID + " target control must be parented to the same control!");
+            /// <summary>
+            /// Positions the control so it's right edge is xOff away from the right edge of another given control once.
+            /// </summary>
+            public void moveRightOf(uiElement targ, int xOff = 0)
+            {
+                if (targ == null) throw new ArgumentNullException(ID + " target cannot be NULL!");
+                if (targ.Parent != Parent) throw new ArgumentException(ID + " target control must be parented to the same control!");
 
-            Style.Default.Set_Position(targ.Block.Right + xOff, Block.Top);
-            //if (horizontal_positioner == null || !horizontal_positioner.Equals(targ, xOff, cPosDir.RIGHT)) horizontal_positioner = new ControlPositioner(targ, xOff, cPosDir.RIGHT);
-        }
+                Style.Default.Set_Position(targ.Block.Right + xOff, Block.Top);
+                //if (horizontal_positioner == null || !horizontal_positioner.Equals(targ, xOff, cPosDir.RIGHT)) horizontal_positioner = new ControlPositioner(targ, xOff, cPosDir.RIGHT);
+            }
 
-        /// <summary>
-        /// Positions the control so it's right edge is xOff away from the left edge of another given control once.
-        /// </summary>
-        public void moveLeftOf(uiElement targ, int xOff = 0)
-        {
-            if (targ == null) throw new ArgumentNullException(ID + " target cannot be NULL!");
-            if (targ.Parent != Parent) throw new ArgumentException(ID + " target control must be parented to the same control!");
+            /// <summary>
+            /// Positions the control so it's right edge is xOff away from the left edge of another given control once.
+            /// </summary>
+            public void moveLeftOf(uiElement targ, int xOff = 0)
+            {
+                if (targ == null) throw new ArgumentNullException(ID + " target cannot be NULL!");
+                if (targ.Parent != Parent) throw new ArgumentException(ID + " target control must be parented to the same control!");
 
-            Style.Default.Set_Position(targ.Block.Left - Block.Width - xOff, Block.Top);
-            //if (horizontal_positioner == null || !horizontal_positioner.Equals(targ, xOff, cPosDir.LEFT)) horizontal_positioner = new ControlPositioner(targ, xOff, cPosDir.LEFT);
-        }
+                Style.Default.Set_Position(targ.Block.Left - Block.Width - xOff, Block.Top);
+                //if (horizontal_positioner == null || !horizontal_positioner.Equals(targ, xOff, cPosDir.LEFT)) horizontal_positioner = new ControlPositioner(targ, xOff, cPosDir.LEFT);
+            }
 
-        /// <summary>
-        /// Adjusts X & Y position of the control so it sites directly above another given control forever.
-        /// </summary>
-        public void sitAbove(uiElement targ, int yOff = 0)
-        {
-            if (targ == null) throw new ArgumentNullException(ID + " target cannot be NULL!");
-            if (targ.Parent != Parent) throw new ArgumentException(ID + " target control must be parented to the same control!");
+            /// <summary>
+            /// Adjusts X & Y position of the control so it sites directly above another given control forever.
+            /// </summary>
+            public void sitAbove(uiElement targ, int yOff = 0)
+            {
+                if (targ == null) throw new ArgumentNullException(ID + " target cannot be NULL!");
+                if (targ.Parent != Parent) throw new ArgumentException(ID + " target control must be parented to the same control!");
 
-            Style.Default.Set_Position(targ.Block.Left, targ.Block.Y - Block.Height - yOff);
-            xAligner = null;
-            //if (vertical_positioner == null || !vertical_positioner.Equals(targ, yOff, cPosDir.ABOVE)) vertical_positioner = new ControlPositioner(targ, yOff, cPosDir.SIT_ABOVE);
-        }
+                Style.Default.Set_Position(targ.Block.Left, targ.Block.Y - Block.Height - yOff);
+                xAligner = null;
+                //if (vertical_positioner == null || !vertical_positioner.Equals(targ, yOff, cPosDir.ABOVE)) vertical_positioner = new ControlPositioner(targ, yOff, cPosDir.SIT_ABOVE);
+            }
 
-        /// <summary>
-        /// Adjusts X & Y position of the control so it sites directly below another given control forever.
-        /// </summary>
-        public void sitBelow(uiElement targ, int yOff = 0)
-        {
-            if (targ == null) throw new ArgumentNullException(ID + " target cannot be NULL!");
-            if (targ.Parent != Parent) throw new ArgumentException(ID + " target control must be parented to the same control!");
+            /// <summary>
+            /// Adjusts X & Y position of the control so it sites directly below another given control forever.
+            /// </summary>
+            public void sitBelow(uiElement targ, int yOff = 0)
+            {
+                if (targ == null) throw new ArgumentNullException(ID + " target cannot be NULL!");
+                if (targ.Parent != Parent) throw new ArgumentException(ID + " target control must be parented to the same control!");
 
-            Style.Default.Set_Position(targ.Block.Left, targ.Block.Bottom + yOff);
-            xAligner = null;
-            //if (vertical_positioner == null || !vertical_positioner.Equals(targ, yOff, cPosDir.BELOW)) vertical_positioner = new ControlPositioner(targ, yOff, cPosDir.SIT_BELOW);
-        }
+                Style.Default.Set_Position(targ.Block.Left, targ.Block.Bottom + yOff);
+                xAligner = null;
+                //if (vertical_positioner == null || !vertical_positioner.Equals(targ, yOff, cPosDir.BELOW)) vertical_positioner = new ControlPositioner(targ, yOff, cPosDir.SIT_BELOW);
+            }
 
-        /// <summary>
-        /// Adjusts X & Y position of the control so it sites directly to the right of another given control forever.
-        /// </summary>
-        public void sitRightOf(uiElement targ, int xOff = 0)
-        {
-            if (targ == null) throw new ArgumentNullException(ID + " target cannot be NULL!");
-            if (targ.Parent != Parent) throw new ArgumentException(ID + " target control must be parented to the same control!");
+            /// <summary>
+            /// Adjusts X & Y position of the control so it sites directly to the right of another given control forever.
+            /// </summary>
+            public void sitRightOf(uiElement targ, int xOff = 0)
+            {
+                if (targ == null) throw new ArgumentNullException(ID + " target cannot be NULL!");
+                if (targ.Parent != Parent) throw new ArgumentException(ID + " target control must be parented to the same control!");
 
-            Style.Default.Set_Position(targ.Block.Right + xOff, targ.Block.Y);
-            yAligner = null;
-            //if (horizontal_positioner == null || !horizontal_positioner.Equals(targ, xOff, cPosDir.RIGHT)) horizontal_positioner = new ControlPositioner(targ, xOff, cPosDir.SIT_RIGHT_OF);
-        }
+                Style.Default.Set_Position(targ.Block.Right + xOff, targ.Block.Y);
+                yAligner = null;
+                //if (horizontal_positioner == null || !horizontal_positioner.Equals(targ, xOff, cPosDir.RIGHT)) horizontal_positioner = new ControlPositioner(targ, xOff, cPosDir.SIT_RIGHT_OF);
+            }
 
-        /// <summary>
-        /// Adjusts X & Y position of the control so it sites directly to the left of another given control forever.
-        /// </summary>
-        public void sitLeftOf(uiElement targ, int xOff = 0)
-        {
-            if (targ == null) throw new ArgumentNullException(ID + " target cannot be NULL!");
-            if (targ.Parent != Parent) throw new ArgumentException(ID + " target control must be parented to the same control!");
+            /// <summary>
+            /// Adjusts X & Y position of the control so it sites directly to the left of another given control forever.
+            /// </summary>
+            public void sitLeftOf(uiElement targ, int xOff = 0)
+            {
+                if (targ == null) throw new ArgumentNullException(ID + " target cannot be NULL!");
+                if (targ.Parent != Parent) throw new ArgumentException(ID + " target control must be parented to the same control!");
 
-            Style.Default.Set_Position(targ.Block.Left - Block.Width - xOff, targ.Block.Y);
-            yAligner = null;
-            //if (horizontal_positioner == null || !horizontal_positioner.Equals(targ, xOff, cPosDir.LEFT)) horizontal_positioner = new ControlPositioner(targ, xOff, cPosDir.SIT_LEFT_OF);
-        }
+                Style.Default.Set_Position(targ.Block.Left - Block.Width - xOff, targ.Block.Y);
+                yAligner = null;
+                //if (horizontal_positioner == null || !horizontal_positioner.Equals(targ, xOff, cPosDir.LEFT)) horizontal_positioner = new ControlPositioner(targ, xOff, cPosDir.SIT_LEFT_OF);
+            }
 
-        /// <summary>
-        /// Repositions the control so it's top edge sits on it's parent's top edge.
-        /// </summary>
-        /// <param name="yOff">Offset from the edge where we will be positioned</param>
-        public void alignTop(int yOff = 0)
-        {
-            int y = yOff;
-            Style.Default.Y.Set(y);
-            if (yAligner == null || !yAligner.Equals(null, yOff, cPosDir.TOP_OF)) yAligner = new uiAligner(this, null, yOff, cPosDir.TOP_OF);
-        }
+            /// <summary>
+            /// Repositions the control so it's top edge sits on it's parent's top edge.
+            /// </summary>
+            /// <param name="yOff">Offset from the edge where we will be positioned</param>
+            public void alignTop(int yOff = 0)
+            {
+                int y = yOff;
+                Style.Default.Y.Set(y);
+                if (yAligner == null || !yAligner.Equals(null, yOff, cPosDir.TOP_OF)) yAligner = new uiAligner(this, null, yOff, cPosDir.TOP_OF);
+            }
 
-        /// <summary>
-        /// Repositions the control so it's bottom edge sits on it's parent's bottom edge.
-        /// </summary>
-        /// <param name="yOff">Offset from the edge where we will be positioned</param>
-        public void alignBottom(int yOff = 0)
-        {
-            if (!isChild) throw new ArgumentException("Must have a parent inorder to call alignBottom()!");
-            int val = Block_Containing.Height;// parent.inner_area.height;
+            /// <summary>
+            /// Repositions the control so it's bottom edge sits on it's parent's bottom edge.
+            /// </summary>
+            /// <param name="yOff">Offset from the edge where we will be positioned</param>
+            public void alignBottom(int yOff = 0)
+            {
+                if (!isChild) throw new ArgumentException("Must have a parent inorder to call alignBottom()!");
+                int val = Block_Containing.Height;// parent.inner_area.height;
             
-            int y = (val - Block.Height - yOff);
-            Style.Default.Y.Set(y);
+                int y = (val - Block.Height - yOff);
+                Style.Default.Y.Set(y);
             
-            if (yAligner == null || !yAligner.Equals(null, yOff, cPosDir.BOTTOM_OF)) yAligner = new uiAligner(this, null, yOff, cPosDir.BOTTOM_OF);
-        }
+                if (yAligner == null || !yAligner.Equals(null, yOff, cPosDir.BOTTOM_OF)) yAligner = new uiAligner(this, null, yOff, cPosDir.BOTTOM_OF);
+            }
 
-        /// <summary>
-        /// Repositions the control so it's left edge sits on it's parent's left edge.
-        /// </summary>
-        /// <param name="xOff">Offset from the edge where we will be positioned</param>
-        public void alignLeftSide(int xOff = 0)
-        {
-            int x = xOff;
-            Style.Default.X.Set(x);
+            /// <summary>
+            /// Repositions the control so it's left edge sits on it's parent's left edge.
+            /// </summary>
+            /// <param name="xOff">Offset from the edge where we will be positioned</param>
+            public void alignLeftSide(int xOff = 0)
+            {
+                int x = xOff;
+                Style.Default.X.Set(x);
 
-            if (xAligner == null || !xAligner.Equals(null, xOff, cPosDir.LEFT_SIDE_OF)) xAligner = new uiAligner(this, null, xOff, cPosDir.LEFT_SIDE_OF);
-        }
+                if (xAligner == null || !xAligner.Equals(null, xOff, cPosDir.LEFT_SIDE_OF)) xAligner = new uiAligner(this, null, xOff, cPosDir.LEFT_SIDE_OF);
+            }
 
-        /// <summary>
-        /// Repositions the control so it's right edge sits on it's parent's right edge.
-        /// </summary>
-        /// <param name="xOff">Offset from the edge where we will be positioned</param>
-        public void alignRightSide(int xOff = 0)
-        {
-            if (!isChild) throw new ArgumentException("Must have a parent inorder to call alignRightSide()!");
-            int val = Block_Containing.Width;
+            /// <summary>
+            /// Repositions the control so it's right edge sits on it's parent's right edge.
+            /// </summary>
+            /// <param name="xOff">Offset from the edge where we will be positioned</param>
+            public void alignRightSide(int xOff = 0)
+            {
+                if (!isChild) throw new ArgumentException("Must have a parent inorder to call alignRightSide()!");
+                int val = Block_Containing.Width;
 
-            int x = (val - Block.Width - xOff);
-            Style.Default.X.Set(x);
+                int x = (val - Block.Width - xOff);
+                Style.Default.X.Set(x);
 
-            if (isChild) return;
-            else if (xAligner == null || !xAligner.Equals(null, xOff, cPosDir.RIGHT_SIDE_OF)) xAligner = new uiAligner(this, null, xOff, cPosDir.RIGHT_SIDE_OF);
-        }
+                if (isChild) return;
+                else if (xAligner == null || !xAligner.Equals(null, xOff, cPosDir.RIGHT_SIDE_OF)) xAligner = new uiAligner(this, null, xOff, cPosDir.RIGHT_SIDE_OF);
+            }
 
-        /// <summary>
-        /// Aligns the control to the middle of the parent area's Vertical axis.
-        /// </summary>
-        /// <param name="yOff">An offset from the center</param>
-        public void CenterVertically(int yOff = 0)
-        {
-            if (!isChild) throw new ArgumentException("Must have a parent inorder to call CenterVertically()!");
-            int val = Block_Containing.Height;
+            /// <summary>
+            /// Aligns the control to the middle of the parent area's Vertical axis.
+            /// </summary>
+            /// <param name="yOff">An offset from the center</param>
+            public void CenterVertically(int yOff = 0)
+            {
+                if (!isChild) throw new ArgumentException("Must have a parent inorder to call CenterVertically()!");
+                int val = Block_Containing.Height;
             
-            int y = ((val / 2) - (Block.Height / 2) + yOff);
-            Style.Default.Y.Set(y);
+                int y = ((val / 2) - (Block.Height / 2) + yOff);
+                Style.Default.Y.Set(y);
             
-            if (yAligner == null || !yAligner.Equals(null, yOff, cPosDir.CENTER_Y)) yAligner = new uiAligner(this, null, yOff, cPosDir.CENTER_Y);
-        }
+                if (yAligner == null || !yAligner.Equals(null, yOff, cPosDir.CENTER_Y)) yAligner = new uiAligner(this, null, yOff, cPosDir.CENTER_Y);
+            }
 
-        /// <summary>
-        /// Aligns the control to the middle of the parent area's Horizontal axis.
-        /// </summary>
-        /// <param name="xOff">An offset from the center</param>
-        public void CenterHorizontally(int xOff = 0)
-        {
-            if (!isChild) throw new ArgumentException("Must have a parent inorder to call CenterHorizontally()!");
-            int val = Block_Containing.Width;
+            /// <summary>
+            /// Aligns the control to the middle of the parent area's Horizontal axis.
+            /// </summary>
+            /// <param name="xOff">An offset from the center</param>
+            public void CenterHorizontally(int xOff = 0)
+            {
+                if (!isChild) throw new ArgumentException("Must have a parent inorder to call CenterHorizontally()!");
+                int val = Block_Containing.Width;
 
-            int x = ((val / 2) - (Block.Width / 2) + xOff);
-            Style.Default.X.Set(x);
+                int x = ((val / 2) - (Block.Width / 2) + xOff);
+                Style.Default.X.Set(x);
             
-            if (xAligner == null || !xAligner.Equals(null, xOff, cPosDir.CENTER_X)) xAligner = new uiAligner(this, null, xOff, cPosDir.CENTER_X);
-        }
-        */
-#endregion
+                if (xAligner == null || !xAligner.Equals(null, xOff, cPosDir.CENTER_X)) xAligner = new uiAligner(this, null, xOff, cPosDir.CENTER_X);
+            }
+            */
+    #endregion
 
-#region Behavior Triggers
-        public void Click()
-        {
-            if (!HasFlags(EElementFlags.Clickable)) return;
-            Handle_Click(this, new DomRoutedEventArgs(this));
-        }
+    #region Behavior Triggers
+            public void Click()
+            {
+                if (!HasFlags(EElementFlags.Clickable)) return;
+                Handle_Click(this, new DomRoutedEventArgs(this));
+            }
 
-        public void DoubleClick()
-        {
-            if (!HasFlags(EElementFlags.DoubleClickable)) return;
+            public void DoubleClick()
+            {
+                if (!HasFlags(EElementFlags.DoubleClickable)) return;
             
-            Handle_DoubleClick(this, new DomRoutedEventArgs(this));
-        }
-#endregion
+                Handle_DoubleClick(this, new DomRoutedEventArgs(this));
+            }
+    #endregion
         
-#region Dragging Event Delegates
-        /// <summary>
-        /// Called at the start of the dragging process
-        /// </summary>
-        public event Action<cssElement, DomItemDragEventArgs> DraggingStart;
-        /// <summary>
-        /// Called as the element is being dragged
-        /// </summary>
-        public event Action<cssElement, DomItemDragEventArgs> DraggingUpdate;
-        /// <summary>
-        /// Called when the dragging operation ends (including being cancelled)
-        /// Occurs AFTER <see cref="Handle_DraggingConfirm"/>
-        /// </summary>
-        public event Action<cssElement, DomItemDragEventArgs> DraggingEnd;
-        /// <summary>
-        /// Called when the dragging operation is confirmed (ended without cancelling)
-        /// </summary>
-        public event Action<cssElement, DomItemDragEventArgs> DraggingConfirm;
-#endregion
+    #region Dragging Event Delegates
+            /// <summary>
+            /// Called at the start of the dragging process
+            /// </summary>
+            public event Action<cssElement, DomItemDragEventArgs> DraggingStart;
+            /// <summary>
+            /// Called as the element is being dragged
+            /// </summary>
+            public event Action<cssElement, DomItemDragEventArgs> DraggingUpdate;
+            /// <summary>
+            /// Called when the dragging operation ends (including being cancelled)
+            /// Occurs AFTER <see cref="Handle_DraggingConfirm"/>
+            /// </summary>
+            public event Action<cssElement, DomItemDragEventArgs> DraggingEnd;
+            /// <summary>
+            /// Called when the dragging operation is confirmed (ended without cancelling)
+            /// </summary>
+            public event Action<cssElement, DomItemDragEventArgs> DraggingConfirm;
+    #endregion
 
-#region Keyboard Event Delegates
-        /// <summary>
-        /// Called whenever the user presses a character key while the element has input-focus
-        /// </summary>
-        public event Action<cssElement, DomCancellableEvent<DomKeyboardKeyEventArgs>> KeyPress;
-        /// <summary>
-        /// Called whenever a keyboard key is depressed while the element has input-focus
-        /// </summary>
-        public event Action<cssElement, DomKeyboardKeyEventArgs> KeyUp;
-        /// <summary>
-        /// Called whenever a keyboard key is pressed while the element has input-focus
-        /// </summary>
-        public event Action<cssElement, DomKeyboardKeyEventArgs> KeyDown;
-#endregion
+    #region Keyboard Event Delegates
+            /// <summary>
+            /// Called whenever the user presses a character key while the element has input-focus
+            /// </summary>
+            public event Action<cssElement, DomCancellableEvent<DomKeyboardKeyEventArgs>> KeyPress;
+            /// <summary>
+            /// Called whenever a keyboard key is depressed while the element has input-focus
+            /// </summary>
+            public event Action<cssElement, DomKeyboardKeyEventArgs> KeyUp;
+            /// <summary>
+            /// Called whenever a keyboard key is pressed while the element has input-focus
+            /// </summary>
+            public event Action<cssElement, DomKeyboardKeyEventArgs> KeyDown;
+    #endregion
 
-#region Routed Events
+    #region Routed Events
 
-#region Mouse Delegates
-        /// <summary>
-        /// Called whenever the mouse releases a button whilst over the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<cssElement, DomMouseButtonEventArgs> MouseUp;
-        /// <summary>
-        /// Called whenever the mouse presses a button whilst over the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<cssElement, DomMouseButtonEventArgs> MouseDown;
-        /// <summary>
-        /// Called whenever the element is 'clicked' by the mouse or by keyboard input (pressing ENTER)
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<cssElement, DomRoutedEventArgs> Clicked;
-        /// <summary>
-        /// Called whenever the element is 'double clicked' by the mouse or by keyboard input (pressing ENTER)
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<cssElement, DomRoutedEventArgs> DoubleClicked;
-        /// <summary>
-        /// Called whenever the mouse clicks the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<cssElement, DomMouseButtonEventArgs> MouseClick;
-        /// <summary>
-        /// Called whenever the mouse double clicks the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<cssElement, DomMouseButtonEventArgs> MouseDoubleClick;
-        /// <summary>
-        /// Called whenever the mouse wheel scrolls whilst over the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<cssElement, DomMouseWheelEventArgs> MouseWheel;
-        /// <summary>
-        /// Called whenever the mouse moves whilst over the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<cssElement, DomMouseMoveEventArgs> MouseMove;
-        /// <summary>
-        /// Called whenever the mouse pauses for longer than <see cref="UI_CONSTANTS.HOVER_TIME"/> over the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<cssElement> MouseHover;
-        /// <summary>
-        /// Called whenever the mouse first moves onto the element, but not one of its children
-        /// </summary>
-        public event Action<cssElement> MouseEnter;
-        /// <summary>
-        /// Called whenever the mouse moved out of the element, but not one of its children
-        /// </summary>
-        public event Action<cssElement> MouseLeave;
-#endregion
+    #region Mouse Delegates
+            /// <summary>
+            /// Called whenever the mouse releases a button whilst over the element
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public event Action<cssElement, DomMouseButtonEventArgs> MouseUp;
+            /// <summary>
+            /// Called whenever the mouse presses a button whilst over the element
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public event Action<cssElement, DomMouseButtonEventArgs> MouseDown;
+            /// <summary>
+            /// Called whenever the element is 'clicked' by the mouse or by keyboard input (pressing ENTER)
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public event Action<cssElement, DomRoutedEventArgs> Clicked;
+            /// <summary>
+            /// Called whenever the element is 'double clicked' by the mouse or by keyboard input (pressing ENTER)
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public event Action<cssElement, DomRoutedEventArgs> DoubleClicked;
+            /// <summary>
+            /// Called whenever the mouse clicks the element
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public event Action<cssElement, DomMouseButtonEventArgs> MouseClick;
+            /// <summary>
+            /// Called whenever the mouse double clicks the element
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public event Action<cssElement, DomMouseButtonEventArgs> MouseDoubleClick;
+            /// <summary>
+            /// Called whenever the mouse wheel scrolls whilst over the element
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public event Action<cssElement, DomMouseWheelEventArgs> MouseWheel;
+            /// <summary>
+            /// Called whenever the mouse moves whilst over the element
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public event Action<cssElement, DomMouseMoveEventArgs> MouseMove;
+            /// <summary>
+            /// Called whenever the mouse pauses for longer than <see cref="UI_CONSTANTS.HOVER_TIME"/> over the element
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public event Action<cssElement> MouseHover;
+            /// <summary>
+            /// Called whenever the mouse first moves onto the element, but not one of its children
+            /// </summary>
+            public event Action<cssElement> MouseEnter;
+            /// <summary>
+            /// Called whenever the mouse moved out of the element, but not one of its children
+            /// </summary>
+            public event Action<cssElement> MouseLeave;
+    #endregion
 
-#region Mouse Handlers
-        public bool IsBeingDragged { get { return object.ReferenceEquals(Root.Mouse.Dragging_Target, this); } }
+    #region Mouse Handlers
+            public bool IsBeingDragged { get { return object.ReferenceEquals(Root.Mouse.Dragging_Target, this); } }
 
-        /// <summary>
-        /// Called whenever the mouse releases a button whilst over the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_MouseUp(cssElement Sender, DomMouseButtonEventArgs Args)
-        {
-            if (Args.Button == EMouseButton.Left) IsActive = false;
-            MouseUp?.Invoke(this, Args);
-        }
-        /// <summary>
-        /// Called whenever the mouse presses a button whilst over the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_MouseDown(cssElement Sender, DomMouseButtonEventArgs Args)
-        {
-            if (Args.Button == EMouseButton.Left) IsActive = true;
-            MouseDown?.Invoke(this, Args);
-        }
+            /// <summary>
+            /// Called whenever the mouse releases a button whilst over the element
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public virtual void Handle_MouseUp(cssElement Sender, DomMouseButtonEventArgs Args)
+            {
+                if (Args.Button == EMouseButton.Left) IsActive = false;
+                MouseUp?.Invoke(this, Args);
+            }
+            /// <summary>
+            /// Called whenever the mouse presses a button whilst over the element
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public virtual void Handle_MouseDown(cssElement Sender, DomMouseButtonEventArgs Args)
+            {
+                if (Args.Button == EMouseButton.Left) IsActive = true;
+                MouseDown?.Invoke(this, Args);
+            }
 
-        /// <summary>
-        /// Called whenever the mouse wheel scrolls whilst over the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_MouseWheel(cssElement Sender, DomMouseWheelEventArgs Args)
-        {
-            MouseWheel?.Invoke(this, Args);
-        }
-        /// <summary>
-        /// Called whenever the mouse moves whilst over the element.
-        /// <para>Fires after MouseEnter</para>
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_MouseMove(cssElement Sender, DomMouseMoveEventArgs Args)
-        {
-            MouseMove?.Invoke(this, Args);
-        }
+            /// <summary>
+            /// Called whenever the mouse wheel scrolls whilst over the element
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public virtual void Handle_MouseWheel(cssElement Sender, DomMouseWheelEventArgs Args)
+            {
+                MouseWheel?.Invoke(this, Args);
+            }
+            /// <summary>
+            /// Called whenever the mouse moves whilst over the element.
+            /// <para>Fires after MouseEnter</para>
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public virtual void Handle_MouseMove(cssElement Sender, DomMouseMoveEventArgs Args)
+            {
+                MouseMove?.Invoke(this, Args);
+            }
         
-        /// <summary>
-        /// Called whenever the mouse rests on the element
-        /// <para>Rest delay dictated by <see cref="UI_CONSTANTS.HOVER_TIME"/></para>
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_MouseHover(cssElement Sender)
-        {
-            MouseHover?.Invoke(this);
-        }
-        /// <summary>
-        /// Called whenever the mouse moves onto the element, but not one of its children
-        /// <para>Fires before MouseMove</para>
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_MouseEnter(cssElement Sender)
-        {
-            IsMouseOver = true;
-            Style.Set_State(ElementPropertySystem.STATE_HOVER, true);
-            MouseEnter?.Invoke(this);
-        }
-        /// <summary>
-        /// Called whenever the mouse moves out of the element, but not one of its children
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_MouseLeave(cssElement Sender)
-        {
-            IsMouseOver = false;
-            Style.Set_State(ElementPropertySystem.STATE_HOVER, false);
-            MouseLeave?.Invoke(this);
-        }
+            /// <summary>
+            /// Called whenever the mouse rests on the element
+            /// <para>Rest delay dictated by <see cref="UI_CONSTANTS.HOVER_TIME"/></para>
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public virtual void Handle_MouseHover(cssElement Sender)
+            {
+                MouseHover?.Invoke(this);
+            }
+            /// <summary>
+            /// Called whenever the mouse moves onto the element, but not one of its children
+            /// <para>Fires before MouseMove</para>
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public virtual void Handle_MouseEnter(cssElement Sender)
+            {
+                IsMouseOver = true;
+                Style.Set_State(ElementPropertySystem.STATE_HOVER, true);
+                MouseEnter?.Invoke(this);
+            }
+            /// <summary>
+            /// Called whenever the mouse moves out of the element, but not one of its children
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public virtual void Handle_MouseLeave(cssElement Sender)
+            {
+                IsMouseOver = false;
+                Style.Set_State(ElementPropertySystem.STATE_HOVER, false);
+                MouseLeave?.Invoke(this);
+            }
 
-        /// <summary>
-        /// Called whenever the element is 'clicked' by the mouse or by keyboard input (pressing ENTER)
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_Click(cssElement Sender, DomRoutedEventArgs Args)
-        {
-            Clicked?.Invoke(this, Args);
-        }
-        /// <summary>
-        /// Called whenever the element is 'double clicked' by the mouse or by keyboard input (pressing ENTER)
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_DoubleClick(cssElement Sender, DomRoutedEventArgs Args)
-        {
-            DoubleClicked?.Invoke(this, Args);
-        }
+            /// <summary>
+            /// Called whenever the element is 'clicked' by the mouse or by keyboard input (pressing ENTER)
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public virtual void Handle_Click(cssElement Sender, DomRoutedEventArgs Args)
+            {
+                Clicked?.Invoke(this, Args);
+            }
+            /// <summary>
+            /// Called whenever the element is 'double clicked' by the mouse or by keyboard input (pressing ENTER)
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public virtual void Handle_DoubleClick(cssElement Sender, DomRoutedEventArgs Args)
+            {
+                DoubleClicked?.Invoke(this, Args);
+            }
 
-        /// <summary>
-        /// Called whenever the mouse clicks the element.
-        /// Two single clicks that occur close enough in time, as determined by the mouse settings of the user's operating system, will generate a MouseDoubleClick event instead of the second MouseClick event.
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_MouseClick(cssElement Sender, DomMouseButtonEventArgs Args)
-        {
-            MouseClick?.Invoke(this, Args);
-        }
-        /// <summary>
-        /// Called whenever the mouse double clicks the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_MouseDoubleClick(cssElement Sender, DomMouseButtonEventArgs Args)
-        {
-            MouseDoubleClick?.Invoke(this, Args);
-        }
-#endregion
+            /// <summary>
+            /// Called whenever the mouse clicks the element.
+            /// Two single clicks that occur close enough in time, as determined by the mouse settings of the user's operating system, will generate a MouseDoubleClick event instead of the second MouseClick event.
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public virtual void Handle_MouseClick(cssElement Sender, DomMouseButtonEventArgs Args)
+            {
+                MouseClick?.Invoke(this, Args);
+            }
+            /// <summary>
+            /// Called whenever the mouse double clicks the element
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public virtual void Handle_MouseDoubleClick(cssElement Sender, DomMouseButtonEventArgs Args)
+            {
+                MouseDoubleClick?.Invoke(this, Args);
+            }
+    #endregion
 
-#endregion
+    #endregion
 
-#region Drag Events
-        /// <summary>
-        /// Fires at the start of the dragging process
-        /// </summary>
-        public virtual void Handle_DraggingStart(cssElement Sender, DomItemDragEventArgs Args)
-        {
-            DraggingStart?.Invoke(this, Args);
-        }
-        /// <summary>
-        /// Fired as the element is being dragged
-        /// </summary>
-        public virtual void Handle_DraggingUpdate(cssElement Sender, DomItemDragEventArgs Args)
-        {
-            DraggingUpdate?.Invoke(this, Args);
-        }
-        /// <summary>
-        /// Fires when the dragging operation is confirmed (ended without cancelling)
-        /// </summary>
-        public virtual void Handle_DraggingConfirm(cssElement Sender, DomItemDragEventArgs Args)
-        {
-            DraggingConfirm?.Invoke(this, Args);
-        }
-        /// <summary>
-        /// Fires when the dragging operation ends (including being cancelled)
-        /// Called AFTER <see cref="Handle_DraggingConfirm"/>
-        /// </summary>
-        public virtual void Handle_DraggingEnd(cssElement Sender, DomItemDragEventArgs Args)
-        {
-            DraggingEnd?.Invoke(this, Args);
-        }
-#endregion
+    #region Drag Events
+            /// <summary>
+            /// Fires at the start of the dragging process
+            /// </summary>
+            public virtual void Handle_DraggingStart(cssElement Sender, DomItemDragEventArgs Args)
+            {
+                DraggingStart?.Invoke(this, Args);
+            }
+            /// <summary>
+            /// Fired as the element is being dragged
+            /// </summary>
+            public virtual void Handle_DraggingUpdate(cssElement Sender, DomItemDragEventArgs Args)
+            {
+                DraggingUpdate?.Invoke(this, Args);
+            }
+            /// <summary>
+            /// Fires when the dragging operation is confirmed (ended without cancelling)
+            /// </summary>
+            public virtual void Handle_DraggingConfirm(cssElement Sender, DomItemDragEventArgs Args)
+            {
+                DraggingConfirm?.Invoke(this, Args);
+            }
+            /// <summary>
+            /// Fires when the dragging operation ends (including being cancelled)
+            /// Called AFTER <see cref="Handle_DraggingConfirm"/>
+            /// </summary>
+            public virtual void Handle_DraggingEnd(cssElement Sender, DomItemDragEventArgs Args)
+            {
+                DraggingEnd?.Invoke(this, Args);
+            }
+    #endregion
 
-#region Preview Events
+    #region Preview Events
 
-#region Delegates
-        /// <summary>
-        /// Called whenever the mouse releases a button whilst over the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<cssElement, DomPreviewMouseButtonEventArgs> PreviewMouseUp;
-        /// <summary>
-        /// Called whenever the mouse presses a button whilst over the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<cssElement, DomPreviewMouseButtonEventArgs> PreviewMouseDown;
-        /// <summary>
-        /// Called whenever the element is 'clicked' by the mouse or by keyboard input (pressing ENTER)
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<cssElement, DomPreviewEventArgs> PreviewClicked;
-        /// <summary>
-        /// Called whenever the element is 'double clicked' by the mouse or by keyboard input (pressing ENTER)
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<cssElement, DomPreviewEventArgs> PreviewDoubleClicked;
-        /// <summary>
-        /// Called whenever the mouse clicks the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<cssElement, DomPreviewMouseButtonEventArgs> PreviewMouseClick;
-        /// <summary>
-        /// Called whenever the mouse double clicks the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<cssElement, DomPreviewMouseButtonEventArgs> PreviewMouseDoubleClick;
-        /// <summary>
-        /// Called whenever the mouse wheel scrolls whilst over the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<cssElement, DomPreviewMouseWheelEventArgs> PreviewMouseWheel;
-        /// <summary>
-        /// Called whenever the mouse moves whilst over the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public event Action<cssElement, DomPreviewMouseMoveEventArgs> PreviewMouseMove;
-#endregion
+    #region Delegates
+            /// <summary>
+            /// Called whenever the mouse releases a button whilst over the element
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public event Action<cssElement, DomPreviewMouseButtonEventArgs> PreviewMouseUp;
+            /// <summary>
+            /// Called whenever the mouse presses a button whilst over the element
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public event Action<cssElement, DomPreviewMouseButtonEventArgs> PreviewMouseDown;
+            /// <summary>
+            /// Called whenever the element is 'clicked' by the mouse or by keyboard input (pressing ENTER)
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public event Action<cssElement, DomPreviewEventArgs> PreviewClicked;
+            /// <summary>
+            /// Called whenever the element is 'double clicked' by the mouse or by keyboard input (pressing ENTER)
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public event Action<cssElement, DomPreviewEventArgs> PreviewDoubleClicked;
+            /// <summary>
+            /// Called whenever the mouse clicks the element
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public event Action<cssElement, DomPreviewMouseButtonEventArgs> PreviewMouseClick;
+            /// <summary>
+            /// Called whenever the mouse double clicks the element
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public event Action<cssElement, DomPreviewMouseButtonEventArgs> PreviewMouseDoubleClick;
+            /// <summary>
+            /// Called whenever the mouse wheel scrolls whilst over the element
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public event Action<cssElement, DomPreviewMouseWheelEventArgs> PreviewMouseWheel;
+            /// <summary>
+            /// Called whenever the mouse moves whilst over the element
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public event Action<cssElement, DomPreviewMouseMoveEventArgs> PreviewMouseMove;
+    #endregion
 
-#region Handlers
+    #region Handlers
 
-        /// <summary>
-        /// Called whenever the mouse releases a button whilst over the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_PreviewMouseUp(cssElement Sender, DomPreviewMouseButtonEventArgs Args)
-        {
-            Args.Handler = this;
-            PreviewMouseUp?.Invoke(this, Args);
-        }
-        /// <summary>
-        /// Called whenever the mouse presses a button whilst over the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_PreviewMouseDown(cssElement Sender, DomPreviewMouseButtonEventArgs Args)
-        {
-            Args.Handler = this;
-            PreviewMouseDown?.Invoke(this, Args);
-        }
+            /// <summary>
+            /// Called whenever the mouse releases a button whilst over the element
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public virtual void Handle_PreviewMouseUp(cssElement Sender, DomPreviewMouseButtonEventArgs Args)
+            {
+                Args.Handler = this;
+                PreviewMouseUp?.Invoke(this, Args);
+            }
+            /// <summary>
+            /// Called whenever the mouse presses a button whilst over the element
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public virtual void Handle_PreviewMouseDown(cssElement Sender, DomPreviewMouseButtonEventArgs Args)
+            {
+                Args.Handler = this;
+                PreviewMouseDown?.Invoke(this, Args);
+            }
 
-        /// <summary>
-        /// Called whenever the mouse wheel scrolls whilst over the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_PreviewMouseWheel(cssElement Sender, DomPreviewMouseWheelEventArgs Args)
-        {
-            Args.Handler = this;
-            PreviewMouseWheel?.Invoke(this, Args);
-        }
-        /// <summary>
-        /// Called whenever the mouse moves whilst over the element.
-        /// <para>Fires after MouseEnter</para>
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_PreviewMouseMove(cssElement Sender, DomPreviewMouseMoveEventArgs Args)
-        {
-            Args.Handler = this;
-            PreviewMouseMove?.Invoke(this, Args);
-        }
+            /// <summary>
+            /// Called whenever the mouse wheel scrolls whilst over the element
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public virtual void Handle_PreviewMouseWheel(cssElement Sender, DomPreviewMouseWheelEventArgs Args)
+            {
+                Args.Handler = this;
+                PreviewMouseWheel?.Invoke(this, Args);
+            }
+            /// <summary>
+            /// Called whenever the mouse moves whilst over the element.
+            /// <para>Fires after MouseEnter</para>
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public virtual void Handle_PreviewMouseMove(cssElement Sender, DomPreviewMouseMoveEventArgs Args)
+            {
+                Args.Handler = this;
+                PreviewMouseMove?.Invoke(this, Args);
+            }
         
-        /// <summary>
-        /// Called whenever the element is 'clicked' by mouse input or otherwise
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_PreviewClick(cssElement Sender, DomPreviewEventArgs Args)
-        {
-            Args.Handler = this;
-            PreviewClicked?.Invoke(this, Args);
-        }
-        /// <summary>
-        /// Called whenever the element is 'double clicked' by mouse input or otherwise
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_PreviewDoubleClick(cssElement Sender, DomPreviewEventArgs Args)
-        {
-            Args.Handler = this;
-            PreviewDoubleClicked?.Invoke(this, Args);
-        }
+            /// <summary>
+            /// Called whenever the element is 'clicked' by mouse input or otherwise
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public virtual void Handle_PreviewClick(cssElement Sender, DomPreviewEventArgs Args)
+            {
+                Args.Handler = this;
+                PreviewClicked?.Invoke(this, Args);
+            }
+            /// <summary>
+            /// Called whenever the element is 'double clicked' by mouse input or otherwise
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public virtual void Handle_PreviewDoubleClick(cssElement Sender, DomPreviewEventArgs Args)
+            {
+                Args.Handler = this;
+                PreviewDoubleClicked?.Invoke(this, Args);
+            }
 
-        /// <summary>
-        /// Called whenever the mouse clicks the element.
-        /// Two single clicks that occur close enough in time, as determined by the mouse settings of the user's operating system, will generate a MouseDoubleClick event instead of the second MouseClick event.
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_PreviewMouseClick(cssElement Sender, DomPreviewMouseButtonEventArgs Args)
-        {
-            Args.Handler = this;
-            PreviewMouseClick?.Invoke(this, Args);
-        }
-        /// <summary>
-        /// Called whenever the mouse double clicks the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public virtual void Handle_PreviewMouseDoubleClick(cssElement Sender, DomPreviewMouseButtonEventArgs Args)
-        {
-            Args.Handler = this;
-            PreviewMouseDoubleClick?.Invoke(this, Args);
-        }
-#endregion
+            /// <summary>
+            /// Called whenever the mouse clicks the element.
+            /// Two single clicks that occur close enough in time, as determined by the mouse settings of the user's operating system, will generate a MouseDoubleClick event instead of the second MouseClick event.
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public virtual void Handle_PreviewMouseClick(cssElement Sender, DomPreviewMouseButtonEventArgs Args)
+            {
+                Args.Handler = this;
+                PreviewMouseClick?.Invoke(this, Args);
+            }
+            /// <summary>
+            /// Called whenever the mouse double clicks the element
+            /// </summary>
+            /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
+            public virtual void Handle_PreviewMouseDoubleClick(cssElement Sender, DomPreviewMouseButtonEventArgs Args)
+            {
+                Args.Handler = this;
+                PreviewMouseDoubleClick?.Invoke(this, Args);
+            }
+    #endregion
 
-#endregion
+    #endregion
 
-#region Keyboard Event Handlers
-        /// <summary>
-        /// Called whenever the user presses a character key while the element has input-focus
-        /// </summary>
-        /// <returns>Continue</returns>
-        public virtual bool Handle_KeyPress(cssElement Sender, DomKeyboardKeyEventArgs Args)
-        {
-            var e = new DomCancellableEvent<DomKeyboardKeyEventArgs>(Args);
-            KeyPress?.Invoke(this, e);
-            if (e.Cancel) return false;
+    #region Keyboard Event Handlers
+            /// <summary>
+            /// Called whenever the user presses a character key while the element has input-focus
+            /// </summary>
+            /// <returns>Continue</returns>
+            public virtual bool Handle_KeyPress(cssElement Sender, DomKeyboardKeyEventArgs Args)
+            {
+                var e = new DomCancellableEvent<DomKeyboardKeyEventArgs>(Args);
+                KeyPress?.Invoke(this, e);
+                if (e.Cancel) return false;
 
-            return true;
-        }
-        /// <summary>
-        /// Called whenever a keyboard key is depressed while the element has input-focus
-        /// </summary>
-        public virtual bool Handle_KeyUp(cssElement Sender, DomKeyboardKeyEventArgs Args)
-        {
-            KeyUp?.Invoke(this, Args);
+                return true;
+            }
+            /// <summary>
+            /// Called whenever a keyboard key is depressed while the element has input-focus
+            /// </summary>
+            public virtual bool Handle_KeyUp(cssElement Sender, DomKeyboardKeyEventArgs Args)
+            {
+                KeyUp?.Invoke(this, Args);
 
-            return true;
-        }
-        /// <summary>
-        /// Called whenever a keyboard key is pressed while the element has input-focus
-        /// </summary>
-        public virtual bool Handle_KeyDown(cssElement Sender, DomKeyboardKeyEventArgs Args)
-        {
-            KeyDown?.Invoke(this, Args);
+                return true;
+            }
+            /// <summary>
+            /// Called whenever a keyboard key is pressed while the element has input-focus
+            /// </summary>
+            public virtual bool Handle_KeyDown(cssElement Sender, DomKeyboardKeyEventArgs Args)
+            {
+                KeyDown?.Invoke(this, Args);
 
-            return true;
-        }
-#endregion
+                return true;
+            }
+    #endregion
 
         
 
-#region Input Focus
-        /// <summary>
-        /// Sets input focus to the element
-        /// </summary>
-        /// <returns>Success</returns>
-        public bool Focus()
-        {
-            // Find the nearest FocusScope
-            cssElement E = this;
-            while (E != null && E.FocusScope == null)
+    #region Input Focus
+            /// <summary>
+            /// Sets input focus to the element
+            /// </summary>
+            /// <returns>Success</returns>
+            public bool Focus()
             {
-                E = E.Parent;
+                // Find the nearest FocusScope
+                cssElement E = this;
+                while (E != null && E.FocusScope == null)
+                {
+                    E = E.Parent;
+                }
+                if (E == null) return false;
+                E.FocusScope.Set(this);// Set ourself to the logical focus element, if this scope has active input focus then it will transfer it to us...
+                return true;
             }
-            if (E == null) return false;
-            E.FocusScope.Set(this);// Set ourself to the logical focus element, if this scope has active input focus then it will transfer it to us...
-            return true;
-        }
 
-        public FocusScope FocusScope { get; protected set; }  = null;
-        /// <summary>
-        /// Indicates whether the element currently has input focus
-        /// </summary>
-        public bool HasFocus { get { if (Root == null) return false; else return object.ReferenceEquals(this, Root.FocusedElement); } }
-        public event Action<cssElement> onFocusGain;
-        public event Action<cssElement> onFocusLose;
+            public FocusScope FocusScope { get; protected set; }  = null;
+            /// <summary>
+            /// Indicates whether the element currently has input focus
+            /// </summary>
+            public bool HasFocus { get { if (Root == null) return false; else return object.ReferenceEquals(this, Root.FocusedElement); } }
+            public event Action<cssElement> onFocusGain;
+            public event Action<cssElement> onFocusLose;
 
-        /// <summary>
-        /// Handles logic for an element gaining input focus
-        /// </summary>
-        internal virtual void Handle_InputFocusGain()
-        {
-            if (FocusScope != null)// If we are a focus scope containing element then we pass it on.
+            /// <summary>
+            /// Handles logic for an element gaining input focus
+            /// </summary>
+            internal virtual void Handle_InputFocusGain()
             {
-                FocusScope.GainFocus();
+                if (FocusScope != null)// If we are a focus scope containing element then we pass it on.
+                {
+                    FocusScope.GainFocus();
+                }
+                else
+                {
+                    Root.SetFocus(this);// Let the keyboard manager know that we accepted input focus
+                    Style.Set_State(ElementPropertySystem.STATE_FOCUS, true);
+                    onFocusGain?.Invoke(this);
+                }
             }
-            else
+            /// <summary>
+            /// Handles logic for an element losing input focus
+            /// </summary>
+            internal virtual void Handle_InputFocusLose()
             {
-                Root.SetFocus(this);// Let the keyboard manager know that we accepted input focus
-                Style.Set_State(ElementPropertySystem.STATE_FOCUS, true);
-                onFocusGain?.Invoke(this);
+                if (FocusScope != null)// If we are a focus scope containing element then we pass it on.
+                {
+                    FocusScope.LoseFocus();
+                }
+                else
+                {
+                    Style.Set_State(ElementPropertySystem.STATE_FOCUS, false);
+                    onFocusLose?.Invoke(this);
+                }
             }
-        }
-        /// <summary>
-        /// Handles logic for an element losing input focus
-        /// </summary>
-        internal virtual void Handle_InputFocusLose()
-        {
-            if (FocusScope != null)// If we are a focus scope containing element then we pass it on.
-            {
-                FocusScope.LoseFocus();
-            }
-            else
-            {
-                Style.Set_State(ElementPropertySystem.STATE_FOCUS, false);
-                onFocusLose?.Invoke(this);
-            }
-        }
-#endregion
+    #endregion
     }
 }

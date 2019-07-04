@@ -20,7 +20,7 @@ namespace CssUI
         /// Backing value for <see cref="Assigned"/>
         /// <para> Docs: https://www.w3.org/TR/css-cascade-3/#cascaded </para>
         /// </summary>
-        CssValueList _assigned = null;
+        CssValueList _assigned = new CssValueList(CssValue.Null);
 
         /// <summary>
         /// Backing value for <see cref="Specified"/>
@@ -51,23 +51,23 @@ namespace CssUI
         /// <summary>
         /// Tracks the previous value for <see cref="Assigned"/> so we can detect when changes occur
         /// </summary>
-        CssValueHash oldAssigned = null;
+        CssValueHash oldAssigned = new CssValueHash();
         /// <summary>
         /// Tracks the previous value for <see cref="Specified"/> so we can detect when changes occur
         /// </summary>
-        CssValueHash oldSpecified = null;
+        CssValueHash oldSpecified = new CssValueHash();
         /// <summary>
         /// Tracks the previous value for <see cref="Computed"/> so we can detect when changes occur
         /// </summary>
-        CssValueHash oldComputed = null;
+        CssValueHash oldComputed = new CssValueHash();
         /// <summary>
         /// Tracks the previous value for <see cref="Used"/> so we can detect when changes occur
         /// </summary>
-        CssValueHash oldUsed = null;
+        CssValueHash oldUsed = new CssValueHash();
         /// <summary>
         /// Tracks the previous value for <see cref="Actual"/> so we can detect when changes occur
         /// </summary>
-        CssValueHash oldActual = null;
+        CssValueHash oldActual = new CssValueHash();
         #endregion
 
         #region Values
@@ -158,7 +158,10 @@ namespace CssUI
         #endregion
 
         #region Accessors
-
+        /// <summary>
+        /// Returns TRUE if the <see cref="Assigned"/> value is <see cref="EStyleDataType.NONE"/>
+        /// </summary>
+        public override bool IsNone { get => (Assigned.FirstOrDefault().Type == EStyleDataType.NONE); }
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// </summary>
@@ -188,7 +191,7 @@ namespace CssUI
         /// <summary>
         /// Returns whether or not the property has a set value that should take affect during cascading.
         /// </summary>
-        public override bool HasValue { get { return Assigned.FirstOrDefault().HasValue(); } }
+        public override bool HasValue { get { return Assigned.FirstOrDefault().HasValue; } }
         #endregion
         
         #region Constructor
@@ -198,6 +201,42 @@ namespace CssUI
         }
         #endregion
 
+        #region Reverting
+        /// <summary>
+        /// Causes this property to revert back to the computed stage such that it must re-interpret its Used and Actual values.
+        /// </summary>
+        /// <param name="suppress">Suppresses any change event from firing once the Used value gets re-interpreted</param>
+        internal override void Revert(bool suppress = false)
+        {
+            _used = null;
+            _actual = null;
+
+            if (suppress)
+                oldUsed.Set(null);
+        }
+        #endregion
+
+        #region Inherited Value
+        /// <summary>
+        /// Returns the inherited value from the properties owners parent element
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public new CssValueList Find_Inherited_Value()
+        {
+            if (ReferenceEquals(Owner.Parent, null))
+            {// Root elements cannot inherit, they use the INITIAL value
+                return new CssValueList(Definition.Initial);
+            }
+            else
+            {// Take our parents computed value
+                ICssProperty prop = Owner.Parent.Style.Cascaded.Get(CssName);
+                if (!ReferenceEquals(prop, null))
+                    return new CssValueList((prop as CssProperty).Computed);
+                else
+                    throw new CssPropertyException($"Cannot read parent element property: {CssName}");
+            }
+        }
+        #endregion
 
         #region Interpreting
 
@@ -207,7 +246,7 @@ namespace CssUI
             CssPropertyDefinition Def = this.Definition;
             Inherited = false;
 
-            if (!AssignedValue.IsNull())
+            if (!AssignedValue.IsNull)
             {
                 switch (AssignedValue.Type)
                 {
@@ -278,10 +317,21 @@ namespace CssUI
                 CssValue newValue = Derive_SpecifiedValue(Assigned.First(), out bool Inherited);
                 if (Inherited)
                 {
-                    var parentProperty = Owner.Parent?.Style.Cascaded.Get(CssName);
-                    if (parentProperty != null)
+                    if (ReferenceEquals(Owner.Parent, null))
+                    {// Root element
+                        _specified = new CssValueList(Definition.Initial);
+                    }
+                    else
                     {
-                        _specified = new CssValueList((parentProperty as CssMultiValueProperty).Assigned);
+                        var parentProperty = Owner.Parent?.Style.Cascaded.Get(CssName);
+                        if (!ReferenceEquals(parentProperty, null))
+                        {
+                            _specified = new CssValueList((parentProperty as CssMultiValueProperty).Assigned);
+                        }
+                        else
+                        {
+                            throw new CssPropertyException($"Cannot read parent element property: {CssName}");
+                        }
                     }
                 }
                 else
@@ -301,7 +351,7 @@ namespace CssUI
             }
 
             // detect changes, fire events
-            if (ReferenceEquals(oldSpecified, null) || oldSpecified != _specified)
+            if (!oldSpecified.HasValue || oldSpecified != _specified)
             {// the computed value changed
                 oldSpecified.Set(_specified);
                 FireValueChangeEvent(ECssPropertyStage.Specified);
@@ -318,10 +368,21 @@ namespace CssUI
             {// The only thing that can make the computed value inherit, is being set to the INHERIT value
                 if(Specified.First().Type == EStyleDataType.INHERIT)
                 {
-                    var parentProperty = Owner.Parent?.Style.Cascaded.Get(CssName);
-                    if (parentProperty != null)
+                    if (ReferenceEquals(Owner.Parent, null))
+                    {// Root element
+                        _computed = new CssValueList(Definition.Initial);
+                    }
+                    else
                     {
-                        _computed = new CssValueList((parentProperty as CssMultiValueProperty).Specified);
+                        var parentProperty = Owner.Parent?.Style.Cascaded.Get(CssName);
+                        if (parentProperty != null)
+                        {
+                            _computed = new CssValueList((parentProperty as CssMultiValueProperty).Specified);
+                        }
+                        else
+                        {
+                            throw new CssPropertyException($"Cannot read parent element property: {CssName}");
+                        }
                     }
                 }
                 else
@@ -341,7 +402,7 @@ namespace CssUI
             }
 
             // detect changes, fire events
-            if (ReferenceEquals(oldComputed, null) || oldComputed != _computed)
+            if (!oldComputed.HasValue || oldComputed != _computed)
             {// the computed value changed
                 oldComputed.Set(_computed);
                 FireValueChangeEvent(ECssPropertyStage.Computed);
@@ -366,7 +427,7 @@ namespace CssUI
             }
 
             // detect changes, fire events
-            if (ReferenceEquals(oldUsed, null) || oldUsed != _used)
+            if (!oldUsed.HasValue || oldUsed != _used)
             {
                 oldUsed.Set(_used);
                 FireValueChangeEvent(ECssPropertyStage.Used);
@@ -391,7 +452,7 @@ namespace CssUI
             }
 
             // detect changes, fire events
-            if (ReferenceEquals(oldActual, null) || oldActual != _actual)
+            if (!oldActual.HasValue || oldActual != _actual)
             {
                 oldActual.Set(_actual);
                 FireValueChangeEvent(ECssPropertyStage.Actual);
@@ -404,11 +465,11 @@ namespace CssUI
         /// Overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
         /// </summary>
         /// <returns>Success</returns>
-        public override async Task<bool> CascadeAsync(ICssProperty prop)
+        public override bool Cascade(ICssProperty prop)
         {
             CssMultiValueProperty Property = prop as CssMultiValueProperty;
             bool changes = false;
-            if (Property.Assigned.FirstOrDefault().HasValue())
+            if (Property.Assigned.FirstOrDefault().HasValue)
             {
                 changes = true;
                 _assigned = new CssValueList(Property.Assigned);
@@ -419,7 +480,16 @@ namespace CssUI
             if (changes)
                 Update();
 
-            return await Task.FromResult(changes);
+            return changes;
+        }
+
+        /// <summary>
+        /// Overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
+        /// </summary>
+        /// <returns>Success</returns>
+        public override async Task<bool> CascadeAsync(ICssProperty prop)
+        {
+            return await Task.Factory.StartNew(() => Cascade(prop)).ConfigureAwait(continueOnCapturedContext: false);
         }
         #endregion
 
@@ -428,7 +498,7 @@ namespace CssUI
         /// Overwrites the assigned values of this instance with values from another if they are different
         /// </summary>
         /// <returns>Success</returns>
-        public override async Task<bool> OverwriteAsync(ICssProperty prop)
+        public override bool Overwrite(ICssProperty prop)
         {// Circumvents locking
             CssMultiValueProperty Property = prop as CssMultiValueProperty;
             bool changes = false;
@@ -445,6 +515,15 @@ namespace CssUI
                 Update();
             return changes;
         }
+
+        /// <summary>
+        /// Overwrites the assigned values of this instance with values from another if they are different
+        /// </summary>
+        /// <returns>Success</returns>
+        public override async Task<bool> OverwriteAsync(ICssProperty prop)
+        {
+            return await Task.Factory.StartNew(() => Overwrite(prop)).ConfigureAwait(continueOnCapturedContext: false);
+        }
         #endregion
 
         #region Updating
@@ -454,7 +533,33 @@ namespace CssUI
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
         public override void Update(bool ComputeNow = false)
         {
-            throw new NotImplementedException();
+            // unset our backing values so they can be updated...
+            _specified = null;
+            _computed = null;
+            _used = null;
+            _actual = null;
+
+            if (ReferenceEquals(oldAssigned, null) || oldAssigned != Assigned)
+            {
+                oldAssigned.Set(Assigned);
+                FireValueChangeEvent(ECssPropertyStage.Assigned);
+            }
+
+            if (ComputeNow)
+            {
+                Reinterpret_Specified();
+                // check if we should reinterpreted Computed aswell
+                if (ReferenceEquals(_computed, null))
+                    Reinterpret_Computed();
+
+                // check if we should reinterpreted Used aswell
+                if (ReferenceEquals(_used, null))
+                    Reinterpret_Used();
+
+                // check if we should reinterpreted Actual aswell
+                if (ReferenceEquals(_actual, null))
+                    Reinterpret_Actual();
+            }
         }
 
         /// <summary>
@@ -464,7 +569,8 @@ namespace CssUI
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
         public override void UpdateDependent(bool ComputeNow = false)
         {
-            throw new NotImplementedException();
+            if (this.IsDependent)
+                Update(ComputeNow);
         }
 
         /// <summary>
@@ -474,7 +580,8 @@ namespace CssUI
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
         public override void UpdateDependentOrAuto(bool ComputeNow = false)
         {
-            throw new NotImplementedException();
+            if (this.IsDependentOrAuto)
+                Update(ComputeNow);
         }
 
         /// <summary>
@@ -484,10 +591,11 @@ namespace CssUI
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
         public override void UpdatePercentageOrAuto(bool ComputeNow = false)
         {
-            throw new NotImplementedException();
+            if (this.IsPercentageOrAuto)
+                Update(ComputeNow);
         }
         #endregion
-        
+
         #region Unit Resolver
         /// <summary>
         /// Allows external code to notify this property that a certain unit type has changed scale and if we have a value which uses that unit-type we need to fire our Changed event because our Computed value will be different

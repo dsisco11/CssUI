@@ -62,8 +62,4 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="CSS PropertyDefs\" />
-  </ItemGroup>
-
 </Project>

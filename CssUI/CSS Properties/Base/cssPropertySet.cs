@@ -81,13 +81,18 @@ namespace CssUI
         public EnumProperty<EPositioning> Positioning => (EnumProperty<EPositioning>)this["positioning"];
         #endregion
 
+        #region Flow
+        public EnumProperty<ECssDirection> Direction => (EnumProperty<ECssDirection>)this["direction"];
+        public EnumProperty<EWritingMode> WritingMode => (EnumProperty<EWritingMode>)this["writing-mode"];
+        #endregion
+
         #region Replaced Element Properties
         public EnumProperty<EObjectFit> ObjectFit => (EnumProperty<EObjectFit>)this["object-fit"];
         public IntProperty ObjectPosition_X => (IntProperty)this["object-position-x"];
         public IntProperty ObjectPosition_Y => (IntProperty)this["object-position-y"];
-        public IntProperty Intrinsic_Width => (IntProperty)this["intrinsic-width"];
-        public IntProperty Intrinsic_Height => (IntProperty)this["intrinsic-height"];
-        public NumberProperty Intrinsic_Ratio => (NumberProperty)this["intrinsic-ratio"];
+        internal IntProperty Intrinsic_Width => (IntProperty)this["intrinsic-width"];
+        internal IntProperty Intrinsic_Height => (IntProperty)this["intrinsic-height"];
+        internal NumberProperty Intrinsic_Ratio => (NumberProperty)this["intrinsic-ratio"];
         #endregion
 
         #region Overflow
@@ -99,8 +104,8 @@ namespace CssUI
         public IntProperty Width => (IntProperty)this["width"];
         public IntProperty Height => (IntProperty)this["height"];
 
-        public IntProperty Content_Width => (IntProperty)this["content-width"];
-        public IntProperty Content_Height => (IntProperty)this["content-height"];
+        internal IntProperty Content_Width => (IntProperty)this["content-width"];
+        internal IntProperty Content_Height => (IntProperty)this["content-height"];
         #endregion
 
         #region Borders
@@ -130,11 +135,11 @@ namespace CssUI
         /// <summary>
         /// The maximum Width of an elements content-area
         /// </summary>
-        public IntProperty Max_Width => (IntProperty)this["max-width"];
+        public NullableIntProperty Max_Width => (NullableIntProperty)this["max-width"];
         /// <summary>
         /// The maximum Height of an elements content-area
         /// </summary>
-        public IntProperty Max_Height => (IntProperty)this["max-height"];
+        public NullableIntProperty Max_Height => (NullableIntProperty)this["max-height"];
         #endregion
 
         #region Position
@@ -231,7 +236,7 @@ namespace CssUI
         /// <summary>
         /// 'line-height' specifies the minimal height of line boxes within the element.
         /// </summary>
-        public IntProperty LineHeight => (IntProperty)this["line-height"];
+        public NumberProperty LineHeight => (NumberProperty)this["line-height"];
         #endregion
 
         #region Opacity
@@ -290,13 +295,15 @@ namespace CssUI
                 new IntProperty("bottom", Owner, selfRef, this.Locked),
                 new IntProperty("left", Owner, selfRef, this.Locked),
 
+                new EnumProperty<ECssDirection>("direction", Owner, selfRef, this.Locked),
+                new EnumProperty<EWritingMode>("writing-mode", Owner, selfRef, this.Locked),
                 new EnumProperty<EDisplayMode>("display", Owner, selfRef, this.Locked),
                 new EnumProperty<EBoxSizingMode>("box-sizing", Owner, selfRef, this.Locked),
                 new EnumProperty<EPositioning>("positioning", Owner, selfRef, this.Locked),
                 new EnumProperty<EOverflowMode>("overflow-x", Owner, selfRef, this.Locked),
                 new EnumProperty<EOverflowMode>("overflow-y", Owner, selfRef, this.Locked),
-
                 new EnumProperty<EObjectFit>("object-fit", Owner, selfRef, this.Locked),
+
                 new IntProperty("object-position-x", Owner, selfRef, this.Locked),
                 new IntProperty("object-position-y", Owner, selfRef, this.Locked),
                 new IntProperty("intrinsic-width", Owner, selfRef, this.Locked),
@@ -312,8 +319,8 @@ namespace CssUI
                 new IntProperty("min-width", Owner, selfRef, this.Locked),
                 new IntProperty("min-height", Owner, selfRef, this.Locked),
 
-                new IntProperty("max-width", Owner, selfRef, this.Locked),
-                new IntProperty("max-height", Owner, selfRef, this.Locked),
+                new NullableIntProperty("max-width", Owner, selfRef, this.Locked),
+                new NullableIntProperty("max-height", Owner, selfRef, this.Locked),
 
                 new IntProperty("margin-top", Owner, selfRef, this.Locked),
                 new IntProperty("margin-right", Owner, selfRef, this.Locked),
@@ -336,6 +343,7 @@ namespace CssUI
                 new IntProperty("border-bottom-width", Owner, selfRef, this.Locked),
                 new IntProperty("border-left-width", Owner, selfRef, this.Locked),
 
+
                 new EnumProperty<ETextAlign>("text-align", Owner, selfRef, this.Locked),
 
                 new NumberProperty("dpi-x", Owner, selfRef, this.Locked),
@@ -343,9 +351,9 @@ namespace CssUI
                 new IntProperty("font-weight", Owner, selfRef, this.Locked),
                 new EnumProperty<EFontStyle>("font-style", Owner, selfRef, this.Locked),
                 new NumberProperty("font-size", Owner, selfRef, this.Locked),
-                new StringProperty("font-family", Owner, selfRef, this.Locked),
+                new MultiStringProperty("font-family", Owner, selfRef, this.Locked),
 
-                new IntProperty("line-height", Owner, selfRef, this.Locked),
+                new NumberProperty("line-height", Owner, selfRef, this.Locked),
 
                 new NumberProperty("opacity", Owner, selfRef, this.Locked),
 
@@ -372,7 +380,7 @@ namespace CssUI
         /// <summary>
         /// A property which affects the elements block changed
         /// </summary>
-        public event Action<ECssPropertyStage, ICssProperty, EPropertyAffects, StackTrace> Property_Changed;
+        public event Action<ECssPropertyStage, ICssProperty, EPropertyDirtFlags, StackTrace> Property_Changed;
         #endregion
 
         #region Change Handlers
@@ -392,7 +400,7 @@ namespace CssUI
             var def = CssUI.Internal.CssProperties.Definitions[Property.CssName];
             if (def == null) throw new Exception(string.Concat("Cannot find a definition for Css property: \"", Property.CssName, "\""));
 
-            EPropertyAffects Flags = def.Flags;
+            EPropertyDirtFlags Flags = def.Flags;
             StackTrace Stack = null;
 #if DEBUG
             //stack = new StackTrace(STACK_FRAME_OFFSET, true);
@@ -486,22 +494,22 @@ namespace CssUI
         #endregion
 
         #region Setters
-        internal async Task Set(ICssProperty Property, ICssProperty Value)
+        internal void Set(ICssProperty Property, ICssProperty Value)
         {
             if (object.ReferenceEquals(Property, null))
                 throw new ArgumentNullException($"{nameof(Property)} cannot be null!");
 
-            await Set(Property.CssName, Value);
+            Set(Property.CssName, Value);
         }
 
-        internal async Task Set(AtomicString CssName, ICssProperty Value)
+        internal void Set(AtomicString CssName, ICssProperty Value)
         {
             if (object.ReferenceEquals(CssName, null))
                 throw new ArgumentNullException($"{nameof(CssName)} cannot be null!");
 
             if (this.CssPropertyMap.TryGetValue(CssName, out ICssProperty Property))
             {
-                await Property.OverwriteAsync(Value);
+                Property.Overwrite(Value);
                 return;
             }
 

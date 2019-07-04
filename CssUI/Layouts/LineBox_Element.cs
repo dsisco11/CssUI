@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace CssUI.Layout
 {
     /// <summary>
@@ -11,10 +6,10 @@ namespace CssUI.Layout
     /// </summary>
     public class LineBox_Element
     {
-        public ePos Pos;
+        public Vec2i Pos;
         public cssElement Element;
 
-        public LineBox_Element(cssElement Element, ePos Pos)
+        public LineBox_Element(cssElement Element, Vec2i Pos)
         {
             this.Pos = Pos;
             this.Element = Element;

@@ -32,17 +32,9 @@ namespace CssUI
         #endregion
 
         #region Blocks
-        public eSize Get_Layout_Area()
+        public Size2D Get_Layout_Area()
         {
-            // We need to account for if MaxSize is set to a real value and if so return it instead of this...
-            eSize retVal = new eSize(Block_Containing.Get_Size());
-            // We need to act like Block_Containing is our margin-block and find the size of our content-block
-            Block_Resize_Border_To_Content(ref retVal.Width, ref retVal.Height);
-
-            if (Style.Max_Width.HasValue) retVal.Width = Style.Max_Width.Value;
-            if (Style.Max_Height.HasValue) retVal.Height = Style.Max_Height.Value;
-
-            return retVal;
+            return Box.Content.Get_Dimensions();
         }
         
         #endregion
@@ -154,7 +146,7 @@ namespace CssUI
         public event Action<cssElement, cssElement> onControl_Added;
         public event Action<cssElement, cssElement> onControl_Removed;
 
-        protected override async void Handle_Style_Property_Change(ICssProperty Property, EPropertyAffects Flags, StackTrace Source)
+        protected override async void Handle_Style_Property_Change(ICssProperty Property, EPropertyDirtFlags Flags, StackTrace Source)
         {
             base.Handle_Style_Property_Change(Property, Flags, Source);
 
@@ -184,7 +176,7 @@ namespace CssUI
         /// </summary>
         protected override void Handle_Layout()
         {
-            eBlock Content_Bounds = null;
+            cssBoxArea Content_Bounds = null;
             // Layout all of our controls
             Content_Bounds = Get_Layout()?.Handle(this, Children.ToArray());
 
@@ -200,56 +192,37 @@ namespace CssUI
 
             // In the case where we had no layout object, find the area our controls occupy manually
             if (Content_Bounds == null) this.Get_Contents_Occupied_Area(out Content_Bounds);
-
-            Style.Set_Content_Width(Content_Bounds.Width);
-            Style.Set_Content_Height(Content_Bounds.Height);
-            /*
-            switch (Style.Display)
-            {
-                // Block elements size to fill up the entire width of their containing-block
-                case EDisplayMode.BLOCK:
-                    Style.Set_Content_Height(Content_Bounds.Height);
-                    break;
-                case EDisplayMode.INLINE_BLOCK:
-                    Style.Set_Content_Width(Content_Bounds.Width);
-                    Style.Set_Content_Height(Content_Bounds.Height);
-                    break;
-                // Inline elements size to their exact content dimensions by default, but not to the size of elements they contain...
-                case EDisplayMode.INLINE:
-                    //Set_Content_Block_Size(Content_Bounds.Width, Content_Bounds.Height);
-                    break;
-            }
-            */
+            Box.Min_Content = new Size2D(Content_Bounds.Width, Content_Bounds.Height);
             // Always try to update our block after this because we might have changed size due to our child-elements being positioned
-            if (Block.IsDirty) Update_Block();
+            Box.Rebuild();
         }
 
         /// <summary>
         /// Returns the area which our controls actually inhabit
         /// </summary>
         /// <param name="Contents_Block"></param>
-        protected void Get_Contents_Occupied_Area(out eBlock Contents_Block)
+        protected void Get_Contents_Occupied_Area(out cssBoxArea Contents_Block)
         {
             int? Left = null, Top = null;
             int? Right = null, Bottom = null;
             foreach (cssElement C in Children)
             {
-                if (!Left.HasValue) Left = C.Block.Left;
-                if (!Top.HasValue) Top = C.Block.Top;
-                if (!Right.HasValue) Right = C.Block.Right;
-                if (!Bottom.HasValue) Bottom = C.Block.Bottom;
+                if (!Top.HasValue) Top = C.Box.Top;
+                if (!Right.HasValue) Right = C.Box.Right;
+                if (!Bottom.HasValue) Bottom = C.Box.Bottom;
+                if (!Left.HasValue) Left = C.Box.Left;
 
-                Left = MathExt.Min(C.Block.Left, Left.Value);
-                Top = MathExt.Min(C.Block.Top, Top.Value);
-                Right = MathExt.Max(C.Block.Right, Right.Value);
-                Bottom = MathExt.Max(C.Block.Bottom, Bottom.Value);
+                Top = MathExt.Min(C.Box.Top, Top.Value);
+                Right = MathExt.Max(C.Box.Right, Right.Value);
+                Bottom = MathExt.Max(C.Box.Bottom, Bottom.Value);
+                Left = MathExt.Min(C.Box.Left, Left.Value);
             }
 
             int T = MathExt.Max(0, Top.HasValue ? Top.Value : 0);
             int R = MathExt.Max(0, Right.HasValue ? Right.Value : 0);
             int B = MathExt.Max(0, Bottom.HasValue ? Bottom.Value : 0);
             int L = MathExt.Max(0, Left.HasValue ? Left.Value : 0);
-            Contents_Block = eBlock.FromTRBL(T, R, B, L);
+            Contents_Block = new cssBoxArea(T, R, B, L);
         }
         #endregion
 
@@ -538,12 +511,12 @@ namespace CssUI
         /// <summary>
         /// Flags the blocks of all children who are dependent on us, as dirty
         /// </summary>
-        protected void Flag_All_Children(EBlockInvalidationReason Reason)
+        protected void Flag_All_Children(EBoxInvalidationReason Reason)
         {
             for (int i = 0; i < Children.Count; i++)
             {
                 var C = Children[i];
-                C.Flag_Block_Dirty(Reason);
+                C.Flag_Box_Dirty(Reason);
             }
         }
 
@@ -555,7 +528,7 @@ namespace CssUI
             for (int i = 0; i < Children.Count; i++)
             {
                 var C = Children[i];
-                C.Flag_Containing_Block_Dirty();
+                C.Handle_Containing_Block_Dirty();
             }
         }
 
@@ -568,9 +541,9 @@ namespace CssUI
         }
         */
 
-        public override void Flag_Block_Dirty(EBlockInvalidationReason Reason)
+        public override void Flag_Box_Dirty(EBoxInvalidationReason Reason)
         {
-            base.Flag_Block_Dirty(Reason);
+            base.Flag_Box_Dirty(Reason);
             Flag_Dependent_Children();
         }
 
@@ -592,11 +565,6 @@ namespace CssUI
             Flag_Dependent_Children();
         }
 
-        protected override void Handle_Content_Block_Change()
-        {
-            base.Handle_Content_Block_Change();
-            //Flag_All_Children(); // Redacted on 06-19-2017 "Why would child elements need to change their block because the parent's content-block changed?"
-        }
         #endregion
 
         #region Hit Testing
@@ -605,7 +573,7 @@ namespace CssUI
         /// Returns the element which intersects the given screen-space point or NULL if none
         /// </summary>
         /// <param name="pos">Screen-Space point to test for intersection with</param>
-        public override cssElement Get_Hit_Element(ePos pos)
+        public override cssElement Get_Hit_Element(Vec2i pos)
         {
             for (int i = Children.Count; i > 0; i--)// Traverse backwards to obey drawing order
             {
@@ -624,7 +592,7 @@ namespace CssUI
         /// </summary>
         /// <param name="pos"></param>
         /// <returns></returns>
-        List<cssElement> Get_Children_Hit(ePos pos)
+        List<cssElement> Get_Children_Hit(Vec2i pos)
         {
             List<cssElement> list = new List<cssElement>();
             for (int i = Children.Count; i > 0; i--)// Traverse backwards to obey drawing order

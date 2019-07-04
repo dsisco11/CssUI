@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace CssUI
 {
     /// <summary>
@@ -11,6 +6,6 @@ namespace CssUI
     /// </summary>
     public interface ILayoutDirector
     {
-        eBlock Handle(IParentElement parent, cssElement[] list);
+        cssBoxArea Handle(IParentElement parent, cssElement[] list);
     }
 }

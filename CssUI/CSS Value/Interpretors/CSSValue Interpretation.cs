@@ -18,7 +18,7 @@ namespace CssUI.CSS
             CssPropertyDefinition Def = Property.Definition;
 
             // CSS specs say if the cascade (assigned) resulted in a value, use it.
-            if (!this.IsNull())
+            if (!this.IsNull)
             {
                 switch (this.Type)
                 {
@@ -88,12 +88,16 @@ namespace CssUI.CSS
             // Resolve any relative values
             switch (this.Type)
             {
+                case EStyleDataType.INHERIT:// SEE:  https://www.w3.org/TR/CSS2/cascade.html#value-def-inherit
+                    {
+                        return Property.Find_Inherited_Value();
+                    }
+                    break;
                 case EStyleDataType.PERCENT:
                     {
                         if (Def.Percentage_Resolver != null)
                         {
-                            double resolved = this.Resolve(null, (double Pct) => Def.Percentage_Resolver(Property.Owner, Pct)).Value;
-                            return CssValue.From_Number(resolved);
+                            return Def.Percentage_Resolver(Property.Owner, (double)this.Value);
                         }
                     }
                     break;
@@ -104,11 +108,6 @@ namespace CssUI.CSS
                         {
                             return CssValue.From_Number(nv.Value);
                         }
-                    }
-                    break;
-                case EStyleDataType.INHERIT:// SEE:  https://www.w3.org/TR/CSS2/cascade.html#value-def-inherit
-                    {
-                        return Property.Find_Inherited_Value();
                     }
                     break;
             }

@@ -51,6 +51,10 @@ namespace CssUI
         #endregion
 
         #region Accessors
+        /// <summary>
+        /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
+        /// </summary>
+        public virtual bool IsAuto { get => false; }
         public bool HasValue { get => (Transforms.Count > 0); }
         public bool IsInherited { get => false; }// A transform property CANNOT be inherited.
         /// <summary>
@@ -86,7 +90,7 @@ namespace CssUI
         /// Overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
         /// </summary>
         /// <returns>Success</returns>
-        public async Task<bool> CascadeAsync(ICssProperty prop)
+        public bool Cascade(ICssProperty prop)
         {// Circumvents locking
             TransformListProperty o = prop as TransformListProperty;
             bool changes = false;
@@ -99,12 +103,30 @@ namespace CssUI
             }
 
             if (changes) Update();
-            return await Task.FromResult(changes);
+            return changes;
+        }
+
+        /// <summary>
+        /// Overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
+        /// </summary>
+        /// <returns>Success</returns>
+        public async Task<bool> CascadeAsync(ICssProperty prop)
+        {
+            return await Task.Factory.StartNew(() => Cascade(prop));
         }
 
         #endregion
 
         #region Overwrite
+
+        /// <summary>
+        /// Overwrites the assigned value of this instance with values from another if they are different
+        /// </summary>
+        /// <returns>Success</returns>
+        public bool Overwrite(ICssProperty prop)
+        {
+            return false;
+        }
 
         /// <summary>
         /// Overwrites the assigned value of this instance with values from another if they are different

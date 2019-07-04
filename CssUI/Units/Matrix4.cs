@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Numerics;
 
-namespace CssUI.Internal
+namespace CssUI
 {
     public class Matrix4
     {
@@ -92,6 +92,13 @@ namespace CssUI.Internal
             Data[12] = p.X;
             Data[13] = p.Y;
             Data[14] = p.Z;
+        }
+
+        public void Set_Translation(float X, float Y, float Z)
+        {
+            Data[12] = X;
+            Data[13] = Y;
+            Data[14] = Z;
         }
         #endregion
 

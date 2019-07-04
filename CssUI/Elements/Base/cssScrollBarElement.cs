@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using CssUI.CSS;
 using CssUI.Enums;
 
@@ -90,7 +89,7 @@ namespace CssUI
             {
                 case ESliderDirection.Vertical:
                     {
-                        int size = Calculate_Thumb_Size(Track.ValueMax, Viewport.Block.Height, Track.Block.Height);
+                        int size = Calculate_Thumb_Size(Track.ValueMax, Viewport.Area.Height, Track.Box.Height);
                         //Track.Thumb.Style.ImplicitRules.Width.Set(null);
                         Track.Thumb.Style.ImplicitRules.Height.Set(size);
                         PageLength = (int)(Track.ValuePerPixel * size);
@@ -98,7 +97,7 @@ namespace CssUI
                     break;
                 case ESliderDirection.Horizontal:
                     {
-                        int size = Calculate_Thumb_Size(Track.ValueMax, Viewport.Block.Width, Track.Block.Width);
+                        int size = Calculate_Thumb_Size(Track.ValueMax, Viewport.Area.Width, Track.Box.Width);
                         Track.Thumb.Style.ImplicitRules.Width.Set(size);
                         //Track.Thumb.Style.ImplicitRules.Height.Set(null);
                         PageLength = (int)(Track.ValuePerPixel * size);
@@ -109,11 +108,14 @@ namespace CssUI
         }
         #endregion
 
+
         #region Constructors
         public cssScrollBarElement(IParentElement Parent, ESliderDirection Dir = ESliderDirection.Unset, string className = null, string ID = null) : base(Parent, className, ID)
         {
             Flags_Remove(EElementFlags.DoubleClickable);
             Layout = ELayoutMode.None;
+            Box.onChange += Handle_Box_Change;
+
             Style.ImplicitRules.Positioning.Value = EPositioning.Fixed;
             // Just so our scrollbars dont have scrollbars by some chance.
             Style.ImplicitRules.Overflow_X.Value = EOverflowMode.Clip;
@@ -179,6 +181,7 @@ namespace CssUI
         }
         #endregion
 
+
         #region Drawing
         public override bool Update()
         {
@@ -222,8 +225,8 @@ namespace CssUI
 
         private void Track_onMouseClick(cssElement Sender, DomMouseButtonEventArgs Args)
         {// Whenever the track of the scrollbar is clicked we want to scroll a page-length toward the clicked location on the track
-            int rcPos = Track.Get_Major_Dimension(Track.PointToLocal(new ePos(Args.Position)));
-            int rtPos = Track.Get_Major_Dimension(Track.PointToLocal(Track.Thumb.Block.Get_Center_Pos()));
+            int rcPos = Track.Get_Major_Dimension(Track.PointToLocal(new Vec2i(Args.Position)));
+            int rtPos = Track.Get_Major_Dimension(Track.PointToLocal(Track.Thumb.Box.Margin.Get_Center_Pos()));
             int dir = MathExt.Clamp(rcPos - rtPos, -1, 1);
 
             if (dir < 0) PageUp();
@@ -237,9 +240,8 @@ namespace CssUI
         #endregion
 
         #region Update
-        protected override void Update_Cached_Blocks()
+        private void Handle_Box_Change(ECssBoxArea obj)
         {
-            base.Update_Cached_Blocks();
             Dirty_Thumb = true;
             Update_Track();
             Update_Thumb();
@@ -251,14 +253,14 @@ namespace CssUI
             {
                 case ESliderDirection.Vertical:
                     {
-                        int h = Block_Content.Height - (Btn_dec.Block.Height + Btn_inc.Block.Height);
+                        int h = Box.Content.Height - (Btn_dec.Box.Height + Btn_inc.Box.Height);
                         //Track.Size.Set(null, h);
                         Track.Style.UserRules.Height.Set(h);
                     }
                     break;
                 case ESliderDirection.Horizontal:
                     {
-                        int w = Block_Content.Width - (Btn_dec.Block.Width + Btn_inc.Block.Width);
+                        int w = Box.Content.Width - (Btn_dec.Box.Width + Btn_inc.Box.Width);
                         //Track.Size.Set(w, null);
                         Track.Style.UserRules.Width.Set(w);
                     }
@@ -276,15 +278,15 @@ namespace CssUI
                 case ESliderDirection.Vertical:
                     {
                         Btn_dec.Style.UserRules.Set_Position(0, 0);
-                        Track.Style.UserRules.Set_Position(0, Btn_dec.Block.Height);
-                        Btn_inc.Style.UserRules.Set_Position(0, Track.Block.Bottom);
+                        Track.Style.UserRules.Set_Position(0, Btn_dec.Box.Height);
+                        Btn_inc.Style.UserRules.Set_Position(0, Track.Box.Bottom);
                     }
                     break;
                 case ESliderDirection.Horizontal:
                     {
                         Btn_dec.Style.UserRules.Set_Position(0, 0);
-                        Track.Style.UserRules.Set_Position(Btn_dec.Block.Width, 0);
-                        Btn_inc.Style.UserRules.Set_Position(Track.Block.Right, 0);
+                        Track.Style.UserRules.Set_Position(Btn_dec.Box.Width, 0);
+                        Btn_inc.Style.UserRules.Set_Position(Track.Box.Right, 0);
                     }
                     break;
             }

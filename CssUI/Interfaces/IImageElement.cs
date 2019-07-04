@@ -15,6 +15,6 @@ namespace CssUI
         /// <summary>
         /// Size of the current image
         /// </summary>
-        eSize Image_Size { get; }
+        Size2D Image_Size { get; }
     }
 }

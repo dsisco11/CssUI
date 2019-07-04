@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace CssUI
 {
     /// <summary>
@@ -20,11 +15,11 @@ namespace CssUI
         /// The element currently being dragged by the mouse
         /// </summary>
         public cssElement Dragging_Target { get; private set; } = null;
-        public ePos Drag_Start { get; private set; } = null;
+        public Vec2i Drag_Start { get; private set; } = null;
         /// <summary>
         /// Tracks the current location the mouse
         /// </summary>
-        public ePos Location = new ePos();
+        public Vec2i Location = new Vec2i(0,0);
         #endregion
 
         /// <summary>

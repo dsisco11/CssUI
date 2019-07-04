@@ -66,13 +66,13 @@ namespace CssUI
 
         #region Matrix
 
-        public eMatrix Matrix { get { return Stack.Matrix; } }
+        public Matrix4 Matrix { get { return Stack.Matrix; } }
         
         /// <summary>
         /// Sets the latest matrix value in the stack.
         /// </summary>
         /// <param name="Matrix"></param>
-        public virtual void Set_Matrix(eMatrix Matrix)
+        public virtual void Set_Matrix(Matrix4 Matrix)
         {
             Stack.Set_Matrix(Matrix, false);
             Finalize_Matrix();
@@ -86,7 +86,7 @@ namespace CssUI
         /// <summary>
         /// Uploads the current matrix value to whatever system is doing the rendering, be it DirectX, OpenGL, Vulkan, D3D, etc.
         /// </summary>
-        public abstract void Upload_Matrix(eMatrix Matrix);
+        public abstract void Upload_Matrix(Matrix4 Matrix);
         #endregion
         
         #region Blending
@@ -152,7 +152,7 @@ namespace CssUI
         /// <param name="Data">Pixel data for the texture</param>
         /// <param name="Size">Pixel dimensions of the texture</param>
         /// <param name="Format">Format for the pixels in Data</param>
-        public abstract object Create_Texture(byte[] Data, eSize Size, EPixelFormat Format);
+        public abstract object Create_Texture(byte[] Data, Size2D Size, EPixelFormat Format);
         /// <summary>
         /// Destroy a texture, ensuring it cannot be used again unless recreated.
         /// </summary>
@@ -180,15 +180,15 @@ namespace CssUI
         /// Outlines a rectangular area with the currently set color
         /// </summary>
         /// <param name="LineThickness">Thickness of the line in pixels</param>
-        /// <param name="block">An element block which describes the rectangular area</param>
-        public abstract void Draw_Rect(int LineThickness, eBlock block);
+        /// <param name="Rect">A rectangular area</param>
+        public abstract void Draw_Rect(int LineThickness, cssRect Rect);
         /// <summary>
         /// Outlines a rectangular area with the currently set color
         /// </summary>
         /// <param name="LineThickness">Thickness of the line in pixels</param>
         /// <param name="pos">Origin location of the area</param>
         /// <param name="size">Size of the area</param>
-        public abstract void Draw_Rect(int LineThickness, ePos Pos, eSize Size);
+        public abstract void Draw_Rect(int LineThickness, Vec2i Pos, Size2D Size);
         /// <summary>
         /// Outlines a rectangular area with the currently set color
         /// </summary>
@@ -236,14 +236,14 @@ namespace CssUI
         /// <summary>
         /// Fills a rectangular area with the currently set color
         /// </summary>
-        /// <param name="block">An element block which describes the rectangular area</param>
-        public abstract void Fill_Rect(eBlock block);
+        /// <param name="Rect">A  rectangular area</param>
+        public abstract void Fill_Rect(cssRect Rect);
         /// <summary>
         /// Fills a rectangular area with the currently set color
         /// </summary>
         /// <param name="pos">Origin location of the area</param>
         /// <param name="size">Size of the area</param>
-        public abstract void Fill_Rect(ePos Pos, eSize Size);
+        public abstract void Fill_Rect(Vec2i Pos, Size2D Size);
         /// <summary>
         /// Fills a rectangular area with the currently set color
         /// </summary>

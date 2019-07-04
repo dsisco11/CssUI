@@ -69,9 +69,8 @@ namespace CssUI
 #if ENABLE_SVG
                 Svg = SvgDocument.Open<SvgDocument>(stream);
                 Dirty_Texture = true;
-                Set_Intrinsic_Size((int)Svg.Bounds.Width, (int)Svg.Bounds.Height);
-                Style.Set_Content_Width((int)Svg.Bounds.Width);
-                Style.Set_Content_Height((int)Svg.Bounds.Height);
+                Box.Set_Intrinsic_Size((int)Svg.Bounds.Width, (int)Svg.Bounds.Height);
+                Box.Set_Content_Size((int)Svg.Bounds.Width, (int)Svg.Bounds.Height);
 #endif
             }
         }
@@ -82,9 +81,8 @@ namespace CssUI
             Svg = null;
 #endif
             Texture = null;
-            Set_Intrinsic_Size(0, 0);
-            Style.Set_Content_Width(0);
-            Style.Set_Content_Height(0);
+            Box.Set_Intrinsic_Size(null, null);
+            Box.Set_Content_Size(null, null);
         }
 #endregion
 

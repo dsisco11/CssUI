@@ -96,8 +96,8 @@ namespace CssUI
             get
             {
                 if (_specified == null)
-                {
-                    Reinterpret_Specified();
+                {// Whomever is asking for this value obviously didnt want the later ones yet, also properties used-value resolution can access early stages of other properties
+                    Reinterpret_Specified(false);
                 }
 
                 return _specified;
@@ -113,8 +113,8 @@ namespace CssUI
             get
             {
                 if (_computed == null)
-                {
-                    Reinterpret_Computed();
+                {// Whomever is asking for this value obviously didnt want the later ones yet, also properties used-value resolution can access early stages of other properties
+                    Reinterpret_Computed(false);
                 }
 
                 return _computed;
@@ -129,8 +129,8 @@ namespace CssUI
             get
             {
                 if (_used == null)
-                {
-                    Reinterpret_Used();
+                {// Whomever is asking for this value obviously didnt want the later ones yet, also properties used-value resolution can access early stages of other properties
+                    Reinterpret_Used(false);
                 }
 
                 return _used;
@@ -157,7 +157,14 @@ namespace CssUI
 
         #region Accessors
 
-        public override bool HasValue { get => !Assigned.IsNull(); }
+        /// <summary>
+        /// Returns TRUE if the <see cref="Assigned"/> value is non-null
+        /// </summary>
+        public override bool HasValue { get => !Assigned.HasValue; }
+        /// <summary>
+        /// Returns TRUE if the <see cref="Assigned"/> value is <see cref="EStyleDataType.NONE"/>
+        /// </summary>
+        public override bool IsNone { get => (Assigned.Type == EStyleDataType.NONE); }
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// </summary>
@@ -194,12 +201,28 @@ namespace CssUI
         }
         #endregion
 
+        #region Reverting
+        /// <summary>
+        /// Causes this property to revert back to the computed stage such that it must re-interpret its Used and Actual values.
+        /// </summary>
+        /// <param name="suppress">Suppresses any change event from firing once the Used value gets re-interpreted</param>
+        internal override void Revert(bool suppress=false)
+        {
+            _used = null;
+            _actual = null;
+
+            if (suppress)
+                oldUsed.Set(null);
+        }
+        #endregion
+
         #region Interpreting
 
         /// <summary>
         /// Reinterprets our <see cref="Specified"/> value
         /// </summary>
-        private void Reinterpret_Specified()
+        /// <param name="Auto_Interpret_Next">Determines whether the next value stage will also be re-interpreted if the current stage changes due to this re-interpretation</param>
+        private void Reinterpret_Specified(bool Auto_Interpret_Next = true)
         {
             _specified = Assigned.Derive_SpecifiedValue(this);
             // detect changes, fire events
@@ -213,7 +236,8 @@ namespace CssUI
             }
         }
 
-        private void Reinterpret_Computed()
+        /// <param name="Auto_Interpret_Next">Determines whether the next value stage will also be re-interpreted if the current stage changes due to this re-interpretation</param>
+        private void Reinterpret_Computed(bool Auto_Interpret_Next = true)
         {
             _computed = Specified.Derive_ComputedValue(this);
             // detect changes, fire events
@@ -227,7 +251,8 @@ namespace CssUI
             }
         }
 
-        private void Reinterpret_Used()
+        /// <param name="Auto_Interpret_Next">Determines whether the next value stage will also be re-interpreted if the current stage changes due to this re-interpretation</param>
+        private void Reinterpret_Used(bool Auto_Interpret_Next = true)
         {
             _used = Computed.Derive_UsedValue(this);
             // detect changes, fire events
@@ -252,29 +277,7 @@ namespace CssUI
             }
         }
         #endregion
-
-        /*#region Inherited Value
-        /// <summary>
-        /// Returns the inherited value from the properties owners parent element
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override CssValue Find_Inherited_Value()
-        {
-            if (Owner is cssRootElement)
-            {// Root elements cannot inherit, they use the INITIAL value
-                return new CssValue(Definition.Initial);
-            }
-            else
-            {// Take our parents computed value
-                ICssProperty prop = Owner.Parent.Style.Cascaded.Get(CssName);
-                if (prop != null)
-                    return new CssValue((prop as CssProperty).Computed);
-                else
-                    return null;
-            }
-        }
-        #endregion*/
-
+        
         #region Unit Resolver
         /// <summary>
         /// Allows external code to notify this property that a certain unit type has changed scale and if we have a value which uses that unit-type we need to fire our Changed event because our Computed value will be different
@@ -294,11 +297,11 @@ namespace CssUI
         /// </summary>
         /// <returns>Success</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override async Task<bool> CascadeAsync(ICssProperty prop)
+        public override bool Cascade(ICssProperty prop)
         {// Circumvents locking
             CssProperty o = prop as CssProperty;
             bool changes = false;
-            if (o.Assigned.HasValue())
+            if (o.Assigned.HasValue)
             {
                 changes = true;
                 // Don't make a copy of the value, they are readonly anyhow
@@ -310,7 +313,17 @@ namespace CssUI
             }
 
             if (changes) Update();
-            return await Task.FromResult(changes);
+            return changes;
+        }
+
+        /// <summary>
+        /// Overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
+        /// </summary>
+        /// <returns>Success</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override async Task<bool> CascadeAsync(ICssProperty prop)
+        {
+            return await Task.Factory.StartNew(() => Cascade(prop)).ConfigureAwait(continueOnCapturedContext: false);
         }
         #endregion
 
@@ -320,7 +333,7 @@ namespace CssUI
         /// </summary>
         /// <returns>Success</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override async Task<bool> OverwriteAsync(ICssProperty prop)
+        public override bool Overwrite(ICssProperty prop)
         {
             CssProperty o = prop as CssProperty;
             bool changes = false;
@@ -336,7 +349,17 @@ namespace CssUI
             }
 
             if (changes) Update();
-            return await Task.FromResult(changes);
+            return changes;
+        }
+
+        /// <summary>
+        /// Overwrites the assigned value of this instance with values from another if they are different
+        /// </summary>
+        /// <returns>Success</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override async Task<bool> OverwriteAsync(ICssProperty prop)
+        {
+            return await Task.Factory.StartNew(() => Overwrite(prop)).ConfigureAwait(continueOnCapturedContext: false);
         }
         #endregion
 
@@ -354,7 +377,7 @@ namespace CssUI
 
         #region Updating
         /// <summary>
-        /// Resets all values back to the Assigned and then recomputes them later
+        /// Resets all values back to the Declared and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
         public override void Update(bool ComputeNow = false)
@@ -389,8 +412,8 @@ namespace CssUI
         }
 
         /// <summary>
-        /// If the Assigned value is one that depends on another value for its final value then
-        /// Resets all values back to the Assigned and then recomputes them later
+        /// If the Declared value is one that depends on another value for its final value then
+        /// Resets all values back to the Declared and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
         public override void UpdateDependent(bool ComputeNow = false)
@@ -400,8 +423,8 @@ namespace CssUI
         }
 
         /// <summary>
-        /// If the Assigned value is one that depends on another value for its final value OR is <see cref="CssValue.Auto"/> then
-        /// Resets all values back to the Assigned and then recomputes them later
+        /// If the Declared value is one that depends on another value for its final value OR is <see cref="CssValue.Auto"/> then
+        /// Resets all values back to the Declared and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
         public override void UpdateDependentOrAuto(bool ComputeNow = false)
@@ -411,8 +434,8 @@ namespace CssUI
         }
 
         /// <summary>
-        /// If the Assigned value is a percentage OR is <see cref="CssValue.Auto"/> then
-        /// Resets all values back to the Assigned and then recomputes them later
+        /// If the Declared value is a percentage OR is <see cref="CssValue.Auto"/> then
+        /// Resets all values back to the Declared and then recomputes them later
         /// </summary>
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
         public override void UpdatePercentageOrAuto(bool ComputeNow = false)
@@ -433,6 +456,15 @@ namespace CssUI
             {
                 Assigned = DeclaredValue;
             }
+        }
+
+        /// <summary>
+        /// Sets the used value without 
+        /// </summary>
+        /// <param name="UsedValue"></param>
+        internal void Set_Used(CssValue UsedValue)
+        {
+
         }
         #endregion
 

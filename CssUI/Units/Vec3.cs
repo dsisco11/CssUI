@@ -1,5 +1,5 @@
 ﻿
-namespace CssUI.Internal
+namespace CssUI
 {
     public class Vec3
     {

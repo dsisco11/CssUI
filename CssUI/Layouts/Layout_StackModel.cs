@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace CssUI
 {
     /// <summary>
@@ -18,7 +13,7 @@ namespace CssUI
         #endregion
 
 
-        public override eBlock Handle(IParentElement Owner, cssElement[] controls)
+        public override cssBoxArea Handle(IParentElement Owner, cssElement[] controls)
         {
             Reset();
 
@@ -28,11 +23,10 @@ namespace CssUI
                 if (!E.Affects_Layout) continue;
 
                 // Get the elements bounds
-                var cBlock = E.Peek_Block();
-                var cSize = cBlock.Get_Size();// E.Get_Layout_Size();
+                var cSize = E.Box.Content.Get_Dimensions();
 
                 // Add the current element to our line
-                Add_To_Line(E, cBlock, cSize);
+                Add_To_Line(E, E.Box.Content, cSize);
                 Start_New_Line();
             }
 

@@ -51,6 +51,10 @@ namespace CssUI
         /// Returns whether or not the property has a set value that should take affect during cascading.
         /// </summary>
         bool HasValue { get; }
+        /// <summary>
+        /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
+        /// </summary>
+        bool IsAuto { get; }
 
         /// <summary>
         /// Returns TRUE if the assigned value is <see cref="CssValue.Inherit"/>
@@ -82,6 +86,12 @@ namespace CssUI
 
         #region Cascading
         /// <summary>
+        /// Overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
+        /// </summary>
+        /// <returns>Success</returns>
+        bool Cascade(ICssProperty value);
+
+        /// <summary>
         /// Asynchronously overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
         /// </summary>
         /// <returns>Success</returns>
@@ -89,6 +99,12 @@ namespace CssUI
         #endregion
 
         #region Overwriting
+        /// <summary>
+        /// Overwrites the assigned value of this instance with values from another if they are different
+        /// </summary>
+        /// <returns>Success</returns>
+        bool Overwrite(ICssProperty value);
+
         /// <summary>
         /// Asynchronously overwrites the assigned value of this instance with values from another if they are different
         /// </summary>

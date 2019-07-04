@@ -21,7 +21,7 @@ namespace CssUI
             if (Color != null)
             {
                 Root.Engine.Set_Color(Color);
-                Root.Engine.Fill_Rect(Block_Content);
+                Root.Engine.Fill_Rect(Box.Content.Edge);
             }
         }
         #endregion

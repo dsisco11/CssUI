@@ -103,7 +103,12 @@ namespace CssUI
             if (!History.ContainsKey(Name))
             {
                 if (!History.TryAdd(Name, new List<double>(100)))
-                    throw new Exception("Unable to add key to benchmark history!");
+                {// maybe another thread added this key?
+                    if (!History.ContainsKey(Name))
+                    {
+                        throw new Exception("Unable to add key to benchmark history!");
+                    }
+                }
             }
 
             History[Name].Add(Timer.Elapsed.TotalSeconds);

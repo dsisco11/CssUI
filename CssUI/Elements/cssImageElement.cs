@@ -19,24 +19,20 @@ namespace CssUI
             Texture = Tex;
             if (Texture == null)
             {
-                Set_Intrinsic_Size(0, 0);
-                Style.UserRules.Content_Width.Set(0);
-                Style.UserRules.Content_Height.Set(0);
-                Style.Set_Content_Width(0);
-                Style.Set_Content_Height(0);
+                Box.Set_Intrinsic_Size(null, null);
+                Box.Set_Content_Size(null, null);
             }
             else
             {
-                Set_Intrinsic_Size(Texture.Size.Width, Texture.Size.Height);
-                Style.Set_Content_Width(Texture.Size.Width);
-                Style.Set_Content_Height(Texture.Size.Height);
+                Box.Set_Intrinsic_Size(Texture.Size.Width, Texture.Size.Height);
+                Box.Set_Content_Size(Texture.Size.Width, Texture.Size.Height);
             }
         }
 
         /// <summary>
         /// Size of the current image
         /// </summary>
-        public eSize Image_Size { get { return new eSize(Texture.Size); } }
+        public Size2D Image_Size { get { return new Size2D(Texture.Size); } }
         #endregion
 
         #region Constructors

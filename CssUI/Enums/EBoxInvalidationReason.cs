@@ -6,7 +6,7 @@ namespace CssUI
     /// Specifies all of the reasons for which a cssElement's block may be flagged as dirty.
     /// </summary>
     [Flags]
-    public enum EBlockInvalidationReason : ushort
+    public enum EBoxInvalidationReason : ushort
     {
         /// <summary>
         /// This block is still valid
@@ -39,5 +39,9 @@ namespace CssUI
         /// A property value affecting the block changed
         /// </summary>
         Property_Changed = (1 << 7),
+        /// <summary>
+        /// The contents of the elemnt have changed
+        /// </summary>
+        Content_Changed = (1 << 8),
     }
 }

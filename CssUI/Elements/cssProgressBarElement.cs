@@ -34,7 +34,7 @@ namespace CssUI
 
         void update_bar()
         {
-            int bWidth = (int)((float)Block.Width * value);
+            int bWidth = (int)((float)Box.Width * value);
             bar.Style.ImplicitRules.Width.Set(bWidth);
         }
         

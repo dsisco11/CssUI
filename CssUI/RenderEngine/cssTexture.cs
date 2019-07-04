@@ -48,7 +48,7 @@ namespace CssUI
         /// <summary>
         /// Size of the current texture
         /// </summary>
-        public readonly eSize Size = eSize.Zero;
+        public readonly Size2D Size = Size2D.Zero;
         #endregion
 
         #region Constructors
@@ -60,7 +60,7 @@ namespace CssUI
         {
         }
 
-        public cssTexture(byte[] Data, eSize Size, EPixelFormat Format)
+        public cssTexture(byte[] Data, Size2D Size, EPixelFormat Format)
         {
             this.Size = Size;
             Push_Frame(Data, Size, Format);
@@ -68,7 +68,7 @@ namespace CssUI
 
         internal cssTexture(Image<Rgba32> image)
         {
-            this.Size = new eSize(image.Width, image.Height);
+            this.Size = new Size2D(image.Width, image.Height);
 
             if (image.Frames.Count > 1)
             {
@@ -88,14 +88,14 @@ namespace CssUI
                     finally
                     {
                         byte[] rgbaBytes = MemoryMarshal.AsBytes(frame.GetPixelSpan()).ToArray();
-                        Push_Frame(rgbaBytes, new eSize(frame.Width, frame.Height), EPixelFormat.RGBA, (delay / 1000.0f));
+                        Push_Frame(rgbaBytes, new Size2D(frame.Width, frame.Height), EPixelFormat.RGBA, (delay / 1000.0f));
                     }
                 }
             }
             else
             {
                 byte[] rgbaBytes = MemoryMarshal.AsBytes(image.GetPixelSpan()).ToArray();
-                Push_Frame(rgbaBytes, new eSize(image.Width, image.Height), EPixelFormat.RGBA);
+                Push_Frame(rgbaBytes, new Size2D(image.Width, image.Height), EPixelFormat.RGBA);
             }
         }
         #endregion
@@ -122,7 +122,7 @@ namespace CssUI
         #endregion
 
         #region Frame Pushing
-        public void Push_Frame(byte[] Data, eSize Size, EPixelFormat Format, float Time = 0f)
+        public void Push_Frame(byte[] Data, Size2D Size, EPixelFormat Format, float Time = 0f)
         {
             FrameAtlas.Add(new cssTextureFrame(Data, Size, Format) { Duration = Time });
             Build_Timeline();
@@ -228,7 +228,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public cssTextureFrame(byte[] Data, eSize Size, EPixelFormat Format)
+        public cssTextureFrame(byte[] Data, Size2D Size, EPixelFormat Format)
         {
             this.Format = Format;
             this.Data = Data;

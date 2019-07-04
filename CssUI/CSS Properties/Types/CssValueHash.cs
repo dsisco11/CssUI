@@ -1,4 +1,5 @@
 ﻿using CssUI.CSS;
+using System;
 
 namespace CssUI.Internal
 {
@@ -8,6 +9,11 @@ namespace CssUI.Internal
     public class CssValueHash
     {
         #region Properties
+        /// <summary>
+        /// Tracks if this hash has been set
+        /// </summary>
+        public bool HasValue { get; private set; } = false;
+
         public int Hash { get; private set; } = 0;
         
         /// <summary>
@@ -30,6 +36,9 @@ namespace CssUI.Internal
         #region Casts
         public void Set(object Value)
         {
+            if (ReferenceEquals(Value, null)) throw new ArgumentNullException();
+
+            HasValue = true;
             this.Hash = Value.GetHashCode();
             ChangeCount++;
         }
@@ -38,12 +47,12 @@ namespace CssUI.Internal
         #region Operators
         public static bool operator == (CssValueHash Hash, object o)
         {
-            return Hash.Hash == o.GetHashCode();
+            return !ReferenceEquals(o, null) && Hash.Hash == o.GetHashCode();
         }
 
         public static bool operator !=(CssValueHash Hash, object o)
         {
-            return Hash.Hash != o.GetHashCode();
+            return  ReferenceEquals(o, null) || Hash.Hash != o.GetHashCode();
         }
 
         public override int GetHashCode()

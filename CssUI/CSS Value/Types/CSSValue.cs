@@ -59,6 +59,36 @@ namespace CssUI.CSS
         public readonly EStyleUnit Unit = EStyleUnit.None;
         #endregion
 
+        #region Accessors
+        public bool IsAuto => (this.Type == EStyleDataType.AUTO);
+        /// <summary>
+        /// Returns whether or our value is a definite Number or Integer
+        /// </summary>
+        public bool IsDefinite => (0 != (this.Type & (EStyleDataType.INTEGER | EStyleDataType.NUMBER)));
+
+        /// <summary>
+        /// Returns whether the value type is <see cref="EStyleDataType.NULL"/>
+        /// </summary>
+        public bool IsNull => (this.Type == EStyleDataType.NULL);
+
+        /// <summary>
+        /// Returns whether there is actually a set value
+        /// </summary>
+        public bool HasValue
+        {
+            get
+            {
+                if (this.Type == EStyleDataType.NULL)
+                    return false;
+
+                if (ReferenceEquals(this.Value, null))
+                    return false;
+
+                return true;
+            }
+        }
+        #endregion
+
         /// <summary>
         /// Interprets the given string as a dimension specifier
         /// </summary>
@@ -690,28 +720,6 @@ namespace CssUI.CSS
         }
 
         #endregion
-
-        /// <summary>
-        /// Returns whether the value type is <see cref="EStyleDataType.NULL"/>
-        /// </summary>
-        public bool IsNull()
-        {
-            return (this.Type == EStyleDataType.NULL);
-        }
-
-        /// <summary>
-        /// Returns whether there is actually a set value
-        /// </summary>
-        public bool HasValue()
-        {
-            if (this.Type == EStyleDataType.NULL)
-                return false;
-
-            if (ReferenceEquals(this.Value, null))
-                return false;
-
-            return true;
-        }
     }
 
 }

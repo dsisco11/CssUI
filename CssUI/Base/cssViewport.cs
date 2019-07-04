@@ -10,14 +10,14 @@ namespace CssUI
     public class cssViewport
     {
         #region Properties
-        public ePos Origin { get; } = new ePos();
-        public eSize Size { get; } = new eSize();
-        public eBlock Block { get; private set; } = new eBlock();
+        public Vec2i Origin { get; } = new Vec2i();
+        public Size2D Size { get; } = new Size2D();
+        public cssBoxArea Area { get; private set; }
         #endregion
 
         #region Events
-        public event Action<eSize, eSize> Resized;
-        public event Action<ePos, ePos> Moved;
+        public event Action<Size2D, Size2D> Resized;
+        public event Action<Vec2i, Vec2i> Moved;
         #endregion
 
         public void Set(int X, int Y, int Width, int Height)
@@ -36,52 +36,14 @@ namespace CssUI
             update_block();
         }
 
-        void update_block()
+        private void update_block()
         {
-            var old = Block;
-            Block = new eBlock(Origin, Size);
+            var old = Area;
+            Area = new cssBoxArea();// XXX: this null may cause problems indeed
+            Area.Update_Bounds(Origin.X, Origin.Y, Size.Width, Size.Height);
 
-            if (old.Get_Size() != Block.Get_Size()) Resized?.Invoke(old.Get_Size(), Block.Get_Size());
-            if (old.Get_Pos() != Block.Get_Pos()) Moved?.Invoke(old.Get_Pos(), Block.Get_Pos());
-        }
-
-        Stack<eBlock> ScissorStack = new Stack<eBlock>(0);
-        public void Push_Scissor(eBlock b)
-        {
-            // Reverse the orientation of our clipping area as OpenGL specifys it's viewport's origin location as the LOWER left corner not the upper left one.
-            var area = Block_Flip_Y(b);
-            ScissorStack.Push(area);
-            /*GL.Enable(EnableCap.ScissorTest);
-            GL.Scissor(area.X, area.Y, area.Width, area.Height);*/
-        }
-
-        eBlock Block_Flip_Y(eBlock b)
-        {
-            int y = (Block.Height - b.Y - b.Height);
-            return eBlock.FromTRBL(y, b.Right, y+b.Height, b.Left);
-        }
-        /// <summary>
-        /// Pops the current scissor area out off the stack and sets the opengl scissoring area to what is was previously
-        /// </summary>
-        public eBlock Pop_Scissor()
-        {
-            if (ScissorStack.Count == 0) throw new Exception("Scissor stack contains no more items!");
-
-            eBlock block = Block_Flip_Y(ScissorStack.Pop());
-            if (ScissorStack.Count == 0)
-            {
-                /*GL.Disable(EnableCap.ScissorTest);*/
-                return block;
-            }
-
-            eBlock area = ScissorStack.First();
-            /*GL.Scissor(area.X, area.Y, area.Width, area.Height);*/
-            return block;
-        }
-
-        public void Scissor_Safety_Check()
-        {
-            if (ScissorStack.Count > 0) throw new Exception("Scissor stack not empty, a call to Pop_Scissor() is missing somewhere!");
+            if (old.Get_Dimensions() != Area.Get_Dimensions()) Resized?.Invoke(old.Get_Dimensions(), Area.Get_Dimensions());
+            if (old.Get_Pos() != Area.Get_Pos()) Moved?.Invoke(old.Get_Pos(), Area.Get_Pos());
         }
 
     }

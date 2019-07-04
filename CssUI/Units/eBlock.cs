@@ -10,7 +10,7 @@ namespace CssUI
     {
         #region Values
         public EBlockFlags Flags { get; private set; } = EBlockFlags.Clean;
-        public EBlockInvalidationReason Dirt { get; private set; } = EBlockInvalidationReason.NotInvalid;
+        public EBoxInvalidationReason Dirt { get; private set; } = EBoxInvalidationReason.NotInvalid;
         /// <summary>
         /// Tracks whether the block needs to be recalculated, this isnt for this block instance in particular though, more so for removing variable clutter from the <see cref="cssElement"/> class.
         /// </summary>
@@ -90,7 +90,7 @@ namespace CssUI
         /// <summary>
         /// Flags the block as dirty, indicating that it's values should be resolved.
         /// </summary>
-        public void Flag_Dirty(EBlockInvalidationReason Reason)
+        public void Flag_Dirty(EBoxInvalidationReason Reason)
         {
             Set_Flag(EBlockFlags.Dirty);
             Dirt |= Reason;
@@ -102,7 +102,7 @@ namespace CssUI
         public void Flag_Clean()
         {
             Unset_Flag(EBlockFlags.Dirty);
-            Dirt = EBlockInvalidationReason.NotInvalid;
+            Dirt = EBoxInvalidationReason.NotInvalid;
         }
 
 

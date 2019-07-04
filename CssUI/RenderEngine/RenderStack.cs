@@ -12,7 +12,7 @@ namespace CssUI
     public class RenderStack
     {
         #region Stacks
-        Stack<eMatrix> MatrixStack = new Stack<eMatrix>();
+        Stack<Matrix4> MatrixStack = new Stack<Matrix4>();
         Stack<cssColor> ColorStack = new Stack<cssColor>();
         Stack<cssColor> BlendingStack = new Stack<cssColor>();
         #endregion
@@ -20,7 +20,7 @@ namespace CssUI
         #region Properties
         public cssColor Color { get { return ColorStack.DefaultIfEmpty(cssColor.White).First() ?? cssColor.White; } private set { } }
         public cssColor Blend_Color { get { return BlendingStack.DefaultIfEmpty(cssColor.White).First() ?? cssColor.White; } private set { } }
-        public eMatrix Matrix { get { return MatrixStack.FirstOrDefault(); } private set { } }
+        public Matrix4 Matrix { get { return MatrixStack.FirstOrDefault(); } private set { } }
         #endregion
 
         #region Events
@@ -82,7 +82,7 @@ namespace CssUI
             }
         }
 
-        public void Set_Matrix(eMatrix value, bool FireChangedEvent = true)
+        public void Set_Matrix(Matrix4 value, bool FireChangedEvent = true)
         {
             // 06-23-2017
             /*
@@ -101,7 +101,7 @@ namespace CssUI
             // Remove the current matrix value from the stack so we can replace it
             if (MatrixStack.Count > 0) MatrixStack.Pop();
             // Find the value we need to stack the incoming one ontop of (so we can combine them)
-            eMatrix mtx = MatrixStack.FirstOrDefault();
+            Matrix4 mtx = MatrixStack.FirstOrDefault();
             // Combine the incoming value with the one before it(if any) in the stack
             if (mtx != null) mtx *= value;
             else mtx = value;

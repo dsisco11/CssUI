@@ -43,9 +43,6 @@ namespace CssUI.CSS
         {
             this.Content_Width = Style.Content_Width;
             this.Content_Height = Style.Content_Height;
-            this.Intrinsic_Width = Style.Intrinsic_Width;
-            this.Intrinsic_Height = Style.Intrinsic_Height;
-            this.Intrinsic_Ratio = Style.Intrinsic_Ratio;
 
             this.Border_Top = Style.Border_Top_Width;
             this.Border_Right = Style.Border_Right_Width;

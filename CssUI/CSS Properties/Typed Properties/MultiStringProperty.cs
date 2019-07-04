@@ -17,7 +17,8 @@ namespace CssUI.CSS
         #endregion
 
         #region Constructors
-        public MultiStringProperty(string CssName, bool Locked, WeakReference<CssPropertySet> Source, cssElement Owner) : base(CssName, Locked, Source, Owner)
+        public MultiStringProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked)
+            : base(CssName, Locked, Source, Owner)
         {
         }
         #endregion

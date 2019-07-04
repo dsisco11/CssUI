@@ -1,5 +1,5 @@
 ﻿
-namespace CssUI.Internal
+namespace CssUI
 {
     public class Vec2
     {
@@ -71,19 +71,20 @@ namespace CssUI.Internal
 
         public override bool Equals(object o)
         {
-
-            if (o is Vec2)
-            {
-                return this == (Vec2)o;
-            }
-
-            return false;
+            return (o is Vec2 vec && this == vec);
         }
 
         public override int GetHashCode()
         {
             return (int)X ^ (int)Y;
         }
+
+        public override string ToString()
+        {
+            return $"{nameof(Vec2)}<{X}, {Y}>";
+        }
         #endregion
+
+
     }
 }

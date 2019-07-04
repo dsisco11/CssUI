@@ -6,11 +6,11 @@ namespace CssUI
         /// <summary>
         /// Location when the dragging process began
         /// </summary>
-        public readonly ePos Origin = null;
+        public readonly Vec2i Origin = null;
         /// <summary>
         /// Location right now
         /// </summary>
-        public readonly ePos Location = null;
+        public readonly Vec2i Location = null;
         /// <summary>
         /// X-Axis difference between the origin and current locations
         /// </summary>
@@ -24,7 +24,7 @@ namespace CssUI
         /// </summary>
         public bool Abort = false;
 
-        public DomItemDragEventArgs(ePos Origin, ePos Current)
+        public DomItemDragEventArgs(Vec2i Origin, Vec2i Current)
         {
             this.Origin = Origin;
             this.Location = Current;

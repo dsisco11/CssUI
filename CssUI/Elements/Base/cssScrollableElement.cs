@@ -12,60 +12,60 @@ namespace CssUI
     /// </summary>
     public abstract class cssScrollableElement : cssCompoundElement
     {
-        #region Blocks
+        #region Scroll Area Updating
         void Update_ScrollViewport_X()
         {
-            Block_ScrollViewport.X = (Block_Padding.X + SB_Horizontal.Value);
+            ScrollViewportArea.Set_Pos_X(Box.Padding.X + SB_Horizontal.Value);
             Update_RenderList();
         }
 
         void Update_ScrollViewport_Y()
         {
-            Block_ScrollViewport.Y = (Block_Padding.Y + SB_Vertical.Value);
+            ScrollViewportArea.Set_Pos_Y(Box.Padding.Y + SB_Vertical.Value);
             Update_RenderList();
         }
 
-        protected override void Update_Cached_Blocks()
+        protected virtual void Update_ScrollArea()
         {
-            base.Update_Cached_Blocks();
-
             if (!IsScrollContainer)
             {
-                Block_Clipping = null;
-                Block_Scroll = null;
-                Block_ScrollViewport = null;
+                ClippingArea = null;
+                ScrollArea = null;
+                ScrollViewportArea = null;
 
                 Update_Vertical_Scrollbar(false);
                 Update_Horizontal_Scrollbar(false);
             }
             else
             {
-                Block_Clipping = new eBlock(Block_Padding);
+                ClippingArea = new cssBoxArea(Box.Padding);
 
-                int cX = Block_Padding.Width;
-                int cY = Block_Padding.Height;
-                if (Style.Content_Width.HasValue || Style.Content_Height.HasValue)
+                int cX = Box.Padding.Width;
+                int cY = Box.Padding.Height;
+                if (Box.Content_Width.HasValue || Box.Content_Height.HasValue)
                 {
-                    if (Style.Content_Width.HasValue) cX = Style.Content_Width.Value;
-                    if (Style.Content_Height.HasValue) cY = Style.Content_Height.Value;
-                    Block_Resize_Padding_To_Content(ref cX, ref cY);
-                    if (Style.Content_Width.HasValue) cX += Style.Padding_Horizontal;// (Style.Padding_Left + Style.Padding_Right);
-                    if (Style.Content_Height.HasValue) cY += Style.Padding_Vertical;// (Style.Padding_Top + Style.Padding_Bottom);
+                    if (Box.Content_Width.HasValue) cX = Box.Content_Width.Value;
+                    if (Box.Content_Height.HasValue) cY = Box.Content_Height.Value;
+
+                    cX -= (Box.Padding.Size_Horizontal + Box.Scrollbar_Size.Width);
+                    cY -= (Box.Padding.Size_Vertical + Box.Scrollbar_Size.Height);
+
+                    if (Box.Content_Width.HasValue) cX += (Box.Padding.Size_Left + Box.Padding.Size_Right);
+                    if (Box.Content_Height.HasValue) cY += (Box.Padding.Size_Top + Box.Padding.Size_Bottom);
                 }
 
-                Block_Scroll = new eBlock(Block_Padding.Get_Pos(), new eSize(cX, cY));
-                if (Block_ScrollViewport == null)
-                    Block_ScrollViewport = new eBlock(new ePos(Block_Padding.Get_Pos()), new eSize(Block_Padding.Get_Size()));
+                ScrollArea = new cssBoxArea(Box, Box.Padding.Get_Pos(), new Size2D(cX, cY));
+                if (ScrollViewportArea == null)
+                {
+                    ScrollViewportArea = new cssBoxArea(Box, Box.Padding.Get_Pos(), Box.Padding.Get_Dimensions());
+                }
                 else
                 {
-                    Block_ScrollViewport.X = Block_Padding.X;
-                    Block_ScrollViewport.Y = Block_Padding.Y;
-                    Block_ScrollViewport.Width = Block_Padding.Width;
-                    Block_ScrollViewport.Height = Block_Padding.Height;
+                    ScrollViewportArea.Update_Bounds(Box.Padding.X, Box.Padding.Y, Box.Padding.Width, Box.Padding.Height);
                 }
                 // Update our scrollbars
-                bool need_vertical = (Style.Overflow_Y != EOverflowMode.Visible && Block_Padding.Height < Block_Scroll.Height);
-                bool need_horizontal = (Style.Overflow_X != EOverflowMode.Visible && Block_Padding.Width < Block_Scroll.Width);
+                bool need_vertical = (Style.Overflow_Y != EOverflowMode.Visible && Box.Padding.Height < ScrollArea.Height);
+                bool need_horizontal = (Style.Overflow_X != EOverflowMode.Visible && Box.Padding.Width < ScrollArea.Width);
 
                 Update_Vertical_Scrollbar(need_vertical);
                 Update_Horizontal_Scrollbar(need_horizontal);
@@ -99,11 +99,11 @@ namespace CssUI
         /// <summary>
         /// Matrix used to apply scrollbar translations to the elements contents during rendering.
         /// </summary>
-        private eMatrix scrollMatrix = new eMatrix();
+        private Matrix4 scrollMatrix = new Matrix4();
         /// <summary>
         /// Matrix used when rendering the actual scrollbard
         /// </summary>
-        private eMatrix scrollbarMatrix = new eMatrix();
+        private Matrix4 scrollbarMatrix = new Matrix4();
 
         /// <summary>
         /// Fires whenever this elements horizontal or vertical scrollbar values changes.
@@ -133,13 +133,13 @@ namespace CssUI
         /// The total area that our scrollbars represent
         /// AKA: the "Scrollbable Overflow Region"
         /// </summary>
-        private eBlock Block_Scroll = null;
+        internal cssBoxArea ScrollArea = null;
         /// <summary>
         /// Stores the current absolute-space area of this elements contents which is visible due to scrolling.
         /// </summary>
-        private eBlock Block_ScrollViewport = null;
-        private uiVScrollBar SB_Vertical = null;
-        private uiHScrollBar SB_Horizontal = null;
+        internal cssBoxArea ScrollViewportArea = null;
+        internal uiVScrollBar SB_Vertical = null;
+        internal uiHScrollBar SB_Horizontal = null;
 
 
         private void Update_Vertical_Scrollbar(bool is_needed)
@@ -170,21 +170,22 @@ namespace CssUI
                     break;
             }
 
-            SB_Vertical.ValueMax = (Block_Scroll.Height - Viewport.Block.Height) + 1;// Set how many pixels we can scroll
+            SB_Vertical.ValueMax = (ScrollArea.Height - Viewport.Area.Height) + 1;// Set how many pixels we can scroll
             SB_Vertical.StepSize = (int)Style.LineHeight;
             // We sit the vertical scrollbar at the padding block's right edge because the ScrollBar_Offset is set to it's width and is accounted for when calculating the padding block's size. So there is already room for us between the padding and border blocks!
             /*
-            SB_Vertical.Style.Default.X.Set(Block_Padding.Right);
-            SB_Vertical.Style.Default.Y.Set(Block_Padding.Top);
-            SB_Vertical.Style.Default.Height.Set(Block_Padding.Height);
+            SB_Vertical.Style.Default.X.Set(Box.Padding.Right);
+            SB_Vertical.Style.Default.Y.Set(Box.Padding.Top);
+            SB_Vertical.Style.Default.Height.Set(Box.Padding.Height);
             */
 
             Update_ScrollViewport_Y();
 
-            if (Style.Overflow_Y == EOverflowMode.Scroll || (Style.Overflow_Y == EOverflowMode.Auto && is_needed))
-                Scrollbar_Offset.Right = SB_Vertical.Block.Width;
+            this.Invalidate_Layout(EBoxInvalidationReason.Scroll_Offset_Change);
+            /*if (Style.Overflow_Y == EOverflowMode.Scroll || (Style.Overflow_Y == EOverflowMode.Auto && is_needed))
+                Scrollbar_Offset.Right = SB_Vertical.Box.Width;
             else
-                Scrollbar_Offset.Right = 0;
+                Scrollbar_Offset.Right = 0;*/
         }
 
         private void Update_Horizontal_Scrollbar(bool is_needed)
@@ -215,19 +216,21 @@ namespace CssUI
                     break;
             }
 
-            SB_Horizontal.ValueMax = (Block_Scroll.Width - Viewport.Block.Width) + 1;// Set how many pixels we can scroll
+            SB_Horizontal.ValueMax = (ScrollArea.Width - Viewport.Area.Width) + 1;// Set how many pixels we can scroll
             SB_Horizontal.StepSize = (int)Style.LineHeight;
             /*
-            SB_Horizontal.Style.Default.X.Set(Block_Padding.Left);
-            SB_Horizontal.Style.Default.Y.Set(Block_Padding.Bottom);
-            SB_Horizontal.Style.Default.Width.Set(Block_Padding.Width);
+            SB_Horizontal.Style.Default.X.Set(Box.Padding.Left);
+            SB_Horizontal.Style.Default.Y.Set(Box.Padding.Bottom);
+            SB_Horizontal.Style.Default.Width.Set(Box.Padding.Width);
             */
             Update_ScrollViewport_X();
 
-            if (Style.Overflow_X == EOverflowMode.Scroll || (Style.Overflow_X == EOverflowMode.Auto && is_needed))
-                Scrollbar_Offset.Bottom = SB_Horizontal.Block.Height;
+            /*if (Style.Overflow_X == EOverflowMode.Scroll || (Style.Overflow_X == EOverflowMode.Auto && is_needed))
+                Scrollbar_Offset.Bottom = SB_Horizontal.Box.Height;
             else
-                Scrollbar_Offset.Bottom = 0;
+                Scrollbar_Offset.Bottom = 0;*/
+
+            this.Invalidate_Layout(EBoxInvalidationReason.Scroll_Offset_Change);
         }
 
         /// <summary>
@@ -251,6 +254,8 @@ namespace CssUI
                     Handle_Scrolled();
                     onScroll?.Invoke(this, SB_Vertical);
                 };
+
+                Invalidate_Layout(EBoxInvalidationReason.Scroll_Offset_Change);
             }
         }
         /// <summary>
@@ -261,8 +266,8 @@ namespace CssUI
             if (SB_Vertical != null)
             {
                 Remove(SB_Vertical);
-                Scrollbar_Offset.Right = 0;
                 SB_Vertical = null;
+                Invalidate_Layout(EBoxInvalidationReason.Scroll_Offset_Change);
             }
         }
         /// <summary>
@@ -286,6 +291,8 @@ namespace CssUI
                     Handle_Scrolled();
                     onScroll?.Invoke(this, SB_Horizontal);
                 };
+
+                Invalidate_Layout(EBoxInvalidationReason.Scroll_Offset_Change);
             }
         }
         /// <summary>
@@ -296,8 +303,8 @@ namespace CssUI
             if (SB_Horizontal != null)
             {
                 Remove(SB_Horizontal);
-                Scrollbar_Offset.Bottom = 0;
                 SB_Horizontal = null;
+                Invalidate_Layout(EBoxInvalidationReason.Scroll_Offset_Change);
             }
         }
         #endregion
@@ -348,7 +355,7 @@ namespace CssUI
             {
                 var C = Children[i];
                 if (!C.ShouldRender) continue;
-                if (Block_ScrollViewport.Intersects(C.Block))
+                if (ScrollViewportArea.Intersects(C.Box.Margin))
                     list.Add(i);
             }
             RenderList = list.ToArray();
@@ -391,10 +398,10 @@ namespace CssUI
         {
             base.Draw_Debug_Bounds();
 
-            if (Block_Scroll != null)
+            if (ScrollArea != null)
             {
                 Root.Engine.Set_Color(0f, 1f, 1f, 1f);
-                Root.Engine.Draw_Rect(1, Block_Scroll);
+                Root.Engine.Draw_Rect(1, ScrollArea.Edge);
             }
         }
 

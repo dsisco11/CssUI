@@ -24,12 +24,6 @@ namespace CssUI
             Viewport.Set(X, Y, Width, Height);
         }
         #endregion
-        /// <summary>
-        /// The containing block of this control
-        /// <para>If the control has an ancestor this will be said ancestors content-area block</para>
-        /// <para>Otherwise, if the control is a root element, this should have the dimensions of the viewport</para>
-        /// </summary>
-        public override eBlock Block_Containing { get => Viewport.Block; }
 
         #region Properties
 
@@ -173,16 +167,16 @@ namespace CssUI
         }
 
         #region Event Handlers (Viewport)
-        private void Viewport_Moved(ePos oldPos, ePos newPos)
+        private void Viewport_Moved(Vec2i oldPos, Vec2i newPos)
         {
             Flag_Layout(ELayoutBit.Dirty);
-            Flag_Containing_Block_Dirty();
+            Handle_Containing_Block_Dirty();
         }
 
-        private void Viewport_Resized(eSize oldSize, eSize newSize)
+        private void Viewport_Resized(Size2D oldSize, Size2D newSize)
         {
             Flag_Layout(ELayoutBit.Dirty);
-            Flag_Containing_Block_Dirty();
+            Handle_Containing_Block_Dirty();
         }
         #endregion
 
@@ -256,7 +250,7 @@ namespace CssUI
         /// Performs recursive hit tests against a screen-space point until the deepest element intersecting said point is found.
         /// </summary>
         /// <param name="pos">Screen-space point to perform hit testing against</param>
-        cssElement Resolve_ScreenSpace_HitTest(ePos pos)
+        cssElement Resolve_ScreenSpace_HitTest(Vec2i pos)
         {
             cssElement last = this;
             do
@@ -273,7 +267,7 @@ namespace CssUI
         /// Performs recursive hit tests against a screen-space point until the deepest element intersecting said point is found.
         /// </summary>
         /// <param name="pos">Screen-space point to perform hit testing against</param>
-        cssElement Resolve_ScreenSpace_HitTest(ePos pos, ref List<cssElement> Path)
+        cssElement Resolve_ScreenSpace_HitTest(Vec2i pos, ref List<cssElement> Path)
         {
             cssElement last = this;
             do
@@ -290,13 +284,13 @@ namespace CssUI
         #endregion
 
         #region Mouse Handlers
-        ePos MouseDragStart = ePos.Zero;
+        Vec2i MouseDragStart = Vec2i.Zero;
         cssElement MouseDragTarget = null;
         /// <summary>
         /// Tracks the UID of elements for which the MouseEnter event has fired. Used for determining when to fire the MouseLeave event
         /// </summary>
         Dictionary<cssElementID, cssElement> EnteredElements = new Dictionary<cssElementID, cssElement>();
-        struct LastClickData { public long Time; public ePos Pos; };
+        struct LastClickData { public long Time; public Vec2i Pos; };
         Dictionary<EMouseButton, LastClickData> LastClick = new Dictionary<EMouseButton, LastClickData>();
 
         protected void Fire_MouseUp(DomPreviewMouseButtonEventArgs e)
@@ -341,7 +335,7 @@ namespace CssUI
             if (Origin.IsDraggable)
             {
                 MouseDragTarget = Origin;
-                MouseDragStart = new ePos(e.Position);
+                MouseDragStart = new Vec2i(e.Position);
             }
 
             // Perform the tunneling event sequence
@@ -388,7 +382,7 @@ namespace CssUI
                 }
             }
             // Update our last click tracking data
-            LastClick[e.Button] = new LastClickData() { Time = Environment.TickCount, Pos = new ePos(e.X, e.Y) };
+            LastClick[e.Button] = new LastClickData() { Time = Environment.TickCount, Pos = new Vec2i(e.X, e.Y) };
 
             Fire_Click(Origin, Path);// The 'click' event is raised everytime an element is double-clicked also
             if (isDoubleClick)
@@ -465,7 +459,7 @@ namespace CssUI
             {
                 if (!MouseDragTarget.IsBeingDragged)
                 {
-                    var dArgs = new DomItemDragEventArgs(MouseDragStart, new ePos(Args.Position));
+                    var dArgs = new DomItemDragEventArgs(MouseDragStart, new Vec2i(Args.Position));
                     Vector2 DragThreshold = Platform.Factory.SystemMetrics.Get_Drag_Event_Distance();
 
                     if (Math.Abs(dArgs.XDelta) > DragThreshold.X || Math.Abs(dArgs.YDelta) > DragThreshold.Y)
@@ -475,7 +469,7 @@ namespace CssUI
                 }
                 else
                 {
-                    var dArgs = new DomItemDragEventArgs(MouseDragStart, new ePos(Args.Position));
+                    var dArgs = new DomItemDragEventArgs(MouseDragStart, new Vec2i(Args.Position));
                     MouseDragTarget.Handle_DraggingUpdate(MouseDragTarget, dArgs);
                     if (dArgs.Abort)
                     {
@@ -495,13 +489,13 @@ namespace CssUI
             Fire_MouseMove(new DomPreviewMouseMoveEventArgs(Mouse.Location.X, Mouse.Location.Y, 0, 0));
         }
 
-        void Halt_ItemDrag_Operation(ePos MousePos, bool Aborted=false)
+        void Halt_ItemDrag_Operation(Vec2i MousePos, bool Aborted=false)
         {
             var Args = new DomItemDragEventArgs(MouseDragStart, MousePos) { Abort = Aborted };
 
             Root.Mouse.Stop_Dragging(MouseDragTarget, Args);
             MouseDragTarget = null;
-            MouseDragStart = ePos.Zero;
+            MouseDragStart = Vec2i.Zero;
         }
 
         /// <summary>

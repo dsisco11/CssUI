@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CssUI.CSS;
 using CssUI.Enums;
@@ -70,7 +71,7 @@ namespace CssUI
         /// <summary>
         /// How much of a single value each pixel on the trackbar represents
         /// </summary>
-        public float ValuePerPixel { get { return ((float)ValueMax / (float)(Get_Major_Dimension(Block_Content.Get_Size() - Thumb.Block.Get_Size()))); } }
+        public float ValuePerPixel { get { return ((float)ValueMax / (float)(Get_Major_Dimension(Box.Content.Get_Dimensions() - Thumb.Box.Get_Dimensions()))); } }
         #endregion
 
         #region Constructors
@@ -121,12 +122,12 @@ namespace CssUI
         /// <summary>
         /// Transforms a point on the trackbar to an int for use as the slider's current Value
         /// </summary>
-        int Track_Point_To_Value(ePos Point)
+        int Track_Point_To_Value(Vec2i Point)
         {
             int retVal = Value;
             int cp = Get_Major_Dimension(Point);
-            int ctr = Get_Major_Dimension(Block.Get_Pos());
-            int cth = Get_Major_Dimension(Thumb.Block.Get_Size());
+            int ctr = Get_Major_Dimension(Box.Get_Position());
+            int cth = Get_Major_Dimension(Thumb.Box.Get_Dimensions());
             int rel = (cp - ctr);// point value relative to the trackbar
             int rv = (int)(ValuePerPixel * (float)rel);
             return rv;
@@ -135,7 +136,8 @@ namespace CssUI
         /// <summary>
         /// Returns the value we are most concerned with from the given item, as indicated by our ESliderDirection value
         /// </summary>
-        public int Get_Major_Dimension(eSize Size)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int Get_Major_Dimension(Size2D Size)
         {
             switch (Direction)
             {
@@ -151,7 +153,8 @@ namespace CssUI
         /// <summary>
         /// Returns the value we are most concerned with from the given item, as indicated by our ESliderDirection value
         /// </summary>
-        public int Get_Major_Dimension(ePos Pos)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int Get_Major_Dimension(Vec2i Pos)
         {
             switch (Direction)
             {
@@ -163,27 +166,28 @@ namespace CssUI
                     throw new ArgumentException("Unhandled ESliderDirection value!");
             }
         }
-
-        /// <summary>
-        /// Returns the value we are most concerned with from the given item, as indicated by our ESliderDirection value
-        /// </summary>
-        public int Get_Major_Dimension(System.Drawing.Point Pos)
-        {
-            switch (Direction)
-            {
-                case ESliderDirection.Vertical:
-                    return Pos.Y;
-                case ESliderDirection.Horizontal:
-                    return Pos.X;
-                default:
-                    throw new ArgumentException("Unhandled ESliderDirection value!");
-            }
-        }
+        /*
+                /// <summary>
+                /// Returns the value we are most concerned with from the given item, as indicated by our ESliderDirection value
+                /// </summary>
+                public int Get_Major_Dimension(System.Drawing.Point Pos)
+                {
+                    switch (Direction)
+                    {
+                        case ESliderDirection.Vertical:
+                            return Pos.Y;
+                        case ESliderDirection.Horizontal:
+                            return Pos.X;
+                        default:
+                            throw new ArgumentException("Unhandled ESliderDirection value!");
+                    }
+                }*/
 
         /// <summary>
         /// Returns the value we are least concerned with from the given item, as indicated by our ESliderDirection value
         /// </summary>
-        public int Get_Minor_Dimension(eSize Size)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int Get_Minor_Dimension(Size2D Size)
         {
             switch (Direction)
             {
@@ -199,7 +203,8 @@ namespace CssUI
         /// <summary>
         /// Returns the value we are least concerned with from the given item, as indicated by our ESliderDirection value
         /// </summary>
-        public int Get_Minor_Dimension(ePos Pos)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int Get_Minor_Dimension(Vec2i Pos)
         {
             switch (Direction)
             {
@@ -212,7 +217,7 @@ namespace CssUI
             }
         }
 
-        /// <summary>
+        /*/// <summary>
         /// Returns the value we are least concerned with from the given item, as indicated by our ESliderDirection value
         /// </summary>
         public int Get_Minor_Dimension(System.Drawing.Point Pos)
@@ -226,7 +231,7 @@ namespace CssUI
                 default:
                     throw new ArgumentException("Unhandled ESliderDirection value!");
             }
-        }
+        }*/
         #endregion
 
         #region Events
@@ -234,10 +239,10 @@ namespace CssUI
         /// <summary>
         /// Offset from the thumb's block origin where the mouse initially started dragging it from.
         /// </summary>
-        ePos Thumb_Pos_At_DragStart = null;
+        Vec2i Thumb_Pos_At_DragStart = null;
         private void Thumb_DraggingStart(cssElement Sender, DomItemDragEventArgs Args)
         {
-            Thumb_Pos_At_DragStart = Thumb.Block.Get_Pos();
+            Thumb_Pos_At_DragStart = Thumb.Box.Get_Position();
         }
         private void Thumb_DraggingEnd(cssElement Sender, DomItemDragEventArgs Args)
         {
@@ -247,7 +252,7 @@ namespace CssUI
         private void Thumb_DraggingUpdate(cssElement Sender, DomItemDragEventArgs Args)
         {
             // okay we want to move the thumb such that the point the user clicked on to initiate the drag coincides with the current mouse location
-            ePos Delta = new ePos(Args.XDelta, Args.YDelta);
+            Vec2i Delta = new Vec2i(Args.XDelta, Args.YDelta);
             if (Math.Abs(Get_Minor_Dimension(Delta)) < UI_CONSTANTS.TRACKBAR_DRAG_THRESHOLD)
             {
                 var nPos = (Delta + Thumb_Pos_At_DragStart);// this is where our thumb should be now
@@ -278,9 +283,9 @@ namespace CssUI
         }
         #endregion
 
-        protected override void Update_Cached_Blocks()
+        protected override void Update_ScrollArea()
         {
-            base.Update_Cached_Blocks();
+            base.Update_ScrollArea();
             Dirty_Thumb = true;
             Update_Thumb();
         }
@@ -293,10 +298,10 @@ namespace CssUI
             return (int)(pct * scalar);
         }
 
-        int Calculate_Value_For_Thumb_Pos(ePos pos)
+        int Calculate_Value_For_Thumb_Pos(Vec2i pos)
         {
-            int tr = Get_Major_Dimension(Block_Content.Get_Size());
-            int th = Get_Major_Dimension(Thumb.Block.Get_Size());
+            int tr = Get_Major_Dimension(Box.Content.Get_Dimensions());
+            int th = Get_Major_Dimension(Thumb.Box.Get_Dimensions());
             int pv = Get_Major_Dimension(pos);
 
             float vpp = ((float)ValueMax / (float)(tr - th));
@@ -322,9 +327,9 @@ namespace CssUI
             {
                 case ESliderDirection.Vertical:
                     {
-                        float ratio = Calculate_Thumb_Size_Ratio(value_max, Block_Content.Height);
-                        int size = (int)(ratio * (float)Block_Content.Height);
-                        int pos = Calculate_Thumb_Pos(Block_Content.Height - Thumb.Block.Height);
+                        float ratio = Calculate_Thumb_Size_Ratio(value_max, Box.Content.Height);
+                        int size = (int)(ratio * (float)Box.Content.Height);
+                        int pos = Calculate_Thumb_Pos(Box.Content.Height - Thumb.Box.Height);
                         
                         Thumb.Style.ImplicitRules.X.Set(0);
                         Thumb.Style.ImplicitRules.Y.Set(pos);
@@ -333,9 +338,9 @@ namespace CssUI
                     break;
                 case ESliderDirection.Horizontal:
                     {
-                        float ratio = Calculate_Thumb_Size_Ratio(value_max, Block_Content.Width);
-                        int size = (int)(ratio * (float)Block_Content.Width);
-                        int pos = Calculate_Thumb_Pos(Block_Content.Width - Thumb.Block.Width);
+                        float ratio = Calculate_Thumb_Size_Ratio(value_max, Box.Content.Width);
+                        int size = (int)(ratio * (float)Box.Content.Width);
+                        int pos = Calculate_Thumb_Pos(Box.Content.Width - Thumb.Box.Width);
                         
                         Thumb.Style.ImplicitRules.X.Set(pos);
                         Thumb.Style.ImplicitRules.Y.Set(0);

@@ -15,7 +15,7 @@ namespace CssUI
         /// <summary>
         /// Gets the maximum size which content for this control can take up
         /// </summary>
-        eSize Get_Layout_Area();
+        Size2D Get_Layout_Area();
         #endregion
 
         #region Layout

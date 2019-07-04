@@ -18,9 +18,9 @@ namespace CssUI.Layout
         /// <summary>
         /// Size of the area which this line's elements occupy
         /// </summary>
-        public eSize InnerSize;
+        public Size2D InnerSize;
 
-        public LineBox(List<LineBox_Element> items, eSize inner_size)
+        public LineBox(List<LineBox_Element> items, Size2D inner_size)
         {
             Items = items;
             InnerSize = inner_size;

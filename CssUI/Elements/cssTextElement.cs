@@ -53,10 +53,10 @@ namespace CssUI
             this.Debug.Draw_Bounds = true;
         }
 
-        private void Style_Property_Change(ICssProperty Sender, EPropertyAffects Flags, System.Diagnostics.StackTrace Origin)
+        private void Style_Property_Change(ICssProperty Sender, EPropertyDirtFlags Flags, System.Diagnostics.StackTrace Origin)
         {
             // If something that affects text has changed then we invalidate our text
-            if (0 != (Flags & EPropertyAffects.Text))
+            if (0 != (Flags & EPropertyDirtFlags.Text))
                 Invalidate_Text();
         }
         #endregion
@@ -80,7 +80,7 @@ namespace CssUI
             
             Root.Engine.Set_Color(Color);
             Root.Engine.Set_Texture(Texture);
-            Root.Engine.Fill_Rect(Block_Content.Get_Pos(), Texture.Size);
+            Root.Engine.Fill_Rect(Box.Content.Get_Pos(), Texture.Size);
             Root.Engine.Set_Texture(null);
         }
         #endregion
@@ -116,8 +116,7 @@ namespace CssUI
             Texture = From_Text_String(text, Style.Font);
             if (Texture != null)
             {
-                Style.Set_Content_Width(Texture.Size.Width);
-                Style.Set_Content_Height(Texture.Size.Height);
+                Box.Set_Content_Size(Texture.Size.Width, Texture.Size.Height);
             }
 
             // unset the text flag

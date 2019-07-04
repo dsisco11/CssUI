@@ -68,7 +68,14 @@ namespace CssUI.Internal
 
         #region Abstract Accessors
 
+        /// <summary>
+        /// Returns TRUE if the <see cref="Assigned"/> value is non-null
+        /// </summary>
         public abstract bool HasValue { get; }
+        /// <summary>
+        /// Returns TRUE if the <see cref="Assigned"/> value is <see cref="EStyleDataType.NONE"/>
+        /// </summary>
+        public abstract bool IsNone { get; }
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// </summary>
@@ -113,7 +120,7 @@ namespace CssUI.Internal
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public CssValue Find_Inherited_Value()
         {
-            if (Owner is cssRootElement)
+            if (ReferenceEquals(Owner.Parent, null))
             {// Root elements cannot inherit, they use the INITIAL value
                 return new CssValue(Definition.Initial);
             }
@@ -129,7 +136,6 @@ namespace CssUI.Internal
         #endregion
 
         #region Constructor
-
         public CssPropertyBase(string CssName, bool Locked, WeakReference<CssPropertySet> Source, cssElement Owner)
         {
             this.CssName = new AtomicString(CssName);
@@ -137,6 +143,14 @@ namespace CssUI.Internal
             this.SourcePtr = Source;
             this.Locked = Locked;
         }
+        #endregion
+
+        #region Reverting
+        /// <summary>
+        /// Causes this property to revert back to the computed stage such that it must re-interpret its Used and Actual values.
+        /// </summary>
+        /// <param name="suppress">Suppresses any change event from firing once the Used value gets re-interpreted</param>
+        internal abstract void Revert(bool suppress=false);
         #endregion
 
         #region Serialization
@@ -152,6 +166,12 @@ namespace CssUI.Internal
 
         #region Cascading
         /// <summary>
+        /// Overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
+        /// </summary>
+        /// <returns>Success</returns>
+        public abstract bool Cascade(ICssProperty value);
+
+        /// <summary>
         /// Asynchronously overwrites the values of this instance with any values from another which aren't <see cref="CssValue.Null"/>
         /// </summary>
         /// <returns>Success</returns>
@@ -159,6 +179,12 @@ namespace CssUI.Internal
         #endregion
 
         #region Overwriting
+        /// <summary>
+        /// Ooverwrites the assigned value of this instance with values from another if they are different
+        /// </summary>
+        /// <returns>Success</returns>
+        public abstract bool Overwrite(ICssProperty value);
+
         /// <summary>
         /// Asynchronously overwrites the assigned value of this instance with values from another if they are different
         /// </summary>
