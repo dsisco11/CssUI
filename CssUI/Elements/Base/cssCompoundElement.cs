@@ -49,7 +49,7 @@ namespace CssUI
             set
             {
                 layoutMode = value;
-                LayoutBit |= ELayoutBit.Dirty;
+                LayoutDirt |= ELayoutDirt.Dirty;
                 layoutDirector = null;
             }
         }

@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="CSS Common\CssEnumTables.cs">
+    <None Include="CSS Implementation\CSS Common\CssEnumTables.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>CssEnumTables.tt</DependentUpon>
@@ -44,7 +44,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="CSS Common\CssEnumTables.cs">
+    <Compile Update="CSS Implementation\CSS Common\CssEnumTables.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>CssEnumTables.tt</DependentUpon>
@@ -62,7 +62,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="CSS Common\CssEnumTables.tt">
+    <None Update="CSS Implementation\CSS Common\CssEnumTables.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>CssEnumTables.cs</LastGenOutput>
     </None>

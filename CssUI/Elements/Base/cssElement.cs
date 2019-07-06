@@ -211,7 +211,7 @@ namespace CssUI
     /// </summary>
     protected virtual void Handle_Resized(eSize oldSize, eSize newSize)
     {
-        if (Parent != null) Parent.Flag_Layout(ELayoutBit.Dirty_Children);
+        if (Parent != null) Parent.Flag_Layout(ELayoutDirt.Dirty_Children);
         update_debug_text();
         onResized?.Invoke(this, oldSize, newSize);
     }
@@ -221,7 +221,7 @@ namespace CssUI
     /// </summary>
     protected virtual void Handle_Moved(ePos oldPos, ePos newPos)
     {
-        if (Parent != null) Parent.Flag_Layout(ELayoutBit.Dirty_Children);
+        if (Parent != null) Parent.Flag_Layout(ELayoutDirt.Dirty_Children);
         onMoved?.Invoke(this, oldPos, newPos);
     }
 
@@ -381,12 +381,12 @@ namespace CssUI
         /// <summary>
         /// Specifys something that affects the controls boundaries has changed, be it the pos, size, border, contents, etc.
         /// </summary>
-        protected ELayoutBit LayoutBit = ELayoutBit.Dirty;
-        public void Flag_Layout(ELayoutBit Flags) { LayoutBit |= Flags; }
+        protected ELayoutDirt LayoutDirt = ELayoutDirt.Dirty;
+        public void Flag_Layout(ELayoutDirt Flags) { LayoutDirt |= Flags; }
 
         public void Invalidate_Layout(EBoxInvalidationReason Reason = EBoxInvalidationReason.Unknown)
         {
-            Flag_Layout(ELayoutBit.Dirty);
+            Flag_Layout(ELayoutDirt.Dirty);
         #if DEBUG
             if (Debug.Log_Layout_Changes)
             {
@@ -401,7 +401,7 @@ namespace CssUI
 
         public void Invalidate_Layout(ICssProperty sender)
         {
-            Flag_Layout(ELayoutBit.Dirty);
+            Flag_Layout(ELayoutDirt.Dirty);
         #if DEBUG
             if (Debug.Log_Layout_Changes) Logs.Info(xLog.XTERM.cyan("[Layout Flagged] {0}.{1} => {2}"), this, sender.CssName, sender);
         #endif
@@ -412,14 +412,11 @@ namespace CssUI
         /// </summary>
         public async void PerformLayout()
         {
-            if (LayoutBit == ELayoutBit.Clean)
+            if (LayoutDirt == ELayoutDirt.Clean)
                 return;
 
             // await Style.Cascade();
             //Guid TMR = Timing.Start("PerformLayout()");
-            // We still need to apply the positioners ourselves here just incase they arent linked to a target control and are a "relative" positioner.
-            xAligner?.Apply_Relative();
-            yAligner?.Apply_Relative();
             
             if (Box.Containing_Box.X != last_containerPos.X || Box.Containing_Box.Y != last_containerPos.Y)
             {
@@ -437,10 +434,10 @@ namespace CssUI
             const int MAX_LAYOUT_CYCLES = 100;
             do
             {
-                LayoutBit = ELayoutBit.Clean;
+                LayoutDirt = ELayoutDirt.Clean;
                 Handle_Layout();
             }
-            while (LayoutBit!=ELayoutBit.Clean && ++cycles < MAX_LAYOUT_CYCLES);
+            while (LayoutDirt!=ELayoutDirt.Clean && ++cycles < MAX_LAYOUT_CYCLES);
             if (cycles >= MAX_LAYOUT_CYCLES) throw new Exception(string.Format("Aborted Handle_Layout() cycle loop after {0} passes!", cycles));
 
             onLayout?.Invoke(this);
@@ -736,7 +733,7 @@ namespace CssUI
                 Box.Rebuild();
             }
 
-            if (LayoutBit > 0)
+            if (LayoutDirt > 0)
             {
                 retVal = true;
                 PerformLayout();

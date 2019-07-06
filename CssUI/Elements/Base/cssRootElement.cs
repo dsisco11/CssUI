@@ -169,13 +169,13 @@ namespace CssUI
         #region Event Handlers (Viewport)
         private void Viewport_Moved(Vec2i oldPos, Vec2i newPos)
         {
-            Flag_Layout(ELayoutBit.Dirty);
+            Flag_Layout(ELayoutDirt.Dirty);
             Handle_Containing_Block_Dirty();
         }
 
         private void Viewport_Resized(Size2D oldSize, Size2D newSize)
         {
-            Flag_Layout(ELayoutBit.Dirty);
+            Flag_Layout(ELayoutDirt.Dirty);
             Handle_Containing_Block_Dirty();
         }
         #endregion

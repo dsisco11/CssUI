@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CssUI
+﻿namespace CssUI
 {
-    public enum ESliderDirection
+    public enum ESliderDirection : byte
     {
         Unset,
         Horizontal,

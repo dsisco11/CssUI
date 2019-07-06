@@ -1,20 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CssUI
 {
     [Flags]
     public enum EDebugOpt : uint
     {
-        ALL = 0,
         BOUND_DRAW = (1 << 0),
         CHILD_BOUND_DRAW = (1 << 1),
         LOG_BLOCK_CHANGES = (1 << 2),
         LOG_PROPERTY_CHANGES = (1 << 3),
         LOG_LAYOUT_CHANGES = (1 << 4),
+        ALL = 0xFFFFFFFF,
     }
 
     public class DebugOpts
