@@ -6,7 +6,7 @@ namespace CssUI
     /// Style value types
     /// </summary>
     [Flags]
-    public enum EStyleDataType : uint
+    public enum ECssDataType : uint
     {
         /// <summary>
         /// Nothing

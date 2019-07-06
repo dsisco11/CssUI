@@ -85,7 +85,7 @@ namespace CssUI.Internal
             // Per the CSS specifications we should not create a font under 9pt
             double val = Math.Max(v.Value, 9.0);
 
-            return new CssValue(EStyleDataType.NUMBER, val);
+            return new CssValue(ECssDataType.NUMBER, val);
         }
 
         /// <summary>
@@ -102,9 +102,9 @@ namespace CssUI.Internal
             {
                 switch(val.Type)
                 {
-                    case EStyleDataType.KEYWORD:
+                    case ECssDataType.KEYWORD:
                         {// Replace generic font-family keywords with a list of our fallback font-familys for that family
-                            switch (val.Value as string)
+                            switch (CssLookup.FromKeyword<ECssGenericFontFamily>(val.Value as string))
                             {
                                 case ECssGenericFontFamily.Serif:
                                 case ECssGenericFontFamily.SansSerif:
@@ -112,7 +112,7 @@ namespace CssUI.Internal
                                 case ECssGenericFontFamily.Cursive:
                                 case ECssGenericFontFamily.Fantasy:
                                     {
-                                        if (FontManager.GenericFamilyMap.TryGetValue(val.Value as string, out List<CssValue> GenericFontFamilys))
+                                        if (FontManager.GenericFamilyMap.TryGetValue(CssLookup.FromKeyword<ECssGenericFontFamily>(val.Value as string), out List<CssValue> GenericFontFamilys))
                                             retValues.AddRange(GenericFontFamilys);
                                     }
                                     break;
@@ -122,7 +122,7 @@ namespace CssUI.Internal
 
                         }
                         break;
-                    case EStyleDataType.STRING:
+                    case ECssDataType.STRING:
                         {// Remove any invalid font-familys
                             foreach(FontFamily family in SystemFonts.Families)
                             {

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CssUI.Internal;
+using System;
+using System.Linq;
 
 namespace CssUI.CSS
 {
@@ -6,31 +8,15 @@ namespace CssUI.CSS
     /// Represents a styling property which holds an enum value
     /// </summary>
     /// <typeparam name="Ty">The enum type this property stores</typeparam>
-    public class EnumProperty<Ty> : CssProperty where Ty : struct, IConvertible
+    public class EnumProperty<Ty> : CssProperty where Ty : struct
     {
-        #region Accessors
-        public Ty Value
-        {
-            get
-            {
-                if (base.Assigned.Type != EStyleDataType.INTEGER) base.Update();
-                if (base.Assigned.Type != EStyleDataType.INTEGER) throw new ArgumentException("EnumPropertys cannot accept unit values other than int!");
-                return (Ty)base.Assigned.Value;
-            }
-            set
-            {
-                base.Assigned = CssValue.From_Int(Convert.ToInt32(value));
-            }
-        }
-        internal CssValue ExplicitValue { get { return base.Assigned; } }
-        #endregion
 
         #region Value Overrides
         public new Ty Actual
         {
             get
             {
-                return (Ty)base.Actual.Value;
+                return CssLookup.FromKeyword<Ty>((string)base.Actual.Value);
             }
         }
         #endregion
@@ -44,16 +30,17 @@ namespace CssUI.CSS
         #endregion
 
         #region Setters
-        public void Set(Ty value)
+        public void Set(Ty Value)
         {
-            base.Assigned = CssValue.From_Int(Convert.ToInt32(value));
+            /* Convert type value into its CSS Keyword */
+            base.Assigned = CssValue.From_Keyword( CssLookup.Enum<Ty>(Value) );
         }
         #endregion
 
         #region ToString
         public override string ToString()
         {
-            if (Computed.Type == EStyleDataType.INTEGER)
+            if (Computed.Type == ECssDataType.INTEGER)
             {
                 return Enum.GetName(typeof(Ty), (Ty)Computed.Value);
             }

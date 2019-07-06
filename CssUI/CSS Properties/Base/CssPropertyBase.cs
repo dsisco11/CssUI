@@ -73,7 +73,7 @@ namespace CssUI.Internal
         /// </summary>
         public abstract bool HasValue { get; }
         /// <summary>
-        /// Returns TRUE if the <see cref="Assigned"/> value is <see cref="EStyleDataType.NONE"/>
+        /// Returns TRUE if the <see cref="Assigned"/> value is <see cref="ECssDataType.NONE"/>
         /// </summary>
         public abstract bool IsNone { get; }
         /// <summary>

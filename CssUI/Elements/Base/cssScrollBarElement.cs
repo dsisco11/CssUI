@@ -116,10 +116,10 @@ namespace CssUI
             Layout = ELayoutMode.None;
             Box.onChange += Handle_Box_Change;
 
-            Style.ImplicitRules.Positioning.Value = EPositioning.Fixed;
+            Style.ImplicitRules.Positioning.Set(EPositioning.Fixed);
             // Just so our scrollbars dont have scrollbars by some chance.
-            Style.ImplicitRules.Overflow_X.Value = EOverflowMode.Clip;
-            Style.ImplicitRules.Overflow_Y.Value = EOverflowMode.Clip;
+            Style.ImplicitRules.Overflow_X.Set(EOverflowMode.Clip);
+            Style.ImplicitRules.Overflow_Y.Set(EOverflowMode.Clip);
             ColorBackground = new cssColor(0.1f, 0.1f, 0.1f, 1.0f);
 
 
@@ -131,12 +131,12 @@ namespace CssUI
             Track.MouseClick += Track_onMouseClick;
 
             Btn_dec = new cssButtonElement(this);
-            Btn_dec.Style.ImplicitRules.Set_Padding_Implicit(3, 3);
+            Btn_dec.Style.ImplicitRules.Set_Padding(3, 3);
             Btn_dec.Clicked += (cssElement Sender, DomRoutedEventArgs Args) => { Value = (Value - StepSize); };
             Btn_dec.Set_Svg(CssIcons.close);
 
             Btn_inc = new cssButtonElement(this);
-            Btn_inc.Style.ImplicitRules.Set_Padding_Implicit(3, 3);
+            Btn_inc.Style.ImplicitRules.Set_Padding(3, 3);
             Btn_inc.Clicked += (cssElement Sender, DomRoutedEventArgs Args) => { Value = (Value + StepSize); };
             Btn_inc.Set_Svg(CssIcons.close);
 

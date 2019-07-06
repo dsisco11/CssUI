@@ -5,6 +5,7 @@ namespace CssUI.Enums
     /// <summary>
     /// Defines all of the different positioning 'scheme' types for elements
     /// </summary>
+    [CssEnum]
     public enum EPositioningScheme
     {
         /// <summary>Object is positioned according to normal flow logic</summary>

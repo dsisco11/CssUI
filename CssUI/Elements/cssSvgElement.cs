@@ -89,7 +89,7 @@ namespace CssUI
 #region Constructors
         public cssSvgElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, EReplacedElementType.SVG, className, ID)
         {
-            Style.Cascaded.ObjectFit.Value = EObjectFit.Contain;
+            Style.Cascaded.ObjectFit.Set(EObjectFit.Contain);
         }
 #endregion
 

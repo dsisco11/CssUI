@@ -114,6 +114,7 @@ namespace CssUI
 
         public double DpiX { get => Cascaded.DpiX.Actual; }
         public double DpiY { get => Cascaded.DpiY.Actual; }
+
         public int FontWeight { get => Cascaded.FontWeight.Actual; }
         public EFontStyle FontStyle { get => Cascaded.FontStyle.Actual; }
         public double FontSize { get => Cascaded.FontSize.Actual; }
@@ -124,74 +125,56 @@ namespace CssUI
         public double Opacity { get => Cascaded.Opacity.Actual; }
         public cssColor Blend_Color { get; private set; } = null;
         #endregion
-
-
+        
         #region Block Values
-        /*public int Layout_Pos_X { get; private set; } = 0;
-        public int Layout_Pos_Y { get; private set; } = 0;*/
 
-        public int ObjectPosition_X { get; private set; } = 0;
-        public int ObjectPosition_Y { get; private set; } = 0;
+        public int ObjectPosition_X { get => Cascaded.ObjectPosition_X.Actual; }
+        public int ObjectPosition_Y { get => Cascaded.ObjectPosition_Y.Actual; }
 
-        /*public int? Intrinsic_Width { get; private set; } = null;
-        public int? Intrinsic_Height { get; private set; } = null;
-        /// <summary>The intrinsic ratio of  Height/Width </summary>
-        public double? Intrinsic_Ratio { get; private set; } = null;*/
+        public int Top { get => Cascaded.Top.Actual; }
+        public int Right { get => Cascaded.Right.Actual; }
+        public int Bottom { get => Cascaded.Bottom.Actual; }
+        public int Left { get => Cascaded.Left.Actual; }
 
-        /*
-        /// <summary>
-        /// X-Axis position of the owning element relative to it's container
-        /// </summary>
-        public int X { get; private set; } = 0;
-        /// <summary>
-        /// Y-Axis position of the owning element relative to it's container
-        /// </summary>
-        public int Y { get; private set; } = 0;*/
+        public int Width { get => Cascaded.Width.Actual; }
+        public int Height { get => Cascaded.Height.Actual; }
 
-        public int Top { get; private set; } = -1;
-        public int Right { get; private set; } = -1;
-        public int Bottom { get; private set; } = -1;
-        public int Left { get; private set; } = -1;
+        public int Min_Width { get => Cascaded.Min_Width.Actual; }
+        public int Min_Height { get => Cascaded.Min_Height.Actual; }
 
-        public int Width { get; private set; } = -1;
-        public int Height { get; private set; } = -1;
-
-        public int? Content_Width { get; private set; } = null;
-        public int? Content_Height { get; private set; } = null;
-
-        public int Min_Width { get; private set; } = -1;
-        public int Min_Height { get; private set; } = -1;
-
-        public int? Max_Width { get; private set; } = null;
-        public int? Max_Height { get; private set; } = null;
+        public int? Max_Width { get => Cascaded.Max_Width.Actual; }
+        public int? Max_Height { get => Cascaded.Max_Height.Actual; }
 
 
-        //public eBlockOffset Margin { get; private set; } = new eBlockOffset(0, 0, 0, 0);
-        public int Margin_Vertical { get => (Margin_Top + Margin_Bottom); }
-        public int Margin_Horizontal { get => (Margin_Left + Margin_Right); }
-        public int Margin_Top { get; private set; } = 0;
-        public int Margin_Right { get; private set; } = 0;
-        public int Margin_Bottom { get; private set; } = 0;
-        public int Margin_Left { get; private set; } = 0;
-
-
-        //public eBlockOffset Padding { get; private set; } = new eBlockOffset(0, 0, 0, 0);
         public int Padding_Vertical { get => (Padding_Top + Padding_Bottom); }
         public int Padding_Horizontal { get => (Padding_Left + Padding_Right); }
-        public int Padding_Top { get; private set; } = 0;
-        public int Padding_Right { get; private set; } = 0;
-        public int Padding_Bottom { get; private set; } = 0;
-        public int Padding_Left { get; private set; } = 0;
 
-        public EBorderStyle Border_Top_Style { get => Cascaded.Border_Top_Style.Computed.AsEnum<EBorderStyle>(); }
+        public int Padding_Top { get => Cascaded.Padding_Top.Actual; }
+        public int Padding_Right { get => Cascaded.Padding_Right.Actual; }
+        public int Padding_Bottom { get => Cascaded.Padding_Bottom.Actual; }
+        public int Padding_Left { get => Cascaded.Padding_Left.Actual; }
+
+        /*public EBorderStyle Border_Top_Style { get => Cascaded.Border_Top_Style.Computed.AsEnum<EBorderStyle>(); }
         public EBorderStyle Border_Right_Style { get => Cascaded.Border_Right_Style.Computed.AsEnum<EBorderStyle>(); }
         public EBorderStyle Border_Bottom_Style { get => Cascaded.Border_Bottom_Style.Computed.AsEnum<EBorderStyle>(); }
-        public EBorderStyle Border_Left_Style { get => Cascaded.Border_Left_Style.Computed.AsEnum<EBorderStyle>(); }
+        public EBorderStyle Border_Left_Style { get => Cascaded.Border_Left_Style.Computed.AsEnum<EBorderStyle>(); }*/
 
-        public int Border_Top_Width { get; private set; } = 0;
-        public int Border_Right_Width { get; private set; } = 0;
-        public int Border_Bottom_Width { get; private set; } = 0;
-        public int Border_Left_Width { get; private set; } = 0;
+        public EBorderStyle Border_Top_Style { get => Cascaded.Border_Top_Style.Actual; }
+        public EBorderStyle Border_Right_Style { get => Cascaded.Border_Right_Style.Actual; }
+        public EBorderStyle Border_Bottom_Style { get => Cascaded.Border_Bottom_Style.Actual; }
+        public EBorderStyle Border_Left_Style { get => Cascaded.Border_Left_Style.Actual; }
+
+        public int Border_Top_Width { get => Cascaded.Border_Top_Width.Actual; }
+        public int Border_Right_Width { get => Cascaded.Border_Right_Width.Actual; }
+        public int Border_Bottom_Width { get => Cascaded.Border_Bottom_Width.Actual; }
+        public int Border_Left_Width { get => Cascaded.Border_Left_Width.Actual; }
+
+        public int Margin_Vertical { get => (Margin_Top + Margin_Bottom); }
+        public int Margin_Horizontal { get => (Margin_Left + Margin_Right); }
+        public int Margin_Top { get => Cascaded.Margin_Top.Actual; }
+        public int Margin_Right { get => Cascaded.Margin_Right.Actual; }
+        public int Margin_Bottom { get => Cascaded.Margin_Bottom.Actual; }
+        public int Margin_Left { get => Cascaded.Margin_Bottom.Actual; }
         #endregion
 
         #region Getters

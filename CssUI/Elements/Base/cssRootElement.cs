@@ -153,12 +153,12 @@ namespace CssUI
 
             // Style ourself
 
-            Style.ImplicitRules.BoxSizing.Set(EBoxSizingMode.BORDER);
+            Style.ImplicitRules.BoxSizing.Set(EBoxSizingMode.BorderBox);
             Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
             Style.ImplicitRules.Width.Set( CssValue.From_Percent(100.0));// Always match the viewport size
             Style.ImplicitRules.Height.Set( CssValue.From_Percent(100.0));// Always match the viewport size
             
-            Style.ImplicitRules.Set_Padding_Implicit(2, 2);
+            Style.ImplicitRules.Set_Padding(2, 2);
 
 
             //Style.ImplicitRules.FontSize.Set(14);

@@ -22,7 +22,7 @@ namespace CssUI.CSS
             {
                 switch (this.Type)
                 {
-                    case EStyleDataType.UNSET:// SEE:  https://www.w3.org/TR/css-cascade-4/#valdef-all-unset
+                    case ECssDataType.UNSET:// SEE:  https://www.w3.org/TR/css-cascade-4/#valdef-all-unset
                         {// This property wants to act as though there is no decleration
 
                             //is this property inherited
@@ -34,12 +34,12 @@ namespace CssUI.CSS
                             return new CssValue(Def.Initial);
                         }
                         break;
-                    case EStyleDataType.INHERIT:
+                    case ECssDataType.INHERIT:
                         {
                             return Property.Find_Inherited_Value();
                         }
                         break;
-                    case EStyleDataType.INITIAL:
+                    case ECssDataType.INITIAL:
                         {// If the Assigned value is the CssValue.Initial literal, then we use our definitions default
                             return Def.Initial;
                         }
@@ -88,12 +88,12 @@ namespace CssUI.CSS
             // Resolve any relative values
             switch (this.Type)
             {
-                case EStyleDataType.INHERIT:// SEE:  https://www.w3.org/TR/CSS2/cascade.html#value-def-inherit
+                case ECssDataType.INHERIT:// SEE:  https://www.w3.org/TR/CSS2/cascade.html#value-def-inherit
                     {
                         return Property.Find_Inherited_Value();
                     }
                     break;
-                case EStyleDataType.PERCENT:
+                case ECssDataType.PERCENT:
                     {
                         if (Def.Percentage_Resolver != null)
                         {
@@ -101,7 +101,7 @@ namespace CssUI.CSS
                         }
                     }
                     break;
-                case EStyleDataType.DIMENSION:
+                case ECssDataType.DIMENSION:
                     {
                         double? nv = this.Resolve((Unit) => StyleUnitResolver.Get_Scale(Property.Owner, Property, Unit));
                         if (nv.HasValue)

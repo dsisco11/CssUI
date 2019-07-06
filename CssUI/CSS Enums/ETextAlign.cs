@@ -5,6 +5,7 @@ namespace CssUI.Enums
     /// <summary>
     /// A block of text is a stack of line boxes. This property specifies how the inline-level boxes within each line box align with respect to the start and end sides of the line box. Alignment is not with respect to the viewport or containing block.
     /// </summary>
+    [CssEnum]
     public enum ETextAlign : int
     {
         /// <summary>Inline-level content is aligned to the start edge of the line box.</summary>

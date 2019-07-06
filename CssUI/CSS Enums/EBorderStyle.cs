@@ -6,7 +6,7 @@ namespace CssUI
     /// <summary>
     /// Defines all the possible border styles
     /// </summary>
-    [Flags]
+    [Flags, CssEnum]
     public enum EBorderStyle : int
     {
         /// <summary>No border, Color and width are ignored.</summary>

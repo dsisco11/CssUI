@@ -80,8 +80,8 @@ namespace CssUI
             Flags_Remove(EElementFlags.DoubleClickable);// Trackbars cannot fire double-click events.
             this.Direction = Dir;
             // So we don't get scrollbars
-            Style.ImplicitRules.Overflow_X.Value = EOverflowMode.Visible;
-            Style.ImplicitRules.Overflow_Y.Value = EOverflowMode.Visible;
+            Style.ImplicitRules.Overflow_X.Set(EOverflowMode.Visible);
+            Style.ImplicitRules.Overflow_Y.Set(EOverflowMode.Visible);
 
             Thumb = new cssBox(this);
             Thumb.Flags_Add(EElementFlags.Draggable);

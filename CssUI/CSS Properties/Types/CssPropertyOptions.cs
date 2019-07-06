@@ -51,11 +51,11 @@ namespace CssUI.CSS
         {
             switch (Value.Type)
             {
-                case EStyleDataType.AUTO:
+                case ECssDataType.AUTO:
                     return AllowAuto;
-                case EStyleDataType.INHERIT:
+                case ECssDataType.INHERIT:
                     return AllowInherited;
-                case EStyleDataType.PERCENT:
+                case ECssDataType.PERCENT:
                     return AllowPercentage;
                 default:
                     return true;
@@ -84,13 +84,13 @@ namespace CssUI.CSS
         {
             switch (Value.Type)
             {
-                case EStyleDataType.AUTO:
+                case ECssDataType.AUTO:
                     if (!AllowAuto) throw new Exception(string.Concat("The property(", Owner.CssName,") cannot be set to AUTO!"));
                     break;
-                case EStyleDataType.INHERIT:
+                case ECssDataType.INHERIT:
                     if (!AllowInherited) throw new Exception(string.Concat("The property(", Owner.CssName, ") cannot be set to INHERITED!"));
                     break;
-                case EStyleDataType.PERCENT:
+                case ECssDataType.PERCENT:
                     if (!AllowPercentage) throw new Exception(string.Concat("The property(", Owner.CssName, ") cannot be set to Percentages!"));
                     break;
                 default:

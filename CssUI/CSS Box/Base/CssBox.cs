@@ -76,11 +76,26 @@ namespace CssUI
         private readonly cssElement Owner;
 
         /// <summary>
+        /// Backing value for <see cref="Containing_Box"/>
+        /// </summary>
+        private cssBoxArea _containing_box = null;
+        /// <summary>
         /// The containing block of this element
         /// <para>If the control has an ancestor this will be said ancestors content-area block</para>
         /// <para>Otherwise, if the element is a root element, this should have the dimensions of the viewport</para>
         /// </summary>
-        public cssBoxArea Containing_Box { get; private set; } = null;
+        public cssBoxArea Containing_Box
+        {
+            get
+            {
+                if (ReferenceEquals(null, _containing_box))
+                {
+                    _containing_box = Find_Containing_Box();
+                }
+                return _containing_box;
+            }
+        }
+
         /// <summary>
         /// The 'Inner Display Type'
         /// Defines the *-level of this box, whether it is block-level, inline-level, or other.
@@ -128,11 +143,11 @@ namespace CssUI
         /// <summary>
         /// Returns <c>True</c> if the Width was given an explicit value (i.e. it doesn't depend on content size)
         /// </summary>
-        public bool IsWidthExplicit => (0 != (Style.Cascaded.Width.Specified.Type & (EStyleDataType.DIMENSION | EStyleDataType.PERCENT)) && !this.DependsOnChildren);
+        public bool IsWidthExplicit => (0 != (Style.Cascaded.Width.Specified.Type & (ECssDataType.DIMENSION | ECssDataType.PERCENT)) && !this.DependsOnChildren);
         /// <summary>
         /// Returns <c>True</c> if the Height was given an explicit value (i.e. it doesn't depend on content size)
         /// </summary>
-        public bool IsHeightExplicit => (0 != (Style.Cascaded.Height.Specified.Type & (EStyleDataType.DIMENSION | EStyleDataType.PERCENT)) && !this.DependsOnChildren);
+        public bool IsHeightExplicit => (0 != (Style.Cascaded.Height.Specified.Type & (ECssDataType.DIMENSION | ECssDataType.PERCENT)) && !this.DependsOnChildren);
 
 
         /// <summary>
@@ -319,7 +334,6 @@ namespace CssUI
         private void Update_Bounds()
         {
             /* Update all of our padding, border-size, and margins */
-
             this.Padding.Size_Top = Style.Padding_Top;
             this.Padding.Size_Right = Style.Padding_Right;
             this.Padding.Size_Bottom = Style.Padding_Bottom;
@@ -426,6 +440,8 @@ namespace CssUI
             if (!this.IsDirty && !Force)
                 return false;
 
+            this.Resolve();
+
             /* change detection */
             var oldPos = new Vec2i(this.X, this.Y);
             var oldSize = new Size2D(this.Width, this.Height);
@@ -448,13 +464,42 @@ namespace CssUI
             Update_Display_Group();
             Update_Display_Types();
             Update_Depends_Flag();
-            this.Containing_Box = Find_Containing_Box();
 
             // Figure out if we have any block-level children
             this.HasBlockLevelChildren = !ReferenceEquals(null, this.SingleOrDefault((CssBox b) => (b.OuterDisplayType == EOuterDisplayType.Block)));
 
             /* Update our bounds */
-            Update_Bounds();
+            switch(this.DisplayGroup)
+            {
+                case EBoxDisplayGroup.INVALID:
+                    {
+                        this.Replaced = null;
+
+                        this.Content.Size_Top = 0;
+                        this.Content.Size_Right = 0;
+                        this.Content.Size_Bottom = 0;
+                        this.Content.Size_Left = 0;
+
+                        this.Padding.Size_Top = 0;
+                        this.Padding.Size_Right = 0;
+                        this.Padding.Size_Bottom = 0;
+                        this.Padding.Size_Left = 0;
+
+                        this.Border.Size_Top = 0;
+                        this.Border.Size_Right = 0;
+                        this.Border.Size_Bottom = 0;
+                        this.Border.Size_Left = 0;
+
+                        this.Margin.Size_Top = 0;
+                        this.Margin.Size_Right = 0;
+                        this.Margin.Size_Bottom = 0;
+                        this.Margin.Size_Left = 0;
+                    }
+                    break;
+                default:
+                    Update_Bounds();
+                    break;
+            }
 
             /* Reset dirt flags */
             Dirt = EBoxInvalidationReason.NotInvalid;
@@ -672,7 +717,7 @@ namespace CssUI
         }
         #endregion
 
-        #region Content
+        #region Content Sizing
 
         public void Set_Content_Size(int? Width, int? Height)
         {
@@ -717,6 +762,8 @@ namespace CssUI
                 this.Intrinsic_Ratio = ((float)Height.Value / (float)Width.Value);
             else
                 this.Intrinsic_Ratio = null;
+
+            Flag(EBoxInvalidationReason.Content_Changed);
         }
 
         public void Set_Intrinsic_Width(int? Width)

@@ -6,6 +6,25 @@ namespace CssUI
 {
     public partial class CssBox
     {
+
+        private void Resolve()
+        {
+            this.Resolve_Box_Properties_Used_Value(out CssValue Left, out CssValue MarginLeft, out CssValue Width, out CssValue MarginRight, out CssValue Right, out CssValue Top, out CssValue MarginTop, out CssValue Height, out CssValue MarginBottom, out CssValue Bottom);
+
+            this.Style.Cascaded.Width.Set_Computed_Value(Width);
+            this.Style.Cascaded.Height.Set_Computed_Value(Height);
+
+            this.Style.Cascaded.Top.Set_Computed_Value(Top);
+            this.Style.Cascaded.Right.Set_Computed_Value(Right);
+            this.Style.Cascaded.Bottom.Set_Computed_Value(Bottom);
+            this.Style.Cascaded.Left.Set_Computed_Value(Left);
+
+            this.Style.Cascaded.Margin_Top.Set_Computed_Value(MarginTop);
+            this.Style.Cascaded.Margin_Right.Set_Computed_Value(MarginRight);
+            this.Style.Cascaded.Margin_Bottom.Set_Computed_Value(MarginBottom);
+            this.Style.Cascaded.Margin_Left.Set_Computed_Value(MarginLeft);
+
+        }
         /// <summary>
         /// Resolves 'Used' values for the following properties:
         /// Width, Height, Top, Right, Bottom, Left, Margin-Left, Margin-Right

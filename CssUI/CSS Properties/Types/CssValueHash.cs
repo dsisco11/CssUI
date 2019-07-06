@@ -36,11 +36,17 @@ namespace CssUI.Internal
         #region Casts
         public void Set(object Value)
         {
-            if (ReferenceEquals(Value, null)) throw new ArgumentNullException();
-
-            HasValue = true;
-            this.Hash = Value.GetHashCode();
-            ChangeCount++;
+            if (ReferenceEquals(Value, null))
+            {
+                this.Hash = 0;
+                HasValue = false;
+            }
+            else
+            {
+                HasValue = true;
+                this.Hash = Value.GetHashCode();
+                ChangeCount++;
+            }
         }
         #endregion
 

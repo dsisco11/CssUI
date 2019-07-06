@@ -19,32 +19,32 @@ namespace CssUI.CSS
         /// <summary>
         /// Value depends on other properties
         /// </summary>
-        public static CssValue Auto = new CssValue(EStyleDataType.AUTO);
+        public static CssValue Auto = new CssValue(ECssDataType.AUTO);
         /// <summary>
         /// (Non-Cascadeable)
         /// Treat as nothing. Eg; The stylesheet didnt specify anything for this property.
         /// </summary>
-        public static CssValue Null = new CssValue(EStyleDataType.NULL);
+        public static CssValue Null = new CssValue(ECssDataType.NULL);
         /// <summary>
         /// (Non-Cascadeable)
         /// Intentionally unsets a property, forcing it to resolve to either its inherited or initial value.
         /// DOCS: https://www.w3.org/TR/css-cascade-3/#inherit-initial
         /// </summary>
-        public static CssValue Unset = new CssValue(EStyleDataType.UNSET);
+        public static CssValue Unset = new CssValue(ECssDataType.UNSET);
         /// <summary>
         /// Value should resolve to it's definitions default value
         /// </summary>
-        public static CssValue Initial = new CssValue(EStyleDataType.INITIAL);
+        public static CssValue Initial = new CssValue(ECssDataType.INITIAL);
         /// <summary>
         /// Value is inherited from the parent element
         /// </summary>
-        public static CssValue Inherit = new CssValue(EStyleDataType.INHERIT);
+        public static CssValue Inherit = new CssValue(ECssDataType.INHERIT);
         /// <summary>
         /// (Cascades)
         /// Value is purposly nothing, No value is assigned, some properties use this state to be ignored.
         /// As in they wont have an effect on the elements styling or block
         /// </summary>
-        public static CssValue None = new CssValue(EStyleDataType.NONE);
+        public static CssValue None = new CssValue(ECssDataType.NONE);
 
         public static CssValue Zero = CssValue.From_Int(0);
         public static CssValue CurrentColor = CssValue.From_String("currentColor");
@@ -54,22 +54,22 @@ namespace CssUI.CSS
 
         #region Properties
         public readonly StyleValueFlags Flags = StyleValueFlags.None;
-        public readonly EStyleDataType Type = EStyleDataType.NULL;
+        public readonly ECssDataType Type = ECssDataType.NULL;
         public readonly dynamic Value = null;
         public readonly EStyleUnit Unit = EStyleUnit.None;
         #endregion
 
         #region Accessors
-        public bool IsAuto => (this.Type == EStyleDataType.AUTO);
+        public bool IsAuto => (this.Type == ECssDataType.AUTO);
         /// <summary>
         /// Returns whether or our value is a definite Number or Integer
         /// </summary>
-        public bool IsDefinite => (0 != (this.Type & (EStyleDataType.INTEGER | EStyleDataType.NUMBER)));
+        public bool IsDefinite => (0 != (this.Type & (ECssDataType.INTEGER | ECssDataType.NUMBER)));
 
         /// <summary>
-        /// Returns whether the value type is <see cref="EStyleDataType.NULL"/>
+        /// Returns whether the value type is <see cref="ECssDataType.NULL"/>
         /// </summary>
-        public bool IsNull => (this.Type == EStyleDataType.NULL);
+        public bool IsNull => (this.Type == ECssDataType.NULL);
 
         /// <summary>
         /// Returns whether there is actually a set value
@@ -78,7 +78,7 @@ namespace CssUI.CSS
         {
             get
             {
-                if (this.Type == EStyleDataType.NULL)
+                if (this.Type == ECssDataType.NULL)
                     return false;
 
                 if (ReferenceEquals(this.Value, null))
@@ -97,9 +97,9 @@ namespace CssUI.CSS
         /// <param name="UnitType"></param>
         /// <param name="newValue"></param>
         /// <returns>Success</returns>
-        bool Get_Dimension_From_String(string ValueStr, out EStyleDataType DataType, out EStyleUnit UnitType, out dynamic newValue)
+        bool Get_Dimension_From_String(string ValueStr, out ECssDataType DataType, out EStyleUnit UnitType, out dynamic newValue)
         {
-            DataType = EStyleDataType.NONE;
+            DataType = ECssDataType.NONE;
             UnitType = EStyleUnit.None;
             newValue = null;
 
@@ -107,10 +107,10 @@ namespace CssUI.CSS
             if (Parser[0].Type == ECssTokenType.Dimension)
             {
                 DimensionToken tok = (DimensionToken)Parser[0];
-                DataType = EStyleDataType.NUMBER;
+                DataType = ECssDataType.NUMBER;
                 newValue = tok.Number;
                 UnitType = (EStyleUnit)Enum.Parse(typeof(EStyleUnit), tok.Unit.ToUpper());
-                if (tok.DataType == ENumericTokenType.Integer) DataType = EStyleDataType.INTEGER;
+                if (tok.DataType == ENumericTokenType.Integer) DataType = ECssDataType.INTEGER;
                 return true;
             }
 
@@ -118,7 +118,7 @@ namespace CssUI.CSS
         }
 
         #region Constructors
-        private CssValue(EStyleDataType Type)
+        private CssValue(ECssDataType Type)
         {
             this.Type = Type;
 
@@ -127,33 +127,33 @@ namespace CssUI.CSS
                 // NOTE: Auto values get calculated in vastly different ways, sometimes this doesn't even indicate that a value depends on the value of other properties,
                 //so it should NOT get the 'Depends' flag
                 //case EStyleDataType.AUTO:
-                case EStyleDataType.INHERIT:// Inherited values function like redirects which compute to the current value of the matching property for the owning element's parent
-                case EStyleDataType.PERCENT:// Percentage values represent a percentage of another property's value
+                case ECssDataType.INHERIT:// Inherited values function like redirects which compute to the current value of the matching property for the owning element's parent
+                case ECssDataType.PERCENT:// Percentage values represent a percentage of another property's value
                     Flags = StyleValueFlags.Depends;
                     break;
-                case EStyleDataType.INTEGER:
-                case EStyleDataType.NUMBER:
-                case EStyleDataType.DIMENSION:
-                case EStyleDataType.COLOR:
-                case EStyleDataType.STRING:
+                case ECssDataType.INTEGER:
+                case ECssDataType.NUMBER:
+                case ECssDataType.DIMENSION:
+                case ECssDataType.COLOR:
+                case ECssDataType.STRING:
                     Flags = StyleValueFlags.Absolute;
                     break;
             }
         }
 
-        public CssValue(EStyleDataType Type, dynamic Value, EStyleUnit Unit) : this(Type)
+        public CssValue(ECssDataType Type, dynamic Value, EStyleUnit Unit) : this(Type)
         {
             this.Unit = Unit;
             this.Value = Value;
         }
 
-        public CssValue(EStyleDataType Type, dynamic Value = null, bool parseUnitType = false) : this(Type)
+        public CssValue(ECssDataType Type, dynamic Value = null, bool parseUnitType = false) : this(Type)
         {
             this.Value = Value;
-            if (parseUnitType && Type != EStyleDataType.STRING && Value is string)
+            if (parseUnitType && Type != ECssDataType.STRING && Value is string)
             {// Find which unit type our string value was given
                 string vStr = (string)Value;
-                EStyleDataType dataTy;
+                ECssDataType dataTy;
                 EStyleUnit unitTy;
                 dynamic NewValue;
                 if (Get_Dimension_From_String(vStr, out dataTy, out unitTy, out NewValue))
@@ -177,45 +177,48 @@ namespace CssUI.CSS
 
         
         /// <summary>Create an integer value from an enum</summary>
-        public static CssValue From_Enum(object value) { return new CssValue(EStyleDataType.INTEGER, (int)value); }
+        public static CssValue From_Enum<Ty>(Ty value) where Ty: struct {
+            /* XXX: set value to enums CssKeyword */
+            return new CssValue(ECssDataType.KEYWORD, CssLookup.Enum<Ty>(value));
+        }
 
         /// <summary>Create an absolute integer value</summary>
-        public static CssValue From_Int(int value) { return new CssValue(EStyleDataType.INTEGER, value); }
+        public static CssValue From_Int(int value) { return new CssValue(ECssDataType.INTEGER, value); }
 
         /// <summary>Create an absolute integer value if not null, or return the given default value</summary>
-        public static CssValue From_Int(int? value, CssValue defaultValue) { return (!value.HasValue ? defaultValue : new CssValue(EStyleDataType.INTEGER, value.Value)); }
+        public static CssValue From_Int(int? value, CssValue defaultValue) { return (!value.HasValue ? defaultValue : new CssValue(ECssDataType.INTEGER, value.Value)); }
         
         /// <summary>Create an absolute number value</summary>
-        public static CssValue From_Number(double value) { return new CssValue(EStyleDataType.NUMBER, (double)value); }
+        public static CssValue From_Number(double value) { return new CssValue(ECssDataType.NUMBER, (double)value); }
 
         /// <summary>Create an absolute number value if not null, or return the given default value</summary>
-        public static CssValue From_Number(double? value, CssValue defaultValue) { return (!value.HasValue ? defaultValue : new CssValue(EStyleDataType.NUMBER, (double)value.Value)); }
+        public static CssValue From_Number(double? value, CssValue defaultValue) { return (!value.HasValue ? defaultValue : new CssValue(ECssDataType.NUMBER, (double)value.Value)); }
         
         /// <summary>Create a percentage value</summary>
         /// <param name="value">Floating-point value in the range [0 - 100]</param>
-        public static CssValue From_Percent(double value) { return new CssValue(EStyleDataType.PERCENT, (double)value); }
+        public static CssValue From_Percent(double value) { return new CssValue(ECssDataType.PERCENT, (double)value); }
 
 
 
         /// <summary>Create an absolute length value</summary>
-        public static CssValue From_Length(string value) { return new CssValue(EStyleDataType.DIMENSION, (string)value, true); }
+        public static CssValue From_Length(string value) { return new CssValue(ECssDataType.DIMENSION, (string)value, true); }
 
         /// <summary>Create an absolute length value</summary>
-        public static CssValue From_Length(double value, EStyleUnit Unit) { return new CssValue(EStyleDataType.DIMENSION, (double)value, Unit); }
+        public static CssValue From_Length(double value, EStyleUnit Unit) { return new CssValue(ECssDataType.DIMENSION, (double)value, Unit); }
 
         /// <summary>Create an absolute length value if not null, or return the given default value</summary>
-        public static CssValue From_Length(double? value, EStyleUnit Unit, CssValue defaultValue) { return (!value.HasValue ? defaultValue : new CssValue(EStyleDataType.DIMENSION, (double)value.Value, Unit)); }
+        public static CssValue From_Length(double? value, EStyleUnit Unit, CssValue defaultValue) { return (!value.HasValue ? defaultValue : new CssValue(ECssDataType.DIMENSION, (double)value.Value, Unit)); }
 
         
 
         /// <summary>Create an RGBA color value</summary>
-        public static CssValue From_Color(cssColor value) { return new CssValue(EStyleDataType.COLOR, value); }
+        public static CssValue From_Color(cssColor value) { return new CssValue(ECssDataType.COLOR, value); }
 
         /// <summary>Create a string value</summary>
-        public static CssValue From_String(string value) { return new CssValue(EStyleDataType.STRING, value); }
+        public static CssValue From_String(string value) { return new CssValue(ECssDataType.STRING, value); }
 
         /// <summary>Create a keyword value</summary>
-        public static CssValue From_Keyword(string value) { return new CssValue(EStyleDataType.KEYWORD, value); }
+        public static CssValue From_Keyword(string value) { return new CssValue(ECssDataType.KEYWORD, value); }
 
         #endregion
 
@@ -224,21 +227,21 @@ namespace CssUI.CSS
         {
             switch (Type)
             {
-                case EStyleDataType.INTEGER:
+                case ECssDataType.INTEGER:
                     return string.Concat((int)Value);
-                case EStyleDataType.NUMBER:
+                case ECssDataType.NUMBER:
                     return string.Concat(((double)Value).ToString("0.###"));
-                case EStyleDataType.DIMENSION:
+                case ECssDataType.DIMENSION:
                     if (Unit == EStyleUnit.None)
                         return string.Concat(((double)Value).ToString("0.###"), "<none>");
                     else
                         return string.Concat(((double)Value).ToString("0.###"), Unit.ToString().ToLower());
-                case EStyleDataType.PERCENT:
+                case ECssDataType.PERCENT:
                     return string.Concat(((double)Value).ToString("0.###"), "%");
-                case EStyleDataType.STRING:
+                case ECssDataType.STRING:
                     return Value as string;
                 default:
-                    return string.Concat("[", Enum.GetName(typeof(EStyleDataType), Type), "]");
+                    return string.Concat("[", Enum.GetName(typeof(ECssDataType), Type), "]");
             }
         }
         #endregion
@@ -271,11 +274,11 @@ namespace CssUI.CSS
         {
             switch (Type)
             {
-                case EStyleDataType.INTEGER:
+                case ECssDataType.INTEGER:
                     return (int)Value;
-                case EStyleDataType.NUMBER:
+                case ECssDataType.NUMBER:
                     return (double)Value;
-                case EStyleDataType.DIMENSION:
+                case ECssDataType.DIMENSION:
                     return ResolveDimension(UnitResolver);
                 default:
                     return null;
@@ -303,11 +306,11 @@ namespace CssUI.CSS
             {
                 switch (Type)
                 {
-                    case EStyleDataType.INTEGER:
+                    case ECssDataType.INTEGER:
                         return (int)Value;
-                    case EStyleDataType.NUMBER:
+                    case ECssDataType.NUMBER:
                         return (double)Value;
-                    case EStyleDataType.DIMENSION:
+                    case ECssDataType.DIMENSION:
                         return ResolveDimension(UnitResolver);
                     default:
                         return null;
@@ -336,13 +339,13 @@ namespace CssUI.CSS
         {
             switch (Type)
             {
-                case EStyleDataType.INTEGER:
+                case ECssDataType.INTEGER:
                     return (int)Value;
-                case EStyleDataType.NUMBER:
+                case ECssDataType.NUMBER:
                     return (double)Value;
-                case EStyleDataType.DIMENSION:
+                case ECssDataType.DIMENSION:
                     return ResolveDimension(UnitResolver);
-                case EStyleDataType.PERCENT:
+                case ECssDataType.PERCENT:
                     return (((double)Value / 100.0) * percentageMultiplier);
                 default:
                     return null;
@@ -369,13 +372,13 @@ namespace CssUI.CSS
         {
             switch (Type)
             {
-                case EStyleDataType.INTEGER:
+                case ECssDataType.INTEGER:
                     return (int)Value;
-                case EStyleDataType.NUMBER:
+                case ECssDataType.NUMBER:
                     return (double)Value;
-                case EStyleDataType.DIMENSION:
+                case ECssDataType.DIMENSION:
                     return ResolveDimension(UnitResolver);
-                case EStyleDataType.PERCENT:
+                case ECssDataType.PERCENT:
                     return percentageResolver(((double)Value / 100.0));
                 default:
                     return null;
@@ -439,9 +442,9 @@ namespace CssUI.CSS
         {
             switch (Type)
             {
-                case EStyleDataType.INTEGER:
+                case ECssDataType.INTEGER:
                     return (int)Value;
-                case EStyleDataType.NUMBER:
+                case ECssDataType.NUMBER:
                     return (double)Value;
                 default:
                     return null;
@@ -457,11 +460,11 @@ namespace CssUI.CSS
         {
             switch (Type)
             {
-                case EStyleDataType.INTEGER:
+                case ECssDataType.INTEGER:
                     return (int)Value;
-                case EStyleDataType.NUMBER:
+                case ECssDataType.NUMBER:
                     return (double)Value;
-                case EStyleDataType.PERCENT:
+                case ECssDataType.PERCENT:
                     return (((double)Value / 100.0) * percentageMultiplier);
                 default:
                     return null;
@@ -488,9 +491,9 @@ namespace CssUI.CSS
             {
                 switch (Type)
                 {
-                    case EStyleDataType.INTEGER:
+                    case ECssDataType.INTEGER:
                         return (int)Value;
-                    case EStyleDataType.NUMBER:
+                    case ECssDataType.NUMBER:
                         return (double)Value;
                     default:
                         return null;
@@ -519,11 +522,11 @@ namespace CssUI.CSS
         {
             switch (Type)
             {
-                case EStyleDataType.INTEGER:
+                case ECssDataType.INTEGER:
                     return (int)Value;
-                case EStyleDataType.NUMBER:
+                case ECssDataType.NUMBER:
                     return (double)Value;
-                case EStyleDataType.PERCENT:
+                case ECssDataType.PERCENT:
                     return (((double)Value / 100.0) * percentageMultiplier);
             }
 
@@ -539,11 +542,11 @@ namespace CssUI.CSS
         {
             switch (Type)
             {
-                case EStyleDataType.INTEGER:
+                case ECssDataType.INTEGER:
                     return (int)Value;
-                case EStyleDataType.NUMBER:
+                case ECssDataType.NUMBER:
                     return (double)Value;
-                case EStyleDataType.PERCENT:
+                case ECssDataType.PERCENT:
                     return percentageResolver(((double)Value / 100.0));
                 default:
                     return null;
@@ -559,11 +562,11 @@ namespace CssUI.CSS
         {
             switch (Type)
             {
-                case EStyleDataType.INTEGER:
+                case ECssDataType.INTEGER:
                     return (int)Value;
-                case EStyleDataType.NUMBER:
+                case ECssDataType.NUMBER:
                     return (double)Value;
-                case EStyleDataType.PERCENT:
+                case ECssDataType.PERCENT:
                     return percentageResolver(((double)Value / 100.0));
             }
 
@@ -615,7 +618,7 @@ namespace CssUI.CSS
         {
             switch (Type)
             {
-                case EStyleDataType.COLOR:
+                case ECssDataType.COLOR:
                     return ((cssColor)Value);
                 default:
                     return null;
@@ -633,21 +636,21 @@ namespace CssUI.CSS
         {
             switch (Type)
             {
-                case EStyleDataType.INTEGER:
-                case EStyleDataType.NUMBER:
+                case ECssDataType.INTEGER:
+                case ECssDataType.NUMBER:
                     return string.Concat(Value);
-                case EStyleDataType.DIMENSION:
+                case ECssDataType.DIMENSION:
                     {
                         if (Unit == EStyleUnit.None)
                             return string.Concat(((double)Value).ToString());
                         else
                             return string.Concat(((double)Value).ToString(), Enum.GetName(typeof(EStyleUnit), Unit).ToLower());
                     }
-                case EStyleDataType.PERCENT:
+                case ECssDataType.PERCENT:
                     return string.Concat((double)Value, "%");
-                case EStyleDataType.COLOR:
+                case ECssDataType.COLOR:
                     return ((cssColor)Value).ToCssString();
-                case EStyleDataType.STRING:
+                case ECssDataType.STRING:
                     return ((string)Value);
                 default:
                     return null;
@@ -674,24 +677,25 @@ namespace CssUI.CSS
 
             switch (A.Type)
             {
-                case EStyleDataType.NULL:
-                case EStyleDataType.UNSET:
-                case EStyleDataType.AUTO:
-                case EStyleDataType.INITIAL:
-                case EStyleDataType.INHERIT:
-                case EStyleDataType.NONE:
+                case ECssDataType.NULL:
+                case ECssDataType.UNSET:
+                case ECssDataType.AUTO:
+                case ECssDataType.INITIAL:
+                case ECssDataType.INHERIT:
+                case ECssDataType.NONE:
                     return true;
-                case EStyleDataType.INTEGER:
-                case EStyleDataType.COLOR:
+                case ECssDataType.INTEGER:
+                case ECssDataType.COLOR:
                     return EqualityComparer<int>.Default.Equals(A.Value, B.Value);
-                case EStyleDataType.NUMBER:
-                case EStyleDataType.DIMENSION:
-                case EStyleDataType.PERCENT:
+                case ECssDataType.NUMBER:
+                case ECssDataType.DIMENSION:
+                case ECssDataType.PERCENT:
                     return EqualityComparer<double>.Default.Equals(A.Value, B.Value);
-                case EStyleDataType.STRING:
+                case ECssDataType.STRING:
+                case ECssDataType.KEYWORD:
                     return EqualityComparer<string>.Default.Equals(A.Value, B.Value);
                 default:
-                    throw new NotImplementedException(string.Concat("Equality comparison logic not implemented for type: ", Enum.GetName(typeof(EStyleDataType), A.Type)));
+                    throw new NotImplementedException(string.Concat("Equality comparison logic not implemented for type: ", Enum.GetName(typeof(ECssDataType), A.Type)));
             }
         }
 

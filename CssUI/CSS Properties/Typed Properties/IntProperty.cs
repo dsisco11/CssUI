@@ -5,43 +5,25 @@ namespace CssUI.CSS
     /// <summary>
     /// Represents a styling property which always resolves to an integer
     /// </summary>
-    public class IntProperty : CssProperty
+    public class IntProperty : LengthProperty
     {
-        #region Accessors
-        //public Action<NamedProperty> onChanged { get { return this.onChanged; } set { this.onChanged = value; } }
-        #endregion
-
         #region Value Overrides
         public new int Actual
         {
             get
             {
-                return base.Actual.Value;
+                return (int)base.Actual.Value;
             }
         }
         #endregion
 
         #region Constructors
         public IntProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked) 
-            : base(CssName, Locked, Source, Owner)
+            : base(CssName, Owner, Source, Locked)
         {
         }
         #endregion
 
-        #region Setters
-        /// <summary>
-        /// Sets the <see cref="Assigned"/> value for this property
-        /// </summary>
-        /// <param name="value"></param>
-        public void Set(int? value)
-        {
-            var newValue = CssValue.From_Int(value, CssValue.Null);
-            if (Assigned != newValue)
-            {
-                Assigned = newValue;
-            }
-        }
-        #endregion
     }
 }
 

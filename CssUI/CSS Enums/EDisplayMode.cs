@@ -3,7 +3,7 @@ using System;
 
 namespace CssUI.Enums
 {
-    [Flags]
+    [Flags, CssEnum]
     public enum EDisplayMode : int
     {
         /// <summary>This value causes an element to generate no boxes (i.e., the element has no effect on layout). Descendant elements do not generate any boxes either; this behavior cannot be overridden by setting the ‘display’ property on the descendants.</summary>

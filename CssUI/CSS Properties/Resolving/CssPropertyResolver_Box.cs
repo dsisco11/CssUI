@@ -10,7 +10,7 @@ namespace CssUI.Internal
         public static dynamic Border_Width_Used(ICssProperty Property)
         {// Docs: https://www.w3.org/TR/css-backgrounds-3/#the-border-width
             var prop = (Property as CssProperty);
-            if (prop.Computed.Type != EStyleDataType.KEYWORD)
+            if (prop.Computed.Type != ECssDataType.KEYWORD)
                 return prop.Computed;
 
 
@@ -67,7 +67,7 @@ namespace CssUI.Internal
             var prop = (Property as CssProperty);
             CssValue Value = prop.Computed;
 
-            if (Value.Type == EStyleDataType.KEYWORD)
+            if (Value.Type == ECssDataType.KEYWORD)
             {
                 string keyword = (Value.Value as string).ToLower();
                 switch (keyword)
@@ -97,7 +97,7 @@ namespace CssUI.Internal
                         throw new NotImplementedException($"Keyword '{keyword}' is not implemented!");
                 }
             }
-            else if (Value.Type == EStyleDataType.AUTO)
+            else if (Value.Type == ECssDataType.AUTO)
             {
                 /* 
                  * For min-width/min-height, specifies an automatic minimum size. 
@@ -127,7 +127,7 @@ namespace CssUI.Internal
             var prop = (Property as CssProperty);
             CssValue Value = prop.Computed;
 
-            if (Value.Type == EStyleDataType.KEYWORD)
+            if (Value.Type == ECssDataType.KEYWORD)
             {
                 string keyword = (Value.Value as string).ToLower();
                 switch (keyword)
@@ -157,7 +157,7 @@ namespace CssUI.Internal
                         throw new NotImplementedException($"Keyword '{keyword}' is not implemented!");
                 }
             }
-            else if (Value.Type == EStyleDataType.AUTO)
+            else if (Value.Type == ECssDataType.AUTO)
             {
                 /* 
                  * For min-width/min-height, specifies an automatic minimum size. 
@@ -187,7 +187,7 @@ namespace CssUI.Internal
             var prop = (Property as CssProperty);
             CssValue Value = prop.Computed;
 
-            if (Value.Type == EStyleDataType.KEYWORD)
+            if (Value.Type == ECssDataType.KEYWORD)
             {
                 string keyword = (Value.Value as string).ToLower();
                 switch (keyword)
@@ -226,7 +226,7 @@ namespace CssUI.Internal
             var prop = (Property as CssProperty);
             CssValue Value = prop.Computed;
 
-            if (Value.Type == EStyleDataType.KEYWORD)
+            if (Value.Type == ECssDataType.KEYWORD)
             {
                 string keyword = (Value.Value as string).ToLower();
                 switch (keyword)
@@ -259,5 +259,53 @@ namespace CssUI.Internal
 
             return Value;
         }
+
+
+
+        public static dynamic Box_Top_Used(ICssProperty Property)
+        {
+            var prop = (Property as CssProperty);
+            CssValue Value = prop.Computed;
+            if (!Value.IsDefinite)
+            {
+                return CssValue.From_Int(0);
+            }
+            return Value;
+        }
+
+        public static dynamic Box_Right_Used(ICssProperty Property)
+        {
+            var prop = (Property as CssProperty);
+            CssValue Value = prop.Computed;
+            if (!Value.IsDefinite)
+            {
+                return CssValue.From_Int(0);
+            }
+            return Value;
+        }
+
+        public static dynamic Box_Bottom_Used(ICssProperty Property)
+        {
+            var prop = (Property as CssProperty);
+            CssValue Value = prop.Computed;
+            if (!Value.IsDefinite)
+            {
+                return CssValue.From_Int(0);
+            }
+            return Value;
+        }
+
+        public static dynamic Box_Left_Used(ICssProperty Property)
+        {
+            var prop = (Property as CssProperty);
+            CssValue Value = prop.Computed;
+            if (!Value.IsDefinite)
+            {
+                return CssValue.From_Int(0);
+            }
+            return Value;
+        }
+
+
     }
 }

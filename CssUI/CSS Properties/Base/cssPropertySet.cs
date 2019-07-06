@@ -74,7 +74,7 @@ namespace CssUI
 
         /// <summary>
         /// Current BoxSizing mode for this element.
-        /// (Defaults to <see cref="EBoxSizingMode.BORDER"/>)
+        /// (Defaults to <see cref="EBoxSizingMode.BorderBox"/>)
         /// </summary>
         public EnumProperty<EBoxSizingMode> BoxSizing => (EnumProperty<EBoxSizingMode>)this["box-sizing"];
 
@@ -90,9 +90,6 @@ namespace CssUI
         public EnumProperty<EObjectFit> ObjectFit => (EnumProperty<EObjectFit>)this["object-fit"];
         public IntProperty ObjectPosition_X => (IntProperty)this["object-position-x"];
         public IntProperty ObjectPosition_Y => (IntProperty)this["object-position-y"];
-        internal IntProperty Intrinsic_Width => (IntProperty)this["intrinsic-width"];
-        internal IntProperty Intrinsic_Height => (IntProperty)this["intrinsic-height"];
-        internal NumberProperty Intrinsic_Ratio => (NumberProperty)this["intrinsic-ratio"];
         #endregion
 
         #region Overflow
@@ -103,9 +100,6 @@ namespace CssUI
         #region Size
         public IntProperty Width => (IntProperty)this["width"];
         public IntProperty Height => (IntProperty)this["height"];
-
-        internal IntProperty Content_Width => (IntProperty)this["content-width"];
-        internal IntProperty Content_Height => (IntProperty)this["content-height"];
         #endregion
 
         #region Borders
@@ -173,29 +167,6 @@ namespace CssUI
         public IntProperty Left => (IntProperty)this["left"];
         #endregion
 
-        #region Margins
-        /// <summary>
-        /// Distance between the elements Top edge and Top border (in pixels)
-        /// <para>Clears an area outside the border. The margin is transparent</para>
-        /// </summary>
-        public IntProperty Margin_Top => (IntProperty)this["margin-top"];
-        /// <summary>
-        /// Distance between the elements Right edge and Right border (in pixels)
-        /// <para>Clears an area outside the border. The margin is transparent</para>
-        /// </summary>
-        public IntProperty Margin_Right => (IntProperty)this["margin-right"];
-        /// <summary>
-        /// Distance between the elements Bottom edge and Bottom border (in pixels)
-        /// <para>Clears an area outside the border. The margin is transparent</para>
-        /// </summary>
-        public IntProperty Margin_Bottom => (IntProperty)this["margin-bottom"];
-        /// <summary>
-        /// Distance between the elements Left edge and Left border (in pixels)
-        /// <para>Clears an area outside the border. The margin is transparent</para>
-        /// </summary>
-        public IntProperty Margin_Left => (IntProperty)this["margin-left"];
-        #endregion
-
         #region Padding
         /// <summary>
         /// Distance between this elements Top border and its content (in pixels)
@@ -219,6 +190,29 @@ namespace CssUI
         public IntProperty Padding_Left => (IntProperty)this["padding-left"];
         #endregion
 
+        #region Margins
+        /// <summary>
+        /// Distance between the elements Top edge and Top border (in pixels)
+        /// <para>Clears an area outside the border. The margin is transparent</para>
+        /// </summary>
+        public IntProperty Margin_Top => (IntProperty)this["margin-top"];
+        /// <summary>
+        /// Distance between the elements Right edge and Right border (in pixels)
+        /// <para>Clears an area outside the border. The margin is transparent</para>
+        /// </summary>
+        public IntProperty Margin_Right => (IntProperty)this["margin-right"];
+        /// <summary>
+        /// Distance between the elements Bottom edge and Bottom border (in pixels)
+        /// <para>Clears an area outside the border. The margin is transparent</para>
+        /// </summary>
+        public IntProperty Margin_Bottom => (IntProperty)this["margin-bottom"];
+        /// <summary>
+        /// Distance between the elements Left edge and Left border (in pixels)
+        /// <para>Clears an area outside the border. The margin is transparent</para>
+        /// </summary>
+        public IntProperty Margin_Left => (IntProperty)this["margin-left"];
+        #endregion
+
         #region Text
         public EnumProperty<ETextAlign> TextAlign => (EnumProperty<ETextAlign>)this["text-align"];
         #endregion
@@ -226,6 +220,7 @@ namespace CssUI
         #region Font
         public NumberProperty DpiX => (NumberProperty)this["dpi-x"];
         public NumberProperty DpiY => (NumberProperty)this["dpi-y"];
+
         public IntProperty FontWeight => (IntProperty)this["font-weight"];
         public EnumProperty<EFontStyle> FontStyle => (EnumProperty<EFontStyle>)this["font-style"];
         public NumberProperty FontSize => (NumberProperty)this["font-size"];
@@ -236,7 +231,7 @@ namespace CssUI
         /// <summary>
         /// 'line-height' specifies the minimal height of line boxes within the element.
         /// </summary>
-        public NumberProperty LineHeight => (NumberProperty)this["line-height"];
+        public IntProperty LineHeight => (IntProperty)this["line-height"];
         #endregion
 
         #region Opacity
@@ -306,15 +301,9 @@ namespace CssUI
 
                 new IntProperty("object-position-x", Owner, selfRef, this.Locked),
                 new IntProperty("object-position-y", Owner, selfRef, this.Locked),
-                new IntProperty("intrinsic-width", Owner, selfRef, this.Locked),
-                new IntProperty("intrinsic-height", Owner, selfRef, this.Locked),
-                new NumberProperty("intrinsic-ratio", Owner, selfRef, this.Locked),
 
                 new IntProperty("width", Owner, selfRef, this.Locked),
                 new IntProperty("height", Owner, selfRef, this.Locked),
-
-                new IntProperty("content-width", Owner, selfRef, this.Locked),
-                new IntProperty("content-height", Owner, selfRef, this.Locked),
 
                 new IntProperty("min-width", Owner, selfRef, this.Locked),
                 new IntProperty("min-height", Owner, selfRef, this.Locked),
@@ -353,7 +342,7 @@ namespace CssUI
                 new NumberProperty("font-size", Owner, selfRef, this.Locked),
                 new MultiStringProperty("font-family", Owner, selfRef, this.Locked),
 
-                new NumberProperty("line-height", Owner, selfRef, this.Locked),
+                new IntProperty("line-height", Owner, selfRef, this.Locked),
 
                 new NumberProperty("opacity", Owner, selfRef, this.Locked),
 
@@ -517,61 +506,19 @@ namespace CssUI
         }
         #endregion
 
-        #region Value Management
-
-        /// <summary>
-        /// Overwrites the property values of this instance with those of any set property values from another instance.
-        /// </summary>
-        /// <param name="props"></param>
-        internal async Task CascadeAsync(CssPropertySet props)
-        {
-            //var tid = Timing.Start("Cascade");
-            if (props.SetProperties.Count <= 0)
-                return;
-
-            AsyncCountdownEvent ctdn = new AsyncCountdownEvent(props.SetProperties.Count);
-            Parallel.ForEach<AtomicString>(props.SetProperties, async (cssName) =>
-            {
-                ICssProperty val = props[cssName];
-                ICssProperty mv = this[cssName];
-
-                await mv.CascadeAsync(val);
-                // Signal our original thread that we are 1 step closer to being done
-                ctdn.Signal();
-            });
-
-            await ctdn.WaitAsync();
-            //Timing.Stop(tid);
-        }
-
-        /// <summary>
-        /// Overwrites any differing property values
-        /// </summary>
-        /// <param name="Target"></param>
-        internal async Task OverwriteAsync(CssPropertySet Target)
-        {
-            AsyncCountdownEvent ctdn = new AsyncCountdownEvent(CssProperties.Count);
-            Parallel.For(0, CssProperties.Count, async (i) =>
-            {
-                ICssProperty prop = CssProperties[i];
-                ICssProperty mv = Target.Get_ByIndex(i);
-
-                await mv.OverwriteAsync(prop);
-                ctdn.Signal();
-            });
-
-            await ctdn.WaitAsync();
-        }
-        #endregion
-
 
         #region Padding Helpers
         public void Set_Padding(int? horizontal, int? vertical)
         {
-            Padding_Top.Set(vertical);
+            /*Padding_Top.Set(vertical);
             Padding_Right.Set(horizontal);
             Padding_Bottom.Set(vertical);
-            Padding_Left.Set(horizontal);
+            Padding_Left.Set(horizontal);*/
+
+            Padding_Top.Set(!vertical.HasValue ? null : CssValue.From_Length(vertical.Value, EStyleUnit.PX));
+            Padding_Right.Set(!horizontal.HasValue ? null : CssValue.From_Length(horizontal.Value, EStyleUnit.PX));
+            Padding_Bottom.Set(!vertical.HasValue ? null : CssValue.From_Length(vertical.Value, EStyleUnit.PX));
+            Padding_Left.Set(!horizontal.HasValue ? null : CssValue.From_Length(horizontal.Value, EStyleUnit.PX));
         }
         public void Set_Padding(CssValue horizontal, CssValue vertical)
         {
@@ -582,40 +529,17 @@ namespace CssUI
         }
         public void Set_Padding(int? top, int? right, int? bottom, int? left)
         {
-            Padding_Top.Set(top);
+            /*Padding_Top.Set(top);
             Padding_Right.Set(right);
             Padding_Bottom.Set(bottom);
-            Padding_Left.Set(left);
+            Padding_Left.Set(left);*/
+
+            Padding_Top.Set(!top.HasValue ? null : CssValue.From_Length(top.Value, EStyleUnit.PX));
+            Padding_Right.Set(!right.HasValue ? null : CssValue.From_Length(right.Value, EStyleUnit.PX));
+            Padding_Bottom.Set(!bottom.HasValue ? null : CssValue.From_Length(bottom.Value, EStyleUnit.PX));
+            Padding_Left.Set(!left.HasValue ? null : CssValue.From_Length(left.Value, EStyleUnit.PX));
         }
         public void Set_Padding(CssValue top, CssValue right, CssValue bottom, CssValue left)
-        {
-            Padding_Top.Set(top);
-            Padding_Right.Set(right);
-            Padding_Bottom.Set(bottom);
-            Padding_Left.Set(left);
-        }
-        public void Set_Padding_Implicit(int? horizontal, int? vertical)
-        {
-            Padding_Top.Set(vertical);
-            Padding_Right.Set(horizontal);
-            Padding_Bottom.Set(vertical);
-            Padding_Left.Set(horizontal);
-        }
-        public void Set_Padding_Implicit(CssValue horizontal, CssValue vertical)
-        {
-            Padding_Top.Set(vertical);
-            Padding_Right.Set(horizontal);
-            Padding_Bottom.Set(vertical);
-            Padding_Left.Set(horizontal);
-        }
-        public void Set_Padding_Implicit(int? top, int? right, int? bottom, int? left)
-        {
-            Padding_Top.Set(top);
-            Padding_Right.Set(right);
-            Padding_Bottom.Set(bottom);
-            Padding_Left.Set(left);
-        }
-        public void Set_Padding_Implicit(CssValue top, CssValue right, CssValue bottom, CssValue left)
         {
             Padding_Top.Set(top);
             Padding_Right.Set(right);
@@ -628,10 +552,15 @@ namespace CssUI
         #region Margin Helpers
         public void Set_Margin(int? horizontal, int? vertical)
         {
-            Margin_Top.Set(vertical);
+            /*Margin_Top.Set(vertical);
             Margin_Right.Set(horizontal);
             Margin_Bottom.Set(vertical);
-            Margin_Left.Set(horizontal);
+            Margin_Left.Set(horizontal);*/
+
+            Margin_Top.Set(!vertical.HasValue ? null : CssValue.From_Length(vertical.Value, EStyleUnit.PX));
+            Margin_Right.Set(!horizontal.HasValue ? null : CssValue.From_Length(horizontal.Value, EStyleUnit.PX));
+            Margin_Bottom.Set(!vertical.HasValue ? null : CssValue.From_Length(vertical.Value, EStyleUnit.PX));
+            Margin_Left.Set(!horizontal.HasValue ? null : CssValue.From_Length(horizontal.Value, EStyleUnit.PX));
         }
         public void Set_Margin(CssValue horizontal, CssValue vertical)
         {
@@ -642,10 +571,15 @@ namespace CssUI
         }
         public void Set_Margin(int? top, int? right, int? bottom, int? left)
         {
-            Margin_Top.Set(top);
+            /*Margin_Top.Set(top);
             Margin_Right.Set(right);
             Margin_Bottom.Set(bottom);
-            Margin_Left.Set(left);
+            Margin_Left.Set(left);*/
+
+            Margin_Top.Set(!top.HasValue ? null : CssValue.From_Length(top.Value, EStyleUnit.PX));
+            Margin_Right.Set(!right.HasValue ? null : CssValue.From_Length(right.Value, EStyleUnit.PX));
+            Margin_Bottom.Set(!bottom.HasValue ? null : CssValue.From_Length(bottom.Value, EStyleUnit.PX));
+            Margin_Left.Set(!left.HasValue ? null : CssValue.From_Length(left.Value, EStyleUnit.PX));
         }
         public void Set_Margin(CssValue top, CssValue right, CssValue bottom, CssValue left)
         {
@@ -656,47 +590,29 @@ namespace CssUI
         }
         public void Set_Margin_Implicit(int? horizontal, int? vertical)
         {
-            Margin_Top.Set(vertical);
+            /*Margin_Top.Set(vertical);
             Margin_Right.Set(horizontal);
             Margin_Bottom.Set(vertical);
-            Margin_Left.Set(horizontal);
-        }
-        public void Set_Margin_Implicit(CssValue horizontal, CssValue vertical)
-        {
-            Margin_Top.Set(vertical);
-            Margin_Right.Set(horizontal);
-            Margin_Bottom.Set(vertical);
-            Margin_Left.Set(horizontal);
-        }
-        public void Set_Margin_Implicit(int? top, int? right, int? bottom, int? left)
-        {
-            Margin_Top.Set(top);
-            Margin_Right.Set(right);
-            Margin_Bottom.Set(bottom);
-            Margin_Left.Set(left);
-        }
-        public void Set_Margin_Implicit(CssValue top, CssValue right, CssValue bottom, CssValue left)
-        {
-            Margin_Top.Set(top);
-            Margin_Right.Set(right);
-            Margin_Bottom.Set(bottom);
-            Margin_Left.Set(left);
+            Margin_Left.Set(horizontal);*/
+
+            Margin_Top.Set(!vertical.HasValue ? null : CssValue.From_Length(vertical.Value, EStyleUnit.PX));
+            Margin_Right.Set(!horizontal.HasValue ? null : CssValue.From_Length(horizontal.Value, EStyleUnit.PX));
+            Margin_Bottom.Set(!vertical.HasValue ? null : CssValue.From_Length(vertical.Value, EStyleUnit.PX));
+            Margin_Left.Set(!horizontal.HasValue ? null : CssValue.From_Length(horizontal.Value, EStyleUnit.PX));
         }
         #endregion
 
 
         #region Position Helpers
-        public void Set_Position(int? x, int? y)
+        public void Set_Position(int? X, int? Y)
         {
-            Left.Set(x);
-            Top.Set(y);
+            /*Left.Set(X);
+            Top.Set(Y);*/
+
+            Left.Set(!X.HasValue ? null : CssValue.From_Length(X.Value, EStyleUnit.PX));
+            Top.Set(!Y.HasValue ? null : CssValue.From_Length(Y.Value, EStyleUnit.PX));
         }
         public void Set_Position(CssValue x, CssValue y)
-        {
-            Left.Set(x);
-            Top.Set(y);
-        }
-        internal void Set_Position_Implicit(int? x, int? y)
         {
             Left.Set(x);
             Top.Set(y);
@@ -710,22 +626,15 @@ namespace CssUI
 
 
         #region Size Helpers
-        public void Set_Size(int? width, int? height)
+        public void Set_Size(int? Width, int? Height)
         {
-            Width.Set(width);
-            Height.Set(height);
+            /*this.Width.Set(Width);
+            this.Height.Set(Height);*/
+
+            this.Width.Set(!Width.HasValue ? null : CssValue.From_Length(Width.Value, EStyleUnit.PX));
+            this.Height.Set(!Height.HasValue ? null : CssValue.From_Length(Height.Value, EStyleUnit.PX));
         }
         public void Set_Size(CssValue width, CssValue height)
-        {
-            Width.Set(width);
-            Height.Set(height);
-        }
-        public void Set_Size_Implicit(int? width, int? height)
-        {
-            Width.Set(width);
-            Height.Set(height);
-        }
-        public void Set_Size_Implicit(CssValue width, CssValue height)
         {
             Width.Set(width);
             Height.Set(height);
@@ -734,22 +643,14 @@ namespace CssUI
 
 
         #region SizeMin Helpers
-        public void Set_SizeMin(int? width, int? height)
+        public void Set_SizeMin(int? Width, int? Height)
         {
-            Min_Width.Set(width);
-            Min_Height.Set(height);
+            /*Min_Width.Set(width);
+            Min_Height.Set(height);*/
+            this.Min_Width.Set(!Width.HasValue ? null : CssValue.From_Length(Width.Value, EStyleUnit.PX));
+            this.Min_Height.Set(!Height.HasValue ? null : CssValue.From_Length(Height.Value, EStyleUnit.PX));
         }
         public void Set_SizeMin(CssValue width, CssValue height)
-        {
-            Min_Width.Set(width);
-            Min_Height.Set(height);
-        }
-        public void Set_SizeMin_Implicit(int? width, int? height)
-        {
-            Min_Width.Set(width);
-            Min_Height.Set(height);
-        }
-        public void Set_SizeMin_Implicit(CssValue width, CssValue height)
         {
             Min_Width.Set(width);
             Min_Height.Set(height);
@@ -758,22 +659,14 @@ namespace CssUI
 
 
         #region SizeMax Helpers
-        public void Set_SizeMax(int? width, int? height)
+        public void Set_SizeMax(int? Width, int? Height)
         {
-            Max_Width.Set(width);
-            Max_Height.Set(height);
+            /*Max_Width.Set(width);
+            Max_Height.Set(height);*/
+            this.Min_Width.Set(!Width.HasValue ? null : CssValue.From_Length(Width.Value, EStyleUnit.PX));
+            this.Min_Height.Set(!Height.HasValue ? null : CssValue.From_Length(Height.Value, EStyleUnit.PX));
         }
         public void Set_SizeMax(CssValue width, CssValue height)
-        {
-            Max_Width.Set(width);
-            Max_Height.Set(height);
-        }
-        public void Set_SizeMax_Implicit(int? width, int? height)
-        {
-            Max_Width.Set(width);
-            Max_Height.Set(height);
-        }
-        public void Set_SizeMax_Implicit(CssValue width, CssValue height)
         {
             Max_Width.Set(width);
             Max_Height.Set(height);

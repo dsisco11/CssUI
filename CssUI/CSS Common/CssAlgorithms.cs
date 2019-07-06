@@ -30,7 +30,7 @@ namespace CssUI.CSS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Solve_Object_Axis_Position(CssValue Pos, int ObjectArea, int ObjectSize)
         {/* https://www.w3.org/TR/css-backgrounds-3/#the-background-position */
-            if (Pos.Type != EStyleDataType.PERCENT)
+            if (Pos.Type != ECssDataType.PERCENT)
                 throw new ArgumentException("Pos must be a Css percent-type value!");
 
             float P = (float)Pos.Value;

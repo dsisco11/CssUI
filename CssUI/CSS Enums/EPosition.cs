@@ -2,6 +2,7 @@
 
 namespace CssUI.Enums
 {
+    [CssEnum]
     public enum EPositioning : int
     {
         /// <summary>

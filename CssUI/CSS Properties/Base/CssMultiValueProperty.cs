@@ -159,17 +159,17 @@ namespace CssUI
 
         #region Accessors
         /// <summary>
-        /// Returns TRUE if the <see cref="Assigned"/> value is <see cref="EStyleDataType.NONE"/>
+        /// Returns TRUE if the <see cref="Assigned"/> value is <see cref="ECssDataType.NONE"/>
         /// </summary>
-        public override bool IsNone { get => (Assigned.FirstOrDefault().Type == EStyleDataType.NONE); }
+        public override bool IsNone { get => (Assigned.FirstOrDefault().Type == ECssDataType.NONE); }
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// </summary>
-        public override bool IsAuto { get => Assigned.FirstOrDefault().Type == EStyleDataType.AUTO; }
+        public override bool IsAuto { get => Assigned.FirstOrDefault().Type == ECssDataType.AUTO; }
         /// <summary>
         /// Returns TRUE if the assigned value is <see cref="CssValue.Inherit"/>
         /// </summary>
-        public override bool IsInherited { get => Assigned.FirstOrDefault().Type == EStyleDataType.INHERIT; }
+        public override bool IsInherited { get => Assigned.FirstOrDefault().Type == ECssDataType.INHERIT; }
         /// <summary>
         /// Returns TRUE if this property is inheritable according to its definition
         /// </summary>
@@ -182,12 +182,12 @@ namespace CssUI
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if the assigned value has the <see cref="StyleValueFlags.Depends"/> flag
         /// </summary>
-        public override bool IsDependentOrAuto { get => (Assigned.FirstOrDefault().Type == EStyleDataType.AUTO || Assigned.FirstOrDefault(o => o.Has_Flags(StyleValueFlags.Depends)) != null); }
+        public override bool IsDependentOrAuto { get => (Assigned.FirstOrDefault().Type == ECssDataType.AUTO || Assigned.FirstOrDefault(o => o.Has_Flags(StyleValueFlags.Depends)) != null); }
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if the assigned value type is a percentage
         /// </summary>
-        public override bool IsPercentageOrAuto { get => (Assigned.FirstOrDefault().Type == EStyleDataType.AUTO || Assigned.FirstOrDefault(o => o.Type == EStyleDataType.PERCENT) != null); }
+        public override bool IsPercentageOrAuto { get => (Assigned.FirstOrDefault().Type == ECssDataType.AUTO || Assigned.FirstOrDefault(o => o.Type == ECssDataType.PERCENT) != null); }
         /// <summary>
         /// Returns whether or not the property has a set value that should take affect during cascading.
         /// </summary>
@@ -250,7 +250,7 @@ namespace CssUI
             {
                 switch (AssignedValue.Type)
                 {
-                    case EStyleDataType.UNSET:// SEE:  https://www.w3.org/TR/css-cascade-4/#valdef-all-unset
+                    case ECssDataType.UNSET:// SEE:  https://www.w3.org/TR/css-cascade-4/#valdef-all-unset
                         {// This property wants to act as though there is no decleration
 
                             //is this property inherited
@@ -263,13 +263,13 @@ namespace CssUI
                             return new CssValue(Def.Initial);
                         }
                         break;
-                    case EStyleDataType.INHERIT:
+                    case ECssDataType.INHERIT:
                         {
                             Inherited = true;
                             return null;
                         }
                         break;
-                    case EStyleDataType.INITIAL:
+                    case ECssDataType.INITIAL:
                         {// If the Assigned value is the CssValue.Initial literal, then we use our definitions default
                             return new CssValue(Def.Initial);
                         }
@@ -366,7 +366,7 @@ namespace CssUI
             _computed = null;
             if (Specified.Count == 1)
             {// The only thing that can make the computed value inherit, is being set to the INHERIT value
-                if(Specified.First().Type == EStyleDataType.INHERIT)
+                if(Specified.First().Type == ECssDataType.INHERIT)
                 {
                     if (ReferenceEquals(Owner.Parent, null))
                     {// Root element

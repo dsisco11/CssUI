@@ -23,12 +23,12 @@ namespace CssUI
         /// <summary>
         /// Return TRUE if any values are set to <see cref="CssValue.Auto"/>
         /// </summary>
-        public override bool IsAuto { get { return (Computed_X.Type == EStyleDataType.AUTO || Computed_Y.Type == EStyleDataType.AUTO); } }
+        public override bool IsAuto { get { return (Computed_X.Type == ECssDataType.AUTO || Computed_Y.Type == ECssDataType.AUTO); } }
         /// <summary>
         /// Return TRUE if any values are set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if any values have the <see cref="StyleValueFlags.Depends"/> flag
         /// </summary>
-        public override bool IsDependentOrAuto { get { return (Computed_X.Type == EStyleDataType.AUTO || Computed_X.Has_Flags(StyleValueFlags.Depends) || Computed_Y.Type == EStyleDataType.AUTO || Computed_Y.Has_Flags(StyleValueFlags.Depends)); } }
+        public override bool IsDependentOrAuto { get { return (Computed_X.Type == ECssDataType.AUTO || Computed_X.Has_Flags(StyleValueFlags.Depends) || Computed_Y.Type == ECssDataType.AUTO || Computed_Y.Has_Flags(StyleValueFlags.Depends)); } }
 
         /// <summary>
         /// The currently resolved X value

@@ -6,6 +6,7 @@ namespace CssUI.Enums
     /// All the different methods for applying size constraints to a UI element
     /// <para>"The ‘object-fit’ property specifies how the contents of a replaced element should be fitted to the box established by its used height and width."</para>
     /// </summary>
+    [CssEnum]
     public enum EObjectFit : int
     {
         /// <summary>

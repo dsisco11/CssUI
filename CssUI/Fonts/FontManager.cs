@@ -18,7 +18,7 @@ namespace CssUI.Fonts
     public static class FontManager
     {
         #region Propreties
-        public static ConcurrentDictionary<AtomicString, List<CssValue>> GenericFamilyMap = new ConcurrentDictionary<AtomicString, List<CssValue>>();
+        public static ConcurrentDictionary<ECssGenericFontFamily, List<CssValue>> GenericFamilyMap = new ConcurrentDictionary<ECssGenericFontFamily, List<CssValue>>();
         public static readonly List<string> Fallbacks = new List<string>();
         #endregion
 

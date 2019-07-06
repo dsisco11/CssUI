@@ -13,7 +13,7 @@ namespace CssUI
         public uiVerticalSpacer(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
         {
             Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
-            Style.ImplicitRules.BoxSizing.Set(EBoxSizingMode.CONTENT);
+            Style.ImplicitRules.BoxSizing.Set(EBoxSizingMode.ContentBox);
         }
         #endregion
     }

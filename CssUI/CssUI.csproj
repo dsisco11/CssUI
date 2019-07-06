@@ -16,6 +16,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="CSS Common\CssEnumTables.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CssEnumTables.tt</DependentUpon>
+    </None>
     <None Include="Localization\ISO-639\Enum_ISO639.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -39,6 +44,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="CSS Common\CssEnumTables.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CssEnumTables.tt</DependentUpon>
+    </Compile>
     <Compile Update="Localization\ISO-639\Enum_ISO639.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -52,6 +62,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="CSS Common\CssEnumTables.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>CssEnumTables.cs</LastGenOutput>
+    </None>
     <None Update="Localization\ISO-639\Enum_ISO639.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Enum_ISO639.cs</LastGenOutput>

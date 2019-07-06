@@ -162,17 +162,17 @@ namespace CssUI
         /// </summary>
         public override bool HasValue { get => !Assigned.HasValue; }
         /// <summary>
-        /// Returns TRUE if the <see cref="Assigned"/> value is <see cref="EStyleDataType.NONE"/>
+        /// Returns TRUE if the <see cref="Assigned"/> value is <see cref="ECssDataType.NONE"/>
         /// </summary>
-        public override bool IsNone { get => (Assigned.Type == EStyleDataType.NONE); }
+        public override bool IsNone { get => (Assigned.Type == ECssDataType.NONE); }
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// </summary>
-        public override bool IsAuto { get => Assigned.Type == EStyleDataType.AUTO; }
+        public override bool IsAuto { get => Assigned.Type == ECssDataType.AUTO; }
         /// <summary>
         /// Returns TRUE if the assigned value is <see cref="CssValue.Inherit"/>
         /// </summary>
-        public override bool IsInherited { get => Assigned.Type == EStyleDataType.INHERIT; }
+        public override bool IsInherited { get => Assigned.Type == ECssDataType.INHERIT; }
         /// <summary>
         /// Returns TRUE if the assigned value has the <see cref="StyleValueFlags.Depends"/> flag
         /// </summary>
@@ -181,12 +181,12 @@ namespace CssUI
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if the assigned value has the <see cref="StyleValueFlags.Depends"/> flag
         /// </summary>
-        public override bool IsDependentOrAuto { get => (Assigned.Type == EStyleDataType.AUTO || Assigned.Has_Flags(StyleValueFlags.Depends)); }
+        public override bool IsDependentOrAuto { get => (Assigned.Type == ECssDataType.AUTO || Assigned.Has_Flags(StyleValueFlags.Depends)); }
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if the assigned value type is a percentage
         /// </summary>
-        public override bool IsPercentageOrAuto { get => (Assigned.Type == EStyleDataType.AUTO || Assigned.Type == EStyleDataType.PERCENT); }
+        public override bool IsPercentageOrAuto { get => (Assigned.Type == ECssDataType.AUTO || Assigned.Type == ECssDataType.PERCENT); }
 
         /// <summary>
         /// All flags which are present for all currently computed <see cref="CssValue"/>'s
@@ -445,7 +445,7 @@ namespace CssUI
         }
         #endregion
 
-        #region Explicit
+        #region Setter
         /// <summary>
         /// Sets the <see cref="Assigned"/> value for this property
         /// </summary>
@@ -459,12 +459,14 @@ namespace CssUI
         }
 
         /// <summary>
-        /// Sets the used value without 
+        /// Allows us to overwrite the computed value in special circumstances such as with Box calculation.
         /// </summary>
-        /// <param name="UsedValue"></param>
-        internal void Set_Used(CssValue UsedValue)
+        /// <param name="Used"></param>
+        internal void Set_Computed_Value(CssValue Used)
         {
-
+            this.Revert(true);
+            this._computed = Used;
+            this.Update(true);
         }
         #endregion
 

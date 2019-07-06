@@ -2,6 +2,7 @@
 
 namespace CssUI.Enums
 {
+    [CssEnum]
     public enum EFontStyle
     {
         [CssKeyword("normal")]

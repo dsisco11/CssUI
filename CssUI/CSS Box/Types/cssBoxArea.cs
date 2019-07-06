@@ -121,14 +121,14 @@ namespace CssUI
         /// Docs: https://www.w3.org/TR/css-writing-modes-4/#logical-width
         public int LogicalWidth
         {
-            get => (Box.Style.WritingMode == Enums.EWritingMode.Horizontal_TB) ? Dimensions.Width : Dimensions.Height;
+            get => (Box?.Style?.WritingMode == Enums.EWritingMode.Horizontal_TB) ? Dimensions.Width : Dimensions.Height;
         }
         /// <summary>
         /// The logical-height for this area
         /// </summary>
         public int LogicalHeight
         {
-            get => (Box.Style.WritingMode == Enums.EWritingMode.Horizontal_TB) ? Dimensions.Height : Dimensions.Width;
+            get => (Box?.Style?.WritingMode == Enums.EWritingMode.Horizontal_TB) ? Dimensions.Height : Dimensions.Width;
         }
         #endregion
 

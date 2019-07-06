@@ -12,12 +12,18 @@ namespace CssUI
         #region Properties
         public Vec2i Origin { get; } = new Vec2i();
         public Size2D Size { get; } = new Size2D();
-        public cssBoxArea Area { get; private set; }
+        public cssBoxArea Area { get; private set; } = new cssBoxArea();
         #endregion
 
         #region Events
         public event Action<Size2D, Size2D> Resized;
         public event Action<Vec2i, Vec2i> Moved;
+        #endregion
+
+        #region Constructors
+        public cssViewport()
+        {
+        }
         #endregion
 
         public void Set(int X, int Y, int Width, int Height)
@@ -42,7 +48,7 @@ namespace CssUI
             Area = new cssBoxArea();// XXX: this null may cause problems indeed
             Area.Update_Bounds(Origin.X, Origin.Y, Size.Width, Size.Height);
 
-            if (old.Get_Dimensions() != Area.Get_Dimensions()) Resized?.Invoke(old.Get_Dimensions(), Area.Get_Dimensions());
+            if (old?.Get_Dimensions() != Area?.Get_Dimensions()) Resized?.Invoke(old.Get_Dimensions(), Area.Get_Dimensions());
             if (old.Get_Pos() != Area.Get_Pos()) Moved?.Invoke(old.Get_Pos(), Area.Get_Pos());
         }
 

@@ -6,6 +6,7 @@ namespace CssUI.Enums
     /// 
     /// </summary>
     /// Docs: https://www.w3.org/TR/css-writing-modes-4/#logical-to-physical
+    [CssEnum]
     public enum EWritingMode : int
     {
         [CssKeyword("horizontal-tb")]

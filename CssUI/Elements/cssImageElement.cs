@@ -38,7 +38,7 @@ namespace CssUI
         #region Constructors
         public cssImageElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, EReplacedElementType.IMAGE, className, ID)
         {
-            Style.ImplicitRules.ObjectFit.Value = EObjectFit.Contain;
+            Style.ImplicitRules.ObjectFit.Set(EObjectFit.Contain);
         }
         #endregion
         
