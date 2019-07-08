@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace CssUI.DOM
 {
@@ -8,10 +6,13 @@ namespace CssUI.DOM
     //SEE:  https://www.w3.org/TR/cssom-1/#parse-a-media-query-list
     public class MediaList
     {
+        #region Properties
         private List<string> mediaQueries = new List<string>();
         public string mediaText;
         public readonly ulong length;
+        #endregion
 
+        #region Getters/Setters
         public string get_item(ulong i)
         {
             return mediaQueries[(int)i];
@@ -21,13 +22,15 @@ namespace CssUI.DOM
         {
             return mediaQueries[(int)i] = value;
         }
+        #endregion
 
 
-
+        #region Constructors
         public MediaList(string mediaText)
         {
             this.mediaText = mediaText;
         }
+        #endregion
 
 
     }

@@ -18,7 +18,7 @@ namespace CssUI
     /// The basis for all OpenGL based UI elements.
     /// <para>NOTE: All OpenGL UI elements inheriting from this base class makes the assumption that texturing is disabled by default when drawing.</para>
     /// </summary>
-    public abstract class cssElement : DomNode, IDisposable, IDomEvents
+    public abstract class cssElement : Node, IDisposable, IDomEvents
     {
     #region Identity
     /// <summary>

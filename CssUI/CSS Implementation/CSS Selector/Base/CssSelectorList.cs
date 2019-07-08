@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CssUI.DOM;
+using System.Collections.Generic;
 
 namespace CssUI.CSS
 {
@@ -12,11 +13,11 @@ namespace CssUI.CSS
         /// Returns a list of all selector specificitys
         /// </summary>
         /// <returns></returns>
-        public IList<long> Get_Specificity(cssElement E, bool IsFromStylesheet)
+        public IList<long> Get_Specificity(Element E, bool IsFromStylesheet)
         {
             var retVal = new List<long>();
 
-            var tmpList = new LinkedList<cssElement>();
+            var tmpList = new LinkedList<Element>();
             tmpList.AddFirst(E);
 
             foreach (CssSelectorFilterSet FilterSet in this)
@@ -30,39 +31,44 @@ namespace CssUI.CSS
             return retVal;
         }
 
-        public bool Query(cssElement E)
+        /// <summary>
+        /// Checks if the given element matches this selector
+        /// </summary>
+        /// <param name="E"></param>
+        /// <returns></returns>
+        public bool Query(Element E)
         {
-            LinkedList<cssElement> List = new LinkedList<cssElement>();
+            LinkedList<Element> List = new LinkedList<Element>();
             List.AddFirst(E);
 
-            List<cssElement> res = Query(List, ESelectorMatchingOrder.LTR);
+            List<Element> res = Query(List, ESelectorMatchingOrder.LTR);
 
             return res.Contains(E);
         }
 
-        public List<cssElement> Query(LinkedList<cssElement> MatchList, ESelectorMatchingOrder Dir)
+        public List<Element> Query(LinkedList<Element> MatchList, ESelectorMatchingOrder Dir)
         {
             if (this.Count == 1)// Most selectors will just have a single instance
             {
                 this[0].Query(MatchList, Dir);
-                return new List<cssElement>(MatchList);
+                return new List<Element>(MatchList);
             }
             else if (this.Count > 1)
             {
                 // If we contain more than a single filter set then the list of matching items we return becomes a collection of any items that were matches by any of our filter sets
-                HashSet<cssElement> retVal = new HashSet<cssElement>();
+                HashSet<Element> retVal = new HashSet<Element>();
                 foreach (CssSelectorFilterSet FilterSet in this)
                 {
                     // Create a clone of our initial list that this filter set can alter
-                    var tmpMatchList = new LinkedList<cssElement>(MatchList);
+                    var tmpMatchList = new LinkedList<Element>(MatchList);
                     if (!FilterSet.Query(tmpMatchList, Dir)) continue;
-                    foreach (cssElement E in tmpMatchList)
+                    foreach (Element E in tmpMatchList)
                     {
                         retVal.Add(E);
                     }
                 }
 
-                return new List<cssElement>(retVal);
+                return new List<Element>(retVal);
             }
 
             return null;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CssUI.DOM;
+using System.Collections.Generic;
 
 namespace CssUI.CSS
 {
@@ -20,7 +21,7 @@ namespace CssUI.CSS
         /// <param name="MatchList">A linked-list of all the elements we want to query, we use a linked list because non-matches are removed mid-iteration</param>
         /// <param name="Dir">The order in which matching will be executed</param>
         /// <returns>Matches</returns>
-        bool Query(LinkedList<cssElement> MatchList, ESelectorMatchingOrder Dir);
+        bool Query(LinkedList<Element> MatchList, ESelectorMatchingOrder Dir);
 
         List<CssSimpleSelector> Get_Selectors();
     }

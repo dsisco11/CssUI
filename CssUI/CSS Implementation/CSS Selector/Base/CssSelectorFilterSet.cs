@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CssUI.DOM;
+using System.Collections.Generic;
 
 namespace CssUI.CSS
 {
@@ -12,7 +13,7 @@ namespace CssUI.CSS
         {
         }
 
-        public bool Query(LinkedList<cssElement> MatchList, ESelectorMatchingOrder Dir)
+        public bool Query(LinkedList<Element> MatchList, ESelectorMatchingOrder Dir)
         {
             foreach (ICssSelectorFilter selector in this)
             {

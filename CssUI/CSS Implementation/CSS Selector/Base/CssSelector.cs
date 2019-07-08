@@ -1,6 +1,8 @@
-﻿using System;
+﻿using CssUI.DOM;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using xLog;
 
 namespace CssUI.CSS
 {
@@ -13,6 +15,7 @@ namespace CssUI.CSS
     public class CssSelector
     {
         #region Properties
+        private static ILogger Log = LogFactory.GetLogger(nameof(CssSelector));
         /// <summary>
         /// Whether this selector is coming from a stylesheet we loaded or from some internal styling rule defined directly in code.
         /// </summary>
@@ -20,7 +23,7 @@ namespace CssUI.CSS
         /// <summary>
         /// List of all selector instances for this selector
         /// </summary>
-        readonly CssSelectorList Selectors;
+        private readonly CssSelectorList Selectors;
 
         #endregion
 
@@ -44,8 +47,16 @@ namespace CssUI.CSS
         /// <returns></returns>
         public static CssSelectorList Parse_Selector(string SelectorString)
         {// DOCS: https://www.w3.org/TR/selectors-3/#selectors
-            CssSelectorParser Parser = new CssSelectorParser(SelectorString);
-            return Parser.Parse_Selector_List();
+            try
+            {
+                CssSelectorParser Parser = new CssSelectorParser(SelectorString);
+                return Parser.Parse_Selector_List();
+            }
+            catch (CssException ex)
+            {
+                Log.Error(ex);
+            }
+            return null;
         }
         #endregion
         
@@ -53,7 +64,7 @@ namespace CssUI.CSS
         /// Returns the greatest specificity value that matches the given element
         /// </summary>
         /// <returns></returns>
-        public long Get_Specificity(cssElement E)
+        public long Get_Specificity(Element E)
         {
             if (Selectors == null)
                 return 0;
@@ -65,7 +76,7 @@ namespace CssUI.CSS
         /// Returns a list of all selector specificitys that match the given element
         /// </summary>
         /// <returns></returns>
-        public IList<long> Get_Specificity_List(cssElement E)
+        public IList<long> Get_Specificity_List(Element E)
         {
             if (Selectors == null)
                 return null;
@@ -74,10 +85,10 @@ namespace CssUI.CSS
         }
 
         /// <summary>
-        /// Querys the selector against a single <see cref="cssElement"/> to determine if it matches it
+        /// Querys the selector against a single <see cref="Element"/> to determine if it matches it
         /// </summary>
         /// <returns>True/False Match</returns>
-        public bool QuerySingle(cssElement E)
+        public bool QuerySingle(Element E)
         {
             return Selectors.Query(E);
         }
@@ -85,18 +96,18 @@ namespace CssUI.CSS
         /// <summary>
         /// Querys the selector against all of the elements within the given root elements tree to determine which ones it matches
         /// </summary>
-        public List<cssElement> Query(cssCompoundElement Root)
+        public List<Element> Query(Element Root)
         {
-            LinkedList<cssElement> MatchList = Root.Get_All_Descendants();
+            LinkedList<Element> MatchList = Root.Get_All_Descendants();
             return Selectors.Query(MatchList, ESelectorMatchingOrder.LTR).ToList();
         }
 
         /// <summary>
-        /// Querys the selector against all of the elements within all of the given root elements trees to determijne which ones it matches
+        /// Querys the selector against all of the elements within all of the given root elements trees to determine which ones it matches
         /// </summary>
-        public List<cssElement> Query(List<cssCompoundElement> Roots)
+        public List<Element> Query(List<Element> Roots)
         {// DOCS: https://www.w3.org/TR/selectors-4/#match-a-selector-against-a-tree
-            LinkedList<cssElement> MatchList = new LinkedList<cssElement>();
+            LinkedList<Element> MatchList = new LinkedList<Element>();
             foreach(cssRootElement Root in Roots)
             {
                 if (Root.Root != Roots[0].Root) throw new Exception("All element trees must belong to the same root element!");
