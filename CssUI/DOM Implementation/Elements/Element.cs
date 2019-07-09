@@ -10,7 +10,7 @@ using System.Text;
 
 namespace CssUI.DOM
 {
-    public class Element : Node
+    public class Element : ParentNode, INonDocumentTypeChildNode
     {
         #region Properties
         public string localName { get; set; }
@@ -78,6 +78,28 @@ namespace CssUI.DOM
         public bool hasAttributes() => this.AttributeList.Count > 0;
         #endregion
 
+        #region INonDocumentTypeChildNode Implementation
+        public Element previousElementSibling
+        {
+            get
+            {
+                Node n = previousSibling;
+                while (!ReferenceEquals(null, n) && !(n is Element)) { n = n.previousSibling; }
+                return n as Element;
+            }
+        }
+
+        public Element nextElementSibling
+        {
+            get
+            {
+                Node n = nextSibling;
+                while (!ReferenceEquals(null, n) && !(n is Element)) { n = n.nextSibling; }
+                return n as Element;
+            }
+        }
+        #endregion
+
         #region Constructors
         public Element(Document ownerDocument, string localName)
         {/* Docs: https://dom.spec.whatwg.org/#interface-element */
@@ -87,6 +109,7 @@ namespace CssUI.DOM
         }
         #endregion
 
+        #region Equality
         public override bool Equals(object obj)
         {/* https://dom.spec.whatwg.org/#concept-node-equals */
             if (!base.Equals(obj))
@@ -114,6 +137,7 @@ namespace CssUI.DOM
             }
             return hash;
         }
+        #endregion
 
         #region Utility
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -307,13 +331,12 @@ namespace CssUI.DOM
         }
         #endregion
 
-
-
+        #region Element Matching / CSS Selectors
         public Element closest(string selectors)
-        {
+        {/* Docs: https://dom.spec.whatwg.org/#dom-element-closest */
             /* The closest(selectors) method, when invoked, must run these steps: */
             /* 1) Let s be the result of parse a selector from selectors. [SELECTORS4] */
-            var s = CssSelector.Parse_Selector(selectors);
+            var s = new CssSelector(selectors);
             /* 2) If s is failure, throw a "SyntaxError" DOMException. */
             if (ReferenceEquals(s, null))
             {
@@ -337,10 +360,10 @@ namespace CssUI.DOM
         }
 
         public bool matches(string selectors)
-        {
+        {/* https://dom.spec.whatwg.org/#dom-element-matches */
             /* The matches(selectors) and webkitMatchesSelector(selectors) methods, when invoked, must run these steps: */
             /* 1) Let s be the result of parse a selector from selectors. [SELECTORS4] */
-            var s = CssSelector.Parse_Selector(selectors);
+            var s = new CssSelector(selectors);
             /* 2) If s is failure, throw a "SyntaxError" DOMException. */
             if (ReferenceEquals(s, null))
             {
@@ -418,5 +441,14 @@ namespace CssUI.DOM
 
             return retList;
         }
+        #endregion
+
+        #region Shadow DOM
+        /* XXX: ShadowDOM stuff here */
+        /*
+          ShadowRoot attachShadow(ShadowRootInit init);
+          readonly attribute ShadowRoot? shadowRoot;
+        */
+        #endregion
     }
 }

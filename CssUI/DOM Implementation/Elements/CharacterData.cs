@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace CssUI.DOM
 {
-    public abstract class CharacterData : Node
+    public abstract class CharacterData : Node, INonDocumentTypeChildNode
     {/* Docs: https://dom.spec.whatwg.org/#interface-characterdata */
         #region Node Implementation
         public override ENodeType nodeType => ENodeType.TEXT_NODE;
@@ -84,6 +84,27 @@ namespace CssUI.DOM
         }
         #endregion
 
+        #region INonDocumentTypeChildNode Implementation
+        public Element previousElementSibling
+        {
+            get
+            {
+                Node n = previousSibling;
+                while(!ReferenceEquals(null, n) && !(n is Element)) { n = n.previousSibling; }
+                return n as Element;
+            }
+        }
+
+        public Element nextElementSibling
+        {
+            get
+            {
+                Node n = nextSibling;
+                while (!ReferenceEquals(null, n) && !(n is Element)) { n = n.nextSibling; }
+                return n as Element;
+            }
+        }
+        #endregion
 
         public string substringData(int offset, int count)
         {
