@@ -1,21 +1,24 @@
-﻿using CssUI.DOM;
+﻿using CssUI.CSS.Enums;
+using CssUI.DOM;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
-namespace CssUI.CSS
+namespace CssUI.CSS.Selectors
 {
     /// <summary>
     /// Represents a collection of selector filtering items
     /// </summary>
-    public class CssSelectorFilterSet : List<ICssSelectorFilter>
+    public class SelectorFilterSet : List<ISelectorFilter>
     {
 
-        public CssSelectorFilterSet()
+        public SelectorFilterSet()
         {
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Query(LinkedList<Element> MatchList, ESelectorMatchingOrder Dir)
         {
-            foreach (ICssSelectorFilter selector in this)
+            foreach (ISelectorFilter selector in this)
             {
                 // We are filtering the match list
                 selector.Query(MatchList, Dir);
@@ -30,14 +33,15 @@ namespace CssUI.CSS
         /// <summary>
         /// Returns the selectors specificity as defined in the CSS 2.1 specification documentation
         /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public long Get_Specificity(bool IsFromStylesheet)
         {// SEE:  https://www.w3.org/TR/2011/REC-css3-selectors-20110929/#specificity
             long A = 0, B = 0, C = 0, D = 0;
             if (IsFromStylesheet) A = 1;
 
-            foreach (ICssSelectorFilter Filter in this)
+            foreach (ISelectorFilter Filter in this)
             {
-                foreach (CssSimpleSelector Simple in Filter.Get_Selectors())
+                foreach (SimpleSelector Simple in Filter.Get_Selectors())
                 {
                     switch (Simple.Type)
                     {

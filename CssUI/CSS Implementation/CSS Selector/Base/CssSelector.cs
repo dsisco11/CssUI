@@ -1,7 +1,9 @@
-﻿using CssUI.DOM;
+﻿using CssUI.CSS.Selectors;
+using CssUI.DOM;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using xLog;
 
 namespace CssUI.CSS
@@ -23,7 +25,7 @@ namespace CssUI.CSS
         /// <summary>
         /// List of all selector instances for this selector
         /// </summary>
-        private readonly CssSelectorList Selectors;
+        private readonly SelectorList Selectors;
 
         #endregion
 
@@ -45,7 +47,7 @@ namespace CssUI.CSS
         /// </summary>
         /// <param name="SelectorString"></param>
         /// <returns></returns>
-        public static CssSelectorList Parse_Selector(string SelectorString)
+        private static SelectorList Parse_Selector(string SelectorString)
         {// DOCS: https://www.w3.org/TR/selectors-3/#selectors
             try
             {
@@ -88,57 +90,17 @@ namespace CssUI.CSS
         /// Querys the selector against a single <see cref="Element"/> to determine if it matches it
         /// </summary>
         /// <returns>True/False Match</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool QuerySingle(Element E)
         {
-            return Selectors.Query(E);
+            return Selectors.Query(E, ESelectorMatchingOrder.RTL);
         }
 
-        /// <summary>
-        /// Querys the selector against all of the elements within the given root elements tree to determine which ones it matches
-        /// </summary>
-        public List<Element> Query(Element Root)
+        public bool Match(Element E)
         {
-            LinkedList<Element> MatchList = Root.Get_All_Descendants();
-            return Selectors.Query(MatchList, ESelectorMatchingOrder.LTR).ToList();
+
         }
 
-        /// <summary>
-        /// Querys the selector against all of the elements within all of the given root elements trees to determine which ones it matches
-        /// </summary>
-        public List<Element> Query(List<Element> Roots)
-        {// DOCS: https://www.w3.org/TR/selectors-4/#match-a-selector-against-a-tree
-            LinkedList<Element> MatchList = new LinkedList<Element>();
-            foreach(cssRootElement Root in Roots)
-            {
-                if (Root.Root != Roots[0].Root) throw new Exception("All element trees must belong to the same root element!");
-                Root.Get_All_Descendants(MatchList);
-            }
-
-            return Selectors.Query(MatchList, ESelectorMatchingOrder.LTR).ToList();
-            /*
-            if (Selectors.Count == 1)// Most selectors will just have a single instance
-            {
-                Selectors[0].Match(MatchList, ESelectorMatchDir.LTR);
-                return MatchList;
-            }
-            else if (Selectors.Count > 1)
-            {
-                HashSet<uiElement> retVal = new HashSet<uiElement>();
-                foreach (CssComplexSelectorList Selector in Selectors)
-                {
-                    var tmpMatchList = new List<uiElement>(MatchList);
-                    Selector.Match(tmpMatchList, ESelectorMatchDir.LTR);
-                    foreach (uiElement E in tmpMatchList)
-                    {
-                        retVal.Add(E);
-                    }
-                }
-                return retVal.ToList();
-            }
-
-            return new List<uiElement>(0);
-            */
-        }
 
     }
     

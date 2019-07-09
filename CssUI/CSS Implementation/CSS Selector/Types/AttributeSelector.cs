@@ -1,10 +1,13 @@
-﻿using System;
+﻿using CssUI.CSS.Enums;
+using CssUI.DOM;
+using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
-namespace CssUI.CSS
+namespace CssUI.CSS.Selectors
 {
 
-    public class CssAttributeSelector : CssSimpleSelector
+    public class AttributeSelector : SimpleSelector
     {
         readonly NamespacePrefixToken Namespace;
         readonly string Attrib;
@@ -16,14 +19,14 @@ namespace CssUI.CSS
         /// <param name="Attrib">The attribute name for this selector</param>
         /// <param name="Operator">String token that defines the method of comparison</param>
         /// <param name="Value"></param>
-        public CssAttributeSelector(NamespacePrefixToken Namespace, string Attrib) : base(ECssSimpleSelectorType.AttributeSelector)
+        public AttributeSelector(NamespacePrefixToken Namespace, string Attrib) : base(ECssSimpleSelectorType.AttributeSelector)
         {
             this.Namespace = Namespace;
             this.Attrib = Attrib;
             this.Operator = ECssAttributeOperator.Isset;
         }
 
-        public CssAttributeSelector(NamespacePrefixToken Namespace, string Attrib, CssToken OperatorToken, string Value) : base(ECssSimpleSelectorType.AttributeSelector)
+        public AttributeSelector(NamespacePrefixToken Namespace, string Attrib, CssToken OperatorToken, string Value) : base(ECssSimpleSelectorType.AttributeSelector)
         {
             this.Namespace = Namespace;
             this.Attrib = Attrib;
@@ -68,24 +71,25 @@ namespace CssUI.CSS
         /// <summary>
         /// Returns whether the selector matches a specified element or index
         /// </summary>
-        override public bool Matches(cssElement E)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        override public bool Matches(Element E)
         {
             switch (Operator)
             {
                 // CSS 2.0 operators
                 case ECssAttributeOperator.Isset:// isset
                     {
-                        return E.Has_Attribute(Attrib);
+                        return E.hasAttribute(Attrib);
                     }
                 case ECssAttributeOperator.Equals:// equals
                     {
                         if (string.IsNullOrEmpty(Value)) return false;
-                        return string.Compare(Value, E.Get_Attribute<string>(Attrib)) == 0;
+                        return string.Compare(Value, E.getAttribute(Attrib)) == 0;
                     }
                 case ECssAttributeOperator.PrefixedWith:// equals or prefixed-with
                     {
-                        if (!E.Has_Attribute(Attrib)) return false;
-                        string val = E.Get_Attribute<string>(Attrib);
+                        if (!E.hasAttribute(Attrib)) return false;
+                        string val = E.getAttribute(Attrib);
                         if (string.Compare(Value, val) == 0) return true;
                         if (val.StartsWith(string.Concat(Value, '-'))) return true;
                         return false;
@@ -93,30 +97,30 @@ namespace CssUI.CSS
                 case ECssAttributeOperator.Includes:// list-contains
                     {
                         if (string.IsNullOrEmpty(Value)) return false;
-                        if (!E.Has_Attribute(Attrib)) return false;
-                        return E.Get_Attribute<string>(Attrib).Split(' ').Contains(Value);
+                        if (!E.hasAttribute(Attrib)) return false;
+                        return E.getAttribute(Attrib).Split(' ').Contains(Value);
                     }
                 // Sub-string operators
                 case ECssAttributeOperator.StartsWith:// starts-with
                     {
                         if (string.IsNullOrEmpty(Value)) return false;
-                        if (!E.Has_Attribute(Attrib)) return false;
-                        return E.Get_Attribute<string>(Attrib).StartsWith(Value);
+                        if (!E.hasAttribute(Attrib)) return false;
+                        return E.getAttribute(Attrib).StartsWith(Value);
                     }
                 case ECssAttributeOperator.EndsWith:// ends-with
                     {
                         if (string.IsNullOrEmpty(Value)) return false;
-                        if (!E.Has_Attribute(Attrib)) return false;
-                        return E.Get_Attribute<string>(Attrib).EndsWith(Value);
+                        if (!E.hasAttribute(Attrib)) return false;
+                        return E.getAttribute(Attrib).EndsWith(Value);
                     }
                 case ECssAttributeOperator.Contains:// contains
                     {
                         if (string.IsNullOrEmpty(Value)) return false;
-                        if (!E.Has_Attribute(Attrib)) return false;
-                        return E.Get_Attribute<string>(Attrib).Contains(Value);
+                        if (!E.hasAttribute(Attrib)) return false;
+                        return E.getAttribute(Attrib).Contains(Value);
                     }
                 default:
-                    throw new CssSelectorException("Attribute selector operator (", Enum.GetName(typeof(ECssAttributeOperator), Operator), ") logic not implemented!");
+                    throw new CssSelectorException($"Attribute selector operator ({Enum.GetName(typeof(ECssAttributeOperator), Operator)}) logic not implemented!");
             }
         }
     }

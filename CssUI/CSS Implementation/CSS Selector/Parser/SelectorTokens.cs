@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CssUI.CSS
+namespace CssUI.CSS.Selectors
 {
     public class NamespacePrefixToken : CssToken
     {

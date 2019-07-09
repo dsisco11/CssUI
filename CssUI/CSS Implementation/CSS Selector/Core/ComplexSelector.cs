@@ -1,12 +1,13 @@
-﻿using System;
+﻿using CssUI.DOM;
+using System;
 using System.Collections.Generic;
 
-namespace CssUI.CSS
+namespace CssUI.CSS.Selectors
 {
     /// <summary>
     /// A Complex selector consists of a Compound selector followed by a Combinator
     /// </summary>
-    public class CssComplexSelector : CssCompoundSelector
+    public class ComplexSelector : CompoundSelector
     {// SEE:  https://drafts.csswg.org/selectors-4/#ref-for-typedef-complex-selector-1
         /// <summary>
         /// The combinator following the selector sequence.
@@ -18,12 +19,12 @@ namespace CssUI.CSS
         /// </summary>
         /// <param name="Chain"></param>
         /// <param name="Combinator">The combinator that comes AFTER the selector sequence.</param>
-        public CssComplexSelector(ESelectorCombinator Combinator, CssCompoundSelector Compound) : base(Compound)
+        public ComplexSelector(ESelectorCombinator Combinator, CompoundSelector Compound) : base(Compound)
         {
             this.Combinator = Combinator;
         }
 
-        public bool Query(LinkedList<cssElement> MatchList, ESelectorMatchingOrder Order)
+        public bool Query(LinkedList<Element> MatchList, ESelectorMatchingOrder Order)
         {
             switch (Order)
             {
@@ -44,13 +45,13 @@ namespace CssUI.CSS
             return true;
         }
 
-        void Apply_Combinator(LinkedList<cssElement> MatchList, ESelectorMatchingOrder Dir)
+        void Apply_Combinator(LinkedList<Element> MatchList, ESelectorMatchingOrder Dir)
         {
             // Transform the matchlist using our combinator
             switch (Combinator)
             {
                 default:
-                    throw new NotImplementedException(string.Concat("[CSS][Selector] Unhandled selector-combinator(", Enum.GetName(typeof(ESelectorCombinator), Combinator), ")!"));
+                    throw new NotImplementedException($"[CSS][Selector] Unhandled selector-combinator({Enum.GetName(typeof(ESelectorCombinator), Combinator)})!"));
             }
         }
     }

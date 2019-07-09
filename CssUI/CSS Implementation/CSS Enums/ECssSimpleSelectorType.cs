@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CssUI.CSS
+﻿namespace CssUI.CSS.Enums
 {
     /// <summary>
     /// Defines all the simple selector types 
@@ -13,7 +7,7 @@ namespace CssUI.CSS
     {
         /// <summary>The universal selector matches any element in any namespace</summary>
         UniversalSelector,
-        /// <summary>A type selector is the name of an element type written using the syntax of CSS qualified names (SEE: https://www.w3.org/TR/css3-namespace/#css-qnames)</summary>
+        /// <summary>A type selector is the name of an element type written using the syntax of CSS qualified names SEE: https://www.w3.org/TR/css3-namespace/#css-qnames </summary>
         TypeSelector,
         /// <summary>Matches an element attribute value</summary>
         AttributeSelector,

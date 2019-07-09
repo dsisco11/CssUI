@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using CssUI.DOM;
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
-namespace CssUI.CSS
+namespace CssUI.CSS.Selectors
 {
-    public class CssPseudoElementSelectorFunction : CssPseudoElementSelector
+    public class CssPseudoElementSelectorFunction : PseudoElementSelector
     {
         protected readonly List<CssToken> Args;
 
@@ -14,12 +17,13 @@ namespace CssUI.CSS
         /// <summary>
         /// Returns whether the selector matches a specified element or index
         /// </summary>
-        override public bool Matches(cssElement E)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        override public bool Matches(Element E)
         {
             switch (Name)
             {
                 default:
-                    throw new CssSelectorException("Selector pseudo-element function (", Name, ") logic not implemented!");
+                    throw new NotImplementedException($"Selector pseudo-element function ({Name}) logic not implemented!");
             }
         }
     }

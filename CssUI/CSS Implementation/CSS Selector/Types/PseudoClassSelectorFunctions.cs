@@ -1,13 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using CssUI.DOM;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
-namespace CssUI.CSS
+namespace CssUI.CSS.Selectors
 {
     
-    public class CssPseudoClassSelectorFunction : CssPseudoClassSelector
+    public class PseudoClassSelectorFunction : PseudoClassSelector
     {
         protected readonly List<CssToken> Args;
 
-        public CssPseudoClassSelectorFunction(string Name, List<CssToken> Args = null) : base(Name)
+        public PseudoClassSelectorFunction(string Name, List<CssToken> Args = null) : base(Name)
         {
             this.Args = Args;
         }
@@ -15,7 +17,8 @@ namespace CssUI.CSS
         /// <summary>
         /// Returns whether the selector matches a specified element or index
         /// </summary>
-        override public bool Matches(cssElement E)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        override public bool Matches(Element E)
         {
             switch (Name)
             {
@@ -27,25 +30,26 @@ namespace CssUI.CSS
         }
     }
 
-    public class CssPseudoClassSelectorAnBFunction : CssPseudoClassSelector
+    public class PseudoClassSelectorAnBFunction : PseudoClassSelector
     {
         protected readonly CssAnBMatcher AnB;
-        protected readonly CssSelectorList Selector;
+        protected readonly SelectorList Selector;
 
-        public CssPseudoClassSelectorAnBFunction(string Name, CssTokenStream Stream) : base(Name)
+        public PseudoClassSelectorAnBFunction(string Name, CssTokenStream Stream) : base(Name)
         {
             AnB = CssAnBMatcher.Consume(Stream);
             if (Stream.Next.Type == ECssTokenType.Ident && string.Compare("or", (Stream.Next as IdentToken).Value)==0)
             {
                 Stream.Consume();// Consume the 'or' string token
-                Selector = CssSelectorParser.Consume_Selector_List(Stream);
+                Selector = SelectorParser.Consume_Selector_List(Stream);
             }
         }
 
         /// <summary>
         /// Returns whether the selector matches a specified element or index
         /// </summary>
-        override public bool Matches(cssElement E)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        override public bool Matches(Element E)
         {
             switch (Name)
             {
@@ -61,19 +65,20 @@ namespace CssUI.CSS
         }
     }
 
-    public class CssPseudoClassSelectorNegationFunction : CssPseudoClassSelector
+    public class PseudoClassSelectorNegationFunction : PseudoClassSelector
     {
-        protected readonly CssSelectorList Selector;
+        protected readonly SelectorList Selector;
 
-        public CssPseudoClassSelectorNegationFunction(string Name, CssTokenStream Stream) : base(Name)
+        public PseudoClassSelectorNegationFunction(string Name, CssTokenStream Stream) : base(Name)
         {
-            Selector = CssSelectorParser.Consume_Selector_List(Stream);
+            Selector = SelectorParser.Consume_Selector_List(Stream);
         }
 
         /// <summary>
         /// Returns whether the selector matches a specified element or index
         /// </summary>
-        override public bool Matches(cssElement E)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        override public bool Matches(Element E)
         {
             return false == Selector.Query(E);
         }
@@ -85,7 +90,8 @@ namespace CssUI.CSS
         /// Performs matching against the 'drop' function
         /// </summary>
         /// <returns></returns>
-        public static bool Drop(cssElement E, List<CssToken> Args)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Drop(Element E, List<CssToken> Args)
         {
             if (Args == null || Args.Count <= 0)
             {// :drop

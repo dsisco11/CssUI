@@ -1,18 +1,20 @@
 ﻿using CssUI.DOM;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
-namespace CssUI.CSS
+namespace CssUI.CSS.Selectors
 {
 
     /// <summary>
     /// 
     /// </summary>
-    public class CssSelectorList : List<CssSelectorFilterSet>
+    public class SelectorList : List<SelectorFilterSet>
     {
         /// <summary>
         /// Returns a list of all selector specificitys
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IList<long> Get_Specificity(Element E, bool IsFromStylesheet)
         {
             var retVal = new List<long>();
@@ -20,7 +22,7 @@ namespace CssUI.CSS
             var tmpList = new LinkedList<Element>();
             tmpList.AddFirst(E);
 
-            foreach (CssSelectorFilterSet FilterSet in this)
+            foreach (SelectorFilterSet FilterSet in this)
             {
                 if(FilterSet.Query(tmpList, ESelectorMatchingOrder.LTR))
                 {
@@ -36,16 +38,18 @@ namespace CssUI.CSS
         /// </summary>
         /// <param name="E"></param>
         /// <returns></returns>
-        public bool Query(Element E)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Query(Element E, ESelectorMatchingOrder Dir = ESelectorMatchingOrder.RTL)
         {
             LinkedList<Element> List = new LinkedList<Element>();
             List.AddFirst(E);
 
-            List<Element> res = Query(List, ESelectorMatchingOrder.LTR);
+            List<Element> res = Query(List, Dir);
 
             return res.Contains(E);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public List<Element> Query(LinkedList<Element> MatchList, ESelectorMatchingOrder Dir)
         {
             if (this.Count == 1)// Most selectors will just have a single instance
@@ -57,7 +61,7 @@ namespace CssUI.CSS
             {
                 // If we contain more than a single filter set then the list of matching items we return becomes a collection of any items that were matches by any of our filter sets
                 HashSet<Element> retVal = new HashSet<Element>();
-                foreach (CssSelectorFilterSet FilterSet in this)
+                foreach (SelectorFilterSet FilterSet in this)
                 {
                     // Create a clone of our initial list that this filter set can alter
                     var tmpMatchList = new LinkedList<Element>(MatchList);

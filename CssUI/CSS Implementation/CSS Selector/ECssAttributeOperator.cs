@@ -1,5 +1,5 @@
 ﻿
-namespace CssUI.CSS
+namespace CssUI.CSS.Selectors
 {
     public enum ECssAttributeOperator
     {

@@ -1,7 +1,7 @@
 ﻿using CssUI.DOM;
 using System.Collections.Generic;
 
-namespace CssUI.CSS
+namespace CssUI.CSS.Selectors
 {
     /// <summary>
     /// Describes the basis for all selector filtering classes
@@ -12,7 +12,7 @@ namespace CssUI.CSS
     /// By doing this we can instead just store a list of those filter objects and simplify things a little bit more.
     /// </para>
     /// </summary>
-    public interface ICssSelectorFilter
+    public interface ISelectorFilter
     {
 
         /// <summary>
@@ -23,6 +23,6 @@ namespace CssUI.CSS
         /// <returns>Matches</returns>
         bool Query(LinkedList<Element> MatchList, ESelectorMatchingOrder Dir);
 
-        List<CssSimpleSelector> Get_Selectors();
+        List<SimpleSelector> Get_Selectors();
     }
 }
