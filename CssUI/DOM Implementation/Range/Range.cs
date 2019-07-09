@@ -405,7 +405,7 @@ namespace CssUI.DOM
                 return fragment;
 
             /* 4) If original start node is original end node, and they are a Text, ProcessingInstruction, or Comment node: */
-            if (ReferenceEquals(startContainer, endContainer) && DOMCommon.IsCommonTextNode(startContainer))
+            if (ReferenceEquals(startContainer, endContainer) && DOMCommon.Is_CommonTextNode(startContainer))
             {
                 CharacterData clone = (CharacterData)startContainer.cloneNode();
                 /* 2) Set the data of clone to the result of substringing data with node original start node, offset original start offset, and count original end offset minus original start offset. */
@@ -465,7 +465,7 @@ namespace CssUI.DOM
                 newOffset = 1 + referenceNode.index;
             }
             /* 15) If first partially contained child is a Text, ProcessingInstruction, or Comment node: */
-            if (DOMCommon.IsCommonTextNode(firstPartiallyContainedChild))
+            if (DOMCommon.Is_CommonTextNode(firstPartiallyContainedChild))
             {
                 CharacterData clone = (CharacterData)startContainer.cloneNode();
                 clone.data = ((CharacterData)startContainer).substringData(startOffset, startContainer.nodeLength - startOffset);
@@ -489,7 +489,7 @@ namespace CssUI.DOM
                 fragment.appendChild(containedChild);
             }
             /* 18) If last partially contained child is a Text, ProcessingInstruction, or Comment node: */
-            if (DOMCommon.IsCommonTextNode(lastPartiallyContainedChild))
+            if (DOMCommon.Is_CommonTextNode(lastPartiallyContainedChild))
             {
                 CharacterData clone = (CharacterData)endContainer.cloneNode();
                 clone.data = ((CharacterData)endContainer).substringData(0, endOffset);
@@ -517,6 +517,90 @@ namespace CssUI.DOM
 
         public DocumentFragment cloneContents()
         {/* Docs: https://dom.spec.whatwg.org/#concept-range-clone */
+            var fragment = new DocumentFragment(null, startContainer.ownerDocument);
+            if (this.collapsed) return fragment;
+
+            /* 4) If original start node is original end node, and they are a Text, ProcessingInstruction, or Comment node: */
+            if (ReferenceEquals(startContainer, endContainer) && DOMCommon.Is_CommonTextNode(startContainer))
+            {
+                CharacterData clone = (CharacterData)startContainer.cloneNode();
+                clone.data = ((CharacterData)startContainer).substringData(startOffset, endOffset - startOffset);
+                fragment.appendChild(clone);
+                return fragment;
+            }
+            var commonAncestor = startContainer;
+            /* 6) While common ancestor is not an inclusive ancestor of original end node, set common ancestor to its own parent. */
+            while (DOMCommon.Is_Inclusive_Ancestor(commonAncestor, endContainer))
+            {
+                commonAncestor = commonAncestor.parentNode;
+            }
+            Node firstPartiallyContainedChild = null;
+            var partialFilter = new FilterRangePartiallyContains(this);
+            /* 8) If original start node is not an inclusive ancestor of original end node, set first partially contained child to the first child of common ancestor that is partially contained in range. */
+            if (!DOMCommon.Is_Inclusive_Ancestor(startContainer, endContainer))
+            {
+                var tree = new TreeWalker(commonAncestor, Enums.ENodeFilterMask.SHOW_ALL, partialFilter);
+                firstPartiallyContainedChild = tree.firstChild();
+            }
+            /* 9) Let last partially contained child be null. */
+            Node lastPartiallyContainedChild = null;
+            /* 10) If original end node is not an inclusive ancestor of original start node, set last partially contained child to the last child of common ancestor that is partially contained in range. */
+            if (!DOMCommon.Is_Inclusive_Ancestor(endContainer, startContainer))
+            {
+                var tree = new TreeWalker(commonAncestor, Enums.ENodeFilterMask.SHOW_ALL, partialFilter);
+                lastPartiallyContainedChild = tree.lastChild();
+            }
+            /* 11) Let contained children be a list of all children of common ancestor that are contained in range, in tree order. */
+            var containedChildren = DOMCommon.Get_Descendents(commonAncestor, new FilterRangeContains(this));
+            /* 12) If any member of contained children is a doctype, then throw a "HierarchyRequestError" DOMException. */
+            if (containedChildren.Count(c => c is DocumentType) > 0)
+                throw new HierarchyRequestError();
+            /* 13) If first partially contained child is a Text, ProcessingInstruction, or Comment node: */
+            if (DOMCommon.Is_CommonTextNode(firstPartiallyContainedChild))
+            {
+                CharacterData clone = (CharacterData)startContainer.cloneNode();
+                /* 2) Set the data of clone to the result of substringing data with node original start node, offset original start offset, and count original start node’s length minus original start offset. */
+                clone.data = ((CharacterData)startContainer).substringData(startOffset, endOffset - startOffset);
+                fragment.appendChild(clone);
+            }
+            /* 14) Otherwise, if first partially contained child is not null: */
+            if (!ReferenceEquals(null, firstPartiallyContainedChild))
+            {
+                Node clone = firstPartiallyContainedChild.cloneNode();
+                fragment.appendChild(clone);
+                /* 3) Let subrange be a new live range whose start is (original start node, original start offset) and whose end is (first partially contained child, first partially contained child’s length). */
+                Range subrange = new Range(startContainer, startOffset, firstPartiallyContainedChild, firstPartiallyContainedChild.nodeLength);
+                var subfragment = subrange.cloneContents();
+                clone.appendChild(subfragment);
+            }
+            /* 15) For each contained child in contained children: */
+            foreach (Node containedChild in containedChildren)
+            {
+                /* 1) Let clone be a clone of contained child with the clone children flag set. */
+                var clone = containedChild.cloneNode(true);
+                fragment.appendChild(clone);
+            }
+            /* 16) If last partially contained child is a Text, ProcessingInstruction, or Comment node: */
+            if (DOMCommon.Is_CommonTextNode(lastPartiallyContainedChild))
+            {
+                CharacterData clone = (CharacterData)endContainer.cloneNode();
+                /* 2) Set the data of clone to the result of substringing data with node original end node, offset 0, and count original end offset. */
+                clone.data = ((CharacterData)endContainer).substringData(0, endOffset);
+                fragment.appendChild(clone);
+            }
+            /* 17) Otherwise, if last partially contained child is not null: */
+            if (!ReferenceEquals(null, lastPartiallyContainedChild))
+            {
+                var clone = lastPartiallyContainedChild.cloneNode();
+                fragment.appendChild(clone);
+                /* 3) Let subrange be a new live range whose start is (last partially contained child, 0) and whose end is (original end node, original end offset). */
+                Range subrange = new Range(lastPartiallyContainedChild, 0, endContainer, endOffset);
+                /* 4) Let subfragment be the result of cloning the contents of subrange. */
+                var subfragment = subrange.cloneContents();
+                clone.appendChild(subfragment);
+            }
+            /* 18) Return fragment. */
+            return fragment;
         }
 
         public void insertNode(Node node)
@@ -579,8 +663,10 @@ namespace CssUI.DOM
 
         }
 
-        public Range cloneRange();
-        public void detach();
+        public Range cloneRange()
+        {
+            return new Range(startContainer, startOffset, endContainer, endOffset);
+        }
 
         public bool isPointInRange(Node node, int offset)
         {/* Docs: https://dom.spec.whatwg.org/#dom-range-ispointinrange */

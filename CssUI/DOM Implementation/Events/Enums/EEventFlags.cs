@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CssUI.DOM
+namespace CssUI.DOM.Events
 {
     [Flags]
     public enum EEventFlags : ushort

@@ -16,7 +16,6 @@ List<EnvDTE.CodeEnum> allEnums = new List<EnvDTE.CodeEnum>();
 Dictionary<int, List<Tuple<EnvDTE.CodeVariable, string>>> EnumMap = new Dictionary<int, List<Tuple<EnvDTE.CodeVariable, string>>>();
 #>
 <#
-/* Find the CssUI.Enums namespace */
 foreach(EnvDTE.ProjectItem item in GetProjectItemsRecursively(project.ProjectItems))
 	{
 		if (item.FileCodeModel == null) continue;
@@ -32,7 +31,7 @@ foreach(EnvDTE.ProjectItem item in GetProjectItemsRecursively(project.ProjectIte
 						bool isTarget = false;
 						foreach(EnvDTE.CodeElement Attr in E.Attributes) 
 						{ 
-							if (Attr.Name == "CssEnum") 
+							if (Attr.Name == "DomEnum") 
 							{ 
 								isTarget = true; break; 
 							} 
@@ -58,9 +57,9 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using CssUI.Internal;
-namespace CssUI.CSS.Internal
+namespace CssUI.DOM.Internal
 {
-	internal static class CssEnumTables
+	internal static class DomEnumTables
 	{
         public static int Get_Enum_Index<Ty>()
         {
@@ -84,7 +83,7 @@ case "<#= E.Name #>": return <#= Index #>;
 
 								foreach(EnvDTE.CodeAttribute attr in enumValue.Attributes)
 								{
-									if (attr.Name == "CssKeyword")
+									if (attr.Name == "DomKeyword")
 									{
 										EnumMap[Index].Add(new Tuple<EnvDTE.CodeVariable, string>(enumValue, attr.Value));
 									}
@@ -105,7 +104,7 @@ default: throw new NotImplementedException($"No lookup-index has defined for enu
 		internal static readonly string[][] TABLE;
 		internal static readonly List<Dictionary<AtomicString, dynamic>> KEYWORD;
 
-		static CssEnumTables()
+		static DomEnumTables()
 		{
 			TABLE = new string[<#=allEnums.Count+1#>][];
 			KEYWORD = new List<Dictionary<AtomicString, dynamic>>(<#=allEnums.Count+1#>);
@@ -162,20 +161,6 @@ default: throw new NotImplementedException($"No lookup-index has defined for enu
 }
 
 <#+	
-
-public List<EnvDTE.CodeElement> GetCodeElementsRecursively(EnvDTE.CodeElements Elements)
-{
-
-    var ret = new List<EnvDTE.CodeElement>();
-    if (Elements == null) return ret;
-    foreach(EnvDTE.CodeElement item in Elements)
-    {
-		ret.Add(item);
-    }
-	ret.AddRange(GetCodeElementsRecursively(Elements));
-
-    return ret;
-}
 
 public List<EnvDTE.ProjectItem> GetProjectItemsRecursively(EnvDTE.ProjectItems items)
 {

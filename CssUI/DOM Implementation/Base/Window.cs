@@ -1,4 +1,5 @@
-﻿using CssUI.DOM.Nodes;
+﻿using CssUI.DOM.Mutation;
+using CssUI.DOM.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Threading;

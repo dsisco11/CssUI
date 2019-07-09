@@ -139,7 +139,7 @@ namespace CssUI.CSS
         /// <param name="scopeElements"></param>
         /// <param name="scopingRoot">Element to limit the search to, only this element and its descendents will be matched against</param>
         /// <returns>All matched elements</returns>
-        public IEnumerable<Element> Match_Against_Tree(IEnumerable<Element> rootElements, Node scopingRoot, params Node[] scopeElements)
+        public IEnumerable<Element> Match_Against_Tree(IEnumerable<Node> rootElements, Node scopingRoot, params Node[] scopeElements)
         {/* Docs: https://drafts.csswg.org/selectors-4/#match-a-selector-against-a-tree */
             if (rootElements.Count() <= 0)
                 return new Element[] { };

@@ -6,7 +6,7 @@ using xLog;
 
 namespace CssUI.DOM
 {
-    public class Document : Node, IGlobalEventHandlers, IDocumentAndElementEventHandlers
+    public class Document : ParentNode, IGlobalEventHandlers, IDocumentAndElementEventHandlers
     {
         internal ILogger Log = LogFactory.GetLogger(nameof(Document));
 
@@ -30,7 +30,7 @@ namespace CssUI.DOM
         /// </summary>
         /* The body element of a document is the first of the html element's children that is either a body element or a frameset element, or null if there is no such element. */
         public HTMLElement body { get; private set; }
-        IList<Node> getElementsByName(string elementName);
+        IEnumerable<Node> getElementsByName(string elementName);
         #endregion
         
         #region user interaction
@@ -55,6 +55,15 @@ namespace CssUI.DOM
         #endregion
 
 
+        public override IEventTarget get_the_parent(Event @event)
+        {
+            /* A document’s get the parent algorithm, given an event, returns null if event’s type attribute value is "load" or document does not have a browsing context, and the document’s relevant global object otherwise. */
+            /* Note: We arent a browser implementation so we will never have a browsing context, knowing this I think we should direguard the check and allow Document to return itsself except for when event is "load" */
+            if (0 == string.Compare(@event.type, "load"))
+                return null;
+
+            return this;
+        }
 
         public Node adoptNode(Node node)
         {/* Docs: https://dom.spec.whatwg.org/#dom-document-adoptnode */

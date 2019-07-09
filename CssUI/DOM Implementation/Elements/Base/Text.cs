@@ -10,6 +10,13 @@ namespace CssUI.DOM
         #region Node Overrides
         public override string nodeName => "#text";
         #endregion
+        
+        #region Slottable
+        public override bool isSlottable => true;
+
+        /* Docs: https://dom.spec.whatwg.org/#slotable-assigned-slot */
+        public override Node assignedSlot { get; protected set; } = null;
+        #endregion
 
         #region Constructors
         public Text(Document ownerDocument, string data)

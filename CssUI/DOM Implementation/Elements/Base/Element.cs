@@ -1,6 +1,7 @@
 ﻿using CssUI.CSS;
 using CssUI.DOM.Enums;
 using CssUI.DOM.Exceptions;
+using CssUI.DOM.Mutation;
 using CssUI.DOM.Nodes;
 using CssUI.Internal;
 using System.Collections.Generic;
@@ -16,6 +17,13 @@ namespace CssUI.DOM
         public string localName { get; set; }
         public readonly string tagName;
 
+        public DOMTokenList classList { get; private set; }
+
+        internal OrderedDictionary<AtomicString, Attr> AttributeList { get; private set; } = new OrderedDictionary<AtomicString, Attr>();
+        public NamedNodeMap Attributes { get; private set; }
+        #endregion
+
+        #region Node Overrides
         public override ENodeType nodeType => Enums.ENodeType.ELEMENT_NODE;
         public override string nodeName => this.localName.ToUpperInvariant();
         public override string nodeValue { get => null; set { /* specs say do nothing */ } }
@@ -45,11 +53,6 @@ namespace CssUI.DOM
                 Node._replace_all_within_node(node, parentNode);
             }
         }
-
-        public DOMTokenList classList { get; private set; }
-
-        internal OrderedDictionary<AtomicString, Attr> AttributeList { get; private set; } = new OrderedDictionary<AtomicString, Attr>();
-        public NamedNodeMap Attributes { get; private set; }
         #endregion
 
         #region Accessors
@@ -76,6 +79,13 @@ namespace CssUI.DOM
 
         IEnumerable<string> getAttributeNames() => this.AttributeList.Select(a => a.Name);
         public bool hasAttributes() => this.AttributeList.Count > 0;
+        #endregion
+
+        #region Slottable
+        public override bool isSlottable => true;
+
+        /* Docs: https://dom.spec.whatwg.org/#slotable-assigned-slot */
+        public override Node assignedSlot { get; protected set; } = null;
         #endregion
 
         #region INonDocumentTypeChildNode Implementation
@@ -141,28 +151,17 @@ namespace CssUI.DOM
 
         #region Utility
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void find_attribute(string qualifiedName, out Attr outAttrib)
+        internal bool find_attribute(string qualifiedName, out Attr outAttrib)
         {
             qualifiedName = qualifiedName.ToLowerInvariant();
-            /* Attr attr = null;
-             int attrIndex = 0;
-             for (int i = 0; i < this.AttributeList.Count; i++)
-             {
-                 var a = this.AttributeList[i];
-                 if (0 == string.Compare(a.Name, qualifiedName))
-                 {
-                     attr = a;
-                     attrIndex = i;
-                     break;
-                 }
-             }*/
             if (!this.AttributeList.TryGetValue(qualifiedName, out Attr attr))
             {
                 outAttrib = null;
-                return;
+                return false;
             }
 
             outAttrib = attr;
+            return true;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -170,7 +169,7 @@ namespace CssUI.DOM
         {
             /* To change an attribute attribute from an element element to value, run these steps: */
             /* 1) Queue an attribute mutation record for element with attribute’s local name, attribute’s namespace, and attribute’s value. */
-            new MutationRecord(EMutationType.Attributes, this, attr.Name, oldValue).QueueRecord();
+            MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, oldValue);
             /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute’s local name, attribute’s value, value, and attribute’s namespace. */
             /* 3) Run the attribute change steps with element, attribute’s local name, attribute’s value, value, and attribute’s namespace. */
             /* 4) Set attribute’s value to value. */
@@ -182,7 +181,7 @@ namespace CssUI.DOM
         {
             /* To append an attribute attribute to an element element, run these steps: */
             /* 1) Queue an attribute mutation record for element with attribute’s local name, attribute’s namespace, and null. */
-            new MutationRecord(EMutationType.Attributes, this, attr.Name, attr.Value).QueueRecord();
+            MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.Value);
             /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute’s local name, null, attribute’s value, and attribute’s namespace. */
             /* 3) Run the attribute change steps with element, attribute’s local name, null, attribute’s value, and attribute’s namespace. */
             change_attribute(attr, null, attr.Value);
@@ -197,7 +196,7 @@ namespace CssUI.DOM
         {
             /* To remove an attribute attribute from an element element, run these steps: */
             /* 1) Queue an attribute mutation record for element with attribute’s local name, attribute’s namespace, and attribute’s value. */
-            new MutationRecord(EMutationType.Attributes, this, attr.Name, attr.Value).QueueRecord();
+            MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.Value);
             /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute’s local name, attribute’s value, null, and attribute’s namespace. */
             /* 3) Run the attribute change steps with element, attribute’s local name, attribute’s value, null, and attribute’s namespace. */
             change_attribute(attr, attr.Value, null);
@@ -212,7 +211,7 @@ namespace CssUI.DOM
         {
             /* To replace an attribute oldAttr by an attribute newAttr in an element element, run these steps: */
             /* 1) Queue an attribute mutation record for element with oldAttr’s local name, oldAttr’s namespace, and oldAttr’s value. */
-            new MutationRecord(EMutationType.Attributes, this, oldAttr.Name, oldAttr.Value).QueueRecord(); // REDUNDANT
+            MutationRecord.Queue_Attribute_Mutation_Record(this, oldAttr.Name, oldAttr.Value); // REDUNDANT
             /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing oldAttr’s local name, oldAttr’s value, newAttr’s value, and oldAttr’s namespace. */
             /* 3) Run the attribute change steps with element, oldAttr’s local name, oldAttr’s value, newAttr’s value, and oldAttr’s namespace. */
             change_attribute(oldAttr, oldAttr.Value, newAttr.Value);
@@ -332,13 +331,18 @@ namespace CssUI.DOM
         #endregion
 
         #region Element Matching / CSS Selectors
+        /// <summary>
+        /// Returns the first (starting at element) inclusive ancestor that matches selectors, and null otherwise.
+        /// </summary>
+        /// <param name="selectors"></param>
+        /// <returns></returns>
         public Element closest(string selectors)
         {/* Docs: https://dom.spec.whatwg.org/#dom-element-closest */
             /* The closest(selectors) method, when invoked, must run these steps: */
             /* 1) Let s be the result of parse a selector from selectors. [SELECTORS4] */
-            var s = new CssSelector(selectors);
+            var Selector = new CssSelector(selectors);
             /* 2) If s is failure, throw a "SyntaxError" DOMException. */
-            if (ReferenceEquals(s, null))
+            if (ReferenceEquals(Selector, null))
             {
                 throw new SyntaxError("Could not parse selector.");
             }
@@ -352,13 +356,18 @@ namespace CssUI.DOM
                     break;
 
                 Element element = (Element)n;
-                if (s.Query(element))
+                if (Selector.Match(element, this))
                     return element;
             }
             /* 5) Return null */
             return null;
         }
 
+        /// <summary>
+        /// Returns true if matching selectors against element’s root yields element, and false otherwise.
+        /// </summary>
+        /// <param name="selectors"></param>
+        /// <returns></returns>
         public bool matches(string selectors)
         {/* https://dom.spec.whatwg.org/#dom-element-matches */
             /* The matches(selectors) and webkitMatchesSelector(selectors) methods, when invoked, must run these steps: */
@@ -370,7 +379,7 @@ namespace CssUI.DOM
                 throw new SyntaxError("Could not parse selector.");
             }
             /* 3) Return true if the result of match a selector against an element, using s, element, and :scope element context object, returns success, and false otherwise. [SELECTORS4] */
-            return s.Query(this);
+            return s.Match(this, this);
         }
 
         public IEnumerable<Element> getElementsByTagName(string qualifiedName)

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CssUI.DOM
 {
-    public class DocumentFragment : Node
+    public class DocumentFragment : ParentNode
     {
         public Element Host { get; private set; } = null;
 
@@ -42,9 +42,10 @@ namespace CssUI.DOM
 
         public override int nodeLength => this.childNodes.Count;
 
-        public DocumentFragment(Element Host)
+        public DocumentFragment(Element Host, Document ownerDocument = null)
         {
             this.Host = Host;
+            this.ownerDocument = ownerDocument;
         }
     }
 }

@@ -68,5 +68,9 @@ namespace CssUI.DOM
         event EventHandler ontoggle;
         event EventHandler onvolumechange;
         event EventHandler onwaiting;
+
+        /* Docs: https://w3c.github.io/selection-api/#extensions-to-globaleventhandlers-interface */
+        event EventHandler onselectstart;
+        event EventHandler onselectionchange;
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM
+﻿namespace CssUI.DOM.Events
 {
     public class EventInit
     {

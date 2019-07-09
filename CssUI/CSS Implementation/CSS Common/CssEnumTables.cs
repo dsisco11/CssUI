@@ -7,7 +7,8 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-namespace CssUI.Internal
+using CssUI.Internal;
+namespace CssUI.CSS.Internal
 {
 	internal static class CssEnumTables
 	{
@@ -19,13 +20,13 @@ namespace CssUI.Internal
 				case "EBoxSizingMode": return 1;
 				case "ECssDirection": return 2;
 				case "ECssGenericFontFamily": return 3;
-				case "EDisplayMode": return 4;
-				case "EFontStyle": return 5;
-				case "EObjectFit": return 6;
-				case "EOverflowMode": return 7;
-				case "EPositioning": return 8;
-				case "EPositioningScheme": return 9;
-				case "EStyleUnit": return 10;
+				case "ECssUnit": return 4;
+				case "EDisplayMode": return 5;
+				case "EFontStyle": return 6;
+				case "EObjectFit": return 7;
+				case "EOverflowMode": return 8;
+				case "EPositioning": return 9;
+				case "EPositioningScheme": return 10;
 				case "ETextAlign": return 11;
 				case "EWritingMode": return 12;
 				default: throw new NotImplementedException($"No lookup-index has defined for enum type '{typeof(Ty).Name}'");
@@ -81,96 +82,96 @@ namespace CssUI.Internal
 			TABLE[3][(int)CssUI.Enums.ECssGenericFontFamily.Monospace] = "monospace";
 
 
+			/* CssUI.ECssUnit */
+			maxIndex = (int)Enum.GetValues(typeof(CssUI.ECssUnit)).Cast<CssUI.ECssUnit>().Max();
+			TABLE[4] = new string[maxIndex+1];
+			TABLE[4][(int)CssUI.ECssUnit.None] = "";
+			TABLE[4][(int)CssUI.ECssUnit.PX] = "px";
+			TABLE[4][(int)CssUI.ECssUnit.EM] = "em";
+			TABLE[4][(int)CssUI.ECssUnit.EX] = "ex";
+			TABLE[4][(int)CssUI.ECssUnit.CH] = "ch";
+			TABLE[4][(int)CssUI.ECssUnit.REM] = "rem";
+			TABLE[4][(int)CssUI.ECssUnit.VW] = "vw";
+			TABLE[4][(int)CssUI.ECssUnit.VH] = "vh";
+			TABLE[4][(int)CssUI.ECssUnit.VMIN] = "vmin";
+			TABLE[4][(int)CssUI.ECssUnit.VMAX] = "vmax";
+			TABLE[4][(int)CssUI.ECssUnit.DEG] = "deg";
+			TABLE[4][(int)CssUI.ECssUnit.GRAD] = "grad";
+			TABLE[4][(int)CssUI.ECssUnit.RAD] = "rad";
+			TABLE[4][(int)CssUI.ECssUnit.TURN] = "turn";
+
+
 			/* CssUI.Enums.EDisplayMode */
 			maxIndex = (int)Enum.GetValues(typeof(CssUI.Enums.EDisplayMode)).Cast<CssUI.Enums.EDisplayMode>().Max();
-			TABLE[4] = new string[maxIndex+1];
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.NONE] = "none";
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.CONTENT] = "content";
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.INLINE] = "inline";
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.RUN_IN] = "run-in";
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.BLOCK] = "block";
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.LIST_ITEM] = "list-item";
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.FLEX] = "flex";
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.FLOW] = "flow";
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.FLOW_ROOT] = "flow-root";
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.GRID] = "grid";
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.TABLE] = "table";
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.TABLE_ROW_GROUP] = "table-row-group";
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.TABLE_HEADER_GROUP] = "table-header-group";
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.TABLE_FOOTER_GROUP] = "table-footer-group";
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.TABLE_ROW] = "table-row";
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.TABLE_CELL] = "table-cell";
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.TABLE_COLUMN_GROUP] = "table-column-group";
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.TABLE_COLUMN] = "table-column";
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.TABLE_CAPTION] = "table-caption";
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.INLINE_BLOCK] = "inline-block";
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.INLINE_TABLE] = "inline-table";
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.INLINE_FLEX] = "inline-flex";
-			TABLE[4][(int)CssUI.Enums.EDisplayMode.INLINE_GRID] = "inline-grid";
+			TABLE[5] = new string[maxIndex+1];
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.NONE] = "none";
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.CONTENT] = "content";
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.INLINE] = "inline";
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.RUN_IN] = "run-in";
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.BLOCK] = "block";
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.LIST_ITEM] = "list-item";
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.FLEX] = "flex";
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.FLOW] = "flow";
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.FLOW_ROOT] = "flow-root";
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.GRID] = "grid";
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.TABLE] = "table";
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.TABLE_ROW_GROUP] = "table-row-group";
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.TABLE_HEADER_GROUP] = "table-header-group";
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.TABLE_FOOTER_GROUP] = "table-footer-group";
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.TABLE_ROW] = "table-row";
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.TABLE_CELL] = "table-cell";
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.TABLE_COLUMN_GROUP] = "table-column-group";
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.TABLE_COLUMN] = "table-column";
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.TABLE_CAPTION] = "table-caption";
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.INLINE_BLOCK] = "inline-block";
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.INLINE_TABLE] = "inline-table";
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.INLINE_FLEX] = "inline-flex";
+			TABLE[5][(int)CssUI.Enums.EDisplayMode.INLINE_GRID] = "inline-grid";
 
 
 			/* CssUI.Enums.EFontStyle */
 			maxIndex = (int)Enum.GetValues(typeof(CssUI.Enums.EFontStyle)).Cast<CssUI.Enums.EFontStyle>().Max();
-			TABLE[5] = new string[maxIndex+1];
-			TABLE[5][(int)CssUI.Enums.EFontStyle.Normal] = "normal";
-			TABLE[5][(int)CssUI.Enums.EFontStyle.Italic] = "italic";
-			TABLE[5][(int)CssUI.Enums.EFontStyle.Oblique] = "oblique";
+			TABLE[6] = new string[maxIndex+1];
+			TABLE[6][(int)CssUI.Enums.EFontStyle.Normal] = "normal";
+			TABLE[6][(int)CssUI.Enums.EFontStyle.Italic] = "italic";
+			TABLE[6][(int)CssUI.Enums.EFontStyle.Oblique] = "oblique";
 
 
 			/* CssUI.Enums.EObjectFit */
 			maxIndex = (int)Enum.GetValues(typeof(CssUI.Enums.EObjectFit)).Cast<CssUI.Enums.EObjectFit>().Max();
-			TABLE[6] = new string[maxIndex+1];
-			TABLE[6][(int)CssUI.Enums.EObjectFit.Fill] = "fill";
-			TABLE[6][(int)CssUI.Enums.EObjectFit.Contain] = "contain";
-			TABLE[6][(int)CssUI.Enums.EObjectFit.Cover] = "cover";
-			TABLE[6][(int)CssUI.Enums.EObjectFit.None] = "none";
-			TABLE[6][(int)CssUI.Enums.EObjectFit.Scale_Down] = "scale-down";
+			TABLE[7] = new string[maxIndex+1];
+			TABLE[7][(int)CssUI.Enums.EObjectFit.Fill] = "fill";
+			TABLE[7][(int)CssUI.Enums.EObjectFit.Contain] = "contain";
+			TABLE[7][(int)CssUI.Enums.EObjectFit.Cover] = "cover";
+			TABLE[7][(int)CssUI.Enums.EObjectFit.None] = "none";
+			TABLE[7][(int)CssUI.Enums.EObjectFit.Scale_Down] = "scale-down";
 
 
 			/* CssUI.Enums.EOverflowMode */
 			maxIndex = (int)Enum.GetValues(typeof(CssUI.Enums.EOverflowMode)).Cast<CssUI.Enums.EOverflowMode>().Max();
-			TABLE[7] = new string[maxIndex+1];
-			TABLE[7][(int)CssUI.Enums.EOverflowMode.Visible] = "visible";
-			TABLE[7][(int)CssUI.Enums.EOverflowMode.Hidden] = "hidden";
-			TABLE[7][(int)CssUI.Enums.EOverflowMode.Clip] = "clip";
-			TABLE[7][(int)CssUI.Enums.EOverflowMode.Scroll] = "scroll";
-			TABLE[7][(int)CssUI.Enums.EOverflowMode.Auto] = "auto";
+			TABLE[8] = new string[maxIndex+1];
+			TABLE[8][(int)CssUI.Enums.EOverflowMode.Visible] = "visible";
+			TABLE[8][(int)CssUI.Enums.EOverflowMode.Hidden] = "hidden";
+			TABLE[8][(int)CssUI.Enums.EOverflowMode.Clip] = "clip";
+			TABLE[8][(int)CssUI.Enums.EOverflowMode.Scroll] = "scroll";
+			TABLE[8][(int)CssUI.Enums.EOverflowMode.Auto] = "auto";
 
 
 			/* CssUI.Enums.EPositioning */
 			maxIndex = (int)Enum.GetValues(typeof(CssUI.Enums.EPositioning)).Cast<CssUI.Enums.EPositioning>().Max();
-			TABLE[8] = new string[maxIndex+1];
-			TABLE[8][(int)CssUI.Enums.EPositioning.Static] = "static";
-			TABLE[8][(int)CssUI.Enums.EPositioning.Relative] = "relative";
-			TABLE[8][(int)CssUI.Enums.EPositioning.Absolute] = "absolute";
-			TABLE[8][(int)CssUI.Enums.EPositioning.Fixed] = "fixed";
+			TABLE[9] = new string[maxIndex+1];
+			TABLE[9][(int)CssUI.Enums.EPositioning.Static] = "static";
+			TABLE[9][(int)CssUI.Enums.EPositioning.Relative] = "relative";
+			TABLE[9][(int)CssUI.Enums.EPositioning.Absolute] = "absolute";
+			TABLE[9][(int)CssUI.Enums.EPositioning.Fixed] = "fixed";
 
 
 			/* CssUI.Enums.EPositioningScheme */
 			maxIndex = (int)Enum.GetValues(typeof(CssUI.Enums.EPositioningScheme)).Cast<CssUI.Enums.EPositioningScheme>().Max();
-			TABLE[9] = new string[maxIndex+1];
-			TABLE[9][(int)CssUI.Enums.EPositioningScheme.Normal] = "normal";
-			TABLE[9][(int)CssUI.Enums.EPositioningScheme.Float] = "float";
-			TABLE[9][(int)CssUI.Enums.EPositioningScheme.Absolute] = "absolute";
-
-
-			/* CssUI.EStyleUnit */
-			maxIndex = (int)Enum.GetValues(typeof(CssUI.ECssUnit)).Cast<CssUI.ECssUnit>().Max();
 			TABLE[10] = new string[maxIndex+1];
-			TABLE[10][(int)CssUI.ECssUnit.None] = "";
-			TABLE[10][(int)CssUI.ECssUnit.PX] = "px";
-			TABLE[10][(int)CssUI.ECssUnit.EM] = "em";
-			TABLE[10][(int)CssUI.ECssUnit.EX] = "ex";
-			TABLE[10][(int)CssUI.ECssUnit.CH] = "ch";
-			TABLE[10][(int)CssUI.ECssUnit.REM] = "rem";
-			TABLE[10][(int)CssUI.ECssUnit.VW] = "vw";
-			TABLE[10][(int)CssUI.ECssUnit.VH] = "vh";
-			TABLE[10][(int)CssUI.ECssUnit.VMIN] = "vmin";
-			TABLE[10][(int)CssUI.ECssUnit.VMAX] = "vmax";
-			TABLE[10][(int)CssUI.ECssUnit.DEG] = "deg";
-			TABLE[10][(int)CssUI.ECssUnit.GRAD] = "grad";
-			TABLE[10][(int)CssUI.ECssUnit.RAD] = "rad";
-			TABLE[10][(int)CssUI.ECssUnit.TURN] = "turn";
+			TABLE[10][(int)CssUI.Enums.EPositioningScheme.Normal] = "normal";
+			TABLE[10][(int)CssUI.Enums.EPositioningScheme.Float] = "float";
+			TABLE[10][(int)CssUI.Enums.EPositioningScheme.Absolute] = "absolute";
 
 
 			/* CssUI.Enums.ETextAlign */
@@ -233,89 +234,89 @@ namespace CssUI.Internal
 			KEYWORD[3].Add(new AtomicString("monospace"), CssUI.Enums.ECssGenericFontFamily.Monospace);
 
 
+			/* CssUI.ECssUnit */
+			KEYWORD.Add(new Dictionary<AtomicString, dynamic>());
+			KEYWORD[4].Add(new AtomicString(""), CssUI.ECssUnit.None);
+			KEYWORD[4].Add(new AtomicString("px"), CssUI.ECssUnit.PX);
+			KEYWORD[4].Add(new AtomicString("em"), CssUI.ECssUnit.EM);
+			KEYWORD[4].Add(new AtomicString("ex"), CssUI.ECssUnit.EX);
+			KEYWORD[4].Add(new AtomicString("ch"), CssUI.ECssUnit.CH);
+			KEYWORD[4].Add(new AtomicString("rem"), CssUI.ECssUnit.REM);
+			KEYWORD[4].Add(new AtomicString("vw"), CssUI.ECssUnit.VW);
+			KEYWORD[4].Add(new AtomicString("vh"), CssUI.ECssUnit.VH);
+			KEYWORD[4].Add(new AtomicString("vmin"), CssUI.ECssUnit.VMIN);
+			KEYWORD[4].Add(new AtomicString("vmax"), CssUI.ECssUnit.VMAX);
+			KEYWORD[4].Add(new AtomicString("deg"), CssUI.ECssUnit.DEG);
+			KEYWORD[4].Add(new AtomicString("grad"), CssUI.ECssUnit.GRAD);
+			KEYWORD[4].Add(new AtomicString("rad"), CssUI.ECssUnit.RAD);
+			KEYWORD[4].Add(new AtomicString("turn"), CssUI.ECssUnit.TURN);
+
+
 			/* CssUI.Enums.EDisplayMode */
 			KEYWORD.Add(new Dictionary<AtomicString, dynamic>());
-			KEYWORD[4].Add(new AtomicString("none"), CssUI.Enums.EDisplayMode.NONE);
-			KEYWORD[4].Add(new AtomicString("content"), CssUI.Enums.EDisplayMode.CONTENT);
-			KEYWORD[4].Add(new AtomicString("inline"), CssUI.Enums.EDisplayMode.INLINE);
-			KEYWORD[4].Add(new AtomicString("run-in"), CssUI.Enums.EDisplayMode.RUN_IN);
-			KEYWORD[4].Add(new AtomicString("block"), CssUI.Enums.EDisplayMode.BLOCK);
-			KEYWORD[4].Add(new AtomicString("list-item"), CssUI.Enums.EDisplayMode.LIST_ITEM);
-			KEYWORD[4].Add(new AtomicString("flex"), CssUI.Enums.EDisplayMode.FLEX);
-			KEYWORD[4].Add(new AtomicString("flow"), CssUI.Enums.EDisplayMode.FLOW);
-			KEYWORD[4].Add(new AtomicString("flow-root"), CssUI.Enums.EDisplayMode.FLOW_ROOT);
-			KEYWORD[4].Add(new AtomicString("grid"), CssUI.Enums.EDisplayMode.GRID);
-			KEYWORD[4].Add(new AtomicString("table"), CssUI.Enums.EDisplayMode.TABLE);
-			KEYWORD[4].Add(new AtomicString("table-row-group"), CssUI.Enums.EDisplayMode.TABLE_ROW_GROUP);
-			KEYWORD[4].Add(new AtomicString("table-header-group"), CssUI.Enums.EDisplayMode.TABLE_HEADER_GROUP);
-			KEYWORD[4].Add(new AtomicString("table-footer-group"), CssUI.Enums.EDisplayMode.TABLE_FOOTER_GROUP);
-			KEYWORD[4].Add(new AtomicString("table-row"), CssUI.Enums.EDisplayMode.TABLE_ROW);
-			KEYWORD[4].Add(new AtomicString("table-cell"), CssUI.Enums.EDisplayMode.TABLE_CELL);
-			KEYWORD[4].Add(new AtomicString("table-column-group"), CssUI.Enums.EDisplayMode.TABLE_COLUMN_GROUP);
-			KEYWORD[4].Add(new AtomicString("table-column"), CssUI.Enums.EDisplayMode.TABLE_COLUMN);
-			KEYWORD[4].Add(new AtomicString("table-caption"), CssUI.Enums.EDisplayMode.TABLE_CAPTION);
-			KEYWORD[4].Add(new AtomicString("inline-block"), CssUI.Enums.EDisplayMode.INLINE_BLOCK);
-			KEYWORD[4].Add(new AtomicString("inline-table"), CssUI.Enums.EDisplayMode.INLINE_TABLE);
-			KEYWORD[4].Add(new AtomicString("inline-flex"), CssUI.Enums.EDisplayMode.INLINE_FLEX);
-			KEYWORD[4].Add(new AtomicString("inline-grid"), CssUI.Enums.EDisplayMode.INLINE_GRID);
+			KEYWORD[5].Add(new AtomicString("none"), CssUI.Enums.EDisplayMode.NONE);
+			KEYWORD[5].Add(new AtomicString("content"), CssUI.Enums.EDisplayMode.CONTENT);
+			KEYWORD[5].Add(new AtomicString("inline"), CssUI.Enums.EDisplayMode.INLINE);
+			KEYWORD[5].Add(new AtomicString("run-in"), CssUI.Enums.EDisplayMode.RUN_IN);
+			KEYWORD[5].Add(new AtomicString("block"), CssUI.Enums.EDisplayMode.BLOCK);
+			KEYWORD[5].Add(new AtomicString("list-item"), CssUI.Enums.EDisplayMode.LIST_ITEM);
+			KEYWORD[5].Add(new AtomicString("flex"), CssUI.Enums.EDisplayMode.FLEX);
+			KEYWORD[5].Add(new AtomicString("flow"), CssUI.Enums.EDisplayMode.FLOW);
+			KEYWORD[5].Add(new AtomicString("flow-root"), CssUI.Enums.EDisplayMode.FLOW_ROOT);
+			KEYWORD[5].Add(new AtomicString("grid"), CssUI.Enums.EDisplayMode.GRID);
+			KEYWORD[5].Add(new AtomicString("table"), CssUI.Enums.EDisplayMode.TABLE);
+			KEYWORD[5].Add(new AtomicString("table-row-group"), CssUI.Enums.EDisplayMode.TABLE_ROW_GROUP);
+			KEYWORD[5].Add(new AtomicString("table-header-group"), CssUI.Enums.EDisplayMode.TABLE_HEADER_GROUP);
+			KEYWORD[5].Add(new AtomicString("table-footer-group"), CssUI.Enums.EDisplayMode.TABLE_FOOTER_GROUP);
+			KEYWORD[5].Add(new AtomicString("table-row"), CssUI.Enums.EDisplayMode.TABLE_ROW);
+			KEYWORD[5].Add(new AtomicString("table-cell"), CssUI.Enums.EDisplayMode.TABLE_CELL);
+			KEYWORD[5].Add(new AtomicString("table-column-group"), CssUI.Enums.EDisplayMode.TABLE_COLUMN_GROUP);
+			KEYWORD[5].Add(new AtomicString("table-column"), CssUI.Enums.EDisplayMode.TABLE_COLUMN);
+			KEYWORD[5].Add(new AtomicString("table-caption"), CssUI.Enums.EDisplayMode.TABLE_CAPTION);
+			KEYWORD[5].Add(new AtomicString("inline-block"), CssUI.Enums.EDisplayMode.INLINE_BLOCK);
+			KEYWORD[5].Add(new AtomicString("inline-table"), CssUI.Enums.EDisplayMode.INLINE_TABLE);
+			KEYWORD[5].Add(new AtomicString("inline-flex"), CssUI.Enums.EDisplayMode.INLINE_FLEX);
+			KEYWORD[5].Add(new AtomicString("inline-grid"), CssUI.Enums.EDisplayMode.INLINE_GRID);
 
 
 			/* CssUI.Enums.EFontStyle */
 			KEYWORD.Add(new Dictionary<AtomicString, dynamic>());
-			KEYWORD[5].Add(new AtomicString("normal"), CssUI.Enums.EFontStyle.Normal);
-			KEYWORD[5].Add(new AtomicString("italic"), CssUI.Enums.EFontStyle.Italic);
-			KEYWORD[5].Add(new AtomicString("oblique"), CssUI.Enums.EFontStyle.Oblique);
+			KEYWORD[6].Add(new AtomicString("normal"), CssUI.Enums.EFontStyle.Normal);
+			KEYWORD[6].Add(new AtomicString("italic"), CssUI.Enums.EFontStyle.Italic);
+			KEYWORD[6].Add(new AtomicString("oblique"), CssUI.Enums.EFontStyle.Oblique);
 
 
 			/* CssUI.Enums.EObjectFit */
 			KEYWORD.Add(new Dictionary<AtomicString, dynamic>());
-			KEYWORD[6].Add(new AtomicString("fill"), CssUI.Enums.EObjectFit.Fill);
-			KEYWORD[6].Add(new AtomicString("contain"), CssUI.Enums.EObjectFit.Contain);
-			KEYWORD[6].Add(new AtomicString("cover"), CssUI.Enums.EObjectFit.Cover);
-			KEYWORD[6].Add(new AtomicString("none"), CssUI.Enums.EObjectFit.None);
-			KEYWORD[6].Add(new AtomicString("scale-down"), CssUI.Enums.EObjectFit.Scale_Down);
+			KEYWORD[7].Add(new AtomicString("fill"), CssUI.Enums.EObjectFit.Fill);
+			KEYWORD[7].Add(new AtomicString("contain"), CssUI.Enums.EObjectFit.Contain);
+			KEYWORD[7].Add(new AtomicString("cover"), CssUI.Enums.EObjectFit.Cover);
+			KEYWORD[7].Add(new AtomicString("none"), CssUI.Enums.EObjectFit.None);
+			KEYWORD[7].Add(new AtomicString("scale-down"), CssUI.Enums.EObjectFit.Scale_Down);
 
 
 			/* CssUI.Enums.EOverflowMode */
 			KEYWORD.Add(new Dictionary<AtomicString, dynamic>());
-			KEYWORD[7].Add(new AtomicString("visible"), CssUI.Enums.EOverflowMode.Visible);
-			KEYWORD[7].Add(new AtomicString("hidden"), CssUI.Enums.EOverflowMode.Hidden);
-			KEYWORD[7].Add(new AtomicString("clip"), CssUI.Enums.EOverflowMode.Clip);
-			KEYWORD[7].Add(new AtomicString("scroll"), CssUI.Enums.EOverflowMode.Scroll);
-			KEYWORD[7].Add(new AtomicString("auto"), CssUI.Enums.EOverflowMode.Auto);
+			KEYWORD[8].Add(new AtomicString("visible"), CssUI.Enums.EOverflowMode.Visible);
+			KEYWORD[8].Add(new AtomicString("hidden"), CssUI.Enums.EOverflowMode.Hidden);
+			KEYWORD[8].Add(new AtomicString("clip"), CssUI.Enums.EOverflowMode.Clip);
+			KEYWORD[8].Add(new AtomicString("scroll"), CssUI.Enums.EOverflowMode.Scroll);
+			KEYWORD[8].Add(new AtomicString("auto"), CssUI.Enums.EOverflowMode.Auto);
 
 
 			/* CssUI.Enums.EPositioning */
 			KEYWORD.Add(new Dictionary<AtomicString, dynamic>());
-			KEYWORD[8].Add(new AtomicString("static"), CssUI.Enums.EPositioning.Static);
-			KEYWORD[8].Add(new AtomicString("relative"), CssUI.Enums.EPositioning.Relative);
-			KEYWORD[8].Add(new AtomicString("absolute"), CssUI.Enums.EPositioning.Absolute);
-			KEYWORD[8].Add(new AtomicString("fixed"), CssUI.Enums.EPositioning.Fixed);
+			KEYWORD[9].Add(new AtomicString("static"), CssUI.Enums.EPositioning.Static);
+			KEYWORD[9].Add(new AtomicString("relative"), CssUI.Enums.EPositioning.Relative);
+			KEYWORD[9].Add(new AtomicString("absolute"), CssUI.Enums.EPositioning.Absolute);
+			KEYWORD[9].Add(new AtomicString("fixed"), CssUI.Enums.EPositioning.Fixed);
 
 
 			/* CssUI.Enums.EPositioningScheme */
 			KEYWORD.Add(new Dictionary<AtomicString, dynamic>());
-			KEYWORD[9].Add(new AtomicString("normal"), CssUI.Enums.EPositioningScheme.Normal);
-			KEYWORD[9].Add(new AtomicString("float"), CssUI.Enums.EPositioningScheme.Float);
-			KEYWORD[9].Add(new AtomicString("absolute"), CssUI.Enums.EPositioningScheme.Absolute);
-
-
-			/* CssUI.EStyleUnit */
-			KEYWORD.Add(new Dictionary<AtomicString, dynamic>());
-			KEYWORD[10].Add(new AtomicString(""), CssUI.ECssUnit.None);
-			KEYWORD[10].Add(new AtomicString("px"), CssUI.ECssUnit.PX);
-			KEYWORD[10].Add(new AtomicString("em"), CssUI.ECssUnit.EM);
-			KEYWORD[10].Add(new AtomicString("ex"), CssUI.ECssUnit.EX);
-			KEYWORD[10].Add(new AtomicString("ch"), CssUI.ECssUnit.CH);
-			KEYWORD[10].Add(new AtomicString("rem"), CssUI.ECssUnit.REM);
-			KEYWORD[10].Add(new AtomicString("vw"), CssUI.ECssUnit.VW);
-			KEYWORD[10].Add(new AtomicString("vh"), CssUI.ECssUnit.VH);
-			KEYWORD[10].Add(new AtomicString("vmin"), CssUI.ECssUnit.VMIN);
-			KEYWORD[10].Add(new AtomicString("vmax"), CssUI.ECssUnit.VMAX);
-			KEYWORD[10].Add(new AtomicString("deg"), CssUI.ECssUnit.DEG);
-			KEYWORD[10].Add(new AtomicString("grad"), CssUI.ECssUnit.GRAD);
-			KEYWORD[10].Add(new AtomicString("rad"), CssUI.ECssUnit.RAD);
-			KEYWORD[10].Add(new AtomicString("turn"), CssUI.ECssUnit.TURN);
+			KEYWORD[10].Add(new AtomicString("normal"), CssUI.Enums.EPositioningScheme.Normal);
+			KEYWORD[10].Add(new AtomicString("float"), CssUI.Enums.EPositioningScheme.Float);
+			KEYWORD[10].Add(new AtomicString("absolute"), CssUI.Enums.EPositioningScheme.Absolute);
 
 
 			/* CssUI.Enums.ETextAlign */

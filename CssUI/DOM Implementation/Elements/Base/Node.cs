@@ -1,4 +1,5 @@
 ﻿using CssUI.DOM.Enums;
+using CssUI.DOM.Events;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Mutation;
 using System;
@@ -33,6 +34,16 @@ namespace CssUI.DOM.Nodes
 
         /* Docs: https://dom.spec.whatwg.org/#concept-node-length */
         public abstract int nodeLength { get; }
+        #endregion
+
+        #region Slottable
+        /// <summary>
+        /// Element and Text nodes are slotables.
+        /// </summary>
+        public virtual bool isSlottable => false;
+
+        public virtual Node assignedSlot { get => null; protected set { } }
+        public bool isAssigned => (isSlottable && !ReferenceEquals(null, assignedSlot));
         #endregion
 
         #region DOM
@@ -179,6 +190,7 @@ namespace CssUI.DOM.Nodes
             return _clone_node(this, null, deep);
         }
 
+        #region Equality
         public bool isEqualNode(Node otherNode) => this.Equals(otherNode);
 
         public override bool Equals(object obj)
@@ -216,6 +228,7 @@ namespace CssUI.DOM.Nodes
 
             return hash;
         }
+        #endregion
 
         public EDocumentPosition compareDocumentPosition(Node other)
         {/* Docs: https://dom.spec.whatwg.org/#dom-node-comparedocumentposition */
@@ -303,7 +316,16 @@ namespace CssUI.DOM.Nodes
 
         #endregion
 
-        #region Abstracted Steps
+        #region Event Stuff
+        public override IEventTarget get_the_parent(Event @event)
+        {
+            /* A node’s get the parent algorithm, given an event, returns the node’s assigned slot, if node is assigned, and node’s parent otherwise. */
+            /* XXX: Assigned Slot stuff here */
+            return this.parentNode;
+        }
+        #endregion
+
+        #region Customizable Overload Steps
         /// <summary>
         /// Runs the W3C specification defined steps on a given parent node for when a child <see cref="Text"/> node changes
         /// </summary>
@@ -858,6 +880,42 @@ namespace CssUI.DOM.Nodes
 
             Node._remove_node_from_parent(child, parent);
             return child;
+        }
+
+        /// <summary>
+        /// Takes multiple nodes and merges them into one, returning the resulting node
+        /// </summary>
+        /// <param name="nodes"></param>
+        /// <param name="document"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static Node _convert_nodes_into_node(Document document, params object[] nodes)
+        {/* Docs: https://dom.spec.whatwg.org/#converting-nodes-into-a-node */
+            Node node = null;
+            /* 2) Replace each string in nodes with a new Text node whose data is the string and node document is document. */
+            for (int i=0; i<nodes.Count(); i++)
+            {
+                if (nodes[i] is string)
+                {
+                    nodes[i] = new Text(document, (string)nodes[i]);
+                }
+            }
+            /* 3) If nodes contains one node, set node to that node. */
+            if (nodes.Count() == 1)
+            {
+                node = (Node)nodes[0];
+            }
+            /* 4) Otherwise, set node to a new DocumentFragment whose node document is document, and then append each node in nodes, if any, to it. */
+            else
+            {
+                node = new DocumentFragment(null, document);
+                foreach(Node child in (Node[])nodes)
+                {
+                    node.appendChild(child);
+                }
+            }
+
+            return node;
         }
         #endregion
 

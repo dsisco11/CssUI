@@ -1,5 +1,4 @@
-﻿
-namespace CssUI.DOM
+﻿namespace CssUI.DOM.Events
 {
     /// <summary>
     /// Allows event receivers to prevent elements from responding to certain events.
