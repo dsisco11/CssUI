@@ -1,5 +1,6 @@
-﻿using CssUI.CSS.Enums;
-using CssUI.DOM;
+﻿using CssUI.DOM;
+using CssUI.DOM.Nodes;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -10,7 +11,7 @@ namespace CssUI.CSS.Selectors
     {
         protected readonly string Name;
 
-        public PseudoClassSelector(string PseudoClass) : base(ECssSimpleSelectorType.PseudoClassSelector)
+        public PseudoClassSelector(string PseudoClass) : base(ESimpleSelectorType.PseudoClassSelector)
         {
             this.Name = PseudoClass;
         }
@@ -33,22 +34,22 @@ namespace CssUI.CSS.Selectors
         /// Returns whether the selector matches a specified element or index
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        override public bool Matches(Element E)
+        override public bool Matches(Element E, params Node[] scopeElements)
         {
             switch (Name)
             {
                 case "hover":
-                    return E.IsMouseOver;
+                    throw new NotImplementedException($"Pseudo-class selector logic for ':{Name}' has not yet been implemented");
                 case "active":
-                    return E.IsActive;
+                    throw new NotImplementedException($"Pseudo-class selector logic for ':{Name}' has not yet been implemented");
                 case "focus":
-                    return E.HasFocus;
+                    throw new NotImplementedException($"Pseudo-class selector logic for ':{Name}' has not yet been implemented");
                 case "enabled":
-                    return E.IsEnabled;
+                    throw new NotImplementedException($"Pseudo-class selector logic for ':{Name}' has not yet been implemented");
                 case "disabled":
-                    return !E.IsEnabled;
+                    throw new NotImplementedException($"Pseudo-class selector logic for ':{Name}' has not yet been implemented");
                 case "drop":
-                    return E.AcceptsDragDrop;
+                    throw new NotImplementedException($"Pseudo-class selector logic for ':{Name}' has not yet been implemented");
                 case "checked":
                     return (E.hasAttribute("checked") && !string.IsNullOrEmpty(E.getAttribute("checked")) == true);
                 case "indeterminate":

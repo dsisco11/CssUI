@@ -1,5 +1,6 @@
-﻿using CssUI.CSS.Enums;
-using CssUI.DOM;
+﻿using CssUI.DOM;
+using CssUI.DOM.Nodes;
+using System.Runtime.CompilerServices;
 
 namespace CssUI.CSS.Selectors
 {
@@ -8,9 +9,9 @@ namespace CssUI.CSS.Selectors
     /// </summary>
     public abstract class SimpleSelector
     {
-        public ECssSimpleSelectorType Type { get; protected set; }
+        public ESimpleSelectorType Type { get; protected set; }
 
-        public SimpleSelector(ECssSimpleSelectorType Type)
+        public SimpleSelector(ESimpleSelectorType Type)
         {
             this.Type = Type;
         }
@@ -18,6 +19,7 @@ namespace CssUI.CSS.Selectors
         /// <summary>
         /// Returns whether the selector matches a specified element or index
         /// </summary>
-        abstract public bool Matches(Element E);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        abstract public bool Matches(Element E, params Node[] scopeElements);
     }
 }

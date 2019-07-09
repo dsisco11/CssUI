@@ -1,5 +1,5 @@
-﻿using CssUI.CSS.Enums;
-using CssUI.DOM;
+﻿using CssUI.DOM;
+using CssUI.DOM.Nodes;
 using System;
 using System.Runtime.CompilerServices;
 
@@ -9,7 +9,7 @@ namespace CssUI.CSS.Selectors
     {
         protected readonly string Name;
 
-        public PseudoElementSelector(string Name) : base(ECssSimpleSelectorType.PseudoElementSelector)
+        public PseudoElementSelector(string Name) : base(ESimpleSelectorType.PseudoElementSelector)
         {
             this.Name = Name;
         }
@@ -18,7 +18,7 @@ namespace CssUI.CSS.Selectors
         /// Returns whether the selector matches a specified element or index
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        override public bool Matches(Element E)
+        override public bool Matches(Element E, params Node[] scopeElements)
         {
             switch (Name)
             {

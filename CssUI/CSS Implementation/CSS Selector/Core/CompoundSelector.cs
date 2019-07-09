@@ -1,6 +1,8 @@
 ﻿using CssUI.DOM;
+using CssUI.DOM.Nodes;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace CssUI.CSS.Selectors
 {
@@ -9,49 +11,57 @@ namespace CssUI.CSS.Selectors
     /// A Compound selector is one that consists of multiple simple selectors
     /// In addition a Compound selector can contain at most ONE type-selector and if it does, that must be the first selector within it.
     /// </summary>
-    public class CompoundSelector : ISelectorFilter
-    {// SEE:  https://drafts.csswg.org/selectors-4/#typedef-compound-selector
+    public class CompoundSelector : List<SimpleSelector>
+    {/* Docs: https://drafts.csswg.org/selectors-4/#typedef-compound-selector */
 
-        public readonly List<SimpleSelector> Selectors = null;
         #region Constructors
         public CompoundSelector()
         {
-            this.Selectors = new List<SimpleSelector>();
         }
 
-        public CompoundSelector(IEnumerable<SimpleSelector> Collection)
+        public CompoundSelector(IEnumerable<SimpleSelector> Collection) : base(Collection)
         {
-            this.Selectors = new List<SimpleSelector>(Collection);
-            SimpleSelector ts = Selectors.FirstOrDefault(o => o is CssTypeSelector);
-            if (ts != null && ts != Selectors[0] || Selectors.Count(o => o is CssTypeSelector) > 1)
+            SimpleSelector ts = this.FirstOrDefault(o => o is TypeSelector);
+            if (ts != null && ts != this[0] || this.Count(o => o is TypeSelector) > 1)
                 throw new CssSyntaxErrorException("Compound selectors can only contain a single type-selector and it MUST be the first selector in the list!");
         }
 
-        public CompoundSelector(CompoundSelector Compound) : this(Compound.Selectors)
+        public CompoundSelector(CompoundSelector Compound) : this(Compound.ToArray())
         {
         }
         #endregion
 
-        public List<SimpleSelector> Get_Selectors() { return Selectors; }
-        public bool Query(LinkedList<Element> MatchList, ESelectorMatchingOrder Order)
+        #region Matching
+        /// <summary>
+        /// Performs simple selector matching against all elements in <paramref name="MatchList"/>.
+        /// Modifies the list, removing any non-matching elements
+        /// </summary>
+        /// <param name="MatchList">List of elements to match against</param>
+        /// <param name="Order">The matching direction</param>
+        /// <returns>True if any elements were a match</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected bool Match(IEnumerable<Element> MatchList, out LinkedList<Element> outList, ESelectorMatchingOrder Order, params Node[] scopeElements)
         {
-            if (MatchList.Count <= 0)
-                return false;
-            // Filter the matchlist with our simple selectors first
-            LinkedListNode<Element> node = MatchList.First;
-            do
+            if (MatchList.Count() <= 0)
             {
-                bool bad = false;// if True then we remove the node from our list
+                outList = (LinkedList<Element>)MatchList;
+                return false;
+            }
+
+            var newList = new LinkedList<Element>();
+            foreach (Element element in MatchList)
+            {
+                bool fullMatch = true;
                 switch (Order)
                 {
                     case ESelectorMatchingOrder.LTR:
                         {
-                            for (int i = 0; i < Selectors.Count; i++)// progressing forwards
+                            for (int i = 0; i < Count; i++)// progressing forwards
                             {
-                                SimpleSelector Selector = Selectors[i];
-                                if (!Selectors[i].Matches(node.Value))
+                                SimpleSelector Selector = this[i];
+                                if (!Selector.Matches(element, scopeElements))
                                 {
-                                    bad = true;
+                                    fullMatch = false;
                                     break;
                                 }
                             }
@@ -59,12 +69,12 @@ namespace CssUI.CSS.Selectors
                         break;
                     case ESelectorMatchingOrder.RTL:
                         {
-                            for (int i = Selectors.Count - 1; i >= 0; i--)// progressing backwards
+                            for (int i = Count - 1; i >= 0; i--)// progressing backwards
                             {
-                                SimpleSelector Selector = Selectors[i];
-                                if (!Selectors[i].Matches(node.Value))
+                                SimpleSelector Selector = this[i];
+                                if (!Selector.Matches(element, scopeElements))
                                 {
-                                    bad = true;
+                                    fullMatch = false;
                                     break;
                                 }
                             }
@@ -72,20 +82,16 @@ namespace CssUI.CSS.Selectors
                         break;
                 }
 
-                if (bad)
+                if (fullMatch)
                 {
-                    var curr = node;// Track current node just incase next is null or something
-                    node = node.Next;// Progress
-                    MatchList.Remove(curr);// Remove this element
-                }
-                else
-                {
-                    node = node.Next;
+                    newList.AddLast(element);
                 }
             }
-            while (node != null);
 
-            return true;
+            outList = newList;
+            return (newList.Count > 0);
         }
+
+        #endregion
     }
 }

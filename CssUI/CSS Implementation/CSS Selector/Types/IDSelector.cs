@@ -1,4 +1,5 @@
 ﻿using CssUI.DOM;
+using CssUI.DOM.Nodes;
 using System.Runtime.CompilerServices;
 
 namespace CssUI.CSS.Selectors
@@ -7,7 +8,7 @@ namespace CssUI.CSS.Selectors
     {
         readonly string MatchID;
 
-        public IDSelector(string MatchID) : base(ECssSimpleSelectorType.IDSelector)
+        public IDSelector(string MatchID) : base(ESimpleSelectorType.IDSelector)
         {
             this.MatchID = MatchID;
         }
@@ -16,7 +17,7 @@ namespace CssUI.CSS.Selectors
         /// Returns whether the selector matches a specified element or index
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        override public bool Matches(Element E)
+        override public bool Matches(Element E, params Node[] scopeElements)
         {
             return string.Compare(E.id.ToLowerInvariant(), MatchID) == 0;
         }

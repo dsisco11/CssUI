@@ -1,5 +1,5 @@
-﻿using CssUI.CSS.Enums;
-using CssUI.DOM;
+﻿using CssUI.DOM;
+using CssUI.DOM.Nodes;
 using System.Runtime.CompilerServices;
 
 namespace CssUI.CSS.Selectors
@@ -11,7 +11,7 @@ namespace CssUI.CSS.Selectors
     /// </summary>
     public class UniversalSelector : SimpleSelector
     {
-        public UniversalSelector() : base(ECssSimpleSelectorType.UniversalSelector)
+        public UniversalSelector() : base(ESimpleSelectorType.UniversalSelector)
         {
         }
 
@@ -19,7 +19,7 @@ namespace CssUI.CSS.Selectors
         /// Returns whether the selector matches a specified element or index
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        override public bool Matches(Element E)
+        override public bool Matches(Element E, params Node[] scopeElements)
         {
             return true;
         }

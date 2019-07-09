@@ -1,9 +1,9 @@
-﻿namespace CssUI.CSS.Enums
+﻿namespace CssUI.CSS.Selectors
 {
     /// <summary>
     /// Defines all the simple selector types 
     /// </summary>
-    public enum ECssSimpleSelectorType
+    public enum ESimpleSelectorType
     {
         /// <summary>The universal selector matches any element in any namespace</summary>
         UniversalSelector,

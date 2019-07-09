@@ -1,6 +1,7 @@
 ﻿using CssUI.CSS.Parser;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace CssUI.CSS.Selectors
 {
@@ -15,16 +16,6 @@ namespace CssUI.CSS.Selectors
         {
             CssParser parser = new CssParser(SelectorString);
             List<CssToken> items = parser.Parse_ComponentValue_List();
-            /*
-            var strm = new ObjectStream<CssComponent>(items.ToArray(), null);
-            IEnumerable<CssToken> Tokens = strm.Consume_While(c => c.Type == ECssComponent.PreservedToken).Select(c => (c as CssPreservedToken).Value);
-            var tokens = new ObjectStream<CssToken>(Tokens, CssToken.EOF);
-            */
-            /*
-            // Pre-parse the tokens into appropriate Selector token types
-            var tokens = new ObjectStream<CssToken>(items, CssToken.EOF);
-            this.Stream = Parse_Tokens(tokens);
-            */
 
             this.Stream = new CssTokenStream(items);
         }
@@ -151,13 +142,18 @@ namespace CssUI.CSS.Selectors
 
 
         #region Parsing
-        public SelectorList Parse_Selector_List()
+        public IEnumerable<ComplexSelector> Parse_Selector_List()
         {
             return Consume_Selector_List(Stream);
         }
+
+        public ComplexSelector Parse_Single_Selector()
+        {
+            return Consume_Single_Selector(Stream);
+        }
         #endregion
 
-        #region Testing
+        #region Token Checks
         static bool Is_Char(CssToken A, char CH)
         {
             return (A.Type == ECssTokenType.Delim && (A as DelimToken).Value == CH);
@@ -244,187 +240,140 @@ namespace CssUI.CSS.Selectors
         #endregion
 
         #region Selector Consuming
-        public static SelectorList Consume_Selector_List(CssTokenStream Stream)
-        {// SEE:  https://www.w3.org/TR/2011/REC-css3-selectors-20110929/#selectors
-            SelectorList List = null;
 
-            SelectorFilterSet Selector = null;
+        /// <summary>
+        /// Consumes a list of complex selectors
+        /// </summary>
+        public static ComplexSelector Consume_Single_Selector(CssTokenStream Stream)
+        {
+            return Consume_Complex_Selector(Stream);
+        }
+
+        /// <summary>
+        /// Consumes a list of complex selectors
+        /// </summary>
+        public static IEnumerable<ComplexSelector> Consume_Selector_List(CssTokenStream Stream)
+        {
+            ComplexSelector Selector;
+            LinkedList<ComplexSelector> List = new LinkedList<ComplexSelector>();
             do
             {
-                Selector = Consume_Selector_FilterSet(Stream);
+                Selector = Consume_Complex_Selector(Stream);
                 if (Selector != null)
                 {
-                    if (List == null) List = new SelectorList();
-                    List.Add(Selector);
+                    List.AddLast(Selector);
+                }
+
+                switch (Stream.Next.Type)
+                {
+                    case ECssTokenType.Comma:
+                        Stream.Consume();
+                        break;
+                    case ECssTokenType.EOF:
+                    default:
+                        Selector = null;
+                        break;
                 }
             }
             while (Selector != null);
+
             return List;
         }
 
         /// <summary>
-        /// Consumes a list of Compound/Complex selectors
-        /// </summary>
-        public static SelectorFilterSet Consume_Selector_FilterSet(CssTokenStream Stream)
-        {
-            SelectorFilterSet List = null;
-            ISelectorFilter Filter;
-            do
-            {
-                Filter = Consume_Filter(Stream);
-                if (Filter != null)
-                {
-                    if (List == null) List = new SelectorFilterSet();
-                    List.Add(Filter);
-                }
-
-                switch (Stream.Next.Type)
-                {
-                    case ECssTokenType.Comma:
-                        Stream.Consume();
-                        break;
-                    case ECssTokenType.EOF:
-                    default:
-                        return List;
-                }
-            }
-            while (Filter != null);
-
-            return null;
-        }
-
-        /// <summary>
-        /// Consumes a list of Compound/Complex selectors
-        /// </summary>
-        public static SelectorFilterSet Consume_Complex_Selector_List(CssTokenStream Stream)
-        {
-            SelectorFilterSet List = null;
-            ComplexSelector Complex;
-            do
-            {
-                Complex = Consume_Complex_Selector(Stream);
-                if (Complex != null)
-                {
-                    if (List == null) List = new SelectorFilterSet();
-                    List.Add(Complex);
-                }
-
-                switch (Stream.Next.Type)
-                {
-                    case ECssTokenType.Comma:
-                        Stream.Consume();
-                        break;
-                    case ECssTokenType.EOF:
-                    default:
-                        return List;
-                }
-            }
-            while (Complex != null);
-
-            return null;
-        }
-
-        /// <summary>
-        /// Consumes a new selector-filter item
+        /// Consumes a sequence of <see cref="RelativeSelector"/> consisting of compound selectors and their combinators (if available)
         /// </summary>
         /// <returns></returns>
-        static ISelectorFilter Consume_Filter(CssTokenStream Stream)
+        private static ComplexSelector Consume_Complex_Selector(CssTokenStream Stream)
+        {
+            RelativeSelector Selector;
+            LinkedList<RelativeSelector> selectorList = new LinkedList<RelativeSelector>();
+            do
+            {
+                Selector = Consume_Relative_Selector(Stream);
+                if (Selector != null)
+                {
+                    selectorList.AddLast(Selector);
+                }
+            }
+            while (Selector != null);
+
+            return new ComplexSelector(selectorList);
+        }
+
+        /// <summary>
+        /// Consumes a single <see cref="CompoundSelector"/> and it's <see cref="ESelectorCombinator"/> (if available)
+        /// </summary>
+        /// <returns></returns>
+        private static RelativeSelector Consume_Relative_Selector(CssTokenStream Stream)
         {
             Stream.Consume_While(tok => tok.Type == ECssTokenType.Whitespace);// Consume all of the prefixing whitespace
             CompoundSelector Compound = Consume_Compound_Selector(Stream);
-            if (Compound == null) return null;
-            if (!Starts_Combinator(Stream.Next)) return Compound;
 
-            CombinatorToken Comb = Consume_Combinator(Stream);
-            ESelectorCombinator Combinator = ESelectorCombinator.None;
-            if (Stream.Next.Type == ECssTokenType.Combinator)
+            if (Compound == null)
+                return null;
+
+            if (!Starts_Combinator(Stream.Next))
             {
-                switch (Comb.Value)
-                {
-                    case " ":
-                    case ">>":
-                        Combinator = ESelectorCombinator.Descendant;
-                        break;
-                    case ">":
-                        Combinator = ESelectorCombinator.Child;
-                        break;
-                    case "+":
-                        Combinator = ESelectorCombinator.Sibling_Adjacent;
-                        break;
-                    case "~":
-                        Combinator = ESelectorCombinator.Sibling_General;
-                        break;
-                    default:
-                        throw new CssParserException(string.Concat("Unrecognized Combinator(", Comb.Value, ")"));
-                }
+                return new RelativeSelector(ESelectorCombinator.None, Compound);
             }
+            else
+            {
+                CombinatorToken Comb = Consume_Combinator(Stream);
+                ESelectorCombinator Combinator = ESelectorCombinator.None;
+                if (Stream.Next.Type == ECssTokenType.Combinator)
+                {
+                    switch(Comb.Value)
+                    {
+                        case " ":
+                        case ">>":
+                            Combinator = ESelectorCombinator.Descendant;
+                            break;
+                        case ">":
+                            Combinator = ESelectorCombinator.Child;
+                            break;
+                        case "+":
+                            Combinator = ESelectorCombinator.Sibling_Adjacent;
+                            break;
+                        case "~":
+                            Combinator = ESelectorCombinator.Sibling_Subsequent;
+                            break;
+                        default:
+                            throw new CssParserException(string.Concat("Unrecognized Combinator(", Comb.Value, ")"));
+                    }
+                }
 
-            return new ComplexSelector(Combinator, Compound);
+                return new RelativeSelector(Combinator, Compound);
+            }
         }
 
         /// <summary>
-        /// Consumes a compound selector and it's combinator (if available)
+        /// Consumes a single <see cref="CompoundSelector"/>, which is a comprised of multiple <see cref="SimpleSelector"/>s
         /// </summary>
         /// <returns></returns>
-        static ComplexSelector Consume_Complex_Selector(CssTokenStream Stream)
+        private static CompoundSelector Consume_Compound_Selector(CssTokenStream Stream)
         {
-            Stream.Consume_While(tok => tok.Type == ECssTokenType.Whitespace);// Consume all of the prefixing whitespace
-            CompoundSelector Compound = Consume_Compound_Selector(Stream);
-            if (Compound == null) return null;
-            if (!Starts_Combinator(Stream.Next)) return new ComplexSelector(ESelectorCombinator.None, Compound);
-
-            CombinatorToken Comb = Consume_Combinator(Stream);
-            ESelectorCombinator Combinator = ESelectorCombinator.None;
-            if (Stream.Next.Type == ECssTokenType.Combinator)
-            {
-                switch(Comb.Value)
-                {
-                    case " ":
-                    case ">>":
-                        Combinator = ESelectorCombinator.Descendant;
-                        break;
-                    case ">":
-                        Combinator = ESelectorCombinator.Child;
-                        break;
-                    case "+":
-                        Combinator = ESelectorCombinator.Sibling_Adjacent;
-                        break;
-                    case "~":
-                        Combinator = ESelectorCombinator.Sibling_General;
-                        break;
-                    default:
-                        throw new CssParserException(string.Concat("Unrecognized Combinator(", Comb.Value, ")"));
-                }
-            }
-
-            return new ComplexSelector(Combinator, Compound);
-        }
-
-        /// <summary>
-        /// Consumes a compound selector, which is a comprised of multiple simple selectors
-        /// </summary>
-        /// <returns></returns>
-        static CompoundSelector Consume_Compound_Selector(CssTokenStream Stream)
-        {
-            CompoundSelector Compound = null;
-            CssSimpleSelector Simple;
+            SimpleSelector Simple;
+            var selectorList = new LinkedList<SimpleSelector>();
             do
             {
-                if (!Starts_Simple_Selector(Stream.Next, Stream.NextNext, Stream.NextNextNext)) return Compound;
+                if (!Starts_Simple_Selector(Stream.Next, Stream.NextNext, Stream.NextNextNext))
+                {
+                    break;
+                }
 
                 Simple = Consume_Simple_Selector(Stream);
                 if (Simple != null)
                 {
-                    if (Compound == null) Compound = new CompoundSelector();
-                    Compound.Selectors.Add(Simple);
+                    selectorList.AddLast(Simple);
                 }
             }
             while (Simple != null);
 
-            return Compound;
+            return new CompoundSelector(selectorList);
         }
 
-        static CssSimpleSelector Consume_Simple_Selector(CssTokenStream Stream)
+        private static SimpleSelector Consume_Simple_Selector(CssTokenStream Stream)
         {
             if (Starts_ID_Selector(Stream.Next))
             {
@@ -462,14 +411,14 @@ namespace CssUI.CSS.Selectors
 
         #region Selector Consumption
 
-        static CssIDSelector Consume_ID_Selector(CssTokenStream Stream)
+        static IDSelector Consume_ID_Selector(CssTokenStream Stream)
         {
             HashToken Hash = (Stream.Consume() as HashToken);
             if (Hash.HashType != EHashTokenType.ID) throw new CssParserException("Invalid Hash token, hash-type is not ID!");
-            return new CssIDSelector(Hash.Value);
+            return new IDSelector(Hash.Value);
         }
 
-        static CssUniversalSelector Consume_Universal_Selector(CssTokenStream Stream)
+        static UniversalSelector Consume_Universal_Selector(CssTokenStream Stream)
         {
             if (Starts_NamespacePrefix(Stream.Next, Stream.NextNext))
             {
@@ -482,26 +431,26 @@ namespace CssUI.CSS.Selectors
                 Stream.Consume();// Consume the '*' character now, because the first token we consumed was actually just the namespace prefix
             }
 
-            return new CssUniversalSelector();
+            return new UniversalSelector();
         }
 
-        static CssTypeSelector Consume_Type_Selector(CssTokenStream Stream)
+        static TypeSelector Consume_Type_Selector(CssTokenStream Stream)
         {
             if (Starts_NamespacePrefix(Stream.Next, Stream.NextNext))
             {
                 NamespacePrefixToken Namespace = Consume_NamespacePrefix(Stream);
-                return new CssTypeSelector(Namespace, Stream.Consume<IdentToken>().Value);
+                return new TypeSelector(Namespace, Stream.Consume<IdentToken>().Value);
             }
             
-            return new CssTypeSelector(Stream.Consume<IdentToken>().Value);
+            return new TypeSelector(Stream.Consume<IdentToken>().Value);
         }
 
-        static CssClassSelector Consume_Class_Selector(CssTokenStream Stream)
+        static ClassSelector Consume_Class_Selector(CssTokenStream Stream)
         {
             Stream.Consume();// Consume the '.' prefixing the classname
             IdentToken Ident = Stream.Consume<IdentToken>();
 
-            return new CssClassSelector(Ident.Value);
+            return new ClassSelector(Ident.Value);
         }
 
         /// <summary>
@@ -511,7 +460,7 @@ namespace CssUI.CSS.Selectors
         /// <para>'[' <qualified-name> <attr-matcher> [ <string-token> | <ident-token> ] <attr-modifier>? ']'</para>
         /// </summary>
         /// <returns></returns>
-        static CssAttributeSelector Consume_Attribute_Selector(CssTokenStream Stream)
+        static AttributeSelector Consume_Attribute_Selector(CssTokenStream Stream)
         {
             Stream.Consume();// Consume the '[' prefix
 
@@ -523,7 +472,7 @@ namespace CssUI.CSS.Selectors
             CssToken Tok = Stream.Consume();
             if (Tok.Type == ECssTokenType.SqBracket_Close)
             {
-                return new CssAttributeSelector(NS, attrName.Value);
+                return new AttributeSelector(NS, attrName.Value);
             }
 
             CssToken OperatorToken = Tok;
@@ -534,11 +483,11 @@ namespace CssUI.CSS.Selectors
 
             if (value.Type == ECssTokenType.String)
             {
-                return new CssAttributeSelector(NS, attrName.Value, OperatorToken, (value as StringToken).Value);
+                return new AttributeSelector(NS, attrName.Value, OperatorToken, (value as StringToken).Value);
             }
             else if (value.Type == ECssTokenType.Ident)
             {
-                return new CssAttributeSelector(NS, attrName.Value, OperatorToken, (value as IdentToken).Value);
+                return new AttributeSelector(NS, attrName.Value, OperatorToken, (value as IdentToken).Value);
             }
 
             return null;// Parse error
@@ -550,14 +499,14 @@ namespace CssUI.CSS.Selectors
         /// <para>':' <ident-token></para>
         /// <para>':' <function-token> <any-value> ')'</para>
         /// </summary>
-        static CssPseudoClassSelector Consume_Pseudo_Class_Selector(CssTokenStream Stream)
+        static PseudoClassSelector Consume_Pseudo_Class_Selector(CssTokenStream Stream)
         {
             Stream.Consume();// Consume the ':' prefix
             switch (Stream.Next.Type)
             {
                 case ECssTokenType.Ident:
                     {
-                        return new CssPseudoClassSelector(Stream.Consume<IdentToken>().Value);
+                        return new PseudoClassSelector(Stream.Consume<IdentToken>().Value);
                     }
                 case ECssTokenType.FunctionName:
                     {
@@ -566,7 +515,7 @@ namespace CssUI.CSS.Selectors
                 case ECssTokenType.Function:
                     {
                         CssFunction func = Stream.Consume<CssFunction>();
-                        return CssPseudoClassSelector.Create_Function(func.Name, func.Arguments);
+                        return PseudoClassSelector.Create_Function(func.Name, func.Arguments);
                     }
             }
 
@@ -579,14 +528,14 @@ namespace CssUI.CSS.Selectors
         /// <para>'::' <ident-token></para>
         /// <para>'::' <function-token> <any-value> ')'</para>
         /// </summary>
-        static CssPseudoElementSelector Consume_Pseudo_Element_Selector(CssTokenStream Stream)
+        static PseudoElementSelector Consume_Pseudo_Element_Selector(CssTokenStream Stream)
         {
             Stream.Consume(2);// Consume the '::' prefix
             switch (Stream.Next.Type)
             {
                 case ECssTokenType.Ident:
                     {
-                        return new CssPseudoElementSelector(Stream.Consume<IdentToken>().Value);
+                        return new PseudoElementSelector(Stream.Consume<IdentToken>().Value);
                     }
                 case ECssTokenType.FunctionName:
                     {

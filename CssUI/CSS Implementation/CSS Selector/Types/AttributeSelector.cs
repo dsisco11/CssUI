@@ -1,5 +1,5 @@
-﻿using CssUI.CSS.Enums;
-using CssUI.DOM;
+﻿using CssUI.DOM;
+using CssUI.DOM.Nodes;
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -14,19 +14,20 @@ namespace CssUI.CSS.Selectors
         readonly ECssAttributeOperator Operator = ECssAttributeOperator.None;
         readonly string Value = null;
 
+        #region Constructor
         /// <summary>
         /// </summary>
         /// <param name="Attrib">The attribute name for this selector</param>
         /// <param name="Operator">String token that defines the method of comparison</param>
         /// <param name="Value"></param>
-        public AttributeSelector(NamespacePrefixToken Namespace, string Attrib) : base(ECssSimpleSelectorType.AttributeSelector)
+        public AttributeSelector(NamespacePrefixToken Namespace, string Attrib) : base(ESimpleSelectorType.AttributeSelector)
         {
             this.Namespace = Namespace;
             this.Attrib = Attrib;
             this.Operator = ECssAttributeOperator.Isset;
         }
 
-        public AttributeSelector(NamespacePrefixToken Namespace, string Attrib, CssToken OperatorToken, string Value) : base(ECssSimpleSelectorType.AttributeSelector)
+        public AttributeSelector(NamespacePrefixToken Namespace, string Attrib, CssToken OperatorToken, string Value) : base(ESimpleSelectorType.AttributeSelector)
         {
             this.Namespace = Namespace;
             this.Attrib = Attrib;
@@ -67,12 +68,13 @@ namespace CssUI.CSS.Selectors
                 }
             }
         }
+        #endregion
 
         /// <summary>
         /// Returns whether the selector matches a specified element or index
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        override public bool Matches(Element E)
+        override public bool Matches(Element E, params Node[] scopeElements)
         {
             switch (Operator)
             {

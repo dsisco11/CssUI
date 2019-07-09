@@ -1,4 +1,5 @@
 ﻿using CssUI.DOM;
+using CssUI.DOM.Nodes;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -18,7 +19,7 @@ namespace CssUI.CSS.Selectors
         /// Returns whether the selector matches a specified element or index
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        override public bool Matches(Element E)
+        override public bool Matches(Element E, params Node[] scopeElements)
         {
             switch (Name)
             {
@@ -33,7 +34,7 @@ namespace CssUI.CSS.Selectors
     public class PseudoClassSelectorAnBFunction : PseudoClassSelector
     {
         protected readonly CssAnBMatcher AnB;
-        protected readonly SelectorList Selector;
+        protected readonly IEnumerable<ComplexSelector> Selectors;
 
         public PseudoClassSelectorAnBFunction(string Name, CssTokenStream Stream) : base(Name)
         {
@@ -41,7 +42,7 @@ namespace CssUI.CSS.Selectors
             if (Stream.Next.Type == ECssTokenType.Ident && string.Compare("or", (Stream.Next as IdentToken).Value)==0)
             {
                 Stream.Consume();// Consume the 'or' string token
-                Selector = SelectorParser.Consume_Selector_List(Stream);
+                Selectors = SelectorParser.Consume_Selector_List(Stream);
             }
         }
 
@@ -49,7 +50,7 @@ namespace CssUI.CSS.Selectors
         /// Returns whether the selector matches a specified element or index
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        override public bool Matches(Element E)
+        override public bool Matches(Element E, params Node[] scopeElements)
         {
             switch (Name)
             {
@@ -67,20 +68,20 @@ namespace CssUI.CSS.Selectors
 
     public class PseudoClassSelectorNegationFunction : PseudoClassSelector
     {
-        protected readonly SelectorList Selector;
+        protected readonly ComplexSelector Selector;
 
         public PseudoClassSelectorNegationFunction(string Name, CssTokenStream Stream) : base(Name)
         {
-            Selector = SelectorParser.Consume_Selector_List(Stream);
+            Selector = SelectorParser.Consume_Single_Selector(Stream);
         }
 
         /// <summary>
         /// Returns whether the selector matches a specified element or index
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        override public bool Matches(Element E)
+        override public bool Matches(Element E, params Node[] scopeElements)
         {
-            return false == Selector.Query(E);
+            return false == Selector.Match(E, scopeElements);
         }
     }
 
