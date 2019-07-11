@@ -29,7 +29,7 @@ namespace CssUI.CSS.Internal
 				case "EPositioningScheme": return 10;
 				case "ETextAlign": return 11;
 				case "EWritingMode": return 12;
-				default: throw new NotImplementedException($"No lookup-index has defined for enum type '{typeof(Ty).Name}'");
+				default: return -1; //throw new NotImplementedException($"No lookup-index has defined for enum type '{typeof(Ty).Name}'");
             }
         }
 

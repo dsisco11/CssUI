@@ -1,5 +1,6 @@
 ﻿
 using CssUI.DOM.Enums;
+using CssUI.DOM.Events;
 
 namespace CssUI.DOM
 {
@@ -14,8 +15,11 @@ namespace CssUI.DOM
         public bool translate;
         public string dir;
         public readonly DOMStringMap dataset;
-        public string nonce; // intentionally no [CEReactions]
+        public string nonce;
 
+        /// <summary>
+        /// Specifies the tab index of this element, that is its selection order when a user cycles through selecting elements by pressing tab
+        /// </summary>
         public long tabIndex;
         #endregion
 
@@ -48,6 +52,25 @@ namespace CssUI.DOM
         public string inputMode { get; set; }
         #endregion
 
+        #region Document Event Handlers
+        public event EventCallback onCopy
+        {
+            add => handlerMap.Add(EEventName.Copy, value);
+            remove => handlerMap.Remove(EEventName.Copy, value);
+        }
+
+        public event EventCallback onCut
+        {
+            add => handlerMap.Add(EEventName.Cut, value);
+            remove => handlerMap.Remove(EEventName.Cut, value);
+        }
+
+        public event EventCallback onPaste
+        {
+            add => handlerMap.Add(EEventName.Paste, value);
+            remove => handlerMap.Remove(EEventName.Paste, value);
+        }
+        #endregion
 
     }
 

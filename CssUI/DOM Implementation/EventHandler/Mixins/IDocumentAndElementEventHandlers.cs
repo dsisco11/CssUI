@@ -4,8 +4,8 @@ namespace CssUI.DOM
 {
     public interface IDocumentAndElementEventHandlers
     {
-        event EventHandler oncopy;
-        event EventHandler oncut;
-        event EventHandler onpaste;
+        event EventCallback onCopy;
+        event EventCallback onCut;
+        event EventCallback onPaste;
     }
 }

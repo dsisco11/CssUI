@@ -11,16 +11,22 @@ namespace CssUI
     {
         #region Enum Lookup
 
-        public static string Enum<Ty>(Ty Value) where Ty : struct
+        public static string Keyword_From_Enum<Ty>(Ty Value) where Ty : struct
         {
             int index = DomEnumTables.Get_Enum_Index<Ty>();
+            if (index < 0)
+                return null;/* Enum has no index */
+
             return DomEnumTables.TABLE[index][Convert.ToInt32(Value)];
         }
 
-        public static Ty FromKeyword<Ty>(string Keyword) where Ty : struct
+        public static Ty? Enum_From_Keyword<Ty>(AtomicString Keyword) where Ty : struct
         {
             int index = DomEnumTables.Get_Enum_Index<Ty>();
-            return (Ty)DomEnumTables.KEYWORD[index][new AtomicString(Keyword)];
+            if (index < 0)
+                return null;/* Enum has no index */
+
+            return (Ty)DomEnumTables.KEYWORD[index][Keyword];
         }
 
         #endregion

@@ -14,7 +14,7 @@
         #endregion
 
         #region Constructors
-        public UIEvent(EEventType type, UIEventInit eventInit = null) : base(type, eventInit)
+        public UIEvent(EEventName type, UIEventInit eventInit = null) : base(type, eventInit)
         {
             this.View = eventInit.view;
             this.Detail = eventInit.detail;

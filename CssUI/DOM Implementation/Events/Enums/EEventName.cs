@@ -3,170 +3,195 @@
 namespace CssUI.DOM.Events
 {
     [DomEnum]
-    public enum EEventType : uint
+    public enum EEventName : int
     {
+        /// <summary>
+        /// Represents all custom (end-user specified) event values
+        /// </summary>
+        CUSTOM = -1,
         [DomKeyword("")]
         None = 0x0,
         [DomKeyword("abort")]
         abort,
         [DomKeyword("auxclick")]
-        auxclick,
+        AuxClick,
         [DomKeyword("blur")]
-        blur,
+        Blur,
         [DomKeyword("cancel")]
-        cancel,
+        Cancel,
         [DomKeyword("canplay")]
-        canplay,
+        CanPlay,
         [DomKeyword("canplaythrough")]
-        canplaythrough,
+        CanPlayThrough,
         [DomKeyword("change")]
-        change,
+        Change,
         [DomKeyword("click")]
-        click,
+        Click,
         [DomKeyword("close")]
-        close,
+        Close,
         [DomKeyword("contextmenu")]
-        contextmenu,
+        ContextMenu,
         [DomKeyword("cuechange")]
-        cuechange,
+        CueChange,
         [DomKeyword("dblclick")]
-        dblclick,
+        DoubleClick,
+    /* Drag drop */
         [DomKeyword("drag")]
-        drag,
+        Drag,
         [DomKeyword("dragend")]
-        dragend,
+        DragEnd,
         [DomKeyword("dragenter")]
-        dragenter,
+        DragEnter,
         [DomKeyword("dragexit")]
-        dragexit,
+        DragExit,
         [DomKeyword("dragleave")]
-        dragleave,
+        DragLeave,
         [DomKeyword("dragover")]
-        dragover,
+        DragOver,
         [DomKeyword("dragstart")]
-        dragstart,
+        DragStart,
         [DomKeyword("drop")]
-        drop,
+        Drop,
+
         [DomKeyword("durationchange")]
-        durationchange,
+        DurationChange,
         [DomKeyword("emptied")]
-        emptied,
+        Emptied,
         [DomKeyword("ended")]
-        ended,
+        Ended,
+
+        [DomKeyword("error")]
+        Error,
+
         [DomKeyword("focus")]
-        focus,
+        Focus,
         [DomKeyword("formdata")]
-        formdata,
+        FormData,
         [DomKeyword("input")]
-        input,
+        Input,
         [DomKeyword("invalid")]
-        invalid,
+        Invalid,
         [DomKeyword("keydown")]
-        keydown,
+        KeyDown,
         [DomKeyword("keypress")]
-        keypress,
+        KeyPress,
         [DomKeyword("keyup")]
-        keyup,
+        KeyUp,
         [DomKeyword("load")]
-        load,
+        Load,
         [DomKeyword("loadeddata")]
-        loadeddata,
+        LoadedData,
         [DomKeyword("loadedmetadata")]
-        loadedmetadata,
+        LoadedMetadata,
         [DomKeyword("loadend")]
-        loadend,
+        LoadEnd,
         [DomKeyword("loadstart")]
-        loadstart,
+        LoadStart,
+/* Mouse input */
         [DomKeyword("mousedown")]
-        mousedown,
+        MouseDown,
         [DomKeyword("mouseenter")]
-        mouseenter,
+        MouseEnter,
         [DomKeyword("mouseleave")]
-        mouseleave,
+        MouseLeave,
         [DomKeyword("mousemove")]
-        mousemove,
+        MouseMove,
         [DomKeyword("mouseout")]
-        mouseout,
+        MouseOut,
         [DomKeyword("mouseover")]
-        mouseover,
+        MouseOver,
         [DomKeyword("mouseup")]
-        mouseup,
+        MouseUp,
         [DomKeyword("wheel")]
-        wheel,
+        Wheel,
+/* Media */
         [DomKeyword("pause")]
-        pause,
+        Pause,
         [DomKeyword("play")]
-        play,
+        Play,
         [DomKeyword("playing")]
-        playing,
+        Playing,
         [DomKeyword("progress")]
-        progress,
+        Progress,
         [DomKeyword("ratechange")]
-        ratechange,
+        RateChange,
         [DomKeyword("reset")]
-        reset,
+        Reset,
         [DomKeyword("resize")]
-        resize,
+        Resize,
         [DomKeyword("scroll")]
-        scroll,
+        Scroll,
         [DomKeyword("securitypolicyviolation")]
-        securitypolicyviolation,
+        SecurityPolicyViolation,
         [DomKeyword("seeked")]
-        seeked,
+        Seeked,
         [DomKeyword("seeking")]
-        seeking,
+        Seeking,
         [DomKeyword("select")]
-        select,
+        Select,
         [DomKeyword("stalled")]
-        stalled,
+        Stalled,
         [DomKeyword("submit")]
-        submit,
+        Submit,
         [DomKeyword("suspend")]
-        suspend,
+        Suspend,
         [DomKeyword("timeupdate")]
-        timeupdate,
+        Timeupdate,
         [DomKeyword("toggle")]
-        toggle,
+        Toggle,
         [DomKeyword("volumechange")]
-        volumechange,
+        Volumechange,
         [DomKeyword("waiting")]
-        waiting,
+        Waiting,
 
         [DomKeyword("selectstart")]
-        selectstart,
+        SelectStart,
         [DomKeyword("selectionchange")]
-        selectionchange,
+        SelectionChange,
         
         [DomKeyword("copy")]
-        copy,
+        Copy,
         [DomKeyword("cut")]
-        cut,
+        Cut,
         [DomKeyword("paste")]
-        paste,
+        Paste,
 
+/* Window events */
+        [DomKeyword("afterprint")]
+        AfterPrint,
+        [DomKeyword("beforeprint")]
+        BeforePrint,
+        [DomKeyword("beforeunload")]
+        BeforeUnload,
         [DomKeyword("hashchange")]
-        hashchange,
+        HashChange,
         [DomKeyword("languagechange")]
-        languagechange,
+        LanguageChange,
         [DomKeyword("message")]
-        message,
+        Message,
         [DomKeyword("messageerror")]
-        messageerror,
+        MessageError,
         [DomKeyword("offline")]
-        offline,
+        Offline,
         [DomKeyword("online")]
-        online,
+        Online,
         [DomKeyword("pagehide")]
-        pagehide,
+        PageHide,
         [DomKeyword("pageshow")]
-        pageshow,
+        PageShow,
         [DomKeyword("popstate")]
-        popstate,
+        PopState,
         [DomKeyword("rejectionhandled")]
-        rejectionhandled,
+        RejectionHandled,
         [DomKeyword("storage")]
-        storage,
+        Storage,
         [DomKeyword("unhandledrejection")]
-        unhandledrejection,
+        UnhandledRejection,
+        [DomKeyword("unload")]
+        Unload,
+
+
+        [DomKeyword("slotchange")]
+        SlotChange,
     }
 }

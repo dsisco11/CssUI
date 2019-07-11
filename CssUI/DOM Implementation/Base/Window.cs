@@ -1,4 +1,5 @@
-﻿using CssUI.DOM.Mutation;
+﻿using CssUI.DOM.Events;
+using CssUI.DOM.Mutation;
 using CssUI.DOM.Nodes;
 using System;
 using System.Collections.Generic;
@@ -10,10 +11,14 @@ namespace CssUI.DOM
     /// <summary>
     /// Represents the global 'Window' object
     /// </summary>
-    public class Window : IGlobalEventHandlers, IWindowEventHandlers
+    public class Window : EventTarget, IGlobalEventHandlers, IWindowEventHandlers
     {/* Docs: https://html.spec.whatwg.org/multipage/window-object.html#window */
 
         public Document document { get; private set; }
+
+        #region Slots
+        internal List<IEventTarget> SignalSlots = new List<IEventTarget>();
+        #endregion
 
         #region Mutation Observers
         internal List<MutationObserver> Observers = new List<MutationObserver>();
@@ -39,8 +44,9 @@ namespace CssUI.DOM
             MutationObserver[] notifySet = Observers.ToArray();
             Interlocked.Exchange(ref mutation_observer_microtask_queued, 0);
             /* 3) Let signalSet be a clone of the surrounding agent’s signal slots. */
+            var signalSet = SignalSlots.ToArray();
             /* 4) Empty the surrounding agent’s signal slots. */
-            // We dont implement slottables
+            SignalSlots.Clear();
 
             /* 5) For each mo of notifySet: */
             foreach(MutationObserver mo in notifySet)
@@ -58,6 +64,12 @@ namespace CssUI.DOM
                 {
                     mo.callback?.Invoke(records, mo);
                 }
+            }
+
+            /* 6) For each slot of signalSet, fire an event named slotchange, with its bubbles attribute set to true, at slot. */
+            foreach(var slot in signalSet)
+            {
+                slot.dispatchEvent(new Event(EEventName.SlotChange, new EventInit() { bubbles = true }));
             }
         }
 
@@ -78,5 +90,9 @@ namespace CssUI.DOM
         {
             return new DOMHighResTimeStamp() { Timestmap = DateTime.UtcNow.Millisecond };
         }
+
+
+        public Node importNode(Node node, bool deep = false);
+        public Node adoptNode(Node node);
     }
 }

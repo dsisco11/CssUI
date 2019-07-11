@@ -7,7 +7,7 @@
         /// </summary>
         public readonly EventTarget relatedTarget = null;
 
-        public FocusEvent(EEventType type, FocusEventInit eventInit) : base(type, eventInit)
+        public FocusEvent(EEventName type, FocusEventInit eventInit) : base(type, eventInit)
         {
             this.relatedTarget = eventInit.relatedTarget;
         }

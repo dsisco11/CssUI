@@ -2,48 +2,53 @@
 
 namespace CssUI.DOM.Events
 {
-    public class KeyboardEvent : UIEvent
-    {  // KeyLocationCode
+    public class MouseEvent : UIEvent
+    {
         #region Properties
         /// <summary>
-        /// key holds the value corresponding to the key pressed.
+        /// The horizontal coordinate at which the event occurred relative to the origin of the screen coordinate system.
         /// </summary>
-        public string key { get; private set; } = string.Empty;
+        public long screenX { get; private set; } = 0;
         /// <summary>
-        /// holds a string that identifies the physical key being pressed. 
-        /// The value is not affected by the current keyboard layout or modifier state, so a particular key will always return the same value.
+        /// The vertical coordinate at which the event occurred relative to the origin of the screen coordinate system.
         /// </summary>
-        public string code { get; private set; } = string.Empty;
+        public long screenY { get; private set; } = 0;
         /// <summary>
-        /// The location attribute contains an indication of the logical location of the key on the device.
+        /// The horizontal coordinate at which the event occurred relative to the viewport associated with the event.
         /// </summary>
-        public EKeyLocation location { get; private set; } = 0x0;
+        public long clientX { get; private set; } = 0;
+        /// <summary>
+        /// The vertical coordinate at which the event occurred relative to the viewport associated with the event.
+        /// </summary>
+        public long clientY { get; private set; } = 0;
 
         /// <summary>
-        /// true if the Control (control) key modifier was active.
+        /// Refer to the KeyboardEvent's ctrlKey attribute.
         /// </summary>
         public bool ctrlKey { get; private set; } = false;
         /// <summary>
-        /// true if the shift (Shift) key modifier was active.
+        /// Refer to the KeyboardEvent's shiftKey attribute.
         /// </summary>
         public bool shiftKey { get; private set; } = false;
         /// <summary>
-        /// true if the Alt (alternative) (or "Option") key modifier was active.
+        /// Refer to the KeyboardEvent's altKey attribute.
         /// </summary>
         public bool altKey { get; private set; } = false;
         /// <summary>
-        /// true if the meta (Meta) key modifier was active.
+        /// Refer to the KeyboardEvent's metaKey attribute.
         /// </summary>
         public bool metaKey { get; private set; } = false;
 
         /// <summary>
-        /// true if the key has been pressed in a sustained manner.
+        /// During mouse events caused by the depression or release of a mouse button, button MUST be used to indicate which pointer device button changed state.
         /// </summary>
-        public bool repeat { get; private set; } = false;
+        public EMouseButton button { get; private set; } = 0x0;
+        public EMouseButtonFlags buttons { get; private set; } = 0x0;
+
         /// <summary>
-        /// true if the key event occurs as part of a composition session, i.e., after a compositionstart event and before the corresponding compositionend event.
+        /// Used to identify a secondary EventTarget related to a UI event, depending on the type of event.
         /// </summary>
-        public bool isComposing { get; private set; } = false;
+        public EventTarget relatedTarget { get; private set; } = null;
         #endregion
 
         #region ModifierState
@@ -59,15 +64,16 @@ namespace CssUI.DOM.Events
         public readonly bool modifierSymbolLock = false;
         #endregion
 
-
         #region Constructors
-        public KeyboardEvent(EEventType type, KeyboardEventInit eventInit) : base(type, eventInit)
+        public MouseEvent(EEventName type, MouseEventInit eventInit)  : base(type, eventInit)
         {
-            key = eventInit.key;
-            code = eventInit.code;
-            location = eventInit.location;
-            repeat = eventInit.repeat;
-            isComposing = eventInit.isComposing;
+            screenX = eventInit.screenX;
+            screenY = eventInit.screenY;
+            clientX = eventInit.clientX;
+            clientY = eventInit.clientY;
+            button = eventInit.button;
+            buttons = eventInit.buttons;
+            relatedTarget = eventInit.relatedTarget;
 
             ctrlKey = eventInit.ctrlKey;
             shiftKey = eventInit.shiftKey;

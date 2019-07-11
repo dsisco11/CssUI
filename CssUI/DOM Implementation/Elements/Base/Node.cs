@@ -14,7 +14,7 @@ namespace CssUI.DOM.Nodes
 
     /// <summary>
     /// </summary>
-    public abstract class Node : EventTarget
+    public abstract class Node : EventTarget, INode
     {/* Docs: https://dom.spec.whatwg.org/#interface-node */
 
         internal ILogger Log { get => this.ownerDocument.Log; }
@@ -24,6 +24,8 @@ namespace CssUI.DOM.Nodes
 
         #region Abstracts
         public abstract ENodeType nodeType { get; }
+
+        /* Docs: https://dom.spec.whatwg.org/#dom-node-nodename */
         public abstract string nodeName { get; }
 
         /* Docs: https://dom.spec.whatwg.org/#dom-node-nodevalue */
@@ -37,23 +39,17 @@ namespace CssUI.DOM.Nodes
         #endregion
 
         #region Slottable
-        /// <summary>
-        /// Element and Text nodes are slotables.
-        /// </summary>
-        public virtual bool isSlottable => false;
-
-        public virtual Node assignedSlot { get => null; protected set { } }
-        public bool isAssigned => (isSlottable && !ReferenceEquals(null, assignedSlot));
+        public bool isAssigned => (this is ISlottable slotable && !ReferenceEquals(null, slotable.assignedSlot));
         #endregion
 
         #region DOM
         public virtual Document ownerDocument { get; internal set; }
         public Node parentNode { get; private set; }
         public Element parentElement { get; private set; }
-        public readonly ChildNodeList childNodes = new ChildNodeList();
+        public ChildNodeList childNodes { get; } = new ChildNodeList();
 
         public Node firstChild { get => childNodes.Count > 0 ? childNodes[0] : null; }
-        public Node lastChild { get=> childNodes.Count > 0 ? childNodes[childNodes.Count-1] : null; }
+        public Node lastChild { get => childNodes.Count > 0 ? childNodes[childNodes.Count - 1] : null; }
         public Node previousSibling { get; internal set; }
         public Node nextSibling { get; internal set; }
 
@@ -125,7 +121,7 @@ namespace CssUI.DOM.Nodes
                 /* 3) Let data be the concatenation of the data of node’s contiguous exclusive Text nodes (excluding itself), in tree order. */
                 var textNodes = Text.get_contiguous_text_nodes(node, true);
                 StringBuilder sb = new StringBuilder();
-                foreach(Text txt in textNodes)
+                foreach (Text txt in textNodes)
                 {
                     sb.Append(txt.textContent);
                 }
@@ -207,7 +203,7 @@ namespace CssUI.DOM.Nodes
             if (this.childNodes.Count != B.childNodes.Count)
                 return false;
 
-            for (int i=0; i<this.childNodes.Count; i++)
+            for (int i = 0; i < this.childNodes.Count; i++)
             {
                 if (!childNodes[i].Equals(B.childNodes[i]))
                     return false;
@@ -237,7 +233,7 @@ namespace CssUI.DOM.Nodes
 
             Node node1 = other;
             Node node2 = this;
-            Attr attr1=null, attr2=null;
+            Attr attr1 = null, attr2 = null;
             if (node1 is Attr)
             {
                 attr1 = (Attr)node1;
@@ -251,7 +247,7 @@ namespace CssUI.DOM.Nodes
                 /* 2) If attr1 and node1 are non-null, and node2 is node1, then: */
                 if (!ReferenceEquals(null, node1) && !ReferenceEquals(null, attr1) && ReferenceEquals(node2, node1))
                 {
-                    foreach(var attr in (node2 as Element).AttributeList)
+                    foreach (var attr in (node2 as Element).AttributeList)
                     {
                         if (attr.Equals(attr1))
                             return EDocumentPosition.PRECEDING | EDocumentPosition.IMPLEMENTATION_SPECIFIC;
@@ -262,7 +258,7 @@ namespace CssUI.DOM.Nodes
             }
 
             /* 6) If node1 or node2 is null, or node1’s root is not node2’s root, then return the result of adding DOCUMENT_POSITION_DISCONNECTED, DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC, and either DOCUMENT_POSITION_PRECEDING or DOCUMENT_POSITION_FOLLOWING, with the constraint that this is to be consistent, together. */
-            if (ReferenceEquals(null, node1) || ReferenceEquals(null, node2) || !ReferenceEquals(node1.getRootNode(), node2.getRootNode()) )
+            if (ReferenceEquals(null, node1) || ReferenceEquals(null, node2) || !ReferenceEquals(node1.getRootNode(), node2.getRootNode()))
             {
                 return EDocumentPosition.DISCONNECTED | EDocumentPosition.IMPLEMENTATION_SPECIFIC | EDocumentPosition.PRECEDING;
             }
@@ -317,10 +313,12 @@ namespace CssUI.DOM.Nodes
         #endregion
 
         #region Event Stuff
-        public override IEventTarget get_the_parent(Event @event)
+        public override EventTarget get_the_parent(Event @event)
         {
             /* A node’s get the parent algorithm, given an event, returns the node’s assigned slot, if node is assigned, and node’s parent otherwise. */
-            /* XXX: Assigned Slot stuff here */
+            if (this.isAssigned)
+                return this.assignedSlot;
+
             return this.parentNode;
         }
         #endregion
@@ -350,6 +348,12 @@ namespace CssUI.DOM.Nodes
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal virtual void run_cloning_steps(ref Node copy, Document document, bool clone_children = false)
+        {
+            /* Currently none of our specifications define this, so it's a placeholder. */
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal virtual void run_attribute_change_steps(ref Node element, string localName, string oldValue, string value, string Namespace)
         {
             /* Currently none of our specifications define this, so it's a placeholder. */
         }
@@ -549,9 +553,9 @@ namespace CssUI.DOM.Nodes
              * if registered’s options’s subtree is true, then append a new transient registered observer whose observer is registered’s observer, 
              * options is registered’s options, and source is registered to node’s registered observer list. */
             var ancestors = DOMCommon.Get_Inclusive_Ancestors(parent);
-            foreach(Node inclusiveAncestor in ancestors)
+            foreach (Node inclusiveAncestor in ancestors)
             {
-                foreach(RegisteredObserver registered in inclusiveAncestor.RegisteredObservers)
+                foreach (RegisteredObserver registered in inclusiveAncestor.RegisteredObservers)
                 {
                     if (registered.options.subtree)
                     {
@@ -615,7 +619,7 @@ namespace CssUI.DOM.Nodes
                 MutationRecord.Queue_Tree_Mutation_Record(node, new Node[] { }, nodes, null, null);
             }
             /* 6) Let previousSibling be child’s previous sibling or parent’s last child if child is null. */
-            var previousSibling = ReferenceEquals(null,child) ? parent.lastChild : child.previousSibling;
+            var previousSibling = ReferenceEquals(null, child) ? parent.lastChild : child.previousSibling;
             int childIndex = ReferenceEquals(null, child) ? 0 : parent.childNodes.IndexOf(child);
             /* 7) For each node in nodes, in tree order: */
             foreach (Node newNode in nodes)
@@ -641,7 +645,7 @@ namespace CssUI.DOM.Nodes
                 /* NOTE: ShadowDOM stuff here */
                 /* 7) For each shadow-including inclusive descendant inclusiveDescendant of node, in shadow-including tree order: */
                 var newNodeDescendents = DOMCommon.Get_Shadow_Including_Inclusive_Descendents(newNode);
-                foreach(Node inclusiveDescendant in newNodeDescendents)
+                foreach (Node inclusiveDescendant in newNodeDescendents)
                 {
                     /* 1) Run the insertion steps with inclusiveDescendant. */
                     parent.run_node_insertion_steps(inclusiveDescendant);
@@ -893,7 +897,7 @@ namespace CssUI.DOM.Nodes
         {/* Docs: https://dom.spec.whatwg.org/#converting-nodes-into-a-node */
             Node node = null;
             /* 2) Replace each string in nodes with a new Text node whose data is the string and node document is document. */
-            for (int i=0; i<nodes.Count(); i++)
+            for (int i = 0; i < nodes.Count(); i++)
             {
                 if (nodes[i] is string)
                 {
@@ -909,7 +913,7 @@ namespace CssUI.DOM.Nodes
             else
             {
                 node = new DocumentFragment(null, document);
-                foreach(Node child in (Node[])nodes)
+                foreach (Node child in (Node[])nodes)
                 {
                     node.appendChild(child);
                 }

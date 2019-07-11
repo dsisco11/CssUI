@@ -5,7 +5,7 @@
 
         public dynamic detail { get; protected set; } = null;
 
-        public CustomEvent(EEventType type, CustomEventInit eventInit = null) : base(type, eventInit)
+        public CustomEvent(EEventName type, CustomEventInit eventInit = null) : base(type, eventInit)
         {
             this.detail = eventInit?.detail;
         }

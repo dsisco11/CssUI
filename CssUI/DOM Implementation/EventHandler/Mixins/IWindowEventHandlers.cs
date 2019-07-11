@@ -2,24 +2,24 @@
 
 namespace CssUI.DOM
 {
-    public interface IWindowEventHandlers
+    public interface IWindowEventCallbacks
     {
         /* These print ones MIGHT be used by someone in the future, consider supporting them. */
-        /*EventHandler onafterprint { get; }
-        EventHandler onbeforeprint { get; }*/
-        // OnBeforeUnloadEventHandler onbeforeunload { get; }
-        event EventHandler onhashchange;
-        event EventHandler onlanguagechange;
-        event EventHandler onmessage;
-        event EventHandler onmessageerror;
-        event EventHandler onoffline;
-        event EventHandler ononline;
-        event EventHandler onpagehide;
-        event EventHandler onpageshow;
-        event EventHandler onpopstate;
-        event EventHandler onrejectionhandled;
-        event EventHandler onstorage;
-        event EventHandler onunhandledrejection;
-        /*EventHandler onunload { get; }*/
+        /*EventCallback onAfterPrint { get; }
+        EventCallback onBeforePrint { get; }*/
+        // OnBeforeUnloadEventCallback onbeforeunload { get; }
+        event EventCallback onHashChange;
+        event EventCallback onLanguageChange;
+        event EventCallback onMessage;
+        event EventCallback onMessagEerror;
+        event EventCallback onOffline;
+        event EventCallback onOnline;
+        event EventCallback onPageHide;
+        event EventCallback onPageShow;
+        event EventCallback onPopState;
+        event EventCallback onRejectionHandled;
+        event EventCallback onStorage;
+        event EventCallback onUnhandledRejection;
+        /*EventCallback onunload { get; }*/
     }
 }

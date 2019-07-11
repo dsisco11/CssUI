@@ -21,6 +21,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>CssEnumTables.tt</DependentUpon>
     </None>
+    <None Include="DOM Implementation\Common\DomEnumTables.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DomEnumTables.tt</DependentUpon>
+    </None>
     <None Include="Localization\ISO-639\Enum_ISO639.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -49,6 +54,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>CssEnumTables.tt</DependentUpon>
     </Compile>
+    <Compile Update="DOM Implementation\Common\DomEnumTables.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DomEnumTables.tt</DependentUpon>
+    </Compile>
     <Compile Update="Localization\ISO-639\Enum_ISO639.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -65,6 +75,10 @@
     <None Update="CSS Implementation\CSS Common\CssEnumTables.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>CssEnumTables.cs</LastGenOutput>
+    </None>
+    <None Update="DOM Implementation\Common\DomEnumTables.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>DomEnumTables.cs</LastGenOutput>
     </None>
     <None Update="Localization\ISO-639\Enum_ISO639.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

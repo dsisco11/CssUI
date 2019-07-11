@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Generic;
 using CssUI.DOM.Nodes;
 using System.Runtime.CompilerServices;
@@ -8,6 +7,7 @@ using CssUI.CSS;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Enums;
 using CssUI.DOM.Events;
+using CssUI.DOM.Internal;
 
 namespace CssUI.DOM
 {
@@ -39,6 +39,187 @@ namespace CssUI.DOM
                 default:
                     return false;
             }
+        }
+        #endregion
+
+        #region CSS Selectors
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IEnumerable<Element> Scope_Match_Selector_String(Node node, string selector)
+        {
+            /* The closest(selectors) method, when invoked, must run these steps: */
+            /* 1) Let s be the result of parse a selector from selectors. [SELECTORS4] */
+            var Selector = new CssSelector(selector);
+            /* 2) If s is failure, throw a "SyntaxError" DOMException. */
+            if (ReferenceEquals(null, Selector))
+            {
+                throw new SyntaxError("Could not parse selector.");
+            }
+            /* 3) Return the result of match a selector against a tree with s and node’s root using scoping root node. [SELECTORS4]. */
+            return Selector.Match_Against_Tree(new Node[] { node }, node.getRootNode());
+        }
+        #endregion
+
+        #region Classifications
+        /// <summary>
+        /// Returns True if the specified document is the active one
+        /// </summary>
+        /// <param name="document"></param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Active_Document(Document document)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Returns true if the node is one of the 3 common text node types: <see cref="Text"/>, <see cref="ProcessingInstruction"/>, or <see cref="Comment"/>
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_CommonTextNode(Node node)
+        {
+            return node is Text || node is ProcessingInstruction || node is Comment;
+        }
+
+        /// <summary>
+        /// Returns true if the node is a slot
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Slot(Node node)
+        {
+            return node is Element element && 0==string.Compare("slot", element.tagName);
+        }
+        #endregion
+
+        #region Slottables
+        internal static ISlot find_slot(ISlottable slottable, bool open_flag = false)
+        {/* Docs: https://dom.spec.whatwg.org/#find-a-slot */
+            if (ReferenceEquals(null, slottable.parentNode))
+                return null;
+
+            var shadow = slottable.parentNode.getRootNode() as ShadowRoot;
+            if (ReferenceEquals(null, shadow))
+                return null;
+
+            if (open_flag && shadow.Mode != EShadowRootMode.Open)
+                return null;
+
+            /* 5) Return the first slot in tree order in shadow’s descendants whose name is slotable’s name, if any, and null otherwise. */
+            var tree = new TreeWalker(shadow, ENodeFilterMask.SHOW_ALL);
+            var node = tree.nextNode();
+            while(!ReferenceEquals(null, node))
+            {
+                if (node is HTMLSlotElement slot)
+                {
+                    if (0 == string.Compare(slot.Name, (slottable as ISlottable).Name))
+                        return slot;
+                }
+                node = tree.nextNode();
+            }
+
+            return null;
+        }
+
+        internal static List<ISlottable> find_slotables(ISlot slot)
+        {/* Docs: https://dom.spec.whatwg.org/#find-slotables */
+            var result = new List<ISlottable>();
+            var root = (slot as Node).getRootNode();
+            if (!(root is ShadowRoot))
+                return result;
+
+            var shadowRoot = root as ShadowRoot;
+            var host = shadowRoot.Host;
+
+            /* 4) For each slotable child of host, slotable, in tree order: */
+            foreach (Node node in host.childNodes)
+            {
+                if (node.isSlottable)
+                {
+                    ISlottable slotable = node as ISlottable;
+                    var foundSlot = DOMCommon.find_slot(slotable);
+                    if (ReferenceEquals(foundSlot, slot))
+                        result.Add(slotable);
+                }
+            }
+
+            return result;
+        }
+
+        internal static List<ISlottable> find_flattened_slotables(ISlot slot)
+        {/* Docs: https://dom.spec.whatwg.org/#find-flattened-slotables */
+            var result = new List<ISlottable>();
+            if (!(slot.getRootNode() is ShadowRoot))
+                return result;
+
+            var slotables = DOMCommon.find_slotables(slot);
+            /* 4) If slotables is the empty list, then append each slotable child of slot, in tree order, to slotables. */
+            if (slotables.Count <= 0)
+            {
+                foreach (Node child in slot.childNodes)
+                {
+                    if (child.isSlottable)
+                    {
+                        slotables.Add(child as ISlottable);
+                    }
+                }
+            }
+            /* 5) For each node in slotables: */
+            foreach (ISlottable node in slotables)
+            {
+                if (node is ISlot && node.getRootNode() is ShadowRoot)
+                {
+                    var temporaryResult = DOMCommon.find_flattened_slotables(node as ISlot);
+                    result.AddRange(temporaryResult);
+                }
+                else
+                {
+                    result.Add(node);
+                }
+            }
+
+            /* 6) Return result. */
+            return result;
+        }
+
+        internal static void assign_slottables(ISlot slot)
+        {/* Docs: https://dom.spec.whatwg.org/#assign-slotables */
+            var slotables = DOMCommon.find_slotables(slot);
+
+            bool match = true;
+            if (slotables.Count() != slot.Assigned.Count())
+                match = false;
+            else
+            {
+                for (int i=0; i<slotables.Count(); i++)
+                {
+                    if (!ReferenceEquals(slotables[i], slot.Assigned[i]))
+                    {
+                        match = false;
+                        break;
+                    }
+                }
+            }
+            /* 2) If slotables and slot’s assigned nodes are not identical, then run signal a slot change for slot. */
+            if (!match)
+            {
+                slot.ownerDocument.window.SignalSlots.Add(slot);
+                slot.ownerDocument.window.QueueObserverMicroTask();
+            }
+            /* 3) Set slot’s assigned nodes to slotables. */
+            slot.Assigned = slotables;
+            /* 4) For each slotable in slotables, set slotable’s assigned slot to slot. */
+            foreach(ISlottable slotable in slotables)
+            {
+                slotable.assignedSlot = slot as Node;
+            }
+        }
+
+        internal static void assign_a_slot(ISlottable slotable)
+        {/* Docs: https://dom.spec.whatwg.org/#assign-a-slot */
+            var slot = DOMCommon.find_slot(slotable);
+            if (!ReferenceEquals(null, slot))
+                DOMCommon.assign_slottables(slot);
         }
         #endregion
 
@@ -239,71 +420,6 @@ namespace CssUI.DOM
         }
         #endregion
 
-        #endregion
-
-        #region CSS Selectors
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<Element> Scope_Match_Selector_String(Node node, string selector)
-        {
-            /* The closest(selectors) method, when invoked, must run these steps: */
-            /* 1) Let s be the result of parse a selector from selectors. [SELECTORS4] */
-            var Selector = new CssSelector(selector);
-            /* 2) If s is failure, throw a "SyntaxError" DOMException. */
-            if (ReferenceEquals(null, Selector))
-            {
-                throw new SyntaxError("Could not parse selector.");
-            }
-            /* 3) Return the result of match a selector against a tree with s and node’s root using scoping root node. [SELECTORS4]. */
-            return Selector.Match_Against_Tree(new Node[] { node }, node.getRootNode());
-        }
-        #endregion
-
-        #region Classifications
-        /// <summary>
-        /// Returns true if the node is one of the 3 common text node types: <see cref="Text"/>, <see cref="ProcessingInstruction"/>, or <see cref="Comment"/>
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_CommonTextNode(Node node)
-        {
-            return node is Text || node is ProcessingInstruction || node is Comment;
-        }
-
-        /// <summary>
-        /// Returns true if the node is a slot
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Slot(Node node)
-        {
-            return node is Element element && 0==string.Compare("slot", element.tagName);
-        }
-        #endregion
-
-        #region Events
-        /// <summary>
-        /// Retargets <paramref name="A"/> against object <paramref name="B"/>
-        /// </summary>
-        /// <param name="A"></param>
-        /// <param name="B"></param>
-        /// <returns></returns>
-        internal static IEventTarget retarget_event(IEventTarget A, IEventTarget B)
-        {/* Docs: https://dom.spec.whatwg.org/#retarget */
-            while (!ReferenceEquals(null, A))
-            {
-                if (!(A is Node))
-                    return (IEventTarget)A;
-                if (A is Node nA && nA.getRootNode() is ShadowRoot)
-                    return (IEventTarget)A;
-                if (B is Node nB && Is_Shadow_Including_Inclusive_Ancestor((A as Node).getRootNode(), B as Node))
-                    return (IEventTarget)A;
-
-                A = ((A as Node).getRootNode() as DocumentFragment).Host;
-            }
-
-            return null;
-        }
         #endregion
 
         #region Hierarchy Getters

@@ -1,10 +1,8 @@
-﻿
-namespace CssUI.DOM.Internal
+﻿namespace CssUI.DOM.Nodes
 {
-    // XXX: Not yet supported
-    public interface ISlottable
+    public interface ISlottable : INode
     {
-        string name { get; set; }
-
+        string Name { get; set; }
+        ISlot assignedSlot { get; set; }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using CssUI.DOM.Exceptions;
+using CssUI.DOM.Internal;
+using CssUI.Internal;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -8,15 +10,50 @@ namespace CssUI.DOM.Events
     /// <summary>
     /// An EventTarget object represents a target to which an event can be dispatched when something has occurred.
     /// </summary>
-    public class EventTarget : IEventTarget, IDisposable
+    public class EventTarget : IDisposable, IEventTarget
     {
         #region Properties
-        protected List<IEventListener> Listeners = new List<IEventListener>();
+        public LinkedList<EventListener> Listeners { get; private set; } = new LinkedList<EventListener>();
+        /// <summary>
+        /// Map of <see cref="EEventName"/>s to a list of their <see cref="EventHandler"/>s
+        /// </summary>
+        /// Docs: https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-map
+        public EventHandlerMap handlerMap { get; private set; }
         #endregion
 
         #region Constructor
-        public EventTarget ()
+        public EventTarget()
         {
+            handlerMap = new EventHandlerMap(this);
+        }
+        #endregion
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    /* Docs: https://html.spec.whatwg.org/multipage/webappapis.html#erase-all-event-listeners-and-handlers */
+                    handlerMap.Dispose();
+                    foreach (var Listener in Listeners)
+                    {
+                        Listener.removed = true;
+                    }
+                    Listeners.Clear();
+                }
+                disposedValue = true;
+            }
+        }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
         }
         #endregion
 
@@ -29,11 +66,11 @@ namespace CssUI.DOM.Events
         /// <param name="capture"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal IEventListener Find_Listener(string type, IEventListener callback, bool capture)
+        internal EventListener Find_Listener(EventName type, EventCallback callback, bool capture)
         {
             foreach (var listener in Listeners)
             {
-                if (0==string.Compare(listener.type, type) && listener.callback == callback && listener.capture == capture)
+                if (listener.type == type && listener.callback == callback && listener.capture == capture)
                     return listener;
             }
 
@@ -46,7 +83,7 @@ namespace CssUI.DOM.Events
 
         #endregion
 
-        public virtual IEventTarget get_the_parent(Event @event)
+        public virtual EventTarget get_the_parent(Event @event)
         {/* Docs: https://dom.spec.whatwg.org/#get-the-parent */
             return null;
         }
@@ -57,7 +94,7 @@ namespace CssUI.DOM.Events
         /// <param name="eventName">Name of the event to listen for</param>
         /// <param name="callback">Callback that fires when the event is triggered.</param>
         /// <param name="options"></param>
-        public void addEventListener(string eventName, IEventListener callback, AddEventListenerOptions options = null)
+        public void addEventListener(EventName eventName, EventCallback callback, AddEventListenerOptions options = null)
         {/* Docs: https://dom.spec.whatwg.org/#dom-eventtarget-addeventlistener */
             bool capture = false;
             bool once = false;
@@ -69,19 +106,20 @@ namespace CssUI.DOM.Events
                 once = options.once;
                 passive = options.passive;
             }
-
+            /* 2) Add an event listener with the context object and an event listener whose type is type, callback is callback, capture is capture, passive is passive, and once is once. */
+            /* To add an event listener given an EventTarget object eventTarget and an event listener listener, run these steps: */
+            /* 1) ... */
+            /* 2) If listener’s callback is null, then return. */
             if (ReferenceEquals(callback, null))
                 return;
 
-            /* 2) Add an event listener with the context object and an event listener whose type is type, callback is callback, capture is capture, passive is passive, and once is once. */
+            /* 3) If eventTarget’s event listener list does not contain an event listener whose type is listener’s type, callback is listener’s callback, and capture is listener’s capture, then append listener to eventTarget’s event listener list. */
             var srch = Find_Listener(eventName, callback, capture);
             if (ReferenceEquals(srch, null))
             {
-                Listeners.Add(callback);
+                var newListener = new EventListener(eventName, callback, capture, once, passive);
+                Listeners.AddLast(newListener);
             }
-
-            var newListener = new EventListener(eventName, callback, capture, once, passive);
-            Listeners.Add(newListener);
         }
 
         /// <summary>
@@ -90,7 +128,7 @@ namespace CssUI.DOM.Events
         /// <param name="eventName">Name of the event</param>
         /// <param name="callback">Callback that fires when the event is triggered.</param>
         /// <param name="options"></param>
-        public void removeEventListener(string eventName, IEventListener callback, EventListenerOptions options = null)
+        public void removeEventListener(EventName eventName, EventCallback callback, EventListenerOptions options = null)
         {
             bool capture = false;
             if (!ReferenceEquals(options, null))
@@ -99,7 +137,7 @@ namespace CssUI.DOM.Events
             }
 
             /* 3) If the context object’s event listener list contains an event listener whose type is type, callback is callback, and capture is capture, then remove an event listener with the context object and that event listener. */
-            IEventListener found = Find_Listener(eventName, callback, capture);
+            var found = Find_Listener(eventName, callback, capture);
             if (!ReferenceEquals(found, null))
             {
                 found.removed = true;
@@ -125,33 +163,7 @@ namespace CssUI.DOM.Events
             Event.isTrusted = false;
 
             /* 3) Return the result of dispatching event to the context object. */
-            return Event.dispatch_event_to_target(Event, this);
+            return EventCommon.dispatch_event_to_target(Event, this);
         }
-
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    foreach(IEventListener o in Listeners)
-                    {
-                        o.removed = true;
-                    }
-                }
-                disposedValue = true;
-            }
-        }
-
-        // This code added to correctly implement the disposable pattern.
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-        }
-        #endregion
     }
 }

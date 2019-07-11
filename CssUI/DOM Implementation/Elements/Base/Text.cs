@@ -5,17 +5,44 @@ using System.Collections.Generic;
 
 namespace CssUI.DOM
 {
-    public class Text : CharacterData
+    public class Text : CharacterData, ISlottable
     {
         #region Node Overrides
         public override string nodeName => "#text";
         #endregion
-        
+
         #region Slottable
-        public override bool isSlottable => true;
+        private string _name = string.Empty;
+        public string Name
+        {/* Docs: https://dom.spec.whatwg.org/#slotable-name */
+            get => _name;
+
+            set
+            {
+                var oldValue = _name;
+                if (0 == string.Compare(value, oldValue)) return;
+                if (value == null && oldValue.Length <= 0) return;
+                if (value.Length <= 0 && oldValue == null) return;
+                if (string.IsNullOrEmpty(value))
+                {
+                    _name = string.Empty;
+                }
+                else
+                {
+                    _name = value;
+                }
+                /* 6) If element is assigned, then run assign slotables for element’s assigned slot. */
+                if (this.isAssigned)
+                {
+                    DOMCommon.assign_slottables(assignedSlot);
+                }
+                /* 7) Run assign a slot for element. */
+                DOMCommon.assign_a_slot(this);
+            }
+        }
 
         /* Docs: https://dom.spec.whatwg.org/#slotable-assigned-slot */
-        public override Node assignedSlot { get; protected set; } = null;
+        public ISlot assignedSlot { get; set; } = null;
         #endregion
 
         #region Constructors

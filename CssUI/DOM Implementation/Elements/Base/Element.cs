@@ -1,6 +1,7 @@
 ﻿using CssUI.CSS;
 using CssUI.DOM.Enums;
 using CssUI.DOM.Exceptions;
+using CssUI.DOM.Internal;
 using CssUI.DOM.Mutation;
 using CssUI.DOM.Nodes;
 using CssUI.Internal;
@@ -11,11 +12,11 @@ using System.Text;
 
 namespace CssUI.DOM
 {
-    public class Element : ParentNode, INonDocumentTypeChildNode
+    public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable
     {
         #region Properties
         public string localName { get; set; }
-        public readonly string tagName;
+        public string tagName { get; protected set; }
 
         public DOMTokenList classList { get; private set; }
 
@@ -77,15 +78,42 @@ namespace CssUI.DOM
             set => this.setAttribute("class", value);
         }
 
-        IEnumerable<string> getAttributeNames() => this.AttributeList.Select(a => a.Name);
+        public IEnumerable<string> getAttributeNames() => this.AttributeList.Select(a => a.Name);
         public bool hasAttributes() => this.AttributeList.Count > 0;
         #endregion
 
         #region Slottable
-        public override bool isSlottable => true;
+        private string _name = string.Empty;
+        public string Name
+        {/* Docs: https://dom.spec.whatwg.org/#slotable-name */
+            get => _name;
+
+            set
+            {
+                var oldValue = getAttribute("name");
+                if (0 == string.Compare(value, oldValue)) return;
+                if (value == null && oldValue.Count() <= 0) return;
+                if (value.Count() <= 0 && oldValue == null) return;
+                if (string.IsNullOrEmpty(value))
+                {
+                    _name = string.Empty;
+                }
+                else
+                {
+                    _name = value;
+                }
+                /* 6) If element is assigned, then run assign slotables for element’s assigned slot. */
+                if (this.isAssigned)
+                {
+                    DOMCommon.assign_slottables(assignedSlot);
+                }
+                /* 7) Run assign a slot for element. */
+                DOMCommon.assign_a_slot(this);
+            }
+        }
 
         /* Docs: https://dom.spec.whatwg.org/#slotable-assigned-slot */
-        public override Node assignedSlot { get; protected set; } = null;
+        public ISlot assignedSlot { get; set; } = null;
         #endregion
 
         #region INonDocumentTypeChildNode Implementation

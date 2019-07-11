@@ -1,4 +1,5 @@
 ﻿using CssUI.DOM.Enums;
+using CssUI.DOM.Events;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Nodes;
 using System.Collections.Generic;
@@ -7,8 +8,10 @@ using xLog;
 namespace CssUI.DOM
 {
     public class Document : ParentNode, IGlobalEventHandlers, IDocumentAndElementEventHandlers
-    {
+    {/* Docs:  */
         internal ILogger Log = LogFactory.GetLogger(nameof(Document));
+
+        internal Window window;
 
         #region Node Implementation
         public override ENodeType nodeType => ENodeType.DOCUMENT_NODE;
@@ -55,11 +58,12 @@ namespace CssUI.DOM
         #endregion
 
 
-        public override IEventTarget get_the_parent(Event @event)
+        public override EventTarget get_the_parent(Event @event)
         {
             /* A document’s get the parent algorithm, given an event, returns null if event’s type attribute value is "load" or document does not have a browsing context, and the document’s relevant global object otherwise. */
             /* Note: We arent a browser implementation so we will never have a browsing context, knowing this I think we should direguard the check and allow Document to return itsself except for when event is "load" */
-            if (0 == string.Compare(@event.type, "load"))
+            //if (0 == string.Compare(@event.type, "load"))
+            if (@event.type == EEventName.Load)
                 return null;
 
             return this;
@@ -106,5 +110,27 @@ namespace CssUI.DOM
 
             return node;
         }
+
+
+
+        #region Document Event Handlers
+        public event EventCallback onCopy
+        {
+            add => handlerMap.Add(EEventName.Copy, value);
+            remove => handlerMap.Remove(EEventName.Copy, value);
+        }
+
+        public event EventCallback onCut
+        {
+            add => handlerMap.Add(EEventName.Cut, value);
+            remove => handlerMap.Remove(EEventName.Cut, value);
+        }
+
+        public event EventCallback onPaste
+        {
+            add => handlerMap.Add(EEventName.Paste, value);
+            remove => handlerMap.Remove(EEventName.Paste, value);
+        }
+        #endregion
     }
 }

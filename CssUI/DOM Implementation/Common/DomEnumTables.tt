@@ -95,7 +95,7 @@ case "<#= E.Name #>": return <#= Index #>;
 				}
 
 				#>
-default: throw new NotImplementedException($"No lookup-index has defined for enum type '{typeof(Ty).Name}'");
+default: return -1;//throw new NotImplementedException($"No lookup-index has defined for enum type '{typeof(Ty).Name}'");
             }
         }
 
