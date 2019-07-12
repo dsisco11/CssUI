@@ -10,9 +10,8 @@ namespace CssUI.DOM
         #endregion
 
         #region Constructor
-        public Comment(string data = "")
+        public Comment(Document ownerDocument, string data = "") : base(ownerDocument, data)
         {
-            this.data = data;
         }
         #endregion
 

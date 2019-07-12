@@ -1,4 +1,5 @@
 ﻿using CssUI.DOM.Enums;
+using CssUI.DOM.Events;
 
 namespace CssUI.DOM
 {
@@ -15,7 +16,7 @@ namespace CssUI.DOM
         }
         #endregion
 
-        public override IEventTarget get_the_parent(Event @event)
+        public override EventTarget get_the_parent(Event @event)
         {
             /* A shadow root’s get the parent algorithm, given an event, returns null if event’s composed flag is unset and shadow root is the root of event’s path’s first struct’s invocation target, and shadow root’s host otherwise. */
             if (!@event.composed && @event.Path.Count > 0 && ReferenceEquals(this, @event.Path[0].invocationTarget))

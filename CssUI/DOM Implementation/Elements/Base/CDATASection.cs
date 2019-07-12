@@ -10,7 +10,7 @@ namespace CssUI.DOM
         public override string nodeName => "#cdata-section";
         #endregion
 
-        public CDATASection()
+        public CDATASection(Document ownerDocument, string data) : base(ownerDocument, data)
         {
         }
     }

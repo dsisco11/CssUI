@@ -4,13 +4,13 @@ using CssUI.DOM.Nodes;
 namespace CssUI.DOM
 {
     /// <summary>
-    /// Rejects any node whose tagName doesnt match
+    /// Rejects any node whose NamespaceURI doesnt match
     /// </summary>
-    public class FilterTagName : NodeFilter
+    public class FilterNamespace : NodeFilter
     {
         public readonly string Name;
 
-        public FilterTagName(string tagName)
+        public FilterNamespace(string tagName)
         {
             Name = tagName;
         }
@@ -21,7 +21,7 @@ namespace CssUI.DOM
                 return ENodeFilterResult.FILTER_SKIP;
 
             // We test reference of string just incase the one being used is like a const or static decleration, or maybe an interned string. it's faster to match an address ptr than to check all chars in an array.
-            if (ReferenceEquals((node as Element).tagName, Name) || 0 == string.Compare((node as Element).tagName, Name))
+            if (ReferenceEquals((node as Element).NamespaceURI, Name) || 0 == string.Compare((node as Element).NamespaceURI, Name))
                 return ENodeFilterResult.FILTER_ACCEPT;
 
             return ENodeFilterResult.FILTER_SKIP;

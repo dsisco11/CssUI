@@ -48,7 +48,7 @@ namespace CssUI.DOM.Events
         /// <summary>
         /// Returns the event’s timestamp as the number of milliseconds measured relative to the time origin.
         /// </summary>
-        public readonly DOMHighResTimeStamp timeStamp;
+        public DOMHighResTimeStamp timeStamp { get; internal set; }
 
         public List<EventPathItem> Path { get; internal set; } = new List<EventPathItem>();
 
@@ -133,6 +133,12 @@ namespace CssUI.DOM.Events
         }
         #endregion
 
+        /// <summary>
+        /// This construct can be used by Event subclasses that have a more complex structure than a simple 1:1 mapping between their initializing dictionary members and IDL attributes.
+        /// </summary>
+        internal virtual void run_constructing_steps()
+        {
+        }
 
         /// <summary>
         /// Returns the invocation target objects of event’s path (objects on which listeners will be invoked), except for any nodes in shadow trees of which the shadow root’s mode is "closed" that are not reachable from event’s currentTarget.

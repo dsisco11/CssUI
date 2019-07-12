@@ -6,7 +6,7 @@
         /// <summary>
         /// The view attribute identifies the Window from which the event was generated.
         /// </summary>
-        public Window View { get; private set; } = null;
+        public Window View { get; internal set; } = null;
         /// <summary>
         /// Specifies some detail information about the Event, depending on the type of event.
         /// </summary>
@@ -14,7 +14,7 @@
         #endregion
 
         #region Constructors
-        public UIEvent(EEventName type, UIEventInit eventInit = null) : base(type, eventInit)
+        public UIEvent(EventName type, UIEventInit eventInit = null) : base(type, eventInit)
         {
             this.View = eventInit.view;
             this.Detail = eventInit.detail;

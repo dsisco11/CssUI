@@ -46,10 +46,8 @@ namespace CssUI.DOM
         #endregion
 
         #region Constructors
-        public Text(Document ownerDocument, string data)
+        public Text(Document ownerDocument, string data) : base(ownerDocument, data)
         {
-            this.ownerDocument = ownerDocument;
-            this.data = data;
         }
         #endregion
 

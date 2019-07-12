@@ -23,9 +23,10 @@ namespace CssUI.DOM
         #endregion
 
         #region Constructors
-        public CharacterData()
+        public CharacterData(Document ownerDocument, string data)
         {
-
+            this.ownerDocument = ownerDocument;
+            this.data = data;
         }
         #endregion
 

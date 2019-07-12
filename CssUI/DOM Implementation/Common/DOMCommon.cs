@@ -8,11 +8,84 @@ using CssUI.DOM.Exceptions;
 using CssUI.DOM.Enums;
 using CssUI.DOM.Events;
 using CssUI.DOM.Internal;
+using System;
+using CssUI.Internal;
 
 namespace CssUI.DOM
 {
     public static class DOMCommon
     {
+        #region Metadata
+        /// <summary>
+        /// Official HTML namespace string
+        /// </summary>
+        public const string HTMLNamespace = "http://www.w3.org/1999/xhtml";
+        /// <summary>
+        /// Official MathML namespace string
+        /// </summary>
+        public const string MathMLNamespace = "http://www.w3.org/1998/Math/MathML";
+        /// <summary>
+        /// Official SVG namespace string
+        /// </summary>
+        public const string SVGNamespace = "http://www.w3.org/2000/svg";
+        /// <summary>
+        /// Official XLink namespace string
+        /// </summary>
+        public const string XLinkNamespace = "http://www.w3.org/1999/xlink";
+        /// <summary>
+        /// Official XML namespace string
+        /// </summary>
+        public const string XMLNamespace = "http://www.w3.org/XML/1998/namespace";
+        /// <summary>
+        /// Official XMLNS namespace string
+        /// </summary>
+        public const string XMLNSNamespace = "http://www.w3.org/2000/xmlns/";
+        #endregion
+
+        #region Lookups
+        /// <summary>
+        /// Returns the HTML Content-Type string associated with the given namespace
+        /// </summary>
+        /// <param name="Namespace"></param>
+        /// <returns></returns>
+        internal static string Lookup_Content_Type_String(string Namespace)
+        {
+            switch (Namespace)
+            {
+                case DOMCommon.HTMLNamespace:
+                    return "application/xhtml+xml";
+                case DOMCommon.SVGNamespace:
+                    return "image/svg+xml";
+                default:
+                    return "application/xml";
+            }
+        }
+
+        internal static Type Lookup_Element_Interface(string localName, string Namespace)
+        {
+            if (Namespace == DOMCommon.HTMLNamespace)
+            {
+                EElementTag? tag = DomLookup.Enum_From_Keyword<EElementTag>(localName);
+                if (!tag.HasValue)
+                    throw new Exception($"unable to find tag type for HTML tag matching \"{localName}\"");
+
+                switch (tag.Value)
+                {
+                    case EElementTag.Div:
+                        return typeof(HTMLElement);
+                    case EElementTag.Body:
+                        return typeof(HTMLBodyElement);
+                    case EElementTag.Template:
+                        return typeof(HTMLTemplateElement);
+                    case EElementTag.Slot:
+                        return typeof(HTMLSlotElement);
+                }
+            }
+
+            return typeof(Element);
+        }
+        #endregion
+
         #region Ordered Sets
         public static string Serialize_Ordered_Set(IEnumerable<string> set)
         {
@@ -24,24 +97,7 @@ namespace CssUI.DOM
             return input.Split('\u0020').ToArray();
         }
         #endregion
-
-        #region Ascii
-        public static bool Is_Ascii_Whitespace(char c)
-        {
-            switch(c)
-            {
-                case '\u0009':
-                case '\u000A':
-                case '\u000C':
-                case '\u000D':
-                case '\u0020':
-                    return true;
-                default:
-                    return false;
-            }
-        }
-        #endregion
-
+        
         #region CSS Selectors
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -134,7 +190,7 @@ namespace CssUI.DOM
             /* 4) For each slotable child of host, slotable, in tree order: */
             foreach (Node node in host.childNodes)
             {
-                if (node.isSlottable)
+                if (node is ISlottable)
                 {
                     ISlottable slotable = node as ISlottable;
                     var foundSlot = DOMCommon.find_slot(slotable);
@@ -158,7 +214,7 @@ namespace CssUI.DOM
             {
                 foreach (Node child in slot.childNodes)
                 {
-                    if (child.isSlottable)
+                    if (child is ISlottable)
                     {
                         slotables.Add(child as ISlottable);
                     }
@@ -211,7 +267,7 @@ namespace CssUI.DOM
             /* 4) For each slotable in slotables, set slotable’s assigned slot to slot. */
             foreach(ISlottable slotable in slotables)
             {
-                slotable.assignedSlot = slot as Node;
+                slotable.assignedSlot = slot;
             }
         }
 
@@ -615,6 +671,187 @@ namespace CssUI.DOM
             }
 
             return list;
+        }
+
+        /// <summary>
+        /// Returns a list of <see cref="Element"/>s matching <paramref name="qualifiedName"/>
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="qualifiedName"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IEnumerable<Element> Get_Elements_By_Qualified_Name(Node root, string qualifiedName)
+        {/* Docs: https://dom.spec.whatwg.org/#concept-getelementsbytagname */
+            /* 1) If qualifiedName is "*" (U+002A), return a HTMLCollection rooted at root, whose filter matches only descendant elements. */
+            if (qualifiedName == "\u002A")
+            {
+                LinkedList<Element> descendents = new LinkedList<Element>();
+                var tree = new TreeWalker(root, ENodeFilterMask.SHOW_ELEMENT);
+                Node node = tree.nextNode();
+                while (!ReferenceEquals(null, node))
+                {
+                    descendents.AddLast((Element)node);
+                    node = tree.nextNode();
+                }
+
+                return descendents;
+            }
+            /* 2) Otherwise, if root’s node document is an HTML document, return a HTMLCollection rooted at root, whose filter matches the following descendant elements: */
+            if (root.ownerDocument is HTMLDocument)
+            {
+                /* 1) Whose namespace is the HTML namespace and whose qualified name is qualifiedName, in ASCII lowercase. */
+                /* 2) Whose namespace is not the HTML namespace and whose qualified name is qualifiedName. */
+
+                LinkedList<Element> descendents = new LinkedList<Element>();
+                var tree = new TreeWalker(root, ENodeFilterMask.SHOW_ELEMENT);
+                Node node = tree.nextNode();
+                while (!ReferenceEquals(null, node))
+                {
+                    var element = (Element)node;
+                    if (element.NamespaceURI == DOMCommon.HTMLNamespace)
+                    {
+                        if (0 == string.Compare(qualifiedName, element.tagName.ToLowerInvariant()))
+                        {
+                            descendents.AddLast(element);
+                        }
+                    }
+                    else if (0 == string.Compare(qualifiedName, element.tagName))
+                    {
+                        descendents.AddLast(element);
+                    }
+
+                    node = tree.nextNode();
+                }
+
+                return descendents;
+            }
+            else
+            {
+                /* 3) Otherwise, return a HTMLCollection rooted at root, whose filter matches descendant elements whose qualified name is qualifiedName. */
+                LinkedList<Element> descendents = new LinkedList<Element>();
+                var tree = new TreeWalker(root, ENodeFilterMask.SHOW_ELEMENT);
+                Node node = tree.nextNode();
+                while (!ReferenceEquals(null, node))
+                {
+                    var element = (Element)node;
+                    if (element.NamespaceURI == DOMCommon.HTMLNamespace)
+                    {
+                        if (0 == string.Compare(qualifiedName, element.tagName.ToLowerInvariant()))
+                        {
+                            descendents.AddLast(element);
+                        }
+                    }
+                    else if (0 == string.Compare(qualifiedName, element.tagName))
+                    {
+                        descendents.AddLast(element);
+                    }
+
+                    node = tree.nextNode();
+                }
+
+                /* When invoked with the same argument, the same HTMLCollection object may be returned as returned by an earlier call. */
+                return descendents;
+            }
+        }
+
+        /// <summary>
+        /// Returns a list of <see cref="Element"/>s which match <paramref name="localName"/> and <paramref name="Namespace"/>
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="Namespace"></param>
+        /// <param name="localName"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IEnumerable<Element> Get_Elements_By_Namespace_And_Local_Name(Node root, string Namespace, string localName)
+        {/* Docs: https://dom.spec.whatwg.org/#concept-getelementsbytagnamens */
+            if (Namespace.Length <= 0)
+                Namespace = null;
+
+            /* 2) If both namespace and localName are "*" (U+002A), return a HTMLCollection rooted at root, whose filter matches descendant elements. */
+            if (Namespace == "\u002A" && localName == "\u002A")
+                return DOMCommon.Get_Descendents(root, null, ENodeFilterMask.SHOW_ELEMENT).Cast<Element>();
+            /* 3) Otherwise, if namespace is "*" (U+002A), return a HTMLCollection rooted at root, whose filter matches descendant elements whose local name is localName. */
+            var localNameFilter = new FilterLocalName(localName);
+            if (Namespace == "\u002A")
+                return DOMCommon.Get_Descendents(root, localNameFilter, ENodeFilterMask.SHOW_ELEMENT).Cast<Element>();
+            /* 4) Otherwise, if localName is "*" (U+002A), return a HTMLCollection rooted at root, whose filter matches descendant elements whose namespace is namespace. */
+            var NamespaceFilter = new FilterNamespace(Namespace);
+            if (localName == "\u002A")
+                return DOMCommon.Get_Descendents(root, NamespaceFilter, ENodeFilterMask.SHOW_ELEMENT).Cast<Element>();
+
+            /* 5) Otherwise, return a HTMLCollection rooted at root, whose filter matches descendant elements whose namespace is namespace and local name is localName. */
+            return DOMCommon.Get_Descendents(root, localNameFilter, ENodeFilterMask.SHOW_ELEMENT)
+                .Where(node => NamespaceFilter.acceptNode(node) == ENodeFilterResult.FILTER_ACCEPT)
+                .Cast<Element>();
+        }
+
+        /// <summary>
+        /// Returns a list of <see cref="Element"/>s which match <paramref name="localName"/> and <paramref name="Namespace"/>
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="Namespace"></param>
+        /// <param name="localName"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IEnumerable<Element> Get_Elements_By_Class_Name(Node root, string classNames)
+        {/* Docs: https://dom.spec.whatwg.org/#concept-getelementsbyclassname */
+            var classes = DOMCommon.Parse_Ordered_Set(classNames.ToLowerInvariant()).Cast<AtomicString>();
+            /* 2) If classes is the empty set, return an empty HTMLCollection. */
+            if (classes.Count() <= 0)
+                return new Element[] { };
+
+            /* 3) Return a HTMLCollection rooted at root, whose filter matches descendant elements that have all their classes in classes. */
+            var descendents = new LinkedList<Element>();
+            var tree = new TreeWalker(root, ENodeFilterMask.SHOW_ELEMENT);
+            Node node = tree.nextNode();
+            while(!ReferenceEquals(null, node))
+            {
+                Element E = node as Element;
+
+                if (E.classList.ContainsAll(classes))
+                    descendents.AddLast(E);
+
+                if (!ReferenceEquals(null, E))
+                    descendents.AddLast(E);
+
+                node = tree.nextNode();
+            }
+
+            return descendents;
+        }
+        #endregion
+
+        #region Internal Algorithms
+        internal static Element createElementNS(Document document, string qualifiedName, string Namespace, ElementCreationOptions options = null)
+        {
+            XMLCommon.Validate_And_Extract(Namespace, qualifiedName, out string Prefix, out string LocalName);
+            return Create_Element(document, LocalName, Prefix);
+        }
+
+        internal static Element Create_Element(Document document, string localName, string Namespace, string prefix = null, string customClassName = null, bool synchronousCustomElementsFlag = false)
+        {/* Docs: https://dom.spec.whatwg.org/#concept-create-element */
+            /* 3) Let result be null. */
+            Element result = null;
+
+            /* 4) Let definition be the result of looking up a custom element definition given document, namespace, localName, and is. */
+            /* XXX: Implement custom elements */
+            object definition = null;
+            /* 5) If definition is non-null, and definition’s name is not equal to its local name (i.e., definition represents a customized built-in element), then: */
+            /* 6) Otherwise, if definition is non-null, then: */
+
+            /* 7) Otherwise: */
+            /* 1) Let interface be the element interface for localName and namespace. */
+            /* 2) Set result to a new element that implements interface, with no attributes, namespace set to namespace, namespace prefix set to prefix, local name set to localName, custom element state set to "uncustomized", custom element definition set to null, is value set to is, and node document set to document. */
+            /* 3) If namespace is the HTML namespace, and either localName is a valid custom element name or is is non-null, then set result’s custom element state to "undefined". */
+
+            var Interface = Lookup_Element_Interface(localName, Namespace);
+            var ctor = Interface.GetConstructor(new Type[]{ typeof(Document), typeof(string), typeof(string), typeof(string) } );
+            if (ReferenceEquals(null, ctor))
+                throw new Exception($"Cannot find interface constructor for element type: \"{localName}\"");
+            /* XXX: Just need to make sure that every tag type has an interface type correctly specified for it */
+            result = (Element)ctor.Invoke(new object[] { document, localName, prefix, Namespace });
+
+            return result;
         }
         #endregion
     }

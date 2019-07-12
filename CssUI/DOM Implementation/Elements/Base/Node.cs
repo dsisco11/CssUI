@@ -43,7 +43,7 @@ namespace CssUI.DOM.Nodes
         #endregion
 
         #region DOM
-        public virtual Document ownerDocument { get; internal set; }
+        public Document ownerDocument { get; internal set; }
         public Node parentNode { get; private set; }
         public Element parentElement { get; private set; }
         public ChildNodeList childNodes { get; } = new ChildNodeList();
@@ -316,8 +316,8 @@ namespace CssUI.DOM.Nodes
         public override EventTarget get_the_parent(Event @event)
         {
             /* A node’s get the parent algorithm, given an event, returns the node’s assigned slot, if node is assigned, and node’s parent otherwise. */
-            if (this.isAssigned)
-                return this.assignedSlot;
+            if (this is ISlottable slottable && slottable.isAssigned)
+                return (EventTarget)slottable.assignedSlot;
 
             return this.parentNode;
         }
@@ -394,7 +394,10 @@ namespace CssUI.DOM.Nodes
                     {
                         case ENodeType.DOCUMENT_NODE:
                             {
-                                copy = new Document();
+                                if (node is HTMLDocument)
+                                    copy = new HTMLDocument((node as Document).contentType);
+                                else
+                                    copy = new XMLDocument((node as Document).contentType);
                             }
                             break;
                         case ENodeType.DOCUMENT_TYPE_NODE:
@@ -406,7 +409,7 @@ namespace CssUI.DOM.Nodes
                         case ENodeType.ATTRIBUTE_NODE:
                             {
                                 var natr = (Attr)node;
-                                copy = new Attr(natr.Name, document) { Value = natr.Value };
+                                copy = new Attr(natr.Name, document, natr.namespaceURI) { Value = natr.Value };
                             }
                             break;
                         default:
@@ -417,11 +420,11 @@ namespace CssUI.DOM.Nodes
                                 }
                                 else if (node is Comment comment)
                                 {
-                                    copy = new Comment(comment.data);
+                                    copy = new Comment(document, comment.data);
                                 }
                                 else if (node is ProcessingInstruction processingInstruction)
                                 {
-                                    copy = new ProcessingInstruction(processingInstruction.target) { data = processingInstruction.data };
+                                    copy = new ProcessingInstruction(document, processingInstruction.target, processingInstruction.data);
                                 }
                                 else
                                 {
@@ -445,7 +448,6 @@ namespace CssUI.DOM.Nodes
                     case ENodeType.ATTRIBUTE_NODE:
                         {
                             var natr = (Attr)node;
-                            (copy as Attr).Name = natr.Name;
                             (copy as Attr).Value = natr.Value;
                         }
                         break;

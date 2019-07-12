@@ -1,47 +1,31 @@
-﻿using System.Linq;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace CssUI.DOM
 {
-    public static class XMLCommon
+    /// <summary>
+    /// Provides common ASCII manipulation functions
+    /// </summary>
+    public static class ASCIICommon
     {
-
-        #region Name Verification
-        /* Docs: https://www.w3.org/TR/xml/#NT-Name */
-
         /// <summary>
-        /// Returns True if the given name string is valid XML
+        /// True id char is an ASCII whitespace character
         /// </summary>
-        public static bool Is_Valid_Name(string name)
+        /// <param name="c"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Ascii_Whitespace(char c)
         {
-            for(int i=0; i<name.Length; i++)
+            switch (c)
             {
-                if ( !Is_NameChar(name[i]) )
+                case '\u0009':
+                case '\u000A':
+                case '\u000C':
+                case '\u000D':
+                case '\u0020':
+                    return true;
+                default:
                     return false;
             }
-            return true;
-        }
-
-        /// <summary>
-        /// True is char is a valid XML name-start character
-        /// </summary>
-        /// <param name="c"></param>
-        /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_NameStartChar(char c)
-        {
-            return (c == ':' || c == '_') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= 0xC0 && c <= 0xD6) || (c >= 0xD8 && c <= 0xF6) || (c >= 0xF8 && c <= 0x2FF) || (c >= 0x370 && c <= 0x37D) || (c >= 0x37F && c <= 0x1FFF) || (c >= 0x200C && c <= 0x200D) || (c >= 0x2070 && c <= 0x218F) || (c >= 0x2C00 && c <= 0x2FEF) || (c >= 0x3001 && c <= 0xD7FF) || (c >= 0xF900 && c <= 0xFDCF) || (c >= 0xFDF0 && c <= 0xFFFD) || (c >= 0x10000 && c <= 0xEFFFF);
-        }
-
-        /// <summary>
-        /// True is char is a valid XML name character
-        /// </summary>
-        /// <param name="c"></param>
-        /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_NameChar(char c)
-        {
-            return Is_NameStartChar(c) || (c >= '0' && c <= '9') || c == 0xB7 || (c >= 0x0300 && c <= 0x036F) || (c >= 0x203F && c <= 0x2040);
         }
 
         /// <summary>
@@ -127,8 +111,5 @@ namespace CssUI.DOM
 
             return (char)('A' + (c - 'a'));
         }
-
-
-        #endregion
     }
 }

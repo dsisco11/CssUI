@@ -18,7 +18,7 @@ namespace CssUI
     /// The basis for all OpenGL based UI elements.
     /// <para>NOTE: All OpenGL UI elements inheriting from this base class makes the assumption that texturing is disabled by default when drawing.</para>
     /// </summary>
-    public abstract class cssElement : Node, IDisposable, IDomEvents
+    public abstract class cssElement : HTMLElement, IDisposable
     {
     #region Identity
     /// <summary>
@@ -282,12 +282,7 @@ namespace CssUI
         
     #endregion
     #endregion
-        
-    #region Aligners Position
-    public cssElementAligner xAligner;
-    public cssElementAligner yAligner;
-    #endregion
-        
+                
     #region Content
     public virtual bool IsEmpty { get { return true; } }
     #endregion
@@ -555,7 +550,7 @@ namespace CssUI
             if (Root != null)
             {
                 Viewport = Root.Viewport;
-                if (!string.IsNullOrEmpty(ID)) Root.Register_Element_ID(ID, this);
+                //if (!string.IsNullOrEmpty(this.id)) Root.Register_Element_ID(this.id, this);
             }
         }
         #endregion
@@ -584,8 +579,8 @@ namespace CssUI
         /// </summary>
         public bool IsEnabled
         {
-            get { return (Has_Attribute("enabled") && (bool)Get_Attribute("enabled")); }
-            set { Set_Attribute("enabled", value); }
+            get => hasAttribute("enabled");
+            set => toggleAttribute("enabled", value);
         }// = true;
 
         /// <summary>
@@ -593,8 +588,8 @@ namespace CssUI
         /// </summary>
         public bool IsMouseOver
         {
-            get { return (Has_Attribute("hovered") && (bool)Get_Attribute("hovered")); }
-            protected set { Set_Attribute("hovered", value); }
+            get => hasAttribute("hovered");
+            protected set => toggleAttribute("hovered", value);
         }// = false;
 
         /// <summary>
@@ -602,8 +597,8 @@ namespace CssUI
         /// </summary>
         public bool IsActive
         {
-            get { return (Has_Attribute("active") && (bool)Get_Attribute("active")); }
-            protected set { Set_Attribute("active", value); }
+            get => hasAttribute("active");
+            protected set => toggleAttribute("active", value);
         }// = false;
 
         /// <summary>
@@ -611,27 +606,27 @@ namespace CssUI
         /// </summary>
         public bool AcceptsDragDrop
         {
-            get { return (Has_Attribute("dropzone") && (bool)Get_Attribute("dropzone")); }
-            protected set { Set_Attribute("dropzone", value); }
-        }// = false;
+            get => hasAttribute("dropzone");
+            protected set => toggleAttribute("dropzone", value);
+        }
 
 
         /// <summary>
         /// Returns all of the drag-drop object types that this element can accept
         /// </summary>
-        public string[] AcceptedDropTypes
+        public ICollection<string> AcceptedDropTypes
         {
             get
             {
-                if (Has_Attribute("dropzone"))
+                if (hasAttribute("dropzone"))
                 {
-                    string[] spl = Get_Attribute<string>("dropzone")?.Replace(" ", "").Split(',');
+                    ICollection<string> spl = DOMCommon.Parse_Ordered_Set(getAttribute("dropzone"));
                     if (spl == null) spl = new string[] { "*" };
                     return spl;
                 }
                 return new string[] { "*" };
             }
-            protected set { Set_Attribute("dropzone", string.Join(",", value)); }
+            protected set { setAttribute("dropzone", string.Join(",", value)); }
         }
 
         /// <summary>
@@ -680,22 +675,22 @@ namespace CssUI
         // Go ahead and assign our ID
         if (string.IsNullOrEmpty(id))
         {
-            ID = UID.ToString();
+            this.id = UID.ToString();
         }
         else
         {
             if (id.StartsWith("#"))
             {
                 if (id.Length > 1)
-                    this.ID = id.Remove(0, 1);
+                    this.id = id.Remove(0, 1);
             }
             else
             {
-                this.ID = id;
+                this.id = id;
             }
         }
         if (!string.IsNullOrEmpty(className))
-            this.Add_Class(className);
+            this.classList.Add(className);
         
         // We resolve the style once this element is parented, if we do it before, then it cant access it's parents block for layout and causes a null exception
         Style = new ElementPropertySystem(this);
@@ -1252,20 +1247,6 @@ namespace CssUI
             public event Action<cssElement, DomItemDragEventArgs> DraggingConfirm;
     #endregion
 
-    #region Keyboard Event Delegates
-            /// <summary>
-            /// Called whenever the user presses a character key while the element has input-focus
-            /// </summary>
-            public event Action<cssElement, DomCancellableEvent<DomKeyboardKeyEventArgs>> KeyPress;
-            /// <summary>
-            /// Called whenever a keyboard key is depressed while the element has input-focus
-            /// </summary>
-            public event Action<cssElement, DomKeyboardKeyEventArgs> KeyUp;
-            /// <summary>
-            /// Called whenever a keyboard key is pressed while the element has input-focus
-            /// </summary>
-            public event Action<cssElement, DomKeyboardKeyEventArgs> KeyDown;
-    #endregion
 
     #region Routed Events
 

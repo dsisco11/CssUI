@@ -1,5 +1,6 @@
 ﻿using CssUI.DOM.Nodes;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CssUI.DOM
 {
@@ -17,10 +18,9 @@ namespace CssUI.DOM
         public List<ISlottable> Assigned { get; set; } = new List<ISlottable>();
         #endregion
 
-        public HTMLSlotElement(string Name, Document document, string localName) : base(document, localName)
+        public HTMLSlotElement(string Name, Document document, string localName, string prefix, string Namespace) : base(document, localName, prefix, Namespace)
         {
             this.Name = Name;
-            tagName = "slot";
         }
 
         /// <summary>
@@ -43,6 +43,14 @@ namespace CssUI.DOM
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
-        public IEnumerable<Element> assignedElements(AssignedNodesOptions options = null);
+        public IEnumerable<Element> assignedElements(AssignedNodesOptions options = null)
+        {/* Docs: https://html.spec.whatwg.org/multipage/scripting.html#dom-slot-assignedelements */
+            if (!options?.flatten ?? false)
+            {
+                return this.Assigned.Where(c => c is Element).Cast<Element>();
+            }
+
+            return DOMCommon.find_flattened_slotables(this).Where(c => c is Element).Cast<Element>();
+        }
     }
 }

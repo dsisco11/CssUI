@@ -15,8 +15,40 @@ namespace CssUI.DOM
     public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable
     {
         #region Properties
+        /// <summary>
+        /// This elements official namespace name string
+        /// </summary>
+        public readonly string NamespaceURI = null;
+        /// <summary>
+        /// This elements namespace prefix eg: "html" or "xml"
+        /// </summary>
+        public readonly string prefix = null;
+        /// <summary>
+        /// Local part of the qualified name of an element.
+        /// </summary>
         public string localName { get; set; }
-        public string tagName { get; protected set; }
+
+        private string qualifiedName => (prefix == null) ? localName : string.Concat(prefix, ":", localName);
+
+        private string _tagname = null;
+        /// <summary>
+        /// For example, if the element is an <img>, its tagName property is "IMG"
+        /// </summary>
+        public string tagName
+        {
+            get
+            {/* Docs: https://dom.spec.whatwg.org/#element-html-uppercased-qualified-name */
+                if (ReferenceEquals(null, _tagname))
+                {
+                    if (NamespaceURI == DOMCommon.HTMLNamespace && ownerDocument is HTMLDocument)
+                        _tagname = new string(qualifiedName.Select(c => ASCIICommon.To_ASCII_Upper_Alpha(c)).ToArray());
+                    else
+                        _tagname = qualifiedName;
+                }
+
+                return _tagname;
+            }
+        }
 
         public DOMTokenList classList { get; private set; }
 
@@ -139,10 +171,12 @@ namespace CssUI.DOM
         #endregion
 
         #region Constructors
-        public Element(Document ownerDocument, string localName)
+        internal Element(Document document, string localName, string prefix="", string Namespace="")
         {/* Docs: https://dom.spec.whatwg.org/#interface-element */
-            this.ownerDocument = ownerDocument;
+            this.ownerDocument = document;
             this.localName = localName;
+            this.prefix = prefix;
+            this.NamespaceURI = Namespace;
             this.classList = new DOMTokenList(this, "class");
         }
         #endregion
@@ -180,9 +214,23 @@ namespace CssUI.DOM
         #region Utility
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal bool find_attribute(string qualifiedName, out Attr outAttrib)
-        {
+        {/* Docs: https://dom.spec.whatwg.org/#concept-element-attributes-get-by-namespace */
             qualifiedName = qualifiedName.ToLowerInvariant();
             if (!this.AttributeList.TryGetValue(qualifiedName, out Attr attr))
+            {
+                outAttrib = null;
+                return false;
+            }
+
+            outAttrib = attr;
+            return true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal bool find_attribute(string localName, string Namespace, out Attr outAttrib)
+        {/* Docs: https://dom.spec.whatwg.org/#concept-element-attributes-get-by-namespace */
+            localName = localName.ToLowerInvariant();
+            if (!this.AttributeList.TryGetValue(localName, out Attr attr))
             {
                 outAttrib = null;
                 return false;
@@ -197,7 +245,7 @@ namespace CssUI.DOM
         {
             /* To change an attribute attribute from an element element to value, run these steps: */
             /* 1) Queue an attribute mutation record for element with attribute’s local name, attribute’s namespace, and attribute’s value. */
-            MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, oldValue);
+            MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.namespaceURI, oldValue);
             /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute’s local name, attribute’s value, value, and attribute’s namespace. */
             /* 3) Run the attribute change steps with element, attribute’s local name, attribute’s value, value, and attribute’s namespace. */
             /* 4) Set attribute’s value to value. */
@@ -209,7 +257,7 @@ namespace CssUI.DOM
         {
             /* To append an attribute attribute to an element element, run these steps: */
             /* 1) Queue an attribute mutation record for element with attribute’s local name, attribute’s namespace, and null. */
-            MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.Value);
+            MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.namespaceURI, attr.Value);
             /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute’s local name, null, attribute’s value, and attribute’s namespace. */
             /* 3) Run the attribute change steps with element, attribute’s local name, null, attribute’s value, and attribute’s namespace. */
             change_attribute(attr, null, attr.Value);
@@ -224,7 +272,7 @@ namespace CssUI.DOM
         {
             /* To remove an attribute attribute from an element element, run these steps: */
             /* 1) Queue an attribute mutation record for element with attribute’s local name, attribute’s namespace, and attribute’s value. */
-            MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.Value);
+            MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.namespaceURI, attr.Value);
             /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute’s local name, attribute’s value, null, and attribute’s namespace. */
             /* 3) Run the attribute change steps with element, attribute’s local name, attribute’s value, null, and attribute’s namespace. */
             change_attribute(attr, attr.Value, null);
@@ -239,7 +287,7 @@ namespace CssUI.DOM
         {
             /* To replace an attribute oldAttr by an attribute newAttr in an element element, run these steps: */
             /* 1) Queue an attribute mutation record for element with oldAttr’s local name, oldAttr’s namespace, and oldAttr’s value. */
-            MutationRecord.Queue_Attribute_Mutation_Record(this, oldAttr.Name, oldAttr.Value); // REDUNDANT
+            MutationRecord.Queue_Attribute_Mutation_Record(this, oldAttr.Name, oldAttr.namespaceURI, oldAttr.Value); // REDUNDANT
             /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing oldAttr’s local name, oldAttr’s value, newAttr’s value, and oldAttr’s namespace. */
             /* 3) Run the attribute change steps with element, oldAttr’s local name, oldAttr’s value, newAttr’s value, and oldAttr’s namespace. */
             change_attribute(oldAttr, oldAttr.Value, newAttr.Value);
@@ -410,82 +458,85 @@ namespace CssUI.DOM
             return s.Match(this, this);
         }
 
+
+        /// <summary>
+        /// If qualifiedName is "*" returns a collection of all descendant elements.
+        /// Otherwise, returns a collection of all descendant elements whose qualified name is qualifiedName. (Matches case-insensitively against elements in the HTML namespace within an HTML document.)
+        /// </summary>
+        /// <param name="qualifiedName"></param>
         public IEnumerable<Element> getElementsByTagName(string qualifiedName)
-        {/* https://dom.spec.whatwg.org/#concept-getelementsbytagname */
-            /* 1) If qualifiedName is "*" (U+002A), return a HTMLCollection rooted at root, whose filter matches only descendant elements. */
-            if (0 == string.Compare(qualifiedName, "\u002A"))
-            {
-                List<Element> collection = new List<Element>();
-                var tree = new TreeWalker(this, ENodeFilterMask.SHOW_ELEMENT);
-                Node n = tree.nextNode();
-                while(!ReferenceEquals(n, null))
-                {
-                    collection.Add((Element)n);
-                    n = tree.nextNode();
-                }
-
-                return collection;
-            }
-            /* 2) Otherwise, if root’s node document is an HTML document, return a HTMLCollection rooted at root, whose filter matches the following descendant elements: */
-            /* Whose namespace is the HTML namespace and whose qualified name is qualifiedName, in ASCII lowercase. */
-
-            string qn = qualifiedName.ToLowerInvariant();
-            List<Element> retList = new List<Element>();
-            var treeWalker = new TreeWalker(this, ENodeFilterMask.SHOW_ELEMENT);
-            Node node = treeWalker.nextNode();
-            while (!ReferenceEquals(node, null))
-            {
-                if (0 == string.Compare(qn, (node as Element).localName.ToLowerInvariant()))
-                    retList.Add((Element)node);
-
-                node = treeWalker.nextNode();
-            }
-
-            return retList;
+        {/* Docs: https://dom.spec.whatwg.org/#concept-getelementsbytagname */
+            /* When invoked with the same argument, the same HTMLCollection object may be returned as returned by an earlier call. */
+            return DOMCommon.Get_Elements_By_Qualified_Name(this, qualifiedName);
         }
 
+        /// <summary>
+        /// If namespace and localName are "*" returns a collection of all descendant elements.
+        /// If only namespace is "*" returns a collection of all descendant elements whose local name is localName.
+        /// If only localName is "*" returns a collection of all descendant elements whose namespace is namespace.
+        /// Otherwise, returns a collection of all descendant elements whose namespace is namespace and local name is localName.
+        /// </summary>
+        /// <param name="Namespace"></param>
+        /// <param name="localName"></param>
+        public IEnumerable<Element> getElementsByTagNameNS(string Namespace, string qualifiedName)
+        {/* Docs:  */
+            return DOMCommon.Get_Elements_By_Namespace_And_Local_Name(this, Namespace, qualifiedName);
+        }
+
+        /// <summary>
+        /// Returns a collection of the elements in the object on which the method was invoked (a document or an element) that have all the classes given by classNames. 
+        /// The classNames argument is interpreted as a space-separated list of classes.
+        /// </summary>
+        /// <param name="classNames"></param>
         public IEnumerable<Element> getElementsByClassName(string classNames)
+        {/* Docs: https://dom.spec.whatwg.org/#dom-element-getelementsbyclassname */
+            return DOMCommon.Get_Elements_By_Class_Name(this, classNames);
+        }
+        #endregion
+
+        #region User Interaction
+        /// <summary>
+        /// Determines if this element can be interacted with
+        /// </summary>
+        public bool Disabled
         {
-            /* The list of elements with class names classNames for a node root is the HTMLCollection returned by the following algorithm: */
-            /* 1) Let classes be the result of running the ordered set parser on classNames. */
-            var classes = DOMCommon.Parse_Ordered_Set(classNames);
-            /* 2) If classes is the empty set, return an empty HTMLCollection. */
-            if (classes.Count <= 0)
-                return new Element[] { };
-            /* 3) Return a HTMLCollection rooted at root, whose filter matches descendant elements that have all their classes in classes. */
+            get => hasAttribute("disabled");
+            set => toggleAttribute("disabled", value);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool Hidden
+        {
+            get => hasAttribute("hidden");
+            set => toggleAttribute("hidden", value);
+        }
 
-            List<Element> retList = new List<Element>();
-            var treeWalker = new TreeWalker(this, ENodeFilterMask.SHOW_ELEMENT);
-            Node node = treeWalker.nextNode();
-            while (!ReferenceEquals(node, null))
-            {
-                var element = (node as Element);
-                bool match = true;
-                foreach(string className in element.classList)
-                {
-                    if (!classes.Contains(className))
-                    {
-                        match = false;
-                        break;
-                    }
-                }
+        protected bool click_in_progress = false;
+        /// <summary>
+        /// Acts as if the element was clicked.
+        /// </summary>
+        public void click()
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#dom-click */
+            if (Disabled)
+                return;
 
-                if (match) retList.Add((Element)node);
+            if (click_in_progress)
+                return;
 
-                node = treeWalker.nextNode();
-            }
-            /* When invoked with the same argument, the same HTMLCollection object may be returned as returned by an earlier call. */
-
-            return retList;
+            click_in_progress = true;
+            EventCommon.fire_synthetic_mouse_event(new Events.EventName(Events.EEventName.Click), this, true);
+            click_in_progress = false;
         }
         #endregion
 
         #region Shadow DOM
         /* XXX: ShadowDOM stuff here */
-        /*
-          ShadowRoot attachShadow(ShadowRootInit init);
-          readonly attribute ShadowRoot? shadowRoot;
-        */
+        public ShadowRoot shadowRoot { get; private set; }
+
+
+        // Docs: https://dom.spec.whatwg.org/#dom-element-attachshadow
+        ShadowRoot attachShadow(ShadowRootInit init);
         #endregion
     }
 }

@@ -1,14 +1,11 @@
-﻿using CssUI.DOM.Enums;
-
-namespace CssUI.DOM
+﻿namespace CssUI.DOM
 {
-    public class HTMLBodyElement : HTMLElement, IWindowEventHandlers
+    public sealed class HTMLBodyElement : HTMLElement, IWindowEventHandlers
     {
 
         #region Constructor
-        public HTMLBodyElement(Document document, string localName) : base(document, localName)
+        public HTMLBodyElement(Document document, string localName, string prefix, string Namespace) : base(document, localName, prefix, Namespace)
         {
-            tagName = "body";
         }
         #endregion
 

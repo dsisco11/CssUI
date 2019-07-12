@@ -28,7 +28,7 @@ namespace CssUI.DOM.Mutation
         /// Returns the local name of the changed attribute, and null otherwise.
         /// </summary>
         public readonly string attributeName = null;
-        // public readonly string attributeNamespace;
+        public readonly string attributeNamespace = null;
         /// <summary>
         /// The return value depends on type. For "attributes", it is the value of the changed attribute before the change. For "characterData", it is the data of the changed node before the change. For "childList", it is null.
         /// </summary>
@@ -36,21 +36,22 @@ namespace CssUI.DOM.Mutation
         #endregion
 
         #region Constructor
-        public MutationRecord(EMutationType type, Node target)
+        private MutationRecord(EMutationType type, Node target)
         {
             this.type = type;
             this.target = target;
         }
 
-        public MutationRecord(EMutationType type, Node target, string attributeName, string oldValue) : this(type, target)
+        private MutationRecord(EMutationType type, Node target, string attributeName, string attributeNamespace, string oldValue) : this(type, target)
         {
             this.attributeName = attributeName;
+            this.attributeNamespace = attributeNamespace;
             this.oldValue = oldValue;
 
         }
 
-        public MutationRecord(EMutationType type, Node target, string attributeName, string oldValue, IEnumerable<Node> addedNodes = null, IEnumerable<Node> removedNodes = null, Node previousSibling = null, Node nextSibling = null)
-            : this(type, target, attributeName, oldValue)
+        private MutationRecord(EMutationType type, Node target, string attributeName, string attributeNamespace, string oldValue, IEnumerable<Node> addedNodes = null, IEnumerable<Node> removedNodes = null, Node previousSibling = null, Node nextSibling = null)
+            : this(type, target, attributeName, attributeNamespace, oldValue)
         {
             this.addedNodes = addedNodes;
             this.removedNodes = removedNodes;
@@ -62,19 +63,19 @@ namespace CssUI.DOM.Mutation
         #region Internal Utility
         internal static void Queue_Text_Mutation_Record(Node target, string oldData)
         {
-            MutationRecord record = new MutationRecord(EMutationType.CharacterData, target, null, oldData, null, null, null, null);
+            MutationRecord record = new MutationRecord(EMutationType.CharacterData, target, null, null, oldData, null, null, null, null);
             MutationRecord.QueueRecord(record);
         }
 
-        internal static void Queue_Attribute_Mutation_Record(Node target, string name, string oldValue)
+        internal static void Queue_Attribute_Mutation_Record(Node target, string localName, string Namespace, string oldValue)
         {
-            MutationRecord record = new MutationRecord(EMutationType.Attributes, target, name, oldValue, null, null, null, null);
+            MutationRecord record = new MutationRecord(EMutationType.Attributes, target, localName, Namespace, oldValue, null, null, null, null);
             MutationRecord.QueueRecord(record);
         }
 
         internal static void Queue_Tree_Mutation_Record(Node target, IEnumerable<Node> addedNodes, IEnumerable<Node> removedNodes, Node previousSibling, Node nextSibling)
         {
-            MutationRecord record = new MutationRecord(EMutationType.ChildList, target, null, null, addedNodes, removedNodes, previousSibling, nextSibling);
+            MutationRecord record = new MutationRecord(EMutationType.ChildList, target, null, null, null, addedNodes, removedNodes, previousSibling, nextSibling);
             MutationRecord.QueueRecord(record);
         }
 
@@ -121,7 +122,7 @@ namespace CssUI.DOM.Mutation
             foreach (KeyValuePair<MutationObserver, string> kv in interestedObservers)
             {
                 /* 1) Let record be a new MutationRecord object with its type set to type, target set to target, attributeName set to name, attributeNamespace set to namespace, oldValue set to mappedOldValue, addedNodes set to addedNodes, removedNodes set to removedNodes, previousSibling set to previousSibling, and nextSibling set to nextSibling. */
-                var record = new MutationRecord(Record.type, Record.target, Record.attributeName, kv.Value, Record.addedNodes, Record.removedNodes, Record.previousSibling, Record.nextSibling);
+                var record = new MutationRecord(Record.type, Record.target, Record.attributeName, Record.attributeNamespace, kv.Value, Record.addedNodes, Record.removedNodes, Record.previousSibling, Record.nextSibling);
                 /* 2) Enqueue record to observer’s record queue. */
                 kv.Key.Enqueue(record);
             }

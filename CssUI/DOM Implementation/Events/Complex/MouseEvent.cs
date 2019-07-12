@@ -4,6 +4,8 @@ namespace CssUI.DOM.Events
 {
     public class MouseEvent : UIEvent
     {
+        public static Type initType = typeof(MouseEventInit);
+
         #region Properties
         /// <summary>
         /// The horizontal coordinate at which the event occurred relative to the origin of the screen coordinate system.

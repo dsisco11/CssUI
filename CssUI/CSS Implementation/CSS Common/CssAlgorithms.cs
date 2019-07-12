@@ -45,6 +45,7 @@ namespace CssUI.CSS
         /// <param name="ObjectArea">Size of the area the object resides in</param>
         /// <param name="ObjectSize">Size of the object itsself</param>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vec2i Solve_Object_Position(CssValue xPos, CssValue yPos, Size2D ObjectArea, Size2D ObjectSize)
         {/* https://www.w3.org/TR/css-backgrounds-3/#the-background-position */
             Vec2i retPos = new Vec2i();
@@ -57,6 +58,7 @@ namespace CssUI.CSS
         /// It resolves the simultaneous constraints presented by the object's intrinsic dimensions and either an unconstrained specified size or one consisting of only a definite width and/or height.
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Size2D Default_Sizing_Algorithm(CssBox Box, CssValue Specified_Width, CssValue Specified_Height, int Default_Width, int Default_Height)
         {/* Docs: https://www.w3.org/TR/css3-images/#default-object-size */
             /* The default sizing algorithm is defined as follows: */
@@ -151,6 +153,7 @@ namespace CssUI.CSS
         }
 
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Size2D Contain_Constraint_Algorithm(CssBox Box, int Width, int Height)
         {/* Docs: https://www.w3.org/TR/css3-images/#contain-constraint */
             /* A contain constraint is resolved by setting the concrete object size to the largest rectangle that has the object's intrinsic aspect ratio and additionally has neither width nor height larger than the constraint rectangle's width and height, respectively. */
@@ -168,6 +171,7 @@ namespace CssUI.CSS
             return new Size2D(Width, Height);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Size2D Cover_Constraint_Algorithm(CssBox Box, int Width, int Height)
         {/* Docs: https://www.w3.org/TR/css3-images/#cover-constraint */
             /* A cover constraint is resolved by setting the concrete object size to the smallest rectangle that has the object's intrinsic aspect ratio and additionally has neither width nor height smaller than the constraint rectangle's width and height, respectively. */

@@ -12,7 +12,7 @@ namespace CssUI.DOM
         #endregion
 
         #region Constructor
-        public ProcessingInstruction(string target)
+        public ProcessingInstruction(Document ownerDocument, string target, string data) : base(ownerDocument, data)
         {
             this.target = target;
         }

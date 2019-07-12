@@ -24,7 +24,7 @@ namespace CssUI.DOM
         #endregion
 
         #region Constructors
-        public HTMLElement(Document document, string localName) : base(document, localName)
+        public HTMLElement(Document document, string localName, string prefix, string Namespace) : base(document, localName, prefix, Namespace)
         {
             dataset = new DOMStringMap(this);
         }

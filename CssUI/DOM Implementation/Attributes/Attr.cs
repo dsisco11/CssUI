@@ -4,16 +4,27 @@ using CssUI.DOM.Nodes;
 namespace CssUI.DOM
 {
     public class Attr : Node
-    {
+    {/* Docs:  */
         public override ENodeType nodeType => Enums.ENodeType.ATTRIBUTE_NODE;
         public override string nodeName => this.Name;
-        private string localName => this.Name;
+
+        /// <summary>
+        /// Namespace name
+        /// </summary>
+        public string namespaceURI { get; private set; } = null;
+        /// <summary>
+        /// Namespace prefix
+        /// </summary>
+        public string prefix { get; private set; } = null;
+        public string localName { get; private set; } = null;
         public override string nodeValue { get => this.Value; set => this.Value = value; }
         public override string textContent { get => this.Value; set => this.Value = value; }
+        public override int nodeLength { get => this.childNodes.Count; }
         /// <summary>
-        /// Same as the localName
+        /// Qualified Name
         /// </summary>
-        public string Name { get; internal set; }
+        /// Docs: https://dom.spec.whatwg.org/#concept-attribute-qualified-name
+        public string Name { get => prefix==null ? localName : string.Concat(prefix, ":", localName); }
 
         private string _value = string.Empty;
         public string Value {
@@ -36,24 +47,27 @@ namespace CssUI.DOM
         public Element ownerElement { get; internal set; } = null;
 
         #region Constructors
-        public Attr(string Name, Element Owner)
+        public Attr(string localName, Element Owner, string Namespace = null)
         {
-            this.Name = Name;
+            this.localName = localName;
             this.ownerElement = Owner;
             this.ownerDocument = Owner.ownerDocument;
+            this.namespaceURI = Namespace;
         }
 
-        public Attr(string Name, Element Owner, Document document)
+        public Attr(string localName, Element Owner, Document document, string Namespace = null)
         {
-            this.Name = Name;
+            this.localName = localName;
             this.ownerElement = Owner;
             this.ownerDocument = document;
+            this.namespaceURI = Namespace;
         }
 
-        public Attr(string Name, Document document)
+        public Attr(string localName, Document document, string Namespace = null)
         {
-            this.Name = Name;
+            this.localName = localName;
             this.ownerDocument = document;
+            this.namespaceURI = Namespace;
         }
         #endregion
 

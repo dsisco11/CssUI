@@ -1,5 +1,6 @@
 ﻿using CssUI.DOM.Events;
 using CssUI.DOM.Nodes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,7 +12,29 @@ namespace CssUI.DOM.Internal
     public static class EventCommon
     {
 
-        #region Specification Algorithms
+        #region Synthetic Events
+        internal static bool fire_synthetic_mouse_event(EventName eventName, Node target, bool not_trusted_flag = false)
+        {/* Docs: https://html.spec.whatwg.org/multipage/webappapis.html#fire-a-synthetic-mouse-event */
+
+            /* 1) Initialize event's ctrlKey, shiftKey, altKey, and metaKey attributes according to the current state of the key input device, if any (false for any keys that are not available). */
+            /* XXX: Implement abstracted method for getting key states, possibly from end-user supplied Document object? */
+            MouseEventInit eventInit = new MouseEventInit()
+            {
+                bubbles = true,
+                cancelable = true,
+            };
+
+            MouseEvent @event = EventCommon.create_event<MouseEvent>(eventName, eventInit);
+            @event.View = target.ownerDocument.defaultView;
+            @event.Flags |= EEventFlags.Composed;
+            if (not_trusted_flag)
+                @event.isTrusted = false;
+
+            return EventCommon.dispatch_event_to_target(@event, target);
+        }
+        #endregion
+
+        #region Common Algorithms
 
         /// <summary>
         /// Retargets <paramref name="A"/> against object <paramref name="B"/>
@@ -94,7 +117,7 @@ namespace CssUI.DOM.Internal
                 /* 5) If isActivationEvent is true and target has activation behavior, then set activationTarget to target. */
                 //if (isActivationEvent && target.)/* This is legacy, we will not have activation behaviour */
                 /* 6) Let slotable be target, if target is a slotable and is assigned, and null otherwise. */
-                var slotable = (target is Node targetNode && targetNode.isSlottable) ? target : null;
+                var slotable = (target is Node targetNode && targetNode is ISlottable) ? target : null;
                 bool slotInClosedTree = false;
                 EventTarget parent = target.get_the_parent(@event);
                 while (!ReferenceEquals(null, parent))
@@ -113,7 +136,7 @@ namespace CssUI.DOM.Internal
                         }
                     }
                     /* 2) If parent is a slotable and is assigned, then set slotable to parent. */
-                    if (((Node)parent).isSlottable && ((Node)parent).isAssigned)
+                    if (parent is ISlottable && ((ISlottable)parent).isAssigned)
                         slotable = parent;
                     /* 3) Let relatedTarget be the result of retargeting event’s relatedTarget against parent. */
                     relatedTarget = EventCommon.retarget_event(@event.relatedTarget, parent);
@@ -309,6 +332,24 @@ namespace CssUI.DOM.Internal
             /* 4) Return eventTarget's node document's relevant global object. */
             /* For us this just means the actual document */
             return (eventTarget as Node).ownerDocument;
+        }
+
+        public static Ty create_event<Ty>(EventName eventName, EventInit eventInit) where Ty : Event
+        {/* Docs: https://dom.spec.whatwg.org/#concept-event-create */
+            Ty @event = inner_create_event<Ty>(eventName, Window.getTimestamp(), eventInit);
+            @event.isTrusted = true;
+            return @event;
+        }
+
+        public static Ty inner_create_event<Ty>(EventName eventName, DOMHighResTimeStamp timeStamp, dynamic eventInit) where Ty : Event
+        {/* Docs: https://dom.spec.whatwg.org/#inner-event-creation-steps */
+            var ctor = typeof(Ty).GetConstructors()[0];
+            Ty @event = (Ty)ctor.Invoke(new object[] { eventName, eventInit });
+            @event.Flags |= EEventFlags.Initialized;
+            @event.timeStamp = timeStamp;
+            /* 5) Run the event constructing steps with event. */
+            @event.run_constructing_steps();
+            return @event;
         }
         #endregion
 

@@ -92,7 +92,14 @@ namespace CssUI.DOM
         }
 
 
-        public Node importNode(Node node, bool deep = false);
-        public Node adoptNode(Node node);
+        public Node importNode(Node node, bool deep = false)
+        {
+            return this.document?.importNode(node, deep);
+        }
+
+        public Node adoptNode(Node node)
+        {
+            return this.document?.adoptNode(node);
+        }
     }
 }
