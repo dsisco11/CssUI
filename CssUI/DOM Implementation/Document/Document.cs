@@ -7,7 +7,7 @@ using xLog;
 
 namespace CssUI.DOM
 {
-    public class Document : ParentNode, IGlobalEventHandlers, IDocumentAndElementEventHandlers
+    public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEventCallbacks
     {/* Docs: https://dom.spec.whatwg.org/#document */
 
         #region Properties
@@ -213,11 +213,11 @@ namespace CssUI.DOM
         public bool hasFocus();
 
         // [CEReactions] boolean execCommand(string commandId, optional boolean showUI = false, optional DOMString value = "");
-        bool queryCommandEnabled(string commandId);
+        /*bool queryCommandEnabled(string commandId);
         bool queryCommandIndeterm(string commandId);
         bool queryCommandState(string commandId);
         bool queryCommandSupported(string commandId);
-        string queryCommandValue(string commandId);
+        string queryCommandValue(string commandId);*/
         #endregion
 
         /// <summary>

@@ -1,5 +1,4 @@
-﻿using CssUI.Enums;
-using SixLabors.Fonts;
+﻿using CssUI.CSS;
 using System.Collections.Generic;
 
 namespace CssUI.Fonts
@@ -32,8 +31,6 @@ namespace CssUI.Fonts
         }
 
         #endregion
-
-
 
         #region Overrides
         public override int GetHashCode()

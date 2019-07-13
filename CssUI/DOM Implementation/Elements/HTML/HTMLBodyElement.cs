@@ -1,6 +1,6 @@
 ﻿namespace CssUI.DOM
 {
-    public sealed class HTMLBodyElement : HTMLElement, IWindowEventHandlers
+    public sealed class HTMLBodyElement : HTMLElement, IWindowEventCallbacks
     {
 
         #region Constructor

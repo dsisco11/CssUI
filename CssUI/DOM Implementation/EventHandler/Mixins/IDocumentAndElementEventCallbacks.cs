@@ -2,7 +2,7 @@
 
 namespace CssUI.DOM
 {
-    public interface IDocumentAndElementEventHandlers
+    public interface IDocumentAndElementEventCallbacks
     {
         event EventCallback onCopy;
         event EventCallback onCut;

@@ -40,7 +40,7 @@ namespace CssUI.DOM
         public void delete(string Name)
         {
             bool hasAlpha = false;
-            for (int i = 0; i < Name.Length; i++) { if (XMLCommon.Is_ASCII_Upper_Alpha(Name[i])) { hasAlpha = true; break; } }
+            for (int i = 0; i < Name.Length; i++) { if (ASCIICommon.Is_ASCII_Upper_Alpha(Name[i])) { hasAlpha = true; break; } }
 
             /* 1) For each ASCII upper alpha in name, insert a U+002D HYPHEN-MINUS character (-) before the character and replace the character with the same character converted to ASCII lowercase. */
             StringBuilder sb = new StringBuilder();
@@ -48,10 +48,10 @@ namespace CssUI.DOM
             {
                 for (int i = 0; i < Name.Length; i++)
                 {
-                    if (XMLCommon.Is_ASCII_Upper_Alpha(Name[i]))
+                    if (ASCIICommon.Is_ASCII_Upper_Alpha(Name[i]))
                     {
                         sb.Append('-');
-                        sb.Append(XMLCommon.To_ASCII_Lower_Alpha(Name[i]));
+                        sb.Append(ASCIICommon.To_ASCII_Lower_Alpha(Name[i]));
                     }
                     else
                     {
@@ -100,7 +100,7 @@ namespace CssUI.DOM
                 throw new SyntaxError();
 
             bool hasAlpha = false;
-            for (int i = 0; i < Name.Length; i++) { if (XMLCommon.Is_ASCII_Upper_Alpha(Name[i])) { hasAlpha = true; break; } }
+            for (int i = 0; i < Name.Length; i++) { if (ASCIICommon.Is_ASCII_Upper_Alpha(Name[i])) { hasAlpha = true; break; } }
 
             /* 2) For each ASCII upper alpha in name, insert a U+002D HYPHEN-MINUS character (-) before the character and replace the character with the same character converted to ASCII lowercase. */
             StringBuilder sb = new StringBuilder();
@@ -108,10 +108,10 @@ namespace CssUI.DOM
             {
                 for (int i = 0; i < Name.Length; i++)
                 {
-                    if (XMLCommon.Is_ASCII_Upper_Alpha(Name[i]))
+                    if (ASCIICommon.Is_ASCII_Upper_Alpha(Name[i]))
                     {
                         sb.Append('-');
-                        sb.Append(XMLCommon.To_ASCII_Lower_Alpha(Name[i]));
+                        sb.Append(ASCIICommon.To_ASCII_Lower_Alpha(Name[i]));
                     }
                     else
                     {
@@ -136,16 +136,16 @@ namespace CssUI.DOM
 
         private string From_XML_Safe_Name(string Name)
         {
-            if (0 == Name.IndexOf("data-") && !XMLCommon.Has_ASCII_Upper_Alpha(Name))
+            if (0 == Name.IndexOf("data-") && !ASCIICommon.Has_ASCII_Upper_Alpha(Name))
             {
                 string str = Name.Substring(5);
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < str.Length; i++)
                 {
-                    if (str[i] == '-' && (i + 1) < str.Length && XMLCommon.Is_ASCII_Lower_Alpha(str[i + 1]))
+                    if (str[i] == '-' && (i + 1) < str.Length && ASCIICommon.Is_ASCII_Lower_Alpha(str[i + 1]))
                     {
                         i++;// skip the hypen
-                        sb.Append(XMLCommon.To_ASCII_Upper_Alpha(str[i + 1]));
+                        sb.Append(ASCIICommon.To_ASCII_Upper_Alpha(str[i + 1]));
                     }
                     else
                     {

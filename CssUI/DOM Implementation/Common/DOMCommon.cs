@@ -87,11 +87,13 @@ namespace CssUI.DOM
         #endregion
 
         #region Ordered Sets
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string Serialize_Ordered_Set(IEnumerable<string> set)
         {
             return string.Join("\u0020", set);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ICollection<string> Parse_Ordered_Set(string input)
         {
             return input.Split('\u0020').ToArray();
