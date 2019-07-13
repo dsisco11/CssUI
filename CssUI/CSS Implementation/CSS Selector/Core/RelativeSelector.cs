@@ -1,8 +1,9 @@
-﻿
-using CssUI.DOM;
+﻿using CssUI.DOM;
 using CssUI.DOM.Nodes;
+using CssUI.CSS.Internal;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System;
 
 namespace CssUI.CSS.Selectors
 {

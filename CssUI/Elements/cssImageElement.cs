@@ -1,4 +1,5 @@
-﻿using CssUI.Enums;
+﻿using CssUI.CSS;
+using CssUI.DOM;
 
 namespace CssUI
 {
@@ -7,7 +8,7 @@ namespace CssUI
     /// </summary>
     public class cssImageElement : cssReplacedElement, IImageElement
     {
-        public override string TypeName { get { return "Image"; } }
+        public static readonly new string CssTagName = "img";
         public override bool IsEmpty { get { return (Texture == null); } }
 
         #region Accessors
@@ -36,7 +37,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public cssImageElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, EReplacedElementType.IMAGE, className, ID)
+        public cssImageElement(Document document, IParentElement Parent, string className = null, string ID = null) : base(document, Parent, EReplacedElementType.IMAGE, className, ID)
         {
             Style.ImplicitRules.ObjectFit.Set(EObjectFit.Contain);
         }

@@ -1,4 +1,5 @@
 ﻿using CssUI.CSS;
+using CssUI.DOM;
 using CssUI.Enums;
 
 namespace CssUI
@@ -8,7 +9,7 @@ namespace CssUI
     /// </summary>
     public class OverlayUI : cssRootElement
     {
-        public override string TypeName { get { return "OverlayUI"; } }
+        public static readonly new string CssTagName = "OverlayUI";
 
         #region Constructors
         public OverlayUI(IRenderEngine Engine) : base(Engine)

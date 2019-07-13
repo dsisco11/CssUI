@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CssUI.Enums;
+using CssUI.CSS;
 using CssUI.Layout;
 
-namespace CssUI
+namespace CssUI.CSS.Internal
 {
     public abstract class LayoutDirectorBase : ILayoutDirector
     {

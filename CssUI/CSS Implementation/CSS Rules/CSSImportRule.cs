@@ -1,5 +1,4 @@
-﻿using CssUI.DOM;
-using CssUI.Enums;
+﻿using CssUI.CSS.Internal;
 using System;
 
 namespace CssUI.CSS

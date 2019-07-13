@@ -1,4 +1,6 @@
-﻿using CssUI.Enums;
+﻿using CssUI.CSS;
+using CssUI.DOM;
+using CssUI.Enums;
 
 namespace CssUI
 {
@@ -7,7 +9,7 @@ namespace CssUI
     /// </summary>
     public class uiHeaderGroup : cssContainerElement
     {
-        public override string TypeName { get { return "GroupBox"; } }
+        public static readonly new string CssTagName = "GroupBox";
 
         #region Components
         cssTextElement text;
@@ -22,12 +24,12 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public uiHeaderGroup(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
+        public uiHeaderGroup(Document document, IParentElement Parent, string className = null, string ID = null) : base(document, Parent, className, ID)
         {
             Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
             Layout = ELayoutMode.Default;
 
-            text = new cssTextElement(this);
+            text = new cssTextElement(this.ownerDocument, this);
             text.Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
             //text.TextFont = new System.Drawing.Font(text.TextFont.FontFamily, 20);
         }

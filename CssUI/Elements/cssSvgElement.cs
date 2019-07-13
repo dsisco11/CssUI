@@ -2,6 +2,8 @@
 using Svg;
 #endif
 using System.IO;
+using CssUI.CSS;
+using CssUI.DOM;
 using CssUI.Enums;
 using CssUI.Extensions;
 
@@ -12,7 +14,7 @@ namespace CssUI
     /// </summary>
     public class cssSvgElement : cssReplacedElement
     {
-        public override string TypeName { get { return "Svg"; } }
+        public static readonly new string CssTagName = "Svg";
 
         #region Accessors
     #if ENABLE_SVG
@@ -86,15 +88,13 @@ namespace CssUI
         }
 #endregion
 
-#region Constructors
-        public cssSvgElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, EReplacedElementType.SVG, className, ID)
+        #region Constructors
+        public cssSvgElement(Document document, IParentElement Parent, string className = null, string ID = null) : base(document, Parent, EReplacedElementType.SVG, className, ID)
         {
             Style.Cascaded.ObjectFit.Set(EObjectFit.Contain);
         }
-#endregion
+        #endregion
 
-#region Drawing
-#endregion
 
         /// <summary>
         /// Occurs after <see cref="Update_Cached_Blocks"/>
@@ -105,7 +105,7 @@ namespace CssUI
             Update_Texture();
         }
 
-#region Texture Updating
+        #region Texture Updating
         protected override void Update_Texture()
         {
 #if ENABLE_SVG

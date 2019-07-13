@@ -1,4 +1,6 @@
-﻿using CssUI.Enums;
+﻿using CssUI.CSS;
+using CssUI.DOM;
+using CssUI.Enums;
 
 namespace CssUI
 {
@@ -7,10 +9,10 @@ namespace CssUI
     /// </summary>
     public class uiVerticalSpacer : cssElement
     {
-        public override string TypeName { get { return "VerticalSpacer"; } }
+        public static new readonly string CssTagName = "VerticalSpacer";
 
         #region Constructors
-        public uiVerticalSpacer(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
+        public uiVerticalSpacer(Document document, IParentElement Parent, string className = null, string ID = null) : base(document, Parent, className, ID)
         {
             Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
             Style.ImplicitRules.BoxSizing.Set(EBoxSizingMode.ContentBox);

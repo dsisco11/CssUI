@@ -1,7 +1,4 @@
-﻿using CssUI.Enums;
-using System;
-
-namespace CssUI.CSS
+﻿namespace CssUI.CSS.Internal
 {
     public sealed class CSSPageRule : CSSGroupingRule
     {

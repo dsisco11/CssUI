@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using CssUI.DOM;
+using System.Linq;
 
 namespace CssUI
 {
@@ -8,7 +9,7 @@ namespace CssUI
     public abstract class cssContainerElement : cssScrollableElement
     {
         #region Constructors
-        public cssContainerElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
+        public cssContainerElement(Document document, IParentElement Parent, string className = null, string ID = null) : base(document, Parent, className, ID)
         {
         }
         #endregion

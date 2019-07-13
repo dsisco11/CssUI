@@ -1,4 +1,5 @@
-﻿using CssUI.Enums;
+﻿using CssUI.CSS.Internal;
+using CssUI.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;

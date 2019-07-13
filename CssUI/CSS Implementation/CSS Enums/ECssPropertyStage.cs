@@ -1,5 +1,5 @@
 ﻿
-namespace CssUI
+namespace CssUI.CSS.Internal
 {
     /// <summary>
     /// Describes all of the different value stages for a Css property
@@ -31,8 +31,5 @@ namespace CssUI
         /// A value that can be used in the rendering process as it has been fully interpreted from the used value and any platform restrictions have been imposed on the value
         /// </summary>
         Actual
-
-
-
     }
 }

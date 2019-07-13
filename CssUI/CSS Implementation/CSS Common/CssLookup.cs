@@ -11,22 +11,38 @@ namespace CssUI
     {
         #region Enum Lookup
 
-        public static string Enum<Ty>(Ty Value) where Ty : struct
+        public static string Keyword_From_Enum<Ty>(Ty Value) where Ty : struct
         {
             int index = CssEnumTables.Get_Enum_Index<Ty>();
             if (index < 0)
-                return null;/* Enum has no index */
-            return CssEnumTables.TABLE[index][Convert.ToInt32(Value)];
+            {
+                /* Enum has no index */
+                return null;
+            }
+
+            /* /!\ This conversion will fucking EXPLODE if the given generic type does not have an integer backing type /!\ */
+            return CssEnumTables.TABLE[index][CastTo<int>.From<Ty>(Value)];
         }
 
-        public static Ty? FromKeyword<Ty>(AtomicString Keyword) where Ty : struct
+        public static Ty? Enum_From_Keyword<Ty>(AtomicString Keyword) where Ty : struct
         {
             int index = CssEnumTables.Get_Enum_Index<Ty>();
             if (index < 0)
-                return null;/* Enum has no index */
+            {
+                /* Enum has no index */
+                return null;
+            }
             return (Ty)CssEnumTables.KEYWORD[index][Keyword];
         }
+        
+        public static bool Is_Declared(Type enumType, AtomicString Keyword)
+        {
+            int index = CssEnumTables.Lookup_Enum_Index(enumType.Name);
+            if (index < 0)
+                return false;/* Enum has no index */
 
+            return CssEnumTables.KEYWORD[index]?.ContainsKey(Keyword) ?? false;
+        }
         #endregion
     }
 }

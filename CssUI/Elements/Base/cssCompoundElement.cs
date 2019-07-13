@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using CssUI.CSS;
+using CssUI.DOM;
 using CssUI.Enums;
 using xLog;
 
@@ -87,7 +88,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public cssCompoundElement(IParentElement Parent, string className, string ID) : base(Parent, className, ID)
+        public cssCompoundElement(Document document, IParentElement Parent, string className, string ID) : base(document, Parent, className, ID)
         {
             Layout = ELayoutMode.Default;
         }

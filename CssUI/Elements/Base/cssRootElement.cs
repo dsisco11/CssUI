@@ -212,7 +212,7 @@ namespace CssUI
         /// </summary>
         public void Unregister_Element(cssElement E)
         {
-            string ID = E.ID;
+            string ID = E.id;
             if (string.IsNullOrEmpty(ID)) return;
 
             if (!ID.StartsWith("#")) ID = string.Concat("#", ID);

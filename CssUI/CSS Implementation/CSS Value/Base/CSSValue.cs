@@ -1,4 +1,5 @@
-﻿using CssUI.CSS.Parser;
+﻿using CssUI.CSS.Internal;
+using CssUI.CSS.Parser;
 using CssUI.Internal;
 using System;
 using System.Collections.Generic;
@@ -179,7 +180,7 @@ namespace CssUI.CSS
         /// <summary>Create an integer value from an enum</summary>
         public static CssValue From_Enum<Ty>(Ty value) where Ty: struct {
             /* XXX: set value to enums CssKeyword */
-            return new CssValue(ECssDataType.KEYWORD, CssLookup.Enum<Ty>(value));
+            return new CssValue(ECssDataType.KEYWORD, CssLookup.Keyword_From_Enum<Ty>(value));
         }
 
         /// <summary>Create an absolute integer value</summary>

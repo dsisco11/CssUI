@@ -1,12 +1,14 @@
 ﻿
+using CssUI.DOM;
+
 namespace CssUI
 {
     public class uiVScrollBar : cssScrollBarElement
     {
-        public override string TypeName { get { return "VertScrollBar"; } }
+        public static readonly new string CssTagName = "VertScrollBar";
 
         #region Constructors
-        public uiVScrollBar(IParentElement Parent, string className = null, string ID = null) : base(Parent, ESliderDirection.Vertical, className, ID)
+        public uiVScrollBar(Document document, IParentElement Parent, string className = null, string ID = null) : base(document, Parent, ESliderDirection.Vertical, className, ID)
         {
         }
         #endregion

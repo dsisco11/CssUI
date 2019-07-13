@@ -1,6 +1,5 @@
-﻿using System;
-
-namespace CssUI.Enums
+﻿
+namespace CssUI.CSS.Internal
 {
     /// <summary>
     /// Boxes in the normal flow belong to a formatting context, 

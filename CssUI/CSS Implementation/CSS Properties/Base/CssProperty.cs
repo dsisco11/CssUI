@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using CssUI.CSS;
+using CssUI.CSS.Internal;
 using CssUI.Internal;
 
-namespace CssUI
+namespace CssUI.CSS
 {
 
     /// <summary>
     /// Represents a CSS property and manages all of its value states: Assigned, Specified, and Computed values.
     /// </summary>
     public class CssProperty : CssPropertyBase, ICssProperty
-    {// DOCS: https://www.w3.org/TR/css-cascade-3/#cascaded
-        
+    {/* Docs: https://www.w3.org/TR/css-cascade-3/#cascaded */
+
         #region backing values
         /// <summary>
         /// Backing value for <see cref="Assigned"/>
@@ -82,7 +82,7 @@ namespace CssUI
                 if (Locked) throw new Exception("Cannot modify the value of a locked css property!");
                 Definition.CheckAndThrow(this, value);
                 // Translate a value of NULL to CSSValue.Null
-                _assigned = (object.ReferenceEquals(value, null) ? CssValue.Null : value);
+                _assigned = ReferenceEquals(value, null) ? CssValue.Null : value;
                 //our assigned value has changed, this means our specified and computed valued are now incorrect.
                 Update();
             }
@@ -164,7 +164,7 @@ namespace CssUI
         /// <summary>
         /// Returns TRUE if the <see cref="Assigned"/> value is <see cref="ECssDataType.NONE"/>
         /// </summary>
-        public override bool IsNone { get => (Assigned.Type == ECssDataType.NONE); }
+        public override bool IsNone { get => Assigned.Type == ECssDataType.NONE; }
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// </summary>
@@ -181,21 +181,21 @@ namespace CssUI
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if the assigned value has the <see cref="ECssValueFlags.Depends"/> flag
         /// </summary>
-        public override bool IsDependentOrAuto { get => (Assigned.Type == ECssDataType.AUTO || Assigned.Has_Flags(ECssValueFlags.Depends)); }
+        public override bool IsDependentOrAuto { get => Assigned.Type == ECssDataType.AUTO || Assigned.Has_Flags(ECssValueFlags.Depends); }
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if the assigned value type is a percentage
         /// </summary>
-        public override bool IsPercentageOrAuto { get => (Assigned.Type == ECssDataType.AUTO || Assigned.Type == ECssDataType.PERCENT); }
+        public override bool IsPercentageOrAuto { get => Assigned.Type == ECssDataType.AUTO || Assigned.Type == ECssDataType.PERCENT; }
 
         /// <summary>
         /// All flags which are present for all currently computed <see cref="CssValue"/>'s
         /// </summary>
-        public override ECssValueFlags Flags { get { return Specified.Flags; } }
+        public override ECssValueFlags Flags => Specified.Flags;
         #endregion
 
         #region Constructor
-        public CssProperty(string CssName, bool Locked, WeakReference<CssPropertySet> Source, cssElement Owner) 
+        public CssProperty(string CssName, bool Locked, WeakReference<CssPropertySet> Source, cssElement Owner)
             : base(CssName, Locked, Source, Owner)
         {
         }
@@ -206,7 +206,7 @@ namespace CssUI
         /// Causes this property to revert back to the computed stage such that it must re-interpret its Used and Actual values.
         /// </summary>
         /// <param name="suppress">Suppresses any change event from firing once the Used value gets re-interpreted</param>
-        internal override void Revert(bool suppress=false)
+        internal override void Revert(bool suppress = false)
         {
             _used = null;
             _actual = null;
@@ -277,7 +277,7 @@ namespace CssUI
             }
         }
         #endregion
-        
+
         #region Unit Resolver
         /// <summary>
         /// Allows external code to notify this property that a certain unit type has changed scale and if we have a value which uses that unit-type we need to fire our Changed event because our Computed value will be different
@@ -308,8 +308,8 @@ namespace CssUI
                 //_value = new CssValue(o.Assigned);
                 _assigned = o.Assigned;
 
-                this.SourcePtr = o.SourcePtr;
-                this.Selector = o.Selector;
+                SourcePtr = o.SourcePtr;
+                Selector = o.Selector;
             }
 
             if (changes) Update();
@@ -344,8 +344,8 @@ namespace CssUI
                 // Don't make a copy of the value, they are readonly anyhow
                 _assigned = o.Assigned;
 
-                this.SourcePtr = o.SourcePtr;
-                this.Selector = o.Selector;
+                SourcePtr = o.SourcePtr;
+                Selector = o.Selector;
             }
 
             if (changes) Update();
@@ -418,7 +418,7 @@ namespace CssUI
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
         public override void UpdateDependent(bool ComputeNow = false)
         {
-            if (this.IsDependent)
+            if (IsDependent)
                 Update(ComputeNow);
         }
 
@@ -429,7 +429,7 @@ namespace CssUI
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
         public override void UpdateDependentOrAuto(bool ComputeNow = false)
         {
-            if (this.IsDependentOrAuto)
+            if (IsDependentOrAuto)
                 Update(ComputeNow);
         }
 
@@ -440,7 +440,7 @@ namespace CssUI
         /// <param name="ComputeNow">If <c>True</c> the final values will be computed now, In most cases leave this false</param>
         public override void UpdatePercentageOrAuto(bool ComputeNow = false)
         {
-            if (this.IsPercentageOrAuto)
+            if (IsPercentageOrAuto)
                 Update(ComputeNow);
         }
         #endregion
@@ -464,9 +464,9 @@ namespace CssUI
         /// <param name="Used"></param>
         internal void Set_Computed_Value(CssValue Used)
         {
-            this.Revert(true);
-            this._computed = Used;
-            this.Update(true);
+            Revert(true);
+            _computed = Used;
+            Update(true);
         }
         #endregion
 

@@ -104,7 +104,7 @@ namespace CssUI.Internal
                 {
                     case ECssDataType.KEYWORD:
                         {// Replace generic font-family keywords with a list of our fallback font-familys for that family
-                            switch (CssLookup.FromKeyword<ECssGenericFontFamily>(val.Value as string))
+                            switch (CssLookup.Enum_From_Keyword<ECssGenericFontFamily>(val.Value as string))
                             {
                                 case ECssGenericFontFamily.Serif:
                                 case ECssGenericFontFamily.SansSerif:
@@ -112,7 +112,7 @@ namespace CssUI.Internal
                                 case ECssGenericFontFamily.Cursive:
                                 case ECssGenericFontFamily.Fantasy:
                                     {
-                                        if (FontManager.GenericFamilyMap.TryGetValue(CssLookup.FromKeyword<ECssGenericFontFamily>(val.Value as string), out List<CssValue> GenericFontFamilys))
+                                        if (FontManager.GenericFamilyMap.TryGetValue(CssLookup.Enum_From_Keyword<ECssGenericFontFamily>(val.Value as string), out List<CssValue> GenericFontFamilys))
                                             retValues.AddRange(GenericFontFamilys);
                                     }
                                     break;

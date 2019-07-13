@@ -1,6 +1,6 @@
-﻿using CssUI.Internal;
+﻿using CssUI.CSS.Internal;
 
-namespace CssUI.Enums
+namespace CssUI.CSS
 {
     /// <summary>
     /// Describes all of the box sizing modes <see cref="cssElement"/>'s can use

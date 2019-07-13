@@ -1,4 +1,4 @@
-﻿using CssUI.Enums;
+﻿using CssUI.CSS.Internal;
 using System;
 
 namespace CssUI.CSS

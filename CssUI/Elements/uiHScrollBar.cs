@@ -1,12 +1,13 @@
-﻿
+﻿using CssUI.DOM;
+
 namespace CssUI
 {
     public class uiHScrollBar : cssScrollBarElement
     {
-        public override string TypeName { get { return "HorzScrollBar"; } }
+        public static readonly new string CssTagName = "HorzScrollBar";
 
         #region Constructors
-        public uiHScrollBar(IParentElement Parent, string className = null, string ID = null) : base(Parent, ESliderDirection.Horizontal, className, ID)
+        public uiHScrollBar(Document document, IParentElement Parent, string className = null, string ID = null) : base(document, Parent, ESliderDirection.Horizontal, className, ID)
         {
         }
         #endregion

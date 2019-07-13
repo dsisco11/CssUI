@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CssUI.DOM;
+using System;
 
 namespace CssUI
 {
@@ -7,10 +8,10 @@ namespace CssUI
     /// </summary>
     public abstract class cssSelectableElement : cssCompoundElement, ISelectableElement
     {
-        public override string TypeName { get { return "Selectable"; } }
+        public static readonly new string CssTagName = "Selectable";
 
         #region Constructors
-        public cssSelectableElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
+        public cssSelectableElement(Document document, IParentElement Parent, string className = null, string ID = null) : base(document, Parent, className, ID)
         {
             Flags_Add(EElementFlags.Focusable);
         }

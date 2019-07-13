@@ -1,4 +1,4 @@
-﻿using CssUI.Internal;
+﻿using CssUI.CSS.Internal;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 

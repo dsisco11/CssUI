@@ -1,5 +1,6 @@
 ﻿using System;
 using CssUI.CSS;
+using CssUI.DOM;
 using CssUI.Enums;
 
 namespace CssUI
@@ -110,7 +111,7 @@ namespace CssUI
 
 
         #region Constructors
-        public cssScrollBarElement(IParentElement Parent, ESliderDirection Dir = ESliderDirection.Unset, string className = null, string ID = null) : base(Parent, className, ID)
+        public cssScrollBarElement(Document document, IParentElement Parent, ESliderDirection Dir = ESliderDirection.Unset, string className = null, string ID = null) : base(document, Parent, className, ID)
         {
             Flags_Remove(EElementFlags.DoubleClickable);
             Layout = ELayoutMode.None;
@@ -123,19 +124,19 @@ namespace CssUI
             ColorBackground = new cssColor(0.1f, 0.1f, 0.1f, 1.0f);
 
 
-            Track = new uiTrackBar(this, Dir)
+            Track = new uiTrackBar(this.ownerDocument, this, Dir)
             {
                 ColorBackground = new cssColor(0f, 0f, 0f, 0.1f)
             };
             Track.ValueChanged += Slider_ValueChanged;
             Track.MouseClick += Track_onMouseClick;
 
-            Btn_dec = new cssButtonElement(this);
+            Btn_dec = new cssButtonElement(this.ownerDocument, this);
             Btn_dec.Style.ImplicitRules.Set_Padding(3, 3);
             Btn_dec.Clicked += (cssElement Sender, DomRoutedEventArgs Args) => { Value = (Value - StepSize); };
             Btn_dec.Set_Svg(CssIcons.close);
 
-            Btn_inc = new cssButtonElement(this);
+            Btn_inc = new cssButtonElement(this.ownerDocument, this);
             Btn_inc.Style.ImplicitRules.Set_Padding(3, 3);
             Btn_inc.Clicked += (cssElement Sender, DomRoutedEventArgs Args) => { Value = (Value + StepSize); };
             Btn_inc.Set_Svg(CssIcons.close);

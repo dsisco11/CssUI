@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CssUI
+namespace CssUI.CSS.Internal
 {
     /// <summary>
     /// Flags which describe the attributes for a <see cref="CSSValue"/>

@@ -1,8 +1,8 @@
-﻿using CssUI.CSS;
-using System;
+﻿using System;
+using CssUI.Internal;
 using System.Collections.Generic;
 
-namespace CssUI.Internal
+namespace CssUI.CSS.Internal
 {
     /// <summary>
     /// Holds all, the specification defined, information about the valid values for a property and how to resolve said values into an absolute form.
@@ -51,7 +51,7 @@ namespace CssUI.Internal
         /// <summary>
         /// Allowed datatypes, when set this will override the disallowed list
         /// </summary>
-        public readonly ECssDataType AllowedTypes = (ECssDataType.INITIAL | ECssDataType.INHERIT | ECssDataType.UNSET);// By default we allow the CSS-wide identifiers. See: https://www.w3.org/TR/css-values-4/#common-keywords
+        public readonly ECssDataType AllowedTypes = ECssDataType.INITIAL | ECssDataType.INHERIT | ECssDataType.UNSET;// By default we allow the CSS-wide identifiers. See: https://www.w3.org/TR/css-values-4/#common-keywords
 
         /// <summary>
         /// A list of all keywords that can be assigned to this property
@@ -85,9 +85,9 @@ namespace CssUI.Internal
             this.Percentage_Resolver = Percentage_Resolver;
 
             if (ReferenceEquals(Keywords, null))
-                this.KeywordWhitelist = new List<string>();
+                KeywordWhitelist = new List<string>();
             else
-                this.KeywordWhitelist = new List<string>(Keywords);
+                KeywordWhitelist = new List<string>(Keywords);
 
             this.DisallowedTypes = DisallowedTypes;
             // Append the specified allowed types to our defaults
@@ -96,11 +96,11 @@ namespace CssUI.Internal
             this.AllowedTypes &= ~DisallowedTypes;
 
             // Setup our resolver index
-            foreach(var o in Resolvers)
+            foreach (var o in Resolvers)
             {
-                this.PropertyStageResolver[(int)o.Item1] = o.Item2;
+                PropertyStageResolver[(int)o.Item1] = o.Item2;
             }
-            
+
         }
 
         #endregion
@@ -115,9 +115,9 @@ namespace CssUI.Internal
         public bool IsValidDataType(ECssDataType Type)
         {
             if (AllowedTypes != 0x0)
-                return (0 != (AllowedTypes & Type));
+                return 0 != (AllowedTypes & Type);
             // Bitwise check against our disallowed types
-            return (0 == (DisallowedTypes & Type));
+            return 0 == (DisallowedTypes & Type);
         }
 
         /// <summary>
@@ -140,14 +140,14 @@ namespace CssUI.Internal
         /// <returns></returns>
         public void CheckAndThrow(ICssProperty Owner, CssValue Value)
         {
-            if (!this.IsValidDataType(Value.Type))
+            if (!IsValidDataType(Value.Type))
                 throw new CssException($"The property({Owner.CssName}) cannot be set to an {Enum.GetName(typeof(ECssDataType), Value.Type)}!");
 
-            switch(Value.Type)
+            switch (Value.Type)
             {
                 case ECssDataType.KEYWORD:
                     {// check this value against our keyword whitelist
-                        if(KeywordWhitelist != null && KeywordWhitelist.Count > 0)
+                        if (KeywordWhitelist != null && KeywordWhitelist.Count > 0)
                         {
                             if (!KeywordWhitelist.Contains(Value.Value as string))
                                 throw new CssException($"Property({Owner.CssName}) does not accept '{Value.Value as string}' as a value!");

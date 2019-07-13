@@ -1,7 +1,7 @@
-﻿using CssUI.Internal;
+﻿using CssUI.CSS.Internal;
 using System;
 
-namespace CssUI
+namespace CssUI.CSS.Enums
 {
     /// <summary>
     /// Defines all the possible border styles

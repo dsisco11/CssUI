@@ -1,6 +1,6 @@
-﻿using CssUI.Internal;
+﻿using CssUI.CSS.Internal;
 
-namespace CssUI.Enums
+namespace CssUI.CSS
 {
     [CssEnum]
     public enum ECssDirection : int

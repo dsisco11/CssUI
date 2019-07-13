@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using CssUI.CSS;
+using CssUI.CSS.Internal;
 using CssUI.Internal;
 
-namespace CssUI
+namespace CssUI.CSS
 {
     /// <summary>
     /// Interface for css properties held within an styling rule block

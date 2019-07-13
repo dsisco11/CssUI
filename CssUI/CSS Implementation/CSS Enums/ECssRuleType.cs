@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CssUI.Enums
+namespace CssUI.CSS.Internal
 {
     public enum ECssRuleType : UInt16
     {

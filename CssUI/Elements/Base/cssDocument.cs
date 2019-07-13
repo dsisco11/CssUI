@@ -1,4 +1,5 @@
 ﻿
+using CssUI.CSS;
 using CssUI.Enums;
 
 namespace CssUI
@@ -8,7 +9,7 @@ namespace CssUI
     /// </summary>
     public class cssDocument : cssRootElement
     {
-        public override string TypeName { get { return "Document"; } }
+        public static readonly new string CssTagName = "Document";
 
         #region Constructors
         public cssDocument(IRenderEngine Engine) : base(Engine)

@@ -1,4 +1,5 @@
-﻿using CssUI.DOM;
+﻿using CssUI.CSS.Internal;
+using CssUI.DOM;
 using CssUI.DOM.Nodes;
 using System.Collections.Generic;
 using System.Linq;

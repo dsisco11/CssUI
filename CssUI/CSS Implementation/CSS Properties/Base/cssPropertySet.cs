@@ -7,6 +7,8 @@ using CssUI.CSS;
 using System.Collections.Concurrent;
 using CssUI.Enums;
 using CssUI.Internal;
+using CssUI.CSS.Internal;
+using CssUI.CSS.Enums;
 
 namespace CssUI
 {

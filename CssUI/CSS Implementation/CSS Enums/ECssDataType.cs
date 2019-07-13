@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CssUI
+namespace CssUI.CSS
 {
     /// <summary>
     /// Style value types

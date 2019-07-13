@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CssUI.CSS;
+using CssUI.DOM;
 using CssUI.Enums;
 
 namespace CssUI
@@ -11,7 +12,7 @@ namespace CssUI
     /// </summary>
     public class uiTrackBar : cssScrollableElement
     {
-        public override string TypeName { get { return "TrackBar"; } }
+        public static readonly new string CssTagName = "TrackBar";
 
         #region Events
         public event Action<uiTrackBar> ValueChanged;
@@ -75,7 +76,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public uiTrackBar(IParentElement Parent, ESliderDirection Dir, string className = null, string ID = null) : base(Parent, className, ID)
+        public uiTrackBar(Document document, IParentElement Parent, ESliderDirection Dir, string className = null, string ID = null) : base(document, Parent, className, ID)
         {
             Flags_Remove(EElementFlags.DoubleClickable);// Trackbars cannot fire double-click events.
             this.Direction = Dir;
@@ -83,7 +84,7 @@ namespace CssUI
             Style.ImplicitRules.Overflow_X.Set(EOverflowMode.Visible);
             Style.ImplicitRules.Overflow_Y.Set(EOverflowMode.Visible);
 
-            Thumb = new cssBox(this);
+            Thumb = new cssBox(this.ownerDocument, this);
             Thumb.Flags_Add(EElementFlags.Draggable);
             Thumb.Color = new cssColor(0.4f, 0.4f, 0.4f, 1.0f);
             Thumb.DraggingStart += Thumb_DraggingStart;

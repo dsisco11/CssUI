@@ -1,10 +1,11 @@
 ﻿using CssUI.CSS;
+using CssUI.DOM;
 
 namespace CssUI
 {
     public class cssProgressBarElement : cssScrollableElement
     {
-        public override string TypeName { get { return "ProgressBar"; } }
+        public static readonly new string CssTagName = "ProgressBar";
 
         #region Values
         float value = 0f;
@@ -17,7 +18,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public cssProgressBarElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
+        public cssProgressBarElement(Document document, IParentElement Parent, string className = null, string ID = null) : base(document, Parent, className, ID)
         {
             Style.ImplicitRules.Padding_Top.Set(3);
             Style.ImplicitRules.Padding_Right.Set(3);
@@ -26,7 +27,7 @@ namespace CssUI
 
             Border = new uiBorderStyle(2, 2, 2, 2);
 
-            bar = new cssBox(this);
+            bar = new cssBox(this.ownerDocument, this);
             bar.Style.ImplicitRules.Height.Set(CssValue.Pct_OneHundred);
             bar.Color = new cssColor(1f, 1f, 1f, 1f);
         }

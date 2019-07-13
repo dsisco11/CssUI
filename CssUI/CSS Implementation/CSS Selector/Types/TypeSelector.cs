@@ -6,7 +6,7 @@ namespace CssUI.CSS.Selectors
 {
 
     /// <summary>
-    /// A type-selector matches an elements <see cref="cssElement.TypeName"/>
+    /// A type-selector matches an elements <see cref="cssElement.CssTagName"/>
     /// </summary>
     public class TypeSelector : SimpleSelector
     {

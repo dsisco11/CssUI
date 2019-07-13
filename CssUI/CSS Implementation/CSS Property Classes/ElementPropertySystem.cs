@@ -6,6 +6,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using CssUI.CSS;
+using CssUI.CSS.Enums;
+using CssUI.CSS.Internal;
 using CssUI.Enums;
 using CssUI.Fonts;
 using CssUI.Internal;
@@ -232,8 +234,8 @@ namespace CssUI
             this.Owner = Owner;
 
             // Populate our rules with a few different common states
-            CssRules.TryAdd(STATE_IMPLICIT, NewPropertySet(STATE_IMPLICIT, $"#{Owner.ID}", Owner, false, EPropertySetOrigin.UserAgent));
-            CssRules.TryAdd(STATE_USER, NewPropertySet(STATE_USER, $"#{Owner.ID}", Owner, true, EPropertySetOrigin.Author));
+            CssRules.TryAdd(STATE_IMPLICIT, NewPropertySet(STATE_IMPLICIT, $"#{Owner.id}", Owner, false, EPropertySetOrigin.UserAgent));
+            CssRules.TryAdd(STATE_USER, NewPropertySet(STATE_USER, $"#{Owner.id}", Owner, true, EPropertySetOrigin.Author));
 
             CssRules.TryAdd(STATE_HOVER, NewPropertySet(STATE_HOVER, ":hover", Owner, true, EPropertySetOrigin.Author));
             CssRules.TryAdd(STATE_FOCUS, NewPropertySet(STATE_FOCUS, ":focus", Owner, true, EPropertySetOrigin.Author));

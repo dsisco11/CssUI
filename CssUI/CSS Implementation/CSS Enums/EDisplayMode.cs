@@ -1,7 +1,7 @@
-﻿using CssUI.Internal;
+﻿using CssUI.CSS.Internal;
 using System;
 
-namespace CssUI.Enums
+namespace CssUI.CSS
 {
     [Flags, CssEnum]
     public enum EDisplayMode : int

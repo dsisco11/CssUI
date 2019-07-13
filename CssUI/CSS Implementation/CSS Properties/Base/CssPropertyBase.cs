@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using CssUI.CSS;
+using CssUI.Internal;
 
-namespace CssUI.Internal
+namespace CssUI.CSS.Internal
 {
     public abstract class CssPropertyBase : ICssProperty
     {
@@ -31,7 +31,7 @@ namespace CssUI.Internal
         /// If true then this propertys values cannot be set externally
         /// </summary>
         public readonly bool Locked = false;
-        
+
         /// <summary>
         /// All flags which are present for all currently computed <see cref="CssValue"/>'s
         /// </summary>
@@ -49,7 +49,7 @@ namespace CssUI.Internal
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                this.SourcePtr.TryGetTarget(out CssPropertySet src);
+                SourcePtr.TryGetTarget(out CssPropertySet src);
                 return src;
             }
         }
@@ -59,9 +59,9 @@ namespace CssUI.Internal
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                if (string.IsNullOrEmpty(this.CssName))
+                if (string.IsNullOrEmpty(CssName))
                     return null;
-                return CssProperties.Definitions[this.CssName];
+                return CssProperties.Definitions[CssName];
             }
         }
         #endregion
@@ -140,7 +140,7 @@ namespace CssUI.Internal
         {
             this.CssName = new AtomicString(CssName);
             this.Owner = Owner;
-            this.SourcePtr = Source;
+            SourcePtr = Source;
             this.Locked = Locked;
         }
         #endregion
@@ -150,7 +150,7 @@ namespace CssUI.Internal
         /// Causes this property to revert back to the computed stage such that it must re-interpret its Used and Actual values.
         /// </summary>
         /// <param name="suppress">Suppresses any change event from firing once the Used value gets re-interpreted</param>
-        internal abstract void Revert(bool suppress=false);
+        internal abstract void Revert(bool suppress = false);
         #endregion
 
         #region Serialization

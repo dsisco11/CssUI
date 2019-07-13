@@ -1,4 +1,6 @@
-﻿namespace CssUI
+﻿using CssUI.CSS;
+
+namespace CssUI
 {
     public static class CSSDebug
     {

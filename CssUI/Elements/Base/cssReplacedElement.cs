@@ -1,4 +1,5 @@
 ﻿using CssUI.CSS;
+using CssUI.DOM;
 using CssUI.Enums;
 
 namespace CssUI
@@ -19,7 +20,7 @@ namespace CssUI
         #endregion
         
         #region Constructors
-        public cssReplacedElement(IParentElement Parent, EReplacedElementType Kind, string className = null, string ID = null) : base(Parent, className, ID)
+        public cssReplacedElement(Document document, IParentElement Parent, EReplacedElementType Kind, string className = null, string ID = null) : base(document, Parent, className, ID)
         {
             this.Kind = Kind;
             this.Box.Flags |= EBoxFlags.REPLACED_ELEMENT;

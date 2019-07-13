@@ -1,4 +1,6 @@
-﻿using CssUI.Enums;
+﻿using CssUI.CSS;
+using CssUI.DOM;
+using CssUI.Enums;
 
 namespace CssUI
 {
@@ -7,10 +9,10 @@ namespace CssUI
     /// </summary>
     public class cssPanelElement : cssContainerElement
     {
-        public override string TypeName { get { return "Panel"; } }
+        public static readonly new string CssTagName = "Panel";
 
         #region Constructors
-        public cssPanelElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
+        public cssPanelElement(Document document, IParentElement Parent, string className = null, string ID = null) : base(document, Parent, className, ID)
         {
             Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
             Layout = ELayoutMode.Default;

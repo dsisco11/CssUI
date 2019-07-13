@@ -1,4 +1,5 @@
-﻿using CssUI.Enums;
+﻿using CssUI.CSS;
+using CssUI.DOM;
 
 namespace CssUI
 {
@@ -7,10 +8,10 @@ namespace CssUI
     /// </summary>
     public class cssDivElement : cssContainerElement
     {
-        public override string TypeName { get { return "Div"; } }
+        public static readonly new string CssTagName = "Div";
 
         #region Constructors
-        public cssDivElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
+        public cssDivElement(Document document, IParentElement Parent, string className = null, string ID = null) : base(document, Parent, className, ID)
         {
             Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
             Layout = ELayoutMode.Default;

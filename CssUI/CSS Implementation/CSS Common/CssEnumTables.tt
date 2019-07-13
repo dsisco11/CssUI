@@ -56,15 +56,23 @@ foreach(EnvDTE.ProjectItem item in GetProjectItemsRecursively(project.ProjectIte
 */
 using System;
 using System.Linq;
-using System.Collections.Generic;
 using CssUI.Internal;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 namespace CssUI.CSS.Internal
 {
 	internal static class CssEnumTables
 	{
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Get_Enum_Index<Ty>()
         {
-            switch(typeof(Ty).Name)
+			return Lookup_Enum_Index(typeof(Ty).Name);
+		}
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int Lookup_Enum_Index(string Name)
+        {
+            switch(Name)
             {
 				<#
 				int Index = 0;

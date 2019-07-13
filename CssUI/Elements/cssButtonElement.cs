@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using CssUI.CSS;
+using CssUI.DOM;
 
 namespace CssUI
 {
@@ -19,7 +20,7 @@ namespace CssUI
     /// </summary>
     public class cssButtonElement : cssScrollableElement, IGenericGraphic, ITextElement
     {
-        public override string TypeName { get { return "Button"; } }
+        public static readonly new string CssTagName = "Button"; 
         public EReplacedElementType ImageType { get { return (gfx!=null ? gfx.Kind : EReplacedElementType.NONE); } }
 
         #region Components
@@ -38,7 +39,7 @@ namespace CssUI
         {
             if (txt == null)
             {
-                txt = new cssTextElement(this);
+                txt = new cssTextElement(this.ownerDocument, this);
                 update_component_order();
             }
         }
@@ -71,7 +72,7 @@ namespace CssUI
             if (gfx != null && gfx.Kind != EReplacedElementType.IMAGE) { Remove(gfx); gfx = null; }
             if (gfx == null)
             {
-                gfx = new cssImageElement(this);
+                gfx = new cssImageElement(this.ownerDocument, this);
                 gfx.Style.ImplicitRules.Set_SizeMax(CssValue.Pct_OneHundred, CssValue.Pct_OneHundred);
                 update_component_order();
             }
@@ -121,7 +122,7 @@ namespace CssUI
             if (gfx!=null && gfx.Kind != EReplacedElementType.SVG) { Remove(gfx); gfx = null; }
             if (gfx == null)
             {
-                gfx = new cssSvgElement(this);
+                gfx = new cssSvgElement(this.ownerDocument, this);
                 gfx.Style.ImplicitRules.Set_SizeMax(CssValue.Pct_OneHundred, CssValue.Pct_OneHundred);
                 update_component_order();
             }
@@ -158,7 +159,7 @@ namespace CssUI
         }
         
         #region Constructors
-        public cssButtonElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
+        public cssButtonElement(Document document, IParentElement Parent, string className = null, string ID = null) : base(document, Parent, className, ID)
         {
             Flags_Remove(EElementFlags.DoubleClickable);// Button elements cannot process double click events, we just want normal click events instead.
         }

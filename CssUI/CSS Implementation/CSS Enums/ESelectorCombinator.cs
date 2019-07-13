@@ -1,5 +1,5 @@
 ﻿
-namespace CssUI.CSS
+namespace CssUI.CSS.Internal
 {
     public enum ESelectorCombinator
     {/* Docs: https://www.w3.org/TR/2018/REC-selectors-3-20181106/#combinators */

@@ -1,8 +1,8 @@
 ﻿using System;
-using CssUI.CSS;
+using CssUI.CSS.Internal;
 using CssUI.CSS.Parser;
 
-namespace CssUI
+namespace CssUI.CSS
 {
     /// <summary>
     /// Specifies the position of a object area (e.g. background image) inside a positioning area (e.g. background positioning area).
@@ -19,16 +19,16 @@ namespace CssUI
         /// <summary>
         /// Returns TRUE if any values have the <see cref="ECssValueFlags.Depends"/> flag
         /// </summary>
-        public override bool IsDependent { get { return (Computed_X.Has_Flags(ECssValueFlags.Depends) || Computed_Y.Has_Flags(ECssValueFlags.Depends)); } }
+        public override bool IsDependent { get { return Computed_X.Has_Flags(ECssValueFlags.Depends) || Computed_Y.Has_Flags(ECssValueFlags.Depends); } }
         /// <summary>
         /// Return TRUE if any values are set to <see cref="CssValue.Auto"/>
         /// </summary>
-        public override bool IsAuto { get { return (Computed_X.Type == ECssDataType.AUTO || Computed_Y.Type == ECssDataType.AUTO); } }
+        public override bool IsAuto { get { return Computed_X.Type == ECssDataType.AUTO || Computed_Y.Type == ECssDataType.AUTO; } }
         /// <summary>
         /// Return TRUE if any values are set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if any values have the <see cref="ECssValueFlags.Depends"/> flag
         /// </summary>
-        public override bool IsDependentOrAuto { get { return (Computed_X.Type == ECssDataType.AUTO || Computed_X.Has_Flags(ECssValueFlags.Depends) || Computed_Y.Type == ECssDataType.AUTO || Computed_Y.Has_Flags(ECssValueFlags.Depends)); } }
+        public override bool IsDependentOrAuto { get { return Computed_X.Type == ECssDataType.AUTO || Computed_X.Has_Flags(ECssValueFlags.Depends) || Computed_Y.Type == ECssDataType.AUTO || Computed_Y.Has_Flags(ECssValueFlags.Depends); } }
 
         /// <summary>
         /// The currently resolved X value
@@ -53,10 +53,10 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public PositionProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked) 
+        public PositionProperty(string CssName, cssElement Owner, WeakReference<CssPropertySet> Source, bool Locked)
             : base(CssName, Locked, Source, Owner)
         {
-            base.onValueChange += this.Handle_Value_Change;
+            onValueChange += Handle_Value_Change;
         }
         #endregion
 
@@ -101,14 +101,14 @@ namespace CssUI
         /// </summary>
         public void Set(string str)
         {
-            base.Assigned = CssValue.From_String(str);
+            Assigned = CssValue.From_String(str);
         }
         /// <summary>
         /// Set the explicit values
         /// </summary>
         public void Set(CssValue x, CssValue y)
         {
-            base.Assigned = CssValue.From_String(Translate_From_XY(x, y));
+            Assigned = CssValue.From_String(Translate_From_XY(x, y));
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace CssUI
         {
             var X = CssValue.From_Int(x, CssValue.Null);
             var Y = CssValue.From_Int(y, CssValue.Null);
-            base.Assigned = CssValue.From_String(Translate_From_XY(X, Y));
+            Assigned = CssValue.From_String(Translate_From_XY(X, Y));
         }
 
         /// <summary>
@@ -130,21 +130,21 @@ namespace CssUI
         {
             var X = CssValue.From_Int((int?)x, CssValue.Null);
             var Y = CssValue.From_Int((int?)y, CssValue.Null);
-            base.Assigned = CssValue.From_String(Translate_From_XY(X, Y));
+            Assigned = CssValue.From_String(Translate_From_XY(X, Y));
         }
         #endregion
 
         #region Operators
         public static bool operator ==(PositionProperty A, PositionProperty B)
         {
-            if (object.ReferenceEquals(A, null) || object.ReferenceEquals(B, null)) return (object.ReferenceEquals(A, null) && object.ReferenceEquals(B, null));
-            return (A.X == B.X && A.Y == B.Y);
+            if (ReferenceEquals(A, null) || ReferenceEquals(B, null)) return ReferenceEquals(A, null) && ReferenceEquals(B, null);
+            return A.X == B.X && A.Y == B.Y;
         }
 
         public static bool operator !=(PositionProperty A, PositionProperty B)
         {
-            if (object.ReferenceEquals(A, null) || object.ReferenceEquals(B, null)) return !(object.ReferenceEquals(A, null) && object.ReferenceEquals(B, null));
-            return (A.X != B.X || A.Y != B.Y);
+            if (ReferenceEquals(A, null) || ReferenceEquals(B, null)) return !(ReferenceEquals(A, null) && ReferenceEquals(B, null));
+            return A.X != B.X || A.Y != B.Y;
         }
 
         public override string ToString() { return string.Concat("[", nameof(PositionProperty), "]<", Computed_X, ", ", Computed_Y, ">"); }

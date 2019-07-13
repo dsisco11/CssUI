@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using CssUI.CSS;
-using System.Threading.Tasks;
-using CssUI.Enums;
+using CssUI.DOM;
+using System.Collections.Generic;
 
 namespace CssUI
 {
@@ -75,7 +74,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public cssScrollableElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
+        public cssScrollableElement(Document document, IParentElement Parent, string className = null, string ID = null) : base(document, Parent, className, ID)
         {
         }
         #endregion

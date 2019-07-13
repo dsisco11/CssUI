@@ -1,5 +1,5 @@
 ﻿
-namespace CssUI
+namespace CssUI.CSS.Internal
 {
     public enum EPropertySetOrigin : uint
     {

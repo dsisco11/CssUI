@@ -1,4 +1,6 @@
 ﻿
+using CssUI.DOM;
+
 namespace CssUI
 {
     /// <summary>
@@ -6,10 +8,10 @@ namespace CssUI
     /// </summary>
     public sealed class cssBox : cssElement
     {
-        public override string TypeName { get { return "Box"; } }
+        public static new readonly string CssTagName = "Rect";
 
         #region Constuctors
-        public cssBox(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
+        public cssBox(Document document, IParentElement Parent, string className = null, string ID = null) : base(document, Parent, className, ID)
         {
             Color = new cssColor(1f, 0f, 1f, 1f);
         }

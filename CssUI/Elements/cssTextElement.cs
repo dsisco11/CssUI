@@ -8,6 +8,8 @@ using SixLabors.ImageSharp.Processing;
 using SixLabors.Primitives;
 using System.Numerics;
 using CssUI.Enums;
+using CssUI.DOM;
+using CssUI.CSS;
 
 namespace CssUI
 {
@@ -17,7 +19,7 @@ namespace CssUI
     /// </summary>
     public class cssTextElement : cssElement, ITextElement
     {
-        public override string TypeName { get { return "Text"; } }
+        public static new readonly string CssTagName = "Text";
 
         public override bool IsEmpty { get { return string.IsNullOrEmpty(text); } }
 
@@ -42,7 +44,7 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public cssTextElement(IParentElement Parent, string className = null, string ID = null) : base(Parent, className, ID)
+        public cssTextElement(Document document, IParentElement Parent, string className = null, string ID = null) : base(document, Parent, className, ID)
         {
             // If the box-sizing mode isn't content then our borders & padding will warp our text because they change the content-area block size and it is no longer the same size as the rendered text!
 

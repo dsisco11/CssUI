@@ -1,6 +1,6 @@
-﻿using CssUI.Internal;
+﻿using CssUI.CSS.Internal;
 
-namespace CssUI.Enums
+namespace CssUI.CSS
 {
     /// <summary>
     /// Provides values to reference the CSS defined generic font familys

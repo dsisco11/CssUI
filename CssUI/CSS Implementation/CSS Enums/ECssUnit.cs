@@ -1,6 +1,6 @@
-﻿using CssUI.Internal;
+﻿using CssUI.CSS.Internal;
 
-namespace CssUI
+namespace CssUI.CSS
 {
     /// <summary>
     /// Defines all of the CSS length unit types
