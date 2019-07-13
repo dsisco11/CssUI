@@ -12,7 +12,7 @@ namespace CssUI.DOM.Events
         [DomKeyword("")]
         None = 0x0,
         [DomKeyword("abort")]
-        abort,
+        Abort,
         [DomKeyword("auxclick")]
         AuxClick,
         [DomKeyword("blur")]
@@ -136,11 +136,11 @@ namespace CssUI.DOM.Events
         [DomKeyword("suspend")]
         Suspend,
         [DomKeyword("timeupdate")]
-        Timeupdate,
+        TimeUpdate,
         [DomKeyword("toggle")]
         Toggle,
         [DomKeyword("volumechange")]
-        Volumechange,
+        VolumeChange,
         [DomKeyword("waiting")]
         Waiting,
 

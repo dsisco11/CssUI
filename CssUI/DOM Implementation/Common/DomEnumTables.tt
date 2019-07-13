@@ -55,15 +55,23 @@ foreach(EnvDTE.ProjectItem item in GetProjectItemsRecursively(project.ProjectIte
 */
 using System;
 using System.Linq;
-using System.Collections.Generic;
 using CssUI.Internal;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 namespace CssUI.DOM.Internal
 {
 	internal static class DomEnumTables
 	{
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Get_Enum_Index<Ty>()
         {
-            switch(typeof(Ty).Name)
+            return Lookup_Enum_Index(typeof(Ty).Name);
+        }
+		
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static int Lookup_Enum_Index(string Name)
+		{		
+            switch(Name)
             {
 				<#
 				int Index = 0;
@@ -97,7 +105,8 @@ case "<#= E.Name #>": return <#= Index #>;
 				#>
 default: return -1;//throw new NotImplementedException($"No lookup-index has defined for enum type '{typeof(Ty).Name}'");
             }
-        }
+		}
+
 
 
 		#region Static Enum Tables

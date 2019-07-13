@@ -52,7 +52,7 @@ namespace CssUI.DOM
 
         public DOMTokenList classList { get; private set; }
 
-        internal OrderedDictionary<AtomicString, Attr> AttributeList { get; private set; } = new OrderedDictionary<AtomicString, Attr>();
+        internal OrderedDictionary<AtomicName<EAttributeName>, Attr> AttributeList { get; private set; } = new OrderedDictionary<AtomicName<EAttributeName>, Attr>();
         public NamedNodeMap Attributes { get; private set; }
         #endregion
 
@@ -213,6 +213,19 @@ namespace CssUI.DOM
 
         #region Utility
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal bool find_attribute(AtomicName<EAttributeName> Name, out Attr outAttrib)
+        {/* Docs: https://dom.spec.whatwg.org/#concept-element-attributes-get-by-namespace */
+            if (!this.AttributeList.TryGetValue(Name, out Attr attr))
+            {
+                outAttrib = null;
+                return false;
+            }
+
+            outAttrib = attr;
+            return true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal bool find_attribute(string qualifiedName, out Attr outAttrib)
         {/* Docs: https://dom.spec.whatwg.org/#concept-element-attributes-get-by-namespace */
             qualifiedName = qualifiedName.ToLowerInvariant();
@@ -229,7 +242,7 @@ namespace CssUI.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal bool find_attribute(string localName, string Namespace, out Attr outAttrib)
         {/* Docs: https://dom.spec.whatwg.org/#concept-element-attributes-get-by-namespace */
-            localName = localName.ToLowerInvariant();
+            localName = string.Concat(Namespace, ":", localName.ToLowerInvariant());
             if (!this.AttributeList.TryGetValue(localName, out Attr attr))
             {
                 outAttrib = null;
@@ -302,6 +315,14 @@ namespace CssUI.DOM
         #endregion
 
         #region Attribute Stuff
+        public string getAttribute(AtomicName<EAttributeName> Name)
+        {
+            Attr attr = this.AttributeList[qualifiedName];
+            /* 2) If attr is null, return null. */
+            /* 3) Return attr’s value. */
+            return attr?.Value;
+        }
+
         public string getAttribute(string qualifiedName)
         {
             qualifiedName = qualifiedName.ToLowerInvariant();
@@ -317,6 +338,21 @@ namespace CssUI.DOM
         }
 
 
+        public void setAttribute(AtomicName<EAttributeName> Name, string value)
+        {
+            find_attribute(Name, out Attr attr);
+
+            if (ReferenceEquals(attr, null))
+            {
+                Attr newAttr = new Attr(Name.Name, this);
+                newAttr.Value = value;
+                append_attribute(newAttr);
+                return;
+            }
+
+            change_attribute(attr, attr.Value, value);
+        }
+
         public void setAttribute(string qualifiedName, string value)
         {
             find_attribute(qualifiedName, out Attr attr);
@@ -331,6 +367,7 @@ namespace CssUI.DOM
 
             change_attribute(attr, attr.Value, value);
         }
+
         public Attr setAttributeNode(Attr attr)
         {
             find_attribute(attr.Name, out Attr oldAttr);
