@@ -10,7 +10,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CssUI", "CssUI\CssUI.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xLog", "..\xLog\xLog\xLog.csproj", "{686BB281-DFA0-4FF4-9007-A8DDB8BFFAE1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CssUI_XUnitTests", "CssUI_XUnitTests\CssUI_XUnitTests.csproj", "{46223138-1AC4-411A-BE7D-DDEE7A5AFF87}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "CssUI_XUnitTests\Tests.csproj", "{46223138-1AC4-411A-BE7D-DDEE7A5AFF87}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
