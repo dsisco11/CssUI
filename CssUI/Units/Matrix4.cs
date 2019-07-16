@@ -1,12 +1,73 @@
 ﻿using System;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace CssUI
 {
     public class Matrix4
     {
+        #region Static
+        const int POW_LUT_SIZE = 2;
+        private static double[,] POW_LUT;
+        static Matrix4()
+        {
+            POW_LUT = new double[POW_LUT_SIZE, POW_LUT_SIZE];
+            for(int i=0; i<POW_LUT_SIZE; i++)
+            {
+                for (int j = 0; j < POW_LUT_SIZE; j++)
+                {
+                    POW_LUT[i, j] = Math.Pow(-1, i + j);
+                }
+            }
+        }
+        #endregion
+
         #region Properties
-        public float[] Data = new float[16];
+        public double[] Data = new double[16];
+        #endregion
+
+        #region Indexing constants
+        internal const int _m11 = 0;
+        internal const int _m12 = 1;
+        internal const int _m13 = 2;
+        internal const int _m14 = 3;
+
+        internal const int _m21 = 4;
+        internal const int _m22 = 5;
+        internal const int _m23 = 6;
+        internal const int _m24 = 7;
+
+        internal const int _m31 = 8;
+        internal const int _m32 = 9;
+        internal const int _m33 = 10;
+        internal const int _m34 = 11;
+
+        internal const int _m41 = 12;
+        internal const int _m42 = 13;
+        internal const int _m43 = 14;
+        internal const int _m44 = 15;
+        #endregion
+
+        #region Accessors
+        public float m11 { get => Data[_m11]; set => Data[_m11] = value; }
+        public float m12 { get => Data[_m12]; set => Data[_m12] = value; }
+        public float m13 { get => Data[_m13]; set => Data[_m13] = value; }
+        public float m14 { get => Data[_m14]; set => Data[_m14] = value; }
+
+        public float m21 { get => Data[_m21]; set => Data[_m21] = value; }
+        public float m22 { get => Data[_m22]; set => Data[_m22] = value; }
+        public float m23 { get => Data[_m23]; set => Data[_m23] = value; }
+        public float m24 { get => Data[_m24]; set => Data[_m24] = value; }
+
+        public float m31 { get => Data[_m31]; set => Data[_m31] = value; }
+        public float m32 { get => Data[_m32]; set => Data[_m32] = value; }
+        public float m33 { get => Data[_m33]; set => Data[_m33] = value; }
+        public float m34 { get => Data[_m34]; set => Data[_m34] = value; }
+
+        public float m41 { get => Data[_m41]; set => Data[_m41] = value; }
+        public float m42 { get => Data[_m42]; set => Data[_m42] = value; }
+        public float m43 { get => Data[_m43]; set => Data[_m43] = value; }
+        public float m44 { get => Data[_m44]; set => Data[_m44] = value; }
         #endregion
 
         #region Constructors
@@ -53,6 +114,16 @@ namespace CssUI
         }
 
         internal Matrix4 CopyAll(float[] src)
+        {
+            Data[0] = src[0]; Data[1] = src[1]; Data[2] = src[2]; Data[3] = src[3];
+            Data[4] = src[4]; Data[5] = src[5]; Data[6] = src[6]; Data[7] = src[7];
+            Data[8] = src[8]; Data[9] = src[9]; Data[10] = src[10]; Data[11] = src[11];
+            Data[12] = src[12]; Data[13] = src[13]; Data[14] = src[14]; Data[15] = src[15];
+
+            return this;
+        }
+
+        internal Matrix4 CopyAll(double[] src)
         {
             Data[0] = src[0]; Data[1] = src[1]; Data[2] = src[2]; Data[3] = src[3];
             Data[4] = src[4]; Data[5] = src[5]; Data[6] = src[6]; Data[7] = src[7];
@@ -134,8 +205,205 @@ namespace CssUI
         }
         #endregion
 
+        #region Internal
+        /// <summary>
+        /// Calculates the data index into a square matrix of a row <paramref name="i"/> and column <paramref name="j"/> without allowing <paramref name="i"/> or <paramref name="j"/> to overflow the square matricies bounds.
+        /// </summary>
+        /// <param name="size">Matrix Width</param>
+        /// <param name="i">Row</param>
+        /// <param name="j">Column</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static int get_index(int size, int i, int j) => ((i % size) * size) + (j % size);
+
+        /// <summary>
+        /// Compiles a submatrix from the given square matrix by deleting row i and column j
+        /// </summary>
+        /// <param name="data">Matrix Values</param>
+        /// <param name="size">Matrix Width</param>
+        /// <param name="i"></param>
+        /// <param name="j"></param>
+        /// <param name="subData"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static void get_submatrix(double[] data, int size, int i, int j, out double[] subData)
+        {
+            int subSize = (size - 1) * (size - 1);
+            double[] subMatrix = new double[subSize];
+            int index = 0;
+
+            for (int _i = 0; _i < size; _i++)
+            {
+                if (i == _i) continue; // skip row i
+                for (int _j = 0; _j < size; _j++)
+                {
+                    if (j == _j) continue; // skip column j
+                    subMatrix[index++] = data[get_index(size, _i, _j)];
+                }
+            }
+
+            subData = subMatrix;
+        }
+
+        /// <summary>
+        /// Calculates the determinant of a square matrix
+        /// </summary>
+        /// <param name="data">Matrix data</param>
+        /// <param name="size">Matrix size</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static double calc_determinant(double[] data, int size)
+        {
+            double Sum = 0;
+
+            /* For each item in the row multiply it by its wrapped diagonal values (count = size) and add this to Sum */
+            for (int j=0; j<size; j++)
+            {/* j = the offset into our horizontal row */
+                double value = 1;
+                for (int c=0; c<size; c++)
+                {/* c = our diagonal index */
+                    //value *= data[rowIndex + j + ((c * size) + j)];
+                    value *= data[get_index(size, c, j+c)];
+                }
+                Sum += value;
+            }
+
+            /* For each item in the row multiply it by its wrapped REVERSE diagonal values (count = size) and subtract this from Sum */
+            for (int j = 0; j < size; j++)
+            {/* j = the offset into our horizontal row */
+                double value = 1;
+                for (int c = 0; c < size; c++)
+                {/* c = our diagonal index */
+                    value *= data[get_index(size, c, j + c)];
+                }
+                Sum -= value;
+            }
+
+            return Sum;
+        }
+
+        /// <summary>
+        /// Calculates the cofactor of a given item <paramref name="i"/>, <paramref name="j"/> within a square matrix
+        /// </summary>
+        /// <param name="data">Matrix Values</param>
+        /// <param name="size">Matrix Width</param>
+        /// <param name="i">Row</param>
+        /// <param name="j">Column</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static double calc_cofactor(double[] data, int size, int i, int j)
+        {
+            /* The cofactor of a given item i,j in a square matrix is the determinant of a sub-matrix consisting of all values except those in row i and column j */
+            int subSize = (size - 1);
+            get_submatrix(data, size, i, j, out double[] submatrix);
+
+            // the real formula is -1^(i+j) but this pattern is repeated so im pretty sure this wrapped table will work and be faster then calculating a TON of powers
+            return POW_LUT[i % 1, j % 1] * calc_determinant(submatrix, subSize);
+        }
+
+        /// <summary>
+        /// Calculates the cofactor expansion of a given matrix, which is the expanded determinant.
+        /// </summary>
+        /// <param name="data">Matrix Values</param>
+        /// <param name="size">Matrix Width</param>
+        /// <param name="i">Row</param>
+        /// <param name="j">Column</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static double calc_cofactor_expansion(double[] data, int size)
+        {
+            /* The cofactor expansion of a given square matrix is the sum of the cofactors of each of its items */
+            double Result = 0;
+
+            for (int i = 0; i < size; i++)
+            {
+                //for (int j = 0; j < size; j++)
+                //{
+                    Result += data[get_index(size, i, j)] * calc_cofactor(data, size, i, 0);
+                //}
+            }
+
+            return Result;
+        }
+
+        /// <summary>
+        /// Calculates the adjugant matrix of a given square matrix of size denoted by <paramref name="size"/>
+        /// </summary>
+        /// <param name="data">Matrix Values</param>
+        /// <param name="size">Matrix Width</param>
+        internal static double[] calc_adjugant_matrix(double[] data, int size)
+        {/* https://en.wikipedia.org/wiki/Determinant */
+            /* The adjugant matrix of a given matrix consists of the cofactor of each value in said matrix */
+            /* A[i,j] = -1^(i+j)|M[j,i]| */
+            double[] matrix = new double[size * size];
+            for (int i=0; i<size; i++)
+            {
+                for (int j = 0; j < size; j++)
+                {
+                    matrix[get_index(size, i, j)] = calc_cofactor(data, size, j, i);
+                }
+            }
+
+            return matrix;
+        }
+
+        /// <summary>
+        /// Calculates the adjugant matrix of a given square matrix of size denoted by <paramref name="size"/>
+        /// </summary>
+        /// <param name="data">Matrix Values</param>
+        /// <param name="size">Matrix Width</param>
+        internal static double[] calc_inverse_matrix(double[] data, int size)
+        {/* https://en.wikipedia.org/wiki/Determinant */
+            /* The adjugant matrix of a given matrix consists of the cofactor of each value in said matrix */
+            /* A-1 = (1/|A|)*~A */
+
+            double determinant = calc_cofactor_expansion(data, size);
+            double inverse = 1.0 / determinant;
+            double[] adjunct = calc_adjugant_matrix(data, size);
+
+            double[] matrix = new double[size * size];
+            for (int i=0; i<size; i++)
+            {
+                for (int j = 0; j < size; j++)
+                {
+                    matrix[get_index(size, i, j)] = inverse * adjunct[get_index(size, i, j)];
+                }
+            }
+
+            return matrix;
+        }
+        #endregion
+
+        #region Determinant
+        public double Determinant()
+        {/* https://semath.info/src/inverse-cofactor-ex4.html */
+            return (m11 * m22 * m33 * m44) + (m11 * m23 * m34 * m42) + (m11 * m24 * m32 * m43)
+                 - (m11 * m24 * m33 * m42) - (m11 * m23 * m32 * m44) - (m11 * m22 * m34 * m43)
+                 - (m12 * m21 * m33 * m44) - (m13 * m21 * m34 * m42) - (m14 * m21 * m32 * m43)
+                 + (m14 * m21 * m33 * m42) + (m13 * m21 * m32 * m44) + (m12 * m21 * m34 * m43)
+                 + (m12 * m23 * m31 * m44) + (m13 * m24 * m31 * m42) + (m14 * m22 * m31 * m43)
+                 - (m14 * m23 * m31 * m42) - (m13 * m22 * m31 * m44) - (m12 * m24 * m31 * m43)
+                 - (m12 * m23 * m34 * m41) - (m13 * m24 * m32 * m41) - (m14 * m22 * m33 * m41)
+                 + (m14 * m23 * m32 * m41) + (m13 * m22 * m34 * m41) + (m12 * m24 * m33 * m41);
+        }
+        #endregion
+
         #region Inversion
-        // Simple but not robust matrix inversion. (Doesn't work properly if there is a scaling or skewing transformation.)
+        /// <summary>
+        /// </summary>
+        /// <returns></returns>
+        public Matrix4 Invert()
+        {/* https://en.wikipedia.org/wiki/Minor_(linear_algebra)#Inverse_of_a_matrix */
+            Matrix4 R = new Matrix4();
+            var invData = calc_inverse_matrix(this.Data, 4);
+            R.CopyAll(invData);
+            return R;
+        }
+
+        /// <summary>
+        /// Simple but not robust matrix inversion. (Doesn't work properly if there is a scaling or skewing transformation.)
+        /// </summary>
+        /// <returns></returns>
         public Matrix4 InvertSimple()
         {
             Matrix4 R = new Matrix4();
@@ -152,12 +420,21 @@ namespace CssUI
         public Matrix4 Transpose()
         {
             Matrix4 R = new Matrix4();
-            R.Data[0] = Data[8]; R.Data[1] = Data[4]; R.Data[2] = Data[0];
+
+            /*R.Data[0] = Data[8]; R.Data[1] = Data[4]; R.Data[2] = Data[0];
             R.Data[4] = Data[9]; R.Data[5] = Data[5]; R.Data[6] = Data[1];
             R.Data[8] = Data[10]; R.Data[9] = Data[6]; R.Data[10] = Data[2];
 
             R.Data[11] = R.Data[7] = R.Data[3] = R.Data[12] = R.Data[13] = R.Data[14] = 0.0f;
-            R.Data[15] = 1.0f;
+            R.Data[15] = 1.0f;*/
+
+            R.m11 = m31; R.m12 = m21; R.m13 = m11;
+            R.m21 = m32; R.m22 = m22; R.m23 = m12;
+            R.m31 = m33; R.m32 = m23; R.m33 = m13;
+
+            R.m34 = R.m24 = R.m14 = R.m41 = R.m42 = R.m43 = 0.0f;
+            R.m44 = 1.0f;
+
             return R;
         }
         #endregion
@@ -221,36 +498,41 @@ namespace CssUI
             R.Data[12] = 0; R.Data[13] = 0; R.Data[14] = 0; R.Data[15] = 1.0f;
             return R;
         }
+        #endregion
 
+        #region Rotation Transforms
         // helpers for Rotate
-        public Matrix4 RotX(float deg)
+        public static Matrix4 get_X_Rotation_Transform(float deg)
         {
+            var matrix = new Matrix4();
             float angle = MathExt.DegreesToRadians(deg);
-            Data[5] = (float)Math.Cos(angle);
-            Data[6] = -(float)Math.Sin(angle);
-            Data[9] = (float)Math.Sin(angle);
-            Data[10] = (float)Math.Cos(angle);
-            return this;
+            matrix.Data[5] = (float)Math.Cos(angle);
+            matrix.Data[6] = -(float)Math.Sin(angle);
+            matrix.Data[9] = (float)Math.Sin(angle);
+            matrix.Data[10] = (float)Math.Cos(angle);
+            return matrix;
         }
 
-        public Matrix4 RotY(float deg)
+        public static Matrix4 get_Y_Rotation_Transform(float deg)
         {
+            var matrix = new Matrix4();
             float angle = MathExt.DegreesToRadians(deg);
-            Data[0] = (float)Math.Cos(angle);
-            Data[2] = (float)Math.Sin(angle);
-            Data[8] = -(float)Math.Sin(angle);
-            Data[10] = (float)Math.Cos(angle);
-            return this;
+            matrix.Data[0] = (float)Math.Cos(angle);
+            matrix.Data[2] = (float)Math.Sin(angle);
+            matrix.Data[8] = -(float)Math.Sin(angle);
+            matrix.Data[10] = (float)Math.Cos(angle);
+            return matrix;
         }
 
-        public Matrix4 RotZ(float deg)
+        public static Matrix4 get_Z_Rotation_Transform(float deg)
         {
+            var matrix = new Matrix4();
             float angle = MathExt.DegreesToRadians(deg);
-            Data[0] = (float)Math.Cos(angle);
-            Data[1] = -(float)Math.Sin(angle);
-            Data[4] = (float)Math.Sin(angle);
-            Data[5] = (float)Math.Cos(angle);
-            return this;
+            matrix.Data[0] = (float)Math.Cos(angle);
+            matrix.Data[1] = -(float)Math.Sin(angle);
+            matrix.Data[4] = (float)Math.Sin(angle);
+            matrix.Data[5] = (float)Math.Cos(angle);
+            return matrix;
         }
         #endregion
 
@@ -281,13 +563,6 @@ namespace CssUI
         #endregion
 
         #region Explicit Casts
-        public static explicit operator Matrix3x2(Matrix4 mat)
-        {
-            return new Matrix3x2(mat.Data[0], mat.Data[4], 
-                                 mat.Data[1], mat.Data[5],
-                                 mat.Data[2], mat.Data[6]);
-        }
-
         public static explicit operator string(Matrix4 mat)
         {
             String str = "[";
@@ -296,7 +571,7 @@ namespace CssUI
             //first convert each value to a string and store in an array
             for (int i = 0; i < 16; i++)
             {
-                arr[i] = String.Format("{0:0.##}", mat.Data[i]);
+                arr[i] = string.Format("{0:0.##}", mat.Data[i]);
                 longest = Math.Max(longest, arr[i].Length);
             }
 

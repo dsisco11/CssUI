@@ -68,18 +68,21 @@ namespace CssUI
             return Math.Sqrt((double)((x * x) + (y * y) + (z * z)));
         }
         #endregion
-
+        
         #region Radians / Degrees
-        const double Ratio_DegToRad = (Math.PI / 180.0);
-        const double Ratio_GradToRad = (Math.PI / 200.0);
-        const double Ratio_TurnToRad = (Math.PI / 0.5);
+        internal const double Radians = (Math.PI / 180.0);
+        internal const double Ratio_DegToRad = (Math.PI / 180.0);
+        internal const double Ratio_GradToRad = (Math.PI / 200.0);
+        internal const double Ratio_TurnToRad = (Math.PI / 0.5);
 
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float DegreesToRadians(float degrees)
         {
             return degrees * (float)Ratio_DegToRad;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static double DegreesToRadians(double degrees)
         {
             return degrees * Ratio_DegToRad;
@@ -93,7 +96,7 @@ namespace CssUI
         /// <param name="b"></param>
         /// <param name="epsilon"></param>
         /// <returns>True If the delta between the values is less than <paramref name="epsilon"/> </returns>
-        public static bool floatEq(double a, double b, double epsilon = 0.001f)
+        public static bool floatEq(double a, double b, double epsilon = 0.0000001f)
         {
             double absA = Math.Abs(a);
             double absB = Math.Abs(b);
@@ -103,11 +106,11 @@ namespace CssUI
             { // shortcut, handles infinities
                 return true;
             }
-            else if (a == 0 || b == 0 || diff < float.Epsilon)
+            else if (a == 0 || b == 0 || diff < double.Epsilon)
             {
                 // a or b is zero or both are extremely close to it
                 // relative error is less meaningful here
-                return diff < (epsilon * float.Epsilon);
+                return diff < (epsilon * double.Epsilon);
             }
             else
             { // use relative error
