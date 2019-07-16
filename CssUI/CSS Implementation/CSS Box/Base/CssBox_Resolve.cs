@@ -4,7 +4,7 @@ using System;
 
 namespace CssUI
 {
-    public partial class CssBox
+    public partial class CssLayoutBox
     {
 
         private void Resolve()

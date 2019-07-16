@@ -11,10 +11,15 @@ namespace CssUI
 {
     /// <summary>
     /// A box as defined in the CSS level 3 box model standards, containing all of the 4 areas: content, padding, border, and margin
-    /// Its origin is center.
+    /// It is actually acontainer for multiple box fragments
+    /// Its origin is Top, Left.
     /// </summary>
-    public partial class CssBox : IEnumerable<CssBox>
+    public partial class CssLayoutBox : IEnumerable<CssBoxFragment>
     {// Docs: https://www.w3.org/TR/css-box-3/#box-model
+
+        #region Backing List
+        private List<CssBoxFragment> Childen = new List<CssBoxFragment>();
+        #endregion
 
         #region Flags
         public EBoxFlags Flags = 0x0;
@@ -48,28 +53,28 @@ namespace CssUI
         /// <summary>
         /// The edge positions of the Repalced-Content-Area 
         /// </summary>
-        public cssBoxArea Replaced { get; private set; } = null;
+        public CssBoxArea Replaced { get; private set; } = null;
         /// <summary>
         /// The edge positions of the Content-Area 
         /// </summary>
-        public readonly cssBoxArea Content;
+        public readonly CssBoxArea Content;
         /// <summary>
         /// The edge positions of the Padding-Area 
         /// </summary>
-        public readonly cssBoxArea Padding;
+        public readonly CssBoxArea Padding;
         /// <summary>
         /// The edge positions of the Border-Area 
         /// </summary>
-        public readonly cssBoxArea Border;
+        public readonly CssBoxArea Border;
         /// <summary>
         /// The edge positions of the Margin-Area 
         /// </summary>
-        public readonly cssBoxArea Margin;
+        public readonly CssBoxArea Margin;
 
         /// <summary>
         /// The block which represents the hitbox for mouse related input events
         /// </summary>
-        public cssBoxArea ClickArea { get => this.Padding; }
+        public CssBoxArea ClickArea { get => this.Padding; }
         #endregion
 
         #region Properties
@@ -78,13 +83,13 @@ namespace CssUI
         /// <summary>
         /// Backing value for <see cref="Containing_Box"/>
         /// </summary>
-        private cssBoxArea _containing_box = null;
+        private CssBoxArea _containing_box = null;
         /// <summary>
         /// The containing block of this element
         /// <para>If the control has an ancestor this will be said ancestors content-area block</para>
         /// <para>Otherwise, if the element is a root element, this should have the dimensions of the viewport</para>
         /// </summary>
-        public cssBoxArea Containing_Box
+        public CssBoxArea Containing_Box
         {
             get
             {
@@ -143,11 +148,11 @@ namespace CssUI
         /// <summary>
         /// Returns <c>True</c> if the Width was given an explicit value (i.e. it doesn't depend on content size)
         /// </summary>
-        public bool IsWidthExplicit => (0 != (Style.Cascaded.Width.Specified.Type & (ECssDataType.DIMENSION | ECssDataType.PERCENT)) && !this.DependsOnChildren);
+        public bool IsWidthExplicit => (0 != (Style.Cascaded.Width.Specified.Type & (ECssValueType.DIMENSION | ECssValueType.PERCENT)) && !this.DependsOnChildren);
         /// <summary>
         /// Returns <c>True</c> if the Height was given an explicit value (i.e. it doesn't depend on content size)
         /// </summary>
-        public bool IsHeightExplicit => (0 != (Style.Cascaded.Height.Specified.Type & (ECssDataType.DIMENSION | ECssDataType.PERCENT)) && !this.DependsOnChildren);
+        public bool IsHeightExplicit => (0 != (Style.Cascaded.Height.Specified.Type & (ECssValueType.DIMENSION | ECssValueType.PERCENT)) && !this.DependsOnChildren);
 
 
         /// <summary>
@@ -312,14 +317,9 @@ namespace CssUI
         #endregion
 
         #region Constructor
-        public CssBox(cssElement Owner)
+        public CssLayoutBox(cssElement Owner)
         {
             this.Owner = Owner;
-            this.Content = new cssBoxArea(this);
-            this.Padding = new cssBoxArea(this);
-            this.Border = new cssBoxArea(this);
-            this.Margin = new cssBoxArea(this);
-
         }
         #endregion
 
@@ -425,7 +425,7 @@ namespace CssUI
             Style.Cascaded.ObjectPosition_Y.UpdateDependent(true);
 
             /* Update replaced area */
-            Replaced = new cssBoxArea(this);
+            Replaced = new CssBoxArea(this);
             Replaced.Fit(this.Content, new Vec2i(Style.ObjectPosition_X, Style.ObjectPosition_Y), Get_Replaced_Block_Size());
         }
         #endregion
@@ -466,7 +466,7 @@ namespace CssUI
             Update_Depends_Flag();
 
             // Figure out if we have any block-level children
-            this.HasBlockLevelChildren = !ReferenceEquals(null, this.SingleOrDefault((CssBox b) => (b.OuterDisplayType == EOuterDisplayType.Block)));
+            this.HasBlockLevelChildren = !ReferenceEquals(null, this.SingleOrDefault((CssLayoutBox b) => (b.OuterDisplayType == EOuterDisplayType.Block)));
 
             /* Update our bounds */
             switch(this.DisplayGroup)
@@ -540,7 +540,7 @@ namespace CssUI
             return true;
         }
 
-        private cssBoxArea Find_Containing_Box()
+        private CssBoxArea Find_Containing_Box()
         {/* Docs: https://www.w3.org/TR/CSS22/visudet.html#containing-block-details */
             /* Root elements */
             if (ReferenceEquals(Owner.Parent, null))
@@ -796,35 +796,40 @@ namespace CssUI
         #endregion
 
         #region Enumeration
-        IEnumerator<CssBox> IEnumerable<CssBox>.GetEnumerator()
+        IEnumerator<CssBoxFragment> IEnumerable<CssBoxFragment>.GetEnumerator()
         {
             if (this.Owner is cssCompoundElement container)
             {
-                return new CssBoxEnumerator(this, container);
+                return new CSSBoxEnumerator(this, container);
             }
 
-            return (IEnumerator<CssBox>)new CssBox[0].GetEnumerator();
+            return (IEnumerator<CssBoxFragment>)new CssBoxFragment[0].GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
             if (this.Owner is cssCompoundElement container)
             {
-                return new CssBoxEnumerator(this, container);
+                return new CSSBoxEnumerator(this, container);
             }
 
-            return new CssBox[0].GetEnumerator();
+            return new CssBoxFragment[0].GetEnumerator();
         }
         #endregion
 
         #region Indexing
         public int Count { get => (Owner is cssCompoundElement o ? o.Count : 0); }
-        public CssBox this[int i]
+        public CssBoxFragment this[int i]
         {
-            get => (Owner is cssCompoundElement o ? o[i].Box : null);
+            //get => (Owner is cssCompoundElement o ? o[i].Box : null);
+            get
+            {
+                if (i < 0 || i >= this.Childen.Count)
+                    throw new IndexOutOfRangeException();
+
+                return this.Childen[i];
+            }
         }
         #endregion
-
-
     }
 }

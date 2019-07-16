@@ -2,30 +2,30 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace CssUI
+namespace CssUI.CSS
 {
-    public class CssBoxEnumerator : IEnumerator<CssBox>
+    public class CSSBoxEnumerator : IEnumerator<CssBoxFragment>
     {
 
         #region Proeprties
-        private CssBox Box;
+        private CssLayoutBox Box;
         private cssCompoundElement Owner;
         private int index = -1;
         #endregion
 
         #region Constructor
-        public CssBoxEnumerator(CssBox Box, cssCompoundElement Owner)
+        public CSSBoxEnumerator(CssLayoutBox Box, cssCompoundElement Owner)
         {
             this.Box = Box;
             this.Owner = Owner;
         }
         #endregion
-        public CssBox Current
+        public CssBoxFragment Current
         {
             get
             {
                 if (index <= -1) throw new InvalidOperationException();
-                return Owner[index].Box;
+                return Box[index];
             }
         }
 
@@ -34,7 +34,7 @@ namespace CssUI
             get
             {
                 if (index <= -1) throw new InvalidOperationException();
-                return Owner[index].Box;
+                return Box[index];
             }
         }
 
@@ -45,7 +45,7 @@ namespace CssUI
         public bool MoveNext()
         {
             index++;
-            if (index < Owner.Count)
+            if (index < Box.Count)
             {
                 return true;
             }

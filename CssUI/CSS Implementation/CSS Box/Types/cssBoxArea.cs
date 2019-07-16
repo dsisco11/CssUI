@@ -1,14 +1,14 @@
 ﻿using System;
 
-namespace CssUI
+namespace CssUI.CSS
 {
     /// <summary>
-    /// Represents an sub-area within a <see cref="CssBox"/>
+    /// Represents an sub-area within a <see cref="CssLayoutBox"/>
     /// </summary>
-    public class cssBoxArea
+    public class CssBoxArea
     {
         #region Properties
-        private readonly CssBox Box;
+        private readonly CssBoxFragment Fragment;
 
         /// <summary>
         /// Holds the origin location for the bounds
@@ -22,11 +22,11 @@ namespace CssUI
         /// <summary>
         /// The edges of this area
         /// </summary>
-        internal cssRect Edge = new cssRect() { Left = 0, Top = 0, Right = 0, Bottom = 0 };
+        internal CssRect Edge = new CssRect() { Left = 0, Top = 0, Right = 0, Bottom = 0 };
         /// <summary>
         /// The edge sizes of this area
         /// </summary>
-        private cssRect Size = new cssRect() { Left = 0, Top = 0, Right = 0, Bottom = 0 };
+        private CssRect Size = new CssRect() { Left = 0, Top = 0, Right = 0, Bottom = 0 };
 
         /// <summary>
         /// Top edge position of this area
@@ -67,11 +67,11 @@ namespace CssUI
         /// <summary>
         /// The combined Left/Right sizes for this edge
         /// </summary>
-        public int Size_Horizontal { get => (Size.Left + Size.Right); }
+        public int Size_Horizontal { get => Size.Left + Size.Right; }
         /// <summary>
         /// The combined Top/Bottom sizes for this edge
         /// </summary>
-        public int Size_Vertical { get => (Size.Top + Size.Bottom); }
+        public int Size_Vertical { get => Size.Top + Size.Bottom; }
 
 
         public int X { get => Pos.X; }
@@ -80,11 +80,11 @@ namespace CssUI
         public int Width { get => Dimensions.Width; }
         public int Height { get => Dimensions.Height; }
 
-        private int Half_Width { get => (Width / 2); }
-        private int Half_Height { get => (Height / 2); }
+        private int Half_Width { get => Width / 2; }
+        private int Half_Height { get => Height / 2; }
 
-        private int CenterX { get => (Left + Half_Width); }
-        private int CenterY { get => (Bottom + Half_Height); }
+        private int CenterX { get => Left + Half_Width; }
+        private int CenterY { get => Bottom + Half_Height; }
 
         /// <summary>
         /// Returns the box's current APPROXIMATE center position
@@ -111,9 +111,9 @@ namespace CssUI
         /// Returns a copy of this areas edges
         /// </summary>
         /// <returns></returns>
-        public cssRect Get_Rect()
+        public CssRect Get_Rect()
         {
-            return new cssRect() { Top = Edge.Top, Right = Edge.Right, Bottom = Edge.Bottom, Left = Edge.Left };
+            return new CssRect() { Top = Edge.Top, Right = Edge.Right, Bottom = Edge.Bottom, Left = Edge.Left };
         }
         /// <summary>
         /// The logical-width for this area
@@ -121,37 +121,37 @@ namespace CssUI
         /// Docs: https://www.w3.org/TR/css-writing-modes-4/#logical-width
         public int LogicalWidth
         {
-            get => (Box?.Style?.WritingMode == Enums.EWritingMode.Horizontal_TB) ? Dimensions.Width : Dimensions.Height;
+            get => Fragment?.Style?.WritingMode == Enums.EWritingMode.Horizontal_TB ? Dimensions.Width : Dimensions.Height;
         }
         /// <summary>
         /// The logical-height for this area
         /// </summary>
         public int LogicalHeight
         {
-            get => (Box?.Style?.WritingMode == Enums.EWritingMode.Horizontal_TB) ? Dimensions.Height : Dimensions.Width;
+            get => Fragment?.Style?.WritingMode == Enums.EWritingMode.Horizontal_TB ? Dimensions.Height : Dimensions.Width;
         }
         #endregion
 
         #region Constructor
-        public cssBoxArea()
+        public CssBoxArea()
         {
         }
 
-        public cssBoxArea(CssBox Box)
+        public CssBoxArea(CssBoxFragment Box)
         {
-            this.Box = Box;
+            this.Fragment = Box;
         }
 
         /// <summary>
-        /// Makes a copy of the given <see cref="cssBoxArea"/>
+        /// Makes a copy of the given <see cref="CssBoxArea"/>
         /// </summary>
         /// <param name="Area"></param>
-        public cssBoxArea(cssBoxArea Area)
+        public CssBoxArea(CssBoxArea Area)
         {
-            this.Box = Area.Box;
-            this.Edge = new cssRect() { Top=Area.Edge.Top, Right=Area.Edge.Right, Bottom = Area.Edge.Bottom, Left=Area.Edge.Left };
-            this.Size = new cssRect() { Top=Area.Size.Top, Right=Area.Size.Right, Bottom = Area.Size.Bottom, Left=Area.Size.Left };
-            this.update_pos_and_dimensions();
+            Fragment = Area.Fragment;
+            Edge = new CssRect() { Top = Area.Edge.Top, Right = Area.Edge.Right, Bottom = Area.Edge.Bottom, Left = Area.Edge.Left };
+            Size = new CssRect() { Top = Area.Size.Top, Right = Area.Size.Right, Bottom = Area.Size.Bottom, Left = Area.Size.Left };
+            update_pos_and_dimensions();
         }
 
         /// <summary>
@@ -160,21 +160,21 @@ namespace CssUI
         /// <param name="Box"></param>
         /// <param name="Position"></param>
         /// <param name="Size"></param>
-        public cssBoxArea(CssBox Box, Vec2i Position, Size2D Size)
+        public CssBoxArea(CssLayoutBox Box, Vec2i Position, Size2D Size)
         {
-            this.Box = Box;
+            this.Fragment = Box;
             Update_Bounds(Position.X, Position.Y, Size.Width, Size.Height);
         }
 
         /// <summary>
-        /// Makes a copy of the given <see cref="cssBoxArea"/>
+        /// Makes a copy of the given <see cref="CssBoxArea"/>
         /// </summary>
         /// <param name="Area"></param>
-        public cssBoxArea(int Top, int Right, int Bottom, int Left)
+        public CssBoxArea(int Top, int Right, int Bottom, int Left)
         {
-            this.Edge = new cssRect() { Top = Top, Right = Right, Bottom = Bottom, Left = Left };
-            this.Size = new cssRect() { Top = 0, Right = 0, Bottom = 0, Left = 0 };
-            this.update_pos_and_dimensions();
+            Edge = new CssRect() { Top = Top, Right = Right, Bottom = Bottom, Left = Left };
+            Size = new CssRect() { Top = 0, Right = 0, Bottom = 0, Left = 0 };
+            update_pos_and_dimensions();
         }
         #endregion
 
@@ -182,10 +182,10 @@ namespace CssUI
 
         private void update_trbl()
         {
-            Edge.Top = (Y - Size.Top);
-            Edge.Right = (X + Width - Size.Right);
-            Edge.Bottom = (Y + Height + Size.Bottom);
-            Edge.Left = (X + Size.Left);
+            Edge.Top = Y - Size.Top;
+            Edge.Right = X + Width - Size.Right;
+            Edge.Bottom = Y + Height + Size.Bottom;
+            Edge.Left = X + Size.Left;
         }
 
         private void update_pos_and_dimensions()
@@ -193,8 +193,8 @@ namespace CssUI
             Pos.X = Left;
             Pos.Y = Bottom;
 
-            Dimensions.Width = (Right - Left);
-            Dimensions.Height = (Bottom - Top);
+            Dimensions.Width = Right - Left;
+            Dimensions.Height = Bottom - Top;
         }
 
         public void Set_Dimensions(int Width, int Height)
@@ -239,12 +239,12 @@ namespace CssUI
         /// Updates this edge area to encapsulate the given edge area
         /// </summary>
         /// <param name="edge"></param>
-        public void Encapsulate(cssBoxArea Area)
+        public void Encapsulate(CssBoxArea Area)
         {
-            Edge.Top = (Area.Top - Size.Top);
-            Edge.Right = (Area.Right - Size.Right);
-            Edge.Bottom = (Area.Bottom + Size.Bottom);
-            Edge.Left = (Area.Left + Size.Left);
+            Edge.Top = Area.Top - Size.Top;
+            Edge.Right = Area.Right - Size.Right;
+            Edge.Bottom = Area.Bottom + Size.Bottom;
+            Edge.Left = Area.Left + Size.Left;
             update_pos_and_dimensions();
         }
 
@@ -252,12 +252,12 @@ namespace CssUI
         /// Updates this edge area to fit within the given edge area
         /// </summary>
         /// <param name="edge"></param>
-        public void Fit(cssBoxArea Area)
+        public void Fit(CssBoxArea Area)
         {
-            Edge.Top = (Area.Top - Area.Size.Top);
-            Edge.Right = (Area.Right - Area.Size.Right);
-            Edge.Bottom = (Area.Bottom + Area.Size.Bottom);
-            Edge.Left = (Area.Left + Area.Size.Left);
+            Edge.Top = Area.Top - Area.Size.Top;
+            Edge.Right = Area.Right - Area.Size.Right;
+            Edge.Bottom = Area.Bottom + Area.Size.Bottom;
+            Edge.Left = Area.Left + Area.Size.Left;
             update_pos_and_dimensions();
         }
 
@@ -265,12 +265,12 @@ namespace CssUI
         /// Updates this edge area to fit within the given edge area and sets it's dimensions within that area
         /// </summary>
         /// <param name="edge"></param>
-        public void Fit(cssBoxArea Area, Vec2i Offset, Size2D Size)
+        public void Fit(CssBoxArea Area, Vec2i Offset, Size2D Size)
         {
-            Edge.Top = (Area.Top - Area.Size.Top) + (Offset.Y);
-            Edge.Right = (Area.Right - Area.Size.Right) + (Offset.X + Size.Width);
-            Edge.Bottom = (Area.Bottom + Area.Size.Bottom) + (Offset.Y + Size.Height);
-            Edge.Left = (Area.Left + Area.Size.Left) + (Offset.X);
+            Edge.Top = Area.Top - Area.Size.Top + Offset.Y;
+            Edge.Right = Area.Right - Area.Size.Right + Offset.X + Size.Width;
+            Edge.Bottom = Area.Bottom + Area.Size.Bottom + Offset.Y + Size.Height;
+            Edge.Left = Area.Left + Area.Size.Left + Offset.X;
             update_pos_and_dimensions();
         }
         #endregion
@@ -301,15 +301,15 @@ namespace CssUI
         }
         #endregion
 
-        public static cssBoxArea ShallowCopy(cssBoxArea Area)
+        public static CssBoxArea ShallowCopy(CssBoxArea Area)
         {
             if (ReferenceEquals(Area, null))
                 return null;
 
-            return new cssBoxArea(Area.Box)
+            return new CssBoxArea(Area.Fragment)
             {
-                Edge = new cssRect() { Top = Area.Edge.Top, Right = Area.Edge.Right, Bottom = Area.Edge.Bottom, Left = Area.Edge.Left },
-                Size = new cssRect() { Top = Area.Size.Top, Right = Area.Size.Right, Bottom = Area.Size.Bottom, Left = Area.Size.Left }
+                Edge = new CssRect() { Top = Area.Edge.Top, Right = Area.Edge.Right, Bottom = Area.Edge.Bottom, Left = Area.Edge.Left },
+                Size = new CssRect() { Top = Area.Size.Top, Right = Area.Size.Right, Bottom = Area.Size.Bottom, Left = Area.Size.Left }
             };
         }
 
@@ -321,7 +321,7 @@ namespace CssUI
         /// <returns></returns>
         public bool Intersects(Vec2i point)
         {
-            return (Left <= point.X && Right >= point.X && Top <= point.Y && Bottom >= point.Y);
+            return Left <= point.X && Right >= point.X && Top <= point.Y && Bottom >= point.Y;
         }
 
         /// <summary>
@@ -331,7 +331,7 @@ namespace CssUI
         /// <returns></returns>
         public bool Intersects(int X, int Y)
         {
-            return (Left <= X && Right >= X && Top <= Y && Bottom >= Y);
+            return Left <= X && Right >= X && Top <= Y && Bottom >= Y;
         }
 
         /// <summary>
@@ -339,35 +339,35 @@ namespace CssUI
         /// </summary>
         /// <param name="point"></param>
         /// <returns></returns>
-        public bool Intersects(cssBoxArea box)
+        public bool Intersects(CssBoxArea box)
         {
-            return (Math.Abs(CenterX - box.CenterX) <= (Half_Width + box.Half_Width)) &&
-                   (Math.Abs(CenterY - box.CenterY) <= (Half_Height + box.Half_Height));
+            return Math.Abs(CenterX - box.CenterX) <= Half_Width + box.Half_Width &&
+                   Math.Abs(CenterY - box.CenterY) <= Half_Height + box.Half_Height;
         }
 
         #endregion
 
         #region Operators
-        public static bool operator ==(cssBoxArea A, cssBoxArea B)
+        public static bool operator ==(CssBoxArea A, CssBoxArea B)
         {
             // If either object is null return whether they are BOTH null
-            if (object.ReferenceEquals(A, null) || object.ReferenceEquals(B, null))
-                return (object.ReferenceEquals(A, null) && object.ReferenceEquals(B, null));
+            if (ReferenceEquals(A, null) || ReferenceEquals(B, null))
+                return ReferenceEquals(A, null) && ReferenceEquals(B, null);
 
             return A.GetHashCode() == B.GetHashCode();
         }
-        public static bool operator !=(cssBoxArea A, cssBoxArea B)
+        public static bool operator !=(CssBoxArea A, CssBoxArea B)
         {
             // If either object is null return whether they are BOTH null
-            if (object.ReferenceEquals(A, null) || object.ReferenceEquals(B, null))
-                return !(object.ReferenceEquals(A, null) && object.ReferenceEquals(B, null));
+            if (ReferenceEquals(A, null) || ReferenceEquals(B, null))
+                return !(ReferenceEquals(A, null) && ReferenceEquals(B, null));
 
             return A.GetHashCode() != B.GetHashCode();
         }
 
         public override bool Equals(object obj)
         {
-            return obj is cssBoxArea area && (GetHashCode() == area.GetHashCode());
+            return obj is CssBoxArea area && GetHashCode() == area.GetHashCode();
         }
         #endregion
 
@@ -376,15 +376,15 @@ namespace CssUI
         public override int GetHashCode()
         {
             int hash = 17;
-            hash = hash * 31 + this.Top;
-            hash = hash * 31 + this.Right;
-            hash = hash * 31 + this.Bottom;
-            hash = hash * 31 + this.Left;
+            hash = hash * 31 + Top;
+            hash = hash * 31 + Right;
+            hash = hash * 31 + Bottom;
+            hash = hash * 31 + Left;
 
-            hash = hash * 31 + this.Size_Top;
-            hash = hash * 31 + this.Size_Right;
-            hash = hash * 31 + this.Size_Bottom;
-            hash = hash * 31 + this.Size_Left;
+            hash = hash * 31 + Size_Top;
+            hash = hash * 31 + Size_Right;
+            hash = hash * 31 + Size_Bottom;
+            hash = hash * 31 + Size_Left;
 
             return hash;
         }
