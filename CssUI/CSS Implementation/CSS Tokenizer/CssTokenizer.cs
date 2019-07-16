@@ -319,7 +319,7 @@ namespace CssUI.CSS.Parser
         }
 
         void Consume_Number(out string Result, out dynamic Number, out ENumericTokenType Type)
-        {// SEE:  https://www.w3.org/TR/css-syntax-3/#consume-a-number0
+        {/* Docs:  https://www.w3.org/TR/css-syntax-3/#consume-a-number0 */
 
             Result = "";
             Type = ENumericTokenType.Integer;

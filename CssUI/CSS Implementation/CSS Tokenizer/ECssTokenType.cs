@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CssUI
+﻿namespace CssUI.CSS.Parser
 {
     /// <summary>
     /// Defines all of the different possible CSS token types
@@ -13,7 +7,7 @@ namespace CssUI
     {
         /// <summary></summary>
         None,
-        /// <summary>Represents a collection of 2 or more characters not within quotations</summary>
+        /// <summary>Represents a collection of 2 or more characters NOT within quotations</summary>
         Ident,
         /// <summary>Represents an identifier followed immediately by an opening-parenthesis "FUNCTION_NAME("</summary>
         FunctionName,
