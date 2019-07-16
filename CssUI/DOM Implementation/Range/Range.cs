@@ -1,6 +1,9 @@
-﻿using CssUI.DOM.Exceptions;
+﻿using CssUI.DOM.Enums;
+using CssUI.DOM.Exceptions;
+using CssUI.DOM.Geometry;
 using CssUI.DOM.Nodes;
 using CssUI.DOM.Traversal;
+using CssUI.Fonts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -72,6 +75,22 @@ namespace CssUI.DOM
                     }
                 }
             }
+        }
+        #endregion
+
+        #region Internal
+        internal Node get_CommonAncestor()
+        {
+            if (ReferenceEquals(null, startContainer) || ReferenceEquals(null, endContainer))
+                return null;
+
+            var commonAncestor = startContainer;
+            while (!DOMCommon.Is_Inclusive_Ancestor(commonAncestor, endContainer))
+            {
+                commonAncestor = commonAncestor.parentNode;
+            }
+
+            return commonAncestor;
         }
         #endregion
 
@@ -513,8 +532,7 @@ namespace CssUI.DOM
             return fragment;
 
         }
-
-
+        
         public DocumentFragment cloneContents()
         {/* Docs: https://dom.spec.whatwg.org/#concept-range-clone */
             var fragment = new DocumentFragment(null, startContainer.ownerDocument);
@@ -722,6 +740,72 @@ namespace CssUI.DOM
             return false;
         }
 
+        public IEnumerable<DOMRect> getClientRects()
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-range-getclientrects */
+            LinkedList<DOMRect> rectList = new LinkedList<DOMRect>();
+            var common = get_CommonAncestor();
+            var tree = new TreeWalker(common, Enums.ENodeFilterMask.SHOW_ALL);
+            Node node = tree.nextNode();
+            while (!ReferenceEquals(null, node))
+            {
+                /* For each element selected by the range, whose parent is not selected by the range, include the border areas returned by invoking getClientRects() on the element. */
+                if (node.nodeType == ENodeType.ELEMENT_NODE)
+                {
+                    if (Contains(node))
+                    {
+                        if (!Contains(node.parentNode))
+                        {
+                            var rects = (node as Element).getClientRects();
+                            foreach (var rect in rects)
+                            {
+                                rectList.AddLast(rect);
+                            }
+                        }
+                    }
+                    continue;
+                }
+
+                /* 
+                 * For each Text node selected or partially selected by the range (including when the boundary-points are identical), 
+                 * include a DOMRect object (for the part that is selected, not the whole line box). 
+                 * The bounds of these DOMRect objects are computed using font metrics; thus, for horizontal writing, the vertical dimension of each box is determined by the font ascent and descent, 
+                 * and the horizontal dimension by the text advance width. The transforms that apply to the ancestors are applied. 
+                 */
+                if (node.nodeType == ENodeType.TEXT_NODE)
+                {
+                    /* XXX: Transforms logic needed here */
+                    if (Contains(node))
+                    {
+                        var r = FontMetrics.getTextRect(node, 0, node.nodeLength);
+                        rectList.AddLast(r);
+                    }
+                    else if (PartiallyContains(node))
+                    {
+                        if (comparePoint(node, 0) <= 0)// Node is slightly BEFORE the range
+                        {
+                            var r = FontMetrics.getTextRect(node, startOffset, startContainer.nodeLength - startOffset);
+                            rectList.AddLast(r);
+                        }
+                        else// Node must be slightly after the range
+                        {
+                            var r = FontMetrics.getTextRect(node, 0, endOffset);
+                            rectList.AddLast(r);
+                        }
+                    }
+                }
+
+                node = tree.nextNode();
+            }
+
+            return rectList;
+        }
+
+        public DOMRect getBoundingClientRect()
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-range-getboundingclientrect */
+            return DOMCommon.getBoundingClientRect(this.getClientRects());
+        }
+
+        #region ToString
         public override string ToString()
         {/* Docs: https://dom.spec.whatwg.org/#dom-range-stringifier */
             /* 2) If the context object’s start node is the context object’s end node and it is a Text node, then return the substring of that Text node’s data beginning at the context object’s start offset and ending at the context object’s end offset. */
@@ -750,5 +834,6 @@ namespace CssUI.DOM
 
             return sb.ToString();
         }
+        #endregion
     }
 }

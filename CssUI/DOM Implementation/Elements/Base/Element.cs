@@ -1,6 +1,7 @@
 ﻿using CssUI.CSS;
 using CssUI.DOM.Enums;
 using CssUI.DOM.Exceptions;
+using CssUI.DOM.Geometry;
 using CssUI.DOM.Internal;
 using CssUI.DOM.Mutation;
 using CssUI.DOM.Nodes;
@@ -50,10 +51,22 @@ namespace CssUI.DOM
             }
         }
 
+        /// <summary>
+        /// Tis elements custom element state
+        /// </summary>
+        public ECustomElement CustomElementState { get; protected set; } = ECustomElement.Undefined;
         public DOMTokenList classList { get; private set; }
 
         internal OrderedDictionary<AtomicName<EAttributeName>, Attr> AttributeList { get; private set; } = new OrderedDictionary<AtomicName<EAttributeName>, Attr>();
         public NamedNodeMap Attributes { get; private set; }
+        #endregion
+
+        #region CSS
+        /// <summary>
+        /// The layout box for this element
+        /// </summary>
+        internal CssLayoutBox Box;
+        public readonly ElementPropertySystem Style;
         #endregion
 
         #region Node Overrides
@@ -100,14 +113,14 @@ namespace CssUI.DOM
 
         public string id
         {/* The id attribute must reflect the "id" content attribute. */
-            get => this.getAttribute("id");
-            set => this.setAttribute("id", value);
+            get => this.getAttribute(EAttributeName.ID);
+            set => this.setAttribute(EAttributeName.ID, value);
         }
 
         public string className
         {/* The className attribute must reflect the "class" content attribute. */
-            get => this.getAttribute("class");
-            set => this.setAttribute("class", value);
+            get => this.getAttribute(EAttributeName.Class);
+            set => this.setAttribute(EAttributeName.Class, value);
         }
 
         public IEnumerable<string> getAttributeNames() => this.AttributeList.Select(a => a.Name);
@@ -115,24 +128,23 @@ namespace CssUI.DOM
         #endregion
 
         #region Slottable
-        private string _name = string.Empty;
         public string Name
         {/* Docs: https://dom.spec.whatwg.org/#slotable-name */
-            get => _name;
+            get => getAttribute(EAttributeName.Name);
 
             set
             {
-                var oldValue = getAttribute("name");
+                var oldValue = getAttribute(EAttributeName.Name);
                 if (0 == string.Compare(value, oldValue)) return;
                 if (value == null && oldValue.Count() <= 0) return;
                 if (value.Count() <= 0 && oldValue == null) return;
                 if (string.IsNullOrEmpty(value))
                 {
-                    _name = string.Empty;
+                    setAttribute(EAttributeName.Name, string.Empty);
                 }
                 else
                 {
-                    _name = value;
+                    setAttribute(EAttributeName.Name, value);
                 }
                 /* 6) If element is assigned, then run assign slotables for element’s assigned slot. */
                 if (this.isAssigned)
@@ -177,7 +189,7 @@ namespace CssUI.DOM
             this.localName = localName;
             this.prefix = prefix;
             this.NamespaceURI = Namespace;
-            this.classList = new DOMTokenList(this, "class");
+            this.classList = new DOMTokenList(this, EAttributeName.Class);
         }
         #endregion
 
@@ -211,7 +223,114 @@ namespace CssUI.DOM
         }
         #endregion
 
-        #region Utility
+        #region Internal States
+        /// <summary>
+        /// An element is being rendered if it has any associated CSS layout boxes, SVG layout boxes, or some equivalent in other styling languages.
+        /// </summary>
+        /// XXX: Implement this logic
+        internal virtual bool is_being_rendered { get { return true; } }
+
+
+        internal bool is_in_formal_activation_state
+        {/* Docs:  */
+            get
+            {
+                /*
+                 * An element is said to be in a formal activation state between the time the user begins to indicate an 
+                 * intent to trigger the element's activation behavior and either the time the user stops indicating an intent to trigger the element's activation behavior, 
+                 * or the time the element's activation behavior has finished running, which ever comes first.
+                 */
+                return is_actively_pointed_at;
+            }
+        }
+
+        /// <summary>
+        /// Returns if the user is indicating(hovering) at this element and their pointing device is in the "down" state
+        /// </summary>
+        internal bool is_actively_pointed_at
+        {/* Docs:  */
+            get
+            {
+                /*
+                 * An element is said to be being actively pointed at while the user indicates the element using a pointing device while that pointing device is in the "down" state 
+                 * (e.g. for a mouse, between the time the mouse button is pressed and the time it is depressed; for a finger in a multitouch environment, while the finger is touching the display surface).
+                 */
+            }
+        }
+
+        /// <summary>
+        /// Returns if the user is indicating (hovering overtop) this element with a pointing device
+        /// </summary>
+        internal bool is_designated
+        {/* Docs:  */
+            get
+            {
+                /*
+                 * An element that the user indicates using a pointing device.
+                 * An element that has a descendant that the user indicates using a pointing device.
+                 * An element that is the labeled control of a label element that is currently matching :hover.
+                 */
+                 return 
+            }
+        }
+
+        /// <summary>
+        /// Does this element currently have focus
+        /// </summary>
+        internal bool is_focused
+        {/* Docs:  */
+            get
+            {
+                /*
+                 * For the purposes of the CSS :focus pseudo-class, an element has the focus when its top-level browsing context has the system focus, 
+                 * it is not itself a browsing context container, and it is one of the elements listed in the focus chain of the currently focused area of the top-level browsing context.
+                 */
+                var focusedElement = ownerDocument.activeElement;
+                if (ReferenceEquals(this, focusedElement))
+                {
+                    return true;
+                }
+
+                IEnumerable<Node> focusChain = DOMCommon.Get_Focus_Chain(focusedElement);
+                foreach (Node node in focusChain)
+                {
+                    if (ReferenceEquals(this, node))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// A node (in particular elements and text nodes) can be marked as inert. 
+        /// When a node is inert, then the user agent must act as if the node was absent for the purposes of targeting user interaction events, 
+        /// may ignore the node for the purposes of text search user interfaces (commonly known as "find in page"), 
+        /// and may prevent the user from selecting text in that node. User agents should allow the user to override the restrictions on search and text selection, however.
+        /// </summary>
+        internal bool inert = false;
+        internal bool is_expressly_inert
+        {/* Docs:  */
+            get => (this.inert && !parentElement.inert);
+        }
+
+        /// <summary>
+        /// Is this element a properly defined element
+        /// </summary>
+        internal bool is_defined
+        {/* Docs: https://dom.spec.whatwg.org/#concept-element-defined */
+            get => CustomElementState == Enums.ECustomElement.Uncustomized || CustomElementState == Enums.ECustomElement.Custom;
+        }
+
+        internal bool is_shadowhost
+        {/* Docs: https://dom.spec.whatwg.org/#element-shadow-host */
+            get => !ReferenceEquals(null, shadowRoot);
+        }
+        #endregion
+
+        #region Internal Utility
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal bool find_attribute(AtomicName<EAttributeName> Name, out Attr outAttrib)
         {/* Docs: https://dom.spec.whatwg.org/#concept-element-attributes-get-by-namespace */
@@ -314,7 +433,7 @@ namespace CssUI.DOM
         }
         #endregion
 
-        #region Attribute Stuff
+        #region HTML Attribute Management
         public string getAttribute(AtomicName<EAttributeName> Name)
         {
             Attr attr = this.AttributeList[qualifiedName];
@@ -331,6 +450,12 @@ namespace CssUI.DOM
             /* 3) Return attr’s value. */
             return attr?.Value;
         }
+
+        public Attr getAttributeNode(AtomicName<EAttributeName> Name)
+        {
+            return this.AttributeList[Name];
+        }
+
         public Attr getAttributeNode(string qualifiedName)
         {
             qualifiedName = qualifiedName.ToLowerInvariant();
@@ -367,7 +492,7 @@ namespace CssUI.DOM
 
             change_attribute(attr, attr.Value, value);
         }
-
+        
         public Attr setAttributeNode(Attr attr)
         {
             find_attribute(attr.Name, out Attr oldAttr);
@@ -386,6 +511,15 @@ namespace CssUI.DOM
             return oldAttr;
         }
 
+        public void removeAttribute(AtomicName<EAttributeName> Name)
+        {
+            find_attribute(Name, out Attr attr);
+            if (!ReferenceEquals(attr, null))
+            {
+                remove_attribute(attr);
+            }
+        }
+
         public void removeAttribute(string qualifiedName)
         {
             find_attribute(qualifiedName, out Attr attr);
@@ -394,6 +528,7 @@ namespace CssUI.DOM
                 remove_attribute(attr);
             }
         }
+
         public Attr removeAttributeNode(Attr attr)
         {
             find_attribute(attr.Name, out Attr outAttr);
@@ -405,6 +540,35 @@ namespace CssUI.DOM
             return attr;
         }
 
+        public bool toggleAttribute(AtomicName<EAttributeName> Name, bool? force = null)
+        {
+            /* 1) If qualifiedName does not match the Name production in XML, then throw an "InvalidCharacterError" DOMException. */
+            /* 2) If the context object is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase. */
+            /* 3) Let attribute be the first attribute in the context object’s attribute list whose qualified name is qualifiedName, and null otherwise. */
+            find_attribute(Name, out Attr attr);
+            /* 4) If attribute is null, then: */
+            if (ReferenceEquals(null, attr))
+            {
+                /* 1) If force is not given or is true, create an attribute whose local name is qualifiedName, value is the empty string, and node document is the context object’s node document, then append this attribute to the context object, and then return true. */
+                if (!force.HasValue || force.Value)
+                {
+                    var newAttr = new Attr(Name, this.ownerDocument) { Value = string.Empty };
+                    append_attribute(newAttr);
+                    return true;
+                }
+                /* 2) Return false. */
+                return false;
+            }
+            /* 5) Otherwise, if force is not given or is false, remove an attribute given qualifiedName and the context object, and then return false. */
+            if (!force.HasValue || !force.Value)
+            {
+                remove_attribute(attr);
+                return false;
+            }
+            /* 6) Return true. */
+            return true;
+        }
+
         public bool toggleAttribute(string qualifiedName, bool? force = null)
         {
             /* 1) If qualifiedName does not match the Name production in XML, then throw an "InvalidCharacterError" DOMException. */
@@ -413,7 +577,7 @@ namespace CssUI.DOM
             /* 3) Let attribute be the first attribute in the context object’s attribute list whose qualified name is qualifiedName, and null otherwise. */
             find_attribute(qualifiedName, out Attr attr);
             /* 4) If attribute is null, then: */
-            if (ReferenceEquals(attr, null))
+            if (ReferenceEquals(null, attr))
             {
                 /* 1) If force is not given or is true, create an attribute whose local name is qualifiedName, value is the empty string, and node document is the context object’s node document, then append this attribute to the context object, and then return true. */
                 if (!force.HasValue || force.Value)
@@ -434,10 +598,31 @@ namespace CssUI.DOM
             /* 6) Return true. */
             return true;
         }
+
+        public bool hasAttribute(AtomicName<EAttributeName> Name)
+        {
+            if (this.AttributeList.TryGetValue(Name, out Attr attr))
+                return !ReferenceEquals(null, attr.Value);
+
+            return false;
+        }
+
+        public bool hasAttribute(AtomicName<EAttributeName> Name, out Attr outAttr)
+        {
+            if (this.AttributeList.TryGetValue(Name, out Attr attr))
+            {
+                outAttr = attr;
+                return !ReferenceEquals(null, attr.Value);
+            }
+
+            outAttr = null;
+            return false;
+        }
+
         public bool hasAttribute(string qualifiedName)
         {
-            if (this.AttributeList.TryGetValue(qualifiedName.ToLowerInvariant(), out Attr _))
-                return true;
+            if (this.AttributeList.TryGetValue(qualifiedName.ToLowerInvariant(), out Attr attr))
+                return !ReferenceEquals(null, attr.Value);
 
             return false;
         }
@@ -457,7 +642,7 @@ namespace CssUI.DOM
             /* 2) If s is failure, throw a "SyntaxError" DOMException. */
             if (ReferenceEquals(Selector, null))
             {
-                throw new SyntaxError("Could not parse selector.");
+                throw new DomSyntaxError("Could not parse selector.");
             }
             /* 3) Let elements be context object’s inclusive ancestors that are elements, in reverse tree order. */
             TreeWalker tree = new TreeWalker(this, ENodeFilterMask.SHOW_ELEMENT);
@@ -489,7 +674,7 @@ namespace CssUI.DOM
             /* 2) If s is failure, throw a "SyntaxError" DOMException. */
             if (ReferenceEquals(s, null))
             {
-                throw new SyntaxError("Could not parse selector.");
+                throw new DomSyntaxError("Could not parse selector.");
             }
             /* 3) Return true if the result of match a selector against an element, using s, element, and :scope element context object, returns success, and false otherwise. [SELECTORS4] */
             return s.Match(this, this);
@@ -531,42 +716,6 @@ namespace CssUI.DOM
         }
         #endregion
 
-        #region User Interaction
-        /// <summary>
-        /// Determines if this element can be interacted with
-        /// </summary>
-        public bool Disabled
-        {
-            get => hasAttribute("disabled");
-            set => toggleAttribute("disabled", value);
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        public bool Hidden
-        {
-            get => hasAttribute("hidden");
-            set => toggleAttribute("hidden", value);
-        }
-
-        protected bool click_in_progress = false;
-        /// <summary>
-        /// Acts as if the element was clicked.
-        /// </summary>
-        public void click()
-        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#dom-click */
-            if (Disabled)
-                return;
-
-            if (click_in_progress)
-                return;
-
-            click_in_progress = true;
-            EventCommon.fire_synthetic_mouse_event(new Events.EventName(Events.EEventName.Click), this, true);
-            click_in_progress = false;
-        }
-        #endregion
-
         #region Shadow DOM
         /* XXX: ShadowDOM stuff here */
         public ShadowRoot shadowRoot { get; private set; }
@@ -574,6 +723,48 @@ namespace CssUI.DOM
 
         // Docs: https://dom.spec.whatwg.org/#dom-element-attachshadow
         ShadowRoot attachShadow(ShadowRootInit init);
+        #endregion
+
+
+        #region Client Rects
+        public LinkedList<DOMRect> getClientRects()
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-element-getclientrects */
+            /* XXX: SVG layout box handling needed here */
+            LinkedList<DOMRect> Rects = new LinkedList<DOMRect>();
+            /* 1) If the element on which it was invoked does not have an associated layout box return an empty sequence and stop this algorithm. */
+            if (ReferenceEquals(null, this.Box))
+                return Rects;
+            /* 2) If the element has an associated SVG layout box return a sequence containing a single DOMRect object that describes the bounding box of the element as defined by the SVG specification, applying the transforms that apply to the element and its ancestors. */
+            /* 3) Return a sequence containing static DOMRect objects in content order, one for each box fragment, describing its border area (including those with a height or width of zero) with the following constraints: */
+            foreach (CssBoxFragment fragment in Box)
+            {
+                /* 1) Apply the transforms that apply to the element and its ancestors. */
+                /* 2) If the element on which the method was invoked has a computed value for the display property of table or inline-table include both the table box and the caption box, if any, but not the anonymous container box. */
+                /* 3) Replace each anonymous block box with its child box(es) and repeat this until no anonymous block boxes are left in the final list. */
+
+                /* XXX: Transforms must be applied here */
+                if (fragment is CssAnonymousBox anonymousBox)
+                {
+                    foreach(var child in anonymousBox)
+                    {
+                        var r = new DOMRect(child.Border.Left, child.Border.Top, child.Border.Width, child.Border.Height);
+                        Rects.AddLast(r);
+                    }
+                }
+                else
+                {
+                    var r = new DOMRect(fragment.Border.Left, fragment.Border.Top, fragment.Border.Width, fragment.Border.Height);
+                    Rects.AddLast(r);
+                }
+            }
+
+            return Rects;
+        }
+
+        public DOMRect getBoundingClientRect()
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-element-getboundingclientrect */
+            return DOMCommon.getBoundingClientRect(this.getClientRects());
+        }
         #endregion
     }
 }
