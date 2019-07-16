@@ -1,4 +1,5 @@
 ﻿using CssUI.CSS.Parser;
+using CssUI.CSS.Serialization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -10,18 +11,18 @@ namespace CssUI.CSS.Selectors
     /// </summary>
     public class SelectorParser
     {
-        readonly CssTokenStream Stream;
+        readonly TokenStream Stream;
 
         public SelectorParser(string SelectorString)
         {
             CssParser parser = new CssParser(SelectorString);
             List<CssToken> items = parser.Parse_ComponentValue_List();
 
-            this.Stream = new CssTokenStream(items);
+            this.Stream = new TokenStream(items);
         }
 
         #region Pre-Parsing
-        static ObjectStream<CssToken> Parse_Tokens(ObjectStream<CssToken> Stream)
+        static TokenStream Parse_Tokens(TokenStream Stream)
         {
             List<CssToken> List = new List<CssToken>();
             CssToken Token;
@@ -31,13 +32,13 @@ namespace CssUI.CSS.Selectors
                 List.Add(Token);
             }
             while (Token.Type != ECssTokenType.EOF);
-            return new ObjectStream<CssToken>(List, CssToken.EOF);
+            return new TokenStream(List, CssToken.EOF);
         }
         #endregion
 
         #region Pre-parse Consumption
 
-        static CssToken Consume_Token(ObjectStream<CssToken> Stream)
+        static CssToken Consume_Token(TokenStream Stream)
         {
             if (Starts_Combinator(Stream.Peek(0)))
             {
@@ -61,7 +62,7 @@ namespace CssUI.CSS.Selectors
             return Stream.Consume();
         }
 
-        static NamespacePrefixToken Consume_NamespacePrefix(ObjectStream<CssToken> Stream)
+        static NamespacePrefixToken Consume_NamespacePrefix(TokenStream Stream)
         {
             string Name = null;
 
@@ -90,7 +91,7 @@ namespace CssUI.CSS.Selectors
             return new NamespacePrefixToken(Name);
         }
 
-        static QualifiedNameToken Consume_QualifiedName(ObjectStream<CssToken> Stream)
+        static QualifiedNameToken Consume_QualifiedName(TokenStream Stream)
         {
             NamespacePrefixToken NS = null;
             if (Starts_NamespacePrefix(Stream.Next, Stream.NextNext))
@@ -105,7 +106,7 @@ namespace CssUI.CSS.Selectors
             return new QualifiedNameToken(Name, NS);
         }
 
-        static CombinatorToken Consume_Combinator(ObjectStream<CssToken> Stream)
+        static CombinatorToken Consume_Combinator(TokenStream Stream)
         {
             var ws = Stream.Consume_While(o => o.Type == ECssTokenType.Whitespace);
             string Value = string.Empty;
@@ -154,11 +155,13 @@ namespace CssUI.CSS.Selectors
         #endregion
 
         #region Token Checks
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static bool Is_Char(CssToken A, char CH)
         {
             return (A.Type == ECssTokenType.Delim && (A as DelimToken).Value == CH);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static bool Starts_Simple_Selector(CssToken A, CssToken B, CssToken C)
         {
             if (Starts_ID_Selector(A)) return true;
@@ -171,36 +174,43 @@ namespace CssUI.CSS.Selectors
             return false;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static bool Starts_ID_Selector(CssToken A)
         {
             return (A.Type == ECssTokenType.Hash && (A as HashToken).HashType == EHashTokenType.ID);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static bool Starts_Class_Selector(CssToken A, CssToken B)
         {
             return (Is_Char(A, '.') && B.Type == ECssTokenType.Ident);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static bool Starts_Attribute_Selector(CssToken A, CssToken B)
         {
             return (A.Type == ECssTokenType.SqBracket_Open && B.Type == ECssTokenType.QualifiedName);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static bool Starts_Pseudo_Class_Selector(CssToken A, CssToken B)
         {
             return (A.Type == ECssTokenType.Colon && (B.Type == ECssTokenType.Ident || B.Type == ECssTokenType.FunctionName));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static bool Starts_Pseudo_Element_Selector(CssToken A, CssToken B, CssToken C)
         {
             return (A.Type == ECssTokenType.Colon && B.Type == ECssTokenType.Colon && (C.Type == ECssTokenType.Ident || C.Type == ECssTokenType.FunctionName));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static bool Starts_Universal_Selector(CssToken A, CssToken B)
         {
             return (Is_Char(A, '*') || A.Type == ECssTokenType.NamespacePrefix && Is_Char(B, '*'));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static bool Starts_Type_Selector(CssToken A, CssToken B, CssToken C)
         {
             if (Starts_NamespacePrefix(A, B))
@@ -211,6 +221,7 @@ namespace CssUI.CSS.Selectors
             //return (A.Type == ECssTokenType.QualifiedName || A.Type == ECssTokenType.NamespacePrefix && B.Type == ECssTokenType.QualifiedName);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static bool Starts_NamespacePrefix(CssToken A, CssToken B)
         {
             if (B.Type == ECssTokenType.Column)
@@ -222,12 +233,14 @@ namespace CssUI.CSS.Selectors
             return (A.Type == ECssTokenType.Column);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static bool Starts_QualifiedName(CssToken A, CssToken B, CssToken C)
         {
             if (Starts_NamespacePrefix(A, B) && C.Type == ECssTokenType.Ident) return true;
             return (A.Type == ECssTokenType.Ident);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static bool Starts_Combinator(CssToken A)
         {
             if (A.Type == ECssTokenType.Whitespace) return true;// ' '
@@ -244,7 +257,7 @@ namespace CssUI.CSS.Selectors
         /// <summary>
         /// Consumes a list of complex selectors
         /// </summary>
-        public static ComplexSelector Consume_Single_Selector(CssTokenStream Stream)
+        public static ComplexSelector Consume_Single_Selector(TokenStream Stream)
         {
             return Consume_Complex_Selector(Stream);
         }
@@ -252,7 +265,7 @@ namespace CssUI.CSS.Selectors
         /// <summary>
         /// Consumes a list of complex selectors
         /// </summary>
-        public static IEnumerable<ComplexSelector> Consume_Selector_List(CssTokenStream Stream)
+        public static IEnumerable<ComplexSelector> Consume_Selector_List(TokenStream Stream)
         {
             ComplexSelector Selector;
             LinkedList<ComplexSelector> List = new LinkedList<ComplexSelector>();
@@ -284,7 +297,7 @@ namespace CssUI.CSS.Selectors
         /// Consumes a sequence of <see cref="RelativeSelector"/> consisting of compound selectors and their combinators (if available)
         /// </summary>
         /// <returns></returns>
-        private static ComplexSelector Consume_Complex_Selector(CssTokenStream Stream)
+        private static ComplexSelector Consume_Complex_Selector(TokenStream Stream)
         {
             RelativeSelector Selector;
             LinkedList<RelativeSelector> selectorList = new LinkedList<RelativeSelector>();
@@ -305,7 +318,7 @@ namespace CssUI.CSS.Selectors
         /// Consumes a single <see cref="CompoundSelector"/> and it's <see cref="ESelectorCombinator"/> (if available)
         /// </summary>
         /// <returns></returns>
-        private static RelativeSelector Consume_Relative_Selector(CssTokenStream Stream)
+        private static RelativeSelector Consume_Relative_Selector(TokenStream Stream)
         {
             Stream.Consume_While(tok => tok.Type == ECssTokenType.Whitespace);// Consume all of the prefixing whitespace
             CompoundSelector Compound = Consume_Compound_Selector(Stream);
@@ -351,7 +364,7 @@ namespace CssUI.CSS.Selectors
         /// Consumes a single <see cref="CompoundSelector"/>, which is a comprised of multiple <see cref="SimpleSelector"/>s
         /// </summary>
         /// <returns></returns>
-        private static CompoundSelector Consume_Compound_Selector(CssTokenStream Stream)
+        private static CompoundSelector Consume_Compound_Selector(TokenStream Stream)
         {
             SimpleSelector Simple;
             var selectorList = new LinkedList<SimpleSelector>();
@@ -373,7 +386,7 @@ namespace CssUI.CSS.Selectors
             return new CompoundSelector(selectorList);
         }
 
-        private static SimpleSelector Consume_Simple_Selector(CssTokenStream Stream)
+        private static SimpleSelector Consume_Simple_Selector(TokenStream Stream)
         {
             if (Starts_ID_Selector(Stream.Next))
             {
@@ -411,14 +424,16 @@ namespace CssUI.CSS.Selectors
 
         #region Selector Consumption
 
-        static IDSelector Consume_ID_Selector(CssTokenStream Stream)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static IDSelector Consume_ID_Selector(TokenStream Stream)
         {
             HashToken Hash = (Stream.Consume() as HashToken);
             if (Hash.HashType != EHashTokenType.ID) throw new CssParserException("Invalid Hash token, hash-type is not ID!");
             return new IDSelector(Hash.Value);
         }
 
-        static UniversalSelector Consume_Universal_Selector(CssTokenStream Stream)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static UniversalSelector Consume_Universal_Selector(TokenStream Stream)
         {
             if (Starts_NamespacePrefix(Stream.Next, Stream.NextNext))
             {
@@ -434,7 +449,8 @@ namespace CssUI.CSS.Selectors
             return new UniversalSelector();
         }
 
-        static TypeSelector Consume_Type_Selector(CssTokenStream Stream)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static TypeSelector Consume_Type_Selector(TokenStream Stream)
         {
             if (Starts_NamespacePrefix(Stream.Next, Stream.NextNext))
             {
@@ -445,7 +461,8 @@ namespace CssUI.CSS.Selectors
             return new TypeSelector(Stream.Consume<IdentToken>().Value);
         }
 
-        static ClassSelector Consume_Class_Selector(CssTokenStream Stream)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static ClassSelector Consume_Class_Selector(TokenStream Stream)
         {
             Stream.Consume();// Consume the '.' prefixing the classname
             IdentToken Ident = Stream.Consume<IdentToken>();
@@ -460,7 +477,8 @@ namespace CssUI.CSS.Selectors
         /// <para>'[' <qualified-name> <attr-matcher> [ <string-token> | <ident-token> ] <attr-modifier>? ']'</para>
         /// </summary>
         /// <returns></returns>
-        static AttributeSelector Consume_Attribute_Selector(CssTokenStream Stream)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static AttributeSelector Consume_Attribute_Selector(TokenStream Stream)
         {
             Stream.Consume();// Consume the '[' prefix
 
@@ -499,7 +517,8 @@ namespace CssUI.CSS.Selectors
         /// <para>':' <ident-token></para>
         /// <para>':' <function-token> <any-value> ')'</para>
         /// </summary>
-        static PseudoClassSelector Consume_Pseudo_Class_Selector(CssTokenStream Stream)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static PseudoClassSelector Consume_Pseudo_Class_Selector(TokenStream Stream)
         {
             Stream.Consume();// Consume the ':' prefix
             switch (Stream.Next.Type)
@@ -528,7 +547,8 @@ namespace CssUI.CSS.Selectors
         /// <para>'::' <ident-token></para>
         /// <para>'::' <function-token> <any-value> ')'</para>
         /// </summary>
-        static PseudoElementSelector Consume_Pseudo_Element_Selector(CssTokenStream Stream)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static PseudoElementSelector Consume_Pseudo_Element_Selector(TokenStream Stream)
         {
             Stream.Consume(2);// Consume the '::' prefix
             switch (Stream.Next.Type)

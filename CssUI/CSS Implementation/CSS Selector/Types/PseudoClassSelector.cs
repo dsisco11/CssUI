@@ -1,4 +1,6 @@
-﻿using CssUI.DOM;
+﻿using CssUI.CSS.Parser;
+using CssUI.CSS.Serialization;
+using CssUI.DOM;
 using CssUI.DOM.Nodes;
 using System;
 using System.Collections.Generic;
@@ -20,11 +22,11 @@ namespace CssUI.CSS.Selectors
         {
             if (string.Compare("not", Name) == 0)
             {
-                return new PseudoClassSelectorNegationFunction(Name, new CssTokenStream(Args));
+                return new PseudoClassSelectorNegationFunction(Name, new TokenStream(Args));
             }
             else if (Name.StartsWith("nth-"))
             {
-                return new PseudoClassSelectorAnBFunction(Name, new CssTokenStream(Args));
+                return new PseudoClassSelectorAnBFunction(Name, new TokenStream(Args));
             }
 
             return new PseudoClassSelectorFunction(Name, Args);

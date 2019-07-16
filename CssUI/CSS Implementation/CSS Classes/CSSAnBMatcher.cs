@@ -1,8 +1,8 @@
-﻿using System;
+﻿using CssUI.CSS.Parser;
+using CssUI.CSS.Serialization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CssUI.CSS
 {
@@ -24,11 +24,11 @@ namespace CssUI.CSS
         }
 
         /// <summary>
-        /// Consumes and returns an An+B token from a <see cref="CssTokenStream"/>
+        /// Consumes and returns an An+B token from a <see cref="TokenStream"/>
         /// </summary>
         /// <param name="Tokens"></param>
         /// <returns></returns>
-        public static CssAnBMatcher Consume(CssTokenStream Stream)
+        public static CssAnBMatcher Consume(ObjectStream<CssToken> Stream)
         {
             // TODO: Test An+B syntax parsing
             int A = 0;

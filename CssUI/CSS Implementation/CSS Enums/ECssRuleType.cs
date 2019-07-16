@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace CssUI.CSS.Internal
+﻿namespace CssUI.CSS.Internal
 {
-    public enum ECssRuleType : UInt16
+    public enum ECssRuleType : ushort
     {
         STYLE_RULE = 1,
         //CHARSET_RULE = 2, // historical

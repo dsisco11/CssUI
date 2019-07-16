@@ -1,5 +1,4 @@
-﻿
-namespace CssUI.CSS
+﻿namespace CssUI.CSS.Parser
 {
     /// <summary>
     /// Represents a token within an <see cref="CssTokenizer"/> instance.
@@ -24,22 +23,22 @@ namespace CssUI.CSS
         #region Equality Operators
         public static bool operator ==(CssToken A, CssToken B)
         {
-            bool Anull = object.ReferenceEquals(null, A);
-            bool Bnull = object.ReferenceEquals(null, B);
+            bool Anull = ReferenceEquals(null, A);
+            bool Bnull = ReferenceEquals(null, B);
             if (Anull ^ Bnull) return false;
             else if (Anull == Bnull) return true;
 
-            return (A.Type == B.Type);
+            return A.Type == B.Type;
         }
 
         public static bool operator !=(CssToken A, CssToken B)
         {
-            bool Anull = object.ReferenceEquals(null, A);
-            bool Bnull = object.ReferenceEquals(null, B);
+            bool Anull = ReferenceEquals(null, A);
+            bool Bnull = ReferenceEquals(null, B);
             if (Anull ^ Bnull) return true;
             else if (Anull == Bnull) return false;
 
-            return (A.Type != B.Type);
+            return A.Type != B.Type;
         }
 
         public override bool Equals(object o)
@@ -55,7 +54,7 @@ namespace CssUI.CSS
 
         public override int GetHashCode()
         {
-            return this.Encode().GetHashCode();
+            return Encode().GetHashCode();
         }
         #endregion
 
@@ -68,7 +67,7 @@ namespace CssUI.CSS
         #region ToString
         public override string ToString()
         {
-            return string.Concat("(", this.GetType().Name, ")", Encode());
+            return string.Concat("(", GetType().Name, ")", Encode());
         }
         #endregion
     }

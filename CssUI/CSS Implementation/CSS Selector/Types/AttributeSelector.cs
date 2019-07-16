@@ -1,4 +1,5 @@
-﻿using CssUI.DOM;
+﻿using CssUI.CSS.Parser;
+using CssUI.DOM;
 using CssUI.DOM.Nodes;
 using System;
 using System.Linq;

@@ -1,11 +1,13 @@
-﻿using CssUI.DOM;
+﻿using CssUI.CSS.Parser;
+using CssUI.CSS.Serialization;
+using CssUI.DOM;
 using CssUI.DOM.Nodes;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace CssUI.CSS.Selectors
 {
-    
+
     public class PseudoClassSelectorFunction : PseudoClassSelector
     {
         protected readonly List<CssToken> Args;
@@ -36,7 +38,7 @@ namespace CssUI.CSS.Selectors
         protected readonly CssAnBMatcher AnB;
         protected readonly IEnumerable<ComplexSelector> Selectors;
 
-        public PseudoClassSelectorAnBFunction(string Name, CssTokenStream Stream) : base(Name)
+        public PseudoClassSelectorAnBFunction(string Name, TokenStream Stream) : base(Name)
         {
             AnB = CssAnBMatcher.Consume(Stream);
             if (Stream.Next.Type == ECssTokenType.Ident && string.Compare("or", (Stream.Next as IdentToken).Value)==0)
@@ -70,7 +72,7 @@ namespace CssUI.CSS.Selectors
     {
         protected readonly ComplexSelector Selector;
 
-        public PseudoClassSelectorNegationFunction(string Name, CssTokenStream Stream) : base(Name)
+        public PseudoClassSelectorNegationFunction(string Name, TokenStream Stream) : base(Name)
         {
             Selector = SelectorParser.Consume_Single_Selector(Stream);
         }
