@@ -5,9 +5,9 @@ using System.Collections.Generic;
 namespace CssUI.CSS.Internal
 {
     /// <summary>
-    /// Holds all, the specification defined, information about the valid values for a property and how to resolve said values into an absolute form.
+    /// Holds all of, the specification defined, information about the valid values for a property and how to resolve said values into an absolute form.
     /// </summary>
-    public class CssPropertyDefinition
+    public class StyleDefinition
     {
 
         #region Properties
@@ -15,14 +15,6 @@ namespace CssUI.CSS.Internal
         /// CSS Name of the property
         /// </summary>
         public readonly AtomicString Name;
-        /// <summary>
-        /// List of all the style values this property can be assigned or <c>null</c> to ignore
-        /// </summary>
-        public readonly CssValue[] LegalValues = null;
-        /// <summary>
-        /// Syntax for assigning to this property within a style sheet
-        /// </summary>
-        public readonly string Syntax = null;
         /// <summary>
         /// Value for this property which is treated as the 'specified' value if the property definition does not have 'Inherited' (inherited by default) set to true or if the owning elements has no parent elements.
         /// </summary>
@@ -75,7 +67,7 @@ namespace CssUI.CSS.Internal
         /// <param name="DisallowedTypes">Bitmask of all value data types which cannot be assigned to this property</param>
         /// <param name="Keywords">List of keywords which can be assigned to this property</param>
         /// <param name="IsPrivate">If TRUE then this property cannot be set from style-sheets</param>
-        public CssPropertyDefinition(string Name, bool Inherited, EPropertyDirtFlags Flags, CssValue Initial, ECssValueType AllowedTypes = 0x0, ECssValueType DisallowedTypes = 0x0, string[] Keywords = null, bool IsPrivate = false, PercentageResolver Percentage_Resolver = null, params Tuple<ECssPropertyStage, PropertyResolverFunc>[] Resolvers)
+        public StyleDefinition(string Name, bool Inherited, EPropertyDirtFlags Flags, CssValue Initial, ECssValueType AllowedTypes = 0x0, ECssValueType DisallowedTypes = 0x0, string[] Keywords = null, bool IsPrivate = false, PercentageResolver Percentage_Resolver = null, params Tuple<ECssPropertyStage, PropertyResolverFunc>[] Resolvers)
         {
             this.Name = new AtomicString(Name);
             this.Flags = Flags;
@@ -105,14 +97,13 @@ namespace CssUI.CSS.Internal
 
         #endregion
 
-        #region Value Checking
-
+        #region Checks
         /// <summary>
         /// Returns whether the specified value is valid according to the currently set options
         /// </summary>
         /// <param name="Value"></param>
         /// <returns></returns>
-        public bool IsValidDataType(ECssValueType Type)
+        public bool Is_Valid_Value_Type(ECssValueType Type)
         {
             if (AllowedTypes != 0x0)
                 return 0 != (AllowedTypes & Type);
@@ -140,8 +131,8 @@ namespace CssUI.CSS.Internal
         /// <returns></returns>
         public void CheckAndThrow(ICssProperty Owner, CssValue Value)
         {
-            if (!IsValidDataType(Value.Type))
-                throw new CssException($"The property({Owner.CssName}) cannot be set to an {Enum.GetName(typeof(ECssValueType), Value.Type)}!");
+            if (!Is_Valid_Value_Type(Value.Type))
+                throw new CssException($"The property({Name}) cannot be set to an {Enum.GetName(typeof(ECssValueType), Value.Type)}!");
 
             switch (Value.Type)
             {
@@ -150,7 +141,7 @@ namespace CssUI.CSS.Internal
                         if (KeywordWhitelist != null && KeywordWhitelist.Count > 0)
                         {
                             if (!KeywordWhitelist.Contains(Value.Value as string))
-                                throw new CssException($"Property({Owner.CssName}) does not accept '{Value.Value as string}' as a value!");
+                                throw new CssException($"Property({Name}) does not accept '{Value.Value as string}' as a value!");
                         }
                     }
                     break;

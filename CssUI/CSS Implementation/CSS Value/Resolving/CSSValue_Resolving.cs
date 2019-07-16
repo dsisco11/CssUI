@@ -15,7 +15,7 @@ namespace CssUI.CSS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal CssValue Derive_SpecifiedValue(ICssProperty Property)
         {// SEE:  https://www.w3.org/TR/css-cascade-3/#specified
-            CssPropertyDefinition Def = Property.Definition;
+            StyleDefinition Def = Property.Definition;
 
             // CSS specs say if the cascade (assigned) resulted in a value, use it.
             if (!this.IsNull)
@@ -83,7 +83,7 @@ namespace CssUI.CSS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal CssValue Derive_ComputedValue(ICssProperty Property)
         {// SEE:  https://www.w3.org/TR/css-cascade-3/#computed
-            CssPropertyDefinition Def = Property.Definition;
+            StyleDefinition Def = Property.Definition;
 
             // Resolve any relative values
             switch (this.Type)

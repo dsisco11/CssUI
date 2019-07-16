@@ -32,7 +32,7 @@ namespace CssUI.CSS
         /// Returns the definition for this property
         /// </summary>
         /// <returns></returns>
-        CssPropertyDefinition Definition { get; }
+        StyleDefinition Definition { get; }
         #endregion
 
         #region Accessors

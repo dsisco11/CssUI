@@ -388,7 +388,7 @@ namespace CssUI
             else SetProperties.Add(Property.CssName);
 
             if (Property.CssName == null) throw new Exception(string.Concat("Cannot fire onChange events for unnamed property! (Name: ", Property.CssName, ")"));
-            var def = CssUI.Internal.CssProperties.Definitions[Property.CssName];
+            var def = CssUI.Internal.CssDefinitions.StyleDefinitions[Property.CssName];
             if (def == null) throw new Exception(string.Concat("Cannot find a definition for Css property: \"", Property.CssName, "\""));
 
             EPropertyDirtFlags Flags = def.Flags;

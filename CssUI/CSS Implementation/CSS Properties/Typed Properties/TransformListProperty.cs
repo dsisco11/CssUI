@@ -73,14 +73,14 @@ namespace CssUI
             }
         }
 
-        public CssPropertyDefinition Definition
+        public StyleDefinition Definition
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
                 if (string.IsNullOrEmpty(this.CssName))
                     return null;
-                return CssProperties.Definitions[this.CssName];
+                return CssDefinitions.StyleDefinitions[this.CssName];
             }
         }
         #endregion

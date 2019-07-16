@@ -52,7 +52,7 @@ namespace CssUI
                                  */
 
                                 // I can only assume this means we default to the property declerations default/initial value
-                                var def = CssProperties.Definitions[Property.CssName];
+                                var def = CssDefinitions.StyleDefinitions[Property.CssName];
                                 if (def != null)
                                 {
                                     return def.Initial.Resolve() ?? throw new CssException($"Failed to resolve the default value specified in the '{Property.CssName}' property decleration to a number!");
@@ -91,7 +91,7 @@ namespace CssUI
                                  */
 
                                 // I can only assume this means we default to the property declerations default/initial value
-                                var def = CssProperties.Definitions[Property.CssName];
+                                var def = CssDefinitions.StyleDefinitions[Property.CssName];
                                 if (def != null)
                                 {
                                     return def.Initial.Resolve() ?? throw new CssException($"Failed to resolve the default value specified in the '{Property.CssName}' property decleration to a number!");
