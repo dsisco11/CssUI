@@ -2,7 +2,6 @@
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CssUI.CSS.Internal;
-using CssUI.Internal;
 
 namespace CssUI.CSS
 {

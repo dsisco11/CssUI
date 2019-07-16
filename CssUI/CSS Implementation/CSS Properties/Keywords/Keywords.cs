@@ -2,7 +2,7 @@
 namespace CssUI.Internal
 {
     /// <summary>
-    /// Provides listing and translation of the CSS specification defined keyword for each property
+    /// Provides listing and translation of the CSS specification defined valid keywords for various properties
     /// </summary>
     public static class Keywords
     {

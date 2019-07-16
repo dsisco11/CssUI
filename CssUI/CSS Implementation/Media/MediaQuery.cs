@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CssUI.DOM;
+using System.Collections.Generic;
 
 namespace CssUI.CSS.Media
 {
@@ -18,5 +19,23 @@ namespace CssUI.CSS.Media
             Features = features;
         }
         #endregion
+
+        /// <summary>
+        /// Returns <c>true</c> if this query matches the given <see cref="Document"/>
+        /// </summary>
+        /// <param name="document">The document to test for a match against</param>
+        public bool Matches(Document document)
+        {
+            if (MediaType != EMediaType.All && MediaType != document.window.screen.MediaType)
+                return false;
+
+            foreach (MediaFeature feature in Features)
+            {
+                if (!feature.Matches(document))
+                    return false;
+            }
+
+            return true;
+        }
     }
 }

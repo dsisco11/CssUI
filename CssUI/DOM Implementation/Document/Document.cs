@@ -1,6 +1,7 @@
 ﻿using CssUI.DOM.Enums;
 using CssUI.DOM.Events;
 using CssUI.DOM.Exceptions;
+using CssUI.DOM.Media;
 using CssUI.DOM.Nodes;
 using System.Collections.Generic;
 using xLog;
@@ -9,6 +10,9 @@ namespace CssUI.DOM
 {
     public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEventCallbacks
     {/* Docs: https://dom.spec.whatwg.org/#document */
+        #region Tracking
+        internal LinkedList<MediaQueryList> _mediaQueryLists = new LinkedList<MediaQueryList>();
+        #endregion
 
         #region Properties
         internal ILogger Log = LogFactory.GetLogger(nameof(Document));
@@ -51,6 +55,15 @@ namespace CssUI.DOM
         }
         #endregion
 
+        #region Event Loops
+        internal void evaluate_media_queries_and_report_changes()
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#evaluate-media-queries-and-report-changes */
+            foreach(MediaQueryList mediaList in _mediaQueryLists)
+            {
+                mediaList.Evaluate();
+            }
+        }
+        #endregion
 
 
         #region DOM tree accessors
@@ -208,7 +221,6 @@ namespace CssUI.DOM
 
             return new ProcessingInstruction(this, target, data);
         }
-
         #endregion
 
         #region Internal States

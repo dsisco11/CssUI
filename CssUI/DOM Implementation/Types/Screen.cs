@@ -1,4 +1,6 @@
-﻿namespace CssUI.DOM
+﻿using CssUI.CSS.Media;
+
+namespace CssUI.DOM
 {
     /// <summary>
     /// Represents information about the screen of the output device
@@ -9,6 +11,7 @@
     {/* Docs: https://www.w3.org/TR/cssom-view-1/#the-screen-interface */
 
         #region Properties
+        public abstract EMediaType MediaType { get; }
         public abstract long availWidth { get; }
         public abstract long availHeight { get; }
         public abstract long width { get;  }

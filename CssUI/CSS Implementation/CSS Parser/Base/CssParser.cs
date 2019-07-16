@@ -632,10 +632,17 @@ namespace CssUI.CSS.Serialization
             /* This must be a range */
             var comparatorTok = (Stream.Consume() as ValuedTokenBase);
             string comparatorString = comparatorTok.Value.ToString();
-            EMediaFeatureComparator? comparator = CssLookup.Enum_From_Keyword<EMediaFeatureComparator>(comparatorString);
-            if (!comparator.HasValue)
+            char[] compBuf = comparatorString.ToCharArray();
+            EMediaFeatureComparator comparator = 0x0;
+            for(int i=0;i<comparatorString.Length; i++)
             {
-                throw new CssParserException($"Unable to interpret keyword \"{comparatorString}\" as enum value");
+                EMediaFeatureComparator? lookup = CssLookup.Enum_From_Keyword<EMediaFeatureComparator>(compBuf[i].ToString());
+                if (!lookup.HasValue)
+                {
+                    throw new CssParserException($"Unable to interpret keyword \"{comparatorString}\" as enum value");
+                }
+
+                comparator |= lookup.Value;
             }
 
             Consume_All_Whitespace(Stream);
@@ -646,7 +653,7 @@ namespace CssUI.CSS.Serialization
             CssValue rangeValue = Consume_CssValue(Stream);
 
 
-            return new MediaFeature(Name.Value, comparator.Value, rangeValue);
+            return new MediaFeature(Name.Value, comparator, rangeValue);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

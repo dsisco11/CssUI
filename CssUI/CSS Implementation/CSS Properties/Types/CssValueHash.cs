@@ -1,7 +1,5 @@
-﻿using CssUI.CSS;
-using System;
-
-namespace CssUI.Internal
+﻿
+namespace CssUI.CSS.Internal
 {
     /// <summary>
     /// Stores the hash for a <see cref="CssValue"/> for later comparison
@@ -15,7 +13,7 @@ namespace CssUI.Internal
         public bool HasValue { get; private set; } = false;
 
         public int Hash { get; private set; } = 0;
-        
+
         /// <summary>
         /// How many times this hash has been changed
         /// </summary>
@@ -29,7 +27,7 @@ namespace CssUI.Internal
         }
         public CssValueHash(CssValue Value)
         {
-            this.Hash = Value.GetHashCode();
+            Hash = Value.GetHashCode();
         }
         #endregion
 
@@ -38,32 +36,32 @@ namespace CssUI.Internal
         {
             if (ReferenceEquals(Value, null))
             {
-                this.Hash = 0;
+                Hash = 0;
                 HasValue = false;
             }
             else
             {
                 HasValue = true;
-                this.Hash = Value.GetHashCode();
+                Hash = Value.GetHashCode();
                 ChangeCount++;
             }
         }
         #endregion
 
         #region Operators
-        public static bool operator == (CssValueHash Hash, object o)
+        public static bool operator ==(CssValueHash Hash, object o)
         {
             return !ReferenceEquals(o, null) && Hash.Hash == o.GetHashCode();
         }
 
         public static bool operator !=(CssValueHash Hash, object o)
         {
-            return  ReferenceEquals(o, null) || Hash.Hash != o.GetHashCode();
+            return ReferenceEquals(o, null) || Hash.Hash != o.GetHashCode();
         }
 
         public override int GetHashCode()
         {
-            return this.Hash;
+            return Hash;
         }
 
         public override bool Equals(object obj)
