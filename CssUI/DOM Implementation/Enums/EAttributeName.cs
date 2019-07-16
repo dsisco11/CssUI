@@ -11,9 +11,25 @@ namespace CssUI.DOM
 
         [DomKeyword("")]
         CUSTOM = -1,
+        [DomKeyword("id")]
+        ID = 0,
+        [DomKeyword("name")]
+        Name,
+        [DomKeyword("class")]
+        Class,
         [DomKeyword("contenteditable")]
         ContentEditable,
         [DomKeyword("draggable")]
         Draggable,
+        [DomKeyword("tabindex")]
+        TabIndex,
+        [DomKeyword("disabled")]
+        Disabled,
+        [DomKeyword("hidden")]
+        Hidden,
+        [DomKeyword("href")]
+        HREF,
+        [DomKeyword("type")]
+        Type,
     }
 }

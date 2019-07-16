@@ -287,14 +287,14 @@ namespace CssUI
         #endregion
 
         #region Box
-        public readonly CssBox Box;
+        public readonly CssLayoutBox Box;
         #endregion
 
         #region Blocks
         /// <summary>
         /// The area for an element that dictates the area it's content may be drawn in, or NULL if no clipping should be used
         /// </summary>
-        public cssBoxArea ClippingArea = null;
+        public CssBoxArea ClippingArea = null;
 
 
         /// <summary>
@@ -644,7 +644,7 @@ namespace CssUI
 
         private cssElement(Document document) : base(document, CssTagName, null, null)
         {
-            Box = new CssBox(this);
+            Box = new CssLayoutBox(this);
 
             if (this is cssRootElement)
                 Root = (cssRootElement)this;
@@ -972,7 +972,7 @@ namespace CssUI
             /// <summary>
             /// Transforms a point from absolute(screen) space into local space relative to the specified block.
             /// </summary>
-            public Vec2i PointToLocal(cssBoxArea area, Vec2i Point)
+            public Vec2i PointToLocal(CssBoxArea area, Vec2i Point)
             {
                 return (Point - area.Get_Pos());
             }
@@ -980,7 +980,7 @@ namespace CssUI
             /// <summary>
             /// Transforms a point from local space relative to the specified block into absolute screen-space.
             /// </summary>
-            public Vec2i PointToScreen(cssBoxArea area, Vec2i Point)
+            public Vec2i PointToScreen(CssBoxArea area, Vec2i Point)
             {
                 return (Point + area.Get_Pos());
             }

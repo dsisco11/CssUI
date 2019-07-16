@@ -177,7 +177,7 @@ namespace CssUI
         /// </summary>
         protected override void Handle_Layout()
         {
-            cssBoxArea Content_Bounds = null;
+            CssBoxArea Content_Bounds = null;
             // Layout all of our controls
             Content_Bounds = Get_Layout()?.Handle(this, Children.ToArray());
 
@@ -202,7 +202,7 @@ namespace CssUI
         /// Returns the area which our controls actually inhabit
         /// </summary>
         /// <param name="Contents_Block"></param>
-        protected void Get_Contents_Occupied_Area(out cssBoxArea Contents_Block)
+        protected void Get_Contents_Occupied_Area(out CssBoxArea Contents_Block)
         {
             int? Left = null, Top = null;
             int? Right = null, Bottom = null;
@@ -223,7 +223,7 @@ namespace CssUI
             int R = MathExt.Max(0, Right.HasValue ? Right.Value : 0);
             int B = MathExt.Max(0, Bottom.HasValue ? Bottom.Value : 0);
             int L = MathExt.Max(0, Left.HasValue ? Left.Value : 0);
-            Contents_Block = new cssBoxArea(T, R, B, L);
+            Contents_Block = new CssBoxArea(T, R, B, L);
         }
         #endregion
 

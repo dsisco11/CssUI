@@ -135,6 +135,19 @@ namespace CssUI.DOM
             }
         }
 
+
+        #region Internal States
+        /// <summary>
+        /// A node (in particular elements and text nodes) can be marked as inert. 
+        /// When a node is inert, then the user agent must act as if the node was absent for the purposes of targeting user interaction events, 
+        /// may ignore the node for the purposes of text search user interfaces (commonly known as "find in page"), 
+        /// and may prevent the user from selecting text in that node. User agents should allow the user to override the restrictions on search and text selection, however.
+        /// </summary>
+        internal bool inert = false;
+        //internal bool is_expressly_inert => (this.inert && !(parentNode is Element E && E.inert) && !(parentNode is Text T && T.inert));
+        internal bool is_expressly_inert => (this.inert && !parentElement.inert);
+        #endregion
+
         #region Internal Utility
         /// <summary>
         /// Returns all of the directly adjacent <see cref="Text"/> nodes to the specified node

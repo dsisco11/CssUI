@@ -1,8 +1,8 @@
 ﻿namespace CssUI.DOM.Exceptions
 {
-    public class SyntaxError : DOMException
+    public class DomSyntaxError : DOMException
     {
-        public SyntaxError(string message = "")
+        public DomSyntaxError(string message = "")
             : base(message, "SyntaxError")
         {
         }

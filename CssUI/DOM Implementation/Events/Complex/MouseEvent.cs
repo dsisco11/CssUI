@@ -66,6 +66,22 @@ namespace CssUI.DOM.Events
         public readonly bool modifierSymbolLock = false;
         #endregion
 
+        #region Accessors
+        public long x => clientX;
+        public long y => clientY;
+
+        public long pageX
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-mouseevent-pagex */
+            get
+            {
+                if (0 != (Flags & EEventFlags.Dispatch))
+                {
+
+                }
+            }
+        }
+        #endregion
+
         #region Constructors
         public MouseEvent(EEventName type, MouseEventInit eventInit)  : base(type, eventInit)
         {

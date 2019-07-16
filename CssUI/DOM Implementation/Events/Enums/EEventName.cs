@@ -193,5 +193,6 @@ namespace CssUI.DOM.Events
 
         [DomKeyword("slotchange")]
         SlotChange,
+
     }
 }

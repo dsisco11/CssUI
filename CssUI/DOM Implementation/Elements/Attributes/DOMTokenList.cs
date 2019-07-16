@@ -23,11 +23,11 @@ namespace CssUI.DOM
         /// <summary>
         /// Name of the attribute this token list represents
         /// </summary>
-        public readonly AtomicString localName;
+        public readonly AtomicName<EAttributeName> localName;
         #endregion
 
         #region Constructor
-        public DOMTokenList(Element ownerElement, AtomicString localName)
+        public DOMTokenList(Element ownerElement, AtomicName<EAttributeName> localName)
         {
             /* 1) Let element be associated element. */
             this.ownerElement = ownerElement;
@@ -127,7 +127,7 @@ namespace CssUI.DOM
             {
                 /* 1) If token is the empty string, then throw a "SyntaxError" DOMException. */
                 if (string.IsNullOrEmpty(token))
-                    throw new SyntaxError();
+                    throw new DomSyntaxError();
                 /* 2) If token contains any ASCII whitespace, then throw an "InvalidCharacterError" DOMException. */
                 bool hasWhitespace = default(char) != token.ToString().ToCharArray().SingleOrDefault(c => ASCIICommon.Is_Ascii_Whitespace(c));
                 if (hasWhitespace)
@@ -151,7 +151,7 @@ namespace CssUI.DOM
             {
                 /* 1) If token is the empty string, then throw a "SyntaxError" DOMException. */
                 if (string.IsNullOrEmpty(token))
-                    throw new SyntaxError("Token cannot be null.");
+                    throw new DomSyntaxError("Token cannot be null.");
                 /* 2) If token contains any ASCII whitespace, then throw an "InvalidCharacterError" DOMException. */
                 bool hasWhitespace = default(char) != token.ToString().ToCharArray().SingleOrDefault(c => ASCIICommon.Is_Ascii_Whitespace(c));
                 if (hasWhitespace)
@@ -171,7 +171,7 @@ namespace CssUI.DOM
             /* The toggle(token, force) method, when invoked, must run these steps: */
             /* 1) If token is the empty string, then throw a "SyntaxError" DOMException. */
             if (string.IsNullOrEmpty(token))
-                throw new SyntaxError("Token cannot be null or empty.");
+                throw new DomSyntaxError("Token cannot be null or empty.");
             /* 2) If token contains any ASCII whitespace, then throw an "InvalidCharacterError" DOMException. */
             bool hasWhitespace = default(char) != token.ToString().ToCharArray().SingleOrDefault(c => ASCIICommon.Is_Ascii_Whitespace(c));
             if (hasWhitespace)
@@ -203,7 +203,7 @@ namespace CssUI.DOM
             /* The replace(token, newToken) method, when invoked, must run these steps: */
             /* 1) If token is the empty string, then throw a "SyntaxError" DOMException. */
             if (string.IsNullOrEmpty(token))
-                throw new SyntaxError("Token cannot be null or empty.");
+                throw new DomSyntaxError("Token cannot be null or empty.");
             /* 2) If token contains any ASCII whitespace, then throw an "InvalidCharacterError" DOMException. */
             bool hasWhitespace = default(char) != token.ToString().ToCharArray().SingleOrDefault(c => ASCIICommon.Is_Ascii_Whitespace(c));
             if (hasWhitespace)

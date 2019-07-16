@@ -1,5 +1,7 @@
 ﻿using CssUI.DOM.Events;
 using CssUI.DOM.Exceptions;
+using CssUI.DOM.Internal;
+using CssUI.DOM.Serialization;
 
 namespace CssUI.DOM
 {
@@ -15,11 +17,6 @@ namespace CssUI.DOM
         public string dir;
         public readonly DOMStringMap dataset;
         public string nonce;
-
-        /// <summary>
-        /// Specifies the tab index of this element, that is its selection order when a user cycles through selecting elements by pressing tab
-        /// </summary>
-        public long tabIndex;
         #endregion
 
         #region Constructors
@@ -30,18 +27,202 @@ namespace CssUI.DOM
         #endregion
 
 
+        #region Internal
+        internal bool tabindex_focus_flag = true;
+
+        /// <summary>
+        /// This definition is used to determine what elements can be focused and which elements match the :enabled and :disabled pseudo-classes.
+        /// </summary>
+        internal bool is_actually_disabled
+        {
+            get
+            {
+                switch (tagName)
+                {
+                    case "button":
+                    case "input":
+                    case "select":
+                    case "textarea":
+                    case "optgroup":
+                    case "option":
+                    case "fieldset":
+                        return this.Disabled;
+                    default:
+                        return false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Does this element match the ':active' pseudoclass
+        /// </summary>
+        internal bool is_being_activated
+        {/* Docs: https://html.spec.whatwg.org/multipage/semantics-other.html#concept-selector-active */
+            get
+            {
+                switch (localName)
+                {
+                    case "input":
+                        {
+                            string inputType = getAttribute(EAttributeName.Type);
+                            if (inputType.Equals("submit") || inputType.Equals("image") || inputType.Equals("reset") || inputType.Equals("button"))
+                            {
+                                return !Disabled && is_in_formal_activation_state;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
+                    case "button":
+                        {
+                            return !Disabled && is_in_formal_activation_state;
+                        }
+                    case "a":
+                    case "area":
+                    case "link":
+                        return hasAttribute(EAttributeName.HREF);
+                }
+                /*
+                 * If the element has its tabindex focus flag set
+                 * The element is being activated if it is in a formal activation state. 
+                 */
+                if (tabindex_focus_flag)
+                {
+                    return is_in_formal_activation_state;
+                }
+
+                /* - If the element has a descendant that is currently matching the :active pseudo-class */
+                var tree = new TreeWalker(this, Enums.ENodeFilterMask.SHOW_ELEMENT, FilterIsActive.Instance);
+                if (!ReferenceEquals(null, tree.nextNode()))
+                    return true;
+
+                /* If the element is being actively pointed at */
+                return is_actively_pointed_at;
+            }
+
+        }
+        #endregion
+
         #region User Interaction
-        public bool hidden;
-        public void click();
-        public void focus(FocusOptions options);
+        /// <summary>
+        /// Specifies the tab index of this element, that is its selection order when a user cycles through selecting elements by pressing tab
+        /// </summary>
+        public int TabIndex
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#attr-tabindex */
+            get
+            {
+                tabindex_focus_flag = false;
+                string attrValue = getAttribute(EAttributeName.ContentEditable);
+                int? parsed = null;
+                if (!string.IsNullOrEmpty(attrValue))
+                    parsed = DOMParser.Parse_Integer(attrValue);
+
+                if (!parsed.HasValue)
+                {
+                    /*
+                     * Modulo platform conventions, it is suggested that for the following elements, the tabindex focus flag be set:
+                     * 
+                     * - a elements that have an href attribute
+                     * - link elements that have an href attribute
+                     * - button elements
+                     * - input elements whose type attribute are not in the Hidden state
+                     * - select elements
+                     * - textarea elements
+                     * - summary elements that are the first summary element child of a details element
+                     * - Elements with a draggable attribute set, if that would enable the user agent to allow the user to begin a drag operations for those elements without the use of a pointing device
+                     * 
+                     */
+                    if (this.Draggable)
+                        tabindex_focus_flag = true;
+                }
+                else if (parsed.Value < 0)
+                {
+                    /* The user agent must set the element's tabindex focus flag, but should omit the element from the sequential focus navigation order. */
+                    tabindex_focus_flag = true;
+                }
+                else if (parsed.Value == 0)
+                {
+                    /* The user agent must set the element's tabindex focus flag, should allow the element and any focusable areas that have the element as their DOM anchor to be reached using sequential focus navigation, following platform conventions to determine the element's relative position in the sequential focus navigation order. */
+                    tabindex_focus_flag = true;
+                }
+                else if (parsed.Value > 0)
+                {
+                    /*  */
+                    tabindex_focus_flag = true;
+                }
+
+                return parsed.Value;
+            }
+            set
+            {
+                setAttribute(EAttributeName.TabIndex, value.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Determines if this element can be interacted with
+        /// </summary>
+        public bool Disabled
+        {
+            get => hasAttribute(EAttributeName.Disabled);
+            set => toggleAttribute(EAttributeName.Disabled, value);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool Hidden
+        {
+            get => hasAttribute(EAttributeName.Hidden);
+            set => toggleAttribute(EAttributeName.Hidden, value);
+        }
+
+        protected bool click_in_progress = false;
+        /// <summary>
+        /// Acts as if the element was clicked.
+        /// </summary>
+        public void click()
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#dom-click */
+            if (Disabled)
+                return;
+
+            if (click_in_progress)
+                return;
+
+            click_in_progress = true;
+            EventCommon.fire_synthetic_mouse_event(new Events.EventName(Events.EEventName.Click), this, true);
+            click_in_progress = false;
+        }
+
+
+        private bool locked_for_focus = false;
+        public void Focus(FocusOptions options)
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#dom-focus */
+            if (locked_for_focus) return;
+            locked_for_focus = true;
+
+            if (!DOMCommon.Is_Focusable(this))
+            {
+
+            }
+        }
+
         // public void blur(); /* "User agents are encouraged to ignore calls to this blur() method entirely." - https://html.spec.whatwg.org/multipage/interaction.html#dom-window-blur */
+
         public string accessKey;
         public string accessKeyLabel { get; private set; }
-        public bool draggable
+
+        public bool Draggable
         {/* Docs: https://html.spec.whatwg.org/multipage/dnd.html#the-draggable-attribute */
             get
             {
-                string attrValue = getAttribute(EAttributeName.Draggable);
+                if (!hasAttribute(EAttributeName.Draggable, out Attr attr))
+                {
+                    return false;
+                }
+
+                string attrValue = attr.Value;
                 if (attrValue == "true")
                 {
                     return true;
@@ -58,6 +239,7 @@ namespace CssUI.DOM
                 setAttribute(EAttributeName.Draggable, value ? "true" : "false");
             }
         }
+
         public bool spellcheck;
         public string autocapitalize;
 
@@ -71,7 +253,7 @@ namespace CssUI.DOM
         /// Can be set, to change that state.
         /// Throws a "SyntaxError" DOMException if the new value isn't one of those strings.
         /// </summary>
-        public string contentEditable
+        public string ContentEditable
         {
             /* Docs: https://html.spec.whatwg.org/multipage/interaction.html#attr-contenteditable */
             get => getAttribute(EAttributeName.ContentEditable);
@@ -81,7 +263,7 @@ namespace CssUI.DOM
                     value = string.Empty;
 
                 if (value!="true" && value!="false" && value!="inherit")
-                    throw new SyntaxError("This attribute only accepts values of \"true\", \"false\", or \"inherit\"");
+                    throw new DomSyntaxError("This attribute only accepts values of \"true\", \"false\", or \"inherit\"");
 
                 setAttribute(EAttributeName.ContentEditable, value);
             }
@@ -94,7 +276,12 @@ namespace CssUI.DOM
         {
             get
             {
-                string attrValue = getAttribute(EAttributeName.ContentEditable);
+                if (!hasAttribute(EAttributeName.ContentEditable, out Attr attr))
+                {
+                    return false;
+                }
+
+                string attrValue = attr.Value;
                 if (attrValue == "true")
                 {
                     return true;

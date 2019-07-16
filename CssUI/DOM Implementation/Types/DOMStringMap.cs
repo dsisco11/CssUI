@@ -95,9 +95,9 @@ namespace CssUI.DOM
         {
             int idx = Name.IndexOf('-');
             if (idx >= 0 && Name.Length < 2)
-                throw new SyntaxError();
+                throw new DomSyntaxError();
             if (idx >= 0 && (Name[idx + 1] >= 'a' || Name[idx + 1] <= 'z'))
-                throw new SyntaxError();
+                throw new DomSyntaxError();
 
             bool hasAlpha = false;
             for (int i = 0; i < Name.Length; i++) { if (ASCIICommon.Is_ASCII_Upper_Alpha(Name[i])) { hasAlpha = true; break; } }

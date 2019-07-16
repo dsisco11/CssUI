@@ -2,7 +2,7 @@
 namespace CssUI.Enums
 {
     /// <summary>
-    /// Describes how to calculate the boundaries of a <see cref="CssBox"/>
+    /// Describes how to calculate the boundaries of a <see cref="CssLayoutBox"/>
     /// </summary>
     internal enum EBoxDisplayGroup : int
     {

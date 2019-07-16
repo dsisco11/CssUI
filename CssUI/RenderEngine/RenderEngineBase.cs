@@ -1,4 +1,6 @@
 ﻿
+using CssUI.CSS;
+
 namespace CssUI
 {
 
@@ -181,7 +183,7 @@ namespace CssUI
         /// </summary>
         /// <param name="LineThickness">Thickness of the line in pixels</param>
         /// <param name="Rect">A rectangular area</param>
-        public abstract void Draw_Rect(int LineThickness, cssRect Rect);
+        public abstract void Draw_Rect(int LineThickness, CssRect Rect);
         /// <summary>
         /// Outlines a rectangular area with the currently set color
         /// </summary>
@@ -237,7 +239,7 @@ namespace CssUI
         /// Fills a rectangular area with the currently set color
         /// </summary>
         /// <param name="Rect">A  rectangular area</param>
-        public abstract void Fill_Rect(cssRect Rect);
+        public abstract void Fill_Rect(CssRect Rect);
         /// <summary>
         /// Fills a rectangular area with the currently set color
         /// </summary>

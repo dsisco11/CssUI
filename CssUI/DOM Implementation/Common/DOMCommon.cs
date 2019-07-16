@@ -10,6 +10,7 @@ using CssUI.DOM.Events;
 using CssUI.DOM.Internal;
 using System;
 using CssUI.Internal;
+using CssUI.DOM.Geometry;
 
 namespace CssUI.DOM
 {
@@ -86,6 +87,49 @@ namespace CssUI.DOM
         }
         #endregion
 
+        #region Checks
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Focusable(HTMLElement element)
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#focusable-area */
+            if (element.tabindex_focus_flag && !element.is_actually_disabled && !element.is_expressly_inert && element.is_being_rendered)
+                return true;
+
+            /* XXX: add others */
+
+            return false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Has_Focus(Document target)
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#has-focus-steps */
+            return true;
+        }
+
+        /// <summary>
+        /// Returns the chain of focus up through the hierarchy from the given node to it's owning document
+        /// </summary>
+        /// <param name="subject"></param>
+        /// <returns></returns>
+        public static IEnumerable<Node> Get_Focus_Chain(Node subject)
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#focus-chain */
+            var output = new LinkedList<Node>();
+            if (ReferenceEquals(null, subject))
+                return output;
+
+            output.AddLast(subject);
+            var tree = new TreeWalker(subject, ENodeFilterMask.SHOW_ALL);
+            Node node = tree.parentNode();
+            while (!ReferenceEquals(null, node))
+            {
+                output.AddLast(node);
+                node = tree.parentNode();
+            }
+
+            return output;
+        }
+        #endregion
+
         #region Ordered Sets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string Serialize_Ordered_Set(IEnumerable<string> set)
@@ -99,7 +143,33 @@ namespace CssUI.DOM
             return input.Split('\u0020').ToArray();
         }
         #endregion
-        
+
+        #region Geometry
+        /// <summary>
+        /// Returns the encompasing bounds of a list of <see cref="DOMRect"/>s
+        /// </summary>
+        /// <param name="Rects"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static DOMRect getBoundingClientRect(IEnumerable<DOMRect> Rects)
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-element-getboundingclientrect */
+            if (!Rects.Any())
+                return new DOMRect(0, 0, 0, 0);
+
+            /* 3) Otherwise, return a static DOMRect object describing the smallest rectangle that includes the first rectangle in list and all of the remaining rectangles of which the height or width is not zero. */
+            double? top = null, right = null, bottom = null, left = null;
+            foreach (var rect in Rects)
+            {
+                top = !top.HasValue ? rect.top : MathExt.Min(top.Value, rect.top);
+                right = !right.HasValue ? rect.right : MathExt.Max(right.Value, rect.right);
+                bottom = !bottom.HasValue ? rect.bottom : MathExt.Max(bottom.Value, rect.bottom);
+                left = !left.HasValue ? rect.left : MathExt.Min(left.Value, rect.left);
+            }
+
+            return new DOMRect(left.Value, top.Value, (right.Value - left.Value), (bottom.Value - top.Value));
+        }
+        #endregion
+
         #region CSS Selectors
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -111,7 +181,7 @@ namespace CssUI.DOM
             /* 2) If s is failure, throw a "SyntaxError" DOMException. */
             if (ReferenceEquals(null, Selector))
             {
-                throw new SyntaxError("Could not parse selector.");
+                throw new DomSyntaxError("Could not parse selector.");
             }
             /* 3) Return the result of match a selector against a tree with s and node’s root using scoping root node. [SELECTORS4]. */
             return Selector.Match_Against_Tree(new Node[] { node }, node.getRootNode());

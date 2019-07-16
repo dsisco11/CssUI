@@ -8,7 +8,7 @@ namespace CssUI.DOM
     public static class ASCIICommon
     {
         /// <summary>
-        /// True id char is an ASCII whitespace character
+        /// True if char is an ASCII whitespace character
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
@@ -29,6 +29,39 @@ namespace CssUI.DOM
         }
 
         /// <summary>
+        /// True if char is an ASCII digit character
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Ascii_Alphanumeric(char c)
+        {
+            return Is_Ascii_Digit(c) || Is_ASCII_Lower_Alpha(c) || Is_ASCII_Upper_Alpha(c);
+        }
+
+        /// <summary>
+        /// True if char is an ASCII digit character
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Ascii_Digit(char c)
+        {
+            return c >= '\u0030' && c <= '\u0039';
+        }
+
+        /// <summary>
+        /// True if char is an ASCII digit character
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Ascii_Alpha(char c)
+        {
+            return Is_ASCII_Lower_Alpha(c) || Is_ASCII_Upper_Alpha(c);
+        }
+
+        /// <summary>
         /// True if char is ASCII alpha lowercase character
         /// </summary>
         /// <param name="c"></param>
@@ -36,7 +69,7 @@ namespace CssUI.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_ASCII_Lower_Alpha(char c)
         {
-            return (c >= 'a' && c <= 'z');
+            return (c >= '\u0061' && c <= '\u007A');
         }
 
         /// <summary>
@@ -47,7 +80,7 @@ namespace CssUI.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_ASCII_Upper_Alpha(char c)
         {
-            return (c >= 'A' && c <= 'Z');
+            return (c >= '\u0041' && c <= '\u005A');
         }
 
         /// <summary>
@@ -95,7 +128,7 @@ namespace CssUI.DOM
             if (!Is_ASCII_Upper_Alpha(c))
                 return c;
 
-            return (char)('a' + (c - 'A'));
+            return (char)('\u0061' + (c - '\u0041'));
         }
 
         /// <summary>
@@ -109,7 +142,7 @@ namespace CssUI.DOM
             if (!Is_ASCII_Lower_Alpha(c))
                 return c;
 
-            return (char)('A' + (c - 'a'));
+            return (char)('\u0041' + (c - '\u0061'));
         }
     }
 }

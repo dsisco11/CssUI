@@ -1,4 +1,5 @@
 ﻿using CssUI.DOM.Events;
+using CssUI.DOM.Media;
 using CssUI.DOM.Mutation;
 using CssUI.DOM.Nodes;
 using System;
@@ -14,7 +15,66 @@ namespace CssUI.DOM
     public class Window : EventTarget, IGlobalEventCallbacks, IWindowEventCallbacks
     {/* Docs: https://html.spec.whatwg.org/multipage/window-object.html#window */
 
+        #region Properties
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Name { get; private set; } = "CssUI v0.0.1";/* XXX: add something here to embed the actual version number upon compiling */
         public Document document { get; private set; }
+
+        /// <summary>
+        /// Determines the area of the document being rendered
+        /// </summary>
+        public readonly VisualViewport visualViewport;
+        #endregion
+
+        #region CSS Object Model Extensions
+        /* Docs: https://www.w3.org/TR/cssom-view-1/#extensions-to-the-window-interface */
+        public MediaQueryList matchMedia(string query)
+        {
+            return new CSS.Serialization.CssParser(query).Parse_Media_Query_List(this.document);
+        }
+
+        public readonly Screen screen;
+        // browsing context
+        public void moveTo(long x, long y) => throw new NotImplementedException();
+        public void moveBy(long x, long y) => throw new NotImplementedException();
+        public void resizeTo(long x, long y) => throw new NotImplementedException();
+        public void resizeBy(long x, long y) => throw new NotImplementedException();
+
+        // Viewport
+        public long innerWidth => 0;
+        public long innerHeight => 0;
+
+        // viewport scrolling
+        /*[Replaceable] readonly attribute double scrollX;
+        [Replaceable] readonly attribute double pageXOffset;
+        [Replaceable] readonly attribute double scrollY;
+        [Replaceable] readonly attribute double pageYOffset;
+        void scroll(optional ScrollToOptions options);
+        void scroll(unrestricted double x, unrestricted double y);
+        void scrollTo(optional ScrollToOptions options);
+        void scrollTo(unrestricted double x, unrestricted double y);
+        void scrollBy(optional ScrollToOptions options);
+        void scrollBy(unrestricted double x, unrestricted double y);
+
+        // client
+        [Replaceable] readonly attribute long screenX;
+        [Replaceable] readonly attribute long screenY;
+        [Replaceable] readonly attribute long outerWidth;
+        [Replaceable] readonly attribute long outerHeight;
+        [Replaceable] readonly attribute double devicePixelRatio;*/
+        #endregion
+
+        #region Constructors
+        public Window(Screen screen)
+        {
+            this.screen = screen;
+            var dom = new DOMImplementation();
+            this.document = dom.createDocument(DOMCommon.XMLNamespace, "CssUI", new DocumentType("cssui"));
+            visualViewport = new VisualViewport(this);
+        }
+        #endregion
 
         #region Slots
         internal List<IEventTarget> SignalSlots = new List<IEventTarget>();
@@ -26,7 +86,6 @@ namespace CssUI.DOM
         internal Task observer_task = Task.FromResult(true);
 
         // XXX: I'm thinking we just throw a new task up instead of bothering to implement the task queue system. We arent a browser afterall.
-
         internal void QueueObserverMicroTask()
         {
             /* To queue a mutation observer microtask, run these steps: */
@@ -76,23 +135,24 @@ namespace CssUI.DOM
 
         #endregion
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public string Name { get; private set; } = "CssUI v0.0.1";/* XXX: add something here to embed the actual version number upon compiling */
-
+        #region Focus
         public string status;
+
         /* Docs: https://html.spec.whatwg.org/multipage/interaction.html#dom-window-focus */
         public void focus();
         /* Docs: https://html.spec.whatwg.org/multipage/interaction.html#dom-window-blur */
         public void blur();
+        #endregion
+
+        #region Internal Utility
+        #endregion
 
         public static DOMHighResTimeStamp getTimestamp()
         {
             return new DOMHighResTimeStamp() { Timestmap = DateTime.UtcNow.Millisecond };
         }
 
-
+        #region Node Management
         public Node importNode(Node node, bool deep = false)
         {
             return this.document?.importNode(node, deep);
@@ -102,6 +162,8 @@ namespace CssUI.DOM
         {
             return this.document?.adoptNode(node);
         }
+        #endregion
+
 
         #region Global Events
         public event EventCallback onAbort
@@ -935,6 +997,21 @@ namespace CssUI.DOM
                 ((IGlobalEventCallbacks)document).onSelectionChange -= value;
             }
         }
+        #endregion
+
+        #region Window Events
+        public event EventCallback onHashChange;
+        public event EventCallback onLanguageChange;
+        public event EventCallback onMessage;
+        public event EventCallback onMessagEerror;
+        public event EventCallback onOffline;
+        public event EventCallback onOnline;
+        public event EventCallback onPageHide;
+        public event EventCallback onPageShow;
+        public event EventCallback onPopState;
+        public event EventCallback onRejectionHandled;
+        public event EventCallback onStorage;
+        public event EventCallback onUnhandledRejection;
         #endregion
     }
 }

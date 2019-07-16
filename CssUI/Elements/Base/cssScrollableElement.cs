@@ -37,7 +37,7 @@ namespace CssUI
             }
             else
             {
-                ClippingArea = new cssBoxArea(Box.Padding);
+                ClippingArea = new CssBoxArea(Box.Padding);
 
                 int cX = Box.Padding.Width;
                 int cY = Box.Padding.Height;
@@ -53,10 +53,10 @@ namespace CssUI
                     if (Box.Content_Height.HasValue) cY += (Box.Padding.Size_Top + Box.Padding.Size_Bottom);
                 }
 
-                ScrollArea = new cssBoxArea(Box, Box.Padding.Get_Pos(), new Size2D(cX, cY));
+                ScrollArea = new CssBoxArea(Box, Box.Padding.Get_Pos(), new Size2D(cX, cY));
                 if (ScrollViewportArea == null)
                 {
-                    ScrollViewportArea = new cssBoxArea(Box, Box.Padding.Get_Pos(), Box.Padding.Get_Dimensions());
+                    ScrollViewportArea = new CssBoxArea(Box, Box.Padding.Get_Pos(), Box.Padding.Get_Dimensions());
                 }
                 else
                 {
@@ -132,11 +132,11 @@ namespace CssUI
         /// The total area that our scrollbars represent
         /// AKA: the "Scrollbable Overflow Region"
         /// </summary>
-        internal cssBoxArea ScrollArea = null;
+        internal CssBoxArea ScrollArea = null;
         /// <summary>
         /// Stores the current absolute-space area of this elements contents which is visible due to scrolling.
         /// </summary>
-        internal cssBoxArea ScrollViewportArea = null;
+        internal CssBoxArea ScrollViewportArea = null;
         internal uiVScrollBar SB_Vertical = null;
         internal uiHScrollBar SB_Horizontal = null;
 
