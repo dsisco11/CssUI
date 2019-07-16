@@ -99,12 +99,12 @@ namespace CssUI
         /// Returns the specified number of items from the stream and progresses the current reading position by that number
         /// </summary>
         /// <param name="Count">Number of characters to consume</param>
-        public List<ItemType> Consume(int Count = 1)
+        public IEnumerable<ItemType> Consume(int Count = 1)
         {
             int EndPos = (ReadPos + Count);
             if (EndPos >= Stream.Length) EndPos = (Stream.Length - 1);
 
-            List<ItemType> retVal = new List<ItemType>();
+            var retVal = new LinkedList<ItemType>();
             for (int i = ReadPos; i < EndPos; i++)
             {
                 retVal.Add(Stream[i]);
@@ -119,13 +119,13 @@ namespace CssUI
         /// </summary>
         /// <param name="Predicate"></param>
         /// <returns></returns>
-        public List<ItemType> Consume_While(Func<ItemType, bool> Predicate)
+        public IEnumerable<ItemType> Consume_While(Func<ItemType, bool> Predicate)
         {
-            List<ItemType> Matches = new List<ItemType>();
+            var Matches = new LinkedList<ItemType>();
             
             while (Predicate(Next))
             {
-                Matches.Add(Consume());
+                Matches.AddLast(Consume());
             }
 
             ReadPos += Matches.Count;
@@ -133,11 +133,30 @@ namespace CssUI
         }
 
         /// <summary>
+        /// Consumes items until reaching the first one that does not match the given predicate, then returns all matched items as new stream and progresses this streams reading position by that number
+        /// </summary>
+        /// <param name="Predicate"></param>
+        /// <returns></returns>
+        public ObjectStream<ItemType> Substream(Func<ItemType, bool> Predicate)
+        {
+            var Matches = new LinkedList<ItemType>();
+            
+            while (Predicate(Next))
+            {
+                Matches.AddLast(Consume());
+            }
+
+            ReadPos += Matches.Count;
+
+            return new ObjectStream<ItemType>(Matches, this.EOF_ITEM);
+        }
+
+        /// <summary>
         /// Pushes the given number of items back onto the front of the stream
         /// </summary>
         /// <param name="Count"></param>
         public void Reconsume(int Count = 1)
-        {// SEE:  https://www.w3.org/TR/css-syntax-3/#reconsume-the-current-input-code-point
+        {/* Docs: https://www.w3.org/TR/css-syntax-3/#reconsume-the-current-input-code-point */
             ReadPos -= Count;
             if (ReadPos < 0) ReadPos = 0;
         }

@@ -10,6 +10,22 @@ namespace CssUI.CSS.Serialization
     public static class ParserCommon
     {
 
+        #region Media Querys
+
+        /// <summary>
+        /// Returns <c>True</c> if the next tokens makeup a media feature comparator ('=', '<', '>', '<=', '>=')
+        /// </summary>
+        /// <param name="Stream"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_And_Token(CssToken A)
+        {
+            if (ReferenceEquals(null, A))
+                throw new ArgumentException();
+
+            return (A.Type == ECssTokenType.Delim && (A as IdentToken).Value.Equals("and"));
+        }
+
         /// <summary>
         /// Returns if the next tokens in the stream define a ratio value
         /// <para>Used by <see cref="Media.MediaFeature"/></para>
@@ -46,7 +62,7 @@ namespace CssUI.CSS.Serialization
             if (A.Type == ECssTokenType.Delim)
             {
                 var delimTok = A as DelimToken;
-                return (delimTok.Value == '=' || delimTok.Value == '<' || delimTok.Value == '>');
+                return (delimTok.Value.Equals('=') || delimTok.Value.Equals('<') || delimTok.Value.Equals('>'));
             }
 
             if (A.Type == ECssTokenType.Ident)
@@ -57,5 +73,7 @@ namespace CssUI.CSS.Serialization
 
             return false;
         }
+
+        #endregion
     }
 }

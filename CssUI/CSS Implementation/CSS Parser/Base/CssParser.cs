@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace CssUI.CSS.Serialization
-{// DOCS: https://www.w3.org/TR/css-syntax-3/#consume-a-simple-block
+{/* Docs: https://www.w3.org/TR/css-syntax-3/ */
 
     /// <summary>
     /// Parses a stream of <see cref="CssToken"/>s and returns 
@@ -133,13 +133,16 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static void Consume_All_Whitespace(TokenStream Stream)
         {
-            if (Stream == null) throw new CssParserException("Stream is NULL!");
+            if (ReferenceEquals(null, Stream))
+            {
+                throw new CssParserException("Stream is NULL!");
+            }
             while (Stream.Next.Type == ECssTokenType.Whitespace) { Stream.Consume(); }
         }
 
         static LinkedList<CssComponent> Consume_Rule_List(TokenStream Stream, bool TopLevel = false)
         {
-            if (Stream == null) throw new CssParserException("Stream is NULL!");
+            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
             LinkedList<CssComponent> Rules = new LinkedList<CssComponent>();
 
             CssToken Token;
@@ -184,7 +187,7 @@ namespace CssUI.CSS.Serialization
 
         static CssAtRule Consume_AtRule(TokenStream Stream)
         {
-            if (Stream == null) throw new CssParserException("Stream is NULL!");
+            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
             string name = (Stream.Next as ValuedTokenBase).Value;
             CssAtRule Rule = new CssAtRule(name);
             CssToken Token;
@@ -213,7 +216,7 @@ namespace CssUI.CSS.Serialization
 
         static CssQualifiedRule Consume_QualifiedRule(TokenStream Stream)
         {
-            if (Stream == null) throw new CssParserException("Stream is NULL!");
+            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
             CssQualifiedRule Rule = new CssQualifiedRule();
             CssToken Token;
             do
@@ -238,7 +241,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static LinkedList<CssComponent> Consume_Decleration_List(TokenStream Stream)
         {// SEE:  https://www.w3.org/TR/css-syntax-3/#consume-a-list-of-declarations0
-            if (Stream == null) throw new CssParserException("Stream is NULL!");
+            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
             LinkedList<CssComponent> List = new LinkedList<CssComponent>();
             CssToken Token;
             do
@@ -293,12 +296,14 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static CssDecleration Consume_Decleration(TokenStream Stream)
         {
-            if (Stream == null) throw new CssParserException("Stream is NULL!");
+            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
             string name = (Stream.Consume() as ValuedTokenBase).Value;
 
             CssDecleration Decleration = new CssDecleration(name);
             // Consume all whitespace
-            while (Stream.Next.Type == ECssTokenType.Whitespace) { Stream.Consume(); }
+            Consume_All_Whitespace(Stream);
+            //while (Stream.Next.Type == ECssTokenType.Whitespace) { Stream.Consume(); }
+
             if (Stream.Next.Type != ECssTokenType.Colon) return null;// Parser error
             Stream.Consume();// Consume the colon
 
@@ -350,7 +355,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static CssToken Consume_ComponentValue(TokenStream Stream)
         {
-            if (Stream == null) throw new CssParserException("Stream is NULL!");
+            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
             switch (Stream.Next.Type)
             {
                 case ECssTokenType.Bracket_Open:
@@ -369,10 +374,13 @@ namespace CssUI.CSS.Serialization
             return Stream.Consume();
         }
 
+        /// <summary>
+        /// Consumes a block of tokens encased inbetween one of: [], {}, or ()
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static CssSimpleBlock Consume_SimpleBlock(TokenStream Stream)
         {
-            if (Stream == null) throw new CssParserException("Stream is NULL!");
+            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
             CssToken StartToken = Stream.Consume();
             CssToken EndToken;
             switch (StartToken.Type)
@@ -387,7 +395,7 @@ namespace CssUI.CSS.Serialization
                     EndToken = new SqBracketCloseToken();
                     break;
                 default:
-                    throw new CssSyntaxErrorException("Current input token is not a bracket type!");
+                    throw new CssSyntaxErrorException("Current input token is not the start of a simple block");
             }
 
             CssSimpleBlock Block = new CssSimpleBlock(StartToken);
@@ -408,7 +416,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static CssFunction Consume_Function(TokenStream Stream)
         {
-            if (Stream == null) throw new CssParserException("Stream is NULL!");
+            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
             if (Stream.Next.Type != ECssTokenType.FunctionName) throw new CssParserException("Expected function name token!");
 
             string name = (Stream.Next as FunctionNameToken).Value;
@@ -438,7 +446,7 @@ namespace CssUI.CSS.Serialization
         #region CSS Values
         public static CssValue Consume_CssValue(TokenStream Stream)
         {
-            if (Stream == null) throw new CssParserException("Stream is NULL!");
+            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
             CssToken Token = Stream.Next;
 
             switch (Token.Type)
@@ -529,9 +537,12 @@ namespace CssUI.CSS.Serialization
 
         static MediaQuery Consume_MediaQuery(TokenStream Stream = null)
         {/* Docs: https://drafts.csswg.org/mediaqueries-4/#mq-syntax */
-            if (Stream == null) throw new CssParserException("Stream is NULL!");
+            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
 
-            if (Stream.Next.Type != ECssTokenType.Ident) throw new CssSyntaxErrorException("Expected ident token");
+            if (Stream.Next.Type != ECssTokenType.Ident)
+            {
+                throw new CssSyntaxErrorException("Expected ident token");
+            }
             EMediaQueryModifier modifier = 0x0;
             EMediaType mediaType = 0x0;
             LinkedList<MediaFeature> featureList = new LinkedList<MediaFeature>();
@@ -545,60 +556,82 @@ namespace CssUI.CSS.Serialization
                 Stream.Consume();// consume this token
                 modifier = mod.Value;
 
-                if (Stream.Next.Type != ECssTokenType.Ident) throw new CssSyntaxErrorException("Expected ident token");
+                if (Stream.Next.Type != ECssTokenType.Ident)
+                {
+                    throw new CssSyntaxErrorException("Expected ident token");
+                }
                 Token = Stream.Next as IdentToken;
             }
 
             /* Skip 'and' keyword if present */
-            if (Token.Value == "and")
+            if (ParserCommon.Is_And_Token(Token))
             {
                 Stream.Consume();
 
-                if (Stream.Next.Type != ECssTokenType.Ident) throw new CssSyntaxErrorException("Expected ident token");
+                if (Stream.Next.Type != ECssTokenType.Ident)
+                {
+                    throw new CssSyntaxErrorException("Expected ident token");
+                }
                 Token = Stream.Next as IdentToken;
             }
 
             /* Set the media type */
             EMediaType? type = CssLookup.Enum_From_Keyword<EMediaType>(Token.Value);
-            if (!type.HasValue) throw new CssParserException($"Unrecognized media type: \"{Token.Value}\"");
+            if (!type.HasValue)
+            {
+                throw new CssParserException($"Unrecognized media type: \"{Token.Value}\"");
+            }
             else
             {
                 Stream.Consume();
             }
 
             /* Skip 'and' keyword if present */
-            if (Token.Value == "and")
+            Consume_All_Whitespace(Stream);
+            if (ParserCommon.Is_And_Token(Token))
             {
                 Stream.Consume();
 
-                if (Stream.Next.Type != ECssTokenType.Ident) throw new CssSyntaxErrorException("Expected ident token");
+                if (Stream.Next.Type != ECssTokenType.Ident)
+                {
+                    throw new CssSyntaxErrorException("Expected ident token");
+                }
                 Token = Stream.Next as IdentToken;
             }
 
             /* Consume features */
-            if (Stream.Next.Type == ECssTokenType.Parenth_Open)
+            Consume_All_Whitespace(Stream);
+            if (Stream.Next.Type != ECssTokenType.Parenth_Open)
             {
-                do
-                {
-                    Consume_All_Whitespace(Stream);
-                    if (Stream.Next.Type == ECssTokenType.Parenth_Close)
-                    {
-                        Stream.Consume();
-                        break;
-                    }
-
-                    var feature = Consume_MediaFeature(Stream);
-                    featureList.AddLast(feature);
-                }
-                while (Stream.Next.Type != ECssTokenType.EOF);
+                throw new CssSyntaxErrorException("Expected left parentheses as start of media features list");
             }
+
+            /* Consume simple block to get our total array of tokens to be interpreted as media features */
+            var block = Consume_SimpleBlock(Stream);
+            TokenStream featureStream = new TokenStream(block.Values);
+            /* Now consume media features until we hit EOF */
+            do
+            {
+                /* Media features are delimited here by either EOF or the 'and' keyword  */
+                var subStream = (TokenStream)featureStream.Substream(tok => !ParserCommon.Is_And_Token(tok));
+
+                Consume_All_Whitespace(featureStream);
+                if (ParserCommon.Is_And_Token(featureStream.Next))
+                {/* Consume 'and' keyword */
+                    featureStream.Consume();
+                }
+
+                var feature = Consume_MediaFeature(subStream);
+                featureList.AddLast(feature);
+            }
+            while (featureStream.Next.Type != ECssTokenType.EOF);
 
             return new MediaQuery(modifier, mediaType, featureList);
         }
 
         static MediaFeature Consume_MediaFeature(TokenStream Stream = null)
         {/* Docs: https://drafts.csswg.org/mediaqueries-4/#mq-syntax */
-            if (Stream == null) throw new CssParserException("Stream is NULL!");
+            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
             /*
              * <mf-plain> = <mf-name> : <mf-value>
              * <mf-boolean> = <mf-name>
@@ -607,8 +640,9 @@ namespace CssUI.CSS.Serialization
              * <mf-value> <mf-lt> <mf-name> <mf-lt> <mf-value>
              * <mf-value> <mf-gt> <mf-name> <mf-gt> <mf-value>
              */
-            Consume_All_Whitespace(Stream);
+
             /* Consume feature name */
+            Consume_All_Whitespace(Stream);
             if (Stream.Next.Type != ECssTokenType.Ident) throw new CssSyntaxErrorException($"Expected Ident-token, but got \"{Enum.GetName(typeof(ECssTokenType), Stream.Next.Type)}\"");
             IdentToken nameTok = Stream.Consume() as IdentToken;
             /* Resolve the name */
@@ -622,8 +656,8 @@ namespace CssUI.CSS.Serialization
                 return new MediaFeature(Name.Value, value);
             }
 
-            Consume_All_Whitespace(Stream);
             /* If the next token is 'and' then it signals the end of this feature */
+            Consume_All_Whitespace(Stream);
             if (!ParserCommon.Starts_Media_Comparator(Stream.Next))
             {/* Boolean */
                 return new MediaFeature(Name.Value, null);
@@ -659,7 +693,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static CssValue Consume_MediaFeature_Value(TokenStream Stream)
         {
-            if (Stream == null) throw new CssParserException("Stream is NULL!");
+            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
             /* Consume: <number> | <dimension> | <ident> | <ratio> */
             Consume_All_Whitespace(Stream);
 
