@@ -48,23 +48,23 @@ namespace CssUI.CSS
         /// <summary>
         /// Tracks the previous value for <see cref="Assigned"/> so we can detect when changes occur
         /// </summary>
-        CssValueHash oldAssigned = new CssValueHash();
+        ValueTracker<CssValue> oldAssigned = new ValueTracker<CssValue>();
         /// <summary>
         /// Tracks the previous value for <see cref="Specified"/> so we can detect when changes occur
         /// </summary>
-        CssValueHash oldSpecified = new CssValueHash();
+        ValueTracker<CssValue> oldSpecified = new ValueTracker<CssValue>();
         /// <summary>
         /// Tracks the previous value for <see cref="Computed"/> so we can detect when changes occur
         /// </summary>
-        CssValueHash oldComputed = new CssValueHash();
+        ValueTracker<CssValue> oldComputed = new ValueTracker<CssValue>();
         /// <summary>
         /// Tracks the previous value for <see cref="Used"/> so we can detect when changes occur
         /// </summary>
-        CssValueHash oldUsed = new CssValueHash();
+        ValueTracker<CssValue> oldUsed = new ValueTracker<CssValue>();
         /// <summary>
         /// Tracks the previous value for <see cref="Actual"/> so we can detect when changes occur
         /// </summary>
-        CssValueHash oldActual = new CssValueHash();
+        ValueTracker<CssValue> oldActual = new ValueTracker<CssValue>();
         #endregion
 
         #region Values
@@ -211,7 +211,9 @@ namespace CssUI.CSS
             _actual = null;
 
             if (suppress)
-                oldUsed.Set(null);
+            {
+                oldUsed.Update(null, true);
+            }
         }
         #endregion
 
@@ -227,7 +229,7 @@ namespace CssUI.CSS
             // detect changes, fire events
             if (ReferenceEquals(oldSpecified, null) || oldSpecified != _specified)
             {// the computed value changed
-                oldSpecified.Set(_specified);
+                oldSpecified.Update(_specified);
                 // FireValueChangeEvent(ECssPropertyStage.Specified);
 
                 // update the Computed value
@@ -242,7 +244,7 @@ namespace CssUI.CSS
             // detect changes, fire events
             if (ReferenceEquals(oldComputed, null) || oldComputed != _computed)
             {
-                oldComputed.Set(_computed);
+                oldComputed.Update(_computed);
                 // FireValueChangeEvent(ECssPropertyStage.Computed);
 
                 // Update the Used value
@@ -257,7 +259,7 @@ namespace CssUI.CSS
             // detect changes, fire events
             if (ReferenceEquals(oldUsed, null) || oldUsed != _used)
             {
-                oldUsed.Set(_used);
+                oldUsed.Update(_used);
                 // FireValueChangeEvent(ECssPropertyStage.Used);
 
                 // update the Actual value
@@ -271,7 +273,7 @@ namespace CssUI.CSS
             // detect changes, fire events
             if (ReferenceEquals(oldActual, null) || oldActual != _actual)
             {
-                oldActual.Set(_actual);
+                oldActual.Update(_actual);
                 FireValueChangeEvent(ECssPropertyStage.Actual);
             }
         }
@@ -389,7 +391,7 @@ namespace CssUI.CSS
 
             if (ReferenceEquals(oldAssigned, null) || oldAssigned != Assigned)
             {
-                oldAssigned.Set(Assigned);
+                oldAssigned.Update(Assigned);
                 FireValueChangeEvent(ECssPropertyStage.Assigned);
             }
 

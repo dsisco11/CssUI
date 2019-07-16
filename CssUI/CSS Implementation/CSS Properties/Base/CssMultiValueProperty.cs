@@ -16,7 +16,7 @@ namespace CssUI
     public abstract class CssMultiValueProperty : CssPropertyBase, ICssProperty
     {
 
-        #region backing values
+        #region Backing Values
         /// <summary>
         /// Backing value for <see cref="Assigned"/>
         /// <para> Docs: https://www.w3.org/TR/css-cascade-3/#cascaded </para>
@@ -48,27 +48,27 @@ namespace CssUI
         CssValueList _actual = null;
         #endregion
 
-        #region value trackers
+        #region Trackers
         /// <summary>
         /// Tracks the previous value for <see cref="Assigned"/> so we can detect when changes occur
         /// </summary>
-        CssValueHash oldAssigned = new CssValueHash();
+        ValueTracker<CssValueList> oldAssigned = new ValueTracker<CssValueList>();
         /// <summary>
         /// Tracks the previous value for <see cref="Specified"/> so we can detect when changes occur
         /// </summary>
-        CssValueHash oldSpecified = new CssValueHash();
+        ValueTracker<CssValueList> oldSpecified = new ValueTracker<CssValueList>();
         /// <summary>
         /// Tracks the previous value for <see cref="Computed"/> so we can detect when changes occur
         /// </summary>
-        CssValueHash oldComputed = new CssValueHash();
+        ValueTracker<CssValueList> oldComputed = new ValueTracker<CssValueList>();
         /// <summary>
         /// Tracks the previous value for <see cref="Used"/> so we can detect when changes occur
         /// </summary>
-        CssValueHash oldUsed = new CssValueHash();
+        ValueTracker<CssValueList> oldUsed = new ValueTracker<CssValueList>();
         /// <summary>
         /// Tracks the previous value for <see cref="Actual"/> so we can detect when changes occur
         /// </summary>
-        CssValueHash oldActual = new CssValueHash();
+        ValueTracker<CssValueList> oldActual = new ValueTracker<CssValueList>();
         #endregion
 
         #region Values
@@ -213,7 +213,9 @@ namespace CssUI
             _actual = null;
 
             if (suppress)
-                oldUsed.Set(null);
+            {
+                oldUsed.Update(null, true);
+            }
         }
         #endregion
 
@@ -244,7 +246,7 @@ namespace CssUI
         #region Deriving
         private CssValue Derive_SpecifiedValue(CssValue AssignedValue, out bool Inherited)
         {
-            CssPropertyDefinition Def = this.Definition;
+            StyleDefinition Def = this.Definition;
             Inherited = false;
 
             if (!AssignedValue.IsNull)
@@ -354,7 +356,7 @@ namespace CssUI
             // detect changes, fire events
             if (!oldSpecified.HasValue || oldSpecified != _specified)
             {// the computed value changed
-                oldSpecified.Set(_specified);
+                oldSpecified.Update(_specified);
                 FireValueChangeEvent(ECssPropertyStage.Specified);
 
                 // update the Computed value
@@ -405,7 +407,7 @@ namespace CssUI
             // detect changes, fire events
             if (!oldComputed.HasValue || oldComputed != _computed)
             {// the computed value changed
-                oldComputed.Set(_computed);
+                oldComputed.Update(_computed);
                 FireValueChangeEvent(ECssPropertyStage.Computed);
 
                 // update the Used value
@@ -430,7 +432,7 @@ namespace CssUI
             // detect changes, fire events
             if (!oldUsed.HasValue || oldUsed != _used)
             {
-                oldUsed.Set(_used);
+                oldUsed.Update(_used);
                 FireValueChangeEvent(ECssPropertyStage.Used);
 
                 // update the Actual value
@@ -455,7 +457,7 @@ namespace CssUI
             // detect changes, fire events
             if (!oldActual.HasValue || oldActual != _actual)
             {
-                oldActual.Set(_actual);
+                oldActual.Update(_actual);
                 FireValueChangeEvent(ECssPropertyStage.Actual);
             }
         }
@@ -542,7 +544,7 @@ namespace CssUI
 
             if (ReferenceEquals(oldAssigned, null) || oldAssigned != Assigned)
             {
-                oldAssigned.Set(Assigned);
+                oldAssigned.Update(Assigned);
                 FireValueChangeEvent(ECssPropertyStage.Assigned);
             }
 
