@@ -40,7 +40,7 @@ namespace CssUI.CSS
         #region ToString
         public override string ToString()
         {
-            if (Computed.Type == ECssDataType.INTEGER)
+            if (Computed.Type == ECssValueType.INTEGER)
             {
                 return Enum.GetName(typeof(Ty), (Ty)Computed.Value);
             }

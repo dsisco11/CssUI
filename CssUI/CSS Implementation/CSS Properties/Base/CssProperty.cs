@@ -162,17 +162,17 @@ namespace CssUI.CSS
         /// </summary>
         public override bool HasValue { get => !Assigned.HasValue; }
         /// <summary>
-        /// Returns TRUE if the <see cref="Assigned"/> value is <see cref="ECssDataType.NONE"/>
+        /// Returns TRUE if the <see cref="Assigned"/> value is <see cref="ECssValueType.NONE"/>
         /// </summary>
-        public override bool IsNone { get => Assigned.Type == ECssDataType.NONE; }
+        public override bool IsNone { get => Assigned.Type == ECssValueType.NONE; }
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// </summary>
-        public override bool IsAuto { get => Assigned.Type == ECssDataType.AUTO; }
+        public override bool IsAuto { get => Assigned.Type == ECssValueType.AUTO; }
         /// <summary>
         /// Returns TRUE if the assigned value is <see cref="CssValue.Inherit"/>
         /// </summary>
-        public override bool IsInherited { get => Assigned.Type == ECssDataType.INHERIT; }
+        public override bool IsInherited { get => Assigned.Type == ECssValueType.INHERIT; }
         /// <summary>
         /// Returns TRUE if the assigned value has the <see cref="ECssValueFlags.Depends"/> flag
         /// </summary>
@@ -181,12 +181,12 @@ namespace CssUI.CSS
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if the assigned value has the <see cref="ECssValueFlags.Depends"/> flag
         /// </summary>
-        public override bool IsDependentOrAuto { get => Assigned.Type == ECssDataType.AUTO || Assigned.Has_Flags(ECssValueFlags.Depends); }
+        public override bool IsDependentOrAuto { get => Assigned.Type == ECssValueType.AUTO || Assigned.Has_Flags(ECssValueFlags.Depends); }
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if the assigned value type is a percentage
         /// </summary>
-        public override bool IsPercentageOrAuto { get => Assigned.Type == ECssDataType.AUTO || Assigned.Type == ECssDataType.PERCENT; }
+        public override bool IsPercentageOrAuto { get => Assigned.Type == ECssValueType.AUTO || Assigned.Type == ECssValueType.PERCENT; }
 
         /// <summary>
         /// All flags which are present for all currently computed <see cref="CssValue"/>'s

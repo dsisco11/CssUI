@@ -46,12 +46,12 @@ namespace CssUI.CSS.Internal
         /// <summary>
         /// All data types which are not allowed for this property
         /// </summary>
-        public readonly ECssDataType DisallowedTypes = 0x0;
+        public readonly ECssValueType DisallowedTypes = 0x0;
 
         /// <summary>
         /// Allowed datatypes, when set this will override the disallowed list
         /// </summary>
-        public readonly ECssDataType AllowedTypes = ECssDataType.INITIAL | ECssDataType.INHERIT | ECssDataType.UNSET;// By default we allow the CSS-wide identifiers. See: https://www.w3.org/TR/css-values-4/#common-keywords
+        public readonly ECssValueType AllowedTypes = ECssValueType.INITIAL | ECssValueType.INHERIT | ECssValueType.UNSET;// By default we allow the CSS-wide identifiers. See: https://www.w3.org/TR/css-values-4/#common-keywords
 
         /// <summary>
         /// A list of all keywords that can be assigned to this property
@@ -75,7 +75,7 @@ namespace CssUI.CSS.Internal
         /// <param name="DisallowedTypes">Bitmask of all value data types which cannot be assigned to this property</param>
         /// <param name="Keywords">List of keywords which can be assigned to this property</param>
         /// <param name="IsPrivate">If TRUE then this property cannot be set from style-sheets</param>
-        public CssPropertyDefinition(string Name, bool Inherited, EPropertyDirtFlags Flags, CssValue Initial, ECssDataType AllowedTypes = 0x0, ECssDataType DisallowedTypes = 0x0, string[] Keywords = null, bool IsPrivate = false, PercentageResolver Percentage_Resolver = null, params Tuple<ECssPropertyStage, PropertyResolverFunc>[] Resolvers)
+        public CssPropertyDefinition(string Name, bool Inherited, EPropertyDirtFlags Flags, CssValue Initial, ECssValueType AllowedTypes = 0x0, ECssValueType DisallowedTypes = 0x0, string[] Keywords = null, bool IsPrivate = false, PercentageResolver Percentage_Resolver = null, params Tuple<ECssPropertyStage, PropertyResolverFunc>[] Resolvers)
         {
             this.Name = new AtomicString(Name);
             this.Flags = Flags;
@@ -112,7 +112,7 @@ namespace CssUI.CSS.Internal
         /// </summary>
         /// <param name="Value"></param>
         /// <returns></returns>
-        public bool IsValidDataType(ECssDataType Type)
+        public bool IsValidDataType(ECssValueType Type)
         {
             if (AllowedTypes != 0x0)
                 return 0 != (AllowedTypes & Type);
@@ -141,11 +141,11 @@ namespace CssUI.CSS.Internal
         public void CheckAndThrow(ICssProperty Owner, CssValue Value)
         {
             if (!IsValidDataType(Value.Type))
-                throw new CssException($"The property({Owner.CssName}) cannot be set to an {Enum.GetName(typeof(ECssDataType), Value.Type)}!");
+                throw new CssException($"The property({Owner.CssName}) cannot be set to an {Enum.GetName(typeof(ECssValueType), Value.Type)}!");
 
             switch (Value.Type)
             {
-                case ECssDataType.KEYWORD:
+                case ECssValueType.KEYWORD:
                     {// check this value against our keyword whitelist
                         if (KeywordWhitelist != null && KeywordWhitelist.Count > 0)
                         {

@@ -85,7 +85,7 @@ namespace CssUI.Internal
             // Per the CSS specifications we should not create a font under 9pt
             double val = Math.Max(v.Value, 9.0);
 
-            return new CssValue(ECssDataType.NUMBER, val);
+            return new CssValue(ECssValueType.NUMBER, val);
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace CssUI.Internal
             {
                 switch(val.Type)
                 {
-                    case ECssDataType.KEYWORD:
+                    case ECssValueType.KEYWORD:
                         {// Replace generic font-family keywords with a list of our fallback font-familys for that family
                             switch (CssLookup.Enum_From_Keyword<ECssGenericFontFamily>(val.Value as string))
                             {
@@ -122,7 +122,7 @@ namespace CssUI.Internal
 
                         }
                         break;
-                    case ECssDataType.STRING:
+                    case ECssValueType.STRING:
                         {// Remove any invalid font-familys
                             foreach(FontFamily family in SystemFonts.Families)
                             {
