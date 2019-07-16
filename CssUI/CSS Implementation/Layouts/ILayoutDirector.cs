@@ -1,4 +1,6 @@
 ﻿
+using CssUI.CSS;
+
 namespace CssUI
 {
     /// <summary>
@@ -6,6 +8,6 @@ namespace CssUI
     /// </summary>
     public interface ILayoutDirector
     {
-        cssBoxArea Handle(IParentElement parent, cssElement[] list);
+        CssBoxArea Handle(IParentElement parent, cssElement[] list);
     }
 }

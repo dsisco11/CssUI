@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CssUI.CSS;
 using CssUI.Layout;
 
 namespace CssUI.CSS.Internal
@@ -9,7 +8,7 @@ namespace CssUI.CSS.Internal
     public abstract class LayoutDirectorBase : ILayoutDirector
     {
         #region Properties
-        protected cssBoxArea layoutBlock;
+        protected CssBoxArea layoutBlock;
         protected Vec2i layoutPos;
         /// <summary>
         /// The biggest control height we encountered for a particular row, so we know how far to move down
@@ -26,11 +25,11 @@ namespace CssUI.CSS.Internal
         protected cssElement Previous = null;
         #endregion
 
-        public abstract cssBoxArea Handle(IParentElement Owner, cssElement[] controls);
+        public abstract CssBoxArea Handle(IParentElement Owner, cssElement[] controls);
 
         protected virtual void Reset()
         {
-            layoutBlock = new cssBoxArea();
+            layoutBlock = new CssBoxArea();
             layoutPos = new Vec2i();
             lineHeight = 0;
             Previous = null;
@@ -56,7 +55,7 @@ namespace CssUI.CSS.Internal
             Previous = null;
         }
 
-        protected virtual void Add_To_Line(cssElement E, cssBoxArea cArea, Size2D cSize)
+        protected virtual void Add_To_Line(cssElement E, CssBoxArea cArea, Size2D cSize)
         {
             Line.Add(new LineBox_Element(E, new Vec2i(layoutPos)));
             Previous = E;

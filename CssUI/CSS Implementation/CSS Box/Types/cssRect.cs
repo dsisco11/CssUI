@@ -1,6 +1,6 @@
-﻿namespace CssUI
+﻿namespace CssUI.CSS
 {
-    public struct cssRect
+    public struct CssRect
     {
         public int Left;
         public int Top;
