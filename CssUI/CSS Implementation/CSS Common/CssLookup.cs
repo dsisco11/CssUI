@@ -2,6 +2,8 @@
 using CssUI.Internal;
 using CssUI.CSS.Internal;
 using System.Linq;
+using CssUI.CSS.Media;
+using System.Runtime.CompilerServices;
 
 namespace CssUI
 {
@@ -10,8 +12,35 @@ namespace CssUI
     /// </summary>
     public static partial class CssLookup
     {
+        #region Definition Lookups
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
+        public static MediaDefinition Lookup_Def(AtomicName<EMediaFeatureName> Name)
+        {
+            if (CssDefinitions.MediaDefinitions.TryGetValue(Name, out MediaDefinition def))
+            {
+                return def;
+            }
+
+            return null;
+        }
+
+        /*
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
+        public static StyleDefinition Lookup_Def(AtomicName<EMediaFeatureName> Name)
+        {
+            if (CssDefinitions.StyleDefinitions.TryGetValue(Name, out StyleDefinition def))
+            {
+                return def;
+            }
+
+            return null;
+        }
+        */
+        #endregion
+
         #region Enum Lookup
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
         public static string Keyword_From_Enum<Ty>(Ty Value) where Ty : struct
         {
             int index = CssEnumTables.Get_Enum_Index<Ty>();
@@ -25,6 +54,7 @@ namespace CssUI
             return CssEnumTables.TABLE[index][CastTo<int>.From<Ty>(Value)];
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
         public static Ty? Enum_From_Keyword<Ty>(AtomicString Keyword) where Ty : struct
         {
             int index = CssEnumTables.Get_Enum_Index<Ty>();
@@ -35,7 +65,8 @@ namespace CssUI
             }
             return (Ty)CssEnumTables.KEYWORD[index][Keyword];
         }
-        
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
         public static bool Is_Declared(Type enumType, AtomicString Keyword)
         {
             int index = CssEnumTables.Lookup_Enum_Index(enumType.Name);
@@ -44,12 +75,13 @@ namespace CssUI
 
             return CssEnumTables.KEYWORD[index]?.ContainsKey(Keyword) ?? false;
         }
-        
+
         /// <summary>
         /// Returns ALL keywords defined for the given enum
         /// </summary>
         /// <param name="enumType"></param>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
         public static string[] Get_Keywords(Type enumType)
         {
             int index = CssEnumTables.Lookup_Enum_Index(enumType.Name);

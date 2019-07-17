@@ -6,16 +6,17 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace CssUI.CSS.Internal
 {
     /// <summary>
     /// Defines all of the possible CSS styles properties and their default values / behaviour flags
     /// </summary>
-    public class CssDefinitions
+    internal class CssDefinitions
     {
-        public static readonly ReadOnlyDictionary<AtomicString, StyleDefinition> StyleDefinitions;
-        public static readonly ReadOnlyDictionary<AtomicName<EMediaFeatureName>, MediaDefinition> MediaDefinitions;
+        internal static readonly ReadOnlyDictionary<AtomicString, StyleDefinition> StyleDefinitions;
+        internal static readonly ReadOnlyDictionary<AtomicName<EMediaFeatureName>, MediaDefinition> MediaDefinitions;
 
         static CssDefinitions()
         {
@@ -38,49 +39,48 @@ namespace CssUI.CSS.Internal
             // Finally all of our definitions go into this global readonly map of Css property definitions!
             MediaDefinitions = new ReadOnlyDictionary<AtomicName<EMediaFeatureName>, MediaDefinition>(MediaDict);
         }
-
-
+        
         #region Media Definitions
         static IEnumerable<MediaDefinition> Create_Media_Definitions()
         {
             return new MediaDefinition[]
             {
-                new MediaDefinition(EMediaFeatureName.Width, ECssValueType.DIMENSION),
-                new MediaDefinition(EMediaFeatureName.Min_Width, ECssValueType.DIMENSION),
-                new MediaDefinition(EMediaFeatureName.Max_Width, ECssValueType.DIMENSION),
+                new MediaDefinition(EMediaFeatureName.Width, EMediaFeatureType.Range, ECssValueType.DIMENSION),
+                new MediaDefinition(EMediaFeatureName.Min_Width, EMediaFeatureType.Range, ECssValueType.DIMENSION),
+                new MediaDefinition(EMediaFeatureName.Max_Width, EMediaFeatureType.Range, ECssValueType.DIMENSION),
 
-                new MediaDefinition(EMediaFeatureName.Height, ECssValueType.DIMENSION),
-                new MediaDefinition(EMediaFeatureName.Min_Height, ECssValueType.DIMENSION),
-                new MediaDefinition(EMediaFeatureName.Max_Height, ECssValueType.DIMENSION),
+                new MediaDefinition(EMediaFeatureName.Height, EMediaFeatureType.Range, ECssValueType.DIMENSION),
+                new MediaDefinition(EMediaFeatureName.Min_Height, EMediaFeatureType.Range, ECssValueType.DIMENSION),
+                new MediaDefinition(EMediaFeatureName.Max_Height, EMediaFeatureType.Range, ECssValueType.DIMENSION),
 
-                new MediaDefinition(EMediaFeatureName.AspectRatio, ECssValueType.RATIO),
-                new MediaDefinition(EMediaFeatureName.Min_AspectRatio, ECssValueType.RATIO),
-                new MediaDefinition(EMediaFeatureName.Max_AspectRatio, ECssValueType.RATIO),
+                new MediaDefinition(EMediaFeatureName.AspectRatio, EMediaFeatureType.Range, ECssValueType.RATIO),
+                new MediaDefinition(EMediaFeatureName.Min_AspectRatio, EMediaFeatureType.Range, ECssValueType.RATIO),
+                new MediaDefinition(EMediaFeatureName.Max_AspectRatio, EMediaFeatureType.Range, ECssValueType.RATIO),
 
-                new MediaDefinition(EMediaFeatureName.Orientation, ECssValueType.KEYWORD, CssLookup.Get_Keywords(typeof(EMediaOrientation))),
+                new MediaDefinition(EMediaFeatureName.Orientation, EMediaFeatureType.Discreet, ECssValueType.KEYWORD, CssLookup.Get_Keywords(typeof(EMediaOrientation))),
 
-                new MediaDefinition(EMediaFeatureName.Resolution, ECssValueType.KEYWORD | ECssValueType.RESOLUTION, CssLookup.Get_Keywords(typeof(EMediaResolution))),
-                new MediaDefinition(EMediaFeatureName.Min_Resolution, ECssValueType.KEYWORD | ECssValueType.RESOLUTION, CssLookup.Get_Keywords(typeof(EMediaResolution))),
-                new MediaDefinition(EMediaFeatureName.Max_Resolution, ECssValueType.KEYWORD | ECssValueType.RESOLUTION, CssLookup.Get_Keywords(typeof(EMediaResolution))),
+                new MediaDefinition(EMediaFeatureName.Resolution, EMediaFeatureType.Range, ECssValueType.KEYWORD | ECssValueType.RESOLUTION, CssLookup.Get_Keywords(typeof(EMediaResolution))),
+                new MediaDefinition(EMediaFeatureName.Min_Resolution, EMediaFeatureType.Range, ECssValueType.KEYWORD | ECssValueType.RESOLUTION, CssLookup.Get_Keywords(typeof(EMediaResolution))),
+                new MediaDefinition(EMediaFeatureName.Max_Resolution, EMediaFeatureType.Range, ECssValueType.KEYWORD | ECssValueType.RESOLUTION, CssLookup.Get_Keywords(typeof(EMediaResolution))),
 
-                new MediaDefinition(EMediaFeatureName.Scan, ECssValueType.KEYWORD, CssLookup.Get_Keywords(typeof(EMediaScan))),
+                new MediaDefinition(EMediaFeatureName.Scan, EMediaFeatureType.Discreet, ECssValueType.KEYWORD, CssLookup.Get_Keywords(typeof(EMediaScan))),
 
-                new MediaDefinition(EMediaFeatureName.Grid, ECssValueType.INTEGER),
+                new MediaDefinition(EMediaFeatureName.Grid, EMediaFeatureType.Discreet, ECssValueType.INTEGER),
 
-                new MediaDefinition(EMediaFeatureName.Update, ECssValueType.KEYWORD, CssLookup.Get_Keywords(typeof(EMediaUpdate))),
+                new MediaDefinition(EMediaFeatureName.Update, EMediaFeatureType.Discreet, ECssValueType.KEYWORD, CssLookup.Get_Keywords(typeof(EMediaUpdate))),
 
-                new MediaDefinition(EMediaFeatureName.OverflowBlock, ECssValueType.KEYWORD, CssLookup.Get_Keywords(typeof(EMediaOverflowBlock))),
-                new MediaDefinition(EMediaFeatureName.OverflowInline, ECssValueType.KEYWORD, CssLookup.Get_Keywords(typeof(EMediaOverflowInline))),
+                new MediaDefinition(EMediaFeatureName.OverflowBlock, EMediaFeatureType.Discreet, ECssValueType.KEYWORD, CssLookup.Get_Keywords(typeof(EMediaOverflowBlock))),
+                new MediaDefinition(EMediaFeatureName.OverflowInline, EMediaFeatureType.Discreet, ECssValueType.KEYWORD, CssLookup.Get_Keywords(typeof(EMediaOverflowInline))),
 
-                new MediaDefinition(EMediaFeatureName.Color, ECssValueType.INTEGER),
+                new MediaDefinition(EMediaFeatureName.Color, EMediaFeatureType.Range, ECssValueType.INTEGER),
 
-                new MediaDefinition(EMediaFeatureName.ColorIndex, ECssValueType.INTEGER),
+                new MediaDefinition(EMediaFeatureName.ColorIndex, EMediaFeatureType.Range, ECssValueType.INTEGER),
 
-                new MediaDefinition(EMediaFeatureName.Monochrome, ECssValueType.INTEGER),
-                new MediaDefinition(EMediaFeatureName.Min_Monochrome, ECssValueType.INTEGER),
-                new MediaDefinition(EMediaFeatureName.Max_Monochrome, ECssValueType.INTEGER),
+                new MediaDefinition(EMediaFeatureName.Monochrome, EMediaFeatureType.Range, ECssValueType.INTEGER),
+                new MediaDefinition(EMediaFeatureName.Min_Monochrome, EMediaFeatureType.Range, ECssValueType.INTEGER),
+                new MediaDefinition(EMediaFeatureName.Max_Monochrome, EMediaFeatureType.Range, ECssValueType.INTEGER),
 
-                new MediaDefinition(EMediaFeatureName.ColorGamut, ECssValueType.KEYWORD, CssLookup.Get_Keywords(typeof(EMediaColorGamut))),
+                new MediaDefinition(EMediaFeatureName.ColorGamut, EMediaFeatureType.Discreet, ECssValueType.KEYWORD, CssLookup.Get_Keywords(typeof(EMediaColorGamut))),
             };
         }
         #endregion
@@ -135,8 +135,9 @@ namespace CssUI.CSS.Internal
                         }
                         else
                         {// fallback to definition
-                                var def = StyleDefinitions[new AtomicString("font-size")];
-                            double r = def.Initial.Resolve() ?? throw new Exception("Failed to resolve default value from 'font-size' definition");
+                            var def = StyleDefinitions[new AtomicString("font-size")];
+                            //double r = def.Initial.Resolve() ?? throw new Exception("Failed to resolve default value from 'font-size' definition");
+                            double r = (double)def.Initial.Value;
                             return CssValue.From_Int((int)(Pct * r));
                         }
                     },
