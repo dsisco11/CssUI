@@ -1,5 +1,6 @@
 ﻿using System;
 using CssUI.CSS;
+using CssUI.CSS.Enums;
 using CssUI.DOM;
 using CssUI.Enums;
 
@@ -241,7 +242,7 @@ namespace CssUI
         #endregion
 
         #region Update
-        private void Handle_Box_Change(ECssBoxArea obj)
+        private void Handle_Box_Change(ECssBoxType obj)
         {
             Dirty_Thumb = true;
             Update_Track();

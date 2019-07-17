@@ -6,6 +6,7 @@ using System.Linq;
 using CssUI.Internal;
 using CssUI.CSS;
 using System.Diagnostics;
+using CssUI.CSS.Enums;
 
 namespace CssUI
 {
@@ -133,7 +134,7 @@ namespace CssUI
         /// <summary>
         /// One of the areas from this box has changed
         /// </summary>
-        public event Action<ECssBoxArea> onChange;
+        public event Action<ECssBoxType> onChange;
 
         #endregion
 
@@ -527,12 +528,12 @@ namespace CssUI
             {
                 Owner.Invalidate_Layout(EBoxInvalidationReason.Block_Changed);
 
-                ECssBoxArea ChangeFlags = 0x0;
-                if (eqReplaced) ChangeFlags |= ECssBoxArea.Replaced;
-                if (eqContent) ChangeFlags |= ECssBoxArea.Content;
-                if (eqPadding) ChangeFlags |= ECssBoxArea.Padding;
-                if (eqBorder) ChangeFlags |= ECssBoxArea.Border;
-                if (eqMargin) ChangeFlags |= ECssBoxArea.Margin;
+                ECssBoxType ChangeFlags = 0x0;
+                if (eqReplaced) ChangeFlags |= ECssBoxType.Replaced;
+                if (eqContent) ChangeFlags |= ECssBoxType.Content;
+                if (eqPadding) ChangeFlags |= ECssBoxType.Padding;
+                if (eqBorder) ChangeFlags |= ECssBoxType.Border;
+                if (eqMargin) ChangeFlags |= ECssBoxType.Margin;
 
                 this.onChange?.Invoke(ChangeFlags);
             }

@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace CssUI.CSS
+namespace CssUI.CSS.Enums
 {
     /// <summary>
     /// Specifies an area-type for a <see cref="CssLayoutBox"/>
     /// </summary>
     [Flags]
-    public enum ECssBoxArea : int
+    public enum ECssBoxType : int
     {
         Replaced = 1 << 1,
         Content = 1 << 2,

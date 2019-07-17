@@ -13,7 +13,7 @@ using System.Text;
 
 namespace CssUI.DOM
 {
-    public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, IGeometryNode
+    public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable
     {
         #region Properties
         /// <summary>

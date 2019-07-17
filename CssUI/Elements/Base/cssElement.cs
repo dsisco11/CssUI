@@ -8,6 +8,7 @@ using CssUI.Types;
 using CssUI.CSS;
 using CssUI.DOM;
 using CssUI.Enums;
+using CssUI.CSS.Enums;
 
 namespace CssUI
 {
@@ -945,7 +946,7 @@ namespace CssUI
             #endregion
 
         #region Handlers
-        private void Box_onChange(ECssBoxArea obj)
+        private void Box_onChange(ECssBoxType obj)
         {
                 this.Invalidate_Layout(EBoxInvalidationReason.Block_Changed);
         }
