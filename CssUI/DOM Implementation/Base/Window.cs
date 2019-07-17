@@ -12,7 +12,7 @@ namespace CssUI.DOM
     /// <summary>
     /// Represents the global 'Window' object
     /// </summary>
-    public class Window : EventTarget, IGlobalEventCallbacks, IWindowEventCallbacks
+    public abstract class Window : EventTarget, IGlobalEventCallbacks, IWindowEventCallbacks
     {/* Docs: https://html.spec.whatwg.org/multipage/window-object.html#window */
 
         #region Properties
@@ -136,12 +136,11 @@ namespace CssUI.DOM
         #endregion
 
         #region Focus
-        public string status;
-
-        /* Docs: https://html.spec.whatwg.org/multipage/interaction.html#dom-window-focus */
-        public void focus();
-        /* Docs: https://html.spec.whatwg.org/multipage/interaction.html#dom-window-blur */
-        public void blur();
+        // public string status;
+        public void focus()
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#dom-window-focus */
+            DOMCommon.Run_Focusing_Steps(new FocusableArea(document, document.documentElement));
+        }
         #endregion
 
         #region Internal Utility

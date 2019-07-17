@@ -171,8 +171,6 @@ namespace CssUI.DOM
         #endregion
 
         #region CSS Selectors
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<Element> Scope_Match_Selector_String(Node node, string selector)
         {
             /* The closest(selectors) method, when invoked, must run these steps: */
@@ -551,7 +549,6 @@ namespace CssUI.DOM
         #endregion
 
         #region Hierarchy Getters
-
         /// <summary>
         /// Returns a list of all nodes within the given range
         /// </summary>
@@ -893,7 +890,7 @@ namespace CssUI.DOM
         }
         #endregion
 
-        #region Internal Algorithms
+        #region Element Creation
         internal static Element createElementNS(Document document, string qualifiedName, string Namespace, ElementCreationOptions options = null)
         {
             XMLCommon.Validate_And_Extract(Namespace, qualifiedName, out string Prefix, out string LocalName);
@@ -924,6 +921,18 @@ namespace CssUI.DOM
             result = (Element)ctor.Invoke(new object[] { document, localName, prefix, Namespace });
 
             return result;
+        }
+        #endregion
+
+        #region Focus
+        internal static void Run_Focusing_Steps(FocusableArea new_focus_target)
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#focusing-steps */
+            throw new NotImplementedException();
+        }
+
+        internal static void Run_Unfocusing_Steps(FocusableArea new_focus_target)
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#unfocusing-steps */
+            throw new NotImplementedException();
         }
         #endregion
     }

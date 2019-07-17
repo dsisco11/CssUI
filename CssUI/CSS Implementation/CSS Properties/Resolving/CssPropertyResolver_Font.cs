@@ -112,7 +112,7 @@ namespace CssUI.Internal
                                 case ECssGenericFontFamily.Cursive:
                                 case ECssGenericFontFamily.Fantasy:
                                     {
-                                        if (FontManager.GenericFamilyMap.TryGetValue(CssLookup.Enum_From_Keyword<ECssGenericFontFamily>(val.Value as string), out List<CssValue> GenericFontFamilys))
+                                        if (FontManager.GenericFamilyMap.TryGetValue(CssLookup.Enum_From_Keyword<ECssGenericFontFamily>(val.Value as string).Value, out List<CssValue> GenericFontFamilys))
                                             retValues.AddRange(GenericFontFamilys);
                                     }
                                     break;
