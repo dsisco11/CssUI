@@ -56,7 +56,7 @@ namespace CssUI
 
         #region Stream Management
         /// <summary>
-        /// Returns the character at +Offset from the current read position within the text
+        /// Returns the item at +<paramref name="Offset"/> from the current read position
         /// </summary>
         /// <param name="Offset">Distance from the current read position at which to peek</param>
         /// <returns></returns>
@@ -65,6 +65,32 @@ namespace CssUI
             int i = (ReadPos + Offset);
             if (i >= Stream.Length || i < 0) return EOF_ITEM;
             return Stream[i];
+        }
+
+        /// <summary>
+        /// Returns <paramref name="Count"/> items starting at +<paramref name="Offset"/> from the current read position
+        /// </summary>
+        /// <param name="Offset">Distance from the current read position at which to peek</param>
+        /// <returns></returns>
+        public IEnumerable<ItemType> Peek(int Offset, int Count)
+        {
+            var list = new LinkedList<ItemType>();
+
+            int startIndex = (ReadPos + Offset);
+            int endIndex = startIndex + Count;
+
+            for (int i=startIndex; i<endIndex; i++)
+            {
+                if (i >= Stream.Length || i < 0)
+                {
+                    list.AddLast(EOF_ITEM);
+                    break;
+                }
+
+                list.AddLast(Stream[i]);
+            }
+
+            return list;
         }
 
         /// <summary>
@@ -107,7 +133,7 @@ namespace CssUI
             var retVal = new LinkedList<ItemType>();
             for (int i = ReadPos; i < EndPos; i++)
             {
-                retVal.Add(Stream[i]);
+                retVal.AddLast(Stream[i]);
             }
             ReadPos = EndPos;
 
