@@ -1,5 +1,7 @@
-﻿using CssUI.CSS.Parser;
+﻿using CssUI.CSS.Media;
+using CssUI.CSS.Parser;
 using System;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace CssUI.CSS.Serialization
@@ -10,28 +12,197 @@ namespace CssUI.CSS.Serialization
     public static class ParserCommon
     {
 
+        #region Common
+        public static string Get_Location(TokenStream Stream)
+        {
+            return string.Join("", Stream.Peek(0, 6).Select(tok => tok.Encode()));
+        }
+        #endregion
+
         #region Media Querys
 
         /// <summary>
-        /// Returns <c>True</c> if the next tokens makeup a media feature comparator ('=', '<', '>', '<=', '>=')
+        /// Returns <c>True</c> if the token is the 'not' keyword
+        /// <para>Used by <see cref="Media.MediaFeature"/></para>
         /// </summary>
         /// <param name="Stream"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_And_Token(CssToken A)
+        public static bool Is_Negator(CssToken A)
         {
             if (ReferenceEquals(null, A))
                 throw new ArgumentException();
 
-            return (A.Type == ECssTokenType.Delim && (A as IdentToken).Value.Equals("and"));
+            if (A.Type != ECssTokenType.Ident)
+                return false;
+
+            string tokStr = (A as IdentToken).Value;
+            return tokStr.Equals("not");
+        }
+
+        /// <summary>
+        /// Returns <c>True</c> if the token is a keyword for <see cref="EMediaCombinator"/> ('and', 'or', 'not')
+        /// <para>Used by <see cref="Media.MediaFeature"/></para>
+        /// </summary>
+        /// <param name="Stream"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Combinator(CssToken A)
+        {
+            if (ReferenceEquals(null, A))
+                throw new ArgumentException();
+
+            if (A.Type != ECssTokenType.Ident)
+                return false;
+
+            string tokStr = (A as IdentToken).Value;
+            return CssLookup.Is_Declared(typeof(EMediaCombinator), tokStr);
+        }
+
+        /// <summary>
+        /// Returns <c>True</c> if the token is a keyword for <see cref="EMediaOperator"/> ('=', '<', '>', '<=', '>=')
+        /// <para>Used by <see cref="Media.MediaFeature"/></para>
+        /// </summary>
+        /// <param name="Stream"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Comparator(CssToken A)
+        {
+            if (ReferenceEquals(null, A))
+                throw new ArgumentException();
+
+            if (A.Type != ECssTokenType.Ident)
+                return false;
+
+            string tokStr = (A as IdentToken).Value;
+            return CssLookup.Is_Declared(typeof(EMediaOperator), tokStr);
+        }
+
+        /// <summary>
+        /// Returns if the next tokens in the stream define a <see cref="MediaCondition"/>
+        /// <para>Used by <see cref="Media.MediaFeature"/></para>
+        /// <para>A <see cref="MediaCondition"/> always starts with an opening parentheses followed by either a combinator or optional whitespace and another opening parentheses</para>
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Starts_Media_Condition(CssToken A, CssToken B, CssToken C)
+        {
+            if (ReferenceEquals(null, A) || ReferenceEquals(null, B) || ReferenceEquals(null, C))
+                throw new ArgumentException();
+            /* Pattern: "(<combinator>" or "( (" */
+
+            if (A.Type != ECssTokenType.Parenth_Open)
+                return false;
+
+            if (Is_Combinator(B))// "(<combinator>"
+                return true;
+
+            if (B.Type == ECssTokenType.Parenth_Open)// "(("
+                return true;
+
+            if (B.Type == ECssTokenType.Whitespace && C.Type == ECssTokenType.Parenth_Open)// "( ("
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Returns if the next tokens in the stream define a <see cref="MediaFeature"/>
+        /// <para>Used by <see cref="Media.MediaFeature"/></para>
+        /// <para>A <see cref="MediaFeature"/> always starts with an opening parentheses followed by optional whitespace and an ident token which is NOT a combinator</para>
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Starts_Media_Feature(CssToken A, CssToken B, CssToken C)
+        {
+            /* Only null check A and B here because thats the minimum that any media feature can consist of eg: "color)" is 2 tokens */
+            if (ReferenceEquals(null, A) || ReferenceEquals(null, B))
+                throw new ArgumentException();
+
+            /* Pattern: "(<ident>" */
+
+            if (A.Type != ECssTokenType.Parenth_Open)
+                return false;
+
+            if (B.Type == ECssTokenType.Ident && !Is_Combinator(B))// "(<ident>"
+                return true;
+
+            if (B.Type == ECssTokenType.Whitespace && C.Type == ECssTokenType.Ident && !Is_Combinator(C))// "( <ident>"
+                return true;
+
+            return false;
+        }
+
+
+        /// <summary>
+        /// Returns if the next tokens in the stream define a discreet media feature
+        /// <para>Used by <see cref="Media.MediaFeature"/></para>
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Starts_Boolean_Feature(CssToken A, CssToken B, CssToken C)
+        {
+            if (ReferenceEquals(null, A) || ReferenceEquals(null, B) || ReferenceEquals(null, C))
+                throw new ArgumentException();
+            /* Pattern: "(<ident>" */
+
+            if (A.Type != ECssTokenType.Parenth_Open)
+                return false;
+
+            if (B.Type == ECssTokenType.Ident)// "(<ident>"
+                return true;
+
+            if (B.Type == ECssTokenType.Whitespace && C.Type == ECssTokenType.Ident)// "( <ident>"
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Returns if the next tokens in the stream define a discreet media feature
+        /// <para>Used by <see cref="Media.MediaFeature"/></para>
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Starts_Discreet_Feature(CssToken A, CssToken B, CssToken C)
+        {
+            if (ReferenceEquals(null, A) || ReferenceEquals(null, B))
+                throw new ArgumentException();
+
+            if (A.Type != ECssTokenType.Ident)
+                return false;
+
+            if (B.Type == ECssTokenType.Colon)
+                return true;
+
+            if (B.Type == ECssTokenType.Whitespace && C.Type == ECssTokenType.Colon)
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Returns if the next tokens in the stream define a discreet media feature
+        /// <para>Used by <see cref="Media.MediaFeature"/></para>
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Starts_Range_Feature(CssToken A, CssToken B, CssToken C)
+        {
+            if (ReferenceEquals(null, A) || ReferenceEquals(null, B))
+                throw new ArgumentException();
+
+            if (A.Type != ECssTokenType.Ident)
+                return false;
+
+            if (Is_Comparator(B))
+                return true;
+
+            if (B.Type == ECssTokenType.Whitespace && Is_Comparator(C))
+                return true;
+
+            return false;
         }
 
         /// <summary>
         /// Returns if the next tokens in the stream define a ratio value
         /// <para>Used by <see cref="Media.MediaFeature"/></para>
         /// </summary>
-        /// <param name="Stream"></param>
-        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Starts_Ratio_Value(CssToken A, CssToken B)
         {
@@ -51,8 +222,6 @@ namespace CssUI.CSS.Serialization
         /// <summary>
         /// Returns <c>True</c> if the next tokens makeup a media feature comparator ('=', '<', '>', '<=', '>=')
         /// </summary>
-        /// <param name="Stream"></param>
-        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Starts_Media_Comparator(CssToken A)
         {

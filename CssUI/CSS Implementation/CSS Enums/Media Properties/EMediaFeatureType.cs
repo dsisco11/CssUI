@@ -2,8 +2,7 @@
 {
     public enum EMediaFeatureType : int
     {
-        Plain,
-        Boolean,
+        Discreet,
         Range
     }
 }

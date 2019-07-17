@@ -113,7 +113,7 @@ namespace CssUI.CSS.Serialization
 
             string type = Identifier<EMediaType>(query.MediaType);
             /* 3) If the media query does not contain media features append type, to s, then return s. */
-            if (query.Features.Count() <= 0)
+            if (query.Conditions.Count() <= 0)
             {
                 sb.Append(type);
                 return sb.ToString();
@@ -127,7 +127,7 @@ namespace CssUI.CSS.Serialization
             }
 
             /* 5) Sort the media features in lexicographical order. */
-            List<MediaFeature> features = query.Features.OrderBy(o => CssLookup.Keyword_From_Enum(o.Name)).ToList();
+            List<MediaFeature> features = query.Conditions.OrderBy(o => CssLookup.Keyword_From_Enum(o.Name)).ToList();
             /* 6) Then, for each media feature: */
             for (int i=0; i<features.Count; i++)
             {

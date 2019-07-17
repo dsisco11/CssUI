@@ -4,6 +4,7 @@ using CssUI.DOM;
 using CssUI.DOM.Media;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace CssUI.CSS.Serialization
@@ -37,7 +38,7 @@ namespace CssUI.CSS.Serialization
         /// Parses and returns a list of rules
         /// </summary>
         /// <returns></returns>
-        public List<CssComponent> Parse_Rule_List()
+        public IEnumerable<CssComponent> Parse_Rule_List()
         {
             TopLevel = false;
             return Consume_Rule_List(Stream, TopLevel);
@@ -81,7 +82,7 @@ namespace CssUI.CSS.Serialization
             return Dec;
         }
 
-        public List<CssComponent> Parse_Decleration_List()
+        public IEnumerable<CssComponent> Parse_Decleration_List()
         {
             return Consume_Decleration_List(Stream);
         }
@@ -102,7 +103,7 @@ namespace CssUI.CSS.Serialization
                 throw new CssSyntaxErrorException("EOF expected");
         }
 
-        public List<CssToken> Parse_ComponentValue_List()
+        public IEnumerable<CssToken> Parse_ComponentValue_List()
         {
             List<CssToken> List = new List<CssToken>();
             CssToken Value;
@@ -130,7 +131,7 @@ namespace CssUI.CSS.Serialization
         /// <summary>
         /// Continually consumes tokens until the current token is not a whitespace one
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
         static void Consume_All_Whitespace(TokenStream Stream)
         {
             if (ReferenceEquals(null, Stream))
@@ -140,7 +141,8 @@ namespace CssUI.CSS.Serialization
             while (Stream.Next.Type == ECssTokenType.Whitespace) { Stream.Consume(); }
         }
 
-        static LinkedList<CssComponent> Consume_Rule_List(TokenStream Stream, bool TopLevel = false)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
+        static IEnumerable<CssComponent> Consume_Rule_List(TokenStream Stream, bool TopLevel = false)
         {
             if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
             LinkedList<CssComponent> Rules = new LinkedList<CssComponent>();
@@ -185,6 +187,7 @@ namespace CssUI.CSS.Serialization
             return Rules;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
         static CssAtRule Consume_AtRule(TokenStream Stream)
         {
             if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
@@ -214,6 +217,7 @@ namespace CssUI.CSS.Serialization
             return Rule;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
         static CssQualifiedRule Consume_QualifiedRule(TokenStream Stream)
         {
             if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
@@ -238,8 +242,8 @@ namespace CssUI.CSS.Serialization
             return Rule;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static LinkedList<CssComponent> Consume_Decleration_List(TokenStream Stream)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
+        static IEnumerable<CssComponent> Consume_Decleration_List(TokenStream Stream)
         {// SEE:  https://www.w3.org/TR/css-syntax-3/#consume-a-list-of-declarations0
             if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
             LinkedList<CssComponent> List = new LinkedList<CssComponent>();
@@ -293,7 +297,7 @@ namespace CssUI.CSS.Serialization
             return List;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
         static CssDecleration Consume_Decleration(TokenStream Stream)
         {
             if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
@@ -348,36 +352,9 @@ namespace CssUI.CSS.Serialization
         }
 
         /// <summary>
-        /// Attempts to consume all tokens within a matching pair of () or {} brackets and otherwise just returns the next token.
-        /// </summary>
-        /// <param name="Stream"></param>
-        /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static CssToken Consume_ComponentValue(TokenStream Stream)
-        {
-            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
-            switch (Stream.Next.Type)
-            {
-                case ECssTokenType.Bracket_Open:
-                case ECssTokenType.SqBracket_Open:
-                case ECssTokenType.Parenth_Open:
-                    {
-                        return Consume_SimpleBlock(Stream);
-                    }
-                case ECssTokenType.FunctionName:
-                    {
-                        return Consume_Function(Stream);
-                    }
-            }
-
-            //return new CssPreservedToken(Stream.Consume());
-            return Stream.Consume();
-        }
-
-        /// <summary>
         /// Consumes a block of tokens encased inbetween one of: [], {}, or ()
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
         static CssSimpleBlock Consume_SimpleBlock(TokenStream Stream)
         {
             if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
@@ -413,7 +390,7 @@ namespace CssUI.CSS.Serialization
             return Block;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
         static CssFunction Consume_Function(TokenStream Stream)
         {
             if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
@@ -440,6 +417,63 @@ namespace CssUI.CSS.Serialization
             while (Token.Type != ECssTokenType.EOF);
 
             return Func;
+        }
+
+        /// <summary>
+        /// Attempts to consume all tokens within a matching pair of () or {} brackets and otherwise just returns the next token.
+        /// </summary>
+        /// <param name="Stream"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
+        static CssToken Consume_ComponentValue(TokenStream Stream)
+        {
+            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
+            switch (Stream.Next.Type)
+            {
+                case ECssTokenType.Bracket_Open:
+                case ECssTokenType.SqBracket_Open:
+                case ECssTokenType.Parenth_Open:
+                    {
+                        return Consume_SimpleBlock(Stream);
+                    }
+                case ECssTokenType.FunctionName:
+                    {
+                        return Consume_Function(Stream);
+                    }
+            }
+
+            //return new CssPreservedToken(Stream.Consume());
+            return Stream.Consume();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
+        static IEnumerable<IEnumerable<CssToken>> Consume_Comma_Seperated_Component_Value_List(TokenStream Stream)
+        {/* Docs: https://drafts.csswg.org/css-syntax-3/#parse-a-comma-separated-list-of-component-values */
+            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
+
+            var cvls = new LinkedList<LinkedList<CssToken>>();
+            var node = cvls.AddLast(new LinkedList<CssToken>());
+
+            do
+            {
+                switch (Stream.Next.Type)
+                {
+                    case ECssTokenType.Comma:
+                    case ECssTokenType.EOF:
+                        {
+                            cvls.AddLast(node);
+                        }
+                        break;
+                    default:
+                        {
+                            node.Value.AddLast(Consume_ComponentValue(Stream));
+                        }
+                        break;
+                }
+            }
+            while (Stream.Next != CssToken.EOF);
+
+            return cvls;
         }
         #endregion
 
@@ -513,24 +547,23 @@ namespace CssUI.CSS.Serialization
 
         #region Media
         public MediaQueryList Parse_Media_Query_List(Document document)
-        {
+        {/* Docs: https://www.w3.org/TR/mediaqueries-4/#mq-syntax */
             Consume_All_Whitespace(this.Stream);
 
-            if (Stream.Next.Type == ECssTokenType.EOF) throw new CssSyntaxErrorException("Unexpected EOF");
-            if (Stream.Next.Type != ECssTokenType.At_Keyword) throw new CssSyntaxErrorException("Expected at-rule");
-
-            CssAtRule rule = Consume_AtRule(Stream);
-            if (ReferenceEquals(null, rule)) throw new CssSyntaxErrorException("Failed to parse Media rule, cannot parse at-rule");
-
+            /* 
+             * To parse a <media-query-list> production, 
+             * parse a comma-separated list of component values, 
+             * then parse each entry in the returned list as a <media-query>. 
+             * Its value is the list of <media-query>s so produced. 
+             */
+            var cvls = Consume_Comma_Seperated_Component_Value_List(this.Stream);
             LinkedList<MediaQuery> queryList = new LinkedList<MediaQuery>();
-            TokenStream tokenStream = new TokenStream(rule.Prelude);
-            CssToken Token = null;
-            do
+            foreach (LinkedList<CssToken> tokenList in cvls)
             {
+                TokenStream tokenStream = new TokenStream(tokenList);
                 var query = Consume_MediaQuery(tokenStream);
                 queryList.AddLast(query);
             }
-            while (Token != CssToken.EOF);
 
             return new MediaQueryList(document, queryList);
         }
@@ -541,113 +574,197 @@ namespace CssUI.CSS.Serialization
 
             if (Stream.Next.Type != ECssTokenType.Ident)
             {
-                throw new CssSyntaxErrorException("Expected ident token");
+                throw new CssSyntaxErrorException("Expected ident token", Stream);
             }
             EMediaQueryModifier modifier = 0x0;
             EMediaType mediaType = 0x0;
-            LinkedList<MediaFeature> featureList = new LinkedList<MediaFeature>();
-
-            IdentToken Token = Stream.Next as IdentToken;
+            LinkedList<IMediaCondition> conditionList = new LinkedList<IMediaCondition>();
 
             /* First check for media modifier */
-            EMediaQueryModifier? mod = CssLookup.Enum_From_Keyword<EMediaQueryModifier>(Token.Value);
-            if (mod.HasValue)
+            if (Stream.Next.Type != ECssTokenType.Ident)
+            {
+                throw new CssSyntaxErrorException("Expected ident token", Stream);
+            }
+            if (CssLookup.Enum_From_Keyword((Stream.Next as IdentToken).Value, out EMediaQueryModifier mod))
             {
                 Stream.Consume();// consume this token
-                modifier = mod.Value;
-
-                if (Stream.Next.Type != ECssTokenType.Ident)
-                {
-                    throw new CssSyntaxErrorException("Expected ident token");
-                }
-                Token = Stream.Next as IdentToken;
+                modifier = mod;
             }
 
             /* Skip 'and' keyword if present */
-            if (ParserCommon.Is_And_Token(Token))
+            if (ParserCommon.Is_Combinator(Stream.Next))
             {
                 Stream.Consume();
-
-                if (Stream.Next.Type != ECssTokenType.Ident)
-                {
-                    throw new CssSyntaxErrorException("Expected ident token");
-                }
-                Token = Stream.Next as IdentToken;
             }
 
             /* Set the media type */
-            EMediaType? type = CssLookup.Enum_From_Keyword<EMediaType>(Token.Value);
-            if (!type.HasValue)
+            if (Stream.Next.Type != ECssTokenType.Ident)
             {
-                throw new CssParserException($"Unrecognized media type: \"{Token.Value}\"");
+                throw new CssSyntaxErrorException("Expected media type", Stream);
+            }
+
+            if (!CssLookup.Enum_From_Keyword((Stream.Next as IdentToken).Value, out EMediaType type))
+            {
+                throw new CssParserException($"Unrecognized media type: \"{(Stream.Next as IdentToken).Value}\" @\"{ParserCommon.Get_Location(Stream)}\"");
             }
             else
             {
                 Stream.Consume();
             }
 
-            /* Skip 'and' keyword if present */
+            /* Skip thew first combinator keyword if present */
             Consume_All_Whitespace(Stream);
-            if (ParserCommon.Is_And_Token(Token))
+            if (ParserCommon.Is_Combinator(Stream.Next))
             {
                 Stream.Consume();
-
-                if (Stream.Next.Type != ECssTokenType.Ident)
-                {
-                    throw new CssSyntaxErrorException("Expected ident token");
-                }
-                Token = Stream.Next as IdentToken;
             }
 
-            /* Consume features */
-            Consume_All_Whitespace(Stream);
-            if (Stream.Next.Type != ECssTokenType.Parenth_Open)
-            {
-                throw new CssSyntaxErrorException("Expected left parentheses as start of media features list");
-            }
 
-            /* Consume simple block to get our total array of tokens to be interpreted as media features */
-            var block = Consume_SimpleBlock(Stream);
-            TokenStream featureStream = new TokenStream(block.Values);
-            /* Now consume media features until we hit EOF */
+            /* Now consume media conditions until we cant anymore */
             do
             {
-                /* Media features are delimited here by either EOF or the 'and' keyword  */
-                var subStream = (TokenStream)featureStream.Substream(tok => !ParserCommon.Is_And_Token(tok));
-
-                Consume_All_Whitespace(featureStream);
-                if (ParserCommon.Is_And_Token(featureStream.Next))
-                {/* Consume 'and' keyword */
-                    featureStream.Consume();
+                Consume_All_Whitespace(Stream);
+                if (Stream.Next.Type != ECssTokenType.Parenth_Open)
+                {/* This isn't invalid, it just signals that we have no more features to consume */
+                    break;
                 }
 
-                var feature = Consume_MediaFeature(subStream);
-                featureList.AddLast(feature);
+                var condition = Consume_Media_Condition(Stream);
+                conditionList.AddLast(condition);
             }
-            while (featureStream.Next.Type != ECssTokenType.EOF);
+            while (Stream.Next.Type != ECssTokenType.EOF);
 
-            return new MediaQuery(modifier, mediaType, featureList);
+            return new MediaQuery(modifier, mediaType, conditionList);
         }
 
-        static MediaFeature Consume_MediaFeature(TokenStream Stream = null)
+        /// <summary>
+        /// Consumes a new <see cref="MediaCondition"/> or <see cref="MediaFeature"/>
+        /// </summary>
+        /// <param name="Stream"></param>
+        /// <returns></returns>
+        static IMediaCondition Consume_Media_Condition(TokenStream Stream)
+        {/* Docs: https://www.w3.org/TR/mediaqueries-4/#media-condition */
+            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
+
+            Consume_All_Whitespace(Stream);
+            if (ParserCommon.Starts_Media_Feature(Stream.Next, Stream.NextNext, Stream.NextNextNext))
+            {
+                return Consume_Media_Feature(Stream);
+            }
+            else if (ParserCommon.Starts_Media_Condition(Stream.Next, Stream.NextNext, Stream.NextNextNext))
+            {
+                EMediaCombinator Combinator = EMediaCombinator.None;
+                var conditionList = new LinkedList<IMediaCondition>();
+
+                Consume_All_Whitespace(Stream);
+
+                if (Stream.Next.Type == ECssTokenType.Parenth_Close)
+                {
+                    /* Empty media condition block */
+                    Stream.Consume();
+                    return null;
+                    //return new MediaCondition(EMediaCombinator.None, new MediaFeature[0]);
+                }
+                else if (Stream.Next.Type == ECssTokenType.Parenth_Open)
+                {
+                    Stream.Consume();
+                }
+
+                /* Repeatedly consume sub-media-conditions until we hit a closing parentheses */
+                do
+                {
+                    Consume_All_Whitespace(Stream);
+
+                    if (Stream.Next.Type == ECssTokenType.Parenth_Close)
+                    {
+                        /* End of this media condition block */
+                        break;
+                    }
+
+                    /* Anything other than the first condition *MUST* specify a combinator */
+                    if (conditionList.Count > 0)
+                    {
+                        if (!ParserCommon.Is_Combinator(Stream.Next))
+                        {
+                            throw new CssSyntaxErrorException($"Expected combinator @: {ParserCommon.Get_Location(Stream)}");
+                        }
+                    }
+
+                    /* Otherwise we just CAN have a combinator */
+                    if (ParserCommon.Is_Combinator(Stream.Next))
+                    {
+                        /* Consume combinator */
+                        IdentToken combinatorToken = Stream.Consume() as IdentToken;
+                        if (!CssLookup.Enum_From_Keyword(combinatorToken.Value, out EMediaCombinator combLookup))
+                        {
+                            throw new CssSyntaxErrorException($"Unrecognized combinator keyword \"{combinatorToken.Value}\" in media query @\"{ParserCommon.Get_Location(Stream)}\"");
+                        }
+                        else if (Combinator == EMediaCombinator.None)
+                        {/* This is the first combinator specified */
+                            Combinator = combLookup;
+                        }
+                        else if (Combinator != EMediaCombinator.None && combLookup != Combinator)
+                        {/* Ensure this new combinator matches the combinator for this method group */
+                            throw new CssSyntaxErrorException($"It is invalid to mix 'and' and 'or' and 'not' at the same level of a media query. please enclose in parentheses the condition @\"{ParserCommon.Get_Location(Stream)}\"");
+                        }
+                    }
+
+                    Consume_All_Whitespace(Stream);
+                    if (Stream.Next.Type != ECssTokenType.Parenth_Open)
+                    {
+                        throw new CssSyntaxErrorException($"Expected opening parentheses to continue media-condition @\"{ParserCommon.Get_Location(Stream)}\"");
+                    }
+
+                    /* Oh look a yummy little sub-condition for us to gobble up! */
+                    var feature = Consume_Media_Condition(Stream);
+                    conditionList.AddLast(feature);
+                }
+                while (Stream.Next.Type != ECssTokenType.EOF);
+
+                return new MediaCondition(Combinator, conditionList);
+            }
+
+            throw new CssSyntaxErrorException($"Expected start of media condition @: \"{ParserCommon.Get_Location(Stream)}\"");
+        }
+
+        static IMediaCondition Consume_Media_Feature(TokenStream Stream)
         {/* Docs: https://drafts.csswg.org/mediaqueries-4/#mq-syntax */
             if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
-            /*
-             * <mf-plain> = <mf-name> : <mf-value>
-             * <mf-boolean> = <mf-name>
-             * <mf-range> = <mf-name> <mf-comparison> <mf-value>
-             * <mf-value> <mf-comparison> <mf-name>
-             * <mf-value> <mf-lt> <mf-name> <mf-lt> <mf-value>
-             * <mf-value> <mf-gt> <mf-name> <mf-gt> <mf-value>
-             */
+
 
             /* Consume feature name */
-            Consume_All_Whitespace(Stream);
-            if (Stream.Next.Type != ECssTokenType.Ident) throw new CssSyntaxErrorException($"Expected Ident-token, but got \"{Enum.GetName(typeof(ECssTokenType), Stream.Next.Type)}\"");
-            IdentToken nameTok = Stream.Consume() as IdentToken;
-            /* Resolve the name */
-            EMediaFeatureName? Name = CssLookup.Enum_From_Keyword<EMediaFeatureName>(nameTok.Value);
-            if (!Name.HasValue) throw new CssParserException($"Unrecognized media type: \"{nameTok.Value}\"");
+            if (ParserCommon.Starts_Boolean_Feature(Stream.Next, Stream.NextNext, Stream.NextNextNext))
+            {
+                /* Consume feature name */
+                IdentToken nameTok = Stream.Consume() as IdentToken;
+
+                /* Resolve the name */
+                EMediaFeatureName? Name = CssLookup.Enum_From_Keyword<EMediaFeatureName>(nameTok.Value);
+                if (!Name.HasValue) throw new CssParserException($"Unrecognized media type: \"{nameTok.Value}\"");
+
+                return new MediaFeature(Name.Value);
+            }
+            else if (ParserCommon.Starts_Discreet_Feature(Stream.Next, Stream.NextNext, Stream.NextNextNext))
+            {
+                /* Consume feature name */
+                IdentToken nameTok = Stream.Consume() as IdentToken;
+
+                /* Resolve the name */
+                EMediaFeatureName? Name = CssLookup.Enum_From_Keyword<EMediaFeatureName>(nameTok.Value);
+                if (!Name.HasValue) throw new CssParserException($"Unrecognized media type: \"{nameTok.Value}\"");
+
+                /* Consume the value to match */
+                Consume_All_Whitespace(Stream);
+                var value = Consume_MediaFeature_Value(Stream);
+
+                return new MediaFeature(Name.Value, value);
+            }
+
+            if (Stream.Next.Type != ECssTokenType.Ident)
+            {/* Short range */
+
+            }
+            //if (Stream.Next.Type != ECssTokenType.Ident) throw new CssSyntaxErrorException($"Expected Ident-token, but got \"{Enum.GetName(typeof(ECssTokenType), Stream.Next.Type)}\"");
             /* Determine feature type: plain / boolean / range */
             if (Stream.Next.Type == ECssTokenType.Colon)
             {/* Plain */
@@ -667,10 +784,10 @@ namespace CssUI.CSS.Serialization
             var comparatorTok = (Stream.Consume() as ValuedTokenBase);
             string comparatorString = comparatorTok.Value.ToString();
             char[] compBuf = comparatorString.ToCharArray();
-            EMediaFeatureComparator comparator = 0x0;
+            EMediaOperator comparator = 0x0;
             for(int i=0;i<comparatorString.Length; i++)
             {
-                EMediaFeatureComparator? lookup = CssLookup.Enum_From_Keyword<EMediaFeatureComparator>(compBuf[i].ToString());
+                EMediaOperator? lookup = CssLookup.Enum_From_Keyword<EMediaOperator>(compBuf[i].ToString());
                 if (!lookup.HasValue)
                 {
                     throw new CssParserException($"Unable to interpret keyword \"{comparatorString}\" as enum value");
@@ -729,6 +846,8 @@ namespace CssUI.CSS.Serialization
 
             throw new CssSyntaxErrorException($"Expected Number/Dimension/Keyword token but got: \"{Enum.GetName(typeof(ECssTokenType), Stream.Next.Type)}\"");
         }
+
+
         #endregion
     }
 }

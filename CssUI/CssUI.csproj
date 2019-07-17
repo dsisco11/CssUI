@@ -91,6 +91,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="CSS Implementation\CSS Enums\Style Properties\" />
     <Folder Include="DOM Implementation\Events\Interfaces\" />
   </ItemGroup>
 

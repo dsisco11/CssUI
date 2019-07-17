@@ -8,15 +8,15 @@ namespace CssUI.CSS.Media
         #region Properties
         public EMediaQueryModifier Modifier { get; private set; }
         public EMediaType MediaType { get; private set; }
-        public LinkedList<MediaFeature> Features { get; private set; }
+        public LinkedList<IMediaCondition> Conditions { get; private set; }
         #endregion
 
         #region Constructors
-        public MediaQuery(EMediaQueryModifier modifier, EMediaType mediaType, LinkedList<MediaFeature> features)
+        public MediaQuery(EMediaQueryModifier modifier, EMediaType mediaType, LinkedList<IMediaCondition> conditions)
         {
             Modifier = modifier;
             MediaType = mediaType;
-            Features = features;
+            Conditions = conditions;
         }
         #endregion
 
@@ -29,10 +29,12 @@ namespace CssUI.CSS.Media
             if (MediaType != EMediaType.All && MediaType != document.window.screen.MediaType)
                 return false;
 
-            foreach (MediaFeature feature in Features)
+            foreach (IMediaCondition condition in Conditions)
             {
-                if (!feature.Matches(document))
+                if (!condition.Matches(document))
+                {
                     return false;
+                }
             }
 
             return true;

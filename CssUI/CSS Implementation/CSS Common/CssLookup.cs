@@ -40,6 +40,24 @@ namespace CssUI
 
         #region Enum Lookup
 
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
+        public static bool Keyword_From_Enum<Ty>(Ty Value, out string outKeyword) where Ty : struct
+        {
+            int index = CssEnumTables.Get_Enum_Index<Ty>();
+            if (index < 0)
+            {
+                /* Enum has no index */
+                outKeyword = null;
+                return false;
+            }
+
+            /* /!\ This conversion will fucking EXPLODE if the given generic type does not have an integer backing type /!\ */
+            outKeyword = CssEnumTables.TABLE[index][CastTo<int>.From<Ty>(Value)];
+            return true;
+        }
+
+        [Obsolete("Encourages bad code, instead use: Keyword_From_Enum<Ty>(Ty Value, out string outKeyword)")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
         public static string Keyword_From_Enum<Ty>(Ty Value) where Ty : struct
         {
@@ -54,6 +72,22 @@ namespace CssUI
             return CssEnumTables.TABLE[index][CastTo<int>.From<Ty>(Value)];
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
+        public static bool Enum_From_Keyword<Ty>(AtomicString Keyword, out Ty outEnum) where Ty : struct
+        {
+            int index = CssEnumTables.Get_Enum_Index<Ty>();
+            if (index < 0)
+            {
+                /* Enum has no index */
+                outEnum = default(Ty);
+                return false;
+            }
+
+            outEnum = (Ty)CssEnumTables.KEYWORD[index][Keyword];
+            return true;
+        }
+
+        [Obsolete("Encourages bad code, instead use: Enum_From_Keyword<Ty>(string, out Ty outEnum)")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
         public static Ty? Enum_From_Keyword<Ty>(AtomicString Keyword) where Ty : struct
         {

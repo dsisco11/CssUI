@@ -1,19 +1,23 @@
 ﻿using CssUI.CSS.Internal;
-using System;
 
 namespace CssUI.CSS.Media
 {
     /// <summary>
     /// Describes the comparison logic for media a feature, these are flags and a feature can have more than one comparator
     /// </summary>
-    [Flags, CssEnum]
-    public enum EMediaFeatureComparator : int
+    [CssEnum]
+    public enum EMediaOperator : int
     {
         [CssKeyword("<")]
-        LessThan = (1 << 1),
+        LessThan,
         [CssKeyword("=")]
-        EqualTo = (1 << 2),
+        EqualTo,
         [CssKeyword(">")]
-        GreaterThan = (1 << 3)
+        GreaterThan,
+
+        [CssKeyword("<=")]
+        LessThanEq,
+        [CssKeyword(">=")]
+        GreaterThanEq,
     }
 }

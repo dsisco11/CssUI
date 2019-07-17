@@ -16,6 +16,10 @@ namespace CssUI.CSS.Internal
         /// Name of the property
         /// </summary>
         public readonly AtomicName<EMediaFeatureName> Name;
+        /// <summary>
+        /// Specifies if this feature name is a Discreet or Range type
+        /// </summary>
+        public readonly EMediaFeatureType Type;
 
         /// <summary>
         /// Allowed datatypes, when set this will override the disallowed list
@@ -41,9 +45,10 @@ namespace CssUI.CSS.Internal
         /// <param name="DisallowedTypes">Bitmask of all value data types which cannot be assigned to this property</param>
         /// <param name="Keywords">List of keywords which can be assigned to this property</param>
         /// <param name="IsPrivate">If TRUE then this property cannot be set from style-sheets</param>
-        public MediaDefinition(AtomicName<EMediaFeatureName> Name, ECssValueType AllowedTypes, string[] Keywords = null)
+        public MediaDefinition(AtomicName<EMediaFeatureName> Name, EMediaFeatureType Type, ECssValueType AllowedTypes, string[] Keywords = null)
         {
             this.Name = Name;
+            this.Type = Type;
 
             if (ReferenceEquals(Keywords, null))
                 KeywordWhitelist = new List<string>();
