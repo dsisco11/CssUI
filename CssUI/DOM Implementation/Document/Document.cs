@@ -33,6 +33,7 @@ namespace CssUI.DOM
         public readonly string contentType;
         public readonly DOMImplementation implementation = new DOMImplementation();
         public Element documentElement { get; private set; }
+        internal CssUnitResolver cssUnitResolver;
         #endregion
 
         #region Node Implementation
@@ -52,6 +53,7 @@ namespace CssUI.DOM
             this.doctype = doctype;
             this.contentType = contentType;
             this.Origin = origin;
+            cssUnitResolver = new CssUnitResolver(this, true);
         }
         #endregion
 

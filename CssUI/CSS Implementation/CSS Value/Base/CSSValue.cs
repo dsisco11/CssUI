@@ -272,6 +272,28 @@ namespace CssUI.CSS
         /// Resolves the value to a decimal and returns it if possible, returns NULL otherwise
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public double Resolve(CssUnitResolver UnitResolver)
+        {
+            switch (Type)
+            {
+                case ECssValueType.INTEGER:
+                    return (int)Value;
+                case ECssValueType.NUMBER:
+                    return (double)Value;
+                case ECssValueType.DIMENSION:
+                case ECssValueType.RESOLUTION:
+                    return UnitResolver.Resolve((double)this.Value, this.Unit);
+                default:
+                    {
+                        throw new CssException($"CSS Value type \"{Enum.GetName(typeof(ECssValueType), Type)}\" cannot be resolved to a number");
+                    }
+            }
+        }
+
+        /// <summary>
+        /// Resolves the value to a decimal and returns it if possible, returns NULL otherwise
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public double? Resolve(StyleUnitResolverDelegate UnitResolver)
         {
             switch (Type)

@@ -103,7 +103,7 @@ namespace CssUI.CSS
                     break;
                 case ECssValueType.DIMENSION:
                     {
-                        double? nv = this.Resolve((Unit) => StyleUnitResolver.Get_Scale(Property.Owner, Property, Unit));
+                        double? nv = this.Resolve((Unit) => CssUnitResolver.Get_Scale(Property.Owner, Property, Unit));
                         if (nv.HasValue)
                         {
                             return CssValue.From_Number(nv.Value);

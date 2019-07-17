@@ -29,5 +29,12 @@ namespace CssUI.DOM
         /// </summary>
         public ulong pixelDepth { get; } = 24;
         #endregion
+
+        #region CssUI
+        /// <summary>
+        /// The dpi (dots per inch) of the current output devices screen
+        /// </summary>
+        public ulong dpi { get; } = 96;
+        #endregion
     }
 }

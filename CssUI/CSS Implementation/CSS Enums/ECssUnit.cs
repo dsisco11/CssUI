@@ -13,11 +13,87 @@ namespace CssUI.CSS
         /// </summary>
         [CssKeyword("")]
         None = 0,
+        /* Physical Units */
         /// <summary>
-        /// Relative to pixel size
+        /// 1/96th of 1in
         /// </summary>
         [CssKeyword("px")]
         PX,
+        /// <summary>
+        /// Points (1pt = 1/72th of 1in)
+        /// </summary>
+        [CssKeyword("pt")]
+        PT,
+        /// <summary>
+        /// Picas (1pc = 1/6th of 1in)
+        /// </summary>
+        [CssKeyword("pc")]
+        PC,
+        /// <summary>
+        /// Inches (1in = 2.54cm = 96px)
+        /// </summary>
+        [CssKeyword("in")]
+        IN,
+        /// <summary>
+        /// Quarter-Millimeters (1Q = 12/40th of 1cm)
+        /// </summary>
+        [CssKeyword("q")]
+        Q,
+        /// <summary>
+        /// Millimeters (1mm = 1/10th of 1cm)
+        /// </summary>
+        [CssKeyword("mm")]
+        MM,
+        /// <summary>
+        /// Centimeters (1cm = 96px / 2.54)
+        /// </summary>
+        [CssKeyword("cm")]
+        CM,
+
+        /* <Resolution> Units */
+        /// <summary>
+        /// Dots per inch
+        /// </summary>
+        [CssKeyword("dpi")]
+        DPI,
+        /// <summary>
+        /// Dots per centimeter
+        /// </summary>
+        [CssKeyword("dpcm")]
+        DPCM,
+        /// <summary>
+        /// Dots per 'px' unit
+        /// </summary>
+        [CssKeyword("dppx")]
+        DPPX,
+
+        /* Time Units*/
+
+        /// <summary>
+        /// Seconds
+        /// </summary>
+        [CssKeyword("s")]
+        S,
+        /// <summary>
+        /// Milliseconds
+        /// </summary>
+        [CssKeyword("ms")]
+        MS,
+
+        /* Frequency Units*/
+
+        /// <summary>
+        /// Hertz
+        /// </summary>
+        [CssKeyword("hz")]
+        HZ,
+        /// <summary>
+        /// KiloHertz
+        /// </summary>
+        [CssKeyword("khz")]
+        KHZ,
+
+        /* Font Units */
         /// <summary>
         /// Relative to font size
         /// </summary>
@@ -80,18 +156,6 @@ namespace CssUI.CSS
         [CssKeyword("turn")]
         TURN,
 
-        /* RESOLUTION UNITS */
-        /// <summary>
-        /// </summary>
-        [CssKeyword("dpi")]
-        DPI,
-        /// <summary>
-        /// </summary>
-        [CssKeyword("dpcm")]
-        DPCM,
-        /// <summary>
-        /// </summary>
-        [CssKeyword("dppx")]
-        DPPX,
+
     }
 }
