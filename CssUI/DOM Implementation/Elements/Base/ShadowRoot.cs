@@ -11,8 +11,9 @@ namespace CssUI.DOM
         #endregion
 
         #region Constructor
-        public ShadowRoot(Element Host, Document document) : base(Host, document)
+        public ShadowRoot(Element Host, Document document, EShadowRootMode Mode) : base(Host, document)
         {
+            this.Mode = Mode;
         }
         #endregion
 

@@ -13,7 +13,7 @@ using System.Text;
 
 namespace CssUI.DOM
 {
-    public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable
+    public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, IGeometryNode
     {
         #region Properties
         /// <summary>
@@ -270,7 +270,9 @@ namespace CssUI.DOM
                  * An element that has a descendant that the user indicates using a pointing device.
                  * An element that is the labeled control of a label element that is currently matching :hover.
                  */
-                 return 
+                 // Get mouse coords
+                 // test if they intersect our bounding rect
+                 return this.getBoundingClientRect()
             }
         }
 
@@ -718,13 +720,53 @@ namespace CssUI.DOM
 
         #region Shadow DOM
         /* XXX: ShadowDOM stuff here */
-        public ShadowRoot shadowRoot { get; private set; }
+        private ShadowRoot _shadow_root = null;
+        public ShadowRoot shadowRoot
+        {
+            get
+            {
+                if (ReferenceEquals(null, _shadow_root))
+                    return null;
+
+                if (_shadow_root.Mode == EShadowRootMode.Closed)
+                    return null;
+
+                return _shadow_root;
+            }
+
+            private set
+            {
+                _shadow_root = value;
+            }
+        }
 
 
-        // Docs: https://dom.spec.whatwg.org/#dom-element-attachshadow
-        ShadowRoot attachShadow(ShadowRootInit init);
+        ShadowRoot attachShadow(ShadowRootInit init)
+        {/* Docs: https://dom.spec.whatwg.org/#dom-element-attachshadow */
+            if (!NamespaceURI.Equals(DOMCommon.HTMLNamespace))
+            {
+                throw new NotSupportedError("Elements must be in the HTML namespace to support a ShadowDOM");
+            }
+
+            /* SKIP THIS */
+            /* 2) If context object’s local name is not a valid custom element name, "article", "aside", "blockquote", "body", "div", "footer", "h1", "h2", "h3", "h4", "h5", "h6", "header", "main" "nav", "p", "section", or "span", then throw a "NotSupportedError" DOMException */
+            /* 3) If context object’s local name is a valid custom element name, or context object’s is value is not null, then:
+                    Let definition be the result of looking up a custom element definition given context object’s node document, its namespace, its local name, and its is value.
+                    If definition is not null and definition’s disable shadow is true, then throw a "NotSupportedError" DOMException. 
+            */
+            /* XXX: Custom element stuff here */
+            /* 4) If context object is a shadow host, then throw an "NotSupportedError" DOMException. */
+            if (this.is_shadowhost)
+            {
+                throw new NotSupportedError("Cannot attach a shadow root to an element which already has a shadow root");
+            }
+
+            var shadow = new ShadowRoot(this, this.ownerDocument, init.Mode);
+            this.shadowRoot = shadow;
+            return shadow;
+
+        }
         #endregion
-
 
         #region Client Rects
         public LinkedList<DOMRect> getClientRects()
@@ -765,6 +807,9 @@ namespace CssUI.DOM
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-element-getboundingclientrect */
             return DOMCommon.getBoundingClientRect(this.getClientRects());
         }
+        #endregion
+
+        #region Geometry
         #endregion
     }
 }

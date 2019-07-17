@@ -4,7 +4,7 @@ namespace CssUI.DOM
 {
     public class ShadowRootInit
     {
-        EShadowRootMode Mode;
+        public EShadowRootMode Mode;
 
         public ShadowRootInit(EShadowRootMode mode)
         {
