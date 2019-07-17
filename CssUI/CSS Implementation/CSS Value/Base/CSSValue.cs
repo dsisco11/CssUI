@@ -1,5 +1,6 @@
 ﻿using CssUI.CSS.Internal;
 using CssUI.CSS.Parser;
+using CssUI.CSS.Serialization;
 using CssUI.Internal;
 using System;
 using System.Collections.Generic;
@@ -116,7 +117,7 @@ namespace CssUI.CSS
                     Flags = ECssValueFlags.Absolute;
                     break;
                 case ECssValueType.UNSET:
-                case EStyleDataType.AUTO:
+                case ECssValueType.AUTO:
                 case ECssValueType.DIMENSION:
                     {
                         /* XXX:
@@ -127,6 +128,11 @@ namespace CssUI.CSS
                     }
                     break;
             }
+        }
+
+        internal CssValue(ECssValueType Type, dynamic Value = null) : this(Type)
+        {
+            this.Value = Value;
         }
 
         internal CssValue(ECssValueType Type, dynamic Value, ECssUnit Unit) : this(Type)
@@ -145,21 +151,19 @@ namespace CssUI.CSS
                     this.Type = keywordType.Value;
                 }
             }
-        }
-
-        internal CssValue(ECssValueType Type, dynamic Value = null, bool parseUnitType = false) : this(Type)
-        {
-            this.Value = Value;
-            if (parseUnitType && Type != ECssValueType.STRING && Value is string)
-            {// Find which unit type our string value was given
-                string vStr = (string)Value;
-                ECssValueType dataTy;
-                ECssUnit unitTy;
-                dynamic NewValue;
-                if (Get_Dimension_From_String(vStr, out dataTy, out unitTy, out NewValue))
-                {// for lengths our value can only be stored as either an Integer or a Number
-                    this.Unit = unitTy;
-                    this.Value = (double)NewValue;
+            else if (Type == ECssValueType.DIMENSION || Type == ECssValueType.RESOLUTION)
+            {
+                /* Make sure to correct the value and distinguish whether we are a Dimension or a Resolution */
+                switch (Unit)
+                {
+                    case ECssUnit.DPI:
+                    case ECssUnit.DPCM:
+                    case ECssUnit.DPPX:
+                        this.Type = ECssValueType.RESOLUTION;
+                        break;
+                    default:
+                        this.Type = ECssValueType.DIMENSION;
+                        break;
                 }
             }
         }
@@ -200,9 +204,6 @@ namespace CssUI.CSS
         public static CssValue From_Percent(double value) => new CssValue(ECssValueType.PERCENT, (double)value);
 
         /// <summary>Create an absolute length value</summary>
-        public static CssValue From_Length(string value) => new CssValue(ECssValueType.DIMENSION, (string)value, true);
-
-        /// <summary>Create an absolute length value</summary>
         public static CssValue From_Length(double value, ECssUnit Unit) => new CssValue(ECssValueType.DIMENSION, (double)value, Unit);
 
         /// <summary>Create an absolute length value if not null, or return the given default value</summary>
@@ -223,35 +224,6 @@ namespace CssUI.CSS
         public static CssValue From_CSS(string css) => new CssParser(css).Parse_CssValue();
 
         #endregion
-
-        /// <summary>
-        /// Interprets the given string as a dimension specifier
-        /// </summary>
-        /// <param name="ValueStr"></param>
-        /// <param name="DataType"></param>
-        /// <param name="UnitType"></param>
-        /// <param name="newValue"></param>
-        /// <returns>Success</returns>
-        /// XXX Find somewhere better to put this
-        bool Get_Dimension_From_String(string ValueStr, out ECssValueType DataType, out ECssUnit UnitType, out dynamic newValue)
-        {
-            DataType = ECssValueType.NONE;
-            UnitType = ECssUnit.None;
-            newValue = null;
-
-            CssTokenizer Parser = new CssTokenizer(ValueStr);
-            if (Parser[0].Type == ECssTokenType.Dimension)
-            {
-                DimensionToken tok = (DimensionToken)Parser[0];
-                DataType = (tok.DataType == ENumericTokenType.Integer) ? ECssValueType.INTEGER : ECssValueType.NUMBER;
-                newValue = tok.Number;
-                UnitType = (ECssUnit)Enum.Parse(typeof(ECssUnit), tok.Unit.ToUpper());
-
-                return true;
-            }
-
-            return false;
-        }
 
         #region ToString
         public override string ToString()

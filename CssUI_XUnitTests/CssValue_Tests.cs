@@ -45,6 +45,18 @@ namespace CssUI_XUnitTests
             Assert.True((int)Value.Value == 1);
             Assert.Equal(ECssValueType.DIMENSION, Value.Type);
 
+            Value = CssValue.From_CSS("96dpi");
+            Assert.True(Value.HasValue);
+            Assert.True(Value.Unit == ECssUnit.DPI);
+            Assert.True((int)Value.Value == 96);
+            Assert.Equal(ECssValueType.RESOLUTION, Value.Type);
+
+            Value = CssValue.From_CSS("1dppx");
+            Assert.True(Value.HasValue);
+            Assert.True(Value.Unit == ECssUnit.DPPX);
+            Assert.True((int)Value.Value == 1);
+            Assert.Equal(ECssValueType.RESOLUTION, Value.Type);
+
 
             /* Check some global keywords to make sure those are being converted to the correct type flag */
 
