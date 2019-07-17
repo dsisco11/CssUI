@@ -1,7 +1,7 @@
 ﻿namespace CssUI.DOM.Geometry
 {
     public class DOMPointReadOnly
-    {/* Docs" https://www.w3.org/TR/geometry-1/#DOMPoint */
+    {/* Docs: https://www.w3.org/TR/geometry-1/#DOMPoint */
         #region Properties
         public double x { get; protected set; }
         public double y { get; protected set; }

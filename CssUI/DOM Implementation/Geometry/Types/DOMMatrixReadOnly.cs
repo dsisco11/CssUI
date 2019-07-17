@@ -6,7 +6,7 @@ namespace CssUI.DOM.Geometry
     /// Represents a mathematical matrix.
     /// </summary>
     public class DOMMatrixReadOnly
-    {
+    {/* Docs: https://www.w3.org/TR/geometry-1/#DOMMatrix */
         #region Backing Values
         protected double[] Data = new double[16];
         #endregion
