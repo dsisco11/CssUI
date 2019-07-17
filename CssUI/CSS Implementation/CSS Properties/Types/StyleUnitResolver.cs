@@ -1,5 +1,5 @@
 ﻿using CssUI.CSS;
-using CssUI.Internal;
+using CssUI.CSS.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;

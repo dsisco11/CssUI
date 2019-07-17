@@ -514,7 +514,7 @@ namespace CssUI.CSS.Serialization
         #region Media
         public MediaQueryList Parse_Media_Query_List(Document document)
         {
-            Consume_All_Whitespace();// Consume all whitespace
+            Consume_All_Whitespace(this.Stream);
 
             if (Stream.Next.Type == ECssTokenType.EOF) throw new CssSyntaxErrorException("Unexpected EOF");
             if (Stream.Next.Type != ECssTokenType.At_Keyword) throw new CssSyntaxErrorException("Expected at-rule");
@@ -646,7 +646,7 @@ namespace CssUI.CSS.Serialization
             if (Stream.Next.Type != ECssTokenType.Ident) throw new CssSyntaxErrorException($"Expected Ident-token, but got \"{Enum.GetName(typeof(ECssTokenType), Stream.Next.Type)}\"");
             IdentToken nameTok = Stream.Consume() as IdentToken;
             /* Resolve the name */
-            EMediaFeature? Name = CssLookup.Enum_From_Keyword<EMediaFeature>(nameTok.Value);
+            EMediaFeatureName? Name = CssLookup.Enum_From_Keyword<EMediaFeatureName>(nameTok.Value);
             if (!Name.HasValue) throw new CssParserException($"Unrecognized media type: \"{nameTok.Value}\"");
             /* Determine feature type: plain / boolean / range */
             if (Stream.Next.Type == ECssTokenType.Colon)

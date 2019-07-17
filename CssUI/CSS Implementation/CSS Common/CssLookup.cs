@@ -1,6 +1,7 @@
 ﻿using System;
 using CssUI.Internal;
 using CssUI.CSS.Internal;
+using System.Linq;
 
 namespace CssUI
 {
@@ -42,6 +43,20 @@ namespace CssUI
                 return false;/* Enum has no index */
 
             return CssEnumTables.KEYWORD[index]?.ContainsKey(Keyword) ?? false;
+        }
+        
+        /// <summary>
+        /// Returns ALL keywords defined for the given enum
+        /// </summary>
+        /// <param name="enumType"></param>
+        /// <returns></returns>
+        public static string[] Get_Keywords(Type enumType)
+        {
+            int index = CssEnumTables.Lookup_Enum_Index(enumType.Name);
+            if (index < 0)
+                return new string[0];/* Enum has no index */
+
+            return CssEnumTables.KEYWORD[index].Keys.Cast<string>().ToArray();
         }
         #endregion
     }

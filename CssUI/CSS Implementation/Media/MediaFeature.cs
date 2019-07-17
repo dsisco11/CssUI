@@ -6,22 +6,22 @@ namespace CssUI.CSS.Media
     /// <summary>
     /// </summary>
     public class MediaFeature
-    {/* Docs: https://drafts.csswg.org/mediaqueries-4/#media-feature */
+    {/* Docs: https://www.w3.org/TR/mediaqueries-4/#mq-features */
         #region Properties
-        public readonly EMediaFeature Name = 0x0;
+        public readonly EMediaFeatureName Name = 0x0;
         public readonly EMediaFeatureType Type = EMediaFeatureType.Plain;
         public readonly EMediaFeatureComparator Comparator = EMediaFeatureComparator.EqualTo;
         private readonly CssValue Value = null;
         #endregion
 
         #region Constructors
-        public MediaFeature(EMediaFeature name, CssValue value)
+        public MediaFeature(EMediaFeatureName name, CssValue value)
         {
             Name = name;
             Value = value;
         }
         
-        public MediaFeature(EMediaFeature name, EMediaFeatureComparator comparator, CssValue value)
+        public MediaFeature(EMediaFeatureName name, EMediaFeatureComparator comparator, CssValue value)
         {
             Name = name;
             Value = value;
@@ -65,27 +65,28 @@ namespace CssUI.CSS.Media
             Screen screen = document.window.screen;
             switch (Name)
             {
-                case EMediaFeature.AspectRatio:
+                case EMediaFeatureName.AspectRatio:
                     {
                         double docAspect = (double)screen.width / (double)screen.height;
                         return Compare(docAspect);
                     }
-                case EMediaFeature.Width:
+                case EMediaFeatureName.Width:
+                case EMediaFeatureName.Min_Width:
                     {
                         return Compare((double)screen.width);
                     }
-                case EMediaFeature.Height:
+                case EMediaFeatureName.Height:
                     {
                         return Compare((double)screen.height);
                     }
-                case EMediaFeature.Orientation:
+                case EMediaFeatureName.Orientation:
                     {
                         //return Compare((double)screen.height);
                     }
 
                 default:
                     {
-                        throw new NotImplementedException($"Media feature \"{Enum.GetName(typeof(EMediaFeature), Name)}\" is not implemented");
+                        throw new NotImplementedException($"Media feature \"{Enum.GetName(typeof(EMediaFeatureName), Name)}\" is not implemented");
                     }
             }
         }

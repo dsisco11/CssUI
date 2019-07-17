@@ -92,10 +92,13 @@ namespace CssUI.CSS
 
 
 
-/* Non-Standard */
         /// <summary>
         /// Ratios are used by the media queries
         /// </summary>
         RATIO = (1 << 32),
+        /// <summary>
+        /// Resolutions are used by the media queries
+        /// </summary>
+        RESOLUTION = (1 << 33),
     }
 }

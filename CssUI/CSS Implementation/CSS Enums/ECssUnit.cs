@@ -78,6 +78,20 @@ namespace CssUI.CSS
         /// Turns. There is 1 turn in a full circle
         /// </summary>
         [CssKeyword("turn")]
-        TURN
+        TURN,
+
+        /* RESOLUTION UNITS */
+        /// <summary>
+        /// </summary>
+        [CssKeyword("dpi")]
+        DPI,
+        /// <summary>
+        /// </summary>
+        [CssKeyword("dpcm")]
+        DPCM,
+        /// <summary>
+        /// </summary>
+        [CssKeyword("dppx")]
+        DPPX,
     }
 }
