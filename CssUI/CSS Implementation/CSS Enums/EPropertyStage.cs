@@ -4,7 +4,7 @@ namespace CssUI.CSS.Internal
     /// <summary>
     /// Describes all of the different value stages for a Css property
     /// </summary>
-    public enum ECssPropertyStage : int
+    public enum EPropertyStage : int
     {
         Invalid = 0,
         /// <summary>

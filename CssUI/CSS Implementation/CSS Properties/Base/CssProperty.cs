@@ -274,7 +274,7 @@ namespace CssUI.CSS
             if (ReferenceEquals(oldActual, null) || oldActual != _actual)
             {
                 oldActual.Update(_actual);
-                FireValueChangeEvent(ECssPropertyStage.Actual);
+                FireValueChangeEvent(EPropertyStage.Actual);
             }
         }
         #endregion
@@ -287,7 +287,7 @@ namespace CssUI.CSS
         {
             if (Specified.Unit == Unit)
             {// We are using this unit and its change will affect our computed value
-                FireValueChangeEvent(ECssPropertyStage.Computed);
+                FireValueChangeEvent(EPropertyStage.Computed);
             }
         }
         #endregion
@@ -392,7 +392,7 @@ namespace CssUI.CSS
             if (ReferenceEquals(oldAssigned, null) || oldAssigned != Assigned)
             {
                 oldAssigned.Update(Assigned);
-                FireValueChangeEvent(ECssPropertyStage.Assigned);
+                FireValueChangeEvent(EPropertyStage.Assigned);
             }
 
             if (ComputeNow)

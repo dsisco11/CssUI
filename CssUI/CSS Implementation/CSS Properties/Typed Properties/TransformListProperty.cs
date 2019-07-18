@@ -35,7 +35,7 @@ namespace CssUI
         /// <summary>
         /// Callback for when any value stage of this property changes
         /// </summary>
-        public event Action<ECssPropertyStage, ICssProperty> onValueChange;
+        public event Action<EPropertyStage, ICssProperty> onValueChange;
         /// <summary>
         /// Tracks which styling rule block this property came from
         /// </summary>
@@ -243,7 +243,7 @@ namespace CssUI
                 }
             }
 
-            if (change) onValueChange?.Invoke(ECssPropertyStage.Computed, this);
+            if (change) onValueChange?.Invoke(EPropertyStage.Computed, this);
         }
 
         private double Get_Unit_Scale(EUnit Unit)

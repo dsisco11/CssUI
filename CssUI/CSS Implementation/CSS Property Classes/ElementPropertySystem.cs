@@ -290,7 +290,7 @@ namespace CssUI
         /// <summary>
         /// A state-specific property changed, we need to resolve this single property
         /// </summary>
-        private void Handle_Declared_Property_Change(ECssPropertyStage Stage, ICssProperty Property, EPropertyDirtFlags Flags, StackTrace Origin)
+        private void Handle_Declared_Property_Change(EPropertyStage Stage, ICssProperty Property, EPropertyDirtFlags Flags, StackTrace Origin)
         {
             /* XXX:
              * To be honest cascading here doesnt make sense
@@ -306,7 +306,7 @@ namespace CssUI
         /// <param name="Property"></param>
         /// <param name="Flags"></param>
         /// <param name="Stack"></param>
-        private void Handle_Cascaded_Property_Change(ECssPropertyStage Stage, ICssProperty Property, EPropertyDirtFlags Flags, StackTrace Stack)
+        private void Handle_Cascaded_Property_Change(EPropertyStage Stage, ICssProperty Property, EPropertyDirtFlags Flags, StackTrace Stack)
         {
             bool IsFlow = ((Flags & EPropertyDirtFlags.Flow) != 0);// Layout
             bool IsBlock = ((Flags & EPropertyDirtFlags.Box) != 0);
@@ -314,7 +314,7 @@ namespace CssUI
             bool IsFont = ((Flags & EPropertyDirtFlags.Text) != 0);
 
             // If the value that changed was a specified one and it affects the block then we need to update our block
-            if (IsBlock && Stage >= ECssPropertyStage.Specified)
+            if (IsBlock && Stage >= EPropertyStage.Specified)
             {
                 // Flag us dirty so we can resolve next time its called
                 this.Flag(EPropertySystemDirtFlags.Block);
@@ -677,9 +677,9 @@ namespace CssUI
         #endregion
 
         #region Update_Blend_Color
-        void Handle_Cascaded_Blend_Change(ECssPropertyStage Stage, ICssProperty Property)
+        void Handle_Cascaded_Blend_Change(EPropertyStage Stage, ICssProperty Property)
         {
-            if (Stage < ECssPropertyStage.Actual)// wait for the Actual value stage
+            if (Stage < EPropertyStage.Actual)// wait for the Actual value stage
                 return;
 
             if (Opacity != 1.0)
@@ -695,9 +695,9 @@ namespace CssUI
 
         #region Transform_Changed
 
-        private void Handle_Cascaded_Transform_Change(ECssPropertyStage Stage, ICssProperty Property)
+        private void Handle_Cascaded_Transform_Change(EPropertyStage Stage, ICssProperty Property)
         {
-            if (Stage < ECssPropertyStage.Actual)// wait for the Actual value stage
+            if (Stage < EPropertyStage.Actual)// wait for the Actual value stage
                 return;
 
             throw new NotImplementedException("Transforms are not yet implemented");

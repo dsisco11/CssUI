@@ -63,7 +63,7 @@ namespace CssUI.CSS
         /// <summary>
         /// Whenever this propertys value changes this is called so we can update our <see cref="Computed_X"/> and <see cref="Computed_Y"/> values
         /// </summary>
-        void Handle_Value_Change(ECssPropertyStage Stage, ICssProperty Sender)
+        void Handle_Value_Change(EPropertyStage Stage, ICssProperty Sender)
         {
         }
 

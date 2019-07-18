@@ -114,7 +114,7 @@ namespace CssUI.CSS.Internal
                 new StyleDefinition("font-family", true, EPropertyDirtFlags.Text | EPropertyDirtFlags.Flow, CssValue.From_Enum(ECssGenericFontFamily.SansSerif),
                     Keywords: Keywords.Font_Familys,
                     AllowedTypes: ECssValueType.STRING | ECssValueType.KEYWORD,
-                    Resolvers: new Tuple<ECssPropertyStage, PropertyResolverFunc>(ECssPropertyStage.Used, CssPropertyResolver.Font_Family_Used)
+                    Resolvers: new Tuple<EPropertyStage, PropertyResolverFunc>(EPropertyStage.Used, CssPropertyResolver.Font_Family_Used)
                     ),
 
 
@@ -122,7 +122,7 @@ namespace CssUI.CSS.Internal
                     DisallowedTypes: ECssValueType.PERCENT,
                     AllowedTypes: ECssValueType.KEYWORD | ECssValueType.INTEGER,
                     Keywords: Keywords.Font_Weight,
-                    Resolvers: new Tuple<ECssPropertyStage, PropertyResolverFunc>(ECssPropertyStage.Computed, CssPropertyResolver.Font_Weight_Computed)
+                    Resolvers: new Tuple<EPropertyStage, PropertyResolverFunc>(EPropertyStage.Computed, CssPropertyResolver.Font_Weight_Computed)
                     ),
 
 
@@ -141,7 +141,7 @@ namespace CssUI.CSS.Internal
                             return CssValue.From_Int((int)(Pct * r));
                         }
                     },
-                    Resolvers: new Tuple<ECssPropertyStage, PropertyResolverFunc>(ECssPropertyStage.Used, CssPropertyResolver.Font_Size_Used)
+                    Resolvers: new Tuple<EPropertyStage, PropertyResolverFunc>(EPropertyStage.Used, CssPropertyResolver.Font_Size_Used)
                     ),
             };
         }
@@ -222,21 +222,21 @@ namespace CssUI.CSS.Internal
                 new StyleDefinition("object-position-x", false, EPropertyDirtFlags.Replaced_Area, CssValue.From_Percent(50.0), DisallowedTypes: ECssValueType.INHERIT, Percentage_Resolver: (E, Pct) => CssValue.From_Int(CssAlgorithms.Solve_Object_Axis_Position((float)Pct, E.Box.Content.Get_Dimensions().Width, E.Box.Get_Replaced_Block_Size().Width))),
                 new StyleDefinition("object-position-y", false, EPropertyDirtFlags.Replaced_Area, CssValue.From_Percent(50.0), DisallowedTypes: ECssValueType.INHERIT, Percentage_Resolver: (E, Pct) => CssValue.From_Int(CssAlgorithms.Solve_Object_Axis_Position((float)Pct, E.Box.Content.Get_Dimensions().Height, E.Box.Get_Replaced_Block_Size().Height))),
 
-                new StyleDefinition("top", false, EPropertyDirtFlags.Margin_Area, CssValue.Auto, ECssValueType.AUTO | ECssValueType.DIMENSION | ECssValueType.PERCENT, 0x0, null, false, (E, Pct) => CssValue.From_Number(Pct * E.Box.Containing_Box.LogicalHeight), new Tuple<ECssPropertyStage, PropertyResolverFunc>(ECssPropertyStage.Used, CssPropertyResolver.Box_Top_Used)),
-                new StyleDefinition("right", false, EPropertyDirtFlags.Margin_Area, CssValue.Auto, ECssValueType.AUTO | ECssValueType.DIMENSION | ECssValueType.PERCENT, 0x0, null, false, (E, Pct) => CssValue.From_Number(Pct * E.Box.Containing_Box.LogicalWidth), new Tuple<ECssPropertyStage, PropertyResolverFunc>(ECssPropertyStage.Used, CssPropertyResolver.Box_Right_Used)),
-                new StyleDefinition("bottom", false, EPropertyDirtFlags.Margin_Area, CssValue.Auto, ECssValueType.AUTO | ECssValueType.DIMENSION | ECssValueType.PERCENT, 0x0, null, false, (E, Pct) => CssValue.From_Number(Pct * E.Box.Containing_Box.LogicalHeight), new Tuple<ECssPropertyStage, PropertyResolverFunc>(ECssPropertyStage.Used, CssPropertyResolver.Box_Bottom_Used)),
-                new StyleDefinition("left", false, EPropertyDirtFlags.Margin_Area, CssValue.Auto, ECssValueType.AUTO | ECssValueType.DIMENSION | ECssValueType.PERCENT, 0x0, null, false, (E, Pct) => CssValue.From_Number(Pct * E.Box.Containing_Box.LogicalWidth), new Tuple<ECssPropertyStage, PropertyResolverFunc>(ECssPropertyStage.Used, CssPropertyResolver.Box_Left_Used)),
+                new StyleDefinition("top", false, EPropertyDirtFlags.Margin_Area, CssValue.Auto, ECssValueType.AUTO | ECssValueType.DIMENSION | ECssValueType.PERCENT, 0x0, null, false, (E, Pct) => CssValue.From_Number(Pct * E.Box.Containing_Box.LogicalHeight), new Tuple<EPropertyStage, PropertyResolverFunc>(EPropertyStage.Used, CssPropertyResolver.Box_Top_Used)),
+                new StyleDefinition("right", false, EPropertyDirtFlags.Margin_Area, CssValue.Auto, ECssValueType.AUTO | ECssValueType.DIMENSION | ECssValueType.PERCENT, 0x0, null, false, (E, Pct) => CssValue.From_Number(Pct * E.Box.Containing_Box.LogicalWidth), new Tuple<EPropertyStage, PropertyResolverFunc>(EPropertyStage.Used, CssPropertyResolver.Box_Right_Used)),
+                new StyleDefinition("bottom", false, EPropertyDirtFlags.Margin_Area, CssValue.Auto, ECssValueType.AUTO | ECssValueType.DIMENSION | ECssValueType.PERCENT, 0x0, null, false, (E, Pct) => CssValue.From_Number(Pct * E.Box.Containing_Box.LogicalHeight), new Tuple<EPropertyStage, PropertyResolverFunc>(EPropertyStage.Used, CssPropertyResolver.Box_Bottom_Used)),
+                new StyleDefinition("left", false, EPropertyDirtFlags.Margin_Area, CssValue.Auto, ECssValueType.AUTO | ECssValueType.DIMENSION | ECssValueType.PERCENT, 0x0, null, false, (E, Pct) => CssValue.From_Number(Pct * E.Box.Containing_Box.LogicalWidth), new Tuple<EPropertyStage, PropertyResolverFunc>(EPropertyStage.Used, CssPropertyResolver.Box_Left_Used)),
 
 
                 new StyleDefinition("width", false, EPropertyDirtFlags.Content_Area, CssValue.Auto, ECssValueType.DIMENSION | ECssValueType.PERCENT | ECssValueType.AUTO | ECssValueType.INHERIT, 0x0, null, false, (E, Pct) => CssValue.From_Number(Pct * E.Box.Containing_Box.LogicalWidth)),
                 new StyleDefinition("height", false, EPropertyDirtFlags.Content_Area, CssValue.Auto, ECssValueType.DIMENSION | ECssValueType.PERCENT | ECssValueType.AUTO | ECssValueType.INHERIT, 0x0, null, false, (E, Pct) => CssValue.From_Number(Pct * E.Box.Containing_Box.LogicalHeight)),
 
 
-                new StyleDefinition("min-width", false, EPropertyDirtFlags.Content_Area, CssValue.Auto, ECssValueType.DIMENSION | ECssValueType.PERCENT | ECssValueType.AUTO, 0x0, Keywords.MinMaxSize, false, (E, Pct) => !E.Box.Containing_Box_Explicit_Width ? CssValue.Zero : CssValue.From_Number(Pct * Math.Max(0, E.Box.Containing_Box.LogicalWidth)), new Tuple<ECssPropertyStage, PropertyResolverFunc>(ECssPropertyStage.Used, CssPropertyResolver.Min_Width_Used) ),
-                new StyleDefinition("min-height", false, EPropertyDirtFlags.Content_Area, CssValue.Auto, ECssValueType.DIMENSION | ECssValueType.PERCENT | ECssValueType.AUTO, 0x0, Keywords.MinMaxSize, false, (E, Pct) => !E.Box.Containing_Box_Explicit_Height ? CssValue.Zero : CssValue.From_Number(Pct * E.Box.Containing_Box.LogicalHeight), new Tuple<ECssPropertyStage, PropertyResolverFunc>(ECssPropertyStage.Used, CssPropertyResolver.Min_Height_Used)),
+                new StyleDefinition("min-width", false, EPropertyDirtFlags.Content_Area, CssValue.Auto, ECssValueType.DIMENSION | ECssValueType.PERCENT | ECssValueType.AUTO, 0x0, Keywords.MinMaxSize, false, (E, Pct) => !E.Box.Containing_Box_Explicit_Width ? CssValue.Zero : CssValue.From_Number(Pct * Math.Max(0, E.Box.Containing_Box.LogicalWidth)), new Tuple<EPropertyStage, PropertyResolverFunc>(EPropertyStage.Used, CssPropertyResolver.Min_Width_Used) ),
+                new StyleDefinition("min-height", false, EPropertyDirtFlags.Content_Area, CssValue.Auto, ECssValueType.DIMENSION | ECssValueType.PERCENT | ECssValueType.AUTO, 0x0, Keywords.MinMaxSize, false, (E, Pct) => !E.Box.Containing_Box_Explicit_Height ? CssValue.Zero : CssValue.From_Number(Pct * E.Box.Containing_Box.LogicalHeight), new Tuple<EPropertyStage, PropertyResolverFunc>(EPropertyStage.Used, CssPropertyResolver.Min_Height_Used)),
 
-                new StyleDefinition("max-width", false, EPropertyDirtFlags.Content_Area, CssValue.None, ECssValueType.DIMENSION | ECssValueType.PERCENT | ECssValueType.NONE, 0x0, Keywords.MinMaxSize, false, (E, Pct) => !E.Box.Containing_Box_Explicit_Width ? CssValue.None : CssValue.From_Number(Pct * Math.Max(0, E.Box.Containing_Box.LogicalWidth)), new Tuple<ECssPropertyStage, PropertyResolverFunc>(ECssPropertyStage.Used, CssPropertyResolver.Max_Width_Used)),
-                new StyleDefinition("max-height", false, EPropertyDirtFlags.Content_Area, CssValue.None, ECssValueType.DIMENSION | ECssValueType.PERCENT | ECssValueType.NONE, 0x0, Keywords.MinMaxSize, false, (E, Pct) => !E.Box.Containing_Box_Explicit_Height ? CssValue.None :  CssValue.From_Number(Pct * E.Box.Containing_Box.LogicalHeight), new Tuple<ECssPropertyStage, PropertyResolverFunc>(ECssPropertyStage.Used, CssPropertyResolver.Max_Height_Used)),
+                new StyleDefinition("max-width", false, EPropertyDirtFlags.Content_Area, CssValue.None, ECssValueType.DIMENSION | ECssValueType.PERCENT | ECssValueType.NONE, 0x0, Keywords.MinMaxSize, false, (E, Pct) => !E.Box.Containing_Box_Explicit_Width ? CssValue.None : CssValue.From_Number(Pct * Math.Max(0, E.Box.Containing_Box.LogicalWidth)), new Tuple<EPropertyStage, PropertyResolverFunc>(EPropertyStage.Used, CssPropertyResolver.Max_Width_Used)),
+                new StyleDefinition("max-height", false, EPropertyDirtFlags.Content_Area, CssValue.None, ECssValueType.DIMENSION | ECssValueType.PERCENT | ECssValueType.NONE, 0x0, Keywords.MinMaxSize, false, (E, Pct) => !E.Box.Containing_Box_Explicit_Height ? CssValue.None :  CssValue.From_Number(Pct * E.Box.Containing_Box.LogicalHeight), new Tuple<EPropertyStage, PropertyResolverFunc>(EPropertyStage.Used, CssPropertyResolver.Max_Height_Used)),
 
 
                 // Padding percentages are all calculated against the containing block's width so it is possible to create elements which conform to an aspect ratio
@@ -245,10 +245,10 @@ namespace CssUI.CSS.Internal
                 new StyleDefinition("padding-bottom", false, EPropertyDirtFlags.Padding_Area, CssValue.Zero, AllowedTypes: ECssValueType.PERCENT | ECssValueType.DIMENSION, Percentage_Resolver: (E, Pct) => CssValue.From_Number(Pct * E.Box.Containing_Box.LogicalWidth)),
                 new StyleDefinition("padding-left", false, EPropertyDirtFlags.Padding_Area, CssValue.Zero, AllowedTypes: ECssValueType.PERCENT | ECssValueType.DIMENSION, Percentage_Resolver: (E, Pct) => CssValue.From_Number(Pct * E.Box.Containing_Box.LogicalWidth)),
 
-                new StyleDefinition("border-top-width", false, EPropertyDirtFlags.Border_Area, CssValue.From_Keyword("medium"), AllowedTypes: ECssValueType.DIMENSION | ECssValueType.KEYWORD, 0x0, Keywords.Border_Width, false, null, new Tuple<ECssPropertyStage, PropertyResolverFunc>(ECssPropertyStage.Used, CssPropertyResolver.Border_Width_Used)),
-                new StyleDefinition("border-right-width", false, EPropertyDirtFlags.Border_Area, CssValue.From_Keyword("medium"), AllowedTypes: ECssValueType.DIMENSION | ECssValueType.KEYWORD, 0x0, Keywords.Border_Width, false, null, new Tuple<ECssPropertyStage, PropertyResolverFunc>(ECssPropertyStage.Used, CssPropertyResolver.Border_Width_Used)),
-                new StyleDefinition("border-bottom-width", false, EPropertyDirtFlags.Border_Area, CssValue.From_Keyword("medium"), AllowedTypes: ECssValueType.DIMENSION | ECssValueType.KEYWORD, 0x0, Keywords.Border_Width, false, null, new Tuple<ECssPropertyStage, PropertyResolverFunc>(ECssPropertyStage.Used, CssPropertyResolver.Border_Width_Used)),
-                new StyleDefinition("border-left-width", false, EPropertyDirtFlags.Border_Area, CssValue.From_Keyword("medium"), AllowedTypes: ECssValueType.DIMENSION | ECssValueType.KEYWORD, 0x0, Keywords.Border_Width, false, null, new Tuple<ECssPropertyStage, PropertyResolverFunc>(ECssPropertyStage.Used, CssPropertyResolver.Border_Width_Used)),
+                new StyleDefinition("border-top-width", false, EPropertyDirtFlags.Border_Area, CssValue.From_Keyword("medium"), AllowedTypes: ECssValueType.DIMENSION | ECssValueType.KEYWORD, 0x0, Keywords.Border_Width, false, null, new Tuple<EPropertyStage, PropertyResolverFunc>(EPropertyStage.Used, CssPropertyResolver.Border_Width_Used)),
+                new StyleDefinition("border-right-width", false, EPropertyDirtFlags.Border_Area, CssValue.From_Keyword("medium"), AllowedTypes: ECssValueType.DIMENSION | ECssValueType.KEYWORD, 0x0, Keywords.Border_Width, false, null, new Tuple<EPropertyStage, PropertyResolverFunc>(EPropertyStage.Used, CssPropertyResolver.Border_Width_Used)),
+                new StyleDefinition("border-bottom-width", false, EPropertyDirtFlags.Border_Area, CssValue.From_Keyword("medium"), AllowedTypes: ECssValueType.DIMENSION | ECssValueType.KEYWORD, 0x0, Keywords.Border_Width, false, null, new Tuple<EPropertyStage, PropertyResolverFunc>(EPropertyStage.Used, CssPropertyResolver.Border_Width_Used)),
+                new StyleDefinition("border-left-width", false, EPropertyDirtFlags.Border_Area, CssValue.From_Keyword("medium"), AllowedTypes: ECssValueType.DIMENSION | ECssValueType.KEYWORD, 0x0, Keywords.Border_Width, false, null, new Tuple<EPropertyStage, PropertyResolverFunc>(EPropertyStage.Used, CssPropertyResolver.Border_Width_Used)),
 
                 // Margin percentages are all calculated against the containing block's width so it is possible to create elements which conform to an aspect ratio
                 new StyleDefinition("margin-top", false, EPropertyDirtFlags.Margin_Area, CssValue.Zero, AllowedTypes: ECssValueType.AUTO | ECssValueType.PERCENT | ECssValueType.DIMENSION, 0x0, null, false, (E, Pct) => CssValue.From_Number(Pct * E.Box.Containing_Box.LogicalWidth)),

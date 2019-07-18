@@ -357,7 +357,7 @@ namespace CssUI
             if (!oldSpecified.HasValue || oldSpecified != _specified)
             {// the computed value changed
                 oldSpecified.Update(_specified);
-                FireValueChangeEvent(ECssPropertyStage.Specified);
+                FireValueChangeEvent(EPropertyStage.Specified);
 
                 // update the Computed value
                 Reinterpret_Computed();
@@ -408,7 +408,7 @@ namespace CssUI
             if (!oldComputed.HasValue || oldComputed != _computed)
             {// the computed value changed
                 oldComputed.Update(_computed);
-                FireValueChangeEvent(ECssPropertyStage.Computed);
+                FireValueChangeEvent(EPropertyStage.Computed);
 
                 // update the Used value
                 Reinterpret_Used();
@@ -419,7 +419,7 @@ namespace CssUI
         {
             _used = null;
             //var ResolutionDelegate = CssPropertyResolver.Get(CssName, ECssPropertyStage.Used);
-            var ResolutionDelegate = Definition.PropertyStageResolver[(int)ECssPropertyStage.Used];
+            var ResolutionDelegate = Definition.PropertyStageResolver[(int)EPropertyStage.Used];
             if (!ReferenceEquals(ResolutionDelegate, null))
             {
                 _used = (CssValueList)ResolutionDelegate.Invoke(this);
@@ -433,7 +433,7 @@ namespace CssUI
             if (!oldUsed.HasValue || oldUsed != _used)
             {
                 oldUsed.Update(_used);
-                FireValueChangeEvent(ECssPropertyStage.Used);
+                FireValueChangeEvent(EPropertyStage.Used);
 
                 // update the Actual value
                 Reinterpret_Actual();
@@ -444,7 +444,7 @@ namespace CssUI
         {
             _actual = null;
             //var ResolutionDelegate = CssPropertyResolver.Get(CssName, ECssPropertyStage.Actual);
-            var ResolutionDelegate = Definition.PropertyStageResolver[(int)ECssPropertyStage.Actual];
+            var ResolutionDelegate = Definition.PropertyStageResolver[(int)EPropertyStage.Actual];
             if (!ReferenceEquals(ResolutionDelegate, null))
             {
                 _actual = (CssValueList)ResolutionDelegate.Invoke(this);
@@ -458,7 +458,7 @@ namespace CssUI
             if (!oldActual.HasValue || oldActual != _actual)
             {
                 oldActual.Update(_actual);
-                FireValueChangeEvent(ECssPropertyStage.Actual);
+                FireValueChangeEvent(EPropertyStage.Actual);
             }
         }
         #endregion
@@ -545,7 +545,7 @@ namespace CssUI
             if (ReferenceEquals(oldAssigned, null) || oldAssigned != Assigned)
             {
                 oldAssigned.Update(Assigned);
-                FireValueChangeEvent(ECssPropertyStage.Assigned);
+                FireValueChangeEvent(EPropertyStage.Assigned);
             }
 
             if (ComputeNow)
@@ -608,7 +608,7 @@ namespace CssUI
             if (Specified.FirstOrDefault(o => o.Unit == Unit) != null)
             {
                 // This unit change will affect our computed value
-                FireValueChangeEvent(ECssPropertyStage.Computed);
+                FireValueChangeEvent(EPropertyStage.Computed);
             }
         }
         #endregion

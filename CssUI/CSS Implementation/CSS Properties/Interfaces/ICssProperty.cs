@@ -15,7 +15,7 @@ namespace CssUI.CSS
         /// <summary>
         /// Callback for when any value stage of this property changes
         /// </summary>
-        event Action<ECssPropertyStage, ICssProperty> onValueChange;
+        event Action<EPropertyStage, ICssProperty> onValueChange;
         #endregion
 
         #region Properties

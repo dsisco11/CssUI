@@ -105,9 +105,9 @@ namespace CssUI.CSS.Internal
         /// <summary>
         /// Callback for when any value stage of this property changes
         /// </summary>
-        public event Action<ECssPropertyStage, ICssProperty> onValueChange;
+        public event Action<EPropertyStage, ICssProperty> onValueChange;
 
-        protected void FireValueChangeEvent(ECssPropertyStage Stage)
+        protected void FireValueChangeEvent(EPropertyStage Stage)
         {
             onValueChange?.Invoke(Stage, this);
         }

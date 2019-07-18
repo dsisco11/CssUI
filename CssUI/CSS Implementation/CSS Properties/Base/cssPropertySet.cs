@@ -371,7 +371,7 @@ namespace CssUI
         /// <summary>
         /// A property which affects the elements block changed
         /// </summary>
-        public event Action<ECssPropertyStage, ICssProperty, EPropertyDirtFlags, StackTrace> Property_Changed;
+        public event Action<EPropertyStage, ICssProperty, EPropertyDirtFlags, StackTrace> Property_Changed;
         #endregion
 
         #region Change Handlers
@@ -382,7 +382,7 @@ namespace CssUI
         /// </summary>
         /// <param name="Stage"></param>
         /// <param name="Property"></param>
-        private void Property_onChanged(ECssPropertyStage Stage, ICssProperty Property)
+        private void Property_onChanged(EPropertyStage Stage, ICssProperty Property)
         {
             if (!Property.HasValue) SetProperties.Remove(Property.CssName);
             else SetProperties.Add(Property.CssName);
