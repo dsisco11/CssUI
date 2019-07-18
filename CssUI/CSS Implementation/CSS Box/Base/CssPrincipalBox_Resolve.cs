@@ -1388,14 +1388,14 @@ namespace CssUI
              * In addition, if the element has any floating descendants whose bottom margin edge is below the element's bottom content edge, then the height is increased to include those edges. Only floats that participate in this block formatting context are taken into account, e.g., floats inside absolutely positioned descendants or other floats are not. 
              */
 
-            if (!this.HasBlockLevelChildren)
+            if (!HasBlockLevelChildren)
             {
                 int topEdge = 0;
                 int bottomEdge = 0;
                 Element node;
 
                 // find our first inline-level element and its top-margin-edge
-                node = this.Owner.firstElementChild;
+                node = Owner.firstElementChild;
                 while (!ReferenceEquals(null, node))
                 {
                     if (node.Box.OuterDisplayType == EOuterDisplayType.Inline)
@@ -1407,8 +1407,8 @@ namespace CssUI
                     node = node.nextElementSibling;
                 }
 
-                // find our last inline-level element and its top-margin-edge
-                node = this.Owner.lastElementChild;
+                // find our last inline-level element and its bottom-margin-edge
+                node = Owner.lastElementChild;
                 while (!ReferenceEquals(null, node))
                 {
                     if (node.Box.OuterDisplayType == EOuterDisplayType.Inline)
@@ -1429,7 +1429,7 @@ namespace CssUI
                 Element node;
 
                 // find our first block-level element and its top-margin-edge
-                node = this.Owner.firstElementChild;
+                node = Owner.firstElementChild;
                 while (!ReferenceEquals(null, node))
                 {
                     if (node.Box.OuterDisplayType == EOuterDisplayType.Block)
@@ -1441,9 +1441,8 @@ namespace CssUI
                     node = node.nextElementSibling;
                 }
 
-
                 // find our last block-level element and its bottom-margin-edge
-                node = this.Owner.lastElementChild;
+                node = Owner.lastElementChild;
                 while (!ReferenceEquals(null, node))
                 {
                     if (node.Box.OuterDisplayType == EOuterDisplayType.Block)

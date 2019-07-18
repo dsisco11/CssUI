@@ -10,6 +10,7 @@ using CssUI.CSS.Enums;
 using CssUI.DOM;
 using CssUI.DOM.Nodes;
 using CssUI.CSS.Formatting;
+using CssUI.CSS.Internal;
 
 namespace CssUI
 {
@@ -563,89 +564,8 @@ namespace CssUI
         }
 
         private CssBoxArea Find_Containing_Block()
-        {/* Docs: https://www.w3.org/TR/CSS22/visudet.html#containing-block-details */
-            /* Root elements */
-            if (ReferenceEquals(Owner.Parent, null))
-                return Owner.Viewport?.Area;
-            /* Other elements */
-            switch (Owner.Style.Positioning)
-            {
-                case EPositioning.Static:
-                case EPositioning.Relative:
-                    {
-                        /* 
-                         * For other elements, if the element's position is 'relative' or 'static', 
-                         * the containing block is formed by the content edge of the nearest ancestor box that is a block container or which establishes a formatting context. 
-                         */
-
-                        DOM.TreeWalker tree = new DOM.TreeWalker(this.Owner, DOM.Enums.ENodeFilterMask.SHOW_ELEMENT);
-                        DOM.Nodes.Node node = tree.parentNode();
-                        while (!ReferenceEquals(null, node))
-                        {
-                            if (node is DOM.Element element)
-                            {
-                                if (element.Box.OuterDisplayType == EOuterDisplayType.Block || !ReferenceEquals(null, element.Box.FormattingContext))
-                                {
-                                    return element.Box.Content;
-                                }
-                            }
-
-                            node = tree.parentNode();
-                        }
-
-                        throw new CssException($"Cant find containing-block for element: {Owner.ToString()}");
-                    }
-                    break;
-                case EPositioning.Fixed:
-                    {/* If the element has 'position: fixed', the containing block is established by the viewport in the case of continuous media or the page area in the case of paged media. */
-                        Viewport view = Owner.ownerDocument.Viewport;
-                        return new CssBoxArea(view.Get_Bounds());
-                    }
-                    break;
-                case EPositioning.Absolute:
-                    {
-                        /*
-                         * If the element has 'position: absolute', the containing block is established by the nearest ancestor with a 'position' of 'absolute', 'relative' or 'fixed', in the following way:
-                         * In the case that the ancestor is an inline element, the containing block is the bounding box around the padding boxes of the first and the last inline boxes generated for that element. 
-                         * In CSS 2.2, if the inline element is split across multiple lines, the containing block is undefined.
-                         * Otherwise, the containing block is formed by the padding edge of the ancestor.
-                         * 
-                         */
-
-                        DOM.TreeWalker tree = new DOM.TreeWalker(this.Owner, DOM.Enums.ENodeFilterMask.SHOW_ELEMENT);
-                        DOM.Nodes.Node node = tree.parentNode();
-                        while (!ReferenceEquals(null, node))
-                        {
-                            if (node is DOM.Element element)
-                            {
-                                if (element.Style.Positioning == EPositioning.Absolute || element.Style.Positioning == EPositioning.Relative || element.Style.Positioning == EPositioning.Fixed)
-                                {
-                                    if (element.Box.OuterDisplayType == EOuterDisplayType.Inline)
-                                    {
-                                        int right;
-                                        int bottom;
-
-
-                                    }
-                                    else
-                                    {
-                                        return element.Box.Padding;
-                                    }
-                                }
-                            }
-
-                            node = tree.parentNode();
-                        }
-
-                        /* If there is no such ancestor, the containing block is the initial containing block. */
-                        return (Owner.getRootNode() as Element).Box.Content;
-                    }
-                    break;
-                default:
-                    {
-                        return Owner.parentElement?.Box.Content;
-                    }
-            }
+        {
+            return new CssBoxArea(CSSCommon.Find_Containing_Block(Owner));
         }
 
         private void Update_Display_Types()

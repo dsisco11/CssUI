@@ -22,12 +22,15 @@ namespace CssUI.DOM.Media
         {
             get
             {
-                bool match = true;
                 foreach(MediaQuery query in QueryList)
                 {
-                    if (query.)
+                    if (!query.Matches(document))
+                    {
+                        return false;
+                    }
                 }
-                return match;
+
+                return true;
             }
         }
         #endregion

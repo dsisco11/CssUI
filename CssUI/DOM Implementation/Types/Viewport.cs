@@ -18,7 +18,7 @@ namespace CssUI.DOM
         public long Width;
         public long Height;
 
-        public DOMRect ScrollingBox = null;
+        internal ScrollBox ScrollingBox = null;
         #endregion
 
         #region Events

@@ -1,6 +1,7 @@
 ﻿using CssUI.DOM.Enums;
 using CssUI.DOM.Events;
 using CssUI.DOM.Exceptions;
+using CssUI.DOM.Geometry;
 using CssUI.DOM.Internal;
 using CssUI.DOM.Media;
 using CssUI.DOM.Nodes;
@@ -60,6 +61,19 @@ namespace CssUI.DOM
         public readonly new Document ownerDocument;
         #endregion
 
+        #region Accessors
+        /// <summary>
+        /// Returns the initial contaiing block
+        /// </summary>
+        internal DOMRect Initial_Containing_Block
+        {/* Docs: https://www.w3.org/TR/css-display-3/#initial-containing-block */
+            get
+            {
+                return documentElement?.Box.Content.Get_Bounds();
+            }
+        }
+        #endregion
+
         #region Constructor
         protected Document(DocumentType doctype, string contentType = null, string origin = null)
         {
@@ -79,8 +93,7 @@ namespace CssUI.DOM
             }
         }
         #endregion
-
-
+        
         #region DOM tree accessors
         /* dir indicates the text direction of this document, but we determine this elsewhere in CssUI */
         // [CEReactions] attribute DOMString dir;
