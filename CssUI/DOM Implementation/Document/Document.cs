@@ -1,6 +1,7 @@
 ﻿using CssUI.DOM.Enums;
 using CssUI.DOM.Events;
 using CssUI.DOM.Exceptions;
+using CssUI.DOM.Internal;
 using CssUI.DOM.Media;
 using CssUI.DOM.Nodes;
 using System.Collections.Generic;
@@ -16,12 +17,24 @@ namespace CssUI.DOM
 
         #region Properties
         internal ILogger Log = LogFactory.GetLogger(nameof(Document));
-        internal Window window;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public readonly Window defaultView;
+        internal BrowsingContext BrowsingContext = null;
+        internal Window window
+        {/* https://html.spec.whatwg.org/multipage/window-object.html#dom-document-defaultview */
+            get
+            {
+                return BrowsingContext?.WindowProxy;
+            }
+        }
+
+        public Window defaultView
+        {/* https://html.spec.whatwg.org/multipage/window-object.html#dom-document-defaultview */
+            get
+            {
+                return BrowsingContext?.WindowProxy;
+            }
+        }
+
         /// <summary>
         /// The area within which element layout is performed
         /// (The viewport used for layout)

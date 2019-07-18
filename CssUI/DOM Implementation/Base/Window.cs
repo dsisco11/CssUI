@@ -1,4 +1,5 @@
 ﻿using CssUI.DOM.Events;
+using CssUI.DOM.Internal;
 using CssUI.DOM.Media;
 using CssUI.DOM.Mutation;
 using CssUI.DOM.Nodes;
@@ -10,9 +11,9 @@ using System.Threading.Tasks;
 namespace CssUI.DOM
 {
     /// <summary>
-    /// Represents the global 'Window' object
+    /// Among other things, the window funnels events from the operating system to the <see cref="Document"/> object
     /// </summary>
-    public abstract class Window : EventTarget, IGlobalEventCallbacks, IWindowEventCallbacks
+    public abstract class Window : BrowsingContext, IGlobalEventCallbacks, IWindowEventCallbacks
     {/* Docs: https://html.spec.whatwg.org/multipage/window-object.html#window */
 
         #region Properties
@@ -26,6 +27,12 @@ namespace CssUI.DOM
         /// Determines the area of the document being rendered
         /// </summary>
         public readonly VisualViewport visualViewport;
+        #endregion
+
+        #region Browsing Context
+
+        internal BrowsingContext BrowsingContext => document?.BrowsingContext;
+        internal override Window WindowProxy { get => this; }
         #endregion
 
         #region CSS Object Model Extensions
@@ -67,11 +74,13 @@ namespace CssUI.DOM
         #endregion
 
         #region Constructors
-        public Window(Screen screen)
+        public Window(Screen screen) : base()
         {
             this.screen = screen;
             var dom = new DOMImplementation();
-            this.document = dom.createDocument(DOMCommon.XMLNamespace, "CssUI", new DocumentType("cssui"));
+            this.document = dom.createDocument(DOMCommon.HTMLNamespace, "CssUI", new DocumentType("cssui"));
+            this.document.BrowsingContext = this;
+
             visualViewport = new VisualViewport(this);
         }
         #endregion
