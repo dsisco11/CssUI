@@ -192,6 +192,8 @@ namespace CssUI.DOM
             this.prefix = prefix;
             this.NamespaceURI = Namespace;
             this.classList = new DOMTokenList(this, EAttributeName.Class);
+
+            this.Style = new ElementPropertySystem(this);
         }
         #endregion
 

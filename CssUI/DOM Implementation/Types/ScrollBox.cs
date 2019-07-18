@@ -1,5 +1,7 @@
-﻿using CssUI.CSS.Enums;
+﻿using CssUI.CSS;
+using CssUI.CSS.Enums;
 using CssUI.CSS.Internal;
+using CssUI.DOM.Enums;
 using CssUI.DOM.Geometry;
 using CssUI.DOM.Nodes;
 
@@ -200,7 +202,7 @@ namespace CssUI.DOM
                     {
                         if (node is Element E)
                         {
-                            if (CSSCommon.Is_Containing_Block_Ancestor_Of(E, Owner))
+                            if (CssCommon.Is_Containing_Block_Ancestor_Of(E, Owner))
                                 continue;
 
                             switch (CASE)
@@ -258,6 +260,20 @@ namespace CssUI.DOM
             Owner = owner;
         }
         #endregion
+
+        void abort_scroll()
+        {
+            /* XXX */
+        }
+
+        internal void Perform_Scroll(DOMPoint pos, Element element, EScrollBehavior behavior = EScrollBehavior.Auto)
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#perform-a-scroll */
+            abort_scroll();
+            if (behavior == EScrollBehavior.Auto && !ReferenceEquals(null, element) && element.Style.ScrollBehavior.)
+            {
+                if ( element.Style.ScrollBehavior == EScrollBehavior.Smooth)
+            }
+        }
 
     }
 }

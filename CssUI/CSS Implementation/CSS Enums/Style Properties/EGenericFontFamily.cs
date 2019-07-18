@@ -6,7 +6,7 @@ namespace CssUI.CSS
     /// Provides values to reference the CSS defined generic font familys
     /// </summary>
     [CssEnum]
-    public enum ECssGenericFontFamily
+    public enum EGenericFontFamily
     {
         [CssKeyword("serif")]
         Serif = 0,

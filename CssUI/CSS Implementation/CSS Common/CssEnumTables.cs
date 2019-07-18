@@ -81,13 +81,13 @@ namespace CssUI.CSS.Internal
 
 
 			/* CssUI.CSS.ECssGenericFontFamily */
-			maxIndex = (int)Enum.GetValues(typeof(CssUI.CSS.ECssGenericFontFamily)).Cast<CssUI.CSS.ECssGenericFontFamily>().Max();
+			maxIndex = (int)Enum.GetValues(typeof(CssUI.CSS.EGenericFontFamily)).Cast<CssUI.CSS.EGenericFontFamily>().Max();
 			TABLE[3] = new string[maxIndex+1];
-			TABLE[3][(int)CssUI.CSS.ECssGenericFontFamily.Serif] = "serif";
-			TABLE[3][(int)CssUI.CSS.ECssGenericFontFamily.SansSerif] = "sans-serif";
-			TABLE[3][(int)CssUI.CSS.ECssGenericFontFamily.Cursive] = "cursive";
-			TABLE[3][(int)CssUI.CSS.ECssGenericFontFamily.Fantasy] = "fantasy";
-			TABLE[3][(int)CssUI.CSS.ECssGenericFontFamily.Monospace] = "monospace";
+			TABLE[3][(int)CssUI.CSS.EGenericFontFamily.Serif] = "serif";
+			TABLE[3][(int)CssUI.CSS.EGenericFontFamily.SansSerif] = "sans-serif";
+			TABLE[3][(int)CssUI.CSS.EGenericFontFamily.Cursive] = "cursive";
+			TABLE[3][(int)CssUI.CSS.EGenericFontFamily.Fantasy] = "fantasy";
+			TABLE[3][(int)CssUI.CSS.EGenericFontFamily.Monospace] = "monospace";
 
 
 			/* CssUI.CSS.ECssUnit */
@@ -235,11 +235,11 @@ namespace CssUI.CSS.Internal
 
 			/* CssUI.CSS.ECssGenericFontFamily */
 			KEYWORD.Add(new Dictionary<AtomicString, dynamic>());
-			KEYWORD[3].Add(new AtomicString("serif"), CssUI.CSS.ECssGenericFontFamily.Serif);
-			KEYWORD[3].Add(new AtomicString("sans-serif"), CssUI.CSS.ECssGenericFontFamily.SansSerif);
-			KEYWORD[3].Add(new AtomicString("cursive"), CssUI.CSS.ECssGenericFontFamily.Cursive);
-			KEYWORD[3].Add(new AtomicString("fantasy"), CssUI.CSS.ECssGenericFontFamily.Fantasy);
-			KEYWORD[3].Add(new AtomicString("monospace"), CssUI.CSS.ECssGenericFontFamily.Monospace);
+			KEYWORD[3].Add(new AtomicString("serif"), CssUI.CSS.EGenericFontFamily.Serif);
+			KEYWORD[3].Add(new AtomicString("sans-serif"), CssUI.CSS.EGenericFontFamily.SansSerif);
+			KEYWORD[3].Add(new AtomicString("cursive"), CssUI.CSS.EGenericFontFamily.Cursive);
+			KEYWORD[3].Add(new AtomicString("fantasy"), CssUI.CSS.EGenericFontFamily.Fantasy);
+			KEYWORD[3].Add(new AtomicString("monospace"), CssUI.CSS.EGenericFontFamily.Monospace);
 
 
 			/* CssUI.CSS.ECssUnit */

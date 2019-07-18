@@ -565,7 +565,7 @@ namespace CssUI
 
         private CssBoxArea Find_Containing_Block()
         {
-            return new CssBoxArea(CSSCommon.Find_Containing_Block(Owner));
+            return new CssBoxArea(CssCommon.Find_Containing_Block(Owner));
         }
 
         private void Update_Display_Types()

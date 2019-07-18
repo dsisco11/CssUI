@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using CssUI.CSS;
 using CssUI.CSS.Enums;
 using CssUI.CSS.Internal;
+using CssUI.DOM;
 using CssUI.Enums;
 using CssUI.Fonts;
 using CssUI.Internal;
@@ -31,7 +32,8 @@ namespace CssUI
         public static AtomicString STATE_HOVER = new AtomicString("Hover");
         #endregion
 
-        private readonly cssElement Owner;
+        private readonly Element Owner;
+        internal readonly CssUnitResolver unitResolver;
 
         #region Dirty Flags
         public EPropertySystemDirtFlags Dirt { get; private set; } = EPropertySystemDirtFlags.Cascade;
@@ -106,8 +108,13 @@ namespace CssUI
             }
         }
 
+
+        // Scrolling Behaviour
+        public EScrollBehavior ScrollBehavior { get => Cascaded.ScrollBehavior.Actual; }
         public EOverflowMode Overflow_X { get => Cascaded.Overflow_X.Actual; }
         public EOverflowMode Overflow_Y { get => Cascaded.Overflow_Y.Actual; }
+
+
         public ETextAlign TextAlign { get => Cascaded.TextAlign.Actual; }
 
         public EObjectFit ObjectFit { get => Cascaded.ObjectFit.Actual; }
@@ -229,18 +236,19 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public ElementPropertySystem(cssElement Owner)
+        public ElementPropertySystem(Element Owner)
         {
             this.Owner = Owner;
+            this.unitResolver = new CssUnitResolver(Owner.ownerDocument, true);
 
             // Populate our rules with a few different common states
-            CssRules.TryAdd(STATE_IMPLICIT, NewPropertySet(STATE_IMPLICIT, $"#{Owner.id}", Owner, false, EPropertySetOrigin.UserAgent));
-            CssRules.TryAdd(STATE_USER, NewPropertySet(STATE_USER, $"#{Owner.id}", Owner, true, EPropertySetOrigin.Author));
+            CssRules.TryAdd(STATE_IMPLICIT, NewPropertySet(STATE_IMPLICIT, $"#{Owner.id}", Owner as cssElement, false, EPropertySetOrigin.UserAgent));
+            CssRules.TryAdd(STATE_USER, NewPropertySet(STATE_USER, $"#{Owner.id}", Owner as cssElement, true, EPropertySetOrigin.Author));
 
-            CssRules.TryAdd(STATE_HOVER, NewPropertySet(STATE_HOVER, ":hover", Owner, true, EPropertySetOrigin.Author));
-            CssRules.TryAdd(STATE_FOCUS, NewPropertySet(STATE_FOCUS, ":focus", Owner, true, EPropertySetOrigin.Author));
+            CssRules.TryAdd(STATE_HOVER, NewPropertySet(STATE_HOVER, ":hover", Owner as cssElement, true, EPropertySetOrigin.Author));
+            CssRules.TryAdd(STATE_FOCUS, NewPropertySet(STATE_FOCUS, ":focus", Owner as cssElement, true, EPropertySetOrigin.Author));
 
-            Cascaded = new CssPropertySet(null, null, Owner, true);
+            Cascaded = new CssPropertySet(null, null, Owner as cssElement, true);
             Cascaded.Property_Changed += Handle_Cascaded_Property_Change;
             // Blending
             Cascaded.Opacity.onValueChange += Handle_Cascaded_Blend_Change;

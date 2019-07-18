@@ -15,6 +15,11 @@ namespace CssUI
     // XXX: This class could be MUCH more performant if we didnt have to create an instance of every defined css property during creation, 
     //      if we could just instantiate the properties when they are needed it would save a lot.
 
+    /* XXX: lets move to referencing these by an AtomicName<ECssProperty> and then just instantiate a LUT which maps the AtomicName to an object pointer.
+     * Note: will have to change the way these proeprties are accessed in that case as some will return null rather then the default value they should have
+     *          Although we could just return the property definitions default value, or better yet some kind of proxy to it which when it has its value changed will instantiate a LIVE instance for the property and assign it to its slot in the LUT.
+     * */
+
     /// <summary>
     /// Holds an instance of all the defined css propertys that a css element can have
     /// Each different styling state of an element gets it's own instance of this class which 
@@ -94,7 +99,8 @@ namespace CssUI
         public IntProperty ObjectPosition_Y => (IntProperty)this["object-position-y"];
         #endregion
 
-        #region Overflow
+        #region Scroll Behavior
+        public EnumProperty<EScrollBehavior> ScrollBehavior => (EnumProperty<EScrollBehavior>)this["scroll-behavior"];
         public EnumProperty<EOverflowMode> Overflow_X => (EnumProperty<EOverflowMode>)this["overflow-x"];
         public EnumProperty<EOverflowMode> Overflow_Y => (EnumProperty<EOverflowMode>)this["overflow-y"];
         #endregion
@@ -297,8 +303,12 @@ namespace CssUI
                 new EnumProperty<EDisplayMode>("display", Owner, selfRef, this.Locked),
                 new EnumProperty<EBoxSizingMode>("box-sizing", Owner, selfRef, this.Locked),
                 new EnumProperty<EPositioning>("positioning", Owner, selfRef, this.Locked),
+
+
+                new EnumProperty<EScrollBehavior>("scroll-behavior", Owner, selfRef, this.Locked),
                 new EnumProperty<EOverflowMode>("overflow-x", Owner, selfRef, this.Locked),
                 new EnumProperty<EOverflowMode>("overflow-y", Owner, selfRef, this.Locked),
+
                 new EnumProperty<EObjectFit>("object-fit", Owner, selfRef, this.Locked),
 
                 new IntProperty("object-position-x", Owner, selfRef, this.Locked),

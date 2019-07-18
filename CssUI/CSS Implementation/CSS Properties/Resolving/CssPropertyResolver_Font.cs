@@ -1,4 +1,5 @@
 ﻿using CssUI.CSS;
+using CssUI.CSS.Internal;
 using CssUI.Enums;
 using CssUI.Fonts;
 using SixLabors.Fonts;
@@ -14,11 +15,95 @@ namespace CssUI.Internal
     public static partial class CssPropertyResolver
     {
 
+        public static dynamic Font_Size_Computed(ICssProperty Property)
+        {// SEE: https://www.w3.org/TR/css-fonts-3/#font-size-prop
+            CssValue value = (Property as CssProperty).Specified;
+            if (ReferenceEquals(null, value))
+            {
+                throw new CssException($"Unable to resolve absolute length for Computed \"{Property.CssName}\" value.");
+            }
+
+            double Size = UserAgent.DEFAULT_FONT_SIZE; /* CssUIs' base font size */
+            double Scaling = 1.0; /* Scaling to apply to our base size, used if the specified value is a keyword */
+
+
+            if (value.HasValue)
+            {
+                if (value.IsDefinite)
+                {
+                    Size = (double)value.Value;
+                }
+                else
+                {
+                    switch (value.Type)
+                    {
+                        case ECssValueType.DIMENSION:
+                            {
+                                Scaling = 1.0;
+                                Size = value.Resolve(Property.Owner.Style.unitResolver);
+                            }
+                            break;
+                        case ECssValueType.KEYWORD:
+                            {
+                                string keyword = value.Value;
+                                if (!CssLookup.Enum_From_Keyword(keyword, out EFontSize outFontSize))
+                                {
+                                    throw new CssException($"");
+                                    throw new CssException($"Unable to resolve absolute length for Computed \"{Property.CssName}\" value.");
+                                }
+                                switch (outFontSize)
+                                {
+                                    /* First off, if the value is an <absolute> size keyword we associate it with a scale and apply it to our base size */
+                                    case EFontSize.XXSmall:
+                                    case EFontSize.XSmall:
+                                    case EFontSize.Small:
+                                    case EFontSize.Medium:
+                                    case EFontSize.Large:
+                                    case EFontSize.XLarge:
+                                    case EFontSize.XXLarge:
+                                        Scaling = CssCommon.Get_Font_Size_Keyword_Scaling_Factor(outFontSize);
+                                        break;
+                                    /* Second, if the value is a <relative> size keyword we find the computed font size of our parent and increase/decrease it to get our value  */
+                                    case EFontSize.Smaller:
+                                        {
+                                            double parentSize = (double)Property.Owner.Parent.Style.Cascaded.FontSize.Computed.Value;
+                                            int scaleIndex = CssCommon.Get_Font_Scaling_Step_Index_From_Size(parentSize);
+                                            Scaling = CssCommon.Get_Font_Scaling_From_Step_Index(scaleIndex - 1);
+                                        }
+                                        break;
+                                    case EFontSize.Larger:
+                                        {
+                                            double parentSize = (double)Property.Owner.Parent.Style.Cascaded.FontSize.Computed.Value;
+                                            int scaleIndex = CssCommon.Get_Font_Scaling_Step_Index_From_Size(parentSize);
+                                            Scaling = CssCommon.Get_Font_Scaling_From_Step_Index(scaleIndex + 1);
+                                        }
+                                        break;
+                                }
+                            }
+                            break;
+                    }
+
+
+                    double finalSize = Size * Scaling;
+                    return CssValue.From_Number(finalSize);
+                }
+            }
+
+
+
+            // Round the size up to the nearest whole pixel value
+            Size = Math.Round(Size, MidpointRounding.AwayFromZero);
+            return CssValue.From_Number(Size);
+        }
+
         public static dynamic Font_Size_Used(ICssProperty Property)
         {// SEE: https://www.w3.org/TR/css-fonts-3/#font-size-prop
             double? v = (Property as CssProperty).Computed.Resolve();
             if (!v.HasValue)
-                throw new CssException("Unable to resolve absolute length for Used value.");
+            {
+                throw new CssException($"Unable to resolve absolute length for Used \"{Property.CssName}\" value.");
+            }
+
             double Size = v.Value;
             if (Size < 9.0)// The specifications say we shouldnt render a font less than 9px in size
                 Size = 9.0;
@@ -34,17 +119,21 @@ namespace CssUI.Internal
             // handle font-weight related keywords
             // This function wouldnt even be called if the value werent a keyword
             string keyword = ((Property as CssProperty).Specified.Value as string).ToLower();
+            if (!CssLookup.Enum_From_Keyword(keyword, out EFontWeight outEnum))
+            {
+                throw new CssException($"Unable to resolve absolute length for Computed \"{Property.CssName}\" value.");
+            }
             int Weight = 400;
 
-            switch (keyword)
+            switch (outEnum)
             {
-                case "normal":
+                case EFontWeight.Normal:
                     Weight = 400;
                     break;
-                case "bold":
+                case EFontWeight.Bold:
                     Weight = 700;
                     break;
-                case "bolder":
+                case EFontWeight.Bolder:
                     {// https://drafts.csswg.org/css-fonts-4/#relative-weights
                         CssValue inherited = Property.Find_Inherited_Value();
                         int w = inherited.Value;
@@ -57,7 +146,7 @@ namespace CssUI.Internal
                         else Weight = 900;
                     }
                     break;
-                case "lighter":
+                case EFontWeight.Lighter:
                     {// https://drafts.csswg.org/css-fonts-4/#relative-weights
                         CssValue inherited = Property.Find_Inherited_Value();
                         int w = inherited.Value;
@@ -76,18 +165,6 @@ namespace CssUI.Internal
             return CssValue.From_Int(Weight);
         }
 
-        public static CssValue Font_Size_Restrict(ICssProperty Property)
-        {
-            double? v = (Property as CssProperty).Used.Resolve();
-            if (!v.HasValue)
-                throw new CssException("Unable to resolve absolute length for Used value.");
-
-            // Per the CSS specifications we should not create a font under 9pt
-            double val = Math.Max(v.Value, 9.0);
-
-            return new CssValue(ECssValueType.NUMBER, val);
-        }
-
         /// <summary>
         /// Filters font family values
         /// </summary>
@@ -104,15 +181,21 @@ namespace CssUI.Internal
                 {
                     case ECssValueType.KEYWORD:
                         {// Replace generic font-family keywords with a list of our fallback font-familys for that family
-                            switch (CssLookup.Enum_From_Keyword<ECssGenericFontFamily>(val.Value as string))
+                            string familyKeyword = val.Value as string;
+                            if (!CssLookup.Enum_From_Keyword(familyKeyword, out EGenericFontFamily outFamily))
                             {
-                                case ECssGenericFontFamily.Serif:
-                                case ECssGenericFontFamily.SansSerif:
-                                case ECssGenericFontFamily.Monospace:
-                                case ECssGenericFontFamily.Cursive:
-                                case ECssGenericFontFamily.Fantasy:
+                                throw new CssException($"Unable to resolve absolute length for Used \"{Property.CssName}\" value.");
+                            }
+
+                            switch (outFamily)
+                            {
+                                case EGenericFontFamily.Serif:
+                                case EGenericFontFamily.SansSerif:
+                                case EGenericFontFamily.Monospace:
+                                case EGenericFontFamily.Cursive:
+                                case EGenericFontFamily.Fantasy:
                                     {
-                                        if (FontManager.GenericFamilyMap.TryGetValue(CssLookup.Enum_From_Keyword<ECssGenericFontFamily>(val.Value as string).Value, out List<CssValue> GenericFontFamilys))
+                                        if (FontManager.GenericFamilyMap.TryGetValue(outFamily, out List<CssValue> GenericFontFamilys))
                                             retValues.AddRange(GenericFontFamilys);
                                     }
                                     break;

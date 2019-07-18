@@ -1,7 +1,7 @@
-﻿using CssUI.CSS.Internal;
-using System;
+﻿using System;
+using CssUI.CSS.Internal;
 
-namespace CssUI.CSS.Enums
+namespace CssUI.CSS
 {
     /// <summary>
     /// Defines all the possible border styles
@@ -9,10 +9,14 @@ namespace CssUI.CSS.Enums
     [Flags, CssEnum]
     public enum EBorderStyle : int
     {
-        /// <summary>No border, Color and width are ignored.</summary>
+        /// <summary>
+        /// No border, Color and width are ignored.
+        /// </summary>
         [CssKeyword("none")]
         None = (1 << 0),
-        /// <summary>Same as 'None' but with different conflict resolution for border-collapsed tables</summary>
+        /// <summary>
+        /// Same as 'None' but with different conflict resolution for border-collapsed tables
+        /// </summary>
         [CssKeyword("hidden")]
         Hidden = (1 << 1),
         [CssKeyword("dotted")]

@@ -124,6 +124,20 @@ namespace CssUI
 
             return CssEnumTables.KEYWORD[index].Keys.Cast<string>().ToArray();
         }
+
+        /// <summary>
+        /// Returns ALL keywords defined for the given enum
+        /// </summary>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
+        public static string[] Get_Keywords<Ty>()
+        {
+            int index = CssEnumTables.Lookup_Enum_Index(typeof(Ty).Name);
+            if (index < 0)
+                return new string[0];/* Enum has no index */
+
+            return CssEnumTables.KEYWORD[index].Keys.Cast<string>().ToArray();
+        }
         #endregion
     }
 }
