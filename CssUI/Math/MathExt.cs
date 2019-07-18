@@ -8,35 +8,35 @@ namespace CssUI
     {
         #region Min
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Min(int A, int B) { return (A < B ? A : B); }
+        public static int Min(int A, int B) => (A < B ? A : B);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static long Min(long A, long B) { return (A < B ? A : B); }
+        public static long Min(long A, long B) => (A < B ? A : B);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Min(float A, float B) { return (A < B ? A : B); }
+        public static float Min(float A, float B) => (A < B ? A : B);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double Min(double A, double B) { return (A < B ? A : B); }
+        public static double Min(double A, double B) => (A < B ? A : B);
         #endregion
 
         #region Max
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Max(int A, int B) { return (A > B ? A : B); }
+        public static int Max(int A, int B) => (A > B ? A : B);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static long Max(long A, long B) { return (A > B ? A : B); }
+        public static long Max(long A, long B) => (A > B ? A : B);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Max(float A, float B) { return (A > B ? A : B); }
+        public static float Max(float A, float B) => (A > B ? A : B);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double Max(double A, double B) { return (A > B ? A : B); }
+        public static double Max(double A, double B) => (A > B ? A : B);
         #endregion
 
         #region Clamp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Clamp(int value, int min, int max) { return Max(min, Min(max, value)); }
+        public static int Clamp(int value, int min, int max) => Max(min, Min(max, value));
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static long Clamp(long value, long min, long max) { return Max(min, Min(max, value)); }
+        public static long Clamp(long value, long min, long max) => Max(min, Min(max, value));
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Clamp(float value, float min, float max) { return Max(min, Min(max, value)); }
+        public static float Clamp(float value, float min, float max) => Max(min, Min(max, value));
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double Clamp(double value, double min, double max) { return Max(min, Min(max, value)); }
+        public static double Clamp(double value, double min, double max) => Max(min, Min(max, value));
         #endregion
 
         #region RangeClamp
