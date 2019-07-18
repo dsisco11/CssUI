@@ -116,24 +116,29 @@ namespace CssUI.CSS
         {
             return new CssRect() { Top = Edge.Top, Right = Edge.Right, Bottom = Edge.Bottom, Left = Edge.Left };
         }
+
+        /* XXX: Have to restructure the CSS box system because this current system does NOT actually describe the CSS break system for fragmentation */
+        private ElementPropertySystem Style => null;
+
         /// <summary>
         /// The logical-width for this area
         /// </summary>
         /// Docs: https://www.w3.org/TR/css-writing-modes-4/#logical-width
         public int LogicalWidth
         {
-            get => Fragment?.Style?.WritingMode == Enums.EWritingMode.Horizontal_TB ? Dimensions.Width : Dimensions.Height;
+            get => Style?.WritingMode != EWritingMode.Horizontal_TB ? Dimensions.Height : Dimensions.Width;
         }
+
         /// <summary>
         /// The logical-height for this area
         /// </summary>
         public int LogicalHeight
         {
-            get => Fragment?.Style?.WritingMode == Enums.EWritingMode.Horizontal_TB ? Dimensions.Height : Dimensions.Width;
+            get => Style?.WritingMode != EWritingMode.Horizontal_TB ? Dimensions.Width : Dimensions.Height;
         }
         #endregion
 
-        #region Constructor
+        #region Constructors
         public CssBoxArea()
         {
         }
@@ -168,12 +173,19 @@ namespace CssUI.CSS
         }
 
         /// <summary>
-        /// Makes a copy of the given <see cref="CssBoxArea"/>
         /// </summary>
-        /// <param name="Area"></param>
-        public CssBoxArea(int Top, int Right, int Bottom, int Left)
+        public CssBoxArea(long Top, long Right, long Bottom, long Left)
         {
-            Edge = new CssRect() { Top = Top, Right = Right, Bottom = Bottom, Left = Left };
+            Edge = new CssRect() { Top = (int)Top, Right = (int)Right, Bottom = (int)Bottom, Left = (int)Left };
+            Size = new CssRect() { Top = 0, Right = 0, Bottom = 0, Left = 0 };
+            update_pos_and_dimensions();
+        }
+
+        /// <summary>
+        /// </summary>
+        public CssBoxArea(DOMRect Rect)
+        {
+            Edge = new CssRect() { Top = (int)Rect.top, Right = (int)Rect.right, Bottom = (int)Rect.bottom, Left = (int)Rect.left };
             Size = new CssRect() { Top = 0, Right = 0, Bottom = 0, Left = 0 };
             update_pos_and_dimensions();
         }
@@ -385,15 +397,15 @@ namespace CssUI.CSS
         public override int GetHashCode()
         {
             int hash = 17;
-            hash = hash * 31 + Top;
-            hash = hash * 31 + Right;
-            hash = hash * 31 + Bottom;
-            hash = hash * 31 + Left;
+            hash = (hash * 31) + Top;
+            hash = (hash * 31) + Right;
+            hash = (hash * 31) + Bottom;
+            hash = (hash * 31) + Left;
 
-            hash = hash * 31 + Size_Top;
-            hash = hash * 31 + Size_Right;
-            hash = hash * 31 + Size_Bottom;
-            hash = hash * 31 + Size_Left;
+            hash = (hash * 31) + Size_Top;
+            hash = (hash * 31) + Size_Right;
+            hash = (hash * 31) + Size_Bottom;
+            hash = (hash * 31) + Size_Left;
 
             return hash;
         }

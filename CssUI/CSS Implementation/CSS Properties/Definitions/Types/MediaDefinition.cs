@@ -31,7 +31,7 @@ namespace CssUI.CSS.Internal
         /// </summary>
         public readonly List<string> KeywordWhitelist = null;
 
-        public readonly ECssUnit DefaultUnit = ECssUnit.PX;
+        public readonly EUnit DefaultUnit = EUnit.PX;
         #endregion
 
         #region Constructors

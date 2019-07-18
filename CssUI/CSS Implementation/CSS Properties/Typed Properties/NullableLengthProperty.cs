@@ -23,7 +23,7 @@ namespace CssUI.CSS
         /// <param name="value"></param>
         public void Set(int? value)
         {
-            var newValue = CssValue.From_Length(value, ECssUnit.PX, CssValue.Null);
+            var newValue = CssValue.From_Length(value, EUnit.PX, CssValue.Null);
             if (Assigned != newValue)
             {
                 Assigned = newValue;

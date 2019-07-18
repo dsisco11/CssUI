@@ -3,7 +3,7 @@
 namespace CssUI.CSS
 {
     [CssEnum]
-    public enum ECssDirection : int
+    public enum EDirection : int
     {
         [CssKeyword("ltr")]
         LTR = 1,

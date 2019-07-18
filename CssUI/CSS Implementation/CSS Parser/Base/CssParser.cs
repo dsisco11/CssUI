@@ -488,11 +488,11 @@ namespace CssUI.CSS.Serialization
                 case ECssTokenType.Dimension:
                     {
                         var tok = Stream.Consume() as DimensionToken;
-                        ECssUnit unit = ECssUnit.PX;
+                        EUnit unit = EUnit.PX;
 
                         if (!string.IsNullOrEmpty(tok.Unit))
                         {
-                            ECssUnit? unitLookup = CssLookup.Enum_From_Keyword<ECssUnit>(tok.Unit);
+                            EUnit? unitLookup = CssLookup.Enum_From_Keyword<EUnit>(tok.Unit);
                             if (!unitLookup.HasValue) throw new CssParserException($"Failed to find keyword in enum lookup table: \"{tok.Unit}\"");
                             unit = unitLookup.Value;
                         }

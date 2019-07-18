@@ -84,7 +84,7 @@ namespace CssUI
         #endregion
 
         #region Flow
-        public EnumProperty<ECssDirection> Direction => (EnumProperty<ECssDirection>)this["direction"];
+        public EnumProperty<EDirection> Direction => (EnumProperty<EDirection>)this["direction"];
         public EnumProperty<EWritingMode> WritingMode => (EnumProperty<EWritingMode>)this["writing-mode"];
         #endregion
 
@@ -292,7 +292,7 @@ namespace CssUI
                 new IntProperty("bottom", Owner, selfRef, this.Locked),
                 new IntProperty("left", Owner, selfRef, this.Locked),
 
-                new EnumProperty<ECssDirection>("direction", Owner, selfRef, this.Locked),
+                new EnumProperty<EDirection>("direction", Owner, selfRef, this.Locked),
                 new EnumProperty<EWritingMode>("writing-mode", Owner, selfRef, this.Locked),
                 new EnumProperty<EDisplayMode>("display", Owner, selfRef, this.Locked),
                 new EnumProperty<EBoxSizingMode>("box-sizing", Owner, selfRef, this.Locked),
@@ -517,10 +517,10 @@ namespace CssUI
             Padding_Bottom.Set(vertical);
             Padding_Left.Set(horizontal);*/
 
-            Padding_Top.Set(!vertical.HasValue ? null : CssValue.From_Length(vertical.Value, ECssUnit.PX));
-            Padding_Right.Set(!horizontal.HasValue ? null : CssValue.From_Length(horizontal.Value, ECssUnit.PX));
-            Padding_Bottom.Set(!vertical.HasValue ? null : CssValue.From_Length(vertical.Value, ECssUnit.PX));
-            Padding_Left.Set(!horizontal.HasValue ? null : CssValue.From_Length(horizontal.Value, ECssUnit.PX));
+            Padding_Top.Set(!vertical.HasValue ? null : CssValue.From_Length(vertical.Value, EUnit.PX));
+            Padding_Right.Set(!horizontal.HasValue ? null : CssValue.From_Length(horizontal.Value, EUnit.PX));
+            Padding_Bottom.Set(!vertical.HasValue ? null : CssValue.From_Length(vertical.Value, EUnit.PX));
+            Padding_Left.Set(!horizontal.HasValue ? null : CssValue.From_Length(horizontal.Value, EUnit.PX));
         }
         public void Set_Padding(CssValue horizontal, CssValue vertical)
         {
@@ -536,10 +536,10 @@ namespace CssUI
             Padding_Bottom.Set(bottom);
             Padding_Left.Set(left);*/
 
-            Padding_Top.Set(!top.HasValue ? null : CssValue.From_Length(top.Value, ECssUnit.PX));
-            Padding_Right.Set(!right.HasValue ? null : CssValue.From_Length(right.Value, ECssUnit.PX));
-            Padding_Bottom.Set(!bottom.HasValue ? null : CssValue.From_Length(bottom.Value, ECssUnit.PX));
-            Padding_Left.Set(!left.HasValue ? null : CssValue.From_Length(left.Value, ECssUnit.PX));
+            Padding_Top.Set(!top.HasValue ? null : CssValue.From_Length(top.Value, EUnit.PX));
+            Padding_Right.Set(!right.HasValue ? null : CssValue.From_Length(right.Value, EUnit.PX));
+            Padding_Bottom.Set(!bottom.HasValue ? null : CssValue.From_Length(bottom.Value, EUnit.PX));
+            Padding_Left.Set(!left.HasValue ? null : CssValue.From_Length(left.Value, EUnit.PX));
         }
         public void Set_Padding(CssValue top, CssValue right, CssValue bottom, CssValue left)
         {
@@ -559,10 +559,10 @@ namespace CssUI
             Margin_Bottom.Set(vertical);
             Margin_Left.Set(horizontal);*/
 
-            Margin_Top.Set(!vertical.HasValue ? null : CssValue.From_Length(vertical.Value, ECssUnit.PX));
-            Margin_Right.Set(!horizontal.HasValue ? null : CssValue.From_Length(horizontal.Value, ECssUnit.PX));
-            Margin_Bottom.Set(!vertical.HasValue ? null : CssValue.From_Length(vertical.Value, ECssUnit.PX));
-            Margin_Left.Set(!horizontal.HasValue ? null : CssValue.From_Length(horizontal.Value, ECssUnit.PX));
+            Margin_Top.Set(!vertical.HasValue ? null : CssValue.From_Length(vertical.Value, EUnit.PX));
+            Margin_Right.Set(!horizontal.HasValue ? null : CssValue.From_Length(horizontal.Value, EUnit.PX));
+            Margin_Bottom.Set(!vertical.HasValue ? null : CssValue.From_Length(vertical.Value, EUnit.PX));
+            Margin_Left.Set(!horizontal.HasValue ? null : CssValue.From_Length(horizontal.Value, EUnit.PX));
         }
         public void Set_Margin(CssValue horizontal, CssValue vertical)
         {
@@ -578,10 +578,10 @@ namespace CssUI
             Margin_Bottom.Set(bottom);
             Margin_Left.Set(left);*/
 
-            Margin_Top.Set(!top.HasValue ? null : CssValue.From_Length(top.Value, ECssUnit.PX));
-            Margin_Right.Set(!right.HasValue ? null : CssValue.From_Length(right.Value, ECssUnit.PX));
-            Margin_Bottom.Set(!bottom.HasValue ? null : CssValue.From_Length(bottom.Value, ECssUnit.PX));
-            Margin_Left.Set(!left.HasValue ? null : CssValue.From_Length(left.Value, ECssUnit.PX));
+            Margin_Top.Set(!top.HasValue ? null : CssValue.From_Length(top.Value, EUnit.PX));
+            Margin_Right.Set(!right.HasValue ? null : CssValue.From_Length(right.Value, EUnit.PX));
+            Margin_Bottom.Set(!bottom.HasValue ? null : CssValue.From_Length(bottom.Value, EUnit.PX));
+            Margin_Left.Set(!left.HasValue ? null : CssValue.From_Length(left.Value, EUnit.PX));
         }
         public void Set_Margin(CssValue top, CssValue right, CssValue bottom, CssValue left)
         {
@@ -597,10 +597,10 @@ namespace CssUI
             Margin_Bottom.Set(vertical);
             Margin_Left.Set(horizontal);*/
 
-            Margin_Top.Set(!vertical.HasValue ? null : CssValue.From_Length(vertical.Value, ECssUnit.PX));
-            Margin_Right.Set(!horizontal.HasValue ? null : CssValue.From_Length(horizontal.Value, ECssUnit.PX));
-            Margin_Bottom.Set(!vertical.HasValue ? null : CssValue.From_Length(vertical.Value, ECssUnit.PX));
-            Margin_Left.Set(!horizontal.HasValue ? null : CssValue.From_Length(horizontal.Value, ECssUnit.PX));
+            Margin_Top.Set(!vertical.HasValue ? null : CssValue.From_Length(vertical.Value, EUnit.PX));
+            Margin_Right.Set(!horizontal.HasValue ? null : CssValue.From_Length(horizontal.Value, EUnit.PX));
+            Margin_Bottom.Set(!vertical.HasValue ? null : CssValue.From_Length(vertical.Value, EUnit.PX));
+            Margin_Left.Set(!horizontal.HasValue ? null : CssValue.From_Length(horizontal.Value, EUnit.PX));
         }
         #endregion
 
@@ -611,8 +611,8 @@ namespace CssUI
             /*Left.Set(X);
             Top.Set(Y);*/
 
-            Left.Set(!X.HasValue ? null : CssValue.From_Length(X.Value, ECssUnit.PX));
-            Top.Set(!Y.HasValue ? null : CssValue.From_Length(Y.Value, ECssUnit.PX));
+            Left.Set(!X.HasValue ? null : CssValue.From_Length(X.Value, EUnit.PX));
+            Top.Set(!Y.HasValue ? null : CssValue.From_Length(Y.Value, EUnit.PX));
         }
         public void Set_Position(CssValue x, CssValue y)
         {
@@ -633,8 +633,8 @@ namespace CssUI
             /*this.Width.Set(Width);
             this.Height.Set(Height);*/
 
-            this.Width.Set(!Width.HasValue ? null : CssValue.From_Length(Width.Value, ECssUnit.PX));
-            this.Height.Set(!Height.HasValue ? null : CssValue.From_Length(Height.Value, ECssUnit.PX));
+            this.Width.Set(!Width.HasValue ? null : CssValue.From_Length(Width.Value, EUnit.PX));
+            this.Height.Set(!Height.HasValue ? null : CssValue.From_Length(Height.Value, EUnit.PX));
         }
         public void Set_Size(CssValue width, CssValue height)
         {
@@ -649,8 +649,8 @@ namespace CssUI
         {
             /*Min_Width.Set(width);
             Min_Height.Set(height);*/
-            this.Min_Width.Set(!Width.HasValue ? null : CssValue.From_Length(Width.Value, ECssUnit.PX));
-            this.Min_Height.Set(!Height.HasValue ? null : CssValue.From_Length(Height.Value, ECssUnit.PX));
+            this.Min_Width.Set(!Width.HasValue ? null : CssValue.From_Length(Width.Value, EUnit.PX));
+            this.Min_Height.Set(!Height.HasValue ? null : CssValue.From_Length(Height.Value, EUnit.PX));
         }
         public void Set_SizeMin(CssValue width, CssValue height)
         {
@@ -665,8 +665,8 @@ namespace CssUI
         {
             /*Max_Width.Set(width);
             Max_Height.Set(height);*/
-            this.Min_Width.Set(!Width.HasValue ? null : CssValue.From_Length(Width.Value, ECssUnit.PX));
-            this.Min_Height.Set(!Height.HasValue ? null : CssValue.From_Length(Height.Value, ECssUnit.PX));
+            this.Min_Width.Set(!Width.HasValue ? null : CssValue.From_Length(Width.Value, EUnit.PX));
+            this.Min_Height.Set(!Height.HasValue ? null : CssValue.From_Length(Height.Value, EUnit.PX));
         }
         public void Set_SizeMax(CssValue width, CssValue height)
         {

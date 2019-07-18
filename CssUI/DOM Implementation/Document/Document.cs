@@ -39,7 +39,7 @@ namespace CssUI.DOM
         /// The area within which element layout is performed
         /// (The viewport used for layout)
         /// </summary>
-        public readonly Viewport layoutViewport;
+        public readonly Viewport Viewport;
 
         public readonly string Origin = null;
         public readonly DocumentType doctype;

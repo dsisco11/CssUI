@@ -214,7 +214,7 @@ namespace CssUI.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_Slot(Node node)
         {
-            return node is Element element && 0==string.Compare("slot", element.tagName);
+            return node is Element element && 0 == string.Compare("slot", element.tagName);
         }
         #endregion
 
@@ -234,7 +234,7 @@ namespace CssUI.DOM
             /* 5) Return the first slot in tree order in shadow’s descendants whose name is slotable’s name, if any, and null otherwise. */
             var tree = new TreeWalker(shadow, ENodeFilterMask.SHOW_ALL);
             var node = tree.nextNode();
-            while(!ReferenceEquals(null, node))
+            while (!ReferenceEquals(null, node))
             {
                 if (node is HTMLSlotElement slot)
                 {
@@ -317,7 +317,7 @@ namespace CssUI.DOM
                 match = false;
             else
             {
-                for (int i=0; i<slotables.Count(); i++)
+                for (int i = 0; i < slotables.Count(); i++)
                 {
                     if (!ReferenceEquals(slotables[i], slot.Assigned[i]))
                     {
@@ -335,7 +335,7 @@ namespace CssUI.DOM
             /* 3) Set slot’s assigned nodes to slotables. */
             slot.Assigned = slotables;
             /* 4) For each slotable in slotables, set slotable’s assigned slot to slot. */
-            foreach(ISlottable slotable in slotables)
+            foreach (ISlottable slotable in slotables)
             {
                 slotable.assignedSlot = slot;
             }
@@ -362,7 +362,7 @@ namespace CssUI.DOM
             var tree = new TreeWalker(A, Enums.ENodeFilterMask.SHOW_ALL);
             /* Proove it true */
             Node node = tree.parentNode();
-            while(!ReferenceEquals(node, null))
+            while (!ReferenceEquals(node, null))
             {
                 if (ReferenceEquals(node, B))
                     return true;
@@ -873,7 +873,7 @@ namespace CssUI.DOM
             var descendents = new LinkedList<Element>();
             var tree = new TreeWalker(root, ENodeFilterMask.SHOW_ELEMENT);
             Node node = tree.nextNode();
-            while(!ReferenceEquals(null, node))
+            while (!ReferenceEquals(null, node))
             {
                 Element E = node as Element;
 
@@ -914,7 +914,7 @@ namespace CssUI.DOM
             /* 3) If namespace is the HTML namespace, and either localName is a valid custom element name or is is non-null, then set result’s custom element state to "undefined". */
 
             var Interface = Lookup_Element_Interface(localName, Namespace);
-            var ctor = Interface.GetConstructor(new Type[]{ typeof(Document), typeof(string), typeof(string), typeof(string) } );
+            var ctor = Interface.GetConstructor(new Type[] { typeof(Document), typeof(string), typeof(string), typeof(string) });
             if (ReferenceEquals(null, ctor))
                 throw new Exception($"Cannot find interface constructor for element type: \"{localName}\"");
             /* XXX: Just need to make sure that every tag type has an interface type correctly specified for it */
@@ -935,5 +935,6 @@ namespace CssUI.DOM
             throw new NotImplementedException();
         }
         #endregion
+
     }
 }

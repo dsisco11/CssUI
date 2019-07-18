@@ -35,30 +35,30 @@ namespace CssUI.Internal
                 case "border-left-width":
                     {
                         if (0 != (Property.Owner.Style.Border_Left_Style & ((EBorderStyle.None | EBorderStyle.Hidden))))
-                            return CssValue.From_Length(0, ECssUnit.PX);
+                            return CssValue.From_Length(0, EUnit.PX);
                     }
                     break;
                 case "border-top-width":
                     {
                         if (0 != (Property.Owner.Style.Border_Top_Style & ((EBorderStyle.None | EBorderStyle.Hidden))))
-                            return CssValue.From_Length(0, ECssUnit.PX);
+                            return CssValue.From_Length(0, EUnit.PX);
                     }
                     break;
                 case "border-right-width":
                     {
                         if (0 != (Property.Owner.Style.Border_Right_Style & ((EBorderStyle.None | EBorderStyle.Hidden))))
-                            return CssValue.From_Length(0, ECssUnit.PX);
+                            return CssValue.From_Length(0, EUnit.PX);
                     }
                     break;
                 case "border-bottom-width":
                     {
                         if (0 != (Property.Owner.Style.Border_Bottom_Style & ((EBorderStyle.None | EBorderStyle.Hidden))))
-                            return CssValue.From_Length(0, ECssUnit.PX);
+                            return CssValue.From_Length(0, EUnit.PX);
                     }
                     break;
             }
 
-            return CssValue.From_Length(Width, ECssUnit.PX);
+            return CssValue.From_Length(Width, EUnit.PX);
         }
 
 

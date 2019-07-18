@@ -77,7 +77,7 @@ namespace CssUI.DOM.Events
             {
                 if (0 != (Flags & EEventFlags.Dispatch))
                 {
-                    var x = View.document.documentElement.Box.Containing_Block.X;
+                    var x = View.document.documentElement.Box.Containing_Box.X;
                     return clientX - x;
                 }
 
@@ -92,7 +92,7 @@ namespace CssUI.DOM.Events
             {
                 if (0 != (Flags & EEventFlags.Dispatch))
                 {
-                    var y = View.document.documentElement.Box.Containing_Block.Y;
+                    var y = View.document.documentElement.Box.Containing_Box.Y;
                     return clientY - y;
                 }
 

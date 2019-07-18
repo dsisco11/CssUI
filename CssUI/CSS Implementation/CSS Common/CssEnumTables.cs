@@ -74,10 +74,10 @@ namespace CssUI.CSS.Internal
 
 
 			/* CssUI.CSS.ECssDirection */
-			maxIndex = (int)Enum.GetValues(typeof(CssUI.CSS.ECssDirection)).Cast<CssUI.CSS.ECssDirection>().Max();
+			maxIndex = (int)Enum.GetValues(typeof(CssUI.CSS.EDirection)).Cast<CssUI.CSS.EDirection>().Max();
 			TABLE[2] = new string[maxIndex+1];
-			TABLE[2][(int)CssUI.CSS.ECssDirection.LTR] = "ltr";
-			TABLE[2][(int)CssUI.CSS.ECssDirection.RTL] = "rtl";
+			TABLE[2][(int)CssUI.CSS.EDirection.LTR] = "ltr";
+			TABLE[2][(int)CssUI.CSS.EDirection.RTL] = "rtl";
 
 
 			/* CssUI.CSS.ECssGenericFontFamily */
@@ -91,22 +91,22 @@ namespace CssUI.CSS.Internal
 
 
 			/* CssUI.CSS.ECssUnit */
-			maxIndex = (int)Enum.GetValues(typeof(CssUI.CSS.ECssUnit)).Cast<CssUI.CSS.ECssUnit>().Max();
+			maxIndex = (int)Enum.GetValues(typeof(CssUI.CSS.EUnit)).Cast<CssUI.CSS.EUnit>().Max();
 			TABLE[4] = new string[maxIndex+1];
-			TABLE[4][(int)CssUI.CSS.ECssUnit.None] = "";
-			TABLE[4][(int)CssUI.CSS.ECssUnit.PX] = "px";
-			TABLE[4][(int)CssUI.CSS.ECssUnit.EM] = "em";
-			TABLE[4][(int)CssUI.CSS.ECssUnit.EX] = "ex";
-			TABLE[4][(int)CssUI.CSS.ECssUnit.CH] = "ch";
-			TABLE[4][(int)CssUI.CSS.ECssUnit.REM] = "rem";
-			TABLE[4][(int)CssUI.CSS.ECssUnit.VW] = "vw";
-			TABLE[4][(int)CssUI.CSS.ECssUnit.VH] = "vh";
-			TABLE[4][(int)CssUI.CSS.ECssUnit.VMIN] = "vmin";
-			TABLE[4][(int)CssUI.CSS.ECssUnit.VMAX] = "vmax";
-			TABLE[4][(int)CssUI.CSS.ECssUnit.DEG] = "deg";
-			TABLE[4][(int)CssUI.CSS.ECssUnit.GRAD] = "grad";
-			TABLE[4][(int)CssUI.CSS.ECssUnit.RAD] = "rad";
-			TABLE[4][(int)CssUI.CSS.ECssUnit.TURN] = "turn";
+			TABLE[4][(int)CssUI.CSS.EUnit.None] = "";
+			TABLE[4][(int)CssUI.CSS.EUnit.PX] = "px";
+			TABLE[4][(int)CssUI.CSS.EUnit.EM] = "em";
+			TABLE[4][(int)CssUI.CSS.EUnit.EX] = "ex";
+			TABLE[4][(int)CssUI.CSS.EUnit.CH] = "ch";
+			TABLE[4][(int)CssUI.CSS.EUnit.REM] = "rem";
+			TABLE[4][(int)CssUI.CSS.EUnit.VW] = "vw";
+			TABLE[4][(int)CssUI.CSS.EUnit.VH] = "vh";
+			TABLE[4][(int)CssUI.CSS.EUnit.VMIN] = "vmin";
+			TABLE[4][(int)CssUI.CSS.EUnit.VMAX] = "vmax";
+			TABLE[4][(int)CssUI.CSS.EUnit.DEG] = "deg";
+			TABLE[4][(int)CssUI.CSS.EUnit.GRAD] = "grad";
+			TABLE[4][(int)CssUI.CSS.EUnit.RAD] = "rad";
+			TABLE[4][(int)CssUI.CSS.EUnit.TURN] = "turn";
 
 
 			/* CssUI.CSS.EDisplayMode */
@@ -229,8 +229,8 @@ namespace CssUI.CSS.Internal
 
 			/* CssUI.CSS.ECssDirection */
 			KEYWORD.Add(new Dictionary<AtomicString, dynamic>());
-			KEYWORD[2].Add(new AtomicString("ltr"), CssUI.CSS.ECssDirection.LTR);
-			KEYWORD[2].Add(new AtomicString("rtl"), CssUI.CSS.ECssDirection.RTL);
+			KEYWORD[2].Add(new AtomicString("ltr"), CssUI.CSS.EDirection.LTR);
+			KEYWORD[2].Add(new AtomicString("rtl"), CssUI.CSS.EDirection.RTL);
 
 
 			/* CssUI.CSS.ECssGenericFontFamily */
@@ -244,20 +244,20 @@ namespace CssUI.CSS.Internal
 
 			/* CssUI.CSS.ECssUnit */
 			KEYWORD.Add(new Dictionary<AtomicString, dynamic>());
-			KEYWORD[4].Add(new AtomicString(""), CssUI.CSS.ECssUnit.None);
-			KEYWORD[4].Add(new AtomicString("px"), CssUI.CSS.ECssUnit.PX);
-			KEYWORD[4].Add(new AtomicString("em"), CssUI.CSS.ECssUnit.EM);
-			KEYWORD[4].Add(new AtomicString("ex"), CssUI.CSS.ECssUnit.EX);
-			KEYWORD[4].Add(new AtomicString("ch"), CssUI.CSS.ECssUnit.CH);
-			KEYWORD[4].Add(new AtomicString("rem"), CssUI.CSS.ECssUnit.REM);
-			KEYWORD[4].Add(new AtomicString("vw"), CssUI.CSS.ECssUnit.VW);
-			KEYWORD[4].Add(new AtomicString("vh"), CssUI.CSS.ECssUnit.VH);
-			KEYWORD[4].Add(new AtomicString("vmin"), CssUI.CSS.ECssUnit.VMIN);
-			KEYWORD[4].Add(new AtomicString("vmax"), CssUI.CSS.ECssUnit.VMAX);
-			KEYWORD[4].Add(new AtomicString("deg"), CssUI.CSS.ECssUnit.DEG);
-			KEYWORD[4].Add(new AtomicString("grad"), CssUI.CSS.ECssUnit.GRAD);
-			KEYWORD[4].Add(new AtomicString("rad"), CssUI.CSS.ECssUnit.RAD);
-			KEYWORD[4].Add(new AtomicString("turn"), CssUI.CSS.ECssUnit.TURN);
+			KEYWORD[4].Add(new AtomicString(""), CssUI.CSS.EUnit.None);
+			KEYWORD[4].Add(new AtomicString("px"), CssUI.CSS.EUnit.PX);
+			KEYWORD[4].Add(new AtomicString("em"), CssUI.CSS.EUnit.EM);
+			KEYWORD[4].Add(new AtomicString("ex"), CssUI.CSS.EUnit.EX);
+			KEYWORD[4].Add(new AtomicString("ch"), CssUI.CSS.EUnit.CH);
+			KEYWORD[4].Add(new AtomicString("rem"), CssUI.CSS.EUnit.REM);
+			KEYWORD[4].Add(new AtomicString("vw"), CssUI.CSS.EUnit.VW);
+			KEYWORD[4].Add(new AtomicString("vh"), CssUI.CSS.EUnit.VH);
+			KEYWORD[4].Add(new AtomicString("vmin"), CssUI.CSS.EUnit.VMIN);
+			KEYWORD[4].Add(new AtomicString("vmax"), CssUI.CSS.EUnit.VMAX);
+			KEYWORD[4].Add(new AtomicString("deg"), CssUI.CSS.EUnit.DEG);
+			KEYWORD[4].Add(new AtomicString("grad"), CssUI.CSS.EUnit.GRAD);
+			KEYWORD[4].Add(new AtomicString("rad"), CssUI.CSS.EUnit.RAD);
+			KEYWORD[4].Add(new AtomicString("turn"), CssUI.CSS.EUnit.TURN);
 
 
 			/* CssUI.CSS.EDisplayMode */

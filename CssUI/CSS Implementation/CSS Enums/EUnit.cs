@@ -6,7 +6,7 @@ namespace CssUI.CSS
     /// Defines all of the CSS length unit types
     /// </summary>
     [CssEnum]
-    public enum ECssUnit : byte
+    public enum EUnit : byte
     {
         /// <summary>
         /// Specified no unit length

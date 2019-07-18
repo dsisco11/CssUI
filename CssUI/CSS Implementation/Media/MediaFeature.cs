@@ -44,11 +44,11 @@ namespace CssUI.CSS.Media
                 }
                 else if (0 != (def.AllowedTypes & ECssValueType.DIMENSION))
                 {
-                    Values = new CssValue[] { CssValue.From_Enum(Name), CssValue.From_Length(0, ECssUnit.PX) };
+                    Values = new CssValue[] { CssValue.From_Enum(Name), CssValue.From_Length(0, EUnit.PX) };
                 }
                 else if (0 != (def.AllowedTypes & ECssValueType.RESOLUTION))
                 {
-                    Values = new CssValue[] { CssValue.From_Enum(Name), CssValue.From_Length(0, ECssUnit.DPPX) };
+                    Values = new CssValue[] { CssValue.From_Enum(Name), CssValue.From_Length(0, EUnit.DPPX) };
                 }
             }
             else

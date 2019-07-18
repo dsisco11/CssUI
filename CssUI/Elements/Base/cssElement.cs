@@ -413,10 +413,10 @@ namespace CssUI
                 // await Style.Cascade();
                 //Guid TMR = Timing.Start("PerformLayout()");
             
-                if (Box.Containing_Block.X != last_containerPos.X || Box.Containing_Block.Y != last_containerPos.Y)
+                if (Box.Containing_Box.X != last_containerPos.X || Box.Containing_Box.Y != last_containerPos.Y)
                 {
-                    last_containerPos.X = Box.Containing_Block.X;
-                    last_containerPos.Y = Box.Containing_Block.Y;
+                    last_containerPos.X = Box.Containing_Box.X;
+                    last_containerPos.Y = Box.Containing_Box.Y;
                 }
 
                 // If our block is dirty then we need to update it NOW before we update the layout and give useless block positions to our child-elements

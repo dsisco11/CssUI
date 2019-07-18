@@ -305,7 +305,7 @@ namespace CssUI
             /* Setup some commonly used variables*/
             bool autoHeight = this.Owner.Style.Cascaded.Height.Computed.IsAuto;
 
-            ECssDirection Direction = Owner.Style.Direction;
+            EDirection Direction = Owner.Style.Direction;
 
             CssValue Height = this.Owner.Style.Cascaded.Height.Computed;
 
@@ -358,7 +358,7 @@ namespace CssUI
                                 if (!this.Containing_Box_Dependent)
                                 {/* 'margin-left' + 'border-left-width' + 'padding-left' + 'width' + 'padding-right' + 'border-right-width' + 'margin-right' = width of containing block */
                                     int eqRes = (marginLeft + BorderLeft + PaddingLeft + PaddingRight + BorderRight + marginRight);
-                                    Width = CssValue.From_Int(this.Containing_Block.LogicalWidth - eqRes);
+                                    Width = CssValue.From_Int(this.Containing_Box.LogicalWidth - eqRes);
                                 }
                             }
                             else if(Width.IsAuto && this.Intrinsic_Width.HasValue) /* Otherwise, if 'width' has a computed value of 'auto', and the element has an intrinsic width, then that intrinsic width is the used value of 'width'. */
@@ -367,7 +367,7 @@ namespace CssUI
                             }
                             else /* Otherwise, if 'width' has a computed value of 'auto', but none of the conditions above are met, then the used value of 'width' becomes 300px. If 300px is too wide to fit the device, UAs should use the width of the largest rectangle that has a 2:1 ratio and fits the device instead. */
                             {
-                                Width = CssValue.From_Length(300, ECssUnit.PX);
+                                Width = CssValue.From_Length(300, EUnit.PX);
                             }
                         }
                     }
@@ -378,7 +378,7 @@ namespace CssUI
                         if (!this.IsReplacedElement)
                         {/* 10.3.3 Block-level, non-replaced elements in normal flow */
                             /* If 'width' is not 'auto' and 'border-left-width' + 'padding-left' + 'width' + 'padding-right' + 'border-right-width' (plus any of 'margin-left' or 'margin-right' that are not 'auto') is larger than the width of the containing block, then any 'auto' values for 'margin-left' or 'margin-right' are, for the following rules, treated as zero. */
-                            bool Exceeds = (!Width.IsAuto && this.Containing_Block.LogicalWidth < (marginLeft + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + marginRight));
+                            bool Exceeds = (!Width.IsAuto && this.Containing_Box.LogicalWidth < (marginLeft + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + marginRight));
                             // I suppose the specs want us to ignore this auto section and just set the margins to 0?
                             if (Exceeds)
                             {
@@ -396,16 +396,16 @@ namespace CssUI
                             {
                                 switch(Direction)
                                 {
-                                    case ECssDirection.LTR:
+                                    case EDirection.LTR:
                                         {
                                             int eqRes = (marginLeft + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight);
-                                            MarginRight = CssValue.From_Int(this.Containing_Block.LogicalWidth - eqRes);
+                                            MarginRight = CssValue.From_Int(this.Containing_Box.LogicalWidth - eqRes);
                                         }
                                         break;
-                                    case ECssDirection.RTL:
+                                    case EDirection.RTL:
                                         {
                                             int eqRes = (BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + marginRight);
-                                            MarginLeft = CssValue.From_Int(this.Containing_Block.LogicalWidth - eqRes);
+                                            MarginLeft = CssValue.From_Int(this.Containing_Box.LogicalWidth - eqRes);
                                         }
                                         break;
                                 }
@@ -415,17 +415,17 @@ namespace CssUI
                                 if (Width.IsAuto)
                                 {
                                     int eqRes = (marginLeft + BorderLeft + PaddingLeft + 0 + PaddingRight + BorderRight + marginRight);
-                                    Width = CssValue.From_Int(this.Containing_Block.LogicalWidth - eqRes);
+                                    Width = CssValue.From_Int(this.Containing_Box.LogicalWidth - eqRes);
                                 }
                                 else if (MarginLeft.IsAuto)
                                 {
                                     int eqRes = (BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + marginRight);
-                                    MarginLeft = CssValue.From_Int(this.Containing_Block.LogicalWidth - eqRes);
+                                    MarginLeft = CssValue.From_Int(this.Containing_Box.LogicalWidth - eqRes);
                                 }
                                 else if (MarginRight.IsAuto)
                                 {
                                     int eqRes = (marginLeft + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight);
-                                    MarginRight = CssValue.From_Int(this.Containing_Block.LogicalWidth - eqRes);
+                                    MarginRight = CssValue.From_Int(this.Containing_Box.LogicalWidth - eqRes);
                                 }
                             }
 
@@ -440,13 +440,13 @@ namespace CssUI
                                 total += BorderRight;
                                 total += (MarginRight.IsAuto ? 0 : MarginRight.Value);
 
-                                Width = CssValue.From_Int(this.Containing_Block.LogicalWidth - total);
+                                Width = CssValue.From_Int(this.Containing_Box.LogicalWidth - total);
                             }
 
                             if (MarginLeft.IsAuto && MarginRight.IsAuto)
                             {/* If both 'margin-left' and 'margin-right' are 'auto', their used values are equal. This horizontally centers the element with respect to the edges of the containing block. */
                                 int eqRes = (BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight);
-                                int avail = (this.Containing_Block.LogicalWidth - eqRes);
+                                int avail = (this.Containing_Box.LogicalWidth - eqRes);
                                 MarginLeft = CssValue.From_Int(avail / 2);
                                 MarginRight = CssValue.From_Int(avail / 2);
                             }
@@ -479,7 +479,7 @@ namespace CssUI
                                 if (!this.Containing_Box_Dependent)
                                 {/* 'margin-left' + 'border-left-width' + 'padding-left' + 'width' + 'padding-right' + 'border-right-width' + 'margin-right' = width of containing block */
                                     int eqRes = (marginLeft + BorderLeft + PaddingLeft + PaddingRight + BorderRight + marginRight);
-                                    Width = CssValue.From_Int(this.Containing_Block.LogicalWidth - eqRes);
+                                    Width = CssValue.From_Int(this.Containing_Box.LogicalWidth - eqRes);
                                 }
                             }
                             else if (Width.IsAuto && this.Intrinsic_Width.HasValue) /* Otherwise, if 'width' has a computed value of 'auto', and the element has an intrinsic width, then that intrinsic width is the used value of 'width'. */
@@ -488,12 +488,12 @@ namespace CssUI
                             }
                             else /* Otherwise, if 'width' has a computed value of 'auto', but none of the conditions above are met, then the used value of 'width' becomes 300px. If 300px is too wide to fit the device, UAs should use the width of the largest rectangle that has a 2:1 ratio and fits the device instead. */
                             {
-                                Width = CssValue.From_Length(300, ECssUnit.PX);
+                                Width = CssValue.From_Length(300, EUnit.PX);
                             }
                             #endregion
 
                             /* If 'width' is not 'auto' and 'border-left-width' + 'padding-left' + 'width' + 'padding-right' + 'border-right-width' (plus any of 'margin-left' or 'margin-right' that are not 'auto') is larger than the width of the containing block, then any 'auto' values for 'margin-left' or 'margin-right' are, for the following rules, treated as zero. */
-                            bool Exceeds = (!Width.IsAuto && this.Containing_Block.LogicalWidth < (marginLeft + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + marginRight));
+                            bool Exceeds = (!Width.IsAuto && this.Containing_Box.LogicalWidth < (marginLeft + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + marginRight));
                             // I suppose the specs want us to ignore this auto section and just set the margins to 0?
                             if (Exceeds)
                             {
@@ -511,16 +511,16 @@ namespace CssUI
                             {
                                 switch (Direction)
                                 {
-                                    case ECssDirection.LTR:
+                                    case EDirection.LTR:
                                         {
                                             int eqRes = (marginLeft + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight);
-                                            MarginRight = CssValue.From_Int(this.Containing_Block.LogicalWidth - eqRes);
+                                            MarginRight = CssValue.From_Int(this.Containing_Box.LogicalWidth - eqRes);
                                         }
                                         break;
-                                    case ECssDirection.RTL:
+                                    case EDirection.RTL:
                                         {
                                             int eqRes = (BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + marginRight);
-                                            MarginLeft = CssValue.From_Int(this.Containing_Block.LogicalWidth - eqRes);
+                                            MarginLeft = CssValue.From_Int(this.Containing_Box.LogicalWidth - eqRes);
                                         }
                                         break;
                                 }
@@ -530,19 +530,19 @@ namespace CssUI
                                 if (MarginLeft.IsAuto)
                                 {
                                     int eqRes = (BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + marginRight);
-                                    MarginLeft = CssValue.From_Int(this.Containing_Block.LogicalWidth - eqRes);
+                                    MarginLeft = CssValue.From_Int(this.Containing_Box.LogicalWidth - eqRes);
                                 }
                                 else if (MarginRight.IsAuto)
                                 {
                                     int eqRes = (marginLeft + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight);
-                                    MarginRight = CssValue.From_Int(this.Containing_Block.LogicalWidth - eqRes);
+                                    MarginRight = CssValue.From_Int(this.Containing_Box.LogicalWidth - eqRes);
                                 }
                             }
 
                             if (MarginLeft.IsAuto && MarginRight.IsAuto)
                             {/* If both 'margin-left' and 'margin-right' are 'auto', their used values are equal. This horizontally centers the element with respect to the edges of the containing block. */
                                 int eqRes = (BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight);
-                                int avail = (this.Containing_Block.LogicalWidth - eqRes);
+                                int avail = (this.Containing_Box.LogicalWidth - eqRes);
                                 MarginLeft = CssValue.From_Int(avail / 2);
                                 MarginRight = CssValue.From_Int(avail / 2);
                             }
@@ -565,7 +565,7 @@ namespace CssUI
                              if (Width.IsAuto)
                             {
                                 int total = (marginLeft + BorderLeft + PaddingLeft + 0 + PaddingRight + BorderRight + marginRight + this.Scrollbar_Size.Width);
-                                int available_width = (this.Containing_Block.LogicalWidth - total);
+                                int available_width = (this.Containing_Box.LogicalWidth - total);
 
                                 Width = CssValue.From_Int(MathExt.Clamp(this.Preferred_Width, this.Min_Content.Width, available_width));
                             }
@@ -602,7 +602,7 @@ namespace CssUI
                                 if (!this.Containing_Box_Dependent)
                                 {/* 'margin-left' + 'border-left-width' + 'padding-left' + 'width' + 'padding-right' + 'border-right-width' + 'margin-right' = width of containing block */
                                     int eqRes = (marginLeft + BorderLeft + PaddingLeft + PaddingRight + BorderRight + marginRight);
-                                    Width = CssValue.From_Int(this.Containing_Block.LogicalWidth - eqRes);
+                                    Width = CssValue.From_Int(this.Containing_Box.LogicalWidth - eqRes);
                                 }
                             }
                             else if (Width.IsAuto && this.Intrinsic_Width.HasValue) /* Otherwise, if 'width' has a computed value of 'auto', and the element has an intrinsic width, then that intrinsic width is the used value of 'width'. */
@@ -611,7 +611,7 @@ namespace CssUI
                             }
                             else /* Otherwise, if 'width' has a computed value of 'auto', but none of the conditions above are met, then the used value of 'width' becomes 300px. If 300px is too wide to fit the device, UAs should use the width of the largest rectangle that has a 2:1 ratio and fits the device instead. */
                             {
-                                Width = CssValue.From_Length(300, ECssUnit.PX);
+                                Width = CssValue.From_Length(300, EUnit.PX);
                             }
                         }
                     }
@@ -631,31 +631,31 @@ namespace CssUI
                                 if (MarginLeft.IsAuto) MarginLeft = CssValue.Zero;
                                 if (MarginRight.IsAuto) MarginRight = CssValue.Zero;
 
-                                if (Direction == ECssDirection.LTR)
+                                if (Direction == EDirection.LTR)
                                 {
                                     Left = CssValue.From_Int(this.Layout_Pos_X);
                                     /* Apply Rule #3 */
                                     /* the width is shrink-to-fit . Then solve for 'right' */
                                     int eqRes = (Left.Value + marginLeft + BorderLeft + PaddingLeft + 0 + PaddingRight + BorderRight + marginRight + 0);
-                                    int avail = (this.Containing_Block.LogicalWidth - eqRes);
+                                    int avail = (this.Containing_Box.LogicalWidth - eqRes);
                                     Width =  CssValue.From_Int(MathExt.Clamp(this.Preferred_Width, this.Min_Content.Width, avail));
 
                                     /* Solve for 'right' */
                                     eqRes = (Left.Value + marginLeft + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + marginRight + 0);
-                                    Right = CssValue.From_Int(Math.Max(0, this.Containing_Block.LogicalWidth - eqRes));
+                                    Right = CssValue.From_Int(Math.Max(0, this.Containing_Box.LogicalWidth - eqRes));
                                 }
-                                else if(Direction == ECssDirection.RTL)
+                                else if(Direction == EDirection.RTL)
                                 {
                                     Right = CssValue.From_Int(this.Layout_Pos_X);
                                     /* Apply Rule #1 */
                                     /* the width is shrink-to-fit . Then solve for 'left' */
                                     int eqRes = (0 + marginLeft + BorderLeft + PaddingLeft + 0 + PaddingRight + BorderRight + marginRight + Right.Value);
-                                    int avail = (this.Containing_Block.LogicalWidth - eqRes);
+                                    int avail = (this.Containing_Box.LogicalWidth - eqRes);
                                     Width = CssValue.From_Int(MathExt.Clamp(this.Preferred_Width, this.Min_Content.Width, avail));
 
                                     /* Solve for 'left' */
                                     eqRes = (0 + marginLeft + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + marginRight + Right.Value);
-                                    Left = CssValue.From_Int(Math.Max(0, this.Containing_Block.LogicalWidth - eqRes));
+                                    Left = CssValue.From_Int(Math.Max(0, this.Containing_Box.LogicalWidth - eqRes));
 
                                 }
                             }
@@ -664,7 +664,7 @@ namespace CssUI
                                 if (MarginLeft.IsAuto && MarginRight.IsAuto)
                                 {/* If none of the three is 'auto': If both 'margin-left' and 'margin-right' are 'auto', solve the equation under the extra constraint that the two margins get equal values, unless this would make them negative, in which case when direction of the containing block is 'ltr' ('rtl'), set 'margin-left' ('margin-right') to zero and solve for 'margin-right' ('margin-left'). If one of 'margin-left' or 'margin-right' is 'auto', solve the equation for that value. If the values are over-constrained, ignore the value for 'left' (in case the 'direction' property of the containing block is 'rtl') or 'right' (in case 'direction' is 'ltr') and solve for that value. */
                                     int eqRes = (Left.Value + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + Right.Value);
-                                    int avail = (this.Containing_Block.LogicalWidth - eqRes);
+                                    int avail = (this.Containing_Box.LogicalWidth - eqRes);
                                     if (avail >= 0)
                                     {
                                         MarginLeft = CssValue.From_Int(avail / 2);
@@ -672,12 +672,12 @@ namespace CssUI
                                     }
                                     else// Negative
                                     {
-                                        if (Direction == ECssDirection.LTR)
+                                        if (Direction == EDirection.LTR)
                                         {
                                             MarginLeft = CssValue.Zero;
                                             MarginRight = CssValue.From_Int(avail);
                                         }
-                                        else if (Direction == ECssDirection.RTL)
+                                        else if (Direction == EDirection.RTL)
                                         {
                                             MarginLeft = CssValue.From_Int(avail);
                                             MarginRight = CssValue.Zero;
@@ -689,28 +689,28 @@ namespace CssUI
                                     if (MarginLeft.IsAuto)
                                     {
                                         int eqRes = (Left.Value + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + MarginRight.Value + Right.Value);
-                                        int avail = (this.Containing_Block.LogicalWidth - eqRes);
+                                        int avail = (this.Containing_Box.LogicalWidth - eqRes);
                                         MarginLeft = CssValue.From_Int(avail);
                                     }
                                     else if (MarginRight.IsAuto)
                                     {
                                         int eqRes = (Left.Value + MarginLeft.Value + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + Right.Value);
-                                        int avail = (this.Containing_Block.LogicalWidth - eqRes);
+                                        int avail = (this.Containing_Box.LogicalWidth - eqRes);
                                         MarginRight = CssValue.From_Int(avail);
                                     }
                                 }
                                 else if (!MarginLeft.IsAuto && !MarginRight.IsAuto) /* If the values are over-constrained, ignore the value for 'left' (in case the 'direction' property of the containing block is 'rtl') or 'right' (in case 'direction' is 'ltr') and solve for that value. */
                                 {
-                                    if (Direction == ECssDirection.LTR)
+                                    if (Direction == EDirection.LTR)
                                     {
                                         int eqRes = (Left.Value + MarginLeft.Value + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + MarginRight.Value);
-                                        int avail = (this.Containing_Block.LogicalWidth - eqRes);
+                                        int avail = (this.Containing_Box.LogicalWidth - eqRes);
                                         Right = CssValue.From_Int(avail);
                                     }
-                                    else if (Direction == ECssDirection.RTL)
+                                    else if (Direction == EDirection.RTL)
                                     {
                                         int eqRes = (MarginLeft.Value + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + MarginRight.Value + Right.Value);
-                                        int avail = (this.Containing_Block.LogicalWidth - eqRes);
+                                        int avail = (this.Containing_Box.LogicalWidth - eqRes);
                                         Left = CssValue.From_Int(avail);
                                     }
                                 }
@@ -725,61 +725,61 @@ namespace CssUI
                                     /* Apply Rule #1 */
                                     /* the width is shrink-to-fit . Then solve for 'left' */
                                     int eqRes = (0 + MarginLeft.Value + BorderLeft + PaddingLeft + 0 + PaddingRight + BorderRight + MarginRight.Value + Right.Value);
-                                    int avail = (this.Containing_Block.LogicalWidth - eqRes);
+                                    int avail = (this.Containing_Box.LogicalWidth - eqRes);
                                     Width = CssValue.From_Int(MathExt.Clamp(this.Preferred_Width, this.Min_Content.Width, avail));
 
                                     /* Solve for 'left' */
                                     eqRes = (0 + MarginLeft.Value + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + MarginRight.Value + Right.Value);
-                                    Left = CssValue.From_Int(this.Containing_Block.LogicalWidth - eqRes);
+                                    Left = CssValue.From_Int(this.Containing_Box.LogicalWidth - eqRes);
                                 }
                                 else if (Left.IsAuto && !Width.IsAuto && Right.IsAuto)
                                 {
                                     /* Apply Rule #2 */
                                     /* if the 'direction' property of the element establishing the static-position containing block is 'ltr' set 'left' to the static position, otherwise set 'right' to the static position. Then solve for 'left' (if 'direction is 'rtl') or 'right' (if 'direction' is 'ltr'). */
-                                    if (Direction == ECssDirection.LTR)
+                                    if (Direction == EDirection.LTR)
                                     {
                                         Left = CssValue.From_Int(this.Layout_Pos_X);
 
                                         int eqRes = (Left.Value + MarginLeft.Value + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + MarginRight.Value + 0);
-                                        int avail = (this.Containing_Block.LogicalWidth - eqRes);
+                                        int avail = (this.Containing_Box.LogicalWidth - eqRes);
                                         Right = CssValue.From_Int(avail);
 
                                     }
-                                    else if (Direction == ECssDirection.RTL)
+                                    else if (Direction == EDirection.RTL)
                                     {
                                         Right = CssValue.From_Int(this.Layout_Pos_X);
 
                                         int eqRes = (0 + MarginLeft.Value + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + MarginRight.Value + Right.Value);
-                                        Left = CssValue.From_Int(this.Containing_Block.LogicalWidth - eqRes);
+                                        Left = CssValue.From_Int(this.Containing_Box.LogicalWidth - eqRes);
                                     }
                                 }
                                 else if (!Left.IsAuto && Width.IsAuto && Right.IsAuto)
                                 {/* Apply Rule #3 */
                                     /* Width is shrink-to-fit */
                                     int eqRes = (Left.Value + MarginLeft.Value + BorderLeft + PaddingLeft + 0 + PaddingRight + BorderRight + MarginRight.Value + 0);
-                                    int avail = (this.Containing_Block.LogicalWidth - eqRes);
+                                    int avail = (this.Containing_Box.LogicalWidth - eqRes);
                                     Width = CssValue.From_Int(MathExt.Clamp(this.Preferred_Width, this.Min_Content.Width, avail));
                                     /* Solve for 'right' */
                                     eqRes = (Left.Value + MarginLeft.Value + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + MarginRight.Value + 0);
-                                    Right = CssValue.From_Int(this.Containing_Block.LogicalWidth - eqRes);
+                                    Right = CssValue.From_Int(this.Containing_Box.LogicalWidth - eqRes);
                                 }
                                 else if(Left.IsAuto && !Width.IsAuto && !Right.IsAuto)
                                 {/* Apply Rule #4 */
                                     /* Solve for 'left' */
                                     int eqRes = (0 + MarginLeft.Value + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + MarginRight.Value + Right.Value);
-                                    Left = CssValue.From_Int(this.Containing_Block.LogicalWidth - eqRes);
+                                    Left = CssValue.From_Int(this.Containing_Box.LogicalWidth - eqRes);
                                 }
                                 else if (!Left.IsAuto && Width.IsAuto && !Right.IsAuto)
                                 {/* Apply Rule #5 */
                                     /* Solve for 'width' */
                                     int eqRes = (Left.Value + MarginLeft.Value + BorderLeft + PaddingLeft + 0 + PaddingRight + BorderRight + MarginRight.Value + Right.Value);
-                                    Width = CssValue.From_Int(this.Containing_Block.LogicalWidth - eqRes);
+                                    Width = CssValue.From_Int(this.Containing_Box.LogicalWidth - eqRes);
                                 }
                                 else if (!Left.IsAuto && !Width.IsAuto && Right.IsAuto)
                                 {/* Apply Rule #6 */
                                     /* Solve for 'right' */
                                     int eqRes = (Left.Value + MarginLeft.Value + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + MarginRight.Value + 0);
-                                    Right = CssValue.From_Int(this.Containing_Block.LogicalWidth - eqRes);
+                                    Right = CssValue.From_Int(this.Containing_Box.LogicalWidth - eqRes);
                                 }
                             }
                         }
@@ -811,7 +811,7 @@ namespace CssUI
                                 if (!this.Containing_Box_Dependent)
                                 {/* 'margin-left' + 'border-left-width' + 'padding-left' + 'width' + 'padding-right' + 'border-right-width' + 'margin-right' = width of containing block */
                                     int eqRes = (marginLeft + BorderLeft + PaddingLeft + PaddingRight + BorderRight + marginRight);
-                                    Width = CssValue.From_Int(this.Containing_Block.LogicalWidth - eqRes);
+                                    Width = CssValue.From_Int(this.Containing_Box.LogicalWidth - eqRes);
                                 }
                             }
                             else if (Width.IsAuto && this.Intrinsic_Width.HasValue) /* Otherwise, if 'width' has a computed value of 'auto', and the element has an intrinsic width, then that intrinsic width is the used value of 'width'. */
@@ -820,14 +820,14 @@ namespace CssUI
                             }
                             else /* Otherwise, if 'width' has a computed value of 'auto', but none of the conditions above are met, then the used value of 'width' becomes 300px. If 300px is too wide to fit the device, UAs should use the width of the largest rectangle that has a 2:1 ratio and fits the device instead. */
                             {
-                                Width = CssValue.From_Length(300, ECssUnit.PX);
+                                Width = CssValue.From_Length(300, EUnit.PX);
                             }
 
                             if (Left.IsAuto && Right.IsAuto)
                             {
-                                if (Direction == ECssDirection.LTR)
+                                if (Direction == EDirection.LTR)
                                     Left = CssValue.From_Int(this.Layout_Pos_X);
-                                else if (Direction == ECssDirection.RTL)
+                                else if (Direction == EDirection.RTL)
                                     Right = CssValue.From_Int(this.Layout_Pos_X);
                             }
 
@@ -847,7 +847,7 @@ namespace CssUI
                                 eqRes += (Width.IsAuto ? 0 : Width.Value);
                                 eqRes += (BorderRight + PaddingRight);
                                 eqRes += (Right.IsAuto ? 0 : Right.Value);
-                                int avail = (this.Containing_Block.LogicalWidth - eqRes);
+                                int avail = (this.Containing_Box.LogicalWidth - eqRes);
 
                                 if (avail >= 0)
                                 {
@@ -857,12 +857,12 @@ namespace CssUI
                                 }
                                 else
                                 {
-                                    if (Direction == ECssDirection.LTR)
+                                    if (Direction == EDirection.LTR)
                                     {
                                         MarginLeft = CssValue.Zero;
                                         MarginRight = CssValue.From_Int(avail);
                                     }
-                                    else if (Direction == ECssDirection.RTL)
+                                    else if (Direction == EDirection.RTL)
                                     {
                                         MarginLeft = CssValue.From_Int(avail);
                                         MarginRight = CssValue.Zero;
@@ -882,7 +882,7 @@ namespace CssUI
                                     eqRes += (BorderRight + PaddingRight);
                                     eqRes += (MarginRight.IsAuto ? 0 : MarginRight.Value);
                                     eqRes += (Right.IsAuto ? 0 : Right.Value);
-                                    int avail = (this.Containing_Block.LogicalWidth - eqRes);
+                                    int avail = (this.Containing_Box.LogicalWidth - eqRes);
 
                                     MarginLeft = CssValue.From_Int(avail);
                                 }
@@ -896,7 +896,7 @@ namespace CssUI
                                     eqRes += (BorderRight + PaddingRight);
                                     eqRes += (MarginRight.IsAuto ? 0 : MarginRight.Value);
                                     eqRes += (Right.IsAuto ? 0 : Right.Value);
-                                    int avail = (this.Containing_Block.LogicalWidth - eqRes);
+                                    int avail = (this.Containing_Box.LogicalWidth - eqRes);
 
                                     MarginRight = CssValue.From_Int(avail);
                                 }
@@ -905,15 +905,15 @@ namespace CssUI
                             bool OverConstrained = !(Left.IsAuto && MarginLeft.IsAuto && Width.IsAuto && MarginRight.IsAuto && Right.IsAuto);
                             if (OverConstrained)
                             {
-                                if (Direction == ECssDirection.LTR)
+                                if (Direction == EDirection.LTR)
                                 {
                                     int eqRes = (MarginLeft.Value + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + 0);
-                                    Right = CssValue.From_Int(this.Containing_Block.LogicalWidth - eqRes);
+                                    Right = CssValue.From_Int(this.Containing_Box.LogicalWidth - eqRes);
                                 }
-                                else if (Direction == ECssDirection.RTL)
+                                else if (Direction == EDirection.RTL)
                                 {
                                     int eqRes = (0 + BorderLeft + PaddingLeft + Width.Value + PaddingRight + BorderRight + MarginRight.Value);
-                                    Left = CssValue.From_Int(this.Containing_Block.LogicalWidth - eqRes);
+                                    Left = CssValue.From_Int(this.Containing_Box.LogicalWidth - eqRes);
                                 }
                             }
 
@@ -928,7 +928,7 @@ namespace CssUI
                             if (Width.IsAuto)
                             {/* the width is shrink-to-fit (as defined for FLOATING elements). Then solve for 'left' */
                                 int eqRes = (marginLeft + BorderLeft + PaddingLeft + 0 + PaddingRight + BorderRight + marginRight + this.Scrollbar_Size.Width);
-                                int avail = (this.Containing_Block.LogicalWidth - eqRes);
+                                int avail = (this.Containing_Box.LogicalWidth - eqRes);
                                 Width = CssValue.From_Int(MathExt.Clamp(this.Preferred_Width, this.Min_Content.Width, avail));
                             }
 
@@ -966,7 +966,7 @@ namespace CssUI
                                 if (!this.Containing_Box_Dependent)
                                 {/* 'margin-left' + 'border-left-width' + 'padding-left' + 'width' + 'padding-right' + 'border-right-width' + 'margin-right' = width of containing block */
                                     int eqRes = (marginLeft + BorderLeft + PaddingLeft + PaddingRight + BorderRight + marginRight);
-                                    Width = CssValue.From_Int(this.Containing_Block.LogicalWidth - eqRes);
+                                    Width = CssValue.From_Int(this.Containing_Box.LogicalWidth - eqRes);
                                 }
                             }
                             else if (Width.IsAuto && this.Intrinsic_Width.HasValue) /* Otherwise, if 'width' has a computed value of 'auto', and the element has an intrinsic width, then that intrinsic width is the used value of 'width'. */
@@ -975,7 +975,7 @@ namespace CssUI
                             }
                             else /* Otherwise, if 'width' has a computed value of 'auto', but none of the conditions above are met, then the used value of 'width' becomes 300px. If 300px is too wide to fit the device, UAs should use the width of the largest rectangle that has a 2:1 ratio and fits the device instead. */
                             {
-                                Width = CssValue.From_Length(300, ECssUnit.PX);
+                                Width = CssValue.From_Length(300, EUnit.PX);
                             }
                         }
                     }
@@ -1038,7 +1038,7 @@ namespace CssUI
                 autoWidth = Width.IsAuto;
             }
 
-            ECssDirection Direction = Owner.Style.Direction;
+            EDirection Direction = Owner.Style.Direction;
 
 
             int PaddingTop = Owner.Style.Cascaded.Padding_Top.Actual;
@@ -1168,7 +1168,7 @@ namespace CssUI
                                 Height = CssValue.From_Int(h);
 
                                 int eqRes = (Top.Value + MarginTop.Value + BorderTop + PaddingTop + Height.Value + PaddingBottom + BorderBottom + MarginBottom.Value + 0);
-                                Bottom = CssValue.From_Int(Containing_Block.LogicalHeight - eqRes);
+                                Bottom = CssValue.From_Int(Containing_Box.LogicalHeight - eqRes);
                             }
                             else if (!Top.IsAuto && !Height.IsAuto && !Bottom.IsAuto)
                             {/* If none of the three are 'auto': If both 'margin-top' and 'margin-bottom' are 'auto', solve the equation under the extra constraint that the two margins get equal values. If one of 'margin-top' or 'margin-bottom' is 'auto', solve the equation for that value. If the values are over-constrained, ignore the value for 'bottom' and solve for that value. */
@@ -1176,7 +1176,7 @@ namespace CssUI
                                 if (MarginTop.IsAuto && MarginBottom.IsAuto)
                                 {
                                     int eqRes = (Top.Value + 0 + BorderTop + PaddingTop + heightVal + PaddingBottom + BorderBottom + 0 + Bottom.Value);
-                                    int avail = (Containing_Block.LogicalHeight - eqRes);
+                                    int avail = (Containing_Box.LogicalHeight - eqRes);
                                     MarginTop = MarginBottom = CssValue.From_Int(avail/2);
                                 }
                                 else if (MarginTop.IsAuto ^ MarginBottom.IsAuto)
@@ -1184,20 +1184,20 @@ namespace CssUI
                                     if (MarginTop.IsAuto)
                                     {
                                         int eqRes = (Top.Value + 0 + BorderTop + PaddingTop + heightVal + PaddingBottom + BorderBottom + MarginBottom.Value + Bottom.Value);
-                                        int avail = (Containing_Block.LogicalHeight - eqRes);
+                                        int avail = (Containing_Box.LogicalHeight - eqRes);
                                         MarginTop = CssValue.From_Int(avail / 2);
                                     }
                                     else if (MarginBottom.IsAuto)
                                     {
                                         int eqRes = (Top.Value + MarginTop.Value + BorderTop + PaddingTop + heightVal + PaddingBottom + BorderBottom + 0 + Bottom.Value);
-                                        int avail = (Containing_Block.LogicalHeight - eqRes);
+                                        int avail = (Containing_Box.LogicalHeight - eqRes);
                                         MarginBottom = CssValue.From_Int(avail / 2);
                                     }
                                 }
                                 else// margins are overconstrained
                                 {/* Resolve for 'bottom' */
                                     int eqRes = (Top.Value + MarginTop.Value + BorderTop + PaddingTop + heightVal + PaddingBottom + BorderBottom + MarginBottom.Value + 0);
-                                    Bottom = CssValue.From_Int(Containing_Block.LogicalHeight - eqRes);
+                                    Bottom = CssValue.From_Int(Containing_Box.LogicalHeight - eqRes);
                                 }
                             }
                             /*
@@ -1218,7 +1218,7 @@ namespace CssUI
 
                                 /* Solve for 'top' */
                                 int eqRes = (0 + MarginTop.Value + BorderTop + PaddingTop + Height.Value + PaddingBottom + BorderBottom + MarginBottom.Value + Bottom.Value);
-                                Top = CssValue.From_Int(Containing_Block.LogicalHeight - eqRes);
+                                Top = CssValue.From_Int(Containing_Box.LogicalHeight - eqRes);
                             }
                             else if (Top.IsAuto && Bottom.IsAuto && !Height.IsAuto)
                             {
@@ -1229,7 +1229,7 @@ namespace CssUI
 
                                 /* Solve for 'bottom' */
                                 int eqRes = (Top.Value + MarginTop.Value + BorderTop + PaddingTop + Height.Value + PaddingBottom + BorderBottom + MarginBottom.Value + 0);
-                                Bottom = CssValue.From_Int(Containing_Block.LogicalHeight - eqRes);
+                                Bottom = CssValue.From_Int(Containing_Box.LogicalHeight - eqRes);
                             }
                             else if (Height.IsAuto && Bottom.IsAuto && !Top.IsAuto)
                             {
@@ -1240,7 +1240,7 @@ namespace CssUI
 
                                 /* Solve for 'bottom' */
                                 int eqRes = (Top.Value + MarginTop.Value + BorderTop + PaddingTop + Height.Value + PaddingBottom + BorderBottom + MarginBottom.Value + 0);
-                                Bottom = CssValue.From_Int(Containing_Block.LogicalHeight - eqRes);
+                                Bottom = CssValue.From_Int(Containing_Box.LogicalHeight - eqRes);
                             }
                             else if (Top.IsAuto && !Height.IsAuto && !Bottom.IsAuto)
                             {
@@ -1249,7 +1249,7 @@ namespace CssUI
 
                                 /* Solve for 'top' */
                                 int eqRes = (0 + MarginTop.Value + BorderTop + PaddingTop + Height.Value + PaddingBottom + BorderBottom + MarginBottom.Value + Bottom.Value);
-                                Top = CssValue.From_Int(Containing_Block.LogicalHeight - eqRes);
+                                Top = CssValue.From_Int(Containing_Box.LogicalHeight - eqRes);
                             }
                             else if(Height.IsAuto && !Top.IsAuto && !Bottom.IsAuto)
                             {
@@ -1258,7 +1258,7 @@ namespace CssUI
 
                                 /* Solve for 'top' */
                                 int eqRes = (Top.Value + MarginTop.Value + BorderTop + PaddingTop + 0 + PaddingBottom + BorderBottom + MarginBottom.Value + Bottom.Value);
-                                Height = CssValue.From_Int(Containing_Block.LogicalHeight - eqRes);
+                                Height = CssValue.From_Int(Containing_Box.LogicalHeight - eqRes);
                             }
                             else if (Bottom.IsAuto && !Top.IsAuto && !Height.IsAuto)
                             {
@@ -1267,7 +1267,7 @@ namespace CssUI
 
                                 /* Solve for 'bottom' */
                                 int eqRes = (Top.Value + MarginTop.Value + BorderTop + PaddingTop + Height.Value + PaddingBottom + BorderBottom + MarginBottom.Value + 0);
-                                Bottom = CssValue.From_Int(Containing_Block.LogicalHeight - eqRes);
+                                Bottom = CssValue.From_Int(Containing_Box.LogicalHeight - eqRes);
                             }
 
                         }
@@ -1316,7 +1316,7 @@ namespace CssUI
                             {/* If at this point both 'margin-top' and 'margin-bottom' are still 'auto', solve the equation under the extra constraint that the two margins must get equal values. */
 
                                 int eqRes = ((Top.IsAuto ? Top.Value : 0) + 0 + BorderTop + PaddingTop + Height.Value + PaddingBottom + BorderBottom + 0 + (Bottom.IsAuto ? Bottom.Value : 0));
-                                int avail = (Containing_Block.LogicalHeight - eqRes);
+                                int avail = (Containing_Box.LogicalHeight - eqRes);
                                 MarginTop = MarginBottom = CssValue.From_Int(avail / 2);
                             }
 
@@ -1326,22 +1326,22 @@ namespace CssUI
                                 if (Top.IsAuto)
                                 {
                                     int eqRes = (0 + MarginTop.Value + BorderTop + PaddingTop + Height.Value + PaddingBottom + BorderBottom + MarginBottom.Value + Bottom.Value);
-                                    Top = CssValue.From_Int(Containing_Block.LogicalHeight - eqRes);
+                                    Top = CssValue.From_Int(Containing_Box.LogicalHeight - eqRes);
                                 }
                                 else if (MarginTop.IsAuto)
                                 {
                                     int eqRes = (Top.Value + 0 + BorderTop + PaddingTop + Height.Value + PaddingBottom + BorderBottom + MarginBottom.Value + Bottom.Value);
-                                    MarginTop = CssValue.From_Int(Containing_Block.LogicalHeight - eqRes);
+                                    MarginTop = CssValue.From_Int(Containing_Box.LogicalHeight - eqRes);
                                 }
                                 else if (MarginBottom.IsAuto)
                                 {
                                     int eqRes = (Top.Value + MarginTop.Value + BorderTop + PaddingTop + Height.Value + PaddingBottom + BorderBottom + 0 + Bottom.Value);
-                                    MarginBottom = CssValue.From_Int(Containing_Block.LogicalHeight - eqRes);
+                                    MarginBottom = CssValue.From_Int(Containing_Box.LogicalHeight - eqRes);
                                 }
                                 else if (Bottom.IsAuto)
                                 {
                                     int eqRes = (Top.Value + MarginTop.Value + BorderTop + PaddingTop + Height.Value + PaddingBottom + BorderBottom + MarginBottom.Value + 0);
-                                    Bottom = CssValue.From_Int(Containing_Block.LogicalHeight - eqRes);
+                                    Bottom = CssValue.From_Int(Containing_Box.LogicalHeight - eqRes);
                                 }
                             }
 
@@ -1349,7 +1349,7 @@ namespace CssUI
                             if (!Top.IsAuto && !MarginTop.IsAuto && !MarginBottom.IsAuto && !Bottom.IsAuto)
                             {
                                 int eqRes = (Top.Value + MarginTop.Value + BorderTop + PaddingTop + Height.Value + PaddingBottom + BorderBottom + MarginBottom.Value + 0);
-                                Bottom = CssValue.From_Int(Containing_Block.LogicalHeight - eqRes);
+                                Bottom = CssValue.From_Int(Containing_Box.LogicalHeight - eqRes);
                             }
                         }
                     }

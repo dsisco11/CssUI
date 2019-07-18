@@ -29,31 +29,31 @@ namespace CssUI_XUnitTests
 
             Value = CssValue.From_CSS("100px");
             Assert.True(Value.HasValue);
-            Assert.True(Value.Unit == ECssUnit.PX);
+            Assert.True(Value.Unit == EUnit.PX);
             Assert.True((int)Value.Value == 100);
             Assert.Equal(ECssValueType.DIMENSION, Value.Type);
 
             Value = CssValue.From_CSS("1ch");
             Assert.True(Value.HasValue);
-            Assert.True(Value.Unit == ECssUnit.CH);
+            Assert.True(Value.Unit == EUnit.CH);
             Assert.True((int)Value.Value == 1);
             Assert.Equal(ECssValueType.DIMENSION, Value.Type);
 
             Value = CssValue.From_CSS("1em");
             Assert.True(Value.HasValue);
-            Assert.True(Value.Unit == ECssUnit.EM);
+            Assert.True(Value.Unit == EUnit.EM);
             Assert.True((int)Value.Value == 1);
             Assert.Equal(ECssValueType.DIMENSION, Value.Type);
 
             Value = CssValue.From_CSS("96dpi");
             Assert.True(Value.HasValue);
-            Assert.True(Value.Unit == ECssUnit.DPI);
+            Assert.True(Value.Unit == EUnit.DPI);
             Assert.True((int)Value.Value == 96);
             Assert.Equal(ECssValueType.RESOLUTION, Value.Type);
 
             Value = CssValue.From_CSS("1dppx");
             Assert.True(Value.HasValue);
-            Assert.True(Value.Unit == ECssUnit.DPPX);
+            Assert.True(Value.Unit == EUnit.DPPX);
             Assert.True((int)Value.Value == 1);
             Assert.Equal(ECssValueType.RESOLUTION, Value.Type);
 

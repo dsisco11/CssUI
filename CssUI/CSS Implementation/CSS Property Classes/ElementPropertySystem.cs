@@ -81,7 +81,7 @@ namespace CssUI
         #endregion
 
         #region Values
-        public ECssDirection Direction { get => Cascaded.Direction.Actual; }
+        public EDirection Direction { get => Cascaded.Direction.Actual; }
         public EWritingMode WritingMode { get => Cascaded.WritingMode.Actual; }
 
         public EDisplayMode Display { get => Cascaded.Display.Actual; }
@@ -560,9 +560,9 @@ namespace CssUI
         /// Notifys all dimension-properties which use the specified unit that its scale has changed and they need to update
         /// </summary>
         /// <param name="Unit"></param>
-        public void Notify_Unit_Scale_Change(ECssUnit Unit)
+        public void Notify_Unit_Scale_Change(EUnit Unit)
         {
-            if (Unit == ECssUnit.None) return;
+            if (Unit == EUnit.None) return;
             foreach(ICssProperty Property in this.Cascaded.Get_Set_Properties())
             {
                 Property.Handle_Unit_Change(Unit);
@@ -659,9 +659,9 @@ namespace CssUI
             if (!MathExt.floatEq(FontSize, oldFontSize))
             {
                 oldFontSize = FontSize;
-                Notify_Unit_Scale_Change(ECssUnit.EM);
-                Notify_Unit_Scale_Change(ECssUnit.EX);
-                Notify_Unit_Scale_Change(ECssUnit.CH);
+                Notify_Unit_Scale_Change(EUnit.EM);
+                Notify_Unit_Scale_Change(EUnit.EX);
+                Notify_Unit_Scale_Change(EUnit.CH);
             }
 
             // Get font from font factory, which will help cache identical fonts

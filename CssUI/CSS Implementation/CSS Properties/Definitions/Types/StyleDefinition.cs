@@ -53,7 +53,7 @@ namespace CssUI.CSS.Internal
         /// A map of resolution delegates to <see cref="ECssPropertyStage"/> which the defined property uses to resolve property values
         /// </summary>
         public readonly PropertyResolverFunc[] PropertyStageResolver = new PropertyResolverFunc[7];
-        public readonly ECssUnit DefaultUnit = ECssUnit.PX;
+        public readonly EUnit DefaultUnit = EUnit.PX;
         #endregion
 
         #region Constructors

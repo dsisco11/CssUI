@@ -14,7 +14,7 @@ namespace CssUI.CSS
     public partial class CssValue
     {
         #region Delegates
-        public delegate double StyleUnitResolverDelegate(ECssUnit unit);
+        public delegate double StyleUnitResolverDelegate(EUnit unit);
         #endregion
 
         #region Static Declerations
@@ -58,7 +58,7 @@ namespace CssUI.CSS
         public readonly ECssValueFlags Flags = ECssValueFlags.None;
         public readonly ECssValueType Type = ECssValueType.NULL;
         public readonly dynamic Value = null;
-        public readonly ECssUnit Unit = ECssUnit.None;
+        public readonly EUnit Unit = EUnit.None;
         #endregion
 
         #region Accessors
@@ -135,7 +135,7 @@ namespace CssUI.CSS
             this.Value = Value;
         }
 
-        internal CssValue(ECssValueType Type, dynamic Value, ECssUnit Unit) : this(Type)
+        internal CssValue(ECssValueType Type, dynamic Value, EUnit Unit) : this(Type)
         {
             this.Unit = Unit;
             this.Value = Value;
@@ -156,9 +156,9 @@ namespace CssUI.CSS
                 /* Make sure to correct the value and distinguish whether we are a Dimension or a Resolution */
                 switch (Unit)
                 {
-                    case ECssUnit.DPI:
-                    case ECssUnit.DPCM:
-                    case ECssUnit.DPPX:
+                    case EUnit.DPI:
+                    case EUnit.DPCM:
+                    case EUnit.DPPX:
                         this.Type = ECssValueType.RESOLUTION;
                         break;
                     default:
@@ -204,10 +204,10 @@ namespace CssUI.CSS
         public static CssValue From_Percent(double value) => new CssValue(ECssValueType.PERCENT, (double)value);
 
         /// <summary>Create an absolute length value</summary>
-        public static CssValue From_Length(double value, ECssUnit Unit) => new CssValue(ECssValueType.DIMENSION, (double)value, Unit);
+        public static CssValue From_Length(double value, EUnit Unit) => new CssValue(ECssValueType.DIMENSION, (double)value, Unit);
 
         /// <summary>Create an absolute length value if not null, or return the given default value</summary>
-        public static CssValue From_Length(double? value, ECssUnit Unit, CssValue defaultValue) => (!value.HasValue ? defaultValue : new CssValue(ECssValueType.DIMENSION, (double)value.Value, Unit));
+        public static CssValue From_Length(double? value, EUnit Unit, CssValue defaultValue) => (!value.HasValue ? defaultValue : new CssValue(ECssValueType.DIMENSION, (double)value.Value, Unit));
 
         
 
@@ -235,7 +235,7 @@ namespace CssUI.CSS
                 case ECssValueType.NUMBER:
                     return string.Concat(((double)Value).ToString("0.###"));
                 case ECssValueType.DIMENSION:
-                    if (Unit == ECssUnit.None)
+                    if (Unit == EUnit.None)
                         return string.Concat(((double)Value).ToString("0.###"), "<none>");
                     else
                         return string.Concat(((double)Value).ToString("0.###"), Unit.ToString().ToLower());
@@ -261,7 +261,7 @@ namespace CssUI.CSS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private double ResolveDimension(StyleUnitResolverDelegate Resolver)
         {
-            if (Unit == ECssUnit.None) return (double)Value;
+            if (Unit == EUnit.None) return (double)Value;
             return (Resolver(Unit) * (double)Value);
         }
         #endregion
@@ -665,10 +665,10 @@ namespace CssUI.CSS
                     return string.Concat(Value);
                 case ECssValueType.DIMENSION:
                     {
-                        if (Unit == ECssUnit.None)
+                        if (Unit == EUnit.None)
                             return string.Concat(((double)Value).ToString());
                         else
-                            return string.Concat(((double)Value).ToString(), Enum.GetName(typeof(ECssUnit), Unit).ToLower());
+                            return string.Concat(((double)Value).ToString(), Enum.GetName(typeof(EUnit), Unit).ToLower());
                     }
                 case ECssValueType.PERCENT:
                     return string.Concat((double)Value, "%");

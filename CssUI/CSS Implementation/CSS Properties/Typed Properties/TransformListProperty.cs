@@ -228,7 +228,7 @@ namespace CssUI
         /// <summary>
         /// Allows external code to notify this property that a certain unit type has changed scale and if we have a value which uses that unit-type we need to fire our Changed event because our Computed value will be different
         /// </summary>
-        public void Handle_Unit_Change(ECssUnit Unit)
+        public void Handle_Unit_Change(EUnit Unit)
         {
             bool change = false;
             foreach(StyleFunction func in Transforms.Values)
@@ -246,7 +246,7 @@ namespace CssUI
             if (change) onValueChange?.Invoke(ECssPropertyStage.Computed, this);
         }
 
-        private double Get_Unit_Scale(ECssUnit Unit)
+        private double Get_Unit_Scale(EUnit Unit)
         {
             return CssUnitResolver.Get_Scale(Owner, this, Unit);
         }

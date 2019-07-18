@@ -283,7 +283,7 @@ namespace CssUI.CSS
         /// <summary>
         /// Allows external code to notify this property that a certain unit type has changed scale and if we have a value which uses that unit-type we need to fire our Changed event because our Computed value will be different
         /// </summary>
-        public override void Handle_Unit_Change(ECssUnit Unit)
+        public override void Handle_Unit_Change(EUnit Unit)
         {
             if (Specified.Unit == Unit)
             {// We are using this unit and its change will affect our computed value

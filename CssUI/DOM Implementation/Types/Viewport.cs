@@ -47,5 +47,10 @@ namespace CssUI.DOM
         }
         #endregion
 
+        public DOMRect Get_Bounds()
+        {
+            return new DOMRect(Left, Top, Width, Height);
+        }
+
     }
 }

@@ -32,7 +32,7 @@ namespace CssUI
         static CssUnitResolver()
         {
             /* Find the max unit enum value */
-            TABLE_SIZE = 1 + Enum.GetValues(typeof(ECssUnit)).Cast<byte>().Max();
+            TABLE_SIZE = 1 + Enum.GetValues(typeof(EUnit)).Cast<byte>().Max();
         }
         #endregion
 
@@ -61,10 +61,10 @@ namespace CssUI
         /// </summary>
         private void Compile_Table()
         {
-            var unitList = Enum.GetValues(typeof(ECssUnit));
+            var unitList = Enum.GetValues(typeof(EUnit));
             SCALING_TABLE = new double[TABLE_SIZE];
 
-            foreach (ECssUnit unit in unitList)
+            foreach (EUnit unit in unitList)
             {
                 SCALING_TABLE[(int)unit] = Get_Scale(this.document, unit, this.anchor_to_dpi);
             }
@@ -76,7 +76,7 @@ namespace CssUI
         /// </summary>
         /// <param name="Unit">Unit the value is specified in</param>
         /// <param name="Value">Value to convert</param>
-        public double Resolve(double Value, ECssUnit Unit)
+        public double Resolve(double Value, EUnit Unit)
         {
             /* First we convert the unit value to the canonical unit (pixels for physical values) */
             return Value * SCALING_TABLE[(int)Unit];
@@ -88,7 +88,7 @@ namespace CssUI
         /// <param name="unitFrom">The unit the value is specified in</param>
         /// <param name="unitTo">The unit to convert to</param>
         /// <param name="value">Value to convert</param>
-        public double Resolve(double value, ECssUnit unitFrom, ECssUnit unitTo)
+        public double Resolve(double value, EUnit unitFrom, EUnit unitTo)
         {
             /* First we convert the unit value to the canonical unit (pixels for physical values) */
             double canonical = value * SCALING_TABLE[(int)unitFrom];
@@ -97,13 +97,13 @@ namespace CssUI
         }
 
         
-        public static double Get_Font_Unit_Scale(Element Owner, ICssProperty Property, ECssUnit Unit)
+        public static double Get_Font_Unit_Scale(Element Owner, ICssProperty Property, EUnit Unit)
         {
             switch (Unit)
             {
-                case ECssUnit.CH:
-                    throw new NotImplementedException($"CSS Unit type '{Enum.GetName(typeof(ECssUnit), Unit)}' has not been implemented!");
-                case ECssUnit.EM:
+                case EUnit.CH:
+                    throw new NotImplementedException($"CSS Unit type '{Enum.GetName(typeof(EUnit), Unit)}' has not been implemented!");
+                case EUnit.EM:
                     {
                         /*
                          * CSS Specs:
@@ -145,7 +145,7 @@ namespace CssUI
                         else
                             return Owner.Style.FontSize;
                     }
-                case ECssUnit.EX:
+                case EUnit.EX:
                     {
                         /*
                          * CSS Specs:
@@ -187,10 +187,10 @@ namespace CssUI
                          * CSS Specs:
                          * In the cases where it is impossible or impractical to determine the x-height, a value of 0.5em should be used.
                          */
-                        return Get_Font_Unit_Scale(Owner, Property, ECssUnit.EM) * 0.5;
+                        return Get_Font_Unit_Scale(Owner, Property, EUnit.EM) * 0.5;
                     }
                 default:
-                    throw new NotImplementedException($"CSS Unit type '{Enum.GetName(typeof(ECssUnit), Unit)}' has not been implemented!");
+                    throw new NotImplementedException($"CSS Unit type '{Enum.GetName(typeof(EUnit), Unit)}' has not been implemented!");
             }
         }
 
@@ -200,17 +200,17 @@ namespace CssUI
         /// <param name="document"></param>
         /// <param name="Unit"></param>
         /// <returns></returns>
-        private static double Get_Scale(Document document, ECssUnit Unit, bool anchor_to_dpi = false)
+        private static double Get_Scale(Document document, EUnit Unit, bool anchor_to_dpi = false)
         {
             switch (Unit)
             {
                 /* Physical Units */
                 /* Docs: https://www.w3.org/TR/css3-values/#physical-units */
-                case ECssUnit.PX:
+                case EUnit.PX:
                     {
                         return 1.0;
                     }
-                case ECssUnit.CM:
+                case EUnit.CM:
                     {
                         if (anchor_to_dpi)
                         {
@@ -219,7 +219,7 @@ namespace CssUI
 
                         return CM_TO_PX;
                     }
-                case ECssUnit.MM:
+                case EUnit.MM:
                     {
                         if (anchor_to_dpi)
                         {
@@ -228,7 +228,7 @@ namespace CssUI
 
                         return MM_TO_PX;
                     }
-                case ECssUnit.Q:
+                case EUnit.Q:
                     {
                         if (anchor_to_dpi)
                         {
@@ -237,7 +237,7 @@ namespace CssUI
 
                         return Q_TO_PX;
                     }
-                case ECssUnit.IN:
+                case EUnit.IN:
                     {
                         if (anchor_to_dpi)
                         {
@@ -246,7 +246,7 @@ namespace CssUI
 
                         return INCH_TO_PX;
                     }
-                case ECssUnit.PC:
+                case EUnit.PC:
                     {
                         if (anchor_to_dpi)
                         {
@@ -255,7 +255,7 @@ namespace CssUI
 
                         return PC_TO_PX;
                     }
-                case ECssUnit.PT:
+                case EUnit.PT:
                     {
                         if (anchor_to_dpi)
                         {
@@ -267,7 +267,7 @@ namespace CssUI
 
                 /* <Resolution> Units */
                 /* Docs: https://www.w3.org/TR/css3-values/#resolution-value */
-                case ECssUnit.DPI:
+                case EUnit.DPI:
                     {
                         if (anchor_to_dpi)
                         {
@@ -276,7 +276,7 @@ namespace CssUI
 
                         return 1 / 96;
                     }
-                case ECssUnit.DPCM:
+                case EUnit.DPCM:
                     {
                         if (anchor_to_dpi)
                         {
@@ -285,29 +285,29 @@ namespace CssUI
 
                         return PT_TO_PX;
                     }
-                case ECssUnit.DPPX:
+                case EUnit.DPPX:
                     {
                         return 1;
                     }
 
                 /* <Time> Units */
                 /* Docs: https://www.w3.org/TR/css3-values/#time */
-                case ECssUnit.S:
+                case EUnit.S:
                     {
                         return 1.0;
                     }
-                case ECssUnit.MS:
+                case EUnit.MS:
                     {
                         return (1 / 1000);
                     }
 
                 /* <Frequency> Units */
                 /* Docs: https://www.w3.org/TR/css3-values/#frequency */
-                case ECssUnit.HZ:
+                case EUnit.HZ:
                     {
                         return 1.0;
                     }
-                case ECssUnit.KHZ:
+                case EUnit.KHZ:
                     {
                         return (1 / 1000);
                     }
@@ -317,48 +317,48 @@ namespace CssUI
                 /* Docs: https://www.w3.org/TR/css3-values/#angles */
                 /* Canonical unit: degrees */
 
-                case ECssUnit.DEG:// Translate degrees to radians
+                case EUnit.DEG:// Translate degrees to radians
                     {
                         return 1.0;
                     }
-                case ECssUnit.GRAD:
+                case EUnit.GRAD:
                     {
                         return (400 / 360);
                     }
-                case ECssUnit.RAD:
+                case EUnit.RAD:
                     {
                         return (180.0 / Math.PI);
                     }
-                case ECssUnit.TURN:
+                case EUnit.TURN:
                     {
                         return 360.0;
                     }
 
                 /* Font Units */
                 /* Docs: https://www.w3.org/TR/css-values-3/#font-relative-lengths */
-                case ECssUnit.REM:
+                case EUnit.REM:
                     {
                         return document.body.Style.FontSize;
                     }
-                case ECssUnit.VMAX:
+                case EUnit.VMAX:
                     {
                         return Math.Max(document.window.visualViewport.Width, document.window.visualViewport.Height);
                     }
-                case ECssUnit.VMIN:
+                case EUnit.VMIN:
                     {
                         return Math.Min(document.window.visualViewport.Width, document.window.visualViewport.Height);
                     }
-                case ECssUnit.VW:
+                case EUnit.VW:
                     {
                         return document.window.visualViewport.Width;
                     }
-                case ECssUnit.VH:
+                case EUnit.VH:
                     {
                         return document.window.visualViewport.Height;
                     }
                 default:
                     {
-                        throw new NotImplementedException($"CSS Unit type '{Enum.GetName(typeof(ECssUnit), Unit)}' has not been implemented!");
+                        throw new NotImplementedException($"CSS Unit type '{Enum.GetName(typeof(EUnit), Unit)}' has not been implemented!");
                     }
             }
 

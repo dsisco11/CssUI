@@ -161,7 +161,7 @@ namespace CssUI.CSS.Internal
         /// <summary>
         /// Allows external code to notify this property that a certain unit type has changed scale and if we have a value which uses that unit-type we need to fire our Changed event because our Computed value will be different
         /// </summary>
-        public abstract void Handle_Unit_Change(ECssUnit Unit);
+        public abstract void Handle_Unit_Change(EUnit Unit);
         #endregion
 
         #region Cascading

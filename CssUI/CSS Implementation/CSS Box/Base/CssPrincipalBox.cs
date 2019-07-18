@@ -9,6 +9,7 @@ using System.Diagnostics;
 using CssUI.CSS.Enums;
 using CssUI.DOM;
 using CssUI.DOM.Nodes;
+using CssUI.CSS.Formatting;
 
 namespace CssUI
 {
@@ -17,16 +18,14 @@ namespace CssUI
     /// It is actually acontainer for multiple box fragments
     /// Its origin is Top, Left.
     /// </summary>
-    public partial class CssPrincipalBox : IEnumerable<CssBoxFragment>
+    public partial class CssPrincipalBox : FragmentationRoot
     {
         /* 
          * Docs: https://www.w3.org/TR/CSS22/visuren.html#box-gen
          * Docs: https://www.w3.org/TR/css-box-3/#box-model
+         * 
+         * Docs: https://www.w3.org/TR/css-break-3/
          */
-
-        #region Backing List
-        private List<CssBoxFragment> Childen = new List<CssBoxFragment>();
-        #endregion
 
         #region Flags
         public EBoxFlags Flags = 0x0;
@@ -58,6 +57,7 @@ namespace CssUI
 
         #region Box Areas
         /* XXX: Should we switch to using DOMRects for tracking these? */
+        /* YES WE SHOULD */
 
         /// <summary>
         /// The edge positions of the Repalced-Content-Area 
@@ -88,6 +88,7 @@ namespace CssUI
 
         #region Properties
         private readonly cssElement Owner;
+        internal IFormattingContext FormattingContext { get; private set; } = null;
 
         /// <summary>
         /// The 'Inner Display Type'
@@ -187,23 +188,23 @@ namespace CssUI
 
 
         /// <summary>
-        /// Backing value for <see cref="Containing_Block"/>
+        /// Backing value for <see cref="Containing_Box"/>
         /// </summary>
-        private CssBoxArea _containing_block = null;
+        private CssBoxArea _containing_box = null;
         /// <summary>
         /// The containing block of this element
         /// <para>If the control has an ancestor this will be said ancestors content-area block</para>
         /// <para>Otherwise, if the element is a root element, this should have the dimensions of the viewport</para>
         /// </summary>
-        public CssBoxArea Containing_Block
+        public CssBoxArea Containing_Box
         {
             get
             {
-                if (ReferenceEquals(null, _containing_block))
+                if (ReferenceEquals(null, _containing_box))
                 {
-                    _containing_block = Find_Containing_Block();
+                    _containing_box = Find_Containing_Block();
                 }
-                return _containing_block;
+                return _containing_box;
             }
         }
 
@@ -577,42 +578,72 @@ namespace CssUI
                          * the containing block is formed by the content edge of the nearest ancestor box that is a block container or which establishes a formatting context. 
                          */
 
-                        // XXX: Finish this, after DOM hierarchy abstraction is implemented
                         DOM.TreeWalker tree = new DOM.TreeWalker(this.Owner, DOM.Enums.ENodeFilterMask.SHOW_ELEMENT);
                         DOM.Nodes.Node node = tree.parentNode();
                         while (!ReferenceEquals(null, node))
                         {
                             if (node is DOM.Element element)
                             {
-                                if (element.Box.OuterDisplayType == EOuterDisplayType.Block || element.Box.For
+                                if (element.Box.OuterDisplayType == EOuterDisplayType.Block || !ReferenceEquals(null, element.Box.FormattingContext))
+                                {
+                                    return element.Box.Content;
+                                }
                             }
 
                             node = tree.parentNode();
                         }
-                        throw new NotImplementedException();
+
+                        throw new CssException($"Cant find containing-block for element: {Owner.ToString()}");
                     }
                     break;
                 case EPositioning.Fixed:
                     {/* If the element has 'position: fixed', the containing block is established by the viewport in the case of continuous media or the page area in the case of paged media. */
-                        return Owner.Viewport?.Area;
+                        Viewport view = Owner.ownerDocument.Viewport;
+                        return new CssBoxArea(view.Get_Bounds());
                     }
                     break;
                 case EPositioning.Absolute:
                     {
                         /*
                          * If the element has 'position: absolute', the containing block is established by the nearest ancestor with a 'position' of 'absolute', 'relative' or 'fixed', in the following way:
-                         * In the case that the ancestor is an inline element, the containing block is the bounding box around the padding boxes of the first and the last inline boxes generated for that element. In CSS 2.2, if the inline element is split across multiple lines, the containing block is undefined.
+                         * In the case that the ancestor is an inline element, the containing block is the bounding box around the padding boxes of the first and the last inline boxes generated for that element. 
+                         * In CSS 2.2, if the inline element is split across multiple lines, the containing block is undefined.
                          * Otherwise, the containing block is formed by the padding edge of the ancestor.
-                         * If there is no such ancestor, the containing block is the initial containing block.
+                         * 
                          */
 
-                        // XXX: Finish this, after DOM hierarchy abstraction is implemented
-                        throw new NotImplementedException();
+                        DOM.TreeWalker tree = new DOM.TreeWalker(this.Owner, DOM.Enums.ENodeFilterMask.SHOW_ELEMENT);
+                        DOM.Nodes.Node node = tree.parentNode();
+                        while (!ReferenceEquals(null, node))
+                        {
+                            if (node is DOM.Element element)
+                            {
+                                if (element.Style.Positioning == EPositioning.Absolute || element.Style.Positioning == EPositioning.Relative || element.Style.Positioning == EPositioning.Fixed)
+                                {
+                                    if (element.Box.OuterDisplayType == EOuterDisplayType.Inline)
+                                    {
+                                        int right;
+                                        int bottom;
+
+
+                                    }
+                                    else
+                                    {
+                                        return element.Box.Padding;
+                                    }
+                                }
+                            }
+
+                            node = tree.parentNode();
+                        }
+
+                        /* If there is no such ancestor, the containing block is the initial containing block. */
+                        return (Owner.getRootNode() as Element).Box.Content;
                     }
                     break;
                 default:
                     {
-                        return Owner.Parent?.Box.Content;
+                        return Owner.parentElement?.Box.Content;
                     }
             }
         }
@@ -825,43 +856,6 @@ namespace CssUI
             this.Flag(EBoxInvalidationReason.Content_Changed);
         }
 
-        #endregion
-
-        #region Enumeration
-        IEnumerator<CssBoxFragment> IEnumerable<CssBoxFragment>.GetEnumerator()
-        {
-            if (this.Owner is cssCompoundElement container)
-            {
-                return new CSSBoxEnumerator(this, container);
-            }
-
-            return (IEnumerator<CssBoxFragment>)new CssBoxFragment[0].GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            if (this.Owner is cssCompoundElement container)
-            {
-                return new CSSBoxEnumerator(this, container);
-            }
-
-            return new CssBoxFragment[0].GetEnumerator();
-        }
-        #endregion
-
-        #region Indexing
-        public int Count { get => (Owner is cssCompoundElement o ? o.Count : 0); }
-        public CssBoxFragment this[int i]
-        {
-            //get => (Owner is cssCompoundElement o ? o[i].Box : null);
-            get
-            {
-                if (i < 0 || i >= this.Childen.Count)
-                    throw new IndexOutOfRangeException();
-
-                return this.Childen[i];
-            }
-        }
         #endregion
     }
 }

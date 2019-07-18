@@ -779,7 +779,7 @@ namespace CssUI.DOM
                 return Rects;
             /* 2) If the element has an associated SVG layout box return a sequence containing a single DOMRect object that describes the bounding box of the element as defined by the SVG specification, applying the transforms that apply to the element and its ancestors. */
             /* 3) Return a sequence containing static DOMRect objects in content order, one for each box fragment, describing its border area (including those with a height or width of zero) with the following constraints: */
-            foreach (CssBoxFragment fragment in Box)
+            foreach (CssBoxFragment fragment in Box.Fragments)
             {
                 /* 1) Apply the transforms that apply to the element and its ancestors. */
                 /* 2) If the element on which the method was invoked has a computed value for the display property of table or inline-table include both the table box and the caption box, if any, but not the anonymous container box. */
@@ -810,7 +810,50 @@ namespace CssUI.DOM
         }
         #endregion
 
-        #region Geometry
+        #region Scrolling
+        internal void scroll_element_into_view(EScrollLogicalPosition block, EScrollLogicalPosition inline)
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#scroll-an-element-into-view */
+            /* To scroll an element into view element, with a ScrollIntoViewOptions dictionary options, 
+             * means to run these steps for each ancestor element or viewport that establishes a scrolling box scrolling box, 
+             * in order of innermost to outermost scrolling box: */
+
+            var tree = new TreeWalker(this, ENodeFilterMask.SHOW_ALL);
+            Node node = tree.parentNode();
+            while (!ReferenceEquals(null, node))
+            {
+
+            }
+        }
+
+        public void ScrollIntoView()
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-element-scrollintoview */
+            EScrollLogicalPosition block = EScrollLogicalPosition.Start;
+            EScrollLogicalPosition inline = EScrollLogicalPosition.Nearest;
+
+            if (ReferenceEquals(null, Box))
+                return;
+
+
+        }
+
+
+        public void scrollIntoView(bool arg);
+        public void scrollIntoView(object arg);
+        public void scroll(ScrollToOptions options);
+        public void scroll(double x, double y);
+        public void scrollTo(ScrollToOptions options);
+        public void scrollTo(double x, double y);
+        public void scrollBy(ScrollToOptions options);
+        public void scrollBy(double x, double y);
+
+        public double scrollTop { get; private set; }
+        public double scrollLeft { get; private set; }
+        public long scrollWidth { get; private set; }
+        public long scrollHeight { get; private set; }
+        public long clientTop { get; private set; }
+        public long clientLeft { get; private set; }
+        public long clientWidth { get; private set; }
+        public long clientHeight { get; private set; }
         #endregion
     }
 }
