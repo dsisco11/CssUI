@@ -2,6 +2,7 @@
 using CssUI.DOM.Enums;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Geometry;
+using CssUI.DOM.Interfaces;
 using CssUI.DOM.Internal;
 using CssUI.DOM.Mutation;
 using CssUI.DOM.Nodes;
@@ -52,7 +53,7 @@ namespace CssUI.DOM
         }
 
         /// <summary>
-        /// Tis elements custom element state
+        /// This elements custom element state
         /// </summary>
         public ECustomElement CustomElementState { get; protected set; } = ECustomElement.Undefined;
         public DOMTokenList classList { get; private set; }
@@ -65,7 +66,7 @@ namespace CssUI.DOM
         /// <summary>
         /// The layout box for this element
         /// </summary>
-        internal CssPrincipalBox Box;
+        public CssPrincipalBox Box { get; internal set; }
         public readonly ElementPropertySystem Style;
         #endregion
 

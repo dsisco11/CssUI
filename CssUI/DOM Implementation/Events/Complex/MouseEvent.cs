@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CssUI.DOM.Interfaces;
+using System;
 
 namespace CssUI.DOM.Events
 {
@@ -76,8 +77,61 @@ namespace CssUI.DOM.Events
             {
                 if (0 != (Flags & EEventFlags.Dispatch))
                 {
-
+                    var x = View.document.documentElement.Box.Containing_Block.X;
+                    return clientX - x;
                 }
+
+                var offset = View?.scrollX ?? 0;
+                return clientX + offset;
+            }
+        }
+
+        public long pageY
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-mouseevent-pagey */
+            get
+            {
+                if (0 != (Flags & EEventFlags.Dispatch))
+                {
+                    var y = View.document.documentElement.Box.Containing_Block.Y;
+                    return clientY - y;
+                }
+
+                var offset = View?.scrollY ?? 0;
+                return clientY + offset;
+            }
+        }
+
+        public long offsetX
+        {/* DOcs: https://www.w3.org/TR/cssom-view-1/#dom-mouseevent-offsetx */
+            get
+            {
+                /* If the event’s dispatch flag is set, 
+                 * return the x-coordinate of the position where the event occurred relative to the origin of the padding edge of the target node, 
+                 * ignoring the transforms that apply to the element and its ancestors, and terminate these steps. */
+
+                if (0 != (Flags & EEventFlags.Dispatch) && !ReferenceEquals(null, relatedTarget))
+                {
+                    return (relatedTarget as Element).Box.Padding.X - clientX;
+                }
+
+                return pageX;
+            }
+        }
+
+        public long offsetY
+        {/* DOcs: https://www.w3.org/TR/cssom-view-1/#dom-mouseevent-offsety */
+            get
+            {
+                /* If the event’s dispatch flag is set, 
+                 * return the y-coordinate of the position where the event occurred relative to the origin of the padding edge of the target node, 
+                 * ignoring the transforms that apply to the element and its ancestors, and terminate these steps. */
+
+                if (0 != (Flags & EEventFlags.Dispatch) && !ReferenceEquals(null, relatedTarget))
+                {
+                    return (relatedTarget as Element).Box.Padding.Y - clientY;
+                }
+
+                return pageY;
             }
         }
         #endregion

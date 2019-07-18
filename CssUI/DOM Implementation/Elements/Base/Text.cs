@@ -1,4 +1,5 @@
 ﻿using CssUI.DOM.Exceptions;
+using CssUI.DOM.Interfaces;
 using CssUI.DOM.Nodes;
 using System;
 using System.Collections.Generic;
@@ -44,7 +45,7 @@ namespace CssUI.DOM
         /* Docs: https://dom.spec.whatwg.org/#slotable-assigned-slot */
         public ISlot assignedSlot { get; set; } = null;
         #endregion
-
+        
         #region Constructors
         public Text(Document ownerDocument, string data) : base(ownerDocument, data)
         {
