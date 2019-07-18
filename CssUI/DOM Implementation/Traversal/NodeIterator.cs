@@ -16,7 +16,7 @@ namespace CssUI.DOM
         public readonly NodeFilter Filter = null;
 
         // XXX: Still dont know where this collection comes from
-        private List<Node> iterCollection = new List<Node>();
+        private ICollection<Node> iterCollection;// = new ICollection<Node>();
         private Node referenceNode = null;
         private bool pointerBeforeReferenceNode = false;
         private bool isActive = false;
@@ -28,6 +28,16 @@ namespace CssUI.DOM
             this.root = root;
             this.referenceNode = root;
             this.whatToShow = whatToShow;
+            this.iterCollection = new Node[0];
+        }
+
+        public NodeIterator(Node root, ICollection<Node> Collection, ENodeFilterMask whatToShow, NodeFilter Filter = null)
+        {
+            this.root = root;
+            this.referenceNode = root;
+            this.whatToShow = whatToShow;
+            this.iterCollection = Collection;
+            this.Filter = Filter;
         }
 
         ~NodeIterator()

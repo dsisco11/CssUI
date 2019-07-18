@@ -3,7 +3,7 @@
 namespace CssUI.CSS.Enums
 {
     /// <summary>
-    /// Specifies an area-type for a <see cref="CssLayoutBox"/>
+    /// Specifies an area-type for a <see cref="CssPrincipalBox"/>
     /// </summary>
     [Flags]
     public enum ECssBoxType : int

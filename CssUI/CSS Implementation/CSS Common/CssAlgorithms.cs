@@ -59,7 +59,7 @@ namespace CssUI.CSS
         /// </summary>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Size2D Default_Sizing_Algorithm(CssLayoutBox Box, CssValue Specified_Width, CssValue Specified_Height, int Default_Width, int Default_Height)
+        public static Size2D Default_Sizing_Algorithm(CssPrincipalBox Box, CssValue Specified_Width, CssValue Specified_Height, int Default_Width, int Default_Height)
         {/* Docs: https://www.w3.org/TR/css3-images/#default-object-size */
             /* The default sizing algorithm is defined as follows: */
 
@@ -154,7 +154,7 @@ namespace CssUI.CSS
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Size2D Contain_Constraint_Algorithm(CssLayoutBox Box, int Width, int Height)
+        public static Size2D Contain_Constraint_Algorithm(CssPrincipalBox Box, int Width, int Height)
         {/* Docs: https://www.w3.org/TR/css3-images/#contain-constraint */
             /* A contain constraint is resolved by setting the concrete object size to the largest rectangle that has the object's intrinsic aspect ratio and additionally has neither width nor height larger than the constraint rectangle's width and height, respectively. */
             float Ratio = (Box.Intrinsic_Ratio.HasValue ? Box.Intrinsic_Ratio.Value : 1f);
@@ -172,7 +172,7 @@ namespace CssUI.CSS
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Size2D Cover_Constraint_Algorithm(CssLayoutBox Box, int Width, int Height)
+        public static Size2D Cover_Constraint_Algorithm(CssPrincipalBox Box, int Width, int Height)
         {/* Docs: https://www.w3.org/TR/css3-images/#cover-constraint */
             /* A cover constraint is resolved by setting the concrete object size to the smallest rectangle that has the object's intrinsic aspect ratio and additionally has neither width nor height smaller than the constraint rectangle's width and height, respectively. */
             float Ratio = (Box.Intrinsic_Ratio.HasValue ? Box.Intrinsic_Ratio.Value : 1f);

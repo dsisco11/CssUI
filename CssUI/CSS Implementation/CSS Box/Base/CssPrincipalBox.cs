@@ -7,6 +7,8 @@ using CssUI.Internal;
 using CssUI.CSS;
 using System.Diagnostics;
 using CssUI.CSS.Enums;
+using CssUI.DOM;
+using CssUI.DOM.Nodes;
 
 namespace CssUI
 {
@@ -15,8 +17,12 @@ namespace CssUI
     /// It is actually acontainer for multiple box fragments
     /// Its origin is Top, Left.
     /// </summary>
-    public partial class CssLayoutBox : IEnumerable<CssBoxFragment>
-    {// Docs: https://www.w3.org/TR/css-box-3/#box-model
+    public partial class CssPrincipalBox : IEnumerable<CssBoxFragment>
+    {
+        /* 
+         * Docs: https://www.w3.org/TR/CSS22/visuren.html#box-gen
+         * Docs: https://www.w3.org/TR/css-box-3/#box-model
+         */
 
         #region Backing List
         private List<CssBoxFragment> Childen = new List<CssBoxFragment>();
@@ -51,6 +57,8 @@ namespace CssUI
         #endregion
 
         #region Box Areas
+        /* XXX: Should we switch to using DOMRects for tracking these? */
+
         /// <summary>
         /// The edge positions of the Repalced-Content-Area 
         /// </summary>
@@ -80,27 +88,6 @@ namespace CssUI
 
         #region Properties
         private readonly cssElement Owner;
-
-        /// <summary>
-        /// Backing value for <see cref="Containing_Box"/>
-        /// </summary>
-        private CssBoxArea _containing_box = null;
-        /// <summary>
-        /// The containing block of this element
-        /// <para>If the control has an ancestor this will be said ancestors content-area block</para>
-        /// <para>Otherwise, if the element is a root element, this should have the dimensions of the viewport</para>
-        /// </summary>
-        public CssBoxArea Containing_Box
-        {
-            get
-            {
-                if (ReferenceEquals(null, _containing_box))
-                {
-                    _containing_box = Find_Containing_Box();
-                }
-                return _containing_box;
-            }
-        }
 
         /// <summary>
         /// The 'Inner Display Type'
@@ -198,6 +185,27 @@ namespace CssUI
         /// </summary>
         public int Left { get => this.Margin.Left; }
 
+
+        /// <summary>
+        /// Backing value for <see cref="Containing_Block"/>
+        /// </summary>
+        private CssBoxArea _containing_block = null;
+        /// <summary>
+        /// The containing block of this element
+        /// <para>If the control has an ancestor this will be said ancestors content-area block</para>
+        /// <para>Otherwise, if the element is a root element, this should have the dimensions of the viewport</para>
+        /// </summary>
+        public CssBoxArea Containing_Block
+        {
+            get
+            {
+                if (ReferenceEquals(null, _containing_block))
+                {
+                    _containing_block = Find_Containing_Block();
+                }
+                return _containing_block;
+            }
+        }
 
         /// <summary>
         /// Returns whether or not our containing block depends on our size
@@ -318,7 +326,7 @@ namespace CssUI
         #endregion
 
         #region Constructor
-        public CssLayoutBox(cssElement Owner)
+        public CssPrincipalBox(cssElement Owner)
         {
             this.Owner = Owner;
         }
@@ -467,7 +475,19 @@ namespace CssUI
             Update_Depends_Flag();
 
             // Figure out if we have any block-level children
-            this.HasBlockLevelChildren = !ReferenceEquals(null, this.SingleOrDefault((CssLayoutBox b) => (b.OuterDisplayType == EOuterDisplayType.Block)));
+            // this.HasBlockLevelChildren = !ReferenceEquals(null, this.SingleOrDefault((CssLayoutBox b) => (b.OuterDisplayType == EOuterDisplayType.Block)));
+            this.HasBlockLevelChildren = false;
+            Element node = Owner.firstElementChild;
+            while (!ReferenceEquals(null, node))
+            {
+                if (node.Box.OuterDisplayType == EOuterDisplayType.Block)
+                {
+                    this.HasBlockLevelChildren = true;
+                    break;
+                }
+
+                node = node.nextElementSibling;
+            }
 
             /* Update our bounds */
             switch(this.DisplayGroup)
@@ -541,7 +561,7 @@ namespace CssUI
             return true;
         }
 
-        private CssBoxArea Find_Containing_Box()
+        private CssBoxArea Find_Containing_Block()
         {/* Docs: https://www.w3.org/TR/CSS22/visudet.html#containing-block-details */
             /* Root elements */
             if (ReferenceEquals(Owner.Parent, null))
@@ -556,8 +576,19 @@ namespace CssUI
                          * For other elements, if the element's position is 'relative' or 'static', 
                          * the containing block is formed by the content edge of the nearest ancestor box that is a block container or which establishes a formatting context. 
                          */
-                        /* Oh my god this would be so easy if we had a DOM implementation */
+
                         // XXX: Finish this, after DOM hierarchy abstraction is implemented
+                        DOM.TreeWalker tree = new DOM.TreeWalker(this.Owner, DOM.Enums.ENodeFilterMask.SHOW_ELEMENT);
+                        DOM.Nodes.Node node = tree.parentNode();
+                        while (!ReferenceEquals(null, node))
+                        {
+                            if (node is DOM.Element element)
+                            {
+                                if (element.Box.OuterDisplayType == EOuterDisplayType.Block || element.Box.For
+                            }
+
+                            node = tree.parentNode();
+                        }
                         throw new NotImplementedException();
                     }
                     break;

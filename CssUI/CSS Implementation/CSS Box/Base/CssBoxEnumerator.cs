@@ -8,13 +8,13 @@ namespace CssUI.CSS
     {
 
         #region Proeprties
-        private CssLayoutBox Box;
+        private CssPrincipalBox Box;
         private cssCompoundElement Owner;
         private int index = -1;
         #endregion
 
         #region Constructor
-        public CSSBoxEnumerator(CssLayoutBox Box, cssCompoundElement Owner)
+        public CSSBoxEnumerator(CssPrincipalBox Box, cssCompoundElement Owner)
         {
             this.Box = Box;
             this.Owner = Owner;

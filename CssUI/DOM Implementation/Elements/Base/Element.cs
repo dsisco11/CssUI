@@ -65,7 +65,7 @@ namespace CssUI.DOM
         /// <summary>
         /// The layout box for this element
         /// </summary>
-        internal CssLayoutBox Box;
+        internal CssPrincipalBox Box;
         public readonly ElementPropertySystem Style;
         #endregion
 

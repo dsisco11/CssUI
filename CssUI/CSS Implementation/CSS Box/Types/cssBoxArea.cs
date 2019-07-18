@@ -1,9 +1,10 @@
-﻿using System;
+﻿using CssUI.DOM.Geometry;
+using System;
 
 namespace CssUI.CSS
 {
     /// <summary>
-    /// Represents an sub-area within a <see cref="CssLayoutBox"/>
+    /// Represents an sub-area within a <see cref="CssPrincipalBox"/>
     /// </summary>
     public class CssBoxArea
     {
@@ -160,7 +161,7 @@ namespace CssUI.CSS
         /// <param name="Box"></param>
         /// <param name="Position"></param>
         /// <param name="Size"></param>
-        public CssBoxArea(CssLayoutBox Box, Vec2i Position, Size2D Size)
+        public CssBoxArea(CssPrincipalBox Box, Vec2i Position, Size2D Size)
         {
             this.Fragment = Box;
             Update_Bounds(Position.X, Position.Y, Size.Width, Size.Height);
@@ -301,6 +302,7 @@ namespace CssUI.CSS
         }
         #endregion
 
+        #region Cloning
         public static CssBoxArea ShallowCopy(CssBoxArea Area)
         {
             if (ReferenceEquals(Area, null))
@@ -312,6 +314,13 @@ namespace CssUI.CSS
                 Size = new CssRect() { Top = Area.Size.Top, Right = Area.Size.Right, Bottom = Area.Size.Bottom, Left = Area.Size.Left }
             };
         }
+
+        public DOMRect Get_Bounds()
+        {
+            return new DOMRect(X, Y, Width, Height);
+        }
+        #endregion
+
 
         #region Intersection
         /// <summary>
