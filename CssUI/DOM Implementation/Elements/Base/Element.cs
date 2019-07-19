@@ -1106,9 +1106,10 @@ namespace CssUI.DOM
             }
 
             /* 4) Let position be the scroll position box would have by aligning scrolling area x-coordinate x with the left of box and aligning scrolling area y-coordinate y with the top of box. */
-            /* XXX: Im not positive that this is what it means for me to do but it's my best guess that it WANTS me to offset our X/Y by the boxs' origin so that the scroll position we give it is RELATIVE to the scrolling box itsself. */
             var origin = box.Origin;
-            var position = new DOMPoint(x - origin.x, y - origin.y);
+            double deltaX = x - origin.x;
+            double deltaY = y - origin.y;
+            var position = new DOMPoint(box.ScrollX + deltaX, box.ScrollY + deltaY);
             /* 5) If position is the same as box’s current scroll position, and box does not have an ongoing smooth scroll, abort these steps. */
             if (position.Equals(box.ScrollX, box.ScrollY) && !box.IsScrolling)
             {
@@ -1456,7 +1457,7 @@ namespace CssUI.DOM
             /* 8) If the element is the root element invoke scroll() on window with scrollX on window as first argument and y as second argument, and terminate these steps. */
             if (is_root)
             {
-                window.Scroll(scrollX, y);
+                window.Scroll(window.scrollX, y);
                 return;
             }
 
@@ -1499,7 +1500,7 @@ namespace CssUI.DOM
             /* 8) If the element is the root element invoke scroll() on window with scrollX on window as first argument and y as second argument, and terminate these steps. */
             if (is_root)
             {
-                window.Scroll(scrollX, y);
+                window.Scroll(window.scrollX, y);
                 return;
             }
 

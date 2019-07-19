@@ -1,4 +1,7 @@
-﻿using CssUI.DOM.Events;
+﻿using CssUI.CSS;
+using CssUI.CSS.Internal;
+using CssUI.DOM.Events;
+using CssUI.DOM.Geometry;
 using CssUI.DOM.Internal;
 using CssUI.DOM.Media;
 using CssUI.DOM.Mutation;
@@ -15,6 +18,15 @@ namespace CssUI.DOM
     /// </summary>
     public abstract class Window : BrowsingContext, IGlobalEventCallbacks, IWindowEventCallbacks
     {/* Docs: https://html.spec.whatwg.org/multipage/window-object.html#window */
+        
+        #region Internal Properties
+        internal List<IEventTarget> SignalSlots = new List<IEventTarget>();
+        /// <summary>
+        /// This is the window itsself
+        /// </summary>
+        internal BrowsingContext BrowsingContext => document?.BrowsingContext;
+        internal override Window WindowProxy { get => this; }
+        #endregion
 
         #region Properties
         /// <summary>
@@ -27,51 +39,7 @@ namespace CssUI.DOM
         /// Determines the area of the document being rendered
         /// </summary>
         public readonly VisualViewport visualViewport;
-        #endregion
-
-        #region Browsing Context
-
-        internal BrowsingContext BrowsingContext => document?.BrowsingContext;
-        internal override Window WindowProxy { get => this; }
-        #endregion
-
-        #region CSS Object Model Extensions
-        /* Docs: https://www.w3.org/TR/cssom-view-1/#extensions-to-the-window-interface */
-        public MediaQueryList matchMedia(string query)
-        {
-            return new CSS.Serialization.CssParser(query).Parse_Media_Query_List(this.document);
-        }
-
         public readonly Screen screen;
-        // browsing context
-        public void moveTo(long x, long y) => throw new NotImplementedException();
-        public void moveBy(long x, long y) => throw new NotImplementedException();
-        public void resizeTo(long x, long y) => throw new NotImplementedException();
-        public void resizeBy(long x, long y) => throw new NotImplementedException();
-
-        // Viewport
-        public long innerWidth => 0;
-        public long innerHeight => 0;
-
-        // viewport scrolling
-        public double scrollX { get; set; }
-        public double pageXOffset { get; set; }
-        public double scrollY { get; set; }
-        public double pageYOffset { get; set; }
-
-        public void Scroll(ScrollToOptions options);
-        public void Scroll(double x, double y);
-        public void ScrollTo(ScrollToOptions options);
-        public void ScrollTo(double x, double y);
-        public void ScrollBy(ScrollToOptions options);
-        public void ScrollBy(double x, double y);
-
-        // client
-        public long screenX { get; set; }
-        public long screenY { get; set; }
-        public long outerWidth { get; set; }
-        public long outerHeight { get; set; }
-        public double devicePixelRatio { get; set; }
         #endregion
 
         #region Constructors
@@ -86,16 +54,166 @@ namespace CssUI.DOM
         }
         #endregion
 
-        #region Slots
-        internal List<IEventTarget> SignalSlots = new List<IEventTarget>();
-        #endregion
 
+        #region CSS Object Model Extensions
+        /* Docs: https://www.w3.org/TR/cssom-view-1/#extensions-to-the-window-interface */
+        public MediaQueryList matchMedia(string query)
+        {
+            return new CSS.Serialization.CssParser(query).Parse_Media_Query_List(this.document);
+        }
+
+        // browsing context
+        public void moveTo(long x, long y) => throw new NotImplementedException();
+        public void moveBy(long x, long y) => throw new NotImplementedException();
+        public void resizeTo(long x, long y) => throw new NotImplementedException();
+        public void resizeBy(long x, long y) => throw new NotImplementedException();
+
+        // Viewport
+        public long innerWidth => ReferenceEquals(null, document.Viewport) ? 0 : document.Viewport.Width;
+        public long innerHeight => ReferenceEquals(null, document.Viewport) ? 0 : document.Viewport.Height;
+
+        // viewport scrolling
+        public double scrollX
+        {
+            get
+            {/* The scrollX attribute attribute must return the x-coordinate, relative to the initial containing block origin, of the left of the viewport, or zero if there is no viewport. */
+                if (ReferenceEquals(null, document.Viewport))
+                    return 0;
+
+                /* XXX: Are we doing scrolling wrong or something? why is it measuring the location of the viewport and not its scrollbox? */
+                var icb = document.Initial_Containing_Block;
+                return document.Viewport.Left - icb.x;
+            }
+        }
+        public double pageXOffset => scrollX;
+        public double scrollY
+        {
+            get
+            {/* The scrollY attribute attribute must return the y-coordinate, relative to the initial containing block origin, of the top of the viewport, or zero if there is no viewport. */
+                if (ReferenceEquals(null, document.Viewport))
+                    return 0;
+
+                /* XXX: Are we doing scrolling wrong or something? why is it measuring the location of the viewport and not its scrollbox? */
+                var icb = document.Initial_Containing_Block;
+                return document.Viewport.Top - icb.y;
+            }
+        }
+        public double pageYOffset => scrollY;
+
+        internal void scroll_window(double x, double y, EScrollBehavior behavior)
+        {
+            double viewportWidth = document.Viewport.Width;
+            double viewportHeight = document.Viewport.Height;
+
+            var scrollBox = document.Viewport.ScrollBox;
+            var scrollArea = scrollBox.ScrollArea;
+
+            if (document.Viewport.ScrollBox.Overflow_Block == CSS.Enums.EOverflowDirection.Rightward)
+            {
+                x = MathExt.Max(0, MathExt.Min(x, scrollArea.width - viewportWidth));
+            }
+            else
+            {
+                x = MathExt.Min(0, MathExt.Max(x, viewportWidth - scrollArea.width));
+            }
+
+            if (document.Viewport.ScrollBox.Overflow_Inline == CSS.Enums.EOverflowDirection.Downward)
+            {
+                y = MathExt.Max(0, MathExt.Min(y, scrollArea.height - viewportHeight));
+            }
+            else
+            {
+                y = MathExt.Min(0, MathExt.Max(y, viewportHeight - scrollArea.height));
+            }
+
+            /* Let position be the scroll position the viewport would have by aligning the x-coordinate x of the viewport scrolling area with the left of the viewport and aligning the y-coordinate y of the viewport scrolling area with the top of the viewport. */
+            double deltaX = x - document.Viewport.Left;
+            double deltaY = y - document.Viewport.Top;
+
+            DOMPoint position = new DOMPoint(scrollBox.ScrollX + deltaX, scrollBox.ScrollY + deltaY);
+            if (position.Equals(scrollBox.ScrollX, scrollBox.ScrollY) && !scrollBox.IsScrolling)
+                return;
+
+            scrollBox.Perform_Scroll(position, document.documentElement, behavior);
+        }
+
+        public void Scroll(ScrollToOptions options) => ScrollTo(options);
+        public void Scroll(double x, double y) => ScrollTo(x, y);
+
+        public void ScrollTo(ScrollToOptions options)
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-window-scroll */
+            if (ReferenceEquals(null, document.Viewport))
+                return;
+
+            double x = options.left.HasValue ? options.left.Value : document.Viewport.ScrollBox.ScrollX;
+            double y = options.top.HasValue ? options.top.Value : document.Viewport.ScrollBox.ScrollY;
+
+            x = CssCommon.Normalize_Non_Finite(x);
+            y = CssCommon.Normalize_Non_Finite(y);
+
+            scroll_window(x, y, options.behavior);
+        }
+        public void ScrollTo(double x, double y)
+        {
+            if (ReferenceEquals(null, document.Viewport))
+                return;
+
+            x = CssCommon.Normalize_Non_Finite(x);
+            y = CssCommon.Normalize_Non_Finite(y);
+
+            scroll_window(x, y, EScrollBehavior.Auto);
+        }
+
+        public void ScrollBy(ScrollToOptions options)
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-window-scrollby */
+            options.left = !options.left.HasValue ? 0 : CssCommon.Normalize_Non_Finite(options.left.Value);
+            options.top = !options.top.HasValue ? 0 : CssCommon.Normalize_Non_Finite(options.top.Value);
+
+            options.left += scrollX;
+            options.top += scrollY;
+
+            Scroll(options);
+        }
+        public void ScrollBy(double x, double y)
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-window-scrollby */
+            var options = new ScrollToOptions(EScrollBehavior.Auto, x, y);
+
+            options.left = !options.left.HasValue ? 0 : CssCommon.Normalize_Non_Finite(options.left.Value);
+            options.top = !options.top.HasValue ? 0 : CssCommon.Normalize_Non_Finite(options.top.Value);
+
+            options.left += scrollX;
+            options.top += scrollY;
+
+            Scroll(options);
+        }
+
+        // client
+
+        /// <summary>
+        /// The screenX attribute must return the x-coordinate, relative to the origin of the screen of the output device, of the left of the client window as number of pixels, or zero if there is no such thing.
+        /// </summary>
+        public abstract long screenX { get; }
+        /// <summary>
+        /// The screenY attribute must return the y-coordinate, relative to the origin of the screen of the output device, of the top of the client window as number of pixels, or zero if there is no such thing.
+        /// </summary>
+        public abstract long screenY { get; }
+        /// <summary>
+        /// The outerWidth attribute must return the width of the client window. If there is no client window this attribute must return zero.
+        /// </summary>
+        public long outerWidth => ReferenceEquals(null, screen) ? 0 : screen.width;
+        /// <summary>
+        /// The outerHeight attribute must return the height of the client window. If there is no client window this attribute must return zero.
+        /// </summary>
+        public long outerHeight => ReferenceEquals(null, screen) ? 0 : screen.height;
+        public double devicePixelRatio { get; }
+        #endregion
+        
         #region Mutation Observers
         internal List<MutationObserver> Observers = new List<MutationObserver>();
         internal int mutation_observer_microtask_queued = 0;
         internal Task observer_task = Task.FromResult(true);
 
-        // XXX: I'm thinking we just throw a new task up instead of bothering to implement the task queue system. We arent a browser afterall.
+        // XXX: I'm thinking we just throw a new task up instead of bothering to implement the task queue system. Its basically the same concept(~ish).
         internal void QueueObserverMicroTask()
         {
             /* To queue a mutation observer microtask, run these steps: */
@@ -142,24 +260,16 @@ namespace CssUI.DOM
                 slot.dispatchEvent(new Event(EEventName.SlotChange, new EventInit() { bubbles = true }));
             }
         }
-
         #endregion
 
-        #region Focus
+        public static DOMHighResTimeStamp getTimestamp() => new DOMHighResTimeStamp() { Timestmap = DateTime.UtcNow.Ticks };
+
         // public string status;
         public void focus()
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#dom-window-focus */
             DOMCommon.Run_Focusing_Steps(new FocusableArea(document, document.documentElement));
         }
-        #endregion
 
-        #region Internal Utility
-        #endregion
-
-        public static DOMHighResTimeStamp getTimestamp()
-        {
-            return new DOMHighResTimeStamp() { Timestmap = DateTime.UtcNow.Millisecond };
-        }
 
         #region Node Management
         public Node importNode(Node node, bool deep = false)

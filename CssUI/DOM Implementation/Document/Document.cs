@@ -5,6 +5,7 @@ using CssUI.DOM.Geometry;
 using CssUI.DOM.Internal;
 using CssUI.DOM.Media;
 using CssUI.DOM.Nodes;
+using System;
 using System.Collections.Generic;
 using xLog;
 
@@ -12,14 +13,11 @@ namespace CssUI.DOM
 {
     public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEventCallbacks
     {/* Docs: https://dom.spec.whatwg.org/#document */
-        #region Tracking
+        #region Internal Properties
         internal LinkedList<MediaQueryList> _mediaQueryLists = new LinkedList<MediaQueryList>();
-        #endregion
-
-        #region Properties
         internal ILogger Log = LogFactory.GetLogger(nameof(Document));
-
         internal BrowsingContext BrowsingContext = null;
+        [Obsolete("Use defaultView in stead")]
         internal Window window
         {/* https://html.spec.whatwg.org/multipage/window-object.html#dom-document-defaultview */
             get
@@ -27,6 +25,21 @@ namespace CssUI.DOM
                 return BrowsingContext?.WindowProxy;
             }
         }
+        internal CssUnitResolver cssUnitResolver;
+
+        /// <summary>
+        /// Returns the initial contaiing block
+        /// </summary>
+        internal DOMRect Initial_Containing_Block
+        {/* Docs: https://www.w3.org/TR/css-display-3/#initial-containing-block */
+            get
+            {
+                return documentElement?.Box.Content.Get_Bounds();
+            }
+        }
+        #endregion
+
+        #region Properties
 
         public Window defaultView
         {/* https://html.spec.whatwg.org/multipage/window-object.html#dom-document-defaultview */
@@ -47,8 +60,10 @@ namespace CssUI.DOM
         public readonly DocumentType doctype;
         public readonly string contentType;
         public readonly DOMImplementation implementation = new DOMImplementation();
+        /// <summary>
+        /// Returns the Element that is the root element of the document (for example, the <html> element for HTML documents).
+        /// </summary>
         public Element documentElement { get; private set; }
-        internal CssUnitResolver cssUnitResolver;
         #endregion
 
         #region Node Implementation
@@ -60,19 +75,6 @@ namespace CssUI.DOM
         public override int nodeLength => this.childNodes.Count;
 
         public readonly new Document ownerDocument;
-        #endregion
-
-        #region Accessors
-        /// <summary>
-        /// Returns the initial contaiing block
-        /// </summary>
-        internal DOMRect Initial_Containing_Block
-        {/* Docs: https://www.w3.org/TR/css-display-3/#initial-containing-block */
-            get
-            {
-                return documentElement?.Box.Content.Get_Bounds();
-            }
-        }
         #endregion
 
         #region Constructor

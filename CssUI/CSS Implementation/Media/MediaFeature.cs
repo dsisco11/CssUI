@@ -1,7 +1,6 @@
 ﻿using CssUI.CSS.Internal;
 using CssUI.DOM;
 using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace CssUI.CSS.Media
@@ -112,8 +111,7 @@ namespace CssUI.CSS.Media
                          * Otherwise, it evaluates to false.
                          */
                         CssValue value = Values[0];
-                        EMediaFeatureName? nameLookup = CssLookup.Enum_From_Keyword<EMediaFeatureName>((string)value.Value);
-                        if (!nameLookup.HasValue)
+                        if (!CssLookup.Enum_From_Keyword((string)value.Value, out EMediaFeatureName nameLookup))
                         {/* This feature is not supported (or maybe valid) so we need to treat it as if it simply doesnt match */
                             IsValid = false;
                             return false;
@@ -126,19 +124,19 @@ namespace CssUI.CSS.Media
                         {
                             case ECssValueType.KEYWORD:
                                 {
-                                    return Compare_Keyword(document, nameLookup.Value, (string)valueB.Value);
+                                    return Compare_Keyword(document, nameLookup, (string)valueB.Value);
                                 }
                             case ECssValueType.INTEGER:
                             case ECssValueType.NUMBER:
                                 {
-                                    double A = Resolve_Media_Name_Value(document, nameLookup.Value);
+                                    double A = Resolve_Media_Name_Value(document, nameLookup);
                                     double B = (double)valueB.Value;
                                     return !MathExt.floatEq(A, (double)valueB.Value);
                                 }
                             case ECssValueType.DIMENSION:
                             case ECssValueType.RESOLUTION:
                                 {
-                                    double A = Resolve_Media_Name_Value(document, nameLookup.Value);
+                                    double A = Resolve_Media_Name_Value(document, nameLookup);
                                     double B = valueB.Resolve(document.cssUnitResolver);
                                     return !MathExt.floatEq(A, (double)valueB.Value);
                                 }

@@ -274,7 +274,7 @@ namespace CssUI.DOM
         }
         #endregion
 
-        #region Constructor
+        #region Constructors
         private ScrollBox(EFlowDirection block_Flow_Direction, EFlowDirection inline_Base_Direction)
         {
             Block = block_Flow_Direction;
