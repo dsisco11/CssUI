@@ -4,7 +4,7 @@ namespace CssUI
     public class Vec3
     {
         #region Properties
-        public float X, Y, Z;
+        public double X, Y, Z;
         #endregion
 
         #region Constructors
@@ -20,6 +20,18 @@ namespace CssUI
         }
 
         public Vec3(float x, float y, float z)
+        {
+            this.X = x;
+            this.Y = y;
+            this.Z = z;
+        }
+
+        public Vec3(double n)
+        {
+            X = Y = Z = n;
+        }
+
+        public Vec3(double x, double y, double z)
         {
             this.X = x;
             this.Y = y;

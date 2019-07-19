@@ -4,6 +4,7 @@ using CssUI.CSS.Internal;
 using CssUI.DOM.Enums;
 using CssUI.DOM.Geometry;
 using CssUI.DOM.Nodes;
+using System;
 
 namespace CssUI.DOM
 {
@@ -28,10 +29,37 @@ namespace CssUI.DOM
         /// <summary>
         /// If true then the scrollbox has an ongoing smooth scroll operation
         /// </summary>
-        public bool smooth_scroll_flag = false;
+        public bool IsScrolling { get; private set; } = false;
+
+        /// <summary>
+        /// The vertical scroll bar bounds
+        /// </summary>
+        public DOMRectReadOnly VScrollBar { get; private set; } = null;
+        /// <summary>
+        /// The horizontal scroll bar bounds
+        /// </summary>
+        public DOMRectReadOnly HScrollBar { get; private set; } = null;
+/*
+        /// <summary>
+        /// Determines along which edge of this box the (horizontal) scrollbar will be rendered on.
+        /// <para><see cref="EDirection.LTR"/> = Bottom</para>
+        /// <para><see cref="EDirection.RTL"/> = Top</para>
+        /// </summary>
+        public EDirection HScrollbarSide = EDirection.LTR;
+
+        /// <summary>
+        /// Determines along which edge of this box the (vertical) scrollbar will be rendered on.
+        /// <para><see cref="EDirection.LTR"/> = Right</para>
+        /// <para><see cref="EDirection.RTL"/> = Left</para>
+        /// </summary>
+        public EDirection VScrollbarSide = EDirection.LTR;
+*/
         #endregion
 
         #region Accessors
+        /// <summary>
+        /// Horizontal overflow direction
+        /// </summary>
         public EOverflowDirection Overflow_Block
         {
             get
@@ -66,6 +94,9 @@ namespace CssUI.DOM
             }
         }
 
+        /// <summary>
+        /// Vertical overflow direction
+        /// </summary>
         public EOverflowDirection Overflow_Inline
         {
             get
@@ -113,7 +144,7 @@ namespace CssUI.DOM
             }
         }
 
-        public DOMRect ScrollingArea
+        public DOMRect ScrollArea
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#scrolling-area */
             get
             {
@@ -261,19 +292,113 @@ namespace CssUI.DOM
         }
         #endregion
 
-        void abort_scroll()
+        #region Utility
+        /// <summary>
+        /// Animation time for smooth scrolling
+        /// </summary>
+        private static TimeSpan Smooth_Scroll_Anim_Time = TimeSpan.FromMilliseconds(350);
+        private ScheduledFunction smooth_scroller = null;
+        private double Smooth_Scroll_End_Time = -1;
+        /// <summary>
+        /// The distance from our smooth scroll start position to the end position
+        /// </summary>
+        private DOMPoint Smooth_Scroll_Distance = null;
+        /// <summary>
+        /// The position this scrollbox should be at when the smooth scroll ends
+        /// </summary>
+        private DOMPoint Smooth_Scroll_Target = null;
+
+        /// <summary>
+        /// Called by the smooth scroller everytime it ticks
+        /// </summary>
+        private void _smooth_scroll_tick()
         {
-            /* XXX */
+            /* How much time has elapsed since the start of the smooth scroll */
+            double deltaTime = Smooth_Scroll_End_Time - DateTime.Now.Ticks;
+            /* We calculate this in reverse, Interpolation goes from [1.0 - 0.0] as time progresses */
+            double Interpolation = 1.0 - (deltaTime / Smooth_Scroll_Anim_Time.Ticks);
+            /* Find out how much to subtract from our target position to the the position we should be at */
+            double deltaX = Interpolation * Smooth_Scroll_Distance.x;
+            double deltaY = Interpolation * Smooth_Scroll_Distance.y;
+            /* Set our current position to the target position minus our animations progression */
+            ScrollX = Smooth_Scroll_Target.x - deltaX;
+            ScrollY = Smooth_Scroll_Target.y - deltaY;
         }
 
-        internal void Perform_Scroll(DOMPoint pos, Element element, EScrollBehavior behavior = EScrollBehavior.Auto)
-        {/* Docs: https://www.w3.org/TR/cssom-view-1/#perform-a-scroll */
-            abort_scroll();
-            if (behavior == EScrollBehavior.Auto && !ReferenceEquals(null, element) && element.Style.ScrollBehavior.)
+        /// <summary>
+        /// Cancels the ongoing smooth scroll (if any) and resets all associated vars
+        /// </summary>
+        private void abort_smooth_scroll()
+        {
+            if (!ReferenceEquals(null, smooth_scroller))
             {
-                if ( element.Style.ScrollBehavior == EScrollBehavior.Smooth)
+                smooth_scroller.Stop();
             }
+
+            if (IsScrolling)
+            {/* If we are in the middle of a smooth scroll then just instant finish it */
+                ScrollX = Smooth_Scroll_Target.x;
+                ScrollY = Smooth_Scroll_Target.y;
+                IsScrolling = false;
+            }
+
+            Smooth_Scroll_End_Time = -1;
+            Smooth_Scroll_Distance = null;
+            Smooth_Scroll_Target = null;
         }
+        private void scroll_to_smooth(DOMPoint location)
+        {/* https://www.w3.org/TR/cssom-view-1/#concept-smooth-scroll */
+            if (ReferenceEquals(null, smooth_scroller))
+            {
+                smooth_scroller = new ScheduledFunction(this._smooth_scroll_tick, TimeSpan.FromMilliseconds(2));
+            }
+
+            /* Find distance between current position and target position */
+            double distX = location.x - ScrollX;
+            double distY = location.y - ScrollY;
+
+            /* Calculate our delta step size so we know how much to add to our scroll position per tick */
+            double deltaX = distX / (double)Smooth_Scroll_Anim_Time.Ticks;
+            double deltaY = distY / (double)Smooth_Scroll_Anim_Time.Ticks;
+
+            Smooth_Scroll_Target = location;
+            Smooth_Scroll_Distance = new DOMPoint(distX, distY);
+
+            /* Set the end time */
+            Smooth_Scroll_End_Time = (DateTime.Now + Smooth_Scroll_Anim_Time).Ticks;
+            /* Start scrolling */
+            smooth_scroller.Start();
+        }
+
+        private void scroll_to_instant(DOMPoint location)
+        {/* https://www.w3.org/TR/cssom-view-1/#concept-instant-scroll */
+            this.ScrollX = location.x;
+            this.ScrollY = location.y;
+        }
+        #endregion
+
+        #region Scrolling
+        internal void Perform_Scroll(DOMPoint location, Element element, EScrollBehavior behavior = EScrollBehavior.Auto)
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#perform-a-scroll */
+            abort_smooth_scroll();
+            if (behavior == EScrollBehavior.Auto && !ReferenceEquals(null, element) && element.Style.ScrollBehavior == EScrollBehavior.Smooth)
+            {
+                if (element.Style.ScrollBehavior == EScrollBehavior.Smooth)
+                {
+                    scroll_to_smooth(location);
+                    return;
+                }
+            }
+            else if (behavior == EScrollBehavior.Smooth)
+            {
+                scroll_to_smooth(location);
+                return;
+            }
+
+            scroll_to_instant(location);
+        }
+
+        #endregion
 
     }
 }

@@ -57,6 +57,24 @@ namespace CssUI.CSS.Internal
         }
         #endregion
 
+        #region CSSOM
+        /// <summary>
+        /// Normalizess a decimal value such that it is not NaN nor Infinity
+        /// </summary>
+        /// <param name="d"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double Normalize_Non_Finite(double d)
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#normalize-non-finite-values */
+            if (double.IsNaN(d) || double.IsInfinity(d))
+            {
+                return 0;
+            }
+
+            return d;
+        }
+        #endregion
+
         #region Fonts
 
         /// <summary>
@@ -273,7 +291,7 @@ namespace CssUI.CSS.Internal
             /* Root elements */
             if (ReferenceEquals(null, Target.parentElement))
             {
-                return Target.ownerDocument.Viewport?.Get_Bounds();
+                return Target.ownerDocument.Viewport?.getBoundingClientRect();
             }
             /* Other elements */
             switch (Target.Style.Positioning)
@@ -303,7 +321,7 @@ namespace CssUI.CSS.Internal
                 case EPositioning.Fixed:
                     {/* If the element has 'position: fixed', the containing block is established by the viewport in the case of continuous media or the page area in the case of paged media. */
                         Viewport view = Target.ownerDocument.Viewport;
-                        return view.Get_Bounds();
+                        return view.getBoundingClientRect();
                     }
                 case EPositioning.Absolute:
                     {

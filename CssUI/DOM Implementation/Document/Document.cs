@@ -42,6 +42,7 @@ namespace CssUI.DOM
         /// </summary>
         public readonly Viewport Viewport;
 
+        public readonly EQuirksMode Mode = EQuirksMode.NoQuirks;
         public readonly string Origin = null;
         public readonly DocumentType doctype;
         public readonly string contentType;
@@ -254,10 +255,7 @@ namespace CssUI.DOM
         #region Internal States
         internal bool is_fully_active
         {/* Docs: https://html.spec.whatwg.org/multipage/#fully-active */
-            get
-            {/* XXX: Implement this logic */
-                return true;
-            }
+            get => !ReferenceEquals(null, BrowsingContext) && ReferenceEquals(this, BrowsingContext.activeDocument);
         }
         #endregion
 

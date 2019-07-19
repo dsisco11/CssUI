@@ -54,23 +54,24 @@ namespace CssUI.DOM
         public long innerHeight => 0;
 
         // viewport scrolling
-        /*[Replaceable] readonly attribute double scrollX;
-        [Replaceable] readonly attribute double pageXOffset;
-        [Replaceable] readonly attribute double scrollY;
-        [Replaceable] readonly attribute double pageYOffset;
-        void scroll(optional ScrollToOptions options);
-        void scroll(unrestricted double x, unrestricted double y);
-        void scrollTo(optional ScrollToOptions options);
-        void scrollTo(unrestricted double x, unrestricted double y);
-        void scrollBy(optional ScrollToOptions options);
-        void scrollBy(unrestricted double x, unrestricted double y);
+        public double scrollX { get; set; }
+        public double pageXOffset { get; set; }
+        public double scrollY { get; set; }
+        public double pageYOffset { get; set; }
+
+        public void Scroll(ScrollToOptions options);
+        public void Scroll(double x, double y);
+        public void ScrollTo(ScrollToOptions options);
+        public void ScrollTo(double x, double y);
+        public void ScrollBy(ScrollToOptions options);
+        public void ScrollBy(double x, double y);
 
         // client
-        [Replaceable] readonly attribute long screenX;
-        [Replaceable] readonly attribute long screenY;
-        [Replaceable] readonly attribute long outerWidth;
-        [Replaceable] readonly attribute long outerHeight;
-        [Replaceable] readonly attribute double devicePixelRatio;*/
+        public long screenX { get; set; }
+        public long screenY { get; set; }
+        public long outerWidth { get; set; }
+        public long outerHeight { get; set; }
+        public double devicePixelRatio { get; set; }
         #endregion
 
         #region Constructors

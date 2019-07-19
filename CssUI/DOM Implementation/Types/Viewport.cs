@@ -10,7 +10,7 @@ namespace CssUI.DOM
     public class Viewport : EventTarget
     {/* Docs: https://wicg.github.io/visual-viewport/#the-visualviewport-interface */
         #region Properties
-        public readonly Document document;
+        public Document document { get; private set; }
 
         public long Left;
         public long Top;
@@ -18,7 +18,7 @@ namespace CssUI.DOM
         public long Width;
         public long Height;
 
-        internal ScrollBox ScrollingBox = null;
+        internal ScrollBox ScrollBox { get; set; } = null;
         #endregion
 
         #region Events
@@ -47,7 +47,7 @@ namespace CssUI.DOM
         }
         #endregion
 
-        public DOMRect Get_Bounds()
+        public DOMRect getBoundingClientRect()
         {
             return new DOMRect(Left, Top, Width, Height);
         }

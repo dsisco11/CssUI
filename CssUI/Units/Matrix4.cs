@@ -555,10 +555,33 @@ namespace CssUI
         // Use a matrix to transform a 3D point with the * operator
         public static Vec3 operator *(Matrix4 m, Vec3 Point)
         {
-            float x = (Point.X * m.Data[0] + Point.Y * m.Data[4] + Point.Z * m.Data[8]) + m.Data[12];
-            float y = (Point.X * m.Data[1] + Point.Y * m.Data[5] + Point.Z * m.Data[9]) + m.Data[13];
-            float z = (Point.X * m.Data[2] + Point.Y * m.Data[6] + Point.Z * m.Data[10]) + m.Data[14];
+            double x = (Point.X * m.Data[0] + Point.Y * m.Data[4] + Point.Z * m.Data[8]) + m.Data[12];
+            double y = (Point.X * m.Data[1] + Point.Y * m.Data[5] + Point.Z * m.Data[9]) + m.Data[13];
+            double z = (Point.X * m.Data[2] + Point.Y * m.Data[6] + Point.Z * m.Data[10]) + m.Data[14];
             return new Vec3(x, y, z);
+        }
+
+
+        public override int GetHashCode()
+        {
+            int hash = 17;
+            hash = (hash * 31) + Data[0].GetHashCode();
+            hash = (hash * 31) + Data[1].GetHashCode();
+            hash = (hash * 31) + Data[2].GetHashCode();
+            hash = (hash * 31) + Data[3].GetHashCode();
+            hash = (hash * 31) + Data[4].GetHashCode();
+            hash = (hash * 31) + Data[5].GetHashCode();
+            hash = (hash * 31) + Data[6].GetHashCode();
+            hash = (hash * 31) + Data[7].GetHashCode();
+            hash = (hash * 31) + Data[8].GetHashCode();
+            hash = (hash * 31) + Data[9].GetHashCode();
+            hash = (hash * 31) + Data[10].GetHashCode();
+            hash = (hash * 31) + Data[11].GetHashCode();
+            hash = (hash * 31) + Data[12].GetHashCode();
+            hash = (hash * 31) + Data[13].GetHashCode();
+            hash = (hash * 31) + Data[14].GetHashCode();
+            hash = (hash * 31) + Data[15].GetHashCode();
+            return hash;
         }
         #endregion
 

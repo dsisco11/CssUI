@@ -185,47 +185,7 @@ namespace CssUI.DOM.Nodes
             /* Docs: https://dom.spec.whatwg.org/#concept-node-clone */
             return _clone_node(this, null, deep);
         }
-
-        #region Equality
-        public bool isEqualNode(Node otherNode) => this.Equals(otherNode);
-
-        public override bool Equals(object obj)
-        {/* https://dom.spec.whatwg.org/#concept-node-equals */
-            if (ReferenceEquals(null, obj))
-                return false;
-
-            if (!(obj is Node B))
-                return false;
-
-            if (this.nodeType != B.nodeType)
-                return false;
-
-            if (this.childNodes.Count != B.childNodes.Count)
-                return false;
-
-            for (int i = 0; i < this.childNodes.Count; i++)
-            {
-                if (!childNodes[i].Equals(B.childNodes[i]))
-                    return false;
-            }
-
-            return true;
-        }
-
-        public override int GetHashCode()
-        {
-            int hash = 17;
-            hash = hash * 31 + (int)nodeType;
-
-            for (int i = 0; i < childNodes.Count; i++)
-            {
-                hash = hash * 31 + childNodes[i].GetHashCode();
-            }
-
-            return hash;
-        }
-        #endregion
-
+        
         public EDocumentPosition compareDocumentPosition(Node other)
         {/* Docs: https://dom.spec.whatwg.org/#dom-node-comparedocumentposition */
             if (ReferenceEquals(this, other))
@@ -312,6 +272,46 @@ namespace CssUI.DOM.Nodes
 
         #endregion
 
+        #region Equality
+        public bool isEqualNode(Node otherNode) => this.Equals(otherNode);
+
+        public override bool Equals(object obj)
+        {/* https://dom.spec.whatwg.org/#concept-node-equals */
+            if (ReferenceEquals(null, obj))
+                return false;
+
+            if (!(obj is Node B))
+                return false;
+
+            if (this.nodeType != B.nodeType)
+                return false;
+
+            if (this.childNodes.Count != B.childNodes.Count)
+                return false;
+
+            for (int i = 0; i < this.childNodes.Count; i++)
+            {
+                if (!childNodes[i].Equals(B.childNodes[i]))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = 17;
+            hash = hash * 31 + (int)nodeType;
+
+            for (int i = 0; i < childNodes.Count; i++)
+            {
+                hash = hash * 31 + childNodes[i].GetHashCode();
+            }
+
+            return hash;
+        }
+        #endregion
+
         #region Event Stuff
         public override EventTarget get_the_parent(Event @event)
         {
@@ -360,7 +360,6 @@ namespace CssUI.DOM.Nodes
         #endregion
 
         #region Internal Utilitys
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static Node _clone_node(Node node, Document document = null, bool clone_children = false)
         {/* Docs: https://dom.spec.whatwg.org/#concept-node-clone */

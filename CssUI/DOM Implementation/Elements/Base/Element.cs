@@ -1,4 +1,5 @@
 ﻿using CssUI.CSS;
+using CssUI.CSS.Internal;
 using CssUI.DOM.Enums;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Geometry;
@@ -228,12 +229,13 @@ namespace CssUI.DOM
         #endregion
 
         #region Internal States
+        internal bool is_root => ReferenceEquals(null, parentNode);
+
         /// <summary>
         /// An element is being rendered if it has any associated CSS layout boxes, SVG layout boxes, or some equivalent in other styling languages.
         /// </summary>
         /// XXX: Implement this logic
-        internal virtual bool is_being_rendered { get { return true; } }
-
+        internal virtual bool is_being_rendered => !ReferenceEquals(null, Box);
 
         internal bool is_in_formal_activation_state
         {/* Docs:  */
@@ -333,6 +335,45 @@ namespace CssUI.DOM
         internal bool is_shadowhost
         {/* Docs: https://dom.spec.whatwg.org/#element-shadow-host */
             get => !ReferenceEquals(null, shadowRoot);
+        }
+
+        internal bool is_potentially_scrollable
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#potentially-scrollable */
+            get
+            {
+                /* An element is potentially scrollable if all of the following conditions are true: */
+                /* The element has an associated CSS layout box. */
+                if (!ReferenceEquals(null, this.Box))
+                {/* The element is not the HTML body element, or it is and the root element’s used value of the overflow-x or overflow-y properties is not visible. */
+                    var root = getRootNode() as Element;
+                    if (!ReferenceEquals(this, ownerDocument.body) || (ReferenceEquals(this, ownerDocument.body) && (root.Style.Overflow_X != EOverflowMode.Visible || root.Style.Overflow_Y != EOverflowMode.Visible)))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Do any of our elements exceed our bounds?
+        /// </summary>
+        internal bool has_overflow
+        {
+            get
+            {
+                if (0 != (Style.Overflow_X & (EOverflowMode.Clip)) || 0 != (Style.Overflow_Y & (EOverflowMode.Clip)))
+                    return false;
+
+                var bounds = this.getBoundingClientRect();
+                if (bounds.left < Box.Padding.Left || bounds.right > Box.Padding.Right)
+                    return true;
+                if (bounds.top < Box.Padding.Top || bounds.bottom > Box.Padding.Bottom)
+                    return true;
+
+                return false;
+            }
         }
         #endregion
 
@@ -772,7 +813,7 @@ namespace CssUI.DOM
         }
         #endregion
 
-        #region Client Rects
+        #region Geometry / Client Rects
         public LinkedList<DOMRect> getClientRects()
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-element-getclientrects */
             /* XXX: SVG layout box handling needed here */
@@ -813,10 +854,209 @@ namespace CssUI.DOM
         }
         #endregion
 
-        #region Scrolling
-        internal ScrollBox ScrollingBox = null;
+        #region Scrolling Internal Utility
 
-        internal void scroll_element_into_view(EScrollLogicalPosition block, EScrollLogicalPosition inline)
+        internal bool scroll_bounds_into_view(Element ancestor, DOMRect elementBoundingBorderBox, ScrollBox ancestorScrollBox, EScrollLogicalPosition block, EScrollLogicalPosition inline, EScrollBehavior behavior)
+        {
+            /* Edge definitions: https://www.w3.org/TR/cssom-view-1/#beginning-edges */
+            double scrollingBoxEdgeA = 0; double elementEdgeA = 0;/* X */
+            double scrollingBoxEdgeB = 0; double elementEdgeB = 0;/* X */
+            double scrollingBoxEdgeC = 0; double elementEdgeC = 0;/* Y */
+            double scrollingBoxEdgeD = 0; double elementEdgeD = 0;/* Y */
+
+            var scrollBox = ancestorScrollBox;
+            var scrollArea = scrollBox.ScrollArea;
+
+            var OverflowBlock = scrollBox.Overflow_Block;
+            var OverflowInline = scrollBox.Overflow_Inline;
+
+            switch (OverflowBlock)
+            {
+                case CSS.Enums.EOverflowDirection.Leftward:
+                    {
+                        switch (OverflowInline)
+                        {
+                            case CSS.Enums.EOverflowDirection.Upward:
+                                {
+                                    scrollingBoxEdgeA = scrollArea.bottom;
+                                    scrollingBoxEdgeB = scrollArea.top;
+                                    scrollingBoxEdgeC = scrollArea.right;
+                                    scrollingBoxEdgeD = scrollArea.left;
+
+                                    elementEdgeA = elementBoundingBorderBox.bottom;
+                                    elementEdgeB = elementBoundingBorderBox.top;
+                                    elementEdgeC = elementBoundingBorderBox.right;
+                                    elementEdgeD = elementBoundingBorderBox.left;
+                                }
+                                break;
+                            case CSS.Enums.EOverflowDirection.Downward:
+                                {
+                                    scrollingBoxEdgeA = scrollArea.top;
+                                    scrollingBoxEdgeB = scrollArea.bottom;
+                                    scrollingBoxEdgeC = scrollArea.left;
+                                    scrollingBoxEdgeD = scrollArea.right;
+
+                                    elementEdgeA = elementBoundingBorderBox.top;
+                                    elementEdgeB = elementBoundingBorderBox.bottom;
+                                    elementEdgeC = elementBoundingBorderBox.left;
+                                    elementEdgeD = elementBoundingBorderBox.right;
+                                }
+                                break;
+                        }
+                    }
+                    break;
+                case CSS.Enums.EOverflowDirection.Rightward:
+                    {
+                        switch (OverflowInline)
+                        {
+                            case CSS.Enums.EOverflowDirection.Upward:
+                                {
+                                    scrollingBoxEdgeA = scrollArea.bottom;
+                                    scrollingBoxEdgeB = scrollArea.top;
+                                    scrollingBoxEdgeC = scrollArea.left;
+                                    scrollingBoxEdgeD = scrollArea.right;
+
+                                    elementEdgeA = elementBoundingBorderBox.bottom;
+                                    elementEdgeB = elementBoundingBorderBox.top;
+                                    elementEdgeC = elementBoundingBorderBox.left;
+                                    elementEdgeD = elementBoundingBorderBox.right;
+                                }
+                                break;
+                            case CSS.Enums.EOverflowDirection.Downward:
+                                {
+                                    scrollingBoxEdgeA = scrollArea.top;
+                                    scrollingBoxEdgeB = scrollArea.bottom;
+                                    scrollingBoxEdgeC = scrollArea.left;
+                                    scrollingBoxEdgeD = scrollArea.right;
+
+                                    elementEdgeA = elementBoundingBorderBox.top;
+                                    elementEdgeB = elementBoundingBorderBox.bottom;
+                                    elementEdgeC = elementBoundingBorderBox.left;
+                                    elementEdgeD = elementBoundingBorderBox.right;
+                                }
+                                break;
+                        }
+                    }
+                    break;
+            }
+
+            /* 7) Let element width be the distance between element edge C and element edge D. */
+            var elementWidth = elementEdgeD - elementEdgeC;
+            var scrollingBoxWidth = scrollingBoxEdgeD - scrollingBoxEdgeC;
+
+            /* 9) Let position be the scroll position scrolling box would have by following these steps: */
+            DOMPoint position = new DOMPoint();
+            switch (block)
+            {
+                case EScrollLogicalPosition.Start:
+                    position.x = (scrollingBoxEdgeA - elementEdgeA);
+                    break;
+                case EScrollLogicalPosition.End:
+                    position.x = (scrollingBoxEdgeB - (elementEdgeB - elementEdgeA));
+                    break;
+                case EScrollLogicalPosition.Center:
+                    position.x = ((scrollingBoxEdgeB - scrollingBoxEdgeA) * 0.5) - ((elementEdgeB - elementEdgeA) * 0.5);
+                    break;
+                case EScrollLogicalPosition.Nearest:
+                    {
+                        /* If element edge A and element edge B are both outside scrolling box edge A and scrolling box edge B: Do nothing. */
+                        if (elementEdgeA < scrollingBoxEdgeA && elementEdgeB > scrollingBoxEdgeB)
+                        {
+                            break;
+                        }
+
+                        /* If element edge A is outside scrolling box edge A and element width is less than scrolling box width */
+                        if (elementEdgeA < scrollingBoxEdgeA && elementWidth < scrollingBoxWidth)
+                        {/* Align element edge A with scrolling box edge A. */
+                            position.x = (scrollingBoxEdgeA - elementEdgeA);
+                        }
+
+                        /* If element edge B is outside scrolling box edge B and element width is greater than scrolling box width */
+                        if (elementEdgeB > scrollingBoxEdgeB && elementWidth > scrollingBoxWidth)
+                        {/* Align element edge A with scrolling box edge A. */
+                            position.x = (scrollingBoxEdgeA - elementEdgeA);
+                        }
+
+                        /* If element edge A is outside scrolling box edge A and element width is greater than scrolling box width */
+                        if (elementEdgeA < scrollingBoxEdgeA && elementWidth > scrollingBoxWidth)
+                        {/* Align element edge B with scrolling box edge B. */
+                            position.x = (scrollingBoxEdgeB - (elementEdgeB - elementEdgeA));
+                        }
+
+                        /* If element edge B is outside scrolling box edge B and element width is less than scrolling box width */
+                        if (elementEdgeB > scrollingBoxEdgeB && elementWidth < scrollingBoxWidth)
+                        {/* Align element edge B with scrolling box edge B. */
+                            position.x = (scrollingBoxEdgeB - (elementEdgeB - elementEdgeA));
+                        }
+                    }
+                    break;
+            }
+
+            switch (inline)
+            {
+                case EScrollLogicalPosition.Start:
+                    position.y = (scrollingBoxEdgeC - elementEdgeC);
+                    break;
+                case EScrollLogicalPosition.End:
+                    position.y = (scrollingBoxEdgeD - (elementEdgeD - elementEdgeC));
+                    break;
+                case EScrollLogicalPosition.Center:
+                    position.y = ((scrollingBoxEdgeD - scrollingBoxEdgeC) * 0.5) - ((elementEdgeD - elementEdgeC) * 0.5);
+                    break;
+                case EScrollLogicalPosition.Nearest:
+                    {
+                        /* If element edge C and element edge D are both outside scrolling box edge C and scrolling box edge D */
+                        if (elementEdgeC < scrollingBoxEdgeC && elementEdgeD > scrollingBoxEdgeD)
+                        {
+                        }
+                        /* If element edge C is outside scrolling box edge C and element width is less than scrolling box width */
+                        if (elementEdgeC < scrollingBoxEdgeC && elementWidth < scrollingBoxWidth)
+                        {
+                            position.y = (scrollingBoxEdgeC - elementEdgeC);
+                        }
+                        /* If element edge D is outside scrolling box edge D and element width is greater than scrolling box width */
+                        if (elementEdgeD > scrollingBoxEdgeD && elementWidth > scrollingBoxWidth)
+                        {
+                            position.y = (scrollingBoxEdgeC - elementEdgeC);
+                        }
+                        /* If element edge C is outside scrolling box edge C and element width is greater than scrolling box width */
+                        if (elementEdgeC < scrollingBoxEdgeC && elementWidth > scrollingBoxWidth)
+                        {
+                            position.y = (scrollingBoxEdgeD - (elementEdgeD - elementEdgeC));
+                        }
+                        /* If element edge D is outside scrolling box edge D and element width is less than scrolling box width */
+                        if (elementEdgeD > scrollingBoxEdgeD && elementWidth < scrollingBoxWidth)
+                        {
+                            position.y = (scrollingBoxEdgeC - elementEdgeC);
+                        }
+                    }
+                    break;
+            }
+
+            /* 10) If position is the same as scrolling box’s current scroll position, and scrolling box does not have an ongoing smooth scroll, abort these steps. */
+            if (MathExt.floatEq(position.x, scrollBox.ScrollX) && MathExt.floatEq(position.y, scrollBox.ScrollY) && !scrollBox.IsScrolling)
+                return false;
+
+            Element associatedElement = null;
+            if (ReferenceEquals(null, scrollBox.Owner))
+            {/* Viewport */
+                associatedElement = scrollBox.View.document.activeElement;
+            }
+            else
+            {/* Element */
+                associatedElement = scrollBox.Owner;
+            }
+
+            scrollBox.Perform_Scroll(position, ancestor, behavior);
+            return true;
+        }
+
+        /// <summary>
+        /// Internal utility function for scrolling the current element into view. its a long process that is probably referenced a few different times so it gets its own function.
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="inline"></param>
+        internal void scroll_element_into_view(EScrollLogicalPosition block, EScrollLogicalPosition inline, EScrollBehavior behavior = EScrollBehavior.Auto)
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#scroll-an-element-into-view */
             /* To scroll an element into view element, with a ScrollIntoViewOptions dictionary options, 
              * means to run these steps for each ancestor element or viewport that establishes a scrolling box scrolling box, 
@@ -832,232 +1072,483 @@ namespace CssUI.DOM
                     if (!ancestor.ownerDocument.Origin.Equals(ownerDocument.Origin))
                         break;
 
-                    var elementBoundingBorderBox = ancestor.getBoundingClientRect();
-                    /* Edge definitions: https://www.w3.org/TR/cssom-view-1/#beginning-edges */
-                    double scrollingBoxEdgeA = 0; double elementEdgeA = 0;/* X */
-                    double scrollingBoxEdgeB = 0; double elementEdgeB = 0;/* X */
-                    double scrollingBoxEdgeC = 0; double elementEdgeC = 0;/* Y */
-                    double scrollingBoxEdgeD = 0; double elementEdgeD = 0;/* Y */
-
-                    var OverflowBlock = ancestor.ScrollingBox.Overflow_Block;
-                    var OverflowInline = ancestor.ScrollingBox.Overflow_Inline;
-
-                    var scrollBox = ancestor.ScrollingBox;
-                    var scrollArea = ancestor.ScrollingBox.ScrollingArea;
-                    var borderArea = ancestor.Box.Border.Get_Bounds();
-
-                    switch (OverflowBlock)
-                    {
-                        case CSS.Enums.EOverflowDirection.Leftward:
-                            {
-                                switch (OverflowInline)
-                                {
-                                    case CSS.Enums.EOverflowDirection.Upward:
-                                        {
-                                            scrollingBoxEdgeA = scrollArea.bottom;
-                                            scrollingBoxEdgeB = scrollArea.top;
-                                            scrollingBoxEdgeC = scrollArea.right;
-                                            scrollingBoxEdgeD = scrollArea.left;
-
-                                            elementEdgeA = borderArea.bottom;
-                                            elementEdgeB = borderArea.top;
-                                            elementEdgeC = borderArea.right;
-                                            elementEdgeD = borderArea.left;
-                                        }
-                                        break;
-                                    case CSS.Enums.EOverflowDirection.Downward:
-                                        {
-                                            scrollingBoxEdgeA = scrollArea.top;
-                                            scrollingBoxEdgeB = scrollArea.bottom;
-                                            scrollingBoxEdgeC = scrollArea.left;
-                                            scrollingBoxEdgeD = scrollArea.right;
-
-                                            elementEdgeA = borderArea.top;
-                                            elementEdgeB = borderArea.bottom;
-                                            elementEdgeC = borderArea.left;
-                                            elementEdgeD = borderArea.right;
-                                        }
-                                        break;
-                                }
-                            }
-                            break;
-                        case CSS.Enums.EOverflowDirection.Rightward:
-                            {
-                                switch (OverflowInline)
-                                {
-                                    case CSS.Enums.EOverflowDirection.Upward:
-                                        {
-                                            scrollingBoxEdgeA = scrollArea.bottom;
-                                            scrollingBoxEdgeB = scrollArea.top;
-                                            scrollingBoxEdgeC = scrollArea.left;
-                                            scrollingBoxEdgeD = scrollArea.right;
-
-                                            elementEdgeA = borderArea.bottom;
-                                            elementEdgeB = borderArea.top;
-                                            elementEdgeC = borderArea.left;
-                                            elementEdgeD = borderArea.right;
-                                        }
-                                        break;
-                                    case CSS.Enums.EOverflowDirection.Downward:
-                                        {
-                                            scrollingBoxEdgeA = scrollArea.top;
-                                            scrollingBoxEdgeB = scrollArea.bottom;
-                                            scrollingBoxEdgeC = scrollArea.left;
-                                            scrollingBoxEdgeD = scrollArea.right;
-
-                                            elementEdgeA = borderArea.top;
-                                            elementEdgeB = borderArea.bottom;
-                                            elementEdgeC = borderArea.left;
-                                            elementEdgeD = borderArea.right;
-                                        }
-                                        break;
-                                }
-                            }
-                            break;
-                    }
-
-                    /* 7) Let element width be the distance between element edge C and element edge D. */
-                    var elementWidth = elementEdgeD - elementEdgeC;
-                    var scrollingBoxWidth = scrollingBoxEdgeD - scrollingBoxEdgeC;
-
-                    /* 9) Let position be the scroll position scrolling box would have by following these steps: */
-                    DOMPoint position = new DOMPoint();
-                    switch (block)
-                    {
-                        case EScrollLogicalPosition.Start:
-                            position.x = (scrollingBoxEdgeA - elementEdgeA);
-                            break;
-                        case EScrollLogicalPosition.End:
-                            position.x = (scrollingBoxEdgeB - (elementEdgeB - elementEdgeA));
-                            break;
-                        case EScrollLogicalPosition.Center:
-                            position.x = ((scrollingBoxEdgeB - scrollingBoxEdgeA) * 0.5) - ((elementEdgeB - elementEdgeA) * 0.5);
-                            break;
-                        case EScrollLogicalPosition.Nearest:
-                            {
-                                /* If element edge A and element edge B are both outside scrolling box edge A and scrolling box edge B: Do nothing. */
-                                if (elementEdgeA < scrollingBoxEdgeA && elementEdgeB > scrollingBoxEdgeB)
-                                {
-                                    break;
-                                }
-
-                                /* If element edge A is outside scrolling box edge A and element width is less than scrolling box width */
-                                if (elementEdgeA < scrollingBoxEdgeA && elementWidth < scrollingBoxWidth)
-                                {/* Align element edge A with scrolling box edge A. */
-                                    position.x = (scrollingBoxEdgeA - elementEdgeA);
-                                }
-
-                                /* If element edge B is outside scrolling box edge B and element width is greater than scrolling box width */
-                                if (elementEdgeB > scrollingBoxEdgeB && elementWidth > scrollingBoxWidth)
-                                {/* Align element edge A with scrolling box edge A. */
-                                    position.x = (scrollingBoxEdgeA - elementEdgeA);
-                                }
-
-                                /* If element edge A is outside scrolling box edge A and element width is greater than scrolling box width */
-                                if (elementEdgeA < scrollingBoxEdgeA && elementWidth > scrollingBoxWidth)
-                                {/* Align element edge B with scrolling box edge B. */
-                                    position.x = (scrollingBoxEdgeB - (elementEdgeB - elementEdgeA));
-                                }
-
-                                /* If element edge B is outside scrolling box edge B and element width is less than scrolling box width */
-                                if (elementEdgeB > scrollingBoxEdgeB && elementWidth < scrollingBoxWidth)
-                                {/* Align element edge B with scrolling box edge B. */
-                                    position.x = (scrollingBoxEdgeB - (elementEdgeB - elementEdgeA));
-                                }
-                            }
-                            break;
-                    }
-
-                    switch (inline)
-                    {
-                        case EScrollLogicalPosition.Start:
-                            position.y = (scrollingBoxEdgeC - elementEdgeC);
-                            break;
-                        case EScrollLogicalPosition.End:
-                            position.y = (scrollingBoxEdgeD - (elementEdgeD - elementEdgeC));
-                            break;
-                        case EScrollLogicalPosition.Center:
-                            position.y = ((scrollingBoxEdgeD - scrollingBoxEdgeC) * 0.5) - ((elementEdgeD - elementEdgeC) * 0.5);
-                            break;
-                        case EScrollLogicalPosition.Nearest:
-                            {
-                                /* If element edge C and element edge D are both outside scrolling box edge C and scrolling box edge D */
-                                if (elementEdgeC < scrollingBoxEdgeC && elementEdgeD > scrollingBoxEdgeD)
-                                {
-                                }
-                                /* If element edge C is outside scrolling box edge C and element width is less than scrolling box width */
-                                if (elementEdgeC < scrollingBoxEdgeC && elementWidth < scrollingBoxWidth)
-                                {
-                                    position.y = (scrollingBoxEdgeC - elementEdgeC);
-                                }
-                                /* If element edge D is outside scrolling box edge D and element width is greater than scrolling box width */
-                                if (elementEdgeD > scrollingBoxEdgeD && elementWidth > scrollingBoxWidth)
-                                {
-                                    position.y = (scrollingBoxEdgeC - elementEdgeC);
-                                }
-                                /* If element edge C is outside scrolling box edge C and element width is greater than scrolling box width */
-                                if (elementEdgeC < scrollingBoxEdgeC && elementWidth > scrollingBoxWidth)
-                                {
-                                    position.y = (scrollingBoxEdgeD - (elementEdgeD - elementEdgeC));
-                                }
-                                /* If element edge D is outside scrolling box edge D and element width is less than scrolling box width */
-                                if (elementEdgeD > scrollingBoxEdgeD && elementWidth < scrollingBoxWidth)
-                                {
-                                    position.y = (scrollingBoxEdgeC - elementEdgeC);
-                                }
-                            }
-                            break;
-                    }
-
-                    /* 10) If position is the same as scrolling box’s current scroll position, and scrolling box does not have an ongoing smooth scroll, abort these steps. */
-                    if (MathExt.floatEq(position.x, scrollBox.ScrollX) && MathExt.floatEq(position.y, scrollBox.ScrollY) && !scrollBox.smooth_scroll_flag)
-                        break;
-
-                    Element associatedElement = null;
-                    if (ReferenceEquals(null, scrollBox.Owner))
-                    {/* Viewport */
-                        associatedElement = scrollBox.View.document.activeElement;
-                    }
-                    else
-                    {/* Element */
-                        associatedElement = scrollBox.Owner;
-                    }
-
-                    EScrollBehavior behavior = EScrollBehavior.Auto;
-
+                    scroll_bounds_into_view(ancestor, this.getBoundingClientRect(), ancestor.ScrollBox, block, inline, behavior);
                 }
+            }
+
+            /* Now also do the viewport... */
+            scroll_bounds_into_view(null, this.getBoundingClientRect(), ownerDocument.Viewport.ScrollBox, block, inline, behavior);
+        }
+
+        internal void scroll_element(double x, double y, EScrollBehavior behavior = EScrollBehavior.Auto)
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#scroll-an-element */
+            /* 1) Let box be element’s associated scrolling box. */
+            var box = ScrollBox;
+            var scrollArea = box.ScrollArea;
+            /* 2) If box has rightward overflow direction */
+            if (ScrollBox.Overflow_Block == CSS.Enums.EOverflowDirection.Rightward)
+            {
+                x = MathExt.Max(0, MathExt.Min(x, scrollArea.width - Box.Padding.Width));
+            }
+            else
+            {
+                x = MathExt.Min(0, MathExt.Max(x, Box.Padding.Width - scrollArea.width));
+            }
+
+            /* 3) If box has downward overflow direction */
+            if (ScrollBox.Overflow_Inline == CSS.Enums.EOverflowDirection.Downward)
+            {
+                y = MathExt.Max(0, MathExt.Min(y, scrollArea.height - Box.Padding.Height));
+            }
+            else
+            {
+                y = MathExt.Min(0, MathExt.Max(y, Box.Padding.Height - scrollArea.height));
+            }
+
+            /* 4) Let position be the scroll position box would have by aligning scrolling area x-coordinate x with the left of box and aligning scrolling area y-coordinate y with the top of box. */
+            /* XXX: Im not positive that this is what it means for me to do but it's my best guess that it WANTS me to offset our X/Y by the boxs' origin so that the scroll position we give it is RELATIVE to the scrolling box itsself. */
+            var origin = box.Origin;
+            var position = new DOMPoint(x - origin.x, y - origin.y);
+            /* 5) If position is the same as box’s current scroll position, and box does not have an ongoing smooth scroll, abort these steps. */
+            if (position.Equals(box.ScrollX, box.ScrollY) && !box.IsScrolling)
+            {
+                return;
+            }
+
+            box.Perform_Scroll(position, this, behavior);
+        }
+        #endregion
+
+        #region Scrolling
+        internal ScrollBox ScrollBox = null;
+
+        public double scrollTop
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-element-scrolltop */
+            get
+            {
+                if (!ownerDocument.is_fully_active)
+                    return 0;
+
+                if (ReferenceEquals(null, ownerDocument.defaultView))
+                    return 0;
+
+                if (is_root && ownerDocument.Mode == EQuirksMode.Quirks)
+                    return 0;
+
+                if (is_root)
+                    return ownerDocument.defaultView.scrollY;
+                
+                if (ReferenceEquals(this, ownerDocument.body) && ownerDocument.Mode == EQuirksMode.Quirks && !is_potentially_scrollable)
+                    return ownerDocument.defaultView.scrollY;
+
+                if (ReferenceEquals(null, Box))
+                    return 0;
+
+                /* 9) Return the y-coordinate of the scrolling area at the alignment point with the top of the padding edge of the element. */
+                /* XXX: The following might not actually be whats wanted by the specifications. What im going to do is combine the scrolling areas offset to our padding edge */
+                /*      its possible that instead whats wanted is the actual non-relative coordinate point where the scrolling area MEETS the top padding edge */
+                return Box.Padding.Top - ScrollBox.ScrollY;
+            }
+            set
+            {
+                double y = value;
+                y = CssCommon.Normalize_Non_Finite(y);
+                var document = ownerDocument;
+                var window = document.defaultView;
+
+                if (!document.is_fully_active)
+                    return;
+
+                if (ReferenceEquals(null, window))
+                    return;
+
+                if (is_root && document.Mode == EQuirksMode.Quirks)
+                    return;
+
+                if (is_root)
+                {
+                    window.Scroll(window.scrollX, y);
+                    return;
+                }
+
+                if (ReferenceEquals(this, document.body) && document.Mode == EQuirksMode.Quirks && !is_potentially_scrollable)
+                {
+                    window.Scroll(window.scrollX, y);
+                    return;
+                }
+
+                if (ReferenceEquals(null, Box) || ReferenceEquals(null, ScrollBox) || !has_overflow)
+                    return;
+
+                scroll_element(scrollLeft, y, EScrollBehavior.Auto);
+            }
+        }
+        public double scrollLeft
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-element-scrollleft */
+            get
+            {
+                var document = ownerDocument;
+                if (!document.is_fully_active)
+                    return 0;
+
+                var window = document.defaultView;
+                if (ReferenceEquals(null, window))
+                    return 0;
+
+                if (is_root && document.Mode == EQuirksMode.Quirks)
+                    return 0;
+
+                if (is_root)
+                    return window.scrollX;
+
+                if (ReferenceEquals(this, document.body) && document.Mode == EQuirksMode.Quirks && !is_potentially_scrollable)
+                    return window.scrollX;
+
+                if (ReferenceEquals(null, Box))
+                    return 0;
+
+                /* 9) Return the x-coordinate of the scrolling area at the alignment point with the left of the padding edge of the element. */
+                /* XXX: The following might not actually be whats wanted by the specifications. What im going to do is combine the scrolling areas offset to our padding edge */
+                /*      its possible that instead whats wanted is the actual non-relative coordinate point where the scrolling area MEETS the top padding edge */
+                return Box.Padding.Left - ScrollBox.ScrollX;
+            }
+
+            set
+            {
+                double x = CssCommon.Normalize_Non_Finite(value);
+                var document = ownerDocument;
+                if (!document.is_fully_active)
+                    return;
+
+                var window = document.defaultView;
+                if (ReferenceEquals(null, window))
+                    return;
+
+                if (is_root && document.Mode == EQuirksMode.Quirks)
+                    return;
+
+                if (is_root)
+                {
+                    window.Scroll(x, window.scrollY);
+                    return;
+                }
+
+                if (ReferenceEquals(this, document.body) && document.Mode == EQuirksMode.Quirks && !is_potentially_scrollable)
+                {
+                    window.Scroll(x, window.scrollY);
+                    return;
+                }
+
+                if (ReferenceEquals(null, Box) || ReferenceEquals(null, ScrollBox) || !has_overflow)
+                    return;
+
+                scroll_element(x, scrollTop, EScrollBehavior.Auto);
+            }
+        }
+        public long scrollWidth
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-element-scrollwidth */
+            get
+            {
+                var document = ownerDocument;
+                if (!document.is_fully_active)
+                    return 0;
+
+                double viewportWidth = 0;
+                if (!ReferenceEquals(null, document.Viewport) && !ReferenceEquals(null, document?.Viewport?.ScrollBox))
+                {
+                    viewportWidth = document.Viewport.Width - (document.Viewport.ScrollBox?.VScrollBar?.width ?? 0);
+                }
+
+                if (is_root && document.Mode != EQuirksMode.Quirks)
+                    return (long)MathExt.Max(viewportWidth, document.Viewport.ScrollBox.ScrollArea.width);
+
+                if (ReferenceEquals(this, document.body) && document.Mode == EQuirksMode.Quirks && !is_potentially_scrollable)
+                    return (long)MathExt.Max(viewportWidth, document.Viewport.ScrollBox.ScrollArea.width);
+
+                if (ReferenceEquals(null, Box))
+                    return 0;
+
+                return (long)ScrollBox.ScrollArea.width;
+            }
+        }
+        public long scrollHeight
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-element-scrollheight */
+            get
+            {
+                var document = ownerDocument;
+                if (!document.is_fully_active)
+                    return 0;
+
+                double viewportHeight = 0;
+                if (!ReferenceEquals(null, document.Viewport) && !ReferenceEquals(null, document?.Viewport?.ScrollBox))
+                {
+                    viewportHeight = document.Viewport.Height - (document.Viewport.ScrollBox?.HScrollBar?.height ?? 0);
+                }
+
+                if (is_root && document.Mode != EQuirksMode.Quirks)
+                    return (long)MathExt.Max(viewportHeight, document.Viewport.ScrollBox.ScrollArea.height);
+
+                if (ReferenceEquals(this, document.body) && document.Mode == EQuirksMode.Quirks && !is_potentially_scrollable)
+                    return (long)MathExt.Max(viewportHeight, document.Viewport.ScrollBox.ScrollArea.height);
+
+                if (ReferenceEquals(null, Box))
+                    return 0;
+
+                return (long)ScrollBox.ScrollArea.height;
             }
         }
 
+        public long clientTop
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-element-clienttop */
+            get
+            {
+                if (ReferenceEquals(null, Box) || Box.OuterDisplayType == CssUI.Enums.EOuterDisplayType.Inline)
+                    return 0;
+
+                /* 2) Return the computed value of the border-top-width property plus the height of any scrollbar rendered between the top padding edge and the top border edge, 
+                 * ignoring any transforms that apply to the element and its ancestors. */
+                double retVal = Style.Border_Top_Width;
+                retVal += MathExt.floatEq(0, ScrollBox.HScrollBar.top) ? ScrollBox.HScrollBar.height : 0;
+                return (long)retVal;
+            }
+        }
+        public long clientLeft
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-element-clientleft */
+            get
+            {
+                if (ReferenceEquals(null, Box) || Box.OuterDisplayType == CssUI.Enums.EOuterDisplayType.Inline)
+                    return 0;
+
+                /* 2) Return the computed value of the border-left-width property plus the width of any scrollbar rendered between the left padding edge and the left border edge, 
+                 * ignoring any transforms that apply to the element and its ancestors. */
+                double retVal = Style.Border_Left_Width;
+                retVal += MathExt.floatEq(0, ScrollBox.VScrollBar.left) ? ScrollBox.VScrollBar.width: 0;
+                return (long)retVal;
+            }
+        }
+        public long clientWidth
+        {/* https://www.w3.org/TR/cssom-view-1/#dom-element-clientwidth */
+            get
+            {
+                if (ReferenceEquals(null, Box) || Box.OuterDisplayType == CssUI.Enums.EOuterDisplayType.Inline)
+                    return 0;
+
+                /* 2) If the element is the root element and the element’s node document is not in quirks mode, 
+                 * sor if the element is the HTML body element and the element’s node document is in quirks mode, 
+                 * return the viewport width excluding the size of a rendered scroll bar (if any). */
+                if ((is_root && ownerDocument.Mode != EQuirksMode.Quirks) || (ReferenceEquals(this, ownerDocument.body) && ownerDocument.Mode == EQuirksMode.Quirks))
+                {
+                    double vpSize = ownerDocument.Viewport.Width;
+                    vpSize -= ReferenceEquals(null, ownerDocument.Viewport.ScrollBox.VScrollBar) ? 0 : ownerDocument.Viewport.ScrollBox.VScrollBar.width;
+                    return (long)vpSize;
+                }
+
+                /* 3) Return the width of the padding edge excluding the width of any rendered scrollbar between the padding edge and the border edge, ignoring any transforms that apply to the element and its ancestors. */
+                double clientSize = Box.Padding.Width;
+                clientSize -= ReferenceEquals(null, ScrollBox.VScrollBar) ? 0 : ScrollBox.VScrollBar.width;
+                return (long)clientSize;
+            }
+        }
+        public long clientHeight
+        {
+            get
+            {
+                if (ReferenceEquals(null, Box) || Box.OuterDisplayType == CssUI.Enums.EOuterDisplayType.Inline)
+                    return 0;
+
+                /* 2) If the element is the root element and the element’s node document is not in quirks mode, 
+                 * or if the element is the HTML body element and the element’s node document is in quirks mode, 
+                 * return the viewport height excluding the size of a rendered scroll bar (if any). */
+                if ((is_root && ownerDocument.Mode != EQuirksMode.Quirks) || (ReferenceEquals(this, ownerDocument.body) && ownerDocument.Mode == EQuirksMode.Quirks))
+                {
+                    double vpSize = ownerDocument.Viewport.Height;
+                    vpSize -= ReferenceEquals(null, ownerDocument.Viewport.ScrollBox.HScrollBar) ? 0 : ownerDocument.Viewport.ScrollBox.HScrollBar.height;
+                    return (long)vpSize;
+                }
+
+                /* 3) Return the height of the padding edge excluding the height of any rendered scrollbar between the padding edge and the border edge, ignoring any transforms that apply to the element and its ancestors. */
+                double clientSize = Box.Padding.Height;
+                clientSize -= ReferenceEquals(null, ScrollBox.HScrollBar) ? 0 : ScrollBox.HScrollBar.height;
+                return (long)clientSize;
+            }
+        }
+
+        /// <summary>
+        /// Ensures this element is visible by scrolling any of its containing elements required such that it is shown.
+        /// </summary>
         public void ScrollIntoView()
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-element-scrollintoview */
+
+            /* 4) If arg is not specified or is true, let the block dictionary member of options have the value "start", and let the inline dictionary member of options have the value "nearest". */
             EScrollLogicalPosition block = EScrollLogicalPosition.Start;
             EScrollLogicalPosition inline = EScrollLogicalPosition.Nearest;
 
             if (ReferenceEquals(null, Box))
                 return;
 
-
+            /* 7) Scroll the element into view with the options. */
+            scroll_element_into_view(block, inline);
+            /* "Optionally perform some other action that brings the element to the user’s attention." */
         }
 
+        /// <summary>
+        /// Ensures this element is visible by scrolling any of its containing elements required such that it is shown.
+        /// </summary>
+        public void ScrollIntoView(bool scroll_to_start)
+        {
+            /* 4) If arg is not specified or is true, let the block dictionary member of options have the value "start", and let the inline dictionary member of options have the value "nearest". */
+            EScrollLogicalPosition block = EScrollLogicalPosition.Start;
+            EScrollLogicalPosition inline = EScrollLogicalPosition.Nearest;
+            /* 5) If arg is false, let the block dictionary member of options have the value "end", and let the inline dictionary member of options have the value "nearest". */
+            if (!scroll_to_start)
+            {
+                block = EScrollLogicalPosition.End;
+                inline = EScrollLogicalPosition.Nearest;
+            }
 
-        public void scrollIntoView(bool arg);
-        public void scrollIntoView(object arg);
-        public void scroll(ScrollToOptions options);
-        public void scroll(double x, double y);
-        public void scrollTo(ScrollToOptions options);
-        public void scrollTo(double x, double y);
-        public void scrollBy(ScrollToOptions options);
-        public void scrollBy(double x, double y);
+            if (ReferenceEquals(null, Box))
+                return;
 
-        public double scrollTop { get; private set; }
-        public double scrollLeft { get; private set; }
-        public long scrollWidth { get; private set; }
-        public long scrollHeight { get; private set; }
-        public long clientTop { get; private set; }
-        public long clientLeft { get; private set; }
-        public long clientWidth { get; private set; }
-        public long clientHeight { get; private set; }
+            /* 7) Scroll the element into view with the options. */
+            scroll_element_into_view(block, inline);
+            /* "Optionally perform some other action that brings the element to the user’s attention." */
+        }
+
+        /// <summary>
+        /// Ensures this element is visible by scrolling any of its containing elements required such that it is shown.
+        /// </summary>
+        public void ScrollIntoView(ScrollIntoViewOptions options)
+        {
+            if (ReferenceEquals(null, Box))
+                return;
+
+            /* 7) Scroll the element into view with the options. */
+            scroll_element_into_view(options.Block, options.Inline);
+            /* "Optionally perform some other action that brings the element to the user’s attention." */
+        }
+
+        /// <summary>
+        /// See: <see cref="ScrollTo(ScrollToOptions)"/>
+        /// </summary>
+        public void Scroll(ScrollToOptions options) => ScrollTo(options);
+
+        /// <summary>
+        /// See: <see cref="ScrollTo(double, double)"/>
+        /// </summary>
+        public void Scroll(double x, double y) => ScrollTo(x, y);
+
+        /// <summary>
+        /// Scrolls this elements scrollbox to the given position
+        /// </summary>
+        public void ScrollTo(ScrollToOptions options)
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-element-scroll */
+            double x = !options.left.HasValue ? scrollLeft : CssCommon.Normalize_Non_Finite(options.left.Value);
+            double y = !options.top.HasValue ? scrollTop : CssCommon.Normalize_Non_Finite(options.top.Value);
+            /* 3) Let document be the element’s node document. */
+            var document = ownerDocument;
+            /* 4) If document is not the active document, terminate these steps. */
+            if (!document.is_fully_active) return;
+            /* 5) Let window be the value of document’s defaultView attribute. */
+            var window = document.defaultView;
+            /* 6) If window is null, terminate these steps. */
+            if (ReferenceEquals(null, window)) return;
+
+            /* 8) If the element is the root element invoke scroll() on window with scrollX on window as first argument and y as second argument, and terminate these steps. */
+            if (is_root)
+            {
+                window.Scroll(scrollX, y);
+                return;
+            }
+
+            /* 9) If the element is the HTML body element, document is in quirks mode, and the element is not potentially scrollable, invoke scroll() on window with options as the only argument, and terminate these steps. */
+            if (ReferenceEquals(this, document.body) && document.Mode == EQuirksMode.Quirks && !is_potentially_scrollable)
+            {
+                window.Scroll(options);
+                return;
+            }
+
+            /* 10) If the element does not have any associated CSS layout box, the element has no associated scrolling box, or the element has no overflow, terminate these steps. */
+            if (ReferenceEquals(null, this.Box) || ReferenceEquals(null, ScrollBox) || !has_overflow)
+            {
+                return;
+            }
+
+            scroll_element(x, y, options.behavior);
+        }
+
+        /// <summary>
+        /// Scrolls this elements scrollbox to the given position
+        /// </summary>
+        /// <param name="x">X-Coordinate position to scroll to</param>
+        /// <param name="y">Y-Coordinate position to scroll to</param>
+        public void ScrollTo(double x, double y)
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-element-scroll */
+
+            x = CssCommon.Normalize_Non_Finite(x);
+            y = CssCommon.Normalize_Non_Finite(y);
+            var options = new ScrollToOptions(EScrollBehavior.Auto, x, y);
+            /* 3) Let document be the element’s node document. */
+            var document = ownerDocument;
+            /* 4) If document is not the active document, terminate these steps. */
+            if (!document.is_fully_active) return;
+            /* 5) Let window be the value of document’s defaultView attribute. */
+            var window = document.defaultView;
+            /* 6) If window is null, terminate these steps. */
+            if (ReferenceEquals(null, window)) return;
+
+            /* 8) If the element is the root element invoke scroll() on window with scrollX on window as first argument and y as second argument, and terminate these steps. */
+            if (is_root)
+            {
+                window.Scroll(scrollX, y);
+                return;
+            }
+
+            /* 9) If the element is the HTML body element, document is in quirks mode, and the element is not potentially scrollable, invoke scroll() on window with options as the only argument, and terminate these steps. */
+            if (ReferenceEquals(this, document.body) && document.Mode == EQuirksMode.Quirks && !is_potentially_scrollable)
+            {
+                window.Scroll(options);
+                return;
+            }
+
+            /* 10) If the element does not have any associated CSS layout box, the element has no associated scrolling box, or the element has no overflow, terminate these steps. */
+            if (ReferenceEquals(null, this.Box) || ReferenceEquals(null, ScrollBox) || !has_overflow)
+            {
+                return;
+            }
+
+            scroll_element(x, y, options.behavior);
+        }
+
+        /// <summary>
+        /// Scrolls this elements contents by a given relative ammount
+        /// </summary>
+        /// <param name="options"></param>
+        public void ScrollBy(ScrollToOptions options)
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-element-scrollby */
+            double top = !options.top.HasValue ? 0 : CssCommon.Normalize_Non_Finite(options.top.Value);
+            double left = !options.left.HasValue ? 0 : CssCommon.Normalize_Non_Finite(options.left.Value);
+
+            top += scrollTop;
+            left += scrollLeft;
+            /* 5) Act as if the scroll() method was invoked with options as the only argument. */
+
+            ScrollTo(left, top);
+        }
+
+        /// <summary>
+        /// Scrolls this elements contents by a given relative ammount
+        /// </summary>
+        public void ScrollBy(double x, double y)
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-element-scrollby */
+            x = CssCommon.Normalize_Non_Finite(x);
+            y = CssCommon.Normalize_Non_Finite(y);
+
+            x += scrollLeft;
+            y += scrollTop;
+
+            var options = new ScrollToOptions(EScrollBehavior.Auto, x, y);
+            ScrollTo(options);
+        }
         #endregion
     }
 }

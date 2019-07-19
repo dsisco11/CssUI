@@ -1,11 +1,11 @@
-﻿using CssUI.DOM.Enums;
+﻿using CssUI.CSS;
 
 namespace CssUI.DOM
 {
     public class ScrollOptions
     {
         #region Properties
-        EScrollBehavior behavior;
+        public EScrollBehavior behavior;
         #endregion
 
         #region Constructors
