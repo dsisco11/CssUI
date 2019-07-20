@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using CssUI.CSS;
-using CssUI.Internal;
 
 namespace CssUI
 {

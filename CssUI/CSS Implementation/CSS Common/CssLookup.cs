@@ -1,5 +1,4 @@
 ﻿using System;
-using CssUI.Internal;
 using CssUI.CSS.Internal;
 using System.Linq;
 using CssUI.CSS.Media;

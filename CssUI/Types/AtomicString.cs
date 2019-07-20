@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 
-namespace CssUI.Internal
+namespace CssUI
 {
     /// <summary>
     /// Wrapper around the string class that caches the value from GetHashCode() to improve string lookup performance
@@ -47,14 +47,14 @@ namespace CssUI.Internal
             this.String = String;
             this.Flags = Flags;
 
-            if (String.ToCharArray().Where(c => Char.IsUpper(c)).Any())
+            if (String.ToCharArray().Where(c => char.IsUpper(c)).Any())
                 Flags |= EAtomicStringFlags.HasUppercase;
         }
 
         #endregion
 
         #region String casting
-        public override string ToString() { return this.String; }
+        public override string ToString() { return String; }
         public static implicit operator string(AtomicString atom) { return atom.String; }
         public static implicit operator AtomicString(string str) { return new AtomicString(str); }
         #endregion
@@ -87,7 +87,7 @@ namespace CssUI.Internal
                 }
                 else
                 {
-                    return (atom.GetHashCode() == GetHashCode());
+                    return atom.GetHashCode() == GetHashCode();
                 }
             }
 
@@ -107,7 +107,7 @@ namespace CssUI.Internal
             }
             else
             {
-                return (A.GetHashCode() == B.GetHashCode());
+                return A.GetHashCode() == B.GetHashCode();
             }
         }
 
@@ -124,7 +124,7 @@ namespace CssUI.Internal
             }
             else
             {
-                return (A.GetHashCode() != B.GetHashCode());
+                return A.GetHashCode() != B.GetHashCode();
             }
         }
     }

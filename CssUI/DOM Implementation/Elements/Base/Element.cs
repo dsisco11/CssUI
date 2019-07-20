@@ -18,6 +18,12 @@ namespace CssUI.DOM
 {
     public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable
     {
+        #region Internal Properties
+        internal OrderedDictionary<AtomicName<EAttributeName>, Attr> AttributeList { get; private set; } = new OrderedDictionary<AtomicName<EAttributeName>, Attr>();
+
+        internal readonly Queue<IElementReaction> Custom_Element_Reaction_Queue = new Queue<IElementReaction>();
+        #endregion
+
         #region Properties
         /// <summary>
         /// This elements official namespace name string
@@ -60,7 +66,6 @@ namespace CssUI.DOM
         public ECustomElement CustomElementState { get; protected set; } = ECustomElement.Undefined;
         public DOMTokenList classList { get; private set; }
 
-        internal OrderedDictionary<AtomicName<EAttributeName>, Attr> AttributeList { get; private set; } = new OrderedDictionary<AtomicName<EAttributeName>, Attr>();
         public NamedNodeMap Attributes { get; private set; }
         #endregion
 

@@ -6,12 +6,13 @@
 */
 using System;
 using System.Linq;
-using CssUI.Internal;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using CssUI;
+
 namespace CssUI.CSS.Internal
 {
-	internal static class CssEnumTables
+    internal static class CssEnumTables
 	{
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Get_Enum_Index<Ty>()

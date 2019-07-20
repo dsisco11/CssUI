@@ -1,6 +1,5 @@
 ﻿using CssUI.DOM.Exceptions;
 using CssUI.Enums;
-using CssUI.Internal;
 using System;
 using System.Collections;
 using System.Collections.Generic;

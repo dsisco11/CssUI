@@ -250,9 +250,9 @@ namespace CssUI.DOM.Nodes
             return DOMCommon.Is_Inclusive_Descendant(other, this);
         }
 
-        public Node insertBefore(Node node, Node child)
+        public Node insertBefore(Node node, Node before)
         {
-            return Node._pre_insert_node(node, this, child);
+            return Node._pre_insert_node(node, this, before);
         }
 
         public Node appendChild(Node node)

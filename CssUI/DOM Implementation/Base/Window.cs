@@ -1,5 +1,6 @@
 ﻿using CssUI.CSS;
 using CssUI.CSS.Internal;
+using CssUI.DOM.CustomElements;
 using CssUI.DOM.Events;
 using CssUI.DOM.Geometry;
 using CssUI.DOM.Internal;
@@ -26,6 +27,8 @@ namespace CssUI.DOM
         /// </summary>
         internal BrowsingContext BrowsingContext => document?.BrowsingContext;
         internal override Window WindowProxy { get => this; }
+
+        internal readonly ElementReactionStack CE_Reactions;
         #endregion
 
         #region Properties
@@ -40,17 +43,23 @@ namespace CssUI.DOM
         /// </summary>
         public readonly VisualViewport visualViewport;
         public readonly Screen screen;
+        public readonly CustomElementRegistry customElements = new CustomElementRegistry();
         #endregion
 
         #region Constructors
-        public Window(Screen screen) : base()
+        private Window() : base()
+        {
+            CE_Reactions = new ElementReactionStack(this);
+            visualViewport = new VisualViewport(this);
+        }
+
+        public Window(Screen screen) : this()
         {
             this.screen = screen;
+
             var dom = new DOMImplementation();
             this.document = dom.createDocument(DOMCommon.HTMLNamespace, "CssUI", new DocumentType("cssui"));
             this.document.BrowsingContext = this;
-
-            visualViewport = new VisualViewport(this);
         }
         #endregion
 

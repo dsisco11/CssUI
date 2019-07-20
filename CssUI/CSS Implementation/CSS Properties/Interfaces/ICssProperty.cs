@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CssUI.CSS.Internal;
-using CssUI.Internal;
 
 namespace CssUI.CSS
 {
