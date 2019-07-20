@@ -119,13 +119,13 @@ namespace CssUI.DOM
          *      Set an attribute value for the context object using name and the given value.
          */
 
-        public string id
+        [CEReactions] public string id
         {/* The id attribute must reflect the "id" content attribute. */
             get => this.getAttribute(EAttributeName.ID);
             set => this.setAttribute(EAttributeName.ID, value);
         }
 
-        public string className
+        [CEReactions] public string className
         {/* The className attribute must reflect the "class" content attribute. */
             get => this.getAttribute(EAttributeName.Class);
             set => this.setAttribute(EAttributeName.Class, value);
@@ -133,9 +133,18 @@ namespace CssUI.DOM
 
         public IEnumerable<string> getAttributeNames() => this.AttributeList.Select(a => a.Name);
         public bool hasAttributes() => this.AttributeList.Count > 0;
+
+        [CEReactions] public string slot
+        {/* The slot attribute must reflect the "slot" content attribute. */
+            get => this.getAttribute(EAttributeName.Slot);
+            set => this.setAttribute(EAttributeName.Slot, value);
+        }
         #endregion
 
         #region Slottable
+        /// <summary>
+        /// Returns the slot name
+        /// </summary>
         public string Name
         {/* Docs: https://dom.spec.whatwg.org/#slotable-name */
             get => getAttribute(EAttributeName.Name);
@@ -191,9 +200,9 @@ namespace CssUI.DOM
         #endregion
 
         #region Constructors
-        internal Element(Document document, string localName, string prefix="", string Namespace="")
+        internal Element(Document document, string localName, string prefix="", string Namespace="") : base()
         {/* Docs: https://dom.spec.whatwg.org/#interface-element */
-            this.ownerDocument = document;
+            this.nodeDocument = document;
             this.localName = localName;
             this.prefix = prefix;
             this.NamespaceURI = Namespace;
@@ -485,6 +494,37 @@ namespace CssUI.DOM
         }
         #endregion
 
+        #region Attribute Casting
+        /// <summary>
+        /// Do not confuse a boolean attribute with an attribute that has a true/fale value.
+        /// <para>Boolean attributes are true/false depending on if they have a non-null value See: <see cref="hasAttribute(AtomicName{EAttributeName})"/></para>
+        /// </summary>
+        /// <param name="Name"></param>
+        /// <returns></returns>
+        public bool getAttribute_Bool(AtomicName<EAttributeName> Name)
+        {
+            string attrValue = getAttribute(Name);
+            return !string.IsNullOrEmpty(attrValue) && attrValue.Equals("true");
+        }
+
+        /// <summary>
+        /// Returns the specified attribute after parsing it into its numeric form
+        /// </summary>
+        /// <param name="Name"></param>
+        /// <returns></returns>
+        public long getAttribute_Numeric(AtomicName<EAttributeName> Name)
+        {
+            string attrValue = getAttribute(Name);
+            if (string.IsNullOrEmpty(attrValue))
+                return 0;
+
+            if (!long.TryParse(attrValue, out long number))
+                return 0;
+
+            return number;
+        }
+        #endregion
+
         #region HTML Attribute Management
         public string getAttribute(AtomicName<EAttributeName> Name)
         {
@@ -515,6 +555,7 @@ namespace CssUI.DOM
         }
 
 
+        [CEReactions]
         public void setAttribute(AtomicName<EAttributeName> Name, string value)
         {
             find_attribute(Name, out Attr attr);
@@ -530,6 +571,7 @@ namespace CssUI.DOM
             change_attribute(attr, attr.Value, value);
         }
 
+        [CEReactions]
         public void setAttribute(string qualifiedName, string value)
         {
             find_attribute(qualifiedName, out Attr attr);
@@ -544,7 +586,8 @@ namespace CssUI.DOM
 
             change_attribute(attr, attr.Value, value);
         }
-        
+
+        [CEReactions]
         public Attr setAttributeNode(Attr attr)
         {
             find_attribute(attr.Name, out Attr oldAttr);
@@ -563,6 +606,7 @@ namespace CssUI.DOM
             return oldAttr;
         }
 
+        [CEReactions]
         public void removeAttribute(AtomicName<EAttributeName> Name)
         {
             find_attribute(Name, out Attr attr);
@@ -572,6 +616,7 @@ namespace CssUI.DOM
             }
         }
 
+        [CEReactions]
         public void removeAttribute(string qualifiedName)
         {
             find_attribute(qualifiedName, out Attr attr);
@@ -581,6 +626,7 @@ namespace CssUI.DOM
             }
         }
 
+        [CEReactions]
         public Attr removeAttributeNode(Attr attr)
         {
             find_attribute(attr.Name, out Attr outAttr);
@@ -592,6 +638,7 @@ namespace CssUI.DOM
             return attr;
         }
 
+        [CEReactions]
         public bool toggleAttribute(AtomicName<EAttributeName> Name, bool? force = null)
         {
             /* 1) If qualifiedName does not match the Name production in XML, then throw an "InvalidCharacterError" DOMException. */
@@ -621,6 +668,7 @@ namespace CssUI.DOM
             return true;
         }
 
+        [CEReactions]
         public bool toggleAttribute(string qualifiedName, bool? force = null)
         {
             /* 1) If qualifiedName does not match the Name production in XML, then throw an "InvalidCharacterError" DOMException. */

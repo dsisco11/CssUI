@@ -12,7 +12,7 @@ namespace CssUI.DOM
         #endregion
 
         #region Constructor
-        public HTMLTableRowElement(Document document, string localName, string prefix, string Namespace) : base(document, localName, prefix, Namespace)
+        public HTMLTableRowElement(Document document, string localName) : base(document, localName)
         {
         }
         #endregion

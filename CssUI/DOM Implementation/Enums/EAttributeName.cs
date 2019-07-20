@@ -17,6 +17,27 @@ namespace CssUI.DOM
         Name,
         [DomKeyword("class")]
         Class,
+        [DomKeyword("width")]
+        Width,
+        [DomKeyword("height")]
+        Height,
+
+        /* HTML Attributes */
+        [DomKeyword("title")]
+        Title,
+        [DomKeyword("lang")]
+        Lang,
+        [DomKeyword("dir")]
+        Dir,
+        [DomKeyword("translate")]
+        Translate,
+        [DomKeyword("nonce")]
+        Nonce,
+
+
+        [DomKeyword("accesskey")]
+        AccessKey,
+
         [DomKeyword("contenteditable")]
         ContentEditable,
         [DomKeyword("draggable")]
@@ -31,5 +52,42 @@ namespace CssUI.DOM
         HREF,
         [DomKeyword("type")]
         Type,
+        [DomKeyword("slot")]
+        Slot,
+        [DomKeyword("media")]
+        Media,
+
+        [DomKeyword("alt")]
+        Alt,
+        [DomKeyword("src")]
+        Src,
+        [DomKeyword("srcset")]
+        SrcSet,
+        [DomKeyword("href")]
+        Href,
+        [DomKeyword("sizes")]
+        Sizes,
+        [DomKeyword("usemap")]
+        UseMap,
+        [DomKeyword("ismap")]
+        IsMap,
+        [DomKeyword("crossorigin")]
+        CrossOrigin,
+        [DomKeyword("referrerpolicy")]
+        ReferrerPolicy,
+        [DomKeyword("decoding")]
+        Decoding,
+
+        /* Table elements */
+
+        [DomKeyword("colspan")]
+        ColSpan,
+        [DomKeyword("rowspan")]
+        RowSpan,
+
+        [DomKeyword("scope")]
+        Scope,
+        [DomKeyword("abbr")]
+        Abbr,
     }
 }

@@ -18,7 +18,7 @@ namespace CssUI.DOM
         public List<ISlottable> Assigned { get; set; } = new List<ISlottable>();
         #endregion
 
-        public HTMLSlotElement(string Name, Document document, string localName, string prefix, string Namespace) : base(document, localName, prefix, Namespace)
+        public HTMLSlotElement(string Name, Document document, string localName, string prefix, string Namespace) : base(document, localName)
         {
             this.Name = Name;
         }

@@ -4,7 +4,7 @@
     {
         public string Text { get; set; }
 
-        public HTMLTitleElement(Document document, string localName, string prefix, string Namespace) : base(document, localName, prefix, Namespace)
+        public HTMLTitleElement(Document document, string localName, string prefix, string Namespace) : base(document, localName)
         {
         }
     }

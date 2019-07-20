@@ -391,7 +391,7 @@ namespace CssUI.DOM
             if (Is_Descendant(A, B))
                 return true;
 
-            if (A.getRootNode() is ShadowRoot aShadow && Is_Shadow_Including_Inclusive_Descendant(aShadow.Host, B))
+            if (A.getRootNode() is ShadowRoot aRootShadow && Is_Shadow_Including_Inclusive_Descendant(aRootShadow.Host, B))
                 return true;
 
             return false;
@@ -635,14 +635,18 @@ namespace CssUI.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<Node> Get_Shadow_Including_Descendents(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
-            /* XXX: Shadow dom stuff */
+            /* NOTE: ShadowDOM stuff here */
+            /* IM just not sure if within this loop i need todo something special, like check if the descendant is a shadow root and then also loop over all of its hosts' descendants or something */
             LinkedList<Node> list = new LinkedList<Node>();
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
-            Node current = tree.nextNode();
-            while (!ReferenceEquals(null, current))
+            Node descendant = tree.nextNode();
+            while (!ReferenceEquals(null, descendant))
             {
-                list.AddLast(current);
-                current = tree.nextNode();
+                if (Is_Shadow_Including_Descendant(descendant, node))
+                {
+                    list.AddLast(descendant);
+                }
+                descendant = tree.nextNode();
             }
 
             return list;
@@ -659,11 +663,11 @@ namespace CssUI.DOM
             LinkedList<Node> list = new LinkedList<Node>();
             list.AddLast(node);
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
-            Node current = tree.nextNode();
-            while (!ReferenceEquals(null, current))
+            Node descendant = tree.nextNode();
+            while (!ReferenceEquals(null, descendant))
             {
-                list.AddLast(current);
-                current = tree.nextNode();
+                list.AddLast(descendant);
+                descendant = tree.nextNode();
             }
 
             return list;
@@ -677,19 +681,23 @@ namespace CssUI.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<Node> Get_Shadow_Including_Inclusive_Descendents(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
-            /* XXX: Shadow dom stuff */
-            LinkedList<Node> list = new LinkedList<Node>();
-            list.AddLast(node);
-            TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
-            Node current = tree.nextNode();
-            while (!ReferenceEquals(null, current))
-            {
-                list.AddLast(current);
-                current = tree.nextNode();
-            }
-
+            LinkedList<Node> list = (LinkedList<Node>)Get_Shadow_Including_Descendents(node, Filter, FilterMask);
+            list.AddFirst(node);// Add the node (inclusive)
             return list;
         }
+
+        /// <summary>
+        /// Returns a list of all ShadowDOM descendents for the given node
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IEnumerable<Node> Get_ShadowDOM_Descendents(ShadowRoot node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        {
+            /* XXX: Shadow dom stuff */
+        }
+
+
 
         /// <summary>
         /// Returns a list of all nodes that preceed the given node (siblings)
@@ -700,17 +708,17 @@ namespace CssUI.DOM
         public static IEnumerable<Node> Get_Preceeding(Node node, NodeFilter Filter = null)
         {
             LinkedList<Node> list = new LinkedList<Node>();
-            Node current = node.previousSibling;
-            while (!ReferenceEquals(null, current))
+            Node sibling = node.previousSibling;
+            while (!ReferenceEquals(null, sibling))
             {
-                var fres = Filter?.acceptNode(current) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
+                var fres = Filter?.acceptNode(sibling) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
                 if (fres == Enums.ENodeFilterResult.FILTER_REJECT)
                     break;
 
                 if (fres == Enums.ENodeFilterResult.FILTER_ACCEPT)
-                    list.AddLast(current);
+                    list.AddLast(sibling);
 
-                current = current.previousSibling;
+                sibling = sibling.previousSibling;
             }
 
             return list;
@@ -725,17 +733,17 @@ namespace CssUI.DOM
         public static IEnumerable<Node> Get_Following(Node node, NodeFilter Filter = null)
         {
             LinkedList<Node> list = new LinkedList<Node>();
-            Node current = node.nextSibling;
-            while (!ReferenceEquals(null, current))
+            Node sibling = node.nextSibling;
+            while (!ReferenceEquals(null, sibling))
             {
-                var fres = Filter?.acceptNode(current) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
+                var fres = Filter?.acceptNode(sibling) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
                 if (fres == Enums.ENodeFilterResult.FILTER_REJECT)
                     break;
 
                 if (fres == Enums.ENodeFilterResult.FILTER_ACCEPT)
-                    list.AddLast(current);
+                    list.AddLast(sibling);
 
-                current = current.nextSibling;
+                sibling = sibling.nextSibling;
             }
 
             return list;
@@ -889,61 +897,102 @@ namespace CssUI.DOM
         }
 
         /// <summary>
-        /// Returns a list of all descendents for the given node
+        /// Returns the root of a given node
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Node Get_Root(Node node)
+        {
+            /* The root of an object is itself, if its parent is null, or else it is the root of its parent. The root of a tree is any object participating in that tree whose parent is null. */
+            if (ReferenceEquals(null, node.parentNode))
+                return node;
+
+            return node.parentNode.getRootNode();
+        }
+
+        /// <summary>
+        /// Returns the (shadow-including) root of a given node
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Node Get_Shadow_Including_Root(Node node)
+        {/* Docs: https://dom.spec.whatwg.org/#concept-shadow-including-root */
+            /* The shadow-including root of an object is its root’s host’s shadow-including root, if the object’s root is a shadow root, and its root otherwise. */
+            Node root = Get_Root(node);
+            if (root is ShadowRoot shadow)
+            {
+                return Get_Shadow_Including_Root(shadow.Host);
+            }
+
+            return root;
+        }
+
+        /// <summary>
+        /// Returns a list of all immediate descendants for the given <paramref name="node"/>
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<Node> Get_Children(Node node, NodeFilter Filter = null)
         {
             LinkedList<Node> list = new LinkedList<Node>();
-            Node current = node.firstChild;
-            while (!ReferenceEquals(null, current))
+            Node child = node.firstChild;
+            while (!ReferenceEquals(null, child))
             {
                 if (!ReferenceEquals(null, Filter))
                 {
-                    var fr = Filter.acceptNode(current);
+                    var fr = Filter.acceptNode(child);
                     if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
-                    else if (fr == ENodeFilterResult.FILTER_SKIP) continue;// move one to next
+                    else if (fr == ENodeFilterResult.FILTER_ACCEPT)
+                    {
+                        list.AddLast(child);
+                    }
+                }
+                else
+                {
+                    list.AddLast(child);
                 }
 
-                list.AddLast(current);
-                current = current.nextSibling;
+                child = child.nextSibling;
             }
 
             return list;
         }
 
         /// <summary>
-        /// Returns a list of all descendents for the given node
+        /// Returns a list of all immediate descendents for the given <paramref name="node"/> which match the given Type <see cref="Ty"/>
         /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<Node> Get_Children_OfType<Ty>(Node node, NodeFilter Filter = null)
         {
             LinkedList<Node> list = new LinkedList<Node>();
-            Node current = node.firstChild;
-            while (!ReferenceEquals(null, current))
+            Node child = node.firstChild;
+            while (!ReferenceEquals(null, child))
             {
-                if (!ReferenceEquals(null, Filter))
+                if (child is Ty)
                 {
-                    var fr = Filter.acceptNode(current);
-                    if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
-                    else if (fr == ENodeFilterResult.FILTER_SKIP) continue;// move one to next
+                    if (!ReferenceEquals(null, Filter))
+                    {
+                        var fr = Filter.acceptNode(child);
+                        if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
+                        else if (fr == ENodeFilterResult.FILTER_ACCEPT)
+                        {
+                            list.AddLast(child);
+                        }
+                    }
+                    else
+                    {
+                        list.AddLast(child);
+                    }
                 }
 
-                if (current is Ty)
-                {
-                    list.AddLast(current);
-                }
-
-                current = current.nextSibling;
+                child = child.nextSibling;
             }
 
             return list;
         }
         #endregion
+
 
         #region Element Creation
         internal static Element createElementNS(Document document, string qualifiedName, string Namespace, ElementCreationOptions options = null)
@@ -978,6 +1027,7 @@ namespace CssUI.DOM
             return result;
         }
         #endregion
+
 
         #region Focus
         internal static void Run_Focusing_Steps(FocusableArea new_focus_target)

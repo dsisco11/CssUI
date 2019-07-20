@@ -10,18 +10,44 @@ namespace CssUI.DOM
     /// The basic interface, from which all the HTML elements' interfaces inherit, and which must be used by elements that have no additional requirements, is the HTMLElement interface.
     /// </summary>
     public class HTMLElement : Element, IGlobalEventCallbacks, IDocumentAndElementEventCallbacks
-    {
+    {/* Docs:  */
         # region Metadata Attributes
-        public string title;
-        public string lang;
-        public bool translate;
-        public string dir;
+        [CEReactions]
+        public string title
+        {
+            get => getAttribute(EAttributeName.Title);
+            set => setAttribute(EAttributeName.Title, value);
+        }
+        [CEReactions]
+        public string lang
+        {
+            get => getAttribute(EAttributeName.Lang);
+            set => setAttribute(EAttributeName.Lang, value);
+        }
+        [CEReactions]
+        public bool translate
+        {
+            get => hasAttribute(EAttributeName.Translate);
+            set => toggleAttribute(EAttributeName.Translate, value);
+        }
+        [CEReactions]
+        public string dir
+        {
+            get => getAttribute(EAttributeName.Dir);
+            set => setAttribute(EAttributeName.Dir, value);
+        }
+        [CEReactions]
+        public string nonce
+        {
+            get => getAttribute(EAttributeName.Nonce);
+            set => setAttribute(EAttributeName.Nonce, value);
+        }
+
         public readonly DOMStringMap dataset;
-        public string nonce;
         #endregion
 
         #region Constructors
-        public HTMLElement(Document document, string localName, string prefix, string Namespace) : base(document, localName, prefix, Namespace)
+        public HTMLElement(Document document, string localName) : base(document, localName, "html", DOMCommon.HTMLNamespace)
         {
             dataset = new DOMStringMap(this);
         }
@@ -47,7 +73,7 @@ namespace CssUI.DOM
                     case "optgroup":
                     case "option":
                     case "fieldset":
-                        return this.Disabled;
+                        return this.disabled;
                     default:
                         return false;
                 }
@@ -68,7 +94,7 @@ namespace CssUI.DOM
                             string inputType = getAttribute(EAttributeName.Type);
                             if (inputType.Equals("submit") || inputType.Equals("image") || inputType.Equals("reset") || inputType.Equals("button"))
                             {
-                                return !Disabled && is_in_formal_activation_state;
+                                return !disabled && is_in_formal_activation_state;
                             }
                             else
                             {
@@ -77,7 +103,7 @@ namespace CssUI.DOM
                         }
                     case "button":
                         {
-                            return !Disabled && is_in_formal_activation_state;
+                            return !disabled && is_in_formal_activation_state;
                         }
                     case "a":
                     case "area":
@@ -126,14 +152,84 @@ namespace CssUI.DOM
                     {
                         return ancestor;
                     }
-                    else if (ancestor.Style.Positioning == CSS.EPositioning.Static && (ancestor is HTMLTableRowElement || ancestor is HTMLTableSectionElement || ancestor is HTMLTableElement))
+                    else if (ancestor.Style.Positioning == CSS.EPositioning.Static && (ancestor is HTMLTableRowElement || ancestor is HTMLTableHeadElement || ancestor is HTMLTableElement))
                     {
-
+                        return ancestor;
                     }
-
 
                     ancestor = tree.parentNode() as Element;
                 }
+
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Returns the position of the top edge of this element relative to its container
+        /// </summary>
+        public long offsetTop
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-htmlelement-offsettop */
+            get
+            {
+                if (ReferenceEquals(null, Box) || ReferenceEquals(this, ownerDocument.body))
+                    return 0;
+
+                var offsetParent = this.offsetParent;
+                if (ReferenceEquals(null, offsetParent))
+                {
+                    return (long)(Box.Border.Top - ownerDocument.Initial_Containing_Block.top);
+                }
+                /* 3) Return the result of subtracting the y-coordinate of the top padding edge of the first CSS layout box associated with the offsetParent 
+                 * of the element from the y-coordinate of the top border edge of the first CSS layout box associated with the element, 
+                 * relative to the initial containing block origin, ignoring any transforms that apply to the element and its ancestors. */
+                return (long)(Box.Border.Top - offsetParent.Box.Padding.Top - ownerDocument.Initial_Containing_Block.top);
+            }
+        }
+        /// <summary>
+        /// Returns the position of the left edge of this element relative to its container
+        /// </summary>
+        public long offsetLeft
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-htmlelement-offsetleft */
+            get
+            {
+                if (ReferenceEquals(null, Box) || ReferenceEquals(this, ownerDocument.body))
+                    return 0;
+
+                var offsetParent = this.offsetParent;
+                if (ReferenceEquals(null, offsetParent))
+                {
+                    return (long)(Box.Border.Left - ownerDocument.Initial_Containing_Block.left);
+                }
+                /* 3) Return the result of subtracting the x-coordinate of the left padding edge of the first CSS layout box associated with the offsetParent 
+                 * of the element from the x-coordinate of the left border edge of the first CSS layout box associated with the element, 
+                 * relative to the initial containing block origin, ignoring any transforms that apply to the element and its ancestors. */
+                return (long)(Box.Border.Left - offsetParent.Box.Padding.Left - ownerDocument.Initial_Containing_Block.left);
+            }
+        }
+        /// <summary>
+        /// Returns the border width of this element
+        /// </summary>
+        public long offsetWidth
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-htmlelement-offsetwidth */
+            get
+            {
+                if (ReferenceEquals(null, Box) || ReferenceEquals(this, ownerDocument.body))
+                    return 0;
+
+                return Box.Border.Width;
+            }
+        }
+        /// <summary>
+        /// Returns the border height of this element
+        /// </summary>
+        public long offsetHeight
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-htmlelement-offsetheight */
+            get
+            {
+                if (ReferenceEquals(null, Box) || ReferenceEquals(this, ownerDocument.body))
+                    return 0;
+
+                return Box.Border.Height;
             }
         }
         #endregion
@@ -142,7 +238,8 @@ namespace CssUI.DOM
         /// <summary>
         /// Specifies the tab index of this element, that is its selection order when a user cycles through selecting elements by pressing tab
         /// </summary>
-        public int TabIndex
+        [CEReactions]
+        public int tabIndex
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#attr-tabindex */
             get
             {
@@ -167,7 +264,7 @@ namespace CssUI.DOM
                      * - Elements with a draggable attribute set, if that would enable the user agent to allow the user to begin a drag operations for those elements without the use of a pointing device
                      * 
                      */
-                    if (this.Draggable)
+                    if (this.draggable)
                         tabindex_focus_flag = true;
                 }
                 else if (parsed.Value < 0)
@@ -197,7 +294,8 @@ namespace CssUI.DOM
         /// <summary>
         /// Determines if this element can be interacted with
         /// </summary>
-        public bool Disabled
+        [CEReactions]
+        public bool disabled
         {
             get => hasAttribute(EAttributeName.Disabled);
             set => toggleAttribute(EAttributeName.Disabled, value);
@@ -206,7 +304,8 @@ namespace CssUI.DOM
         /// <summary>
         /// 
         /// </summary>
-        public bool Hidden
+        [CEReactions]
+        public bool hidden
         {
             get => hasAttribute(EAttributeName.Hidden);
             set => toggleAttribute(EAttributeName.Hidden, value);
@@ -218,7 +317,7 @@ namespace CssUI.DOM
         /// </summary>
         public void click()
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#dom-click */
-            if (Disabled)
+            if (disabled)
                 return;
 
             if (click_in_progress)
@@ -244,10 +343,17 @@ namespace CssUI.DOM
 
         // public void blur(); /* "User agents are encouraged to ignore calls to this blur() method entirely." - https://html.spec.whatwg.org/multipage/interaction.html#dom-window-blur */
 
-        public string accessKey;
+        [CEReactions]
+        public string accessKey
+        {
+            get => getAttribute(EAttributeName.AccessKey);
+            set => setAttribute(EAttributeName.AccessKey, value);
+        }
+
         public string accessKeyLabel { get; private set; }
 
-        public bool Draggable
+        [CEReactions]
+        public bool draggable
         {/* Docs: https://html.spec.whatwg.org/multipage/dnd.html#the-draggable-attribute */
             get
             {
@@ -274,9 +380,12 @@ namespace CssUI.DOM
             }
         }
 
+        [CEReactions]
         public bool spellcheck;
+        [CEReactions]
         public string autocapitalize;
 
+        [CEReactions]
         public string innerText;
         #endregion
 
@@ -287,6 +396,7 @@ namespace CssUI.DOM
         /// Can be set, to change that state.
         /// Throws a "SyntaxError" DOMException if the new value isn't one of those strings.
         /// </summary>
+        [CEReactions]
         public string ContentEditable
         {
             /* Docs: https://html.spec.whatwg.org/multipage/interaction.html#attr-contenteditable */
@@ -296,7 +406,7 @@ namespace CssUI.DOM
                 if (value == null)
                     value = string.Empty;
 
-                if (value!="true" && value!="false" && value!="inherit")
+                if (!value.Equals("true") && !value.Equals("false") && !value.Equals("inherit"))
                     throw new DomSyntaxError("This attribute only accepts values of \"true\", \"false\", or \"inherit\"");
 
                 setAttribute(EAttributeName.ContentEditable, value);
@@ -316,11 +426,11 @@ namespace CssUI.DOM
                 }
 
                 string attrValue = attr.Value;
-                if (attrValue == "true")
+                if (attrValue.Equals("true"))
                 {
                     return true;
                 }
-                else if (attrValue == "inherit")
+                else if (attrValue.Equals("inherit"))
                 {
                     return parentElement is HTMLElement element && element.isContentEditable;
                 }
@@ -329,14 +439,18 @@ namespace CssUI.DOM
             }
         }
 
+        /* XXX: Implement this */
+        [CEReactions]
         public string enterKeyHint
-        {
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#attr-enterkeyhint */
             get;
             set;
         }
 
+        /* XXX: Implement this */
+        [CEReactions]
         public string inputMode
-        {
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#attr-inputmode */
             get;
             set;
         }

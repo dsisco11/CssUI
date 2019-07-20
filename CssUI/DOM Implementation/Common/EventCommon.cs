@@ -18,7 +18,8 @@ namespace CssUI.DOM.Internal
 
             /* 1) Initialize event's ctrlKey, shiftKey, altKey, and metaKey attributes according to the current state of the key input device, if any (false for any keys that are not available). */
             /* XXX: Implement abstracted method for getting key states, possibly from end-user supplied Document object? */
-            MouseEventInit eventInit = new MouseEventInit()
+
+            MouseEventInit eventInit = new MouseEventInit(0, 0, 0, 0, Events.EMouseButton.Left, EMouseButtonFlags.Left, target)
             {
                 bubbles = true,
                 cancelable = true,

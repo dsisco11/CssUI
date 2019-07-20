@@ -27,7 +27,7 @@ namespace CssUI
 
         public void Set()
         {
-            // Stop the timeour timer
+            // Stop the timer
             if (timer_timeout != null)
             {
                 timer_timeout.Change(Timeout.Infinite, Timeout.Infinite);

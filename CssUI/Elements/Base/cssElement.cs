@@ -643,7 +643,7 @@ namespace CssUI
 
         #region Constructors
 
-        private cssElement(Document document) : base(document, CssTagName, null, null)
+        private cssElement(Document document) : base(document, CssTagName)
         {
             Box = new CssPrincipalBox(this);
 

@@ -20,6 +20,7 @@ namespace CssUI.DOM.Nodes
         internal ILogger Log { get => this.ownerDocument.Log; }
         #region Properties
         internal List<RegisteredObserver> RegisteredObservers = new List<RegisteredObserver>();
+        public Document nodeDocument { get; internal set; }
         #endregion
 
         #region Abstracts
@@ -43,7 +44,13 @@ namespace CssUI.DOM.Nodes
         #endregion
 
         #region DOM
-        public Document ownerDocument { get; internal set; }
+        public Document ownerDocument
+        {/* Docs: https://dom.spec.whatwg.org/#dom-node-ownerdocument */
+            get
+            {
+                return (this is Document) ? null : nodeDocument;
+            }
+        }
         public Node parentNode { get; private set; }
         public Element parentElement { get; private set; }
         public ChildNodeList childNodes { get; } = new ChildNodeList();
@@ -89,15 +96,12 @@ namespace CssUI.DOM.Nodes
         public Node getRootNode(GetRootNodeOptions options = null)
         {/* Docs: https://dom.spec.whatwg.org/#dom-node-getrootnode */
             /* The getRootNode(options) method, when invoked, must return context object’s shadow-including root if options’s composed is true, and context object’s root otherwise. */
-            if (!ReferenceEquals(options, null) && options.composed)
+            if (!ReferenceEquals(null, options) && options.composed)
             {
-                throw new NotImplementedException("shadow-nodes are not yet implemented");
+                DOMCommon.Get_Shadow_Including_Root(this);
             }
-            /* The root of an object is itself, if its parent is null, or else it is the root of its parent. The root of a tree is any object participating in that tree whose parent is null. */
-            if (ReferenceEquals(parentNode, null))
-                return this;
 
-            return parentNode.getRootNode();
+            return DOMCommon.Get_Root(this);
         }
 
         /// <summary>
@@ -929,7 +933,7 @@ namespace CssUI.DOM.Nodes
         /// Whenever any node or element is cloned, this function is called internally such that derived classes may populate the newly cloned instance with any required data such that it would be a perfect copy
         /// </summary>
         /// <param name="newClone"></param>
-        protected virtual Node onClone() { return null; }
+        protected virtual Node onClone(Node newClone) { return null; }
         #endregion
 
     }

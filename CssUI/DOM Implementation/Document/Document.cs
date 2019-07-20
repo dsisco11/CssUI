@@ -7,6 +7,7 @@ using CssUI.DOM.Media;
 using CssUI.DOM.Nodes;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using xLog;
 
 namespace CssUI.DOM
@@ -14,6 +15,8 @@ namespace CssUI.DOM
     public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEventCallbacks
     {/* Docs: https://dom.spec.whatwg.org/#document */
         #region Internal Properties
+        /* XXX: This never fires because we dont have a system to notify the document its not active yet */
+        internal readonly ManualResetEvent Active_State_Change_Signal = new ManualResetEvent(false);
         internal LinkedList<MediaQueryList> _mediaQueryLists = new LinkedList<MediaQueryList>();
         internal ILogger Log = LogFactory.GetLogger(nameof(Document));
         internal BrowsingContext BrowsingContext = null;
@@ -40,7 +43,6 @@ namespace CssUI.DOM
         #endregion
 
         #region Properties
-
         public Window defaultView
         {/* https://html.spec.whatwg.org/multipage/window-object.html#dom-document-defaultview */
             get
@@ -64,6 +66,8 @@ namespace CssUI.DOM
         /// Returns the Element that is the root element of the document (for example, the <html> element for HTML documents).
         /// </summary>
         public Element documentElement { get; private set; }
+
+        public LinkedList<HTMLImageElement> Images = new LinkedList<HTMLImageElement>();
         #endregion
 
         #region Node Implementation
@@ -355,13 +359,13 @@ namespace CssUI.DOM
                 foreach (Node inclusiveDescendant in descendentsList)
                 {
                     /* 1) Set inclusiveDescendant’s node document to document. */
-                    inclusiveDescendant.ownerDocument = this;
+                    inclusiveDescendant.nodeDocument = this;
                     /* 2) If inclusiveDescendant is an element, then set the node document of each attribute in inclusiveDescendant’s attribute list to document. */
                     if (inclusiveDescendant is Element element)
                     {
                         foreach (var attr in element.AttributeList)
                         {
-                            attr.ownerDocument = this;
+                            attr.nodeDocument = this;
                         }
                     }
                 }

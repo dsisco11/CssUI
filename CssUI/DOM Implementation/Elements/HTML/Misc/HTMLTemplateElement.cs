@@ -7,7 +7,7 @@
         #endregion
 
         #region Constructor
-        public HTMLTemplateElement(Document document, string localName, string prefix, string Namespace, DocumentFragment content) : base(document, localName, prefix, Namespace)
+        public HTMLTemplateElement(Document document, string localName, string prefix, string Namespace, DocumentFragment content) : base(document, localName)
         {
             this.content = content;
         }
