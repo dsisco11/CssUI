@@ -1,6 +1,7 @@
 ﻿using CssUI.DOM.Events;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Internal;
+using CssUI.DOM.Nodes;
 using CssUI.DOM.Serialization;
 
 namespace CssUI.DOM
@@ -101,6 +102,39 @@ namespace CssUI.DOM
                 return is_actively_pointed_at;
             }
 
+        }
+        #endregion
+
+        #region CSS Object Model
+        public Element offsetParent
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-htmlelement-offsetparent */
+            get
+            {
+                if (ReferenceEquals(null, Box) || is_root || ReferenceEquals(this, ownerDocument.body) || Style.Positioning == CSS.EPositioning.Fixed)
+                    return null;
+
+                /* 2) Return the nearest ancestor element of the element for which at least one of the following is true and terminate this algorithm if such an ancestor is found: */
+                var tree = new TreeWalker(this, Enums.ENodeFilterMask.SHOW_ELEMENT);
+                Element ancestor = tree.parentNode() as Element;
+                while (!ReferenceEquals(null, ancestor))
+                {
+                    if (ancestor.Style.Positioning != CSS.EPositioning.Static)
+                    {
+                        return ancestor;
+                    }
+                    else if (ReferenceEquals(ancestor, ownerDocument.body))
+                    {
+                        return ancestor;
+                    }
+                    else if (ancestor.Style.Positioning == CSS.EPositioning.Static && (ancestor is HTMLTableRowElement || ancestor is HTMLTableSectionElement || ancestor is HTMLTableElement))
+                    {
+
+                    }
+
+
+                    ancestor = tree.parentNode() as Element;
+                }
+            }
         }
         #endregion
 
