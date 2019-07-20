@@ -9,7 +9,6 @@ using CssUI.DOM.Enums;
 using CssUI.DOM.Events;
 using CssUI.DOM.Internal;
 using System;
-using CssUI.Internal;
 using CssUI.DOM.Geometry;
 
 namespace CssUI.DOM
@@ -887,6 +886,62 @@ namespace CssUI.DOM
             }
 
             return descendents;
+        }
+
+        /// <summary>
+        /// Returns a list of all descendents for the given node
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IEnumerable<Node> Get_Children(Node node, NodeFilter Filter = null)
+        {
+            LinkedList<Node> list = new LinkedList<Node>();
+            Node current = node.firstChild;
+            while (!ReferenceEquals(null, current))
+            {
+                if (!ReferenceEquals(null, Filter))
+                {
+                    var fr = Filter.acceptNode(current);
+                    if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
+                    else if (fr == ENodeFilterResult.FILTER_SKIP) continue;// move one to next
+                }
+
+                list.AddLast(current);
+                current = current.nextSibling;
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// Returns a list of all descendents for the given node
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IEnumerable<Node> Get_Children_OfType<Ty>(Node node, NodeFilter Filter = null)
+        {
+            LinkedList<Node> list = new LinkedList<Node>();
+            Node current = node.firstChild;
+            while (!ReferenceEquals(null, current))
+            {
+                if (!ReferenceEquals(null, Filter))
+                {
+                    var fr = Filter.acceptNode(current);
+                    if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
+                    else if (fr == ENodeFilterResult.FILTER_SKIP) continue;// move one to next
+                }
+
+                if (current is Ty)
+                {
+                    list.AddLast(current);
+                }
+
+                current = current.nextSibling;
+            }
+
+            return list;
         }
         #endregion
 
