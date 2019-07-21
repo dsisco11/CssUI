@@ -16,31 +16,31 @@ namespace CssUI.DOM
         public string title
         {
             get => getAttribute(EAttributeName.Title);
-            set => setAttribute(EAttributeName.Title, value);
+            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Title, value));
         }
         [CEReactions]
         public string lang
         {
             get => getAttribute(EAttributeName.Lang);
-            set => setAttribute(EAttributeName.Lang, value);
+            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Lang, value));
         }
         [CEReactions]
         public bool translate
         {
             get => hasAttribute(EAttributeName.Translate);
-            set => toggleAttribute(EAttributeName.Translate, value);
+            set => ReactionsCommon.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Translate, value));
         }
         [CEReactions]
         public string dir
         {
             get => getAttribute(EAttributeName.Dir);
-            set => setAttribute(EAttributeName.Dir, value);
+            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Dir, value));
         }
         [CEReactions]
         public string nonce
         {
             get => getAttribute(EAttributeName.Nonce);
-            set => setAttribute(EAttributeName.Nonce, value);
+            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Nonce, value));
         }
 
         public readonly DOMStringMap dataset;
@@ -285,10 +285,7 @@ namespace CssUI.DOM
 
                 return parsed.Value;
             }
-            set
-            {
-                setAttribute(EAttributeName.TabIndex, value.ToString());
-            }
+            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.TabIndex, value.ToString()));
         }
 
         /// <summary>
@@ -298,7 +295,7 @@ namespace CssUI.DOM
         public bool disabled
         {
             get => hasAttribute(EAttributeName.Disabled);
-            set => toggleAttribute(EAttributeName.Disabled, value);
+            set => ReactionsCommon.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Disabled, value));
         }
 
         /// <summary>
@@ -308,7 +305,7 @@ namespace CssUI.DOM
         public bool hidden
         {
             get => hasAttribute(EAttributeName.Hidden);
-            set => toggleAttribute(EAttributeName.Hidden, value);
+            set => ReactionsCommon.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Hidden, value));
         }
 
         protected bool click_in_progress = false;
@@ -347,7 +344,7 @@ namespace CssUI.DOM
         public string accessKey
         {
             get => getAttribute(EAttributeName.AccessKey);
-            set => setAttribute(EAttributeName.AccessKey, value);
+            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.AccessKey, value));
         }
 
         public string accessKeyLabel { get; private set; }
@@ -374,11 +371,12 @@ namespace CssUI.DOM
 
                 return false;
             }
-            set => setAttribute(EAttributeName.Draggable, value ? "true" : "false");
+            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Draggable, value ? "true" : "false"));
         }
 
         [CEReactions]
         public bool spellcheck;
+
         [CEReactions]
         public string autocapitalize;
 
@@ -400,13 +398,16 @@ namespace CssUI.DOM
             get => getAttribute(EAttributeName.ContentEditable);
             set
             {
-                if (value == null)
-                    value = string.Empty;
+                ReactionsCommon.Wrap_CEReaction(this, () =>
+                {
+                    if (value == null)
+                        value = string.Empty;
 
-                if (!value.Equals("true") && !value.Equals("false") && !value.Equals("inherit"))
-                    throw new DomSyntaxError("This attribute only accepts values of \"true\", \"false\", or \"inherit\"");
+                    if (!value.Equals("true") && !value.Equals("false") && !value.Equals("inherit"))
+                        throw new DomSyntaxError("This attribute only accepts values of \"true\", \"false\", or \"inherit\"");
 
-                setAttribute(EAttributeName.ContentEditable, value);
+                    setAttribute(EAttributeName.ContentEditable, value);
+                });
             }
         }
 

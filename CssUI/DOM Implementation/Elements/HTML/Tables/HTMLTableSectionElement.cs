@@ -75,7 +75,7 @@ namespace CssUI.DOM
         /// <param name="index"></param>
         [CEReactions] void deleteRow(int index)
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-tbody-deleterow */
-            ReactionCommon.Wrap_CEReaction(this, () => _delete_row(index));
+            ReactionsCommon.Wrap_CEReaction(this, () => _delete_row(index));
         }
 
         #region Internal Utilities

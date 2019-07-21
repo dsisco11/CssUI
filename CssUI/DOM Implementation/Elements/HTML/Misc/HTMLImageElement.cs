@@ -1,4 +1,5 @@
 ﻿using CssUI.DOM.Exceptions;
+using CssUI.DOM.Internal;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,27 +14,27 @@ namespace CssUI.DOM
         [CEReactions] public string alt
         {
             get => getAttribute(EAttributeName.Alt);
-            set => setAttribute(EAttributeName.Alt, value);
+            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Alt, value));
         }
         [CEReactions] public string src
         {
             get => getAttribute(EAttributeName.Src);
-            set => setAttribute(EAttributeName.Src, value);
+            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Src, value));
         }
         [CEReactions] public string srcset
         {
             get => getAttribute(EAttributeName.SrcSet);
-            set => setAttribute(EAttributeName.SrcSet, value);
+            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.SrcSet, value));
         }
         [CEReactions] public string sizes
         {
             get => getAttribute(EAttributeName.Sizes);
-            set => setAttribute(EAttributeName.Sizes, value);
+            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Sizes, value));
         }
         [CEReactions] public string crossOrigin
         {
             get => getAttribute(EAttributeName.CrossOrigin);
-            set => setAttribute(EAttributeName.CrossOrigin, value);
+            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.CrossOrigin, value));
         }
 
         /// <summary>
@@ -42,7 +43,7 @@ namespace CssUI.DOM
         [CEReactions] public string useMap
         {
             get => getAttribute(EAttributeName.UseMap);
-            set => setAttribute(EAttributeName.UseMap, value);
+            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.UseMap, value));
         }
 
         /// <summary>
@@ -52,29 +53,29 @@ namespace CssUI.DOM
         [CEReactions] public bool isMap
         {
             get => hasAttribute(EAttributeName.IsMap);
-            set => toggleAttribute(EAttributeName.IsMap, value);
+            set => ReactionsCommon.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.IsMap, value));
         }
 
         [CEReactions] public uint width
         {
             get => (uint)MathExt.Max(0, getAttribute_Numeric(EAttributeName.Width));
-            set => setAttribute(EAttributeName.Width, value.ToString());
+            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Width, value.ToString()));
         }
         [CEReactions] public uint height
         {
             get => (uint)MathExt.Max(0, getAttribute_Numeric(EAttributeName.Height));
-            set => setAttribute(EAttributeName.Height, value.ToString());
+            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Height, value.ToString()));
         }
 
         [CEReactions] public string referrerPolicy
         {
             get => getAttribute(EAttributeName.ReferrerPolicy);
-            set => setAttribute(EAttributeName.ReferrerPolicy, value);
+            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.ReferrerPolicy, value));
         }
         [CEReactions] public string decoding
         {
             get => getAttribute(EAttributeName.Decoding);
-            set => setAttribute(EAttributeName.Decoding, value);
+            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Decoding, value));
         }
 
         protected DataRequest currentRequest;

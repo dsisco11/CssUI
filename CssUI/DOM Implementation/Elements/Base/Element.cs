@@ -121,14 +121,14 @@ namespace CssUI.DOM
 
         [CEReactions] public string id
         {/* The id attribute must reflect the "id" content attribute. */
-            get => this.getAttribute(EAttributeName.ID);
-            set => this.setAttribute(EAttributeName.ID, value);
+            get => getAttribute(EAttributeName.ID);
+            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.ID, value));
         }
 
         [CEReactions] public string className
         {/* The className attribute must reflect the "class" content attribute. */
-            get => this.getAttribute(EAttributeName.Class);
-            set => this.setAttribute(EAttributeName.Class, value);
+            get => getAttribute(EAttributeName.Class);
+            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Class, value));
         }
 
         public IEnumerable<string> getAttributeNames() => this.AttributeList.Select(a => a.Name);
@@ -136,8 +136,8 @@ namespace CssUI.DOM
 
         [CEReactions] public string slot
         {/* The slot attribute must reflect the "slot" content attribute. */
-            get => this.getAttribute(EAttributeName.Slot);
-            set => this.setAttribute(EAttributeName.Slot, value);
+            get => getAttribute(EAttributeName.Slot);
+            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Slot, value));
         }
         #endregion
 
@@ -148,7 +148,6 @@ namespace CssUI.DOM
         public string Name
         {/* Docs: https://dom.spec.whatwg.org/#slotable-name */
             get => getAttribute(EAttributeName.Name);
-
             set
             {
                 var oldValue = getAttribute(EAttributeName.Name);
@@ -558,145 +557,169 @@ namespace CssUI.DOM
         [CEReactions]
         public void setAttribute(AtomicName<EAttributeName> Name, string value)
         {
-            find_attribute(Name, out Attr attr);
-
-            if (ReferenceEquals(attr, null))
+            ReactionsCommon.Wrap_CEReaction(this, () =>
             {
-                Attr newAttr = new Attr(Name.Name, this);
-                newAttr.Value = value;
-                append_attribute(newAttr);
-                return;
-            }
+                find_attribute(Name, out Attr attr);
 
-            change_attribute(attr, attr.Value, value);
+                if (ReferenceEquals(attr, null))
+                {
+                    Attr newAttr = new Attr(Name.Name, this);
+                    newAttr.Value = value;
+                    append_attribute(newAttr);
+                    return;
+                }
+
+                change_attribute(attr, attr.Value, value);
+            });
         }
 
         [CEReactions]
         public void setAttribute(string qualifiedName, string value)
         {
-            find_attribute(qualifiedName, out Attr attr);
-
-            if (ReferenceEquals(attr, null))
+            ReactionsCommon.Wrap_CEReaction(this, () =>
             {
-                Attr newAttr = new Attr(qualifiedName, this);
-                newAttr.Value = value;
-                append_attribute(newAttr);
-                return;
-            }
+                find_attribute(qualifiedName, out Attr attr);
 
-            change_attribute(attr, attr.Value, value);
+                if (ReferenceEquals(attr, null))
+                {
+                    Attr newAttr = new Attr(qualifiedName, this);
+                    newAttr.Value = value;
+                    append_attribute(newAttr);
+                    return;
+                }
+
+                change_attribute(attr, attr.Value, value);
+            });
         }
 
         [CEReactions]
         public Attr setAttributeNode(Attr attr)
         {
-            find_attribute(attr.Name, out Attr oldAttr);
-            if (ReferenceEquals(attr, oldAttr))
-                return attr;
-
-            if (!ReferenceEquals(oldAttr, null))
+            return ReactionsCommon.Wrap_CEReaction(this, () =>
             {
-                replace_attribute(oldAttr, attr);
-            }
-            else
-            {
-                append_attribute(attr);
-            }
+                find_attribute(attr.Name, out Attr oldAttr);
+                if (ReferenceEquals(attr, oldAttr))
+                    return attr;
 
-            return oldAttr;
+                if (!ReferenceEquals(oldAttr, null))
+                {
+                    replace_attribute(oldAttr, attr);
+                }
+                else
+                {
+                    append_attribute(attr);
+                }
+
+                return oldAttr;
+            });
         }
 
         [CEReactions]
         public void removeAttribute(AtomicName<EAttributeName> Name)
         {
-            find_attribute(Name, out Attr attr);
-            if (!ReferenceEquals(attr, null))
+            ReactionsCommon.Wrap_CEReaction(this, () =>
             {
-                remove_attribute(attr);
-            }
+                find_attribute(Name, out Attr attr);
+                if (!ReferenceEquals(attr, null))
+                {
+                    remove_attribute(attr);
+                }
+            });
         }
 
         [CEReactions]
         public void removeAttribute(string qualifiedName)
         {
-            find_attribute(qualifiedName, out Attr attr);
-            if (!ReferenceEquals(attr, null))
+            ReactionsCommon.Wrap_CEReaction(this, () =>
             {
-                remove_attribute(attr);
-            }
+                find_attribute(qualifiedName, out Attr attr);
+                if (!ReferenceEquals(attr, null))
+                {
+                    remove_attribute(attr);
+                }
+            });
         }
 
         [CEReactions]
         public Attr removeAttributeNode(Attr attr)
         {
-            find_attribute(attr.Name, out Attr outAttr);
-            if (!ReferenceEquals(attr, null))
+            return ReactionsCommon.Wrap_CEReaction(this, () =>
             {
-                remove_attribute(attr);
-            }
+                find_attribute(attr.Name, out Attr outAttr);
+                if (!ReferenceEquals(attr, null))
+                {
+                    remove_attribute(attr);
+                }
 
-            return attr;
+                return attr;
+            });
         }
 
         [CEReactions]
         public bool toggleAttribute(AtomicName<EAttributeName> Name, bool? force = null)
         {
-            /* 1) If qualifiedName does not match the Name production in XML, then throw an "InvalidCharacterError" DOMException. */
-            /* 2) If the context object is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase. */
-            /* 3) Let attribute be the first attribute in the context object’s attribute list whose qualified name is qualifiedName, and null otherwise. */
-            find_attribute(Name, out Attr attr);
-            /* 4) If attribute is null, then: */
-            if (ReferenceEquals(null, attr))
+            return ReactionsCommon.Wrap_CEReaction(this, () =>
             {
-                /* 1) If force is not given or is true, create an attribute whose local name is qualifiedName, value is the empty string, and node document is the context object’s node document, then append this attribute to the context object, and then return true. */
-                if (!force.HasValue || force.Value)
+                /* 1) If qualifiedName does not match the Name production in XML, then throw an "InvalidCharacterError" DOMException. */
+                /* 2) If the context object is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase. */
+                /* 3) Let attribute be the first attribute in the context object’s attribute list whose qualified name is qualifiedName, and null otherwise. */
+                find_attribute(Name, out Attr attr);
+                /* 4) If attribute is null, then: */
+                if (ReferenceEquals(null, attr))
                 {
-                    var newAttr = new Attr(Name, this.ownerDocument) { Value = string.Empty };
-                    append_attribute(newAttr);
-                    return true;
+                    /* 1) If force is not given or is true, create an attribute whose local name is qualifiedName, value is the empty string, and node document is the context object’s node document, then append this attribute to the context object, and then return true. */
+                    if (!force.HasValue || force.Value)
+                    {
+                        var newAttr = new Attr(Name, this.ownerDocument) { Value = string.Empty };
+                        append_attribute(newAttr);
+                        return true;
+                    }
+                    /* 2) Return false. */
+                    return false;
                 }
-                /* 2) Return false. */
-                return false;
-            }
-            /* 5) Otherwise, if force is not given or is false, remove an attribute given qualifiedName and the context object, and then return false. */
-            if (!force.HasValue || !force.Value)
-            {
-                remove_attribute(attr);
-                return false;
-            }
-            /* 6) Return true. */
-            return true;
+                /* 5) Otherwise, if force is not given or is false, remove an attribute given qualifiedName and the context object, and then return false. */
+                if (!force.HasValue || !force.Value)
+                {
+                    remove_attribute(attr);
+                    return false;
+                }
+                /* 6) Return true. */
+                return true;
+            });
         }
 
         [CEReactions]
         public bool toggleAttribute(string qualifiedName, bool? force = null)
         {
-            /* 1) If qualifiedName does not match the Name production in XML, then throw an "InvalidCharacterError" DOMException. */
-            /* 2) If the context object is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase. */
-            qualifiedName = qualifiedName.ToLowerInvariant();
-            /* 3) Let attribute be the first attribute in the context object’s attribute list whose qualified name is qualifiedName, and null otherwise. */
-            find_attribute(qualifiedName, out Attr attr);
-            /* 4) If attribute is null, then: */
-            if (ReferenceEquals(null, attr))
+            return ReactionsCommon.Wrap_CEReaction(this, () =>
             {
-                /* 1) If force is not given or is true, create an attribute whose local name is qualifiedName, value is the empty string, and node document is the context object’s node document, then append this attribute to the context object, and then return true. */
-                if (!force.HasValue || force.Value)
+                /* 1) If qualifiedName does not match the Name production in XML, then throw an "InvalidCharacterError" DOMException. */
+                /* 2) If the context object is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase. */
+                qualifiedName = qualifiedName.ToLowerInvariant();
+                /* 3) Let attribute be the first attribute in the context object’s attribute list whose qualified name is qualifiedName, and null otherwise. */
+                find_attribute(qualifiedName, out Attr attr);
+                /* 4) If attribute is null, then: */
+                if (ReferenceEquals(null, attr))
                 {
-                    var newAttr = new Attr(qualifiedName, this.ownerDocument) { Value = string.Empty };
-                    append_attribute(newAttr);
-                    return true;
+                    /* 1) If force is not given or is true, create an attribute whose local name is qualifiedName, value is the empty string, and node document is the context object’s node document, then append this attribute to the context object, and then return true. */
+                    if (!force.HasValue || force.Value)
+                    {
+                        var newAttr = new Attr(qualifiedName, this.ownerDocument) { Value = string.Empty };
+                        append_attribute(newAttr);
+                        return true;
+                    }
+                    /* 2) Return false. */
+                    return false;
                 }
-                /* 2) Return false. */
-                return false;
-            }
-            /* 5) Otherwise, if force is not given or is false, remove an attribute given qualifiedName and the context object, and then return false. */
-            if (!force.HasValue || !force.Value)
-            {
-                remove_attribute(attr);
-                return false;
-            }
-            /* 6) Return true. */
-            return true;
+                /* 5) Otherwise, if force is not given or is false, remove an attribute given qualifiedName and the context object, and then return false. */
+                if (!force.HasValue || !force.Value)
+                {
+                    remove_attribute(attr);
+                    return false;
+                }
+                /* 6) Return true. */
+                return true;
+            });
         }
 
         public bool hasAttribute(AtomicName<EAttributeName> Name)

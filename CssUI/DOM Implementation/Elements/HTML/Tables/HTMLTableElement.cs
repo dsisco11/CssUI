@@ -31,7 +31,7 @@ namespace CssUI.DOM
             }
             set
             {
-                ReactionCommon.Wrap_CEReaction(this, () =>
+                ReactionsCommon.Wrap_CEReaction(this, () =>
                 {
                     HTMLTableCaptionElement target = caption;
                     if (!ReferenceEquals(null, target))
@@ -146,7 +146,7 @@ namespace CssUI.DOM
 
         [CEReactions] public void deleteRow(int index)
         {
-            ReactionCommon.Wrap_CEReaction(this, () => _delete_row(index));
+            ReactionsCommon.Wrap_CEReaction(this, () => _delete_row(index));
         }
 
         #region Internal Utilities
