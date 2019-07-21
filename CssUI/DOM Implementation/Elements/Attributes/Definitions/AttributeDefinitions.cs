@@ -25,50 +25,50 @@ namespace CssUI.DOM
         {
             return new AttributeDefinition[]
             {
-                new AttributeDefinition(EAttributeName.Width, false, 0x0, EAttributeType.Integer, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.Height, false, 0x0, EAttributeType.Integer, MissingValueDefault: null),
+                new AttributeDefinition(EAttributeName.Width, EAttributeType.Integer, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.Height, EAttributeType.Integer, null, null, 0x0),
 
-                new AttributeDefinition(EAttributeName.ID, false, 0x0, EAttributeType.String, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.Class, false, 0x0, EAttributeType.String, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.Slot, false, 0x0, EAttributeType.String, MissingValueDefault: null),
+                new AttributeDefinition(EAttributeName.ID, EAttributeType.String, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.Class, EAttributeType.String, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.Slot, EAttributeType.String, null, null, 0x0),
                 
 
-                new AttributeDefinition(EAttributeName.Media, false, 0x0, EAttributeType.String, MissingValueDefault: null),
+                new AttributeDefinition(EAttributeName.Media, EAttributeType.String, null, null, 0x0),
 
                 /* HTML Element Attributes */
-                new AttributeDefinition(EAttributeName.Title, false, 0x0, EAttributeType.String, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.Lang, false, 0x0, EAttributeType.String, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.Translate, false, 0x0, EAttributeType.Boolean, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.Dir, false, 0x0, EAttributeType.String, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.Nonce, false, 0x0, EAttributeType.String, MissingValueDefault: null),
+                new AttributeDefinition(EAttributeName.Title, EAttributeType.String, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.Lang, EAttributeType.String, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.Translate, EAttributeType.Boolean, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.Dir, EAttributeType.String, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.Nonce, EAttributeType.String, null, null, 0x0),
 
-                new AttributeDefinition(EAttributeName.TabIndex, false, 0x0, EAttributeType.Integer, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.Disabled, false, 0x0, EAttributeType.Boolean, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.Hidden, false, 0x0, EAttributeType.Boolean, MissingValueDefault: null),
+                new AttributeDefinition(EAttributeName.TabIndex, EAttributeType.Integer, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.Disabled, EAttributeType.Boolean, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.Hidden, EAttributeType.Boolean, null, null, 0x0),
 
-                new AttributeDefinition(EAttributeName.AccessKey, false, 0x0, EAttributeType.KeyCombo, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.Draggable, false, 0x0, EAttributeType.Boolean, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.SpellCheck, false, 0x0, EAttributeType.Boolean, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.AutoCapitalize, false, 0x0, EAttributeType.String, MissingValueDefault: null),
+                new AttributeDefinition(EAttributeName.AccessKey, EAttributeType.KeyCombo, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.Draggable, EAttributeType.Boolean, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.SpellCheck, EAttributeType.Boolean, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.AutoCapitalize, EAttributeType.String, null, null, 0x0),
 
-                new AttributeDefinition(EAttributeName.ContentEditable, false, 0x0, EAttributeType.Enumerated, DomLookup.Get_Keywords<EContentEditable>(), null),
+                new AttributeDefinition(EAttributeName.ContentEditable, EAttributeType.Enumerated, null, null, 0x0, DomLookup.Get_Keywords<EContentEditable>(), typeof(EContentEditable)),
 
                 /* Image Attributes */
-                new AttributeDefinition(EAttributeName.Src, false, 0x0, EAttributeType.String, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.SrcSet, false, 0x0, EAttributeType.String, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.Alt, false, 0x0, EAttributeType.String, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.Sizes, false, 0x0, EAttributeType.String, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.CrossOrigin, false, 0x0, EAttributeType.String, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.UseMap, false, 0x0, EAttributeType.String, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.IsMap, false, 0x0, EAttributeType.Boolean, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.ReferrerPolicy, false, 0x0, EAttributeType.String, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.Decoding, false, 0x0, EAttributeType.String, MissingValueDefault: null),
+                new AttributeDefinition(EAttributeName.Src, EAttributeType.String, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.SrcSet, EAttributeType.String, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.Alt, EAttributeType.String, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.Sizes, EAttributeType.String, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.CrossOrigin, EAttributeType.String, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.UseMap, EAttributeType.String, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.IsMap, EAttributeType.Boolean, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.ReferrerPolicy, EAttributeType.String, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.Decoding, EAttributeType.String, null, null, 0x0),
 
                 /* Table Attributes */
-                new AttributeDefinition(EAttributeName.Scope, false, 0x0, EAttributeType.String, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.Abbr, false, 0x0, EAttributeType.String, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.ColSpan, false, 0x0, EAttributeType.Integer, MissingValueDefault: null),
-                new AttributeDefinition(EAttributeName.RowSpan, false, 0x0, EAttributeType.Integer, MissingValueDefault: null),
+                new AttributeDefinition(EAttributeName.Scope, EAttributeType.String, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.Abbr, EAttributeType.String, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.ColSpan, EAttributeType.Integer, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.RowSpan, EAttributeType.Integer, null, null, 0x0),
 
             };
         }

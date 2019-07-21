@@ -1,5 +1,4 @@
 ﻿using System;
-using CssUI.Internal;
 using System.Collections.Generic;
 using CssUI.DOM.Enums;
 using CssUI.DOM.Exceptions;
@@ -25,21 +24,15 @@ namespace CssUI.DOM
         /// When the attribute is not specified, if there is a missing value default state defined, then that is the state represented by the (missing) attribute. Otherwise, the absence of the attribute means that there is no state represented.
         /// </summary>
         /// Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#missing-value-default
-        public readonly AtomicString MissingValueDefault = null;
+        public readonly AttributeValue MissingValueDefault = null;
         /// <summary>
         /// 
         /// </summary>
-        public readonly AtomicString InvalidValueDefault = null;
-        /// <summary>
-        /// If TRUE then this attribute will be inherited by default, meaning it's value is passed down to child elements rather then their matching property using it's 'initial' value
-        /// </summary>
-        public readonly bool Inherited = false;
-
+        public readonly AttributeValue InvalidValueDefault = null;
         /// <summary>
         /// Allowed datatypes
         /// </summary>
         public readonly EAttributeType Type = 0x0;
-
         /// <summary>
         /// A list of all keywords that can be assigned to this property
         /// </summary>
@@ -48,20 +41,25 @@ namespace CssUI.DOM
         public readonly Type enumType = null;
         #endregion
 
+        #region Accessors
+        /// <summary>
+        /// If TRUE then this attribute will be inherited by default, meaning it's value is passed down to child elements rather then their matching property using it's 'initial' value
+        /// </summary>
+        public bool Inherited => 0 != (Flags & EAttributeFlags.Inherited);
+        #endregion
+
         #region Constructors
         /// <summary>
         /// Creates a DOM attribute definition
         /// </summary>
         /// <param name="Name">DOM attribute name</param>
-        /// <param name="Inherited">Do child elements inherit this value if they are unset?</param>
         /// <param name="Flags">Indicates what aspects of an element this property affects</param>
         /// <param name="MissingValueDefault">Default value for the attribute</param>
         /// <param name="Keywords">List of keywords which can be assigned to this attribute</param>
-        public AttributeDefinition(AtomicName<EAttributeName> Name, bool Inherited, EAttributeFlags Flags, EAttributeType Type = 0x0, string[] Keywords = null, AtomicString MissingValueDefault = null, AtomicString InvalidValueDefault = null, Type enumType)
+        public AttributeDefinition(AtomicName<EAttributeName> Name, EAttributeType Type = 0x0, AttributeValue MissingValueDefault = null, AttributeValue InvalidValueDefault = null, EAttributeFlags Flags = 0x0, string[] Keywords = null, Type enumType = null)
         {
             this.Name = Name;
             this.Flags = Flags;
-            this.Inherited = Inherited;
             this.MissingValueDefault = MissingValueDefault;
             this.InvalidValueDefault = InvalidValueDefault;
             this.enumType = enumType;
@@ -214,6 +212,51 @@ namespace CssUI.DOM
         /// <param name="Value"></param>
         /// <returns></returns>
         public void CheckAndThrow(string Value) => Parse(Value, out _);
+
+        /// <summary>
+        /// Throws an exception if the value is invalid according to the currently set options
+        /// </summary>
+        /// <param name="Value"></param>
+        /// <returns></returns>
+        public void CheckAndThrow(AttributeValue Value)
+        {
+            if (Type == Value.Type)
+                return;// We're good
+
+            /* Our types dont exactly match so we need to just check some edge cases, like Integer vs. NonNegative_Integer */
+            switch (Type)
+            {
+                case EAttributeType.Integer:
+                case EAttributeType.NonNegative_Integer:
+                    {
+                        if (Value.Type == EAttributeType.Integer || Value.Type == EAttributeType.NonNegative_Integer)
+                        {
+                            return;// This case is fine
+                        }
+                    }
+                    break;
+                case EAttributeType.Length:
+                case EAttributeType.NonZero_Length:
+                    {
+                        if (Value.Type == EAttributeType.Length || Value.Type == EAttributeType.NonZero_Length)
+                        {
+                            return;// This case is fine
+                        }
+                    }
+                    break;
+                case EAttributeType.Percentage:
+                case EAttributeType.NonZero_Percentage:
+                    {
+                        if (Value.Type == EAttributeType.Percentage || Value.Type == EAttributeType.NonZero_Percentage)
+                        {
+                            return;// This case is fine
+                        }
+                    }
+                    break;
+            }
+
+            throw new Exception($"A {Enum.GetName(typeof(EAttributeType), this.Type)} attribute cannot be assigned a {Enum.GetName(typeof(EAttributeType), Value.Type)} value!");
+        }
         #endregion
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

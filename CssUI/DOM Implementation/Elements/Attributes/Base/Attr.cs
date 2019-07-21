@@ -23,6 +23,9 @@ namespace CssUI.DOM
         private AttributeValue _value = null;
         public Element ownerElement { get; internal set; } = null;
         private WeakReference<AttributeDefinition> _definition = null;
+
+        private bool Is_MissingValue = false;
+        private bool Is_InvalidValue = false;
         #endregion
 
         #region Accessors
@@ -43,8 +46,8 @@ namespace CssUI.DOM
             }
         }
 
-        public override string nodeValue { get => Value.Data; set => Value = AttributeValue.Parse(value, Definition); }
-        public override string textContent { get => Value.Data; set => Value = AttributeValue.Parse(value, Definition); }
+        public override string nodeValue { get => Value.Data; set => _set_value(AttributeValue.Parse(value, Definition)); }
+        public override string textContent { get => Value.Data; set => _set_value(AttributeValue.Parse(value, Definition)); }
         public override int nodeLength { get => childNodes.Count; }
 
         /// <summary>
@@ -60,7 +63,7 @@ namespace CssUI.DOM
                 /* 1) If attribute’s element is null, then set attribute’s value to value. */
                 if (ReferenceEquals(null, ownerElement))
                 {
-                    _value = value;
+                    _set_value(value);
                 }
                 else
                 {
@@ -71,6 +74,36 @@ namespace CssUI.DOM
         }
         #endregion
 
+        #region Internal Utilities
+        private void _set_value(AttributeValue newValue)
+        {
+            Is_MissingValue = ReferenceEquals(null, newValue) || ReferenceEquals(null, newValue.Data);
+            Is_InvalidValue = false;
+
+            try
+            {
+                Definition.CheckAndThrow(newValue);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex);
+                Is_InvalidValue = true;
+            }
+
+            if (Is_MissingValue)
+            {
+                _value = Definition.MissingValueDefault;
+            }
+            else if (Is_InvalidValue)
+            {
+                _value = Definition.InvalidValueDefault;
+            }
+            else
+            {
+                _value = newValue;
+            }
+        }
+        #endregion
 
         #region Constructors
         public Attr(AtomicName<EAttributeName> localName, Element Owner, string Namespace = null)
