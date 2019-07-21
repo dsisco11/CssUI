@@ -48,7 +48,7 @@ namespace CssUI.DOM
                 new AttributeDefinition(EAttributeName.Hidden, EAttributeType.Boolean, null, null, 0x0),
 
                 new AttributeDefinition(EAttributeName.AccessKey, EAttributeType.KeyCombo, null, null, 0x0),
-                new AttributeDefinition(EAttributeName.Draggable, EAttributeType.Boolean, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.Draggable, EAttributeType.Enumerated, AttributeValue.From_Enum(EDraggable.Auto), AttributeValue.From_Enum(EDraggable.Auto), 0x0, DomLookup.Get_Keywords<EDraggable>(), typeof(EDraggable)),
                 new AttributeDefinition(EAttributeName.SpellCheck, EAttributeType.Boolean, null, null, 0x0),
                 new AttributeDefinition(EAttributeName.AutoCapitalize, EAttributeType.String, null, null, 0x0),
 

@@ -13,7 +13,7 @@ namespace CssUI.DOM
         [CEReactions] public uint colSpan
         {/* The td and th elements may have a colspan content attribute specified, whose value must be a valid non-negative integer greater than zero and less than or equal to 1000. */
             get => (uint)MathExt.Clamp(getAttribute(EAttributeName.ColSpan)?.Get_UInt() ?? 0, 0, 1000);
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.ColSpan, AttributeValue.From_Integer((uint)MathExt.Clamp(value, 0, 1000))));
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.ColSpan, AttributeValue.From_Integer((uint)MathExt.Clamp(value, 0, 1000))));
         }
         /// <summary>
         /// Number of rows that the cell is to span
@@ -23,7 +23,7 @@ namespace CssUI.DOM
             /* The td and th elements may also have a rowspan content attribute specified, whose value must be a valid non-negative integer less than or equal to 65534. 
              * For this attribute, the value zero means that the cell is to span all the remaining rows in the row group. */
             get => (uint)MathExt.Clamp(getAttribute(EAttributeName.RowSpan)?.Get_UInt() ?? 0, 0, ushort.MaxValue);
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.RowSpan, AttributeValue.From_Integer((uint)MathExt.Clamp(value, 0, ushort.MaxValue))));
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.RowSpan, AttributeValue.From_Integer((uint)MathExt.Clamp(value, 0, ushort.MaxValue))));
         }
         /// <summary>
         /// The header cells for this cell
@@ -32,7 +32,7 @@ namespace CssUI.DOM
         public string headers
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#attr-tdth-headers */
             get => getAttribute(EAttributeName.Headers)?.Get_String();
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Headers, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Headers, AttributeValue.From_String(value)));
         }
 
         /// <summary>

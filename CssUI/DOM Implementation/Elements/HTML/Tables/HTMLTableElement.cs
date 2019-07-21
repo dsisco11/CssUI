@@ -32,7 +32,7 @@ namespace CssUI.DOM
             }
             set
             {
-                ReactionsCommon.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(this, () =>
                 {
                     HTMLTableCaptionElement target = caption;
                     if (!ReferenceEquals(null, target))
@@ -147,7 +147,7 @@ namespace CssUI.DOM
 
         [CEReactions] public void deleteRow(int index)
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-deleterow */
-            ReactionsCommon.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(this, () =>
             {
                 int rowCount = rows.Count;
                 if (index < -1 || index > rowCount)

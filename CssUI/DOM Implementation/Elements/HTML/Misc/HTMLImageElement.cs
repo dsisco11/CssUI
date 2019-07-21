@@ -15,27 +15,27 @@ namespace CssUI.DOM
         [CEReactions] public string alt
         {
             get => getAttribute(EAttributeName.Alt)?.Get_String();
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Alt, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Alt, AttributeValue.From_String(value)));
         }
         [CEReactions] public string src
         {
             get => getAttribute(EAttributeName.Src)?.Get_String();
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Src, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Src, AttributeValue.From_String(value)));
         }
         [CEReactions] public string srcset
         {
             get => getAttribute(EAttributeName.SrcSet)?.Get_String();
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.SrcSet, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.SrcSet, AttributeValue.From_String(value)));
         }
         [CEReactions] public string sizes
         {
             get => getAttribute(EAttributeName.Sizes)?.Get_String();
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Sizes, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Sizes, AttributeValue.From_String(value)));
         }
         [CEReactions] public string crossOrigin
         {
             get => getAttribute(EAttributeName.CrossOrigin)?.Get_String();
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.CrossOrigin, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.CrossOrigin, AttributeValue.From_String(value)));
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace CssUI.DOM
         [CEReactions] public string useMap
         {
             get => getAttribute(EAttributeName.UseMap)?.Get_String();
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.UseMap, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.UseMap, AttributeValue.From_String(value)));
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace CssUI.DOM
         [CEReactions] public bool isMap
         {
             get => hasAttribute(EAttributeName.IsMap);
-            set => ReactionsCommon.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.IsMap, value));
+            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.IsMap, value));
         }
 
         /* =====================================================================
@@ -66,23 +66,23 @@ namespace CssUI.DOM
         [CEReactions] public uint width
         {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content.html#dom-img-width */
             get => (uint)MathExt.Max(0, getAttribute(EAttributeName.Width)?.Get_UInt() ?? 0);
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Width, AttributeValue.From_Integer(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Width, AttributeValue.From_Integer(value)));
         }
         [CEReactions] public uint height
         {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content.html#dom-img-width */
             get => (uint)MathExt.Max(0, getAttribute(EAttributeName.Height)?.Get_UInt() ?? 0);
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Height, AttributeValue.From_Integer(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Height, AttributeValue.From_Integer(value)));
         }
 
         [CEReactions] public string referrerPolicy
         {
             get => getAttribute(EAttributeName.ReferrerPolicy).Get_String();
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.ReferrerPolicy, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.ReferrerPolicy, AttributeValue.From_String(value)));
         }
         [CEReactions] public string decoding
         {
             get => getAttribute(EAttributeName.Decoding).Get_String();
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Decoding, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Decoding, AttributeValue.From_String(value)));
         }
 
         protected DataRequest currentRequest;

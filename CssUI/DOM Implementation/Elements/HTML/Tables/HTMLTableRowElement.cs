@@ -133,7 +133,7 @@ namespace CssUI.DOM
         /// <param name="index"></param>
         [CEReactions] public void deleteCell(int index)
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-tr-deletecell */
-            ReactionsCommon.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(this, () =>
             {
                 int cellCount = cells.Count;
                 if (index < -1 || index > cellCount)

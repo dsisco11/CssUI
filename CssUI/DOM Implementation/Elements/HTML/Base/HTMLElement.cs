@@ -11,37 +11,49 @@ namespace CssUI.DOM
     /// The basic interface, from which all the HTML elements' interfaces inherit, and which must be used by elements that have no additional requirements, is the HTMLElement interface.
     /// </summary>
     public class HTMLElement : Element, IGlobalEventCallbacks, IDocumentAndElementEventCallbacks
-    {/* Docs:  */
+    {/* Docs: https://html.spec.whatwg.org/multipage/dom.html#htmlelement */
         # region Metadata Attributes
+
+        /// <summary>
+        /// The lang attribute (in no namespace) specifies the primary language for the element's contents and for any of the element's attributes that contain text. 
+        /// Its value must be a valid BCP 47 language tag, or the empty string. Setting the attribute to the empty string indicates that the primary language is unknown.
+        /// </summary>
         [CEReactions]
         public string title
         {
-            get => getAttribute(EAttributeName.Title);
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Title, value));
+            get => getAttribute(EAttributeName.Title).Get_String();
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Title, AttributeValue.From_String(value)));
         }
+
         [CEReactions]
         public string lang
         {
-            get => getAttribute(EAttributeName.Lang);
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Lang, value));
+            get => getAttribute(EAttributeName.Lang).Get_String();
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Lang, AttributeValue.From_String(value)));
         }
+
         [CEReactions]
         public bool translate
         {
             get => hasAttribute(EAttributeName.Translate);
-            set => ReactionsCommon.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Translate, value));
+            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Translate, value));
         }
+
         [CEReactions]
         public string dir
         {
-            get => getAttribute(EAttributeName.Dir);
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Dir, value));
+            get => getAttribute(EAttributeName.Dir).Get_String();
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Dir, AttributeValue.From_String(value)));
         }
-        [CEReactions]
-        public string nonce
-        {
-            get => getAttribute(EAttributeName.Nonce);
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Nonce, value));
+
+        /// <summary>
+        /// Returns the value of the element's [[CryptographicNonce]] internal slot.
+        /// Can be set, to update that slot's value.
+        /// </summary>
+        public string nonce// Intentionally no [CEReactions]
+        {/* Docs: https://html.spec.whatwg.org/multipage/urls-and-fetching.html#dom-noncedelement-nonce */
+            get => getAttribute(EAttributeName.Nonce).Get_String();
+            set => setAttribute(EAttributeName.Nonce, AttributeValue.From_String(value));
         }
 
         public readonly DOMStringMap dataset;
@@ -245,13 +257,21 @@ namespace CssUI.DOM
             get
             {
                 tabindex_focus_flag = false;
-                string attrValue = getAttribute(EAttributeName.ContentEditable);
-                int? parsed = null;
-                if (!string.IsNullOrEmpty(attrValue))
-                    parsed = DOMParser.Parse_Integer(attrValue);
+                Attr Attrib = getAttributeNode(EAttributeName.ContentEditable);
+                /* Get the attributes integer value and default to -1 if it cannot be resolved */
+                int attrValue = Attrib?.Value?.Get_Int() ?? -1;
 
-                if (!parsed.HasValue)
+                /* If the attribute is omitted or parsing the value returns an error */
+                if (ReferenceEquals(null, Attrib.Value) || Attrib.Is_MissingValue || Attrib.Is_InvalidValue)
                 {
+                    /* The tabIndex IDL attribute must reflect the value of the tabindex content attribute. 
+                     * The default value is 0 if the element is an a, area, button, iframe, input, select, or textarea element, or is a summary element that is a summary for its parent details. 
+                     * The default value is −1 otherwise. */
+                    if (Attrib.Is_MissingValue)
+                    {
+                        /* XXX: Implement checks for these special element classes once they exist */
+                    }
+
                     /*
                      * Modulo platform conventions, it is suggested that for the following elements, the tabindex focus flag be set:
                      * 
@@ -268,25 +288,28 @@ namespace CssUI.DOM
                     if (this.draggable)
                         tabindex_focus_flag = true;
                 }
-                else if (parsed.Value < 0)
+                else
                 {
-                    /* The user agent must set the element's tabindex focus flag, but should omit the element from the sequential focus navigation order. */
-                    tabindex_focus_flag = true;
-                }
-                else if (parsed.Value == 0)
-                {
-                    /* The user agent must set the element's tabindex focus flag, should allow the element and any focusable areas that have the element as their DOM anchor to be reached using sequential focus navigation, following platform conventions to determine the element's relative position in the sequential focus navigation order. */
-                    tabindex_focus_flag = true;
-                }
-                else if (parsed.Value > 0)
-                {
-                    /*  */
-                    tabindex_focus_flag = true;
+                    if (attrValue < 0)
+                    {
+                        /* The user agent must set the element's tabindex focus flag, but should omit the element from the sequential focus navigation order. */
+                        tabindex_focus_flag = true;
+                    }
+                    else if (attrValue == 0)
+                    {
+                        /* The user agent must set the element's tabindex focus flag, should allow the element and any focusable areas that have the element as their DOM anchor to be reached using sequential focus navigation, following platform conventions to determine the element's relative position in the sequential focus navigation order. */
+                        tabindex_focus_flag = true;
+                    }
+                    else if (attrValue > 0)
+                    {
+                        /*  */
+                        tabindex_focus_flag = true;
+                    }
                 }
 
-                return parsed.Value;
+                return attrValue;
             }
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.TabIndex, value.ToString()));
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.TabIndex, AttributeValue.From_Integer(value)));
         }
 
         /// <summary>
@@ -296,7 +319,7 @@ namespace CssUI.DOM
         public bool disabled
         {
             get => hasAttribute(EAttributeName.Disabled);
-            set => ReactionsCommon.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Disabled, value));
+            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Disabled, value));
         }
 
         /// <summary>
@@ -306,7 +329,7 @@ namespace CssUI.DOM
         public bool hidden
         {
             get => hasAttribute(EAttributeName.Hidden);
-            set => ReactionsCommon.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Hidden, value));
+            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Hidden, value));
         }
 
         protected bool click_in_progress = false;
@@ -335,21 +358,26 @@ namespace CssUI.DOM
 
             if (!DOMCommon.Is_Focusable(this))
             {
-
+                /* XXX: */
             }
         }
 
         // public void blur(); /* "User agents are encouraged to ignore calls to this blur() method entirely." - https://html.spec.whatwg.org/multipage/interaction.html#dom-window-blur */
 
+            /* XXX: finish access key logic */
         [CEReactions]
         public string accessKey
         {
-            get => getAttribute(EAttributeName.AccessKey);
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.AccessKey, value));
+            get => getAttribute(EAttributeName.AccessKey).Get_String();
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.AccessKey, AttributeValue.Parse(EAttributeName.AccessKey, value)));
         }
 
         public string accessKeyLabel { get; private set; }
 
+        /// <summary>
+        /// Returns true if the element is draggable; otherwise, returns false.
+        /// Can be set, to override the default and set the draggable content attribute.
+        /// </summary>
         [CEReactions]
         public bool draggable
         {/* Docs: https://html.spec.whatwg.org/multipage/dnd.html#the-draggable-attribute */
@@ -360,21 +388,22 @@ namespace CssUI.DOM
                     return false;
                 }
 
-                string attrValue = attr.Value;
-                if (attrValue.Equals("true"))
+                EDraggable attrValue = attr.Value.Get_Enum<EDraggable>();
+                if (attrValue == EDraggable.True)
                 {
                     return true;
                 }
-                else if (attrValue.Equals("auto"))
+                else if (attrValue == EDraggable.Auto)
                 {
                     return parentElement is HTMLElement element && element.isContentEditable;
                 }
 
                 return false;
             }
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Draggable, value ? "true" : "false"));
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Draggable, AttributeValue.From_Enum(value ? EDraggable.True : EDraggable.False)));
         }
 
+        /* XXX: implement these */
         [CEReactions]
         public bool spellcheck;
 

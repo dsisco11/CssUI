@@ -97,7 +97,12 @@ namespace CssUI.DOM
         /// <returns></returns>
         public static AttributeValue From_Enum<Ty>(Ty enumValue) where Ty: struct
         {
-            DomLookup.Keyword_From_Enum(enumValue, out string keyword);
+            /* Not all enumeration values will have a DOM keywrod, some defined by the specification explicitly say certain values should NOT have a keyword */
+            string keyword = null;
+
+            if (DomLookup.Keyword_From_Enum(enumValue, out string outKey))
+                keyword = outKey;
+
             return new AttributeValue(EAttributeType.Enumerated, keyword, enumValue);
         }
         #endregion
@@ -190,7 +195,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Retreives this value as the requested type if possible
         /// </summary>
-        public ulong Get_Enum<Ty>()
+        public Ty Get_Enum<Ty>()
         {
             if (Type != EAttributeType.Enumerated)
             {

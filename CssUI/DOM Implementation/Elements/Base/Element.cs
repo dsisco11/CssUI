@@ -124,13 +124,13 @@ namespace CssUI.DOM
         [CEReactions] public string id
         {/* The id attribute must reflect the "id" content attribute. */
             get => getAttribute(EAttributeName.ID);
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.ID, value));
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.ID, value));
         }
 
         [CEReactions] public string className
         {/* The className attribute must reflect the "class" content attribute. */
             get => getAttribute(EAttributeName.Class);
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Class, value));
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Class, value));
         }
 
         public IEnumerable<string> getAttributeNames() => this.AttributeList.Select(a => a.Name);
@@ -139,7 +139,7 @@ namespace CssUI.DOM
         [CEReactions] public string slot
         {/* The slot attribute must reflect the "slot" content attribute. */
             get => getAttribute(EAttributeName.Slot);
-            set => ReactionsCommon.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Slot, value));
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Slot, value));
         }
         #endregion
 
@@ -548,7 +548,7 @@ namespace CssUI.DOM
         [CEReactions]
         public void setAttribute(AtomicName<EAttributeName> Name, AttributeValue value)
         {
-            ReactionsCommon.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(this, () =>
             {
                 find_attribute(Name, out Attr attr);
 
@@ -574,7 +574,7 @@ namespace CssUI.DOM
         [Obsolete]
         public void setAttribute(string qualifiedName, string value)
         {
-            ReactionsCommon.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(this, () =>
             {
                 find_attribute(qualifiedName, out Attr attr);
 
@@ -617,7 +617,7 @@ namespace CssUI.DOM
         [CEReactions]
         public void removeAttribute(AtomicName<EAttributeName> Name)
         {
-            ReactionsCommon.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(this, () =>
             {
                 find_attribute(Name, out Attr attr);
                 if (!ReferenceEquals(attr, null))
@@ -631,7 +631,7 @@ namespace CssUI.DOM
         [Obsolete]
         public void removeAttribute(string qualifiedName)
         {
-            ReactionsCommon.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(this, () =>
             {
                 find_attribute(qualifiedName, out Attr attr);
                 if (!ReferenceEquals(attr, null))
