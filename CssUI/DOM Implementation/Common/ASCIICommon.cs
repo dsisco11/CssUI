@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace CssUI.DOM
 {
@@ -51,7 +52,7 @@ namespace CssUI.DOM
         }
 
         /// <summary>
-        /// True if char is an ASCII digit character
+        /// True if char is an ASCII alphabet character
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
@@ -143,6 +144,21 @@ namespace CssUI.DOM
                 return c;
 
             return (char)('\u0041' + (c - '\u0061'));
+        }
+
+
+        /// <summary>
+        /// Converts an ASCII digit character to its numeric value
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int Ascii_Digit_To_Value(char c)
+        {
+            if (c < '\u0030' || c > '\u0039')
+                throw new IndexOutOfRangeException();
+
+            return (c - '\u0030');
         }
     }
 }

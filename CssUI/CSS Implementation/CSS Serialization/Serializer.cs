@@ -83,7 +83,7 @@ namespace CssUI.CSS.Serialization
                 {
                     sb.Append(Escape_Code_Point(c));
                 }
-                else if (i == 0 && c == UnicodeCommon.CHAR_DASH && characters.Length < 2)// First char is '-' & no second char
+                else if (i == 0 && c == UnicodeCommon.CHAR_HYPHEN_MINUS && characters.Length < 2)// First char is '-' & no second char
                 {
                     sb.Append(Escape_Character(c));
                 }

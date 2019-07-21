@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CssUI
 {
@@ -26,6 +22,12 @@ namespace CssUI
 
         public readonly ItemType EOF_ITEM = default(ItemType);
         #endregion
+
+        #region Accessors
+        public int Position => ReadPos;
+        public int Length => Data.Length;
+        #endregion
+
 
         #region Constructors
         public DataStream(ReadOnlyMemory<ItemType> Data, ItemType EOF_ITEM)
@@ -124,7 +126,22 @@ namespace CssUI
         /// </summary>
         /// <param name="Predicate"></param>
         /// <returns></returns>
-        public ReadOnlySpan<ItemType> Consume_While(Func<ItemType, bool> Predicate)
+        public void Consume_While(Func<ItemType, bool> Predicate)
+        {
+            int startIndex = ReadPos;
+
+            while (Predicate(Next))
+            {
+                Consume();
+            }
+        }
+
+        /// <summary>
+        /// Consumes items until reaching the first one that does not match the given predicate, then returns all matched items and progresses the current reading position by that number
+        /// </summary>
+        /// <param name="Predicate"></param>
+        /// <returns></returns>
+        public void Consume_While(Func<ItemType, bool> Predicate, out ReadOnlySpan<ItemType> outConsumed)
         {
             int startIndex = ReadPos;
 
@@ -134,7 +151,7 @@ namespace CssUI
             }
 
             int count = ReadPos - startIndex;
-            return Stream.Slice(startIndex, count);
+            outConsumed = Stream.Slice(startIndex, count);
         }
 
         /// <summary>
