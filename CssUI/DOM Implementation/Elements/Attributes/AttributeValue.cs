@@ -87,6 +87,14 @@ namespace CssUI.DOM
         }
         #endregion
 
+        #region Parsing
+        public static AttributeValue Parse(string Input, AttributeDefinition Def) 
+        {
+            Def.Parse(Input, out dynamic outVal);
+            return new AttributeValue(Def.Type, Input, outVal);
+        }
+        #endregion
+
 
     }
 }

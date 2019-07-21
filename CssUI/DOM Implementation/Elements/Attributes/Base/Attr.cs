@@ -1,12 +1,14 @@
 ﻿using CssUI.DOM.Enums;
 using CssUI.DOM.Nodes;
+using System;
 
 namespace CssUI.DOM
 {
     public class Attr : Node
     {/* Docs:  */
-        public override ENodeType nodeType => Enums.ENodeType.ATTRIBUTE_NODE;
-        public override string nodeName => this.Name;
+        #region Properties
+        public override ENodeType nodeType => ENodeType.ATTRIBUTE_NODE;
+        public override string nodeName => Name;
 
         /// <summary>
         /// Namespace name
@@ -17,41 +19,65 @@ namespace CssUI.DOM
         /// </summary>
         public string prefix { get; private set; } = null;
         public AtomicName<EAttributeName> localName { get; private set; } = null;
-        public override string nodeValue { get => this.Value; set => this.Value = value; }
-        public override string textContent { get => this.Value; set => this.Value = value; }
-        public override int nodeLength { get => this.childNodes.Count; }
+
+        private AttributeValue _value = null;
+        public Element ownerElement { get; internal set; } = null;
+        private WeakReference<AttributeDefinition> _definition = null;
+        #endregion
+
+        #region Accessors
+
+        public AttributeDefinition Definition
+        {
+            get
+            {
+                if (ReferenceEquals(null, _definition))
+                {
+                    _definition = new WeakReference<AttributeDefinition>(AttributeDefinition.Lookup(localName));
+                }
+
+                if (_definition.TryGetTarget(out AttributeDefinition outDef))
+                    return outDef;
+
+                return null;
+            }
+        }
+
+        public override string nodeValue { get => Value.Data; set => Value = AttributeValue.Parse(value, Definition); }
+        public override string textContent { get => Value.Data; set => Value = AttributeValue.Parse(value, Definition); }
+        public override int nodeLength { get => childNodes.Count; }
+
         /// <summary>
         /// Qualified Name
         /// </summary>
         /// Docs: https://dom.spec.whatwg.org/#concept-attribute-qualified-name
         public string Name { get => prefix==null ? localName.ToString() : string.Concat(prefix, ":", localName); }
 
-        private string _value = string.Empty;
-        public string Value {
+        public AttributeValue Value {
             get => _value;
             set
             {
                 /* 1) If attribute’s element is null, then set attribute’s value to value. */
-                if (ReferenceEquals(this.ownerElement, null))
+                if (ReferenceEquals(null, ownerElement))
                 {
                     _value = value;
                 }
                 else
                 {
                     /* 2) Otherwise, change attribute from attribute’s element to value. */
-                    this.ownerElement.setAttribute(this.localName, value);
+                    ownerElement.setAttribute(localName, value);
                 }
             }
         }
+        #endregion
 
-        public Element ownerElement { get; internal set; } = null;
 
         #region Constructors
         public Attr(AtomicName<EAttributeName> localName, Element Owner, string Namespace = null)
         {
             this.localName = localName;
             this.ownerElement = Owner;
-            this.ownerDocument = Owner.ownerDocument;
+            this.nodeDocument = Owner.nodeDocument;
             this.namespaceURI = Namespace;
         }
 
@@ -59,14 +85,14 @@ namespace CssUI.DOM
         {
             this.localName = localName;
             this.ownerElement = Owner;
-            this.ownerDocument = document;
+            this.nodeDocument = document;
             this.namespaceURI = Namespace;
         }
 
         public Attr(AtomicName<EAttributeName> localName, Document document, string Namespace = null)
         {
             this.localName = localName;
-            this.ownerDocument = document;
+            this.nodeDocument = document;
             this.namespaceURI = Namespace;
         }
         #endregion
@@ -79,9 +105,7 @@ namespace CssUI.DOM
             if (!(obj is Attr B))
                 return false;
 
-            return this.localName == B.localName && this.Value.Equals(B.Value);
+            return localName.Equals(B.localName) && Value.Equals(B.Value);
         }
-
-
     };
 }

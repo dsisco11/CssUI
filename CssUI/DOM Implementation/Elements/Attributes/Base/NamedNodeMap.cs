@@ -14,7 +14,7 @@ namespace CssUI.DOM
         #region Constructor
         public NamedNodeMap(Element Owner)
         {
-            this.ownerElement = Owner;
+            ownerElement = Owner;
         }
         #endregion
 
@@ -33,20 +33,6 @@ namespace CssUI.DOM
                 ownerElement.AttributeList[index] = value;
             }
         }
-
-        /*public Attr this[string qualifiedName]
-        {
-            get => getNamedItem(qualifiedName);
-            set
-            {
-                find_attribute(qualifiedName, out Attr outAttr, out int outIndex);
-
-                Attr oldAttr = ownerElement.AttributeList[index];
-                if (ReferenceEquals(oldAttr, value)) return;
-                ownerElement.AttributeList[index] = value;
-            }
-        }*/
-
 
         public Attr item(int index)
         {
@@ -70,7 +56,7 @@ namespace CssUI.DOM
             /* 1) If attr’s element is neither null nor element, throw an "InUseAttributeError" DOMException. */
             if (ReferenceEquals(ownerElement, null)) throw new InUseAttributeError("Element is null!");
             /* 2) Let oldAttr be the result of getting an attribute given attr’s namespace, attr’s local name, and element. */
-            this.ownerElement.find_attribute(attr.localName, attr.namespaceURI, out Attr oldAttr);
+            ownerElement.find_attribute(attr.localName, attr.namespaceURI, out Attr oldAttr);
             /* 3) If oldAttr is attr, return attr. */
             if (ReferenceEquals(oldAttr, attr)) return attr;
             /* 4) If oldAttr is non-null, replace it by attr in element. */
@@ -94,7 +80,7 @@ namespace CssUI.DOM
 
             /* To remove an attribute by name given a qualifiedName and element element, run these steps: */
             /* 1) Let attr be the result of getting an attribute given qualifiedName and element. */
-            this.ownerElement.find_attribute(qualifiedName, out Attr attr);
+            ownerElement.find_attribute(qualifiedName, out Attr attr);
                 /* 2) If attr is non-null, remove it from element. */
                 if (!ReferenceEquals(attr, null))
                 {

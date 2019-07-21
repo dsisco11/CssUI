@@ -8,6 +8,7 @@ using CssUI.DOM.Internal;
 using CssUI.DOM.Mutation;
 using CssUI.DOM.Nodes;
 using CssUI.Internal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -394,7 +395,20 @@ namespace CssUI.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal bool find_attribute(AtomicName<EAttributeName> Name, out Attr outAttrib)
         {/* Docs: https://dom.spec.whatwg.org/#concept-element-attributes-get-by-namespace */
-            if (!this.AttributeList.TryGetValue(Name, out Attr attr))
+            if (!AttributeList.TryGetValue(Name, out Attr attr))
+            {
+                outAttrib = null;
+                return false;
+            }
+
+            outAttrib = attr;
+            return true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal bool find_attribute(AtomicName<EAttributeName> Name, string Namespace, out Attr outAttrib)
+        {/* Docs: https://dom.spec.whatwg.org/#concept-element-attributes-get-by-namespace */
+            if (!AttributeList.TryGetValue(Name, out Attr attr))
             {
                 outAttrib = null;
                 return false;
@@ -408,7 +422,7 @@ namespace CssUI.DOM
         internal bool find_attribute(string qualifiedName, out Attr outAttrib)
         {/* Docs: https://dom.spec.whatwg.org/#concept-element-attributes-get-by-namespace */
             qualifiedName = qualifiedName.ToLowerInvariant();
-            if (!this.AttributeList.TryGetValue(qualifiedName, out Attr attr))
+            if (!AttributeList.TryGetValue(qualifiedName, out Attr attr))
             {
                 outAttrib = null;
                 return false;
@@ -422,7 +436,7 @@ namespace CssUI.DOM
         internal bool find_attribute(string localName, string Namespace, out Attr outAttrib)
         {/* Docs: https://dom.spec.whatwg.org/#concept-element-attributes-get-by-namespace */
             localName = string.Concat(Namespace, ":", localName.ToLowerInvariant());
-            if (!this.AttributeList.TryGetValue(localName, out Attr attr))
+            if (!AttributeList.TryGetValue(localName, out Attr attr))
             {
                 outAttrib = null;
                 return false;
@@ -433,7 +447,7 @@ namespace CssUI.DOM
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void change_attribute(Attr attr, string oldValue, string newValue)
+        internal void change_attribute(Attr attr, AttributeValue oldValue, AttributeValue newValue)
         {
             /* To change an attribute attribute from an element element to value, run these steps: */
             /* 1) Queue an attribute mutation record for element with attribute’s local name, attribute’s namespace, and attribute’s value. */
@@ -495,22 +509,11 @@ namespace CssUI.DOM
 
         #region Attribute Casting
         /// <summary>
-        /// Do not confuse a boolean attribute with an attribute that has a true/fale value.
-        /// <para>Boolean attributes are true/false depending on if they have a non-null value See: <see cref="hasAttribute(AtomicName{EAttributeName})"/></para>
-        /// </summary>
-        /// <param name="Name"></param>
-        /// <returns></returns>
-        public bool getAttribute_Bool(AtomicName<EAttributeName> Name)
-        {
-            string attrValue = getAttribute(Name);
-            return !string.IsNullOrEmpty(attrValue) && attrValue.Equals("true");
-        }
-
-        /// <summary>
         /// Returns the specified attribute after parsing it into its numeric form
         /// </summary>
         /// <param name="Name"></param>
         /// <returns></returns>
+        [Obsolete]
         public long getAttribute_Numeric(AtomicName<EAttributeName> Name)
         {
             string attrValue = getAttribute(Name);
@@ -554,8 +557,9 @@ namespace CssUI.DOM
         }
 
 
+
         [CEReactions]
-        public void setAttribute(AtomicName<EAttributeName> Name, string value)
+        public void setAttribute(AtomicName<EAttributeName> Name, AttributeValue value)
         {
             ReactionsCommon.Wrap_CEReaction(this, () =>
             {
@@ -571,6 +575,12 @@ namespace CssUI.DOM
 
                 change_attribute(attr, attr.Value, value);
             });
+        }
+
+        [CEReactions]
+        [Obsolete("Attributes must be assigned through AttributeValue objects", true)]
+        public void setAttribute(AtomicName<EAttributeName> Name, string value)
+        {
         }
 
         [CEReactions]
@@ -614,6 +624,8 @@ namespace CssUI.DOM
             });
         }
 
+
+
         [CEReactions]
         public void removeAttribute(AtomicName<EAttributeName> Name)
         {
@@ -654,6 +666,8 @@ namespace CssUI.DOM
                 return attr;
             });
         }
+
+
 
         [CEReactions]
         public bool toggleAttribute(AtomicName<EAttributeName> Name, bool? force = null)
@@ -721,6 +735,8 @@ namespace CssUI.DOM
                 return true;
             });
         }
+
+
 
         public bool hasAttribute(AtomicName<EAttributeName> Name)
         {

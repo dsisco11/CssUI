@@ -32,7 +32,7 @@ namespace CssUI.DOM.Mutation
         /// <summary>
         /// The return value depends on type. For "attributes", it is the value of the changed attribute before the change. For "characterData", it is the data of the changed node before the change. For "childList", it is null.
         /// </summary>
-        public readonly string oldValue = null;
+        public readonly dynamic oldValue = null;
         #endregion
 
         #region Constructor
@@ -42,15 +42,14 @@ namespace CssUI.DOM.Mutation
             this.target = target;
         }
 
-        private MutationRecord(EMutationType type, Node target, string attributeName, string attributeNamespace, string oldValue) : this(type, target)
+        private MutationRecord(EMutationType type, Node target, string attributeName, string attributeNamespace, dynamic oldValue) : this(type, target)
         {
             this.attributeName = attributeName;
             this.attributeNamespace = attributeNamespace;
             this.oldValue = oldValue;
-
         }
 
-        private MutationRecord(EMutationType type, Node target, string attributeName, string attributeNamespace, string oldValue, IEnumerable<Node> addedNodes = null, IEnumerable<Node> removedNodes = null, Node previousSibling = null, Node nextSibling = null)
+        private MutationRecord(EMutationType type, Node target, string attributeName, string attributeNamespace, string oldValue, IEnumerable<Node> addedNodes, IEnumerable<Node> removedNodes, Node previousSibling, Node nextSibling)
             : this(type, target, attributeName, attributeNamespace, oldValue)
         {
             this.addedNodes = addedNodes;
@@ -67,9 +66,9 @@ namespace CssUI.DOM.Mutation
             MutationRecord.QueueRecord(record);
         }
 
-        internal static void Queue_Attribute_Mutation_Record(Node target, string localName, string Namespace, string oldValue)
+        internal static void Queue_Attribute_Mutation_Record(Node target, string localName, string Namespace, dynamic oldValue)
         {
-            MutationRecord record = new MutationRecord(EMutationType.Attributes, target, localName, Namespace, oldValue, null, null, null, null);
+            MutationRecord record = new MutationRecord(EMutationType.Attributes, target, localName, Namespace, oldValue);
             MutationRecord.QueueRecord(record);
         }
 

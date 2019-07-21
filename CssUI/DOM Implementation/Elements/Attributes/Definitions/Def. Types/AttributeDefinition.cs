@@ -44,6 +44,8 @@ namespace CssUI.DOM
         /// A list of all keywords that can be assigned to this property
         /// </summary>
         public readonly HashSet<string> Keywords = null;
+
+        public readonly Type enumType = null;
         #endregion
 
         #region Constructors
@@ -55,13 +57,14 @@ namespace CssUI.DOM
         /// <param name="Flags">Indicates what aspects of an element this property affects</param>
         /// <param name="MissingValueDefault">Default value for the attribute</param>
         /// <param name="Keywords">List of keywords which can be assigned to this attribute</param>
-        public AttributeDefinition(AtomicName<EAttributeName> Name, bool Inherited, EAttributeFlags Flags, EAttributeType Type = 0x0, string[] Keywords = null, AtomicString MissingValueDefault = null, AtomicString InvalidValueDefault = null)
+        public AttributeDefinition(AtomicName<EAttributeName> Name, bool Inherited, EAttributeFlags Flags, EAttributeType Type = 0x0, string[] Keywords = null, AtomicString MissingValueDefault = null, AtomicString InvalidValueDefault = null, Type enumType)
         {
             this.Name = Name;
             this.Flags = Flags;
             this.Inherited = Inherited;
             this.MissingValueDefault = MissingValueDefault;
             this.InvalidValueDefault = InvalidValueDefault;
+            this.enumType = enumType;
 
             if (ReferenceEquals(null, Keywords))
             {
@@ -79,87 +82,114 @@ namespace CssUI.DOM
 
         #endregion
 
-        #region Checks
-        
-        /// <summary>
-        /// Throws an exception if the value is invalid according to the currently set options
-        /// </summary>
-        /// <param name="Value"></param>
-        /// <returns></returns>
-        public void CheckAndThrow(string Value)
+        #region Parsing
+        public void Parse(string Input, out dynamic outValue)
         {
             switch (Type)
             {
                 case EAttributeType.String:// strings accept any value
+                    {
+                        outValue = Input;
+                    }
                     break;
                 case EAttributeType.Boolean:// we need no verification for booleans. they dont care what the value use, only whether its null or not
+                    {
+                        outValue = !ReferenceEquals(null, Input);
+                    }
                     break;
                 case EAttributeType.Enumerated:
                     {
                         if (!ReferenceEquals(null, Keywords) && Keywords.Count > 0)
                         {
-                            if (!Keywords.Contains(Value.ToLowerInvariant()))
+                            string strLower = Input.ToLowerInvariant();
+                            if (!Keywords.Contains(strLower))
                             {
-                                throw new DomSyntaxError($"Attribute {Name}: \"{Value}\" is not an acceptable value");
+                                throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an acceptable value, Acceptable values are: {string.Join(", ", Keywords)}");
                             }
+
+                            if (!DomLookup.Enum_From_Keyword(enumType.Name, strLower, out var outEnum))
+                            {
+                                outValue = strLower;
+                                throw new Exception($"Unable to find keyword value for \"{strLower}\" in enum: {enumType.Name}");
+                            }
+
+                            outValue = outEnum;
+                        }
+                        else
+                        {
+                            throw new DomSyntaxError($"Definition for enumerated attribute \"{Name}\" does not have any keywords specified!");
                         }
                     }
                     break;
                 case EAttributeType.Integer:
                     {
-                        if (!DOMParser.Parse_Integer(ref Value, out _))
+                        if (!DOMParser.Parse_Integer(ref Input, out long outVal))
                         {
-                            throw new DomSyntaxError($"Attribute {Name}: \"{Value}\" is not an valid integer");
+                            throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an valid integer");
                         }
+
+                        outValue = outVal;
                     }
                     break;
                 case EAttributeType.NonNegative_Integer:
                     {
-                        if (!DOMParser.Parse_Integer(ref Value, out long outVal) || outVal < 0)
+                        if (!DOMParser.Parse_Integer(ref Input, out long outVal) || outVal < 0)
                         {
-                            throw new DomSyntaxError($"Attribute {Name}: \"{Value}\" is not an valid non-negative integer");
+                            throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an valid non-negative integer");
                         }
+
+                        outValue = (ulong)outVal;
                     }
                     break;
                 case EAttributeType.FloatingPoint:
                     {
-                        if (!DOMParser.Parse_FloatingPoint(ref Value, out _))
+                        if (!DOMParser.Parse_FloatingPoint(ref Input, out var outVal))
                         {
-                            throw new DomSyntaxError($"Attribute {Name}: \"{Value}\" is not an valid number");
+                            throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an valid number");
                         }
+
+                        outValue = outVal;
                     }
                     break;
 
                 case EAttributeType.Length:
                     {
-                        if (!DOMParser.Parse_Length(ref Value, out _, out EAttributeType outTy) || outTy != EAttributeType.Length)
+                        if (!DOMParser.Parse_Length(ref Input, out var outVal, out EAttributeType outTy) || outTy != EAttributeType.Length)
                         {
-                            throw new DomSyntaxError($"Attribute {Name}: \"{Value}\" is not an valid length");
+                            throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an valid length");
                         }
+
+                        outValue = outVal;
                     }
                     break;
                 case EAttributeType.NonZero_Length:
                     {
-                        if (!DOMParser.Parse_Length(ref Value, out var outVal, out EAttributeType outTy) || outVal <= 0d || outTy != EAttributeType.Length)
+                        if (!DOMParser.Parse_Length(ref Input, out var outVal, out EAttributeType outTy) || outVal <= 0d || outTy != EAttributeType.Length)
                         {
-                            throw new DomSyntaxError($"Attribute {Name}: \"{Value}\" is not an valid non-zero length");
+                            throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an valid non-zero length");
                         }
+
+                        outValue = outVal;
                     }
                     break;
                 case EAttributeType.Percentage:
                     {
-                        if (!DOMParser.Parse_Length(ref Value, out _, out EAttributeType outTy) || outTy != EAttributeType.Percentage)
+                        if (!DOMParser.Parse_Length(ref Input, out var outVal, out EAttributeType outTy) || outTy != EAttributeType.Percentage)
                         {
-                            throw new DomSyntaxError($"Attribute {Name}: \"{Value}\" is not an valid percentage");
+                            throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an valid percentage");
                         }
+
+                        outValue = outVal;
                     }
                     break;
                 case EAttributeType.NonZero_Percentage:
                     {
-                        if (!DOMParser.Parse_Length(ref Value, out var outVal, out EAttributeType outTy) || outVal <= 0d || outTy != EAttributeType.Percentage)
+                        if (!DOMParser.Parse_Length(ref Input, out var outVal, out EAttributeType outTy) || outVal <= 0d || outTy != EAttributeType.Percentage)
                         {
-                            throw new DomSyntaxError($"Attribute {Name}: \"{Value}\" is not an valid non-zero percentage");
+                            throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an valid non-zero percentage");
                         }
+
+                        outValue = outVal;
                     }
                     break;
                 case EAttributeType.KeyCombo:
@@ -174,6 +204,16 @@ namespace CssUI.DOM
                     break;
             }
         }
+        #endregion
+
+        #region Checks
+
+        /// <summary>
+        /// Throws an exception if the value is invalid according to the currently set options
+        /// </summary>
+        /// <param name="Value"></param>
+        /// <returns></returns>
+        public void CheckAndThrow(string Value) => Parse(Value, out _);
         #endregion
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

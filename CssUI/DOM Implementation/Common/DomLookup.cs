@@ -47,6 +47,21 @@ namespace CssUI
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
+        public static bool Enum_From_Keyword(string EnumName, AtomicString Keyword, out dynamic outEnum)
+        {
+            int index = DomEnumTables.Lookup_Enum_Index(EnumName);
+            if (index < 0)
+            {
+                /* Enum has no index */
+                outEnum = 0;
+                return false;
+            }
+
+            outEnum = DomEnumTables.KEYWORD[index][Keyword];
+            return true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
         public static bool Enum_From_Keyword<Ty>(AtomicString Keyword, out Ty outEnum) where Ty : struct
         {
             int index = DomEnumTables.Get_Enum_Index<Ty>();
