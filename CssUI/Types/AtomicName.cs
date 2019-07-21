@@ -8,7 +8,7 @@ namespace CssUI
     /// This is used for things like DOM element attributes, and CSS property names.
     /// <para>AtomicNames can effectively be thought of as self indexing strings, Maps and lists of AtomicNames cease being indexed by strings and instead are effectively indexed by their self assigned integer values</para>
     /// </summary>
-    public class AtomicName<Ty> where Ty : struct, IConvertible
+    public class AtomicName<Ty> : IConvertible, IComparable<Int32>, IEquatable<Int32> where Ty : struct
     {
         #region Static
         private static int CUSTOM_VALUE = -1;
@@ -82,13 +82,19 @@ namespace CssUI
             {
                 /* /!\ These conversions will fucking EXPLODE if the given generic type does not have an integer backing type /!\ */
                 Ty enumValue = CastTo<Ty>.From<int>(value);
-                string domLUT = DomLookup.Keyword_From_Enum<Ty>(enumValue);
-                if (!ReferenceEquals(null, domLUT)) return domLUT;
-                string cssLUT = CssLookup.Keyword_From_Enum<Ty>(enumValue);
-                if (!ReferenceEquals(null, cssLUT)) return cssLUT;
+
+                if (DomLookup.Keyword_From_Enum<Ty>(enumValue, out string domLUT) && !ReferenceEquals(null, domLUT))
+                {
+                    return domLUT;
+                }
+
+                if (CssLookup.Keyword_From_Enum<Ty>(enumValue, out string cssLUT) && !ReferenceEquals(null, cssLUT))
+                {
+                    return cssLUT;
+                }
             }
 
-            /* Alright buster, we will do things the slow way */
+            /* Alright buster, we gotta do things the slow way */
             if (NameRegistry.TryGetKey(value, out AtomicString name))
                 return name;
 
@@ -176,6 +182,20 @@ namespace CssUI
 
             return false;
         }
+
+        public bool Equals(AtomicName<Ty> Name)
+        {
+            if (ReferenceEquals(null, Name))
+                return false;
+
+            return this.Value.Equals(Name.Value);
+        }
+
+        public bool Equals(int other)
+        {
+            return Value.Equals(other);
+        }
+
         #endregion
 
         #region Overrides
@@ -183,5 +203,80 @@ namespace CssUI
 
         public override string ToString() => this.Name;
         #endregion
+
+        #region Comparable
+        public int CompareTo(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+                return 1;
+
+            if (obj is AtomicName<Ty> objName)
+            {
+                return this.Value.CompareTo(objName.Value);
+            }
+            else if (obj is int oInt)
+            {
+                return this.Value.CompareTo(oInt);
+            }
+            else if (obj is uint oUInt)
+            {
+                return this.Value.CompareTo(oUInt);
+            }
+            else
+            {
+                throw new ArgumentException($"Object is not an {nameof(AtomicName<Ty>)} or Integer");
+            }
+        }
+
+        public int CompareTo(AtomicName<Ty> Name)
+        {
+            if (ReferenceEquals(null, Name))
+                return 1;
+
+            return this.Value.CompareTo(Name.Value);
+        }
+
+        public int CompareTo(int other)
+        {
+            return Value.CompareTo(other);
+        }
+        #endregion
+
+        #region Convertable
+        bool IConvertible.ToBoolean(IFormatProvider provider) => Convert.ToBoolean(Value, provider);
+
+        byte IConvertible.ToByte(IFormatProvider provider) => Convert.ToByte(Value, provider);
+
+        UInt16 IConvertible.ToUInt16(IFormatProvider provider) => Convert.ToUInt16(Value, provider);
+
+        Int16 IConvertible.ToInt16(IFormatProvider provider) => Convert.ToInt16(Value, provider);
+
+        UInt32 IConvertible.ToUInt32(IFormatProvider provider) => Convert.ToUInt32(Value, provider);
+
+        Int32 IConvertible.ToInt32(IFormatProvider provider) => Convert.ToInt32(Value, provider);
+
+        UInt64 IConvertible.ToUInt64(IFormatProvider provider) => Convert.ToUInt64(Value, provider);
+
+        Int64 IConvertible.ToInt64(IFormatProvider provider) => Convert.ToInt64(Value, provider);
+
+        public TypeCode GetTypeCode() => Value.GetTypeCode();
+
+        public char ToChar(IFormatProvider provider) => ((IConvertible)Value).ToChar(provider);
+
+        public DateTime ToDateTime(IFormatProvider provider) => ((IConvertible)Value).ToDateTime(provider);
+
+        public decimal ToDecimal(IFormatProvider provider) => ((IConvertible)Value).ToDecimal(provider);
+
+        public double ToDouble(IFormatProvider provider) => ((IConvertible)Value).ToDouble(provider);
+
+        public sbyte ToSByte(IFormatProvider provider) => ((IConvertible)Value).ToSByte(provider);
+
+        public float ToSingle(IFormatProvider provider) => ((IConvertible)Value).ToSingle(provider);
+
+        public string ToString(IFormatProvider provider) => Value.ToString(provider);
+
+        public object ToType(Type conversionType, IFormatProvider provider) => ((IConvertible)Value).ToType(conversionType, provider);
+        #endregion
+
     }
 }
