@@ -1,4 +1,6 @@
-﻿namespace CssUI.DOM
+﻿using CssUI.DOM.CustomElements;
+
+namespace CssUI.DOM
 {
     public class HTMLTableCellHeadElement : HTMLTableCellElement
     {

@@ -1,16 +1,18 @@
-﻿using CssUI.DOM.CustomElements;
-
-namespace CssUI.DOM.Internal
+﻿
+namespace CssUI.DOM.CustomElements
 {
-    internal class CallbackReaction : IElementReaction
+    /// <summary>
+    /// Implements a Custom element reaction callback containing a function handler to call and the arguments to pass to it.
+    /// </summary>
+    internal class ReactionCallback : IElementReaction
     {
         #region Properties
-        private readonly CustomReactionCallback Callback = null;
+        private readonly ReactionHandler Callback = null;
         private readonly object[] Args = null;
         #endregion
 
         #region Constructor
-        public CallbackReaction(CustomReactionCallback Callback, params object[] Args)
+        public ReactionCallback(ReactionHandler Callback, params object[] Args)
         {
             this.Callback = Callback;
             this.Args = Args;

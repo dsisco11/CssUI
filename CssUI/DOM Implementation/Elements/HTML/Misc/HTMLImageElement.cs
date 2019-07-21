@@ -1,4 +1,5 @@
-﻿using CssUI.DOM.Exceptions;
+﻿using CssUI.DOM.CustomElements;
+using CssUI.DOM.Exceptions;
 using CssUI.DOM.Internal;
 using System.IO;
 using System.Threading;

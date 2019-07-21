@@ -1,4 +1,5 @@
-﻿using CssUI.DOM.Events;
+﻿using CssUI.DOM.CustomElements;
+using CssUI.DOM.Events;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Internal;
 using CssUI.DOM.Nodes;

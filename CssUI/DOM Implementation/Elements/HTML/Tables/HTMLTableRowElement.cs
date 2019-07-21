@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Internal;
+using CssUI.DOM.CustomElements;
 
 namespace CssUI.DOM
 {

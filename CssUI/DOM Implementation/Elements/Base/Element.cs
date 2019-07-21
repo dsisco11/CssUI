@@ -1,5 +1,6 @@
 ﻿using CssUI.CSS;
 using CssUI.CSS.Internal;
+using CssUI.DOM.CustomElements;
 using CssUI.DOM.Enums;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Geometry;
@@ -454,6 +455,7 @@ namespace CssUI.DOM
             MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.namespaceURI, oldValue);
             /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute’s local name, attribute’s value, value, and attribute’s namespace. */
             /* XXX: Custom element reaction stuff here */
+            CEReactions.
 
             /* 3) Run the attribute change steps with element, attribute’s local name, attribute’s value, value, and attribute’s namespace. */
             /* 4) Set attribute’s value to value. */

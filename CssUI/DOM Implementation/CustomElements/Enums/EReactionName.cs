@@ -1,12 +1,12 @@
 ﻿using CssUI.DOM.Internal;
 
-namespace CssUI.DOM.Enums
+namespace CssUI.DOM.CustomElements
 {
     /// <summary>
     /// Lists all of the possible custom element reactions
     /// </summary>
     [DomEnum]
-    public enum EElementReactionName : int
+    public enum EReactionName : int
     {
         [DomKeyword("attributeChangedCallback")]
         AttributeChanged,

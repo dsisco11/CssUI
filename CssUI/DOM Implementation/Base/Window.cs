@@ -28,7 +28,7 @@ namespace CssUI.DOM
         internal BrowsingContext BrowsingContext => document?.BrowsingContext;
         internal override Window WindowProxy { get => this; }
 
-        internal readonly ElementReactionStack CE_Reactions;
+        internal readonly ElementReactionStack Reactions;
         #endregion
 
         #region Properties
@@ -49,7 +49,7 @@ namespace CssUI.DOM
         #region Constructors
         private Window() : base()
         {
-            CE_Reactions = new ElementReactionStack(this);
+            Reactions = new ElementReactionStack(this);
             visualViewport = new VisualViewport(this);
         }
 

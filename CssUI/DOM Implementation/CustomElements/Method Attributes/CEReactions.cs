@@ -1,16 +1,17 @@
-﻿using CssUI.DOM.CustomElements;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace CssUI.DOM.Internal
+namespace CssUI.DOM.CustomElements
 {
     /// <summary>
-    /// Provides utility for handling custom element reactions internally
+    /// Attribute which indicates that the marked Operation, Setter, Deleter, etc is to be supplemented with additional steps in order to appropriately track and invoke custom element reactions.
+    /// <para>Also provides utility functions related to wrapping and handling custom element related methods</para>
     /// </summary>
-    internal static class ReactionsCommon
-    {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#custom-element-reaction-queue */
+    public class CEReactions : Attribute
+    {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#cereactions */
 
+        /* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#custom-element-reaction-queue */
 
         /// <summary>
         /// Convenient wrapper for any Operations, attributes, setters, or deleters marked with [<see cref="CEReactions"/>]
@@ -18,7 +19,7 @@ namespace CssUI.DOM.Internal
         /// <param name="element">Element to queue this reaction for</param>
         /// <param name="wrappedMethod">The specifications dictate that for any [CEReaction] attributed method, the original steps given for said method must be encompassed by the callback reaction steps, this method is those original steps</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static void Wrap_CEReaction(Element element, Action wrappedMethod)
+        public static void Wrap_CEReaction(Element element, Action wrappedMethod)
         {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#cereactions */
             /* 1) Push a new element queue onto this object's relevant agent's custom element reactions stack. */
             var window = element.ownerDocument.defaultView;
@@ -53,7 +54,7 @@ namespace CssUI.DOM.Internal
         /// <param name="wrappedMethod">The specifications dictate that for any [CEReaction] attributed method, the original steps given for said method must be encompassed by the callback reaction steps, this method is those original steps</param>
         /// <returns>The returned value of <paramref name="wrappedMethod"/></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static dynamic Wrap_CEReaction(Element element, Func<dynamic> wrappedMethod)
+        public static dynamic Wrap_CEReaction(Element element, Func<dynamic> wrappedMethod)
         {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#cereactions */
             /* 1) Push a new element queue onto this object's relevant agent's custom element reactions stack. */
             var window = element.ownerDocument.defaultView;
@@ -85,10 +86,8 @@ namespace CssUI.DOM.Internal
             return retValue;
         }
 
-
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static void Enqueue_Callback_Reaction(Element element, AtomicName<EReactionName> Reaction, params object[] Args)
+        public static void Enqueue_Callback_Reaction(Element element, AtomicName<EReactionName> Reaction, params object[] Args)
         {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#enqueue-a-custom-element-callback-reaction */
             /* 1) Let definition be element's custom element definition. */
             CustomElementDefinition def = element.ownerDocument.defaultView.customElements.Lookup(element.tagName);
