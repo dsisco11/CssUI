@@ -1,17 +1,20 @@
-﻿using CssUI.DOM.Nodes;
+﻿using CssUI.DOM.Exceptions;
+using CssUI.DOM.Internal;
+using CssUI.DOM.Nodes;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CssUI.DOM
 {
     public class HTMLTableElement : HTMLElement
-    {
+    {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#the-table-element */
         #region Accessors
 
         /// <summary>
         /// Returns the table's caption element.
         /// Can be set, to replace the caption element.
         /// /// </summary>
-        [CEReactions] HTMLTableCaptionElement caption
+        [CEReactions] public HTMLTableCaptionElement caption
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-caption */
             get
             {
@@ -28,28 +31,31 @@ namespace CssUI.DOM
             }
             set
             {
-                HTMLTableCaptionElement target = caption;
-                if (!ReferenceEquals(null, target))
+                ReactionCommon.Wrap_CEReaction(this, () =>
                 {
-                    removeChild(target);
-                }
+                    HTMLTableCaptionElement target = caption;
+                    if (!ReferenceEquals(null, target))
+                    {
+                        removeChild(target);
+                    }
 
-                Node first = firstChild;
-                if (ReferenceEquals(null, first))
-                {
-                    appendChild(value);
-                }
-                else
-                {
-                    insertBefore(firstChild, value);
-                }
+                    Node first = firstChild;
+                    if (ReferenceEquals(null, first))
+                    {
+                        appendChild(value);
+                    }
+                    else
+                    {
+                        insertBefore(firstChild, value);
+                    }
+                });
             }
         }
 
-        [CEReactions] HTMLTableSectionElement tHead;
-        [CEReactions] HTMLTableSectionElement tFoot;
+        [CEReactions] public HTMLTableSectionElement tHead;
+        [CEReactions] public HTMLTableSectionElement tFoot;
 
-        IEnumerable<HTMLElement> tBodies
+        public ICollection<HTMLElement> tBodies
         {
             get
             {
@@ -57,7 +63,7 @@ namespace CssUI.DOM
             }
         }
 
-        public IEnumerable<HTMLElement> rows
+        public ICollection<HTMLElement> rows
         {
             get
             {
@@ -73,18 +79,92 @@ namespace CssUI.DOM
         }
         #endregion
 
-        HTMLTableCaptionElement createCaption();
-        HTMLTableHeadElement createTHead();
-        HTMLTableBodyElement createTBody();
-        HTMLTableFootElement createTFoot();
-        HTMLTableRowElement insertRow(long index = -1);
+        public HTMLTableCaptionElement createCaption();
+        public HTMLTableHeadElement createTHead();
+        public HTMLTableBodyElement createTBody();
+        public HTMLTableFootElement createTFoot();
 
-        [CEReactions] void deleteCaption();
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index">Index to insert new row at</param>
+        /// <exception cref="IndexSizeError"></exception>
+        /// <returns></returns>
+        public HTMLTableRowElement insertRow(int index = -1)
+        {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-insertrow */
+            int rowCount = rows.Count;
+            if (index < -1 || index > rowCount)
+            {
+                throw new IndexSizeError();
+            }
 
-        [CEReactions] void deleteTHead();
+            if (rowCount <= 0 && tBodies.Count <= 0)
+            {
+                var body = new HTMLTableBodyElement(nodeDocument);
+                var row = new HTMLTableRowElement(nodeDocument);
 
-        [CEReactions] void deleteTFoot();
+                body.appendChild(row);
+                appendChild(body);
 
-        [CEReactions] void deleteRow(long index);
+                return row;
+            }
+
+            if (rowCount <= 0)
+            {
+                var row = new HTMLTableRowElement(nodeDocument);
+                tBodies.Last().appendChild(row);
+                return row;
+            }
+
+            if (index == -1 || index == rowCount)
+            {
+                var row = new HTMLTableRowElement(nodeDocument);
+                var parent = rows.Last().parentNode;
+                parent.appendChild(row);
+                return row;
+            }
+
+            var newRow = new HTMLTableRowElement(nodeDocument);
+            var indexRow = rows.ElementAt(index);
+            indexRow.parentNode.insertBefore(newRow, indexRow);
+            return newRow;
+        }
+
+
+        [CEReactions] public void deleteCaption();
+
+        [CEReactions] public void deleteTHead();
+
+        [CEReactions] public void deleteTFoot();
+
+        [CEReactions] public void deleteRow(int index)
+        {
+            ReactionCommon.Wrap_CEReaction(this, () => _delete_row(index));
+        }
+
+        #region Internal Utilities
+        private void _delete_row(int index)
+        {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-deleterow */
+            int rowCount = rows.Count;
+            if (index < -1 || index > rowCount)
+            {
+                throw new IndexSizeError();
+            }
+
+            if (index == -1)
+            {
+                if (rowCount > 0)
+                {
+                    var row = rows.Last();
+                    row.parentElement.removeChild(row);
+                }
+            }
+            else
+            {
+                var row = rows.ElementAt(index);
+                row.parentElement.removeChild(row);
+            }
+        }
+        #endregion
     }
 }

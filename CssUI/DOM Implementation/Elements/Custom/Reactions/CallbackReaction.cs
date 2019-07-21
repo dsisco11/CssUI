@@ -1,16 +1,16 @@
-﻿using System;
+﻿using CssUI.DOM.CustomElements;
 
 namespace CssUI.DOM.Internal
 {
     internal class CallbackReaction : IElementReaction
     {
         #region Properties
-        private readonly Action<object[]> Callback = null;
+        private readonly CustomReactionCallback Callback = null;
         private readonly object[] Args = null;
         #endregion
 
         #region Constructor
-        public CallbackReaction(Action<object[]> Callback, params object[] Args)
+        public CallbackReaction(CustomReactionCallback Callback, params object[] Args)
         {
             this.Callback = Callback;
             this.Args = Args;

@@ -17,7 +17,7 @@ namespace CssUI.DOM.CustomElements
         /// <summary>
         /// The custom element reactions stack
         /// </summary>
-        internal Stack<Queue<Element>> Reactions_Stack = new Stack<Queue<Element>>();
+        internal Stack<Queue<Element>> Stack = new Stack<Queue<Element>>();
 
         private readonly Window window;
         private Task processingTask = null;
@@ -27,7 +27,7 @@ namespace CssUI.DOM.CustomElements
         /// <summary>
         /// The current element queue is the element queue at the top of the custom element reactions stack
         /// </summary>
-        internal Queue<Element> Current_Queue => Reactions_Stack.Peek();
+        internal Queue<Element> Current_Queue => Stack.Peek();
         #endregion
 
         #region Constructor
@@ -38,13 +38,21 @@ namespace CssUI.DOM.CustomElements
         #endregion
 
         /// <summary>
+        /// Pushes a new elements queue onto the reactions stack.
+        /// </summary>
+        internal void Push_New_Element_Queue()
+        {
+            Stack.Push(new Queue<Element>());
+        }
+
+        /// <summary>
         /// Enqueues an element on a windows custom element queue so its' custom reaction events may be processed
         /// </summary>
         /// <param name="window"></param>
         /// <param name="element"></param>
         internal void Enqueue_Element(Element element)
         {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#enqueue-an-element-on-the-appropriate-element-queue */
-            var reactionsStack = Reactions_Stack;
+            var reactionsStack = Stack;
             if (reactionsStack.Count <= 0)
             {
                 Backup_Queue.Enqueue(element);

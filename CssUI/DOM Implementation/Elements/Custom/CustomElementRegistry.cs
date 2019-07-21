@@ -23,6 +23,17 @@ namespace CssUI.DOM.CustomElements
         }
         #endregion
 
+        public CustomElementDefinition this[int index]
+        {
+            get => Definitions[index];
+        }
+
+        public CustomElementDefinition Lookup(string tagName)
+        {
+            return Definitions.First(def => def.localName.Equals(tagName)) ?? null;
+        }
+
+
         [CEReactions]
         public void define(string name, CustomElementConstructor constructor, ElementDefinitionOptions options);
 

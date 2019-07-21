@@ -78,12 +78,15 @@ namespace CssUI.DOM
         [DomKeyword("decoding")]
         Decoding,
 
-        /* Table elements */
+        /* TABLE ATTRIBUTES */
 
         [DomKeyword("colspan")]
         ColSpan,
         [DomKeyword("rowspan")]
         RowSpan,
+
+        [DomKeyword("headers")]
+        Headers,
 
         [DomKeyword("scope")]
         Scope,
