@@ -10,13 +10,15 @@ namespace CssUI
     /// Provides access to a genericized, consumable stream of data.
     /// </summary>
     /// <typeparam name="ItemType"></typeparam>
-    public class ObjectStream<ItemType>// where ItemType : class
+    public class DataStream<ItemType>
     {
         #region Properties
         /// <summary>
         /// Our stream of tokens
         /// </summary>
-        private readonly ItemType[] Stream = null;
+        private readonly ReadOnlyMemory<ItemType> Data;
+        private ReadOnlySpan<ItemType> Stream => Data.Span;
+
         /// <summary>
         /// The current position at which tokens will be read from the stream
         /// </summary>
@@ -26,15 +28,9 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public ObjectStream(ItemType[] Items, ItemType EOF_ITEM)
+        public DataStream(ReadOnlyMemory<ItemType> Data, ItemType EOF_ITEM)
         {
-            this.Stream = Items;
-            this.EOF_ITEM = EOF_ITEM;
-        }
-
-        public ObjectStream(IEnumerable<ItemType> Items, ItemType EOF_ITEM)
-        {
-            this.Stream = Items.ToArray();
+            this.Data = Data;
             this.EOF_ITEM = EOF_ITEM;
         }
         #endregion
@@ -63,34 +59,18 @@ namespace CssUI
         public ItemType Peek(int Offset = 0)
         {
             int i = (ReadPos + Offset);
-            if (i >= Stream.Length || i < 0) return EOF_ITEM;
-            return Stream[i];
-        }
 
-        /// <summary>
-        /// Returns <paramref name="Count"/> items starting at +<paramref name="Offset"/> from the current read position
-        /// </summary>
-        /// <param name="Offset">Distance from the current read position at which to peek</param>
-        /// <returns></returns>
-        public IEnumerable<ItemType> Peek(int Offset, int Count)
-        {
-            var list = new LinkedList<ItemType>();
-
-            int startIndex = (ReadPos + Offset);
-            int endIndex = startIndex + Count;
-
-            for (int i=startIndex; i<endIndex; i++)
+            if (i < 0)
             {
-                if (i >= Stream.Length || i < 0)
-                {
-                    list.AddLast(EOF_ITEM);
-                    break;
-                }
-
-                list.AddLast(Stream[i]);
+                throw new IndexOutOfRangeException();
             }
 
-            return list;
+            if (i >= Stream.Length)
+            {
+                return EOF_ITEM;
+            }
+
+            return Stream[i];
         }
 
         /// <summary>
@@ -125,19 +105,18 @@ namespace CssUI
         /// Returns the specified number of items from the stream and progresses the current reading position by that number
         /// </summary>
         /// <param name="Count">Number of characters to consume</param>
-        public IEnumerable<ItemType> Consume(int Count = 1)
+        public ReadOnlySpan<ItemType> Consume(int Count = 1)
         {
-            int EndPos = (ReadPos + Count);
-            if (EndPos >= Stream.Length) EndPos = (Stream.Length - 1);
+            int startIndex = ReadPos;
+            int endIndex = (ReadPos + Count);
 
-            var retVal = new LinkedList<ItemType>();
-            for (int i = ReadPos; i < EndPos; i++)
+            if (endIndex >= Stream.Length)
             {
-                retVal.AddLast(Stream[i]);
+                endIndex = (Stream.Length - 1);
             }
-            ReadPos = EndPos;
 
-            return retVal;
+            ReadPos = endIndex;
+            return Stream.Slice(startIndex, Count);
         }
 
         /// <summary>
@@ -145,17 +124,17 @@ namespace CssUI
         /// </summary>
         /// <param name="Predicate"></param>
         /// <returns></returns>
-        public IEnumerable<ItemType> Consume_While(Func<ItemType, bool> Predicate)
+        public ReadOnlySpan<ItemType> Consume_While(Func<ItemType, bool> Predicate)
         {
-            var Matches = new LinkedList<ItemType>();
-            
+            int startIndex = ReadPos;
+
             while (Predicate(Next))
             {
-                Matches.AddLast(Consume());
+                Consume();
             }
 
-            ReadPos += Matches.Count;
-            return Matches;
+            int count = ReadPos - startIndex;
+            return Stream.Slice(startIndex, count);
         }
 
         /// <summary>
@@ -163,18 +142,19 @@ namespace CssUI
         /// </summary>
         /// <param name="Predicate"></param>
         /// <returns></returns>
-        public ObjectStream<ItemType> Substream(Func<ItemType, bool> Predicate)
+        public DataStream<ItemType> Substream(Func<ItemType, bool> Predicate)
         {
-            var Matches = new LinkedList<ItemType>();
-            
+            int startIndex = ReadPos;
+
             while (Predicate(Next))
             {
-                Matches.AddLast(Consume());
+                Consume();
             }
 
-            ReadPos += Matches.Count;
+            int count = ReadPos - startIndex;
+            var consumed = Data.Slice(startIndex, count);
 
-            return new ObjectStream<ItemType>(Matches, this.EOF_ITEM);
+            return new DataStream<ItemType>(consumed, this.EOF_ITEM);
         }
 
         /// <summary>

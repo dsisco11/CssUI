@@ -5,18 +5,19 @@
     /// </summary>
     public class StringTokenizer
     {
-#region Properties
+        #region Properties
         public int ReadPos { get; private set; }
         public readonly string Text;
         #endregion
 
-#region Constructors
+        #region Constructors
         public StringTokenizer(string Text)
         {
             this.Text = Text;
         }
-#endregion
+        #endregion
 
+        #region Buffer Operations
         /// <summary>
         /// Returns the character at +Offset from the current read position within the text
         /// </summary>
@@ -67,6 +68,7 @@
             ReadPos -= Count;
             if (ReadPos < 0) ReadPos = 0;
         }
+        #endregion
 
     }
 }
