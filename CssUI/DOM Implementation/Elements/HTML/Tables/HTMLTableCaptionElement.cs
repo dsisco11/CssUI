@@ -2,8 +2,13 @@
 {
     public class HTMLTableCaptionElement : HTMLElement
     {
-        public HTMLTableCaptionElement(Document document, string localName, string prefix, string Namespace) : base(document, localName)
+        #region Constructors
+        public HTMLTableCaptionElement(Document document) : base(document, "caption")
         {
         }
+        public HTMLTableCaptionElement(Document document, string localName) : base(document, localName)
+        {
+        }
+        #endregion
     }
 }

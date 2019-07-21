@@ -55,14 +55,14 @@ namespace CssUI.DOM
             set => toggleAttribute(EAttributeName.IsMap, value);
         }
 
-        [CEReactions] public ulong width
+        [CEReactions] public uint width
         {
-            get => (ulong)MathExt.Max(0, getAttribute_Numeric(EAttributeName.Width));
+            get => (uint)MathExt.Max(0, getAttribute_Numeric(EAttributeName.Width));
             set => setAttribute(EAttributeName.Width, value.ToString());
         }
-        [CEReactions] public ulong height
+        [CEReactions] public uint height
         {
-            get => (ulong)MathExt.Max(0, getAttribute_Numeric(EAttributeName.Height));
+            get => (uint)MathExt.Max(0, getAttribute_Numeric(EAttributeName.Height));
             set => setAttribute(EAttributeName.Height, value.ToString());
         }
 

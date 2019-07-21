@@ -52,7 +52,14 @@ namespace CssUI.DOM
             }
         }
 
-        [CEReactions] public HTMLTableSectionElement tHead;
+        [CEReactions] public HTMLTableSectionElement tHead
+        {/* Docs:  */
+            get
+            {
+
+            }
+        }
+
         [CEReactions] public HTMLTableSectionElement tFoot;
 
         public ICollection<HTMLElement> tBodies

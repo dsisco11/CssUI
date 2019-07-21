@@ -363,21 +363,18 @@ namespace CssUI.DOM
                 }
 
                 string attrValue = attr.Value;
-                if (attrValue == "true")
+                if (attrValue.Equals("true"))
                 {
                     return true;
                 }
-                else if (attrValue == "auto")
+                else if (attrValue.Equals("auto"))
                 {
                     return parentElement is HTMLElement element && element.isContentEditable;
                 }
 
                 return false;
             }
-            set
-            {
-                setAttribute(EAttributeName.Draggable, value ? "true" : "false");
-            }
+            set => setAttribute(EAttributeName.Draggable, value ? "true" : "false");
         }
 
         [CEReactions]

@@ -37,6 +37,10 @@ namespace CssUI.DOM
 
         [DomKeyword("accesskey")]
         AccessKey,
+        [DomKeyword("spellcheck")]
+        SpellCheck,
+        [DomKeyword("autocapitalize")]
+        AutoCapitalize,
 
         [DomKeyword("contenteditable")]
         ContentEditable,

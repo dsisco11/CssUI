@@ -9,7 +9,6 @@ namespace CssUI.CSS.Internal
     /// </summary>
     public class StyleDefinition
     {
-
         #region Properties
         /// <summary>
         /// CSS Name of the property
