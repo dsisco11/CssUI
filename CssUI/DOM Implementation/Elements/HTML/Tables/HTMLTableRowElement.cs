@@ -1,5 +1,7 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
+using CssUI.DOM.Exceptions;
+using CssUI.DOM.Internal;
 
 namespace CssUI.DOM
 {
@@ -60,7 +62,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Returns an HTMLCollection of the td and th elements of the row.
         /// </summary>
-        public ICollection<HTMLTableCellElement> cells
+        public IReadOnlyCollection<HTMLTableCellElement> cells
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-tr-cells */
             get
             {
@@ -92,8 +94,62 @@ namespace CssUI.DOM
         }
         #endregion
 
+        /// <summary>
+        /// Creates a td element, inserts it into the table row at the position given by the argument, and returns the td.
+        /// The position is relative to the cells in the row.The index −1, which is the default if the argument is omitted, is equivalent to inserting at the end of the row.
+        /// If the given position is less than −1 or greater than the number of cells, throws an "IndexSizeError" DOMException.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public HTMLTableCellElement insertCell(int index = -1)
+        {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-tr-insertcell */
+            int cellCount = cells.Count;
+            if (index < -1 || index > cellCount)
+            {
+                throw new IndexSizeError();
+            }
 
-        public HTMLTableCellElement insertCell(long index = -1);
-        [CEReactions] public void deleteCell(long index);
+            var tableCell = new HTMLTableCellElement(nodeDocument);
+
+            if (index == -1 || index == cellCount)
+            {
+                appendChild(tableCell);
+            }
+            else
+            {
+                var before = cells.ElementAt(index);
+                insertBefore(tableCell, before);
+            }
+
+            return tableCell;
+        }
+
+        /// <summary>
+        /// Removes the td or th element with the given position in the row.
+        /// The position is relative to the cells in the row.The index −1 is equivalent to deleting the last cell of the row.
+        /// If the given position is less than −1 or greater than the index of the last cell, or if there are no cells, throws an "IndexSizeError" DOMException.
+        /// </summary>
+        /// <param name="index"></param>
+        [CEReactions] public void deleteCell(int index)
+        {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-tr-deletecell */
+            ReactionsCommon.Wrap_CEReaction(this, () =>
+            {
+                int cellCount = cells.Count;
+                if (index < -1 || index > cellCount)
+                {
+                    throw new IndexSizeError();
+                }
+
+                if (index == -1 && cellCount > 0)
+                {
+                    removeChild(cells.Last());
+                }
+                else
+                {
+                    var targetCell = cells.ElementAt(index);
+                    removeChild(targetCell);
+                }
+            });
+        }
     }
 }

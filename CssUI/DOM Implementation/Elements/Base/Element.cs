@@ -453,6 +453,8 @@ namespace CssUI.DOM
             /* 1) Queue an attribute mutation record for element with attribute’s local name, attribute’s namespace, and attribute’s value. */
             MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.namespaceURI, oldValue);
             /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute’s local name, attribute’s value, value, and attribute’s namespace. */
+            /* XXX: Custom element reaction stuff here */
+
             /* 3) Run the attribute change steps with element, attribute’s local name, attribute’s value, value, and attribute’s namespace. */
             /* 4) Set attribute’s value to value. */
             attr.Value = newValue;
@@ -506,29 +508,10 @@ namespace CssUI.DOM
             newAttr.ownerElement = this;
         }
         #endregion
-
-        #region Attribute Casting
-        /// <summary>
-        /// Returns the specified attribute after parsing it into its numeric form
-        /// </summary>
-        /// <param name="Name"></param>
-        /// <returns></returns>
-        [Obsolete]
-        public long getAttribute_Numeric(AtomicName<EAttributeName> Name)
-        {
-            string attrValue = getAttribute(Name);
-            if (string.IsNullOrEmpty(attrValue))
-                return 0;
-
-            if (!long.TryParse(attrValue, out long number))
-                return 0;
-
-            return number;
-        }
-        #endregion
+        
 
         #region HTML Attribute Management
-        public string getAttribute(AtomicName<EAttributeName> Name)
+        public AttributeValue getAttribute(AtomicName<EAttributeName> Name)
         {
             Attr attr = this.AttributeList[qualifiedName];
             /* 2) If attr is null, return null. */
@@ -536,6 +519,7 @@ namespace CssUI.DOM
             return attr?.Value;
         }
 
+        [Obsolete]
         public string getAttribute(string qualifiedName)
         {
             qualifiedName = qualifiedName.ToLowerInvariant();
@@ -550,6 +534,7 @@ namespace CssUI.DOM
             return this.AttributeList[Name];
         }
 
+        [Obsolete]
         public Attr getAttributeNode(string qualifiedName)
         {
             qualifiedName = qualifiedName.ToLowerInvariant();
@@ -584,6 +569,7 @@ namespace CssUI.DOM
         }
 
         [CEReactions]
+        [Obsolete]
         public void setAttribute(string qualifiedName, string value)
         {
             ReactionsCommon.Wrap_CEReaction(this, () =>
@@ -640,6 +626,7 @@ namespace CssUI.DOM
         }
 
         [CEReactions]
+        [Obsolete]
         public void removeAttribute(string qualifiedName)
         {
             ReactionsCommon.Wrap_CEReaction(this, () =>
@@ -684,7 +671,7 @@ namespace CssUI.DOM
                     /* 1) If force is not given or is true, create an attribute whose local name is qualifiedName, value is the empty string, and node document is the context object’s node document, then append this attribute to the context object, and then return true. */
                     if (!force.HasValue || force.Value)
                     {
-                        var newAttr = new Attr(Name, this.ownerDocument) { Value = string.Empty };
+                        var newAttr = new Attr(Name, this.ownerDocument) { Value = AttributeValue.Parse(Name, string.Empty) };
                         append_attribute(newAttr);
                         return true;
                     }
@@ -702,7 +689,7 @@ namespace CssUI.DOM
             });
         }
 
-        [CEReactions]
+        [CEReactions, Obsolete("Use toggleAttribute(AtomicName<EAttributeName> Name, bool? force)")]
         public bool toggleAttribute(string qualifiedName, bool? force = null)
         {
             return ReactionsCommon.Wrap_CEReaction(this, () =>
@@ -718,7 +705,7 @@ namespace CssUI.DOM
                     /* 1) If force is not given or is true, create an attribute whose local name is qualifiedName, value is the empty string, and node document is the context object’s node document, then append this attribute to the context object, and then return true. */
                     if (!force.HasValue || force.Value)
                     {
-                        var newAttr = new Attr(qualifiedName, this.ownerDocument) { Value = string.Empty };
+                        var newAttr = new Attr(qualifiedName, this.ownerDocument) { Value = AttributeValue.Parse(qualifiedName, string.Empty) };
                         append_attribute(newAttr);
                         return true;
                     }
@@ -758,6 +745,7 @@ namespace CssUI.DOM
             return false;
         }
 
+        [Obsolete]
         public bool hasAttribute(string qualifiedName)
         {
             if (this.AttributeList.TryGetValue(qualifiedName.ToLowerInvariant(), out Attr attr))

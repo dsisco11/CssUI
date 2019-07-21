@@ -47,6 +47,21 @@ namespace CssUI.DOM
         /// <summary>
         /// Creates a new <see cref="EAttributeType.Integer"/> type attribute value
         /// </summary>
+        public static AttributeValue From_Integer(int Integer) => new AttributeValue(EAttributeType.Integer, Integer.ToString(), Integer);
+
+        /// <summary>
+        /// Creates a new <see cref="EAttributeType.Integer"/> type attribute value
+        /// </summary>
+        public static AttributeValue From_Integer(uint Integer) => new AttributeValue(EAttributeType.NonNegative_Integer, Integer.ToString(), Integer);
+
+        /// <summary>
+        /// Creates a new <see cref="EAttributeType.Integer"/> type attribute value
+        /// </summary>
+        public static AttributeValue From_Integer(ulong Integer) => new AttributeValue(EAttributeType.NonNegative_Integer, Integer.ToString(), Integer);
+
+        /// <summary>
+        /// Creates a new <see cref="EAttributeType.Integer"/> type attribute value
+        /// </summary>
         public static AttributeValue From_Integer(long Integer) => new AttributeValue(EAttributeType.Integer, Integer.ToString(), Integer);
 
         /// <summary>
@@ -88,8 +103,9 @@ namespace CssUI.DOM
         #endregion
 
         #region Parsing
-        public static AttributeValue Parse(string Input, AttributeDefinition Def) 
+        public static AttributeValue Parse(AtomicName<EAttributeName> Name, string Input) 
         {
+            var Def = AttributeDefinition.Lookup(Name);
             Def.Parse(Input, out dynamic outVal);
             return new AttributeValue(Def.Type, Input, outVal);
         }

@@ -5,13 +5,13 @@
         #region Properties
         [CEReactions] public string scope
         {
-            get => getAttribute(EAttributeName.Scope);
-            set => setAttribute(EAttributeName.Scope, value);
+            get => getAttribute(EAttributeName.Scope)?.Get_String();
+            set => setAttribute(EAttributeName.Scope, AttributeValue.From_String(value));
         }
         [CEReactions] public string abbr
         {
-            get => getAttribute(EAttributeName.Abbr);
-            set => setAttribute(EAttributeName.Abbr, value);
+            get => getAttribute(EAttributeName.Abbr).Get_String();
+            set => setAttribute(EAttributeName.Abbr, AttributeValue.From_String(value));
         }
         #endregion
 

@@ -9,7 +9,7 @@ namespace CssUI.DOM
     public abstract class HTMLTableSectionElement : HTMLElement
     {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#htmltablesectionelement */
         #region Accessors
-        public ICollection<HTMLElement> rows
+        public IReadOnlyCollection<HTMLElement> rows
         {/* The rows attribute must return an HTMLCollection rooted at this element, whose filter matches only tr elements that are children of this element. */
             get
             {
@@ -75,29 +75,31 @@ namespace CssUI.DOM
         /// <param name="index"></param>
         [CEReactions] void deleteRow(int index)
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-tbody-deleterow */
-            ReactionsCommon.Wrap_CEReaction(this, () => _delete_row(index));
+            ReactionsCommon.Wrap_CEReaction(this, () =>
+            {
+                int rowCount = rows.Count;
+                if (index < -1 || index > rowCount)
+                {
+                    throw new IndexSizeError();
+                }
+
+                if (index == -1)
+                {
+                    var row = rows.Last();
+                    removeChild(row);
+                }
+                else
+                {
+                    var row = rows.ElementAt(index);
+                    removeChild(row);
+                }
+            });
         }
 
         #region Internal Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void _delete_row(int index)
-        {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-tbody-deleterow */
-            int rowCount = rows.Count;
-            if (index < -1 || index > rowCount)
-            {
-                throw new IndexSizeError();
-            }
-
-            if (index == -1)
-            {
-                var row = rows.Last();
-                removeChild(row);
-            }
-            else
-            {
-                var row = rows.ElementAt(index);
-                removeChild(row);
-            }
+        {
         }
         #endregion
     }

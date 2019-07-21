@@ -65,10 +65,10 @@ namespace CssUI.DOM
                 new AttributeDefinition(EAttributeName.Decoding, EAttributeType.String, null, null, 0x0),
 
                 /* Table Attributes */
-                new AttributeDefinition(EAttributeName.Scope, EAttributeType.String, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.Scope, EAttributeType.Enumerated, AttributeValue.From_Enum(ECellScope.Auto), AttributeValue.From_Enum(ECellScope.Auto), EAttributeFlags.None, DomLookup.Get_Keywords<ECellScope>()),
                 new AttributeDefinition(EAttributeName.Abbr, EAttributeType.String, null, null, 0x0),
-                new AttributeDefinition(EAttributeName.ColSpan, EAttributeType.Integer, null, null, 0x0),
-                new AttributeDefinition(EAttributeName.RowSpan, EAttributeType.Integer, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.ColSpan, EAttributeType.NonNegative_Integer, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.RowSpan, EAttributeType.NonNegative_Integer, null, null, 0x0),
 
             };
         }

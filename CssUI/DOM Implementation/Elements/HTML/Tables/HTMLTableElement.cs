@@ -62,7 +62,7 @@ namespace CssUI.DOM
 
         [CEReactions] public HTMLTableSectionElement tFoot;
 
-        public ICollection<HTMLElement> tBodies
+        public IReadOnlyCollection<HTMLElement> tBodies
         {
             get
             {
@@ -70,7 +70,7 @@ namespace CssUI.DOM
             }
         }
 
-        public ICollection<HTMLElement> rows
+        public IReadOnlyCollection<HTMLElement> rows
         {
             get
             {
@@ -145,33 +145,30 @@ namespace CssUI.DOM
         [CEReactions] public void deleteTFoot();
 
         [CEReactions] public void deleteRow(int index)
-        {
-            ReactionsCommon.Wrap_CEReaction(this, () => _delete_row(index));
-        }
-
-        #region Internal Utilities
-        private void _delete_row(int index)
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-deleterow */
-            int rowCount = rows.Count;
-            if (index < -1 || index > rowCount)
+            ReactionsCommon.Wrap_CEReaction(this, () =>
             {
-                throw new IndexSizeError();
-            }
-
-            if (index == -1)
-            {
-                if (rowCount > 0)
+                int rowCount = rows.Count;
+                if (index < -1 || index > rowCount)
                 {
-                    var row = rows.Last();
+                    throw new IndexSizeError();
+                }
+
+                if (index == -1)
+                {
+                    if (rowCount > 0)
+                    {
+                        var row = rows.Last();
+                        row.parentElement.removeChild(row);
+                    }
+                }
+                else
+                {
+                    var row = rows.ElementAt(index);
                     row.parentElement.removeChild(row);
                 }
-            }
-            else
-            {
-                var row = rows.ElementAt(index);
-                row.parentElement.removeChild(row);
-            }
+            });
         }
-        #endregion
+
     }
 }
