@@ -123,23 +123,23 @@ namespace CssUI.DOM
 
         [CEReactions] public string id
         {/* The id attribute must reflect the "id" content attribute. */
-            get => getAttribute(EAttributeName.ID);
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.ID, value));
+            get => getAttribute(EAttributeName.ID).Get_String();
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.ID, AttributeValue.Parse(EAttributeName.ID, value)));
         }
 
         [CEReactions] public string className
         {/* The className attribute must reflect the "class" content attribute. */
-            get => getAttribute(EAttributeName.Class);
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Class, value));
+            get => getAttribute(EAttributeName.Class).Get_String();
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Class, AttributeValue.Parse(EAttributeName.Class, value)));
         }
 
-        public IEnumerable<string> getAttributeNames() => this.AttributeList.Select(a => a.Name);
-        public bool hasAttributes() => this.AttributeList.Count > 0;
+        public IEnumerable<string> getAttributeNames() => AttributeList.Select(a => a.Name);
+        public bool hasAttributes() => AttributeList.Count > 0;
 
         [CEReactions] public string slot
         {/* The slot attribute must reflect the "slot" content attribute. */
-            get => getAttribute(EAttributeName.Slot);
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Slot, value));
+            get => getAttribute(EAttributeName.Slot).Get_String();
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Slot, AttributeValue.From_String(value)));
         }
         #endregion
 
@@ -149,23 +149,31 @@ namespace CssUI.DOM
         /// </summary>
         public string Name
         {/* Docs: https://dom.spec.whatwg.org/#slotable-name */
-            get => getAttribute(EAttributeName.Name);
+            get => getAttribute(EAttributeName.Name).Get_String();
             set
             {
-                var oldValue = getAttribute(EAttributeName.Name);
-                if (0 == string.Compare(value, oldValue)) return;
-                if (value == null && oldValue.Count() <= 0) return;
-                if (value.Count() <= 0 && oldValue == null) return;
+                AttributeValue val = getAttribute(EAttributeName.Name);
+                string oldValue = val.Get_String();
+
+                if (oldValue.Equals(value))
+                    return;
+
+                if (value == null && oldValue.Length <= 0)
+                    return;
+
+                if (value.Length <= 0 && oldValue == null)
+                    return;
+
                 if (string.IsNullOrEmpty(value))
                 {
-                    setAttribute(EAttributeName.Name, string.Empty);
+                    setAttribute(EAttributeName.Name, null);
                 }
                 else
                 {
-                    setAttribute(EAttributeName.Name, value);
+                    setAttribute(EAttributeName.Name, AttributeValue.From_String(value));
                 }
                 /* 6) If element is assigned, then run assign slotables for element’s assigned slot. */
-                if (this.isAssigned)
+                if (isAssigned)
                 {
                     DOMCommon.assign_slottables(assignedSlot);
                 }
@@ -453,9 +461,9 @@ namespace CssUI.DOM
             /* To change an attribute attribute from an element element to value, run these steps: */
             /* 1) Queue an attribute mutation record for element with attribute’s local name, attribute’s namespace, and attribute’s value. */
             MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.namespaceURI, oldValue);
+
             /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute’s local name, attribute’s value, value, and attribute’s namespace. */
-            /* XXX: Custom element reaction stuff here */
-            CEReactions.
+            CEReactions.Enqueue_Callback_Reaction(this, EReactionName.AttributeChanged, attr.localName, attr.Value, attr.namespaceURI);
 
             /* 3) Run the attribute change steps with element, attribute’s local name, attribute’s value, value, and attribute’s namespace. */
             /* 4) Set attribute’s value to value. */
@@ -468,7 +476,10 @@ namespace CssUI.DOM
             /* To append an attribute attribute to an element element, run these steps: */
             /* 1) Queue an attribute mutation record for element with attribute’s local name, attribute’s namespace, and null. */
             MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.namespaceURI, attr.Value);
+
             /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute’s local name, null, attribute’s value, and attribute’s namespace. */
+            CEReactions.Enqueue_Callback_Reaction(this, EReactionName.AttributeChanged, attr.localName, null, attr.Value, attr.namespaceURI);
+
             /* 3) Run the attribute change steps with element, attribute’s local name, null, attribute’s value, and attribute’s namespace. */
             change_attribute(attr, null, attr.Value);
             /* 4) Append attribute to element’s attribute list. */
@@ -483,7 +494,10 @@ namespace CssUI.DOM
             /* To remove an attribute attribute from an element element, run these steps: */
             /* 1) Queue an attribute mutation record for element with attribute’s local name, attribute’s namespace, and attribute’s value. */
             MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.namespaceURI, attr.Value);
+
             /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute’s local name, attribute’s value, null, and attribute’s namespace. */
+            CEReactions.Enqueue_Callback_Reaction(this, EReactionName.AttributeChanged, attr.localName, attr.Value, null, attr.namespaceURI);
+
             /* 3) Run the attribute change steps with element, attribute’s local name, attribute’s value, null, and attribute’s namespace. */
             change_attribute(attr, attr.Value, null);
             /* 4) Remove attribute from element’s attribute list. */
@@ -498,7 +512,10 @@ namespace CssUI.DOM
             /* To replace an attribute oldAttr by an attribute newAttr in an element element, run these steps: */
             /* 1) Queue an attribute mutation record for element with oldAttr’s local name, oldAttr’s namespace, and oldAttr’s value. */
             MutationRecord.Queue_Attribute_Mutation_Record(this, oldAttr.Name, oldAttr.namespaceURI, oldAttr.Value); // REDUNDANT
+
             /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing oldAttr’s local name, oldAttr’s value, newAttr’s value, and oldAttr’s namespace. */
+            CEReactions.Enqueue_Callback_Reaction(this, EReactionName.AttributeChanged, oldAttr.localName, oldAttr.Value, newAttr.Value, oldAttr.namespaceURI);
+
             /* 3) Run the attribute change steps with element, oldAttr’s local name, oldAttr’s value, newAttr’s value, and oldAttr’s namespace. */
             change_attribute(oldAttr, oldAttr.Value, newAttr.Value);
             /* 4) Replace oldAttr by newAttr in element’s attribute list. */
@@ -515,20 +532,15 @@ namespace CssUI.DOM
         #region HTML Attribute Management
         public AttributeValue getAttribute(AtomicName<EAttributeName> Name)
         {
-            Attr attr = this.AttributeList[qualifiedName];
+            Attr attr = AttributeList[qualifiedName];
             /* 2) If attr is null, return null. */
             /* 3) Return attr’s value. */
             return attr?.Value;
         }
 
-        [Obsolete]
+        [Obsolete("Attributes should be specified via an AtomicName instance", true)]
         public string getAttribute(string qualifiedName)
         {
-            qualifiedName = qualifiedName.ToLowerInvariant();
-            Attr attr = this.AttributeList[qualifiedName];
-            /* 2) If attr is null, return null. */
-            /* 3) Return attr’s value. */
-            return attr?.Value;
         }
 
         public Attr getAttributeNode(AtomicName<EAttributeName> Name)
@@ -536,7 +548,7 @@ namespace CssUI.DOM
             return this.AttributeList[Name];
         }
 
-        [Obsolete]
+        [Obsolete("Attributes should be specified via an AtomicName instance", true)]
         public Attr getAttributeNode(string qualifiedName)
         {
             qualifiedName = qualifiedName.ToLowerInvariant();
@@ -571,23 +583,9 @@ namespace CssUI.DOM
         }
 
         [CEReactions]
-        [Obsolete]
+        [Obsolete("Attributes should be specified via an AtomicName instance", true)]
         public void setAttribute(string qualifiedName, string value)
         {
-            CEReactions.Wrap_CEReaction(this, () =>
-            {
-                find_attribute(qualifiedName, out Attr attr);
-
-                if (ReferenceEquals(attr, null))
-                {
-                    Attr newAttr = new Attr(qualifiedName, this);
-                    newAttr.Value = value;
-                    append_attribute(newAttr);
-                    return;
-                }
-
-                change_attribute(attr, attr.Value, value);
-            });
         }
 
         [CEReactions]
@@ -628,7 +626,7 @@ namespace CssUI.DOM
         }
 
         [CEReactions]
-        [Obsolete]
+        [Obsolete("Attributes should be specified via an AtomicName instance", true)]
         public void removeAttribute(string qualifiedName)
         {
             CEReactions.Wrap_CEReaction(this, () =>
@@ -691,7 +689,7 @@ namespace CssUI.DOM
             });
         }
 
-        [CEReactions, Obsolete("Use toggleAttribute(AtomicName<EAttributeName> Name, bool? force)")]
+        [CEReactions, Obsolete("Use toggleAttribute(AtomicName<EAttributeName> Name, bool? force)", true)]
         public bool toggleAttribute(string qualifiedName, bool? force = null)
         {
             return ReactionsCommon.Wrap_CEReaction(this, () =>
@@ -747,7 +745,7 @@ namespace CssUI.DOM
             return false;
         }
 
-        [Obsolete]
+        [Obsolete("Attributes should be specified via an AtomicName instance", true)]
         public bool hasAttribute(string qualifiedName)
         {
             if (this.AttributeList.TryGetValue(qualifiedName.ToLowerInvariant(), out Attr attr))

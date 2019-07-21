@@ -1,5 +1,4 @@
-﻿
-namespace CssUI.Extensions
+﻿namespace CssUI.Extensions
 {
     public static class StringExt
     {
