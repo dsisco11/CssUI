@@ -20,12 +20,23 @@ namespace CssUI.DOM
         public string prefix { get; private set; } = null;
         public AtomicName<EAttributeName> localName { get; private set; } = null;
 
-        private AttributeValue _value = null;
+        /// <summary>
+        /// The actual value assigned to this attribute by the user
+        /// </summary>
+        private AttributeValue _value_assigned = null;
+        /// <summary>
+        /// The value being used for this attribute (an invalid/missing assigned value can cause this value to be assigned a default)
+        /// </summary>
+        private AttributeValue _value_used = null;
+
         public Element ownerElement { get; internal set; } = null;
         private WeakReference<AttributeDefinition> _definition = null;
 
-        private bool Is_MissingValue = false;
-        private bool Is_InvalidValue = false;
+        /// <summary>
+        /// True if this attribute doesnt have an assigned value
+        /// </summary>
+        public bool Is_MissingValue => ReferenceEquals(null, _value_assigned);
+        public bool Is_InvalidValue { get; private set; } = false;
         #endregion
 
         #region Accessors
@@ -46,8 +57,8 @@ namespace CssUI.DOM
             }
         }
 
-        public override string nodeValue { get => Value.Data; set => _set_value(AttributeValue.Parse(value, Definition)); }
-        public override string textContent { get => Value.Data; set => _set_value(AttributeValue.Parse(value, Definition)); }
+        public override string nodeValue { get => Value.Data; set => _set_value(AttributeValue.Parse(localName, value)); }
+        public override string textContent { get => Value.Data; set => _set_value(AttributeValue.Parse(localName, value)); }
         public override int nodeLength { get => childNodes.Count; }
 
         /// <summary>
@@ -57,7 +68,7 @@ namespace CssUI.DOM
         public string Name { get => prefix==null ? localName.ToString() : string.Concat(prefix, ":", localName); }
 
         public AttributeValue Value {
-            get => _value;
+            get => _value_used;
             set
             {
                 /* 1) If attribute’s element is null, then set attribute’s value to value. */
@@ -77,30 +88,33 @@ namespace CssUI.DOM
         #region Internal Utilities
         private void _set_value(AttributeValue newValue)
         {
-            Is_MissingValue = ReferenceEquals(null, newValue) || ReferenceEquals(null, newValue.Data);
-            Is_InvalidValue = false;
-
-            try
-            {
-                Definition.CheckAndThrow(newValue);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex);
-                Is_InvalidValue = true;
-            }
+            _value_assigned = newValue;
 
             if (Is_MissingValue)
             {
-                _value = Definition.MissingValueDefault;
-            }
-            else if (Is_InvalidValue)
-            {
-                _value = Definition.InvalidValueDefault;
+                _value_used = Definition.MissingValueDefault;
             }
             else
             {
-                _value = newValue;
+                try
+                {
+                    Is_InvalidValue = false;
+                    Definition.CheckAndThrow(newValue);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex);
+                    Is_InvalidValue = true;
+                }
+
+                if (Is_InvalidValue)
+                {
+                    _value_used = Definition.InvalidValueDefault;
+                }
+                else
+                {
+                    _value_used = _value_assigned;
+                }
             }
         }
         #endregion
