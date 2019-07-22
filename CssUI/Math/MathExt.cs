@@ -10,7 +10,11 @@ namespace CssUI
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Min(int A, int B) => (A < B ? A : B);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static uint Min(uint A, uint B) => (A < B ? A : B);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long Min(long A, long B) => (A < B ? A : B);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ulong Min(ulong A, ulong B) => (A < B ? A : B);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Min(float A, float B) => (A < B ? A : B);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -21,7 +25,11 @@ namespace CssUI
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Max(int A, int B) => (A > B ? A : B);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static uint Max(uint A, uint B) => (A > B ? A : B);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long Max(long A, long B) => (A > B ? A : B);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ulong Max(ulong A, ulong B) => (A > B ? A : B);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Max(float A, float B) => (A > B ? A : B);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -32,7 +40,11 @@ namespace CssUI
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Clamp(int value, int min, int max) => Max(min, Min(max, value));
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static uint Clamp(uint value, uint min, uint max) => Max(min, Min(max, value));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long Clamp(long value, long min, long max) => Max(min, Min(max, value));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ulong Clamp(ulong value, ulong min, ulong max) => Max(min, Min(max, value));
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Clamp(float value, float min, float max) => Max(min, Min(max, value));
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -41,13 +53,17 @@ namespace CssUI
 
         #region RangeClamp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int RangeClamp(int value, int a, int b) { int min = (a < b ? a : b); int max = (a < b ? b : a); return Max(min, Min(max, value)); }
+        public static int RangeClamp(int value, int a, int b) => Max(Min(a, b), Min(Max(a, b), value));
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static long RangeClamp(long value, long a, long b) { long min = (a < b ? a : b); long max = (a < b ? b : a); return Max(min, Min(max, value)); }
+        public static uint RangeClamp(uint value, uint a, uint b) => Max(Min(a, b), Min(Max(a, b), value));
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float RangeClamp(float value, float a, float b) { float min = (a < b ? a : b); float max = (a < b ? b : a); return Max(min, Min(max, value)); }
+        public static long RangeClamp(long value, long a, long b) => Max(Min(a, b), Min(Max(a, b), value));
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double RangeClamp(double value, double a, double b) { double min = (a < b ? a : b); double max = (a < b ? b : a); return Max(min, Min(max, value)); }
+        public static ulong RangeClamp(ulong value, ulong a, ulong b) => Max(Min(a, b), Min(Max(a, b), value));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float RangeClamp(float value, float a, float b) => Max(Min(a, b), Min(Max(a, b), value));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double RangeClamp(double value, double a, double b) => Max(Min(a, b), Min(Max(a, b), value));
         #endregion
 
         #region Distance
