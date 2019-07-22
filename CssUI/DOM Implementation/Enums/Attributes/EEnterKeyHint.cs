@@ -8,7 +8,7 @@ namespace CssUI.DOM
     /// </summary>
     [DomEnum]
     public enum EEnterKeyHint : int
-    {
+    {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#input-modalities:-the-enterkeyhint-attribute */
         /// <summary>
         /// The user agent should present a cue for the operation 'enter', typically inserting a new line.
         /// </summary>

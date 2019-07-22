@@ -1217,7 +1217,7 @@ namespace CssUI.DOM
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-element-scrolltop */
             get
             {
-                if (!ownerDocument.is_fully_active)
+                if (!ownerDocument.Is_FullyActive)
                     return 0;
 
                 if (ReferenceEquals(null, ownerDocument.defaultView))
@@ -1247,7 +1247,7 @@ namespace CssUI.DOM
                 var document = ownerDocument;
                 var window = document.defaultView;
 
-                if (!document.is_fully_active)
+                if (!document.Is_FullyActive)
                     return;
 
                 if (ReferenceEquals(null, window))
@@ -1279,7 +1279,7 @@ namespace CssUI.DOM
             get
             {
                 var document = ownerDocument;
-                if (!document.is_fully_active)
+                if (!document.Is_FullyActive)
                     return 0;
 
                 var window = document.defaultView;
@@ -1308,7 +1308,7 @@ namespace CssUI.DOM
             {
                 double x = CssCommon.Normalize_Non_Finite(value);
                 var document = ownerDocument;
-                if (!document.is_fully_active)
+                if (!document.Is_FullyActive)
                     return;
 
                 var window = document.defaultView;
@@ -1341,7 +1341,7 @@ namespace CssUI.DOM
             get
             {
                 var document = ownerDocument;
-                if (!document.is_fully_active)
+                if (!document.Is_FullyActive)
                     return 0;
 
                 double viewportWidth = 0;
@@ -1367,7 +1367,7 @@ namespace CssUI.DOM
             get
             {
                 var document = ownerDocument;
-                if (!document.is_fully_active)
+                if (!document.Is_FullyActive)
                     return 0;
 
                 double viewportHeight = 0;
@@ -1538,7 +1538,7 @@ namespace CssUI.DOM
             /* 3) Let document be the element’s node document. */
             var document = ownerDocument;
             /* 4) If document is not the active document, terminate these steps. */
-            if (!document.is_fully_active) return;
+            if (!document.Is_FullyActive) return;
             /* 5) Let window be the value of document’s defaultView attribute. */
             var window = document.defaultView;
             /* 6) If window is null, terminate these steps. */
@@ -1581,7 +1581,7 @@ namespace CssUI.DOM
             /* 3) Let document be the element’s node document. */
             var document = ownerDocument;
             /* 4) If document is not the active document, terminate these steps. */
-            if (!document.is_fully_active) return;
+            if (!document.Is_FullyActive) return;
             /* 5) Let window be the value of document’s defaultView attribute. */
             var window = document.defaultView;
             /* 6) If window is null, terminate these steps. */

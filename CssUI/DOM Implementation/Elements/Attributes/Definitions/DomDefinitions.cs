@@ -39,7 +39,7 @@ namespace CssUI.DOM
                 new AttributeDefinition(EAttributeName.Title, EAttributeType.String, null, null, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.Lang, EAttributeType.String, null, null, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.Translate, EAttributeType.Boolean, null, null, EAttributeFlags.None),
-                new AttributeDefinition(EAttributeName.Dir, EAttributeType.String, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.Dir, EAttributeType.Enumerated, null, null, EAttributeFlags.None, DomLookup.Get_Keywords<EDir>()),
                 new AttributeDefinition(EAttributeName.Nonce, EAttributeType.String, null, null, EAttributeFlags.None),
 
                 /* The tabIndex IDL attribute must reflect the value of the tabindex content attribute. The default value is 0 if the element is an a, area, button, iframe, input, select, or textarea element, or is a summary element that is a summary for its parent details. The default value is −1 otherwise. */
@@ -49,8 +49,9 @@ namespace CssUI.DOM
 
                 new AttributeDefinition(EAttributeName.AccessKey, EAttributeType.KeyCombo, null, null, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.Draggable, EAttributeType.Enumerated, AttributeValue.From_Enum(EDraggable.Auto), AttributeValue.From_Enum(EDraggable.Auto), EAttributeFlags.None, DomLookup.Get_Keywords<EDraggable>(), typeof(EDraggable)),
-                new AttributeDefinition(EAttributeName.SpellCheck, EAttributeType.Boolean, null, null, EAttributeFlags.None),
-                new AttributeDefinition(EAttributeName.AutoCapitalize, EAttributeType.String, null, null, EAttributeFlags.None),
+
+                new AttributeDefinition(EAttributeName.Spellcheck, EAttributeType.Enumerated, AttributeValue.From_Enum(ESpellcheck.Default), AttributeValue.From_Enum(ESpellcheck.Default), EAttributeFlags.None, DomLookup.Get_Keywords<ESpellcheck>()),
+                new AttributeDefinition(EAttributeName.AutoCapitalize, EAttributeType.Enumerated, AttributeValue.From_Enum(EAutoCapitalizationHint.Default), AttributeValue.From_Enum(EAutoCapitalizationHint.Sentences), EAttributeFlags.None, DomLookup.Get_Keywords<EAutoCapitalizationHint>()),
 
                 new AttributeDefinition(EAttributeName.ContentEditable, EAttributeType.Enumerated, null, null, EAttributeFlags.None, DomLookup.Get_Keywords<EContentEditable>(), typeof(EContentEditable)),
 
@@ -74,6 +75,7 @@ namespace CssUI.DOM
 
 
                 /* Input Attributes */
+                new AttributeDefinition(EAttributeName.Type, EAttributeType.Enumerated, AttributeValue.From_Enum(EInputType.Text), AttributeValue.From_Enum(EInputType.Text), EAttributeFlags.None, DomLookup.Get_Keywords<EInputType>()),
                 new AttributeDefinition(EAttributeName.InputMode, EAttributeType.Enumerated, null, null, EAttributeFlags.None, DomLookup.Get_Keywords<EInputMode>()),
                 new AttributeDefinition(EAttributeName.EnterKeyHint, EAttributeType.Enumerated, null, null, EAttributeFlags.None, DomLookup.Get_Keywords<EEnterKeyHint>()),
 

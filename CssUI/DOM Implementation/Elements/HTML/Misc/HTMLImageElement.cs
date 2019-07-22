@@ -189,7 +189,7 @@ namespace CssUI.DOM
                  *      its current request's state is broken,
                  *      then reject promise with an "EncodingError" DOMException.
                  */
-                if (!nodeDocument.is_fully_active)
+                if (!nodeDocument.Is_FullyActive)
                 {
                     tcs.TrySetException(new EncodingError());
                     return;
@@ -210,7 +210,7 @@ namespace CssUI.DOM
                     while (true)
                     {
                         WaitHandle.WaitAny(new WaitHandle[] { currentRequest.State_Change_Signal, nodeDocument.Active_State_Change_Signal });
-                        if (!nodeDocument.is_fully_active || currentRequest.State == Enums.EDataRequestState.Broken)
+                        if (!nodeDocument.Is_FullyActive || currentRequest.State == Enums.EDataRequestState.Broken)
                         {
                             tcs.TrySetException(new EncodingError());
                             return;

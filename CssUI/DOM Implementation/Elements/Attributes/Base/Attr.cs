@@ -37,6 +37,10 @@ namespace CssUI.DOM
         /// </summary>
         public bool Is_MissingValue => ReferenceEquals(null, _value_assigned);
         public bool Is_InvalidValue { get; private set; } = false;
+        /// <summary>
+        /// Returns if this attribute is Missing or Invalid
+        /// </summary>
+        public bool Is_Defined => !(Is_MissingValue || Is_InvalidValue);
         #endregion
 
         #region Accessors

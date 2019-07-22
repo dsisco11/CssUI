@@ -40,7 +40,7 @@ namespace CssUI.DOM
         #region Accessors
         public double OffsetLeft
         {
-            get => !window.document.is_fully_active ? 0 : ();
+            get => !window.document.Is_FullyActive ? 0 : ();
         }
         public double OffsetTop;
 

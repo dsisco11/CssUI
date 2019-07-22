@@ -1,14 +1,13 @@
 ﻿namespace CssUI.DOM
 {
-    public sealed class HTMLBodyElement : HTMLElement//, IWindowEventCallbacks
+    public sealed class HTMLBodyElement : HTMLElement
     {
 
         #region Constructor
-        public HTMLBodyElement(Document document, string localName, string prefix, string Namespace) : base(document, localName)
+        public HTMLBodyElement(Document document) : base(document, "body")
         {
         }
         #endregion
-
 
     }
 }

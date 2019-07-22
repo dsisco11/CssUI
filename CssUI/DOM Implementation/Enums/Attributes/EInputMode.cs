@@ -4,7 +4,7 @@ namespace CssUI.DOM
 {
     [DomEnum]
     public enum EInputMode : int
-    {
+    {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#attr-inputmode */
         /// <summary>
         /// The user agent should not display a virtual keyboard. This keyword is useful for content that renders its own keyboard control.
         /// </summary>

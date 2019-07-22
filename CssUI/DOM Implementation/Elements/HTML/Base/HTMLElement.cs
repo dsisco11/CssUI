@@ -39,11 +39,82 @@ namespace CssUI.DOM
             set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Translate, value));
         }
 
+        /// <summary>
+        /// The dir attribute specifies the element's text directionality.
+        /// </summary>
         [CEReactions]
-        public string dir
+        public EDir dir
         {
-            get => getAttribute(EAttributeName.Dir).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Dir, AttributeValue.From_String(value)));
+            get => getAttribute(EAttributeName.Dir).Get_Enum<EDir>();
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Dir, AttributeValue.From_Enum(value)));
+        }
+
+        /// <summary>
+        /// Resolves the directionality of the element
+        /// </summary>
+        public CSS.EDirection directionality
+        {/* Docs: https://html.spec.whatwg.org/multipage/dom.html#the-directionality */
+            get
+            {
+                /* If the element's dir attribute is in the ltr state
+                 * If the element is a document element and the dir attribute is not in a defined state (i.e. it is not present or has an invalid value)
+                 * If the element is an input element whose type attribute is in the Telephone state, and the dir attribute is not in a defined state (i.e. it is not present or has an invalid value)
+                 */
+                Attr attr = getAttributeNode(EAttributeName.Dir);
+                EDir dirValue = dir;
+                if (dirValue == EDir.Ltr)
+                {
+                    return CSS.EDirection.LTR;
+                }
+                else if (ReferenceEquals(this, ownerDocument.documentElement) && !attr.Is_Defined)
+                {
+                    return CSS.EDirection.LTR;
+                }
+                else if (this is HTMLInputElement inputElement && inputElement.type == EInputType.Telephone)
+                {
+                    return CSS.EDirection.LTR;
+                }
+
+                if (dirValue == EDir.Rtl)
+                {
+                    return CSS.EDirection.RTL;
+                }
+                /*
+                if (dirValue == EDir.Auto && (this is HTMLTextAreaElement || (this is HTMLInputElement e && (e.type == EInputType.Text || e.type == EInputType.Search || e.type == EInputType.Telephone || e.type == EInputType.Url || e.type == EInputType.Email)))
+                {
+                    *//* If the element's value contains a character of bidirectional character type AL or R, and there is no character of bidirectional character type L anywhere before it in the element's value, then the directionality of the element is 'rtl'. [BIDI]
+                     * Otherwise, if the element's value is not the empty string, or if the element is a document element, the directionality of the element is 'ltr'.
+                     * Otherwise, the directionality of the element is the same as the element's parent element's directionality. 
+                     *//*
+
+                }
+                */
+
+                if (dirValue == EDir.Auto || (!attr.Is_Defined && this is HTMLBdiElement))
+                {
+                    /* Find the first character in tree order that matches the following criteria:
+                     * The character is from a Text node that is a descendant of the element whose directionality is being determined.
+                     * The character is of bidirectional character type L, AL, or R. [BIDI]
+                     * The character is not in a Text node that has an ancestor element that is a descendant of the element whose directionality is being determined and that is either:
+                     * -  A bdi element.
+                     * -  A script element.
+                     * -  A style element.
+                     * -  A textarea element.
+                     * An element with a dir attribute in a defined state.
+                     * If such a character is found and it is of bidirectional character type AL or R, the directionality of the element is 'rtl'.
+                     * If such a character is found and it is of bidirectional character type L, the directionality of the element is 'ltr'.
+                     * Otherwise, if the element is a document element, the directionality of the element is 'ltr'.
+                     * Otherwise, the directionality of the element is the same as the element's parent element's directionality.
+                     */
+                }
+
+                if (!attr.Is_Defined && !ReferenceEquals(null, parentElement))
+                {
+                    return (parentElement as HTMLElement).directionality;
+                }
+
+                return CSS.EDirection.LTR;
+            }
         }
 
         /// <summary>
@@ -60,6 +131,11 @@ namespace CssUI.DOM
         #endregion
 
         #region Constructors
+        /// <summary>
+        /// Instantiates a new HTML element
+        /// </summary>
+        /// <param name="document">The document this element resides in</param>
+        /// <param name="localName">Also know as the HTML tag</param>
         public HTMLElement(Document document, string localName) : base(document, localName, "html", DOMCommon.HTMLNamespace)
         {
             dataset = new DOMStringMap(this);
@@ -404,11 +480,98 @@ namespace CssUI.DOM
         }
 
         /* XXX: implement these */
+        /// <summary>
+        /// Determines the default behavior of spellchecking for this element
+        /// </summary>
+        protected ESpellcheckBehavior Spellcheck_Default = ESpellcheckBehavior.False_By_Default;
+        /// <summary>
+        /// Returns true if the element is to have its spelling and grammar checked; otherwise, returns false.
+        /// Can be set, to override the default and set the spellcheck content attribute.
+        /// </summary>
         [CEReactions]
-        public bool spellcheck;
+        public bool spellcheck
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#spelling-and-grammar-checking */
+            get
+            {
+                /* The spellcheck IDL attribute, on getting, must return true if the element's spellcheck content attribute is in the true state, 
+                 * or if the element's spellcheck content attribute is in the default state and the element's default behavior is true-by-default, 
+                 * or if the element's spellcheck content attribute is in the default state and the element's default behavior is inherit-by-default and the element's parent element's spellcheck IDL attribute would return true; 
+                 * otherwise, if none of those conditions applies, then the attribute must instead return false. */
+                ESpellcheck enumValue = getAttribute(EAttributeName.Spellcheck).Get_Enum<ESpellcheck>();
 
+                if (enumValue == ESpellcheck.True)
+                {
+                    return true;
+                }
+                else if (enumValue == ESpellcheck.Default)
+                {
+                    switch (Spellcheck_Default)
+                    {
+                        case ESpellcheckBehavior.True_By_Default:
+                            return true;
+
+                        case ESpellcheckBehavior.Inherit_By_Default:
+                            {
+                                if (!ReferenceEquals(null, parentElement) && parentElement is HTMLElement parentHTML)
+                                {
+                                    if (parentHTML.spellcheck)
+                                    {
+                                        return true;
+                                    }
+                                }
+                            }
+                            break;
+                    }
+                }
+
+                /* otherwise, if none of those conditions applies, then the attribute must instead return false. */
+                return false;
+            }
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Spellcheck, AttributeValue.From_Enum(value ? ESpellcheck.True : ESpellcheck.False)));
+        }
+
+        /// <summary>
+        /// Is this element an autocapitalize-inheriting element?
+        /// </summary>
+        protected bool Autocapitalize_Inherited = false;
+        /// <summary>
+        /// Returns the current autocapitalization state for the element, or an empty string if it hasn't been set. Note that for input and textarea elements that inherit their state from a form element, 
+        /// this will return the autocapitalization state of the form element, but for an element in an editable region, 
+        /// this will not return the autocapitalization state of the editing host (unless this element is, in fact, the editing host).
+        /// Can be set, to set the autocapitalize content attribute(and thereby change the autocapitalization behavior for the element).
+        /// </summary>
         [CEReactions]
-        public string autocapitalize;
+        public EAutoCapitalizationHint autocapitalize
+        {
+            get
+            {
+                Attr attr = getAttributeNode(EAttributeName.AutoCapitalize);
+                if (!ReferenceEquals(null, attr))
+                {
+                    var enumValue = attr.Value.Get_Enum<EAutoCapitalizationHint>();
+                    if (enumValue != EAutoCapitalizationHint.Default)
+                    {
+                        return enumValue;
+                    }
+                    else/* Default */
+                    {
+                        if (Autocapitalize_Inherited)
+                        {
+                            if (this is IFormAssociatedElement formElement)
+                            {
+                                if (!ReferenceEquals(null, formElement.form))
+                                {
+                                    return formElement.form.autocapitalize;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return EAutoCapitalizationHint.Default;
+            }
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.AutoCapitalize, AttributeValue.From_Enum(value)));
+        }
 
         [CEReactions]
         public string innerText;

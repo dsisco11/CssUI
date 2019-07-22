@@ -38,7 +38,7 @@ namespace CssUI.DOM
         [DomKeyword("accesskey")]
         AccessKey,
         [DomKeyword("spellcheck")]
-        SpellCheck,
+        Spellcheck,
         [DomKeyword("autocapitalize")]
         AutoCapitalize,
 
