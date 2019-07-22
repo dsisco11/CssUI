@@ -1,4 +1,5 @@
-﻿using CssUI.DOM.Enums;
+﻿using CssUI.DOM.CustomElements;
+using CssUI.DOM.Enums;
 using CssUI.DOM.Events;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Mutation;
@@ -65,8 +66,7 @@ namespace CssUI.DOM.Nodes
         /// Returns true if node is connected and false otherwise.
         /// </summary>
         /// https://dom.spec.whatwg.org/#connected
-        /// NOTE: ShadowDOM stuff here
-        public bool isConnected { get => false; }
+        public bool isConnected { get => DOMCommon.Get_Shadow_Including_Root(this) is Document; }
 
         /// <summary>
         /// The index of this node within it's parent nodes child list
@@ -119,7 +119,7 @@ namespace CssUI.DOM.Nodes
                 /* 2) If length is zero, then remove node and continue with the next exclusive Text node, if any. */
                 if (length <= 0)
                 {
-                    Node._remove_node_from_parent(node, this);
+                    _remove_node_from_parent(node, this);
                     continue;
                 }
                 /* 3) Let data be the concatenation of the data of node’s contiguous exclusive Text nodes (excluding itself), in tree order. */
@@ -176,7 +176,7 @@ namespace CssUI.DOM.Nodes
                 /* 7) Remove node’s contiguous exclusive Text nodes (excluding itself), in tree order. */
                 foreach (Node cnode in textNodes)
                 {
-                    Node._remove_node_from_parent(cnode, this);
+                    _remove_node_from_parent(cnode, this);
                 }
             }
         }
@@ -184,7 +184,8 @@ namespace CssUI.DOM.Nodes
         public Node cloneNode(bool deep = false)
         {/* Docs: https://dom.spec.whatwg.org/#dom-node-clonenode */
             /* 1) If context object is a shadow root, then throw a "NotSupportedError" DOMException. */
-            /* NOTE: ShadowDOM stuff here */
+            if (this is ShadowRoot)
+                throw new NotSupportedError("Cannot clone a shadow-root");
             /* 2) Return a clone of the context object, with the clone children flag set if deep is true. */
             /* Docs: https://dom.spec.whatwg.org/#concept-node-clone */
             return _clone_node(this, null, deep);
@@ -364,6 +365,12 @@ namespace CssUI.DOM.Nodes
         #endregion
 
         #region Internal Utilitys
+        internal virtual bool Is_ShadowHost
+        {/* Docs: https://dom.spec.whatwg.org/#element-shadow-host */
+            get => this is Element E && !ReferenceEquals(null, E.shadowRoot);
+        }
+
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static Node _clone_node(Node node, Document document = null, bool clone_children = false)
         {/* Docs: https://dom.spec.whatwg.org/#concept-node-clone */
@@ -497,7 +504,6 @@ namespace CssUI.DOM.Nodes
             return copy;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static void _remove_node_from_parent(Node node, Node parent, bool suppress_observers = false)
         {/* Docs: https://dom.spec.whatwg.org/#concept-node-remove */
             /* 1) Let index be node’s index. */
@@ -547,12 +553,47 @@ namespace CssUI.DOM.Nodes
             var nextSibling = node.nextSibling;
             /* 9) Remove node from its parent’s children. */
             parent.childNodes.Remove(node);
-            /* NOTE: Slottable / Shadow DOM steps go here, if we ever support those things then we must update this code */
+            /* 10) If node is assigned, then run assign slotables for node’s assigned slot. */
+            if (node.isAssigned)
+            {
+                DOMCommon.Assign_Slottables((node as ISlottable).assignedSlot);
+            }
+            /* 11) If parent’s root is a shadow root, and parent is a slot whose assigned nodes is the empty list, then run signal a slot change for parent. */
+            Node parentRoot = parent.getRootNode();
+            if (parentRoot is ShadowRoot && parent is ISlot parentSlot && !parentSlot.assignedNodes().Any())
+            {
+                parentSlot.Signal_Slot_Change();
+            }
+
+            /* 12) If node has an inclusive descendant that is a slot, then: */
+            if (DOMCommon.Get_Inclusive_Descendents(node).Where(child => child is ISlot).Any())
+            {
+                /* 1) Run assign slotables for a tree with parent’s root. */
+                DOMCommon.Assign_Slottables_For_Tree(parentRoot);
+                /* 2) Run assign slotables for a tree with node. */
+                DOMCommon.Assign_Slottables_For_Tree(node);
+            }
+
             /* 13) Run the removing steps with node and parent. */
             parent.run_node_removing_steps(node);
 
-            /* NOTE: Custom element handling code goes here. */
-            /* NOTE: Shadow dom removal code here */
+            /* 14) If node is custom, then enqueue a custom element callback reaction with node, callback name "disconnectedCallback", and an empty argument list. */
+            if (node is Element nodeElement)
+            {
+                CEReactions.Enqueue_Reaction(nodeElement, EReactionName.Disconnected, new object[0]);
+            }
+
+            /* 15) For each shadow-including descendant descendant of node, in shadow-including tree order, then: */
+            foreach (Node descendant in DOMCommon.Get_Shadow_Including_Descendents(node))
+            {
+                /* 1) Run the removing steps with descendant. */
+                _remove_node_from_parent(descendant, node);
+                /* 2) If descendant is custom, then enqueue a custom element callback reaction with descendant, callback name "disconnectedCallback", and an empty argument list. */
+                if (descendant is Element childElement)
+                {
+                    CEReactions.Enqueue_Reaction(childElement, EReactionName.Disconnected, new object[0]);
+                }
+            }
 
             /* 16) For each inclusive ancestor inclusiveAncestor of parent, and then for each registered of inclusiveAncestor’s registered observer list, 
              * if registered’s options’s subtree is true, then append a new transient registered observer whose observer is registered’s observer, 
@@ -618,7 +659,7 @@ namespace CssUI.DOM.Nodes
             {
                 foreach (Node cn in doc2.childNodes)
                 {
-                    Node._remove_node_from_parent(cn, doc2, true);
+                    _remove_node_from_parent(cn, doc2, true);
                 }
                 /* 5) If node is a DocumentFragment node, then queue a tree mutation record for node with « », nodes, null, and null. */
                 MutationRecord.Queue_Tree_Mutation_Record(node, new Node[] { }, nodes, null, null);
@@ -641,13 +682,26 @@ namespace CssUI.DOM.Nodes
                     // Increment childIndex so its position is correct
                     childIndex++;
                 }
-                /* NOTE: ShadowDOM stuff here */
+                /* 3) If parent is a shadow host and node is a slotable, then assign a slot for node. */
+                if (parent.Is_ShadowHost && node is ISlottable)
+                {
+                    DOMCommon.Assign_A_Slot(node as ISlottable);
+                }
+
                 /* 4) If node is a Text node, run the child text content change steps for parent. */
                 if (node is Text txt)
                 {
                     parent.run_child_text_node_change_steps(txt);
                 }
-                /* NOTE: ShadowDOM stuff here */
+                /* 5) If parent’s root is a shadow root, and parent is a slot whose assigned nodes is the empty list, then run signal a slot change for parent. */
+                if (parent.getRootNode().Is_ShadowHost && parent is ISlot parentSlot && !parentSlot.assignedNodes().Any())
+                {
+                    parentSlot.Signal_Slot_Change();
+                }
+
+                /* 6) Run assign slotables for a tree with node’s root. */
+                DOMCommon.Assign_Slottables_For_Tree(node.getRootNode());
+
                 /* 7) For each shadow-including inclusive descendant inclusiveDescendant of node, in shadow-including tree order: */
                 var newNodeDescendents = DOMCommon.Get_Shadow_Including_Inclusive_Descendents(newNode);
                 foreach (Node inclusiveDescendant in newNodeDescendents)
@@ -658,9 +712,9 @@ namespace CssUI.DOM.Nodes
                     if (inclusiveDescendant.isConnected)
                     {
                         /* 1) If inclusiveDescendant is custom, then enqueue a custom element callback reaction with inclusiveDescendant, callback name "connectedCallback", and an empty argument list. */
-                        /* NOTE: Custom element stuff here */
+                        CEReactions.Enqueue_Reaction(inclusiveDescendant as Element, EReactionName.Connected, new object[0]);
                         /* 2) Otherwise, try to upgrade inclusiveDescendant. */
-                        /* NOTE: Custom element stuff here */
+                        CEReactions.Upgrade_Element(inclusiveDescendant as Element);
                     }
                 }
             }
@@ -750,7 +804,7 @@ namespace CssUI.DOM.Nodes
             {
                 /* 1) Set removedNodes to « child ». */
                 removedNodes = new Node[] { child };
-                Node._remove_node_from_parent(child, child.parentNode, true);
+                _remove_node_from_parent(child, child.parentNode, true);
             }
             /* 13) Let nodes be node’s children if node is a DocumentFragment node; otherwise « node ». */
             IEnumerable<Node> nodes = (node is DocumentFragment) ? node.childNodes : (IEnumerable<Node>)new Node[] { node };
@@ -785,7 +839,7 @@ namespace CssUI.DOM.Nodes
             /* 6) Remove all parent’s children, in tree order, with the suppress observers flag set. */
             foreach (Node child in parent.childNodes)
             {
-                Node._remove_node_from_parent(child, parent, true);
+                _remove_node_from_parent(child, parent, true);
             }
             /* 7) If node is not null, then insert node into parent before null with the suppress observers flag set. */
             if (!ReferenceEquals(null, node))
@@ -887,7 +941,7 @@ namespace CssUI.DOM.Nodes
             if (!ReferenceEquals(child.parentNode, parent))
                 throw new NotFoundError("child node is not a child of the specified parent");
 
-            Node._remove_node_from_parent(child, parent);
+            _remove_node_from_parent(child, parent);
             return child;
         }
 

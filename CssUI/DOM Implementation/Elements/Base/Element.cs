@@ -175,10 +175,10 @@ namespace CssUI.DOM
                 /* 6) If element is assigned, then run assign slotables for element’s assigned slot. */
                 if (isAssigned)
                 {
-                    DOMCommon.assign_slottables(assignedSlot);
+                    DOMCommon.Assign_Slottables(assignedSlot);
                 }
                 /* 7) Run assign a slot for element. */
-                DOMCommon.assign_a_slot(this);
+                DOMCommon.Assign_A_Slot(this);
             }
         }
 
@@ -350,12 +350,21 @@ namespace CssUI.DOM
         /// <summary>
         /// Is this element a properly defined element
         /// </summary>
-        internal bool is_defined
+        internal bool Is_Defined
         {/* Docs: https://dom.spec.whatwg.org/#concept-element-defined */
             get => CustomElementState == Enums.ECustomElement.Uncustomized || CustomElementState == Enums.ECustomElement.Custom;
         }
 
-        internal bool is_shadowhost
+        /// <summary>
+        /// Is this element a custom element
+        /// <para>An element whose custom element state is "custom" is said to be custom.</para>
+        /// </summary>
+        internal bool Is_Custom
+        {/* Docs: https://dom.spec.whatwg.org/#concept-element-custom */
+            get => CustomElementState == Enums.ECustomElement.Custom;
+        }
+
+        internal override bool Is_ShadowHost
         {/* Docs: https://dom.spec.whatwg.org/#element-shadow-host */
             get => !ReferenceEquals(null, shadowRoot);
         }
@@ -463,7 +472,7 @@ namespace CssUI.DOM
             MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.namespaceURI, oldValue);
 
             /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute’s local name, attribute’s value, value, and attribute’s namespace. */
-            CEReactions.Enqueue_Callback_Reaction(this, EReactionName.AttributeChanged, attr.localName, attr.Value, attr.namespaceURI);
+            CEReactions.Enqueue_Reaction(this, EReactionName.AttributeChanged, attr.localName, attr.Value, attr.namespaceURI);
 
             /* 3) Run the attribute change steps with element, attribute’s local name, attribute’s value, value, and attribute’s namespace. */
             /* 4) Set attribute’s value to value. */
@@ -478,7 +487,7 @@ namespace CssUI.DOM
             MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.namespaceURI, attr.Value);
 
             /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute’s local name, null, attribute’s value, and attribute’s namespace. */
-            CEReactions.Enqueue_Callback_Reaction(this, EReactionName.AttributeChanged, attr.localName, null, attr.Value, attr.namespaceURI);
+            CEReactions.Enqueue_Reaction(this, EReactionName.AttributeChanged, attr.localName, null, attr.Value, attr.namespaceURI);
 
             /* 3) Run the attribute change steps with element, attribute’s local name, null, attribute’s value, and attribute’s namespace. */
             change_attribute(attr, null, attr.Value);
@@ -496,7 +505,7 @@ namespace CssUI.DOM
             MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.namespaceURI, attr.Value);
 
             /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute’s local name, attribute’s value, null, and attribute’s namespace. */
-            CEReactions.Enqueue_Callback_Reaction(this, EReactionName.AttributeChanged, attr.localName, attr.Value, null, attr.namespaceURI);
+            CEReactions.Enqueue_Reaction(this, EReactionName.AttributeChanged, attr.localName, attr.Value, null, attr.namespaceURI);
 
             /* 3) Run the attribute change steps with element, attribute’s local name, attribute’s value, null, and attribute’s namespace. */
             change_attribute(attr, attr.Value, null);
@@ -514,7 +523,7 @@ namespace CssUI.DOM
             MutationRecord.Queue_Attribute_Mutation_Record(this, oldAttr.Name, oldAttr.namespaceURI, oldAttr.Value); // REDUNDANT
 
             /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing oldAttr’s local name, oldAttr’s value, newAttr’s value, and oldAttr’s namespace. */
-            CEReactions.Enqueue_Callback_Reaction(this, EReactionName.AttributeChanged, oldAttr.localName, oldAttr.Value, newAttr.Value, oldAttr.namespaceURI);
+            CEReactions.Enqueue_Reaction(this, EReactionName.AttributeChanged, oldAttr.localName, oldAttr.Value, newAttr.Value, oldAttr.namespaceURI);
 
             /* 3) Run the attribute change steps with element, oldAttr’s local name, oldAttr’s value, newAttr’s value, and oldAttr’s namespace. */
             change_attribute(oldAttr, oldAttr.Value, newAttr.Value);
@@ -541,6 +550,7 @@ namespace CssUI.DOM
         [Obsolete("Attributes should be specified via an AtomicName instance", true)]
         public string getAttribute(string qualifiedName)
         {
+            return null;
         }
 
         public Attr getAttributeNode(AtomicName<EAttributeName> Name)
@@ -881,7 +891,7 @@ namespace CssUI.DOM
             */
             /* XXX: Custom element stuff here */
             /* 4) If context object is a shadow host, then throw an "NotSupportedError" DOMException. */
-            if (this.is_shadowhost)
+            if (this.Is_ShadowHost)
             {
                 throw new NotSupportedError("Cannot attach a shadow root to an element which already has a shadow root");
             }

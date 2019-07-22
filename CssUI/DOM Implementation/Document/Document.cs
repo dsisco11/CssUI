@@ -1,4 +1,5 @@
-﻿using CssUI.DOM.Enums;
+﻿using CssUI.DOM.CustomElements;
+using CssUI.DOM.Enums;
 using CssUI.DOM.Events;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Geometry;
@@ -342,8 +343,7 @@ namespace CssUI.DOM
         public Node adoptNode(Node node)
         {/* Docs: https://dom.spec.whatwg.org/#dom-document-adoptnode */
             if (node is Document) throw new NotSupportedError();
-            /* NOTE: Shadow DOM stuff here */
-
+            if (node is ShadowRoot) throw new HierarchyRequestError("Cannot adopt a shadow-root into a document");
             /* Docs: https://dom.spec.whatwg.org/#concept-node-adopt */
             /* 1) Let oldDocument be node’s node document. */
             var oldDocument = node.ownerDocument;
@@ -355,7 +355,6 @@ namespace CssUI.DOM
             {
                 var descendentsList = DOMCommon.Get_Shadow_Including_Inclusive_Descendents(node);
                 /* 1) For each inclusiveDescendant in node’s shadow-including inclusive descendants: */
-                /* NOTE: Shadow DOM stuff here */
                 foreach (Node inclusiveDescendant in descendentsList)
                 {
                     /* 1) Set inclusiveDescendant’s node document to document. */
@@ -369,12 +368,16 @@ namespace CssUI.DOM
                         }
                     }
                 }
+
                 /* 2) For each inclusiveDescendant in node’s shadow-including inclusive descendants that is custom, enqueue a custom element callback reaction with inclusiveDescendant, callback name "adoptedCallback", and an argument list containing oldDocument and document. */
-                /* NOTE: Custom element stuff here */
                 /* 3) For each inclusiveDescendant in node’s shadow-including inclusive descendants, in shadow-including tree order, run the adopting steps with inclusiveDescendant and oldDocument. */
                 foreach (Node inclusiveDescendant in descendentsList)
                 {
-                    this.adoptNode(inclusiveDescendant);
+                    if (inclusiveDescendant is Element childElement)
+                    {
+                        CEReactions.Enqueue_Reaction(childElement, EReactionName.Adopted, oldDocument, this);
+                    }
+                    adoptNode(inclusiveDescendant);
                 }
             }
 

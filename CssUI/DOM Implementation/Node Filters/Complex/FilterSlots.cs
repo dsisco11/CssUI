@@ -4,15 +4,15 @@ using CssUI.DOM.Nodes;
 namespace CssUI.DOM
 {
     /// <summary>
-    /// Accepts only nodes that implement <see cref="ISlottable"/>
+    /// Accepts only nodes that implements <see cref="ISlot"/>
     /// </summary>
-    public class FilterSlotable : NodeFilter
+    public class FilterSlots : NodeFilter
     {
-        public static FilterSlotable Instance = new FilterSlotable();
+        public static FilterSlots Instance = new FilterSlots();
 
         public override ENodeFilterResult acceptNode(Node node)
         {
-            if (node is ISlottable)
+            if (node is ISlot)
                 return ENodeFilterResult.FILTER_ACCEPT;
 
             return ENodeFilterResult.FILTER_SKIP;

@@ -207,18 +207,10 @@ namespace CssUI.DOM
             return node is Text || node is ProcessingInstruction || node is Comment;
         }
 
-        /// <summary>
-        /// Returns true if the node is a slot
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Slot(Node node)
-        {
-            return node is Element element && 0 == string.Compare("slot", element.tagName);
-        }
         #endregion
 
         #region Slottables
-        internal static ISlot find_slot(ISlottable slottable, bool open_flag = false)
+        internal static ISlot Sind_Slot(ISlottable slottable, bool open_flag = false)
         {/* Docs: https://dom.spec.whatwg.org/#find-a-slot */
             if (ReferenceEquals(null, slottable.parentNode))
                 return null;
@@ -246,7 +238,7 @@ namespace CssUI.DOM
             return null;
         }
 
-        internal static List<ISlottable> find_slotables(ISlot slot)
+        internal static List<ISlottable> Find_Slotables(ISlot slot)
         {/* Docs: https://dom.spec.whatwg.org/#find-slotables */
             var result = new List<ISlottable>();
             var root = (slot as Node).getRootNode();
@@ -262,7 +254,7 @@ namespace CssUI.DOM
                 if (node is ISlottable)
                 {
                     ISlottable slotable = node as ISlottable;
-                    var foundSlot = DOMCommon.find_slot(slotable);
+                    var foundSlot = DOMCommon.Sind_Slot(slotable);
                     if (ReferenceEquals(foundSlot, slot))
                         result.Add(slotable);
                 }
@@ -271,13 +263,13 @@ namespace CssUI.DOM
             return result;
         }
 
-        internal static List<ISlottable> find_flattened_slotables(ISlot slot)
+        internal static List<ISlottable> Find_Flattened_Slotables(ISlot slot)
         {/* Docs: https://dom.spec.whatwg.org/#find-flattened-slotables */
             var result = new List<ISlottable>();
             if (!(slot.getRootNode() is ShadowRoot))
                 return result;
 
-            var slotables = DOMCommon.find_slotables(slot);
+            var slotables = Find_Slotables(slot);
             /* 4) If slotables is the empty list, then append each slotable child of slot, in tree order, to slotables. */
             if (slotables.Count <= 0)
             {
@@ -289,12 +281,13 @@ namespace CssUI.DOM
                     }
                 }
             }
+
             /* 5) For each node in slotables: */
             foreach (ISlottable node in slotables)
             {
                 if (node is ISlot && node.getRootNode() is ShadowRoot)
                 {
-                    var temporaryResult = DOMCommon.find_flattened_slotables(node as ISlot);
+                    var temporaryResult = DOMCommon.Find_Flattened_Slotables(node as ISlot);
                     result.AddRange(temporaryResult);
                 }
                 else
@@ -307,16 +300,30 @@ namespace CssUI.DOM
             return result;
         }
 
-        internal static void assign_slottables(ISlot slot)
+        internal static void Assign_Slottables_For_Tree(Node root)
+        {/* Docs: https://dom.spec.whatwg.org/#assign-slotables-for-a-tree */
+            /* To assign slotables for a tree, given a node root, run assign slotables for each slot slot in root’s inclusive descendants, in tree order. */
+            var inclusiveDescendants = Get_Inclusive_Descendents(root, FilterSlots.Instance);
+            foreach (ISlot descendant in inclusiveDescendants)
+            {
+                Assign_Slottables(descendant);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="slot"></param>
+        internal static void Assign_Slottables(ISlot slot)
         {/* Docs: https://dom.spec.whatwg.org/#assign-slotables */
-            var slotables = DOMCommon.find_slotables(slot);
+            var slotables = DOMCommon.Find_Slotables(slot);
 
             bool match = true;
-            if (slotables.Count() != slot.Assigned.Count())
+            if (slotables.Count != slot.Assigned.Count)
                 match = false;
             else
             {
-                for (int i = 0; i < slotables.Count(); i++)
+                for (int i = 0; i < slotables.Count; i++)
                 {
                     if (!ReferenceEquals(slotables[i], slot.Assigned[i]))
                     {
@@ -328,8 +335,7 @@ namespace CssUI.DOM
             /* 2) If slotables and slot’s assigned nodes are not identical, then run signal a slot change for slot. */
             if (!match)
             {
-                slot.ownerDocument.window.SignalSlots.Add(slot);
-                slot.ownerDocument.window.QueueObserverMicroTask();
+                slot.Signal_Slot_Change();
             }
             /* 3) Set slot’s assigned nodes to slotables. */
             slot.Assigned = slotables;
@@ -340,11 +346,15 @@ namespace CssUI.DOM
             }
         }
 
-        internal static void assign_a_slot(ISlottable slotable)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="slotable"></param>
+        internal static void Assign_A_Slot(ISlottable slotable)
         {/* Docs: https://dom.spec.whatwg.org/#assign-a-slot */
-            var slot = DOMCommon.find_slot(slotable);
+            var slot = DOMCommon.Sind_Slot(slotable);
             if (!ReferenceEquals(null, slot))
-                DOMCommon.assign_slottables(slot);
+                DOMCommon.Assign_Slottables(slot);
         }
         #endregion
 
@@ -635,8 +645,6 @@ namespace CssUI.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<Node> Get_Shadow_Including_Descendents(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
-            /* NOTE: ShadowDOM stuff here */
-            /* IM just not sure if within this loop i need todo something special, like check if the descendant is a shadow root and then also loop over all of its hosts' descendants or something */
             LinkedList<Node> list = new LinkedList<Node>();
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
             Node descendant = tree.nextNode();
@@ -645,6 +653,12 @@ namespace CssUI.DOM
                 if (Is_Shadow_Including_Descendant(descendant, node))
                 {
                     list.AddLast(descendant);
+                }
+
+                if (descendant.Is_ShadowHost)
+                {
+                    var element = descendant as Element;
+                    Get_Shadow_Including_Descendents(element.shadowRoot);
                 }
                 descendant = tree.nextNode();
             }

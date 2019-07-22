@@ -13,6 +13,45 @@ namespace CssUI.DOM.CustomElements
 
         /* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#custom-element-reaction-queue */
 
+
+
+        public static void Upgrade_Element(Element element)
+        {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#concept-try-upgrade */
+        }
+
+
+        public static void Enqueue_Reaction(Element element, AtomicName<EReactionName> Reaction, params object[] Args)
+        {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#enqueue-a-custom-element-callback-reaction */
+            if (!element.Is_Custom)
+                return;
+            /* 1) Let definition be element's custom element definition. */
+            CustomElementDefinition def = element.ownerDocument.defaultView.customElements.Lookup(element.tagName);
+            if (ReferenceEquals(null, def))
+                return;
+
+            /* 2) Let callback be the value of the entry in definition's lifecycle callbacks with key callbackName. */
+            var callback = def.lifecycleCallbacks[Reaction];
+            /* 3) If callback is null, then return */
+            if (ReferenceEquals(null, callback))
+                return;
+
+            /* 4) If callbackName is "attributeChangedCallback", then: */
+            if (Reaction == EReactionName.AttributeChanged)
+            {
+                /* 1) Let attributeName be the first element of args. */
+                AtomicName<EAttributeName> attributeName = Args[0] as AtomicName<EAttributeName>;
+                /* 2) If definition's observed attributes does not contain attributeName, then return. */
+                if (!def.observedAttributes.Contains(attributeName))
+                    return;
+            }
+
+            /* 5) Add a new callback reaction to element's custom element reaction queue, with callback function callback and arguments args. */
+            element.Custom_Element_Reaction_Queue.Enqueue(new ReactionCallback(callback, Args));
+            /* 6) Enqueue an element on the appropriate element queue given element. */
+            element.ownerDocument.defaultView.Reactions.Enqueue_Element(element);
+        }
+
+
         /// <summary>
         /// Convenient wrapper for any Operations, attributes, setters, or deleters marked with [<see cref="CEReactions"/>]
         /// </summary>
@@ -84,36 +123,6 @@ namespace CssUI.DOM.CustomElements
 
             /* 6) If a value value was returned from the original steps, return value. */
             return retValue;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Enqueue_Callback_Reaction(Element element, AtomicName<EReactionName> Reaction, params object[] Args)
-        {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#enqueue-a-custom-element-callback-reaction */
-            /* 1) Let definition be element's custom element definition. */
-            CustomElementDefinition def = element.ownerDocument.defaultView.customElements.Lookup(element.tagName);
-            if (ReferenceEquals(null, def))
-                return;
-
-            /* 2) Let callback be the value of the entry in definition's lifecycle callbacks with key callbackName. */
-            var callback = def.lifecycleCallbacks[Reaction];
-            /* 3) If callback is null, then return */
-            if (ReferenceEquals(null, callback))
-                return;
-
-            /* 4) If callbackName is "attributeChangedCallback", then: */
-            if (Reaction == EReactionName.AttributeChanged)
-            {
-                /* 1) Let attributeName be the first element of args. */
-                AtomicName<EAttributeName> attributeName = Args[0] as AtomicName<EAttributeName>;
-                /* 2) If definition's observed attributes does not contain attributeName, then return. */
-                if (!def.observedAttributes.Contains(attributeName))
-                    return;
-            }
-
-            /* 5) Add a new callback reaction to element's custom element reaction queue, with callback function callback and arguments args. */
-            element.Custom_Element_Reaction_Queue.Enqueue(new ReactionCallback(callback, Args));
-            /* 6) Enqueue an element on the appropriate element queue given element. */
-            element.ownerDocument.defaultView.Reactions.Enqueue_Element(element);
         }
     }
 }

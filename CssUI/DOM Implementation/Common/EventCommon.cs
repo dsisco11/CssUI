@@ -127,7 +127,7 @@ namespace CssUI.DOM.Internal
                     if (!ReferenceEquals(null, slotable))
                     {
                         /* 1) Assert: parent is a slot. */
-                        if (DOMCommon.Is_Slot((Node)parent))
+                        if (parent is ISlot)
                         {
                             /* 2) Set slotable to null. */
                             slotable = null;

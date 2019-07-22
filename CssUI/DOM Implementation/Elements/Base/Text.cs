@@ -35,10 +35,10 @@ namespace CssUI.DOM
                 /* 6) If element is assigned, then run assign slotables for element’s assigned slot. */
                 if (this.isAssigned)
                 {
-                    DOMCommon.assign_slottables(assignedSlot);
+                    DOMCommon.Assign_Slottables(assignedSlot);
                 }
                 /* 7) Run assign a slot for element. */
-                DOMCommon.assign_a_slot(this);
+                DOMCommon.Assign_A_Slot(this);
             }
         }
 

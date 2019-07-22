@@ -657,7 +657,7 @@ namespace CssUI.DOM
 
             /* 9) If node’s parent is not null, remove node from its parent. */
             if (!ReferenceEquals(null, node.parentNode))
-                Node._remove_node_from_parent(node, node.parentNode);
+                node.parentNode.removeChild(node);
 
             /* 10) Let newOffset be parent’s length if referenceNode is null, and referenceNode’s index otherwise. */
             int newOffset = ReferenceEquals(null, referenceNode) ? parent.nodeLength : referenceNode.index;

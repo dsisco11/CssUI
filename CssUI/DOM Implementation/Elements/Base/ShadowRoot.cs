@@ -25,7 +25,7 @@ namespace CssUI.DOM
                 return null;
             }
 
-            return this.Host;
+            return Host;
         }
     }
 }

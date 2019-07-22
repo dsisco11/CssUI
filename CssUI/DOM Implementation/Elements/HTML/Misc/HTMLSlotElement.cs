@@ -28,14 +28,14 @@ namespace CssUI.DOM
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
-        public IEnumerable<ISlottable> assignedNodes(AssignedNodesOptions options = null)
+        public IReadOnlyCollection<ISlottable> assignedNodes(AssignedNodesOptions options = null)
         {/* Docs: https://html.spec.whatwg.org/multipage/scripting.html#dom-slot-assignednodes */
             if (!options?.flatten ?? false)
             {
-                return this.Assigned;
+                return Assigned;
             }
 
-            return DOMCommon.find_flattened_slotables(this);
+            return DOMCommon.Find_Flattened_Slotables(this);
         }
 
         /// <summary>
@@ -47,10 +47,22 @@ namespace CssUI.DOM
         {/* Docs: https://html.spec.whatwg.org/multipage/scripting.html#dom-slot-assignedelements */
             if (!options?.flatten ?? false)
             {
-                return this.Assigned.Where(c => c is Element).Cast<Element>();
+                return Assigned.Where(c => c is Element).Cast<Element>();
             }
 
-            return DOMCommon.find_flattened_slotables(this).Where(c => c is Element).Cast<Element>();
+            return DOMCommon.Find_Flattened_Slotables(this).Where(c => c is Element).Cast<Element>();
+        }
+
+
+        public void Signal_Slot_Change()
+        {/* Docs: https://dom.spec.whatwg.org/#signal-a-slot-change */
+
+            Window window = ownerDocument?.defaultView;
+            if (!ReferenceEquals(null, window))
+            {
+                window.SignalSlots.Add(this);
+                window.QueueObserverMicroTask();
+            }
         }
     }
 }
