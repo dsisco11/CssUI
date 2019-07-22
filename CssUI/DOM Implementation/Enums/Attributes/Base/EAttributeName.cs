@@ -98,5 +98,12 @@ namespace CssUI.DOM
         Scope,
         [DomKeyword("abbr")]
         Abbr,
+
+        /* INPUT */
+
+        [DomKeyword("inputmode")]
+        InputMode,
+        [DomKeyword("enterkeyhint")]
+        EnterKeyHint,
     }
 }

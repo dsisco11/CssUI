@@ -345,7 +345,7 @@ namespace CssUI.DOM
                 return;
 
             click_in_progress = true;
-            EventCommon.fire_synthetic_mouse_event(new Events.EventName(Events.EEventName.Click), this, true);
+            EventCommon.fire_synthetic_mouse_event(new EventName(EEventName.Click), this, true);
             click_in_progress = false;
         }
 
