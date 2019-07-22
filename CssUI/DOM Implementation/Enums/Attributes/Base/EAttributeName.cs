@@ -84,6 +84,8 @@ namespace CssUI.DOM
 
         /* TABLE ATTRIBUTES */
 
+        [DomKeyword("span")]
+        Span,
         [DomKeyword("colspan")]
         ColSpan,
         [DomKeyword("rowspan")]

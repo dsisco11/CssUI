@@ -1,6 +1,5 @@
 ﻿using CssUI.DOM.CustomElements;
 using CssUI.DOM.Exceptions;
-using CssUI.DOM.Internal;
 using CssUI.DOM.Nodes;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,19 +16,8 @@ namespace CssUI.DOM
         /// /// </summary>
         [CEReactions] public HTMLTableCaptionElement caption
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-caption */
-            get
-            {
-                Element child = firstElementChild;
-                while (!ReferenceEquals(null, child))
-                {
-                    if (child is HTMLTableCaptionElement)
-                        return child as HTMLTableCaptionElement;
 
-                    child = child.nextElementSibling;
-                }
-
-                return null;
-            }
+            get => DOMCommon.Get_First_Element_Child_OfType<HTMLTableCaptionElement>(this);
             set
             {
                 CEReactions.Wrap_CEReaction(this, () =>
@@ -53,30 +41,94 @@ namespace CssUI.DOM
             }
         }
 
-        [CEReactions] public HTMLTableSectionElement tHead
-        {/* Docs:  */
-            get
-            {
+        /// <summary>
+        /// Returns the table's thead element.
+        /// Can be set, to replace the thead element.If the new value is not a thead element, throws a "HierarchyRequestError" DOMException.
+        /// </summary>
+        [CEReactions] public HTMLTableHeadElement tHead
+        {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-thead */
 
+            get => DOMCommon.Get_First_Element_Child_OfType<HTMLTableHeadElement>(this);
+            set
+            {
+                CEReactions.Wrap_CEReaction(this, () => 
+                {
+                    HTMLTableHeadElement firstOfType = tHead;
+                    if (!ReferenceEquals(null, firstOfType))
+                    {
+                        removeChild(firstOfType);
+                    }
+
+                    /* the new value, if not null, must be inserted immediately before the first element in the table element that is neither a caption element nor a colgroup element, if any, 
+                     * or at the end of the table if there are no such elements. */
+                    if (!ReferenceEquals(null, value))
+                    {
+                        if (!(value is HTMLTableHeadElement))
+                        {
+                            throw new HierarchyRequestError();
+                        }
+
+                        Element before = firstElementChild;
+                        while (!ReferenceEquals(null, before))
+                        {
+                            if (!(before is HTMLTableCaptionElement || before is HTMLTableColGroupElement))
+                            {
+                                insertBefore(value, before);
+                                return;
+                            }
+                        }
+
+                        /* ...or at the end of the table if there are no such elements. */
+                        appendChild(value);
+                    }
+                });
             }
         }
 
-        [CEReactions] public HTMLTableSectionElement tFoot;
-
-        public IReadOnlyCollection<HTMLElement> tBodies
-        {
-            get
+        /// <summary>
+        /// Returns the table's tfoot element.
+        /// Can be set, to replace the tfoot element.If the new value is not a tfoot element, throws a "HierarchyRequestError" DOMException.
+        /// </summary>
+        [CEReactions] public HTMLTableFootElement tFoot
+        {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-tfoot */
+            get => DOMCommon.Get_First_Element_Child_OfType<HTMLTableFootElement>(this);
+            set
             {
+                CEReactions.Wrap_CEReaction(this, () =>
+                {
+                    /* On setting, if the new value is null or a tfoot element, the first tfoot element child of the table element, 
+                     * if any, must be removed, and the new value, if not null, must be inserted at the end of the table. 
+                     * If the new value is neither null nor a tfoot element, then a "HierarchyRequestError" DOMException must be thrown instead. */
+                    var firstOfType = tFoot;
+                    if (!ReferenceEquals(null, firstOfType))
+                    {
+                        removeChild(firstOfType);
+                    }
 
+                    if (!ReferenceEquals(null, value) && !(value is HTMLTableFootElement))
+                    {
+                        throw new HierarchyRequestError();
+                    }
+
+                    appendChild(value);
+                });
             }
         }
 
-        public IReadOnlyCollection<HTMLElement> rows
-        {
-            get
-            {
+        /// <summary>
+        /// Returns a collection of the tbody elements of the table.
+        /// </summary>
+        public IReadOnlyCollection<HTMLTableBodyElement> tBodies
+        {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-tbodies */
+            get => DOMCommon.Get_Children_OfType<HTMLTableBodyElement>(this);
+        }
 
-            }
+        /// <summary>
+        /// Returns a collection of the tr elements of the table.
+        /// </summary>
+        public IReadOnlyCollection<HTMLTableRowElement> rows
+        {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-rows */
+            get => DOMCommon.Get_Children_OfType<HTMLTableRowElement>(this);
         }
 
         #endregion
@@ -87,13 +139,100 @@ namespace CssUI.DOM
         }
         #endregion
 
-        public HTMLTableCaptionElement createCaption();
-        public HTMLTableHeadElement createTHead();
-        public HTMLTableBodyElement createTBody();
-        public HTMLTableFootElement createTFoot();
+        /// <summary>
+        /// Ensures the table has a caption element, and returns it.
+        /// </summary>
+        /// <returns></returns>
+        public HTMLTableCaptionElement createCaption()
+        {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-createcaption */
+            var firstOfType = DOMCommon.Get_First_Element_Child_OfType<HTMLTableCaptionElement>(this);
+
+            if (!ReferenceEquals(null, firstOfType))
+                return firstOfType;
+
+            var newChild = new HTMLTableCaptionElement(nodeDocument);
+            insertFirst(newChild);
+
+            return newChild;
+        }
 
         /// <summary>
-        /// 
+        /// Ensures the table has a thead element, and returns it.
+        /// </summary>
+        /// <returns></returns>
+        public HTMLTableHeadElement createTHead()
+        {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-createthead */
+
+            var firstOfType = DOMCommon.Get_First_Element_Child_OfType<HTMLTableHeadElement>(this);
+
+            if (!ReferenceEquals(null, firstOfType))
+                return firstOfType;
+
+            var newChild = new HTMLTableHeadElement(nodeDocument);
+
+            Element before = firstElementChild;
+            while (!ReferenceEquals(null, before))
+            {
+                if (!(before is HTMLTableCaptionElement || before is HTMLTableColGroupElement))
+                {
+                    insertBefore(newChild, before);
+                    return newChild;
+                }
+            }
+
+            appendChild(newChild);
+            return newChild;
+        }
+
+        /// <summary>
+        /// Ensures the table has a tfoot element, and returns it.
+        /// </summary>
+        /// <returns></returns>
+        public HTMLTableFootElement createTFoot()
+        {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-createtfoot */
+
+            var firstOfType = DOMCommon.Get_First_Element_Child_OfType<HTMLTableFootElement>(this);
+
+            if (!ReferenceEquals(null, firstOfType))
+                return firstOfType;
+
+
+            var newChild = new HTMLTableFootElement(nodeDocument);
+            appendChild(newChild);
+            return newChild;
+        }
+
+        /// <summary>
+        /// Ensures the table has a tbody element, and returns it.
+        /// </summary>
+        /// <returns></returns>
+        public HTMLTableBodyElement createTBody()
+        {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-createtbody */
+
+            /* The createTBody() method must table-create a new tbody element, insert it immediately after the last tbody element child in the table element, 
+             * if any, or at the end of the table element if the table element has no tbody element children, 
+             * and then must return the new tbody element. */
+            var lastOfType = DOMCommon.Get_Last_Element_Child_OfType<HTMLTableBodyElement>(this);
+            var newChild = new HTMLTableBodyElement(nodeDocument);
+
+            if (!ReferenceEquals(null, lastOfType))
+            {
+                var nextToLast = lastOfType.nextElementSibling;
+                if (!ReferenceEquals(null, nextToLast))
+                {
+                    insertBefore(newChild, nextToLast);
+                    return newChild;
+                }
+            }
+
+            appendChild(newChild);
+            return newChild;
+        }
+
+        /// <summary>
+        /// Creates a tr element, along with a tbody if required, inserts them into the table at the position given by the argument, and returns the tr.
+        /// The position is relative to the rows in the table.The index −1, which is the default if the argument is omitted, is equivalent to inserting at the end of the table.
+        /// If the given position is less than −1 or greater than the number of rows, throws an "IndexSizeError" DOMException.
         /// </summary>
         /// <param name="index">Index to insert new row at</param>
         /// <exception cref="IndexSizeError"></exception>
@@ -138,15 +277,57 @@ namespace CssUI.DOM
             return newRow;
         }
 
+        /// <summary>
+        /// Ensures the table does not have a caption element.
+        /// </summary>
+        [CEReactions] public void deleteCaption()
+        {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-deletecaption */
 
-        [CEReactions] public void deleteCaption();
+            CEReactions.Wrap_CEReaction(this, () =>
+            {
+                var firstOfType = DOMCommon.Get_First_Element_Child_OfType<HTMLTableCaptionElement>(this);
+                if (!ReferenceEquals(null, firstOfType))
+                    removeChild(firstOfType);
+            });
+        }
 
-        [CEReactions] public void deleteTHead();
+        /// <summary>
+        /// Ensures the table does not have a thead element.
+        /// </summary>
+        [CEReactions] public void deleteTHead()
+        {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-deletethead */
 
-        [CEReactions] public void deleteTFoot();
+            CEReactions.Wrap_CEReaction(this, () =>
+            {
+                var firstOfType = DOMCommon.Get_First_Element_Child_OfType<HTMLTableHeadElement>(this);
+                if (!ReferenceEquals(null, firstOfType))
+                    removeChild(firstOfType);
+            });
+        }
 
+        /// <summary>
+        /// Ensures the table does not have a tfoot element.
+        /// </summary>
+        [CEReactions] public void deleteTFoot()
+        {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-deletetfoot */
+
+            CEReactions.Wrap_CEReaction(this, () =>
+            {
+                var firstOfType = DOMCommon.Get_First_Element_Child_OfType<HTMLTableFootElement>(this);
+                if (!ReferenceEquals(null, firstOfType))
+                    removeChild(firstOfType);
+            });
+        }
+
+        /// <summary>
+        /// Removes the tr element with the given position in the table.
+        /// The position is relative to the rows in the table.The index −1 is equivalent to deleting the last row of the table.
+        /// If the given position is less than −1 or greater than the index of the last row, or if there are no rows, throws an "IndexSizeError" DOMException.
+        /// </summary>
+        /// <param name="index"></param>
         [CEReactions] public void deleteRow(int index)
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-deleterow */
+
             CEReactions.Wrap_CEReaction(this, () =>
             {
                 int rowCount = rows.Count;

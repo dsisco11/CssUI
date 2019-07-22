@@ -43,7 +43,7 @@ namespace CssUI.DOM
                 new AttributeDefinition(EAttributeName.Nonce, EAttributeType.String, null, null, 0x0),
 
                 /* The tabIndex IDL attribute must reflect the value of the tabindex content attribute. The default value is 0 if the element is an a, area, button, iframe, input, select, or textarea element, or is a summary element that is a summary for its parent details. The default value is −1 otherwise. */
-                new AttributeDefinition(EAttributeName.TabIndex, EAttributeType.Integer, AttributeValue.From_Integer(-1), AttributeValue.From_Integer(-1), 0x0),
+                new AttributeDefinition(EAttributeName.TabIndex, EAttributeType.Integer, AttributeValue.NegativeOne, AttributeValue.NegativeOne, 0x0),
                 new AttributeDefinition(EAttributeName.Disabled, EAttributeType.Boolean, null, null, 0x0),
                 new AttributeDefinition(EAttributeName.Hidden, EAttributeType.Boolean, null, null, 0x0),
 
@@ -68,6 +68,7 @@ namespace CssUI.DOM
                 /* Table Attributes */
                 new AttributeDefinition(EAttributeName.Scope, EAttributeType.Enumerated, AttributeValue.From_Enum(ECellScope.Auto), AttributeValue.From_Enum(ECellScope.Auto), EAttributeFlags.None, DomLookup.Get_Keywords<ECellScope>()),
                 new AttributeDefinition(EAttributeName.Abbr, EAttributeType.String, null, null, 0x0),
+                new AttributeDefinition(EAttributeName.Span, EAttributeType.NonNegative_Integer, AttributeValue.One, AttributeValue.One, 0x0),
                 new AttributeDefinition(EAttributeName.ColSpan, EAttributeType.NonNegative_Integer, null, null, 0x0),
                 new AttributeDefinition(EAttributeName.RowSpan, EAttributeType.NonNegative_Integer, null, null, 0x0),
 

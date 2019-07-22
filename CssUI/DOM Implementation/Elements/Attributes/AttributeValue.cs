@@ -8,6 +8,12 @@ namespace CssUI.DOM
     /// </summary>
     public class AttributeValue
     {
+        #region Constants
+        public static AttributeValue NegativeOne = new AttributeValue(EAttributeType.Integer, "-1", -1);
+        public static AttributeValue Zero = new AttributeValue(EAttributeType.NonNegative_Integer, "0", 0);
+        public static AttributeValue One = new AttributeValue(EAttributeType.NonNegative_Integer, "1", 1);
+        #endregion
+
         #region Properties
         /// <summary>
         /// Name of this attribute

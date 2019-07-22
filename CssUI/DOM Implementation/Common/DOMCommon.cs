@@ -564,15 +564,15 @@ namespace CssUI.DOM
         /// <param name="node"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<Node> Get_Range_Nodes(Range range)
+        public static IReadOnlyCollection<Node> Get_Range_Nodes(Range range)
         {
             var commonAncestor = range.startContainer;
-            while (!DOMCommon.Is_Inclusive_Ancestor(commonAncestor, range.endContainer))
+            while (!Is_Inclusive_Ancestor(commonAncestor, range.endContainer))
             {
                 commonAncestor = commonAncestor.parentNode;
             }
 
-            var containedChildren = DOMCommon.Get_Descendents(commonAncestor, new FilterRangeContains(range));
+            var containedChildren = Get_Descendents(commonAncestor, new FilterRangeContains(range));
             return containedChildren;
         }
 
@@ -582,7 +582,7 @@ namespace CssUI.DOM
         /// <param name="node"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<Node> Get_Ancestors(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static IReadOnlyCollection<Node> Get_Ancestors(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             LinkedList<Node> list = new LinkedList<Node>();
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
@@ -602,7 +602,7 @@ namespace CssUI.DOM
         /// <param name="node"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<Node> Get_Inclusive_Ancestors(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static IReadOnlyCollection<Node> Get_Inclusive_Ancestors(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             LinkedList<Node> list = new LinkedList<Node>();
             list.AddLast(node);
@@ -623,7 +623,7 @@ namespace CssUI.DOM
         /// <param name="node"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<Node> Get_Descendents(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static IReadOnlyCollection<Node> Get_Descendents(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             LinkedList<Node> list = new LinkedList<Node>();
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
@@ -643,7 +643,7 @@ namespace CssUI.DOM
         /// <param name="node"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<Node> Get_Shadow_Including_Descendents(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static IReadOnlyCollection<Node> Get_Shadow_Including_Descendents(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             LinkedList<Node> list = new LinkedList<Node>();
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
@@ -672,7 +672,7 @@ namespace CssUI.DOM
         /// <param name="node"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<Node> Get_Inclusive_Descendents(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static IReadOnlyCollection<Node> Get_Inclusive_Descendents(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             LinkedList<Node> list = new LinkedList<Node>();
             list.AddLast(node);
@@ -693,7 +693,7 @@ namespace CssUI.DOM
         /// <param name="node"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<Node> Get_Shadow_Including_Inclusive_Descendents(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static IReadOnlyCollection<Node> Get_Shadow_Including_Inclusive_Descendents(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             LinkedList<Node> list = (LinkedList<Node>)Get_Shadow_Including_Descendents(node, Filter, FilterMask);
             list.AddFirst(node);// Add the node (inclusive)
@@ -701,25 +701,12 @@ namespace CssUI.DOM
         }
 
         /// <summary>
-        /// Returns a list of all ShadowDOM descendents for the given node
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<Node> Get_ShadowDOM_Descendents(ShadowRoot node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
-        {
-            /* XXX: Shadow dom stuff */
-        }
-
-
-
-        /// <summary>
         /// Returns a list of all nodes that preceed the given node (siblings)
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<Node> Get_Preceeding(Node node, NodeFilter Filter = null)
+        public static IReadOnlyCollection<Node> Get_Preceeding(Node node, NodeFilter Filter = null)
         {
             LinkedList<Node> list = new LinkedList<Node>();
             Node sibling = node.previousSibling;
@@ -744,7 +731,7 @@ namespace CssUI.DOM
         /// <param name="node"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<Node> Get_Following(Node node, NodeFilter Filter = null)
+        public static IReadOnlyCollection<Node> Get_Following(Node node, NodeFilter Filter = null)
         {
             LinkedList<Node> list = new LinkedList<Node>();
             Node sibling = node.nextSibling;
@@ -770,7 +757,7 @@ namespace CssUI.DOM
         /// <param name="qualifiedName"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<Element> Get_Elements_By_Qualified_Name(Node root, string qualifiedName)
+        public static IReadOnlyCollection<Element> Get_Elements_By_Qualified_Name(Node root, string qualifiedName)
         {/* Docs: https://dom.spec.whatwg.org/#concept-getelementsbytagname */
             /* 1) If qualifiedName is "*" (U+002A), return a HTMLCollection rooted at root, whose filter matches only descendant elements. */
             if (qualifiedName == "\u002A")
@@ -852,7 +839,7 @@ namespace CssUI.DOM
         /// <param name="localName"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<Element> Get_Elements_By_Namespace_And_Local_Name(Node root, string Namespace, string localName)
+        public static IReadOnlyCollection<Element> Get_Elements_By_Namespace_And_Local_Name(Node root, string Namespace, string localName)
         {/* Docs: https://dom.spec.whatwg.org/#concept-getelementsbytagnamens */
             if (Namespace.Length <= 0)
                 Namespace = null;
@@ -883,7 +870,7 @@ namespace CssUI.DOM
         /// <param name="localName"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<Element> Get_Elements_By_Class_Name(Node root, string classNames)
+        public static IReadOnlyCollection<Element> Get_Elements_By_Class_Name(Node root, string classNames)
         {/* Docs: https://dom.spec.whatwg.org/#concept-getelementsbyclassname */
             var classes = DOMCommon.Parse_Ordered_Set(classNames.ToLowerInvariant()).Cast<AtomicString>();
             /* 2) If classes is the empty set, return an empty HTMLCollection. */
@@ -947,7 +934,7 @@ namespace CssUI.DOM
         /// Returns a list of all immediate descendants for the given <paramref name="node"/>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<Node> Get_Children(Node node, NodeFilter Filter = null)
+        public static IReadOnlyCollection<Node> Get_Children(Node node, NodeFilter Filter = null)
         {
             LinkedList<Node> list = new LinkedList<Node>();
             Node child = node.firstChild;
@@ -977,13 +964,13 @@ namespace CssUI.DOM
         /// Returns a list of all immediate descendents for the given <paramref name="node"/> which match the given Type <see cref="Ty"/>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<Node> Get_Children_OfType<Ty>(Node node, NodeFilter Filter = null)
+        public static IReadOnlyCollection<Ty> Get_Children_OfType<Ty>(Node node, NodeFilter Filter = null) where Ty : IEventTarget
         {
-            LinkedList<Node> list = new LinkedList<Node>();
+            LinkedList<Ty> list = new LinkedList<Ty>();
             Node child = node.firstChild;
             while (!ReferenceEquals(null, child))
             {
-                if (child is Ty)
+                if (child is Ty childAsType)
                 {
                     if (!ReferenceEquals(null, Filter))
                     {
@@ -991,12 +978,12 @@ namespace CssUI.DOM
                         if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
                         else if (fr == ENodeFilterResult.FILTER_ACCEPT)
                         {
-                            list.AddLast(child);
+                            list.AddLast(childAsType);
                         }
                     }
                     else
                     {
-                        list.AddLast(child);
+                        list.AddLast(childAsType);
                     }
                 }
 
@@ -1004,6 +991,135 @@ namespace CssUI.DOM
             }
 
             return list;
+        }
+        
+
+        /// <summary>
+        /// Returns the first immediate descendent which matches the given <paramref name="Filter"/> and Type <typeparamref name="Ty"/>
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Ty Get_First_Child_OfType<Ty>(Node Node, NodeFilter Filter = null) where Ty : Node
+        {
+            Node child = Node.firstChild;
+            while (!ReferenceEquals(null, child))
+            {
+                if (child is Ty childAsType)
+                {
+                    if (!ReferenceEquals(null, Filter))
+                    {
+                        var fr = Filter.acceptNode(child);
+                        if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
+                        else if (fr == ENodeFilterResult.FILTER_ACCEPT)
+                        {
+                            return childAsType;
+                        }
+                    }
+                    else
+                    {
+                        return childAsType;
+                    }
+                }
+
+                child = child.nextSibling;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Returns the first immediate descendent which matches the given <paramref name="Filter"/> and Type <typeparamref name="Ty"/>
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Ty Get_Last_Child_OfType<Ty>(Node Node, NodeFilter Filter = null) where Ty : Node
+        {
+            Node child = Node.lastChild;
+            while (!ReferenceEquals(null, child))
+            {
+                if (child is Ty childAsType)
+                {
+                    if (!ReferenceEquals(null, Filter))
+                    {
+                        var fr = Filter.acceptNode(child);
+                        if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
+                        else if (fr == ENodeFilterResult.FILTER_ACCEPT)
+                        {
+                            return childAsType;
+                        }
+                    }
+                    else
+                    {
+                        return childAsType;
+                    }
+                }
+
+                child = child.previousSibling;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Returns the first immediate (<see cref="Element"/>) descendent which matches the given <paramref name="Filter"/> and Type <typeparamref name="Ty"/>
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Ty Get_First_Element_Child_OfType<Ty>(Element Node, NodeFilter Filter = null) where Ty : Node
+        {
+            Element child = Node.firstElementChild;
+            while (!ReferenceEquals(null, child))
+            {
+                if (child is Ty childAsType)
+                {
+                    if (!ReferenceEquals(null, Filter))
+                    {
+                        var fr = Filter.acceptNode(child);
+                        if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
+                        else if (fr == ENodeFilterResult.FILTER_ACCEPT)
+                        {
+                            return childAsType;
+                        }
+                    }
+                    else
+                    {
+                        return childAsType;
+                    }
+                }
+
+                child = child.nextElementSibling;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Returns the last immediate (<see cref="Element"/>) descendent which matches the given <paramref name="Filter"/> and Type <typeparamref name="Ty"/>
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Ty Get_Last_Element_Child_OfType<Ty>(Element Node, NodeFilter Filter = null) where Ty : Node
+        {
+            Element child = Node.lastElementChild;
+            while (!ReferenceEquals(null, child))
+            {
+                if (child is Ty childAsType)
+                {
+                    if (!ReferenceEquals(null, Filter))
+                    {
+                        var fr = Filter.acceptNode(child);
+                        if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
+                        else if (fr == ENodeFilterResult.FILTER_ACCEPT)
+                        {
+                            return childAsType;
+                        }
+                    }
+                    else
+                    {
+                        return childAsType;
+                    }
+                }
+
+                child = child.previousElementSibling;
+            }
+
+            return null;
         }
         #endregion
 

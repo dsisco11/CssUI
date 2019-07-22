@@ -255,24 +255,40 @@ namespace CssUI.DOM.Nodes
             return DOMCommon.Is_Inclusive_Descendant(other, this);
         }
 
-        public Node insertBefore(Node node, Node before)
+        /// <summary>
+        /// Inserts the given node at the front of this nodes children
+        /// </summary>
+        /// <param name="newNode"></param>
+        /// <returns></returns>
+        internal Node insertFirst(Node newNode)
         {
-            return Node._pre_insert_node(node, this, before);
+            return _pre_insert_node(newNode, this, null);
+        }
+
+        /// <summary>
+        /// Inserts the given node into this nodes children infront of <paramref name="before"/>
+        /// </summary>
+        /// <param name="newNode"></param>
+        /// <param name="before"></param>
+        /// <returns></returns>
+        public Node insertBefore(Node newNode, Node before)
+        {
+            return _pre_insert_node(newNode, this, before);
         }
 
         public Node appendChild(Node node)
         {
-            return Node._pre_insert_node(node, this, null);
+            return _pre_insert_node(node, this, null);
         }
 
         public Node replaceChild(Node node, Node child)
         {
-            return Node._replace_node_within_parent(node, this, child);
+            return _replace_node_within_parent(node, this, child);
         }
 
         public Node removeChild(Node child)
         {
-            return Node._pre_remove_node(child, this);
+            return _pre_remove_node(child, this);
         }
 
         #endregion
@@ -638,16 +654,15 @@ namespace CssUI.DOM.Nodes
             /* 2) If child is non-null, then: */
             if (!ReferenceEquals(null, child))
             {
-                int childIdx = child.index;// Cache this value here so it doesnt keep getting looked up
                 foreach (WeakReference<Range> weakRef in Range.LIVE_RANGES)
                 {
                     if (weakRef.TryGetTarget(out Range liveRange))
                     {
                         /* 1) For each live range whose start node is parent and start offset is greater than child’s index, increase its start offset by count. */
-                        if (ReferenceEquals(parent, liveRange.startContainer) && liveRange.startOffset > childIdx)
+                        if (ReferenceEquals(parent, liveRange.startContainer) && liveRange.startOffset > child.index)
                             liveRange.startOffset += count;
                         /* 2) For each live range whose end node is parent and end offset is greater than child’s index, increase its end offset by count. */
-                        if (ReferenceEquals(parent, liveRange.endContainer) && liveRange.endOffset > childIdx)
+                        if (ReferenceEquals(parent, liveRange.endContainer) && liveRange.endOffset > child.index)
                             liveRange.endOffset += count;
                     }
                 }
@@ -666,7 +681,7 @@ namespace CssUI.DOM.Nodes
             }
             /* 6) Let previousSibling be child’s previous sibling or parent’s last child if child is null. */
             var previousSibling = ReferenceEquals(null, child) ? parent.lastChild : child.previousSibling;
-            int childIndex = ReferenceEquals(null, child) ? 0 : parent.childNodes.IndexOf(child);
+            int childIndex = ReferenceEquals(null, child) ? 0 : child.index;
             /* 7) For each node in nodes, in tree order: */
             foreach (Node newNode in nodes)
             {
@@ -919,13 +934,13 @@ namespace CssUI.DOM.Nodes
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static Node _pre_insert_node(Node node, Node parent, Node child)
         {/* Docs: https://dom.spec.whatwg.org/#concept-node-pre-insert */
-            Node._ensure_pre_insertion_validity(node, parent, child);
+            _ensure_pre_insertion_validity(node, parent, child);
             var referenceChild = child;
             if (ReferenceEquals(referenceChild, node))
                 referenceChild = node.nextSibling;
 
             parent.ownerDocument.adoptNode(node);
-            Node._insert_node_into_parent_before(node, parent, referenceChild);
+            _insert_node_into_parent_before(node, parent, referenceChild);
             return node;
         }
 
