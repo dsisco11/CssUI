@@ -22,6 +22,10 @@ namespace CssUI.DOM
         [DomKeyword("height")]
         Height,
 
+        [DomKeyword("is")]
+        IS,
+
+
         /* HTML Attributes */
         [DomKeyword("title")]
         Title,

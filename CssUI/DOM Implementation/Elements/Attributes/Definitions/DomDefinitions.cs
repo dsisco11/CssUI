@@ -31,6 +31,8 @@ namespace CssUI.DOM
                 new AttributeDefinition(EAttributeName.ID, EAttributeType.String, null, null, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.Class, EAttributeType.String, null, null, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.Slot, EAttributeType.String, null, null, EAttributeFlags.None),
+
+                new AttributeDefinition(EAttributeName.IS, EAttributeType.String, null, null, EAttributeFlags.None),
                 
 
                 new AttributeDefinition(EAttributeName.Media, EAttributeType.String, null, null, EAttributeFlags.None),

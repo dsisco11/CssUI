@@ -391,7 +391,7 @@ namespace CssUI.DOM.Nodes
             {
                 if (ReferenceEquals(null, copy))
                 {
-                    copy = new Element(document, element.localName);
+                    copy = DOMCommon.Create_Element(document, element.localName, element.NamespaceURI, element.prefix, element.is_value, false);
                 }
                 else
                 {
@@ -400,7 +400,7 @@ namespace CssUI.DOM.Nodes
 
                 foreach (Attr attr in element.AttributeList)
                 {
-                    Attr copyAttribute = (Attr)_clone_node(attr);
+                    Attr copyAttribute = (Attr)attr.cloneNode();
                     (copy as Element).append_attribute(copyAttribute);
                 }
             }
@@ -452,7 +452,14 @@ namespace CssUI.DOM.Nodes
                                 }
                                 else
                                 {
-                                    if (ReferenceEquals(null, copy)) throw new InvalidNodeTypeError("Cloning logic for this node type has not been implemented!");
+                                    if (ReferenceEquals(null, copy))
+                                    {
+                                        throw new InvalidNodeTypeError("Cloning logic for this node type has not been implemented!");
+                                    }
+                                    else
+                                    {
+                                        node.CopyTo(ref copy);
+                                    }
                                 }
                             }
                             break;

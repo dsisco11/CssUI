@@ -122,6 +122,15 @@ namespace CssUI.DOM
          */
 
         /// <summary>
+        /// an elements 'is' attribute specifies its custom element class
+        /// </summary>
+        public string is_value
+        {/* Docs: https://dom.spec.whatwg.org/#concept-element-is-value */
+            get => getAttribute(EAttributeName.IS).Get_String();
+            set => setAttribute(EAttributeName.IS, AttributeValue.From_String(value));
+        }
+
+        /// <summary>
         /// A completely unique identifier for this element 
         /// </summary>
         [CEReactions]
