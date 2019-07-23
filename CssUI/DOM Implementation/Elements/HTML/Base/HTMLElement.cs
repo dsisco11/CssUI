@@ -19,21 +19,21 @@ namespace CssUI.DOM
         /// Its value must be a valid BCP 47 language tag, or the empty string. Setting the attribute to the empty string indicates that the primary language is unknown.
         /// </summary>
         [CEReactions]
-        public string title
+        public string Title
         {
             get => getAttribute(EAttributeName.Title).Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Title, AttributeValue.From_String(value)));
         }
 
         [CEReactions]
-        public string lang
+        public string Lang
         {
             get => getAttribute(EAttributeName.Lang).Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Lang, AttributeValue.From_String(value)));
         }
 
         [CEReactions]
-        public bool translate
+        public bool Translate
         {
             get => hasAttribute(EAttributeName.Translate);
             set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Translate, value));
@@ -43,7 +43,7 @@ namespace CssUI.DOM
         /// The dir attribute specifies the element's text directionality.
         /// </summary>
         [CEReactions]
-        public EDir dir
+        public EDir Dir
         {
             get => getAttribute(EAttributeName.Dir).Get_Enum<EDir>();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Dir, AttributeValue.From_Enum(value)));
@@ -61,7 +61,7 @@ namespace CssUI.DOM
                  * If the element is an input element whose type attribute is in the Telephone state, and the dir attribute is not in a defined state (i.e. it is not present or has an invalid value)
                  */
                 Attr attr = getAttributeNode(EAttributeName.Dir);
-                EDir dirValue = dir;
+                EDir dirValue = Dir;
                 if (dirValue == EDir.Ltr)
                 {
                     return CSS.EDirection.LTR;
@@ -79,6 +79,7 @@ namespace CssUI.DOM
                 {
                     return CSS.EDirection.RTL;
                 }
+                /* XXX: Finish this */
                 /*
                 if (dirValue == EDir.Auto && (this is HTMLTextAreaElement || (this is HTMLInputElement e && (e.type == EInputType.Text || e.type == EInputType.Search || e.type == EInputType.Telephone || e.type == EInputType.Url || e.type == EInputType.Email)))
                 {
@@ -90,6 +91,7 @@ namespace CssUI.DOM
                 }
                 */
 
+                /* XXX: Finish this */
                 if (dirValue == EDir.Auto || (!attr.Is_Defined && this is HTMLBdiElement))
                 {
                     /* Find the first character in tree order that matches the following criteria:
@@ -162,7 +164,7 @@ namespace CssUI.DOM
                     case "optgroup":
                     case "option":
                     case "fieldset":
-                        return this.disabled;
+                        return Disabled;
                     default:
                         return false;
                 }
@@ -176,28 +178,30 @@ namespace CssUI.DOM
         {/* Docs: https://html.spec.whatwg.org/multipage/semantics-other.html#concept-selector-active */
             get
             {
-                switch (localName)
+                if (this is HTMLInputElement inputElement)
                 {
-                    case "input":
-                        {
-                            string inputType = getAttribute(EAttributeName.Type);
-                            if (inputType.Equals("submit") || inputType.Equals("image") || inputType.Equals("reset") || inputType.Equals("button"))
-                            {
-                                return !disabled && is_in_formal_activation_state;
-                            }
-                            else
-                            {
-                                return false;
-                            }
-                        }
-                    case "button":
-                        {
-                            return !disabled && is_in_formal_activation_state;
-                        }
-                    case "a":
-                    case "area":
-                    case "link":
-                        return hasAttribute(EAttributeName.HREF);
+                    if (inputElement.type == EInputType.Submit || inputElement.type == EInputType.Image || inputElement.type == EInputType.reset || inputElement.type == EInputType.button)
+                    {
+                        return !Disabled && is_in_formal_activation_state;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else if (this is HTMLButtonElement)
+                {
+                    return !Disabled && is_in_formal_activation_state;
+                }
+                else
+                {
+                    switch (localName)
+                    {
+                        case "a":
+                        case "area":
+                        case "link":
+                            return hasAttribute(EAttributeName.HREF);
+                    }
                 }
                 /*
                  * If the element has its tabindex focus flag set
@@ -328,7 +332,7 @@ namespace CssUI.DOM
         /// Specifies the tab index of this element, that is its selection order when a user cycles through selecting elements by pressing tab
         /// </summary>
         [CEReactions]
-        public int tabIndex
+        public int TabIndex
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#attr-tabindex */
             get
             {
@@ -361,7 +365,7 @@ namespace CssUI.DOM
                      * - Elements with a draggable attribute set, if that would enable the user agent to allow the user to begin a drag operations for those elements without the use of a pointing device
                      * 
                      */
-                    if (this.draggable)
+                    if (this.Draggable)
                         tabindex_focus_flag = true;
                 }
                 else
@@ -392,7 +396,7 @@ namespace CssUI.DOM
         /// Determines if this element can be interacted with
         /// </summary>
         [CEReactions]
-        public bool disabled
+        public bool Disabled
         {
             get => hasAttribute(EAttributeName.Disabled);
             set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Disabled, value));
@@ -402,7 +406,7 @@ namespace CssUI.DOM
         /// 
         /// </summary>
         [CEReactions]
-        public bool hidden
+        public bool Hidden
         {
             get => hasAttribute(EAttributeName.Hidden);
             set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Hidden, value));
@@ -414,7 +418,7 @@ namespace CssUI.DOM
         /// </summary>
         public void click()
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#dom-click */
-            if (disabled)
+            if (Disabled)
                 return;
 
             if (click_in_progress)
@@ -440,22 +444,22 @@ namespace CssUI.DOM
 
         // public void blur(); /* "User agents are encouraged to ignore calls to this blur() method entirely." - https://html.spec.whatwg.org/multipage/interaction.html#dom-window-blur */
 
-            /* XXX: finish access key logic */
+        /* XXX: finish access key logic */
         [CEReactions]
-        public string accessKey
+        public string AccessKey
         {
             get => getAttribute(EAttributeName.AccessKey).Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.AccessKey, AttributeValue.Parse(EAttributeName.AccessKey, value)));
         }
 
-        public string accessKeyLabel { get; private set; }
+        public string AccessKeyLabel { get; private set; }
 
         /// <summary>
         /// Returns true if the element is draggable; otherwise, returns false.
         /// Can be set, to override the default and set the draggable content attribute.
         /// </summary>
         [CEReactions]
-        public bool draggable
+        public bool Draggable
         {/* Docs: https://html.spec.whatwg.org/multipage/dnd.html#the-draggable-attribute */
             get
             {
@@ -489,7 +493,7 @@ namespace CssUI.DOM
         /// Can be set, to override the default and set the spellcheck content attribute.
         /// </summary>
         [CEReactions]
-        public bool spellcheck
+        public bool Spellcheck
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#spelling-and-grammar-checking */
             get
             {
@@ -514,7 +518,7 @@ namespace CssUI.DOM
                             {
                                 if (!ReferenceEquals(null, parentElement) && parentElement is HTMLElement parentHTML)
                                 {
-                                    if (parentHTML.spellcheck)
+                                    if (parentHTML.Spellcheck)
                                     {
                                         return true;
                                     }
@@ -541,7 +545,7 @@ namespace CssUI.DOM
         /// Can be set, to set the autocapitalize content attribute(and thereby change the autocapitalization behavior for the element).
         /// </summary>
         [CEReactions]
-        public EAutoCapitalizationHint autocapitalize
+        public EAutoCapitalizationHint Autocapitalize
         {
             get
             {
@@ -561,7 +565,7 @@ namespace CssUI.DOM
                             {
                                 if (!ReferenceEquals(null, formElement.form))
                                 {
-                                    return formElement.form.autocapitalize;
+                                    return formElement.form.Autocapitalize;
                                 }
                             }
                         }
@@ -585,21 +589,15 @@ namespace CssUI.DOM
         /// Throws a "SyntaxError" DOMException if the new value isn't one of those strings.
         /// </summary>
         [CEReactions]
-        public string ContentEditable
+        public EContentEditable ContentEditable
         {
             /* Docs: https://html.spec.whatwg.org/multipage/interaction.html#attr-contenteditable */
-            get => getAttribute(EAttributeName.ContentEditable);
+            get => getAttribute(EAttributeName.ContentEditable).Get_Enum<EContentEditable>();
             set
             {
-                ReactionsCommon.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(this, () =>
                 {
-                    if (value == null)
-                        value = string.Empty;
-
-                    if (!value.Equals("true") && !value.Equals("false") && !value.Equals("inherit"))
-                        throw new DomSyntaxError("This attribute only accepts values of \"true\", \"false\", or \"inherit\"");
-
-                    setAttribute(EAttributeName.ContentEditable, value);
+                    setAttribute(EAttributeName.ContentEditable, AttributeValue.From_Enum(value));
                 });
             }
         }
@@ -616,12 +614,12 @@ namespace CssUI.DOM
                     return false;
                 }
 
-                string attrValue = attr.Value;
-                if (attrValue.Equals("true"))
+                EContentEditable attrValue = attr.Value.Get_Enum<EContentEditable>();
+                if (attrValue == EContentEditable.True)
                 {
                     return true;
                 }
-                else if (attrValue.Equals("inherit"))
+                else if (attrValue == EContentEditable.Inherit)
                 {
                     return parentElement is HTMLElement element && element.isContentEditable;
                 }
@@ -632,7 +630,7 @@ namespace CssUI.DOM
 
         /* XXX: Implement this */
         [CEReactions]
-        public string enterKeyHint
+        public string EnterKeyHint
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#attr-enterkeyhint */
             get;
             set;
@@ -640,7 +638,7 @@ namespace CssUI.DOM
 
         /* XXX: Implement this */
         [CEReactions]
-        public string inputMode
+        public string InputMode
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#attr-inputmode */
             get;
             set;
