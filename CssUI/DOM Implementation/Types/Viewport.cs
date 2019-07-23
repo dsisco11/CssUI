@@ -7,7 +7,7 @@ namespace CssUI.DOM
     /// <summary>
     /// Represents an area of view.
     /// </summary>
-    public class Viewport : EventTarget
+    public class Viewport : EventTarget, IViewport
     {/* Docs: https://wicg.github.io/visual-viewport/#the-visualviewport-interface */
         #region Properties
         public Document document { get; private set; }
@@ -22,13 +22,13 @@ namespace CssUI.DOM
         #endregion
 
         #region Events
-        public event EventCallback onresize
+        public event EventCallback onResize
         {
             add => handlerMap.Add(EEventName.Resize, value);
             remove => handlerMap.Remove(EEventName.Resize, value);
         }
 
-        public event EventCallback onscroll
+        public event EventCallback onScroll
         {
             add => handlerMap.Add(EEventName.Scroll, value);
             remove => handlerMap.Remove(EEventName.Scroll, value);
