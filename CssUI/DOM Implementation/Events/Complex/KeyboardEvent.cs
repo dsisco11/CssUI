@@ -3,7 +3,8 @@
 namespace CssUI.DOM.Events
 {
     public class KeyboardEvent : UIEvent
-    {  // KeyLocationCode
+    {/* Docs: https://w3c.github.io/uievents/#idl-keyboardevent */
+        // KeyLocationCode
         public static Type initType = typeof(KeyboardEventInit);
 
         #region Properties
@@ -11,11 +12,13 @@ namespace CssUI.DOM.Events
         /// key holds the value corresponding to the key pressed.
         /// </summary>
         public string key { get; private set; } = string.Empty;
+
         /// <summary>
-        /// holds a string that identifies the physical key being pressed. 
+        /// Identifies the physical key being pressed. 
         /// The value is not affected by the current keyboard layout or modifier state, so a particular key will always return the same value.
         /// </summary>
-        public string code { get; private set; } = string.Empty;
+        public EKeyboardCode code { get; private set; } = 0x0;
+
         /// <summary>
         /// The location attribute contains an indication of the logical location of the key on the device.
         /// </summary>

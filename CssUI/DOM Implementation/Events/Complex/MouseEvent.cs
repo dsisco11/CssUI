@@ -82,7 +82,7 @@ namespace CssUI.DOM.Events
                 }
 
                 var offset = View?.scrollX ?? 0;
-                return clientX + offset;
+                return clientX + (long)offset;
             }
         }
 
@@ -97,7 +97,7 @@ namespace CssUI.DOM.Events
                 }
 
                 var offset = View?.scrollY ?? 0;
-                return clientY + offset;
+                return clientY + (long)offset;
             }
         }
 

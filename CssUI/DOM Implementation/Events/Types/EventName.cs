@@ -26,7 +26,8 @@ namespace CssUI.DOM.Events
                 if (!ReferenceEquals(null, _name))
                 {/* Resolve the backing value */
                     if (IsCustom) throw new System.Exception("Name backing-value for custom event type is not set!");
-                    _name = DomLookup.Keyword_From_Enum<EEventName>((EEventName)Value);
+                    DomLookup.Keyword_From_Enum((EEventName)Value, out string outKeyword);
+                    _name = outKeyword;
                 }
 
                 return _name;
@@ -120,9 +121,9 @@ namespace CssUI.DOM.Events
         #endregion
 
         #region Overrides
-        public override int GetHashCode() => this.Value;
+        public override int GetHashCode() => Value;
 
-        public override string ToString() => this.Name;
+        public override string ToString() => Name;
         #endregion
     }
 }
