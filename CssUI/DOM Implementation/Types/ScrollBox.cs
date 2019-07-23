@@ -14,7 +14,7 @@ namespace CssUI.DOM
         public EFlowDirection Block;
         public EFlowDirection Inline;
         public readonly Element Owner = null;
-        public readonly Viewport View = null;
+        public readonly IViewport View = null;
 
         /// <summary>
         /// Current x-coordinate offset position of this scrollbox
@@ -281,7 +281,7 @@ namespace CssUI.DOM
             Inline = inline_Base_Direction;
         }
 
-        public ScrollBox(Viewport owner, EFlowDirection block_Flow_Direction, EFlowDirection inline_Base_Direction) : this(block_Flow_Direction, inline_Base_Direction)
+        public ScrollBox(IViewport owner, EFlowDirection block_Flow_Direction, EFlowDirection inline_Base_Direction) : this(block_Flow_Direction, inline_Base_Direction)
         {
             View = owner;
         }

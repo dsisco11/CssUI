@@ -15,7 +15,7 @@ namespace CssUI.DOM
             // Add all of our definitions to a backing dictionary
             var AttrDict = new Dictionary<AtomicName<EAttributeName>, AttributeDefinition>();
             foreach (var def in AttrDefs) { AttrDict.Add(def.Name, def); }
-            // Finally all of our definitions go into this global readonly map of Css property definitions!
+            // Finally all of our definitions go into this global readonly map of attribute definitions!
             AttributeDefinitions = new ReadOnlyDictionary<AtomicName<EAttributeName>, AttributeDefinition>(AttrDict);
         }
 
