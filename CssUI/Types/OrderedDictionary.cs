@@ -203,7 +203,7 @@ namespace CssUI
         #endregion
 
         #region Enumeration
-        public IEnumerator GetEnumerator()
+        public IEnumerator<ValueTy> GetEnumerator()
         {
             return ((IList<ValueTy>)Items).GetEnumerator();
         }

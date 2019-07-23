@@ -266,7 +266,7 @@ namespace CssUI.DOM
         }
         #endregion
 
-        #region user interaction
+        #region User Interaction
         /// <summary>
         /// The term focusable area is used to refer to regions of the interface that can become the target of keyboard input. Focusable areas can be elements, parts of elements, or other regions managed by the user agent.
         /// </summary>
@@ -342,8 +342,10 @@ namespace CssUI.DOM
         /// <returns></returns>
         public Node adoptNode(Node node)
         {/* Docs: https://dom.spec.whatwg.org/#dom-document-adoptnode */
+
             if (node is Document) throw new NotSupportedError();
             if (node is ShadowRoot) throw new HierarchyRequestError("Cannot adopt a shadow-root into a document");
+
             /* Docs: https://dom.spec.whatwg.org/#concept-node-adopt */
             /* 1) Let oldDocument be node’s node document. */
             var oldDocument = node.ownerDocument;
@@ -382,6 +384,13 @@ namespace CssUI.DOM
             }
 
             return node;
+        }
+        #endregion
+
+        #region Event Loop
+        public void Run_Event_Loop()
+        {
+
         }
         #endregion
 

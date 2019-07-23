@@ -1,43 +1,123 @@
-﻿namespace CssUI
+﻿using System;
+
+namespace CssUI
 {
     public static class UnicodeCommon
     {
-        #region Defines
-        public const char CHAR_EOF = '\0';
+        #region Constants
+        /* Specials */
         public const char CHAR_MAX = char.MaxValue;
-        public const char CHAR_NULL = (char)'\u0000';
-        public const char CHAR_TAB = (char)'\t';
-        public const char CHAR_SPACE = (char)'\u0020';
-        public const char CHAR_NEWLINE = (char)'\n';
-        public const char CHAR_QUOTATION_MARK = (char)'\u0022';// "
-        public const char CHAR_REPLACEMENT = (char)'\uFFFD';// U+FFFD
-        public const char CHAR_APOSTRAPHE = (char)'\u0027';// '
+        public const char CHAR_EOF = '\u0000';
+        public const char CHAR_NULL = '\u0000';
+        public const char CHAR_REPLACEMENT = '\uFFFD';// U+FFFD
 
-        public const char CHAR_PLUS_SIGN = (char)'\u002B';// '
-        public const char CHAR_PERCENT = (char)'\u0025';// '
+
+
+        /* Ascii whitespace */
+        /* Docs: https://infra.spec.whatwg.org/#ascii-whitespace */
+        public const char CHAR_TAB = '\u0009';
+        /// <summary>
+        /// Line Feed (Newline)
+        /// </summary>
+        public const char CHAR_LINE_FEED = '\u000A';
+        /// <summary>
+        /// Form Feed
+        /// </summary>
+        public const char CHAR_FORM_FEED = '\u000C';
+        /// <summary>
+        /// CR
+        /// </summary>
+        public const char CHAR_CARRIAGE_RETURN = '\u000D';
+        /// <summary>
+        /// " "
+        /// </summary>
+        public const char CHAR_SPACE = '\u0020';
+
+        [Obsolete("Use CHAR_LINE_FEED")]
+        public const char CHAR_NEWLINE = '\n';
+
+
+        /* C0 Control codes */
+        /* Docs: https://infra.spec.whatwg.org/#c0-control */
+        /// <summary>
+        /// C0 Control code: INFORMATION SEPARATOR ONE
+        /// </summary>
+        public const char CHAR_C0_INFO_SEPERATOR = '\u001F';
+        public const char CHAR_C0_DELETE = '\u007F';
+        public const char CHAR_C0_APPLICATION_PROGRAM_COMMAND = '\u009F';
+
+
+        /* Ascii digits */
+        /* Docs: https://infra.spec.whatwg.org/#ascii-digit */
+        public const char CHAR_DIGIT_0 = '\u0030';
+        public const char CHAR_DIGIT_9 = '\u0039';
+
+
+        /* Ascii Upper Alpha */
+        /* Docs: https://infra.spec.whatwg.org/#ascii-upper-alpha */
+        public const char CHAR_A_UPPER = '\u0041';
+        public const char CHAR_F_UPPER = '\u0046';
+        public const char CHAR_Z_UPPER = '\u005A';
+
+
+        /* Ascii Lower Alpha */
+        /* Docs: https://infra.spec.whatwg.org/#ascii-lower-alpha */
+        public const char CHAR_A_LOWER = '\u0061';
+        public const char CHAR_F_LOWER = '\u0066';
+        public const char CHAR_Z_LOWER = '\u007A';
+
+
+        /* Common */
+        /// <summary>
+        /// "
+        /// </summary>
+        public const char CHAR_QUOTATION_MARK = '\u0022';
+        /// <summary>
+        /// '
+        /// </summary>
+        public const char CHAR_APOSTRAPHE = '\u0027';
+        /// <summary>
+        /// +
+        /// </summary>
+        public const char CHAR_PLUS_SIGN = '\u002B';
+        /// <summary>
+        /// %
+        /// </summary>
+        public const char CHAR_PERCENT = '\u0025';
         /// <summary>
         /// -
         /// </summary>
-        public const char CHAR_HYPHEN_MINUS = (char)'\u002D';
+        public const char CHAR_HYPHEN_MINUS = '\u002D';
         /// <summary>
         /// _
         /// </summary>
-        public const char CHAR_UNDERSCORE = (char)'\u005F';
+        public const char CHAR_UNDERSCORE = '\u005F';
         /// <summary>
         /// .
         /// </summary>
-        public const char CHAR_FULL_STOP = (char)'\u002E';
+        public const char CHAR_FULL_STOP = '\u002E';
         /// <summary>
         /// /
         /// </summary>
-        public const char CHAR_SOLIDUS = (char)'/';
+        public const char CHAR_SOLIDUS = '/';
         /// <summary>
         /// \
         /// </summary>
-        public const char CHAR_REVERSE_SOLIDUS = (char)'\u005C';
+        public const char CHAR_REVERSE_SOLIDUS = '\u005C';
 
-        public const char CHAR_SLASH = (char)'/';
-        public const char CHAR_BACKSLASH = (char)'\u005C';
+        /// <summary>
+        /// Same as: <see cref="CHAR_SOLIDUS"/>
+        /// </summary>
+        [Obsolete("Use CHAR_SOLIDUS")]
+        public const char CHAR_SLASH = '/';
+        /// <summary>
+        /// Same as: <see cref="CHAR_REVERSE_SOLIDUS"/>
+        /// </summary>
+        [Obsolete("Use CHAR_REVERSE_SOLIDUS")]
+        public const char CHAR_BACKSLASH = '\u005C';
+
         #endregion
+
+
     }
 }

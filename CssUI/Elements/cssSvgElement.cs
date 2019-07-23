@@ -5,7 +5,6 @@ using System.IO;
 using CssUI.CSS;
 using CssUI.DOM;
 using CssUI.Enums;
-using CssUI.Extensions;
 
 namespace CssUI
 {

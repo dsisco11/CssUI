@@ -1158,13 +1158,6 @@ namespace CssUI.DOM
         }
         #endregion
 
-        #region Event Loop
-        public void Run_Event_Loop()
-        {
-
-        }
-        #endregion
-
         #region Focus
         internal static void Run_Focusing_Steps(FocusableArea new_focus_target)
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#focusing-steps */
