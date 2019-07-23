@@ -121,22 +121,41 @@ namespace CssUI.DOM
          *      Set an attribute value for the context object using name and the given value.
          */
 
-        [CEReactions] public string id
+        /// <summary>
+        /// A completely unique identifier for this element 
+        /// </summary>
+        [CEReactions]
+        public string id
         {/* The id attribute must reflect the "id" content attribute. */
             get => getAttribute(EAttributeName.ID).Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.ID, AttributeValue.Parse(EAttributeName.ID, value)));
         }
 
-        [CEReactions] public string className
+        /// <summary>
+        /// List of classes that apply to this element
+        /// </summary>
+        [CEReactions]
+        public string className
         {/* The className attribute must reflect the "class" content attribute. */
             get => getAttribute(EAttributeName.Class).Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Class, AttributeValue.Parse(EAttributeName.Class, value)));
         }
 
-        public IEnumerable<string> getAttributeNames() => AttributeList.Select(a => a.Name);
+        /// <summary>
+        /// Returns true if this element has any attributes defined
+        /// </summary>
+        /// <returns></returns>
         public bool hasAttributes() => AttributeList.Count > 0;
 
-        [CEReactions] public string slot
+        /// <summary>
+        /// Returns a list of names for all defined attributes
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<string> getAttributeNames() => AttributeList.Select(a => a.Name);
+
+
+        [CEReactions]
+        public string slot
         {/* The slot attribute must reflect the "slot" content attribute. */
             get => getAttribute(EAttributeName.Slot).Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Slot, AttributeValue.From_String(value)));
@@ -221,6 +240,7 @@ namespace CssUI.DOM
         }
         #endregion
 
+        
         #region Equality
         public override bool Equals(object obj)
         {/* https://dom.spec.whatwg.org/#concept-node-equals */

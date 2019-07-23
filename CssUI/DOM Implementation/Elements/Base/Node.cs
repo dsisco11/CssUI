@@ -18,7 +18,7 @@ namespace CssUI.DOM.Nodes
     public abstract class Node : EventTarget, INode
     {/* Docs: https://dom.spec.whatwg.org/#interface-node */
 
-        internal ILogger Log { get => this.ownerDocument.Log; }
+        internal ILogger Log { get => nodeDocument.Log; }
         #region Properties
         internal List<RegisteredObserver> RegisteredObservers = new List<RegisteredObserver>();
         public Document nodeDocument { get; internal set; }
@@ -71,22 +71,8 @@ namespace CssUI.DOM.Nodes
         /// <summary>
         /// The index of this node within it's parent nodes child list
         /// </summary>
-        public int index
-        {/* The index for nodes is now automatically assigned and updated by the ChildNodeList class */
-            get;
-            /*{
-                *//* The index of an object is its number of preceding siblings, or 0 if it has none. *//*
-                int retVal = 0;
-                var node = previousSibling;
-                while (!ReferenceEquals(node, null))
-                {
-                    retVal++;
-                    node = node.previousSibling;
-                }
-                return retVal;
-            }*/
-            internal set;
-        }
+        /// Note: The index for nodes is now automatically assigned and updated by the ChildNodeList class
+        public int index { get; internal set; }
 
         /// <summary>
         /// Returns node’s root.
@@ -185,7 +171,10 @@ namespace CssUI.DOM.Nodes
         {/* Docs: https://dom.spec.whatwg.org/#dom-node-clonenode */
             /* 1) If context object is a shadow root, then throw a "NotSupportedError" DOMException. */
             if (this is ShadowRoot)
+            {
                 throw new NotSupportedError("Cannot clone a shadow-root");
+            }
+
             /* 2) Return a clone of the context object, with the clone children flag set if deep is true. */
             /* Docs: https://dom.spec.whatwg.org/#concept-node-clone */
             return _clone_node(this, null, deep);
@@ -392,13 +381,18 @@ namespace CssUI.DOM.Nodes
         {/* Docs: https://dom.spec.whatwg.org/#concept-node-clone */
             /* 1) If document is not given, let document be node’s node document. */
             if (ReferenceEquals(null, document))
+            {
                 document = node.ownerDocument;
+            }
+
             /* 2) If node is an element, then: */
-            Node copy = node.onClone();
+            Node copy = null;
             if (node is Element element)
             {
                 if (ReferenceEquals(null, copy))
+                {
                     copy = new Element(document, element.localName);
+                }
                 else
                 {
                     (copy as Element).localName = element.localName;
@@ -406,7 +400,7 @@ namespace CssUI.DOM.Nodes
 
                 foreach (Attr attr in element.AttributeList)
                 {
-                    Attr copyAttribute = (Attr)Node._clone_node(attr);
+                    Attr copyAttribute = (Attr)_clone_node(attr);
                     (copy as Element).append_attribute(copyAttribute);
                 }
             }
@@ -421,9 +415,13 @@ namespace CssUI.DOM.Nodes
                         case ENodeType.DOCUMENT_NODE:
                             {
                                 if (node is HTMLDocument)
+                                {
                                     copy = new HTMLDocument((node as Document).contentType);
+                                }
                                 else
+                                {
                                     copy = new XMLDocument((node as Document).contentType);
+                                }
                             }
                             break;
                         case ENodeType.DOCUMENT_TYPE_NODE:
@@ -479,18 +477,14 @@ namespace CssUI.DOM.Nodes
                         break;
                     default:
                         {
-                            if (node is Text txt)
-                            {
-                                (copy as Text).data = txt.data;
-                            }
-                            else if (node is Comment comment)
-                            {
-                                (copy as Comment).data = comment.data;
-                            }
-                            else if (node is ProcessingInstruction processingInstruction)
+                            if (node is ProcessingInstruction processingInstruction)
                             {
                                 (copy as ProcessingInstruction).target = processingInstruction.target;
                                 (copy as ProcessingInstruction).data = processingInstruction.data;
+                            }
+                            else if (node is CharacterData charNode)
+                            {
+                                (copy as CharacterData).data = charNode.data;
                             }
                         }
                         break;
@@ -499,14 +493,18 @@ namespace CssUI.DOM.Nodes
             /* 4) Set copy’s node document and document to copy, if copy is a document, and set copy’s node document to document otherwise. */
             if (copy is Document)
             {
-                copy.ownerDocument = copy as Document;
+                copy.nodeDocument = copy as Document;
             }
             else
             {
-                copy.ownerDocument = document;
+                copy.nodeDocument = document;
             }
+
             /* 5) Run any cloning steps defined for node in other applicable specifications and pass copy, node, document and the clone children flag if set, as parameters. */
             node.run_cloning_steps(ref copy, document, clone_children);
+            /* 5.1) Also lets run CssUIs CopyTo function */
+            node.CopyTo(ref copy);
+
             /* 6) If the clone children flag is set, clone all the children of node and append them to copy, with document as specified and the clone children flag being set */
             if (clone_children)
             {
@@ -520,6 +518,7 @@ namespace CssUI.DOM.Nodes
             return copy;
         }
 
+        /* Do NOT inline this function, its too large and used too often */
         internal static void _remove_node_from_parent(Node node, Node parent, bool suppress_observers = false)
         {/* Docs: https://dom.spec.whatwg.org/#concept-node-remove */
             /* 1) Let index be node’s index. */
@@ -998,11 +997,12 @@ namespace CssUI.DOM.Nodes
         #endregion
 
         #region CssUI
+
         /// <summary>
         /// Whenever any node or element is cloned, this function is called internally such that derived classes may populate the newly cloned instance with any required data such that it would be a perfect copy
         /// </summary>
-        /// <param name="newClone"></param>
-        protected virtual Node onClone(Node newClone) { return null; }
+        /// <param name="newNode"></param>
+        protected virtual void CopyTo(ref Node newNode) { }
         #endregion
 
     }

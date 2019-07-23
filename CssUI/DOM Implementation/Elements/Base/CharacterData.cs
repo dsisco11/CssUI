@@ -25,7 +25,7 @@ namespace CssUI.DOM
         #region Constructors
         public CharacterData(Document ownerDocument, string data)
         {
-            this.ownerDocument = ownerDocument;
+            this.nodeDocument = ownerDocument;
             this.data = data;
         }
         #endregion
@@ -116,10 +116,10 @@ namespace CssUI.DOM
             /* 3) If offset plus count is greater than length, return a string whose value is the code units from the offsetth code unit to the end of node’s data, and then return. */
             if ((offset + count) > Length)
             {
-                return this.data.Substring(offset, (Length - offset));
+                return data.Substring(offset, (Length - offset));
             }
             /* 4) Return a string whose value is the code units from the offsetth code unit to the offset+countth code unit in node’s data. */
-            return this.data.Substring(offset, count);
+            return data.Substring(offset, count);
         }
 
         public void appendData(string data)

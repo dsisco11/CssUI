@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace CssUI
@@ -6,28 +7,28 @@ namespace CssUI
     /// <summary>
     /// Implementation of an ordered/indexed dictionary backed by a list.
     /// </summary>
-    /// <typeparam name="keyTy"></typeparam>
-    /// <typeparam name="valueTy"></typeparam>
-    public class OrderedDictionary<keyTy, valueTy> : IEnumerable<valueTy>
+    /// <typeparam name="KeyTy"></typeparam>
+    /// <typeparam name="ValueTy"></typeparam>
+    public class OrderedDictionary<KeyTy, ValueTy> : IEnumerable<ValueTy>
     {
         #region Properties
-        private ReversableDictionary<keyTy, int> KeyIndex = new ReversableDictionary<keyTy, int>();
-        private List<valueTy> Items = new List<valueTy>();
+        private ReversableDictionary<KeyTy, int> KeyIndex = new ReversableDictionary<KeyTy, int>();
+        private List<ValueTy> Items = new List<ValueTy>();
         #endregion
 
         #region Accessors
-        public int Count => ((IList<valueTy>)Items).Count;
-        public bool IsReadOnly => ((IList<valueTy>)Items).IsReadOnly;
-        public valueTy this[int index]
+        public int Count => ((IList<ValueTy>)Items).Count;
+        public bool IsReadOnly => ((IList<ValueTy>)Items).IsReadOnly;
+        public ValueTy this[int index]
         {
-            get => ((IList<valueTy>)Items)[index];
-            set => ((IList<valueTy>)Items)[index] = value;
+            get => ((IList<ValueTy>)Items)[index];
+            set => ((IList<ValueTy>)Items)[index] = value;
         }
 
-        public valueTy this[keyTy key]
+        public ValueTy this[KeyTy key]
         {
-            get => ((IList<valueTy>)Items)[KeyIndex[key]];
-            set => ((IList<valueTy>)Items)[KeyIndex[key]] = value;
+            get => ((IList<ValueTy>)Items)[KeyIndex[key]];
+            set => ((IList<ValueTy>)Items)[KeyIndex[key]] = value;
         }
         #endregion
 
@@ -38,26 +39,26 @@ namespace CssUI
         #endregion
 
         #region Indexing
-        public int IndexOfKey(keyTy key) => KeyIndex[key];
-        public int IndexOfValue(valueTy item) => Items.IndexOf(item);
+        public int IndexOfKey(KeyTy key) => KeyIndex[key];
+        public int IndexOfValue(ValueTy item) => Items.IndexOf(item);
         #endregion
 
         #region Add / Insert
-        public void Add(keyTy key, valueTy item)
+        public void Add(KeyTy key, ValueTy item)
         {
             int index = Items.Count;
             Items.Add(item);
             KeyIndex.Add(key, index);
         }
 
-        public void Insert(int index, keyTy key, valueTy item)
+        public void Insert(int index, KeyTy key, ValueTy item)
         {
             /* Find the item we will displace */
             var displaced = Items[index];
             Items.Insert(index, item);
 
             /* Find the key of the item we are displacing by looking for it by its value */
-            if (!KeyIndex.TryGetKey(index, out keyTy movedKey))
+            if (!KeyIndex.TryGetKey(index, out KeyTy movedKey))
             {
                 throw new System.Exception($"Unable to reverse lookup key by value!");
             }
@@ -73,7 +74,7 @@ namespace CssUI
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public bool Remove(keyTy key)
+        public bool Remove(KeyTy key)
         {
             /* 1) Find the index */
             if (!KeyIndex.TryGetValue(key, out int index))
@@ -94,7 +95,7 @@ namespace CssUI
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public bool RemoveValue(valueTy item)
+        public bool RemoveValue(ValueTy item)
         {
             int index = Items.IndexOf(item);
             /* 1) Remove the value */
@@ -132,10 +133,10 @@ namespace CssUI
         #endregion
 
         #region Updates
-        public void Update(int index, keyTy newKey, valueTy newValue)
+        public void Update(int index, KeyTy newKey, ValueTy newValue)
         {
             /* 1) Check if the oldValue and newValue are the same*/
-            valueTy oldValue = Items[index];
+            ValueTy oldValue = Items[index];
             if (!oldValue.Equals(newValue))
             {
                 /* Update the value */
@@ -143,7 +144,7 @@ namespace CssUI
             }
 
             /* 2) Check if the oldKey and newKey are the same */
-            KeyIndex.TryGetKey(index, out keyTy oldKey);
+            KeyIndex.TryGetKey(index, out KeyTy oldKey);
             if (!oldKey.Equals(newKey))
             {
                 /* Update our key map */
@@ -152,7 +153,7 @@ namespace CssUI
             }
         }
 
-        public void Update(keyTy key, valueTy newValue)
+        public void Update(KeyTy key, ValueTy newValue)
         {
             /* 1) Find the values index */
             KeyIndex.TryGetValue(key, out int index);
@@ -162,22 +163,22 @@ namespace CssUI
         #endregion
 
         #region Querys
-        public bool ContainsKey(keyTy key)
+        public bool ContainsKey(KeyTy key)
         {
             return KeyIndex.ContainsKey(key);
         }
 
-        public bool ContainsValue(valueTy item)
+        public bool ContainsValue(ValueTy item)
         {
-            return ((IList<valueTy>)Items).Contains(item);
+            return ((IList<ValueTy>)Items).Contains(item);
         }
 
-        public bool TryGetKey(valueTy value, out keyTy outKey)
+        public bool TryGetKey(ValueTy value, out KeyTy outKey)
         {
             int index = Items.IndexOf(value);
-            if (!KeyIndex.TryGetKey(index, out keyTy key))
+            if (!KeyIndex.TryGetKey(index, out KeyTy key))
             {
-                outKey = default(keyTy);
+                outKey = default(KeyTy);
                 return false;
             }
 
@@ -185,11 +186,11 @@ namespace CssUI
             return true;
         }
 
-        public bool TryGetValue(keyTy key, out valueTy outValue)
+        public bool TryGetValue(KeyTy key, out ValueTy outValue)
         {
             if (!KeyIndex.TryGetValue(key, out int index))
             {
-                outValue = default(valueTy);
+                outValue = default(ValueTy);
                 return false;
             }
 
@@ -202,15 +203,58 @@ namespace CssUI
         #endregion
 
         #region Enumeration
-        public IEnumerator<valueTy> GetEnumerator()
+        public IEnumerator GetEnumerator()
         {
-            return ((IList<valueTy>)Items).GetEnumerator();
+            return ((IList<ValueTy>)Items).GetEnumerator();
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        IEnumerator<ValueTy> IEnumerable<ValueTy>.GetEnumerator()
         {
-            return ((IList<valueTy>)Items).GetEnumerator();
+            return ((IEnumerable<ValueTy>)Items).GetEnumerator();
         }
+        /*
+       /// <summary>
+       /// Enumerates the elements of an ordered dictionary
+       /// </summary>
+       public struct Enumerator : IEnumerator<KeyValuePair<KeyTy, ValueTy>>, IEnumerator, IDisposable, IDictionaryEnumerator
+       {
+           /// <summary>
+           /// Gets the element at the current position of the enumerator.
+           /// </summary>
+           /// <returns>The element in the <see cref="OrderedDictionary{keyTy, valueTy}"/> at the current position of the enumerator</returns>
+           public KeyValuePair<KeyTy, ValueTy> Current { get => new KeyValuePair<KeyTy, ValueTy>((KeyTy)Key, (ValueTy)Value); }
+
+           public DictionaryEntry Entry;
+
+           public object Key => Entry.Key;
+
+           public object Value => Entry.Value;
+
+           object IEnumerator.Current => Current;
+
+           private IEnumerator<KeyValuePair<KeyTy, uint>> enumerator;
+
+           /// <summary>
+           /// Releases all resources used by the <see cref="OrderedDictionary{keyTy, valueTy}.Enumerator"/>
+           /// </summary>
+           public void Dispose()
+           {
+           }
+
+           /// <summary>
+           /// Advances the enumerator to the next element of the <see cref="OrderedDictionary{KeyTy, ValueTy}"/>
+           /// </summary>
+           /// <returns><c>True</c> if the enumerator was successfully advanced to the next element; <c>False</c> if the enumerator has passed the end of the collection.</returns>
+           /// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+           public bool MoveNext()
+           {
+           }
+
+           public void Reset()
+           {
+           }
+       }
+*/
         #endregion
 
     }
