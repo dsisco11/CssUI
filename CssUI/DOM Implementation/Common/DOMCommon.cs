@@ -10,6 +10,7 @@ using CssUI.DOM.Events;
 using CssUI.DOM.Internal;
 using System;
 using CssUI.DOM.Geometry;
+using CssUI.DOM.CustomElements;
 
 namespace CssUI.DOM
 {
@@ -63,13 +64,15 @@ namespace CssUI.DOM
 
         internal static Type Lookup_Element_Interface(string localName, string Namespace)
         {
-            if (Namespace == DOMCommon.HTMLNamespace)
+            if (Namespace.Equals(HTMLNamespace))
             {
-                EElementTag? tag = DomLookup.Enum_From_Keyword<EElementTag>(localName);
-                if (!tag.HasValue)
-                    throw new Exception($"unable to find tag type for HTML tag matching \"{localName}\"");
+                if (!DomLookup.Enum_From_Keyword(localName, out EElementTag outTag))
+                {
+                    return typeof(HTMLUnknownElement);
+                    // throw new Exception($"unable to find tag type for HTML tag matching \"{localName}\"");
+                }
 
-                switch (tag.Value)
+                switch (outTag)
                 {
                     case EElementTag.Div:
                         return typeof(HTMLElement);
@@ -106,26 +109,77 @@ namespace CssUI.DOM
         }
 
         /// <summary>
-        /// Returns the chain of focus up through the hierarchy from the given node to it's owning document
+        /// Returns true if the element is a form-associated-custom-element
         /// </summary>
-        /// <param name="subject"></param>
+        /// <param name="element"></param>
         /// <returns></returns>
-        public static IEnumerable<Node> Get_Focus_Chain(Node subject)
-        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#focus-chain */
-            var output = new LinkedList<Node>();
-            if (ReferenceEquals(null, subject))
-                return output;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Form_Associated_Custom_Element(Element element)
+        {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-element */
 
-            output.AddLast(subject);
-            var tree = new TreeWalker(subject, ENodeFilterMask.SHOW_ALL);
-            Node node = tree.parentNode();
-            while (!ReferenceEquals(null, node))
-            {
-                output.AddLast(node);
-                node = tree.parentNode();
-            }
+            return (element.isCustom && element.Definition.TryGetTarget(out CustomElementDefinition outDef) && outDef.bFormAssociated);
+        }
 
-            return output;
+        /// <summary>
+        /// Returns true if the element is a form-listed-element
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Listed_Element(Element element)
+        {/* Docs: https://html.spec.whatwg.org/multipage/forms.html#category-listed */
+
+            /* XXX: Implement the checks for the rest of these */
+            /* button, fieldset, input, object, output, select, textarea, form-associated custom elements */
+            if (Is_Form_Associated_Custom_Element(element))
+                return true;
+
+            if (element is HTMLInputElement)
+                return true;
+
+            return false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Submittable_Element(Element element)
+        {/* Docs: https://html.spec.whatwg.org/multipage/forms.html#category-submit */
+
+            /* XXX: Implement the checks for the rest of these */
+            /* button, input, object, select, textarea, form-associated custom elements */
+            if (Is_Form_Associated_Custom_Element(element))
+                return true;
+
+            if (element is HTMLInputElement)
+                return true;
+
+            return false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Resettable_Element(Element element)
+        {/* Docs: https://html.spec.whatwg.org/multipage/forms.html#category-reset */
+
+            /* XXX: Implement the checks for the rest of these */
+            /* input, output, select, textarea, form-associated custom elements */
+            if (Is_Form_Associated_Custom_Element(element))
+                return true;
+
+            if (element is HTMLInputElement)
+                return true;
+
+            return false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Autocapitalize_Inheriting_Element(Element element)
+        {/* Docs: https://html.spec.whatwg.org/multipage/forms.html#category-autocapitalize */
+
+            /* XXX: Implement the checks for the rest of these */
+            /* button, fieldset, input, output, select, textarea */
+            if (element is HTMLInputElement)
+                return true;
+
+            return false;
         }
         #endregion
 
@@ -358,6 +412,97 @@ namespace CssUI.DOM
         }
         #endregion
 
+        #region Forms
+        public static void Reset_Form_Owner(Element element)
+        {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#reset-the-form-owner */
+            if (!(element is IFormAssociatedElement formElement))
+                return;
+
+
+            /* 1) Unset element's parser inserted flag. */
+            formElement.bParserInserted = false;
+
+            /* 2) If all of the following conditions are true 
+                *      element's form owner is not null
+                *      element is not listed or its form content attribute is not present
+                *      element's form owner is its nearest form element ancestor after the change to the ancestor chain
+                * then do nothing, and return. */
+            if (!ReferenceEquals(null, formElement.form))
+            {
+                if (!Is_Listed_Element(element) || !element.hasAttribute(EAttributeName.Form))
+                {
+                    var nearestForm = Get_Nth_Ancestor(element, 1, FilterForms.Instance, ENodeFilterMask.SHOW_ELEMENT);
+                    if (ReferenceEquals(formElement.form, nearestForm))
+                    {
+                        /* Do nothing, and return */
+                        return;
+                    }
+                }
+            }
+
+            formElement.form = null;
+
+            /* 4) If element is listed, has a form content attribute, and is connected, then: */
+            if (Is_Listed_Element(element) && element.hasAttribute(EAttributeName.Form) && element.isConnected)
+            {
+                /* 1) If the first element in element's tree, in tree order, to have an ID that is case-sensitively equal to element's form content attribute's value, is a form element, then associate the element with that form element. */
+                var idValue = element.getAttribute(EAttributeName.Form).Get_String();
+                Element searchResult = (Element)Get_Nth_Ancestor(element, 1, new FilterAttribute(EAttributeName.ID, AttributeValue.From_String(idValue)), ENodeFilterMask.SHOW_ELEMENT);
+                if (!ReferenceEquals(null, searchResult) && searchResult is HTMLFormElement form)
+                {
+                    formElement.form = form;
+                }
+            }
+            /* 5) Otherwise, if element has an ancestor form element, then associate element with the nearest such ancestor form element. */
+            else
+            {
+                var nearestForm = Get_Nth_Ancestor(element, 1, FilterForms.Instance, ENodeFilterMask.SHOW_ELEMENT);
+                if (!ReferenceEquals(null, nearestForm))
+                {
+                    formElement.form = (HTMLFormElement)nearestForm;
+                }
+            }
+        }
+
+        public static List<FormDataValue> Construct_Form_Entry_List(HTMLFormElement form, Element submitter = null, string encoding = null)
+        {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#constructing-the-form-data-set */
+            if (form.bConstructingEntryList)
+                return null;
+
+            form.bConstructingEntryList = true;
+
+            var controls = (IEnumerable<Element>)Get_Descendents(form, FilterIsSubmittable.Instance, ENodeFilterMask.SHOW_ELEMENT).Where(child => child is IFormAssociatedElement childElement && ReferenceEquals(form, childElement.form));
+            List<FormDataValue> entries = new List<FormDataValue>();
+
+            /* 5) For each element field in controls, in tree order: */
+            foreach (Element field in controls)
+            {
+                /* 
+                 * If any of the following is true:
+                 *      The field element has a datalist element ancestor.
+                 *      The field element is disabled.
+                 *      The field element is a button but it is not submitter.
+                 *      The field element is an input element whose type attribute is in the Checkbox state and whose checkedness is false.
+                 *      The field element is an input element whose type attribute is in the Radio Button state and whose checkedness is false.
+                 *      The field element is an object element that is not using a plugin.
+                 *  Then continue.
+                 */
+                if ((field as HTMLElement).disabled)
+                {
+                    continue;
+                }
+                else if (!ReferenceEquals(null, Get_Nth_Ancestor(field, 1, new FilterElementType(typeof(HTMLDataListElement)), ENodeFilterMask.SHOW_ELEMENT)))
+                {
+                    continue;
+                }
+                else if ()
+                {
+                }
+
+            }
+        }
+        #endregion
+
         #region Hierarchy Checks
 
         #region Descendants
@@ -579,7 +724,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Returns a list of all ancestors for the given node, that is; the chain of parent elements all the way up to the root element.
         /// </summary>
-        /// <param name="node"></param>
+        /// <param name="node">The node to start searching from</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IReadOnlyCollection<Node> Get_Ancestors(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
@@ -597,9 +742,39 @@ namespace CssUI.DOM
         }
 
         /// <summary>
+        /// Returns Nth ancestor for the given node, that is; the Nth parent element along the chain of elements going all the way up to the root element.
+        /// </summary>
+        /// <param name="node">The node to start searching from</param>
+        /// <param name="N">The number of elements to traverse</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Node Get_Nth_Ancestor(Node node, int N, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        {
+            if (N <= 0)
+            {
+                throw new IndexOutOfRangeException($"N must be greater than 0");
+            }
+
+            TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
+            Node current = tree.parentNode();
+            while (!ReferenceEquals(null, current))
+            {
+                N--;
+                if (N == 0)
+                {
+                    return current;
+                }
+
+                current = tree.parentNode();
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Returns a list of all (inclusive) ancestors for the given node, that is; the chain of parent elements all the way up to the root element.
         /// </summary>
-        /// <param name="node"></param>
+        /// <param name="node">The node to start searching from</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IReadOnlyCollection<Node> Get_Inclusive_Ancestors(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
@@ -620,7 +795,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Returns a list of all descendents for the given node
         /// </summary>
-        /// <param name="node"></param>
+        /// <param name="node">The node to start searching from</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IReadOnlyCollection<Node> Get_Descendents(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
@@ -640,7 +815,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Returns a list of all descendents for the given node and, in addition, all of its ShadowDOM descendents
         /// </summary>
-        /// <param name="node"></param>
+        /// <param name="node">The node to start searching from</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IReadOnlyCollection<Node> Get_Shadow_Including_Descendents(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
@@ -669,7 +844,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Returns a list of all (inclusive) descendents for the given node
         /// </summary>
-        /// <param name="node"></param>
+        /// <param name="node">The node to start searching from</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IReadOnlyCollection<Node> Get_Inclusive_Descendents(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
@@ -690,7 +865,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Returns a list of all (inclusive) descendents for the given node and, in addition, all of its ShadowDOM (inclusive) descendents
         /// </summary>
-        /// <param name="node"></param>
+        /// <param name="node">The node to start searching from</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IReadOnlyCollection<Node> Get_Shadow_Including_Inclusive_Descendents(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
@@ -703,7 +878,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Returns a list of all nodes that preceed the given node (siblings)
         /// </summary>
-        /// <param name="node"></param>
+        /// <param name="node">The node to start searching from</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IReadOnlyCollection<Node> Get_Preceeding(Node node, NodeFilter Filter = null)
@@ -728,7 +903,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Returns a list of all nodes that follow the given node (siblings)
         /// </summary>
-        /// <param name="node"></param>
+        /// <param name="node">The node to start searching from</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IReadOnlyCollection<Node> Get_Following(Node node, NodeFilter Filter = null)
@@ -753,22 +928,22 @@ namespace CssUI.DOM
         /// <summary>
         /// Returns a list of <see cref="Element"/>s matching <paramref name="qualifiedName"/>
         /// </summary>
-        /// <param name="root"></param>
+        /// <param name="root">The node to start searching from</param>
         /// <param name="qualifiedName"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IReadOnlyCollection<Element> Get_Elements_By_Qualified_Name(Node root, string qualifiedName)
         {/* Docs: https://dom.spec.whatwg.org/#concept-getelementsbytagname */
             /* 1) If qualifiedName is "*" (U+002A), return a HTMLCollection rooted at root, whose filter matches only descendant elements. */
-            if (qualifiedName == "\u002A")
+            if (StringExt.streq(qualifiedName.AsSpan(), "\u002A".AsSpan()))
             {
                 LinkedList<Element> descendents = new LinkedList<Element>();
                 var tree = new TreeWalker(root, ENodeFilterMask.SHOW_ELEMENT);
-                Node node = tree.nextNode();
-                while (!ReferenceEquals(null, node))
+                Node descendant = tree.nextNode();
+                while (!ReferenceEquals(null, descendant))
                 {
-                    descendents.AddLast((Element)node);
-                    node = tree.nextNode();
+                    descendents.AddLast((Element)descendant);
+                    descendant = tree.nextNode();
                 }
 
                 return descendents;
@@ -781,23 +956,23 @@ namespace CssUI.DOM
 
                 LinkedList<Element> descendents = new LinkedList<Element>();
                 var tree = new TreeWalker(root, ENodeFilterMask.SHOW_ELEMENT);
-                Node node = tree.nextNode();
-                while (!ReferenceEquals(null, node))
+                Node descendant = tree.nextNode();
+                while (!ReferenceEquals(null, descendant))
                 {
-                    var element = (Element)node;
-                    if (element.NamespaceURI == DOMCommon.HTMLNamespace)
+                    var element = (Element)descendant;
+                    if (StringExt.streq(element.NamespaceURI.AsSpan(), HTMLNamespace.AsSpan()))
                     {
-                        if (0 == string.Compare(qualifiedName, element.tagName.ToLowerInvariant()))
+                        if (StringExt.streq(qualifiedName.AsSpan(), element.tagName.ToLowerInvariant().AsSpan()))
                         {
                             descendents.AddLast(element);
                         }
                     }
-                    else if (0 == string.Compare(qualifiedName, element.tagName))
+                    else if (StringExt.streq(qualifiedName.AsSpan(), element.tagName.AsSpan()))
                     {
                         descendents.AddLast(element);
                     }
 
-                    node = tree.nextNode();
+                    descendant = tree.nextNode();
                 }
 
                 return descendents;
@@ -811,14 +986,14 @@ namespace CssUI.DOM
                 while (!ReferenceEquals(null, node))
                 {
                     var element = (Element)node;
-                    if (element.NamespaceURI == DOMCommon.HTMLNamespace)
+                    if (StringExt.streq(element.NamespaceURI.AsSpan(), HTMLNamespace.AsSpan()))
                     {
-                        if (0 == string.Compare(qualifiedName, element.tagName.ToLowerInvariant()))
+                        if (StringExt.streq(qualifiedName.AsSpan(), element.tagName.ToLowerInvariant().AsSpan()))
                         {
                             descendents.AddLast(element);
                         }
                     }
-                    else if (0 == string.Compare(qualifiedName, element.tagName))
+                    else if (StringExt.streq(qualifiedName.AsSpan(), element.tagName.AsSpan()))
                     {
                         descendents.AddLast(element);
                     }
@@ -834,7 +1009,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Returns a list of <see cref="Element"/>s which match <paramref name="localName"/> and <paramref name="Namespace"/>
         /// </summary>
-        /// <param name="root"></param>
+        /// <param name="root">The node to start searching from</param>
         /// <param name="Namespace"></param>
         /// <param name="localName"></param>
         /// <returns></returns>
@@ -845,45 +1020,44 @@ namespace CssUI.DOM
                 Namespace = null;
 
             /* 2) If both namespace and localName are "*" (U+002A), return a HTMLCollection rooted at root, whose filter matches descendant elements. */
-            if (Namespace == "\u002A" && localName == "\u002A")
-                return DOMCommon.Get_Descendents(root, null, ENodeFilterMask.SHOW_ELEMENT).Cast<Element>();
+            if (Namespace.Equals("\u002A") && localName.Equals("\u002A"))
+                return (IReadOnlyCollection<Element>)Get_Descendents(root, null, ENodeFilterMask.SHOW_ELEMENT);
+
             /* 3) Otherwise, if namespace is "*" (U+002A), return a HTMLCollection rooted at root, whose filter matches descendant elements whose local name is localName. */
             var localNameFilter = new FilterLocalName(localName);
-            if (Namespace == "\u002A")
-                return DOMCommon.Get_Descendents(root, localNameFilter, ENodeFilterMask.SHOW_ELEMENT).Cast<Element>();
+            if (Namespace.Equals("\u002A"))
+                return (IReadOnlyCollection<Element>)Get_Descendents(root, localNameFilter, ENodeFilterMask.SHOW_ELEMENT);
+
             /* 4) Otherwise, if localName is "*" (U+002A), return a HTMLCollection rooted at root, whose filter matches descendant elements whose namespace is namespace. */
             var NamespaceFilter = new FilterNamespace(Namespace);
-            if (localName == "\u002A")
-                return DOMCommon.Get_Descendents(root, NamespaceFilter, ENodeFilterMask.SHOW_ELEMENT).Cast<Element>();
+            if (localName.Equals("\u002A"))
+                return (IReadOnlyCollection<Element>)Get_Descendents(root, NamespaceFilter, ENodeFilterMask.SHOW_ELEMENT);
 
             /* 5) Otherwise, return a HTMLCollection rooted at root, whose filter matches descendant elements whose namespace is namespace and local name is localName. */
-            return DOMCommon.Get_Descendents(root, localNameFilter, ENodeFilterMask.SHOW_ELEMENT)
-                .Where(node => NamespaceFilter.acceptNode(node) == ENodeFilterResult.FILTER_ACCEPT)
-                .Cast<Element>();
+            return (IReadOnlyCollection<Element>)Get_Descendents(root, localNameFilter, ENodeFilterMask.SHOW_ELEMENT)
+                .Where(descendant => NamespaceFilter.acceptNode(descendant) == ENodeFilterResult.FILTER_ACCEPT);
         }
 
         /// <summary>
         /// Returns a list of <see cref="Element"/>s which match <paramref name="localName"/> and <paramref name="Namespace"/>
         /// </summary>
-        /// <param name="root"></param>
-        /// <param name="Namespace"></param>
-        /// <param name="localName"></param>
+        /// <param name="root">The node to start searching from</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IReadOnlyCollection<Element> Get_Elements_By_Class_Name(Node root, string classNames)
         {/* Docs: https://dom.spec.whatwg.org/#concept-getelementsbyclassname */
-            var classes = DOMCommon.Parse_Ordered_Set(classNames.ToLowerInvariant()).Cast<AtomicString>();
+            var classes = Parse_Ordered_Set(classNames.ToLowerInvariant()).Cast<AtomicString>();
             /* 2) If classes is the empty set, return an empty HTMLCollection. */
             if (classes.Count() <= 0)
-                return new Element[] { };
+                return new Element[0];
 
             /* 3) Return a HTMLCollection rooted at root, whose filter matches descendant elements that have all their classes in classes. */
             var descendents = new LinkedList<Element>();
             var tree = new TreeWalker(root, ENodeFilterMask.SHOW_ELEMENT);
-            Node node = tree.nextNode();
-            while (!ReferenceEquals(null, node))
+            Node descendant = tree.nextNode();
+            while (!ReferenceEquals(null, descendant))
             {
-                Element E = node as Element;
+                Element E = descendant as Element;
 
                 if (E.classList.ContainsAll(classes))
                     descendents.AddLast(E);
@@ -891,7 +1065,7 @@ namespace CssUI.DOM
                 if (!ReferenceEquals(null, E))
                     descendents.AddLast(E);
 
-                node = tree.nextNode();
+                descendant = tree.nextNode();
             }
 
             return descendents;
@@ -900,7 +1074,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Returns the root of a given node
         /// </summary>
-        /// <param name="node"></param>
+        /// <param name="node">The node to start searching from</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Node Get_Root(Node node)
@@ -915,23 +1089,24 @@ namespace CssUI.DOM
         /// <summary>
         /// Returns the (shadow-including) root of a given node
         /// </summary>
-        /// <param name="node"></param>
+        /// <param name="node">The node to start searching from</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Node Get_Shadow_Including_Root(Node node)
         {/* Docs: https://dom.spec.whatwg.org/#concept-shadow-including-root */
             /* The shadow-including root of an object is its root’s host’s shadow-including root, if the object’s root is a shadow root, and its root otherwise. */
-            Node root = Get_Root(node);
-            if (root is ShadowRoot shadow)
+            Node rootNode = Get_Root(node);
+            if (rootNode is ShadowRoot shadow)
             {
                 return Get_Shadow_Including_Root(shadow.Host);
             }
 
-            return root;
+            return rootNode;
         }
 
         /// <summary>
         /// Returns a list of all immediate descendants for the given <paramref name="node"/>
+        /// <param name="node">The node to start searching from</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IReadOnlyCollection<Node> Get_Children(Node node, NodeFilter Filter = null)
@@ -961,7 +1136,8 @@ namespace CssUI.DOM
         }
 
         /// <summary>
-        /// Returns a list of all immediate descendents for the given <paramref name="node"/> which match the given Type <see cref="Ty"/>
+        /// Returns a list of all immediate descendents for the given <paramref name="node"/> which match the given Type <typeparamref name="Ty"/>
+        /// <param name="node">The node to start searching from</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IReadOnlyCollection<Ty> Get_Children_OfType<Ty>(Node node, NodeFilter Filter = null) where Ty : IEventTarget
@@ -992,10 +1168,11 @@ namespace CssUI.DOM
 
             return list;
         }
-        
+
 
         /// <summary>
         /// Returns the first immediate descendent which matches the given <paramref name="Filter"/> and Type <typeparamref name="Ty"/>
+        /// <param name="node">The node to start searching from</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Ty Get_First_Child_OfType<Ty>(Node Node, NodeFilter Filter = null) where Ty : Node
@@ -1028,6 +1205,7 @@ namespace CssUI.DOM
 
         /// <summary>
         /// Returns the first immediate descendent which matches the given <paramref name="Filter"/> and Type <typeparamref name="Ty"/>
+        /// <param name="node">The node to start searching from</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Ty Get_Last_Child_OfType<Ty>(Node Node, NodeFilter Filter = null) where Ty : Node
@@ -1060,6 +1238,7 @@ namespace CssUI.DOM
 
         /// <summary>
         /// Returns the first immediate (<see cref="Element"/>) descendent which matches the given <paramref name="Filter"/> and Type <typeparamref name="Ty"/>
+        /// <param name="node">The node to start searching from</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Ty Get_First_Element_Child_OfType<Ty>(Element Node, NodeFilter Filter = null) where Ty : Node
@@ -1092,6 +1271,7 @@ namespace CssUI.DOM
 
         /// <summary>
         /// Returns the last immediate (<see cref="Element"/>) descendent which matches the given <paramref name="Filter"/> and Type <typeparamref name="Ty"/>
+        /// <param name="node">The node to start searching from</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Ty Get_Last_Element_Child_OfType<Ty>(Element Node, NodeFilter Filter = null) where Ty : Node
@@ -1167,6 +1347,29 @@ namespace CssUI.DOM
         internal static void Run_Unfocusing_Steps(FocusableArea new_focus_target)
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#unfocusing-steps */
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Returns the chain of focus up through the hierarchy from the given node to it's owning document
+        /// </summary>
+        /// <param name="subject"></param>
+        /// <returns></returns>
+        public static IEnumerable<Node> Get_Focus_Chain(Node subject)
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#focus-chain */
+            var output = new LinkedList<Node>();
+            if (ReferenceEquals(null, subject))
+                return output;
+
+            output.AddLast(subject);
+            var tree = new TreeWalker(subject, ENodeFilterMask.SHOW_ALL);
+            Node node = tree.parentNode();
+            while (!ReferenceEquals(null, node))
+            {
+                output.AddLast(node);
+                node = tree.parentNode();
+            }
+
+            return output;
         }
         #endregion
 
