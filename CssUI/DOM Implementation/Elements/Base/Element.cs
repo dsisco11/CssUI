@@ -19,7 +19,7 @@ using System.Text;
 namespace CssUI.DOM
 {
     public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable
-    {
+    {/* Docs: https://dom.spec.whatwg.org/#interface-element */
         #region Internal Properties
         internal OrderedDictionary<AtomicName<EAttributeName>, Attr> AttributeList { get; private set; } = new OrderedDictionary<AtomicName<EAttributeName>, Attr>();
 
@@ -62,13 +62,21 @@ namespace CssUI.DOM
             }
         }
 
-        /// <summary>
-        /// This elements custom element state
-        /// </summary>
-        public ECustomElement CustomElementState { get; protected set; } = ECustomElement.Undefined;
         public DOMTokenList classList { get; private set; }
 
         public NamedNodeMap Attributes { get; private set; }
+        #endregion
+
+        #region Custom Element
+        /// <summary>
+        /// This elements custom element state
+        /// </summary>
+        public ECustomElement CustomElementState { get; internal set; } = ECustomElement.Undefined;
+        /// <summary>
+        /// The custom element definition
+        /// </summary>
+        public WeakReference<CustomElementDefinition> Definition { get; internal set; } = null;
+        internal ElementInternals internals = null;
         #endregion
 
         #region CSS
@@ -259,10 +267,27 @@ namespace CssUI.DOM
             if (!(obj is Element B))
                 return false;
 
-            /* Ensure all attributes match */
-            foreach (Attr attr in this.AttributeList)
+
+            if (AttributeList.Count != B.AttributeList.Count)
+                return false;
+
+            if (!StringExt.streq(NamespaceURI.AsSpan(), B.NamespaceURI.AsSpan()))
+                return false;
+
+            if (!StringExt.streq(prefix.AsSpan(), B.prefix.AsSpan()))
+                return false;
+
+            if (!StringExt.streq(localName.AsSpan(), B.localName.AsSpan()))
+                return false;
+
+            /* If A is an element, each attribute in its attribute list has an attribute that equals an attribute in B’s attribute list. */
+            foreach (Attr attr in AttributeList)
             {
-                if (!attr.Equals(B.getAttribute(attr.Name)))
+                Attr bAttr = B.getAttributeNode(attr.localName);
+                if (ReferenceEquals(null, bAttr))
+                    return false;
+
+                if (!attr.Equals(bAttr))
                     return false;
             }
 
@@ -388,7 +413,7 @@ namespace CssUI.DOM
         /// Is this element a custom element
         /// <para>An element whose custom element state is "custom" is said to be custom.</para>
         /// </summary>
-        internal bool Is_Custom
+        internal bool isCustom
         {/* Docs: https://dom.spec.whatwg.org/#concept-element-custom */
             get => CustomElementState == Enums.ECustomElement.Custom;
         }
@@ -567,13 +592,15 @@ namespace CssUI.DOM
         #endregion
         
 
-        #region HTML Attribute Management
+        #region Attribute Management
         public AttributeValue getAttribute(AtomicName<EAttributeName> Name)
         {
-            Attr attr = AttributeList[qualifiedName];
+            if (!AttributeList.TryGetValue(Name, out Attr outAttr))
+                return null;
+
             /* 2) If attr is null, return null. */
             /* 3) Return attr’s value. */
-            return attr?.Value;
+            return outAttr.Value;
         }
 
         [Obsolete("Attributes should be specified via an AtomicName instance", true)]
@@ -584,7 +611,10 @@ namespace CssUI.DOM
 
         public Attr getAttributeNode(AtomicName<EAttributeName> Name)
         {
-            return this.AttributeList[Name];
+            if (!AttributeList.TryGetValue(Name, out Attr outAttr))
+                return null;
+
+            return outAttr;
         }
 
         [Obsolete("Attributes should be specified via an AtomicName instance", true)]
@@ -883,7 +913,6 @@ namespace CssUI.DOM
         #endregion
 
         #region Shadow DOM
-        /* XXX: ShadowDOM stuff here */
         private ShadowRoot _shadow_root = null;
         public ShadowRoot shadowRoot
         {
@@ -898,7 +927,7 @@ namespace CssUI.DOM
                 return _shadow_root;
             }
 
-            private set
+            internal set
             {
                 _shadow_root = value;
             }
@@ -912,21 +941,35 @@ namespace CssUI.DOM
                 throw new NotSupportedError("Elements must be in the HTML namespace to support a ShadowDOM");
             }
 
-            /* SKIP THIS */
+            /* XXX: Implement checking for these html elements */
             /* 2) If context object’s local name is not a valid custom element name, "article", "aside", "blockquote", "body", "div", "footer", "h1", "h2", "h3", "h4", "h5", "h6", "header", "main" "nav", "p", "section", or "span", then throw a "NotSupportedError" DOMException */
+            bool isValidCustomName = HTMLCommon.Is_Valid_Custom_Element_Name(localName.AsMemory());
+            if (!isValidCustomName)
+            {
+                throw new NotSupportedError($"Cannot attach ShadowDOM to invalid custom element");
+            }
             /* 3) If context object’s local name is a valid custom element name, or context object’s is value is not null, then:
                     Let definition be the result of looking up a custom element definition given context object’s node document, its namespace, its local name, and its is value.
                     If definition is not null and definition’s disable shadow is true, then throw a "NotSupportedError" DOMException. 
             */
-            /* XXX: Custom element stuff here */
-            /* 4) If context object is a shadow host, then throw an "NotSupportedError" DOMException. */
-            if (this.Is_ShadowHost)
+            if (isValidCustomName || !ReferenceEquals(null, is_value))
             {
-                throw new NotSupportedError("Cannot attach a shadow root to an element which already has a shadow root");
+                var definition = nodeDocument.defaultView.customElements.Lookup(nodeDocument, NamespaceURI, localName, is_value);
+                if (!ReferenceEquals(null, definition) && definition.bDisableShadow)
+                {
+                    throw new NotSupportedError($"Cannot attach ShadowDOM to custom element whose definition has ShadowDOM disabled");
+                }
             }
 
-            var shadow = new ShadowRoot(this, this.ownerDocument, init.Mode);
-            this.shadowRoot = shadow;
+            /* 4) If context object is a shadow host, then throw an "NotSupportedError" DOMException. */
+            if (Is_ShadowHost)
+            {
+                throw new NotSupportedError("Cannot attach a ShadowDOM to an element which already has one");
+            }
+
+            var shadow = new ShadowRoot(this, nodeDocument, init.Mode);
+            /* 6) Set context object’s shadow root to shadow. */
+            shadowRoot = shadow;
             return shadow;
 
         }

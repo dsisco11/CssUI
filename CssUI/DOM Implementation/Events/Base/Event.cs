@@ -147,22 +147,23 @@ namespace CssUI.DOM.Events
         public List<EventTarget> composedPath()
         {/* Docs: https://dom.spec.whatwg.org/#dom-event-composedpath */
             var composedPath = new List<EventTarget>();
-            if (this.Path.Count <= 0)
+            if (Path.Count <= 0)
             {
                 return composedPath;
             }
 
-            composedPath.Add(this.currentTarget);
+            composedPath.Add(currentTarget);
             int currentTargetIndex = 0;
             int currentTargetHiddenSubtreeLevel = 0;
 
-            int index = this.Path.Count - 1;
+            /* 9) While index is greater than or equal to 0: */
+            int index = Path.Count - 1;
             while(index >= 0)
             {
-                EventPathItem pathItem = this.Path[index];
+                EventPathItem pathItem = Path[index];
                 if (pathItem.root_of_closed_tree) currentTargetHiddenSubtreeLevel++;
 
-                if (ReferenceEquals(pathItem.invocationTarget, this.currentTarget))
+                if (ReferenceEquals(pathItem.invocationTarget, currentTarget))
                 {
                     currentTargetIndex = index;
                     break;
@@ -240,7 +241,7 @@ namespace CssUI.DOM.Events
         /// </summary>
         public void stopPropagation()
         {
-            this.Flags |= EEventFlags.StopPropogation;
+            Flags |= EEventFlags.StopPropogation;
         }
 
         /// <summary>
@@ -248,8 +249,8 @@ namespace CssUI.DOM.Events
         /// </summary>
         public void stopImmediatePropagation()
         {
-            this.Flags |= EEventFlags.StopPropogation;
-            this.Flags |= EEventFlags.StopImmediatePropogation;
+            Flags |= EEventFlags.StopPropogation;
+            Flags |= EEventFlags.StopImmediatePropogation;
         }
 
         #region Internal Utility

@@ -1,13 +1,17 @@
-﻿namespace CssUI.DOM.Internal
+﻿using CssUI.DOM.CustomElements;
+
+namespace CssUI.DOM.Internal
 {
     internal class UpgradeReaction : IElementReaction
     {
         #region Properties
+        public readonly CustomElementDefinition definition = null;
         #endregion
 
         #region Constructor
-        public UpgradeReaction()
+        public UpgradeReaction(CustomElementDefinition definition)
         {
+            this.definition = definition;
         }
         #endregion
         /// <summary>

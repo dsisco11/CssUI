@@ -24,7 +24,6 @@ namespace CssUI.DOM
             return true;
         }
 
-
         /// <summary>
         /// Returns True if the given string follows the XML qName format
         /// </summary>

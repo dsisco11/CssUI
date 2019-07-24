@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CssUI.DOM.Internal;
+using CssUI.DOM.Nodes;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -15,17 +17,124 @@ namespace CssUI.DOM.CustomElements
 
 
 
-        public static void Upgrade_Element(Element element)
+        public static void Upgrade_Element(Element element, ref CustomElementDefinition definition)
+        {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#upgrades */
+            if (element.isCustom)
+            {
+                return;
+            }
+
+            if (element.CustomElementState == Enums.ECustomElement.Failed)
+            {
+                return;
+            }
+
+            element.Definition = new WeakReference<CustomElementDefinition>(definition);
+            /* 4) For each attribute in element's attribute list, in order, enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute's local name, null, attribute's value, and attribute's namespace. */
+            foreach (Attr attr in element.AttributeList)
+            {
+                Enqueue_Reaction(element, EReactionName.AttributeChanged, attr.localName, null, attr.Value, attr.namespaceURI);
+            }
+
+            if (element.isConnected)
+            {
+                Enqueue_Reaction(element, EReactionName.Connected);
+            }
+
+            definition.constructionStack.Push(new WeakReference<Element>(element));
+
+            var C = definition.constructor;
+            /* 8) Run the following substeps while catching any exceptions: */
+            try
+            {
+                if (definition.bDisableShadow && !ReferenceEquals(null, element.shadowRoot))
+                {
+                    throw new NotSupportedException($"Cannot upgrade a custom element which has a shadow root and whose definition has ShadowDOM disabled");
+                }
+
+                /* Notes:
+                 * Okay so the specifications intended this system to be used by javascript, and because of this it relies on being able to sort of tack on prototype functions and stuff to an element object.
+                 * We are implementing this (and using it) with C#, as such we cannot simply "tack-on" things to this element instance to upgrade it to this class.
+                 * So we need to actually completely replace the element within the document with an instance of the class it should be which also contains all of its data & children...
+                 * Fortunately creating a clone of this element and "stealing" its children will do exactly that!
+                 */
+
+                /* UPDATE: 
+                 *      We cannot just replace the element because we cannot update any instances of it being referenced in memory, 
+                 *      so we need to figure out a way we can do the equivalent of this upgrade to the actual live element instance in memory */
+
+                throw new NotImplementedException($"Custom element upgrading is not yet supported");
+
+                /* Clone this node to get an upgraded version of it *//*
+                Element upgradeResult = (Element)Node._clone_node(element, null);
+
+                *//* Steal all of the old nodes children *//*
+                Node lastNode = null;
+                foreach (Node child in element.childNodes)
+                {
+                    Node._insert_node_into_parent_before(child, upgradeResult, lastNode, true);
+                    lastNode = child;
+                }
+                */
+            }
+            catch(Exception ex)
+            {
+                element.CustomElementState = Enums.ECustomElement.Failed;
+                element.Definition = null;
+                element.Custom_Element_Reaction_Queue.Clear();
+
+                throw ex;
+            }
+            finally
+            {
+                definition.constructionStack.Pop();
+            }
+
+            /* 9) If element is a form-associated custom element, then: */
+            if (element is IFormAssociatedElement formElement)
+            {
+                /* 1) Reset the form owner of element. If element is associated with a form element, then enqueue a custom element callback reaction with element, callback name "formAssociatedCallback", and « the associated form ». */
+                DOMCommon.Reset_Form_Owner(element);
+                if (!ReferenceEquals(null, formElement.form))
+                {
+                    Enqueue_Reaction(element, EReactionName.FormAssociated, formElement.form);
+                }
+
+                /* 2) If element is disabled, then enqueue a custom element callback reaction with element, callback name "formDisabledCallback" and « true ». */
+                if (element is HTMLElement htmlElement && htmlElement.disabled)
+                {
+                    Enqueue_Reaction(element, EReactionName.FormDisabled, true);
+                }
+            }
+
+            element.CustomElementState = Enums.ECustomElement.Custom;
+        }
+
+
+        public static void Try_Upgrade_Element(Element element)
         {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#concept-try-upgrade */
+            var definition = element.nodeDocument.defaultView.customElements.Lookup(element.nodeDocument, element.NamespaceURI, element.localName, element.is_value);
+            if (!ReferenceEquals(null, definition))
+            {
+                Enqueue_Upgrade(element, definition);
+            }
+        }
+
+
+        public static void Enqueue_Upgrade(Element element, CustomElementDefinition definition)
+        {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#enqueue-a-custom-element-upgrade-reaction */
+            UpgradeReaction reaction = new UpgradeReaction(definition);
+            element.Custom_Element_Reaction_Queue.Enqueue(reaction);
+            element.ownerDocument.defaultView.Reactions.Enqueue_Element(element);
         }
 
 
         public static void Enqueue_Reaction(Element element, AtomicName<EReactionName> Reaction, params object[] Args)
         {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#enqueue-a-custom-element-callback-reaction */
-            if (!element.Is_Custom)
+            if (!element.isCustom)
                 return;
             /* 1) Let definition be element's custom element definition. */
-            CustomElementDefinition def = element.ownerDocument.defaultView.customElements.Lookup(element.tagName);
+            CustomElementDefinition def = element.ownerDocument.defaultView.customElements.Lookup(element.ownerDocument, element.NamespaceURI, element.tagName, element.is_value);
             if (ReferenceEquals(null, def))
                 return;
 

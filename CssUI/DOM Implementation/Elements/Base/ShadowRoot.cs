@@ -7,6 +7,7 @@ namespace CssUI.DOM
     {/* Docs: https://dom.spec.whatwg.org/#interface-shadowroot */
         #region Properties
         public EShadowRootMode Mode { get; private set; }
+        /* Host property provided by DocumentFragment */
         //public Element Host;
         #endregion
 

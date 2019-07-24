@@ -145,6 +145,39 @@ namespace CssUI.DOM
         #endregion
 
 
+        #region Custom Element
+        public bool attached_internals { get; private set; } = false;
+
+        public ElementInternals attachInternals()
+        {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#dom-attachinternals */
+            if (!ReferenceEquals(null, is_value))
+            {
+                throw new NotSupportedError("Cannot attach internals to element that still has it's 'is' value");
+            }
+
+            var definition = nodeDocument.defaultView.customElements.Lookup(nodeDocument, NamespaceURI, localName, null);
+            if (ReferenceEquals(null, definition))
+            {
+                throw new NotSupportedError("Element internals may only be attached to custom elements");
+            }
+
+            if (definition.bDisableInternals)
+            {
+                throw new NotSupportedError("Cannot attach internals to custom elements whose definition has internals disabled");
+            }
+
+            if (attached_internals)
+            {
+                throw new NotSupportedError("Cannot attach internals to element which already has internals attached");
+            }
+
+            attached_internals = true;
+
+            internals = new ElementInternals(this);
+            return internals;
+        }
+        #endregion
+
         #region Internal
         internal bool tabindex_focus_flag = true;
 
@@ -164,7 +197,7 @@ namespace CssUI.DOM
                     case "optgroup":
                     case "option":
                     case "fieldset":
-                        return Disabled;
+                        return disabled;
                     default:
                         return false;
                 }
@@ -182,7 +215,7 @@ namespace CssUI.DOM
                 {
                     if (inputElement.type == EInputType.Submit || inputElement.type == EInputType.Image || inputElement.type == EInputType.reset || inputElement.type == EInputType.button)
                     {
-                        return !Disabled && is_in_formal_activation_state;
+                        return !disabled && is_in_formal_activation_state;
                     }
                     else
                     {
@@ -191,7 +224,7 @@ namespace CssUI.DOM
                 }
                 else if (this is HTMLButtonElement)
                 {
-                    return !Disabled && is_in_formal_activation_state;
+                    return !disabled && is_in_formal_activation_state;
                 }
                 else
                 {
@@ -396,7 +429,7 @@ namespace CssUI.DOM
         /// Determines if this element can be interacted with
         /// </summary>
         [CEReactions]
-        public bool Disabled
+        public virtual bool disabled
         {
             get => hasAttribute(EAttributeName.Disabled);
             set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Disabled, value));
@@ -418,7 +451,7 @@ namespace CssUI.DOM
         /// </summary>
         public void click()
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#dom-click */
-            if (Disabled)
+            if (disabled)
                 return;
 
             if (click_in_progress)

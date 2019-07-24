@@ -283,41 +283,42 @@ namespace CssUI.DOM.Nodes
         #endregion
 
         #region Equality
-        public bool isEqualNode(Node otherNode) => this.Equals(otherNode);
+        public bool isEqualNode(Node otherNode)
+        {
+            if (ReferenceEquals(null, otherNode))
+                return false;
+
+            return true;
+        }
 
         public override bool Equals(object obj)
         {/* https://dom.spec.whatwg.org/#concept-node-equals */
             if (ReferenceEquals(null, obj))
                 return false;
 
-            if (!(obj is Node B))
+            if (!(obj is Node otherNode))
+                return false;
+            /* A and B’s nodeType attribute value is identical. */
+            if (nodeType != otherNode.nodeType)
                 return false;
 
-            if (this.nodeType != B.nodeType)
+            /* A and B have the same number of children. */
+            if (childNodes.Count != otherNode.childNodes.Count)
                 return false;
-
-            if (this.childNodes.Count != B.childNodes.Count)
-                return false;
-
-            for (int i = 0; i < this.childNodes.Count; i++)
+            /* Each child of A equals the child of B at the identical index. */
+            for (int i = 0; i < childNodes.Count; i++)
             {
-                if (!childNodes[i].Equals(B.childNodes[i]))
+                if (!childNodes[i].isEqualNode(otherNode.childNodes[i]))
                     return false;
             }
 
-            return true;
+            return isEqualNode(otherNode);
         }
 
         public override int GetHashCode()
         {
             int hash = 17;
             hash = hash * 31 + (int)nodeType;
-
-            for (int i = 0; i < childNodes.Count; i++)
-            {
-                hash = hash * 31 + childNodes[i].GetHashCode();
-            }
-
             return hash;
         }
         #endregion
@@ -377,7 +378,7 @@ namespace CssUI.DOM.Nodes
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static Node _clone_node(Node node, Document document = null, bool clone_children = false)
+        internal static Node _clone_node(Node node, Document document = null, bool clone_children = false, Node targetNode = null)
         {/* Docs: https://dom.spec.whatwg.org/#concept-node-clone */
             /* 1) If document is not given, let document be node’s node document. */
             if (ReferenceEquals(null, document))
@@ -386,7 +387,7 @@ namespace CssUI.DOM.Nodes
             }
 
             /* 2) If node is an element, then: */
-            Node copy = null;
+            Node copy = targetNode;
             if (node is Element element)
             {
                 if (ReferenceEquals(null, copy))
@@ -465,6 +466,7 @@ namespace CssUI.DOM.Nodes
                             break;
                     }
                 }
+
                 /* Copy any required data */
                 switch (node.nodeType)
                 {
@@ -510,7 +512,7 @@ namespace CssUI.DOM.Nodes
             /* 5) Run any cloning steps defined for node in other applicable specifications and pass copy, node, document and the clone children flag if set, as parameters. */
             node.run_cloning_steps(ref copy, document, clone_children);
             /* 5.1) Also lets run CssUIs CopyTo function */
-            node.CopyTo(ref copy);
+            node.CopyTo(ref copy, true);
 
             /* 6) If the clone children flag is set, clone all the children of node and append them to copy, with document as specified and the clone children flag being set */
             if (clone_children)
@@ -674,7 +676,7 @@ namespace CssUI.DOM.Nodes
                 }
             }
             /* 3) Let nodes be node’s children, if node is a DocumentFragment node; otherwise « node ». */
-            IEnumerable<Node> nodes = (node is DocumentFragment doc1) ? doc1.childNodes : (IEnumerable<Node>)new Node[] { };
+            IEnumerable<Node> nodes = (node is DocumentFragment doc1) ? doc1.childNodes : (IEnumerable<Node>)new Node[0];
             /* 4) If node is a DocumentFragment node, remove its children with the suppress observers flag set. */
             if (node is DocumentFragment doc2)
             {
@@ -683,7 +685,7 @@ namespace CssUI.DOM.Nodes
                     _remove_node_from_parent(cn, doc2, true);
                 }
                 /* 5) If node is a DocumentFragment node, then queue a tree mutation record for node with « », nodes, null, and null. */
-                MutationRecord.Queue_Tree_Mutation_Record(node, new Node[] { }, nodes, null, null);
+                MutationRecord.Queue_Tree_Mutation_Record(node, new Node[0], nodes, null, null);
             }
             /* 6) Let previousSibling be child’s previous sibling or parent’s last child if child is null. */
             var previousSibling = ReferenceEquals(null, child) ? parent.lastChild : child.previousSibling;
@@ -735,7 +737,7 @@ namespace CssUI.DOM.Nodes
                         /* 1) If inclusiveDescendant is custom, then enqueue a custom element callback reaction with inclusiveDescendant, callback name "connectedCallback", and an empty argument list. */
                         CEReactions.Enqueue_Reaction(inclusiveDescendant as Element, EReactionName.Connected, new object[0]);
                         /* 2) Otherwise, try to upgrade inclusiveDescendant. */
-                        CEReactions.Upgrade_Element(inclusiveDescendant as Element);
+                        CEReactions.Try_Upgrade_Element(inclusiveDescendant as Element);
                     }
                 }
             }
@@ -743,16 +745,16 @@ namespace CssUI.DOM.Nodes
             /* 8) If suppress observers flag is unset, then queue a tree mutation record for parent with nodes, « », previousSibling, and child. */
             if (!suppress_observers)
             {
-                MutationRecord.Queue_Tree_Mutation_Record(parent, nodes, new Node[] { }, previousSibling, child);
+                MutationRecord.Queue_Tree_Mutation_Record(parent, nodes, new Node[0], previousSibling, child);
             }
         }
 
         /// <summary>
-        /// 
+        /// Replaces a specified node within a parent with a new one
         /// </summary>
-        /// <param name="node"></param>
-        /// <param name="parent"></param>
-        /// <param name="child"></param>
+        /// <param name="node">The new node being inserted</param>
+        /// <param name="parent">Parent node which the new node will be inserted into</param>
+        /// <param name="child">The child node to replace</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static Node _replace_node_within_parent(Node node, Node parent, Node child)
@@ -839,8 +841,8 @@ namespace CssUI.DOM.Nodes
         /// <summary>
         /// Removes all children within a parent element replacing them with the specified node.
         /// </summary>
-        /// <param name="node"></param>
-        /// <param name="parent"></param>
+        /// <param name="node">The node which will replace all others</param>
+        /// <param name="parent">The parent node whose children are being replaced</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static void _replace_all_within_node(Node node, Node parent)
         {/* Docs: https://dom.spec.whatwg.org/#concept-node-replace-all */
@@ -874,9 +876,9 @@ namespace CssUI.DOM.Nodes
         /// <summary>
         /// Ensures the given <paramref name="node"/>, <paramref name="parent"/>, and <paramref name="child"/> are valid types for insertion
         /// </summary>
-        /// <param name="node"></param>
-        /// <param name="parent"></param>
-        /// <param name="child"></param>
+        /// <param name="node">Node being inserted</param>
+        /// <param name="parent">Parent node which is being inserted into</param>
+        /// <param name="child">Child node being used as a reference point for insertion</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static void _ensure_pre_insertion_validity(Node node, Node parent, Node child)
         {/* Docs: https://dom.spec.whatwg.org/#concept-node-ensure-pre-insertion-validity */
@@ -934,9 +936,9 @@ namespace CssUI.DOM.Nodes
         /// Inserts a given <paramref name="node"/> into the given <paramref name="parent"/> before the given <paramref name="child"/>
         /// Validating the types of all parameters before executing the operation.
         /// </summary>
-        /// <param name="node"></param>
-        /// <param name="parent"></param>
-        /// <param name="child"></param>
+        /// <param name="node">Node being inserted</param>
+        /// <param name="parent">Parent node which is being inserted into</param>
+        /// <param name="child">Child node being used as a reference point for insertion</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static Node _pre_insert_node(Node node, Node parent, Node child)
         {/* Docs: https://dom.spec.whatwg.org/#concept-node-pre-insert */
@@ -953,8 +955,8 @@ namespace CssUI.DOM.Nodes
         /// <summary>
         /// Validates and then removes the given child from the given parent.
         /// </summary>
-        /// <param name="child"></param>
-        /// <param name="parent"></param>
+        /// <param name="child">Node to remove</param>
+        /// <param name="parent">Parent to remove node from</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static Node _pre_remove_node(Node child, Node parent)
@@ -969,8 +971,6 @@ namespace CssUI.DOM.Nodes
         /// <summary>
         /// Takes multiple nodes and merges them into one, returning the resulting node
         /// </summary>
-        /// <param name="nodes"></param>
-        /// <param name="document"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static Node _convert_nodes_into_node(Document document, params object[] nodes)
@@ -1008,8 +1008,9 @@ namespace CssUI.DOM.Nodes
         /// <summary>
         /// Whenever any node or element is cloned, this function is called internally such that derived classes may populate the newly cloned instance with any required data such that it would be a perfect copy
         /// </summary>
-        /// <param name="newNode"></param>
-        protected virtual void CopyTo(ref Node newNode) { }
+        /// <param name="newNode">The node to copy data too</param>
+        /// <param name="deep">Whether to also copy all child nodes</param>
+        protected virtual void CopyTo(ref Node newNode, bool deep = false) { }
         #endregion
 
     }
