@@ -7,12 +7,27 @@ namespace CssUI.DOM
     public class HTMLInputElement : HTMLElement, IFormAssociatedElement
     {
         #region Properties
-        /*[CEReactions] public string accept;
+        public bool bParserInserted { get; set; }
+
+        #endregion
+
+        #region Constructors
+        public HTMLInputElement(Document document) : base(document, "input")
+        {
+        }
+
+        public HTMLInputElement(Document document, string localName) : base(document, localName)
+        {
+        }
+        #endregion
+
+
+        [CEReactions] public string accept;
         [CEReactions] public string alt;
         [CEReactions] public string autocomplete;
         [CEReactions] public bool autofocus;
         [CEReactions] public bool defaultChecked;
-        public bool checked;
+        public bool Checked;
         [CEReactions] public string dirName;
         [CEReactions] public bool disabled;
         public HTMLFormElement form { get; private set; }
@@ -38,8 +53,9 @@ namespace CssUI.DOM
         [CEReactions] public uint size;
         [CEReactions] public string src;
         [CEReactions] public string step;
-        */
-        [CEReactions] public EInputType type
+
+        [CEReactions]
+        public EInputType type
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#dom-input-type */
             get => getAttribute(EAttributeName.Type).Get_Enum<EInputType>();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Type, AttributeValue.From_Enum(value)));
@@ -72,16 +88,5 @@ namespace CssUI.DOM
         void setRangeText(string replacement, uint start, uint end, SelectionMode selectionMode = "preserve");
         void setSelectionRange(uint start, uint end, string direction);
         */
-        #endregion
-
-        #region Constructors
-        public HTMLInputElement(Document document) : base(document, "input")
-        {
-        }
-
-        public HTMLInputElement(Document document, string localName) : base(document, localName)
-        {
-        }
-        #endregion
     }
 }

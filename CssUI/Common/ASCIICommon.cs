@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using static CssUI.UnicodeCommon;
 
 namespace CssUI
@@ -145,7 +147,7 @@ namespace CssUI
         }
         #endregion
 
-        #region String Transformation
+        #region String Checks
 
         /// <summary>
         /// True if string contains ASCII alpha lowercase characters
@@ -177,6 +179,60 @@ namespace CssUI
             }
 
             return false;
+        }
+
+        #endregion
+
+        #region String Transformation
+
+        public static string Strip_And_Collapse_Whitespace(ReadOnlyMemory<char> buffMem)
+        {/* Docs: https://infra.spec.whatwg.org/#strip-and-collapse-ascii-whitespace */
+            ReadOnlySpan<char> buff = buffMem.Span;
+            /* Create a list of memory chunks that make up the final string */
+            int newLength = 0;
+            int chunkStart = -1;
+            int chunkCount = 0;
+            var chunks = new LinkedList<ReadOnlyMemory<char>>();
+
+            for (int i=0; i<buff.Length; i++)
+            {
+                if (Is_Ascii_Whitespace(buff[i]))
+                {
+                    if (chunkStart > -1)
+                    {/* This whitespace marks the end of a chunk, push it to our list */
+                        int chunkLen = i - chunkStart;
+                        chunks.AddLast(buffMem.Slice(chunkStart, chunkLen));
+
+                        chunkCount++;
+                        chunkStart = -1;
+                        newLength += chunkLen;
+                    }
+                }
+                else if (chunkStart == -1)
+                {// this is the first char of a new segment
+                    chunkStart = i;
+                }
+            }
+
+            /* Compile the new string */
+            int whiteSpaceCount = (chunkCount - 1);/* Number of whitespace chars we will insert into new string */
+            newLength += whiteSpaceCount;
+            char[] dataPtr = new char[newLength];
+            Memory<char> data = new Memory<char>(dataPtr);
+            string newStr = new string(dataPtr);
+
+            int index = 0;
+            foreach (var chunk in chunks)
+            {
+                /* Copy substring */
+                chunk.CopyTo( data.Slice(index) );
+                index += chunk.Length;
+                /* Insert whitespace */
+                data.Span[index] = CHAR_SPACE;
+                index++;
+            }
+
+            return newStr;
         }
         #endregion
     }

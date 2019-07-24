@@ -5,6 +5,9 @@ namespace CssUI.DOM
     public class HTMLFormElement : HTMLElement
     {/* Docs: https://html.spec.whatwg.org/multipage/forms.html#htmlformelement */
         #region Properties
+        public bool bConstructingEntryList { get; internal set; } = false;
+        public bool bFiringSubmissionEvents { get; internal set; } = false;
+
         /*[CEReactions] public string acceptCharset;
         [CEReactions] public string action;
         [CEReactions] public string autocomplete;

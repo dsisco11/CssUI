@@ -37,6 +37,10 @@ namespace CssUI.DOM
         Translate,
         [DomKeyword("nonce")]
         Nonce,
+        [DomKeyword("text")]
+        Text,
+        [DomKeyword("label")]
+        Label,
 
 
         [DomKeyword("accesskey")]
@@ -109,5 +113,14 @@ namespace CssUI.DOM
         InputMode,
         [DomKeyword("enterkeyhint")]
         EnterKeyHint,
+
+        /* FORMS */
+
+        [DomKeyword("form")]
+        Form,
+        [DomKeyword("value")]
+        Value,
+        [DomKeyword("selected")]
+        Selected,
     }
 }

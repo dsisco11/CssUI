@@ -4,15 +4,15 @@ using CssUI.DOM.Nodes;
 namespace CssUI.DOM
 {
     /// <summary>
-    /// Accepts only nodes that implement <see cref="ISlottable"/>
+    /// Accepts only nodes that are <see cref="HTMLFormElement"/>
     /// </summary>
-    public class FilterSlotable : NodeFilter
+    public class FilterForms : NodeFilter
     {
-        public static NodeFilter Instance = new FilterSlotable();
+        public static NodeFilter Instance = new FilterForms();
 
         public override ENodeFilterResult acceptNode(Node node)
         {
-            if (node is ISlottable)
+            if (node is HTMLFormElement)
                 return ENodeFilterResult.FILTER_ACCEPT;
 
             return ENodeFilterResult.FILTER_SKIP;

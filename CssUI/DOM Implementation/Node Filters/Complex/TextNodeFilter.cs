@@ -8,7 +8,7 @@ namespace CssUI.DOM
     /// </summary>
     public class TextNodeFilter : NodeFilter
     {
-        public static TextNodeFilter Instance = new TextNodeFilter();
+        public static NodeFilter Instance = new TextNodeFilter();
 
         public override ENodeFilterResult acceptNode(Node node)
         {

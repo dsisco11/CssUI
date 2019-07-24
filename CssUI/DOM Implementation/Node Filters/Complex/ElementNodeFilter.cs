@@ -4,11 +4,11 @@ using CssUI.DOM.Nodes;
 namespace CssUI.DOM
 {
     /// <summary>
-    /// Rejects any node that isnt an instance of <see cref="Text"/>
+    /// Rejects any node that isnt an instance of <see cref="Element"/>
     /// </summary>
     public class ElementNodeFilter : NodeFilter
     {
-        public static ElementNodeFilter Instance = new ElementNodeFilter();
+        public static NodeFilter Instance = new ElementNodeFilter();
 
         public override ENodeFilterResult acceptNode(Node node)
         {

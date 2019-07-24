@@ -479,15 +479,34 @@ namespace CssUI.DOM
             {
                 /* 
                  * If any of the following is true:
-                 *      The field element has a datalist element ancestor.
                  *      The field element is disabled.
                  *      The field element is a button but it is not submitter.
                  *      The field element is an input element whose type attribute is in the Checkbox state and whose checkedness is false.
                  *      The field element is an input element whose type attribute is in the Radio Button state and whose checkedness is false.
                  *      The field element is an object element that is not using a plugin.
+                 *      The field element has a datalist element ancestor.
                  *  Then continue.
                  */
                 if ((field as HTMLElement).disabled)
+                {
+                    continue;
+                }
+                else if (field is HTMLButtonElement && !ReferenceEquals(field, submitter))
+                {
+                    continue;
+                }
+                else if (field is HTMLInputElement inputElement)
+                {
+                    if (inputElement.type == EInputType.Checkbox && !inputElement.Checked)
+                    {
+                        continue;
+                    }
+                    else if (inputElement.type == EInputType.Radio && !inputElement.Checked)
+                    {
+                        continue;
+                    }
+                }
+                else if (field is HTMLObjectElement objectElement && ReferenceEquals(null, objectElement.plugin))
                 {
                     continue;
                 }
@@ -495,11 +514,14 @@ namespace CssUI.DOM
                 {
                     continue;
                 }
-                else if ()
-                {
-                }
 
+                /* 2) If the field element is an input element whose type attribute is in the Image Button state, then: */
+                if (field is HTMLInputElement inputElement1 && inputElement1.type == EInputType.Image)
+                {
+                    /* XXX: implement this */
+                }
             }
+
         }
         #endregion
 

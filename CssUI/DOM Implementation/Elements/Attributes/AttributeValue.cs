@@ -1,4 +1,5 @@
 ﻿using CssUI.DOM.Enums;
+using System;
 
 namespace CssUI.DOM
 {
@@ -238,6 +239,51 @@ namespace CssUI.DOM
         }
 
 
+        #endregion
+
+        #region Equality
+        public override bool Equals(object obj)
+        {
+            if (!(obj is AttributeValue other))
+                return false;
+
+            if (Type == other.Type)
+            {
+                switch(Type)
+                {
+                    case EAttributeType.Boolean:
+                        {
+                            return true;
+                        }
+                    case EAttributeType.Integer:
+                        {
+                            return (int)Value == (int)other.Value;
+                        }
+                    case EAttributeType.NonNegative_Integer:
+                        {
+                            return (uint)Value == (uint)other.Value;
+                        }
+                    case EAttributeType.Enumerated:
+                        {
+                            return (long)Value == (long)other.Value;
+                        }
+                    case EAttributeType.NonZero_Length:
+                    case EAttributeType.NonZero_Percentage:
+                    case EAttributeType.FloatingPoint:
+                        {
+                            return MathExt.floatEq((double)Value, (double)other.Value);
+                        }
+                    default:
+                        {
+                            return StringExt.streq(Data.AsSpan(), other.Data.AsSpan());
+                        }
+                }
+            }
+            else
+            {/* Its possible these values are compatible but have different types */
+                return StringExt.streq(Data.AsSpan(), other.Data.AsSpan());
+            }
+        }
         #endregion
 
     }
