@@ -16,18 +16,12 @@ namespace CssUI
         private ReadOnlySpan<ItemType> Stream => Data.Span;
 
         /// <summary>
-        /// The current position at which tokens will be read from the stream
+        /// The current position at which data will be read from the stream
         /// </summary>
-        private int ReadPos = 0;
+        public int Position { get; private set; } = 0;
 
         public readonly ItemType EOF_ITEM = default(ItemType);
         #endregion
-
-        #region Accessors
-        public int Position => ReadPos;
-        public int Length => Data.Length;
-        #endregion
-
 
         #region Constructors
         public DataStream(ReadOnlyMemory<ItemType> Data, ItemType EOF_ITEM)
@@ -35,21 +29,33 @@ namespace CssUI
             this.Data = Data;
             this.EOF_ITEM = EOF_ITEM;
         }
+
+        public DataStream(ItemType[] Items, ItemType EOF_ITEM)
+        {
+            this.Data = new ReadOnlyMemory<ItemType>(Items);
+            this.EOF_ITEM = EOF_ITEM;
+        }
         #endregion
 
         #region Accessors
+        public int Length => Data.Length;
         /// <summary>
         /// Returns the next item to be consumed, equivalent to calling Peek(0)
         /// </summary>
-        public ItemType Next { get { return Peek(0); } }
+        public ItemType Next => Peek(0);
         /// <summary>
         /// Returns the next item to be consumed, equivalent to calling Peek(1)
         /// </summary>
-        public ItemType NextNext { get { return Peek(1); } }
+        public ItemType NextNext => Peek(1);
         /// <summary>
         /// Returns the next item to be consumed, equivalent to calling Peek(2)
         /// </summary>
-        public ItemType NextNextNext { get { return Peek(2); } }
+        public ItemType NextNextNext => Peek(2);
+        #endregion
+
+        #region Data
+        public ReadOnlyMemory<ItemType> AsMemory() => Data;
+        public ReadOnlySpan<ItemType> AsSpan() => Data.Span;
         #endregion
 
         #region Stream Management
@@ -60,7 +66,7 @@ namespace CssUI
         /// <returns></returns>
         public ItemType Peek(int Offset = 0)
         {
-            int i = (ReadPos + Offset);
+            int i = (Position + Offset);
 
             if (i < 0)
             {
@@ -80,11 +86,11 @@ namespace CssUI
         /// </summary>
         public ItemType Consume()
         {
-            int EndPos = (ReadPos + 1);
-            if (ReadPos >= Stream.Length) return EOF_ITEM;
+            int EndPos = (Position + 1);
+            if (Position >= Stream.Length) return EOF_ITEM;
 
-            ItemType retVal = Stream[ReadPos];
-            ReadPos += 1;
+            ItemType retVal = Stream[Position];
+            Position += 1;
 
             return retVal;
         }
@@ -94,11 +100,11 @@ namespace CssUI
         /// </summary>
         public CastType Consume<CastType>() where CastType : ItemType
         {
-            int EndPos = (ReadPos + 1);
-            if (ReadPos >= Stream.Length) return default(CastType);
+            int EndPos = (Position + 1);
+            if (Position >= Stream.Length) return default(CastType);
 
-            ItemType retVal = Stream[ReadPos];
-            ReadPos += 1;
+            ItemType retVal = Stream[Position];
+            Position += 1;
 
             return (CastType)retVal;
         }
@@ -109,15 +115,15 @@ namespace CssUI
         /// <param name="Count">Number of characters to consume</param>
         public ReadOnlySpan<ItemType> Consume(int Count = 1)
         {
-            int startIndex = ReadPos;
-            int endIndex = (ReadPos + Count);
+            int startIndex = Position;
+            int endIndex = (Position + Count);
 
             if (endIndex >= Stream.Length)
             {
                 endIndex = (Stream.Length - 1);
             }
 
-            ReadPos = endIndex;
+            Position = endIndex;
             return Stream.Slice(startIndex, Count);
         }
 
@@ -128,7 +134,7 @@ namespace CssUI
         /// <returns></returns>
         public void Consume_While(Func<ItemType, bool> Predicate)
         {
-            int startIndex = ReadPos;
+            int startIndex = Position;
 
             while (Predicate(Next))
             {
@@ -143,14 +149,14 @@ namespace CssUI
         /// <returns></returns>
         public void Consume_While(Func<ItemType, bool> Predicate, out ReadOnlySpan<ItemType> outConsumed)
         {
-            int startIndex = ReadPos;
+            int startIndex = Position;
 
             while (Predicate(Next))
             {
                 Consume();
             }
 
-            int count = ReadPos - startIndex;
+            int count = Position - startIndex;
             outConsumed = Stream.Slice(startIndex, count);
         }
 
@@ -161,14 +167,14 @@ namespace CssUI
         /// <returns></returns>
         public DataStream<ItemType> Substream(Func<ItemType, bool> Predicate)
         {
-            int startIndex = ReadPos;
+            int startIndex = Position;
 
             while (Predicate(Next))
             {
                 Consume();
             }
 
-            int count = ReadPos - startIndex;
+            int count = Position - startIndex;
             var consumed = Data.Slice(startIndex, count);
 
             return new DataStream<ItemType>(consumed, this.EOF_ITEM);
@@ -180,8 +186,8 @@ namespace CssUI
         /// <param name="Count"></param>
         public void Reconsume(int Count = 1)
         {/* Docs: https://www.w3.org/TR/css-syntax-3/#reconsume-the-current-input-code-point */
-            ReadPos -= Count;
-            if (ReadPos < 0) ReadPos = 0;
+            Position -= Count;
+            if (Position < 0) Position = 0;
         }
 
         #endregion

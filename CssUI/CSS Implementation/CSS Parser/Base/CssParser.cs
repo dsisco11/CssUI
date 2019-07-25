@@ -547,7 +547,7 @@ namespace CssUI.CSS.Serialization
         #region Media
         public MediaQueryList Parse_Media_Query_List(Document document)
         {/* Docs: https://www.w3.org/TR/mediaqueries-4/#mq-syntax */
-            Consume_All_Whitespace(this.Stream);
+            Consume_All_Whitespace(Stream);
 
             /* 
              * To parse a <media-query-list> production, 
@@ -555,11 +555,11 @@ namespace CssUI.CSS.Serialization
              * then parse each entry in the returned list as a <media-query>. 
              * Its value is the list of <media-query>s so produced. 
              */
-            var cvls = Consume_Comma_Seperated_Component_Value_List(this.Stream);
+            var cvls = Consume_Comma_Seperated_Component_Value_List(Stream);
             LinkedList<MediaQuery> queryList = new LinkedList<MediaQuery>();
             foreach (LinkedList<CssToken> tokenList in cvls)
             {
-                TokenStream tokenStream = new TokenStream(tokenList);
+                TokenStream tokenStream = new TokenStream(tokenList.ToArray());
                 var query = Consume_MediaQuery(tokenStream);
                 queryList.AddLast(query);
             }
@@ -646,29 +646,38 @@ namespace CssUI.CSS.Serialization
             if (Stream == null) throw new CssParserException("Stream is NULL!");
 
             Consume_All_Whitespace(Stream);
-            if (ParserCommon.Starts_Media_Feature(Stream.Next, Stream.NextNext, Stream.NextNextNext))
+            if (ParserCommon.Starts_Media_Feature(Stream.AsSpan()))
             {
-                return Consume_Media_Feature(Stream);
+                /* Consume opening parentheses */
+                Stream.Consume();
+                var feature = Consume_Media_Feature(Stream);
+
+                /* Consume closing parentheses */
+                if (Stream.Next.Type == ECssTokenType.Parenth_Close)
+                {
+                    Stream.Consume();
+                }
+
+                return feature;
             }
-            else if (ParserCommon.Starts_Media_Condition(Stream.Next, Stream.NextNext, Stream.NextNextNext))
+            else if (ParserCommon.Starts_Media_Condition(Stream.AsSpan()))
             {
                 EMediaCombinator Combinator = EMediaCombinator.None;
                 var conditionList = new LinkedList<IMediaCondition>();
 
-                Consume_All_Whitespace(Stream);
 
                 if (Stream.Next.Type == ECssTokenType.Parenth_Close)
                 {
                     /* Empty media condition block */
                     Stream.Consume();
-                    return null;
-                    //return new MediaCondition(EMediaCombinator.None, new MediaFeature[0]);
+                    return new MediaCondition(EMediaCombinator.None, new MediaFeature[0]);
                 }
                 else if (Stream.Next.Type == ECssTokenType.Parenth_Open)
                 {
                     Stream.Consume();
                 }
 
+                Consume_All_Whitespace(Stream);
                 /* Repeatedly consume sub-media-conditions until we hit a closing parentheses */
                 do
                 {
@@ -685,11 +694,11 @@ namespace CssUI.CSS.Serialization
                     {
                         if (!ParserCommon.Is_Combinator(Stream.Next))
                         {
-                            throw new CssSyntaxErrorException($"Expected combinator @: {ParserCommon.Get_Location(Stream)}");
+                            throw new CssSyntaxErrorException($"Expected combinator @: {ParserCommon.Get_Location(Stream.AsSpan())}");
                         }
                     }
 
-                    /* Otherwise we just CAN have a combinator */
+                    /* Otherwise we just COULD have a combinator */
                     if (ParserCommon.Is_Combinator(Stream.Next))
                     {
                         /* Consume combinator */
@@ -720,6 +729,12 @@ namespace CssUI.CSS.Serialization
                 }
                 while (Stream.Next.Type != ECssTokenType.EOF);
 
+                /* Consume closing parentheses */
+                if (Stream.Next.Type == ECssTokenType.Parenth_Close)
+                {
+                    Stream.Consume();
+                }
+
                 return new MediaCondition(Combinator, conditionList);
             }
 
@@ -730,28 +745,28 @@ namespace CssUI.CSS.Serialization
         {/* Docs: https://drafts.csswg.org/mediaqueries-4/#mq-syntax */
             if (Stream == null) throw new CssParserException("Stream is NULL!");
 
-            EMediaFeatureName Name = 0x0;
+            
             /* Consume feature name */
-            if (ParserCommon.Starts_Boolean_Feature(Stream.Next, Stream.NextNext, Stream.NextNextNext))
+            if (ParserCommon.Starts_Boolean_Feature(Stream.AsSpan()))
             {
                 /* Consume feature name */
                 IdentToken nameTok = Stream.Consume() as IdentToken;
 
                 /* Resolve the name */
-                if (!CssLookup.TryEnum(nameTok.Value, out Name))
+                if (!CssLookup.TryEnum(nameTok.Value, out EMediaFeatureName Name))
                 {
                     throw new CssParserException($"Unrecognized media type: \"{nameTok.Value}\"");
                 }
 
                 return new MediaFeature(Name);
             }
-            else if (ParserCommon.Starts_Discreet_Feature(Stream.Next, Stream.NextNext, Stream.NextNextNext))
+            else if (ParserCommon.Starts_Discreet_Feature(Stream.AsSpan()))
             {
                 /* Consume feature name */
                 IdentToken nameTok = Stream.Consume() as IdentToken;
 
                 /* Resolve the name */
-                if (!CssLookup.TryEnum(nameTok.Value, out Name))
+                if (!CssLookup.TryEnum(nameTok.Value, out EMediaFeatureName Name))
                 {
                     throw new CssParserException($"Unrecognized media type: \"{nameTok.Value}\"");
                 }
@@ -762,58 +777,76 @@ namespace CssUI.CSS.Serialization
 
                 return new MediaFeature(new CssValue[] { CssValue.From_Enum(Name), value }, new EMediaOperator[] { EMediaOperator.EqualTo });
             }
-
-            /* This is a range feature of some sort, it could be a short one or a long one */
-            /* Repeatedly consume CssValues, operator, and a single ident */
-            LinkedList<CssValue> Values = new LinkedList<CssValue>();
-            LinkedList<EMediaOperator> Ops = new LinkedList<EMediaOperator>();
-
-            while (Stream.Next != CssToken.EOF)
+            else if (ParserCommon.Starts_Range_Feature(Stream.AsSpan()))
             {
+                /* This is a range feature of some sort, it could be a short one or a long one */
+                /* Repeatedly consume CssValues, operator, and a single ident */
+                LinkedList<CssValue> Values = new LinkedList<CssValue>();
+                LinkedList<EMediaOperator> Ops = new LinkedList<EMediaOperator>();
+                bool firstToken = true;
+                bool lastWasComparator = false;
 
-                if (Stream.Next.Type == ECssTokenType.Ident)
+                while (Stream.Next != CssToken.EOF)
                 {
-                    IdentToken nameTok = Stream.Consume() as IdentToken;
-                    /* Resolve the name */
-                    if (!CssLookup.TryEnum(nameTok.Value, out Name))
+                    Consume_All_Whitespace(Stream);
+
+                    if (Stream.Next.Type == ECssTokenType.Parenth_Close)
                     {
-                        throw new CssParserException($"Unrecognized media type: \"{nameTok.Value}\"");
+                        break;
+                    }
+                    else if (Stream.Next.Type == ECssTokenType.Ident)
+                    {
+                        if (!firstToken && !lastWasComparator)
+                        {
+                            throw new CssSyntaxErrorException($"Expected comparator @: \"{ParserCommon.Get_Location(Stream.AsSpan())}\"");
+                        }
+
+                        var nameTok = (IdentToken)Stream.Consume();
+                        /* Resolve the name */
+                        if (!CssLookup.TryEnum(nameTok.Value, out EMediaFeatureName Name))
+                        {
+                            throw new CssParserException($"Unrecognized media type: \"{nameTok.Value}\"");
+                        }
+
+                        var value = CssValue.From_Enum(Name);
+                        Values.AddLast(value);
+                        lastWasComparator = false;
+                    }
+                    else if (ParserCommon.Starts_MF_Ident_Or_Value(Stream.AsSpan()))
+                    {
+                        if (!firstToken && !lastWasComparator)
+                        {
+                            throw new CssSyntaxErrorException($"Expected comparator @: \"{ParserCommon.Get_Location(Stream.AsSpan())}\"");
+                        }
+
+                        CssValue value = Consume_MediaFeature_Value(Stream);
+                        Values.AddLast(value);
+                        lastWasComparator = false;
+                    }
+                    else if (ParserCommon.Is_Comparator(Stream.Next))
+                    {
+                        if (lastWasComparator || firstToken)
+                        {
+                            throw new CssSyntaxErrorException($"Unexpected comparator @: \"{ParserCommon.Get_Location(Stream.AsSpan())}\"");
+                        }
+
+                        var comparatorTok = (ValuedTokenBase)Stream.Consume();
+                        if (!CssLookup.TryEnum(comparatorTok.Value, out EMediaOperator outComparator))
+                        {
+                            throw new CssParserException($"Unable to interpret keyword \"{comparatorTok.Value}\" as enum value");
+                        }
+
+                        Ops.AddLast(outComparator);
+                        lastWasComparator = true;
                     }
 
-                    var value = CssValue.From_Enum(Name);
-                    Values.AddLast(value);
-                }
-            }
-
-            //if (Stream.Next.Type != ECssTokenType.Ident) throw new CssSyntaxErrorException($"Expected Ident-token, but got \"{Enum.GetName(typeof(ECssTokenType), Stream.Next.Type)}\"");
-            Consume_All_Whitespace(Stream);
-
-
-            /* This must be a range */
-            var comparatorTok = (Stream.Consume() as ValuedTokenBase);
-            string comparatorString = comparatorTok.Value.ToString();
-            char[] compBuf = comparatorString.ToCharArray();
-            EMediaOperator comparator = 0x0;
-            for(int i=0;i<comparatorString.Length; i++)
-            {
-                if (!CssLookup.TryEnum(compBuf[i].ToString(), out EMediaOperator lookup))
-                {
-                    throw new CssParserException($"Unable to interpret keyword \"{comparatorString}\" as enum value");
+                    firstToken = false;
                 }
 
-                comparator |= lookup;
+                return new MediaFeature(Values.ToArray(), Ops.ToArray());
             }
 
-            Consume_All_Whitespace(Stream);
-            /* Safety check if the next toke is the 'and' keyword */
-            if (Stream.Next.Type == ECssTokenType.Ident && (Stream.Next as IdentToken).Value.Equals("and"))
-            {
-                throw new CssSyntaxErrorException($"A value is expected after the comparator \'{comparatorTok.Value}\' within a Media rule");
-            }
-
-            CssValue rangeValue = Consume_CssValue(Stream);
-
-            return new MediaFeature(Name, comparator, rangeValue);
+            return null;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -830,7 +863,7 @@ namespace CssUI.CSS.Serialization
                         var numTok = Stream.Consume() as NumberToken;
                         /* This could be a ratio - so check if it is */
                         /* A ratio is a <number> <?whitespace> / <?whitespace> <number> */
-                        if (ParserCommon.Starts_Ratio_Value(Stream.Next, Stream.NextNext))
+                        if (ParserCommon.Starts_Ratio_Value(Stream.AsSpan()))
                         {
                             Consume_All_Whitespace(Stream);
                             DelimToken dtok = Stream.Consume() as DelimToken;
