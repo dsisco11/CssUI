@@ -29,7 +29,7 @@ namespace CssUI.CSS.Media
             Context = EMediaFeatureContext.Boolean;
 
             MediaDefinition def = CssLookup.Lookup_Def(Name);
-            if (!ReferenceEquals(null, def))
+            if (def != null)
             {
                 IsValid = true;
                 /* if an allowed type is keywords and 'none' is an option then we match it against that keyword */

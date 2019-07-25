@@ -25,7 +25,7 @@ namespace CssUI.DOM
             Attr attr = element.getAttributeNode(Name);
 
             /* Skip elements which do not have this attribute */
-            if (ReferenceEquals(null, attr))
+            if (attr == null)
                 return ENodeFilterResult.FILTER_SKIP;
 
             AttributeValue attrValue = attr.Value;

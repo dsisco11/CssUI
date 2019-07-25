@@ -153,10 +153,10 @@ namespace CssUI
                          * The exception is when 'ex' occurs in the value of the 'font-size' property, 
                          * in which case it refers to the 'ex' of the parent element.
                          */
-                        if (Property.CssName == "font-size" && Property.Owner == Owner)
+                        if (Property.CssName.Equals("font-size") && Property.Owner == Owner)
                         {// We are being called from the font-size property
 
-                            if (!ReferenceEquals(null, Owner.parentElement))
+                            if (Owner.parentElement != null)
                             {// Basically just try and inherit our parents unit scale
                                 return Get_Font_Unit_Scale(Owner.parentElement, Property, Unit);
                             }

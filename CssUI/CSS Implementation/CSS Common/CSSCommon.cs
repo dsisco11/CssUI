@@ -210,7 +210,7 @@ namespace CssUI.CSS.Internal
         public static bool Is_Containing_Block_Ancestor_Of(Element A, Element B)
         {/* Docs: https://www.w3.org/TR/CSS22/visudet.html#containing-block-details */
             /* Root elements */
-            if (ReferenceEquals(null, A.parentElement))
+            if (A.parentElement == null)
             {
                 return true;
             }
@@ -228,11 +228,11 @@ namespace CssUI.CSS.Internal
 
                         DOM.TreeWalker tree = new DOM.TreeWalker(A, DOM.Enums.ENodeFilterMask.SHOW_ELEMENT);
                         DOM.Nodes.Node node = tree.parentNode();
-                        while (!ReferenceEquals(null, node))
+                        while (node != null)
                         {
                             if (node is DOM.Element element)
                             {
-                                if (element.Box.OuterDisplayType == EOuterDisplayType.Block || !ReferenceEquals(null, element.Box.FormattingContext))
+                                if (element.Box.OuterDisplayType == EOuterDisplayType.Block || element.Box.FormattingContext != null)
                                 {
                                     return DOMCommon.Is_Ancestor(element, B);
                                 }
@@ -259,7 +259,7 @@ namespace CssUI.CSS.Internal
 
                         DOM.TreeWalker tree = new DOM.TreeWalker(A, DOM.Enums.ENodeFilterMask.SHOW_ELEMENT);
                         DOM.Nodes.Node node = tree.parentNode();
-                        while (!ReferenceEquals(null, node))
+                        while (node != null)
                         {
                             if (node is DOM.Element ancestor)
                             {
@@ -289,7 +289,7 @@ namespace CssUI.CSS.Internal
         public static DOMRect Find_Containing_Block(Element Target)
         {/* Docs: https://www.w3.org/TR/CSS22/visudet.html#containing-block-details */
             /* Root elements */
-            if (ReferenceEquals(null, Target.parentElement))
+            if (Target.parentElement == null)
             {
                 return Target.ownerDocument.Viewport?.getBoundingClientRect();
             }
@@ -305,11 +305,11 @@ namespace CssUI.CSS.Internal
                          */
                         DOM.TreeWalker tree = new DOM.TreeWalker(Target, DOM.Enums.ENodeFilterMask.SHOW_ELEMENT);
                         DOM.Nodes.Node node = tree.parentNode();
-                        while (!ReferenceEquals(null, node))
+                        while (node != null)
                         {
                             if (node is DOM.Element element)
                             {
-                                if (element.Box.OuterDisplayType == EOuterDisplayType.Block || !ReferenceEquals(null, element.Box.FormattingContext))
+                                if (element.Box.OuterDisplayType == EOuterDisplayType.Block || element.Box.FormattingContext != null)
                                 {
                                     return element.Box.Content.Get_Bounds();
                                 }
@@ -334,7 +334,7 @@ namespace CssUI.CSS.Internal
                          */
                         DOM.TreeWalker tree = new DOM.TreeWalker(Target, DOM.Enums.ENodeFilterMask.SHOW_ELEMENT);
                         DOM.Nodes.Node node = tree.parentNode();
-                        while (!ReferenceEquals(null, node))
+                        while (node != null)
                         {
                             if (node is DOM.Element ancestor)
                             {
@@ -347,7 +347,7 @@ namespace CssUI.CSS.Internal
 
                                         // find our first inline-level element and its padding-edges
                                         child = ancestor.firstElementChild;
-                                        while (!ReferenceEquals(null, child))
+                                        while (child != null)
                                         {
                                             if (child.Box.OuterDisplayType == EOuterDisplayType.Inline)
                                             {
@@ -361,7 +361,7 @@ namespace CssUI.CSS.Internal
 
                                         // find our last inline-level element and its padding-edges
                                         child = ancestor.lastElementChild;
-                                        while (!ReferenceEquals(null, child))
+                                        while (child != null)
                                         {
                                             if (child.Box.OuterDisplayType == EOuterDisplayType.Inline)
                                             {

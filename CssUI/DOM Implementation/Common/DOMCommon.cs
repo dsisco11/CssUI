@@ -230,7 +230,7 @@ namespace CssUI.DOM
             /* 1) Let s be the result of parse a selector from selectors. [SELECTORS4] */
             var Selector = new CssSelector(selector);
             /* 2) If s is failure, throw a "SyntaxError" DOMException. */
-            if (ReferenceEquals(null, Selector))
+            if (Selector == null)
             {
                 throw new DomSyntaxError("Could not parse selector.");
             }
@@ -264,13 +264,13 @@ namespace CssUI.DOM
         #endregion
 
         #region Slottables
-        internal static ISlot Sind_Slot(ISlottable slottable, bool open_flag = false)
+        internal static ISlot Find_Slot(ISlottable slottable, bool open_flag = false)
         {/* Docs: https://dom.spec.whatwg.org/#find-a-slot */
-            if (ReferenceEquals(null, slottable.parentNode))
+            if (slottable.parentNode == null)
                 return null;
 
             var shadow = slottable.parentNode.getRootNode() as ShadowRoot;
-            if (ReferenceEquals(null, shadow))
+            if (shadow == null)
                 return null;
 
             if (open_flag && shadow.Mode != EShadowRootMode.Open)
@@ -279,7 +279,7 @@ namespace CssUI.DOM
             /* 5) Return the first slot in tree order in shadow’s descendants whose name is slotable’s name, if any, and null otherwise. */
             var tree = new TreeWalker(shadow, ENodeFilterMask.SHOW_ALL);
             var node = tree.nextNode();
-            while (!ReferenceEquals(null, node))
+            while (node != null)
             {
                 if (node is HTMLSlotElement slot)
                 {
@@ -308,7 +308,7 @@ namespace CssUI.DOM
                 if (node is ISlottable)
                 {
                     ISlottable slotable = node as ISlottable;
-                    var foundSlot = DOMCommon.Sind_Slot(slotable);
+                    var foundSlot = DOMCommon.Find_Slot(slotable);
                     if (ReferenceEquals(foundSlot, slot))
                         result.Add(slotable);
                 }
@@ -406,8 +406,8 @@ namespace CssUI.DOM
         /// <param name="slotable"></param>
         internal static void Assign_A_Slot(ISlottable slotable)
         {/* Docs: https://dom.spec.whatwg.org/#assign-a-slot */
-            var slot = DOMCommon.Sind_Slot(slotable);
-            if (!ReferenceEquals(null, slot))
+            var slot = DOMCommon.Find_Slot(slotable);
+            if (slot != null)
                 DOMCommon.Assign_Slottables(slot);
         }
         #endregion
@@ -427,7 +427,7 @@ namespace CssUI.DOM
                 *      element is not listed or its form content attribute is not present
                 *      element's form owner is its nearest form element ancestor after the change to the ancestor chain
                 * then do nothing, and return. */
-            if (!ReferenceEquals(null, formElement.form))
+            if (formElement.form != null)
             {
                 if (!Is_Listed_Element(element) || !element.hasAttribute(EAttributeName.Form))
                 {
@@ -448,7 +448,7 @@ namespace CssUI.DOM
                 /* 1) If the first element in element's tree, in tree order, to have an ID that is case-sensitively equal to element's form content attribute's value, is a form element, then associate the element with that form element. */
                 var idValue = element.getAttribute(EAttributeName.Form).Get_String();
                 Element searchResult = (Element)Get_Nth_Ancestor(element, 1, new FilterAttribute(EAttributeName.ID, AttributeValue.From_String(idValue)), ENodeFilterMask.SHOW_ELEMENT);
-                if (!ReferenceEquals(null, searchResult) && searchResult is HTMLFormElement form)
+                if (searchResult != null && searchResult is HTMLFormElement form)
                 {
                     formElement.form = form;
                 }
@@ -457,7 +457,7 @@ namespace CssUI.DOM
             else
             {
                 var nearestForm = Get_Nth_Ancestor(element, 1, FilterForms.Instance, ENodeFilterMask.SHOW_ELEMENT);
-                if (!ReferenceEquals(null, nearestForm))
+                if (nearestForm != null)
                 {
                     formElement.form = (HTMLFormElement)nearestForm;
                 }
@@ -506,11 +506,11 @@ namespace CssUI.DOM
                         continue;
                     }
                 }
-                else if (field is HTMLObjectElement objectElement && ReferenceEquals(null, objectElement.plugin))
+                else if (field is HTMLObjectElement objectElement && objectElement.plugin == null)
                 {
                     continue;
                 }
-                else if (!ReferenceEquals(null, Get_Nth_Ancestor(field, 1, new FilterElementType(typeof(HTMLDataListElement)), ENodeFilterMask.SHOW_ELEMENT)))
+                else if (null != Get_Nth_Ancestor(field, 1, new FilterElementType(typeof(HTMLDataListElement)), ENodeFilterMask.SHOW_ELEMENT))
                 {
                     continue;
                 }
@@ -622,7 +622,7 @@ namespace CssUI.DOM
             var root = B.getRootNode();
             if (root is DocumentFragment doc)
             {
-                if (!ReferenceEquals(null, doc.Host))
+                if (doc.Host != null)
                 {
                     return Is_Host_Including_Inclusive_Ancestor(A, doc.Host);
                 }
@@ -754,7 +754,7 @@ namespace CssUI.DOM
             LinkedList<Node> list = new LinkedList<Node>();
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
             Node current = tree.parentNode();
-            while (!ReferenceEquals(null, current))
+            while (current != null)
             {
                 list.AddLast(current);
                 current = tree.parentNode();
@@ -779,7 +779,7 @@ namespace CssUI.DOM
 
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
             Node current = tree.parentNode();
-            while (!ReferenceEquals(null, current))
+            while (current != null)
             {
                 N--;
                 if (N == 0)
@@ -805,7 +805,7 @@ namespace CssUI.DOM
             list.AddLast(node);
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
             Node current = tree.parentNode();
-            while (!ReferenceEquals(null, current))
+            while (current != null)
             {
                 list.AddLast(current);
                 current = tree.parentNode();
@@ -825,7 +825,7 @@ namespace CssUI.DOM
             LinkedList<Node> list = new LinkedList<Node>();
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
             Node current = tree.nextNode();
-            while (!ReferenceEquals(null, current))
+            while (current != null)
             {
                 list.AddLast(current);
                 current = tree.nextNode();
@@ -845,7 +845,7 @@ namespace CssUI.DOM
             LinkedList<Node> list = new LinkedList<Node>();
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
             Node descendant = tree.nextNode();
-            while (!ReferenceEquals(null, descendant))
+            while (descendant != null)
             {
                 if (Is_Shadow_Including_Descendant(descendant, node))
                 {
@@ -875,7 +875,7 @@ namespace CssUI.DOM
             list.AddLast(node);
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
             Node descendant = tree.nextNode();
-            while (!ReferenceEquals(null, descendant))
+            while (descendant != null)
             {
                 list.AddLast(descendant);
                 descendant = tree.nextNode();
@@ -907,7 +907,7 @@ namespace CssUI.DOM
         {
             LinkedList<Node> list = new LinkedList<Node>();
             Node sibling = node.previousSibling;
-            while (!ReferenceEquals(null, sibling))
+            while (sibling != null)
             {
                 var fres = Filter?.acceptNode(sibling) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
                 if (fres == Enums.ENodeFilterResult.FILTER_REJECT)
@@ -932,7 +932,7 @@ namespace CssUI.DOM
         {
             LinkedList<Node> list = new LinkedList<Node>();
             Node sibling = node.nextSibling;
-            while (!ReferenceEquals(null, sibling))
+            while (sibling != null)
             {
                 var fres = Filter?.acceptNode(sibling) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
                 if (fres == Enums.ENodeFilterResult.FILTER_REJECT)
@@ -962,7 +962,7 @@ namespace CssUI.DOM
                 LinkedList<Element> descendents = new LinkedList<Element>();
                 var tree = new TreeWalker(root, ENodeFilterMask.SHOW_ELEMENT);
                 Node descendant = tree.nextNode();
-                while (!ReferenceEquals(null, descendant))
+                while (descendant != null)
                 {
                     descendents.AddLast((Element)descendant);
                     descendant = tree.nextNode();
@@ -979,7 +979,7 @@ namespace CssUI.DOM
                 LinkedList<Element> descendents = new LinkedList<Element>();
                 var tree = new TreeWalker(root, ENodeFilterMask.SHOW_ELEMENT);
                 Node descendant = tree.nextNode();
-                while (!ReferenceEquals(null, descendant))
+                while (descendant != null)
                 {
                     var element = (Element)descendant;
                     if (StringExt.streq(element.NamespaceURI.AsSpan(), HTMLNamespace.AsSpan()))
@@ -1005,7 +1005,7 @@ namespace CssUI.DOM
                 LinkedList<Element> descendents = new LinkedList<Element>();
                 var tree = new TreeWalker(root, ENodeFilterMask.SHOW_ELEMENT);
                 Node node = tree.nextNode();
-                while (!ReferenceEquals(null, node))
+                while (node != null)
                 {
                     var element = (Element)node;
                     if (StringExt.streq(element.NamespaceURI.AsSpan(), HTMLNamespace.AsSpan()))
@@ -1077,14 +1077,14 @@ namespace CssUI.DOM
             var descendents = new LinkedList<Element>();
             var tree = new TreeWalker(root, ENodeFilterMask.SHOW_ELEMENT);
             Node descendant = tree.nextNode();
-            while (!ReferenceEquals(null, descendant))
+            while (descendant != null)
             {
                 Element E = descendant as Element;
 
                 if (E.classList.ContainsAll(classes))
                     descendents.AddLast(E);
 
-                if (!ReferenceEquals(null, E))
+                if (E != null)
                     descendents.AddLast(E);
 
                 descendant = tree.nextNode();
@@ -1102,7 +1102,7 @@ namespace CssUI.DOM
         public static Node Get_Root(Node node)
         {
             /* The root of an object is itself, if its parent is null, or else it is the root of its parent. The root of a tree is any object participating in that tree whose parent is null. */
-            if (ReferenceEquals(null, node.parentNode))
+            if (node.parentNode == null)
                 return node;
 
             return node.parentNode.getRootNode();
@@ -1135,9 +1135,9 @@ namespace CssUI.DOM
         {
             LinkedList<Node> list = new LinkedList<Node>();
             Node child = node.firstChild;
-            while (!ReferenceEquals(null, child))
+            while (child != null)
             {
-                if (!ReferenceEquals(null, Filter))
+                if (Filter != null)
                 {
                     var fr = Filter.acceptNode(child);
                     if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
@@ -1166,11 +1166,11 @@ namespace CssUI.DOM
         {
             LinkedList<Ty> list = new LinkedList<Ty>();
             Node child = node.firstChild;
-            while (!ReferenceEquals(null, child))
+            while (child != null)
             {
                 if (child is Ty childAsType)
                 {
-                    if (!ReferenceEquals(null, Filter))
+                    if (Filter != null)
                     {
                         var fr = Filter.acceptNode(child);
                         if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
@@ -1200,11 +1200,11 @@ namespace CssUI.DOM
         public static Ty Get_First_Child_OfType<Ty>(Node Node, NodeFilter Filter = null) where Ty : Node
         {
             Node child = Node.firstChild;
-            while (!ReferenceEquals(null, child))
+            while (child != null)
             {
                 if (child is Ty childAsType)
                 {
-                    if (!ReferenceEquals(null, Filter))
+                    if (Filter != null)
                     {
                         var fr = Filter.acceptNode(child);
                         if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
@@ -1233,11 +1233,11 @@ namespace CssUI.DOM
         public static Ty Get_Last_Child_OfType<Ty>(Node Node, NodeFilter Filter = null) where Ty : Node
         {
             Node child = Node.lastChild;
-            while (!ReferenceEquals(null, child))
+            while (child != null)
             {
                 if (child is Ty childAsType)
                 {
-                    if (!ReferenceEquals(null, Filter))
+                    if (Filter != null)
                     {
                         var fr = Filter.acceptNode(child);
                         if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
@@ -1266,11 +1266,11 @@ namespace CssUI.DOM
         public static Ty Get_First_Element_Child_OfType<Ty>(Element Node, NodeFilter Filter = null) where Ty : Node
         {
             Element child = Node.firstElementChild;
-            while (!ReferenceEquals(null, child))
+            while (child != null)
             {
                 if (child is Ty childAsType)
                 {
-                    if (!ReferenceEquals(null, Filter))
+                    if (Filter != null)
                     {
                         var fr = Filter.acceptNode(child);
                         if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
@@ -1299,11 +1299,11 @@ namespace CssUI.DOM
         public static Ty Get_Last_Element_Child_OfType<Ty>(Element Node, NodeFilter Filter = null) where Ty : Node
         {
             Element child = Node.lastElementChild;
-            while (!ReferenceEquals(null, child))
+            while (child != null)
             {
                 if (child is Ty childAsType)
                 {
-                    if (!ReferenceEquals(null, Filter))
+                    if (Filter != null)
                     {
                         var fr = Filter.acceptNode(child);
                         if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
@@ -1351,7 +1351,7 @@ namespace CssUI.DOM
 
             var Interface = Lookup_Element_Interface(localName, Namespace);
             var ctor = Interface.GetConstructor(new Type[] { typeof(Document), typeof(string), typeof(string), typeof(string) });
-            if (ReferenceEquals(null, ctor))
+            if (ctor == null)
                 throw new Exception($"Cannot find interface constructor for element type: \"{localName}\"");
             /* XXX: Just need to make sure that every tag type has an interface type correctly specified for it */
             result = (Element)ctor.Invoke(new object[] { document, localName, prefix, Namespace });
@@ -1379,13 +1379,13 @@ namespace CssUI.DOM
         public static IEnumerable<Node> Get_Focus_Chain(Node subject)
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#focus-chain */
             var output = new LinkedList<Node>();
-            if (ReferenceEquals(null, subject))
+            if (subject == null)
                 return output;
 
             output.AddLast(subject);
             var tree = new TreeWalker(subject, ENodeFilterMask.SHOW_ALL);
             Node node = tree.parentNode();
-            while (!ReferenceEquals(null, node))
+            while (node != null)
             {
                 output.AddLast(node);
                 node = tree.parentNode();

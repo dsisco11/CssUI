@@ -64,7 +64,7 @@ namespace CssUI.DOM
             this.InvalidValueDefault = InvalidValueDefault;
             this.enumType = enumType;
 
-            if (ReferenceEquals(null, Keywords))
+            if (Keywords == null)
             {
                 this.Keywords = new HashSet<string>(new string[0]);
             }
@@ -97,7 +97,7 @@ namespace CssUI.DOM
                     break;
                 case EAttributeType.Enumerated:
                     {
-                        if (!ReferenceEquals(null, Keywords) && Keywords.Count > 0)
+                        if (Keywords != null && Keywords.Count > 0)
                         {
                             string strLower = Input.ToLowerInvariant();
                             if (!Keywords.Contains(strLower))

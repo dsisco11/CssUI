@@ -41,7 +41,7 @@ namespace CssUI.DOM.Nodes
         #endregion
 
         #region Slottable
-        public bool isAssigned => (this is ISlottable slotable && !ReferenceEquals(null, slotable.assignedSlot));
+        public bool isAssigned => (this is ISlottable slotable && slotable.assignedSlot != null);
         #endregion
 
         #region DOM
@@ -82,7 +82,7 @@ namespace CssUI.DOM.Nodes
         public Node getRootNode(GetRootNodeOptions options = null)
         {/* Docs: https://dom.spec.whatwg.org/#dom-node-getrootnode */
             /* The getRootNode(options) method, when invoked, must return context object’s shadow-including root if options’s composed is true, and context object’s root otherwise. */
-            if (!ReferenceEquals(null, options) && options.composed)
+            if (options != null && options.composed)
             {
                 DOMCommon.Get_Shadow_Including_Root(this);
             }
@@ -199,7 +199,7 @@ namespace CssUI.DOM.Nodes
                 attr2 = (Attr)node2;
                 node2 = attr2.ownerElement;
                 /* 2) If attr1 and node1 are non-null, and node2 is node1, then: */
-                if (!ReferenceEquals(null, node1) && !ReferenceEquals(null, attr1) && ReferenceEquals(node2, node1))
+                if (node1 != null && attr1 != null && ReferenceEquals(node2, node1))
                 {
                     foreach (var attr in (node2 as Element).AttributeList)
                     {
@@ -212,19 +212,19 @@ namespace CssUI.DOM.Nodes
             }
 
             /* 6) If node1 or node2 is null, or node1’s root is not node2’s root, then return the result of adding DOCUMENT_POSITION_DISCONNECTED, DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC, and either DOCUMENT_POSITION_PRECEDING or DOCUMENT_POSITION_FOLLOWING, with the constraint that this is to be consistent, together. */
-            if (ReferenceEquals(null, node1) || ReferenceEquals(null, node2) || !ReferenceEquals(node1.getRootNode(), node2.getRootNode()))
+            if (node1 == null || node2 == null || !ReferenceEquals(node1.getRootNode(), node2.getRootNode()))
             {
                 return EDocumentPosition.DISCONNECTED | EDocumentPosition.IMPLEMENTATION_SPECIFIC | EDocumentPosition.PRECEDING;
             }
 
             /* 7) If node1 is an ancestor of node2 and attr1 is null, or node1 is node2 and attr2 is non-null, then return the result of adding DOCUMENT_POSITION_CONTAINS to DOCUMENT_POSITION_PRECEDING. */
-            if ((DOMCommon.Is_Ancestor(node1, node2) && ReferenceEquals(null, attr1)) || (ReferenceEquals(node1, node2) && !ReferenceEquals(null, attr2)))
+            if ((DOMCommon.Is_Ancestor(node1, node2) && attr1 == null) || (ReferenceEquals(node1, node2) && attr2 != null))
             {
                 return EDocumentPosition.CONTAINS | EDocumentPosition.PRECEDING;
             }
 
             /* 8) If node1 is a descendant of node2 and attr2 is null, or node1 is node2 and attr1 is non-null, then return the result of adding DOCUMENT_POSITION_CONTAINED_BY to DOCUMENT_POSITION_FOLLOWING. */
-            if ((DOMCommon.Is_Descendant(node1, node2) && ReferenceEquals(null, attr2)) || (ReferenceEquals(node1, node2) && !ReferenceEquals(null, attr1)))
+            if ((DOMCommon.Is_Descendant(node1, node2) && attr2 == null) || (ReferenceEquals(node1, node2) && attr1 != null))
             {
                 return EDocumentPosition.CONTAINED_BY | EDocumentPosition.FOLLOWING;
             }
@@ -285,7 +285,7 @@ namespace CssUI.DOM.Nodes
         #region Equality
         public bool isEqualNode(Node otherNode)
         {
-            if (ReferenceEquals(null, otherNode))
+            if (otherNode == null)
                 return false;
 
             return true;
@@ -293,7 +293,7 @@ namespace CssUI.DOM.Nodes
 
         public override bool Equals(object obj)
         {/* https://dom.spec.whatwg.org/#concept-node-equals */
-            if (ReferenceEquals(null, obj))
+            if (obj == null)
                 return false;
 
             if (!(obj is Node otherNode))
@@ -373,7 +373,7 @@ namespace CssUI.DOM.Nodes
         #region Internal Utilitys
         internal virtual bool Is_ShadowHost
         {/* Docs: https://dom.spec.whatwg.org/#element-shadow-host */
-            get => this is Element E && !ReferenceEquals(null, E.shadowRoot);
+            get => this is Element E && E.shadowRoot != null;
         }
 
 
@@ -381,7 +381,7 @@ namespace CssUI.DOM.Nodes
         internal static Node _clone_node(Node node, Document document = null, bool clone_children = false, Node targetNode = null)
         {/* Docs: https://dom.spec.whatwg.org/#concept-node-clone */
             /* 1) If document is not given, let document be node’s node document. */
-            if (ReferenceEquals(null, document))
+            if (document == null)
             {
                 document = node.ownerDocument;
             }
@@ -390,7 +390,7 @@ namespace CssUI.DOM.Nodes
             Node copy = targetNode;
             if (node is Element element)
             {
-                if (ReferenceEquals(null, copy))
+                if (copy == null)
                 {
                     copy = DOMCommon.Create_Element(document, element.localName, element.NamespaceURI, element.prefix, element.is_value, false);
                 }
@@ -409,7 +409,7 @@ namespace CssUI.DOM.Nodes
             else
             {
                 /* Ensure copy is an instance */
-                if (ReferenceEquals(null, copy))
+                if (copy == null)
                 {
                     switch (node.nodeType)
                     {
@@ -453,7 +453,7 @@ namespace CssUI.DOM.Nodes
                                 }
                                 else
                                 {
-                                    if (ReferenceEquals(null, copy))
+                                    if (copy == null)
                                     {
                                         throw new InvalidNodeTypeError("Cloning logic for this node type has not been implemented!");
                                     }
@@ -660,7 +660,7 @@ namespace CssUI.DOM.Nodes
             /* 1) Let count be the number of children of node if it is a DocumentFragment node, and one otherwise. */
             int count = (node is DocumentFragment doc) ? doc.childNodes.Count : 1;
             /* 2) If child is non-null, then: */
-            if (!ReferenceEquals(null, child))
+            if (child != null)
             {
                 foreach (WeakReference<Range> weakRef in Range.LIVE_RANGES)
                 {
@@ -688,13 +688,13 @@ namespace CssUI.DOM.Nodes
                 MutationRecord.Queue_Tree_Mutation_Record(node, new Node[0], nodes, null, null);
             }
             /* 6) Let previousSibling be child’s previous sibling or parent’s last child if child is null. */
-            var previousSibling = ReferenceEquals(null, child) ? parent.lastChild : child.previousSibling;
-            int childIndex = ReferenceEquals(null, child) ? 0 : child.index;
+            var previousSibling = child == null ? parent.lastChild : child.previousSibling;
+            int childIndex = child == null ? 0 : child.index;
             /* 7) For each node in nodes, in tree order: */
             foreach (Node newNode in nodes)
             {
                 /* 1) If child is null, then append node to parent’s children. */
-                if (ReferenceEquals(null, child))
+                if (child == null)
                 {
                     parent.childNodes.Add(newNode);
                 }
@@ -823,7 +823,7 @@ namespace CssUI.DOM.Nodes
             /* 11) Let removedNodes be the empty list. */
             var removedNodes = new Node[] { };
             /* 12) If child’s parent is not null, then: */
-            if (!ReferenceEquals(null, child.parentNode))
+            if (child.parentNode != null)
             {
                 /* 1) Set removedNodes to « child ». */
                 removedNodes = new Node[] { child };
@@ -847,7 +847,7 @@ namespace CssUI.DOM.Nodes
         internal static void _replace_all_within_node(Node node, Node parent)
         {/* Docs: https://dom.spec.whatwg.org/#concept-node-replace-all */
             /* 1) If node is not null, adopt node into parent’s node document. */
-            if (!ReferenceEquals(null, node))
+            if (node != null)
             {
                 parent.ownerDocument.adoptNode(node);
             }
@@ -857,7 +857,7 @@ namespace CssUI.DOM.Nodes
 
             if (node is DocumentFragment)
                 addedNodes = node.childNodes;
-            else if (!ReferenceEquals(null, node))
+            else if (node != null)
                 addedNodes = new Node[] { node };
             /* 6) Remove all parent’s children, in tree order, with the suppress observers flag set. */
             foreach (Node child in parent.childNodes)
@@ -865,9 +865,9 @@ namespace CssUI.DOM.Nodes
                 _remove_node_from_parent(child, parent, true);
             }
             /* 7) If node is not null, then insert node into parent before null with the suppress observers flag set. */
-            if (!ReferenceEquals(null, node))
+            if (node != null)
             {
-                Node._insert_node_into_parent_before(node, parent, null, true);
+                _insert_node_into_parent_before(node, parent, null, true);
             }
             /* 8) Queue a tree mutation record for parent with addedNodes, removedNodes, null, and null. */
             MutationRecord.Queue_Tree_Mutation_Record(parent, addedNodes, removedNodes, null, null);
@@ -889,7 +889,7 @@ namespace CssUI.DOM.Nodes
                 throw new HierarchyRequestError();
 
             /* 3) If child is not null and its parent is not parent, then throw a "NotFoundError" DOMException. */
-            if (!ReferenceEquals(null, child) && !ReferenceEquals(parent, child.parentNode))
+            if (child != null && !ReferenceEquals(parent, child.parentNode))
                 throw new NotFoundError();
             /* 4) If node is not a DocumentFragment, DocumentType, Element, Text, ProcessingInstruction, or Comment node, throw a "HierarchyRequestError" DOMException. */
             if (!(node is DocumentFragment) && !(node is DocumentType) && !(node is Element) && !(node is Text) && !(node is ProcessingInstruction) && !(node is Comment))
@@ -909,24 +909,34 @@ namespace CssUI.DOM.Nodes
                      */
                     var eCount = docFrag.childNodes.Count(c => c is Element);
                     if (eCount > 1 || docFrag.childNodes.Count(c => c is Text) > 0)
+                    {
                         throw new HierarchyRequestError();
+                    }
                     else if (eCount == 1)
                     {
                         if (parent.childNodes.Count(c => c is Element) > 0 || child is DocumentType)
+                        {
                             throw new HierarchyRequestError();
-                        if (!ReferenceEquals(null, child) && DOMCommon.Get_Following(child).Count(c => c is DocumentType) > 0)
+                        }
+                        if (child != null && DOMCommon.Get_Following(child).Count(c => c is DocumentType) > 0)
+                        {
                             throw new HierarchyRequestError();
+                        }
                     }
                 }
                 else if (node is Element element)
                 {
-                    if (parent.childNodes.Count(c => c is Element) > 0 || child is DocumentType || (!ReferenceEquals(null, child) && DOMCommon.Get_Following(child).Count(c => c is DocumentType) > 0))
+                    if (parent.childNodes.Count(c => c is Element) > 0 || child is DocumentType || (child != null && DOMCommon.Get_Following(child).Count(c => c is DocumentType) > 0))
+                    {
                         throw new HierarchyRequestError();
+                    }
                 }
                 else if (node is DocumentType docType)
                 {
-                    if (parent.childNodes.Count(c => c is DocumentType) > 0 || (!ReferenceEquals(null, child) && DOMCommon.Get_Preceeding(child).Count(c => c is Element) > 0) || (ReferenceEquals(null, child) && parent.childNodes.Count(c => c is Element) > 0))
+                    if (parent.childNodes.Count(c => c is DocumentType) > 0 || (child != null && DOMCommon.Get_Preceeding(child).Count(c => c is Element) > 0) || (child == null && parent.childNodes.Count(c => c is Element) > 0))
+                    {
                         throw new HierarchyRequestError();
+                    }
                 }
             }
 

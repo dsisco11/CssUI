@@ -26,7 +26,7 @@ namespace CssUI
                 if (!ReferenceEquals(null, _name))
                 {/* Resolve the backing value */
                     if (IsCustom)
-                        throw new System.Exception("Name backing-value for custom event type is not set!");
+                        throw new Exception("Name backing-value for custom event type is not set!");
 
                     string name = Value_To_Name( Value );
                     if (ReferenceEquals(null, name))
@@ -174,10 +174,10 @@ namespace CssUI
 
         public override bool Equals(object obj)
         {
-            if (obj is AtomicName<Ty> name && name.Value == this.Value)
+            if (obj is AtomicName<Ty> name && Value.Equals(name.Value))
                 return true;
 
-            if (obj is Ty enumValue && Convert.ToInt32(enumValue) == this.Value)
+            if (obj is Ty enumValue && Value.Equals(Convert.ToInt32(enumValue)))
                 return true;
 
             return false;
@@ -185,10 +185,10 @@ namespace CssUI
 
         public bool Equals(AtomicName<Ty> Name)
         {
-            if (ReferenceEquals(null, Name))
+            if (Name == null)
                 return false;
 
-            return this.Value.Equals(Name.Value);
+            return Value.Equals(Name.Value);
         }
 
         public bool Equals(int other)
@@ -207,20 +207,20 @@ namespace CssUI
         #region Comparable
         public int CompareTo(object obj)
         {
-            if (ReferenceEquals(null, obj))
+            if (obj == null)
                 return 1;
 
             if (obj is AtomicName<Ty> objName)
             {
-                return this.Value.CompareTo(objName.Value);
+                return Value.CompareTo(objName.Value);
             }
             else if (obj is int oInt)
             {
-                return this.Value.CompareTo(oInt);
+                return Value.CompareTo(oInt);
             }
             else if (obj is uint oUInt)
             {
-                return this.Value.CompareTo(oUInt);
+                return Value.CompareTo(oUInt);
             }
             else
             {
@@ -230,10 +230,10 @@ namespace CssUI
 
         public int CompareTo(AtomicName<Ty> Name)
         {
-            if (ReferenceEquals(null, Name))
+            if (Name == null)
                 return 1;
 
-            return this.Value.CompareTo(Name.Value);
+            return Value.CompareTo(Name.Value);
         }
 
         public int CompareTo(int other)

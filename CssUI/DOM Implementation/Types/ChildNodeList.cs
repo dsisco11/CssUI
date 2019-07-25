@@ -43,7 +43,7 @@ namespace CssUI.DOM
 
             node.index = index;
 
-            if (!ReferenceEquals(null, previousNode))
+            if (previousNode != null)
             {
                 node.previousSibling = previousNode;
                 previousNode.nextSibling = node;
@@ -54,7 +54,7 @@ namespace CssUI.DOM
                 node.previousSibling = null;
             }
 
-            if (!ReferenceEquals(null, nextNode))
+            if (nextNode != null)
             {
                 node.nextSibling = nextNode;
                 nextNode.previousSibling = node;

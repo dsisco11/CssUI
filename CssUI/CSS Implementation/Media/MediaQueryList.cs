@@ -79,14 +79,16 @@ namespace CssUI.DOM.Media
             {
                 oldMatchState = newMatchState;
                 var evt = new MediaQueryListEvent(EEventName.Change, new MediaQueryListEventInit(media, newMatchState));
-                this.dispatchEvent( evt );
+                dispatchEvent( evt );
             }
         }
 
         public void addEventListener(EventListener listener)
         {
-            if (ReferenceEquals(null, listener))
+            if (listener == null)
+            {
                 return;
+            }
 
             base.addEventListener(EEventName.Change, listener.callback, new AddEventListenerOptions(false));
         }

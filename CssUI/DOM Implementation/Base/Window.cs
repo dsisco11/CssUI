@@ -78,15 +78,15 @@ namespace CssUI.DOM
         public void resizeBy(long x, long y) => throw new NotImplementedException();
 
         // Viewport
-        public long innerWidth => ReferenceEquals(null, document.Viewport) ? 0 : document.Viewport.Width;
-        public long innerHeight => ReferenceEquals(null, document.Viewport) ? 0 : document.Viewport.Height;
+        public long innerWidth => (document.Viewport == null) ? 0 : document.Viewport.Width;
+        public long innerHeight => (document.Viewport == null) ? 0 : document.Viewport.Height;
 
         // viewport scrolling
         public double scrollX
         {
             get
             {/* The scrollX attribute attribute must return the x-coordinate, relative to the initial containing block origin, of the left of the viewport, or zero if there is no viewport. */
-                if (ReferenceEquals(null, document.Viewport))
+                if (document.Viewport == null)
                     return 0;
 
                 /* XXX: Are we doing scrolling wrong or something? why is it measuring the location of the viewport and not its scrollbox? */
@@ -99,7 +99,7 @@ namespace CssUI.DOM
         {
             get
             {/* The scrollY attribute attribute must return the y-coordinate, relative to the initial containing block origin, of the top of the viewport, or zero if there is no viewport. */
-                if (ReferenceEquals(null, document.Viewport))
+                if (document.Viewport == null)
                     return 0;
 
                 /* XXX: Are we doing scrolling wrong or something? why is it measuring the location of the viewport and not its scrollbox? */
@@ -151,7 +151,7 @@ namespace CssUI.DOM
 
         public void ScrollTo(ScrollToOptions options)
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-window-scroll */
-            if (ReferenceEquals(null, document.Viewport))
+            if (document.Viewport == null)
                 return;
 
             double x = options.left.HasValue ? options.left.Value : document.Viewport.ScrollBox.ScrollX;
@@ -164,7 +164,7 @@ namespace CssUI.DOM
         }
         public void ScrollTo(double x, double y)
         {
-            if (ReferenceEquals(null, document.Viewport))
+            if (document.Viewport == null)
                 return;
 
             x = CssCommon.Normalize_Non_Finite(x);
@@ -209,11 +209,11 @@ namespace CssUI.DOM
         /// <summary>
         /// The outerWidth attribute must return the width of the client window. If there is no client window this attribute must return zero.
         /// </summary>
-        public long outerWidth => ReferenceEquals(null, screen) ? 0 : screen.width;
+        public long outerWidth => (screen == null) ? 0 : screen.width;
         /// <summary>
         /// The outerHeight attribute must return the height of the client window. If there is no client window this attribute must return zero.
         /// </summary>
-        public long outerHeight => ReferenceEquals(null, screen) ? 0 : screen.height;
+        public long outerHeight => (screen == null) ? 0 : screen.height;
         public double devicePixelRatio { get; }
         #endregion
         

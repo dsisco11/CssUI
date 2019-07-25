@@ -110,7 +110,7 @@ namespace CssUI.DOM
                      */
                 }
 
-                if (!attr.Is_Defined && !ReferenceEquals(null, parentElement))
+                if (!attr.Is_Defined && parentElement != null)
                 {
                     return (parentElement as HTMLElement).directionality;
                 }
@@ -156,7 +156,7 @@ namespace CssUI.DOM
             }
 
             var definition = nodeDocument.defaultView.customElements.Lookup(nodeDocument, NamespaceURI, localName, null);
-            if (ReferenceEquals(null, definition))
+            if (definition == null)
             {
                 throw new NotSupportedError("Element internals may only be attached to custom elements");
             }
@@ -247,7 +247,7 @@ namespace CssUI.DOM
 
                 /* - If the element has a descendant that is currently matching the :active pseudo-class */
                 var tree = new TreeWalker(this, Enums.ENodeFilterMask.SHOW_ELEMENT, FilterIsActive.Instance);
-                if (!ReferenceEquals(null, tree.nextNode()))
+                if (tree.nextNode() != null)
                     return true;
 
                 /* If the element is being actively pointed at */
@@ -262,13 +262,13 @@ namespace CssUI.DOM
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-htmlelement-offsetparent */
             get
             {
-                if (ReferenceEquals(null, Box) || is_root || ReferenceEquals(this, ownerDocument.body) || Style.Positioning == CSS.EPositioning.Fixed)
+                if (Box == null || is_root || ReferenceEquals(this, ownerDocument.body) || Style.Positioning == CSS.EPositioning.Fixed)
                     return null;
 
                 /* 2) Return the nearest ancestor element of the element for which at least one of the following is true and terminate this algorithm if such an ancestor is found: */
                 var tree = new TreeWalker(this, Enums.ENodeFilterMask.SHOW_ELEMENT);
                 Element ancestor = tree.parentNode() as Element;
-                while (!ReferenceEquals(null, ancestor))
+                while (ancestor != null)
                 {
                     if (ancestor.Style.Positioning != CSS.EPositioning.Static)
                     {
@@ -297,11 +297,11 @@ namespace CssUI.DOM
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-htmlelement-offsettop */
             get
             {
-                if (ReferenceEquals(null, Box) || ReferenceEquals(this, ownerDocument.body))
+                if (Box == null || ReferenceEquals(this, ownerDocument.body))
                     return 0;
 
                 var offsetParent = this.offsetParent;
-                if (ReferenceEquals(null, offsetParent))
+                if (offsetParent == null)
                 {
                     return (long)(Box.Border.Top - ownerDocument.Initial_Containing_Block.top);
                 }
@@ -318,11 +318,11 @@ namespace CssUI.DOM
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-htmlelement-offsetleft */
             get
             {
-                if (ReferenceEquals(null, Box) || ReferenceEquals(this, ownerDocument.body))
+                if (Box == null || ReferenceEquals(this, ownerDocument.body))
                     return 0;
 
                 var offsetParent = this.offsetParent;
-                if (ReferenceEquals(null, offsetParent))
+                if (offsetParent == null)
                 {
                     return (long)(Box.Border.Left - ownerDocument.Initial_Containing_Block.left);
                 }
@@ -339,7 +339,7 @@ namespace CssUI.DOM
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-htmlelement-offsetwidth */
             get
             {
-                if (ReferenceEquals(null, Box) || ReferenceEquals(this, ownerDocument.body))
+                if (Box == null || ReferenceEquals(this, ownerDocument.body))
                     return 0;
 
                 return Box.Border.Width;
@@ -352,7 +352,7 @@ namespace CssUI.DOM
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-htmlelement-offsetheight */
             get
             {
-                if (ReferenceEquals(null, Box) || ReferenceEquals(this, ownerDocument.body))
+                if (Box == null || ReferenceEquals(this, ownerDocument.body))
                     return 0;
 
                 return Box.Border.Height;
@@ -375,7 +375,7 @@ namespace CssUI.DOM
                 int attrValue = Attrib?.Value?.Get_Int() ?? -1;
 
                 /* If the attribute is omitted or parsing the value returns an error */
-                if (ReferenceEquals(null, Attrib.Value) || Attrib.Is_MissingValue || Attrib.Is_InvalidValue)
+                if (Attrib?.Value == null || Attrib.Is_MissingValue || Attrib.Is_InvalidValue)
                 {
                     /* The tabIndex IDL attribute must reflect the value of the tabindex content attribute. 
                      * The default value is 0 if the element is an a, area, button, iframe, input, select, or textarea element, or is a summary element that is a summary for its parent details. 
@@ -549,7 +549,7 @@ namespace CssUI.DOM
 
                         case ESpellcheckBehavior.Inherit_By_Default:
                             {
-                                if (!ReferenceEquals(null, parentElement) && parentElement is HTMLElement parentHTML)
+                                if (parentElement != null && parentElement is HTMLElement parentHTML)
                                 {
                                     if (parentHTML.Spellcheck)
                                     {
@@ -583,7 +583,7 @@ namespace CssUI.DOM
             get
             {
                 Attr attr = getAttributeNode(EAttributeName.AutoCapitalize);
-                if (!ReferenceEquals(null, attr))
+                if (attr != null)
                 {
                     var enumValue = attr.Value.Get_Enum<EAutoCapitalizationHint>();
                     if (enumValue != EAutoCapitalizationHint.Default)
@@ -596,7 +596,7 @@ namespace CssUI.DOM
                         {
                             if (this is IFormAssociatedElement formElement)
                             {
-                                if (!ReferenceEquals(null, formElement.form))
+                                if (formElement.form != null)
                                 {
                                     return formElement.form.Autocapitalize;
                                 }

@@ -11,16 +11,19 @@ namespace CssUI.CSS.Selectors
 
     public class PseudoClassSelector : SimpleSelector
     {
+        /// <summary>
+        /// The pseudo class name
+        /// </summary>
         protected readonly string Name;
 
         public PseudoClassSelector(string PseudoClass) : base(ESimpleSelectorType.PseudoClassSelector)
         {
-            this.Name = PseudoClass;
+            Name = PseudoClass;
         }
 
         public static PseudoClassSelector Create_Function(string Name, List<CssToken> Args = null)
         {
-            if (string.Compare("not", Name) == 0)
+            if (Name.Equals("not"))
             {
                 return new PseudoClassSelectorNegationFunction(Name, new TokenStream(Args));
             }
@@ -63,7 +66,7 @@ namespace CssUI.CSS.Selectors
                 case "root":
                     {
                         var root = E.getRootNode();
-                        return (ReferenceEquals(null, root) || ReferenceEquals(E, root));
+                        return (root == null || ReferenceEquals(E, root));
                     }
                 default:
                     throw new CssSelectorException("Selector pseudo-class (", Name, ") logic not implemented!");

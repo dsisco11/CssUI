@@ -26,7 +26,7 @@ namespace CssUI.CSS.Media
         /// <param name="document">The document to test for a match against</param>
         public bool Matches(Document document)
         {
-            if (MediaType != EMediaType.All && MediaType != document.window.screen.MediaType)
+            if (MediaType != EMediaType.All && MediaType != document.defaultView.screen.MediaType)
                 return false;
 
             foreach (IMediaCondition condition in Conditions)

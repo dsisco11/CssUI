@@ -58,7 +58,7 @@ namespace CssUI.DOM
         {/* Docs: https://dom.spec.whatwg.org/#signal-a-slot-change */
 
             Window window = ownerDocument?.defaultView;
-            if (!ReferenceEquals(null, window))
+            if (window != null)
             {
                 window.SignalSlots.Add(this);
                 window.QueueObserverMicroTask();

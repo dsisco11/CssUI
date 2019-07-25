@@ -57,11 +57,11 @@ namespace CssUI.DOM
             if (offset > Length) throw new IndexSizeError();
 
             var count = Length - offset;
-            var newData = this.substringData(offset, count);
+            var newData = substringData(offset, count);
             /* 5) Let new node be a new Text node, with the same node document as node. Set new node’s data to new data. */
             var newNode = new Text(ownerDocument, newData);
-            var parent = this.parentNode;
-            if (!ReferenceEquals(null, parent))
+            var parent = parentNode;
+            if (parent != null)
             {
                 /* 1) Insert new node into parent before node’s next sibling. */
                 Node._insert_node_into_parent_before(newNode, parent, this.nextSibling);

@@ -201,7 +201,7 @@ namespace CssUI
         {
             get
             {
-                if (ReferenceEquals(null, _containing_box))
+                if (_containing_box == null)
                 {
                     _containing_box = Find_Containing_Block();
                 }
@@ -477,10 +477,10 @@ namespace CssUI
             Update_Depends_Flag();
 
             // Figure out if we have any block-level children
-            // this.HasBlockLevelChildren = !ReferenceEquals(null, this.SingleOrDefault((CssLayoutBox b) => (b.OuterDisplayType == EOuterDisplayType.Block)));
+            // this.HasBlockLevelChildren = (null != this.SingleOrDefault((CssLayoutBox b) => (b.OuterDisplayType == EOuterDisplayType.Block)));
             this.HasBlockLevelChildren = false;
             Element node = Owner.firstElementChild;
-            while (!ReferenceEquals(null, node))
+            while (node != null)
             {
                 if (node.Box.OuterDisplayType == EOuterDisplayType.Block)
                 {

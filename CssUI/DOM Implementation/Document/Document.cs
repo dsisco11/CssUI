@@ -262,7 +262,7 @@ namespace CssUI.DOM
         #region Internal States
         internal bool Is_FullyActive
         {/* Docs: https://html.spec.whatwg.org/multipage/#fully-active */
-            get => !ReferenceEquals(null, BrowsingContext) && ReferenceEquals(this, BrowsingContext.activeDocument);
+            get => (BrowsingContext != null) && ReferenceEquals(this, BrowsingContext.activeDocument);
         }
         #endregion
 

@@ -23,13 +23,13 @@ namespace CssUI.DOM
                 CEReactions.Wrap_CEReaction(this, () =>
                 {
                     HTMLTableCaptionElement target = caption;
-                    if (!ReferenceEquals(null, target))
+                    if (target != null)
                     {
                         removeChild(target);
                     }
 
                     Node first = firstChild;
-                    if (ReferenceEquals(null, first))
+                    if (first == null)
                     {
                         appendChild(value);
                     }
@@ -54,14 +54,14 @@ namespace CssUI.DOM
                 CEReactions.Wrap_CEReaction(this, () => 
                 {
                     HTMLTableHeadElement firstOfType = tHead;
-                    if (!ReferenceEquals(null, firstOfType))
+                    if (firstOfType != null)
                     {
                         removeChild(firstOfType);
                     }
 
                     /* the new value, if not null, must be inserted immediately before the first element in the table element that is neither a caption element nor a colgroup element, if any, 
                      * or at the end of the table if there are no such elements. */
-                    if (!ReferenceEquals(null, value))
+                    if (value != null)
                     {
                         if (!(value is HTMLTableHeadElement))
                         {
@@ -69,7 +69,7 @@ namespace CssUI.DOM
                         }
 
                         Element before = firstElementChild;
-                        while (!ReferenceEquals(null, before))
+                        while (before != null)
                         {
                             if (!(before is HTMLTableCaptionElement || before is HTMLTableColGroupElement))
                             {
@@ -100,12 +100,12 @@ namespace CssUI.DOM
                      * if any, must be removed, and the new value, if not null, must be inserted at the end of the table. 
                      * If the new value is neither null nor a tfoot element, then a "HierarchyRequestError" DOMException must be thrown instead. */
                     var firstOfType = tFoot;
-                    if (!ReferenceEquals(null, firstOfType))
+                    if (firstOfType != null)
                     {
                         removeChild(firstOfType);
                     }
 
-                    if (!ReferenceEquals(null, value) && !(value is HTMLTableFootElement))
+                    if (value != null && !(value is HTMLTableFootElement))
                     {
                         throw new HierarchyRequestError();
                     }
@@ -147,8 +147,10 @@ namespace CssUI.DOM
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-createcaption */
             var firstOfType = DOMCommon.Get_First_Element_Child_OfType<HTMLTableCaptionElement>(this);
 
-            if (!ReferenceEquals(null, firstOfType))
+            if (firstOfType != null)
+            {
                 return firstOfType;
+            }
 
             var newChild = new HTMLTableCaptionElement(nodeDocument);
             insertFirst(newChild);
@@ -165,13 +167,15 @@ namespace CssUI.DOM
 
             var firstOfType = DOMCommon.Get_First_Element_Child_OfType<HTMLTableHeadElement>(this);
 
-            if (!ReferenceEquals(null, firstOfType))
+            if (firstOfType != null)
+            {
                 return firstOfType;
+            }
 
             var newChild = new HTMLTableHeadElement(nodeDocument);
 
             Element before = firstElementChild;
-            while (!ReferenceEquals(null, before))
+            while (before != null)
             {
                 if (!(before is HTMLTableCaptionElement || before is HTMLTableColGroupElement))
                 {
@@ -193,8 +197,10 @@ namespace CssUI.DOM
 
             var firstOfType = DOMCommon.Get_First_Element_Child_OfType<HTMLTableFootElement>(this);
 
-            if (!ReferenceEquals(null, firstOfType))
+            if (firstOfType != null)
+            {
                 return firstOfType;
+            }
 
 
             var newChild = new HTMLTableFootElement(nodeDocument);
@@ -215,10 +221,10 @@ namespace CssUI.DOM
             var lastOfType = DOMCommon.Get_Last_Element_Child_OfType<HTMLTableBodyElement>(this);
             var newChild = new HTMLTableBodyElement(nodeDocument);
 
-            if (!ReferenceEquals(null, lastOfType))
+            if (lastOfType != null)
             {
                 var nextToLast = lastOfType.nextElementSibling;
-                if (!ReferenceEquals(null, nextToLast))
+                if (nextToLast != null)
                 {
                     insertBefore(newChild, nextToLast);
                     return newChild;
@@ -286,8 +292,10 @@ namespace CssUI.DOM
             CEReactions.Wrap_CEReaction(this, () =>
             {
                 var firstOfType = DOMCommon.Get_First_Element_Child_OfType<HTMLTableCaptionElement>(this);
-                if (!ReferenceEquals(null, firstOfType))
+                if (firstOfType != null)
+                {
                     removeChild(firstOfType);
+                }
             });
         }
 
@@ -300,8 +308,10 @@ namespace CssUI.DOM
             CEReactions.Wrap_CEReaction(this, () =>
             {
                 var firstOfType = DOMCommon.Get_First_Element_Child_OfType<HTMLTableHeadElement>(this);
-                if (!ReferenceEquals(null, firstOfType))
+                if (firstOfType != null)
+                {
                     removeChild(firstOfType);
+                }
             });
         }
 
@@ -314,8 +324,10 @@ namespace CssUI.DOM
             CEReactions.Wrap_CEReaction(this, () =>
             {
                 var firstOfType = DOMCommon.Get_First_Element_Child_OfType<HTMLTableFootElement>(this);
-                if (!ReferenceEquals(null, firstOfType))
+                if (firstOfType != null)
+                {
                     removeChild(firstOfType);
+                }
             });
         }
 

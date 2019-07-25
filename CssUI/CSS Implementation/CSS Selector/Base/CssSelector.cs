@@ -155,7 +155,7 @@ namespace CssUI.CSS
             /* Resolve scoping */
             if (scopeElements.Count() <= 0)
             {
-                if (!ReferenceEquals(null, scopingRoot))
+                if (scopingRoot != null)
                 {
                     scopeElements = new Node[] { scopingRoot };
                 }
@@ -175,7 +175,7 @@ namespace CssUI.CSS
              * For each possible pseudo-element associated with element that is one of the pseudo-elements allowed to show up in the match list, if the result of match a selector against a pseudo-element for the pseudo-element and selector is success, add the pseudo-element to the selector match list.
             */
             NodeFilter Filter = null;
-            if (!ReferenceEquals(null, scopingRoot))
+            if (scopingRoot != null)
                 Filter = new FilterDescendantOf(scopingRoot);
 
             LinkedList<Node> candidateElements = new LinkedList<Node>();
@@ -189,7 +189,7 @@ namespace CssUI.CSS
             LinkedList<Element> matchList = new LinkedList<Element>();
             foreach(Element candidate in candidateElements)
             {
-                if (this.Match(candidate, scopeElements))
+                if (Match(candidate, scopeElements))
                     matchList.AddLast(candidate);
             }
             /* For each possible pseudo-element associated with element that is one of the pseudo-elements allowed to show up in the match list, if the result of match a selector against a pseudo-element for the pseudo-element and selector is success, add the pseudo-element to the selector match list. */

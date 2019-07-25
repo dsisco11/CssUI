@@ -41,7 +41,7 @@ namespace CssUI.DOM.CustomElements
                 return null;
             }
 
-            if (ReferenceEquals(null, document?.defaultView))
+            if (document?.defaultView == null)
             {
                 return null;
             }
@@ -77,7 +77,7 @@ namespace CssUI.DOM.CustomElements
         {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#dom-customelementregistry-define */
 
             /* 1) If IsConstructor(constructor) is false, then throw a TypeError. */
-            if (ReferenceEquals(null, constructor))
+            if (constructor == null)
             {
                 throw new TypeError();
             }
@@ -142,7 +142,7 @@ namespace CssUI.DOM.CustomElements
                 if (!options.lifecycleCallbacks.TryGetValue(EReactionName.AttributeChanged, out ReactionHandler attrChangeCallback))
                 {
                     observeAllAttributes = options.observeAllAttributes;
-                    if (!ReferenceEquals(null, options.observedAttributes))
+                    if (options.observedAttributes != null)
                     {
                         observedAttributes = options.observedAttributes;
                     }
@@ -152,16 +152,16 @@ namespace CssUI.DOM.CustomElements
                 disableShadow = options.bDisableShadow;
                 ReactionHandler outHandle;
 
-                if (options.lifecycleCallbacks.TryGetValue(EReactionName.Connected, out outHandle) && !ReferenceEquals(null, outHandle))
+                if (options.lifecycleCallbacks.TryGetValue(EReactionName.Connected, out outHandle) && outHandle != null)
                     lifecycleCallbacks[EReactionName.Connected] = outHandle;
 
-                if (options.lifecycleCallbacks.TryGetValue(EReactionName.Disconnected, out outHandle) && !ReferenceEquals(null, outHandle))
+                if (options.lifecycleCallbacks.TryGetValue(EReactionName.Disconnected, out outHandle) && outHandle != null)
                     lifecycleCallbacks[EReactionName.Disconnected] = outHandle;
 
-                if (options.lifecycleCallbacks.TryGetValue(EReactionName.Adopted, out outHandle) && !ReferenceEquals(null, outHandle))
+                if (options.lifecycleCallbacks.TryGetValue(EReactionName.Adopted, out outHandle) && outHandle != null)
                     lifecycleCallbacks[EReactionName.Adopted] = outHandle;
 
-                if (options.lifecycleCallbacks.TryGetValue(EReactionName.AttributeChanged, out outHandle) && !ReferenceEquals(null, outHandle))
+                if (options.lifecycleCallbacks.TryGetValue(EReactionName.AttributeChanged, out outHandle) && outHandle != null)
                     lifecycleCallbacks[EReactionName.AttributeChanged] = outHandle;
 
 
@@ -169,16 +169,16 @@ namespace CssUI.DOM.CustomElements
                 formAssociated = options.bFormAssociated;
                 if (formAssociated)
                 {
-                    if (options.lifecycleCallbacks.TryGetValue(EReactionName.FormAssociated, out outHandle) && !ReferenceEquals(null, outHandle))
+                    if (options.lifecycleCallbacks.TryGetValue(EReactionName.FormAssociated, out outHandle) && outHandle != null)
                         lifecycleCallbacks[EReactionName.FormAssociated] = outHandle;
 
-                    if (options.lifecycleCallbacks.TryGetValue(EReactionName.FormDisabled, out outHandle) && !ReferenceEquals(null, outHandle))
+                    if (options.lifecycleCallbacks.TryGetValue(EReactionName.FormDisabled, out outHandle) && outHandle != null)
                         lifecycleCallbacks[EReactionName.FormDisabled] = outHandle;
 
-                    if (options.lifecycleCallbacks.TryGetValue(EReactionName.FormReset, out outHandle) && !ReferenceEquals(null, outHandle))
+                    if (options.lifecycleCallbacks.TryGetValue(EReactionName.FormReset, out outHandle) && outHandle != null)
                         lifecycleCallbacks[EReactionName.FormReset] = outHandle;
 
-                    if (options.lifecycleCallbacks.TryGetValue(EReactionName.FormStateRestore, out outHandle) && !ReferenceEquals(null, outHandle))
+                    if (options.lifecycleCallbacks.TryGetValue(EReactionName.FormStateRestore, out outHandle) && outHandle != null)
                         lifecycleCallbacks[EReactionName.FormStateRestore] = outHandle;
                 }
 

@@ -70,7 +70,7 @@ namespace CssUI.DOM
                 /* The cells attribute must return an HTMLCollection rooted at this tr element, whose filter matches only td and th elements that are children of the tr element. */
                 LinkedList<HTMLTableCellElement> cellList = new LinkedList<HTMLTableCellElement>();
                 Element child = firstElementChild;
-                while (!ReferenceEquals(null, child))
+                while (child != null)
                 {
                     if (child is HTMLTableCellElement childCell)
                     {

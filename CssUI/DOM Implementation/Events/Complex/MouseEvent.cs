@@ -109,7 +109,7 @@ namespace CssUI.DOM.Events
                  * return the x-coordinate of the position where the event occurred relative to the origin of the padding edge of the target node, 
                  * ignoring the transforms that apply to the element and its ancestors, and terminate these steps. */
 
-                if (0 != (Flags & EEventFlags.Dispatch) && !ReferenceEquals(null, relatedTarget))
+                if (0 != (Flags & EEventFlags.Dispatch) && relatedTarget != null)
                 {
                     return (relatedTarget as Element).Box.Padding.X - clientX;
                 }
@@ -126,7 +126,7 @@ namespace CssUI.DOM.Events
                  * return the y-coordinate of the position where the event occurred relative to the origin of the padding edge of the target node, 
                  * ignoring the transforms that apply to the element and its ancestors, and terminate these steps. */
 
-                if (0 != (Flags & EEventFlags.Dispatch) && !ReferenceEquals(null, relatedTarget))
+                if (0 != (Flags & EEventFlags.Dispatch) && relatedTarget != null)
                 {
                     return (relatedTarget as Element).Box.Padding.Y - clientY;
                 }

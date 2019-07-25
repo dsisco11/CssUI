@@ -73,7 +73,7 @@ namespace CssUI.DOM.Events
             {
                 /* Verify the event is accepted by this element */
                 var eventTarget = EventCommon.determine_target(Owner, Name);
-                if (ReferenceEquals(null, eventTarget))
+                if (eventTarget == null)
                     return null;/* This event is not valid for the owning element */
 
                 if (!Map.TryGetValue(Name, out LinkedList<EventHandler> handlerList))
@@ -87,7 +87,7 @@ namespace CssUI.DOM.Events
         {
             /* Verify the event is accepted by this element */
             var eventTarget = EventCommon.determine_target(Owner, Name);
-            if (ReferenceEquals(null, eventTarget))
+            if (eventTarget == null)
                 return false;/* This event is not valid for the owning element */
 
             if (!Map.TryGetValue(Name, out LinkedList<EventHandler> handlerList))
@@ -107,7 +107,7 @@ namespace CssUI.DOM.Events
         {
             /* Verify the event is accepted by this element */
             var eventTarget = EventCommon.determine_target(Owner, Name);
-            if (ReferenceEquals(null, eventTarget))
+            if (eventTarget == null)
                 return false;/* This event is not valid for the owning element */
 
             if (!Map.TryGetValue(Name, out LinkedList<EventHandler> handlerList))
@@ -117,13 +117,13 @@ namespace CssUI.DOM.Events
 
             bool found = false;
             var node = handlerList.First;
-            while (!ReferenceEquals(null, node))
+            while (node != null)
             {
                 var handler = node.Value;
                 if (ReferenceEquals(Callback, handler.callback))
                 {
                     handlerList.Remove(node);
-                    if (!ReferenceEquals(null, handler.listener))
+                    if (handler.listener != null)
                     {
                         handler.listener.removed = true;
                         Owner.Listeners.Remove(handler.listener);

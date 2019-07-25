@@ -26,12 +26,16 @@ namespace CssUI_XUnitTests
             foreach (Type type in allTypes)
             {
                 attr = type.GetCustomAttribute(typeof(CssUI.DOM.Internal.DomEnumAttribute));
-                if (!ReferenceEquals(null, attr))
+                if (attr != null)
+                {
                     domEnumList.Add(type);
+                }
 
                 attr = type.GetCustomAttribute(typeof(CssUI.CSS.Internal.CssEnumAttribute));
-                if (!ReferenceEquals(null, attr))
+                if (attr != null)
+                {
                     cssEnumList.Add(type);
+                }
             }
         }
 

@@ -89,7 +89,7 @@ namespace CssUI.DOM
                 nodeIterator.pointerBeforeReferenceNode = false;
             }
             /* 3) Set nodeIterator’s reference to toBeRemovedNode’s parent, if toBeRemovedNode’s previous sibling is null, and to the inclusive descendant of toBeRemovedNode’s previous sibling that appears last in tree order otherwise. */
-            if (ReferenceEquals(null, toBeRemovedNode.previousSibling))
+            if (toBeRemovedNode.previousSibling == null)
             {
                 nodeIterator.referenceNode = toBeRemovedNode.parentNode;
             }
@@ -103,7 +103,7 @@ namespace CssUI.DOM
                 Node n = tree.lastChild();
                 Node newNode = toBeRemovedNode.previousSibling;
                 /* Find the most-descended last child */
-                while (!ReferenceEquals(null, n))
+                while (n != null)
                 {
                     /* We keep going deeper until the traversal stops going deeper */
                     if (!DOMCommon.Is_Descendant(n, newNode))

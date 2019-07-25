@@ -132,7 +132,7 @@ namespace CssUI.DOM
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#scrolling-area-origin */
             get
             {
-                if (ReferenceEquals(null, Owner))
+                if (Owner == null)
                 {/* Viewport */
                     var icb = View.document.Initial_Containing_Block;
                     return new DOMPoint(icb.left, icb.top);
@@ -167,7 +167,7 @@ namespace CssUI.DOM
                 }
 
 
-                if (ReferenceEquals(null, Owner))
+                if (Owner == null)
                 {/* Viewport */
                     double top = 0, right = 0, bottom = 0, left = 0;
                     DOMRect icb = View.document.Initial_Containing_Block;
@@ -179,7 +179,7 @@ namespace CssUI.DOM
 
                     var tree = new TreeWalker(View.document.documentElement, Enums.ENodeFilterMask.SHOW_ELEMENT);
                     Node node = tree.nextNode();
-                    while (!ReferenceEquals(null, node))
+                    while (node != null)
                     {
                         if (node is Element E)
                         {
@@ -229,7 +229,7 @@ namespace CssUI.DOM
 
                     var tree = new TreeWalker(Owner, Enums.ENodeFilterMask.SHOW_ELEMENT);
                     Node node = tree.nextNode();
-                    while (!ReferenceEquals(null, node))
+                    while (node != null)
                     {
                         if (node is Element E)
                         {
@@ -330,7 +330,7 @@ namespace CssUI.DOM
         /// </summary>
         private void abort_smooth_scroll()
         {
-            if (!ReferenceEquals(null, smooth_scroller))
+            if (smooth_scroller != null)
             {
                 smooth_scroller.Stop();
             }
@@ -348,7 +348,7 @@ namespace CssUI.DOM
         }
         private void scroll_to_smooth(DOMPoint location)
         {/* https://www.w3.org/TR/cssom-view-1/#concept-smooth-scroll */
-            if (ReferenceEquals(null, smooth_scroller))
+            if (smooth_scroller == null)
             {
                 smooth_scroller = new ScheduledFunction(this._smooth_scroll_tick, TimeSpan.FromMilliseconds(2));
             }
@@ -381,7 +381,7 @@ namespace CssUI.DOM
         internal void Perform_Scroll(DOMPoint location, Element element, EScrollBehavior behavior = EScrollBehavior.Auto)
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#perform-a-scroll */
             abort_smooth_scroll();
-            if (behavior == EScrollBehavior.Auto && !ReferenceEquals(null, element) && element.Style.ScrollBehavior == EScrollBehavior.Smooth)
+            if (behavior == EScrollBehavior.Auto && element != null && element.Style.ScrollBehavior == EScrollBehavior.Smooth)
             {
                 if (element.Style.ScrollBehavior == EScrollBehavior.Smooth)
                 {

@@ -91,7 +91,7 @@ namespace CssUI.DOM
             get
             {
                 Node n = previousSibling;
-                while(!ReferenceEquals(null, n) && !(n is Element)) { n = n.previousSibling; }
+                while((n != null) && !(n is Element)) { n = n.previousSibling; }
                 return n as Element;
             }
         }
@@ -101,7 +101,7 @@ namespace CssUI.DOM
             get
             {
                 Node n = nextSibling;
-                while (!ReferenceEquals(null, n) && !(n is Element)) { n = n.nextSibling; }
+                while ((n != null) && !(n is Element)) { n = n.nextSibling; }
                 return n as Element;
             }
         }

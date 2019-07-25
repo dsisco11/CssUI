@@ -134,7 +134,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
         static void Consume_All_Whitespace(TokenStream Stream)
         {
-            if (ReferenceEquals(null, Stream))
+            if (Stream == null)
             {
                 throw new CssParserException("Stream is NULL!");
             }
@@ -144,7 +144,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
         static IEnumerable<CssComponent> Consume_Rule_List(TokenStream Stream, bool TopLevel = false)
         {
-            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
+            if (Stream == null) throw new CssParserException("Stream is NULL!");
             LinkedList<CssComponent> Rules = new LinkedList<CssComponent>();
 
             CssToken Token;
@@ -190,7 +190,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
         static CssAtRule Consume_AtRule(TokenStream Stream)
         {
-            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
+            if (Stream == null) throw new CssParserException("Stream is NULL!");
             string name = (Stream.Next as ValuedTokenBase).Value;
             CssAtRule Rule = new CssAtRule(name);
             CssToken Token;
@@ -220,7 +220,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
         static CssQualifiedRule Consume_QualifiedRule(TokenStream Stream)
         {
-            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
+            if (Stream == null) throw new CssParserException("Stream is NULL!");
             CssQualifiedRule Rule = new CssQualifiedRule();
             CssToken Token;
             do
@@ -245,7 +245,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
         static IEnumerable<CssComponent> Consume_Decleration_List(TokenStream Stream)
         {// SEE:  https://www.w3.org/TR/css-syntax-3/#consume-a-list-of-declarations0
-            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
+            if (Stream == null) throw new CssParserException("Stream is NULL!");
             LinkedList<CssComponent> List = new LinkedList<CssComponent>();
             CssToken Token;
             do
@@ -300,7 +300,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
         static CssDecleration Consume_Decleration(TokenStream Stream)
         {
-            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
+            if (Stream == null) throw new CssParserException("Stream is NULL!");
             string name = (Stream.Consume() as ValuedTokenBase).Value;
 
             CssDecleration Decleration = new CssDecleration(name);
@@ -357,7 +357,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
         static CssSimpleBlock Consume_SimpleBlock(TokenStream Stream)
         {
-            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
+            if (Stream == null) throw new CssParserException("Stream is NULL!");
             CssToken StartToken = Stream.Consume();
             CssToken EndToken;
             switch (StartToken.Type)
@@ -393,7 +393,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
         static CssFunction Consume_Function(TokenStream Stream)
         {
-            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
+            if (Stream == null) throw new CssParserException("Stream is NULL!");
             if (Stream.Next.Type != ECssTokenType.FunctionName) throw new CssParserException("Expected function name token!");
 
             string name = (Stream.Next as FunctionNameToken).Value;
@@ -427,7 +427,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
         static CssToken Consume_ComponentValue(TokenStream Stream)
         {
-            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
+            if (Stream == null) throw new CssParserException("Stream is NULL!");
             switch (Stream.Next.Type)
             {
                 case ECssTokenType.Bracket_Open:
@@ -449,7 +449,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
         static IEnumerable<IEnumerable<CssToken>> Consume_Comma_Seperated_Component_Value_List(TokenStream Stream)
         {/* Docs: https://drafts.csswg.org/css-syntax-3/#parse-a-comma-separated-list-of-component-values */
-            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
+            if (Stream == null) throw new CssParserException("Stream is NULL!");
 
             var cvls = new LinkedList<LinkedList<CssToken>>();
             var node = cvls.AddLast(new LinkedList<CssToken>());
@@ -480,7 +480,7 @@ namespace CssUI.CSS.Serialization
         #region CSS Values
         public static CssValue Consume_CssValue(TokenStream Stream)
         {
-            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
+            if (Stream == null) throw new CssParserException("Stream is NULL!");
             CssToken Token = Stream.Next;
 
             switch (Token.Type)
@@ -570,7 +570,7 @@ namespace CssUI.CSS.Serialization
 
         static MediaQuery Consume_MediaQuery(TokenStream Stream = null)
         {/* Docs: https://drafts.csswg.org/mediaqueries-4/#mq-syntax */
-            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
+            if (Stream == null) throw new CssParserException("Stream is NULL!");
 
             if (Stream.Next.Type != ECssTokenType.Ident)
             {
@@ -644,7 +644,7 @@ namespace CssUI.CSS.Serialization
         /// <returns></returns>
         static IMediaCondition Consume_Media_Condition(TokenStream Stream)
         {/* Docs: https://www.w3.org/TR/mediaqueries-4/#media-condition */
-            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
+            if (Stream == null) throw new CssParserException("Stream is NULL!");
 
             Consume_All_Whitespace(Stream);
             if (ParserCommon.Starts_Media_Feature(Stream.Next, Stream.NextNext, Stream.NextNextNext))
@@ -729,7 +729,7 @@ namespace CssUI.CSS.Serialization
 
         static IMediaCondition Consume_Media_Feature(TokenStream Stream)
         {/* Docs: https://drafts.csswg.org/mediaqueries-4/#mq-syntax */
-            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
+            if (Stream == null) throw new CssParserException("Stream is NULL!");
 
 
             /* Consume feature name */
@@ -810,7 +810,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static CssValue Consume_MediaFeature_Value(TokenStream Stream)
         {
-            if (ReferenceEquals(null, Stream)) throw new CssParserException("Stream is NULL!");
+            if (Stream == null) throw new CssParserException("Stream is NULL!");
             /* Consume: <number> | <dimension> | <ident> | <ratio> */
             Consume_All_Whitespace(Stream);
 

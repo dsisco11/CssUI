@@ -15,8 +15,8 @@ namespace CssUI.DOM
             get
             {
                 LinkedList<HTMLElement> rowList = new LinkedList<HTMLElement>();
-                Element child = this.firstElementChild;
-                while (!ReferenceEquals(null, child))
+                Element child = firstElementChild;
+                while (child != null)
                 {
                     if (child is HTMLTableRowElement rowElement)
                         rowList.AddLast(rowElement);

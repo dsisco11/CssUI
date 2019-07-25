@@ -30,10 +30,10 @@ namespace CssUI.DOM
             }
 
             /* 4) If doctype is non-null, append doctype to document. */
-            if (!ReferenceEquals(null, doctype))
+            if (doctype != null)
                 document.append(doctype);
             /* 5) If element is non-null, append element to document. */
-            if (!ReferenceEquals(null, element))
+            if (element != null)
                 document.append(element);
 
             /* 6) document’s origin is context object’s associated document’s origin. */
@@ -44,7 +44,7 @@ namespace CssUI.DOM
         public Document createHTMLDocument(string title)
         {
             var doc = new HTMLDocument("text/html");
-            doc.append(new DocumentType("html") { ownerDocument = doc });
+            doc.append(new DocumentType("html") { nodeDocument = doc });
             /* 4) Append the result of creating an element given doc, html, and the HTML namespace, to doc. */
             var html = DOMCommon.createElementNS(doc, "html", DOMCommon.HTMLNamespace);
             doc.append(html);

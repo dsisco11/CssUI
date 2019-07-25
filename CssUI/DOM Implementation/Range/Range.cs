@@ -81,7 +81,7 @@ namespace CssUI.DOM
         #region Internal
         internal Node get_CommonAncestor()
         {
-            if (ReferenceEquals(null, startContainer) || ReferenceEquals(null, endContainer))
+            if (startContainer == null || endContainer == null)
                 return null;
 
             var commonAncestor = startContainer;
@@ -475,7 +475,7 @@ namespace CssUI.DOM
             {
                 Node referenceNode = startContainer;
                 /* 2) While reference node’s parent is not null and is not an inclusive ancestor of original end node, set reference node to its parent. */
-                while (!ReferenceEquals(null, referenceNode.parentNode) && !DOMCommon.Is_Inclusive_Ancestor(referenceNode.parentNode, endContainer))
+                while (referenceNode.parentNode != null && !DOMCommon.Is_Inclusive_Ancestor(referenceNode.parentNode, endContainer))
                 {
                     referenceNode = referenceNode.parentNode;
                 }
@@ -493,7 +493,7 @@ namespace CssUI.DOM
                 ((CharacterData)startContainer).replaceData(startOffset, startContainer.nodeLength - startOffset, string.Empty);
             }
             /* 16) Otherwise, if first partially contained child is not null: */
-            else if (!ReferenceEquals(null, firstPartiallyContainedChild))
+            else if (firstPartiallyContainedChild != null)
             {
                 Node clone = firstPartiallyContainedChild.cloneNode();
                 fragment.appendChild(clone);
@@ -516,7 +516,7 @@ namespace CssUI.DOM
                 ((CharacterData)endContainer).replaceData(0, endOffset, string.Empty);
             }
             /* 19) Otherwise, if last partially contained child is not null: */
-            else if (!ReferenceEquals(null, lastPartiallyContainedChild))
+            else if (lastPartiallyContainedChild != null)
             {
                 Node clone = lastPartiallyContainedChild.cloneNode();
                 fragment.appendChild(clone);
@@ -582,7 +582,7 @@ namespace CssUI.DOM
                 fragment.appendChild(clone);
             }
             /* 14) Otherwise, if first partially contained child is not null: */
-            if (!ReferenceEquals(null, firstPartiallyContainedChild))
+            if (firstPartiallyContainedChild != null)
             {
                 Node clone = firstPartiallyContainedChild.cloneNode();
                 fragment.appendChild(clone);
@@ -607,7 +607,7 @@ namespace CssUI.DOM
                 fragment.appendChild(clone);
             }
             /* 17) Otherwise, if last partially contained child is not null: */
-            if (!ReferenceEquals(null, lastPartiallyContainedChild))
+            if (lastPartiallyContainedChild != null)
             {
                 var clone = lastPartiallyContainedChild.cloneNode();
                 fragment.appendChild(clone);
@@ -624,7 +624,7 @@ namespace CssUI.DOM
         public void insertNode(Node node)
         {/* Docs: https://dom.spec.whatwg.org/#concept-range-insert */
             /* 1) If range’s start node is a ProcessingInstruction or Comment node, is a Text node whose parent is null, or is node, then throw a "HierarchyRequestError" DOMException. */
-            if (startContainer is ProcessingInstruction || startContainer is Comment || (startContainer is Text startTxt && ReferenceEquals(null, startTxt.parentNode)))
+            if (startContainer is ProcessingInstruction || startContainer is Comment || (startContainer is Text startTxt && startTxt.parentNode == null))
                 throw new HierarchyRequestError();
 
             Node referenceNode = null;
@@ -640,7 +640,7 @@ namespace CssUI.DOM
             }
 
             /* 5) Let parent be range’s start node if referenceNode is null, and referenceNode’s parent otherwise. */
-            Node parent = ReferenceEquals(null, referenceNode) ? startContainer : referenceNode.parentNode;
+            Node parent = referenceNode == null ? startContainer : referenceNode.parentNode;
 
             /* 6) Ensure pre-insertion validity of node into parent before referenceNode. */
             Node._ensure_pre_insertion_validity(node, parent, referenceNode);
@@ -656,11 +656,11 @@ namespace CssUI.DOM
                 referenceNode = referenceNode.nextSibling;
 
             /* 9) If node’s parent is not null, remove node from its parent. */
-            if (!ReferenceEquals(null, node.parentNode))
+            if (node.parentNode != null)
                 node.parentNode.removeChild(node);
 
             /* 10) Let newOffset be parent’s length if referenceNode is null, and referenceNode’s index otherwise. */
-            int newOffset = ReferenceEquals(null, referenceNode) ? parent.nodeLength : referenceNode.index;
+            int newOffset = referenceNode == null ? parent.nodeLength : referenceNode.index;
 
             /* 11) Increase newOffset by node’s length if node is a DocumentFragment node, and one otherwise. */
             newOffset += (node is DocumentFragment) ? node.nodeLength : 1;
@@ -727,7 +727,7 @@ namespace CssUI.DOM
                 return false;
 
             var parent = node.parentNode;
-            if (ReferenceEquals(null, parent))
+            if (parent == null)
                 return true;
 
             int offset = node.index;
@@ -746,7 +746,7 @@ namespace CssUI.DOM
             var common = get_CommonAncestor();
             var tree = new TreeWalker(common, Enums.ENodeFilterMask.SHOW_ALL);
             Node node = tree.nextNode();
-            while (!ReferenceEquals(null, node))
+            while (node != null)
             {
                 /* For each element selected by the range, whose parent is not selected by the range, include the border areas returned by invoking getClientRects() on the element. */
                 if (node.nodeType == ENodeType.ELEMENT_NODE)

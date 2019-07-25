@@ -35,7 +35,7 @@ namespace CssUI.DOM
         /// <summary>
         /// True if this attribute doesnt have an assigned value
         /// </summary>
-        public bool Is_MissingValue => ReferenceEquals(null, _value_assigned);
+        public bool Is_MissingValue => (_value_assigned == null);
         public bool Is_InvalidValue { get; private set; } = false;
         /// <summary>
         /// Returns if this attribute is Missing or Invalid
@@ -49,7 +49,7 @@ namespace CssUI.DOM
         {
             get
             {
-                if (ReferenceEquals(null, _definition))
+                if (_definition == null)
                 {
                     _definition = new WeakReference<AttributeDefinition>(AttributeDefinition.Lookup(localName));
                 }
@@ -76,7 +76,7 @@ namespace CssUI.DOM
             set
             {
                 /* 1) If attribute’s element is null, then set attribute’s value to value. */
-                if (ReferenceEquals(null, ownerElement))
+                if (ownerElement == null)
                 {
                     _set_value(value);
                 }

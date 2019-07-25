@@ -214,7 +214,7 @@ namespace CssUI
         /// <summary>
         /// Instance object given to us by the <see cref="IRenderEngine"/> implementation, which it uses to actually handle the texture.
         /// </summary>
-        public object Instance { get; private set; } = null;
+        public dynamic Instance { get; private set; } = null;
         /// <summary>
         /// Time (in seconds) this frame should be onscreen for
         /// </summary>
@@ -224,7 +224,7 @@ namespace CssUI
         /// <summary>
         /// Returns whether this frame is ready for the <see cref="IRenderEngine"/> instance to draw it, or if it still needs to be created.
         /// </summary>
-        public bool IsReady { get { return !object.ReferenceEquals(null, Instance); } }
+        public bool IsReady => (Instance != null);
         #endregion
 
         #region Constructors

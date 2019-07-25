@@ -18,7 +18,7 @@ namespace CssUI.Internal
         public static dynamic Font_Size_Computed(ICssProperty Property)
         {// SEE: https://www.w3.org/TR/css-fonts-3/#font-size-prop
             CssValue value = (Property as CssProperty).Specified;
-            if (ReferenceEquals(null, value))
+            if (value == null)
             {
                 throw new CssException($"Unable to resolve absolute length for Computed \"{Property.CssName}\" value.");
             }

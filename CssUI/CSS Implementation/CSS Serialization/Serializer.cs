@@ -136,7 +136,7 @@ namespace CssUI.CSS.Serialization
                 sb.Append('\u0028');
                 sb.Append(CssLookup.Keyword_From_Enum(feature.Name));
                 /* 2) If a value is given append a ":" (U+003A), followed by a single SPACE (U+0020), followed by the serialized media feature value, to s. */
-                if (!ReferenceEquals(null, feature.Value))
+                if (feature.Value != null)
                 {
                     sb.Append("\u003A\u0020");
                     sb.Append(feature.Value.ToString());
@@ -155,7 +155,7 @@ namespace CssUI.CSS.Serialization
 
         public static string MediaQueryList(IEnumerable<MediaQuery> queries)
         {
-            IEnumerable<string> queryList = queries.Select(q => Serializer.MediaQuery(q));
+            IEnumerable<string> queryList = queries.Select(q => MediaQuery(q));
             return Serialize_Comma_List(queryList);
         }
         #endregion

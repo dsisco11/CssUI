@@ -29,7 +29,7 @@ namespace CssUI.DOM
 
         public DOMRect getClientRect()
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-caretposition-getclientrect */
-            if (!ReferenceEquals(null, caretRange))
+            if (caretRange != null)
             {
                 IEnumerable<DOMRect> list = caretRange.getClientRects();
                 if (!list.Any())

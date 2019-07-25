@@ -228,7 +228,7 @@ namespace CssUI.DOM
             get
             {
                 Node n = previousSibling;
-                while (!ReferenceEquals(null, n) && !(n is Element)) { n = n.previousSibling; }
+                while ((n != null) && !(n is Element)) { n = n.previousSibling; }
                 return n as Element;
             }
         }
@@ -238,7 +238,7 @@ namespace CssUI.DOM
             get
             {
                 Node n = nextSibling;
-                while (!ReferenceEquals(null, n) && !(n is Element)) { n = n.nextSibling; }
+                while ((n != null) && !(n is Element)) { n = n.nextSibling; }
                 return n as Element;
             }
         }
@@ -284,7 +284,7 @@ namespace CssUI.DOM
             foreach (Attr attr in AttributeList)
             {
                 Attr bAttr = B.getAttributeNode(attr.localName);
-                if (ReferenceEquals(null, bAttr))
+                if (bAttr == null)
                     return false;
 
                 if (!attr.Equals(bAttr))
@@ -306,13 +306,13 @@ namespace CssUI.DOM
         #endregion
 
         #region Internal States
-        internal bool is_root => ReferenceEquals(null, parentNode);
+        internal bool is_root => parentNode == null;
 
         /// <summary>
         /// An element is being rendered if it has any associated CSS layout boxes, SVG layout boxes, or some equivalent in other styling languages.
         /// </summary>
         /// XXX: Implement this logic
-        internal virtual bool is_being_rendered => !ReferenceEquals(null, Box);
+        internal virtual bool is_being_rendered => Box != null;
 
         internal bool is_in_formal_activation_state
         {/* Docs:  */
@@ -420,7 +420,7 @@ namespace CssUI.DOM
 
         internal override bool Is_ShadowHost
         {/* Docs: https://dom.spec.whatwg.org/#element-shadow-host */
-            get => !ReferenceEquals(null, shadowRoot);
+            get => shadowRoot != null;
         }
 
         internal bool is_potentially_scrollable
@@ -429,7 +429,7 @@ namespace CssUI.DOM
             {
                 /* An element is potentially scrollable if all of the following conditions are true: */
                 /* The element has an associated CSS layout box. */
-                if (!ReferenceEquals(null, this.Box))
+                if (this.Box != null)
                 {/* The element is not the HTML body element, or it is and the root element’s used value of the overflow-x or overflow-y properties is not visible. */
                     var root = getRootNode() as Element;
                     if (!ReferenceEquals(this, ownerDocument.body) || (ReferenceEquals(this, ownerDocument.body) && (root.Style.Overflow_X != EOverflowMode.Visible || root.Style.Overflow_Y != EOverflowMode.Visible)))
@@ -711,7 +711,7 @@ namespace CssUI.DOM
         [CEReactions]
         public Attr removeAttributeNode(Attr attr)
         {
-            return ReactionsCommon.Wrap_CEReaction(this, () =>
+            return CEReactions.Wrap_CEReaction(this, () =>
             {
                 find_attribute(attr.Name, out Attr outAttr);
                 if (!ReferenceEquals(attr, null))
@@ -728,14 +728,14 @@ namespace CssUI.DOM
         [CEReactions]
         public bool toggleAttribute(AtomicName<EAttributeName> Name, bool? force = null)
         {
-            return ReactionsCommon.Wrap_CEReaction(this, () =>
+            return CEReactions.Wrap_CEReaction(this, () =>
             {
                 /* 1) If qualifiedName does not match the Name production in XML, then throw an "InvalidCharacterError" DOMException. */
                 /* 2) If the context object is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase. */
                 /* 3) Let attribute be the first attribute in the context object’s attribute list whose qualified name is qualifiedName, and null otherwise. */
                 find_attribute(Name, out Attr attr);
                 /* 4) If attribute is null, then: */
-                if (ReferenceEquals(null, attr))
+                if (attr == null)
                 {
                     /* 1) If force is not given or is true, create an attribute whose local name is qualifiedName, value is the empty string, and node document is the context object’s node document, then append this attribute to the context object, and then return true. */
                     if (!force.HasValue || force.Value)
@@ -761,7 +761,7 @@ namespace CssUI.DOM
         [CEReactions, Obsolete("Use toggleAttribute(AtomicName<EAttributeName> Name, bool? force)", true)]
         public bool toggleAttribute(string qualifiedName, bool? force = null)
         {
-            return ReactionsCommon.Wrap_CEReaction(this, () =>
+            return CEReactions.Wrap_CEReaction(this, () =>
             {
                 /* 1) If qualifiedName does not match the Name production in XML, then throw an "InvalidCharacterError" DOMException. */
                 /* 2) If the context object is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase. */
@@ -769,7 +769,7 @@ namespace CssUI.DOM
                 /* 3) Let attribute be the first attribute in the context object’s attribute list whose qualified name is qualifiedName, and null otherwise. */
                 find_attribute(qualifiedName, out Attr attr);
                 /* 4) If attribute is null, then: */
-                if (ReferenceEquals(null, attr))
+                if (attr == null)
                 {
                     /* 1) If force is not given or is true, create an attribute whose local name is qualifiedName, value is the empty string, and node document is the context object’s node document, then append this attribute to the context object, and then return true. */
                     if (!force.HasValue || force.Value)
@@ -796,18 +796,18 @@ namespace CssUI.DOM
 
         public bool hasAttribute(AtomicName<EAttributeName> Name)
         {
-            if (this.AttributeList.TryGetValue(Name, out Attr attr))
-                return !ReferenceEquals(null, attr.Value);
+            if (AttributeList.TryGetValue(Name, out Attr attr))
+                return attr.Value != null;
 
             return false;
         }
 
         public bool hasAttribute(AtomicName<EAttributeName> Name, out Attr outAttr)
         {
-            if (this.AttributeList.TryGetValue(Name, out Attr attr))
+            if (AttributeList.TryGetValue(Name, out Attr attr))
             {
                 outAttr = attr;
-                return !ReferenceEquals(null, attr.Value);
+                return attr.Value != null;
             }
 
             outAttr = null;
@@ -817,8 +817,8 @@ namespace CssUI.DOM
         [Obsolete("Attributes should be specified via an AtomicName instance", true)]
         public bool hasAttribute(string qualifiedName)
         {
-            if (this.AttributeList.TryGetValue(qualifiedName.ToLowerInvariant(), out Attr attr))
-                return !ReferenceEquals(null, attr.Value);
+            if (AttributeList.TryGetValue(qualifiedName.ToLowerInvariant(), out Attr attr))
+                return attr.Value != null;
 
             return false;
         }
@@ -918,7 +918,7 @@ namespace CssUI.DOM
         {
             get
             {
-                if (ReferenceEquals(null, _shadow_root))
+                if (_shadow_root == null)
                     return null;
 
                 if (_shadow_root.Mode == EShadowRootMode.Closed)
@@ -955,7 +955,7 @@ namespace CssUI.DOM
             if (isValidCustomName || !ReferenceEquals(null, is_value))
             {
                 var definition = nodeDocument.defaultView.customElements.Lookup(nodeDocument, NamespaceURI, localName, is_value);
-                if (!ReferenceEquals(null, definition) && definition.bDisableShadow)
+                if (definition != null && definition.bDisableShadow)
                 {
                     throw new NotSupportedError($"Cannot attach ShadowDOM to custom element whose definition has ShadowDOM disabled");
                 }
@@ -981,8 +981,10 @@ namespace CssUI.DOM
             /* XXX: SVG layout box handling needed here */
             LinkedList<DOMRect> Rects = new LinkedList<DOMRect>();
             /* 1) If the element on which it was invoked does not have an associated layout box return an empty sequence and stop this algorithm. */
-            if (ReferenceEquals(null, this.Box))
+            if (Box == null)
+            {
                 return Rects;
+            }
             /* 2) If the element has an associated SVG layout box return a sequence containing a single DOMRect object that describes the bounding box of the element as defined by the SVG specification, applying the transforms that apply to the element and its ancestors. */
             /* 3) Return a sequence containing static DOMRect objects in content order, one for each box fragment, describing its border area (including those with a height or width of zero) with the following constraints: */
             foreach (CssBoxFragment fragment in Box.Fragments)
@@ -1200,7 +1202,7 @@ namespace CssUI.DOM
                 return false;
 
             Element associatedElement = null;
-            if (ReferenceEquals(null, scrollBox.Owner))
+            if (scrollBox.Owner == null)
             {/* Viewport */
                 associatedElement = scrollBox.View.document.activeElement;
             }
@@ -1226,7 +1228,7 @@ namespace CssUI.DOM
 
             var tree = new TreeWalker(this, ENodeFilterMask.SHOW_ALL);
             Node node = tree.parentNode();
-            while (!ReferenceEquals(null, node))
+            while (node != null)
             {
                 if (node is Element ancestor)
                 {
@@ -1292,7 +1294,7 @@ namespace CssUI.DOM
                 if (!ownerDocument.Is_FullyActive)
                     return 0;
 
-                if (ReferenceEquals(null, ownerDocument.defaultView))
+                if (ownerDocument.defaultView == null)
                     return 0;
 
                 if (is_root && ownerDocument.Mode == EQuirksMode.Quirks)
@@ -1304,7 +1306,7 @@ namespace CssUI.DOM
                 if (ReferenceEquals(this, ownerDocument.body) && ownerDocument.Mode == EQuirksMode.Quirks && !is_potentially_scrollable)
                     return ownerDocument.defaultView.scrollY;
 
-                if (ReferenceEquals(null, Box))
+                if (Box == null)
                     return 0;
 
                 /* 9) Return the y-coordinate of the scrolling area at the alignment point with the top of the padding edge of the element. */
@@ -1322,7 +1324,7 @@ namespace CssUI.DOM
                 if (!document.Is_FullyActive)
                     return;
 
-                if (ReferenceEquals(null, window))
+                if (window == null)
                     return;
 
                 if (is_root && document.Mode == EQuirksMode.Quirks)
@@ -1340,7 +1342,7 @@ namespace CssUI.DOM
                     return;
                 }
 
-                if (ReferenceEquals(null, Box) || ReferenceEquals(null, ScrollBox) || !has_overflow)
+                if (Box == null || ScrollBox == null || !has_overflow)
                     return;
 
                 scroll_element(scrollLeft, y, EScrollBehavior.Auto);
@@ -1355,7 +1357,7 @@ namespace CssUI.DOM
                     return 0;
 
                 var window = document.defaultView;
-                if (ReferenceEquals(null, window))
+                if (window == null)
                     return 0;
 
                 if (is_root && document.Mode == EQuirksMode.Quirks)
@@ -1367,7 +1369,7 @@ namespace CssUI.DOM
                 if (ReferenceEquals(this, document.body) && document.Mode == EQuirksMode.Quirks && !is_potentially_scrollable)
                     return window.scrollX;
 
-                if (ReferenceEquals(null, Box))
+                if (Box == null)
                     return 0;
 
                 /* 9) Return the x-coordinate of the scrolling area at the alignment point with the left of the padding edge of the element. */
@@ -1384,7 +1386,7 @@ namespace CssUI.DOM
                     return;
 
                 var window = document.defaultView;
-                if (ReferenceEquals(null, window))
+                if (window == null)
                     return;
 
                 if (is_root && document.Mode == EQuirksMode.Quirks)
@@ -1402,7 +1404,7 @@ namespace CssUI.DOM
                     return;
                 }
 
-                if (ReferenceEquals(null, Box) || ReferenceEquals(null, ScrollBox) || !has_overflow)
+                if (Box == null || ScrollBox == null || !has_overflow)
                     return;
 
                 scroll_element(x, scrollTop, EScrollBehavior.Auto);
@@ -1417,7 +1419,7 @@ namespace CssUI.DOM
                     return 0;
 
                 double viewportWidth = 0;
-                if (!ReferenceEquals(null, document.Viewport) && !ReferenceEquals(null, document?.Viewport?.ScrollBox))
+                if (document.Viewport != null && document?.Viewport?.ScrollBox != null)
                 {
                     viewportWidth = document.Viewport.Width - (document.Viewport.ScrollBox?.VScrollBar?.width ?? 0);
                 }
@@ -1428,7 +1430,7 @@ namespace CssUI.DOM
                 if (ReferenceEquals(this, document.body) && document.Mode == EQuirksMode.Quirks && !is_potentially_scrollable)
                     return (long)MathExt.Max(viewportWidth, document.Viewport.ScrollBox.ScrollArea.width);
 
-                if (ReferenceEquals(null, Box))
+                if (Box == null)
                     return 0;
 
                 return (long)ScrollBox.ScrollArea.width;
@@ -1443,7 +1445,7 @@ namespace CssUI.DOM
                     return 0;
 
                 double viewportHeight = 0;
-                if (!ReferenceEquals(null, document.Viewport) && !ReferenceEquals(null, document?.Viewport?.ScrollBox))
+                if (document.Viewport != null && document?.Viewport?.ScrollBox != null)
                 {
                     viewportHeight = document.Viewport.Height - (document.Viewport.ScrollBox?.HScrollBar?.height ?? 0);
                 }
@@ -1454,7 +1456,7 @@ namespace CssUI.DOM
                 if (ReferenceEquals(this, document.body) && document.Mode == EQuirksMode.Quirks && !is_potentially_scrollable)
                     return (long)MathExt.Max(viewportHeight, document.Viewport.ScrollBox.ScrollArea.height);
 
-                if (ReferenceEquals(null, Box))
+                if (Box == null)
                     return 0;
 
                 return (long)ScrollBox.ScrollArea.height;
@@ -1465,7 +1467,7 @@ namespace CssUI.DOM
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-element-clienttop */
             get
             {
-                if (ReferenceEquals(null, Box) || Box.OuterDisplayType == CssUI.Enums.EOuterDisplayType.Inline)
+                if (Box == null || Box.OuterDisplayType == CssUI.Enums.EOuterDisplayType.Inline)
                     return 0;
 
                 /* 2) Return the computed value of the border-top-width property plus the height of any scrollbar rendered between the top padding edge and the top border edge, 
@@ -1479,7 +1481,7 @@ namespace CssUI.DOM
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-element-clientleft */
             get
             {
-                if (ReferenceEquals(null, Box) || Box.OuterDisplayType == CssUI.Enums.EOuterDisplayType.Inline)
+                if (Box == null || Box.OuterDisplayType == CssUI.Enums.EOuterDisplayType.Inline)
                     return 0;
 
                 /* 2) Return the computed value of the border-left-width property plus the width of any scrollbar rendered between the left padding edge and the left border edge, 
@@ -1493,7 +1495,7 @@ namespace CssUI.DOM
         {/* https://www.w3.org/TR/cssom-view-1/#dom-element-clientwidth */
             get
             {
-                if (ReferenceEquals(null, Box) || Box.OuterDisplayType == CssUI.Enums.EOuterDisplayType.Inline)
+                if (Box == null || Box.OuterDisplayType == CssUI.Enums.EOuterDisplayType.Inline)
                     return 0;
 
                 /* 2) If the element is the root element and the element’s node document is not in quirks mode, 
@@ -1502,13 +1504,13 @@ namespace CssUI.DOM
                 if ((is_root && ownerDocument.Mode != EQuirksMode.Quirks) || (ReferenceEquals(this, ownerDocument.body) && ownerDocument.Mode == EQuirksMode.Quirks))
                 {
                     double vpSize = ownerDocument.Viewport.Width;
-                    vpSize -= ReferenceEquals(null, ownerDocument.Viewport.ScrollBox.VScrollBar) ? 0 : ownerDocument.Viewport.ScrollBox.VScrollBar.width;
+                    vpSize -= (null == ownerDocument.Viewport.ScrollBox.VScrollBar) ? 0 : ownerDocument.Viewport.ScrollBox.VScrollBar.width;
                     return (long)vpSize;
                 }
 
                 /* 3) Return the width of the padding edge excluding the width of any rendered scrollbar between the padding edge and the border edge, ignoring any transforms that apply to the element and its ancestors. */
                 double clientSize = Box.Padding.Width;
-                clientSize -= ReferenceEquals(null, ScrollBox.VScrollBar) ? 0 : ScrollBox.VScrollBar.width;
+                clientSize -= (null == ScrollBox.VScrollBar) ? 0 : ScrollBox.VScrollBar.width;
                 return (long)clientSize;
             }
         }
@@ -1516,7 +1518,7 @@ namespace CssUI.DOM
         {
             get
             {
-                if (ReferenceEquals(null, Box) || Box.OuterDisplayType == CssUI.Enums.EOuterDisplayType.Inline)
+                if (Box == null || Box.OuterDisplayType == CssUI.Enums.EOuterDisplayType.Inline)
                     return 0;
 
                 /* 2) If the element is the root element and the element’s node document is not in quirks mode, 
@@ -1525,13 +1527,13 @@ namespace CssUI.DOM
                 if ((is_root && ownerDocument.Mode != EQuirksMode.Quirks) || (ReferenceEquals(this, ownerDocument.body) && ownerDocument.Mode == EQuirksMode.Quirks))
                 {
                     double vpSize = ownerDocument.Viewport.Height;
-                    vpSize -= ReferenceEquals(null, ownerDocument.Viewport.ScrollBox.HScrollBar) ? 0 : ownerDocument.Viewport.ScrollBox.HScrollBar.height;
+                    vpSize -= (null == ownerDocument.Viewport.ScrollBox.HScrollBar) ? 0 : ownerDocument.Viewport.ScrollBox.HScrollBar.height;
                     return (long)vpSize;
                 }
 
                 /* 3) Return the height of the padding edge excluding the height of any rendered scrollbar between the padding edge and the border edge, ignoring any transforms that apply to the element and its ancestors. */
                 double clientSize = Box.Padding.Height;
-                clientSize -= ReferenceEquals(null, ScrollBox.HScrollBar) ? 0 : ScrollBox.HScrollBar.height;
+                clientSize -= (null == ScrollBox.HScrollBar) ? 0 : ScrollBox.HScrollBar.height;
                 return (long)clientSize;
             }
         }
@@ -1546,7 +1548,7 @@ namespace CssUI.DOM
             EScrollLogicalPosition block = EScrollLogicalPosition.Start;
             EScrollLogicalPosition inline = EScrollLogicalPosition.Nearest;
 
-            if (ReferenceEquals(null, Box))
+            if (Box == null)
                 return;
 
             /* 7) Scroll the element into view with the options. */
@@ -1569,7 +1571,7 @@ namespace CssUI.DOM
                 inline = EScrollLogicalPosition.Nearest;
             }
 
-            if (ReferenceEquals(null, Box))
+            if (Box == null)
                 return;
 
             /* 7) Scroll the element into view with the options. */
@@ -1582,7 +1584,7 @@ namespace CssUI.DOM
         /// </summary>
         public void ScrollIntoView(ScrollIntoViewOptions options)
         {
-            if (ReferenceEquals(null, Box))
+            if (Box == null)
                 return;
 
             /* 7) Scroll the element into view with the options. */
@@ -1614,7 +1616,10 @@ namespace CssUI.DOM
             /* 5) Let window be the value of document’s defaultView attribute. */
             var window = document.defaultView;
             /* 6) If window is null, terminate these steps. */
-            if (ReferenceEquals(null, window)) return;
+            if (window == null)
+            {
+                return;
+            }
 
             /* 8) If the element is the root element invoke scroll() on window with scrollX on window as first argument and y as second argument, and terminate these steps. */
             if (is_root)
@@ -1631,7 +1636,7 @@ namespace CssUI.DOM
             }
 
             /* 10) If the element does not have any associated CSS layout box, the element has no associated scrolling box, or the element has no overflow, terminate these steps. */
-            if (ReferenceEquals(null, this.Box) || ReferenceEquals(null, ScrollBox) || !has_overflow)
+            if (Box == null || ScrollBox == null || !has_overflow)
             {
                 return;
             }
@@ -1657,7 +1662,10 @@ namespace CssUI.DOM
             /* 5) Let window be the value of document’s defaultView attribute. */
             var window = document.defaultView;
             /* 6) If window is null, terminate these steps. */
-            if (ReferenceEquals(null, window)) return;
+            if (window == null)
+            {
+                return;
+            }
 
             /* 8) If the element is the root element invoke scroll() on window with scrollX on window as first argument and y as second argument, and terminate these steps. */
             if (is_root)
@@ -1674,7 +1682,7 @@ namespace CssUI.DOM
             }
 
             /* 10) If the element does not have any associated CSS layout box, the element has no associated scrolling box, or the element has no overflow, terminate these steps. */
-            if (ReferenceEquals(null, this.Box) || ReferenceEquals(null, ScrollBox) || !has_overflow)
+            if (Box == null || ScrollBox == null || !has_overflow)
             {
                 return;
             }

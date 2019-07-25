@@ -97,8 +97,10 @@ namespace CssUI.DOM
             get
             {
                 HTMLSelectElement select = get_select();
-                if (ReferenceEquals(null, select))
+                if (select == null)
+                {
                     return 0;
+                }
 
                 var optionsList = select.options;
                 for(int i=0; i<optionsList.Count; i++)
@@ -109,7 +111,7 @@ namespace CssUI.DOM
                     }
                 }
 
-                throw new System.Exception("Unable to find current option within parent <select>s options list!");
+                throw new Exception("Unable to find current option within parent <select>s options list!");
             }
         }
 
@@ -177,7 +179,7 @@ namespace CssUI.DOM
                 var tree = new TreeWalker(this, Enums.ENodeFilterMask.SHOW_ALL);
 
                 Node descendant = tree.nextNode();
-                while (!ReferenceEquals(null, descendant))
+                while (descendant != null)
                 {
                     if (descendant is HTMLScriptElement)
                     {
@@ -228,7 +230,7 @@ namespace CssUI.DOM
             set
             {
                 HTMLSelectElement select = get_select();
-                if (!ReferenceEquals(null, select))
+                if (select != null)
                 {
                     return select.form;
                 }

@@ -47,7 +47,7 @@ namespace CssUI.DOM.CustomElements
             /* 8) Run the following substeps while catching any exceptions: */
             try
             {
-                if (definition.bDisableShadow && !ReferenceEquals(null, element.shadowRoot))
+                if (definition.bDisableShadow && element.shadowRoot != null)
                 {
                     throw new NotSupportedException($"Cannot upgrade a custom element which has a shadow root and whose definition has ShadowDOM disabled");
                 }
@@ -95,7 +95,7 @@ namespace CssUI.DOM.CustomElements
             {
                 /* 1) Reset the form owner of element. If element is associated with a form element, then enqueue a custom element callback reaction with element, callback name "formAssociatedCallback", and « the associated form ». */
                 DOMCommon.Reset_Form_Owner(element);
-                if (!ReferenceEquals(null, formElement.form))
+                if (formElement.form != null)
                 {
                     Enqueue_Reaction(element, EReactionName.FormAssociated, formElement.form);
                 }
@@ -114,7 +114,7 @@ namespace CssUI.DOM.CustomElements
         public static void Try_Upgrade_Element(Element element)
         {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#concept-try-upgrade */
             var definition = element.nodeDocument.defaultView.customElements.Lookup(element.nodeDocument, element.NamespaceURI, element.localName, element.is_value);
-            if (!ReferenceEquals(null, definition))
+            if (definition != null)
             {
                 Enqueue_Upgrade(element, definition);
             }
@@ -135,13 +135,13 @@ namespace CssUI.DOM.CustomElements
                 return;
             /* 1) Let definition be element's custom element definition. */
             CustomElementDefinition def = element.ownerDocument.defaultView.customElements.Lookup(element.ownerDocument, element.NamespaceURI, element.tagName, element.is_value);
-            if (ReferenceEquals(null, def))
+            if (def == null)
                 return;
 
             /* 2) Let callback be the value of the entry in definition's lifecycle callbacks with key callbackName. */
             var callback = def.lifecycleCallbacks[Reaction];
             /* 3) If callback is null, then return */
-            if (ReferenceEquals(null, callback))
+            if (callback == null)
                 return;
 
             /* 4) If callbackName is "attributeChangedCallback", then: */
@@ -189,7 +189,7 @@ namespace CssUI.DOM.CustomElements
             /* 4) Invoke custom element reactions in queue. */
             window.Reactions.Invoke_Reactions(queue);
             /* 5) If an exception exception was thrown by the original steps, rethrow exception. */
-            if (!ReferenceEquals(null, exception))
+            if (exception != null)
             {
                 throw exception;
             }
@@ -225,7 +225,7 @@ namespace CssUI.DOM.CustomElements
             /* 4) Invoke custom element reactions in queue. */
             window.Reactions.Invoke_Reactions(queue);
             /* 5) If an exception exception was thrown by the original steps, rethrow exception. */
-            if (!ReferenceEquals(null, exception))
+            if (exception != null)
             {
                 throw exception;
             }

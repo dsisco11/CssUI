@@ -45,7 +45,7 @@ namespace CssUI.DOM.Internal
         /// <returns></returns>
         internal static EventTarget retarget_event(EventTarget A, EventTarget B)
         {/* Docs: https://dom.spec.whatwg.org/#retarget */
-            while (!ReferenceEquals(null, A))
+            while (A != null)
             {
                 if (!(A is Node))
                     return (EventTarget)A;
@@ -121,10 +121,10 @@ namespace CssUI.DOM.Internal
                 var slotable = (target is Node targetNode && targetNode is ISlottable) ? target : null;
                 bool slotInClosedTree = false;
                 EventTarget parent = target.get_the_parent(@event);
-                while (!ReferenceEquals(null, parent))
+                while (parent != null)
                 {
                     /* 1) If slotable is non-null: */
-                    if (!ReferenceEquals(null, slotable))
+                    if (slotable != null)
                     {
                         /* 1) Assert: parent is a slot. */
                         if (parent is ISlot)
@@ -152,7 +152,7 @@ namespace CssUI.DOM.Internal
                     if (parent is Window || (parent is Node && DOMCommon.Is_Shadow_Including_Inclusive_Ancestor((target as Node).getRootNode(), parent as Node)))
                     {
                         /* 1) If isActivationEvent is true, event’s bubbles attribute is true, activationTarget is null, and parent has activation behavior, then set activationTarget to parent. */
-                        // if (isActivationEvent && @event.bubbles && ReferenceEquals(null, activationTarget))
+                        // if (isActivationEvent && @event.bubbles && null == activationTarget)
                         /* 2) Append to an event path with event, parent, null, relatedTarget, touchTargets, and slot-in-closed-tree. */
                         EventCommon.append_to_event_path(@event, parent, null, relatedTarget, touchTargets, slotInClosedTree);
                     }
@@ -169,15 +169,15 @@ namespace CssUI.DOM.Internal
                         EventCommon.append_to_event_path(@event, parent, target, relatedTarget, touchTargets, slotInClosedTree);
                     }
                     /* 9) If parent is non-null, then set parent to the result of invoking parent’s get the parent with event. */
-                    if (!ReferenceEquals(null, parent))
+                    if (parent != null)
                         parent = parent.get_the_parent(@event);
                     /* 10) Set slot-in-closed-tree to false. */
                     slotInClosedTree = false;
                 }
                 /* 10) Let clearTargetsStruct be the last struct in event’s path whose shadow-adjusted target is non-null. */
-                var clearTargetsStruct = @event.Path.FindLast(p => !ReferenceEquals(null, p.shadow_adjusted_target));
+                var clearTargetsStruct = @event.Path.FindLast(p => null != p.shadow_adjusted_target);
                 /* 11) Let clearTargets be true if clearTargetsStruct’s shadow-adjusted target, clearTargetsStruct’s relatedTarget, or an EventTarget object in clearTargetsStruct’s touch target list is a node and its root is a shadow root, and false otherwise. */
-                clearTargets = (clearTargetsStruct.shadow_adjusted_target is Node n1 && n1.getRootNode() is ShadowRoot) || (clearTargetsStruct.relatedTarget is Node n2 && n2.getRootNode() is ShadowRoot) || !ReferenceEquals(null, clearTargetsStruct.touch_target_list.Find(t => t is Node n3 && n3.getRootNode() is ShadowRoot));
+                clearTargets = (clearTargetsStruct.shadow_adjusted_target is Node n1 && n1.getRootNode() is ShadowRoot) || (clearTargetsStruct.relatedTarget is Node n2 && n2.getRootNode() is ShadowRoot) || (null != clearTargetsStruct.touch_target_list.Find(t => t is Node n3 && n3.getRootNode() is ShadowRoot));
                 /* 12) If activationTarget is non-null and activationTarget has legacy-pre-activation behavior, then run activationTarget’s legacy-pre-activation behavior. */
 
                 /* 13) For each struct in event’s path, in reverse order: */
@@ -185,7 +185,7 @@ namespace CssUI.DOM.Internal
                 {
                     EventPathItem @struct = @event.Path[i];
                     /* 1) If struct’s shadow-adjusted target is non-null, then set event’s eventPhase attribute to AT_TARGET. */
-                    if (!ReferenceEquals(null, @struct.shadow_adjusted_target))
+                    if (@struct.shadow_adjusted_target != null)
                         @event.eventPhase = EEventPhase.AT_TARGET;
                     /* 2) Otherwise, set event’s eventPhase attribute to CAPTURING_PHASE. */
                     else
@@ -198,7 +198,7 @@ namespace CssUI.DOM.Internal
                 foreach (EventPathItem @struct in @event.Path)
                 {
                     /* 1) If struct’s shadow-adjusted target is non-null, then set event’s eventPhase attribute to AT_TARGET. */
-                    if (!ReferenceEquals(null, @struct))
+                    if (@struct != null)
                         @event.eventPhase = EEventPhase.AT_TARGET;
                     /* 2) Otherwise: */
                     else
@@ -226,7 +226,7 @@ namespace CssUI.DOM.Internal
                 @event.TouchTargetList.Clear();
             }
             /* 11) If activationTarget is non-null, then: */
-            if (!ReferenceEquals(null, activationTarget))
+            if (activationTarget != null)
             {
                 /* 1) If event’s canceled flag is unset, then run activationTarget’s activation behavior with event. */
                 // if (0 == (@event.Flags & EEventFlags.Canceled)) activationTarget.a
@@ -240,7 +240,7 @@ namespace CssUI.DOM.Internal
         public static void invoke(EventPathItem @struct, Event @event, EEventPhase phase, bool legacyOutputDidListenersThrowFlag = false)
         {/* Docs: https://dom.spec.whatwg.org/#concept-event-listener-invoke */
             /* 1) Set event’s target to the shadow-adjusted target of the last struct in event’s path, that is either struct or preceding struct, whose shadow-adjusted target is non-null. */
-            if (!ReferenceEquals(null, @struct.shadow_adjusted_target))
+            if (@struct.shadow_adjusted_target != null)
                 @event.target = @struct.shadow_adjusted_target;
             else
             {
@@ -249,7 +249,7 @@ namespace CssUI.DOM.Internal
                 /* Find the path-item preceeding struct which has a valid shadow-adjusted target */
                 for (int i = structIndex - 1; i >= 0; i--)
                 {
-                    if (!ReferenceEquals(null, @event.Path[i].shadow_adjusted_target))
+                    if (@event.Path[i].shadow_adjusted_target != null)
                     {
                         @event.target = @event.Path[i].shadow_adjusted_target;
                         break;

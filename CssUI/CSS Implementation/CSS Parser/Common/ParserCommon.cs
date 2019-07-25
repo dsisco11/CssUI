@@ -30,7 +30,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_Negator(CssToken A)
         {
-            if (ReferenceEquals(null, A))
+            if (A == null)
                 throw new ArgumentException();
 
             if (A.Type != ECssTokenType.Ident)
@@ -49,7 +49,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_Combinator(CssToken A)
         {
-            if (ReferenceEquals(null, A))
+            if (A == null)
                 throw new ArgumentException();
 
             if (A.Type != ECssTokenType.Ident)
@@ -68,7 +68,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_Comparator(CssToken A)
         {
-            if (ReferenceEquals(null, A))
+            if (A == null)
                 throw new ArgumentException();
 
             if (A.Type != ECssTokenType.Ident)
@@ -86,7 +86,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Starts_Media_Condition(CssToken A, CssToken B, CssToken C)
         {
-            if (ReferenceEquals(null, A) || ReferenceEquals(null, B) || ReferenceEquals(null, C))
+            if (A == null || B == null || C == null)
                 throw new ArgumentException();
             /* Pattern: "(<combinator>" or "( (" */
 
@@ -114,7 +114,7 @@ namespace CssUI.CSS.Serialization
         public static bool Starts_Media_Feature(CssToken A, CssToken B, CssToken C)
         {
             /* Only null check A and B here because thats the minimum that any media feature can consist of eg: "color)" is 2 tokens */
-            if (ReferenceEquals(null, A) || ReferenceEquals(null, B))
+            if (A == null || B == null)
                 throw new ArgumentException();
 
             /* Pattern: "(<ident>" */
@@ -139,7 +139,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Starts_Boolean_Feature(CssToken A, CssToken B, CssToken C)
         {
-            if (ReferenceEquals(null, A) || ReferenceEquals(null, B) || ReferenceEquals(null, C))
+            if (A == null || B == null || C == null)
                 throw new ArgumentException();
             /* Pattern: "(<ident>" */
 
@@ -162,7 +162,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Starts_Discreet_Feature(CssToken A, CssToken B, CssToken C)
         {
-            if (ReferenceEquals(null, A) || ReferenceEquals(null, B))
+            if (A == null || B == null)
                 throw new ArgumentException();
 
             if (A.Type != ECssTokenType.Ident)
@@ -184,7 +184,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Starts_Range_Feature(CssToken A, CssToken B, CssToken C)
         {
-            if (ReferenceEquals(null, A) || ReferenceEquals(null, B))
+            if (A == null || B == null)
                 throw new ArgumentException();
 
             if (A.Type != ECssTokenType.Ident)
@@ -207,7 +207,7 @@ namespace CssUI.CSS.Serialization
         public static bool Starts_Ratio_Value(CssToken A, CssToken B)
         {
             /* A ratio is a <number> <?whitespace> / <?whitespace> <number> */
-            if (ReferenceEquals(null, A) || ReferenceEquals(null, B))
+            if (A == null || B == null)
                 throw new ArgumentException();
 
             if (A.Type == ECssTokenType.Delim && (A as ValuedTokenBase).Value.Equals("/"))
@@ -225,7 +225,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Starts_Media_Comparator(CssToken A)
         {
-            if (ReferenceEquals(null, A))
+            if (A == null)
                 throw new ArgumentException();
 
             if (A.Type == ECssTokenType.Delim)
