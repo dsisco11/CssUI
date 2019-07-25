@@ -88,7 +88,7 @@ namespace CssUI
                     return domLUT;
                 }
 
-                if (CssLookup.Keyword_From_Enum<Ty>(enumValue, out string cssLUT) && !ReferenceEquals(null, cssLUT))
+                if (CssLookup.TryKeyword<Ty>(enumValue, out string cssLUT) && !ReferenceEquals(null, cssLUT))
                 {
                     return cssLUT;
                 }

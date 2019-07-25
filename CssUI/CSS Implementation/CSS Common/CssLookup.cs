@@ -41,7 +41,7 @@ namespace CssUI
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
-        public static bool Keyword_From_Enum<Ty>(Ty Value, out string outKeyword) where Ty : struct
+        public static bool TryKeyword<Ty>(Ty Value, out string outKeyword) where Ty : struct
         {
             int index = CssEnumTables.Get_Enum_Index<Ty>();
             if (index < 0)
@@ -69,38 +69,23 @@ namespace CssUI
             int index = CssEnumTables.Get_Enum_Index<Ty>();
             if (index < 0)
             {
-                throw new CssException($"Unable to find keyword for enum value {Enum.GetName(typeof(Ty), Value)} in CSS enum table");
+                throw new CssException($"Unable to find keyword for enum value {System.Enum.GetName(typeof(Ty), Value)} in CSS enum table");
             }
 
             /* /!\ This conversion will fucking EXPLODE if the given generic type does not have an integer backing type /!\ */
             string keyword = CssEnumTables.TABLE[index][CastTo<int>.From<Ty>(Value)];
             if (ReferenceEquals(null, keyword))
             {
-                throw new CssException($"Unable to find keyword for enum value {Enum.GetName(typeof(Ty), Value)} in CSS enum table");
+                throw new CssException($"Unable to find keyword for enum value {System.Enum.GetName(typeof(Ty), Value)} in CSS enum table");
             }
 
             return keyword;
         }
 
-        [Obsolete("Encourages bad code, instead use: Keyword_From_Enum<Ty>(Ty Value, out string outKeyword)")]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
-        public static string Keyword_From_Enum<Ty>(Ty Value) where Ty : struct
-        {
-            int index = CssEnumTables.Get_Enum_Index<Ty>();
-            if (index < 0)
-            {
-                /* Enum has no index */
-                return null;
-            }
-
-            /* /!\ This conversion will fucking EXPLODE if the given generic type does not have an integer backing type /!\ */
-            return CssEnumTables.TABLE[index][CastTo<int>.From<Ty>(Value)];
-        }
-
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
-        public static bool Enum_From_Keyword<Ty>(AtomicString Keyword, out Ty outEnum) where Ty : struct
+        public static bool TryEnum<Ty>(AtomicString Keyword, out Ty outEnum) where Ty : struct
         {
             int index = CssEnumTables.Get_Enum_Index<Ty>();
             if (index < 0)
@@ -113,6 +98,30 @@ namespace CssUI
             outEnum = (Ty)CssEnumTables.KEYWORD[index][Keyword];
             return true;
         }
+
+        /// <summary>
+        /// Retrieves an enum value from a given keyword
+        /// </summary>
+        /// <typeparam name="Ty">The enum type to return</typeparam>
+        /// <param name="Keyword">Keyword to lookup enum value for</param>
+        /// <returns>Enum value</returns>
+        /// <exception cref="CssException">Throws if the keyword does not exist in the lookup table</exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
+        public static Ty Enum<Ty>(AtomicString Keyword) where Ty : struct
+        {
+            int index = CssEnumTables.Get_Enum_Index<Ty>();
+            if (index > -1)
+            {
+                if (CssEnumTables.KEYWORD[index].TryGetValue(Keyword, out dynamic outEnum))
+                {
+                    return (Ty)outEnum;
+                }
+            }
+
+            throw new CssException($"Unable to find keyword for enum value {Keyword} in CSS enum table");
+        }
+
+
 
         [Obsolete("Encourages bad code, instead use: Enum_From_Keyword<Ty>(string, out Ty outEnum)")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it

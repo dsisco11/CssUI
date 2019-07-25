@@ -492,9 +492,8 @@ namespace CssUI.CSS.Serialization
 
                         if (!string.IsNullOrEmpty(tok.Unit))
                         {
-                            EUnit? unitLookup = CssLookup.Enum_From_Keyword<EUnit>(tok.Unit);
-                            if (!unitLookup.HasValue) throw new CssParserException($"Failed to find keyword in enum lookup table: \"{tok.Unit}\"");
-                            unit = unitLookup.Value;
+                            EUnit unitLookup = CssLookup.Enum<EUnit>(tok.Unit);
+                            unit = unitLookup;
                         }
 
                         return new CssValue(ECssValueType.DIMENSION, tok.Number, unit);
@@ -541,7 +540,7 @@ namespace CssUI.CSS.Serialization
                     break;
             }
 
-            throw new CssParserException($"Unhandled token type cannot be interpreted as css-value: \"{CssLookup.Keyword_From_Enum(Token.Type)}\"");
+            throw new CssParserException($"Unhandled token type cannot be interpreted as css-value: \"{CssLookup.Keyword(Token.Type)}\"");
         }
         #endregion
 
@@ -585,7 +584,7 @@ namespace CssUI.CSS.Serialization
             {
                 throw new CssSyntaxErrorException("Expected ident token", Stream);
             }
-            if (CssLookup.Enum_From_Keyword((Stream.Next as IdentToken).Value, out EMediaQueryModifier mod))
+            if (CssLookup.TryEnum((Stream.Next as IdentToken).Value, out EMediaQueryModifier mod))
             {
                 Stream.Consume();// consume this token
                 modifier = mod;
@@ -603,7 +602,7 @@ namespace CssUI.CSS.Serialization
                 throw new CssSyntaxErrorException("Expected media type", Stream);
             }
 
-            if (!CssLookup.Enum_From_Keyword((Stream.Next as IdentToken).Value, out EMediaType type))
+            if (!CssLookup.TryEnum((Stream.Next as IdentToken).Value, out EMediaType type))
             {
                 throw new CssParserException($"Unrecognized media type: \"{(Stream.Next as IdentToken).Value}\" @\"{ParserCommon.Get_Location(Stream)}\"");
             }
@@ -695,7 +694,7 @@ namespace CssUI.CSS.Serialization
                     {
                         /* Consume combinator */
                         IdentToken combinatorToken = Stream.Consume() as IdentToken;
-                        if (!CssLookup.Enum_From_Keyword(combinatorToken.Value, out EMediaCombinator combLookup))
+                        if (!CssLookup.TryEnum(combinatorToken.Value, out EMediaCombinator combLookup))
                         {
                             throw new CssSyntaxErrorException($"Unrecognized combinator keyword \"{combinatorToken.Value}\" in media query @\"{ParserCommon.Get_Location(Stream)}\"");
                         }
@@ -731,7 +730,7 @@ namespace CssUI.CSS.Serialization
         {/* Docs: https://drafts.csswg.org/mediaqueries-4/#mq-syntax */
             if (Stream == null) throw new CssParserException("Stream is NULL!");
 
-
+            EMediaFeatureName Name = 0x0;
             /* Consume feature name */
             if (ParserCommon.Starts_Boolean_Feature(Stream.Next, Stream.NextNext, Stream.NextNextNext))
             {
@@ -739,10 +738,12 @@ namespace CssUI.CSS.Serialization
                 IdentToken nameTok = Stream.Consume() as IdentToken;
 
                 /* Resolve the name */
-                EMediaFeatureName? Name = CssLookup.Enum_From_Keyword<EMediaFeatureName>(nameTok.Value);
-                if (!Name.HasValue) throw new CssParserException($"Unrecognized media type: \"{nameTok.Value}\"");
+                if (!CssLookup.TryEnum(nameTok.Value, out Name))
+                {
+                    throw new CssParserException($"Unrecognized media type: \"{nameTok.Value}\"");
+                }
 
-                return new MediaFeature(Name.Value);
+                return new MediaFeature(Name);
             }
             else if (ParserCommon.Starts_Discreet_Feature(Stream.Next, Stream.NextNext, Stream.NextNextNext))
             {
@@ -750,35 +751,43 @@ namespace CssUI.CSS.Serialization
                 IdentToken nameTok = Stream.Consume() as IdentToken;
 
                 /* Resolve the name */
-                EMediaFeatureName? Name = CssLookup.Enum_From_Keyword<EMediaFeatureName>(nameTok.Value);
-                if (!Name.HasValue) throw new CssParserException($"Unrecognized media type: \"{nameTok.Value}\"");
+                if (!CssLookup.TryEnum(nameTok.Value, out Name))
+                {
+                    throw new CssParserException($"Unrecognized media type: \"{nameTok.Value}\"");
+                }
 
                 /* Consume the value to match */
                 Consume_All_Whitespace(Stream);
                 var value = Consume_MediaFeature_Value(Stream);
 
-                return new MediaFeature(Name.Value, value);
+                return new MediaFeature(new CssValue[] { CssValue.From_Enum(Name), value }, new EMediaOperator[] { EMediaOperator.EqualTo });
             }
 
-            if (Stream.Next.Type != ECssTokenType.Ident)
-            {/* Short range */
+            /* This is a range feature of some sort, it could be a short one or a long one */
+            /* Repeatedly consume CssValues, operator, and a single ident */
+            LinkedList<CssValue> Values = new LinkedList<CssValue>();
+            LinkedList<EMediaOperator> Ops = new LinkedList<EMediaOperator>();
 
+            while (Stream.Next != CssToken.EOF)
+            {
+
+                if (Stream.Next.Type == ECssTokenType.Ident)
+                {
+                    IdentToken nameTok = Stream.Consume() as IdentToken;
+                    /* Resolve the name */
+                    if (!CssLookup.TryEnum(nameTok.Value, out Name))
+                    {
+                        throw new CssParserException($"Unrecognized media type: \"{nameTok.Value}\"");
+                    }
+
+                    var value = CssValue.From_Enum(Name);
+                    Values.AddLast(value);
+                }
             }
+
             //if (Stream.Next.Type != ECssTokenType.Ident) throw new CssSyntaxErrorException($"Expected Ident-token, but got \"{Enum.GetName(typeof(ECssTokenType), Stream.Next.Type)}\"");
-            /* Determine feature type: plain / boolean / range */
-            if (Stream.Next.Type == ECssTokenType.Colon)
-            {/* Plain */
-                Stream.Consume();// Consume the ':'
-                var value = Consume_MediaFeature_Value(Stream);
-                return new MediaFeature(Name.Value, value);
-            }
-
-            /* If the next token is 'and' then it signals the end of this feature */
             Consume_All_Whitespace(Stream);
-            if (!ParserCommon.Starts_Media_Comparator(Stream.Next))
-            {/* Boolean */
-                return new MediaFeature(Name.Value, null);
-            }
+
 
             /* This must be a range */
             var comparatorTok = (Stream.Consume() as ValuedTokenBase);
@@ -787,24 +796,24 @@ namespace CssUI.CSS.Serialization
             EMediaOperator comparator = 0x0;
             for(int i=0;i<comparatorString.Length; i++)
             {
-                EMediaOperator? lookup = CssLookup.Enum_From_Keyword<EMediaOperator>(compBuf[i].ToString());
-                if (!lookup.HasValue)
+                if (!CssLookup.TryEnum(compBuf[i].ToString(), out EMediaOperator lookup))
                 {
                     throw new CssParserException($"Unable to interpret keyword \"{comparatorString}\" as enum value");
                 }
 
-                comparator |= lookup.Value;
+                comparator |= lookup;
             }
 
             Consume_All_Whitespace(Stream);
             /* Safety check if the next toke is the 'and' keyword */
             if (Stream.Next.Type == ECssTokenType.Ident && (Stream.Next as IdentToken).Value.Equals("and"))
+            {
                 throw new CssSyntaxErrorException($"A value is expected after the comparator \'{comparatorTok.Value}\' within a Media rule");
+            }
 
             CssValue rangeValue = Consume_CssValue(Stream);
 
-
-            return new MediaFeature(Name.Value, comparator, rangeValue);
+            return new MediaFeature(Name, comparator, rangeValue);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
