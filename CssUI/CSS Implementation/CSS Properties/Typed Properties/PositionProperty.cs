@@ -87,8 +87,6 @@ namespace CssUI.CSS
         /// </summary>
         void Translate_From_String(string str, out CssValue X, out CssValue Y)
         {
-            CssTokenizer Parser = new CssTokenizer(Specified.AsString());
-
             X = null;
             Y = null;
         }

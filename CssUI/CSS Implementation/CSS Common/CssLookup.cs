@@ -56,6 +56,32 @@ namespace CssUI
             return true;
         }
 
+        /// <summary>
+        /// Retrieves the keyword for the specified enum value.
+        /// </summary>
+        /// <typeparam name="Ty">Enum for which the keyword is listed</typeparam>
+        /// <param name="Value">Enum value to lookup</param>
+        /// <returns>Keyword</returns>
+        /// <exception cref="CssException">If the keyword cannot be found</exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
+        public static string Keyword<Ty>(Ty Value) where Ty : struct
+        {
+            int index = CssEnumTables.Get_Enum_Index<Ty>();
+            if (index < 0)
+            {
+                throw new CssException($"Unable to find keyword for enum value {Enum.GetName(typeof(Ty), Value)} in CSS enum table");
+            }
+
+            /* /!\ This conversion will fucking EXPLODE if the given generic type does not have an integer backing type /!\ */
+            string keyword = CssEnumTables.TABLE[index][CastTo<int>.From<Ty>(Value)];
+            if (ReferenceEquals(null, keyword))
+            {
+                throw new CssException($"Unable to find keyword for enum value {Enum.GetName(typeof(Ty), Value)} in CSS enum table");
+            }
+
+            return keyword;
+        }
+
         [Obsolete("Encourages bad code, instead use: Keyword_From_Enum<Ty>(Ty Value, out string outKeyword)")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
         public static string Keyword_From_Enum<Ty>(Ty Value) where Ty : struct
@@ -70,6 +96,8 @@ namespace CssUI
             /* /!\ This conversion will fucking EXPLODE if the given generic type does not have an integer backing type /!\ */
             return CssEnumTables.TABLE[index][CastTo<int>.From<Ty>(Value)];
         }
+
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
         public static bool Enum_From_Keyword<Ty>(AtomicString Keyword, out Ty outEnum) where Ty : struct

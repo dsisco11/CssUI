@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CssUI
+﻿namespace CssUI.CSS
 {
     /// <summary>
     /// Encapsulates an RGBA color.
@@ -54,7 +48,7 @@ namespace CssUI
             this.R = R;
             this.G = G;
             this.B = B;
-            this.A = 1.0;
+            A = 1.0;
         }
         /// <summary>
         /// Creates a new color object by specifying values for the Red, Green, Blue, and Alpha channels.
@@ -76,42 +70,42 @@ namespace CssUI
 
         public cssColor Scale(double r, double g, double b, double a)
         {
-            this.R *= r;
-            this.G *= g;
-            this.B *= b;
-            this.A *= a;
+            R *= r;
+            G *= g;
+            B *= b;
+            A *= a;
             return this;
         }
 
         public cssColor Scale(double rgb, double a)
         {
-            this.R *= rgb;
-            this.G *= rgb;
-            this.B *= rgb;
-            this.A *= a;
+            R *= rgb;
+            G *= rgb;
+            B *= rgb;
+            A *= a;
             return this;
         }
 
         public cssColor ScaleAlpha(double a)
         {
-            this.A *= a;
+            A *= a;
             return this;
         }
 
         public cssColor ScaleRGB(double x)
         {
-            this.R *= x;
-            this.G *= x;
-            this.B *= x;
+            R *= x;
+            G *= x;
+            B *= x;
             return this;
         }
 
         public cssColor ScaleRGBA(double x)
         {
-            this.R *= x;
-            this.G *= x;
-            this.B *= x;
-            this.A *= x;
+            R *= x;
+            G *= x;
+            B *= x;
+            A *= x;
             return this;
         }
         #endregion
@@ -120,7 +114,7 @@ namespace CssUI
 
         private static double Interp(double x, double y, double i)
         {
-            return (x*(1.0-i)) + (y*i);
+            return x * (1.0 - i) + y * i;
         }
 
         public cssColor Mix(cssColor c, double blend)
@@ -146,7 +140,6 @@ namespace CssUI
         {
             return (iR << 0) + (iG << 8) + (iB << 16) + (iA << 24);
         }
-
 
         public string ToCssString()
         {
@@ -174,6 +167,20 @@ namespace CssUI
         public string ToHexRGBA()
         {
             return string.Concat("#", iR.ToString("X2"), iG.ToString("X2"), iB.ToString("X2"), iA.ToString("X2"));
+        }
+        #endregion
+
+        #region Serialization
+        public string Serialize()
+        {
+            if (iA < 255)
+            {
+                /* Return RGBA Hex code */
+                return string.Concat("#", iR.ToString("X2"), iG.ToString("X2"), iB.ToString("X2"), iA.ToString("X2"));
+            }
+
+            /* Return RGB Hex code */
+            return string.Concat("#", iR.ToString("X2"), iG.ToString("X2"), iB.ToString("X2"));
         }
         #endregion
 

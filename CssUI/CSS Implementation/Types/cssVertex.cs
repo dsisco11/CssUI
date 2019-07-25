@@ -1,5 +1,4 @@
-﻿
-namespace CssUI
+﻿namespace CssUI.CSS
 {
     public struct cssVertex
     {

@@ -76,7 +76,7 @@ namespace CssUI.CSS.Media
         Grid,
 
         /// <summary>
-        /// The update media feature is used to query the ability of the output device to modify the apearance of content once it has been rendered. It accepts the following values:
+        /// The update media feature is used to query the ability of the output device to modify the apearance of content once it has been rendered.
         /// </summary>
         [CssKeyword("update")]
         Update,

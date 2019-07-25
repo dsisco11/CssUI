@@ -48,6 +48,27 @@ namespace CssUI.DOM
         /// (*Must* return 24 according to specifications)
         /// </summary>
         public ulong pixelDepth { get; } = 24;
+
+        /// <summary>
+        /// Return "1" if the current output devices screen is grid based (such as a tty terminal or an lcd phone based display with only one font)
+        /// </summary>
+        public ulong isGrid { get; } = 0;
+
+        /// <summary>
+        /// The bits per pixel in the monochrome framebuffer of the current output device or 0 if the device is not a monochrome device
+        /// </summary>
+        public ulong monochromeDepth { get; } = 0;
+
+        /// <summary>
+        /// The color-index describes the number of entries in the color lookup table of the output device. 
+        /// If the device does not use a color lookup table, the value is zero.
+        /// </summary>
+        public ulong colorIndex { get; } = 0;
+
+        /// <summary>
+        /// The current output devices refresh rate
+        /// </summary>
+        public double refreshRate { get; } = 0.0;
         #endregion
 
         #region CssUI

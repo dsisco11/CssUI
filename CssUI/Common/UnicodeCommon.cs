@@ -106,6 +106,21 @@ namespace CssUI
         public const char CHAR_REVERSE_SOLIDUS = '\u005C';
 
         /// <summary>
+        /// :
+        /// </summary>
+        public const char CHAR_COLON = '\u003A';
+
+        /// <summary>
+        /// (
+        /// </summary>
+        public const char CHAR_PARENTHESES_OPEN = '\u0028';
+
+        /// <summary>
+        /// )
+        /// </summary>
+        public const char CHAR_PARENTHESES_CLOSE = '\u0029';
+
+        /// <summary>
         /// Same as: <see cref="CHAR_SOLIDUS"/>
         /// </summary>
         [Obsolete("Use CHAR_SOLIDUS")]

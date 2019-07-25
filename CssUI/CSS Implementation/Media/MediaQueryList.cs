@@ -1,11 +1,13 @@
 ﻿using CssUI.CSS.Media;
+using CssUI.CSS.Serialization;
 using CssUI.DOM.Events;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace CssUI.DOM.Media
 {
-    public class MediaQueryList : EventTarget, IDisposable
+    public class MediaQueryList : EventTarget, ICssSerializeable, IDisposable
     {/* Docs: https://www.w3.org/TR/cssom-view-1/#mediaquerylist */
         #region Properties
         public readonly Document document;
@@ -96,6 +98,18 @@ namespace CssUI.DOM.Media
         public void removeEventListener(EventListener listener)
         {
             base.removeEventListener(EEventName.Change, listener.callback, new EventListenerOptions(false));
+        }
+
+
+        public string Serialize()
+        {
+            List<string> stringList = new List<string>();
+            foreach (MediaQuery Query in QueryList)
+            {
+                stringList.Add(Query.Serialize());
+            }
+
+            return Serializer.Serialize_Comma_List(stringList);
         }
     }
 }

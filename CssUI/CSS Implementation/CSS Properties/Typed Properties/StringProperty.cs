@@ -12,7 +12,7 @@ namespace CssUI.CSS
         {
             get
             {// Anything other than an actual string value returns NULL
-                return base.Specified?.AsString();
+                return base.Specified?.Get_String();
             }
         }
         #endregion

@@ -5,6 +5,7 @@ using CssUI.Internal;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace CssUI.CSS
 {
@@ -62,16 +63,16 @@ namespace CssUI.CSS
         #endregion
 
         #region Accessors
-        public bool IsAuto => (this.Type == ECssValueType.AUTO);
+        public bool IsAuto => (Type == ECssValueType.AUTO);
         /// <summary>
         /// Returns whether or our value is a definite Number or Integer
         /// </summary>
-        public bool IsDefinite => (0 != (this.Type & (ECssValueType.INTEGER | ECssValueType.NUMBER)));
+        public bool IsDefinite => (0 != (Type & (ECssValueType.INTEGER | ECssValueType.NUMBER)));
 
         /// <summary>
         /// Returns whether the value type is <see cref="ECssValueType.NULL"/>
         /// </summary>
-        public bool IsNull => (this.Type == ECssValueType.NULL);
+        public bool IsNull => (Type == ECssValueType.NULL);
 
         /// <summary>
         /// Returns whether there is actually a set value
@@ -80,10 +81,10 @@ namespace CssUI.CSS
         {
             get
             {
-                if (this.Type == ECssValueType.NULL)
+                if (Type == ECssValueType.NULL)
                     return false;
 
-                if (ReferenceEquals(this.Value, null))
+                if (ReferenceEquals(null, Value))
                     return false;
 
                 return true;
@@ -94,15 +95,15 @@ namespace CssUI.CSS
         #region Constructors
         internal CssValue(CssFunction function)
         {
-            this.Type = ECssValueType.FUNCTION;
-            this.Value = function;
+            Type = ECssValueType.FUNCTION;
+            Value = function;
         }
 
-        private CssValue(ECssValueType Type)
+        private CssValue(ECssValueType type)
         {
-            this.Type = Type;
+            this.Type = type;
 
-            switch (Type)
+            switch (type)
             {
                 // NOTE: Auto values get calculated in vastly different ways, sometimes this doesn't even indicate that a value depends on the value of other properties,
                 //so it should NOT get the 'Depends' flag
@@ -130,39 +131,36 @@ namespace CssUI.CSS
             }
         }
 
-        internal CssValue(ECssValueType Type, dynamic Value = null) : this(Type)
+        internal CssValue(ECssValueType type, dynamic value = null) : this(type)
         {
-            this.Value = Value;
+            Value = value;
         }
 
-        internal CssValue(ECssValueType Type, dynamic Value, EUnit Unit) : this(Type)
+        internal CssValue(ECssValueType type, dynamic value, EUnit unit) : this(type)
         {
-            this.Unit = Unit;
-            this.Value = Value;
+            Unit = unit;
+            Value = value;
 
-            if (Type == ECssValueType.KEYWORD)// Try and catch some common IMPORTANT keywords
+            if (type == ECssValueType.KEYWORD)// Try and catch some common IMPORTANT keywords
             {
                 /* If our keyword can be resolved to another ECssValueType then its an global keyword */
-
-                // ECssValueType? keywordType = CssLookup.Enum_From_Keyword<ECssValueType>(((string)Value).ToLowerInvariant());
-                ECssValueType? keywordType = CssLookup.Enum_From_Keyword<ECssValueType>(Value as string);
-                if (keywordType.HasValue)
+                if (!CssLookup.Enum_From_Keyword(value as string, out ECssValueType outType))
                 {
-                    this.Type = keywordType.Value;
+                    Type = outType;
                 }
             }
-            else if (Type == ECssValueType.DIMENSION || Type == ECssValueType.RESOLUTION)
+            else if (type == ECssValueType.DIMENSION || type == ECssValueType.RESOLUTION)
             {
                 /* Make sure to correct the value and distinguish whether we are a Dimension or a Resolution */
-                switch (Unit)
+                switch (unit)
                 {
                     case EUnit.DPI:
                     case EUnit.DPCM:
                     case EUnit.DPPX:
-                        this.Type = ECssValueType.RESOLUTION;
+                        Type = ECssValueType.RESOLUTION;
                         break;
                     default:
-                        this.Type = ECssValueType.DIMENSION;
+                        Type = ECssValueType.DIMENSION;
                         break;
                 }
             }
@@ -183,9 +181,17 @@ namespace CssUI.CSS
         #region Instantiation
         /// <summary> Returns a new <see cref="CssValue"/> instance which is a copy of this one. </summary>
         public CssValue Clone() => new CssValue(this);
-        
+
         /// <summary>Create an integer value from an enum</summary>
-        public static CssValue From_Enum<Ty>(Ty value) where Ty: struct => new CssValue(ECssValueType.KEYWORD, CssLookup.Keyword_From_Enum<Ty>(value));
+        public static CssValue From_Enum<Ty>(Ty value) where Ty : struct
+        {
+            if (!CssLookup.Keyword_From_Enum<Ty>(value, out string outKeyword))
+            {
+                throw new CssException($"Unable to find keyword for enum value {value} in CSS enum table");
+            }
+
+            return new CssValue(ECssValueType.KEYWORD, outKeyword);
+        }
 
         /// <summary>Create an absolute integer value</summary>
         public static CssValue From_Int(int value) => new CssValue(ECssValueType.INTEGER, value);
@@ -650,42 +656,15 @@ namespace CssUI.CSS
         }
         #endregion
 
-        #region AsString
-
-        /// <summary>
-        /// Returns the value as a CSS string if possible, or NULL.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string AsString()
-        {
-            switch (Type)
-            {
-                case ECssValueType.INTEGER:
-                case ECssValueType.NUMBER:
-                    return string.Concat(Value);
-                case ECssValueType.DIMENSION:
-                    {
-                        if (Unit == EUnit.None)
-                            return string.Concat(((double)Value).ToString());
-                        else
-                            return string.Concat(((double)Value).ToString(), Enum.GetName(typeof(EUnit), Unit).ToLower());
-                    }
-                case ECssValueType.PERCENT:
-                    return string.Concat((double)Value, "%");
-                case ECssValueType.COLOR:
-                    return ((cssColor)Value).ToCssString();
-                case ECssValueType.STRING:
-                    return ((string)Value);
-                default:
-                    return null;
-            }
-        }
-        #endregion
-
-        #region AsEnum
+        #region Converters
         public Ty AsEnum<Ty>() where Ty : struct, IConvertible
         {
             return (Ty)Value;
+        }
+
+        public string AsString()
+        {
+            return Value as string;
         }
         #endregion
 
@@ -747,6 +726,77 @@ namespace CssUI.CSS
             return this.ToString().GetHashCode();
         }
 
+        #endregion
+
+        #region Serialization
+        public string Serialize()
+        {
+            switch (Type)
+            {
+                case ECssValueType.AUTO:
+                case ECssValueType.INHERIT:
+                case ECssValueType.INITIAL:
+                case ECssValueType.DEFAULT:
+                case ECssValueType.UNSET:
+                case ECssValueType.NONE:
+                    {
+                        if (!CssLookup.Keyword_From_Enum(Type, out string outKeyword))
+                        {
+                            throw new CssException($"Unable to find keyword for enum value {Type} in CSS enum table");
+                        }
+
+                        return outKeyword;
+                    }
+                case ECssValueType.NULL:
+                    {
+                        return string.Empty;
+                    }
+                case ECssValueType.KEYWORD:
+                    {
+                        return (string)Value;
+                    }
+                case ECssValueType.STRING:
+                    {
+                        return string.Concat(UnicodeCommon.CHAR_QUOTATION_MARK, (string)Value, UnicodeCommon.CHAR_QUOTATION_MARK);
+                    }
+                case ECssValueType.COLOR:
+                    {
+                        return ((cssColor)Value).Serialize();
+                    }
+                case ECssValueType.DIMENSION:
+                    {
+                        if (Unit == EUnit.None)
+                        {
+                            return ((double)Value).ToString();
+                        }
+                        else
+                        {
+                            if (!CssLookup.Keyword_From_Enum(Unit, out string unitStr))
+                            {
+                                throw new CssException($"Unable to find enum value {Unit} in CSS enum table");
+                            }
+
+                            return string.Concat(((double)Value).ToString(), unitStr);
+                        }
+                    }
+                case ECssValueType.PERCENT:
+                    {
+                        return string.Concat(((double)Value).ToString(), UnicodeCommon.CHAR_PERCENT);
+                    }
+                case ECssValueType.NUMBER:
+                    {
+                        return ((double)Value).ToString();
+                    }
+                case ECssValueType.INTEGER:
+                    {
+                        return ((long)Value).ToString();
+                    }
+                default:
+                    {
+                        throw new NotImplementedException($"Serialization logic for CSS value type {Type} has not been implemented");
+                    }
+            }
+        }
         #endregion
     }
 

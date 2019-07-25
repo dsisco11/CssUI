@@ -1,4 +1,5 @@
-﻿using CssUI.CSS.Enums;
+﻿using CssUI.CSS;
+using CssUI.CSS.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;

@@ -1,13 +1,16 @@
 ﻿using CssUI.CSS.Internal;
+using CssUI.CSS.Serialization;
 using CssUI.DOM;
 using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
+using System.Text;
 
 namespace CssUI.CSS.Media
 {
     /// <summary>
     /// </summary>
-    public class MediaFeature : IMediaCondition
+    public class MediaFeature : IMediaCondition, ICssSerializeable
     {/* Docs: https://www.w3.org/TR/mediaqueries-4/#mq-features */
         #region Properties
         private readonly EMediaCombinator Combinator = EMediaCombinator.None;
@@ -58,7 +61,9 @@ namespace CssUI.CSS.Media
 
             /* For sanity just catch the case where we dont have values to compare here */
             if (Values.Length <= 0)
+            {
                 IsValid = false;
+            }
         }
         
         /// <summary>
@@ -168,6 +173,83 @@ namespace CssUI.CSS.Media
 
         bool Compare_Keyword(Document document, EMediaFeatureName Name, string keyword)
         {
+            switch (Name)
+            {
+                case EMediaFeatureName.Orientation:
+                    {
+                        if (DomLookup.Enum_From_Keyword(keyword, out EMediaOrientation outOrientation))
+                        {
+                            double width = Resolve_Media_Name_Value(document, EMediaFeatureName.Width);
+                            double height = Resolve_Media_Name_Value(document, EMediaFeatureName.Height);
+
+                            return (outOrientation == EMediaOrientation.Landscape) ? width >= height: height >= width;
+                        }
+                    }
+                    break;
+                case EMediaFeatureName.Update:
+                    {
+                        if (DomLookup.Enum_From_Keyword(keyword, out EMediaUpdate outUpdateRate))
+                        {
+                            double refreshRate = Resolve_Media_Name_Value(document, Name);
+                            switch (outUpdateRate)
+                            {
+                                case EMediaUpdate.None:
+                                    {
+                                        return MathExt.floatEq(0.0, refreshRate);
+                                    }
+                                case EMediaUpdate.Slow:
+                                    {
+                                        return refreshRate < 20;
+                                    }
+                                case EMediaUpdate.Fast:
+                                    {
+                                        return refreshRate > 20;
+                                    }
+                            }
+                        }
+                    }
+                    break;
+                case EMediaFeatureName.Color:
+                case EMediaFeatureName.Min_Color:
+                case EMediaFeatureName.Max_Color:
+                    {
+                        return Resolve_Media_Name_Value(document, Name) > 0;
+                    }
+                case EMediaFeatureName.Monochrome:
+                case EMediaFeatureName.Min_Monochrome:
+                case EMediaFeatureName.Max_Monochrome:
+                    {
+                        return Resolve_Media_Name_Value(document, Name) > 0;
+                    }
+                case EMediaFeatureName.ColorIndex:
+                case EMediaFeatureName.Min_ColorIndex:
+                case EMediaFeatureName.Max_ColorIndex:
+                    {
+                        return Resolve_Media_Name_Value(document, Name) > 0;
+                    }
+                case EMediaFeatureName.Grid:
+                    {
+                        return Resolve_Media_Name_Value(document, Name) > 0;
+                    }
+                case EMediaFeatureName.Width:
+                case EMediaFeatureName.Min_Width:
+                case EMediaFeatureName.Max_Width:
+                    {
+                        return Resolve_Media_Name_Value(document, Name) > 0;
+                    }
+                case EMediaFeatureName.Height:
+                case EMediaFeatureName.Min_Height:
+                case EMediaFeatureName.Max_Height:
+                    {
+                        return Resolve_Media_Name_Value(document, Name) > 0;
+                    }
+                case EMediaFeatureName.AspectRatio:
+                case EMediaFeatureName.Min_AspectRatio:
+                case EMediaFeatureName.Max_AspectRatio:
+                    {
+                        return Resolve_Media_Name_Value(document, Name) > 0;
+                    }
+            }
 
             return false;
         }
@@ -242,9 +324,9 @@ namespace CssUI.CSS.Media
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        double Resolve_Media_Name_Value(Document document, EMediaFeatureName Name)
+        dynamic Resolve_Media_Name_Value(Document document, EMediaFeatureName Name)
         {
-            Screen screen = document.window.screen;
+            Screen screen = document.defaultView.screen;
             switch (Name)
             {
                 case EMediaFeatureName.AspectRatio:
@@ -257,13 +339,39 @@ namespace CssUI.CSS.Media
                 case EMediaFeatureName.Min_Width:
                 case EMediaFeatureName.Max_Width:
                     {
-                        return (double)screen.width;
+                        return screen.width;
                     }
                 case EMediaFeatureName.Height:
                 case EMediaFeatureName.Min_Height:
                 case EMediaFeatureName.Max_Height:
                     {
-                        return (double)screen.height;
+                        return screen.height;
+                    }
+                case EMediaFeatureName.Color:
+                case EMediaFeatureName.Min_Color:
+                case EMediaFeatureName.Max_Color:
+                    {
+                        return screen.colorDepth;
+                    }
+                case EMediaFeatureName.Monochrome:
+                case EMediaFeatureName.Min_Monochrome:
+                case EMediaFeatureName.Max_Monochrome:
+                    {
+                        return screen.monochromeDepth;
+                    }
+                case EMediaFeatureName.ColorIndex:
+                case EMediaFeatureName.Min_ColorIndex:
+                case EMediaFeatureName.Max_ColorIndex:
+                    {
+                        return screen.colorIndex;
+                    }
+                case EMediaFeatureName.Grid:
+                    {
+                        return screen.isGrid;
+                    }
+                case EMediaFeatureName.Update:
+                    {
+                        return screen.refreshRate;
                     }
                 default:
                     {
@@ -271,7 +379,65 @@ namespace CssUI.CSS.Media
                     }
             }
         }
+
+        public string Serialize()
+        {
+            if (!IsValid)
+            {
+                return string.Empty;
+            }
+
+            if (!CssLookup.Keyword_From_Enum(Values[0].AsEnum<EMediaFeatureName>(), out string Name))
+            {
+                throw new CssSyntaxErrorException($"Could not find media-feature name");
+            }
+
+
+            StringBuilder sb = new StringBuilder();
+            /* 1) Append a "(" (U+0028), followed by the media feature name, converted to ASCII lowercase, to s. */
+            sb.Append(UnicodeCommon.CHAR_PARENTHESES_OPEN);
+
+            if (Context == EMediaFeatureContext.Boolean)
+            {
+                sb.Append(Name);
+            }
+            else if (Context == EMediaFeatureContext.Range)
+            {
+                sb.Append(Name);
+
+                if (Operators.Length == 0 && Values.Length == 2)
+                {
+                    /* If a value is given append a ":" (U+003A), followed by a single SPACE (U+0020), followed by the serialized media feature value. */
+                    sb.Append(UnicodeCommon.CHAR_COLON);
+                    sb.Append(UnicodeCommon.CHAR_SPACE);
+                    sb.Append(Values[1].Serialize());
+                }
+                else
+                {
+                    /* Serialize all value/operator pairs  */
+                    for (int i = 1; i < Operators.Length; i++)
+                    {
+                        CssValue B = Values[i];
+                        EMediaOperator op = Operators[i - 1];
+                        if (!CssLookup.Keyword_From_Enum(op, out string outComparator))
+                        {
+                            throw new CssSyntaxErrorException("Unable to find the specified comparator within the CSS enum LUT");
+                        }
+
+                        sb.Append(B.Serialize());
+                        sb.Append(outComparator);
+                    }
+                }
+            }
+            /* 3) Append a ")" (U+0029) to s. */
+            sb.Append(UnicodeCommon.CHAR_PARENTHESES_CLOSE);
+
+            return sb.ToString();
+        }
+
         #endregion
+
+
 
 
     }
