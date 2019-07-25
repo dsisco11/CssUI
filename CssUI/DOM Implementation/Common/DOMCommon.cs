@@ -464,7 +464,7 @@ namespace CssUI.DOM
             }
         }
 
-        public static List<FormDataValue> Construct_Form_Entry_List(HTMLFormElement form, Element submitter = null, string encoding = null)
+        public static List<FormDataEntryValue> Construct_Form_Entry_List(HTMLFormElement form, Element submitter = null, string encoding = null)
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#constructing-the-form-data-set */
             if (form.bConstructingEntryList)
                 return null;
@@ -472,7 +472,7 @@ namespace CssUI.DOM
             form.bConstructingEntryList = true;
 
             var controls = (IEnumerable<Element>)Get_Descendents(form, FilterIsSubmittable.Instance, ENodeFilterMask.SHOW_ELEMENT).Where(child => child is IFormAssociatedElement childElement && ReferenceEquals(form, childElement.form));
-            List<FormDataValue> entries = new List<FormDataValue>();
+            List<FormDataEntryValue> entries = new List<FormDataEntryValue>();
 
             /* 5) For each element field in controls, in tree order: */
             foreach (Element field in controls)
