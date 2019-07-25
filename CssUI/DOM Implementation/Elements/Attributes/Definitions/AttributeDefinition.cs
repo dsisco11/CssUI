@@ -105,7 +105,7 @@ namespace CssUI.DOM
                                 throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an acceptable value, Acceptable values are: {string.Join(", ", Keywords)}");
                             }
 
-                            if (!DomLookup.Enum_From_Keyword(enumType.Name, strLower, out var outEnum))
+                            if (!DomLookup.TryEnum(enumType.Name, strLower, out var outEnum))
                             {
                                 outValue = strLower;
                                 throw new Exception($"Unable to find keyword value for \"{strLower}\" in enum: {enumType.Name}");

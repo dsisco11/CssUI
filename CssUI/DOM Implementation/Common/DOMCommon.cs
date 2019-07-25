@@ -66,7 +66,7 @@ namespace CssUI.DOM
         {
             if (Namespace.Equals(HTMLNamespace))
             {
-                if (!DomLookup.Enum_From_Keyword(localName, out EElementTag outTag))
+                if (!DomLookup.TryEnum(localName, out EElementTag outTag))
                 {
                     return typeof(HTMLUnknownElement);
                     // throw new Exception($"unable to find tag type for HTML tag matching \"{localName}\"");

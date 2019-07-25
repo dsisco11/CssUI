@@ -83,7 +83,7 @@ namespace CssUI
                 /* /!\ These conversions will fucking EXPLODE if the given generic type does not have an integer backing type /!\ */
                 Ty enumValue = CastTo<Ty>.From<int>(value);
 
-                if (DomLookup.Keyword_From_Enum<Ty>(enumValue, out string domLUT) && !ReferenceEquals(null, domLUT))
+                if (DomLookup.TryKeyword<Ty>(enumValue, out string domLUT) && !ReferenceEquals(null, domLUT))
                 {
                     return domLUT;
                 }

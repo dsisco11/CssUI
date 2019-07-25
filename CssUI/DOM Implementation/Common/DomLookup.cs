@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using CssUI.DOM.Exceptions;
 using CssUI.DOM.Internal;
 
 namespace CssUI
@@ -10,10 +11,16 @@ namespace CssUI
     /// </summary>
     public static partial class DomLookup
     {
-        #region Enum Lookup
-
+        #region Keywords
+        /// <summary>
+        /// Attempts to retrieve the keyword value for the specified enum value
+        /// </summary>
+        /// <typeparam name="Ty">Enum for which the keyword is listed</typeparam>
+        /// <param name="Value">Enum value to lookup</param>
+        /// <param name="outKeyword">Returned value</param>
+        /// <returns>Success</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
-        public static bool Keyword_From_Enum<Ty>(Ty Value, out string outKeyword) where Ty : struct
+        public static bool TryKeyword<Ty>(Ty Value, out string outKeyword) where Ty : struct
         {
             int index = DomEnumTables.Get_Enum_Index<Ty>();
             if (index < 0)
@@ -29,40 +36,41 @@ namespace CssUI
         }
 
 
-        [Obsolete("Encourages bad code, instead use: Keyword_From_Enum<Ty>(Ty Value, out string outKeyword)")]
+        /// <summary>
+        /// Retrieves the keyword for the specified enum value.
+        /// </summary>
+        /// <typeparam name="Ty">Enum for which the keyword is listed</typeparam>
+        /// <param name="Value">Enum value to lookup</param>
+        /// <returns>Keyword</returns>
+        /// <exception cref="CssException">If the keyword cannot be found</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
-        public static string Keyword_From_Enum<Ty>(Ty Value) where Ty : struct
+        public static string Keyword<Ty>(Ty Value) where Ty : struct
         {
             int index = DomEnumTables.Get_Enum_Index<Ty>();
-            if (index < 0)
+            if (index > -1)
             {
-                /* Enum has no index */
-                return null;
+                /* /!\ This conversion will fucking EXPLODE if the given generic type does not have an integer backing type /!\ */
+                string keyword = DomEnumTables.TABLE[index][CastTo<int>.From<Ty>(Value)];
+                if (!ReferenceEquals(null, keyword))
+                {
+                    return keyword;
+                }
             }
 
-            /* /!\ This conversion will fucking EXPLODE if the given generic type does not have an integer backing type /!\ */
-            return DomEnumTables.TABLE[index][CastTo<int>.From<Ty>(Value)];
+            throw new DOMException($"Unable to find keyword for enum value {System.Enum.GetName(typeof(Ty), Value)} in DOM enum table");
         }
+        #endregion
 
-
-
+        #region Enums
+        /// <summary>
+        /// Attempts to retrieve an enum value from a given keyword
+        /// </summary>
+        /// <typeparam name="Ty">The enum type to return</typeparam>
+        /// <param name="Keyword">Keyword to lookup enum value for</param>
+        /// <param name="outEnum">Returned enum value</param>
+        /// <returns>Success</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
-        public static bool Enum_From_Keyword(string EnumName, AtomicString Keyword, out dynamic outEnum)
-        {
-            int index = DomEnumTables.Lookup_Enum_Index(EnumName);
-            if (index < 0)
-            {
-                /* Enum has no index */
-                outEnum = 0;
-                return false;
-            }
-
-            outEnum = DomEnumTables.KEYWORD[index][Keyword];
-            return true;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
-        public static bool Enum_From_Keyword<Ty>(AtomicString Keyword, out Ty outEnum) where Ty : struct
+        public static bool TryEnum<Ty>(AtomicString Keyword, out Ty outEnum) where Ty : struct
         {
             int index = DomEnumTables.Get_Enum_Index<Ty>();
             if (index < 0)
@@ -76,19 +84,77 @@ namespace CssUI
             return true;
         }
 
-        [Obsolete("Encourages bad code, instead use: Enum_From_Keyword<Ty>(string, out Ty outEnum)")]
+
+        /// <summary>
+        /// Attempts to retrieve an enum value from a given keyword
+        /// </summary>
+        /// <param name="EnumName">Name of the enum to search</param>
+        /// <param name="Keyword">Keyword to lookup enum value for</param>
+        /// <param name="outEnum">Returned enum value</param>
+        /// <returns>Success</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
-        public static Ty? Enum_From_Keyword<Ty>(AtomicString Keyword) where Ty : struct
+        public static bool TryEnum(string EnumName, AtomicString Keyword, out dynamic outEnum)
         {
-            int index = DomEnumTables.Get_Enum_Index<Ty>();
+            int index = DomEnumTables.Lookup_Enum_Index(EnumName);
             if (index < 0)
             {
                 /* Enum has no index */
-                return null;
+                outEnum = 0;
+                return false;
             }
 
-            return (Ty)DomEnumTables.KEYWORD[index][Keyword];
+            outEnum = DomEnumTables.KEYWORD[index][Keyword];
+            return true;
         }
+
+
+        /// <summary>
+        /// Retrieves an enum value from a given keyword
+        /// </summary>
+        /// <typeparam name="Ty">The enum type to return</typeparam>
+        /// <param name="Keyword">Keyword to lookup enum value for</param>
+        /// <returns>Enum value</returns>
+        /// <exception cref="CssException">Throws if the keyword does not exist in the lookup table</exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
+        public static Ty Enum<Ty>(AtomicString Keyword) where Ty : struct
+        {
+            int index = DomEnumTables.Get_Enum_Index<Ty>();
+            if (index > -1)
+            {
+                if (DomEnumTables.KEYWORD[index].TryGetValue(Keyword, out dynamic outEnum))
+                {
+                    return (Ty)outEnum;
+                }
+            }
+
+            throw new CssException($"Unable to find keyword for enum value {Keyword} in CSS enum table");
+        }
+
+        /// <summary>
+        /// Retrieves an enum value from a given keyword
+        /// </summary>
+        /// <param name="EnumName">Name of the enum to search</param>
+        /// <param name="Keyword">Keyword to lookup enum value for</param>
+        /// <returns>Enum value</returns>
+        /// <exception cref="CssException">Throws if the keyword does not exist in the lookup table</exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
+        public static dynamic Enum(string EnumName, AtomicString Keyword)
+        {
+            int index = DomEnumTables.Lookup_Enum_Index(EnumName);
+            if (index > -1)
+            {
+                if (DomEnumTables.KEYWORD[index].TryGetValue(Keyword, out dynamic outEnum))
+                {
+                    return outEnum;
+                }
+            }
+
+            throw new CssException($"Unable to find keyword for enum value {Keyword} in CSS enum table");
+        }
+
+        #endregion
+
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
         public static bool Is_Declared(Type enumType, AtomicString Keyword)

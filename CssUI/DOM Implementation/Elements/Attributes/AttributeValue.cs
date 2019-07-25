@@ -107,7 +107,7 @@ namespace CssUI.DOM
             /* Not all enumeration values will have a DOM keywrod, some defined by the specification explicitly say certain values should NOT have a keyword */
             string keyword = null;
 
-            if (DomLookup.Keyword_From_Enum(enumValue, out string outKey))
+            if (DomLookup.TryKeyword(enumValue, out string outKey))
                 keyword = outKey;
 
             return new AttributeValue(EAttributeType.Enumerated, keyword, enumValue);

@@ -26,7 +26,7 @@ namespace CssUI.DOM.Events
                 if (!ReferenceEquals(null, _name))
                 {/* Resolve the backing value */
                     if (IsCustom) throw new System.Exception("Name backing-value for custom event type is not set!");
-                    DomLookup.Keyword_From_Enum((EEventName)Value, out string outKeyword);
+                    DomLookup.TryKeyword((EEventName)Value, out string outKeyword);
                     _name = outKeyword;
                 }
 
@@ -68,9 +68,10 @@ namespace CssUI.DOM.Events
         #region Custom Registry
         private int Get_Or_Register_Name(AtomicString Name)
         {
-            var enumValue = DomLookup.Enum_From_Keyword<EEventName>(Name);
-            if (enumValue.HasValue)
-                return (int)enumValue.Value;
+            if (DomLookup.TryEnum(Name, out EEventName enumValue))
+            {
+                return (int)enumValue;
+            }
 
             if (!CustomRegistry.TryGetValue(Name, out int Value))
             {/* Register new custom name */

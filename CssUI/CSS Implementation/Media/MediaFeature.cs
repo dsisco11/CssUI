@@ -177,7 +177,7 @@ namespace CssUI.CSS.Media
             {
                 case EMediaFeatureName.Orientation:
                     {
-                        if (DomLookup.Enum_From_Keyword(keyword, out EMediaOrientation outOrientation))
+                        if (DomLookup.TryEnum(keyword, out EMediaOrientation outOrientation))
                         {
                             double width = Resolve_Media_Name_Value(document, EMediaFeatureName.Width);
                             double height = Resolve_Media_Name_Value(document, EMediaFeatureName.Height);
@@ -188,7 +188,7 @@ namespace CssUI.CSS.Media
                     break;
                 case EMediaFeatureName.Update:
                     {
-                        if (DomLookup.Enum_From_Keyword(keyword, out EMediaUpdate outUpdateRate))
+                        if (DomLookup.TryEnum(keyword, out EMediaUpdate outUpdateRate))
                         {
                             double refreshRate = Resolve_Media_Name_Value(document, Name);
                             switch (outUpdateRate)
