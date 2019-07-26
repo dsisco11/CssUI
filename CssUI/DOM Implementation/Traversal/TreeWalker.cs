@@ -41,10 +41,10 @@ namespace CssUI.DOM
             int n = (int)node.nodeType;
             /* 3) If the nth bit (where 0 is the least significant bit) of traverser’s whatToShow is not set, then return FILTER_SKIP. */
             ulong mask = (1UL << n);
-            if (0 == ((ulong)this.whatToShow & mask))
+            if (0 == ((ulong)whatToShow & mask))
                 return ENodeFilterResult.FILTER_SKIP;
             /* If traverser’s filter is null, then return FILTER_ACCEPT. */
-            if (this.Filter == null)
+            if (Filter == null)
                 return ENodeFilterResult.FILTER_ACCEPT;
 
             /* Set traverser’s active flag. */
@@ -53,7 +53,7 @@ namespace CssUI.DOM
             ENodeFilterResult result;
             try
             {
-                result = this.Filter.acceptNode(node);
+                result = Filter.acceptNode(node);
             }
             catch (DOMException)
             {

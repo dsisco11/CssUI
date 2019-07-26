@@ -308,7 +308,7 @@ namespace CssUI.DOM
                 if (node is ISlottable)
                 {
                     ISlottable slotable = node as ISlottable;
-                    var foundSlot = DOMCommon.Find_Slot(slotable);
+                    var foundSlot = Find_Slot(slotable);
                     if (ReferenceEquals(foundSlot, slot))
                         result.Add(slotable);
                 }

@@ -39,14 +39,29 @@ namespace CssUI
             return true;
         }
 
+        #region Common Transformations
 
+
+        /// <summary>
+        /// Strips leading and trailing whitespace from a string and also collapses groups of whitespace characters with a single space
+        /// </summary>
+        /// <param name="buffMem">String memory</param>
+        /// <returns>Altered string</returns>
+        public static string Strip_And_Collapse_Whitespace(ReadOnlyMemory<char> buffMem)
+        {/* Docs: https://infra.spec.whatwg.org/#strip-and-collapse-ascii-whitespace */
+            var replacement = new string(UnicodeCommon.CHAR_SPACE, 1);
+            return Replace(buffMem, FilterWhitespace.Instance, replacement.AsSpan());
+        }
+        #endregion
+
+        #region String replacement
 
         /// <summary>
         /// Replaces every occurrence of U+000D (CR) not followed by U+000A (LF), and every occurrence of U+000A (LF) not preceded by U+000D (CR), by a string consisting of a U+000D (CR) and U+000A (LF).
         /// </summary>
         /// <param name="buffMem">String memory</param>
         /// <returns>Altered string</returns>
-        public static string Replace(ReadOnlyMemory<char> buffMem, DataFilter<DataStream<char>> dataFilter, ReadOnlySpan<char> substituteData)
+        public static string Replace(ReadOnlyMemory<char> buffMem, DataFilter<char> dataFilter, ReadOnlySpan<char> substituteData)
         {
             DataStream<char> Stream = new DataStream<char>(buffMem, UnicodeCommon.EOF);
             /* Create a list of memory chunks that make up the final string */
@@ -59,7 +74,7 @@ namespace CssUI
              * Scan for LF characters, when encountered if not preceeded by a CR create a new chunk (non inclusive). */
             while (!Stream.atEOF)
             {
-                EFilterResult filterResult = dataFilter.acceptData(Stream);
+                EFilterResult filterResult = dataFilter.acceptData(Stream.Next);
                 /* When filter result:
                  * ACCEPT: Char should be included in chunk
                  * SKIP: Char should not be included in chunk, if at chunk-start shift chunk-start past char, otherwise end chunk
@@ -138,5 +153,6 @@ namespace CssUI
 
             return newStr;
         }
+        #endregion
     }
 }

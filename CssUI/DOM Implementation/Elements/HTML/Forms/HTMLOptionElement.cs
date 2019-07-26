@@ -200,7 +200,7 @@ namespace CssUI.DOM
                 }
 
                 string textStr = sb.ToString();
-                return ASCIICommon.Strip_And_Collapse_Whitespace(textStr.AsMemory());
+                return StringCommon.Strip_And_Collapse_Whitespace(textStr.AsMemory());
             }
 
             set
