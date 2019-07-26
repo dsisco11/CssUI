@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace CssUI
 {
@@ -55,7 +56,7 @@ namespace CssUI
         /// <summary>
         /// Returns whether the stream position is currently at the EOF
         /// </summary>
-        public bool atEOF => Next.Equals(EOF_ITEM);
+        public bool atEOF => Peek(0).Equals(EOF_ITEM);
         #endregion
 
         #region Data
@@ -69,6 +70,7 @@ namespace CssUI
         /// </summary>
         /// <param name="Offset">Distance from the current read position at which to peek</param>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ItemType Peek(int Offset = 0)
         {
             int i = (Position + Offset);

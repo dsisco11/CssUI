@@ -23,7 +23,7 @@ namespace CssUI
         /// Returns whether <paramref name="str1"/> and <paramref name="str2"/> contain the same values
         /// </summary>
         /// <returns>True if both strings are an exact match</returns>
-        public static bool streq(ReadOnlySpan<char> str1, ReadOnlySpan<char> str2)
+        public static bool Streq(ReadOnlySpan<char> str1, ReadOnlySpan<char> str2)
         {
             if (str1.Length != str2.Length)
                 return false;
@@ -152,6 +152,47 @@ namespace CssUI
             }
 
             return newStr;
+        }
+
+
+
+        /// <summary>
+        /// Runs a transform function on every character in a string and returns a new string containing the transformed characters
+        /// </summary>
+        /// <param name="buffMem">String memory</param>
+        /// <param name="Transform">Function that takes in a char and outputs one that should go into the new string. Returning a null char will cause that char to be omitted from the returned string</param>
+        /// <returns>Altered string</returns>
+        public static string Transform(ReadOnlyMemory<char> buffMem, Func<char, char> Transform)
+        {
+            DataStream<char> Stream = new DataStream<char>(buffMem, UnicodeCommon.EOF);
+            int Length = buffMem.Length;
+
+            char[] dataPtr = new char[Length];
+            Memory<char> data = new Memory<char>(dataPtr);
+            var buff = data.Span;
+            int idx = 0;
+
+            while (!Stream.atEOF)
+            {
+                char ch = Transform(Stream.Next);
+                if (ch != UnicodeCommon.CHAR_NULL)
+                {
+                    buff[idx++] = ch;
+                }
+
+                Stream.Consume();
+            }
+
+            if (idx < Length)
+            {/* The new string isnt quite as long as the old one */
+                char[] finalDataPtr = new char[idx];
+                Span<char> finalBuff = new Span<char>(finalDataPtr);
+
+                buff.CopyTo(finalBuff);
+                return new string(finalDataPtr);
+            }
+
+            return new string(dataPtr);
         }
         #endregion
     }

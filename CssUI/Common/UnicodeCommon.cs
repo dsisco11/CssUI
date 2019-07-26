@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace CssUI
 {
@@ -307,6 +308,71 @@ namespace CssUI
             return false;
         }
 
+        #endregion
+
+        #region Unicode String Transformations
+
+        /// <summary>
+        /// Converts a given string into unicode scalar values
+        /// </summary>
+        /// <param name="stringMem"></param>
+        /// <returns></returns>
+        public static string Convert_To_Scalar_Values(ReadOnlyMemory<char> stringMem)
+        {/* Docs: https://heycam.github.io/webidl/#dfn-obtain-unicode */
+            /* XXX: Optimize this */
+
+            var S = stringMem.Span;
+            int n = stringMem.Length;
+            int i = 0;
+            StringBuilder U = new StringBuilder();
+
+            for(;i<n; i++)
+            {
+                char c = S[i];
+                if (c < 0xD800 || c > 0xDFFF)
+                {/* Append to U the Unicode character with code point c. */
+                    U.Append(c);
+                }
+                else if (0xDc00 <= c && c <= 0xDFFF)
+                {/* Append to U a U+FFFD REPLACEMENT CHARACTER. */
+                    U.Append(CHAR_REPLACEMENT);
+                }
+                else if (0xD800 <= c && c <= 0xDBFF)
+                {
+                    /* 1) If i = n−1, then append to U a U+FFFD REPLACEMENT CHARACTER. */
+                    if (i == n-1)
+                    {
+                        U.Append(CHAR_REPLACEMENT);
+                    }
+                    else /* Otherwise, i < n−1: */
+                    {
+                        char d = S[i + 1];
+                        if (0xDC00 <= d && d <= 0xDFFF)
+                        {
+                            /* 1) Let a be c & 0x3FF. */
+                            int a = c & 0x3FF;
+                            /* 2) Let b be d & 0x3FF. */
+                            int b = d & 0x3FF;
+                            /* 3) Append to U the Unicode character with code point 2^16+2^10a+b. */
+                            const int x = 65536;// 2^16
+                            const int y = 1024;// 2^10
+                            char z = (char)(x + (y * a) + b);
+
+                            U.Append(z);
+                            /* 4) Set i to i+1. */
+                            i = i + 1;
+                        }
+                        else if (d < 0xDC00 || d > 0xDFFF)
+                        {
+                            U.Append(CHAR_REPLACEMENT);
+                        }
+                    }
+                }
+            }
+
+
+            return U.ToString();
+        }
         #endregion
 
     }
