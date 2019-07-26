@@ -23,13 +23,13 @@ namespace CssUI.DOM
             get
             {
                 string safeName = To_XML_Safe_Name(Name);
-                string Value = Owner.Attributes.getNamedItem(safeName)?.Value;
+                string Value = Owner.Attributes.getNamedItem(safeName)?.Value?.Get_String();
                 return ReferenceEquals(null, Value) ? string.Empty : Value;
             }
             set
             {
                 string safeName = To_XML_Safe_Name(Name);
-                Owner.setAttribute(safeName, value);
+                Owner.setAttribute(safeName, AttributeValue.From_String(value));
             }
         }
 
@@ -50,7 +50,7 @@ namespace CssUI.DOM
                 {
                     if (UnicodeCommon.Is_ASCII_Upper_Alpha(Name[i]))
                     {
-                        sb.Append('-');
+                        sb.Append(UnicodeCommon.CHAR_HYPHEN_MINUS);
                         sb.Append(UnicodeCommon.To_ASCII_Lower_Alpha(Name[i]));
                     }
                     else
@@ -81,7 +81,7 @@ namespace CssUI.DOM
                 string unsafeName = From_XML_Safe_Name(attr.Name);
                 if (!ReferenceEquals(null, unsafeName))
                 {
-                    list.AddLast(new KeyValuePair<string, string>(unsafeName, attr.Value));
+                    list.AddLast(new KeyValuePair<string, string>(unsafeName, attr.Value.Get_String()));
                 }
             }
 

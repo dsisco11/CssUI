@@ -21,7 +21,7 @@ namespace CssUI.CSS.Selectors
             Name = PseudoClass;
         }
 
-        public static PseudoClassSelector Create_Function(string Name, List<CssToken> Args = null)
+        public static PseudoClassSelector Create_Function(string Name, CssToken[] Args = null)
         {
             if (Name.Equals("not"))
             {
@@ -32,7 +32,7 @@ namespace CssUI.CSS.Selectors
                 return new PseudoClassSelectorAnBFunction(Name, new TokenStream(Args));
             }
 
-            return new PseudoClassSelectorFunction(Name, Args);
+            return new PseudoClassSelectorFunction(Name, new List<CssToken>(Args));
         }
 
         /// <summary>
@@ -56,10 +56,12 @@ namespace CssUI.CSS.Selectors
                 case "drop":
                     throw new NotImplementedException($"Pseudo-class selector logic for ':{Name}' has not yet been implemented");
                 case "checked":
-                    return (E.hasAttribute("checked") && !string.IsNullOrEmpty(E.getAttribute("checked")) == true);
+                    {
+                        return (E.hasAttribute(EAttributeName.Checked, out Attr outChecked) && !string.IsNullOrEmpty(outChecked.Value.Get_String()) == true);
+                    }
                 case "indeterminate":
                     {// SEE:  https://www.w3.org/TR/2011/REC-css3-selectors-20110929/#indeterminate
-                        return (E.hasAttribute("checked") && string.Compare(E.getAttribute("checked"), "2")==0);
+                        return (E.hasAttribute(EAttributeName.Checked, out Attr outChecked) && outChecked.Value.Get_String().Equals("2"));
                     }
                 case "empty":
                     return !E.hasChildNodes();

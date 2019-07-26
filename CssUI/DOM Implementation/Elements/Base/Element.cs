@@ -52,8 +52,8 @@ namespace CssUI.DOM
             {/* Docs: https://dom.spec.whatwg.org/#element-html-uppercased-qualified-name */
                 if (ReferenceEquals(null, _tagname))
                 {
-                    if (NamespaceURI == DOMCommon.HTMLNamespace && ownerDocument is HTMLDocument)
-                        _tagname = new string(qualifiedName.Select(c => UnicodeCommon.To_ASCII_Upper_Alpha(c)).ToArray());
+                    if (StringCommon.Streq(NamespaceURI.AsSpan(), DOMCommon.HTMLNamespace.AsSpan()) && ownerDocument is HTMLDocument)
+                        _tagname = StringCommon.Transform(qualifiedName.AsMemory(), UnicodeCommon.To_ASCII_Upper_Alpha);
                     else
                         _tagname = qualifiedName;
                 }
@@ -183,7 +183,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Returns the slot name
         /// </summary>
-        public string Name
+        internal string Name
         {/* Docs: https://dom.spec.whatwg.org/#slotable-name */
             get => getAttribute(EAttributeName.Name).Get_String();
             set
@@ -194,10 +194,10 @@ namespace CssUI.DOM
                 if (oldValue.Equals(value))
                     return;
 
-                if (value == null && oldValue.Length <= 0)
+                if (ReferenceEquals(value, null) && oldValue.Length <= 0)
                     return;
 
-                if (value.Length <= 0 && oldValue == null)
+                if (value.Length <= 0 && ReferenceEquals(oldValue, null))
                     return;
 
                 if (string.IsNullOrEmpty(value))
@@ -271,13 +271,13 @@ namespace CssUI.DOM
             if (AttributeList.Count != B.AttributeList.Count)
                 return false;
 
-            if (!StringCommon.streq(NamespaceURI.AsSpan(), B.NamespaceURI.AsSpan()))
+            if (!StringCommon.Streq(NamespaceURI.AsSpan(), B.NamespaceURI.AsSpan()))
                 return false;
 
-            if (!StringCommon.streq(prefix.AsSpan(), B.prefix.AsSpan()))
+            if (!StringCommon.Streq(prefix.AsSpan(), B.prefix.AsSpan()))
                 return false;
 
-            if (!StringCommon.streq(localName.AsSpan(), B.localName.AsSpan()))
+            if (!StringCommon.Streq(localName.AsSpan(), B.localName.AsSpan()))
                 return false;
 
             /* If A is an element, each attribute in its attribute list has an attribute that equals an attribute in B’s attribute list. */
@@ -603,12 +603,6 @@ namespace CssUI.DOM
             return outAttr.Value;
         }
 
-        [Obsolete("Attributes should be specified via an AtomicName instance", true)]
-        public string getAttribute(string qualifiedName)
-        {
-            return null;
-        }
-
         public Attr getAttributeNode(AtomicName<EAttributeName> Name)
         {
             if (!AttributeList.TryGetValue(Name, out Attr outAttr))
@@ -616,14 +610,6 @@ namespace CssUI.DOM
 
             return outAttr;
         }
-
-        [Obsolete("Attributes should be specified via an AtomicName instance", true)]
-        public Attr getAttributeNode(string qualifiedName)
-        {
-            qualifiedName = qualifiedName.ToLowerInvariant();
-            return this.AttributeList[qualifiedName];
-        }
-
 
 
         [CEReactions]
@@ -646,21 +632,9 @@ namespace CssUI.DOM
         }
 
         [CEReactions]
-        [Obsolete("Attributes must be assigned through AttributeValue objects", true)]
-        public void setAttribute(AtomicName<EAttributeName> Name, string value)
-        {
-        }
-
-        [CEReactions]
-        [Obsolete("Attributes should be specified via an AtomicName instance", true)]
-        public void setAttribute(string qualifiedName, string value)
-        {
-        }
-
-        [CEReactions]
         public Attr setAttributeNode(Attr attr)
         {
-            return ReactionsCommon.Wrap_CEReaction(this, () =>
+            return CEReactions.Wrap_CEReaction(this, () =>
             {
                 find_attribute(attr.Name, out Attr oldAttr);
                 if (ReferenceEquals(attr, oldAttr))
@@ -687,20 +661,6 @@ namespace CssUI.DOM
             CEReactions.Wrap_CEReaction(this, () =>
             {
                 find_attribute(Name, out Attr attr);
-                if (!ReferenceEquals(attr, null))
-                {
-                    remove_attribute(attr);
-                }
-            });
-        }
-
-        [CEReactions]
-        [Obsolete("Attributes should be specified via an AtomicName instance", true)]
-        public void removeAttribute(string qualifiedName)
-        {
-            CEReactions.Wrap_CEReaction(this, () =>
-            {
-                find_attribute(qualifiedName, out Attr attr);
                 if (!ReferenceEquals(attr, null))
                 {
                     remove_attribute(attr);
@@ -758,41 +718,6 @@ namespace CssUI.DOM
             });
         }
 
-        [CEReactions, Obsolete("Use toggleAttribute(AtomicName<EAttributeName> Name, bool? force)", true)]
-        public bool toggleAttribute(string qualifiedName, bool? force = null)
-        {
-            return CEReactions.Wrap_CEReaction(this, () =>
-            {
-                /* 1) If qualifiedName does not match the Name production in XML, then throw an "InvalidCharacterError" DOMException. */
-                /* 2) If the context object is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase. */
-                qualifiedName = qualifiedName.ToLowerInvariant();
-                /* 3) Let attribute be the first attribute in the context object’s attribute list whose qualified name is qualifiedName, and null otherwise. */
-                find_attribute(qualifiedName, out Attr attr);
-                /* 4) If attribute is null, then: */
-                if (attr == null)
-                {
-                    /* 1) If force is not given or is true, create an attribute whose local name is qualifiedName, value is the empty string, and node document is the context object’s node document, then append this attribute to the context object, and then return true. */
-                    if (!force.HasValue || force.Value)
-                    {
-                        var newAttr = new Attr(qualifiedName, this.ownerDocument) { Value = AttributeValue.Parse(qualifiedName, string.Empty) };
-                        append_attribute(newAttr);
-                        return true;
-                    }
-                    /* 2) Return false. */
-                    return false;
-                }
-                /* 5) Otherwise, if force is not given or is false, remove an attribute given qualifiedName and the context object, and then return false. */
-                if (!force.HasValue || !force.Value)
-                {
-                    remove_attribute(attr);
-                    return false;
-                }
-                /* 6) Return true. */
-                return true;
-            });
-        }
-
-
 
         public bool hasAttribute(AtomicName<EAttributeName> Name)
         {
@@ -811,15 +736,6 @@ namespace CssUI.DOM
             }
 
             outAttr = null;
-            return false;
-        }
-
-        [Obsolete("Attributes should be specified via an AtomicName instance", true)]
-        public bool hasAttribute(string qualifiedName)
-        {
-            if (AttributeList.TryGetValue(qualifiedName.ToLowerInvariant(), out Attr attr))
-                return attr.Value != null;
-
             return false;
         }
         #endregion

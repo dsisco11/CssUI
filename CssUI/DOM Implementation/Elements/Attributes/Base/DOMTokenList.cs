@@ -80,11 +80,13 @@ namespace CssUI.DOM
         {
             /* A DOMTokenList object’s update steps are: */
             /* 1) If the associated element does not have an associated attribute and token set is empty, then return. */
-            if (!this.ownerElement.AttributeList.ContainsKey(this.localName.ToString().ToLowerInvariant()) && this.TokenSet.Count <= 0)
+            string name = localName.ToString();
+            string lowerName = StringCommon.Transform(name.AsMemory(), UnicodeCommon.To_ASCII_Lower_Alpha);
+            if (!ownerElement.AttributeList.ContainsKey(lowerName) && TokenSet.Count <= 0)
                 return;
 
             /* 2) Set an attribute value for the associated element using associated attribute’s local name and the result of running the ordered set serializer for token set. */
-            this.ownerElement.setAttribute(this.localName, DOMCommon.Serialize_Ordered_Set(TokenSet.Cast<string>()));
+            ownerElement.setAttribute(localName, AttributeValue.From_String(DOMCommon.Serialize_Ordered_Set(TokenSet.Cast<string>())));
         }
         #endregion
 

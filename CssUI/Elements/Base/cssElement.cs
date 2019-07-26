@@ -617,15 +617,15 @@ namespace CssUI
             {
                 get
                 {
-                    if (hasAttribute("dropzone"))
+                    if (hasAttribute(EAttributeName.Dropzone, out Attr outAttr))
                     {
-                        ICollection<string> spl = DOMCommon.Parse_Ordered_Set(getAttribute("dropzone"));
+                        ICollection<string> spl = DOMCommon.Parse_Ordered_Set(outAttr.Value.Get_String());
                         if (spl == null) spl = new string[] { "*" };
                         return spl;
                     }
                     return new string[] { "*" };
                 }
-                protected set { setAttribute("dropzone", string.Join(",", value)); }
+                protected set { setAttribute(EAttributeName.Dropzone, AttributeValue.From_String(DOMCommon.Serialize_Ordered_Set(value))); }
             }
 
             /// <summary>

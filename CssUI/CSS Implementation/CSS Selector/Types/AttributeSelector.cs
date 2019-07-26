@@ -7,11 +7,11 @@ using System.Runtime.CompilerServices;
 
 namespace CssUI.CSS.Selectors
 {
-
+    /* XXX: Finish this, we need to add the rest of the attribute operators */
     public class AttributeSelector : SimpleSelector
     {
         readonly NamespacePrefixToken Namespace;
-        readonly string Attrib;
+        readonly AtomicName<EAttributeName> AttributeName;
         readonly ECssAttributeOperator Operator = ECssAttributeOperator.None;
         readonly string Value = null;
 
@@ -24,14 +24,14 @@ namespace CssUI.CSS.Selectors
         public AttributeSelector(NamespacePrefixToken Namespace, string Attrib) : base(ESimpleSelectorType.AttributeSelector)
         {
             this.Namespace = Namespace;
-            this.Attrib = Attrib;
+            this.AttributeName = Attrib;
             this.Operator = ECssAttributeOperator.Isset;
         }
 
         public AttributeSelector(NamespacePrefixToken Namespace, string Attrib, CssToken OperatorToken, string Value) : base(ESimpleSelectorType.AttributeSelector)
         {
             this.Namespace = Namespace;
-            this.Attrib = Attrib;
+            this.AttributeName = Attrib;
             if (Value == null) Value = string.Empty;
             this.Value = Value;
 
@@ -82,45 +82,45 @@ namespace CssUI.CSS.Selectors
                 // CSS 2.0 operators
                 case ECssAttributeOperator.Isset:// isset
                     {
-                        return E.hasAttribute(Attrib);
+                        return E.hasAttribute(AttributeName);
                     }
                 case ECssAttributeOperator.Equals:// equals
                     {
                         if (string.IsNullOrEmpty(Value)) return false;
-                        return string.Compare(Value, E.getAttribute(Attrib)) == 0;
+                        return StringCommon.Streq(Value.AsSpan(), E.getAttribute(AttributeName).Get_String().AsSpan());
                     }
                 case ECssAttributeOperator.PrefixedWith:// equals or prefixed-with
                     {
-                        if (!E.hasAttribute(Attrib)) return false;
-                        string val = E.getAttribute(Attrib);
-                        if (string.Compare(Value, val) == 0) return true;
+                        if (!E.hasAttribute(AttributeName)) return false;
+                        string val = E.getAttribute(AttributeName).Get_String();
+                        if (StringCommon.Streq(Value.AsSpan(),val.AsSpan())) return true;
                         if (val.StartsWith(string.Concat(Value, '-'))) return true;
                         return false;
                     }
                 case ECssAttributeOperator.Includes:// list-contains
                     {
                         if (string.IsNullOrEmpty(Value)) return false;
-                        if (!E.hasAttribute(Attrib)) return false;
-                        return E.getAttribute(Attrib).Split(' ').Contains(Value);
+                        if (!E.hasAttribute(AttributeName)) return false;
+                        return E.getAttribute(AttributeName).Split(' ').Contains(Value);
                     }
                 // Sub-string operators
                 case ECssAttributeOperator.StartsWith:// starts-with
                     {
                         if (string.IsNullOrEmpty(Value)) return false;
-                        if (!E.hasAttribute(Attrib)) return false;
-                        return E.getAttribute(Attrib).StartsWith(Value);
+                        if (!E.hasAttribute(AttributeName)) return false;
+                        return E.getAttribute(AttributeName).StartsWith(Value);
                     }
                 case ECssAttributeOperator.EndsWith:// ends-with
                     {
                         if (string.IsNullOrEmpty(Value)) return false;
-                        if (!E.hasAttribute(Attrib)) return false;
-                        return E.getAttribute(Attrib).EndsWith(Value);
+                        if (!E.hasAttribute(AttributeName)) return false;
+                        return E.getAttribute(AttributeName).EndsWith(Value);
                     }
                 case ECssAttributeOperator.Contains:// contains
                     {
                         if (string.IsNullOrEmpty(Value)) return false;
-                        if (!E.hasAttribute(Attrib)) return false;
-                        return E.getAttribute(Attrib).Contains(Value);
+                        if (!E.hasAttribute(AttributeName)) return false;
+                        return E.getAttribute(AttributeName).Contains(Value);
                     }
                 default:
                     throw new CssSelectorException($"Attribute selector operator ({Enum.GetName(typeof(ECssAttributeOperator), Operator)}) logic not implemented!");

@@ -41,7 +41,7 @@ namespace CssUI.CSS.Selectors
         public PseudoClassSelectorAnBFunction(string Name, TokenStream Stream) : base(Name)
         {
             AnB = CssAnBMatcher.Consume(Stream);
-            if (Stream.Next.Type == ECssTokenType.Ident && string.Compare("or", (Stream.Next as IdentToken).Value)==0)
+            if (Stream.Next.Type == ECssTokenType.Ident && (Stream.Next as IdentToken).Value.Equals("or"))
             {
                 Stream.Consume();// Consume the 'or' string token
                 Selectors = SelectorParser.Consume_Selector_List(Stream);

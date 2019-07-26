@@ -94,7 +94,7 @@ namespace CssUI.DOM.Nodes
         /// Returns whether node has children.
         /// </summary>
         /// <returns></returns>
-        public bool hasChildNodes() => (this.childNodes.Count > 0);
+        public bool hasChildNodes() => (childNodes.Count > 0);
 
         public void normalize()
         {/* Docs: https://dom.spec.whatwg.org/#dom-node-normalize */
