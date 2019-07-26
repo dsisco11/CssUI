@@ -53,7 +53,7 @@ namespace CssUI.DOM
                 if (ReferenceEquals(null, _tagname))
                 {
                     if (NamespaceURI == DOMCommon.HTMLNamespace && ownerDocument is HTMLDocument)
-                        _tagname = new string(qualifiedName.Select(c => ASCIICommon.To_ASCII_Upper_Alpha(c)).ToArray());
+                        _tagname = new string(qualifiedName.Select(c => UnicodeCommon.To_ASCII_Upper_Alpha(c)).ToArray());
                     else
                         _tagname = qualifiedName;
                 }

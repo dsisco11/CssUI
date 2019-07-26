@@ -35,7 +35,7 @@ namespace CssUI.DOM.Internal
             char[] buf = new char[Name.Length];
             for (int c=0; c<buf.Length; c++)
             {
-                buf[c] = ASCIICommon.To_ASCII_Upper_Alpha(Name[c]);
+                buf[c] = UnicodeCommon.To_ASCII_Upper_Alpha(Name[c]);
             }
 
             return new string(buf);
@@ -74,7 +74,7 @@ namespace CssUI.DOM.Internal
             }
 
             /* Must start with a lowercased alpha character */
-            if (!ASCIICommon.Is_ASCII_Lower_Alpha(Stream.Next))
+            if (!UnicodeCommon.Is_ASCII_Lower_Alpha(Stream.Next))
             {
                 return false;
             }

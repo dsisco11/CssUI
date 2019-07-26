@@ -13,7 +13,7 @@ namespace CssUI.Filters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override EFilterResult acceptData(char data)
         {
-            if (ASCIICommon.Is_Ascii_Whitespace(data))
+            if (UnicodeCommon.Is_Ascii_Whitespace(data))
             {
                 return EFilterResult.FILTER_SKIP;
             }

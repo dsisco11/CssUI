@@ -17,7 +17,7 @@ namespace CssUI.DOM.Serialization
             bool sign = true;
 
             /* SKip ASCII whitespace */
-            Stream.Consume_While(ASCIICommon.Is_Ascii_Whitespace);
+            Stream.Consume_While(UnicodeCommon.Is_Ascii_Whitespace);
 
             if (Stream.Next == UnicodeCommon.EOF)
             {
@@ -37,9 +37,9 @@ namespace CssUI.DOM.Serialization
 
 
             /* Collect sequence of ASCII digit codepoints */
-            Stream.Consume_While(ASCIICommon.Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
+            Stream.Consume_While(UnicodeCommon.Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
 
-            if (Stream.Next != UnicodeCommon.EOF && ASCIICommon.Is_Ascii_Alpha(Stream.Next))
+            if (Stream.Next != UnicodeCommon.EOF && UnicodeCommon.Is_Ascii_Alpha(Stream.Next))
             {
                 outValue = long.MaxValue;
                 return false;
@@ -60,7 +60,7 @@ namespace CssUI.DOM.Serialization
             double exponent = 1;
 
             /* Skip ASCII whitespace */
-            Stream.Consume_While(ASCIICommon.Is_Ascii_Whitespace);
+            Stream.Consume_While(UnicodeCommon.Is_Ascii_Whitespace);
 
             if (Stream.Next == UnicodeCommon.EOF)
                 throw new DomSyntaxError();
@@ -88,11 +88,11 @@ namespace CssUI.DOM.Serialization
              * and that is not the last character in input, 
              * and the character after the character indicated by position is an ASCII digit, 
              * then set value to zero and jump to the step labeled fraction. */
-            if (Stream.Next == UnicodeCommon.CHAR_FULL_STOP && Stream.NextNext != UnicodeCommon.EOF && ASCIICommon.Is_Ascii_Digit(Stream.NextNext))
+            if (Stream.Next == UnicodeCommon.CHAR_FULL_STOP && Stream.NextNext != UnicodeCommon.EOF && UnicodeCommon.Is_Ascii_Digit(Stream.NextNext))
             {
                 value = 0;
             }
-            else if (!ASCIICommon.Is_Ascii_Digit(Stream.Next))
+            else if (!UnicodeCommon.Is_Ascii_Digit(Stream.Next))
             {
                 outValue = double.NaN;
                 return false;
@@ -100,7 +100,7 @@ namespace CssUI.DOM.Serialization
             else
             {
                 /* 11) Collect a sequence of code points that are ASCII digits from input given position, and interpret the resulting sequence as a base-ten integer. Multiply value by that integer. */
-                Stream.Consume_While(ASCIICommon.Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
+                Stream.Consume_While(UnicodeCommon.Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
                 value *= double.Parse(outDigits.ToString());
             }
 
@@ -112,17 +112,17 @@ namespace CssUI.DOM.Serialization
                 {
                     Stream.Consume();
                     /* 2) If position is past the end of input, or if the character indicated by position is not an ASCII digit, U+0065 LATIN SMALL LETTER E (e), or U+0045 LATIN CAPITAL LETTER E (E), then jump to the step labeled conversion. */
-                    if (Stream.Next != UnicodeCommon.EOF && (ASCIICommon.Is_Ascii_Digit(Stream.Next) || Stream.Next == '\u0045' || Stream.Next == '\u0065'))
+                    if (Stream.Next != UnicodeCommon.EOF && (UnicodeCommon.Is_Ascii_Digit(Stream.Next) || Stream.Next == '\u0045' || Stream.Next == '\u0065'))
                     {
                         /* 3) If the character indicated by position is a U+0065 LATIN SMALL LETTER E character (e) or a U+0045 LATIN CAPITAL LETTER E character (E), skip the remainder of these substeps. */
-                        if (ASCIICommon.Is_Ascii_Digit(Stream.Next))
+                        if (UnicodeCommon.Is_Ascii_Digit(Stream.Next))
                         {
-                            while (ASCIICommon.Is_Ascii_Digit(Stream.Next))
+                            while (UnicodeCommon.Is_Ascii_Digit(Stream.Next))
                             {
                                 /* 4) Fraction loop: Multiply divisor by ten. */
                                 divisor *= 10;
                                 /* 5) Add the value of the character indicated by position, interpreted as a base-ten digit (0..9) and divided by divisor, to value. */
-                                double n = ASCIICommon.Ascii_Digit_To_Value(Stream.Next) / divisor;
+                                double n = UnicodeCommon.Ascii_Digit_To_Value(Stream.Next) / divisor;
                                 value += n;
                                 /* 6) Advance position to the next character. */
                                 Stream.Consume();
@@ -152,10 +152,10 @@ namespace CssUI.DOM.Serialization
                     }
 
                     /* 4) If the character indicated by position is not an ASCII digit, then jump to the step labeled conversion. */
-                    if (ASCIICommon.Is_Ascii_Digit(Stream.Next))
+                    if (UnicodeCommon.Is_Ascii_Digit(Stream.Next))
                     {
                         /* 5) Collect a sequence of code points that are ASCII digits from input given position, and interpret the resulting sequence as a base-ten integer. Multiply exponent by that integer. */
-                        Stream.Consume_While(ASCIICommon.Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
+                        Stream.Consume_While(UnicodeCommon.Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
                         exponent *= double.Parse(outDigits.ToString());
                         /* 6) Multiply value by ten raised to the exponentth power. */
                         value *= Math.Pow(10, exponent);
@@ -184,7 +184,7 @@ namespace CssUI.DOM.Serialization
         {
             DataStream<char> Stream = new DataStream<char>(input.AsMemory(), UnicodeCommon.EOF);
             /* 3) Skip ASCII whitespace within input given position. */
-            Stream.Consume_While(ASCIICommon.Is_Ascii_Whitespace);
+            Stream.Consume_While(UnicodeCommon.Is_Ascii_Whitespace);
             if (Stream.Next == UnicodeCommon.EOF)
             {
                 outValue = double.NaN;
@@ -193,7 +193,7 @@ namespace CssUI.DOM.Serialization
             }
 
             /* 5) Collect a sequence of code points that are ASCII digits from input given position, and interpret the resulting sequence as a base-ten integer. Let value be that number. */
-            Stream.Consume_While(ASCIICommon.Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
+            Stream.Consume_While(UnicodeCommon.Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
             double value = double.Parse(outDigits.ToString());
 
             /* 6) If position is past the end of input, then return value as a length. */
@@ -215,7 +215,7 @@ namespace CssUI.DOM.Serialization
                     outType = EAttributeType.Length;
                     return true;
                 }
-                else if (!ASCIICommon.Is_Ascii_Digit(Stream.Next))
+                else if (!UnicodeCommon.Is_Ascii_Digit(Stream.Next))
                 {
                     outType = (Stream.Next == UnicodeCommon.CHAR_PERCENT) ? EAttributeType.Percentage : EAttributeType.Length;
                     outValue = value;
@@ -225,11 +225,11 @@ namespace CssUI.DOM.Serialization
                 /* 3) Let divisor have the value 1. */
                 double divisor = 1;
 
-                while (ASCIICommon.Is_Ascii_Digit(Stream.Next))
+                while (UnicodeCommon.Is_Ascii_Digit(Stream.Next))
                 {
                     divisor *= 10;
                     /* 2) Add the value of the code point at position within input, interpreted as a base-ten digit (0..9) and divided by divisor, to value. */
-                    double n = (double)ASCIICommon.Ascii_Digit_To_Value(Stream.Next) / divisor;
+                    double n = (double)UnicodeCommon.Ascii_Digit_To_Value(Stream.Next) / divisor;
                     value += n;
                     Stream.Consume();
                 }

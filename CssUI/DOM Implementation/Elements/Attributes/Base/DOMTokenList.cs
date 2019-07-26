@@ -128,7 +128,7 @@ namespace CssUI.DOM
                 if (string.IsNullOrEmpty(token))
                     throw new DomSyntaxError();
                 /* 2) If token contains any ASCII whitespace, then throw an "InvalidCharacterError" DOMException. */
-                bool hasWhitespace = default(char) != token.ToString().ToCharArray().SingleOrDefault(c => ASCIICommon.Is_Ascii_Whitespace(c));
+                bool hasWhitespace = default(char) != token.ToString().ToCharArray().SingleOrDefault(c => UnicodeCommon.Is_Ascii_Whitespace(c));
                 if (hasWhitespace)
                     throw new InvalidCharacterError("tokens cannot contain whitespaces");
             }
@@ -152,7 +152,7 @@ namespace CssUI.DOM
                 if (string.IsNullOrEmpty(token))
                     throw new DomSyntaxError("Token cannot be null.");
                 /* 2) If token contains any ASCII whitespace, then throw an "InvalidCharacterError" DOMException. */
-                bool hasWhitespace = default(char) != token.ToString().ToCharArray().SingleOrDefault(c => ASCIICommon.Is_Ascii_Whitespace(c));
+                bool hasWhitespace = default(char) != token.ToString().ToCharArray().SingleOrDefault(c => UnicodeCommon.Is_Ascii_Whitespace(c));
                 if (hasWhitespace)
                     throw new InvalidCharacterError("Tokens cannot contain whitespaces");
             }
@@ -172,7 +172,7 @@ namespace CssUI.DOM
             if (string.IsNullOrEmpty(token))
                 throw new DomSyntaxError("Token cannot be null or empty.");
             /* 2) If token contains any ASCII whitespace, then throw an "InvalidCharacterError" DOMException. */
-            bool hasWhitespace = default(char) != token.ToString().ToCharArray().SingleOrDefault(c => ASCIICommon.Is_Ascii_Whitespace(c));
+            bool hasWhitespace = default(char) != token.ToString().ToCharArray().SingleOrDefault(c => UnicodeCommon.Is_Ascii_Whitespace(c));
             if (hasWhitespace)
                 throw new InvalidCharacterError("Tokens cannot contain whitespaces");
             /* 3) If context object’s token set[token] exists, then: */
@@ -204,7 +204,7 @@ namespace CssUI.DOM
             if (string.IsNullOrEmpty(token))
                 throw new DomSyntaxError("Token cannot be null or empty.");
             /* 2) If token contains any ASCII whitespace, then throw an "InvalidCharacterError" DOMException. */
-            bool hasWhitespace = default(char) != token.ToString().ToCharArray().SingleOrDefault(c => ASCIICommon.Is_Ascii_Whitespace(c));
+            bool hasWhitespace = default(char) != token.ToString().ToCharArray().SingleOrDefault(c => UnicodeCommon.Is_Ascii_Whitespace(c));
             if (hasWhitespace)
                 throw new InvalidCharacterError("Tokens cannot contain whitespaces");
 
