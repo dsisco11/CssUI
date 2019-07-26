@@ -15,6 +15,19 @@ namespace CssUI.DOM
         #endregion
 
         #region Constructor
+        public FormData(HTMLFormElement form, List<Tuple<string, FormDataEntryValue>> Entries)
+        {
+            this.form = form;
+            this.Entries = Entries ?? throw new InvalidStateError();
+        }
+
+        public FormData(HTMLFormElement form)
+        {/* Docs: https://xhr.spec.whatwg.org/#dom-formdata */
+            this.form = form;
+            var list = DOMCommon.Construct_Form_Entry_List(form);
+            Entries = list ?? throw new InvalidStateError();
+        }
+
         public FormData(FormData other)
         {/* Docs: https://xhr.spec.whatwg.org/#dom-formdata */
             form = other.form;
@@ -24,13 +37,6 @@ namespace CssUI.DOM
                 list = new List<Tuple<string, FormDataEntryValue>>(other.Entries);
             }
 
-            Entries = list ?? throw new InvalidStateError();
-        }
-
-        public FormData(HTMLFormElement form)
-        {/* Docs: https://xhr.spec.whatwg.org/#dom-formdata */
-            this.form = form;
-            var list = DOMCommon.Construct_Form_Entry_List(form);
             Entries = list ?? throw new InvalidStateError();
         }
         #endregion

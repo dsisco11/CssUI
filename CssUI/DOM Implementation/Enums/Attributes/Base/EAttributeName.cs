@@ -69,6 +69,11 @@ namespace CssUI.DOM
         [DomKeyword("media")]
         Media,
 
+
+        [DomKeyword("dropzone")]
+        Dropzone,
+
+
         [DomKeyword("alt")]
         Alt,
         [DomKeyword("src")]
@@ -109,6 +114,8 @@ namespace CssUI.DOM
 
         /* INPUT */
 
+        [DomKeyword("checked")]
+        Checked,
         [DomKeyword("inputmode")]
         InputMode,
         [DomKeyword("enterkeyhint")]
@@ -124,5 +131,7 @@ namespace CssUI.DOM
         Selected,
         [DomKeyword("required")]
         Required,
+        [DomKeyword("dirname")]
+        Dirname,
     }
 }

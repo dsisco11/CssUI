@@ -4,7 +4,7 @@ using CssUI.DOM.Nodes;
 namespace CssUI.DOM
 {
     /// <summary>
-    /// Rejects any node that isnt slotable
+    /// Rejects any node that isnt submittable
     /// </summary>
     public class FilterIsSubmittable : NodeFilter
     {
@@ -12,10 +12,10 @@ namespace CssUI.DOM
 
         public override ENodeFilterResult acceptNode(Node node)
         {
-            if (node.nodeType != ENodeType.ELEMENT_NODE || !(node is HTMLElement))
+            if (node.nodeType != ENodeType.ELEMENT_NODE || !(node is HTMLElement nodeElement))
                 return ENodeFilterResult.FILTER_REJECT;
 
-            if ((node as HTMLElement).is_being_activated)
+            if (DOMCommon.Is_Submittable_Element(nodeElement))
                 return ENodeFilterResult.FILTER_ACCEPT;
 
             return ENodeFilterResult.FILTER_SKIP;

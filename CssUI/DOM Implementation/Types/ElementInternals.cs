@@ -131,7 +131,7 @@ namespace CssUI.DOM
                     throw new NotSupportedError($"Element internals may only function on custom form-associated elements");
                 }
 
-                if (DOMCommon.Check_Form_Associated_Element_Barred_From_Validation(TargetElement))
+                if (FormCommon.Check_Form_Associated_Element_Barred_From_Validation(TargetElement))
                 {
                     return false;
                 }

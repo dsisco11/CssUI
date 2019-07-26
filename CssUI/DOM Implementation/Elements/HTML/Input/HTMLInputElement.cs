@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace CssUI.DOM
 {
-    public class HTMLInputElement : HTMLElement, IFormAssociatedElement
+    public class HTMLInputElement : HTMLElement, IFormAssociatedElement, IListedElement, ISubmittableElement, IResettableElement, ILableableElement, IAutoCapitalizeInheritingElement
     {
         #region Properties
         public bool bParserInserted { get; set; }
@@ -31,7 +31,7 @@ namespace CssUI.DOM
         [CEReactions] public string dirName;
         [CEReactions] public bool disabled;
         public HTMLFormElement form { get; private set; }
-        public FileList files;
+        public List<FileBlob> files;
         [CEReactions] public string formAction;
         [CEReactions] public string formEnctype;
         [CEReactions] public string formMethod;

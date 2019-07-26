@@ -10,6 +10,8 @@ namespace CssUI.DOM
         HTMLFormElement form { get; set; }
         bool bParserInserted { get; set; }
 
+        dynamic get_value();
+
         /// <summary>
         /// Each form-associated custom element has a state. 
         /// It is information with which the user agent can restore a user's input for the element. 
