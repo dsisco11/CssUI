@@ -57,7 +57,7 @@ namespace CssUI
         #region String replacement
 
         /// <summary>
-        /// Replaces every occurrence of U+000D (CR) not followed by U+000A (LF), and every occurrence of U+000A (LF) not preceded by U+000D (CR), by a string consisting of a U+000D (CR) and U+000A (LF).
+        /// Replaces all characters, for which <paramref name="dataFilter"/> does not return <see cref="EFilterResult.FILTER_ACCEPT"/>, with the characters provided by <paramref name="substituteData"/>
         /// </summary>
         /// <param name="buffMem">String memory</param>
         /// <returns>Altered string</returns>

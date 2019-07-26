@@ -43,6 +43,7 @@ namespace CssUI
         /// The value of this name for comparison purposes
         /// </summary>
         internal readonly int Value;
+        public readonly Ty? EnumValue = null;
         public readonly bool IsCustom;
         #endregion
 
@@ -55,8 +56,12 @@ namespace CssUI
         {
             var eV = Enum_To_Value(enumValue);
             if (!eV.HasValue)
+            {
                 throw new Exception($"Unable to convert \"{typeof(Ty).Name}\" value to integer");
+            }
+
             Value = eV.Value;
+            EnumValue = enumValue;
         }
 
         /// <summary>

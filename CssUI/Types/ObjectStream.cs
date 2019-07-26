@@ -10,7 +10,7 @@ namespace CssUI
     /// Provides access to a genericized, consumable stream of data.
     /// </summary>
     /// <typeparam name="ItemType"></typeparam>
-    [Obsolete("Please use DataStream instead")]
+    [Obsolete("Please use DataStream instead", true)]
     public class ObjectStream<ItemType>// where ItemType : class
     {
         #region Properties

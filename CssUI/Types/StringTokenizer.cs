@@ -1,5 +1,6 @@
 ﻿namespace CssUI
 {
+    /* XXX: Replace with DataStream instance */
     /// <summary>
     /// A generic string tokenizer
     /// </summary>
