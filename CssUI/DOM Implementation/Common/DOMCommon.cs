@@ -698,12 +698,7 @@ namespace CssUI.DOM
             Node current = tree.parentNode();
             while (current != null)
             {
-                N--;
-                if (N == 0)
-                {
-                    return current;
-                }
-
+                if (--N <= 0) { return current; }
                 current = tree.parentNode();
             }
 
@@ -749,6 +744,31 @@ namespace CssUI.DOM
             }
 
             return list;
+        }
+
+        /// <summary>
+        /// Returns Nth descendant for the given node
+        /// </summary>
+        /// <param name="node">The node to start searching from</param>
+        /// <param name="N">The number of elements to traverse</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Node Get_Nth_Descendant(Node node, int N, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        {
+            if (N <= 0)
+            {
+                throw new IndexOutOfRangeException("N must be greater than 0");
+            }
+
+            TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
+            Node current = tree.nextNode();
+            while (current != null)
+            {
+                if (--N <= 0) { return current; }
+                current = tree.nextNode();
+            }
+
+            return null;
         }
 
         /// <summary>
