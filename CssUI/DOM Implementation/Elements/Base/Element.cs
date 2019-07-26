@@ -271,13 +271,13 @@ namespace CssUI.DOM
             if (AttributeList.Count != B.AttributeList.Count)
                 return false;
 
-            if (!StringExt.streq(NamespaceURI.AsSpan(), B.NamespaceURI.AsSpan()))
+            if (!StringCommon.streq(NamespaceURI.AsSpan(), B.NamespaceURI.AsSpan()))
                 return false;
 
-            if (!StringExt.streq(prefix.AsSpan(), B.prefix.AsSpan()))
+            if (!StringCommon.streq(prefix.AsSpan(), B.prefix.AsSpan()))
                 return false;
 
-            if (!StringExt.streq(localName.AsSpan(), B.localName.AsSpan()))
+            if (!StringCommon.streq(localName.AsSpan(), B.localName.AsSpan()))
                 return false;
 
             /* If A is an element, each attribute in its attribute list has an attribute that equals an attribute in B’s attribute list. */

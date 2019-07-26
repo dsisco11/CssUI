@@ -51,6 +51,11 @@ namespace CssUI
         /// Returns the next item to be consumed, equivalent to calling Peek(2)
         /// </summary>
         public ItemType NextNextNext => Peek(2);
+
+        /// <summary>
+        /// Returns whether the stream position is currently at the EOF
+        /// </summary>
+        public bool atEOF => Next.Equals(EOF_ITEM);
         #endregion
 
         #region Data

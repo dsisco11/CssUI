@@ -7,7 +7,7 @@ namespace CssUI
         #region Constants
         /* Specials */
         public const char CHAR_MAX = char.MaxValue;
-        public const char CHAR_EOF = '\u0000';
+        public const char EOF = '\u0000';
         public const char CHAR_NULL = '\u0000';
         public const char CHAR_REPLACEMENT = '\uFFFD';// U+FFFD
 

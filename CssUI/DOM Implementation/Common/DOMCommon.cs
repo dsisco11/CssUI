@@ -466,6 +466,7 @@ namespace CssUI.DOM
 
         private static void Append_Form_Entry_List(ref List<Tuple<string, FormDataEntryValue>> entryList, string name, object value, bool prevent_line_break_normalization_flag = false)
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#append-an-entry */
+            /* 1) For name, replace every occurrence of U+000D (CR) not followed by U+000A (LF), and every occurrence of U+000A (LF) not preceded by U+000D (CR), by a string consisting of a U+000D (CR) and U+000A (LF). */
 
         }
 
@@ -1026,7 +1027,7 @@ namespace CssUI.DOM
         public static IReadOnlyCollection<Element> Get_Elements_By_Qualified_Name(Node root, string qualifiedName)
         {/* Docs: https://dom.spec.whatwg.org/#concept-getelementsbytagname */
             /* 1) If qualifiedName is "*" (U+002A), return a HTMLCollection rooted at root, whose filter matches only descendant elements. */
-            if (StringExt.streq(qualifiedName.AsSpan(), "\u002A".AsSpan()))
+            if (StringCommon.streq(qualifiedName.AsSpan(), "\u002A".AsSpan()))
             {
                 LinkedList<Element> descendents = new LinkedList<Element>();
                 var tree = new TreeWalker(root, ENodeFilterMask.SHOW_ELEMENT);
@@ -1051,14 +1052,14 @@ namespace CssUI.DOM
                 while (descendant != null)
                 {
                     var element = (Element)descendant;
-                    if (StringExt.streq(element.NamespaceURI.AsSpan(), HTMLNamespace.AsSpan()))
+                    if (StringCommon.streq(element.NamespaceURI.AsSpan(), HTMLNamespace.AsSpan()))
                     {
-                        if (StringExt.streq(qualifiedName.AsSpan(), element.tagName.ToLowerInvariant().AsSpan()))
+                        if (StringCommon.streq(qualifiedName.AsSpan(), element.tagName.ToLowerInvariant().AsSpan()))
                         {
                             descendents.AddLast(element);
                         }
                     }
-                    else if (StringExt.streq(qualifiedName.AsSpan(), element.tagName.AsSpan()))
+                    else if (StringCommon.streq(qualifiedName.AsSpan(), element.tagName.AsSpan()))
                     {
                         descendents.AddLast(element);
                     }
@@ -1077,14 +1078,14 @@ namespace CssUI.DOM
                 while (node != null)
                 {
                     var element = (Element)node;
-                    if (StringExt.streq(element.NamespaceURI.AsSpan(), HTMLNamespace.AsSpan()))
+                    if (StringCommon.streq(element.NamespaceURI.AsSpan(), HTMLNamespace.AsSpan()))
                     {
-                        if (StringExt.streq(qualifiedName.AsSpan(), element.tagName.ToLowerInvariant().AsSpan()))
+                        if (StringCommon.streq(qualifiedName.AsSpan(), element.tagName.ToLowerInvariant().AsSpan()))
                         {
                             descendents.AddLast(element);
                         }
                     }
-                    else if (StringExt.streq(qualifiedName.AsSpan(), element.tagName.AsSpan()))
+                    else if (StringCommon.streq(qualifiedName.AsSpan(), element.tagName.AsSpan()))
                     {
                         descendents.AddLast(element);
                     }

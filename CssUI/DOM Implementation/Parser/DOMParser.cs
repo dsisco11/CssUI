@@ -13,13 +13,13 @@ namespace CssUI.DOM.Serialization
 
         public static bool Parse_Integer(ref string input, out long outValue)
         {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#signed-integers */
-            DataStream<char> Stream = new DataStream<char>(input.AsMemory(), UnicodeCommon.CHAR_EOF);
+            DataStream<char> Stream = new DataStream<char>(input.AsMemory(), UnicodeCommon.EOF);
             bool sign = true;
 
             /* SKip ASCII whitespace */
             Stream.Consume_While(ASCIICommon.Is_Ascii_Whitespace);
 
-            if (Stream.Next == UnicodeCommon.CHAR_EOF)
+            if (Stream.Next == UnicodeCommon.EOF)
             {
                 outValue = long.MaxValue;
                 return false;
@@ -39,7 +39,7 @@ namespace CssUI.DOM.Serialization
             /* Collect sequence of ASCII digit codepoints */
             Stream.Consume_While(ASCIICommon.Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
 
-            if (Stream.Next != UnicodeCommon.CHAR_EOF && ASCIICommon.Is_Ascii_Alpha(Stream.Next))
+            if (Stream.Next != UnicodeCommon.EOF && ASCIICommon.Is_Ascii_Alpha(Stream.Next))
             {
                 outValue = long.MaxValue;
                 return false;
@@ -53,7 +53,7 @@ namespace CssUI.DOM.Serialization
 
         public static bool Parse_FloatingPoint(ref string input, out double outValue)
         {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#rules-for-parsing-floating-point-number-values */
-            DataStream<char> Stream = new DataStream<char>(input.AsMemory(), UnicodeCommon.CHAR_EOF);
+            DataStream<char> Stream = new DataStream<char>(input.AsMemory(), UnicodeCommon.EOF);
 
             double value = 1;
             double divisor = 1;
@@ -62,7 +62,7 @@ namespace CssUI.DOM.Serialization
             /* Skip ASCII whitespace */
             Stream.Consume_While(ASCIICommon.Is_Ascii_Whitespace);
 
-            if (Stream.Next == UnicodeCommon.CHAR_EOF)
+            if (Stream.Next == UnicodeCommon.EOF)
                 throw new DomSyntaxError();
 
             switch (Stream.Next)
@@ -81,14 +81,14 @@ namespace CssUI.DOM.Serialization
                     break;
             }
 
-            if (Stream.Next == UnicodeCommon.CHAR_EOF)
+            if (Stream.Next == UnicodeCommon.EOF)
                 throw new DomSyntaxError();
 
             /* 9) If the character indicated by position is a U+002E FULL STOP (.), 
              * and that is not the last character in input, 
              * and the character after the character indicated by position is an ASCII digit, 
              * then set value to zero and jump to the step labeled fraction. */
-            if (Stream.Next == UnicodeCommon.CHAR_FULL_STOP && Stream.NextNext != UnicodeCommon.CHAR_EOF && ASCIICommon.Is_Ascii_Digit(Stream.NextNext))
+            if (Stream.Next == UnicodeCommon.CHAR_FULL_STOP && Stream.NextNext != UnicodeCommon.EOF && ASCIICommon.Is_Ascii_Digit(Stream.NextNext))
             {
                 value = 0;
             }
@@ -105,14 +105,14 @@ namespace CssUI.DOM.Serialization
             }
 
             /* 12) If position is past the end of input, jump to the step labeled conversion. */
-            if (Stream.Next != UnicodeCommon.CHAR_EOF)
+            if (Stream.Next != UnicodeCommon.EOF)
             {
                 /* 13) Fraction: If the character indicated by position is a U+002E FULL STOP (.), run these substeps: */
                 if (Stream.Next == UnicodeCommon.CHAR_FULL_STOP)
                 {
                     Stream.Consume();
                     /* 2) If position is past the end of input, or if the character indicated by position is not an ASCII digit, U+0065 LATIN SMALL LETTER E (e), or U+0045 LATIN CAPITAL LETTER E (E), then jump to the step labeled conversion. */
-                    if (Stream.Next != UnicodeCommon.CHAR_EOF && (ASCIICommon.Is_Ascii_Digit(Stream.Next) || Stream.Next == '\u0045' || Stream.Next == '\u0065'))
+                    if (Stream.Next != UnicodeCommon.EOF && (ASCIICommon.Is_Ascii_Digit(Stream.Next) || Stream.Next == '\u0045' || Stream.Next == '\u0065'))
                     {
                         /* 3) If the character indicated by position is a U+0065 LATIN SMALL LETTER E character (e) or a U+0045 LATIN CAPITAL LETTER E character (E), skip the remainder of these substeps. */
                         if (ASCIICommon.Is_Ascii_Digit(Stream.Next))
@@ -128,7 +128,7 @@ namespace CssUI.DOM.Serialization
                                 Stream.Consume();
                                 /* 7) If position is past the end of input, then jump to the step labeled conversion. */
 
-                                if (Stream.Next == UnicodeCommon.CHAR_EOF)
+                                if (Stream.Next == UnicodeCommon.EOF)
                                     break;
                             }
                         }
@@ -182,10 +182,10 @@ namespace CssUI.DOM.Serialization
 
         public static bool Parse_Length(ref string input, out double outValue, out EAttributeType outType)
         {
-            DataStream<char> Stream = new DataStream<char>(input.AsMemory(), UnicodeCommon.CHAR_EOF);
+            DataStream<char> Stream = new DataStream<char>(input.AsMemory(), UnicodeCommon.EOF);
             /* 3) Skip ASCII whitespace within input given position. */
             Stream.Consume_While(ASCIICommon.Is_Ascii_Whitespace);
-            if (Stream.Next == UnicodeCommon.CHAR_EOF)
+            if (Stream.Next == UnicodeCommon.EOF)
             {
                 outValue = double.NaN;
                 outType = EAttributeType.Length;
@@ -197,7 +197,7 @@ namespace CssUI.DOM.Serialization
             double value = double.Parse(outDigits.ToString());
 
             /* 6) If position is past the end of input, then return value as a length. */
-            if (Stream.Next == UnicodeCommon.CHAR_EOF)
+            if (Stream.Next == UnicodeCommon.EOF)
             {
                 outValue = value;
                 outType = EAttributeType.Length;
@@ -209,7 +209,7 @@ namespace CssUI.DOM.Serialization
             {
                 Stream.Consume();
                 /* 2) If position is past the end of input or the code point at position within input is not an ASCII digit, then return the current dimension value with value, input, and position. */
-                if (Stream.Next == UnicodeCommon.CHAR_EOF)
+                if (Stream.Next == UnicodeCommon.EOF)
                 {
                     outValue = value;
                     outType = EAttributeType.Length;

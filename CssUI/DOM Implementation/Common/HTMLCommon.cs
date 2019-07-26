@@ -66,7 +66,7 @@ namespace CssUI.DOM.Internal
 
         public static bool Is_Valid_Custom_Element_Name(ReadOnlyMemory<char> data)
         {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name */
-            DataStream<char> Stream = new DataStream<char>(data, CHAR_EOF);
+            DataStream<char> Stream = new DataStream<char>(data, EOF);
             /* FORMAT:  [a-z] (PCENChar)* '-' (PCENChar)*  */
             if (data.IsEmpty || data.Length < 2)
             {
@@ -95,7 +95,7 @@ namespace CssUI.DOM.Internal
             Stream.Consume_While(c => Is_PCEN_Char(c));
 
             /* All PCEN chars have been consumed, if this isnt EOF then its an invalid char */
-            if (Stream.Next != CHAR_EOF)
+            if (Stream.Next != EOF)
             {
                 return false;
             }
@@ -112,7 +112,7 @@ namespace CssUI.DOM.Internal
              */
             for (int i=0; i< FORBIDDEN_CUSTOM_ELEMENT_NAMES.Length; i++)
             {
-                if (StringExt.streq(data.Span, FORBIDDEN_CUSTOM_ELEMENT_NAMES[i].AsSpan()))
+                if (StringCommon.streq(data.Span, FORBIDDEN_CUSTOM_ELEMENT_NAMES[i].AsSpan()))
                 {
                     return false;
                 }

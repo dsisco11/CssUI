@@ -36,7 +36,7 @@ namespace CssUI.DOM.CustomElements
 
         public CustomElementDefinition Lookup(Document document, string NamespaceURI, string localName, string isValue)
         {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#look-up-a-custom-element-definition */
-            if (!StringExt.streq(NamespaceURI.AsSpan(), DOMCommon.HTMLNamespace.AsSpan()))
+            if (!StringCommon.streq(NamespaceURI.AsSpan(), DOMCommon.HTMLNamespace.AsSpan()))
             {
                 return null;
             }
@@ -50,12 +50,12 @@ namespace CssUI.DOM.CustomElements
             /* 5) If there is a custom element definition in registry with name equal to is and local name equal to localName, return that custom element definition. */
             foreach (CustomElementDefinition definition in Definitions)
             {
-                if (StringExt.streq(localName.AsSpan(), definition.name.AsSpan()) && StringExt.streq(localName.AsSpan(), definition.localName.AsSpan()))
+                if (StringCommon.streq(localName.AsSpan(), definition.name.AsSpan()) && StringCommon.streq(localName.AsSpan(), definition.localName.AsSpan()))
                 {
                     return definition;
                 }
 
-                if (StringExt.streq(isValue.AsSpan(), definition.name.AsSpan()) && StringExt.streq(localName.AsSpan(), definition.localName.AsSpan()))
+                if (StringCommon.streq(isValue.AsSpan(), definition.name.AsSpan()) && StringCommon.streq(localName.AsSpan(), definition.localName.AsSpan()))
                 {
                     return definition;
                 }
@@ -87,7 +87,7 @@ namespace CssUI.DOM.CustomElements
                 throw new DomSyntaxError($"\"{name}\" is not a valid custom element name!");
             }
             /* 3) If this CustomElementRegistry contains an entry with name name, then throw a "NotSupportedError" DOMException. */
-            if (Definitions.Any(def => StringExt.streq(def.name.AsSpan(), name.AsSpan())))
+            if (Definitions.Any(def => StringCommon.streq(def.name.AsSpan(), name.AsSpan())))
             {
                 throw new NotSupportedError($"A custom element definition for \"{name}\" already exists");
             }
