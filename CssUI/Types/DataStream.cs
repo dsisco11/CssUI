@@ -19,7 +19,7 @@ namespace CssUI
         /// <summary>
         /// The current position at which data will be read from the stream
         /// </summary>
-        public int Position { get; private set; } = 0;
+        public ulong Position { get; private set; } = 0;
 
         public readonly ItemType EOF_ITEM = default(ItemType);
         #endregion
@@ -71,21 +71,21 @@ namespace CssUI
         /// <param name="Offset">Distance from the current read position at which to peek</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ItemType Peek(int Offset = 0)
+        public ItemType Peek(long Offset = 0)
         {
-            int i = (Position + Offset);
+            long index = ((long)Position + Offset);
 
-            if (i < 0)
+            if (index < 0)
             {
                 throw new IndexOutOfRangeException();
             }
 
-            if (i >= Stream.Length)
+            if (index >= Stream.Length)
             {
                 return EOF_ITEM;
             }
 
-            return Stream[i];
+            return Stream[(int)index];
         }
 
         /// <summary>
@@ -93,10 +93,10 @@ namespace CssUI
         /// </summary>
         public ItemType Consume()
         {
-            int EndPos = (Position + 1);
-            if (Position >= Stream.Length) return EOF_ITEM;
+            var EndPos = (Position + 1);
+            if (Position >= (ulong)Stream.Length) return EOF_ITEM;
 
-            ItemType retVal = Stream[Position];
+            ItemType retVal = Stream[(int)Position];
             Position += 1;
 
             return retVal;
@@ -107,10 +107,10 @@ namespace CssUI
         /// </summary>
         public CastType Consume<CastType>() where CastType : ItemType
         {
-            int EndPos = (Position + 1);
-            if (Position >= Stream.Length) return default(CastType);
+            var EndPos = (Position + 1);
+            if (Position >= (ulong)Stream.Length) return default(CastType);
 
-            ItemType retVal = Stream[Position];
+            ItemType retVal = Stream[(int)Position];
             Position += 1;
 
             return (CastType)retVal;
@@ -120,18 +120,18 @@ namespace CssUI
         /// Returns the specified number of items from the stream and progresses the current reading position by that number
         /// </summary>
         /// <param name="Count">Number of characters to consume</param>
-        public ReadOnlySpan<ItemType> Consume(int Count = 1)
+        public ReadOnlySpan<ItemType> Consume(ulong Count = 1)
         {
-            int startIndex = Position;
-            int endIndex = (Position + Count);
+            var startIndex = Position;
+            var endIndex = (Position + Count);
 
-            if (endIndex >= Stream.Length)
+            if (endIndex >= (ulong)Stream.Length)
             {
-                endIndex = (Stream.Length - 1);
+                endIndex = (((ulong)Stream.Length) - 1);
             }
 
             Position = endIndex;
-            return Stream.Slice(startIndex, Count);
+            return Stream.Slice((int)startIndex, (int)Count);
         }
 
         /// <summary>
@@ -141,8 +141,6 @@ namespace CssUI
         /// <returns></returns>
         public void Consume_While(Func<ItemType, bool> Predicate)
         {
-            int startIndex = Position;
-
             while (Predicate(Next))
             {
                 Consume();
@@ -156,15 +154,15 @@ namespace CssUI
         /// <returns></returns>
         public void Consume_While(Func<ItemType, bool> Predicate, out ReadOnlySpan<ItemType> outConsumed)
         {
-            int startIndex = Position;
+            var startIndex = Position;
 
             while (Predicate(Next))
             {
                 Consume();
             }
 
-            int count = Position - startIndex;
-            outConsumed = Stream.Slice(startIndex, count);
+            var count = Position - startIndex;
+            outConsumed = Stream.Slice((int)startIndex, (int)count);
         }
 
         /// <summary>
@@ -174,27 +172,26 @@ namespace CssUI
         /// <returns></returns>
         public DataStream<ItemType> Substream(Func<ItemType, bool> Predicate)
         {
-            int startIndex = Position;
+            var startIndex = Position;
 
             while (Predicate(Next))
             {
                 Consume();
             }
 
-            int count = Position - startIndex;
-            var consumed = Data.Slice(startIndex, count);
+            var count = Position - startIndex;
+            var consumed = Data.Slice((int)startIndex, (int)count);
 
-            return new DataStream<ItemType>(consumed, this.EOF_ITEM);
+            return new DataStream<ItemType>(consumed, EOF_ITEM);
         }
 
         /// <summary>
         /// Pushes the given number of items back onto the front of the stream
         /// </summary>
         /// <param name="Count"></param>
-        public void Reconsume(int Count = 1)
-        {/* Docs: https://www.w3.org/TR/css-syntax-3/#reconsume-the-current-input-code-point */
+        public void Reconsume(ulong Count = 1)
+        {
             Position -= Count;
-            if (Position < 0) Position = 0;
         }
 
         #endregion
