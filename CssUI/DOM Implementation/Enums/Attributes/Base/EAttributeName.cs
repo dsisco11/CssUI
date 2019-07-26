@@ -122,5 +122,7 @@ namespace CssUI.DOM
         Value,
         [DomKeyword("selected")]
         Selected,
+        [DomKeyword("required")]
+        Required,
     }
 }

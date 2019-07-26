@@ -464,7 +464,12 @@ namespace CssUI.DOM
             }
         }
 
-        public static List<FormDataEntryValue> Construct_Form_Entry_List(HTMLFormElement form, Element submitter = null, string encoding = null)
+        private static void Append_Form_Entry_List(ref List<Tuple<string, FormDataEntryValue>> entryList, string name, object value, bool prevent_line_break_normalization_flag = false)
+        {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#append-an-entry */
+
+        }
+
+        public static List<Tuple<string, FormDataEntryValue>> Construct_Form_Entry_List(HTMLFormElement form, Element submitter = null, string encoding = null)
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#constructing-the-form-data-set */
             if (form.bConstructingEntryList)
                 return null;
@@ -472,7 +477,7 @@ namespace CssUI.DOM
             form.bConstructingEntryList = true;
 
             var controls = (IEnumerable<Element>)Get_Descendents(form, FilterIsSubmittable.Instance, ENodeFilterMask.SHOW_ELEMENT).Where(child => child is IFormAssociatedElement childElement && ReferenceEquals(form, childElement.form));
-            List<FormDataEntryValue> entries = new List<FormDataEntryValue>();
+            List<Tuple<string, FormDataEntryValue>> entries = new List<Tuple<string, FormDataEntryValue>>();
 
             /* 5) For each element field in controls, in tree order: */
             foreach (Element field in controls)
@@ -495,8 +500,9 @@ namespace CssUI.DOM
                 {
                     continue;
                 }
-                else if (field is HTMLInputElement inputElement)
+                else if (field is HTMLInputElement)
                 {
+                    var inputElement = (HTMLInputElement)field;
                     if (inputElement.type == EInputType.Checkbox && !inputElement.Checked)
                     {
                         continue;
@@ -516,9 +522,72 @@ namespace CssUI.DOM
                 }
 
                 /* 2) If the field element is an input element whose type attribute is in the Image Button state, then: */
-                if (field is HTMLInputElement inputElement1 && inputElement1.type == EInputType.Image)
+                if (field is HTMLInputElement)
                 {
-                    /* XXX: implement this */
+                    var inputElement = (HTMLInputElement)field;
+                    if (inputElement.type == EInputType.Image)
+                    {
+                        string name = inputElement.name.Length > 0 ? inputElement.name : string.Empty;
+
+                        var namex = string.Concat(name, UnicodeCommon.CHAR_X_LOWER);
+                        var namey = string.Concat(name, UnicodeCommon.CHAR_Y_LOWER);
+
+                        /* 4) The field element is submitter, and before this algorithm was invoked the user indicated a coordinate. 
+                         * Let x be the x-component of the coordinate selected by the user, and let y be the y-component of the coordinate selected by the user. */
+                        if (ReferenceEquals(field, submitter))
+                        {
+
+                        }
+                    }
+                }
+            }
+
+        }
+
+
+        public static bool Check_Form_Validity(Element element)
+        {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#statically-validate-the-constraints */
+
+        }
+
+
+        public static bool Check_Form_Associated_Element_Barred_From_Validation(Element element)
+        {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#barred-from-constraint-validation */
+
+
+            return false;
+        }
+
+        /// <summary>
+        /// Returns whether a given element satisfies it's constraints
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        public static bool Check_Form_Associated_Element_Satisfies_Constraints(Element element)
+        {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#suffering-from-being-missing */
+
+            if (Is_Form_Associated_Custom_Element(element))
+            {
+                var formElement = ((IFormAssociatedElement)element);
+                EValidityState flags = formElement.validity_flags;
+                if (0 != (flags & (EValidityState.valueMissing | EValidityState.typeMismatch | EValidityState.patternMismatch | EValidityState.tooLong | EValidityState.tooShort | EValidityState.rangeUnderflow | EValidityState.rangeOverflow | EValidityState.stepMismatch | EValidityState.badInput)))
+                {
+                    return false;
+                }
+
+                if (!ReferenceEquals(null, formElement.custom_validity_error_message) && formElement.custom_validity_error_message.Length > 0)
+                {
+                    return false;
+                }
+            }
+
+            /* XXX: Implement the validation for select elements and radio button groups */
+            /* When a control has no value but has a required attribute (input required, textarea required); or, more complicated rules for select elements and controls in radio button groups, as specified in their sections. */
+            if (element.hasAttribute(EAttributeName.Required))
+            {
+                if (element is HTMLInputElement inputElement && (ReferenceEquals(null, inputElement.value) || inputElement.value.Length <= 0))
+                {
+                    return false;
                 }
             }
 

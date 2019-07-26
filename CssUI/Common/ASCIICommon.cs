@@ -185,6 +185,11 @@ namespace CssUI
 
         #region String Transformation
 
+        /// <summary>
+        /// Strips leading and trailing whitespace from a string and also collapses groups of whitespace characters with a single space
+        /// </summary>
+        /// <param name="buffMem">String memory</param>
+        /// <returns>Altered string</returns>
         public static string Strip_And_Collapse_Whitespace(ReadOnlyMemory<char> buffMem)
         {/* Docs: https://infra.spec.whatwg.org/#strip-and-collapse-ascii-whitespace */
             ReadOnlySpan<char> buff = buffMem.Span;

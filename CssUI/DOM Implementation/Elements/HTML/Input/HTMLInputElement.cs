@@ -60,33 +60,38 @@ namespace CssUI.DOM
             get => getAttribute(EAttributeName.Type).Get_Enum<EInputType>();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Type, AttributeValue.From_Enum(value)));
         }
-        /*
+
         [CEReactions] public string defaultValue;
         [CEReactions] public string value;
         public object valueAsDate;
         public double valueAsNumber;
         [CEReactions] public uint width;
 
-        void stepUp(long n = 1);
-        void stepDown(long n = 1);
+        public void stepUp(long n = 1);
+        public void stepDown(long n = 1);
 
-        readonly public bool willValidate;
-        readonly public ValidityState validity;
-        readonly public string validationMessage;
-        bool checkValidity();
-        bool reportValidity();
-        void setCustomValidity(string error);
+        public readonly bool willValidate;
+        public readonly EValidityState validity;
+        public readonly string validationMessage;
 
-        readonly public IReadOnlyCollection<Node> labels;
+        public bool checkValidity();
+        public bool reportValidity();
+        public void setCustomValidity(string error);
 
-        void select();
+        public IReadOnlyCollection<Node> labels;
+
+        public void select();
         public uint selectionStart;
         public uint selectionEnd;
         public string selectionDirection;
 
-        void setRangeText(string replacement);
-        void setRangeText(string replacement, uint start, uint end, SelectionMode selectionMode = "preserve");
-        void setSelectionRange(uint start, uint end, string direction);
-        */
+        /* Docs: https://html.spec.whatwg.org/multipage/input.html#concept-input-type-image-coordinate */
+        public int selected_coordinate_x { get; private set; } = 0;
+        public int selected_coordinate_y { get; private set; } = 0;
+
+        public void setRangeText(string replacement);
+        public void setRangeText(string replacement, uint start, uint end, SelectionMode selectionMode = "preserve");
+        public void setSelectionRange(uint start, uint end, string direction);
+
     }
 }

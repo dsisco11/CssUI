@@ -64,6 +64,8 @@ namespace CssUI
         /* Docs: https://infra.spec.whatwg.org/#ascii-lower-alpha */
         public const char CHAR_A_LOWER = '\u0061';
         public const char CHAR_F_LOWER = '\u0066';
+        public const char CHAR_X_LOWER = '\u0078';
+        public const char CHAR_Y_LOWER = '\u0079';
         public const char CHAR_Z_LOWER = '\u007A';
 
 
