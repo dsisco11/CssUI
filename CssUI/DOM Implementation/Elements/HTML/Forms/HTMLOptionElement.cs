@@ -10,15 +10,15 @@ namespace CssUI.DOM
     /// <summary>
     /// The option element represents an option in a select element or as part of a list of suggestions in a datalist element.
     /// </summary>
-    public class HTMLOptionElement : HTMLElement, IFormAssociatedElement
+    public class HTMLOptionElement : FormAssociatedElement
     {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#the-option-element */
         #region Properties
-        public bool bParserInserted { get; set; } = false;
         public bool dirtiness { get; protected set; } = false;
 
         /* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#concept-option-selectedness */
         public bool selectedness { get; protected set; } = false;
         #endregion
+
 
         #region Constructors
         /// <summary>
@@ -60,6 +60,8 @@ namespace CssUI.DOM
         }
         #endregion
 
+
+        #region Utility
         private HTMLSelectElement get_select()
         {
             if (parentElement is HTMLSelectElement parentSelect)
@@ -73,6 +75,23 @@ namespace CssUI.DOM
             }
 
             return null;
+        }
+        #endregion
+
+
+        #region Accessors
+        public override HTMLFormElement form
+        {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#dom-option-form */
+            get
+            {
+                HTMLSelectElement select = get_select();
+                if (select != null)
+                {
+                    return select.form;
+                }
+
+                return null;
+            }
         }
 
         /// <summary>
@@ -103,7 +122,7 @@ namespace CssUI.DOM
                 }
 
                 var optionsList = select.options;
-                for(int i=0; i<optionsList.Count; i++)
+                for (int i = 0; i < optionsList.Count; i++)
                 {
                     if (ReferenceEquals(this, optionsList.ElementAt(i)))
                     {
@@ -138,7 +157,8 @@ namespace CssUI.DOM
             set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Selected, value));
         }
 
-        [CEReactions] public string label
+        [CEReactions]
+        public string label
         {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#attr-option-label */
             get
             {
@@ -153,7 +173,8 @@ namespace CssUI.DOM
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Label, AttributeValue.From_String(value)));
         }
 
-        [CEReactions] public string value
+        [CEReactions]
+        public string value
         {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#dom-option-value */
             get
             {
@@ -168,7 +189,8 @@ namespace CssUI.DOM
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Value, AttributeValue.From_String(value)));
         }
 
-        [CEReactions] public string text
+        [CEReactions]
+        public string text
         {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#dom-option-text */
             get
             {
@@ -220,24 +242,16 @@ namespace CssUI.DOM
             }
         }
 
+        #endregion
 
-        public HTMLFormElement form
-        {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#dom-option-form */
-            get
-            {
-                return get_select()?.form ?? null;
-            }
-            set
-            {
-                HTMLSelectElement select = get_select();
-                if (select != null)
-                {
-                    return select.form;
-                }
 
-                return null;
-            }
+        internal override EValidityState query_validity()
+        {
+            EValidityState flags = 0x0;
+
+
+
+
         }
-
     }
 }

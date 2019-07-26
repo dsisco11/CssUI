@@ -340,7 +340,7 @@ namespace CssUI.DOM.Nodes
         /// </summary>
         /// <param name="parent"></param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal virtual void run_child_text_node_change_steps(Node node)
+        internal virtual void run_child_text_node_change_steps(this Node node)
         {
             /* Currently none of our specifications define this, so it's a placeholder. */
         }
@@ -364,9 +364,21 @@ namespace CssUI.DOM.Nodes
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal virtual void run_attribute_change_steps(ref Node element, string localName, string oldValue, string value, string Namespace)
+        internal virtual void run_attribute_change_steps(this Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue value, string Namespace)
         {
-            /* Currently none of our specifications define this, so it's a placeholder. */
+            if (localName.IsCustom)
+            {
+                return;
+            }
+
+            switch (localName.EnumValue)
+            {
+                case EAttributeName.ID:
+                    {
+                        ownerDocument.Update_Element_ID(element, oldValue, value);
+                    }
+                    break;
+            }
         }
         #endregion
 

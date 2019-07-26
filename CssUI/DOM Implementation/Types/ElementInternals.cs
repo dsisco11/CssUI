@@ -45,7 +45,7 @@ namespace CssUI.DOM
                 throw new ArgumentException($"The State argument (if specified) must be one of string, FileBlob, or FormData");
             }
 
-            var element = (IFormAssociatedElement)TargetElement;
+            var element = (FormAssociatedElement)TargetElement;
             /* 3) Set target element's submission value to value if value is not a FormData object, or to a clone of the entry list associated with value otherwise. */
             if (value is FormData valueFormData)
             {
@@ -91,13 +91,13 @@ namespace CssUI.DOM
                 throw new TypeError("A message must be given when setting validity flags");
             }
 
-            var element = (IFormAssociatedElement)TargetElement;
-            element.validity_flags = flags;
-            element.validation_message = ReferenceEquals(null, message) ? string.Empty : message;
+            var element = (FormAssociatedElement)TargetElement;
+            element.validity = flags;
+            element.validationMessage = ReferenceEquals(null, message) ? string.Empty : message;
 
             if (0 != (flags & EValidityState.customError))
             {
-                element.custom_validity_error_message = element.validation_message;
+                element.custom_validity_error_message = element.validationMessage;
             }
             else
             {
@@ -131,7 +131,7 @@ namespace CssUI.DOM
                     throw new NotSupportedError($"Element internals may only function on custom form-associated elements");
                 }
 
-                if (FormCommon.Check_Form_Associated_Element_Barred_From_Validation(TargetElement))
+                if (FormCommon.Is_Barred_From_Validation((FormAssociatedElement)TargetElement))
                 {
                     return false;
                 }
@@ -143,12 +143,12 @@ namespace CssUI.DOM
         /// <summary>
         /// Returns the ValidityState object for internals's target element.
         /// </summary>
-        public EValidityState validity => ((IFormAssociatedElement)TargetElement).validity_flags;
+        public EValidityState validity => ((FormAssociatedElement)TargetElement).validity;
 
         /// <summary>
         /// Returns the error message that would be shown to the user if internals's target element was to be checked for validity.
         /// </summary>
-        public string validationMessage => ((IFormAssociatedElement)TargetElement).validation_message;
+        public string validationMessage => ((FormAssociatedElement)TargetElement).validationMessage;
 
         /// <summary>
         /// Returns true if internals's target element has no validity problems; false otherwise. Fires an invalid event at the element in the latter case.
@@ -161,17 +161,37 @@ namespace CssUI.DOM
                 throw new NotSupportedError($"Element internals may only function on custom form-associated elements");
             }
 
-            var element = (IFormAssociatedElement)TargetElement;
-            if (willValidate && )
+            var element = (FormAssociatedElement)TargetElement;
+            return element.checkValidity();
         }
 
         /// <summary>
         /// Returns true if internals's target element has no validity problems; otherwise, returns false, fires an invalid event at the element, and (if the event isn't canceled) reports the problem to the user.
         /// </summary>
         /// <returns></returns>
-        public bool reportValidity();
+        public bool reportValidity()
+        {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#dom-elementinternals-reportvalidity */
+            if (!DOMCommon.Is_Form_Associated_Custom_Element(TargetElement))
+            {
+                throw new NotSupportedError($"Element internals may only function on custom form-associated elements");
+            }
 
-        public readonly IReadOnlyCollection<Node> labels;
+            var element = (FormAssociatedElement)TargetElement;
+            return element.reportValidity();
+        }
+
+        public IReadOnlyCollection<HTMLLabelElement> labels
+        {/* Docs: https://html.spec.whatwg.org/multipage/forms.html#dom-elementinternals-labels */
+            get
+            {
+                if (!DOMCommon.Is_Form_Associated_Custom_Element(TargetElement))
+                {
+                    throw new NotSupportedError($"Element internals may only function on custom form-associated elements");
+                }
+
+                return (IReadOnlyCollection<HTMLLabelElement>)DOMCommon.Get_Descendents(form, new FilterLabelFor(TargetElement), Enums.ENodeFilterMask.SHOW_ELEMENT);
+            }
+        }
 
     }
 }

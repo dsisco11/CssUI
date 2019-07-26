@@ -89,9 +89,9 @@ namespace CssUI.DOM
 
         #region Node Overrides
         public override ENodeType nodeType => Enums.ENodeType.ELEMENT_NODE;
-        public override string nodeName => this.localName.ToUpperInvariant();
+        public override string nodeName => localName.ToUpperInvariant();
         public override string nodeValue { get => null; set { /* specs say do nothing */ } }
-        public override int nodeLength => this.childNodes.Count;
+        public override int nodeLength => childNodes.Count;
         public override string textContent {
             get
             {
@@ -529,6 +529,7 @@ namespace CssUI.DOM
             CEReactions.Enqueue_Reaction(this, EReactionName.AttributeChanged, attr.localName, attr.Value, attr.namespaceURI);
 
             /* 3) Run the attribute change steps with element, attribute’s local name, attribute’s value, value, and attribute’s namespace. */
+            run_attribute_change_steps(this, attr.localName, attr.Value, newValue, attr.namespaceURI);
             /* 4) Set attribute’s value to value. */
             attr.Value = newValue;
         }
@@ -545,8 +546,11 @@ namespace CssUI.DOM
 
             /* 3) Run the attribute change steps with element, attribute’s local name, null, attribute’s value, and attribute’s namespace. */
             change_attribute(attr, null, attr.Value);
+
             /* 4) Append attribute to element’s attribute list. */
-            this.AttributeList.Add(attr.Name.ToLowerInvariant(), attr);
+            //AttributeList.Add(attr.Name.ToLowerInvariant(), attr);
+            AttributeList.Add(attr.localName, attr);
+
             /* 5) Set attribute’s element to element. */
             attr.ownerElement = this;
         }
@@ -564,7 +568,8 @@ namespace CssUI.DOM
             /* 3) Run the attribute change steps with element, attribute’s local name, attribute’s value, null, and attribute’s namespace. */
             change_attribute(attr, attr.Value, null);
             /* 4) Remove attribute from element’s attribute list. */
-            this.AttributeList.Remove(attr.Name.ToLowerInvariant());
+            //AttributeList.Remove(attr.Name.ToLowerInvariant());
+            AttributeList.Remove(attr.localName);
             /* 5) Set attribute’s element to null. */
             attr.ownerElement = null;
         }
@@ -582,10 +587,14 @@ namespace CssUI.DOM
             /* 3) Run the attribute change steps with element, oldAttr’s local name, oldAttr’s value, newAttr’s value, and oldAttr’s namespace. */
             change_attribute(oldAttr, oldAttr.Value, newAttr.Value);
             /* 4) Replace oldAttr by newAttr in element’s attribute list. */
-            // find_attribute(oldAttr.Name, out Attr _, out int outIndex);
-            this.AttributeList[oldAttr.Name.ToLowerInvariant()] = newAttr;
+            //string lowerName = StringCommon.Transform(oldAttr.Name.AsMemory(), UnicodeCommon.To_ASCII_Lower_Alpha);
+            //AttributeList[lowerName] = newAttr;
+
+            AttributeList[oldAttr.localName] = newAttr;
+
             /* 5) Set oldAttr’s element to null. */
             oldAttr.ownerElement = null;
+
             /* 6) Set newAttr’s element to element. */
             newAttr.ownerElement = this;
         }
@@ -602,7 +611,6 @@ namespace CssUI.DOM
             /* 3) Return attr’s value. */
             return outAttr.Value;
         }
-
         public Attr getAttributeNode(AtomicName<EAttributeName> Name)
         {
             if (!AttributeList.TryGetValue(Name, out Attr outAttr))
@@ -630,7 +638,6 @@ namespace CssUI.DOM
                 change_attribute(attr, attr.Value, value);
             });
         }
-
         [CEReactions]
         public Attr setAttributeNode(Attr attr)
         {
@@ -654,7 +661,6 @@ namespace CssUI.DOM
         }
 
 
-
         [CEReactions]
         public void removeAttribute(AtomicName<EAttributeName> Name)
         {
@@ -667,7 +673,6 @@ namespace CssUI.DOM
                 }
             });
         }
-
         [CEReactions]
         public Attr removeAttributeNode(Attr attr)
         {
@@ -682,7 +687,6 @@ namespace CssUI.DOM
                 return attr;
             });
         }
-
 
 
         [CEReactions]
@@ -726,7 +730,6 @@ namespace CssUI.DOM
 
             return false;
         }
-
         public bool hasAttribute(AtomicName<EAttributeName> Name, out Attr outAttr)
         {
             if (AttributeList.TryGetValue(Name, out Attr attr))

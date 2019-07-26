@@ -464,7 +464,7 @@ namespace CssUI.DOM
 
 
         private bool locked_for_focus = false;
-        public void Focus(FocusOptions options)
+        public void Focus(FocusOptions options = null)
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#dom-focus */
             if (locked_for_focus) return;
             locked_for_focus = true;
@@ -592,9 +592,9 @@ namespace CssUI.DOM
                     }
                     else/* Default */
                     {
-                        if (Autocapitalize_Inherited)
+                        if (Autocapitalize_Inherited || DOMCommon.Is_Autocapitalize_Inheriting_Element(this))
                         {
-                            if (this is IFormAssociatedElement formElement)
+                            if (this is FormAssociatedElement formElement)
                             {
                                 if (formElement.form != null)
                                 {

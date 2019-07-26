@@ -1,10 +1,11 @@
 ﻿using CssUI.DOM.CustomElements;
 using CssUI.DOM.Nodes;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CssUI.DOM
 {
-    public class HTMLSelectElement : HTMLElement, IFormAssociatedElement
+    public class HTMLSelectElement : FormAssociatedElement
     {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#htmlselectelement */
         #region Properties
         readonly HTMLFormElement form;
@@ -38,17 +39,26 @@ namespace CssUI.DOM
         [CEReactions] public void remove(long index);
         [CEReactions] public setter void (ulong index, HTMLOptionElement? option);
 
-        public readonly IReadOnlyCollection<Element> selectedOptions;
+        public readonly IReadOnlyCollection<HTMLOptionElement> selectedOptions;
         public long selectedIndex;
-        public string value;
 
-        public readonly bool willValidate;
-        public readonly EValidityState validity;
-        public readonly string validationMessage;
-        public bool checkValidity();
-        public bool reportValidity();
-        public void setCustomValidity(string error);
+        public override string value
+        {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#dom-select-value */
+            get
+            {
+                var selected = selectedOptions;
+                if (selected.Count <= 0)
+                {
+                    return string.Empty;
+                }
 
-        public IReadOnlyCollection<Node> labels;
+                return selected.First()?.value;
+            }
+        }
+
+        public IReadOnlyCollection<HTMLLabelElement> labels
+        {
+            get => (IReadOnlyCollection<HTMLLabelElement>)DOMCommon.Get_Descendents(form, new FilterLabelFor(this), Enums.ENodeFilterMask.SHOW_ELEMENT);
+        }
     }
 }

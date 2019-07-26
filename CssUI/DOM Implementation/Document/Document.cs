@@ -387,6 +387,56 @@ namespace CssUI.DOM
         }
         #endregion
 
+        #region ID Map
+        Dictionary<AtomicString, WeakReference<Element>> Element_ID_Map = new Dictionary<AtomicString, WeakReference<Element>>();
+
+        public Element getElementByID(AtomicString id)
+        {
+            if (Element_ID_Map.TryGetValue(id, out WeakReference<Element> weakRef))
+            {
+                if (weakRef.TryGetTarget(out Element element))
+                {
+                    return element;
+                }
+            }
+
+            return null;
+        }
+
+        internal void Update_Element_ID(Element element, AttributeValue oldValue, AttributeValue newValue)
+        {
+            AtomicString oldKey = oldValue.Get_Atomic();
+            AtomicString newKey = newValue.Get_Atomic();
+            WeakReference<Element> weakRef;
+
+            if (oldKey.Equals(newKey)) return;
+
+            if (Element_ID_Map.TryGetValue(oldKey, out weakRef))
+            {
+                Element_ID_Map.Remove(oldKey);
+            }
+
+            if (weakRef == null)
+            {
+                weakRef = new WeakReference<Element>(element);
+            }
+
+            if (!Element_ID_Map.ContainsKey(newKey))
+            {
+                Element_ID_Map.Add(newValue.Get_Atomic(), weakRef);
+            }
+            else
+            {
+                /* It appears there is already an element that has this ID, so we need to traverse the tree and get the first tree-order element with this ID, thats the true owner */
+                NodeFilter idFilter = new FilterAttribute(EAttributeName.ID, newValue);
+                var owner = (Element)DOMCommon.Get_Nth_Ancestor(documentElement, 1, idFilter, ENodeFilterMask.SHOW_ELEMENT);
+                /* This is the canonical owner of this ID */
+                weakRef.SetTarget(owner);
+                Element_ID_Map[newKey] = weakRef;
+            }
+        }
+        #endregion
+
         #region Event Loop
         public void Run_Event_Loop()
         {

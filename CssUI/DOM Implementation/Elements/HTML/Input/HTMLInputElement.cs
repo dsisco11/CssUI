@@ -1,13 +1,13 @@
 ﻿using CssUI.DOM.CustomElements;
 using CssUI.DOM.Nodes;
+using System;
 using System.Collections.Generic;
 
 namespace CssUI.DOM
 {
-    public class HTMLInputElement : HTMLElement, IFormAssociatedElement, IListedElement, ISubmittableElement, IResettableElement, ILableableElement, IAutoCapitalizeInheritingElement
-    {
+    public class HTMLInputElement : FormAssociatedElement, IListedElement, ISubmittableElement, IResettableElement, ILableableElement, IAutoCapitalizeInheritingElement
+    {/* Docs:  */
         #region Properties
-        public bool bParserInserted { get; set; }
 
         #endregion
 
@@ -30,7 +30,6 @@ namespace CssUI.DOM
         public bool Checked;
         [CEReactions] public string dirName;
         [CEReactions] public bool disabled;
-        public HTMLFormElement form { get; private set; }
         public List<FileBlob> files;
         [CEReactions] public string formAction;
         [CEReactions] public string formEnctype;
@@ -70,15 +69,16 @@ namespace CssUI.DOM
         public void stepUp(long n = 1);
         public void stepDown(long n = 1);
 
-        public readonly bool willValidate;
-        public readonly EValidityState validity;
-        public readonly string validationMessage;
+        public IReadOnlyCollection<HTMLLabelElement> labels
+        {
+            get
+            {
+                if (type == EInputType.Hidden)
+                    return null;
 
-        public bool checkValidity();
-        public bool reportValidity();
-        public void setCustomValidity(string error);
-
-        public IReadOnlyCollection<Node> labels;
+                return (IReadOnlyCollection<HTMLLabelElement>)DOMCommon.Get_Descendents(form, new FilterLabelFor(this), Enums.ENodeFilterMask.SHOW_ELEMENT);
+            }
+        }
 
         public void select();
         public uint selectionStart;
@@ -88,6 +88,59 @@ namespace CssUI.DOM
         /* Docs: https://html.spec.whatwg.org/multipage/input.html#concept-input-type-image-coordinate */
         public int selected_coordinate_x { get; private set; } = 0;
         public int selected_coordinate_y { get; private set; } = 0;
+
+
+        #region State Determined Algorithms
+        long get_minimum()
+        {/* Docs: https://html.spec.whatwg.org/multipage/input.html#attr-input-min */
+        }
+
+        long get_maximum()
+        {/* Docs: https://html.spec.whatwg.org/multipage/input.html#attr-input-max */
+        }
+
+        long convert_string_to_number(ReadOnlyMemory<char> buffMem)
+        {
+        }
+
+        string convert_number_to_string(long num)
+        {
+        }
+        #endregion
+
+        #region Form-Associated Element Overrides
+        internal override EValidityState query_validity()
+        {
+            EValidityState flags = base.query_validity();
+
+            /* When a control has no value but has a required attribute (input required, textarea required); or, more complicated rules for select elements and controls in radio button groups, as specified in their sections. */
+            if (hasAttribute(EAttributeName.Required))
+            {
+                if (ReferenceEquals(null, value) || value.Length <= 0)
+                {
+                    flags |= EValidityState.valueMissing;
+                }
+            }
+
+            /* When a control has a value that is too long for the form control maxlength attribute (input maxlength, textarea maxlength). */
+            if (value.Length > maxLength)
+            {
+                flags |= EValidityState.tooLong;
+            }
+
+            /* When a control has a value that is too short for the form control minlength attribute (input minlength, textarea minlength). */
+            if (value.Length < minLength)
+            {
+                flags |= EValidityState.tooShort;
+            }
+
+            if (!ReferenceEquals(null, value) && value.Length > 0)
+            {
+                /* When a control has a value that is not the empty string and is too low for the min attribute. */
+            }
+        }
+        #endregion
+
 
         public void setRangeText(string replacement);
         public void setRangeText(string replacement, uint start, uint end, SelectionMode selectionMode = "preserve");

@@ -95,6 +95,11 @@ namespace CssUI.DOM
         [DomKeyword("decoding")]
         Decoding,
 
+        /* LABEL ATTRIBUTES */
+        [DomKeyword("for")]
+        For,
+
+
         /* TABLE ATTRIBUTES */
 
         [DomKeyword("span")]

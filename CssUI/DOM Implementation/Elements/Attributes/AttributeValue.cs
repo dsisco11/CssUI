@@ -91,10 +91,17 @@ namespace CssUI.DOM
         /// </summary>
         public static AttributeValue From_Boolean(bool boolVal) => new AttributeValue(EAttributeType.Boolean, boolVal ? string.Empty : null, boolVal);
 
+        /*
         /// <summary>
         /// Creates a new <see cref="EAttributeType.String"/> type attribute value
         /// </summary>
         public static AttributeValue From_String(string str) => new AttributeValue(EAttributeType.String, str, str);
+        */
+
+        /// <summary>
+        /// Creates a new <see cref="EAttributeType.String"/> type attribute value
+        /// </summary>
+        public static AttributeValue From_String(AtomicString str) => new AttributeValue(EAttributeType.String, str, str);
 
         /// <summary>
         /// Creates a new <see cref="EAttributeType.Enumerated"/> type attribute value
@@ -124,6 +131,11 @@ namespace CssUI.DOM
         #endregion
 
         #region Value Retreival
+        /// <summary>
+        /// Retreives this value as an <see cref="AtomicString"/> if possible
+        /// </summary>
+        public AtomicString Get_Atomic() => Value as AtomicString;
+
         /// <summary>
         /// Retreives this value as a string if possible
         /// </summary>
@@ -275,7 +287,14 @@ namespace CssUI.DOM
                         }
                     default:
                         {
-                            return StringCommon.Streq(Data.AsSpan(), other.Data.AsSpan());
+                            if (other.Type == EAttributeType.String)
+                            {
+                                return ((AtomicString)Value).Equals((AtomicString)other.Value);
+                            }
+                            else
+                            {
+                                return StringCommon.Streq(Data.AsSpan(), other.Data.AsSpan());
+                            }
                         }
                 }
             }

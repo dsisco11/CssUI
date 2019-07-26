@@ -83,26 +83,23 @@ namespace CssUI.DOM
         }
 
         #region Forms
-        public static void Reset_Form_Owner(Element element)
+        public static void Reset_Form_Owner(FormAssociatedElement element)
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#reset-the-form-owner */
-            if (!(element is IFormAssociatedElement formElement))
-                return;
-
 
             /* 1) Unset element's parser inserted flag. */
-            formElement.bParserInserted = false;
+            element.bParserInserted = false;
 
             /* 2) If all of the following conditions are true 
                 *      element's form owner is not null
                 *      element is not listed or its form content attribute is not present
                 *      element's form owner is its nearest form element ancestor after the change to the ancestor chain
                 * then do nothing, and return. */
-            if (formElement.form != null)
+            if (element.form != null)
             {
                 if (!DOMCommon.Is_Listed_Element(element) || !element.hasAttribute(EAttributeName.Form))
                 {
                     var nearestForm = DOMCommon.Get_Nth_Ancestor(element, 1, FilterForms.Instance, ENodeFilterMask.SHOW_ELEMENT);
-                    if (ReferenceEquals(formElement.form, nearestForm))
+                    if (ReferenceEquals(element.form, nearestForm))
                     {
                         /* Do nothing, and return */
                         return;
@@ -110,7 +107,7 @@ namespace CssUI.DOM
                 }
             }
 
-            formElement.form = null;
+            element.form = null;
 
             /* 4) If element is listed, has a form content attribute, and is connected, then: */
             if (DOMCommon.Is_Listed_Element(element) && element.hasAttribute(EAttributeName.Form) && element.isConnected)
@@ -120,7 +117,7 @@ namespace CssUI.DOM
                 Element searchResult = (Element)DOMCommon.Get_Nth_Ancestor(element, 1, new FilterAttribute(EAttributeName.ID, AttributeValue.From_String(idValue)), ENodeFilterMask.SHOW_ELEMENT);
                 if (searchResult != null && searchResult is HTMLFormElement form)
                 {
-                    formElement.form = form;
+                    element.form = form;
                 }
             }
             /* 5) Otherwise, if element has an ancestor form element, then associate element with the nearest such ancestor form element. */
@@ -129,7 +126,7 @@ namespace CssUI.DOM
                 var nearestForm = DOMCommon.Get_Nth_Ancestor(element, 1, FilterForms.Instance, ENodeFilterMask.SHOW_ELEMENT);
                 if (nearestForm != null)
                 {
-                    formElement.form = (HTMLFormElement)nearestForm;
+                    element.form = (HTMLFormElement)nearestForm;
                 }
             }
         }
@@ -142,11 +139,11 @@ namespace CssUI.DOM
 
             form.bConstructingEntryList = true;
 
-            var controls = (IEnumerable<Element>)DOMCommon.Get_Descendents(form, FilterIsSubmittable.Instance, ENodeFilterMask.SHOW_ELEMENT).Where(child => child is IFormAssociatedElement childElement && ReferenceEquals(form, childElement.form));
+            var controls = (IEnumerable<FormAssociatedElement>)DOMCommon.Get_Descendents(form, FilterIsSubmittable.Instance, ENodeFilterMask.SHOW_ELEMENT).Where(child => child is FormAssociatedElement childElement && ReferenceEquals(form, childElement.form));
             List<Tuple<string, FormDataEntryValue>> entryList = new List<Tuple<string, FormDataEntryValue>>();
 
             /* 5) For each element field in controls, in tree order: */
-            foreach (Element field in controls)
+            foreach (FormAssociatedElement field in controls)
             {
                 /* 
                  * If any of the following is true:
@@ -288,8 +285,8 @@ namespace CssUI.DOM
                 /* 12) Otherwise, append an entry to entry list with name and the value of the field element. */
                 else
                 {
-                    var formElement = (IFormAssociatedElement)field;
-                    Append_Entry_To_List(ref entryList, name, formElement.get_value());
+                    var formElement = field;
+                    Append_Entry_To_List(ref entryList, name, formElement.value);
                 }
 
                 /* 13) If the element has a dirname attribute, and that attribute's value is not the empty string, then: */
@@ -313,52 +310,17 @@ namespace CssUI.DOM
         }
 
 
-        public static bool Check_Form_Validity(Element element)
+        public static bool Check_Form_Validity(HTMLFormElement element)
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#statically-validate-the-constraints */
 
         }
 
 
-        public static bool Check_Form_Associated_Element_Barred_From_Validation(Element element)
+        public static bool Is_Barred_From_Validation(FormAssociatedElement element)
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#barred-from-constraint-validation */
 
 
             return false;
-        }
-
-        /// <summary>
-        /// Returns whether a given element satisfies it's constraints
-        /// </summary>
-        /// <param name="element"></param>
-        /// <returns></returns>
-        public static bool Check_Form_Associated_Element_Satisfies_Constraints(Element element)
-        {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#suffering-from-being-missing */
-
-            if (DOMCommon.Is_Form_Associated_Custom_Element(element))
-            {
-                var formElement = ((IFormAssociatedElement)element);
-                EValidityState flags = formElement.validity_flags;
-                if (0 != (flags & (EValidityState.valueMissing | EValidityState.typeMismatch | EValidityState.patternMismatch | EValidityState.tooLong | EValidityState.tooShort | EValidityState.rangeUnderflow | EValidityState.rangeOverflow | EValidityState.stepMismatch | EValidityState.badInput)))
-                {
-                    return false;
-                }
-
-                if (!ReferenceEquals(null, formElement.custom_validity_error_message) && formElement.custom_validity_error_message.Length > 0)
-                {
-                    return false;
-                }
-            }
-
-            /* XXX: Implement the validation for select elements and radio button groups */
-            /* When a control has no value but has a required attribute (input required, textarea required); or, more complicated rules for select elements and controls in radio button groups, as specified in their sections. */
-            if (element.hasAttribute(EAttributeName.Required))
-            {
-                if (element is HTMLInputElement inputElement && (ReferenceEquals(null, inputElement.value) || inputElement.value.Length <= 0))
-                {
-                    return false;
-                }
-            }
-
         }
         #endregion
     }
