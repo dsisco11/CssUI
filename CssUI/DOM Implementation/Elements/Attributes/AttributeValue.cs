@@ -275,13 +275,13 @@ namespace CssUI.DOM
                         }
                     default:
                         {
-                            return StringCommon.streq(Data.AsSpan(), other.Data.AsSpan());
+                            return StringCommon.Streq(Data.AsSpan(), other.Data.AsSpan());
                         }
                 }
             }
             else
             {/* Its possible these values are compatible but have different types */
-                return StringCommon.streq(Data.AsSpan(), other.Data.AsSpan());
+                return StringCommon.Streq(Data.AsSpan(), other.Data.AsSpan());
             }
         }
         #endregion

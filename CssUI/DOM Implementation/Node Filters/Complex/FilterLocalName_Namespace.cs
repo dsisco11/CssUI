@@ -25,9 +25,9 @@ namespace CssUI.DOM
 
             // We test references of strings just incase the one being used is like a const or static decleration, or maybe an interned string. it's faster to match an address ptr than to check all chars in an array.
 
-            if (ReferenceEquals(element.NamespaceURI, NamespaceURI) || StringCommon.streq(element.NamespaceURI.AsSpan(), NamespaceURI.AsSpan()))
+            if (ReferenceEquals(element.NamespaceURI, NamespaceURI) || StringCommon.Streq(element.NamespaceURI.AsSpan(), NamespaceURI.AsSpan()))
             {
-                if (ReferenceEquals(element.localName, Name) || StringCommon.streq(element.localName.AsSpan(), Name.AsSpan()))
+                if (ReferenceEquals(element.localName, Name) || StringCommon.Streq(element.localName.AsSpan(), Name.AsSpan()))
                 {
                     return ENodeFilterResult.FILTER_ACCEPT;
                 }

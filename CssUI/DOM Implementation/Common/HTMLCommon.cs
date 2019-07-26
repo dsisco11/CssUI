@@ -112,7 +112,7 @@ namespace CssUI.DOM.Internal
              */
             for (int i=0; i< FORBIDDEN_CUSTOM_ELEMENT_NAMES.Length; i++)
             {
-                if (StringCommon.streq(data.Span, FORBIDDEN_CUSTOM_ELEMENT_NAMES[i].AsSpan()))
+                if (StringCommon.Streq(data.Span, FORBIDDEN_CUSTOM_ELEMENT_NAMES[i].AsSpan()))
                 {
                     return false;
                 }
