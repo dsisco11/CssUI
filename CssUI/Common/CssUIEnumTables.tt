@@ -91,17 +91,6 @@ namespace CssUI
 {
 	internal static class CSSUIEnumTables
 	{
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Get_Enum_Index<Ty>()
-        {
-            if (Lookup_Index<Ty>(out int outIndex))
-			{
-				return outIndex;
-			}
-
-			return -1;
-        }
-
 		static Dictionary<RuntimeTypeHandle, int> TypeHandleMap = CreateTypeMap();
 		
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -120,6 +109,29 @@ typeMap[typeof(<#= E.FullName #>).TypeHandle] = <#= typeIndex++ #>;
 
 			return typeMap;
 		}
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int Get_Enum_Index<Ty>()
+        {
+			if (TypeHandleMap.TryGetValue(typeof(Ty).TypeHandle, out int outIndex))
+			{
+				return outIndex;
+			}
+
+			return -1;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int Get_Enum_Index(RuntimeTypeHandle Handle)
+        {
+			if (TypeHandleMap.TryGetValue(Handle, out int outIndex))
+			{
+				return outIndex;
+			}
+
+			return -1;
+        }
 		
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool Lookup_Index<Ty>(out int outIndex) where Ty : struct

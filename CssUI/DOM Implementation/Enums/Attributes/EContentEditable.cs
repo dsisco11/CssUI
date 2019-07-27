@@ -1,17 +1,18 @@
-﻿using CssUI.DOM.Internal;
+﻿using CssUI.Internal;
 
 namespace CssUI.DOM
 {
-    [DomEnum]
-    public enum EContentEditable : int
-    {
-        [DomKeyword("true")]
+    [MetaEnum]
+    public enum EContentEditable : short
+    {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#attr-contenteditable */
+
+        Invalid = -1,
+        Missing = 0,
+        [MetaKeyword("true")]
         True,
-
-        [DomKeyword("false")]
+        [MetaKeyword("false")]
         False,
-
-        [DomKeyword("inherit")]
+        [MetaKeyword("inherit")]
         Inherit
     }
 }

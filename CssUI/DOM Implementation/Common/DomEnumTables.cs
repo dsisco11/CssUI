@@ -92,7 +92,7 @@ namespace CssUI.DOM.Internal
 			TABLE[1][(int)CssUI.DOM.EAttributeName.Label] = new EnumData("label");
 			TABLE[1][(int)CssUI.DOM.EAttributeName.AccessKey] = new EnumData("accesskey");
 			TABLE[1][(int)CssUI.DOM.EAttributeName.Spellcheck] = new EnumData("spellcheck");
-			TABLE[1][(int)CssUI.DOM.EAttributeName.AutoCapitalize] = new EnumData("autocapitalize");
+			TABLE[1][(int)CssUI.DOM.EAttributeName.Autocapitalize] = new EnumData("autocapitalize");
 			TABLE[1][(int)CssUI.DOM.EAttributeName.ContentEditable] = new EnumData("contenteditable");
 			TABLE[1][(int)CssUI.DOM.EAttributeName.Draggable] = new EnumData("draggable");
 			TABLE[1][(int)CssUI.DOM.EAttributeName.TabIndex] = new EnumData("tabindex");
@@ -123,7 +123,7 @@ namespace CssUI.DOM.Internal
 			TABLE[1][(int)CssUI.DOM.EAttributeName.Checked] = new EnumData("checked");
 			TABLE[1][(int)CssUI.DOM.EAttributeName.InputMode] = new EnumData("inputmode");
 			TABLE[1][(int)CssUI.DOM.EAttributeName.EnterKeyHint] = new EnumData("enterkeyhint");
-			TABLE[1][(int)CssUI.DOM.EAttributeName.AutoComplete] = new EnumData("autocomplete");
+			TABLE[1][(int)CssUI.DOM.EAttributeName.Autocomplete] = new EnumData("autocomplete");
 			TABLE[1][(int)CssUI.DOM.EAttributeName.Form] = new EnumData("form");
 			TABLE[1][(int)CssUI.DOM.EAttributeName.Value] = new EnumData("value");
 			TABLE[1][(int)CssUI.DOM.EAttributeName.Selected] = new EnumData("selected");
@@ -588,7 +588,7 @@ namespace CssUI.DOM.Internal
 			KEYWORD[1].Add(new AtomicString("label"), CssUI.DOM.EAttributeName.Label);
 			KEYWORD[1].Add(new AtomicString("accesskey"), CssUI.DOM.EAttributeName.AccessKey);
 			KEYWORD[1].Add(new AtomicString("spellcheck"), CssUI.DOM.EAttributeName.Spellcheck);
-			KEYWORD[1].Add(new AtomicString("autocapitalize"), CssUI.DOM.EAttributeName.AutoCapitalize);
+			KEYWORD[1].Add(new AtomicString("autocapitalize"), CssUI.DOM.EAttributeName.Autocapitalize);
 			KEYWORD[1].Add(new AtomicString("contenteditable"), CssUI.DOM.EAttributeName.ContentEditable);
 			KEYWORD[1].Add(new AtomicString("draggable"), CssUI.DOM.EAttributeName.Draggable);
 			KEYWORD[1].Add(new AtomicString("tabindex"), CssUI.DOM.EAttributeName.TabIndex);
@@ -619,7 +619,7 @@ namespace CssUI.DOM.Internal
 			KEYWORD[1].Add(new AtomicString("checked"), CssUI.DOM.EAttributeName.Checked);
 			KEYWORD[1].Add(new AtomicString("inputmode"), CssUI.DOM.EAttributeName.InputMode);
 			KEYWORD[1].Add(new AtomicString("enterkeyhint"), CssUI.DOM.EAttributeName.EnterKeyHint);
-			KEYWORD[1].Add(new AtomicString("autocomplete"), CssUI.DOM.EAttributeName.AutoComplete);
+			KEYWORD[1].Add(new AtomicString("autocomplete"), CssUI.DOM.EAttributeName.Autocomplete);
 			KEYWORD[1].Add(new AtomicString("form"), CssUI.DOM.EAttributeName.Form);
 			KEYWORD[1].Add(new AtomicString("value"), CssUI.DOM.EAttributeName.Value);
 			KEYWORD[1].Add(new AtomicString("selected"), CssUI.DOM.EAttributeName.Selected);

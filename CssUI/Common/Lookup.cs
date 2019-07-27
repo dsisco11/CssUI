@@ -83,6 +83,29 @@ namespace CssUI
             return true;
         }
 
+        /// <summary>
+        /// Attempts to retrieve the metadata value for the specified enum value
+        /// </summary>
+        /// <typeparam name="Ty">Enum for which the metadata is listed</typeparam>
+        /// <param name="Value">Enum value to lookup</param>
+        /// <param name="outData">Returned value</param>
+        /// <returns>Success</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
+        public static bool TryData(Type enumType, dynamic Value, out EnumData outData)
+        {
+            int index = CSSUIEnumTables.Get_Enum_Index(enumType.TypeHandle);
+            if (index < 0)
+            {
+                /* Enum has no index */
+                outData = null;
+                return false;
+            }
+
+            /* /!\ This conversion will fucking EXPLODE if the given generic type does not have an integer backing type /!\ */
+            outData = CSSUIEnumTables.TABLE[index][CastTo<int>.From(Value)];
+            return true;
+        }
+
 
         /// <summary>
         /// Retrieves the metadata for the specified enum value.
@@ -107,6 +130,31 @@ namespace CssUI
 
             throw new Exception($"Unable to find keyword for enum value {System.Enum.GetName(typeof(Ty), Value)} in CssUI enum table");
         }
+
+
+        /// <summary>
+        /// Retrieves the metadata for the specified enum value.
+        /// </summary>
+        /// <typeparam name="Ty">Enum for which the metadata is listed</typeparam>
+        /// <param name="Value">Enum value to lookup</param>
+        /// <returns>Enum metadata</returns>
+        /// <exception cref="CssException">If the keyword cannot be found</exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
+        public static EnumData Data(Type enumType, dynamic Value)
+        {
+            int index = CSSUIEnumTables.Get_Enum_Index(enumType.TypeHandle);
+            if (index > -1)
+            {
+                /* /!\ This conversion will fucking EXPLODE if the given generic type does not have an integer backing type /!\ */
+                var dataLookup = CSSUIEnumTables.TABLE[index][CastTo<int>.From(Value)];
+                if (!ReferenceEquals(null, dataLookup))
+                {
+                    return dataLookup;
+                }
+            }
+
+            throw new Exception($"Unable to find keyword for enum value {System.Enum.GetName(enumType, Value)} in CssUI enum table");
+        }
         #endregion
 
 
@@ -130,6 +178,28 @@ namespace CssUI
             }
 
             outEnum = (Ty)CSSUIEnumTables.KEYWORD[index][Keyword];
+            return true;
+        }
+        
+        /// <summary>
+        /// Attempts to retrieve an enum value from a given keyword
+        /// </summary>
+        /// <typeparam name="Ty">The enum type to return</typeparam>
+        /// <param name="Keyword">Keyword to lookup enum value for</param>
+        /// <param name="outEnum">Returned enum value</param>
+        /// <returns>Success</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
+        public static bool TryEnum(Type enumType, AtomicString Keyword, out dynamic outEnum)
+        {
+            int index = CSSUIEnumTables.Get_Enum_Index(enumType.TypeHandle);
+            if (index < 0)
+            {
+                /* Enum has no index */
+                outEnum = null;
+                return false;
+            }
+
+            outEnum = CSSUIEnumTables.KEYWORD[index][Keyword];
             return true;
         }
         

@@ -1,142 +1,155 @@
-﻿using CssUI.DOM.Internal;
+﻿using CssUI.Internal;
 
 namespace CssUI.DOM
 {
     /// <summary>
     /// List of all common HTML attribute names
     /// </summary>
-    [DomEnum]
+    [MetaEnum]
     public enum EAttributeName : int
     {
 
-        [DomKeyword("")]
+        /*[MetaKeyword("")]*/ // DO NOT GIVE NEGATIVE ENUM VALUES A KEYWORD
         CUSTOM = -1,
-        [DomKeyword("id")]
+        [MetaKeyword("id")]
         ID = 0,
-        [DomKeyword("name")]
+        [MetaKeyword("name")]
         Name,
-        [DomKeyword("class")]
+        [MetaKeyword("class")]
         Class,
-        [DomKeyword("width")]
+        [MetaKeyword("width")]
         Width,
-        [DomKeyword("height")]
+        [MetaKeyword("height")]
         Height,
 
-        [DomKeyword("is")]
+        [MetaKeyword("is")]
         IS,
 
 
         /* HTML Attributes */
-        [DomKeyword("title")]
+        [MetaKeyword("title")]
         Title,
-        [DomKeyword("lang")]
+        [MetaKeyword("lang")]
         Lang,
-        [DomKeyword("dir")]
+        [MetaKeyword("dir")]
         Dir,
-        [DomKeyword("translate")]
+        [MetaKeyword("translate")]
         Translate,
-        [DomKeyword("nonce")]
+        [MetaKeyword("nonce")]
         Nonce,
-        [DomKeyword("text")]
+        [MetaKeyword("text")]
         Text,
-        [DomKeyword("label")]
+        [MetaKeyword("label")]
         Label,
 
 
-        [DomKeyword("accesskey")]
+        [MetaKeyword("accesskey")]
         AccessKey,
-        [DomKeyword("spellcheck")]
+        [MetaKeyword("spellcheck")]
         Spellcheck,
-        [DomKeyword("autocapitalize")]
-        AutoCapitalize,
+        [MetaKeyword("autocapitalize")]
+        Autocapitalize,
 
-        [DomKeyword("contenteditable")]
+        [MetaKeyword("contenteditable")]
         ContentEditable,
-        [DomKeyword("draggable")]
+        [MetaKeyword("draggable")]
         Draggable,
-        [DomKeyword("tabindex")]
+        [MetaKeyword("tabindex")]
         TabIndex,
-        [DomKeyword("disabled")]
+        [MetaKeyword("disabled")]
         Disabled,
-        [DomKeyword("hidden")]
+        [MetaKeyword("hidden")]
         Hidden,
-        [DomKeyword("href")]
+        [MetaKeyword("href")]
         HREF,
-        [DomKeyword("type")]
+        [MetaKeyword("type")]
         Type,
-        [DomKeyword("slot")]
+        [MetaKeyword("slot")]
         Slot,
-        [DomKeyword("media")]
+        [MetaKeyword("media")]
         Media,
 
 
-        [DomKeyword("dropzone")]
+        [MetaKeyword("dropzone")]
         Dropzone,
 
 
-        [DomKeyword("alt")]
+        [MetaKeyword("alt")]
         Alt,
-        [DomKeyword("src")]
+        [MetaKeyword("src")]
         Src,
-        [DomKeyword("srcset")]
+        [MetaKeyword("srcset")]
         SrcSet,
-        [DomKeyword("href")]
+        [MetaKeyword("href")]
         Href,
-        [DomKeyword("sizes")]
+        [MetaKeyword("sizes")]
         Sizes,
-        [DomKeyword("usemap")]
+        [MetaKeyword("usemap")]
         UseMap,
-        [DomKeyword("ismap")]
+        [MetaKeyword("ismap")]
         IsMap,
-        [DomKeyword("crossorigin")]
+        [MetaKeyword("crossorigin")]
         CrossOrigin,
-        [DomKeyword("referrerpolicy")]
+        [MetaKeyword("referrerpolicy")]
         ReferrerPolicy,
-        [DomKeyword("decoding")]
+        [MetaKeyword("decoding")]
         Decoding,
 
         /* LABEL ATTRIBUTES */
-        [DomKeyword("for")]
+        [MetaKeyword("for")]
         For,
 
 
         /* TABLE ATTRIBUTES */
 
-        [DomKeyword("span")]
+        [MetaKeyword("span")]
         Span,
-        [DomKeyword("colspan")]
+        [MetaKeyword("colspan")]
         ColSpan,
-        [DomKeyword("rowspan")]
+        [MetaKeyword("rowspan")]
         RowSpan,
+        [MetaKeyword("cols")]
+        Cols,
+        [MetaKeyword("rows")]
+        Rows,
 
-        [DomKeyword("headers")]
+        [MetaKeyword("headers")]
         Headers,
 
-        [DomKeyword("scope")]
+        [MetaKeyword("scope")]
         Scope,
-        [DomKeyword("abbr")]
+        [MetaKeyword("abbr")]
         Abbr,
 
         /* INPUT */
 
-        [DomKeyword("checked")]
+        [MetaKeyword("checked")]
         Checked,
-        [DomKeyword("inputmode")]
+        [MetaKeyword("inputmode")]
         InputMode,
-        [DomKeyword("enterkeyhint")]
+        [MetaKeyword("enterkeyhint")]
         EnterKeyHint,
+        [MetaKeyword("autocomplete")]
+        Autocomplete,
+        [MetaKeyword("autofocus")]
+        Autofocus,
+        [MetaKeyword("multiple")]
+        Multiple,
+        [MetaKeyword("required")]
+        Required,
+        [MetaKeyword("size")]
+        Size,
+
+        [MetaKeyword("form")]
+        Form,
+        [MetaKeyword("value")]
+        Value,
+        [MetaKeyword("selected")]
+        Selected,
+        [MetaKeyword("dirname")]
+        Dirname,
+
 
         /* FORMS */
-
-        [DomKeyword("form")]
-        Form,
-        [DomKeyword("value")]
-        Value,
-        [DomKeyword("selected")]
-        Selected,
-        [DomKeyword("required")]
-        Required,
-        [DomKeyword("dirname")]
-        Dirname,
     }
 }
