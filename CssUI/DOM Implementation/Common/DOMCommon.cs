@@ -214,16 +214,21 @@ namespace CssUI.DOM
         #endregion
 
         #region Ordered Sets
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string Serialize_Ordered_Set(IEnumerable<string> set)
         {
-            return string.Join("\u0020", set);
+            return StringCommon.Join(UnicodeCommon.CHAR_SPACE, set.Select(str => str.AsMemory()));
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ICollection<string> Parse_Ordered_Set(string input)
+        public static IReadOnlyList<string> Parse_Ordered_Set(ReadOnlyMemory<char> Input)
         {
-            return input.Split('\u0020').ToArray();
+            var Tokens = StringCommon.Strtok(Input, UnicodeCommon.CHAR_SPACE);
+            List<string> stringList = new List<string>(Tokens.Count);
+            for (int i=0; i<Tokens.Count; i++)
+            {
+                stringList[i] = Tokens[i].ToString();
+            }
+
+            return stringList;
         }
         #endregion
 
