@@ -31,7 +31,7 @@ foreach(EnvDTE.ProjectItem item in GetProjectItemsRecursively(project.ProjectIte
 						bool isTarget = false;
 						foreach(EnvDTE.CodeElement Attr in E.Attributes) 
 						{ 
-							if (Attr.Name == "DomEnum") 
+							if (Attr.Name == "MetaEnum") 
 							{ 
 								isTarget = true; break; 
 							} 
@@ -47,6 +47,35 @@ foreach(EnvDTE.ProjectItem item in GetProjectItemsRecursively(project.ProjectIte
 		}
 	}
 #>
+
+
+<#
+int enumIndex = 0;
+foreach(EnvDTE.CodeEnum E in allEnums)
+{
+/* Setup this enum in the map */
+	EnumMap.Add(enumIndex, new List<Tuple<EnvDTE.CodeVariable, string>>());
+
+	foreach(EnvDTE.CodeElement enumChild in E.Children)
+	{
+		if (enumChild.Kind == EnvDTE.vsCMElement.vsCMElementVariable)
+		{
+			EnvDTE.CodeVariable enumValue = (EnvDTE.CodeVariable)enumChild;
+
+			foreach(EnvDTE.CodeAttribute attr in enumValue.Attributes)
+			{
+				if (attr.Name.Equals("EnumKeyword"))
+				{
+					EnumMap[enumIndex].Add(new Tuple<EnvDTE.CodeVariable, string>(enumValue, attr.Value));
+				}
+			}
+		}
+	}
+	enumIndex++;
+}
+
+#>
+
 /* 
 * =====================================================
 *		   	THIS CODE IS GENERATED, 
@@ -58,15 +87,53 @@ using System.Linq;
 using CssUI.Internal;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-namespace CssUI.DOM.Internal
+namespace CssUI
 {
-	internal static class DomEnumTables
+	internal static class CSSUIEnumTables
 	{
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Get_Enum_Index<Ty>()
         {
-            return Lookup_Enum_Index(typeof(Ty).Name);
+            if (Lookup_Index<Ty>(out int outIndex))
+			{
+				return outIndex;
+			}
+
+			return -1;
         }
+
+		static Dictionary<RuntimeTypeHandle, int> TypeHandleMap = CreateTypeMap();
+		
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+		static Dictionary<RuntimeTypeHandle, int> CreateTypeMap()
+		{	
+			var typeMap = new Dictionary<RuntimeTypeHandle, int>();
+			<#
+			int typeIndex = 0;
+			foreach(EnvDTE.CodeEnum E in allEnums)
+			{
+			#>
+typeMap[typeof(<#= E.FullName #>).TypeHandle] = <#= typeIndex++ #>;
+			<#
+			}
+			#>
+
+			return typeMap;
+		}
+		
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool Lookup_Index<Ty>(out int outIndex) where Ty : struct
+		{
+			if (TypeHandleMap.TryGetValue(typeof(Ty).TypeHandle, out int outMapValue))
+			{
+				outIndex = outMapValue;
+				return true;
+			}
+
+			outIndex = -1;
+			return false;
+		}
+
 		
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int Lookup_Enum_Index(string Name)
@@ -78,30 +145,9 @@ namespace CssUI.DOM.Internal
 				foreach(EnvDTE.CodeEnum E in allEnums)
 				{
 				#>
-case "<#= E.Name #>": return <#= Index #>;
+case "<#= E.Name #>": return <#= Index++ #>;
 				<#
-				/* Setup this enum in the map */
-						EnumMap.Add(Index, new List<Tuple<EnvDTE.CodeVariable, string>>());
-
-						foreach(EnvDTE.CodeElement enumChild in E.Children)
-						{
-							if (enumChild.Kind == EnvDTE.vsCMElement.vsCMElementVariable)
-							{
-								EnvDTE.CodeVariable enumValue = (EnvDTE.CodeVariable)enumChild;
-
-								foreach(EnvDTE.CodeAttribute attr in enumValue.Attributes)
-								{
-									if (attr.Name.Equals("DomKeyword"))
-									{
-										EnumMap[Index].Add(new Tuple<EnvDTE.CodeVariable, string>(enumValue, attr.Value));
-									}
-								}
-							}
-						}
-						
-					Index++;
 				}
-
 				#>
 default: return -1;//throw new NotImplementedException($"No lookup-index has defined for enum type '{typeof(Ty).Name}'");
             }
@@ -113,7 +159,7 @@ default: return -1;//throw new NotImplementedException($"No lookup-index has def
 		internal static readonly EnumData[][] TABLE;
 		internal static readonly List<Dictionary<AtomicString, dynamic>> KEYWORD;
 
-		static DomEnumTables()
+		static CSSUIEnumTables()
 		{
 			TABLE = new EnumData[<#=allEnums.Count+1#>][];
 			KEYWORD = new List<Dictionary<AtomicString, dynamic>>(<#=allEnums.Count+1#>);
@@ -163,8 +209,9 @@ default: return -1;//throw new NotImplementedException($"No lookup-index has def
 <#
 				for(int i=0; i<vMap.Count; i++)
 				{
+					string key = vMap[i].Item2.Split(',')[0];
 #>
-			KEYWORD[<#=idx#>].Add(new AtomicString(<#=vMap[i].Item2#>), <#=vMap[i].Item1.FullName#>);
+			KEYWORD[<#=idx#>].Add(new AtomicString(<#=key#>), <#=vMap[i].Item1.FullName#>);
 <#
 				}
 				#>
