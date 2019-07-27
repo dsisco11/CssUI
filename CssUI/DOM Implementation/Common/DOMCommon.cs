@@ -692,9 +692,9 @@ namespace CssUI.DOM
         /// <param name="N">The number of elements to traverse</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Node Get_Nth_Ancestor(Node node, int N, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static Node Get_Nth_Ancestor(Node node, uint N, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
-            if (N <= 0)
+            if (N == 0)
             {
                 throw new IndexOutOfRangeException("N must be greater than 0");
             }
@@ -758,9 +758,9 @@ namespace CssUI.DOM
         /// <param name="N">The number of elements to traverse</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Node Get_Nth_Descendant(Node node, int N, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static Node Get_Nth_Descendant(Node node, uint N, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
-            if (N <= 0)
+            if (N == 0)
             {
                 throw new IndexOutOfRangeException("N must be greater than 0");
             }
@@ -839,15 +839,17 @@ namespace CssUI.DOM
             return list;
         }
 
+
         /// <summary>
-        /// Returns a list of all nodes that preceed the given node (siblings)
+        /// Returns a list of all previous and adjacent sibling nodes for the given node
         /// </summary>
         /// <param name="node">The node to start searching from</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IReadOnlyCollection<Node> Get_Preceeding(Node node, NodeFilter Filter = null)
+        public static IReadOnlyCollection<Node> Get_Previous(Node node, NodeFilter Filter = null)
         {
             LinkedList<Node> list = new LinkedList<Node>();
+
             Node sibling = node.previousSibling;
             while (sibling != null)
             {
@@ -865,12 +867,154 @@ namespace CssUI.DOM
         }
 
         /// <summary>
-        /// Returns a list of all nodes that follow the given node (siblings)
+        /// Returns Nth previous and adjacent sibling for the given node
+        /// </summary>
+        /// <param name="node">The node to start searching from</param>
+        /// <param name="N">The number of elements to traverse</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Node Get_Nth_Previous(Node node, uint N, NodeFilter Filter = null)
+        {
+            if (N == 0)
+            {
+                throw new IndexOutOfRangeException("N must be greater than 0");
+            }
+
+            Node sibling = node.previousSibling;
+            while (sibling != null)
+            {
+                var fres = Filter?.acceptNode(sibling) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
+                if (fres == Enums.ENodeFilterResult.FILTER_REJECT)
+                    break;
+
+                if (fres == Enums.ENodeFilterResult.FILTER_ACCEPT)
+                {
+                    if (--N <= 0)
+                    {
+                        return sibling;
+                    }
+                }
+
+                sibling = sibling.previousSibling;
+            }
+
+            return null;
+        }
+
+
+        /// <summary>
+        /// Returns a list of all tree-order preceeding (sibling) nodes for the given node 
         /// </summary>
         /// <param name="node">The node to start searching from</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IReadOnlyCollection<Node> Get_Following(Node node, NodeFilter Filter = null)
+        public static IReadOnlyCollection<Node> Get_Preceeding(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        {
+            LinkedList<Node> list = new LinkedList<Node>();
+            TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
+
+            Node sibling = tree.previousSibling();
+            while (sibling != null)
+            {
+                var fres = Filter?.acceptNode(sibling) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
+                if (fres == Enums.ENodeFilterResult.FILTER_REJECT)
+                    break;
+
+                if (fres == Enums.ENodeFilterResult.FILTER_ACCEPT)
+                    list.AddLast(sibling);
+
+                sibling = tree.previousSibling();
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// Returns Nth tree-order preceeding sibling for the given node
+        /// </summary>
+        /// <param name="node">The node to start searching from</param>
+        /// <param name="N">The number of elements to traverse</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Node Get_Nth_Preceeding(Node node, uint N, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        {
+            if (N == 0)
+            {
+                throw new IndexOutOfRangeException("N must be greater than 0");
+            }
+
+            TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
+            Node current = tree.previousSibling();
+            while (current != null)
+            {
+                if (--N <= 0) { return current; }
+                current = tree.previousSibling();
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Returns a list of all tree-order following (sibling) nodes for the given node 
+        /// </summary>
+        /// <param name="node">The node to start searching from</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IReadOnlyCollection<Node> Get_Following(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        {
+            LinkedList<Node> list = new LinkedList<Node>();
+            TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
+
+            Node sibling = tree.nextSibling();
+            while (sibling != null)
+            {
+                var fres = Filter?.acceptNode(sibling) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
+                if (fres == Enums.ENodeFilterResult.FILTER_REJECT)
+                    break;
+
+                if (fres == Enums.ENodeFilterResult.FILTER_ACCEPT)
+                    list.AddLast(sibling);
+
+                sibling = tree.nextSibling();
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// Returns Nth tree-order following sibling for the given node
+        /// </summary>
+        /// <param name="node">The node to start searching from</param>
+        /// <param name="N">The number of elements to traverse</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Node Get_Nth_Following(Node node, uint N, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        {
+            if (N == 0)
+            {
+                throw new IndexOutOfRangeException("N must be greater than 0");
+            }
+
+            TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
+            Node current = tree.nextSibling();
+            while (current != null)
+            {
+                if (--N <= 0) { return current; }
+                current = tree.nextSibling();
+            }
+
+            return null;
+        }
+
+
+
+        /// <summary>
+        /// Returns a list of all nodes after and adjacent to the given node (siblings)
+        /// </summary>
+        /// <param name="node">The node to start searching from</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IReadOnlyCollection<Node> Get_Next(Node node, NodeFilter Filter = null)
         {
             LinkedList<Node> list = new LinkedList<Node>();
             Node sibling = node.nextSibling;
@@ -888,6 +1032,42 @@ namespace CssUI.DOM
 
             return list;
         }
+
+        /// <summary>
+        /// Returns Nth next sibling for the given node
+        /// </summary>
+        /// <param name="node">The node to start searching from</param>
+        /// <param name="N">The number of elements to traverse</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Node Get_Nth_Next(Node node, uint N, NodeFilter Filter = null)
+        {
+            if (N == 0)
+            {
+                throw new IndexOutOfRangeException("N must be greater than 0");
+            }
+
+            Node sibling = node.nextSibling;
+            while (sibling != null)
+            {
+                var fres = Filter?.acceptNode(sibling) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
+                if (fres == Enums.ENodeFilterResult.FILTER_REJECT)
+                    break;
+
+                if (fres == Enums.ENodeFilterResult.FILTER_ACCEPT)
+                {
+                    if (--N <= 0)
+                    {
+                        return sibling;
+                    }
+                }
+
+                sibling = sibling.nextSibling;
+            }
+
+            return null;
+        }
+
 
         /// <summary>
         /// Returns a list of <see cref="Element"/>s matching <paramref name="qualifiedName"/>
