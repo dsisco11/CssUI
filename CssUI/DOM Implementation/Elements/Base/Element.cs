@@ -5,7 +5,6 @@ using CssUI.DOM.Enums;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Geometry;
 using CssUI.DOM.Interfaces;
-using CssUI.DOM.Internal;
 using CssUI.DOM.Mutation;
 using CssUI.DOM.Nodes;
 using CssUI.Internal;
@@ -463,6 +462,26 @@ namespace CssUI.DOM
         }
         #endregion
 
+        #region Customizable Steps
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal virtual void run_attribute_change_steps(this Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue value, string Namespace)
+        {
+            if (localName.IsCustom)
+            {
+                return;
+            }
+
+            switch (localName.EnumValue)
+            {
+                case EAttributeName.ID:
+                    {
+                        ownerDocument.Update_Element_ID(element, oldValue, value);
+                    }
+                    break;
+            }
+        }
+        #endregion
+
         #region Internal Utility
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal bool find_attribute(AtomicName<EAttributeName> Name, out Attr outAttrib)
@@ -891,6 +910,200 @@ namespace CssUI.DOM
             shadowRoot = shadow;
             return shadow;
 
+        }
+        #endregion
+
+        #region ChildNode Implementation
+        /// <summary>
+        /// Inserts nodes just before node, while replacing strings in nodes with equivalent Text nodes.
+        /// </summary>
+        /// <exception cref="HierarchyRequestError">if the constraints of the node tree are violated.</exception>
+        [CEReactions] public void before(params Node[] nodes)
+        {/* Docs: https://dom.spec.whatwg.org/#dom-childnode-before */
+            CEReactions.Wrap_CEReaction(this, () =>
+            {
+                var parent = parentNode;
+                if (parent == null)
+                {
+                    return;
+                }
+
+                Node viablePreviousSibling = DOMCommon.Get_Nth_Preceeding(this, 1, new FilterNotOneOf(nodes.AsMemory()));
+                var node = _convert_nodes_into_node(nodeDocument, nodes);
+                if (viablePreviousSibling == null)
+                {
+                    viablePreviousSibling = parent.firstChild;
+                }
+                else
+                {
+                    viablePreviousSibling = viablePreviousSibling.nextSibling;
+                }
+
+                _pre_insert_node(node, parent, viablePreviousSibling);
+            });
+        }
+
+        /// <summary>
+        /// Inserts nodes just before node, while replacing strings in nodes with equivalent Text nodes.
+        /// </summary>
+        /// <exception cref="HierarchyRequestError">if the constraints of the node tree are violated.</exception>
+        [CEReactions] public void before(params string[] nodes)
+        {/* Docs: https://dom.spec.whatwg.org/#dom-childnode-before */
+            CEReactions.Wrap_CEReaction(this, () =>
+            {
+                var parent = parentNode;
+                if (parent == null)
+                {
+                    return;
+                }
+
+                Node viablePreviousSibling = null;// DOMCommon.Get_Nth_Preceeding(this, 1, new FilterNotOneOf(nodes.AsMemory()));
+                var node = _convert_nodes_into_node(nodeDocument, nodes);
+                if (viablePreviousSibling == null)
+                {
+                    viablePreviousSibling = parent.firstChild;
+                }
+                else
+                {
+                    viablePreviousSibling = viablePreviousSibling.nextSibling;
+                }
+
+                _pre_insert_node(node, parent, viablePreviousSibling);
+            });
+        }
+
+        /// <summary>
+        /// Inserts nodes just after node, while replacing strings in nodes with equivalent Text nodes.
+        /// </summary>
+        /// <exception cref="HierarchyRequestError">if the constraints of the node tree are violated.</exception>
+        [CEReactions] public void after(params Node[] nodes)
+        {/* Docs: https://dom.spec.whatwg.org/#dom-childnode-after */
+            CEReactions.Wrap_CEReaction(this, () =>
+            {
+                var parent = parentNode;
+                if (parent == null)
+                {
+                    return;
+                }
+
+                Node viableNextSibling = DOMCommon.Get_Nth_Following(this, 1, new FilterNotOneOf(nodes.AsMemory()));
+                var node = _convert_nodes_into_node(nodeDocument, nodes);
+                if (viableNextSibling == null)
+                {
+                    viableNextSibling = parent.firstChild;
+                }
+                else
+                {
+                    viableNextSibling = viableNextSibling.nextSibling;
+                }
+
+                _pre_insert_node(node, parent, viableNextSibling);
+            });
+        }
+
+        /// <summary>
+        /// Inserts nodes just after node, while replacing strings in nodes with equivalent Text nodes.
+        /// </summary>
+        /// <exception cref="HierarchyRequestError">if the constraints of the node tree are violated.</exception>
+        [CEReactions] public void after(params string[] nodes)
+        {/* Docs: https://dom.spec.whatwg.org/#dom-childnode-after */
+            CEReactions.Wrap_CEReaction(this, () =>
+            {
+                var parent = parentNode;
+                if (parent == null)
+                {
+                    return;
+                }
+
+                Node viableNextSibling = null;// DOMCommon.Get_Nth_Following(this, 1, new FilterNotOneOf(nodes.AsMemory()));
+                var node = _convert_nodes_into_node(nodeDocument, nodes);
+                if (viableNextSibling == null)
+                {
+                    viableNextSibling = parent.firstChild;
+                }
+                else
+                {
+                    viableNextSibling = viableNextSibling.nextSibling;
+                }
+
+                _pre_insert_node(node, parent, viableNextSibling);
+            });
+        }
+
+        /// <summary>
+        /// Replaces node with nodes, while replacing strings in nodes with equivalent Text nodes.
+        /// </summary>
+        /// <exception cref="HierarchyRequestError">if the constraints of the node tree are violated.</exception>
+        [CEReactions] public void replaceWith(params Node[] nodes)
+        {/* Docs: https://dom.spec.whatwg.org/#dom-childnode-replacewith */
+            CEReactions.Wrap_CEReaction(this, () =>
+            {
+                var parent = parentNode;
+                if (parent == null)
+                {
+                    return;
+                }
+
+                Node viableNextSibling = DOMCommon.Get_Nth_Following(this, 1, new FilterNotOneOf(nodes.AsMemory()));
+                var node = _convert_nodes_into_node(nodeDocument, nodes);
+
+                /* 5) If context object’s parent is parent, replace the context object with node within parent. */
+                /* (We check this because context object could have been inserted into node.) */
+                if (ReferenceEquals(parentNode, parent))
+                {
+                    parent.replaceChild(this, node);
+                }
+                else
+                {
+                    _pre_insert_node(node, parent, viableNextSibling);
+                }
+            });
+        }
+
+        /// <summary>
+        /// Replaces node with nodes, while replacing strings in nodes with equivalent Text nodes.
+        /// </summary>
+        /// <exception cref="HierarchyRequestError">if the constraints of the node tree are violated.</exception>
+        [CEReactions] public void replaceWith(params string[] nodes)
+        {/* Docs: https://dom.spec.whatwg.org/#dom-childnode-replacewith */
+            CEReactions.Wrap_CEReaction(this, () =>
+            {
+                var parent = parentNode;
+                if (parent == null)
+                {
+                    return;
+                }
+
+                Node viableNextSibling = null;// DOMCommon.Get_Nth_Following(this, 1, new FilterNotOneOf(nodes.AsMemory()));
+                var node = _convert_nodes_into_node(nodeDocument, nodes);
+
+                /* 5) If context object’s parent is parent, replace the context object with node within parent. */
+                /* (We check this because context object could have been inserted into node.) */
+                if (ReferenceEquals(parentNode, parent))
+                {
+                    parent.replaceChild(this, node);
+                }
+                else
+                {
+                    _pre_insert_node(node, parent, viableNextSibling);
+                }
+            });
+        }
+
+        /// <summary>
+        /// Removes node.
+        /// </summary>
+        [CEReactions] public void remove()
+        {/* Docs: https://dom.spec.whatwg.org/#dom-childnode-remove */
+            CEReactions.Wrap_CEReaction(this, () =>
+            {
+                if (parentNode == null)
+                {
+                    return;
+                }
+
+                parentNode.removeChild(this);
+            });
         }
         #endregion
 

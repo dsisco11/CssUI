@@ -72,7 +72,7 @@ namespace CssUI.DOM.Nodes
         /// The index of this node within it's parent nodes child list
         /// </summary>
         /// Note: The index for nodes is now automatically assigned and updated by the ChildNodeList class
-        public int index { get; internal set; }
+        public ulong index { get; internal set; }
 
         /// <summary>
         /// Returns node’s root.
@@ -296,6 +296,9 @@ namespace CssUI.DOM.Nodes
             if (obj == null)
                 return false;
 
+            if (ReferenceEquals(this, obj))
+                return true;
+
             if (!(obj is Node otherNode))
                 return false;
             /* A and B’s nodeType attribute value is identical. */
@@ -340,7 +343,7 @@ namespace CssUI.DOM.Nodes
         /// </summary>
         /// <param name="parent"></param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal virtual void run_child_text_node_change_steps(this Node node)
+        internal virtual void run_child_text_node_change_steps(Node node)
         {
             /* Currently none of our specifications define this, so it's a placeholder. */
         }
@@ -361,24 +364,6 @@ namespace CssUI.DOM.Nodes
         internal virtual void run_cloning_steps(ref Node copy, Document document, bool clone_children = false)
         {
             /* Currently none of our specifications define this, so it's a placeholder. */
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal virtual void run_attribute_change_steps(this Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue value, string Namespace)
-        {
-            if (localName.IsCustom)
-            {
-                return;
-            }
-
-            switch (localName.EnumValue)
-            {
-                case EAttributeName.ID:
-                    {
-                        ownerDocument.Update_Element_ID(element, oldValue, value);
-                    }
-                    break;
-            }
         }
         #endregion
 
@@ -772,19 +757,29 @@ namespace CssUI.DOM.Nodes
         internal static Node _replace_node_within_parent(Node node, Node parent, Node child)
         {/* Docs: https://dom.spec.whatwg.org/#concept-node-replace */
             if (!(parent is Document) && !(parent is DocumentFragment) && !(parent is Element))
+            {
                 throw new HierarchyRequestError("Parent is not a valid type");
+            }
 
             if (DOMCommon.Is_Host_Including_Inclusive_Ancestor(node, parent))
+            {
                 throw new HierarchyRequestError("Cannot insert a node which is the ancestor of parent into parent.");
+            }
 
             if (!ReferenceEquals(child.parentNode, parent))
+            {
                 throw new NotFoundError();
+            }
 
             if (!(node is DocumentFragment) && !(node is DocumentType) && !(node is Element) && !(node is Text) && !(node is ProcessingInstruction) && !(node is Comment))
+            {
                 throw new HierarchyRequestError("Node is not a valid type to insert into parent.");
+            }
 
             if ((node is Text && parent is Document) || (node is DocumentType && !(parent is Document)))
+            {
                 throw new HierarchyRequestError();
+            }
 
             if (parent is Document)
             {
@@ -792,15 +787,21 @@ namespace CssUI.DOM.Nodes
                 {
                     int eCount = node.childNodes.Count(c => c is Element);
                     if (eCount > 1 || node.childNodes.Count(c => c is Text) > 0)
+                    {
                         throw new HierarchyRequestError();
+                    }
                     else
                     {
                         /* Otherwise, if node has one element child and either parent has an element child that is not child or a doctype is following child. */
                         var eChildren = parent.childNodes.Where(c => c is Element);
                         if (eCount == 1 && (eChildren.Count(c => !ReferenceEquals(c, child)) > 0))
+                        {
                             throw new HierarchyRequestError();
+                        }
                         else if (eCount == 1 && DOMCommon.Get_Following(child).Count(c => c is DocumentType) > 0)
+                        {
                             throw new HierarchyRequestError();
+                        }
                     }
                 }
             }
@@ -809,18 +810,26 @@ namespace CssUI.DOM.Nodes
                 /* parent has an element child that is not child or a doctype is following child. */
                 var eChildren = parent.childNodes.Where(c => c is Element);
                 if (eChildren.Count(c => !ReferenceEquals(c, child)) > 0)// parent has element that is not child
+                {
                     throw new HierarchyRequestError();
+                }
                 else if (DOMCommon.Get_Following(child).Count(c => c is DocumentType) > 0)// doctype is following child
+                {
                     throw new HierarchyRequestError();
+                }
             }
             else if (node is DocumentType)
             {
                 /* parent has a doctype child that is not child, or an element is preceding child. */
                 var eChildren = parent.childNodes.Where(c => c is DocumentType);
                 if (eChildren.Count(c => !ReferenceEquals(c, child)) > 0)// parent has a doctype that is not child
+                {
                     throw new HierarchyRequestError();
+                }
                 else if (DOMCommon.Get_Preceeding(child).Count(c => c is Element) > 0)// element is preceeding child
+                {
                     throw new HierarchyRequestError();
+                }
             }
 
             /* 7) Let reference child be child’s next sibling. */

@@ -7,7 +7,7 @@ namespace CssUI.DOM.Nodes
     {
         ChildNodeList childNodes { get; }
         Node firstChild { get; }
-        int index { get; }
+        ulong index { get; }
         bool isAssigned { get; }
         bool isConnected { get; }
         Node lastChild { get; }
