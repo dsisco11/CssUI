@@ -54,9 +54,10 @@ namespace CssUI.DOM
             }
 
             /* 1) If element's submission value is a list of entries, then append each item of element's submission value to entry list, and return. */
-            IFormAssociatedElement formElement = (IFormAssociatedElement)element;
-            if (formElement.submission_value is FormData data)
+            FormAssociatedElement formElement = (FormAssociatedElement)element;
+            if (formElement.submission_value.Type == ESubmissionValue.EntryList)
             {
+                FormData data = formElement.submission_value.Value;
                 foreach (var entry in data)
                 {
                     entryList.Add(new Tuple<string, FormDataEntryValue>(entry.Item1, entry.Item2));
@@ -179,7 +180,7 @@ namespace CssUI.DOM
                 {
                     continue;
                 }
-                else if (null != DOMCommon.Get_Nth_Ancestor(field, 1, new FilterElementType(typeof(HTMLDataListElement)), ENodeFilterMask.SHOW_ELEMENT))
+                else if (null != DOMCommon.Get_Nth_Ancestor(field, 1, new FilterElementType<HTMLDataListElement>(), ENodeFilterMask.SHOW_ELEMENT))
                 {
                     continue;
                 }
