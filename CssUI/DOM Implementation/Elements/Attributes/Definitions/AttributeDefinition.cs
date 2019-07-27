@@ -39,6 +39,15 @@ namespace CssUI.DOM
         public readonly HashSet<string> Keywords = null;
 
         public readonly Type enumType = null;
+
+        /// <summary>
+        /// The minimum value (if any) that can be assigned to this attribute
+        /// </summary>
+        public readonly dynamic LowerRange = null;
+        /// <summary>
+        /// The maximum value (if any) that can be assigned to this attribute
+        /// </summary>
+        public readonly dynamic UpperRange = null;
         #endregion
 
         #region Accessors
@@ -56,13 +65,15 @@ namespace CssUI.DOM
         /// <param name="Flags">Indicates what aspects of an element this property affects</param>
         /// <param name="MissingValueDefault">Default value for the attribute</param>
         /// <param name="Keywords">List of keywords which can be assigned to this attribute</param>
-        public AttributeDefinition(AtomicName<EAttributeName> Name, EAttributeType Type = 0x0, AttributeValue MissingValueDefault = null, AttributeValue InvalidValueDefault = null, EAttributeFlags Flags = 0x0, string[] Keywords = null, Type enumType = null)
+        public AttributeDefinition(AtomicName<EAttributeName> Name, EAttributeType Type = 0x0, AttributeValue MissingValueDefault = null, AttributeValue InvalidValueDefault = null, EAttributeFlags Flags = 0x0, string[] Keywords = null, Type enumType = null, dynamic lowerRange = null, dynamic upperRange = null)
         {
             this.Name = Name;
             this.Flags = Flags;
             this.MissingValueDefault = MissingValueDefault;
             this.InvalidValueDefault = InvalidValueDefault;
             this.enumType = enumType;
+            this.LowerRange = lowerRange;
+            this.UpperRange = upperRange;
 
             if (Keywords == null)
             {
@@ -105,7 +116,7 @@ namespace CssUI.DOM
                                 throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an acceptable value, Acceptable values are: {string.Join(", ", Keywords)}");
                             }
 
-                            if (!DomLookup.TryEnum(enumType.Name, strLower, out var outEnum))
+                            if (!CssUI.Lookup.TryEnum(enumType, strLower, out var outEnum))
                             {
                                 outValue = strLower;
                                 throw new Exception($"Unable to find keyword value for \"{strLower}\" in enum: {enumType.Name}");

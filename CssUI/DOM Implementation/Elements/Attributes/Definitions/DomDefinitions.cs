@@ -1,5 +1,4 @@
-﻿
-using CssUI.DOM.Enums;
+﻿using CssUI.DOM.Enums;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -41,7 +40,7 @@ namespace CssUI.DOM
                 new AttributeDefinition(EAttributeName.Title, EAttributeType.String, null, null, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.Lang, EAttributeType.String, null, null, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.Translate, EAttributeType.Boolean, null, null, EAttributeFlags.None),
-                new AttributeDefinition(EAttributeName.Dir, EAttributeType.Enumerated, null, null, EAttributeFlags.None, DomLookup.Get_Keywords<EDir>()),
+                new AttributeDefinition(EAttributeName.Dir, EAttributeType.Enumerated, null, null, EAttributeFlags.None, Lookup.Get_Keywords<EDir>()),
                 new AttributeDefinition(EAttributeName.Nonce, EAttributeType.String, null, null, EAttributeFlags.None),
 
                 /* The tabIndex IDL attribute must reflect the value of the tabindex content attribute. The default value is 0 if the element is an a, area, button, iframe, input, select, or textarea element, or is a summary element that is a summary for its parent details. The default value is −1 otherwise. */
@@ -50,12 +49,12 @@ namespace CssUI.DOM
                 new AttributeDefinition(EAttributeName.Hidden, EAttributeType.Boolean, null, null, EAttributeFlags.None),
 
                 new AttributeDefinition(EAttributeName.AccessKey, EAttributeType.KeyCombo, null, null, EAttributeFlags.None),
-                new AttributeDefinition(EAttributeName.Draggable, EAttributeType.Enumerated, AttributeValue.From_Enum(EDraggable.Auto), AttributeValue.From_Enum(EDraggable.Auto), EAttributeFlags.None, DomLookup.Get_Keywords<EDraggable>(), typeof(EDraggable)),
+                new AttributeDefinition(EAttributeName.Draggable, EAttributeType.Enumerated, AttributeValue.From_Enum(EDraggable.Auto), AttributeValue.From_Enum(EDraggable.Auto), EAttributeFlags.None, Lookup.Get_Keywords<EDraggable>(), typeof(EDraggable)),
 
-                new AttributeDefinition(EAttributeName.Spellcheck, EAttributeType.Enumerated, AttributeValue.From_Enum(ESpellcheck.Default), AttributeValue.From_Enum(ESpellcheck.Default), EAttributeFlags.None, DomLookup.Get_Keywords<ESpellcheck>()),
-                new AttributeDefinition(EAttributeName.AutoCapitalize, EAttributeType.Enumerated, AttributeValue.From_Enum(EAutoCapitalizationHint.Default), AttributeValue.From_Enum(EAutoCapitalizationHint.Sentences), EAttributeFlags.None, DomLookup.Get_Keywords<EAutoCapitalizationHint>()),
+                new AttributeDefinition(EAttributeName.Spellcheck, EAttributeType.Enumerated, AttributeValue.From_Enum(ESpellcheck.Default), AttributeValue.From_Enum(ESpellcheck.Default), EAttributeFlags.None, Lookup.Get_Keywords<ESpellcheck>()),
+                new AttributeDefinition(EAttributeName.Autocapitalize, EAttributeType.Enumerated, AttributeValue.From_Enum(EAutoCapitalizationHint.Default), AttributeValue.From_Enum(EAutoCapitalizationHint.Sentences), EAttributeFlags.None, Lookup.Get_Keywords<EAutoCapitalizationHint>()),
 
-                new AttributeDefinition(EAttributeName.ContentEditable, EAttributeType.Enumerated, null, null, EAttributeFlags.None, DomLookup.Get_Keywords<EContentEditable>(), typeof(EContentEditable)),
+                new AttributeDefinition(EAttributeName.ContentEditable, EAttributeType.Enumerated, null, null, EAttributeFlags.None, Lookup.Get_Keywords<EContentEditable>(), typeof(EContentEditable)),
 
                 /* Image Attributes */
                 new AttributeDefinition(EAttributeName.Src, EAttributeType.String, null, null, EAttributeFlags.None),
@@ -68,18 +67,37 @@ namespace CssUI.DOM
                 new AttributeDefinition(EAttributeName.ReferrerPolicy, EAttributeType.String, null, null, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.Decoding, EAttributeType.String, null, null, EAttributeFlags.None),
 
+                
+                /* LABEL ATTRIBUTES */
+                new AttributeDefinition(EAttributeName.For, EAttributeType.String, null, null, EAttributeFlags.None),
+
+
                 /* Table Attributes */
-                new AttributeDefinition(EAttributeName.Scope, EAttributeType.Enumerated, AttributeValue.From_Enum(ECellScope.Auto), AttributeValue.From_Enum(ECellScope.Auto), EAttributeFlags.None, DomLookup.Get_Keywords<ECellScope>()),
+                new AttributeDefinition(EAttributeName.Scope, EAttributeType.Enumerated, AttributeValue.From_Enum(ECellScope.Auto), AttributeValue.From_Enum(ECellScope.Auto), EAttributeFlags.None, Lookup.Get_Keywords<ECellScope>()),
                 new AttributeDefinition(EAttributeName.Abbr, EAttributeType.String, null, null, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.Span, EAttributeType.NonNegative_Integer, AttributeValue.One, AttributeValue.One, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.ColSpan, EAttributeType.NonNegative_Integer, null, null, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.RowSpan, EAttributeType.NonNegative_Integer, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.Cols, EAttributeType.NonNegative_Integer, AttributeValue.From_Integer(20U), null, EAttributeFlags.None, null, null, lowerRange: 1u),
+                new AttributeDefinition(EAttributeName.Rows, EAttributeType.NonNegative_Integer, AttributeValue.From_Integer(2U), null, EAttributeFlags.None, null, null, lowerRange: 1u),
 
 
                 /* Input Attributes */
-                new AttributeDefinition(EAttributeName.Type, EAttributeType.Enumerated, AttributeValue.From_Enum(EInputType.Text), AttributeValue.From_Enum(EInputType.Text), EAttributeFlags.None, DomLookup.Get_Keywords<EInputType>()),
-                new AttributeDefinition(EAttributeName.InputMode, EAttributeType.Enumerated, null, null, EAttributeFlags.None, DomLookup.Get_Keywords<EInputMode>()),
-                new AttributeDefinition(EAttributeName.EnterKeyHint, EAttributeType.Enumerated, null, null, EAttributeFlags.None, DomLookup.Get_Keywords<EEnterKeyHint>()),
+                new AttributeDefinition(EAttributeName.Type, EAttributeType.Enumerated, AttributeValue.From_Enum(EInputType.Text), AttributeValue.From_Enum(EInputType.Text), EAttributeFlags.None, Lookup.Get_Keywords<EInputType>()),
+                new AttributeDefinition(EAttributeName.InputMode, EAttributeType.Enumerated, null, null, EAttributeFlags.None, Lookup.Get_Keywords<EInputMode>()),
+                new AttributeDefinition(EAttributeName.EnterKeyHint, EAttributeType.Enumerated, null, null, EAttributeFlags.None, Lookup.Get_Keywords<EEnterKeyHint>()),
+                new AttributeDefinition(EAttributeName.Autocomplete, EAttributeType.String, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.Autofocus, EAttributeType.Boolean, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.Multiple, EAttributeType.Boolean, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.Required, EAttributeType.Boolean, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.Size, EAttributeType.NonNegative_Integer, AttributeValue.From_Integer(0u), null, EAttributeFlags.None),
+
+
+                /* FORM Attributes */
+                new AttributeDefinition(EAttributeName.Form, EAttributeType.String, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.Value, EAttributeType.String, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.Selected, EAttributeType.Boolean, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.Dirname, EAttributeType.Enumerated, null, null, EAttributeFlags.None, Lookup.Get_Keywords<EDirName>()),
 
             };
         }

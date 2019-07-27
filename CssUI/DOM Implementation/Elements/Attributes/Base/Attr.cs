@@ -102,8 +102,19 @@ namespace CssUI.DOM
             {
                 try
                 {
+                    var def = Definition;
                     Is_InvalidValue = false;
-                    Definition.CheckAndThrow(newValue);
+                    def.CheckAndThrow(newValue);
+
+                    if (!(def.LowerRange is null) && newValue.Get_RAW() < def.LowerRange)
+                    {
+                        newValue = def.MissingValueDefault;
+                    }
+
+                    if (!(def.UpperRange is null) && newValue.Get_RAW() > def.UpperRange)
+                    {
+                        newValue = def.MissingValueDefault;
+                    }
                 }
                 catch (Exception ex)
                 {
