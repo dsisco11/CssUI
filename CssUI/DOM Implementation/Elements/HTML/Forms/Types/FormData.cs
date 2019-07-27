@@ -24,7 +24,7 @@ namespace CssUI.DOM
         public FormData(HTMLFormElement form)
         {/* Docs: https://xhr.spec.whatwg.org/#dom-formdata */
             this.form = form;
-            var list = DOMCommon.Construct_Form_Entry_List(form);
+            var list = FormCommon.Construct_Form_Entry_List(form);
             Entries = list ?? throw new InvalidStateError();
         }
 
@@ -50,13 +50,14 @@ namespace CssUI.DOM
         public void append(string name, ReadOnlyMemory<byte> blobValue, string filename = null)
         {/* Docs: https://xhr.spec.whatwg.org/#dom-formdata-append */
             FormDataEntryValue entry = null;
-            if (filename is null || filename.Length == 0)
+            if (string.IsNullOrEmpty(filename))
             {
-                entry = new FormDataEntryValue(EFormDataValueType.Blob, name, new FileBlob("blob", blobValue));
+                /* 3) If value is a Blob object and not a File object, then set value to a new File object, representing the same bytes, whose name attribute value is "blob". */
+                entry = new FormDataEntryValue(EFormDataValueType.Blob, name, new FileBlob(blobValue, "blob"));
             }
             else
             {
-                entry = new FormDataEntryValue(EFormDataValueType.File, name, new FileBlob(filename, blobValue));
+                entry = new FormDataEntryValue(EFormDataValueType.File, name, new FileBlob(blobValue, filename));
             }
 
             Entries.Add(new Tuple<string, FormDataEntryValue>(name, entry));
@@ -100,13 +101,14 @@ namespace CssUI.DOM
         public void set(string name, ReadOnlyMemory<byte> blobValue, string filename = null)
         {/* Docs: https://xhr.spec.whatwg.org/#dom-formdata-set */
             FormDataEntryValue entry = null;
-            if (filename is null || filename.Length == 0)
+            if (string.IsNullOrEmpty(filename))
             {
-                entry = new FormDataEntryValue(EFormDataValueType.Blob, name, new FileBlob("blob", blobValue));
+                /* 3) If value is a Blob object and not a File object, then set value to a new File object, representing the same bytes, whose name attribute value is "blob". */
+                entry = new FormDataEntryValue(EFormDataValueType.Blob, name, new FileBlob(blobValue, "blob"));
             }
             else
             {
-                entry = new FormDataEntryValue(EFormDataValueType.File, name, new FileBlob(filename, blobValue));
+                entry = new FormDataEntryValue(EFormDataValueType.File, name, new FileBlob(blobValue, filename));
             }
 
             int index = Entries.FindIndex(e => StringCommon.Streq(name.AsSpan(), e.Item1.AsSpan()));

@@ -27,7 +27,7 @@ namespace CssUI.DOM
         /// </summary>
         /// <param name="value">New value to assign to the element, must be <see cref="string"/>, <see cref="FileBlob"/>, or <see cref="FormData"/></param>
         /// <param name="state">New state to give the element, must be <see cref="string"/>, <see cref="FileBlob"/>, or <see cref="FormData"/></param>
-        public void setFormValue(object value, object state = null)
+        public void setFormValue(FormSubmissionValue value, FormSubmissionValue state = null)
         {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#dom-elementinternals-setformvalue */
 
             if (!DOMCommon.Is_Form_Associated_Custom_Element(TargetElement))
@@ -35,21 +35,11 @@ namespace CssUI.DOM
                 throw new NotSupportedError($"Element internals may only function on custom form-associated elements");
             }
 
-            if (!(value is string) && !(value is FileBlob) && !(value is FormData))
-            {
-                throw new ArgumentException($"The Value argument must be one of string, FileBlob, or FormData");
-            }
-
-            if (!(state is null) && !(state is string) && !(state is FileBlob) && !(state is FormData))
-            {
-                throw new ArgumentException($"The State argument (if specified) must be one of string, FileBlob, or FormData");
-            }
-
             var element = (FormAssociatedElement)TargetElement;
             /* 3) Set target element's submission value to value if value is not a FormData object, or to a clone of the entry list associated with value otherwise. */
-            if (value is FormData valueFormData)
+            if (value.Type == ESubmissionValue.EntryList)
             {
-                element.submission_value = new FormData(valueFormData);
+                element.submission_value = new FormData(value.Value);
             }
             else
             {
@@ -61,9 +51,9 @@ namespace CssUI.DOM
             {
                 element.state = element.submission_value;
             }
-            else if (state is FormData stateFormData)
+            else if (state.Type == ESubmissionValue.EntryList)
             {
-                element.state = new FormData(stateFormData);
+                element.state = new FormData(state.Value);
             }
             else
             {

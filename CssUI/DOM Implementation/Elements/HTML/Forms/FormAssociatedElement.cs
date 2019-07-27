@@ -5,19 +5,19 @@ namespace CssUI.DOM
 {
     public abstract class FormAssociatedElement : HTMLElement
     {
-        #region Properties
+        #region Backing Values
+        HTMLFormElement _form = null;
+        #endregion
+
+
+        #region Internal Properties
         internal bool bParserInserted { get; set; }
-
-        public virtual HTMLFormElement form { get; internal set; }
-        public virtual string value { get; set; }
-
-
-        public EValidityState validity { get; internal set; }
 
         /// <summary>
         /// This is used to allow <see cref="ElementInternals"/> to set their elements validationMessage
         /// </summary>
         internal string custom_validity_message { get; set; } = null;
+
         /// <summary>
         /// The custom validity error message will be used when alerting the user to the problem with the control.
         /// </summary>
@@ -28,19 +28,56 @@ namespace CssUI.DOM
         /// </summary>
         internal Element validation_anchor { get; set; }
 
-
-
         /// <summary>
         /// Each form-associated custom element has a state. 
         /// It is information with which the user agent can restore a user's input for the element. 
         /// The initial value of state is null, and state can be null, a string, a File, or a list of entries.
         /// </summary>
-        internal object state { get; set; }
+        internal FormSubmissionValue state { get; set; }
+
         /// <summary>
         /// Each form-associated custom element has submission value. 
         /// It is used to provide one or more entries on form submission, and The initial value of submission value is null, and submission value can be null, a string, a File, or a list of entries.
         /// </summary>
-        internal object submission_value { get; set; }
+        internal FormSubmissionValue submission_value { get; set; }
+        #endregion
+
+
+        #region Properties
+
+        public virtual HTMLFormElement form
+        {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#form-owner */
+            get
+            {
+                /* If a form has been explicitly set then return it */
+                if (_form != null)
+                {
+                    return _form;
+                }
+
+                /* if the 'form' content attribute has been specified then find the form by the id given by the attribute */
+                AttributeValue attr = getAttribute(EAttributeName.Form);
+                if (attr != null)
+                {
+                    Element formElement = ownerDocument?.getElementByID(attr.Get_Atomic());
+                    if (!(formElement is HTMLFormElement))
+                        return null;
+
+                    return (HTMLFormElement)formElement;
+                }
+
+                return null;
+            }
+
+            internal set
+            {
+                _form = value;
+            }
+        }
+
+        public virtual string value { get; set; }
+
+        public EValidityState validity { get; internal set; }
         #endregion
 
 
@@ -204,7 +241,7 @@ namespace CssUI.DOM
             /* When a control has no value but has a required attribute (input required, textarea required); or, more complicated rules for select elements and controls in radio button groups, as specified in their sections. */
             if (hasAttribute(EAttributeName.Required))
             {
-                if (ReferenceEquals(null, value) || value.Length <= 0)
+                if (string.IsNullOrEmpty(value))
                 {
                     flags |= EValidityState.valueMissing;
                 }
@@ -223,7 +260,7 @@ namespace CssUI.DOM
                     return false;
                 }
 
-                if (!ReferenceEquals(null, custom_validity_error_message) && custom_validity_error_message.Length > 0)
+                if (!string.IsNullOrEmpty(custom_validity_error_message))
                 {
                     return false;
                 }
