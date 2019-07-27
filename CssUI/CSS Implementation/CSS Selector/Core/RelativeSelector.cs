@@ -103,9 +103,9 @@ namespace CssUI.CSS.Selectors
                         switch (Dir)
                         {
                             case ESelectorMatchingOrder.LTR:
-                                return (LinkedList<Element>)DOMCommon.Get_Following(element, ElementNodeFilter.Instance);
+                                return (LinkedList<Element>)DOMCommon.Get_Following(element, FilterElements.Instance);
                             default:
-                                return (LinkedList<Element>)DOMCommon.Get_Preceeding(element, ElementNodeFilter.Instance);
+                                return (LinkedList<Element>)DOMCommon.Get_Preceeding(element, FilterElements.Instance);
                         }
                     }
                 case ESelectorCombinator.Descendant:
@@ -113,9 +113,9 @@ namespace CssUI.CSS.Selectors
                         switch (Dir)
                         {
                             case ESelectorMatchingOrder.LTR:
-                                return (LinkedList<Element>)DOMCommon.Get_Descendents(element, ElementNodeFilter.Instance);
+                                return (LinkedList<Element>)DOMCommon.Get_Descendents(element, FilterElements.Instance);
                             default:
-                                return (LinkedList<Element>)DOMCommon.Get_Ancestors(element, ElementNodeFilter.Instance);
+                                return (LinkedList<Element>)DOMCommon.Get_Ancestors(element, FilterElements.Instance);
                         }
                     }
                 case ESelectorCombinator.None:

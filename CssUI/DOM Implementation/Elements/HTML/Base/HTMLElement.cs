@@ -582,7 +582,7 @@ namespace CssUI.DOM
         {
             get
             {
-                Attr attr = getAttributeNode(EAttributeName.AutoCapitalize);
+                Attr attr = getAttributeNode(EAttributeName.Autocapitalize);
                 if (attr != null)
                 {
                     var enumValue = attr.Value.Get_Enum<EAutoCapitalizationHint>();
@@ -607,7 +607,7 @@ namespace CssUI.DOM
 
                 return EAutoCapitalizationHint.Default;
             }
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.AutoCapitalize, AttributeValue.From_Enum(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Autocapitalize, AttributeValue.From_Enum(value)));
         }
 
         [CEReactions]
