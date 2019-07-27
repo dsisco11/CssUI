@@ -174,7 +174,7 @@ namespace CssUI.DOM
         }
 
         [CEReactions]
-        public string value
+        public override string value
         {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#dom-option-value */
             get
             {

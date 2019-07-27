@@ -40,6 +40,7 @@ namespace CssUI
 
         #region Accessors
         public int Length => Data.Length;
+        public ulong Remaining => ((ulong)Data.Length - Position);
         /// <summary>
         /// Returns the next item to be consumed, equivalent to calling Peek(0)
         /// </summary>
