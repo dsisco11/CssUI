@@ -35,18 +35,17 @@ namespace CssUI.DOM
         private void replace_data(int offset, int count, string data)
         {
             /* To replace data of node node with offset offset, count count, and data data, run these steps: */
-            int length = this.Length;
-            if (offset > this.Length) throw new IndexSizeError();
+            if (offset > Length) throw new IndexSizeError();
             /* 3) If offset plus count is greater than length, then set count to length minus offset. */
-            if ((offset + count) > this.Length) count = (this.Length - offset);
+            if ((offset + count) > Length) count = (Length - offset);
             /* 4) Queue a mutation record of "characterData" for node with null, null, node’s data, « », « », null, and null. */
             MutationRecord.Queue_Text_Mutation_Record(this, this.data);
             /* 5) Insert data into node’s data after offset code units. */
             string newData = this.data.Insert((int)offset, data);
             /* 6) Let delete offset be offset + data’s length. */
-            var delete = offset + data.Length;
+            var delete = offset + nodeLength;
             /* 7) Starting from delete offset code units, remove count code units from node’s data. */
-            this.data = newData.Remove(delete, count);
+            this.data = newData.Remove((int)delete, (int)count);
             foreach (var weakRef in Range.LIVE_RANGES)
             {
                 if (weakRef.TryGetTarget(out Range liveRange))
@@ -64,12 +63,12 @@ namespace CssUI.DOM
                     /* 10) For each live range whose start node is node and start offset is greater than offset plus count, increase its start offset by data’s length and decrease it by count. */
                     if (ReferenceEquals(this, liveRange.startContainer) && liveRange.startOffset > (offset + count))
                     {
-                        liveRange.startOffset += (data.Length - count);
+                        liveRange.startOffset += (nodeLength - count);
                     }
                     /* 11) For each live range whose end node is node and end offset is greater than offset plus count, increase its end offset by data’s length and decrease it by count. */
                     if (ReferenceEquals(this, liveRange.endContainer) && liveRange.endOffset > (offset + count))
                     {
-                        liveRange.endOffset += (data.Length - count);
+                        liveRange.endOffset += (nodeLength - count);
                     }
                 }
                 else
@@ -78,7 +77,7 @@ namespace CssUI.DOM
                 }
             }
             /* 12) If node is a Text node and its parent is not null, run the child text content change steps for node’s parent. */
-            if (this is Text txtNode && !ReferenceEquals(this.parentNode, null))
+            if (this is Text txtNode && parentNode != null)
             {
                 parentNode.run_child_text_node_change_steps(txtNode);
             }
@@ -116,10 +115,10 @@ namespace CssUI.DOM
             /* 3) If offset plus count is greater than length, return a string whose value is the code units from the offsetth code unit to the end of node’s data, and then return. */
             if ((offset + count) > Length)
             {
-                return data.Substring(offset, (Length - offset));
+                return data.Substring((int)offset, (int)(Length - offset));
             }
             /* 4) Return a string whose value is the code units from the offsetth code unit to the offset+countth code unit in node’s data. */
-            return data.Substring(offset, count);
+            return data.Substring((int)offset, (int)count);
         }
 
         public void appendData(string data)

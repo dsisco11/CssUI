@@ -7,7 +7,7 @@ namespace CssUI.DOM.Nodes
     {
         ChildNodeList childNodes { get; }
         Node firstChild { get; }
-        ulong index { get; }
+        int index { get; }
         bool isAssigned { get; }
         bool isConnected { get; }
         Node lastChild { get; }
@@ -27,7 +27,6 @@ namespace CssUI.DOM.Nodes
         EDocumentPosition compareDocumentPosition(Node other);
         bool contains(Node other);
         Node getRootNode(GetRootNodeOptions options = null);
-        EventTarget get_the_parent(Event @event);
         bool hasChildNodes();
         Node insertBefore(Node node, Node child);
         bool isEqualNode(Node otherNode);

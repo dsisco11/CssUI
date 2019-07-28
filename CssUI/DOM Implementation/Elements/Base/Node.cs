@@ -72,7 +72,7 @@ namespace CssUI.DOM.Nodes
         /// The index of this node within it's parent nodes child list
         /// </summary>
         /// Note: The index for nodes is now automatically assigned and updated by the ChildNodeList class
-        public ulong index { get; internal set; }
+        public int index { get; internal set; }
 
         /// <summary>
         /// Returns node’s root.

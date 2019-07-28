@@ -2,16 +2,17 @@
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Nodes;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace CssUI.DOM
 {
-    public class HTMLOptionsCollection
+    public class HTMLOptionsCollection  : IEnumerable<HTMLOptionElement>
     {/* Docs: https://html.spec.whatwg.org/multipage/common-dom-interfaces.html#htmloptionscollection */
         #region Properties
         public readonly HTMLSelectElement root;
-        public static FilterElementType OptionElementFilter = new FilterElementType(typeof(HTMLOptionElement));
+        public static NodeFilter OptionElementFilter = new FilterElementType<HTMLOptionElement>();
         #endregion
 
         #region Constructor
@@ -31,22 +32,22 @@ namespace CssUI.DOM
         /// When set to a greater number, adds new blank option elements to that container.
         /// </summary>
         [CEReactions]
-        public ulong length// shadows inherited length
+        public int length// shadows inherited length
         {
-            get => (ulong)Collection.Count;
+            get => Collection.Count;
             set
             {
                 CEReactions.Wrap_CEReaction(root, () =>
                 {
                     var items = Collection;
-                    ulong len = (ulong)items.Count;
+                    int len = items.Count;
 
                     /* When set to a smaller number, truncates the number of option elements in the corresponding container. */
                     if (value < len)
                     {
-                        for (ulong i =len-1; i>value; i--)
+                        for (int i =len-1; i>value; i--)
                         {
-                            var rmv = items[(int)i];
+                            var rmv = items[i];
                             root.removeChild(rmv);
                         }
                     }
@@ -54,8 +55,8 @@ namespace CssUI.DOM
                     /* When set to a greater number, adds new blank option elements to that container. */
                     if (value > len)
                     {
-                        ulong add = value - len;
-                        for (ulong i=0; i<add; i++)
+                        var add = value - len;
+                        for (int i=0; i<add; i++)
                         {
                             var opt = new HTMLOptionElement(root.nodeDocument);
                             root.appendChild(opt);
@@ -71,16 +72,16 @@ namespace CssUI.DOM
         /// <param name="index"></param>
         /// <returns></returns>
         [CEReactions]
-        public HTMLOptionElement this[ulong index]
+        public HTMLOptionElement this[int index]
         {
-            get => Collection[(int)index];
+            get => Collection[index];
             set
             {/* Docs: https://html.spec.whatwg.org/multipage/common-dom-interfaces.html#dom-htmloptionscollection-setter */
                 CEReactions.Wrap_CEReaction(root, () =>
                 {
                     if (value == null)
                     {
-                        remove((long)index);
+                        remove(index);
                         return;
                     }
 
@@ -88,7 +89,7 @@ namespace CssUI.DOM
                     if (n > 0)
                     {
                         var frag = new DocumentFragment(root, root.nodeDocument);
-                        for(ulong i=0; i<=n-1; i++)
+                        for(int i=0; i<=n-1; i++)
                         {
                             var opt = new HTMLOptionElement(root.nodeDocument);
                             frag.append(opt);
@@ -103,7 +104,7 @@ namespace CssUI.DOM
                     }
                     else
                     {
-                        root.replaceChild(value, Collection[(int)index]);
+                        root.replaceChild(value, Collection[index]);
                     }
                 });
             }
@@ -324,6 +325,19 @@ namespace CssUI.DOM
             get => root.selectedIndex;
             set => root.selectedIndex = value;
         }
+
+
+        #region IEnumerable Implementation
+        public IEnumerator<HTMLOptionElement> GetEnumerator()
+        {
+            return ((IEnumerable<HTMLOptionElement>)Collection).GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ((IEnumerable<HTMLOptionElement>)Collection).GetEnumerator();
+        }
+        #endregion
 
     }
 }

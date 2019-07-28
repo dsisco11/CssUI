@@ -35,11 +35,11 @@ namespace CssUI.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void Update_Node_Links(int index)
         {
-            if (index > Items.Count) throw new IndexOutOfRangeException();
+            if (index > Count) throw new IndexOutOfRangeException();
 
-            var previousNode = (Items.Count > (index-1)) ? Items[index - 1] : null;
+            var previousNode = (Count > (index - 1)) ? Items[index - 1] : null;
             var node = Items[index];
-            var nextNode = (Items.Count > (index+1)) ? Items[index + 1] : null;
+            var nextNode = (Count > (index+1)) ? Items[index + 1] : null;
 
             node.index = index;
 

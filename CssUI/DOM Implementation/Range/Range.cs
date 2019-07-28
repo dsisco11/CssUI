@@ -35,8 +35,8 @@ namespace CssUI.DOM
         #endregion
 
         #region Accessors
-        internal BoundaryPoint start { get => new BoundaryPoint() { node = this.startContainer, offset = this.startOffset }; }
-        internal BoundaryPoint end { get => new BoundaryPoint() { node = this.endContainer, offset = this.endOffset }; }
+        internal BoundaryPoint start { get => new BoundaryPoint() { node = startContainer, offset = startOffset }; }
+        internal BoundaryPoint end { get => new BoundaryPoint() { node = endContainer, offset = endOffset }; }
         public Node root { get => startContainer?.getRootNode(); }
         #endregion
 
