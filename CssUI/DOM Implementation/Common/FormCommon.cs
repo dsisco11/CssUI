@@ -317,9 +317,60 @@ namespace CssUI.DOM
         }
 
 
-        public static bool Is_Barred_From_Validation(FormAssociatedElement element)
+        public static bool Is_Barred_From_Validation(HTMLElement element)
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#barred-from-constraint-validation */
 
+            /* Constraint validation: If an element is disabled, it is barred from constraint validation. */
+            if (element.disabled)
+            {
+                return true;
+            }
+
+            /* Constraint validation: If the readonly attribute is specified on a form-associated custom element, the element is barred from constraint validation. */
+            if (DOMCommon.Is_Form_Associated_Custom_Element(element))
+            {
+                if (element.hasAttribute(EAttributeName.ReadOnly))
+                {
+                    return true;
+                }
+            }
+
+            /* Constraint validation: object elements are always barred from constraint validation. */
+            if (element is HTMLObjectElement)
+            {
+                return true;
+            }
+            /* Constraint validation: If the readonly attribute is specified on a textarea element, the element is barred from constraint validation. */
+            else if (element is HTMLTextAreaElement textArea)
+            {
+                if (textArea.readOnly)
+                    return true;
+            }
+            else if (element is HTMLInputElement inputElement)
+            {
+                if (inputElement.readOnly)
+                    return true;
+
+                switch (inputElement.type)
+                {
+                    case EInputType.Hidden:
+                    case EInputType.reset:
+                    case EInputType.button:
+                        return true;
+                }
+            }
+            else if (element is HTMLButtonElement buttonElement)
+            {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#the-button-element:barred-from-constraint-validation */
+                /* XXX: finish this */
+                ...
+            }
+
+            /* Constraint validation: If an element has a datalist element ancestor, it is barred from constraint validation. */
+            var datalist = DOMCommon.Get_Nth_Ancestor(element, 1, FilterDatalistElement.Instance, ENodeFilterMask.SHOW_ELEMENT);
+            if (datalist != null)
+            {
+                return true;
+            }
 
             return false;
         }
