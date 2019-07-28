@@ -5,7 +5,7 @@ using System;
 namespace CssUI.DOM
 {
     /// <summary>
-    /// Accepts only nodes that are of the given type
+    /// Skips any nodes that are not of the given type
     /// </summary>
     public class FilterElementType<Ty> : NodeFilter
     {

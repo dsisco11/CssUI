@@ -63,7 +63,6 @@ namespace CssUI.DOM
         }
         #endregion
 
-
         #region CSS Object Model Extensions
         /* Docs: https://www.w3.org/TR/cssom-view-1/#extensions-to-the-window-interface */
         public MediaQueryList matchMedia(string query)
