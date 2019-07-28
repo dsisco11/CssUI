@@ -179,16 +179,16 @@ namespace CssUI.DOM
         #endregion
 
         #region Slottable
+        private string _slot_Name = string.Empty;
         /// <summary>
         /// Returns the slot name
         /// </summary>
-        internal string Name
+        internal string Slot_Name
         {/* Docs: https://dom.spec.whatwg.org/#slotable-name */
-            get => getAttribute(EAttributeName.Name).Get_String();
+            get => _slot_Name;
             set
             {
-                AttributeValue val = getAttribute(EAttributeName.Name);
-                string oldValue = val.Get_String();
+                string oldValue = _slot_Name;
 
                 if (oldValue.Equals(value))
                     return;
@@ -201,11 +201,11 @@ namespace CssUI.DOM
 
                 if (string.IsNullOrEmpty(value))
                 {
-                    setAttribute(EAttributeName.Name, null);
+                    _slot_Name = null;
                 }
                 else
                 {
-                    setAttribute(EAttributeName.Name, AttributeValue.From_String(value));
+                    _slot_Name = value;
                 }
                 /* 6) If element is assigned, then run assign slotables for element’s assigned slot. */
                 if (isAssigned)
