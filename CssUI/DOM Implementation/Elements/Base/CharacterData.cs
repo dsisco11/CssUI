@@ -11,10 +11,10 @@ namespace CssUI.DOM
         #region Node Implementation
         public override ENodeType nodeType => ENodeType.TEXT_NODE;
         public override string nodeName => "#text";
-        public override string nodeValue { get => this.data; set => replace_data(0, this.Length, value ?? string.Empty); }
-        public override string textContent { get => this.data; set => replace_data(0, Length, value ?? string.Empty); }
+        public override string nodeValue { get => data; set => replace_data(0, Length, value ?? string.Empty); }
+        public override string textContent { get => data; set => replace_data(0, Length, value ?? string.Empty); }
 
-        public override int nodeLength => this.data.Length;
+        public override int nodeLength => data.Length;
         #endregion
 
         #region Properties
