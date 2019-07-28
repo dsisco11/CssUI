@@ -170,7 +170,7 @@ namespace CssUI.DOM
                 }
             }
             while (currentNode != null);
-            /* Add our self to the lsit too (maybe) */
+            /* Add our self to the list too (maybe) */
             if (!exclude_self)
                 nodeList.AddLast((Text)node);
 

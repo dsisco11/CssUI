@@ -59,14 +59,14 @@ namespace CssUI
         #endregion
 
 
-        #region Joining
+        #region Concatenation
         /// <summary>
-        /// Joins an array of strings into a single string with each original string seperated from the next by a given delimiter
+        /// Concatenates an array of strings into a single string with each original string seperated from the next by a given delimiter
         /// </summary>
         /// <param name="Delim">The delimiter(s) that should seperate each token</param>
         /// <param name="Inputs">The strings to join</param>
         /// <returns></returns>
-        public static string Join(char Delim, IEnumerable<ReadOnlyMemory<char>> Inputs)
+        public static string Concat(char Delim, IEnumerable<ReadOnlyMemory<char>> Inputs)
         {
             ulong chunkCount = 0;
             ulong newLength = 0;
@@ -100,12 +100,12 @@ namespace CssUI
         }
 
         /// <summary>
-        /// Joins an array of strings into a single string with each original string seperated from the next by a given delimiter
+        /// Concatenates an array of strings into a single string with each original string seperated from the next by a given delimiter
         /// </summary>
         /// <param name="Delim">The delimiter(s) that should seperate each token</param>
         /// <param name="Inputs">The strings to join</param>
         /// <returns></returns>
-        public static string Join(char Delim, params ReadOnlyMemory<char>[] Inputs)
+        public static string Concat(char Delim, params ReadOnlyMemory<char>[] Inputs)
         {
             ulong chunkCount = (ulong)Inputs.Length;
             ulong newLength = 0;
@@ -138,12 +138,12 @@ namespace CssUI
         }
 
         /// <summary>
-        /// Joins an array of strings into a single string with each original string seperated from the next by a given delimiter
+        /// Concatenates an array of strings into a single string with each original string seperated from the next by a given delimiter
         /// </summary>
         /// <param name="Delim">The delimiter(s) that should seperate each token</param>
         /// <param name="Inputs">The strings to join</param>
         /// <returns></returns>
-        public static string Join(ReadOnlyMemory<char> Delim, IEnumerable<ReadOnlyMemory<char>> Inputs)
+        public static string Concat(ReadOnlyMemory<char> Delim, IEnumerable<ReadOnlyMemory<char>> Inputs)
         {
             ulong chunkCount = 0;
             ulong newLength = 0;
@@ -178,12 +178,12 @@ namespace CssUI
         }
 
         /// <summary>
-        /// Joins an array of strings into a single string with each original string seperated from the next by a given delimiter
+        /// Concatenates an array of strings into a single string with each original string seperated from the next by a given delimiter
         /// </summary>
         /// <param name="Delim">The delimiter(s) that should seperate each token</param>
         /// <param name="Inputs">The strings to join</param>
         /// <returns></returns>
-        public static string Join(ReadOnlyMemory<char> Delim, params ReadOnlyMemory<char>[] Inputs)
+        public static string Concat(ReadOnlyMemory<char> Delim, params ReadOnlyMemory<char>[] Inputs)
         {
             ulong chunkCount = (ulong)Inputs.Length;
             ulong newLength = 0;
@@ -215,6 +215,78 @@ namespace CssUI
 
             return newStr;
         }
+
+        /* Delimitless concats */
+
+        /// <summary>
+        /// Concatenates an array of strings into a single string
+        /// </summary>
+        /// <param name="Delim">The delimiter(s) that should seperate each token</param>
+        /// <param name="Inputs">The strings to join</param>
+        /// <returns></returns>
+        public static string Concat(IEnumerable<ReadOnlyMemory<char>> Inputs)
+        {
+            ulong chunkCount = 0;
+            ulong newLength = 0;
+            foreach (var chunk in Inputs)
+            {
+                chunkCount++;
+                newLength += (ulong)chunk.Length;
+            }
+
+            /* Compile the new string */
+            ulong insertCount = (chunkCount - 1);/* Number of delimiters we will insert into new string */
+            newLength += insertCount;
+
+            char[] dataPtr = new char[newLength];
+            Memory<char> data = new Memory<char>(dataPtr);
+            string newStr = new string(dataPtr);
+
+            ulong index = 0;
+            foreach (var chunk in Inputs)
+            {
+                /* Copy substring */
+                chunk.CopyTo(data.Slice((int)index));
+                index += (ulong)chunk.Length;
+            }
+
+            return newStr;
+        }
+
+        /// <summary>
+        /// Concatenates an array of strings into a single string
+        /// </summary>
+        /// <param name="Delim">The delimiter(s) that should seperate each token</param>
+        /// <param name="Inputs">The strings to join</param>
+        /// <returns></returns>
+        public static string Concat(params ReadOnlyMemory<char>[] Inputs)
+        {
+            ulong chunkCount = (ulong)Inputs.Length;
+            ulong newLength = 0;
+            for (ulong i = 0; i < chunkCount; i++)
+            {
+                newLength += (ulong)Inputs[i].Length;
+            }
+
+            /* Compile the new string */
+            ulong insertCount = (chunkCount - 1);/* Number of delimiters we will insert into new string */
+            newLength += insertCount;
+
+            char[] dataPtr = new char[newLength];
+            Memory<char> data = new Memory<char>(dataPtr);
+            string newStr = new string(dataPtr);
+
+            ulong index = 0;
+            foreach (var chunk in Inputs)
+            {
+                /* Copy substring */
+                chunk.CopyTo(data.Slice((int)index));
+                index += (ulong)chunk.Length;
+            }
+
+            return newStr;
+        }
+
         #endregion
 
 
