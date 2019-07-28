@@ -216,7 +216,7 @@ namespace CssUI.DOM
         #region Ordered Sets
         public static string Serialize_Ordered_Set(IEnumerable<string> set)
         {
-            return StringCommon.Join(UnicodeCommon.CHAR_SPACE, set.Select(str => str.AsMemory()));
+            return StringCommon.Concat(UnicodeCommon.CHAR_SPACE, set.Select(str => str.AsMemory()));
         }
 
         public static IReadOnlyList<string> Parse_Ordered_Set(ReadOnlyMemory<char> Input)
@@ -1249,7 +1249,7 @@ namespace CssUI.DOM
         }
 
         /// <summary>
-        /// Returns a list of all immediate descendants for the given <paramref name="node"/>
+        /// Returns a list of all descendents of <paramref name="node"/> whose parent node is <paramref name="node"/>
         /// <param name="node">The node to start searching from</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1257,9 +1257,9 @@ namespace CssUI.DOM
         {
             LinkedList<Node> list = new LinkedList<Node>();
             Node child = node.firstChild;
-            while (child != null)
+            if (Filter != null)
             {
-                if (Filter != null)
+                while (child != null)
                 {
                     var fr = Filter.acceptNode(child);
                     if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
@@ -1267,32 +1267,79 @@ namespace CssUI.DOM
                     {
                         list.AddLast(child);
                     }
+                    child = child.nextSibling;
                 }
-                else
+            }
+            else
+            {
+                while (child != null)
                 {
                     list.AddLast(child);
+                    child = child.nextSibling;
                 }
-
-                child = child.nextSibling;
             }
 
             return list;
         }
 
         /// <summary>
-        /// Returns a list of all immediate descendents for the given <paramref name="node"/> which match the given Type <typeparamref name="Ty"/>
+        /// Returns the Nth descendent of <paramref name="node"/> whose parent node is <paramref name="node"/>
         /// <param name="node">The node to start searching from</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IReadOnlyCollection<Ty> Get_Children_OfType<Ty>(Node node, NodeFilter Filter = null) where Ty : IEventTarget
+        public static Node Get_Nth_Child(Node node, uint N, NodeFilter Filter = null)
         {
-            LinkedList<Ty> list = new LinkedList<Ty>();
-            Node child = node.firstChild;
-            while (child != null)
+            if (N == 0)
             {
-                if (child is Ty childAsType)
+                throw new IndexOutOfRangeException("N must be greater than 0");
+            }
+
+            Node child = node.firstChild;
+            if (Filter != null)
+            {
+                while (child != null)
                 {
-                    if (Filter != null)
+                    var fr = Filter.acceptNode(child);
+                    if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
+                    else if (fr == ENodeFilterResult.FILTER_ACCEPT)
+                    {
+                        if (--N <= 0)
+                        {
+                            return child;
+                        }
+                    }
+                    child = child.nextSibling;
+                }
+            }
+            else
+            {
+                while (child != null)
+                {
+                    if (--N <= 0)
+                    {
+                        return child;
+                    }
+                    child = child.nextSibling;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Returns a list of all descendents of <paramref name="node"/> whose parent node is <paramref name="node"/> and whom match the given <typeparamref name="NodeType"/>
+        /// <param name="node">The node to start searching from</param>
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IReadOnlyCollection<NodeType> Get_Children_OfType<NodeType>(Node node, NodeFilter Filter = null) where NodeType : IEventTarget
+        {
+            LinkedList<NodeType> list = new LinkedList<NodeType>();
+            Node child = node.firstChild;
+            if (Filter != null)
+            {
+                while (child != null)
+                {
+                    if (child is NodeType childAsType)
                     {
                         var fr = Filter.acceptNode(child);
                         if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
@@ -1301,63 +1348,96 @@ namespace CssUI.DOM
                             list.AddLast(childAsType);
                         }
                     }
-                    else
+                    child = child.nextSibling;
+                }
+            }
+            else
+            {
+                while (child != null)
+                {
+                    if (child is NodeType childAsType)
                     {
                         list.AddLast(childAsType);
+                        child = child.nextSibling;
                     }
                 }
-
-                child = child.nextSibling;
             }
 
             return list;
         }
 
-
         /// <summary>
-        /// Returns the first immediate descendent which matches the given <paramref name="Filter"/> and Type <typeparamref name="Ty"/>
+        /// Returns the Nth descendent of <paramref name="node"/> whose parent node is <paramref name="node"/> and whom matches the given <typeparamref name="NodeType"/>
         /// <param name="node">The node to start searching from</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Ty Get_First_Child_OfType<Ty>(Node Node, NodeFilter Filter = null) where Ty : Node
+        public static NodeType Get_Nth_Child_OfType<NodeType>(Node node, uint N, NodeFilter Filter = null) where NodeType : IEventTarget
         {
-            Node child = Node.firstChild;
-            while (child != null)
+            if (N == 0)
             {
-                if (child is Ty childAsType)
+                throw new IndexOutOfRangeException("N must be greater than 0");
+            }
+
+            Node child = node.firstChild;
+            if (Filter != null)
+            {
+                while (child != null)
                 {
-                    if (Filter != null)
+                    if (child is NodeType childAsType)
                     {
                         var fr = Filter.acceptNode(child);
                         if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
                         else if (fr == ENodeFilterResult.FILTER_ACCEPT)
                         {
+                            if (--N <= 0)
+                            {
+                                return childAsType;
+                            }
+                        }
+                    }
+                    child = child.nextSibling;
+                }
+            }
+            else
+            {
+                while (child != null)
+                {
+                    if (child is NodeType childAsType)
+                    {
+                        if (--N <= 0)
+                        {
                             return childAsType;
                         }
                     }
-                    else
-                    {
-                        return childAsType;
-                    }
+                    child = child.nextSibling;
                 }
-
-                child = child.nextSibling;
             }
 
-            return null;
+            return default(NodeType);
         }
 
+
         /// <summary>
-        /// Returns the first immediate descendent which matches the given <paramref name="Filter"/> and Type <typeparamref name="Ty"/>
+        /// Returns the first immediate descendent which matches the given <paramref name="Filter"/> and Type <typeparamref name="NodeType"/>
         /// <param name="node">The node to start searching from</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Ty Get_Last_Child_OfType<Ty>(Node Node, NodeFilter Filter = null) where Ty : Node
+        public static NodeType Get_First_Child_OfType<NodeType>(Node node, NodeFilter Filter = null) where NodeType : IEventTarget
         {
-            Node child = Node.lastChild;
+            return Get_Nth_Child_OfType<NodeType>(node, 1, Filter);
+        }
+
+        /// <summary>
+        /// Returns the first descendent of <paramref name="node"/> whose parent node is <paramref name="node"/> and which matches the given <paramref name="Filter"/> and <typeparamref name="NodeType"/>
+        /// <param name="node">The node to start searching from</param>
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static NodeType Get_Last_Child_OfType<NodeType>(Node node, NodeFilter Filter = null) where NodeType : IEventTarget
+        {
+            Node child = node.lastChild;
             while (child != null)
             {
-                if (child is Ty childAsType)
+                if (child is NodeType childAsType)
                 {
                     if (Filter != null)
                     {
@@ -1377,55 +1457,123 @@ namespace CssUI.DOM
                 child = child.previousSibling;
             }
 
-            return null;
+            return default(NodeType);
         }
+        
 
         /// <summary>
-        /// Returns the first immediate (<see cref="Element"/>) descendent which matches the given <paramref name="Filter"/> and Type <typeparamref name="Ty"/>
-        /// <param name="node">The node to start searching from</param>
+        /// Returns the descendents of <paramref name="element"/> whose parent node is <paramref name="element"/> and whom matches the given <typeparamref name="ElementType"/>
+        /// <param name="element">The node to start searching from</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Ty Get_First_Element_Child_OfType<Ty>(Element Node, NodeFilter Filter = null) where Ty : Node
+        public static IReadOnlyCollection<ElementType> Get_Element_Children_OfType<ElementType>(Element element, NodeFilter Filter = null) where ElementType : Element
         {
-            Element child = Node.firstElementChild;
-            while (child != null)
+            LinkedList<ElementType> list = new LinkedList<ElementType>();
+            Element child = element.firstElementChild;
+            if (Filter != null)
             {
-                if (child is Ty childAsType)
+                while (child != null)
                 {
-                    if (Filter != null)
+                    if (child is ElementType childAsType)
                     {
                         var fr = Filter.acceptNode(child);
                         if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
                         else if (fr == ENodeFilterResult.FILTER_ACCEPT)
                         {
-                            return childAsType;
+                            list.AddLast(childAsType);
                         }
                     }
-                    else
-                    {
-                        return childAsType;
-                    }
+                    child = child.nextElementSibling;
                 }
-
-                child = child.nextElementSibling;
+            }
+            else
+            {
+                while (child != null)
+                {
+                    if (child is ElementType childAsType)
+                    {
+                        list.AddLast(childAsType);
+                    }
+                    child = child.nextElementSibling;
+                }
             }
 
-            return null;
+            return list;
         }
 
         /// <summary>
-        /// Returns the last immediate (<see cref="Element"/>) descendent which matches the given <paramref name="Filter"/> and Type <typeparamref name="Ty"/>
-        /// <param name="node">The node to start searching from</param>
+        /// Returns the Nth descendent of <paramref name="element"/> whose parent node is <paramref name="element"/> and whom matches the given <typeparamref name="ElementType"/>
+        /// <param name="element">The node to start searching from</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Ty Get_Last_Element_Child_OfType<Ty>(Element Node, NodeFilter Filter = null) where Ty : Node
+        public static ElementType Get_Nth_Element_Child_OfType<ElementType>(Element element, uint N, NodeFilter Filter = null) where ElementType : Element
         {
-            Element child = Node.lastElementChild;
-            while (child != null)
+            if (N == 0)
             {
-                if (child is Ty childAsType)
+                throw new IndexOutOfRangeException("N must be greater than 0");
+            }
+
+            Element child = element.firstElementChild;
+            if (Filter != null)
+            {
+                while (child != null)
                 {
-                    if (Filter != null)
+                    if (child is ElementType childAsType)
+                    {
+                        var fr = Filter.acceptNode(child);
+                        if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
+                        else if (fr == ENodeFilterResult.FILTER_ACCEPT)
+                        {
+                            if (--N <= 0)
+                            {
+                                return childAsType;
+                            }
+                        }
+                    }
+                    child = child.nextElementSibling;
+                }
+            }
+            else
+            {
+                while (child != null)
+                {
+                    if (child is ElementType childAsType)
+                    {
+                        if (--N <= 0)
+                        {
+                            return childAsType;
+                        }
+                    }
+                    child = child.nextElementSibling;
+                }
+            }
+
+            return default(ElementType);
+        }
+
+        /// <summary>
+        /// Returns the first immediate (<see cref="Element"/>) descendent which matches the given <paramref name="Filter"/> and Type <typeparamref name="ElementType"/>
+        /// <param name="element">The node to start searching from</param>
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ElementType Get_First_Element_Child_OfType<ElementType>(Element element, NodeFilter Filter = null) where ElementType : Element
+        {
+            return Get_Nth_Element_Child_OfType<ElementType>(element, 1, Filter);
+        }
+
+        /// <summary>
+        /// Returns the last (<see cref="Element"/>) descendent of <paramref name="element"/> whose parent node is <paramref name="element"/> and whom matches the given <paramref name="Filter"/> and <typeparamref name="ElementType"/>
+        /// <param name="element">The node to start searching from</param>
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ElementType Get_Last_Element_Child_OfType<ElementType>(Element element, NodeFilter Filter = null) where ElementType : Node
+        {
+            Element child = element.lastElementChild;
+            if (Filter != null)
+            {
+                while (child != null)
+                {
+                    if (child is ElementType childAsType)
                     {
                         var fr = Filter.acceptNode(child);
                         if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
@@ -1434,13 +1582,19 @@ namespace CssUI.DOM
                             return childAsType;
                         }
                     }
-                    else
+                    child = child.previousElementSibling;
+                }
+            }
+            else
+            {
+                while (child != null)
+                {
+                    if (child is ElementType childAsType)
                     {
                         return childAsType;
                     }
+                    child = child.previousElementSibling;
                 }
-
-                child = child.previousElementSibling;
             }
 
             return null;
