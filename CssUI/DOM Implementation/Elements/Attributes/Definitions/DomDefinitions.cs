@@ -91,6 +91,14 @@ namespace CssUI.DOM
                 new AttributeDefinition(EAttributeName.Multiple, EAttributeType.Boolean, null, null, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.Required, EAttributeType.Boolean, null, null, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.Size, EAttributeType.NonNegative_Integer, AttributeValue.From_Integer(0u), null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.Placeholder, EAttributeType.String, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.MinLength, EAttributeType.NonNegative_Integer, null, null, EAttributeFlags.None, null, null),
+                new AttributeDefinition(EAttributeName.MaxLength, EAttributeType.NonNegative_Integer, null, null, EAttributeFlags.None, null, null),
+
+
+                /* TextArea Attributes */
+                new AttributeDefinition(EAttributeName.ReadOnly, EAttributeType.Boolean, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.Wrap, EAttributeType.String, null, null, EAttributeFlags.None),
 
 
                 /* FORM Attributes */

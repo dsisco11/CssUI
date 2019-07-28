@@ -77,6 +77,8 @@ namespace CssUI.DOM
 
         public virtual string value { get; set; }
 
+        public abstract string type { get; }
+
         public EValidityState validity { get; internal set; }
         #endregion
 

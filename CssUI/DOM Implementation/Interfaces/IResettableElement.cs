@@ -6,5 +6,6 @@ namespace CssUI.DOM
     /// </summary>
     public interface IResettableElement
     {
+        void Reset();
     }
 }

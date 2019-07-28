@@ -13,10 +13,10 @@ namespace CssUI.DOM
     public class HTMLOptionElement : FormAssociatedElement
     {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#the-option-element */
         #region Properties
-        public bool dirtiness { get; protected set; } = false;
+        internal bool dirtiness { get; set; } = false;
 
         /* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#concept-option-selectedness */
-        public bool selectedness { get; protected set; } = false;
+        internal bool selectedness { get; set; } = false;
         #endregion
 
 

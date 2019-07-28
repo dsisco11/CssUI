@@ -139,6 +139,14 @@ namespace CssUI.DOM
         Required,
         [MetaKeyword("size")]
         Size,
+        [MetaKeyword("placeholder")]
+        Placeholder,
+
+        /* TEXTAREA */
+        [MetaKeyword("readonly")]
+        ReadOnly,
+        [MetaKeyword("wrap")]
+        Wrap,
 
         [MetaKeyword("form")]
         Form,
@@ -148,6 +156,10 @@ namespace CssUI.DOM
         Selected,
         [MetaKeyword("dirname")]
         Dirname,
+        [MetaKeyword("minlength")]
+        MinLength,
+        [MetaKeyword("maxlength")]
+        MaxLength,
 
 
         /* FORMS */
