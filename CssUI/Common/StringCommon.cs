@@ -30,6 +30,29 @@ namespace CssUI
             return true;
         }
 
+        /// <summary>
+        /// Returns whether <paramref name="str"/> contains any characters matching the given filter
+        /// </summary>
+        /// <returns>True if string contains a character which the given filter matches</returns>
+        public static bool Scan(ReadOnlySpan<char> str, DataFilter<char> Filter)
+        {
+            if (Filter == null)
+                return false;
+
+            if (str.Length == 0)
+                return false;
+
+            for (int i = 0; i < str.Length; i++)
+            {
+                var result = Filter.acceptData(str[i]);
+                if (result == EFilterResult.FILTER_ACCEPT)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
         #endregion
 
 

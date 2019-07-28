@@ -375,5 +375,14 @@ namespace CssUI
         }
         #endregion
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Selectable_Char(char c)
+        {
+            if (Is_Ascii_Control(c))
+                return false;
+
+            return true;
+        }
+
     }
 }

@@ -8,7 +8,7 @@ namespace CssUI.Filters
     /// </summary>
     public class FilterWhitespace : DataFilter<char>
     {
-        public static FilterWhitespace Instance = new FilterWhitespace();
+        public static DataFilter<char> Instance = new FilterWhitespace();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override EFilterResult acceptData(char data)

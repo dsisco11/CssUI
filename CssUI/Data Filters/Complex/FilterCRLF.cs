@@ -7,7 +7,7 @@ namespace CssUI.Filters
     /// </summary>
     public class FilterCRLF : DataFilter<char>
     {
-        public static FilterCRLF Instance = new FilterCRLF();
+        public static DataFilter<char> Instance = new FilterCRLF();
         public static string LF = new string(new char[] { UnicodeCommon.CHAR_LINE_FEED });
         public static string CRLF = new string(new char[] { UnicodeCommon.CHAR_CARRIAGE_RETURN, UnicodeCommon.CHAR_LINE_FEED });
 
