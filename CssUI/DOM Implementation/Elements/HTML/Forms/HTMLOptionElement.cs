@@ -247,7 +247,9 @@ namespace CssUI.DOM
         #endregion
 
         #region Overrides
-        internal override void run_attribute_change_steps(this Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue value, string Namespace)
+        internal override bool has_activation_behaviour => true;
+
+        internal override void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue value, string Namespace)
         {
             base.run_attribute_change_steps(element, localName, oldValue, value, Namespace);
 
