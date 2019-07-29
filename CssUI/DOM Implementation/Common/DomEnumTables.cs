@@ -240,8 +240,8 @@ namespace CssUI.DOM.Internal
 			TABLE[9][(int)CssUI.DOM.EInputType.File] = new EnumData("file");
 			TABLE[9][(int)CssUI.DOM.EInputType.Submit] = new EnumData("submit");
 			TABLE[9][(int)CssUI.DOM.EInputType.Image] = new EnumData("image");
-			TABLE[9][(int)CssUI.DOM.EInputType.reset] = new EnumData("reset");
-			TABLE[9][(int)CssUI.DOM.EInputType.button] = new EnumData("button");
+			TABLE[9][(int)CssUI.DOM.EInputType.Reset] = new EnumData("reset");
+			TABLE[9][(int)CssUI.DOM.EInputType.Button] = new EnumData("button");
 			#endregion
 			
 
@@ -728,8 +728,8 @@ namespace CssUI.DOM.Internal
 			KEYWORD[9].Add(new AtomicString("file"), CssUI.DOM.EInputType.File);
 			KEYWORD[9].Add(new AtomicString("submit"), CssUI.DOM.EInputType.Submit);
 			KEYWORD[9].Add(new AtomicString("image"), CssUI.DOM.EInputType.Image);
-			KEYWORD[9].Add(new AtomicString("reset"), CssUI.DOM.EInputType.reset);
-			KEYWORD[9].Add(new AtomicString("button"), CssUI.DOM.EInputType.button);
+			KEYWORD[9].Add(new AtomicString("reset"), CssUI.DOM.EInputType.Reset);
+			KEYWORD[9].Add(new AtomicString("button"), CssUI.DOM.EInputType.Button);
 			#endregion
 				
 

@@ -133,12 +133,12 @@ namespace CssUI.DOM
         /// n/a
         /// </summary>
         [DomKeyword("reset")]
-        reset,
+        Reset,
 
         /// <summary>
         /// n/a
         /// </summary>
         [DomKeyword("button")]
-        button,
+        Button,
     }
 }

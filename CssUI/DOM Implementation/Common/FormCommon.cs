@@ -354,8 +354,8 @@ namespace CssUI.DOM
                 switch (inputElement.type)
                 {
                     case EInputType.Hidden:
-                    case EInputType.reset:
-                    case EInputType.button:
+                    case EInputType.Reset:
+                    case EInputType.Button:
                         return true;
                 }
             }
