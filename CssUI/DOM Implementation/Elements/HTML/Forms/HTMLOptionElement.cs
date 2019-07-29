@@ -13,6 +13,9 @@ namespace CssUI.DOM
     public class HTMLOptionElement : FormAssociatedElement
     {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#the-option-element */
         #region Properties
+        /// <summary>
+        /// The dirtiness of an option element is a boolean state, initially false. It controls whether adding or removing the selected content attribute has any effect.
+        /// </summary>
         internal bool dirtiness { get; set; } = false;
 
         /* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#concept-option-selectedness */
@@ -104,7 +107,7 @@ namespace CssUI.DOM
             {
                 selectedness = value;
                 dirtiness = true;
-                get_select()?.ask_for_reset(this);
+                get_select()?.request_reset();
             }
         }
 
@@ -241,17 +244,34 @@ namespace CssUI.DOM
                 });
             }
         }
-
         #endregion
 
-
-        internal override EValidityState query_validity()
+        #region Overrides
+        internal override void run_attribute_change_steps(this Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue value, string Namespace)
         {
-            EValidityState flags = 0x0;
+            base.run_attribute_change_steps(element, localName, oldValue, value, Namespace);
 
-
-
-
+            /* Whenever an option element's selected attribute is added, if its dirtiness is false, its selectedness must be set to true. 
+             * Whenever an option element's selected attribute is removed, if its dirtiness is false, its selectedness must be set to false. */
+            if (localName == EAttributeName.Selected)
+            {
+                if (oldValue == null)// Added
+                {
+                    if (!dirtiness)
+                    {
+                        selectedness = true;
+                    }
+                }
+                else// Removed
+                {
+                    if (!dirtiness)
+                    {
+                        selectedness = false;
+                    }
+                }
+            }
         }
+        #endregion
+
     }
 }

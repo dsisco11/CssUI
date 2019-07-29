@@ -12,7 +12,6 @@ namespace CssUI.DOM
     {/* Docs: https://html.spec.whatwg.org/multipage/common-dom-interfaces.html#htmloptionscollection */
         #region Properties
         public readonly HTMLSelectElement root;
-        public static NodeFilter OptionElementFilter = new FilterElementType<HTMLOptionElement>();
         #endregion
 
         #region Constructor
@@ -23,7 +22,7 @@ namespace CssUI.DOM
         #endregion
 
         #region Accessors
-        private List<HTMLOptionElement> Collection => new List<HTMLOptionElement>((IEnumerable<HTMLOptionElement>)DOMCommon.Get_Descendents(root, OptionElementFilter, Enums.ENodeFilterMask.SHOW_ELEMENT));
+        private IReadOnlyList<HTMLOptionElement> Collection => DOMCommon.Get_Descendents_OfType<HTMLOptionElement>(root, null, Enums.ENodeFilterMask.SHOW_ELEMENT).ToArray();
         #endregion
 
         /// <summary>
@@ -125,7 +124,8 @@ namespace CssUI.DOM
                     name = name.Substring(1);
                 }
 
-                return Collection.FirstOrDefault(o => StringCommon.Streq(o.id.AsSpan(), name.AsSpan()));
+                return DOMCommon.Get_Nth_Descendant_OfType<HTMLOptionElement>(root, 1, new FilterAttribute(EAttributeName.ID, AttributeValue.From_String(name)), Enums.ENodeFilterMask.SHOW_ELEMENT);
+                // return Collection.FirstOrDefault(o => StringCommon.Streq(o.id.AsSpan(), name.AsSpan()));
             }
         }
 
