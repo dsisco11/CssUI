@@ -60,8 +60,6 @@ namespace CssUI.DOM
         Disabled,
         [MetaKeyword("hidden")]
         Hidden,
-        [MetaKeyword("href")]
-        HREF,
         [MetaKeyword("type")]
         Type,
         [MetaKeyword("slot")]
@@ -95,9 +93,22 @@ namespace CssUI.DOM
         [MetaKeyword("decoding")]
         Decoding,
 
+        [MetaKeyword("enctype")]
+        EncType,
+        [MetaKeyword("method")]
+        Method,
+        [MetaKeyword("novalidate")]
+        NoValidate,
+        [MetaKeyword("target")]
+        Target,
+
         /* LABEL ATTRIBUTES */
         [MetaKeyword("for")]
         For,
+
+        /* DIALOG ATTRIBUTES */
+        [MetaKeyword("open")]
+        Open,
 
 
         /* TABLE ATTRIBUTES */
@@ -141,6 +152,32 @@ namespace CssUI.DOM
         Size,
         [MetaKeyword("placeholder")]
         Placeholder,
+
+        [MetaKeyword("accept")]
+        Accept,
+
+        [MetaKeyword("action")]
+        Action,
+        [MetaKeyword("formaction")]
+        FormAction,
+        [MetaKeyword("formenctype")]
+        FormEncType,
+        [MetaKeyword("formmethod")]
+        FormMethod,
+        [MetaKeyword("formnovalidate")]
+        FormNoValidate,
+        [MetaKeyword("formtarget")]
+        FormTarget,
+        [MetaKeyword("list")]
+        List,
+        [MetaKeyword("min")]
+        Min,
+        [MetaKeyword("max")]
+        Max,
+        [MetaKeyword("pattern")]
+        Pattern,
+        [MetaKeyword("step")]
+        Step,
 
         /* TEXTAREA */
         [MetaKeyword("readonly")]

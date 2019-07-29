@@ -56,6 +56,15 @@ namespace CssUI.DOM
 
                 new AttributeDefinition(EAttributeName.ContentEditable, EAttributeType.Enumerated, null, null, EAttributeFlags.None, Lookup.Get_Keywords<EContentEditable>(), typeof(EContentEditable)),
 
+                new AttributeDefinition(EAttributeName.EncType, EAttributeType.Enumerated, AttributeValue.From_Enum(EEncType.FormData), AttributeValue.From_Enum(EEncType.FormData), EAttributeFlags.None, Lookup.Get_Keywords<EEncType>(), typeof(EEncType)),
+                new AttributeDefinition(EAttributeName.Method, EAttributeType.Enumerated, AttributeValue.From_Enum(EFormMethod.Get), AttributeValue.From_Enum(EFormMethod.Get), EAttributeFlags.None, Lookup.Get_Keywords<EFormMethod>(), typeof(EFormMethod)),
+                new AttributeDefinition(EAttributeName.NoValidate, EAttributeType.Boolean, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.Target, EAttributeType.String, null, null, EAttributeFlags.None),
+
+
+                /* Dialog Attributes */
+                new AttributeDefinition(EAttributeName.Open, EAttributeType.Boolean, null, null, EAttributeFlags.None),
+
                 /* Image Attributes */
                 new AttributeDefinition(EAttributeName.Src, EAttributeType.String, null, null, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.SrcSet, EAttributeType.String, null, null, EAttributeFlags.None),
@@ -94,6 +103,19 @@ namespace CssUI.DOM
                 new AttributeDefinition(EAttributeName.Placeholder, EAttributeType.String, null, null, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.MinLength, EAttributeType.NonNegative_Integer, null, null, EAttributeFlags.None, null, null),
                 new AttributeDefinition(EAttributeName.MaxLength, EAttributeType.NonNegative_Integer, null, null, EAttributeFlags.None, null, null),
+
+                new AttributeDefinition(EAttributeName.Accept, EAttributeType.String, null, null, EAttributeFlags.None),
+
+                new AttributeDefinition(EAttributeName.Action, EAttributeType.String, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.FormAction, EAttributeType.String, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.FormEncType, EAttributeType.Enumerated, null, AttributeValue.From_Enum(EEncType.FormData), EAttributeFlags.None, Lookup.Get_Keywords<EEncType>(), typeof(EEncType)),
+                new AttributeDefinition(EAttributeName.FormMethod, EAttributeType.Enumerated, null, null, EAttributeFlags.None, Lookup.Get_Keywords<EFormMethod>(), typeof(EFormMethod)),
+                new AttributeDefinition(EAttributeName.FormNoValidate, EAttributeType.Boolean, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.FormTarget, EAttributeType.String, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.List, EAttributeType.String, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.Min, EAttributeType.String, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.Max, EAttributeType.String, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.Pattern, EAttributeType.String, null, null, EAttributeFlags.None),
 
 
                 /* TextArea Attributes */
