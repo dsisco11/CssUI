@@ -106,12 +106,13 @@ namespace CssUI
         #endregion
 
         /// <summary>
-        /// Determines the equality of two floating point values based on the delta between them.
+        /// Returns <c>True</c> if <paramref name="a"/> is equal to <paramref name="b"/> within a range of error <paramref name="epsilon"/>
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <param name="epsilon"></param>
         /// <returns>True If the delta between the values is less than <paramref name="epsilon"/> </returns>
+        [Obsolete("Start using the short form: Feq")]
         public static bool floatEq(double a, double b, double epsilon = 0.0000001f)
         {
             double absA = Math.Abs(a);
@@ -119,6 +120,93 @@ namespace CssUI
             double diff = Math.Abs(a - b);
 
             if (a == b)
+            { // shortcut, handles infinities
+                return true;
+            }
+            else if (a == 0 || b == 0 || diff < double.Epsilon)
+            {
+                // a or b is zero or both are extremely close to it
+                // relative error is less meaningful here
+                return diff < (epsilon * double.Epsilon);
+            }
+            else
+            { // use relative error
+                return diff / (absA + absB) < epsilon;
+            }
+        }
+
+        /// <summary>
+        /// Returns <c>True</c> if <paramref name="a"/> is equal to <paramref name="b"/> within a range of error <paramref name="epsilon"/>
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="epsilon"></param>
+        /// <returns>True If the delta between the values is less than <paramref name="epsilon"/> </returns>
+        public static bool Feq(double a, double b, double epsilon = 0.0000001)
+        {
+            double absA = Math.Abs(a);
+            double absB = Math.Abs(b);
+            double diff = Math.Abs(a - b);
+
+            if (a == b)
+            { // shortcut, handles infinities
+                return true;
+            }
+            else if (a == 0 || b == 0 || diff < double.Epsilon)
+            {
+                // a or b is zero or both are extremely close to it
+                // relative error is less meaningful here
+                return diff < (epsilon * double.Epsilon);
+            }
+            else
+            { // use relative error
+                return diff / (absA + absB) < epsilon;
+            }
+        }
+
+        /// <summary>
+        /// Returns <c>True</c> if <paramref name="a"/> is less than or equal to <paramref name="b"/> within a range of error <paramref name="epsilon"/>
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="epsilon"></param>
+        /// <returns>True If the delta between the values is less than <paramref name="epsilon"/> </returns>
+        public static bool Flteq(double a, double b, double epsilon = 0.0000001)
+        {
+            double absA = Math.Abs(a);
+            double absB = Math.Abs(b);
+            double diff = Math.Abs(a - b);
+
+            if (a <= b)
+            { // shortcut, handles infinities
+                return true;
+            }
+            else if (a == 0 || b == 0 || diff < double.Epsilon)
+            {
+                // a or b is zero or both are extremely close to it
+                // relative error is less meaningful here
+                return diff < (epsilon * double.Epsilon);
+            }
+            else
+            { // use relative error
+                return diff / (absA + absB) < epsilon;
+            }
+        }
+
+        /// <summary>
+        /// Returns <c>True</c> if <paramref name="a"/> is greater than or equal to <paramref name="b"/> within a range of error <paramref name="epsilon"/>
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="epsilon"></param>
+        /// <returns>True If the delta between the values is less than <paramref name="epsilon"/> </returns>
+        public static bool Fgteq(double a, double b, double epsilon = 0.0000001)
+        {
+            double absA = Math.Abs(a);
+            double absB = Math.Abs(b);
+            double diff = Math.Abs(a - b);
+
+            if (a >= b)
             { // shortcut, handles infinities
                 return true;
             }
