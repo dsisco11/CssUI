@@ -188,19 +188,28 @@ namespace CssUI.DOM
         {
             get
             {
-                switch (tagName)
-                {
-                    case "button":
-                    case "input":
-                    case "select":
-                    case "textarea":
-                    case "optgroup":
-                    case "option":
-                    case "fieldset":
-                        return disabled;
-                    default:
-                        return false;
-                }
+                if (this is HTMLButtonElement)
+                    return disabled;
+
+                if (this is HTMLInputElement)
+                    return disabled;
+
+                if (this is HTMLSelectElement)
+                    return disabled;
+
+                if (this is HTMLTextAreaElement)
+                    return disabled;
+
+                if (this is HTMLOptGroupElement)
+                    return disabled;
+
+                if (this is HTMLOptionElement)
+                    return disabled;
+
+                if (this is HTMLFieldSetElement)
+                    return disabled;
+
+                return false;
             }
         }
 
@@ -213,7 +222,7 @@ namespace CssUI.DOM
             {
                 if (this is HTMLInputElement inputElement)
                 {
-                    if (inputElement.type == EInputType.Submit || inputElement.type == EInputType.Image || inputElement.type == EInputType.reset || inputElement.type == EInputType.button)
+                    if (inputElement.type == EInputType.Submit || inputElement.type == EInputType.Image || inputElement.type == EInputType.Reset || inputElement.type == EInputType.Button)
                     {
                         return !disabled && is_in_formal_activation_state;
                     }
@@ -228,13 +237,8 @@ namespace CssUI.DOM
                 }
                 else
                 {
-                    switch (localName)
-                    {
-                        case "a":
-                        case "area":
-                        case "link":
-                            return hasAttribute(EAttributeName.HREF);
-                    }
+                    if (this is HTMLAElement || this is HTMLAreaElement || this is HTMLLinkElement)
+                        return hasAttribute(EAttributeName.Href);
                 }
                 /*
                  * If the element has its tabindex focus flag set
@@ -398,8 +402,43 @@ namespace CssUI.DOM
                      * - Elements with a draggable attribute set, if that would enable the user agent to allow the user to begin a drag operations for those elements without the use of a pointing device
                      * 
                      */
-                    if (this.Draggable)
+
+                    if ((this is HTMLAElement || this is HTMLLinkElement) && hasAttribute(EAttributeName.Href))
+                    {
                         tabindex_focus_flag = true;
+                    }
+                    else if (this is HTMLButtonElement)
+                    {
+                        tabindex_focus_flag = true;
+                    }
+                    else if (this is HTMLInputElement inputElement && inputElement.type != EInputType.Hidden)
+                    {
+                        tabindex_focus_flag = true;
+                    }
+                    else if (this is HTMLSelectElement)
+                    {
+                        tabindex_focus_flag = true;
+                    }
+                    else if (this is HTMLTextAreaElement)
+                    {
+                        tabindex_focus_flag = true;
+                    }
+                    else if (this is HTMLSummaryElement summaryElement && summaryElement.is_summary_for_parent_details)
+                    {
+                        tabindex_focus_flag = true;
+                    }
+                    else if (Draggable)
+                    {
+                        tabindex_focus_flag = true;
+                    }
+                    else if (DOMCommon.Is_Editing_Host(this))
+                    {
+                        tabindex_focus_flag = true;
+                    }
+                    else if (this is IBrowsingContextContainer)
+                    {
+                        tabindex_focus_flag = true;
+                    }
                 }
                 else
                 {
