@@ -11,9 +11,9 @@ namespace CssUI.DOM.Serialization
 
 
 
-        public static bool Parse_Integer(ref string input, out long outValue)
+        public static bool Parse_Integer(ReadOnlyMemory<char> input, out long outValue)
         {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#signed-integers */
-            DataStream<char> Stream = new DataStream<char>(input.AsMemory(), UnicodeCommon.EOF);
+            DataStream<char> Stream = new DataStream<char>(input, UnicodeCommon.EOF);
             bool sign = true;
 
             /* SKip ASCII whitespace */
@@ -51,9 +51,9 @@ namespace CssUI.DOM.Serialization
             return true;
         }
 
-        public static bool Parse_FloatingPoint(ref string input, out double outValue)
+        public static bool Parse_FloatingPoint(ReadOnlyMemory<char> input, out double outValue)
         {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#rules-for-parsing-floating-point-number-values */
-            DataStream<char> Stream = new DataStream<char>(input.AsMemory(), UnicodeCommon.EOF);
+            DataStream<char> Stream = new DataStream<char>(input, UnicodeCommon.EOF);
 
             double value = 1;
             double divisor = 1;
@@ -180,9 +180,9 @@ namespace CssUI.DOM.Serialization
             return true;
         }
 
-        public static bool Parse_Length(ref string input, out double outValue, out EAttributeType outType)
+        public static bool Parse_Length(ReadOnlyMemory<char> input, out double outValue, out EAttributeType outType)
         {
-            DataStream<char> Stream = new DataStream<char>(input.AsMemory(), UnicodeCommon.EOF);
+            DataStream<char> Stream = new DataStream<char>(input, UnicodeCommon.EOF);
             /* 3) Skip ASCII whitespace within input given position. */
             Stream.Consume_While(UnicodeCommon.Is_Ascii_Whitespace);
             if (Stream.Next == UnicodeCommon.EOF)

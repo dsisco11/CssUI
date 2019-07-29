@@ -113,7 +113,7 @@ namespace CssUI.DOM
                             string strLower = Input.ToLowerInvariant();
                             if (!Keywords.Contains(strLower))
                             {
-                                throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an acceptable value, Acceptable values are: {string.Join(", ", Keywords)}");
+                                throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an acceptable value, Acceptable values are: {StringCommon.Concat(@", ".AsMemory(), Keywords.Select(o => o.AsMemory()))}");
                             }
 
                             if (!CssUI.Lookup.TryEnum(enumType, strLower, out var outEnum))
@@ -132,7 +132,7 @@ namespace CssUI.DOM
                     break;
                 case EAttributeType.Integer:
                     {
-                        if (!DOMParser.Parse_Integer(ref Input, out long outVal))
+                        if (!DOMParser.Parse_Integer(Input.AsMemory(), out long outVal))
                         {
                             throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an valid integer");
                         }
@@ -142,7 +142,7 @@ namespace CssUI.DOM
                     break;
                 case EAttributeType.NonNegative_Integer:
                     {
-                        if (!DOMParser.Parse_Integer(ref Input, out long outVal) || outVal < 0)
+                        if (!DOMParser.Parse_Integer(Input.AsMemory(), out long outVal) || outVal < 0)
                         {
                             throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an valid non-negative integer");
                         }
@@ -152,7 +152,7 @@ namespace CssUI.DOM
                     break;
                 case EAttributeType.FloatingPoint:
                     {
-                        if (!DOMParser.Parse_FloatingPoint(ref Input, out var outVal))
+                        if (!DOMParser.Parse_FloatingPoint(Input.AsMemory(), out var outVal))
                         {
                             throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an valid number");
                         }
@@ -163,7 +163,7 @@ namespace CssUI.DOM
 
                 case EAttributeType.Length:
                     {
-                        if (!DOMParser.Parse_Length(ref Input, out var outVal, out EAttributeType outTy) || outTy != EAttributeType.Length)
+                        if (!DOMParser.Parse_Length(Input.AsMemory(), out var outVal, out EAttributeType outTy) || outTy != EAttributeType.Length)
                         {
                             throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an valid length");
                         }
@@ -173,7 +173,7 @@ namespace CssUI.DOM
                     break;
                 case EAttributeType.NonZero_Length:
                     {
-                        if (!DOMParser.Parse_Length(ref Input, out var outVal, out EAttributeType outTy) || outVal <= 0d || outTy != EAttributeType.Length)
+                        if (!DOMParser.Parse_Length(Input.AsMemory(), out var outVal, out EAttributeType outTy) || outVal <= 0d || outTy != EAttributeType.Length)
                         {
                             throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an valid non-zero length");
                         }
@@ -183,7 +183,7 @@ namespace CssUI.DOM
                     break;
                 case EAttributeType.Percentage:
                     {
-                        if (!DOMParser.Parse_Length(ref Input, out var outVal, out EAttributeType outTy) || outTy != EAttributeType.Percentage)
+                        if (!DOMParser.Parse_Length(Input.AsMemory(), out var outVal, out EAttributeType outTy) || outTy != EAttributeType.Percentage)
                         {
                             throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an valid percentage");
                         }
@@ -193,7 +193,7 @@ namespace CssUI.DOM
                     break;
                 case EAttributeType.NonZero_Percentage:
                     {
-                        if (!DOMParser.Parse_Length(ref Input, out var outVal, out EAttributeType outTy) || outVal <= 0d || outTy != EAttributeType.Percentage)
+                        if (!DOMParser.Parse_Length(Input.AsMemory(), out var outVal, out EAttributeType outTy) || outVal <= 0d || outTy != EAttributeType.Percentage)
                         {
                             throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an valid non-zero percentage");
                         }
