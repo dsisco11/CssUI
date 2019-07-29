@@ -10,6 +10,11 @@ namespace CssUI.DOM.Traversal
     {
         private Node targetNode;
 
+        public FilterDescendantOf(Node targetNode)
+        {
+            this.targetNode = targetNode;
+        }
+
         public override ENodeFilterResult acceptNode(Node node)
         {
             /* omitting any node without a parent */
@@ -20,11 +25,6 @@ namespace CssUI.DOM.Traversal
                 return ENodeFilterResult.FILTER_ACCEPT;
 
             return ENodeFilterResult.FILTER_REJECT;
-        }
-
-        public FilterDescendantOf(Node targetNode)
-        {
-            this.targetNode = targetNode;
         }
     }
 }
