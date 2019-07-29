@@ -65,29 +65,29 @@ namespace CssUI.DOM
 
         public void delete(string name)
         {/* Docs: https://xhr.spec.whatwg.org/#dom-formdata-delete */
-            Entries.RemoveAll(e => StringCommon.Streq(name.AsSpan(), e.Item1.AsSpan()));
+            Entries.RemoveAll(e => StringCommon.StrEq(name.AsSpan(), e.Item1.AsSpan()));
         }
 
         public FormDataEntryValue get(string name)
         {/* Docs: https://xhr.spec.whatwg.org/#dom-formdata-get */
-            return Entries.First(e => StringCommon.Streq(name.AsSpan(), e.Item1.AsSpan())).Item2;
+            return Entries.First(e => StringCommon.StrEq(name.AsSpan(), e.Item1.AsSpan())).Item2;
         }
 
         public IReadOnlyCollection<FormDataEntryValue> getAll(string name)
         {/* Docs: https://xhr.spec.whatwg.org/#dom-formdata-getall */
-            return Entries.Where(e => StringCommon.Streq(name.AsSpan(), e.Item1.AsSpan())).Select(e => e.Item2).ToArray();
+            return Entries.Where(e => StringCommon.StrEq(name.AsSpan(), e.Item1.AsSpan())).Select(e => e.Item2).ToArray();
         }
 
         public bool has(string name)
         {/* Docs: https://xhr.spec.whatwg.org/#dom-formdata-has */
-            return Entries.Any(e => StringCommon.Streq(name.AsSpan(), e.Item1.AsSpan()));
+            return Entries.Any(e => StringCommon.StrEq(name.AsSpan(), e.Item1.AsSpan()));
         }
 
         public void set(string name, string value)
         {/* Docs: https://xhr.spec.whatwg.org/#dom-formdata-set */
             var entry = new FormDataEntryValue(EFormDataValueType.String, name, value);
-            int index = Entries.FindIndex(e => StringCommon.Streq(name.AsSpan(), e.Item1.AsSpan()));
-            Entries.RemoveAll(e => StringCommon.Streq(name.AsSpan(), e.Item1.AsSpan()));
+            int index = Entries.FindIndex(e => StringCommon.StrEq(name.AsSpan(), e.Item1.AsSpan()));
+            Entries.RemoveAll(e => StringCommon.StrEq(name.AsSpan(), e.Item1.AsSpan()));
             if (index < 0)
             {
                 Entries.Add(new Tuple<string, FormDataEntryValue>(name, entry));
@@ -111,8 +111,8 @@ namespace CssUI.DOM
                 entry = new FormDataEntryValue(EFormDataValueType.File, name, new FileBlob(blobValue, filename));
             }
 
-            int index = Entries.FindIndex(e => StringCommon.Streq(name.AsSpan(), e.Item1.AsSpan()));
-            Entries.RemoveAll(e => StringCommon.Streq(name.AsSpan(), e.Item1.AsSpan()));
+            int index = Entries.FindIndex(e => StringCommon.StrEq(name.AsSpan(), e.Item1.AsSpan()));
+            Entries.RemoveAll(e => StringCommon.StrEq(name.AsSpan(), e.Item1.AsSpan()));
             if (index < 0)
             {
                 Entries.Add(new Tuple<string, FormDataEntryValue>(name, entry));
