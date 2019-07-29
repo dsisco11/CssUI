@@ -66,7 +66,7 @@ namespace CssUI.DOM.Nodes
 
 
         /// <summary>
-        /// Returns true if node is connected and false otherwise.
+        /// Returns true if node is connected to a document and false otherwise.
         /// </summary>
         /// https://dom.spec.whatwg.org/#connected
         public bool isConnected { get => DOMCommon.Get_Shadow_Including_Root(this) is Document; }
@@ -326,6 +326,21 @@ namespace CssUI.DOM.Nodes
             int hash = 17;
             hash = hash * 31 + (int)nodeType;
             return hash;
+        }
+        #endregion
+
+        #region Internal
+        /// <summary>
+        /// A node (in particular elements and text nodes) can be marked as inert. 
+        /// When a node is inert, then the user agent must act as if the node was absent for the purposes of targeting user interaction events, 
+        /// may ignore the node for the purposes of text search user interfaces (commonly known as "find in page"), 
+        /// and may prevent the user from selecting text in that node. User agents should allow the user to override the restrictions on search and text selection, however.
+        /// </summary>
+        internal bool inert = false;
+        internal bool is_expressly_inert
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#expressly-inert */
+            /* An element is expressly inert if it is inert and its node document is not inert. */
+            get => (inert && !nodeDocument.inert);
         }
         #endregion
 
