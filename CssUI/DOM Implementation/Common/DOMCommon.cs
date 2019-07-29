@@ -93,7 +93,7 @@ namespace CssUI.DOM
         #region Checks
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Focusable(HTMLElement element)
+        internal static bool Is_Focusable(HTMLElement element)
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#focusable-area */
             if (element.tabindex_focus_flag && !element.is_actually_disabled && !element.is_expressly_inert && element.is_being_rendered)
                 return true;
@@ -104,7 +104,7 @@ namespace CssUI.DOM
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Has_Focus(Document target)
+        internal static bool Has_Focus(Document target)
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#has-focus-steps */
             return true;
         }
@@ -115,7 +115,7 @@ namespace CssUI.DOM
         /// <param name="element"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Form_Associated_Custom_Element(Element element)
+        internal static bool Is_Form_Associated_Custom_Element(Element element)
         {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-element */
 
             return (element.isCustom && element.Definition.TryGetTarget(out CustomElementDefinition outDef) && outDef.bFormAssociated);
@@ -127,7 +127,7 @@ namespace CssUI.DOM
         /// <param name="element"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Listed_Element(Element element)
+        internal static bool Is_Listed_Element(Element element)
         {/* Docs: https://html.spec.whatwg.org/multipage/forms.html#category-listed */
 
             /* XXX: Add the interface to the rest of these */
@@ -142,7 +142,7 @@ namespace CssUI.DOM
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Submittable_Element(Element element)
+        internal static bool Is_Submittable_Element(Element element)
         {/* Docs: https://html.spec.whatwg.org/multipage/forms.html#category-submit */
 
             /* XXX: Add the interface to the rest of these */
@@ -157,7 +157,7 @@ namespace CssUI.DOM
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Resettable_Element(Element element)
+        internal static bool Is_Resettable_Element(Element element)
         {/* Docs: https://html.spec.whatwg.org/multipage/forms.html#category-reset */
 
             /* XXX: Add the interface to the rest of these */
@@ -177,7 +177,7 @@ namespace CssUI.DOM
         /// <param name="element"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Autocapitalize_Inheriting_Element(Element element)
+        internal static bool Is_Autocapitalize_Inheriting_Element(Element element)
         {/* Docs: https://html.spec.whatwg.org/multipage/forms.html#category-autocapitalize */
 
             /* XXX: Add the interface to the rest of these */
@@ -195,7 +195,7 @@ namespace CssUI.DOM
         /// <param name="element"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Lableable_Element(Element element)
+        internal static bool Is_Lableable_Element(Element element)
         {/* Docs: https://html.spec.whatwg.org/multipage/forms.html#category-label */
 
             /* XXX: Add the interface to the rest of these */
@@ -211,6 +211,40 @@ namespace CssUI.DOM
 
             return false;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static bool Is_Editing_Host(Node node)
+        {/* Docs: https://w3c.github.io/editing/execCommand.html#editing-host */
+            /* An editing host is a node that is either an HTML element with a contenteditable attribute set to the true state, or the HTML element child of a document whose designMode is enabled. */
+            if (node is HTMLElement element)
+            {
+                if (element.isContentEditable)
+                    return true;
+
+                if (element.nodeDocument.DesignMode == EDesignMode.ON)
+                    return true;
+            }
+
+            return false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static bool Is_Being_Used_As_Canvas_Fallback_Content(Element element)
+        {/* Docs: https://html.spec.whatwg.org/multipage/canvas.html#being-used-as-relevant-canvas-fallback-content */
+
+            /* An element whose nearest canvas element ancestor is being rendered and represents embedded content is an element that is being used as relevant canvas fallback content. */
+            var canvas = Get_Nth_Ancestor_OfType<HTMLCanvasElement>(element, 1, null, ENodeFilterMask.SHOW_ELEMENT);
+            if (canvas != null)
+            {
+                if (canvas.is_being_rendered)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         #endregion
 
         #region Ordered Sets
@@ -1058,6 +1092,7 @@ namespace CssUI.DOM
             return null;
         }
 
+
         /// <summary>
         /// Returns a list of all tree-order following (sibling) nodes for the given node 
         /// </summary>
@@ -1109,8 +1144,7 @@ namespace CssUI.DOM
 
             return null;
         }
-
-
+        
 
         /// <summary>
         /// Returns a list of all nodes after and adjacent to the given node (siblings)
@@ -1171,7 +1205,7 @@ namespace CssUI.DOM
 
             return null;
         }
-
+        
 
         /// <summary>
         /// Returns a list of <see cref="Element"/>s matching <paramref name="qualifiedName"/>
@@ -1183,7 +1217,7 @@ namespace CssUI.DOM
         public static IReadOnlyCollection<Element> Get_Elements_By_Qualified_Name(Node root, string qualifiedName)
         {/* Docs: https://dom.spec.whatwg.org/#concept-getelementsbytagname */
             /* 1) If qualifiedName is "*" (U+002A), return a HTMLCollection rooted at root, whose filter matches only descendant elements. */
-            if (StringCommon.Streq(qualifiedName.AsSpan(), "\u002A".AsSpan()))
+            if (StringCommon.StrEq(qualifiedName.AsSpan(), "\u002A".AsSpan()))
             {
                 LinkedList<Element> descendents = new LinkedList<Element>();
                 var tree = new TreeWalker(root, ENodeFilterMask.SHOW_ELEMENT);
@@ -1208,14 +1242,14 @@ namespace CssUI.DOM
                 while (descendant != null)
                 {
                     var element = (Element)descendant;
-                    if (StringCommon.Streq(element.NamespaceURI.AsSpan(), HTMLNamespace.AsSpan()))
+                    if (StringCommon.StrEq(element.NamespaceURI.AsSpan(), HTMLNamespace.AsSpan()))
                     {
-                        if (StringCommon.Streq(qualifiedName.AsSpan(), element.tagName.ToLowerInvariant().AsSpan()))
+                        if (StringCommon.StrEq(qualifiedName.AsSpan(), element.tagName.ToLowerInvariant().AsSpan()))
                         {
                             descendents.AddLast(element);
                         }
                     }
-                    else if (StringCommon.Streq(qualifiedName.AsSpan(), element.tagName.AsSpan()))
+                    else if (StringCommon.StrEq(qualifiedName.AsSpan(), element.tagName.AsSpan()))
                     {
                         descendents.AddLast(element);
                     }
@@ -1234,14 +1268,14 @@ namespace CssUI.DOM
                 while (node != null)
                 {
                     var element = (Element)node;
-                    if (StringCommon.Streq(element.NamespaceURI.AsSpan(), HTMLNamespace.AsSpan()))
+                    if (StringCommon.StrEq(element.NamespaceURI.AsSpan(), HTMLNamespace.AsSpan()))
                     {
-                        if (StringCommon.Streq(qualifiedName.AsSpan(), element.tagName.ToLowerInvariant().AsSpan()))
+                        if (StringCommon.StrEq(qualifiedName.AsSpan(), element.tagName.ToLowerInvariant().AsSpan()))
                         {
                             descendents.AddLast(element);
                         }
                     }
-                    else if (StringCommon.Streq(qualifiedName.AsSpan(), element.tagName.AsSpan()))
+                    else if (StringCommon.StrEq(qualifiedName.AsSpan(), element.tagName.AsSpan()))
                     {
                         descendents.AddLast(element);
                     }
@@ -1741,6 +1775,100 @@ namespace CssUI.DOM
         #endregion
 
         #region Focus
+        /// <summary>
+        /// Returns <c>True</c> is the given target is a valid focusable area
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        internal static bool Is_Focusable_Area(EventTarget target)
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#focusable-area */
+
+            /* Elements that have their tabindex focus flag set, that are not actually disabled, that are not expressly inert, and that are either being rendered or being used as relevant canvas fallback content. */
+            if (target is HTMLElement element)
+            {
+                if (element.tabindex_focus_flag && !element.is_actually_disabled && !element.is_expressly_inert)
+                {
+                    if (element.is_being_rendered || Is_Being_Used_As_Canvas_Fallback_Content(element))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            /* The shapes of area elements in an image map associated with an img element that is being rendered and is not expressly inert. */
+            if (target is HTMLAreaElement areaElement)
+            {
+                /* XXX: figure this out */
+            }
+
+            /* The user-agent provided subwidgets of elements that are being rendered and are not actually disabled or expressly inert. */
+            /* XXX: dont forget these */
+
+            /* The scrollable regions of elements that are being rendered and are not expressly inert. */
+            if (target is ScrollBox scrollbox && scrollbox.Owner.is_being_rendered && !scrollbox.Owner.is_expressly_inert)
+            {
+                return true;
+            }
+
+            /* The viewport of a Document that has a non-null browsing context and is not inert. */
+            if (target is IViewport viewport && viewport.document.BrowsingContext != null)
+            {
+                return true;
+            }
+
+            /* Any other element or part of an element, especially to aid with accessibility or to better match platform conventions. */
+            /* XXX: This seems to contradict the fact that elements must have the tabindex_focus_flag set */
+
+            return false;
+        }
+
+        /// <summary>
+        /// Returns the chain of focus up through the hierarchy from the given node to it's owning document
+        /// </summary>
+        /// <param name="subject"></param>
+        /// <returns></returns>
+        internal static IReadOnlyCollection<FocusableArea> Get_Focus_Chain(FocusableArea subject)
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#focus-chain */
+            if (subject == null)
+                return new FocusableArea[0];
+
+            /* 1) Let current object be subject. */
+            FocusableArea currentObject = subject;
+            /* 2) Let output be an empty list. */
+            var output = new LinkedList<FocusableArea>();
+            /* 3) Loop: Append current object to output. */
+            while (currentObject != null)
+            {
+                output.AddLast(currentObject);
+
+                /* 4) If current object is an area element's shape, append that area element to output. */
+                if (currentObject.FocusTarget is HTMLAreaElement area)
+                {
+                    output.AddLast(area);
+                }
+                /* Otherwise) if current object is a focusable area whose DOM anchor is an element that is not current object itself, append that DOM anchor element to output. */
+                else
+                {
+                    if (currentObject.DOMAnchor is Element element && !ReferenceEquals(currentObject.DOMAnchor, currentObject.FocusTarget))
+                    {
+                        output.AddLast(element);
+                    }
+                }
+
+                /* 5) If current object is a Document in a nested browsing context, let current object be its browsing context container, and return to the step labeled loop. */
+                if (currentObject.FocusTarget is Document document && document.BrowsingContext is IBrowsingContextContainer)
+                {
+                    currentObject = document.BrowsingContext;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return output;
+        }
+
         internal static void Run_Focusing_Steps(FocusableArea new_focus_target)
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#focusing-steps */
             throw new NotImplementedException();
@@ -1751,27 +1879,74 @@ namespace CssUI.DOM
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Returns the chain of focus up through the hierarchy from the given node to it's owning document
-        /// </summary>
-        /// <param name="subject"></param>
-        /// <returns></returns>
-        public static IEnumerable<Node> Get_Focus_Chain(Node subject)
-        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#focus-chain */
-            var output = new LinkedList<Node>();
-            if (subject == null)
-                return output;
+        internal static void Run_Focus_Update_Steps(IReadOnlyCollection<FocusableArea> oldChain, IReadOnlyCollection<FocusableArea> newChain, FocusableArea newFocusTarget)
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#focus-update-steps */
+            throw new NotImplementedException();
+        }
+        #endregion
 
-            output.AddLast(subject);
-            var tree = new TreeWalker(subject, ENodeFilterMask.SHOW_ALL);
-            Node node = tree.parentNode();
-            while (node != null)
+        #region Modal Dialogs
+
+        internal static void Run_Dialog_Focusing_Steps(Element subject)
+        {/* Docs: https://html.spec.whatwg.org/multipage/interactive-elements.html#dialog-focusing-steps */
+            if (subject.inert) return;
+            /* 2) Let control be the first descendant element of subject, in tree order, that is not inert and has the autofocus attribute specified. */
+            Element firstNonInert = null;
+            Element firstAutofocus = null;
+
+            var tree = new TreeWalker(subject, Enums.ENodeFilterMask.SHOW_ELEMENT, FilterNonInert.Instance);
+            Node current = tree.nextNode();
+            while (current != null)
             {
-                output.AddLast(node);
-                node = tree.parentNode();
+                if (current is Element currentElement)
+                {
+                    firstNonInert = firstNonInert ?? currentElement;
+                    if (currentElement.hasAttribute(EAttributeName.Autofocus))
+                    {
+                        firstAutofocus = currentElement;
+                        break;
+                    }
+                }
             }
 
-            return output;
+            /* If there isn't one, then let control be the first non-inert descendant element of subject, in tree order. */
+            /* If there isn't one of those either, then let control be subject. */
+            Element control = firstAutofocus ?? firstNonInert ?? subject;
+            DOMCommon.Run_Focusing_Steps(control);
+        }
+
+        internal static void Modal_Dialog_Block_Document(Document document, HTMLDialogElement dialog)
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#blocked-by-a-modal-dialog */
+            /* ...While document is so blocked, every node that is connected to document, with the exception of the subject element and its shadow-including descendants, must be marked inert */
+            if (document.topLayer.Contains(dialog))
+            {
+                document.topLayer.Remove(dialog);
+            }
+
+            document.topLayer.AddLast(dialog);
+
+            var Filter = new FilterShadowIncludingDescendantOf(dialog, ENodeFilterResult.FILTER_REJECT, ENodeFilterResult.FILTER_ACCEPT);
+            var descendants = Get_Shadow_Including_Descendents(document, Filter, ENodeFilterMask.SHOW_ALL);
+            foreach (Node descendant in descendants)
+            {
+                descendant.inert = true;
+            }
+        }
+
+        internal static void Modal_Dialog_Unblock_Document(Document document, HTMLDialogElement dialog)
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#blocked-by-a-modal-dialog */
+            /* ...While document is so blocked, every node that is connected to document, with the exception of the subject element and its shadow-including descendants, must be marked inert */
+            if (document.topLayer.Contains(dialog))
+            {
+                document.topLayer.Remove(dialog);
+            }
+
+            var Filter = new FilterShadowIncludingDescendantOf(dialog, ENodeFilterResult.FILTER_REJECT, ENodeFilterResult.FILTER_ACCEPT);
+            var descendants = Get_Shadow_Including_Descendents(document, Filter, ENodeFilterMask.SHOW_ALL);
+            foreach (Node descendant in descendants)
+            {
+                descendant.inert = false;
+            }
         }
         #endregion
 
