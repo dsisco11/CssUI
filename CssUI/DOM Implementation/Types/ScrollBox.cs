@@ -2,14 +2,15 @@
 using CssUI.CSS.Enums;
 using CssUI.CSS.Internal;
 using CssUI.DOM.Enums;
+using CssUI.DOM.Events;
 using CssUI.DOM.Geometry;
 using CssUI.DOM.Nodes;
 using System;
 
 namespace CssUI.DOM
 {
-    public class ScrollBox
-    {
+    public class ScrollBox : EventTarget
+    {/*  */
         #region Property
         public EFlowDirection Block;
         public EFlowDirection Inline;
@@ -346,6 +347,7 @@ namespace CssUI.DOM
             Smooth_Scroll_Distance = null;
             Smooth_Scroll_Target = null;
         }
+
         private void scroll_to_smooth(DOMPoint location)
         {/* https://www.w3.org/TR/cssom-view-1/#concept-smooth-scroll */
             if (smooth_scroller == null)
