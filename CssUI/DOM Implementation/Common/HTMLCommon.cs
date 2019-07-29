@@ -32,16 +32,9 @@ namespace CssUI.DOM
         #endregion
 
         #region String Transformation
-        public static string Uppercased_Name(string Name)
+        public static string Uppercased_Name(ReadOnlyMemory<char> Name)
         {/* Docs: https://dom.spec.whatwg.org/#element-html-uppercased-qualified-name */
-
-            char[] buf = new char[Name.Length];
-            for (int c = 0; c < buf.Length; c++)
-            {
-                buf[c] = To_ASCII_Upper_Alpha(Name[c]);
-            }
-
-            return new string(buf);
+            return StringCommon.Transform(Name, To_ASCII_Upper_Alpha);
         }
         #endregion
 
@@ -66,6 +59,25 @@ namespace CssUI.DOM
         #endregion
 
         #region Validation
+        public static bool Is_Valid_Browsing_Context_Name(ReadOnlyMemory<char> data)
+        {/* Docs: https://html.spec.whatwg.org/multipage/browsers.html#valid-browsing-context-name */
+            if (data.Span[0] == UnicodeCommon.CHAR_UNDERSCORE)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public static bool Is_Valid_Browsing_Context_Keyword(ReadOnlyMemory<char> data)
+        {/* Docs: https://html.spec.whatwg.org/multipage/browsers.html#valid-browsing-context-name */
+            return Lookup.Is_Declared<EBrowsingTarget>(data.ToString());
+        }
+
+        public static bool Is_Valid_Browsing_Context_Name_Or_Keyword(ReadOnlyMemory<char> data)
+        {/* Docs: https://html.spec.whatwg.org/multipage/browsers.html#valid-browsing-context-name */
+            return Is_Valid_Browsing_Context_Name(data) || Is_Valid_Browsing_Context_Keyword(data);
+        }
 
         public static bool Is_Valid_Custom_Element_Name(ReadOnlyMemory<char> data)
         {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name */
@@ -115,7 +127,7 @@ namespace CssUI.DOM
              */
             for (int i = 0; i < FORBIDDEN_CUSTOM_ELEMENT_NAMES.Length; i++)
             {
-                if (StringCommon.Streq(data.Span, FORBIDDEN_CUSTOM_ELEMENT_NAMES[i].AsSpan()))
+                if (StringCommon.StrEq(data.Span, FORBIDDEN_CUSTOM_ELEMENT_NAMES[i].AsSpan()))
                 {
                     return false;
                 }
