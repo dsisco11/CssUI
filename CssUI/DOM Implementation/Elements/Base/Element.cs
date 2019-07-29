@@ -714,7 +714,14 @@ namespace CssUI.DOM
             return CEReactions.Wrap_CEReaction(this, () =>
             {
                 /* 1) If qualifiedName does not match the Name production in XML, then throw an "InvalidCharacterError" DOMException. */
+                if (!XMLCommon.Is_Valid(Name.Name))
+                {
+                    throw new InvalidCharacterError($"The givne name is not a valid XML name: \"{Name.Name}\"");
+                }
+
                 /* 2) If the context object is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase. */
+                /* Dont need to */
+
                 /* 3) Let attribute be the first attribute in the context object’s attribute list whose qualified name is qualifiedName, and null otherwise. */
                 find_attribute(Name, out Attr attr);
                 /* 4) If attribute is null, then: */
@@ -723,7 +730,7 @@ namespace CssUI.DOM
                     /* 1) If force is not given or is true, create an attribute whose local name is qualifiedName, value is the empty string, and node document is the context object’s node document, then append this attribute to the context object, and then return true. */
                     if (!force.HasValue || force.Value)
                     {
-                        var newAttr = new Attr(Name, this.ownerDocument) { Value = AttributeValue.Parse(Name, string.Empty) };
+                        var newAttr = new Attr(Name, nodeDocument) { Value = AttributeValue.Parse(Name, string.Empty) };
                         append_attribute(newAttr);
                         return true;
                     }

@@ -83,6 +83,23 @@ namespace CssUI.DOM
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Returns whether the given name follows the XML name production format
+        /// </summary>
+        /// <param name="Name"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Valid(string Name)
+        {/* Docs: https://dom.spec.whatwg.org/#validate */
+            if (!Is_Valid_QName(Name) && !Is_Valid_Name(Name))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Validate(string Name)
         {/* Docs: https://dom.spec.whatwg.org/#validate */
