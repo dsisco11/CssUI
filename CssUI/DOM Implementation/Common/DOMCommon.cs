@@ -686,6 +686,29 @@ namespace CssUI.DOM
         }
 
         /// <summary>
+        /// Returns a list of all ancestors for the given node whom match the given <typeparamref name="NodeType"/>
+        /// </summary>
+        /// <param name="node">The node to start searching from</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IReadOnlyCollection<NodeType> Get_Ancestors_OfType<NodeType>(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL) where NodeType : IEventTarget
+        {
+            LinkedList<NodeType> list = new LinkedList<NodeType>();
+            TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
+            Node current = tree.parentNode();
+            while (current != null)
+            {
+                if (current is NodeType currentAsType)
+                {
+                    list.AddLast(currentAsType);
+                }
+                current = tree.parentNode();
+            }
+
+            return list;
+        }
+
+        /// <summary>
         /// Returns Nth ancestor for the given node, that is; the Nth parent element along the chain of elements going all the way up to the root element.
         /// </summary>
         /// <param name="node">The node to start searching from</param>
@@ -708,6 +731,35 @@ namespace CssUI.DOM
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Returns Nth ancestor for the given node whom matches the given <typeparamref name="NodeType"/>
+        /// </summary>
+        /// <param name="node">The node to start searching from</param>
+        /// <param name="N">The number of elements to traverse</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static NodeType Get_Nth_Ancestor_OfType<NodeType>(Node node, uint N, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL) where NodeType : IEventTarget
+        {
+            if (N == 0)
+            {
+                throw new IndexOutOfRangeException("N must be greater than 0");
+            }
+
+            TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
+            Node current = tree.parentNode();
+            while (current != null)
+            {
+                if (current is NodeType nodeAsType)
+                {
+                    if (--N <= 0) { return nodeAsType; }
+                }
+
+                current = tree.parentNode();
+            }
+
+            return default(NodeType);
         }
 
         /// <summary>
@@ -752,6 +804,29 @@ namespace CssUI.DOM
         }
 
         /// <summary>
+        /// Returns a list of all descendents for the given node whom match the given <typeparamref name="NodeType"/>
+        /// </summary>
+        /// <param name="node">The node to start searching from</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IReadOnlyCollection<NodeType> Get_Descendents_OfType<NodeType>(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL) where NodeType: IEventTarget
+        {
+            LinkedList<NodeType> list = new LinkedList<NodeType>();
+            TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
+            Node current = tree.nextNode();
+            while (current != null)
+            {
+                if (current is NodeType currentAsType)
+                {
+                    list.AddLast(currentAsType);
+                }
+                current = tree.nextNode();
+            }
+
+            return list;
+        }
+
+        /// <summary>
         /// Returns Nth descendant for the given node
         /// </summary>
         /// <param name="node">The node to start searching from</param>
@@ -774,6 +849,35 @@ namespace CssUI.DOM
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Returns Nth descendant for the given node whom matches the given <typeparamref name="NodeType"/>
+        /// </summary>
+        /// <param name="node">The node to start searching from</param>
+        /// <param name="N">The number of elements to traverse</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static NodeType Get_Nth_Descendant_OfType<NodeType>(Node node, uint N, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL) where NodeType: IEventTarget
+        {
+            if (N == 0)
+            {
+                throw new IndexOutOfRangeException("N must be greater than 0");
+            }
+
+            TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
+            Node current = tree.nextNode();
+            while (current != null)
+            {
+                if (current is NodeType nodeAsType)
+                {
+                    if (--N <= 0) { return nodeAsType; }
+                }
+
+                current = tree.nextNode();
+            }
+
+            return default(NodeType);
         }
 
         /// <summary>
