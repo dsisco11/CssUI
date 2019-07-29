@@ -155,7 +155,7 @@ namespace CssUI.DOM
                 base.value = value;
                 bDirtyValueFlag = true;
                 /* 4) If the new API value is different from oldAPIValue, then move the text entry cursor position to the end of the text control, unselecting any selected text and resetting the selection direction to "none". */
-                if (!StringCommon.Streq(oldAPIValue.AsSpan(), get_api_value().AsSpan()))
+                if (!StringCommon.StrEq(oldAPIValue.AsSpan(), get_api_value().AsSpan()))
                 {
                     text_entry_cursor_position = value.Length;
                     selection.Collapse();
@@ -198,6 +198,7 @@ namespace CssUI.DOM
             {
                 /* When a control has a value that is not the empty string and is too low for the min attribute. */
                 /* XXX: */
+                ...
             }
         }
         #endregion

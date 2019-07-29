@@ -96,7 +96,7 @@ namespace CssUI.DOM
                     option.selectedness = false;
                     if (first != null) continue;
 
-                    if (StringCommon.Streq(option.value.AsSpan(), value.AsSpan()))
+                    if (StringCommon.StrEq(option.value.AsSpan(), value.AsSpan()))
                         first = option;
 
                 }
