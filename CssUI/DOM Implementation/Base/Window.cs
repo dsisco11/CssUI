@@ -272,10 +272,45 @@ namespace CssUI.DOM
 
         public static DOMHighResTimeStamp getTimestamp() => new DOMHighResTimeStamp() { Timestmap = DateTime.UtcNow.Ticks };
 
+
+        /// <summary>
+        /// The term focusable area is used to refer to regions of the interface that can become the target of keyboard input. Focusable areas can be elements, parts of elements, or other regions managed by the user agent.
+        /// </summary>
+        /// Docs: https://html.spec.whatwg.org/multipage/interaction.html#currently-focused-area-of-a-top-level-browsing-context
+        internal FocusableArea FocusedArea
+        {
+            get
+            {
+                /* 1) Let candidate be the Document of the top-level browsing context. */
+                var candidate = document;
+                while (true)
+                {
+                    /* 2) If the designated focused area of the document is a browsing context container with a non-null nested browsing context, 
+                     * then let candidate be the active document of that browsing context container's nested browsing context, and redo this step. */
+                    if (candidate.focusedArea is IBrowsingContextContainer container && container.Nested_Browsing_Context != null)
+                    {
+                        candidate = container.Nested_Browsing_Context.activeDocument;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                /* 3) If candidate has a focused area, set candidate to candidate's focused area. */
+                if (candidate.focusedArea != null)
+                {
+                    return candidate.focusedArea;
+                }
+
+                /* 4) Return candidate. */
+                return candidate;
+            }
+        }
         // public string status;
         public void focus()
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#dom-window-focus */
-            DOMCommon.Run_Focusing_Steps(new FocusableArea(document, document.documentElement));
+            DOMCommon.Run_Focusing_Steps(document);
         }
 
 

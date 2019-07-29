@@ -15,13 +15,28 @@ namespace CssUI.DOM
 {
     public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEventCallbacks
     {/* Docs: https://dom.spec.whatwg.org/#document */
+
+        #region Backing Values
+        private EDesignMode _designMode = EDesignMode.OFF;
+        #endregion
+
+        #region Rendering
+        /// <summary>
+        /// The top layer is an ordered set of elements, rendered in the order they appear in the set. The last element in the set is rendered last, and thus appears on top.
+        /// </summary>
+        /// Docs: https://fullscreen.spec.whatwg.org/#top-layer
+        internal LinkedList<Node> topLayer = new LinkedList<Node>();
+        #endregion
+
         #region Internal Properties
+        internal ILogger Log = LogFactory.GetLogger(nameof(Document));
+
         /* XXX: This never fires because we dont have a system to notify the document its not active yet */
         internal readonly ManualResetEvent Active_State_Change_Signal = new ManualResetEvent(false);
         internal LinkedList<MediaQueryList> _mediaQueryLists = new LinkedList<MediaQueryList>();
-        internal ILogger Log = LogFactory.GetLogger(nameof(Document));
         internal BrowsingContext BrowsingContext = null;
-        [Obsolete("Use defaultView in stead")]
+
+        [Obsolete("Use defaultView in stead", true)]
         internal Window window
         {/* https://html.spec.whatwg.org/multipage/window-object.html#dom-document-defaultview */
             get
@@ -59,10 +74,38 @@ namespace CssUI.DOM
         public readonly Viewport Viewport;
 
         public readonly EQuirksMode Mode = EQuirksMode.NoQuirks;
+        public readonly string URL = "/";
         public readonly string Origin = null;
         public readonly DocumentType doctype;
         public readonly string contentType;
         public readonly DOMImplementation implementation = new DOMImplementation();
+
+        public EDesignMode DesignMode
+        {
+            get => _designMode;
+            set
+            {
+                var oldValue = _designMode;
+                _designMode = value;
+
+                /* When the designMode changes from being disabled to being enabled, 
+                 * the user agent must immediately reset the document's active range's start and end boundary points to be at the start of the Document 
+                 * and then run the focusing steps for the document element of the Document, if non-null. */
+                if (value == EDesignMode.ON && oldValue == EDesignMode.OFF)
+                {
+                    Range activeRange = getSelection();
+                    if (activeRange != null)
+                    {
+                        activeRange.collapse(true);
+                    }
+
+                    if (documentElement != null)
+                    {
+                        DOMCommon.Run_Focusing_Steps(documentElement);
+                    }
+                }
+            }
+        }
         /// <summary>
         /// Returns the Element that is the root element of the document (for example, the <html> element for HTML documents).
         /// </summary>
@@ -270,8 +313,9 @@ namespace CssUI.DOM
         /// <summary>
         /// The term focusable area is used to refer to regions of the interface that can become the target of keyboard input. Focusable areas can be elements, parts of elements, or other regions managed by the user agent.
         /// </summary>
-        /// Docs: https://html.spec.whatwg.org/multipage/interaction.html#focusable-area
-        internal FocusableArea focusableArea = null;
+        /// Docs: https://html.spec.whatwg.org/multipage/interaction.html#focused-area-of-the-document
+        internal FocusableArea focusedArea = null;
+
 
         /// <summary>
         /// Returns the deepest element in the document through which or to which key events are being routed. This is, roughly speaking, the focused element in the document.
