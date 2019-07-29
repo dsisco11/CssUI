@@ -41,6 +41,9 @@ namespace CssUI.DOM.Nodes
         #endregion
 
         #region Slottable
+        /// <summary>
+        /// Returns whether this node has been assigned a slot
+        /// </summary>
         public bool isAssigned => (this is ISlottable slotable && slotable.assignedSlot != null);
         #endregion
 

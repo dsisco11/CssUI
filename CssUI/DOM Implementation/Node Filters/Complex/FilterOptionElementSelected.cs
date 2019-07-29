@@ -13,7 +13,7 @@ namespace CssUI.DOM
         public override ENodeFilterResult acceptNode(Node node)
         {
             //if (type.IsInstanceOfType(node))
-            if (node is HTMLOptionElement opt && opt.selectedness)
+            if (node is HTMLOptionElement opt && opt.selected)
             {
                 return ENodeFilterResult.FILTER_ACCEPT;
             }

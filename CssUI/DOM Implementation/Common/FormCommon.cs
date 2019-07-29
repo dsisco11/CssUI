@@ -232,7 +232,7 @@ namespace CssUI.DOM
                 {
                     foreach (var option in selectElement.options)
                     {
-                        if (option.selectedness && !option.disabled)
+                        if (option.selected && !option.disabled)
                         {
                             Append_Entry_To_List(ref entryList, name, option.value);
                         }

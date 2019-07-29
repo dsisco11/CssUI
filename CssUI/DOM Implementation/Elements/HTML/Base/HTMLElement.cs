@@ -66,7 +66,7 @@ namespace CssUI.DOM
                 {
                     return CSS.EDirection.LTR;
                 }
-                else if (ReferenceEquals(this, ownerDocument.documentElement) && !attr.Is_Defined)
+                else if (ReferenceEquals(this, ownerDocument.documentElement) && !attr.IsDefined)
                 {
                     return CSS.EDirection.LTR;
                 }
@@ -92,7 +92,7 @@ namespace CssUI.DOM
                 */
 
                 /* XXX: Finish this */
-                if (dirValue == EDir.Auto || (!attr.Is_Defined && this is HTMLBdiElement))
+                if (dirValue == EDir.Auto || (!attr.IsDefined && this is HTMLBdiElement))
                 {
                     /* Find the first character in tree order that matches the following criteria:
                      * The character is from a Text node that is a descendant of the element whose directionality is being determined.
@@ -110,7 +110,7 @@ namespace CssUI.DOM
                      */
                 }
 
-                if (!attr.Is_Defined && parentElement != null)
+                if (!attr.IsDefined && parentElement != null)
                 {
                     return (parentElement as HTMLElement).directionality;
                 }
@@ -375,12 +375,12 @@ namespace CssUI.DOM
                 int attrValue = Attrib?.Value?.Get_Int() ?? -1;
 
                 /* If the attribute is omitted or parsing the value returns an error */
-                if (Attrib?.Value == null || Attrib.Is_MissingValue || Attrib.Is_InvalidValue)
+                if (Attrib?.Value == null || Attrib.IsMissingValue || Attrib.IsInvalidValue)
                 {
                     /* The tabIndex IDL attribute must reflect the value of the tabindex content attribute. 
                      * The default value is 0 if the element is an a, area, button, iframe, input, select, or textarea element, or is a summary element that is a summary for its parent details. 
                      * The default value is −1 otherwise. */
-                    if (Attrib.Is_MissingValue)
+                    if (Attrib.IsMissingValue)
                     {
                         /* XXX: Implement checks for these special element classes once they exist */
                     }

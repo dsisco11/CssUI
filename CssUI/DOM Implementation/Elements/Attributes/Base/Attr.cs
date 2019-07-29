@@ -35,12 +35,13 @@ namespace CssUI.DOM
         /// <summary>
         /// True if this attribute doesnt have an assigned value
         /// </summary>
-        public bool Is_MissingValue => (_value_assigned == null);
-        public bool Is_InvalidValue { get; private set; } = false;
+        public bool IsMissingValue => (_value_assigned == null);
+        public bool IsInvalidValue { get; private set; } = false;
+
         /// <summary>
-        /// Returns if this attribute is Missing or Invalid
+        /// Returns <c>True</c> if this attribute is not Missing or Invalid
         /// </summary>
-        public bool Is_Defined => !(Is_MissingValue || Is_InvalidValue);
+        public bool IsDefined => !(IsMissingValue || IsInvalidValue);
         #endregion
 
         #region Accessors
@@ -94,7 +95,7 @@ namespace CssUI.DOM
         {
             _value_assigned = newValue;
 
-            if (Is_MissingValue)
+            if (IsMissingValue)
             {
                 _value_used = Definition.MissingValueDefault;
             }
@@ -103,7 +104,7 @@ namespace CssUI.DOM
                 try
                 {
                     var def = Definition;
-                    Is_InvalidValue = false;
+                    IsInvalidValue = false;
                     def.CheckAndThrow(newValue);
 
                     if (!(def.LowerRange is null) && newValue.Get_RAW() < def.LowerRange)
@@ -119,10 +120,10 @@ namespace CssUI.DOM
                 catch (Exception ex)
                 {
                     Log.Error(ex);
-                    Is_InvalidValue = true;
+                    IsInvalidValue = true;
                 }
 
-                if (Is_InvalidValue)
+                if (IsInvalidValue)
                 {
                     _value_used = Definition.InvalidValueDefault;
                 }
