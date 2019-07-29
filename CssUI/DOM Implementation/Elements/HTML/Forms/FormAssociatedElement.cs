@@ -7,6 +7,7 @@ namespace CssUI.DOM
     {
         #region Backing Values
         HTMLFormElement _form = null;
+        EValidityState _validity = 0x0;
         #endregion
 
 
@@ -69,7 +70,7 @@ namespace CssUI.DOM
                 return null;
             }
 
-            internal set
+            set
             {
                 _form = value;
             }
@@ -79,7 +80,11 @@ namespace CssUI.DOM
 
         public abstract string type { get; }
 
-        public EValidityState validity { get; internal set; }
+        public EValidityState validity
+        {
+            get => (_validity | query_validity());
+            internal set => _validity = value;
+        }
         #endregion
 
 
@@ -181,7 +186,7 @@ namespace CssUI.DOM
         /// <returns></returns>
         public virtual bool checkValidity()
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#dom-cva-checkvalidity */
-            if (!FormCommon.Is_Barred_From_Validation(this) && 0x0 != validity)
+            if (!FormCommon.Is_Barred_From_Validation(this) && !check_satisfies_constraints())
             {
                 dispatchEvent(new Event(EEventName.Invalid, new EventInit() { cancelable = true }));
                 return false;
@@ -196,7 +201,7 @@ namespace CssUI.DOM
         /// <returns></returns>
         public virtual bool reportValidity()
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#report-validity-steps */
-            if (!FormCommon.Is_Barred_From_Validation(this) && 0x0 != validity)
+            if (!FormCommon.Is_Barred_From_Validation(this) && !check_satisfies_constraints())
             {
                 /* 1) Let report be the result of firing an event named invalid at element, with the cancelable attribute initialized to true. */
 
@@ -247,6 +252,11 @@ namespace CssUI.DOM
                 {
                     flags |= EValidityState.valueMissing;
                 }
+            }
+
+            if (!string.IsNullOrEmpty(custom_validity_error_message))
+            {
+                flags |= EValidityState.customError;
             }
 
             return flags;
