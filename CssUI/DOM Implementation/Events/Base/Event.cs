@@ -52,7 +52,7 @@ namespace CssUI.DOM.Events
 
         public List<EventPathItem> Path { get; internal set; } = new List<EventPathItem>();
 
-        public List<EventTarget> TouchTargetList { get; internal set; } = new List<EventTarget>();
+        public LinkedList<EventTarget> TouchTargetList { get; internal set; } = new LinkedList<EventTarget>();
         #endregion
 
         #region Accessors

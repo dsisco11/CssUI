@@ -19,6 +19,8 @@ namespace CssUI.DOM.Events
         /// </summary>
         /// Docs: https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-map
         public EventHandlerMap handlerMap { get; private set; }
+
+        internal virtual bool has_activation_behaviour { get => false; }
         #endregion
 
         #region Constructor
@@ -77,8 +79,12 @@ namespace CssUI.DOM.Events
             return null;
         }
 
-        internal virtual void activation_behaviour()// Legacy
+        internal virtual void activation_behaviour(Event @event)
         {/* Docs: https://dom.spec.whatwg.org/#eventtarget-activation-behavior */
+        }
+
+        internal virtual void legacy_pre_activation_behaviour()
+        {/* Docs: https://dom.spec.whatwg.org/#eventtarget-legacy-pre-activation-behavior */
         }
 
         #endregion
