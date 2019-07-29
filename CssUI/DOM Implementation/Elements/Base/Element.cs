@@ -51,7 +51,7 @@ namespace CssUI.DOM
             {/* Docs: https://dom.spec.whatwg.org/#element-html-uppercased-qualified-name */
                 if (ReferenceEquals(null, _tagname))
                 {
-                    if (StringCommon.Streq(NamespaceURI.AsSpan(), DOMCommon.HTMLNamespace.AsSpan()) && ownerDocument is HTMLDocument)
+                    if (StringCommon.StrEq(NamespaceURI.AsSpan(), DOMCommon.HTMLNamespace.AsSpan()) && ownerDocument is HTMLDocument)
                         _tagname = StringCommon.Transform(qualifiedName.AsMemory(), UnicodeCommon.To_ASCII_Upper_Alpha);
                     else
                         _tagname = qualifiedName;
@@ -270,13 +270,13 @@ namespace CssUI.DOM
             if (AttributeList.Count != B.AttributeList.Count)
                 return false;
 
-            if (!StringCommon.Streq(NamespaceURI.AsSpan(), B.NamespaceURI.AsSpan()))
+            if (!StringCommon.StrEq(NamespaceURI.AsSpan(), B.NamespaceURI.AsSpan()))
                 return false;
 
-            if (!StringCommon.Streq(prefix.AsSpan(), B.prefix.AsSpan()))
+            if (!StringCommon.StrEq(prefix.AsSpan(), B.prefix.AsSpan()))
                 return false;
 
-            if (!StringCommon.Streq(localName.AsSpan(), B.localName.AsSpan()))
+            if (!StringCommon.StrEq(localName.AsSpan(), B.localName.AsSpan()))
                 return false;
 
             /* If A is an element, each attribute in its attribute list has an attribute that equals an attribute in B’s attribute list. */
@@ -365,11 +365,14 @@ namespace CssUI.DOM
         {/* Docs:  */
             get
             {
+                /* An element that is the DOM anchor of a focusable area is said to gain focus when that focusable area becomes the currently focused area of a top-level browsing context. 
+                 * When an element is the DOM anchor of a focusable area of the currently focused area of a top-level browsing context, it is focused. */
+
                 /*
                  * For the purposes of the CSS :focus pseudo-class, an element has the focus when its top-level browsing context has the system focus, 
                  * it is not itself a browsing context container, and it is one of the elements listed in the focus chain of the currently focused area of the top-level browsing context.
                  */
-                var focusedElement = ownerDocument.activeElement;
+                var focusedElement = ownerDocument?.defaultView?.FocusedArea?.DOMAnchor;
                 if (ReferenceEquals(this, focusedElement))
                 {
                     return true;
@@ -386,18 +389,6 @@ namespace CssUI.DOM
 
                 return false;
             }
-        }
-
-        /// <summary>
-        /// A node (in particular elements and text nodes) can be marked as inert. 
-        /// When a node is inert, then the user agent must act as if the node was absent for the purposes of targeting user interaction events, 
-        /// may ignore the node for the purposes of text search user interfaces (commonly known as "find in page"), 
-        /// and may prevent the user from selecting text in that node. User agents should allow the user to override the restrictions on search and text selection, however.
-        /// </summary>
-        internal bool inert = false;
-        internal bool is_expressly_inert
-        {/* Docs:  */
-            get => (this.inert && !parentElement.inert);
         }
 
         /// <summary>

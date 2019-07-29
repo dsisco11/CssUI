@@ -22,7 +22,7 @@ namespace CssUI.DOM
                 return ENodeFilterResult.FILTER_SKIP;
 
             // We test reference of string just incase the one being used is like a const or static decleration, or maybe an interned string. it's faster to match an address ptr than to check all chars in an array.
-            if (ReferenceEquals((node as Element).localName, Name) || StringCommon.Streq((node as Element).localName.AsSpan(), Name.AsSpan()))
+            if (ReferenceEquals((node as Element).localName, Name) || StringCommon.StrEq((node as Element).localName.AsSpan(), Name.AsSpan()))
                 return ENodeFilterResult.FILTER_ACCEPT;
 
             return ENodeFilterResult.FILTER_SKIP;

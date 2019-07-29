@@ -1,4 +1,5 @@
 ﻿using CssUI.DOM.Exceptions;
+using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -131,15 +132,15 @@ namespace CssUI.DOM
                 throw new NamespaceError($"The qualified name contains a prefix but no namespace was specified");
 
             /* 7) If prefix is "xml" and namespace is not the XML namespace, then throw a "NamespaceError" DOMException. */
-            if (0 == string.Compare("xml", prefix) && 0 != string.Compare(Namespace, DOMCommon.XMLNamespace))
+            if (StringCommon.StrEq("xml".AsSpan(), prefix.AsSpan()) && !StringCommon.StrEq(Namespace.AsSpan(), DOMCommon.XMLNamespace.AsSpan()))
                 throw new NamespaceError($"The qualified names' prefix \"{qualifiedName}\" does not match the namespace specified \"{Namespace}\"");
 
             /* 8) If either qualifiedName or prefix is "xmlns" and namespace is not the XMLNS namespace, then throw a "NamespaceError" DOMException. */
-            if ((0 == string.Compare("xmlns", qualifiedName) || 0 == string.Compare("xmlns", prefix)) && 0 != string.Compare(Namespace, DOMCommon.XMLNSNamespace))
+            if ((StringCommon.StrEq("xmlns".AsSpan(), qualifiedName.AsSpan()) || StringCommon.StrEq("xmlns".AsSpan(), prefix.AsSpan())) && !StringCommon.StrEq(Namespace.AsSpan(), DOMCommon.XMLNSNamespace.AsSpan()))
                 throw new NamespaceError($"The qualified names' prefix \"{qualifiedName}\" does not match the namespace specified \"{Namespace}\"");
 
             /* 9) If namespace is the XMLNS namespace and neither qualifiedName nor prefix is "xmlns", then throw a "NamespaceError" DOMException. */
-            if ((0 != string.Compare("xmlns", qualifiedName) || 0 != string.Compare("xmlns", prefix)) && 0 == string.Compare(Namespace, DOMCommon.XMLNSNamespace))
+            if ((!StringCommon.StrEq("xmlns".AsSpan(), qualifiedName.AsSpan()) || !StringCommon.StrEq("xmlns".AsSpan(), prefix.AsSpan())) && StringCommon.StrEq(Namespace.AsSpan(), DOMCommon.XMLNSNamespace.AsSpan()))
                 throw new NamespaceError($"The qualified names' prefix \"{qualifiedName}\" does not match the namespace specified \"{Namespace}\"");
 
             outPrefix = prefix;

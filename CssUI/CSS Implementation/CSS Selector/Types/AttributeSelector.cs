@@ -87,13 +87,13 @@ namespace CssUI.CSS.Selectors
                 case ECssAttributeOperator.Equals:// equals
                     {
                         if (string.IsNullOrEmpty(Value)) return false;
-                        return StringCommon.Streq(Value.AsSpan(), E.getAttribute(AttributeName).Get_String().AsSpan());
+                        return StringCommon.StrEq(Value.AsSpan(), E.getAttribute(AttributeName).Get_String().AsSpan());
                     }
                 case ECssAttributeOperator.PrefixedWith:// equals or prefixed-with
                     {
                         if (!E.hasAttribute(AttributeName)) return false;
                         string val = E.getAttribute(AttributeName).Get_String();
-                        if (StringCommon.Streq(Value.AsSpan(),val.AsSpan())) return true;
+                        if (StringCommon.StrEq(Value.AsSpan(),val.AsSpan())) return true;
                         if (val.StartsWith(string.Concat(Value, '-'))) return true;
                         return false;
                     }

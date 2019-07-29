@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using static CssUI.UnicodeCommon;
 
 namespace CssUI
 {
@@ -11,17 +12,37 @@ namespace CssUI
         #region Checks
 
         /// <summary>
-        /// Returns whether <paramref name="str1"/> and <paramref name="str2"/> contain the same values
+        /// Returns whether <paramref name="p"/> and <paramref name="q"/> contain the same values
         /// </summary>
         /// <returns>True if both strings are an exact match</returns>
-        public static bool Streq(ReadOnlySpan<char> str1, ReadOnlySpan<char> str2)
+        public static bool StrEq(ReadOnlySpan<char> p, ReadOnlySpan<char> q)
         {
-            if (str1.Length != str2.Length)
+            if (p.Length != q.Length)
                 return false;
 
-            for (int i = 0; i < str1.Length; i++)
+            for (int i = 0; i < p.Length; i++)
             {
-                if (str1[i] != str2[i])
+                if (p[i] != q[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Returns whether <paramref name="p"/> and <paramref name="q"/> contain the same (case-insensitive) values
+        /// </summary>
+        /// <returns>True if both strings are an case-insensitive match</returns>
+        public static bool StriEq(ReadOnlySpan<char> p, ReadOnlySpan<char> q)
+        {
+            if (p.Length != q.Length)
+                return false;
+
+            for (int i = 0; i < p.Length; i++)
+            {
+                if (To_ASCII_Lower_Alpha(p[i]) != To_ASCII_Lower_Alpha(q[i]))
                 {
                     return false;
                 }
