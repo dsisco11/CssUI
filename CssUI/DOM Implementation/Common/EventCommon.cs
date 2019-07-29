@@ -25,13 +25,13 @@ namespace CssUI.DOM.Internal
                 cancelable = true,
             };
 
-            MouseEvent @event = EventCommon.create_event<MouseEvent>(eventName, eventInit);
+            MouseEvent @event = create_event<MouseEvent>(eventName, eventInit);
             @event.View = target.ownerDocument.defaultView;
             @event.Flags |= EEventFlags.Composed;
             if (not_trusted_flag)
                 @event.isTrusted = false;
 
-            return EventCommon.dispatch_event_to_target(@event, target);
+            return dispatch_event_to_target(@event, target);
         }
         #endregion
 
@@ -69,7 +69,7 @@ namespace CssUI.DOM.Internal
         /// <param name="relatedTarget"></param>
         /// <param name="touchTargets"></param>
         /// <param name="slotInClosedTree"></param>
-        public static void append_to_event_path(Event @event, EventTarget invocationTarget, EventTarget shadowAdjustedTarget, EventTarget relatedTarget, List<EventTarget> touchTargets, bool slotInClosedTree)
+        public static void append_to_event_path(Event @event, EventTarget invocationTarget, EventTarget shadowAdjustedTarget, EventTarget relatedTarget, LinkedList<EventTarget> touchTargets, bool slotInClosedTree)
         {/* Docs: https://dom.spec.whatwg.org/#concept-event-path-append */
             bool invocationTargetInShadowTree = false;
             if (invocationTarget is Node invTargNode && invTargNode.getRootNode() is ShadowRoot)
@@ -106,17 +106,20 @@ namespace CssUI.DOM.Internal
             /* 5) If target is not relatedTarget or target is event’s relatedTarget, then: */
             if (!ReferenceEquals(target, relatedTarget) || ReferenceEquals(target, @event.relatedTarget))
             {
-                var touchTargets = new List<EventTarget>();
+                var touchTargets = new LinkedList<EventTarget>();
                 foreach (var touchTarget in @event.TouchTargetList)
                 {
-                    touchTargets.Add(EventCommon.retarget_event(touchTarget, target));
+                    touchTargets.AddLast(EventCommon.retarget_event(touchTarget, target));
                 }
                 /* 3) Append to an event path with event, target, targetOverride, relatedTarget, touchTargets, and false. */
                 append_to_event_path(@event, target, targetOverride, relatedTarget, touchTargets, false);
                 /* 4) Let isActivationEvent be true, if event is a MouseEvent object and event’s type attribute is "click", and false otherwise. */
                 bool isActivationEvent = (@event is MouseEvent mouseEvent && mouseEvent.type == EEventName.Click);
                 /* 5) If isActivationEvent is true and target has activation behavior, then set activationTarget to target. */
-                //if (isActivationEvent && target.)/* This is legacy, we will not have activation behaviour */
+                if (isActivationEvent && target.has_activation_behaviour)
+                {
+                    activationTarget = target;
+                }
                 /* 6) Let slotable be target, if target is a slotable and is assigned, and null otherwise. */
                 var slotable = (target is Node targetNode && targetNode is ISlottable) ? target : null;
                 bool slotInClosedTree = false;
@@ -133,26 +136,33 @@ namespace CssUI.DOM.Internal
                             slotable = null;
                             /* 3) If parent’s root is a shadow root whose mode is "closed", then set slot-in-closed-tree to true. */
                             if (((Node)parent).getRootNode() is ShadowRoot parentShadow && parentShadow.Mode == Enums.EShadowRootMode.Closed)
+                            {
                                 slotInClosedTree = true;
+                            }
                         }
                     }
                     /* 2) If parent is a slotable and is assigned, then set slotable to parent. */
                     if (parent is ISlottable && ((ISlottable)parent).isAssigned)
+                    {
                         slotable = parent;
+                    }
                     /* 3) Let relatedTarget be the result of retargeting event’s relatedTarget against parent. */
                     relatedTarget = EventCommon.retarget_event(@event.relatedTarget, parent);
                     /* 4) Let touchTargets be a new list. */
-                    touchTargets = new List<EventTarget>();
+                    touchTargets = new LinkedList<EventTarget>();
                     /* 5) For each touchTarget of event’s touch target list, append the result of retargeting touchTarget against parent to touchTargets. */
                     foreach (var touchTarget in @event.TouchTargetList)
                     {
-                        touchTargets.Add(EventCommon.retarget_event(touchTarget, parent));
+                        touchTargets.AddLast(EventCommon.retarget_event(touchTarget, parent));
                     }
                     /* 6) If parent is a Window object, or parent is a node and target’s root is a shadow-including inclusive ancestor of parent, then: */
                     if (parent is Window || (parent is Node && DOMCommon.Is_Shadow_Including_Inclusive_Ancestor((target as Node).getRootNode(), parent as Node)))
                     {
                         /* 1) If isActivationEvent is true, event’s bubbles attribute is true, activationTarget is null, and parent has activation behavior, then set activationTarget to parent. */
-                        // if (isActivationEvent && @event.bubbles && null == activationTarget)
+                        if (isActivationEvent && @event.bubbles && activationTarget == null && parent.has_activation_behaviour)
+                        {
+                            activationTarget = parent;
+                        }
                         /* 2) Append to an event path with event, parent, null, relatedTarget, touchTargets, and slot-in-closed-tree. */
                         EventCommon.append_to_event_path(@event, parent, null, relatedTarget, touchTargets, slotInClosedTree);
                     }
@@ -164,7 +174,10 @@ namespace CssUI.DOM.Internal
                     {
                         target = parent;
                         /* 1) If isActivationEvent is true, activationTarget is null, and target has activation behavior, then set activationTarget to target. */
-                        //if (isActivationEvent && )
+                        if (isActivationEvent && activationTarget == null && target.has_activation_behaviour)
+                        {
+                            activationTarget = target;
+                        }
                         /* 2) Append to an event path with event, parent, target, relatedTarget, touchTargets, and slot-in-closed-tree. */
                         EventCommon.append_to_event_path(@event, parent, target, relatedTarget, touchTargets, slotInClosedTree);
                     }
@@ -179,6 +192,7 @@ namespace CssUI.DOM.Internal
                 /* 11) Let clearTargets be true if clearTargetsStruct’s shadow-adjusted target, clearTargetsStruct’s relatedTarget, or an EventTarget object in clearTargetsStruct’s touch target list is a node and its root is a shadow root, and false otherwise. */
                 clearTargets = (clearTargetsStruct.shadow_adjusted_target is Node n1 && n1.getRootNode() is ShadowRoot) || (clearTargetsStruct.relatedTarget is Node n2 && n2.getRootNode() is ShadowRoot) || (null != clearTargetsStruct.touch_target_list.Find(t => t is Node n3 && n3.getRootNode() is ShadowRoot));
                 /* 12) If activationTarget is non-null and activationTarget has legacy-pre-activation behavior, then run activationTarget’s legacy-pre-activation behavior. */
+                activationTarget?.legacy_pre_activation_behaviour();
 
                 /* 13) For each struct in event’s path, in reverse order: */
                 for (int i = @event.Path.Count - 1; i >= 0; i--)
@@ -198,7 +212,7 @@ namespace CssUI.DOM.Internal
                 foreach (EventPathItem @struct in @event.Path)
                 {
                     /* 1) If struct’s shadow-adjusted target is non-null, then set event’s eventPhase attribute to AT_TARGET. */
-                    if (@struct != null)
+                    if (@struct.shadow_adjusted_target != null)
                         @event.eventPhase = EEventPhase.AT_TARGET;
                     /* 2) Otherwise: */
                     else
@@ -229,7 +243,8 @@ namespace CssUI.DOM.Internal
             if (activationTarget != null)
             {
                 /* 1) If event’s canceled flag is unset, then run activationTarget’s activation behavior with event. */
-                // if (0 == (@event.Flags & EEventFlags.Canceled)) activationTarget.a
+                if (0 == (@event.Flags & EEventFlags.Canceled))
+                    activationTarget.activation_behaviour(@event);
                 /* 2) Otherwise, if activationTarget has legacy-canceled-activation behavior, then run activationTarget’s legacy-canceled-activation behavior. */
             }
 
