@@ -4,18 +4,18 @@ using CssUI.DOM.Nodes;
 namespace CssUI.DOM
 {
     /// <summary>
-    /// Rejects any node that isnt slotable
+    /// Rejects any node that is disabled
     /// </summary>
-    public class FilterIsActive : NodeFilter
+    public class FilterDisabled : NodeFilter
     {
-        public static NodeFilter Instance = new FilterIsActive();
+        public static NodeFilter Instance = new FilterDisabled();
 
         public override ENodeFilterResult acceptNode(Node node)
         {
             if (node.nodeType != ENodeType.ELEMENT_NODE || !(node is HTMLElement element))
                 return ENodeFilterResult.FILTER_REJECT;
 
-            if (element.is_being_activated)
+            if (element.disabled)
                 return ENodeFilterResult.FILTER_ACCEPT;
 
             return ENodeFilterResult.FILTER_SKIP;
