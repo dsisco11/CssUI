@@ -192,7 +192,10 @@ namespace CssUI.DOM.Internal
                 /* 11) Let clearTargets be true if clearTargetsStruct’s shadow-adjusted target, clearTargetsStruct’s relatedTarget, or an EventTarget object in clearTargetsStruct’s touch target list is a node and its root is a shadow root, and false otherwise. */
                 clearTargets = (clearTargetsStruct.shadow_adjusted_target is Node n1 && n1.getRootNode() is ShadowRoot) || (clearTargetsStruct.relatedTarget is Node n2 && n2.getRootNode() is ShadowRoot) || (null != clearTargetsStruct.touch_target_list.Find(t => t is Node n3 && n3.getRootNode() is ShadowRoot));
                 /* 12) If activationTarget is non-null and activationTarget has legacy-pre-activation behavior, then run activationTarget’s legacy-pre-activation behavior. */
-                activationTarget?.legacy_pre_activation_behaviour();
+                if (activationTarget != null && activationTarget.has_legacy_activation_behaviour)
+                {
+                    activationTarget?.legacy_pre_activation_behaviour();
+                }
 
                 /* 13) For each struct in event’s path, in reverse order: */
                 for (int i = @event.Path.Count - 1; i >= 0; i--)
@@ -244,8 +247,14 @@ namespace CssUI.DOM.Internal
             {
                 /* 1) If event’s canceled flag is unset, then run activationTarget’s activation behavior with event. */
                 if (0 == (@event.Flags & EEventFlags.Canceled))
+                {
                     activationTarget.activation_behaviour(@event);
+                }
                 /* 2) Otherwise, if activationTarget has legacy-canceled-activation behavior, then run activationTarget’s legacy-canceled-activation behavior. */
+                else if (activationTarget.has_legacy_activation_behaviour)
+                {
+                    activationTarget.legacy_canceled_pre_activation_behaviour();
+                }
             }
 
             /* 12) Return false if event’s canceled flag is set, and true otherwise. */
@@ -338,7 +347,7 @@ namespace CssUI.DOM.Internal
                 return eventTarget;
             
             /* 2) If name is not the name of an attribute member of the WindowEventHandlers interface mixin and the Window-reflecting body element event handler set does not contain name, then return eventTarget. */
-            if (!EventCommon.Is_Window_Event(Name.EValue) && !EventCommon.Is_Window_Reflecting_Body_Element_Event(Name.EValue))
+            if (!EventCommon.Is_Window_Event(Name.EnumValue) && !EventCommon.Is_Window_Reflecting_Body_Element_Event(Name.EnumValue))
                 return eventTarget;
 
             /* 3) If eventTarget's node document is not an active document, then return null. */
