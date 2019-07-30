@@ -21,6 +21,7 @@ namespace CssUI.DOM.Events
         public EventHandlerMap handlerMap { get; private set; }
 
         internal virtual bool has_activation_behaviour { get => false; }
+        internal virtual bool has_legacy_activation_behaviour { get => false; }
         #endregion
 
         #region Constructor
@@ -84,6 +85,10 @@ namespace CssUI.DOM.Events
         }
 
         internal virtual void legacy_pre_activation_behaviour()
+        {/* Docs: https://dom.spec.whatwg.org/#eventtarget-legacy-pre-activation-behavior */
+        }
+
+        internal virtual void legacy_canceled_pre_activation_behaviour()
         {/* Docs: https://dom.spec.whatwg.org/#eventtarget-legacy-pre-activation-behavior */
         }
 
