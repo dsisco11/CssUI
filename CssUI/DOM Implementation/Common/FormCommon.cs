@@ -366,13 +366,28 @@ namespace CssUI.DOM
             }
 
             /* Constraint validation: If an element has a datalist element ancestor, it is barred from constraint validation. */
-            var datalist = DOMCommon.Get_Nth_Ancestor(element, 1, FilterDatalistElement.Instance, ENodeFilterMask.SHOW_ELEMENT);
-            if (datalist != null)
+            var datalistAncestor = DOMCommon.Get_Nth_Ancestor_OfType<HTMLDataListElement>(element, 1, null, ENodeFilterMask.SHOW_ELEMENT);
+            if (datalistAncestor != null)
             {
                 return true;
             }
 
             return false;
+        }
+
+        public static void Submit_Form(HTMLFormElement form, Element submitter, bool? submitted_from_submit = null)
+        {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#concept-form-submit */
+            /* XXX: implement form submission, we should support form submitting to actual web addresses */
+            throw new NotImplementedException();
+
+            if (form.bConstructingEntryList) return;
+
+            var formDocument = form.nodeDocument;
+            var formBrowsingContext = formDocument.BrowsingContext;
+            if (!submitted_from_submit.HasValue || !submitted_from_submit.Value)
+            {
+
+            }
         }
         #endregion
     }

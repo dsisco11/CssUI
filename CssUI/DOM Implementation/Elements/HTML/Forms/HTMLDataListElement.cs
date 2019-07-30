@@ -12,7 +12,7 @@ namespace CssUI.DOM
         {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#dom-datalist-options */
             get
             {
-                return (IReadOnlyCollection<Element>)DOMCommon.Get_Descendents(this, FilterOptionElement.Instance, Enums.ENodeFilterMask.SHOW_ELEMENT);
+                return (IReadOnlyCollection<Element>)DOMCommon.Get_Descendents_OfType<HTMLOptionElement>(this, null, Enums.ENodeFilterMask.SHOW_ELEMENT);
             }
         }
         #endregion
