@@ -26,8 +26,8 @@ namespace CssUI.DOM.Events
                 if (!ReferenceEquals(null, _name))
                 {/* Resolve the backing value */
                     if (IsCustom) throw new System.Exception("Name backing-value for custom event type is not set!");
-                    DomLookup.TryKeyword((EEventName)Value, out string outKeyword);
-                    _name = outKeyword;
+                    string keyword = Lookup.Keyword((EEventName)Value);
+                    _name = keyword;
                 }
 
                 return _name;
@@ -38,7 +38,7 @@ namespace CssUI.DOM.Events
         /// The value for this object which gets compared against
         /// </summary>
         internal readonly int Value;// { get; private set; }
-        internal EEventName EValue => Value < 0 ? EEventName.CUSTOM : (EEventName)Value;
+        internal EEventName EnumValue => Value < 0 ? EEventName.CUSTOM : (EEventName)Value;
         public readonly bool IsCustom;
         #endregion
 
