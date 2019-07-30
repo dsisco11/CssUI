@@ -330,6 +330,35 @@ namespace CssUI.DOM
             return node is Text || node is ProcessingInstruction || node is Comment;
         }
 
+        /// <summary>
+        /// Returns true if the event was triggered by a user action
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Triggered_By_UserActivation(Event @event)
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#triggered-by-user-activation */
+            if (!@event.isTrusted)
+                return false;
+
+            switch (@event.type.EnumValue)
+            {
+                case EEventName.Change:
+                case EEventName.Click:
+                case EEventName.ContextMenu:
+                case EEventName.DoubleClick:
+                case EEventName.MouseUp:
+                case EEventName.PointerUp:
+                case EEventName.Reset:
+                case EEventName.Submit:
+                case EEventName.TouchEnd:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+
         #endregion
 
         #region Slottables
