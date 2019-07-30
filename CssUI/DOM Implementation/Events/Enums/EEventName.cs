@@ -128,7 +128,19 @@ namespace CssUI.DOM.Events
         [MetaKeyword("lostpointercapture")]
         LostPointerCapture,
 
-/* Media */
+        /* Touch input */
+        /* Docs: https://w3c.github.io/touch-events/#introduction */
+        [MetaKeyword("touchstart")]
+        TouchStart,
+        [MetaKeyword("touchend")]
+        TouchEnd,
+        [MetaKeyword("touchmove")]
+        TouchMove,
+        [MetaKeyword("touchcancel")]
+        TouchCancel,
+
+
+        /* Media */
         [MetaKeyword("pause")]
         Pause,
         [MetaKeyword("play")]
