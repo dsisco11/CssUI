@@ -1,197 +1,221 @@
-﻿using CssUI.DOM.Internal;
+﻿using CssUI.Internal;
 
 namespace CssUI.DOM.Events
 {
-    [DomEnum]
+    [MetaEnum]
     public enum EEventName : int
     {
         /// <summary>
         /// Represents all custom (end-user specified) event values
         /// </summary>
         CUSTOM = -1,
-        [DomKeyword("")]
+        [MetaKeyword("")]
         None = 0x0,
-        [DomKeyword("abort")]
+        [MetaKeyword("abort")]
         Abort,
-        [DomKeyword("auxclick")]
+        [MetaKeyword("auxclick")]
         AuxClick,
-        [DomKeyword("blur")]
+        [MetaKeyword("blur")]
         Blur,
-        [DomKeyword("cancel")]
+        [MetaKeyword("cancel")]
         Cancel,
-        [DomKeyword("canplay")]
+        [MetaKeyword("canplay")]
         CanPlay,
-        [DomKeyword("canplaythrough")]
+        [MetaKeyword("canplaythrough")]
         CanPlayThrough,
-        [DomKeyword("change")]
+        [MetaKeyword("change")]
         Change,
-        [DomKeyword("click")]
+        [MetaKeyword("click")]
         Click,
-        [DomKeyword("close")]
+        [MetaKeyword("close")]
         Close,
-        [DomKeyword("contextmenu")]
+        [MetaKeyword("contextmenu")]
         ContextMenu,
-        [DomKeyword("cuechange")]
+        [MetaKeyword("cuechange")]
         CueChange,
-        [DomKeyword("dblclick")]
+        [MetaKeyword("dblclick")]
         DoubleClick,
+
     /* Drag drop */
-        [DomKeyword("drag")]
+        [MetaKeyword("drag")]
         Drag,
-        [DomKeyword("dragend")]
+        [MetaKeyword("dragend")]
         DragEnd,
-        [DomKeyword("dragenter")]
+        [MetaKeyword("dragenter")]
         DragEnter,
-        [DomKeyword("dragexit")]
+        [MetaKeyword("dragexit")]
         DragExit,
-        [DomKeyword("dragleave")]
+        [MetaKeyword("dragleave")]
         DragLeave,
-        [DomKeyword("dragover")]
+        [MetaKeyword("dragover")]
         DragOver,
-        [DomKeyword("dragstart")]
+        [MetaKeyword("dragstart")]
         DragStart,
-        [DomKeyword("drop")]
+        [MetaKeyword("drop")]
         Drop,
 
-        [DomKeyword("durationchange")]
+        [MetaKeyword("durationchange")]
         DurationChange,
-        [DomKeyword("emptied")]
+        [MetaKeyword("emptied")]
         Emptied,
-        [DomKeyword("ended")]
+        [MetaKeyword("ended")]
         Ended,
 
-        [DomKeyword("error")]
+        [MetaKeyword("error")]
         Error,
 
-        [DomKeyword("focus")]
+        [MetaKeyword("focus")]
         Focus,
-        [DomKeyword("formdata")]
+        [MetaKeyword("formdata")]
         FormData,
-        [DomKeyword("input")]
+        [MetaKeyword("input")]
         Input,
-        [DomKeyword("invalid")]
+        [MetaKeyword("invalid")]
         Invalid,
-        [DomKeyword("keydown")]
+        [MetaKeyword("keydown")]
         KeyDown,
-        [DomKeyword("keypress")]
+        [MetaKeyword("keypress")]
         KeyPress,
-        [DomKeyword("keyup")]
+        [MetaKeyword("keyup")]
         KeyUp,
-        [DomKeyword("load")]
+        [MetaKeyword("load")]
         Load,
-        [DomKeyword("loadeddata")]
+        [MetaKeyword("loadeddata")]
         LoadedData,
-        [DomKeyword("loadedmetadata")]
+        [MetaKeyword("loadedmetadata")]
         LoadedMetadata,
-        [DomKeyword("loadend")]
+        [MetaKeyword("loadend")]
         LoadEnd,
-        [DomKeyword("loadstart")]
+        [MetaKeyword("loadstart")]
         LoadStart,
+
 /* Mouse input */
-        [DomKeyword("mousedown")]
+        [MetaKeyword("mousedown")]
         MouseDown,
-        [DomKeyword("mouseenter")]
+        [MetaKeyword("mouseenter")]
         MouseEnter,
-        [DomKeyword("mouseleave")]
+        [MetaKeyword("mouseleave")]
         MouseLeave,
-        [DomKeyword("mousemove")]
+        [MetaKeyword("mousemove")]
         MouseMove,
-        [DomKeyword("mouseout")]
+        [MetaKeyword("mouseout")]
         MouseOut,
-        [DomKeyword("mouseover")]
+        [MetaKeyword("mouseover")]
         MouseOver,
-        [DomKeyword("mouseup")]
+        [MetaKeyword("mouseup")]
         MouseUp,
-        [DomKeyword("wheel")]
+        [MetaKeyword("wheel")]
         Wheel,
+
+/* Pointer input */
+/* Docs: https://w3c.github.io/pointerevents/#intro */
+        [MetaKeyword("pointerover")]
+        PointerOver,
+        [MetaKeyword("pointerdown")]
+        PointerDown,
+        [MetaKeyword("pointermove")]
+        PointerMove,
+        [MetaKeyword("pointerup")]
+        PointerUp,
+        [MetaKeyword("pointercancel")]
+        PointerCancel,
+        [MetaKeyword("pointerout")]
+        PointerOut,
+        [MetaKeyword("pointerleave")]
+        PointerLeave,
+        [MetaKeyword("gotpointercapture")]
+        GotPointerCapture,
+        [MetaKeyword("lostpointercapture")]
+        LostPointerCapture,
+
 /* Media */
-        [DomKeyword("pause")]
+        [MetaKeyword("pause")]
         Pause,
-        [DomKeyword("play")]
+        [MetaKeyword("play")]
         Play,
-        [DomKeyword("playing")]
+        [MetaKeyword("playing")]
         Playing,
-        [DomKeyword("progress")]
+        [MetaKeyword("progress")]
         Progress,
-        [DomKeyword("ratechange")]
+        [MetaKeyword("ratechange")]
         RateChange,
-        [DomKeyword("reset")]
+        [MetaKeyword("reset")]
         Reset,
-        [DomKeyword("resize")]
+        [MetaKeyword("resize")]
         Resize,
-        [DomKeyword("scroll")]
+        [MetaKeyword("scroll")]
         Scroll,
-        [DomKeyword("securitypolicyviolation")]
+        [MetaKeyword("securitypolicyviolation")]
         SecurityPolicyViolation,
-        [DomKeyword("seeked")]
+        [MetaKeyword("seeked")]
         Seeked,
-        [DomKeyword("seeking")]
+        [MetaKeyword("seeking")]
         Seeking,
-        [DomKeyword("select")]
+        [MetaKeyword("select")]
         Select,
-        [DomKeyword("stalled")]
+        [MetaKeyword("stalled")]
         Stalled,
-        [DomKeyword("submit")]
+        [MetaKeyword("submit")]
         Submit,
-        [DomKeyword("suspend")]
+        [MetaKeyword("suspend")]
         Suspend,
-        [DomKeyword("timeupdate")]
+        [MetaKeyword("timeupdate")]
         TimeUpdate,
-        [DomKeyword("toggle")]
+        [MetaKeyword("toggle")]
         Toggle,
-        [DomKeyword("volumechange")]
+        [MetaKeyword("volumechange")]
         VolumeChange,
-        [DomKeyword("waiting")]
+        [MetaKeyword("waiting")]
         Waiting,
 
-        [DomKeyword("selectstart")]
+        [MetaKeyword("selectstart")]
         SelectStart,
-        [DomKeyword("selectionchange")]
+        [MetaKeyword("selectionchange")]
         SelectionChange,
         
-        [DomKeyword("copy")]
+        [MetaKeyword("copy")]
         Copy,
-        [DomKeyword("cut")]
+        [MetaKeyword("cut")]
         Cut,
-        [DomKeyword("paste")]
+        [MetaKeyword("paste")]
         Paste,
 
 /* Window events */
-        [DomKeyword("afterprint")]
+        [MetaKeyword("afterprint")]
         AfterPrint,
-        [DomKeyword("beforeprint")]
+        [MetaKeyword("beforeprint")]
         BeforePrint,
-        [DomKeyword("beforeunload")]
+        [MetaKeyword("beforeunload")]
         BeforeUnload,
-        [DomKeyword("hashchange")]
+        [MetaKeyword("hashchange")]
         HashChange,
-        [DomKeyword("languagechange")]
+        [MetaKeyword("languagechange")]
         LanguageChange,
-        [DomKeyword("message")]
+        [MetaKeyword("message")]
         Message,
-        [DomKeyword("messageerror")]
+        [MetaKeyword("messageerror")]
         MessageError,
-        [DomKeyword("offline")]
+        [MetaKeyword("offline")]
         Offline,
-        [DomKeyword("online")]
+        [MetaKeyword("online")]
         Online,
-        [DomKeyword("pagehide")]
+        [MetaKeyword("pagehide")]
         PageHide,
-        [DomKeyword("pageshow")]
+        [MetaKeyword("pageshow")]
         PageShow,
-        [DomKeyword("popstate")]
+        [MetaKeyword("popstate")]
         PopState,
-        [DomKeyword("rejectionhandled")]
+        [MetaKeyword("rejectionhandled")]
         RejectionHandled,
-        [DomKeyword("storage")]
+        [MetaKeyword("storage")]
         Storage,
-        [DomKeyword("unhandledrejection")]
+        [MetaKeyword("unhandledrejection")]
         UnhandledRejection,
-        [DomKeyword("unload")]
+        [MetaKeyword("unload")]
         Unload,
 
 
-        [DomKeyword("slotchange")]
+        [MetaKeyword("slotchange")]
         SlotChange,
 
     }
