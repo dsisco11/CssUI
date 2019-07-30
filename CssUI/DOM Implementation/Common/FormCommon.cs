@@ -99,7 +99,7 @@ namespace CssUI.DOM
             {
                 if (!DOMCommon.Is_Listed_Element(element) || !element.hasAttribute(EAttributeName.Form))
                 {
-                    var nearestForm = DOMCommon.Get_Nth_Ancestor(element, 1, FilterForms.Instance, ENodeFilterMask.SHOW_ELEMENT);
+                    var nearestForm = DOMCommon.Get_Nth_Ancestor_OfType<HTMLFormElement>(element, 1, null, ENodeFilterMask.SHOW_ELEMENT);
                     if (ReferenceEquals(element.form, nearestForm))
                     {
                         /* Do nothing, and return */
@@ -124,7 +124,7 @@ namespace CssUI.DOM
             /* 5) Otherwise, if element has an ancestor form element, then associate element with the nearest such ancestor form element. */
             else
             {
-                var nearestForm = DOMCommon.Get_Nth_Ancestor(element, 1, FilterForms.Instance, ENodeFilterMask.SHOW_ELEMENT);
+                var nearestForm = DOMCommon.Get_Nth_Ancestor_OfType<HTMLFormElement>(element, 1, null, ENodeFilterMask.SHOW_ELEMENT);
                 if (nearestForm != null)
                 {
                     element.form = (HTMLFormElement)nearestForm;
@@ -373,6 +373,14 @@ namespace CssUI.DOM
             }
 
             return false;
+        }
+
+        public static void Reset_Form(HTMLFormElement form)
+        {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#concept-form-reset */
+            var reset = form.dispatchEvent(new Event(EEventName.Reset, new EventInit() { bubbles = true, cancelable = true }));
+            if (reset)
+            {
+            }
         }
 
         public static void Submit_Form(HTMLFormElement form, Element submitter, bool? submitted_from_submit = null)
