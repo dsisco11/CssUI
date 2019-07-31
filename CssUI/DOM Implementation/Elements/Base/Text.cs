@@ -14,7 +14,7 @@ namespace CssUI.DOM
 
         #region Slottable
         private string _name = string.Empty;
-        public string Name
+        public string Slot_Name
         {/* Docs: https://dom.spec.whatwg.org/#slotable-name */
             get => _name;
 

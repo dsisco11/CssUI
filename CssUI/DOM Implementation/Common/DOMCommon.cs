@@ -381,7 +381,7 @@ namespace CssUI.DOM
             {
                 if (node is HTMLSlotElement slot)
                 {
-                    if (0 == string.Compare(slot.Name, (slottable as ISlottable).Name))
+                    if (StringCommon.StrEq(slot.Name.AsSpan(), (slottable as ISlottable).Slot_Name.AsSpan()))
                         return slot;
                 }
                 node = tree.nextNode();

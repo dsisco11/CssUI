@@ -2,7 +2,7 @@
 {
     public interface ISlottable : INode
     {
-        string Name { get; set; }
+        string Slot_Name { get; set; }
         ISlot assignedSlot { get; set; }
     }
 }
