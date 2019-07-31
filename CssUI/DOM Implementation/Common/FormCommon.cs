@@ -180,7 +180,7 @@ namespace CssUI.DOM
                 {
                     continue;
                 }
-                else if (null != DOMCommon.Get_Nth_Ancestor(field, 1, new FilterElementType<HTMLDataListElement>(), ENodeFilterMask.SHOW_ELEMENT))
+                else if (null != DOMCommon.Get_Nth_Ancestor_OfType<HTMLDataListElement>(field, 1, null, ENodeFilterMask.SHOW_ELEMENT))
                 {
                     continue;
                 }
@@ -274,7 +274,7 @@ namespace CssUI.DOM
                 else if (field is HTMLInputElement && (field as HTMLInputElement).type == EInputType.Hidden && (field as HTMLInputElement).name.Equals("_charset_"))
                 {
                     var inputElement = (HTMLInputElement)field;
-                    var charset = string.IsNullOrEmpty(inputElement.formEnctype) ? "UTF-8" : inputElement.formEnctype;
+                    var charset = inputElement.formEnctype.HasValue ? Lookup.Keyword(inputElement.formEnctype.Value) : "UTF-8";
                     Append_Entry_To_List(ref entryList, name, charset);
                 }
                 /* 11) Otherwise, if the field element is a textarea element, append an entry to entry list with name and the value of the field element, and the prevent line break normalization flag set. */
@@ -380,6 +380,8 @@ namespace CssUI.DOM
             var reset = form.dispatchEvent(new Event(EEventName.Reset, new EventInit() { bubbles = true, cancelable = true }));
             if (reset)
             {
+                var resettableList = DOMCommon.Get_Descendents_OfType<IResettableElement>(form, new FilterFormOwner(form), ENodeFilterMask.SHOW_ELEMENT);
+
             }
         }
 
