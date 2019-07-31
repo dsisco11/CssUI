@@ -1,18 +1,26 @@
 ﻿using CssUI.DOM.CustomElements;
+using CssUI.DOM.Events;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Nodes;
 using CssUI.DOM.Serialization;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CssUI.DOM
 {
 
     public class HTMLInputElement : FormAssociatedElement, IListedElement, ISubmittableElement, IResettableElement, ILableableElement, IAutoCapitalizeInheritingElement
     {/* Docs: https://html.spec.whatwg.org/multipage/input.html#the-input-element */
+        const bool THROW_FOR_ATTR_INVALID_TYPES = false;
+        const bool THROW_FOR_METHOD_INVALID_TYPES = false;
+
         #region Backing Values
         private string _value = string.Empty;
         private List<FileBlob> selected_files = new List<FileBlob>();
+        private bool _checkedness = false;
+        private NodeFilter labelFilter;
         #endregion
 
         #region Properties
@@ -21,7 +29,6 @@ namespace CssUI.DOM
         /// </summary>
         private bool bDirtyValueFlag = false;
         private bool bDirtyCheckednessFlag = false;
-        private bool checkedness = false;
 
         public bool indeterminate;
 
@@ -31,16 +38,31 @@ namespace CssUI.DOM
         #endregion
 
         #region Constructors
-        public HTMLInputElement(Document document) : base(document, "input")
+        public HTMLInputElement(Document document) : this(document, "input")
         {
         }
 
         public HTMLInputElement(Document document, string localName) : base(document, localName)
         {
+            labelFilter = new FilterLabelFor(this);
+            if (hasAttribute(EAttributeName.Type))
+            {
+                update_rendering_for_type(type);
+                run_value_sanitization();
+            }
         }
         #endregion
 
         #region Accessors
+        private bool checkedness
+        {
+            get => _checkedness;
+            set
+            {
+                _checkedness = value;
+                update_radio_button_group();
+            }
+        }
         /// <summary>
         /// Allows manipulating the checkedness of the input element
         /// </summary>
@@ -83,7 +105,10 @@ namespace CssUI.DOM
                     case EInputType.Time:
                         break;
                     default:
-                        throw new InvalidStateError($"The input-type({Enum.GetName(typeof(EInputType), type)}) value cannot be converted to the requested type");
+                        {
+                            if (THROW_FOR_METHOD_INVALID_TYPES) throw new InvalidStateError($"The input-type({Enum.GetName(typeof(EInputType), type)}) value cannot be converted to the requested type");
+                            else return;
+                        }
                 }
 
                 if (value.HasValue || value.Value.Ticks == 0)
@@ -132,7 +157,10 @@ namespace CssUI.DOM
                     case EInputType.Radio:
                         break;
                     default:
-                        throw new InvalidStateError($"The input-type({Enum.GetName(typeof(EInputType), type)}) value cannot be converted to the requested type");
+                        {
+                            if (THROW_FOR_METHOD_INVALID_TYPES) throw new InvalidStateError($"The input-type({Enum.GetName(typeof(EInputType), type)}) value cannot be converted to the requested type");
+                            else return;
+                        }
                 }
 
                 if (double.IsInfinity(value)) throw new TypeError("Value cannot be infinity");
@@ -154,7 +182,23 @@ namespace CssUI.DOM
         [CEReactions] public string accept
         {
             get => getAttribute(EAttributeName.Accept).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Accept, AttributeValue.From_String(value)));
+            set
+            {
+                CEReactions.Wrap_CEReaction(this, () => {
+                    switch (type)
+                    {
+                        case EInputType.File:
+                            break;
+                        default:
+                            {
+                                if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                                else return;
+                            }
+                    }
+
+                    setAttribute(EAttributeName.Accept, AttributeValue.From_String(value));
+                });
+            }
         }
 
         /// <summary>
@@ -168,7 +212,19 @@ namespace CssUI.DOM
                 HTMLCommon.Resolve_Autofill(this, out _, out _, out _, out string outValue);
                 return outValue;
             }
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Alt, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => {
+				switch(type)
+                {
+                    case EInputType.Image:
+                        break;
+                    default:
+                        {
+                            if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                            else return;
+                        }
+                }
+				setAttribute(EAttributeName.Alt, AttributeValue.From_String(value));
+			});
         }
 
         /// <summary>
@@ -177,7 +233,33 @@ namespace CssUI.DOM
         [CEReactions] public string autocomplete
         {
             get => getAttribute(EAttributeName.Autocomplete).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Autocomplete, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => {
+				switch(type)
+                {
+                    case EInputType.Hidden:
+                    case EInputType.Text:
+                    case EInputType.Search:
+                    case EInputType.Url:
+                    case EInputType.Telephone:
+                    case EInputType.Email:
+                    case EInputType.Password:
+                    case EInputType.Date:
+                    case EInputType.Month:
+                    case EInputType.Week:
+                    case EInputType.Time:
+                    case EInputType.Local:
+                    case EInputType.Number:
+                    case EInputType.Range:
+                    case EInputType.Color:
+                        break;
+                    default:
+                        {
+                            if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                            else return;
+                        }
+                }
+				setAttribute(EAttributeName.Autocomplete, AttributeValue.From_String(value));
+			});
         }
 
         /// <summary>
@@ -192,13 +274,39 @@ namespace CssUI.DOM
         [CEReactions] public bool defaultChecked
         {
             get => hasAttribute(EAttributeName.Checked);
-            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Checked, value));
+            set => CEReactions.Wrap_CEReaction(this, () => {
+				switch(type)
+                {
+                    case EInputType.Checkbox:
+                    case EInputType.Radio:
+                        break;
+                    default:
+                        {
+                            if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                            else return;
+                        }
+                }
+				toggleAttribute(EAttributeName.Checked, value);
+			});
         }
 
         [CEReactions] public string dirName
         {
             get => getAttribute(EAttributeName.Dirname)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Dirname, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => {
+				switch(type)
+                {
+                    case EInputType.Text:
+                    case EInputType.Search:
+                        break;
+                    default:
+                        {
+                            if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                            else return;
+                        }
+                }
+				setAttribute(EAttributeName.Dirname, AttributeValue.From_String(value));
+			});
         }
 
         //[CEReactions] public bool disabled; /* Redundant */
@@ -235,25 +343,79 @@ namespace CssUI.DOM
 
                 return attrValue;
             }
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.FormAction, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => {
+				switch(type)
+                {
+                    case EInputType.Submit:
+                    case EInputType.Image:
+                        break;
+                    default:
+                        {
+                            if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                            else return;
+                        }
+                }
+				setAttribute(EAttributeName.FormAction, AttributeValue.From_String(value));
+			});
         }
 
-        [CEReactions] public EEncType formEnctype
+        [CEReactions] public EEncType? formEnctype
         {
-            get => getAttribute(EAttributeName.FormEncType).Get_Enum<EEncType>();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.FormEncType, AttributeValue.From_Enum(value)));
+            get => getAttribute(EAttributeName.FormEncType)?.Get_Enum<EEncType>();
+            set => CEReactions.Wrap_CEReaction(this, () => {
+				switch(type)
+                {
+                    case EInputType.Submit:
+                    case EInputType.Image:
+                        break;
+                    default:
+                        {
+                            if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                            else return;
+                        }
+                }
+
+				setAttribute(EAttributeName.FormEncType, !value.HasValue ? null : AttributeValue.From_Enum(value.Value));
+			});
         }
 
-        [CEReactions] public EFormMethod formMethod
+        [CEReactions] public EFormMethod? formMethod
         {
-            get => getAttribute(EAttributeName.FormMethod).Get_Enum<EFormMethod>();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.FormMethod, AttributeValue.From_Enum(value)));
+            get => getAttribute(EAttributeName.FormMethod)?.Get_Enum<EFormMethod>();
+            set => CEReactions.Wrap_CEReaction(this, () => {
+				switch(type)
+                {
+                    case EInputType.Submit:
+                    case EInputType.Image:
+                        break;
+                    default:
+                        {
+                            if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                            else return;
+                        }
+                }
+
+				setAttribute(EAttributeName.FormMethod, !value.HasValue ? null : AttributeValue.From_Enum(value.Value));
+			});
         }
 
         [CEReactions] public bool formNoValidate
         {
             get => hasAttribute(EAttributeName.FormNoValidate);
-            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.NoValidate, value));
+            set => CEReactions.Wrap_CEReaction(this, () => {
+				switch(type)
+                {
+                    case EInputType.Submit:
+                    case EInputType.Image:
+                        break;
+                    default:
+                        {
+                            if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                            else return;
+                        }
+                }
+				toggleAttribute(EAttributeName.NoValidate, value);
+			});
         }
 
         [CEReactions] public string formTarget
@@ -261,12 +423,26 @@ namespace CssUI.DOM
             get => getAttribute(EAttributeName.FormTarget).Get_String();
             set
             {
-                if (HTMLCommon.Is_Valid_Browsing_Context_Name_Or_Keyword(value.AsMemory()))
-                {
-                    throw new DOMException($"formtarget cannot accept the invalid value: \"{value}\"");
-                }
+                CEReactions.Wrap_CEReaction(this, () => {
+				    switch(type)
+                    {
+                        case EInputType.Submit:
+                        case EInputType.Image:
+                            break;
+                        default:
+                            {
+                                if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                                else return;
+                            }
+                    }
 
-                CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.FormAction, AttributeValue.From_String(value)));
+                    if (HTMLCommon.Is_Valid_Browsing_Context_Name_Or_Keyword(value.AsMemory()))
+                    {
+                        throw new DOMException($"formtarget cannot accept the invalid value: \"{value}\"");
+                    }
+
+                    setAttribute(EAttributeName.FormAction, AttributeValue.From_String(value));
+                });
             }
         }
 
@@ -296,79 +472,306 @@ namespace CssUI.DOM
 
                 return null;
             }
-            private set => setAttribute(EAttributeName.List, value==null ? null : AttributeValue.From_String(value?.id));
+            private set
+            {
+                switch(type)
+                {
+                    case EInputType.Text:
+                    case EInputType.Search:
+                    case EInputType.Url:
+                    case EInputType.Telephone:
+                    case EInputType.Email:
+                    case EInputType.Date:
+                    case EInputType.Month:
+                    case EInputType.Week:
+                    case EInputType.Time:
+                    case EInputType.Local:
+                    case EInputType.Number:
+                    case EInputType.Range:
+                    case EInputType.Color:
+                        break;
+                    default:
+                        {
+                            if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                            else return;
+                        }
+                }
+
+                setAttribute(EAttributeName.List, value == null ? null : AttributeValue.From_String(value?.id));
+            }
         }
 
         [CEReactions] public string max
         {
             get => getAttribute(EAttributeName.Max)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Max, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => {
+				switch(type)
+                {
+                    case EInputType.Date:
+                    case EInputType.Month:
+                    case EInputType.Week:
+                    case EInputType.Time:
+                    case EInputType.Local:
+                    case EInputType.Number:
+                    case EInputType.Range:
+                        break;
+                    default:
+                        {
+                            if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                            else return;
+                        }
+                }
+				setAttribute(EAttributeName.Max, AttributeValue.From_String(value));
+			});
         }
 
         [CEReactions] public int maxLength
         {
             get => getAttribute(EAttributeName.MaxLength).Get_Int();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.MaxLength, AttributeValue.From_Integer(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => {
+				switch(type)
+                {
+                    case EInputType.Text:
+                    case EInputType.Search:
+                    case EInputType.Url:
+                    case EInputType.Telephone:
+                    case EInputType.Email:
+                    case EInputType.Password:
+                        break;
+                    default:
+                        {
+                            if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                            else return;
+                        }
+                }
+				setAttribute(EAttributeName.MaxLength, AttributeValue.From_Integer(value));
+			});
         }
 
         [CEReactions] public string min
         {
             get => getAttribute(EAttributeName.Min)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Min, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => {
+				switch(type)
+                {
+                    case EInputType.Date:
+                    case EInputType.Month:
+                    case EInputType.Week:
+                    case EInputType.Time:
+                    case EInputType.Local:
+                    case EInputType.Number:
+                    case EInputType.Range:
+                        break;
+                    default:
+                        {
+                            if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                            else return;
+                        }
+                }
+				setAttribute(EAttributeName.Min, AttributeValue.From_String(value));
+			});
         }
 
         [CEReactions] public int minLength
         {
             get => getAttribute(EAttributeName.MinLength).Get_Int();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.MinLength, AttributeValue.From_Integer(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => {
+				switch(type)
+                {
+                    case EInputType.Text:
+                    case EInputType.Search:
+                    case EInputType.Url:
+                    case EInputType.Telephone:
+                    case EInputType.Email:
+                    case EInputType.Password:
+                        break;
+                    default:
+                        {
+                            if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                            else return;
+                        }
+                }
+				setAttribute(EAttributeName.MinLength, AttributeValue.From_Integer(value));
+			});
         }
 
         [CEReactions] public bool multiple
         {
             get => hasAttribute(EAttributeName.Multiple);
-            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Multiple, value));
+            set => CEReactions.Wrap_CEReaction(this, () => {
+				switch(type)
+                {
+                    case EInputType.Email:
+                    case EInputType.File:
+                        break;
+                    default:
+                        {
+                            if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                            else return;
+                        }
+                }
+				toggleAttribute(EAttributeName.Multiple, value);
+			});
         }
 
         [CEReactions] public string name
         {
-            get => getAttribute(EAttributeName.Name)?.Get_String();
+            get => getAttribute(EAttributeName.Name).Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Name, AttributeValue.From_String(value)));
         }
 
         [CEReactions] public string pattern
         {
             get => getAttribute(EAttributeName.Pattern)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Pattern, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => {
+				switch(type)
+                {
+                    case EInputType.Text:
+                    case EInputType.Search:
+                    case EInputType.Url:
+                    case EInputType.Telephone:
+                    case EInputType.Email:
+                    case EInputType.Password:
+                        break;
+                    default:
+                        {
+                            if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                            else return;
+                        }
+                }
+				setAttribute(EAttributeName.Pattern, AttributeValue.From_String(value));
+			});
         }
 
         [CEReactions] public string placeholder
         {
             get => getAttribute(EAttributeName.Placeholder)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Placeholder, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => {
+				switch(type)
+                {
+                    case EInputType.Text:
+                    case EInputType.Search:
+                    case EInputType.Url:
+                    case EInputType.Telephone:
+                    case EInputType.Email:
+                    case EInputType.Password:
+                    case EInputType.Number:
+                        break;
+                    default:
+                        {
+                            if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                            else return;
+                        }
+                }
+				setAttribute(EAttributeName.Placeholder, AttributeValue.From_String(value));
+			});
         }
 
         [CEReactions] public bool readOnly
         {
             get => hasAttribute(EAttributeName.ReadOnly);
-            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.ReadOnly, value));
+            set
+            {
+                CEReactions.Wrap_CEReaction(this, () => {
+                    switch (type)
+                    {
+                        case EInputType.Text:
+                        case EInputType.Search:
+                        case EInputType.Url:
+                        case EInputType.Telephone:
+                        case EInputType.Email:
+                        case EInputType.Password:
+                        case EInputType.Date:
+                        case EInputType.Month:
+                        case EInputType.Week:
+                        case EInputType.Time:
+                        case EInputType.Local:
+                        case EInputType.Number:
+                            break;
+                        default:
+                            {
+                                if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                                else return;
+                            }
+                    }
+
+                    toggleAttribute(EAttributeName.ReadOnly, value);
+                });
+            }
         }
 
         [CEReactions] public bool required
         {
             get => hasAttribute(EAttributeName.Required);
-            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Required, value));
+            set => CEReactions.Wrap_CEReaction(this, () => {
+				switch(type)
+				{
+                        case EInputType.Text:
+                        case EInputType.Search:
+                        case EInputType.Url:
+                        case EInputType.Telephone:
+                        case EInputType.Email:
+                        case EInputType.Password:
+                        case EInputType.Date:
+                        case EInputType.Month:
+                        case EInputType.Week:
+                        case EInputType.Time:
+                        case EInputType.Local:
+                        case EInputType.Number:
+                        case EInputType.Checkbox:
+                        case EInputType.Radio:
+                        case EInputType.File:
+                            break;
+                        default:
+                            {
+                                if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                                else return;
+                            }
+				}
+				toggleAttribute(EAttributeName.Required, value);
+			});
         }
 
         [CEReactions] public uint size
         {
             get => getAttribute(EAttributeName.Size).Get_UInt();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Size, AttributeValue.From_Integer(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => {
+				switch(type)
+                {
+                    case EInputType.Text:
+                    case EInputType.Search:
+                    case EInputType.Url:
+                    case EInputType.Telephone:
+                    case EInputType.Email:
+                    case EInputType.Password:
+                    case EInputType.Image:
+                        break;
+                    default:
+                        {
+                            if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                            else return;
+                        }
+                }
+				setAttribute(EAttributeName.Size, AttributeValue.From_Integer(value));
+			});
         }
 
         [CEReactions] public string src
         {
             get => getAttribute(EAttributeName.Src)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Src, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => {
+				switch(type)
+                {
+                    case EInputType.Image:
+                        break;
+                    default:
+                        {
+                            if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                            else return;
+                        }
+                }
+				setAttribute(EAttributeName.Src, AttributeValue.From_String(value));
+			});
         }
 
         [CEReactions] public new EInputType type
@@ -387,13 +790,53 @@ namespace CssUI.DOM
         {
             ...
         }
+
+        public override HTMLFormElement form
+        {
+            get => base.form;
+            set
+            {
+                base.form = value;
+                update_radio_button_group();
+            }
+        }
         #endregion
+
+        public IReadOnlyCollection<HTMLLabelElement> labels
+        {
+            get
+            {
+                if (type == EInputType.Hidden)
+                    return null;
+
+                return (IReadOnlyCollection<HTMLLabelElement>)DOMCommon.Get_Descendents(form, labelFilter, Enums.ENodeFilterMask.SHOW_ELEMENT);
+            }
+        }
 
         #region Input Step
         [CEReactions] public string step
         {
             get => getAttribute(EAttributeName.Step)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Step, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(this, () => {
+				switch(type)
+                {
+                    case EInputType.Date:
+                    case EInputType.Month:
+                    case EInputType.Week:
+                    case EInputType.Time:
+                    case EInputType.Local:
+                    case EInputType.Number:
+                    case EInputType.Range:
+                    case EInputType.Color:
+                        break;
+                    default:
+                        {
+                            if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                            else return;
+                        }
+                }
+				setAttribute(EAttributeName.Step, AttributeValue.From_String(value));
+			});
         }
 
         double default_step
@@ -470,12 +913,238 @@ namespace CssUI.DOM
                 return outParsed * step_scale_factor;
             }
         }
+
+
+        public void stepUp(long n = 1)
+        {/* Docs: https://html.spec.whatwg.org/multipage/input.html#dom-input-stepup */
+            switch (type)
+            {
+                case EInputType.Date:
+                case EInputType.Month:
+                case EInputType.Week:
+                case EInputType.Time:
+                case EInputType.Local:
+                case EInputType.Number:
+                case EInputType.Radio:
+                    break;
+                default:
+                    {
+                        if (THROW_FOR_METHOD_INVALID_TYPES) throw new InvalidStateError($"The input-type({Enum.GetName(typeof(EInputType), type)}) does not implement the stepUp() method");
+                        else return;
+                    }
+            }
+
+            if (!allowed_value_step.HasValue)
+            {
+                throw new InvalidStateError("Input element has no allowed-value-step, step cannot be \"any\"");
+            }
+            var allowed_step = allowed_value_step.Value;
+
+            /* 3) If the element has a minimum and a maximum and the minimum is greater than the maximum, then return. */
+            var min = get_minimum();
+            var max = get_maximum();
+            if (min.HasValue && max.HasValue && min > max)
+            {
+                if (min > max)
+                    return;
+
+                /* 4) If the element has a minimum and a maximum and there is no value greater than or equal to the element's minimum and less than or equal to the element's maximum that, 
+                 * when subtracted from the step base, is an integral multiple of the allowed value step, then return. */
+                var mn = step_base - min.Value;
+                var mx = step_base - max.Value;
+                var minMult = allowed_step / mn;
+                var maxMult = allowed_step / mx;
+                var delta = maxMult - minMult;
+                if ((int)delta == 0) // these two values fall within the same multiple of the allowed-step
+                {
+                    if (!MathExt.Feq(0, (allowed_step % mn)))
+                    {
+                        return;
+                    }
+                }
+            }
+
+            double value = 0;
+            /* 5) If applying the algorithm to convert a string to a number to the string given by the element's value does not result in an error, 
+             * then let value be the result of that algorithm. Otherwise, let value be zero. */
+            if (convert_string_to_number(_value.AsMemory(), out double outValue))
+            {
+                value = outValue;
+            }
+
+            /* 6) Let valueBeforeStepping be value. */
+            var valueBeforeStepping = value;
+            /* 7) If value subtracted from the step base is not an integral multiple of the allowed value step, 
+             * then set value to the nearest value that, when subtracted from the step base, is an integral multiple of the allowed value step, 
+             * and that is less than value if the method invoked was the stepDown() method, and more than value otherwise. */
+            double deltaValueStepBase = step_base - value;
+            double mult = allowed_step / value;
+            if (!MathExt.Feq(0, mult))
+            {
+                value = step_base + (Math.Floor(mult) * allowed_step);
+                if (value < valueBeforeStepping)
+                {
+                    value += allowed_step;
+                }
+            }
+            /* Otherwise (value subtracted from the step base is an integral multiple of the allowed value step): */
+            else
+            {
+                /* 2) Let delta be the allowed value step multiplied by n. */
+                var delta = allowed_step * n;
+                /* 3) If the method invoked was the stepDown() method, negate delta. */
+                /* 4) Let value be the result of adding delta to value. */
+                value += delta;
+            }
+
+            /* 8) If the element has a minimum, and value is less than that minimum, 
+             * then set value to the smallest value that, when subtracted from the step base, 
+             * is an integral multiple of the allowed value step, and that is more than or equal to minimum. */
+            if (min.HasValue && value < min)
+            {
+                var diffMin = min.Value - value;
+                var diffMult = Math.Ceiling(allowed_step / diffMin);
+                value += allowed_step * diffMult;
+            }
+
+            /* 9) If the element has a maximum, and value is greater than that maximum, 
+             * then set value to the largest value that, when subtracted from the step base, 
+             * is an integral multiple of the allowed value step, and that is less than or equal to maximum. */
+            if (max.HasValue && value > max)
+            {
+                var diffMax = max.Value - value;
+                var diffMult = Math.Ceiling(allowed_step / diffMax);
+                value -= allowed_step * diffMult;
+            }
+
+            /* 10) If either the method invoked was the stepDown() method and value is greater than valueBeforeStepping, 
+             * or the method invoked was the stepUp() method and value is less than valueBeforeStepping, then return. */
+            if (value < valueBeforeStepping)
+                return;
+
+            /* 11) Let value as string be the result of running the algorithm to convert a number to a string, as defined for the input element's type attribute's current state, on value. */
+            convert_number_to_string(value, out string valueAsString);
+            this.value = valueAsString;
+        }
+
+        public void stepDown(long n = 1)
+        {/* Docs: https://html.spec.whatwg.org/multipage/input.html#dom-input-stepup */
+            switch (type)
+            {
+                case EInputType.Date:
+                case EInputType.Month:
+                case EInputType.Week:
+                case EInputType.Time:
+                case EInputType.Local:
+                case EInputType.Number:
+                case EInputType.Radio:
+                    break;
+                default:
+                    {
+                        if (THROW_FOR_METHOD_INVALID_TYPES) throw new InvalidStateError($"The input-type({Enum.GetName(typeof(EInputType), type)}) does not implement the stepUp() method");
+                        else return;
+                    }
+            }
+
+            if (!allowed_value_step.HasValue)
+            {
+                throw new InvalidStateError("Input element has no allowed-value-step, step cannot be \"any\"");
+            }
+            var allowed_step = allowed_value_step.Value;
+
+            /* 3) If the element has a minimum and a maximum and the minimum is greater than the maximum, then return. */
+            var min = get_minimum();
+            var max = get_maximum();
+            if (min.HasValue && max.HasValue && min > max)
+            {
+                if (min > max)
+                    return;
+
+                /* 4) If the element has a minimum and a maximum and there is no value greater than or equal to the element's minimum and less than or equal to the element's maximum that, 
+                 * when subtracted from the step base, is an integral multiple of the allowed value step, then return. */
+                var mn = step_base - min.Value;
+                var mx = step_base - max.Value;
+                var minMult = allowed_step / mn;
+                var maxMult = allowed_step / mx;
+                var delta = maxMult - minMult;
+                if ((int)delta == 0) // these two values fall within the same multiple of the allowed-step
+                {
+                    if (!MathExt.Feq(0, (allowed_step % mn)))
+                    {
+                        return;
+                    }
+                }
+            }
+
+            double value = 0;
+            /* 5) If applying the algorithm to convert a string to a number to the string given by the element's value does not result in an error, 
+             * then let value be the result of that algorithm. Otherwise, let value be zero. */
+            if (convert_string_to_number(_value.AsMemory(), out double outValue))
+            {
+                value = outValue;
+            }
+
+            /* 6) Let valueBeforeStepping be value. */
+            var valueBeforeStepping = value;
+
+            /* 7) If value subtracted from the step base is not an integral multiple of the allowed value step, 
+             * then set value to the nearest value that, when subtracted from the step base, is an integral multiple of the allowed value step, 
+             * and that is less than value if the method invoked was the stepDown() method, and more than value otherwise. */
+            double deltaValueStepBase = step_base - value;
+            double mult = allowed_step / value;
+            if (!MathExt.Feq(0, mult))
+            {
+                value = step_base + (Math.Floor(mult) * allowed_step);
+                if (value > valueBeforeStepping)
+                {
+                    value -= allowed_step;
+                }
+            }
+            /* Otherwise (value subtracted from the step base is an integral multiple of the allowed value step): */
+            else
+            {
+                /* 2) Let delta be the allowed value step multiplied by n. */
+                var delta = allowed_step * n;
+                /* 3) If the method invoked was the stepDown() method, negate delta. */
+                /* 4) Let value be the result of adding delta to value. */
+                value -= delta;
+            }
+
+            /* 8) If the element has a minimum, and value is less than that minimum, 
+             * then set value to the smallest value that, when subtracted from the step base, 
+             * is an integral multiple of the allowed value step, and that is more than or equal to minimum. */
+            if (min.HasValue && value < min)
+            {
+                var diffMin = min.Value - value;
+                var diffMult = Math.Ceiling(allowed_step / diffMin);
+                value += allowed_step * diffMult;
+            }
+
+            /* 9) If the element has a maximum, and value is greater than that maximum, 
+             * then set value to the largest value that, when subtracted from the step base, 
+             * is an integral multiple of the allowed value step, and that is less than or equal to maximum. */
+            if (max.HasValue && value > max)
+            {
+                var diffMax = max.Value - value;
+                var diffMult = Math.Ceiling(allowed_step / diffMax);
+                value -= allowed_step * diffMult;
+            }
+
+            /* 10) If either the method invoked was the stepDown() method and value is greater than valueBeforeStepping, 
+             * or the method invoked was the stepUp() method and value is less than valueBeforeStepping, then return. */
+            if (value > valueBeforeStepping)
+                return;
+
+            /* 11) Let value as string be the result of running the algorithm to convert a number to a string, as defined for the input element's type attribute's current state, on value. */
+            convert_number_to_string(value, out string valueAsString);
+            this.value = valueAsString;
+        }
         #endregion
 
         #region Input Value
         private enum EInputValueMode { Value, Default, Default_ON, Filename };
 
-        private EInputValueMode Get_Value_Mode()
+        private static EInputValueMode Get_Input_Value_Mode(EInputType type)
         {
             switch (type)
             {
@@ -515,7 +1184,7 @@ namespace CssUI.DOM
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#dom-input-value */
             get
             {
-                switch (Get_Value_Mode())
+                switch (Get_Input_Value_Mode(type))
                 {
                     case EInputValueMode.Value:
                         {
@@ -541,7 +1210,7 @@ namespace CssUI.DOM
 
             set
             {
-                switch (Get_Value_Mode())
+                switch (Get_Input_Value_Mode(type))
                 {
                     case EInputValueMode.Value:
                         {
@@ -584,96 +1253,6 @@ namespace CssUI.DOM
             }
         }
         #endregion
-
-
-        public void stepUp(long n = 1)
-        {/* Docs: https://html.spec.whatwg.org/multipage/input.html#dom-input-stepup */
-            switch (type)
-            {
-                case EInputType.Date:
-                case EInputType.Month:
-                case EInputType.Week:
-                case EInputType.Time:
-                case EInputType.Local:
-                case EInputType.Number:
-                case EInputType.Radio:
-                    break;
-                default:
-                    throw new InvalidStateError($"The input-type({Enum.GetName(typeof(EInputType), type)}) does not implement the stepUp() method");
-            }
-
-            if (!allowed_value_step.HasValue)
-            {
-                throw new InvalidStateError("Input element has no allowed-value-step, step cannot be \"any\"");
-            }
-            /* 3) If the element has a minimum and a maximum and the minimum is greater than the maximum, then return. */
-            var min = get_minimum();
-            var max = get_maximum();
-            if (min.HasValue && max.HasValue && min > max)
-            {
-                if (min > max)
-                    return;
-
-                /* 4) If the element has a minimum and a maximum and there is no value greater than or equal to the element's minimum and less than or equal to the element's maximum that, 
-                 * when subtracted from the step base, is an integral multiple of the allowed value step, then return. */
-                var allowed_step = allowed_value_step.Value;
-                var mn = step_base - min.Value;
-                var mx = step_base - max.Value;
-                var minMult = allowed_step / mn;
-                var maxMult = allowed_step / mx;
-                var delta = maxMult - minMult;
-                if ((int)delta == 0) // these two values fall within the same multiple of the allowed-step
-                {
-                    if ((allowed_step % mn) != 0)
-                    {
-                        return;
-                    }
-                }
-            }
-
-            double value = 0;
-            /* 5) If applying the algorithm to convert a string to a number to the string given by the element's value does not result in an error, 
-             * then let value be the result of that algorithm. Otherwise, let value be zero. */
-            if (convert_string_to_number(_value.AsMemory(), out double outValue))
-            {
-                value = outValue;
-            }
-
-            var valueBeforeStepping = value;
-            /* 7) If value subtracted from the step base is not an integral multiple of the allowed value step, 
-             * then set value to the nearest value that, when subtracted from the step base, is an integral multiple of the allowed value step, 
-             * and that is less than value if the method invoked was the stepDown() method, and more than value otherwise. */
-
-
-        }
-
-        public void stepDown(long n = 1)
-        {/* Docs: https://html.spec.whatwg.org/multipage/input.html#dom-input-stepup */
-            switch (type)
-            {
-                case EInputType.Date:
-                case EInputType.Month:
-                case EInputType.Week:
-                case EInputType.Time:
-                case EInputType.Local:
-                case EInputType.Number:
-                case EInputType.Radio:
-                    break;
-                default:
-                    throw new InvalidStateError($"The input-type({Enum.GetName(typeof(EInputType), type)}) does not implement the stepDown() method");
-            }
-        }
-
-        public IReadOnlyCollection<HTMLLabelElement> labels
-        {
-            get
-            {
-                if (type == EInputType.Hidden)
-                    return null;
-
-                return (IReadOnlyCollection<HTMLLabelElement>)DOMCommon.Get_Descendents(form, new FilterLabelFor(this), Enums.ENodeFilterMask.SHOW_ELEMENT);
-            }
-        }
 
 
         #region State Determined Algorithms
@@ -737,25 +1316,6 @@ namespace CssUI.DOM
         }
         #endregion
 
-        #region Overrides
-        internal override void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue value, string Namespace)
-        {
-            base.run_attribute_change_steps(element, localName, oldValue, value, Namespace);
-
-            /* When the value content attribute is added, set, or removed, 
-             * if the control's dirty value flag is false, the user agent must set the value of the element to the value of the value content attribute, 
-             * if there is one, or the empty string otherwise, and then run the current value sanitization algorithm, if one is defined. */
-            if (localName == EAttributeName.Value)
-            {
-                if (!bDirtyValueFlag)
-                {
-                    this.value = defaultValue ?? string.Empty;
-                    run_value_sanitization();
-                }
-            }
-        }
-        #endregion
-
         #region Form-Associated Element Overrides
         internal override EValidityState query_validity()
         {
@@ -764,6 +1324,48 @@ namespace CssUI.DOM
             /* When a control has no value but has a required attribute (input required, textarea required); or, more complicated rules for select elements and controls in radio button groups, as specified in their sections. */
             if (hasAttribute(EAttributeName.Required))
             {
+                switch (type)
+                {
+                    case EInputType.Checkbox:
+                        {
+                            if (!checkedness)
+                            {
+                                flags |= EValidityState.valueMissing;
+                            }
+                        }
+                        break;
+                    case EInputType.Radio:
+                        {/* Constraint validation: If an element in the radio button group is required, and all of the input elements in the radio button group have a checkedness that is false, then the element is suffering from being missing. */
+                            if (!Checked)
+                            {
+                                var group = Get_Radio_Button_Group();
+                                bool missing = true;
+                                foreach (var input in group)
+                                {
+                                    if (input.Checked)
+                                    {
+                                        missing = false;
+                                        break;
+                                    }
+                                }
+
+                                if (missing)
+                                {
+                                    flags |= EValidityState.valueMissing;
+                                }
+                            }
+                        }
+                        break;
+                    case EInputType.File:
+                        {
+                            if (selected_files.Count <= 0)
+                            {
+                                flags |= EValidityState.valueMissing;
+                            }
+                        }
+                        break;
+                }
+
                 if (ReferenceEquals(null, value) || value.Length <= 0)
                 {
                     flags |= EValidityState.valueMissing;
@@ -799,10 +1401,24 @@ namespace CssUI.DOM
                 }
             }
 
-            if (!ReferenceEquals(null, value) && value.Length > 0)
+            if (!ReferenceEquals(null, value) && value.Length > 0 && convert_string_to_number(value.AsMemory(), out double outValue))
             {
                 /* When a control has a value that is not the empty string and is too low for the min attribute. */
+                var min = get_minimum();
+                if (min.HasValue && outValue < min.Value)
+                {
+                    flags |= EValidityState.rangeUnderflow;
+                }
+
+                /*  */
+                var max = get_maximum();
+                if (max.HasValue && outValue > max.Value)
+                {
+                    flags |= EValidityState.rangeOverflow;
+                }
             }
+
+            return flags;
         }
         #endregion
 
@@ -836,7 +1452,10 @@ namespace CssUI.DOM
                     case EInputType.File:
                         break;
                     default:
-                        return;
+                        {
+                            if (THROW_FOR_METHOD_INVALID_TYPES) throw new InvalidStateError($"The input element type({Enum.GetName(typeof(EInputType), type)}) does not support this function");
+                            else return;
+                        }
                 }
             }
 
@@ -889,7 +1508,10 @@ namespace CssUI.DOM
                         case EInputType.Password:
                             break;
                         default:
-                            throw new InvalidStateError($"This property is not valid for input elements of type \"{Lookup.Keyword(inputElement.type)}\"");
+                            {
+                                if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This property is not valid for input elements of type \"{Lookup.Keyword(inputElement.type)}\"");
+                                else return;
+                            }
                     }
                 }
                 var end = selectionEnd;
@@ -940,7 +1562,10 @@ namespace CssUI.DOM
                         case EInputType.Password:
                             break;
                         default:
-                            throw new InvalidStateError($"This property is not valid for input elements of type \"{Lookup.Keyword(inputElement.type)}\"");
+                            {
+                                if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This property is not valid for input elements of type \"{Lookup.Keyword(inputElement.type)}\"");
+                                else return;
+                            }
                     }
                 }
                 setSelectionRange(selectionStart, value, selectionDirection);
@@ -982,7 +1607,10 @@ namespace CssUI.DOM
                         case EInputType.Password:
                             break;
                         default:
-                            throw new InvalidStateError($"This property is not valid for input elements of type \"{Lookup.Keyword(inputElement.type)}\"");
+                            {
+                                if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This property is not valid for input elements of type \"{Lookup.Keyword(inputElement.type)}\"");
+                                else return;
+                            }
                     }
                 }
                 setSelectionRange(selectionStart, selectionEnd, value);
@@ -1003,7 +1631,10 @@ namespace CssUI.DOM
                     case EInputType.Password:
                         break;
                     default:
-                        throw new InvalidStateError($"This method is not valid for input elements of type \"{Lookup.Keyword(inputElement.type)}\"");
+                        {
+                            if (THROW_FOR_METHOD_INVALID_TYPES) throw new InvalidStateError($"The input element type({Enum.GetName(typeof(EInputType), type)}) does not support this function");
+                            else return;
+                        }
                 }
             }
 
@@ -1068,7 +1699,10 @@ namespace CssUI.DOM
                     case EInputType.Password:
                         break;
                     default:
-                        throw new InvalidStateError($"This method is not valid for input elements of type \"{Lookup.Keyword(inputElement.type)}\"");
+                        {
+                            if (THROW_FOR_METHOD_INVALID_TYPES) throw new InvalidStateError($"The input element type({Enum.GetName(typeof(EInputType), type)}) does not support this function");
+                            else return;
+                        }
                 }
             }
 
@@ -1141,7 +1775,10 @@ namespace CssUI.DOM
                     case EInputType.Password:
                         break;
                     default:
-                        throw new InvalidStateError($"This method is not valid for input elements of type \"{Lookup.Keyword(inputElement.type)}\"");
+                        {
+                            if (THROW_FOR_METHOD_INVALID_TYPES) throw new InvalidStateError($"The input element type({Enum.GetName(typeof(EInputType), type)}) does not support this function");
+                            else return;
+                        }
                 }
             }
 
@@ -1217,6 +1854,291 @@ namespace CssUI.DOM
             }
 
             setSelectionRange(selection_start, selection_end);
+        }
+        #endregion
+
+        #region Utility
+        internal bool isMutable
+        {
+            get
+            {
+                if (disabled) return false;
+
+                return true;
+            }
+        }
+
+        private static bool is_type_text_selectable(EInputType type)
+        {
+            switch (type)
+            {
+                case EInputType.Text:
+                case EInputType.Search:
+                case EInputType.Url:
+                case EInputType.Telephone:
+                case EInputType.Password:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        internal IReadOnlyCollection<HTMLInputElement> Get_Radio_Button_Group()
+        {
+            Node root = form;
+            if (root == null) root = ownerDocument;
+            if (root == null) return new HTMLInputElement[0];
+
+            return DOMCommon.Get_Descendents_OfType<HTMLInputElement>(root, new FilterRadioGroup(this), Enums.ENodeFilterMask.SHOW_ELEMENT);
+        }
+
+        /// <summary>
+        /// If this is a radio button input type and its checkedness is currently true then this function will set the checkedness of all other buttons within its group to false.
+        /// </summary>
+        private void update_radio_button_group()
+        {
+            if (_checkedness == true && type == EInputType.Radio)
+            {/* ...the checkedness state of all the other elements in the same radio button group must be set to false: */
+                var group = Get_Radio_Button_Group();
+                foreach (var radioButton in group)
+                {
+                    radioButton.checkedness = false;
+                }
+            }
+        }
+
+        internal void signal_type_change()
+        {
+            if (type == EInputType.Radio)
+            {
+                update_radio_button_group();
+            }
+        }
+        #endregion
+
+        #region Rendering
+        /// <summary>
+        /// Sets up the required states for rendering this element as a particular type
+        /// </summary>
+        private void update_rendering_for_type(EInputType type)
+        {
+        }
+        #endregion
+
+        #region Overrides
+        internal override void run_cloning_steps(ref Node copy, Document document, bool clone_children = false)
+        {
+            base.run_cloning_steps(ref copy, document, clone_children);
+            /* The cloning steps for input elements must propagate the value, dirty value flag, checkedness, and dirty checkedness flag from the node being cloned to the copy. */
+            if (copy is HTMLInputElement otherInput)// of course it is an input element, we just need a cast and if we cast we might aswell check too
+            {
+                otherInput._value = _value;
+                otherInput.bDirtyValueFlag = bDirtyValueFlag;
+                otherInput.checkedness = checkedness;
+                otherInput.bDirtyCheckednessFlag = bDirtyCheckednessFlag;
+            }
+        }
+
+        internal override void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue newValue, string Namespace)
+        {
+            base.run_attribute_change_steps(element, localName, oldValue, newValue, Namespace);
+
+
+            if (!localName.EnumValue.HasValue)
+                return;
+            switch (localName.EnumValue.Value)
+            {
+                case EAttributeName.Value:
+                    {
+                        /* When the value content attribute is added, set, or removed, 
+                         * if the control's dirty value flag is false, the user agent must set the value of the element to the value of the value content attribute, 
+                         * if there is one, or the empty string otherwise, and then run the current value sanitization algorithm, if one is defined. */
+                        if (!bDirtyValueFlag)
+                        {
+                            this._value = getAttribute(EAttributeName.Value)?.Get_String() ?? string.Empty;
+                            run_value_sanitization();
+                        }
+                    }
+                    break;
+                case EAttributeName.Name:
+                case EAttributeName.Form:
+                    {
+                        update_radio_button_group();
+                    }
+                    break;
+                case EAttributeName.Type:
+                    {/* Docs: https://html.spec.whatwg.org/multipage/input.html#input-type-change */
+                     /* 1) If the previous state of the element's type attribute put the value IDL attribute in the value mode, 
+                      * and the element's value is not the empty string, and the new state of the element's type attribute puts the value IDL attribute in either the default mode or the default/on mode, 
+                      * then set the element's value content attribute to the element's value. */
+                        EInputType oldType = oldValue.Get_Enum<EInputType>();
+                        EInputType newType = newValue.Get_Enum<EInputType>();
+                        var oldMode = Get_Input_Value_Mode(oldType);
+                        var newMode = Get_Input_Value_Mode(newType);
+                        if (oldMode == EInputValueMode.Value && !string.IsNullOrEmpty(this.value) && (newMode == EInputValueMode.Default || newMode == EInputValueMode.Default_ON))
+                        {
+                            setAttribute(EAttributeName.Value, AttributeValue.From_String(_value));
+                        }
+                        /* 2) Otherwise, if the previous state of the element's type attribute put the value IDL attribute in any mode other than the value mode, 
+                        * and the new state of the element's type attribute puts the value IDL attribute in the value mode, 
+                        * then set the value of the element to the value of the value content attribute, 
+                        * if there is one, or the empty string otherwise, and then set the control's dirty value flag to false. */
+                        else if (oldMode != EInputValueMode.Value && newMode == EInputValueMode.Value)
+                        {
+                    
+                            this._value = getAttribute(EAttributeName.Value)?.Get_String() ?? string.Empty;
+                            bDirtyValueFlag = false;
+                        }
+                        /* 3) Otherwise, if the previous state of the element's type attribute put the value IDL attribute in any mode other than the filename mode, 
+                         * and the new state of the element's type attribute puts the value IDL attribute in the filename mode, then set the value of the element to the empty string. */
+                        else if (oldMode != EInputValueMode.Filename && newMode == EInputValueMode.Filename)
+                        {
+                            this._value = string.Empty;
+                        }
+                        /* 4) Update the element's rendering and behavior to the new state's. */
+                        update_rendering_for_type(newType);
+                        /* 5) Signal a type change for the element. (The Radio Button state uses this, in particular.) */
+                        signal_type_change();
+                        /* 6) Invoke the value sanitization algorithm, if one is defined for the type attribute's new state. */
+                        run_value_sanitization();
+                        /* 7) Let previouslySelectable be true if setRangeText() previously applied to the element, and false otherwise. */
+                        bool previouslySelectable = is_type_text_selectable(oldType);
+                        /* 8) Let nowSelectable be true if setRangeText() now applies to the element, and false otherwise. */
+                        bool nowSelectable = is_type_text_selectable(newType);
+                        /* 9) If previouslySelectable is false and nowSelectable is true, set the element's text entry cursor position to the beginning of the text control, and set its selection direction to "none". */
+                        if (!previouslySelectable && nowSelectable)
+                        {
+                            text_entry_cursor_position = 0;
+                            selection.direction = ESelectionDirection.None;
+                        }
+                    }
+                    break;
+            }
+
+        }
+
+
+        internal override bool has_activation_behaviour => true;
+        internal override bool has_legacy_activation_behaviour => true;
+        internal override void activation_behaviour(Event @event)
+        {
+            base.activation_behaviour(@event);
+
+            /* 1) If this element is not mutable, then return. */
+            if (!isMutable)
+                return;
+
+            /* 2) Run this element's input activation behavior, if any, and do nothing otherwise. */
+            switch (type)
+            {
+                case EInputType.Checkbox:
+                case EInputType.Radio:
+                    {
+                        Task.Factory.StartNew(() =>
+                        {
+                            dispatchEvent(new Event(EEventName.Input, new EventInit() { bubbles = true }));
+                            dispatchEvent(new Event(EEventName.Change, new EventInit() { bubbles = true }));
+                        });
+                    }
+                    break;
+                case EInputType.File: /* Docs: https://html.spec.whatwg.org/multipage/input.html#file-upload-state-(type=file):input-activation-behavior */
+                    {
+                        if (!DOMCommon.Is_Triggered_By_UserActivation(@event))
+                            return;
+
+                        /* XXX: implement the logic laid out in the documentation @ the link */
+                    }
+                    break;
+                case EInputType.Submit:
+                    {
+                        if (form != null && nodeDocument.Is_FullyActive)
+                        {
+                            FormCommon.Submit_Form(form, this);
+                        }
+                    }
+                    break;
+                case EInputType.Image: /* Docs: https://html.spec.whatwg.org/multipage/input.html#image-button-state-(type=image):input-activation-behavior */
+                    {
+                        /* XXX: implement the logic laid out in the documentation @ the link */
+                    }
+                    break;
+                case EInputType.Reset:
+                    {
+                        if (form != null && nodeDocument.Is_FullyActive)
+                        {
+                            FormCommon.Reset_Form(form);
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        HTMLInputElement legacyPreActivation_RadioRef = null;
+        bool legacyPreActivation_Checkedness = false;
+        bool legacyPreActivation_Indeterminate = false;
+        internal override void legacy_pre_activation_behaviour()
+        {
+            base.legacy_pre_activation_behaviour();
+
+            /* 1) If this element is not mutable, then return. */
+            if (!isMutable)
+                return;
+
+            /* 2) If this element's type attribute is in the Checkbox state, 
+             * then set this element's checkedness to its opposite value (i.e. true if it is false, false if it is true) and set this element's indeterminate IDL attribute to false. */
+            if (type == EInputType.Checkbox)
+            {
+                legacyPreActivation_Checkedness = checkedness;
+                legacyPreActivation_Indeterminate = indeterminate;
+
+                checkedness = !checkedness;
+                indeterminate = false;
+            }
+            /* 3) If this element's type attribute is in the Radio Button state, 
+             * then get a reference to the element in this element's radio button group that has its checkedness set to true, if any, and then set this element's checkedness to true. */
+            else if (type == EInputType.Radio)
+            {
+                var checkedElement = Get_Radio_Button_Group().FirstOrDefault(e => e.Checked);
+                legacyPreActivation_RadioRef = checkedElement;
+            }
+        }
+
+        internal override void legacy_canceled_pre_activation_behaviour()
+        {
+            base.legacy_canceled_pre_activation_behaviour();
+
+            /* 1) If this element is not mutable, then return. */
+            if (!isMutable)
+                return;
+
+            /* 2) If the element's type attribute is in the Checkbox state, 
+             * then set the element's checkedness and the element's indeterminate IDL attribute back to the values they had before the legacy-pre-activation behavior was run. */
+            if (type == EInputType.Checkbox)
+            {
+                checkedness = legacyPreActivation_Checkedness;
+                indeterminate = legacyPreActivation_Indeterminate;
+            }
+            /* 3) If this element's type attribute is in the Radio Button state, 
+             * then if the element to which a reference was obtained in the legacy-pre-activation behavior, 
+             * if any, is still in what is now this element's radio button group, if it still has one, and if so, setting that element's checkedness to true; 
+             * or else, if there was no such element, or that element is no longer in this element's radio button group, 
+             * or if this element no longer has a radio button group, setting this element's checkedness to false. */
+            else if (type == EInputType.Radio)
+            {
+                if (!ReferenceEquals(null, legacyPreActivation_RadioRef))
+                {
+                    var group = Get_Radio_Button_Group();
+                    if (group.FirstOrDefault(o => ReferenceEquals(o, legacyPreActivation_RadioRef)) != null)
+                    {
+                        legacyPreActivation_RadioRef.checkedness = true;
+                        return;
+                    }
+                }
+
+                checkedness = false;
+            }
         }
         #endregion
     }
