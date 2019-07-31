@@ -381,7 +381,10 @@ namespace CssUI.DOM
             if (reset)
             {
                 var resettableList = DOMCommon.Get_Descendents_OfType<IResettableElement>(form, new FilterFormOwner(form), ENodeFilterMask.SHOW_ELEMENT);
-
+                foreach (IResettableElement resettable in resettableList)
+                {
+                    resettable.Reset();
+                }
             }
         }
 
