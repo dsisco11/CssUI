@@ -167,6 +167,11 @@ namespace CssUI.DOM
 
         public uint textLength => (uint)get_api_value().Length;
 
+        public IReadOnlyCollection<HTMLLabelElement> labels
+        {
+            get => (IReadOnlyCollection<HTMLLabelElement>)DOMCommon.Get_Descendents(form, labelFilter, Enums.ENodeFilterMask.SHOW_ELEMENT);
+        }
+
         #region Form-Associated Element Overrides
         internal override EValidityState query_validity()
         {
@@ -194,12 +199,7 @@ namespace CssUI.DOM
                 flags |= EValidityState.tooShort;
             }
 
-            if (!ReferenceEquals(null, value) && length > 0)
-            {
-                /* When a control has a value that is not the empty string and is too low for the min attribute. */
-                /* XXX: */
-                ...
-            }
+            return flags;
         }
         #endregion
 
@@ -209,7 +209,7 @@ namespace CssUI.DOM
             value = defaultValue;
         }
 
-        #region Internal Steps
+        #region Overrides
         internal override void run_child_text_node_change_steps(Node node)
         {
             base.run_child_text_node_change_steps(node);
@@ -229,11 +229,6 @@ namespace CssUI.DOM
             other.bDirtyValueFlag = bDirtyValueFlag;
         }
         #endregion
-
-        public IReadOnlyCollection<HTMLLabelElement> labels
-        {
-            get => (IReadOnlyCollection<HTMLLabelElement>)DOMCommon.Get_Descendents(form, labelFilter, Enums.ENodeFilterMask.SHOW_ELEMENT);
-        }
 
 
         #region Text Selection
