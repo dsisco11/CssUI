@@ -81,11 +81,11 @@ namespace CssUI.CSS
         }
 
         /// <summary>
-        /// Returns a list of all selector specificitys
+        /// Returns a list of all selector specificitys that match the given element (<paramref name="E"/>)
         /// </summary>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IList<long> Get_Specificitys(Element E)
+        public IReadOnlyList<long> Get_Specificitys(Element E)
         {
             var retVal = new List<long>();
 
@@ -97,21 +97,9 @@ namespace CssUI.CSS
                 }
             }
 
-            return retVal;
+            return retVal.ToArray();
         }
 
-
-        /// <summary>
-        /// Returns a list of all selector specificitys that match the given element
-        /// </summary>
-        /// <returns></returns>
-        public IList<long> Get_Specificity_List(Element E)
-        {
-            if (Selectors == null)
-                return null;
-
-            return Selectors.Get_Specificity(E, IsFromStylesheet);
-        }
         
         /// <summary>
         /// Performs matching against a single element
@@ -195,7 +183,7 @@ namespace CssUI.CSS
             /* For each possible pseudo-element associated with element that is one of the pseudo-elements allowed to show up in the match list, if the result of match a selector against a pseudo-element for the pseudo-element and selector is success, add the pseudo-element to the selector match list. */
             /* XXX: pseudo-element Need to implement this stuff */
 
-            return matchList;
+            return matchList.ToArray();
         }
 
 
