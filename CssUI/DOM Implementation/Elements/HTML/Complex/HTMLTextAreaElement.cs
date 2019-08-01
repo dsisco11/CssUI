@@ -52,7 +52,7 @@ namespace CssUI.DOM
 
         [CEReactions] public uint cols
         {
-            get => getAttribute(EAttributeName.Cols).Get_Long();
+            get => getAttribute(EAttributeName.Cols).Get_UInt();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Cols, AttributeValue.From_Integer(value)));
         }
 
@@ -88,7 +88,7 @@ namespace CssUI.DOM
 
         [CEReactions] public uint rows
         {
-            get => getAttribute(EAttributeName.Rows).Get_ULong();
+            get => getAttribute(EAttributeName.Rows).Get_UInt();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Rows, AttributeValue.From_Integer(value)));
         }
 
@@ -239,32 +239,7 @@ namespace CssUI.DOM
 
         public void select()
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#dom-textarea/input-select */
-            /* 1) If this element is an input element, and either select() does not apply to this element or the corresponding control has no selectable text, return. */
-            if (this is HTMLInputElement inputElement)
-            {
-                var ty = inputElement.type;
-                switch (inputElement.type)
-                {
-                    case EInputType.Text:
-                    case EInputType.Search:
-                    case EInputType.Url:
-                    case EInputType.Telephone:
-                    case EInputType.Email:
-                    case EInputType.Password:
-                    case EInputType.Date:
-                    case EInputType.Month:
-                    case EInputType.Week:
-                    case EInputType.Time:
-                    case EInputType.Local:
-                    case EInputType.Number:
-                    case EInputType.Color:
-                    case EInputType.File:
-                        break;
-                    default:
-                        return;
-                }
-            }
-
+            /* 1) If this element... ...has no selectable text, return. */
             if (!StringCommon.Scan(value.AsSpan(), Filters.FilterCharSelectable.Instance))
             {
                 return;
