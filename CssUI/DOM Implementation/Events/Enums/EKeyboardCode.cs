@@ -1,447 +1,447 @@
-﻿using CssUI.DOM.Internal;
+﻿using CssUI.Internal;
 
 namespace CssUI.DOM.Events
 {
-    [DomEnum]
-    public enum EKeyboardCode : short
+    [MetaEnum]
+    public enum EKeyboardCode : int
     {/* Docs: https://www.w3.org/TR/uievents-code/#code-value-tables */
 
         /// <summary>
         /// This value code should be used when no other value given in this specification is appropriate.
         /// </summary>
-        [DomKeyword("")]
+        [MetaKeyword("")]
         Invalid = 0x0,
 
         /// <summary>
         /// `~ on a US keyboard. This is the 半角/全角/漢字 (hankaku/zenkaku/kanji) key on Japanese keyboards
         /// </summary>
-        [DomKeyword("Backquote")]
+        [MetaKeyword("Backquote", '`')]
         Backquote,
 
         /// <summary>
         /// Used for both the US \| (on the 101-key layout) and also for the key    located between the " and Enter keys on row C of the 102-, 104- and 106-key layouts. Labelled #~ on a UK (102) keyboard.
         /// </summary>
-        [DomKeyword("Backslash")]
+        [MetaKeyword("Backslash", UnicodeCommon.CHAR_REVERSE_SOLIDUS)]
         Backslash,
         
         /// <summary>
         /// Backspace or ⌫.	Labelled Delete on Apple keyboards.
         /// </summary>
-        [DomKeyword("Backspace")]
+        [MetaKeyword("Backspace", '⌫')]
         Backspace,
 
         /// <summary>
         /// [{ on a US keyboard.
         /// </summary>
-        [DomKeyword("BracketLeft")]
+        [MetaKeyword("BracketLeft", '[')]
         BracketLeft,
 
         /// <summary>
         /// ]} on a US keyboard.
         /// </summary>
-        [DomKeyword("BracketRight")]
+        [MetaKeyword("BracketRight", ']')]
         BracketRight,
 
         /// <summary>
         /// ,< on a US keyboard.
         /// </summary>
-        [DomKeyword("Comma")]
+        [MetaKeyword("Comma", ',')]
         Comma,
 
         /// <summary>
         /// 0 ) on a US keyboard.
         /// </summary>
-        [DomKeyword("Digit0")]
+        [MetaKeyword("Digit0", '0')]
         Digit0,
 
         /// <summary>
         /// 1 ! on a US keyboard.
         /// </summary>
-        [DomKeyword("Digit1")]
+        [MetaKeyword("Digit1", '1')]
         Digit1,
 
         /// <summary>
         /// 2 @ on a US keyboard.
         /// </summary>
-        [DomKeyword("Digit2")]
+        [MetaKeyword("Digit2", '2')]
         Digit2,
 
         /// <summary>
         /// 3 # on a US keyboard.
         /// </summary>
-        [DomKeyword("Digit3")]
+        [MetaKeyword("Digit3", '3')]
         Digit3,
 
         /// <summary>
         /// 4 $ on a US keyboard.
         /// </summary>
-        [DomKeyword("Digit4")]
+        [MetaKeyword("Digit4", '4')]
         Digit4,
 
         /// <summary>
         /// 5 % on a US keyboard.
         /// </summary>
-        [DomKeyword("Digit5")]
+        [MetaKeyword("Digit5", '5')]
         Digit5,
 
         /// <summary>
         /// 6 ^ on a US keyboard.
         /// </summary>
-        [DomKeyword("Digit6")]
+        [MetaKeyword("Digit6", '6')]
         Digit6,
 
         /// <summary>
         /// 7 & on a US keyboard.
         /// </summary>
-        [DomKeyword("Digit7")]
+        [MetaKeyword("Digit7", '7')]
         Digit7,
 
         /// <summary>
         /// 8 * on a US keyboard.
         /// </summary>
-        [DomKeyword("Digit8")]
+        [MetaKeyword("Digit8", '8')]
         Digit8,
 
         /// <summary>
         /// 9 ( on a US keyboard.
         /// </summary>
-        [DomKeyword("Digit9")]
+        [MetaKeyword("Digit9", '9')]
         Digit9,
 
         /// <summary>
         /// = + on a US keyboard.
         /// </summary>
-        [DomKeyword("Equal")]
+        [MetaKeyword("Equal", '=')]
         Equal,
 
         /// <summary>
         /// Located between the left Shift and Z keys.	Labelled \| on a UK keyboard.
         /// </summary>
-        [DomKeyword("IntlBackslash")]
+        [MetaKeyword("IntlBackslash", UnicodeCommon.CHAR_REVERSE_SOLIDUS)]
         IntlBackslash,
 
         /// <summary>
-        /// Located between the / and right Shift keys.	Labelled \ろ (ro) on a Japanese keyboard.
+        /// Located between the / and right Shift keys.	Labelled \ (ro) on a Japanese keyboard.
         /// </summary>
-        [DomKeyword("IntlRo")]
+        [MetaKeyword("IntlRo", 'ろ')]
         IntlRo,
 
         /// <summary>
-        /// Located between the = and Backspace keys.	Labelled ¥ (yen) on a Japanese keyboard. \/ on a Russian keyboard.
+        /// Located between the = and Backspace keys.	Labelled  (yen) on a Japanese keyboard. \/ on a Russian keyboard.
         /// </summary>
-        [DomKeyword("IntlYen")]
+        [MetaKeyword("IntlYen", '¥')]
         IntlYen,
 
         /// <summary>
         /// a on a US keyboard.Labelled q on an AZERTY (e.g., French) keyboard.
         /// </summary>
-        [DomKeyword("KeyA")]
+        [MetaKeyword("KeyA", 'a')]
         KeyA,
 
         /// <summary>
         /// b on a US keyboard.
         /// </summary>
-        [DomKeyword("KeyB")]
+        [MetaKeyword("KeyB", 'b')]
         KeyB,
 
         /// <summary>
         /// c on a US keyboard.
         /// </summary>
-        [DomKeyword("KeyC")]
+        [MetaKeyword("KeyC", 'c')]
         KeyC,
 
         /// <summary>
         /// d on a US keyboard.
         /// </summary>
-        [DomKeyword("KeyD")]
+        [MetaKeyword("KeyD", 'd')]
         KeyD,
 
         /// <summary>
         /// e on a US keyboard.
         /// </summary>
-        [DomKeyword("KeyE")]
+        [MetaKeyword("KeyE", 'e')]
         KeyE,
 
         /// <summary>
         /// f on a US keyboard.
         /// </summary>
-        [DomKeyword("KeyF")]
+        [MetaKeyword("KeyF", 'f')]
         KeyF,
 
         /// <summary>
         /// g on a US keyboard.
         /// </summary>
-        [DomKeyword("KeyG")]
+        [MetaKeyword("KeyG", 'g')]
         KeyG,
 
         /// <summary>
         /// h on a US keyboard.
         /// </summary>
-        [DomKeyword("KeyH")]
+        [MetaKeyword("KeyH", 'h')]
         KeyH,
 
         /// <summary>
         /// i on a US keyboard.
         /// </summary>
-        [DomKeyword("KeyI")]
+        [MetaKeyword("KeyI", 'i')]
         KeyI,
 
         /// <summary>
         /// j on a US keyboard.
         /// </summary>
-        [DomKeyword("KeyJ")]
+        [MetaKeyword("KeyJ", 'j')]
         KeyJ,
 
         /// <summary>
         /// k on a US keyboard.
         /// </summary>
-        [DomKeyword("KeyK")]
+        [MetaKeyword("KeyK", 'k')]
         KeyK,
 
         /// <summary>
         /// l on a US keyboard.
         /// </summary>
-        [DomKeyword("KeyL")]
+        [MetaKeyword("KeyL", 'l')]
         KeyL,
 
         /// <summary>
         /// m on a US keyboard.
         /// </summary>
-        [DomKeyword("KeyM")]
+        [MetaKeyword("KeyM", 'm')]
         KeyM,
 
         /// <summary>
         /// n on a US keyboard.
         /// </summary>
-        [DomKeyword("KeyN")]
+        [MetaKeyword("KeyN", 'n')]
         KeyN,
 
         /// <summary>
         /// o on a US keyboard.
         /// </summary>
-        [DomKeyword("KeyO")]
+        [MetaKeyword("KeyO", 'o')]
         KeyO,
 
         /// <summary>
         /// p on a US keyboard.
         /// </summary>
-        [DomKeyword("KeyP")]
+        [MetaKeyword("KeyP", 'p')]
         KeyP,
 
         /// <summary>
         /// q on a US keyboard.Labelled a on an AZERTY (e.g., French) keyboard.
         /// </summary>
-        [DomKeyword("KeyQ")]
+        [MetaKeyword("KeyQ", 'q')]
         KeyQ,
 
         /// <summary>
         /// r on a US keyboard.
         /// </summary>
-        [DomKeyword("KeyR")]
+        [MetaKeyword("KeyR", 'r')]
         KeyR,
 
         /// <summary>
         /// s on a US keyboard.
         /// </summary>
-        [DomKeyword("KeyS")]
+        [MetaKeyword("KeyS", 's')]
         KeyS,
 
         /// <summary>
         /// t on a US keyboard.
         /// </summary>
-        [DomKeyword("KeyT")]
+        [MetaKeyword("KeyT", 't')]
         KeyT,
 
         /// <summary>
         /// u on a US keyboard.
         /// </summary>
-        [DomKeyword("KeyU")]
+        [MetaKeyword("KeyU", 'u')]
         KeyU,
 
         /// <summary>
         /// v on a US keyboard.
         /// </summary>
-        [DomKeyword("KeyV")]
+        [MetaKeyword("KeyV", 'v')]
         KeyV,
 
         /// <summary>
         /// w on a US keyboard.Labelled z on an AZERTY (e.g., French) keyboard.
         /// </summary>
-        [DomKeyword("KeyW")]
+        [MetaKeyword("KeyW", 'w')]
         KeyW,
 
         /// <summary>
         /// x on a US keyboard.
         /// </summary>
-        [DomKeyword("KeyX")]
+        [MetaKeyword("KeyX", 'x')]
         KeyX,
 
         /// <summary>
         /// y on a US keyboard.Labelled z on a QWERTZ (e.g., German) keyboard.
         /// </summary>
-        [DomKeyword("KeyY")]
+        [MetaKeyword("KeyY", 'y')]
         KeyY,
 
         /// <summary>
         /// z on a US keyboard.Labelled w on an AZERTY (e.g., French) keyboard, and y on a QWERTZ (e.g., German) keyboard.
         /// </summary>
-        [DomKeyword("KeyZ")]
+        [MetaKeyword("KeyZ", 'z')]
         KeyZ,
 
         /// <summary>
         /// -_ on a US keyboard.
         /// </summary>
-        [DomKeyword("Minus")]
+        [MetaKeyword("Minus", '-')]
         Minus,
 
         /// <summary>
         /// .> on a US keyboard.
         /// </summary>
-        [DomKeyword("Period")]
+        [MetaKeyword("Period", '.')]
         Period,
 
         /// <summary>
         /// '" on a US keyboard.
         /// </summary>
-        [DomKeyword("Quote")]
+        [MetaKeyword("Quote", UnicodeCommon.CHAR_APOSTRAPHE)]
         Quote,
 
         /// <summary>
         /// ;: on a US keyboard.
         /// </summary>
-        [DomKeyword("Semicolon")]
+        [MetaKeyword("Semicolon", ';')]
         Semicolon,
 
         /// <summary>
         /// /? on a US keyboard.
         /// </summary>
-        [DomKeyword("Slash")]
+        [MetaKeyword("Slash", '/')]
         Slash,
 
         /// <summary>
         /// Alt, Option or ⌥.
         /// </summary>
-        [DomKeyword("AltLeft")]
+        [MetaKeyword("AltLeft", UnicodeCommon.KEY_ALT_MODIFIER)]
         AltLeft,
 
         /// <summary>
         /// Alt, Option or ⌥.	This is labelled AltGr key on many keyboard layouts.
         /// </summary>
-        [DomKeyword("AltRight")]
+        [MetaKeyword("AltRight", UnicodeCommon.KEY_ALT_MODIFIER)]
         AltRight,
 
         /// <summary>
         /// CapsLock or ⇪
         /// </summary>
-        [DomKeyword("CapsLock")]
+        [MetaKeyword("CapsLock", UnicodeCommon.KEY_CAPSLOCK)]
         CapsLock,
 
         /// <summary>
         /// The application context menu key, which is typically found between the right Meta key and the right Control key.
         /// </summary>
-        [DomKeyword("ContextMenu")]
+        [MetaKeyword("ContextMenu")]
         ContextMenu,
 
         /// <summary>
         /// Control or ⌃
         /// </summary>
-        [DomKeyword("ControlLeft")]
+        [MetaKeyword("ControlLeft", UnicodeCommon.KEY_CTRL_MODIFIER)]
         ControlLeft,
 
         /// <summary>
         /// Control or ⌃
         /// </summary>
-        [DomKeyword("ControlRight")]
+        [MetaKeyword("ControlRight", UnicodeCommon.KEY_CTRL_MODIFIER)]
         ControlRight,
 
         /// <summary>
         /// Enter or ↵. Labelled Return on Apple keyboards.
         /// </summary>
-        [DomKeyword("Enter")]
+        [MetaKeyword("Enter", UnicodeCommon.KEY_ENTER)]
         Enter,
 
         /// <summary>
         /// The Windows, ⌘, Command or other OS symbol key.
         /// </summary>
-        [DomKeyword("MetaLeft")]
+        [MetaKeyword("MetaLeft", UnicodeCommon.KEY_META_MODIFIER)]
         MetaLeft,
 
         /// <summary>
         /// The Windows, ⌘, Command or other OS symbol key.
         /// </summary>
-        [DomKeyword("MetaRight")]
+        [MetaKeyword("MetaRight", UnicodeCommon.KEY_META_MODIFIER)]
         MetaRight,
 
         /// <summary>
         /// Shift or ⇧
         /// </summary>
-        [DomKeyword("ShiftLeft")]
+        [MetaKeyword("ShiftLeft", UnicodeCommon.KEY_SHIFT_MODIFIER)]
         ShiftLeft,
 
         /// <summary>
         /// Shift or ⇧
         /// </summary>
-        [DomKeyword("ShiftRight")]
+        [MetaKeyword("ShiftRight", UnicodeCommon.KEY_SHIFT_MODIFIER)]
         ShiftRight,
 
         /// <summary>
         /// (space)
         /// </summary>
-        [DomKeyword("Space")]
+        [MetaKeyword("Space", UnicodeCommon.KEY_SPACE)]
         Space,
 
         /// <summary>
         /// Tab or ⇥
         /// </summary>
-        [DomKeyword("Tab")]
+        [MetaKeyword("Tab", UnicodeCommon.KEY_TAB)]
         Tab,
 
         /// <summary>
         /// Japanese: 変換 (henkan)
         /// </summary>
-        [DomKeyword("Convert")]
+        [MetaKeyword("Convert")]
         Convert,
 
         /// <summary>
         /// Japanese: カタカナ/ひらがな/ローマ字 (katakana/hiragana/romaji)
         /// </summary>
-        [DomKeyword("KanaMode")]
+        [MetaKeyword("KanaMode")]
         KanaMode,
 
         /// <summary>
         /// Korean: HangulMode 한/영 (han/yeong) Japanese (Mac keyboard): かな (kana)
         /// </summary>
-        [DomKeyword("Lang1")]
+        [MetaKeyword("Lang1", '한', '영')]
         Lang1,
 
         /// <summary>
         /// Korean: Hanja 한자 (hanja) Japanese (Mac keyboard): 英数 (eisu)
         /// </summary>
-        [DomKeyword("Lang2")]
+        [MetaKeyword("Lang2")]
         Lang2,
 
         /// <summary>
         /// Japanese (word-processing keyboard): Katakana
         /// </summary>
-        [DomKeyword("Lang3")]
+        [MetaKeyword("Lang3")]
         Lang3,
 
         /// <summary>
         /// Japanese (word-processing keyboard): Hiragana
         /// </summary>
-        [DomKeyword("Lang4")]
+        [MetaKeyword("Lang4")]
         Lang4,
 
         /// <summary>
         /// Japanese (word-processing keyboard): Zenkaku/Hankaku
         /// </summary>
-        [DomKeyword("Lang5")]
+        [MetaKeyword("Lang5")]
         Lang5,
 
         /// <summary>
         /// Japanese: 無変換 (muhenkan)
         /// </summary>
-        [DomKeyword("NonConvert")]
+        [MetaKeyword("NonConvert")]
         NonConvert,
 
 
@@ -449,43 +449,43 @@ namespace CssUI.DOM.Events
         /// <summary>
         /// ⌦. The forward delete key.	Note that on Apple keyboards, the key labelled Delete on the main part of the keyboard should be encoded as "Backspace".
         /// </summary>
-        [DomKeyword("Delete")]
+        [MetaKeyword("Delete", UnicodeCommon.KEY_DELETE)]
         Delete,
 
         /// <summary>
         /// Page Down, End or ↘
         /// </summary>
-        [DomKeyword("End")]
+        [MetaKeyword("End", UnicodeCommon.KEY_END)]
         End,
 
         /// <summary>
         /// Help. Not present on standard PC keyboards.
         /// </summary>
-        [DomKeyword("Help")]
+        [MetaKeyword("Help")]
         Help,
 
         /// <summary>
         /// Home or ↖
         /// </summary>
-        [DomKeyword("Home")]
+        [MetaKeyword("Home", UnicodeCommon.KEY_HOME)]
         Home,
 
         /// <summary>
         /// Insert or Ins. Not present on Apple keyboards.
         /// </summary>
-        [DomKeyword("Insert")]
+        [MetaKeyword("Insert")]
         Insert,
 
         /// <summary>
         /// Page Down, PgDn or ⇟
         /// </summary>
-        [DomKeyword("PageDown")]
+        [MetaKeyword("PageDown", UnicodeCommon.KEY_PGDOWN)]
         PageDown,
 
         /// <summary>
         /// Page Up, PgUp or ⇞
         /// </summary>
-        [DomKeyword("PageUp")]
+        [MetaKeyword("PageUp", UnicodeCommon.KEY_PGUP)]
         PageUp,
 
 
@@ -495,25 +495,25 @@ namespace CssUI.DOM.Events
         /// <summary>
         /// ↓
         /// </summary>
-        [DomKeyword("ArrowDown")]
+        [MetaKeyword("ArrowDown", UnicodeCommon.KEY_DOWN)]
         ArrowDown,
 
         /// <summary>
         /// ←
         /// </summary>
-        [DomKeyword("ArrowLeft")]
+        [MetaKeyword("ArrowLeft", UnicodeCommon.KEY_LEFT)]
         ArrowLeft,
 
         /// <summary>
         /// →
         /// </summary>
-        [DomKeyword("ArrowRight")]
+        [MetaKeyword("ArrowRight", UnicodeCommon.KEY_RIGHT)]
         ArrowRight,
 
         /// <summary>
         /// ↑
         /// </summary>
-        [DomKeyword("ArrowUp")]
+        [MetaKeyword("ArrowUp", UnicodeCommon.KEY_UP)]
         ArrowUp,
 
 
@@ -524,186 +524,186 @@ namespace CssUI.DOM.Events
         /// <summary>
         /// On the Mac, the "NumLock" code should be used for the numpad Clear key.
         /// </summary>
-        [DomKeyword("NumLock")]
+        [MetaKeyword("NumLock")]
         NumLock,
 
         /// <summary>
         /// 0 Ins on a keyboard 0 on a phone or remote control
         /// </summary>
-        [DomKeyword("Numpad0")]
+        [MetaKeyword("Numpad0")]
         Numpad0,
 
         /// <summary>
         /// 1 End on a keyboard 1 or 1 QZ on a phone or remote control
         /// </summary>
-        [DomKeyword("Numpad1")]
+        [MetaKeyword("Numpad1")]
         Numpad1,
 
         /// <summary>
         /// 2 ↓ on a keyboard 2 ABC on a phone or remote control
         /// </summary>
-        [DomKeyword("Numpad2")]
+        [MetaKeyword("Numpad2")]
         Numpad2,
 
         /// <summary>
         /// 3 PgDn on a keyboard 3 DEF on a phone or remote control
         /// </summary>
-        [DomKeyword("Numpad3")]
+        [MetaKeyword("Numpad3")]
         Numpad3,
 
         /// <summary>
         /// 4 ← on a keyboard 4 GHI on a phone or remote control
         /// </summary>
-        [DomKeyword("Numpad4")]
+        [MetaKeyword("Numpad4")]
         Numpad4,
 
         /// <summary>
         /// 5 on a keyboard 5 JKL on a phone or remote control
         /// </summary>
-        [DomKeyword("Numpad5")]
+        [MetaKeyword("Numpad5")]
         Numpad5,
 
         /// <summary>
         /// 6 → on a keyboard 6 MNO on a phone or remote control
         /// </summary>
-        [DomKeyword("Numpad6")]
+        [MetaKeyword("Numpad6")]
         Numpad6,
 
         /// <summary>
         /// 7 Home on a keyboard 7 PQRS or 7 PRS on a phone  or remote control
         /// </summary>
-        [DomKeyword("Numpad7")]
+        [MetaKeyword("Numpad7")]
         Numpad7,
 
         /// <summary>
         /// 8 ↑ on a keyboard 8 TUV on a phone or remote control
         /// </summary>
-        [DomKeyword("Numpad8")]
+        [MetaKeyword("Numpad8")]
         Numpad8,
 
         /// <summary>
         /// 9 PgUp on a keyboard 9 WXYZ or 9 WXY on a phone  or remote control
         /// </summary>
-        [DomKeyword("Numpad9")]
+        [MetaKeyword("Numpad9")]
         Numpad9,
 
         /// <summary>
         /// +
         /// </summary>
-        [DomKeyword("NumpadAdd")]
+        [MetaKeyword("NumpadAdd", '+')]
         NumpadAdd,
 
         /// <summary>
         /// Found on the Microsoft Natural Keyboard.
         /// </summary>
-        [DomKeyword("NumpadBackspace")]
+        [MetaKeyword("NumpadBackspace")]
         NumpadBackspace,
 
         /// <summary>
         /// C or AC (All Clear). Also for use with numpads that have a Clear key that is separate from the NumLock key. On the Mac, the numpad Clear key should always be encoded as "NumLock".
         /// </summary>
-        [DomKeyword("NumpadClear")]
+        [MetaKeyword("NumpadClear")]
         NumpadClear,
 
         /// <summary>
         /// CE (Clear Entry)
         /// </summary>
-        [DomKeyword("NumpadClearEntry")]
+        [MetaKeyword("NumpadClearEntry")]
         NumpadClearEntry,
 
         /// <summary>
         /// , (thousands separator). For locales where the thousands separator	is a "." (e.g., Brazil), this key may generate a ..
         /// </summary>
-        [DomKeyword("NumpadComma")]
+        [MetaKeyword("NumpadComma")]
         NumpadComma,
 
         /// <summary>
         /// . Del. For locales where the decimal separator is "," (e.g., Brazil), this key may generate a,.
         /// </summary>
-        [DomKeyword("NumpadDecimal")]
+        [MetaKeyword("NumpadDecimal")]
         NumpadDecimal,
 
         /// <summary>
         /// /
         /// </summary>
-        [DomKeyword("NumpadDivide")]
+        [MetaKeyword("NumpadDivide")]
         NumpadDivide,
         /// <summary>
         /// Newline
         /// </summary>
-        [DomKeyword("NumpadEnter")]
-        ),
+        [MetaKeyword("NumpadEnter")]
+        NumpadEnter,
 
         /// <summary>
         /// =
         /// </summary>
-        [DomKeyword("NumpadEqual")]
+        [MetaKeyword("NumpadEqual")]
         NumpadEqual,
 
         /// <summary>
         /// # on a phone or remote control device. This key is typically found	below the 9 key and to the right of the 0 key.
         /// </summary>
-        [DomKeyword("NumpadHash")]
+        [MetaKeyword("NumpadHash")]
         NumpadHash,
 
         /// <summary>
         /// M+ Add current entry to the value stored in memory.
         /// </summary>
-        [DomKeyword("NumpadMemoryAdd")]
+        [MetaKeyword("NumpadMemoryAdd")]
         NumpadMemoryAdd,
 
         /// <summary>
         /// MC Clear the value stored in memory.
         /// </summary>
-        [DomKeyword("NumpadMemoryClear")]
+        [MetaKeyword("NumpadMemoryClear")]
         NumpadMemoryClear,
 
         /// <summary>
         /// MR Replace the current entry with the value stored in memory.
         /// </summary>
-        [DomKeyword("NumpadMemoryRecall")]
+        [MetaKeyword("NumpadMemoryRecall")]
         NumpadMemoryRecall,
 
         /// <summary>
         /// MS Replace the value stored in memory with the current entry.
         /// </summary>
-        [DomKeyword("NumpadMemoryStore")]
+        [MetaKeyword("NumpadMemoryStore")]
         NumpadMemoryStore,
 
         /// <summary>
         /// M- Subtract current entry from the value stored in memory.
         /// </summary>
-        [DomKeyword("NumpadMemorySubtract")]
+        [MetaKeyword("NumpadMemorySubtract")]
         NumpadMemorySubtract,
 
         /// <summary>
         /// * on a keyboard. For use with numpads that provide mathematical operations (+, -, * and /). Use "NumpadStar" for the * key on phones and remote controls.
         /// </summary>
-        [DomKeyword("NumpadMultiply")]
+        [MetaKeyword("NumpadMultiply")]
         NumpadMultiply,
 
         /// <summary>
         /// ( Found on the Microsoft Natural Keyboard.
         /// </summary>
-        [DomKeyword("NumpadParenLeft")]
+        [MetaKeyword("NumpadParenLeft")]
         NumpadParenLeft,
 
         /// <summary>
         /// ) Found on the Microsoft Natural Keyboard.
         /// </summary>
-        [DomKeyword("NumpadParenRight")]
+        [MetaKeyword("NumpadParenRight")]
         NumpadParenRight,
 
         /// <summary>
         /// * on a phone or remote control device.	This key is typically found below the 7 key and to the left of the 0 key. Use "NumpadMultiply" for the * key on numeric keypads.
         /// </summary>
-        [DomKeyword("NumpadStar")]
+        [MetaKeyword("NumpadStar")]
         NumpadStar,
 
         /// <summary>
         /// -
         /// </summary>
-        [DomKeyword("NumpadSubtract")]
+        [MetaKeyword("NumpadSubtract")]
         NumpadSubtract,
 
 
@@ -714,109 +714,109 @@ namespace CssUI.DOM.Events
         /// <summary>
         /// Esc or ⎋
         /// </summary>
-        [DomKeyword("Escape")]
+        [MetaKeyword("Escape", UnicodeCommon.KEY_ESCAPE)]
         Escape,
 
         /// <summary>
         /// F1
         /// </summary>
-        [DomKeyword("F1")]
+        [MetaKeyword("F1")]
         F1,
 
         /// <summary>
         /// F2
         /// </summary>
-        [DomKeyword("F2")]
+        [MetaKeyword("F2")]
         F2,
 
         /// <summary>
         /// F3
         /// </summary>
-        [DomKeyword("F3")]
+        [MetaKeyword("F3")]
         F3,
 
         /// <summary>
         /// F4
         /// </summary>
-        [DomKeyword("F4")]
+        [MetaKeyword("F4")]
         F4,
 
         /// <summary>
         /// F5
         /// </summary>
-        [DomKeyword("F5")]
+        [MetaKeyword("F5")]
         F5,
 
         /// <summary>
         /// F6
         /// </summary>
-        [DomKeyword("F6")]
+        [MetaKeyword("F6")]
         F6,
 
         /// <summary>
         /// F7
         /// </summary>
-        [DomKeyword("F7")]
+        [MetaKeyword("F7")]
         F7,
 
         /// <summary>
         /// F8
         /// </summary>
-        [DomKeyword("F8")]
+        [MetaKeyword("F8")]
         F8,
 
         /// <summary>
         /// F9
         /// </summary>
-        [DomKeyword("F9")]
+        [MetaKeyword("F9")]
         F9,
 
         /// <summary>
         /// F10
         /// </summary>
-        [DomKeyword("F10")]
+        [MetaKeyword("F10")]
         F10,
 
         /// <summary>
         /// F11
         /// </summary>
-        [DomKeyword("F11")]
+        [MetaKeyword("F11")]
         F11,
 
         /// <summary>
         /// F12
         /// </summary>
-        [DomKeyword("F12")]
+        [MetaKeyword("F12")]
         F12,
 
         /// <summary>
         /// Fn This is typically a hardware key that does not generate a separate   code. Most keyboards do not place this key in the function section, but it is included here to keep it with related keys.
         /// </summary>
-        [DomKeyword("Fn")]
+        [MetaKeyword("Fn")]
         Fn,
 
         /// <summary>
         /// FLock or FnLock. Function Lock key. Found on the Microsoft  Natural Keyboard.
         /// </summary>
-        [DomKeyword("FnLock")]
+        [MetaKeyword("FnLock")]
         FnLock,
 
         /// <summary>
         /// PrtScr SysRq or Print Screen
         /// </summary>
-        [DomKeyword("PrintScreen")]
+        [MetaKeyword("PrintScreen")]
         PrintScreen,
 
         /// <summary>
         /// Scroll Lock
         /// </summary>
-        [DomKeyword("ScrollLock")]
+        [MetaKeyword("ScrollLock")]
         ScrollLock,
 
         /// <summary>
         /// Pause Break
         /// </summary>
-        [DomKeyword("Pause")]
+        [MetaKeyword("Pause")]
         Pause,
 
 
@@ -827,132 +827,132 @@ namespace CssUI.DOM.Events
         /// <summary>
         /// Some laptops place this key to the left of the ↑ key.
         /// </summary>
-        [DomKeyword("BrowserBack")]
+        [MetaKeyword("BrowserBack")]
         BrowserBack,
         /// <summary>
         /// No definition
         /// </summary>
-        [DomKeyword("BrowserFavorites")]
+        [MetaKeyword("BrowserFavorites")]
         BrowserFavorites,
 
         /// <summary>
         /// Some laptops place this key to the right of the ↑ key.
         /// </summary>
-        [DomKeyword("BrowserForward")]
+        [MetaKeyword("BrowserForward")]
         BrowserForward,
 
         /// <summary>
         ///         
         /// </summary>
-        [DomKeyword("BrowserHome")]
+        [MetaKeyword("BrowserHome")]
         BrowserHome,
 
         /// <summary>
         ///         
         /// </summary>
-        [DomKeyword("BrowserRefresh")]
+        [MetaKeyword("BrowserRefresh")]
         BrowserRefresh,
 
         /// <summary>
         ///         
         /// </summary>
-        [DomKeyword("BrowserSearch")]
+        [MetaKeyword("BrowserSearch")]
         BrowserSearch,
 
         /// <summary>
         ///         
         /// </summary>
-        [DomKeyword("BrowserStop")]
+        [MetaKeyword("BrowserStop")]
         BrowserStop,
 
         /// <summary>
         /// Eject or ⏏. This key is placed in the function  section on some Apple keyboards.
         /// </summary>
-        [DomKeyword("Eject")]
+        [MetaKeyword("Eject")]
         Eject,
 
         /// <summary>
         /// Sometimes labelled My Computer on the keyboard
         /// </summary>
-        [DomKeyword("LaunchApp1")]
+        [MetaKeyword("LaunchApp1")]
         LaunchApp1,
 
         /// <summary>
         /// Sometimes labelled Calculator on the keyboard
         /// </summary>
-        [DomKeyword("LaunchApp2")]
+        [MetaKeyword("LaunchApp2")]
         LaunchApp2,
 
         /// <summary>
         ///         
         /// </summary>
-        [DomKeyword("LaunchMail")]
+        [MetaKeyword("LaunchMail")]
         LaunchMail,
 
         /// <summary>
         ///         
         /// </summary>
-        [DomKeyword("MediaPlayPause")]
+        [MetaKeyword("MediaPlayPause")]
         MediaPlayPause,
 
         /// <summary>
         ///         
         /// </summary>
-        [DomKeyword("MediaSelect")]
+        [MetaKeyword("MediaSelect")]
         MediaSelect,
 
         /// <summary>
         ///         
         /// </summary>
-        [DomKeyword("MediaStop")]
+        [MetaKeyword("MediaStop")]
         MediaStop,
 
         /// <summary>
         ///         
         /// </summary>
-        [DomKeyword("MediaTrackNext")]
+        [MetaKeyword("MediaTrackNext")]
         MediaTrackNext,
 
         /// <summary>
         ///         
         /// </summary>
-        [DomKeyword("MediaTrackPrevious")]
+        [MetaKeyword("MediaTrackPrevious")]
         MediaTrackPrevious,
 
         /// <summary>
         /// This key is placed in the function section on some Apple keyboards, replacing the Eject key.
         /// </summary>
-        [DomKeyword("Power")]
+        [MetaKeyword("Power")]
         Power,
 
         /// <summary>
         ///         
         /// </summary>
-        [DomKeyword("Sleep")]
+        [MetaKeyword("Sleep")]
         Sleep,
 
         /// <summary>
         ///         
         /// </summary>
-        [DomKeyword("AudioVolumeDown")]
+        [MetaKeyword("AudioVolumeDown")]
         AudioVolumeDown,
 
         /// <summary>
         ///         
         /// </summary>
-        [DomKeyword("AudioVolumeMute")]
+        [MetaKeyword("AudioVolumeMute")]
         AudioVolumeMute,
 
         /// <summary>
         ///         
         /// </summary>
-        [DomKeyword("AudioVolumeUp")]
+        [MetaKeyword("AudioVolumeUp")]
         AudioVolumeUp,
 
         /// <summary>
         /// 
         /// </summary>
-        [DomKeyword("WakeUp")]
+        [MetaKeyword("WakeUp")]
         WakeUp,
 
 
