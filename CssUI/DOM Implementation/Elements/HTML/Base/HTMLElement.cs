@@ -4,6 +4,7 @@ using CssUI.DOM.Exceptions;
 using CssUI.DOM.Internal;
 using CssUI.DOM.Nodes;
 using CssUI.DOM.Serialization;
+using System;
 
 namespace CssUI.DOM
 {
@@ -514,9 +515,15 @@ namespace CssUI.DOM
             }
         }
 
-        // public void blur(); /* "User agents are encouraged to ignore calls to this blur() method entirely." - https://html.spec.whatwg.org/multipage/interaction.html#dom-window-blur */
+        //public void blur(); /* "User agents are encouraged to ignore calls to this blur() method entirely." - https://html.spec.whatwg.org/multipage/interaction.html#dom-window-blur */
 
-        /* XXX: finish access key logic */
+        /// <summary>
+        /// 
+        /// </summary>
+        /// Docs: https://html.spec.whatwg.org/multipage/interaction.html#assigned-access-key
+        public KeyCombination assignedAccessKey { get; private set; } = null;
+
+
         [CEReactions]
         public string AccessKey
         {
@@ -524,7 +531,65 @@ namespace CssUI.DOM
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.AccessKey, AttributeValue.Parse(EAttributeName.AccessKey, value)));
         }
 
-        public string AccessKeyLabel { get; private set; }
+        /* This has been removed from HTML5.1 because it's not a good solution to the problem of user discovery */
+        /*public string AccessKeyLabel
+        {*//* Docs: https://html.spec.whatwg.org/multipage/interaction.html#dom-accesskeylabel *//*
+            get => assignedAccessKey?.Label ?? string.Empty();
+            private set;
+        }*/
+
+        internal void update_accessKey()
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#assigned-access-key */
+         /* Whenever an element's accesskey attribute is set, changed, or removed, the user agent must update the element's assigned access key by running the following steps: */
+
+            /* 1) If the element has no accesskey attribute, then skip to the fallback step below. */
+            if (hasAttribute(EAttributeName.AccessKey, out Attr outAttr) && outAttr.IsDefined)
+            {
+                /* 2) Otherwise, split the attribute's value on ASCII whitespace, and let keys be the resulting tokens. */
+                var keys = StringCommon.Strtok(outAttr.Value.Get_String().AsMemory(), UnicodeCommon.CHAR_SPACE);
+                /* 3) For each value in keys in turn, in the order the tokens appeared in the attribute's value, run the following substeps: */
+                foreach (var keyStr in keys)
+                {
+                    /* 1) If the value is not a string exactly one code point in length, then skip the remainder of these steps for this value. */
+                    if (keyStr.Length != 1) continue;
+                    char key = keyStr.Span[0];
+                    /* 2) If the value does not correspond to a key on the system's keyboard, then skip the remainder of these steps for this value. */
+                    if (!nodeDocument.defaultView.Keyboard.Has_Key(key)) continue;
+                    /* 3) If the user agent can find a mix of zero or more modifier keys that, combined with the key that corresponds to the value given in the attribute, 
+                     * can be used as the access key, then the user agent may assign that combination of keys as the element's assigned access key and return. */
+                    KeyCombination combo;
+
+                    EKeyboardCode keyCode = nodeDocument.defaultView.Keyboard.TranslateKey(key);
+                    /* Test all ctrl, alt, & shift modifier keys */
+
+                    combo = new KeyCombination(altKey: true, keys: keyCode);
+                    if (nodeDocument.Register_Key_Command(combo, () => this.Focus()))
+                    {
+                        assignedAccessKey = combo;
+                        return;
+                    }
+
+                    combo = new KeyCombination(ctrlKey: true, keys: keyCode);
+                    if (nodeDocument.Register_Key_Command(combo, () => this.Focus()))
+                    {
+                        assignedAccessKey = combo;
+                        return;
+                    }
+
+                    combo = new KeyCombination(shiftKey: true, keys: keyCode);
+                    if (nodeDocument.Register_Key_Command(combo, () => this.Focus()))
+                    {
+                        assignedAccessKey = combo;
+                        return;
+                    }
+                }
+
+                /* 4) Fallback: Optionally, the user agent may assign a key combination of its choosing as the element's assigned access key and then return. */
+                assignedAccessKey = null;
+            }
+        }
+
+
 
         /// <summary>
         /// Returns true if the element is draggable; otherwise, returns false.
@@ -555,7 +620,7 @@ namespace CssUI.DOM
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Draggable, AttributeValue.From_Enum(value ? EDraggable.True : EDraggable.False)));
         }
 
-        /* XXX: implement these */
+        /* XXX: Spellcheck implementation */
         /// <summary>
         /// Determines the default behavior of spellchecking for this element
         /// </summary>
@@ -716,6 +781,19 @@ namespace CssUI.DOM
             set;
         }
         #endregion
+
+        #region Overrides
+        internal override void run_attribute_change_steps(this Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue newValue, string Namespace)
+        {
+            base.run_attribute_change_steps(element, localName, oldValue, newValue, Namespace);
+
+            if (localName == EAttributeName.AccessKey)
+            {
+            }
+
+        }
+        #endregion
+
 
         #region Document Events
         public event EventCallback onCopy
