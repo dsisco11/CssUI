@@ -378,10 +378,10 @@ namespace CssUI.DOM
                     return true;
                 }
 
-                IEnumerable<Node> focusChain = DOMCommon.Get_Focus_Chain(focusedElement);
-                foreach (Node node in focusChain)
+                var focusChain = DOMCommon.Get_Focus_Chain(focusedElement);
+                foreach (FocusableArea area in focusChain)
                 {
-                    if (ReferenceEquals(this, node))
+                    if (ReferenceEquals(this, area.DOMAnchor))
                     {
                         return true;
                     }
