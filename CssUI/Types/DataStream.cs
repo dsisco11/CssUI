@@ -156,6 +156,25 @@ namespace CssUI
         /// </summary>
         /// <param name="Predicate"></param>
         /// <returns>True if atleast a single item was consumed</returns>
+        public bool Consume_While(Func<ItemType, bool> Predicate, out ReadOnlyMemory<ItemType> outConsumed)
+        {
+            var startIndex = Position;
+
+            while (Predicate(Next))
+            {
+                Consume();
+            }
+
+            var count = Position - startIndex;
+            outConsumed = Data.Slice((int)startIndex, (int)count);
+            return count > 0;
+        }
+
+        /// <summary>
+        /// Consumes items until reaching the first one that does not match the given predicate, then returns all matched items and progresses the current reading position by that number
+        /// </summary>
+        /// <param name="Predicate"></param>
+        /// <returns>True if atleast a single item was consumed</returns>
         public bool Consume_While(Func<ItemType, bool> Predicate, out ReadOnlySpan<ItemType> outConsumed)
         {
             var startIndex = Position;
