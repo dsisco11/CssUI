@@ -248,21 +248,33 @@ namespace CssUI.DOM
         #endregion
 
         #region Ordered Sets
-        public static string Serialize_Ordered_Set(IEnumerable<string> set)
+        public static string Serialize_Ordered_Set(IEnumerable<ReadOnlyMemory<char>> set)
         {
-            return StringCommon.Concat(UnicodeCommon.CHAR_SPACE, set.Select(str => str.AsMemory()));
+            return StringCommon.Concat(UnicodeCommon.CHAR_SPACE, set);
         }
 
-        public static IReadOnlyList<string> Parse_Ordered_Set(ReadOnlyMemory<char> Input)
+        public static IReadOnlyList<ReadOnlyMemory<char>> Parse_Ordered_Set(ReadOnlyMemory<char> Input)
         {
-            var Tokens = StringCommon.Strtok(Input, UnicodeCommon.CHAR_SPACE);
-            List<string> stringList = new List<string>(Tokens.Count);
-            for (int i=0; i<Tokens.Count; i++)
+            return StringCommon.Strtok(Input, UnicodeCommon.CHAR_SPACE);
+        }
+
+
+        public static string Serialize_Comma_Seperated_list(IEnumerable<ReadOnlyMemory<char>> list)
+        {
+            return StringCommon.Concat(UnicodeCommon.CHAR_SPACE, list.Select(str => str.AsMemory()));
+        }
+
+        public static IReadOnlyList<ReadOnlyMemory<char>> Parse_Comma_Seperated_List(ReadOnlyMemory<char> Input)
+        {/* Docs: https://infra.spec.whatwg.org/#split-on-commas */
+            var Tokens = StringCommon.Strtok(Input, UnicodeCommon.CHAR_COMMA);
+            var newList = new ReadOnlyMemory<char>[Tokens.Count];
+
+            for (int i=0; i < Tokens.Count; i++)
             {
-                stringList[i] = Tokens[i].ToString();
+                newList[i] = StringCommon.Trim(Tokens[i]);
             }
 
-            return stringList;
+            return newList;
         }
         #endregion
 
@@ -1359,7 +1371,7 @@ namespace CssUI.DOM
         {/* Docs: https://dom.spec.whatwg.org/#concept-getelementsbyclassname */
 
             classNames = StringCommon.Transform(classNames.AsMemory(), UnicodeCommon.To_ASCII_Lower_Alpha);
-            var classes = Parse_Ordered_Set(classNames.AsMemory()).Cast<AtomicString>();
+            var classes = Parse_Ordered_Set(classNames.AsMemory()).Select(o => (AtomicString)o.ToString());
             /* 2) If classes is the empty set, return an empty HTMLCollection. */
             if (classes.Count() <= 0)
                 return new Element[0];

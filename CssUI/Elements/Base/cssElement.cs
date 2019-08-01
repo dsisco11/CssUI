@@ -9,6 +9,7 @@ using CssUI.CSS;
 using CssUI.DOM;
 using CssUI.Enums;
 using CssUI.CSS.Enums;
+using System.Linq;
 
 namespace CssUI
 {
@@ -619,13 +620,13 @@ namespace CssUI
                 {
                     if (hasAttribute(EAttributeName.Dropzone, out Attr outAttr))
                     {
-                        ICollection<string> spl = DOMCommon.Parse_Ordered_Set(outAttr.Value.Get_String());
+                        ICollection<string> spl = DOMCommon.Parse_Ordered_Set(outAttr.Value.Get_String().AsMemory());
                         if (spl == null) spl = new string[] { "*" };
                         return spl;
                     }
                     return new string[] { "*" };
                 }
-                protected set { setAttribute(EAttributeName.Dropzone, AttributeValue.From_String(DOMCommon.Serialize_Ordered_Set(value))); }
+                protected set { setAttribute(EAttributeName.Dropzone, AttributeValue.From_String(DOMCommon.Serialize_Ordered_Set(value.Select(o => o.AsMemory())))); }
             }
 
             /// <summary>

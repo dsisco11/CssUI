@@ -34,7 +34,7 @@ namespace CssUI.DOM
             this.localName = localName;
             /* 3) Let value be the result of getting an attribute value given element and localName. */
             this.ownerElement.find_attribute(localName, out Attr attr);
-            this.Value = attr?.Value;
+            this.Value = attr?.Value.Get_String();
             /* 4) Run the attribute change steps for element, localName, value, value, and null. */
             
             /* 1) If localName is associated attribute’s local name, namespace is null, and value is null, then empty token set. */
@@ -46,7 +46,10 @@ namespace CssUI.DOM
             {
                 /* 2) Otherwise, if localName is associated attribute’s local name, namespace is null, then set token set to value, parsed. */
                 TokenSet = new List<AtomicString>();
-                var tokens = DOMCommon.Parse_Ordered_Set(Value.ToString());
+                var valueMem = Value.ToString().AsMemory();
+                var rawTokens = DOMCommon.Parse_Ordered_Set(valueMem);
+                var tokens = rawTokens.Select(o => o.ToString());
+
                 foreach (var token in tokens)
                 {
                     TokenSet.Add(new AtomicString(token, EAtomicStringFlags.CaseInsensitive));
@@ -86,7 +89,7 @@ namespace CssUI.DOM
                 return;
 
             /* 2) Set an attribute value for the associated element using associated attribute’s local name and the result of running the ordered set serializer for token set. */
-            ownerElement.setAttribute(localName, AttributeValue.From_String(DOMCommon.Serialize_Ordered_Set(TokenSet.Cast<string>())));
+            ownerElement.setAttribute(localName, AttributeValue.From_String(DOMCommon.Serialize_Ordered_Set(TokenSet.Select(t => ((string)t).AsMemory()))));
         }
         #endregion
 

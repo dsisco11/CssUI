@@ -240,7 +240,7 @@ namespace CssUI.DOM
         public void select()
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#dom-textarea/input-select */
             /* 1) If this element... ...has no selectable text, return. */
-            if (!StringCommon.Scan(value.AsSpan(), Filters.FilterCharSelectable.Instance))
+            if (!StringCommon.Contains(value.AsSpan(), Filters.FilterCharSelectable.Instance))
             {
                 return;
             }
