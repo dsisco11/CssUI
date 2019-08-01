@@ -139,21 +139,24 @@ namespace CssUI
         /// Consumes items until reaching the first one that does not match the given predicate, then returns all matched items and progresses the current reading position by that number
         /// </summary>
         /// <param name="Predicate"></param>
-        /// <returns></returns>
-        public void Consume_While(Func<ItemType, bool> Predicate)
+        /// <returns>True if atleast a single item was consumed</returns>
+        public bool Consume_While(Func<ItemType, bool> Predicate)
         {
+            bool consumed = Predicate(Next);
             while (Predicate(Next))
             {
                 Consume();
             }
+
+            return consumed;
         }
 
         /// <summary>
         /// Consumes items until reaching the first one that does not match the given predicate, then returns all matched items and progresses the current reading position by that number
         /// </summary>
         /// <param name="Predicate"></param>
-        /// <returns></returns>
-        public void Consume_While(Func<ItemType, bool> Predicate, out ReadOnlySpan<ItemType> outConsumed)
+        /// <returns>True if atleast a single item was consumed</returns>
+        public bool Consume_While(Func<ItemType, bool> Predicate, out ReadOnlySpan<ItemType> outConsumed)
         {
             var startIndex = Position;
 
@@ -164,6 +167,7 @@ namespace CssUI
 
             var count = Position - startIndex;
             outConsumed = Stream.Slice((int)startIndex, (int)count);
+            return count > 0;
         }
 
         /// <summary>
