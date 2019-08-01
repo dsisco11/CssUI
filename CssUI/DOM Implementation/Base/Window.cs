@@ -1,5 +1,6 @@
 ﻿using CssUI.CSS;
 using CssUI.CSS.Internal;
+using CssUI.Devices;
 using CssUI.DOM.CustomElements;
 using CssUI.DOM.Events;
 using CssUI.DOM.Geometry;
@@ -8,6 +9,7 @@ using CssUI.DOM.Media;
 using CssUI.DOM.Mutation;
 using CssUI.DOM.Nodes;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,19 +45,30 @@ namespace CssUI.DOM
         /// </summary>
         public readonly VisualViewport visualViewport;
         public readonly Screen screen;
-        public readonly CustomElementRegistry customElements = new CustomElementRegistry();
+        public readonly CustomElementRegistry customElements;
+        #endregion
+
+        #region Devices
+        public MouseDevice Mouse = null;
+        public KeyboardDevice Keyboard = null;
+
+        private ConcurrentDictionary<KeyCombination, Action> KeyCommands = new ConcurrentDictionary<KeyCombination, Action>();
+        private ConcurrentHashSet<KeyCombination> ProtectedKeyCommands = new ConcurrentHashSet<KeyCombination>();
         #endregion
 
         #region Constructors
         private Window() : base()
         {
-            Reactions = new ElementReactionStack(this);
             visualViewport = new VisualViewport(this);
+            Reactions = new ElementReactionStack(this);
+            customElements = new CustomElementRegistry(this);
         }
 
-        public Window(Screen screen) : this()
+        public Window(Screen screen, MouseDevice mouseDevice, KeyboardDevice keyboardDevice) : this()
         {
             this.screen = screen;
+            Mouse = mouseDevice;
+            Keyboard = keyboardDevice;
 
             var dom = new DOMImplementation();
             this.document = dom.createDocument(DOMCommon.HTMLNamespace, "CssUI", new DocumentType("cssui"));
@@ -267,6 +280,54 @@ namespace CssUI.DOM
             {
                 slot.dispatchEvent(new Event(EEventName.SlotChange, new EventInit() { bubbles = true }));
             }
+        }
+        #endregion
+
+
+        #region Keyboard Commands
+        /* XXX: KeyCommand processing on keyboard input */
+
+        /// <summary>
+        /// Returns true if the given <paramref name="command"/> was able to be registered to <paramref name="combo"/>
+        /// </summary>
+        /// <param name="combo">The key combination to register</param>
+        /// <returns></returns>
+        public bool Register_Key_Command(KeyCombination combo, Action command)
+        {
+            if (ProtectedKeyCommands.Contains(combo)) return false;
+
+            return KeyCommands.TryAdd(combo, command);
+        }
+
+        /// <summary>
+        /// Returns true if the given key-combination <paramref name="combo"/> was able to be unegistered
+        /// </summary>
+        /// <param name="combo">The key combination to register</param>
+        /// <returns></returns>
+        public bool Unregister_Key_Command(KeyCombination combo)
+        {
+            if (ProtectedKeyCommands.Contains(combo)) return false;
+
+            return KeyCommands.TryRemove(combo, out _);
+        }
+
+        /// <summary>
+        /// Attempts to register the given <paramref name="command"/> as a protected key command
+        /// <para>Protected commands cannot be unregistered or replaced</para>
+        /// </summary>
+        /// <param name="combo">The key combination to register</param>
+        /// <returns></returns>
+        public bool Register_Protected_Key_Command(KeyCombination combo, Action command)
+        {
+            if (ProtectedKeyCommands.Contains(combo)) return false;
+
+            if (KeyCommands.ContainsKey(combo)) KeyCommands.TryRemove(combo, out _);
+            if (KeyCommands.TryAdd(combo, command))
+            {
+                return ProtectedKeyCommands.Add(combo);
+            }
+
+            return false;
         }
         #endregion
 

@@ -7,6 +7,7 @@ using CssUI.DOM.Internal;
 using CssUI.DOM.Media;
 using CssUI.DOM.Nodes;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using xLog;
@@ -112,6 +113,8 @@ namespace CssUI.DOM
         public Element documentElement { get; private set; }
 
         public LinkedList<HTMLImageElement> Images = new LinkedList<HTMLImageElement>();
+
+        private ConcurrentDictionary<KeyCombination, Action> KeyCommands = new ConcurrentDictionary<KeyCombination, Action>();
         #endregion
 
         #region Node Implementation
@@ -306,6 +309,31 @@ namespace CssUI.DOM
         internal bool Is_FullyActive
         {/* Docs: https://html.spec.whatwg.org/multipage/#fully-active */
             get => (BrowsingContext != null) && ReferenceEquals(this, BrowsingContext.activeDocument);
+        }
+        #endregion
+
+        #region Keyboard Commands
+        /* XXX: KeyCommand processing on keyboard input */
+
+        /// <summary>
+        /// Returns true if the given <paramref name="command"/> was able to be registered to <paramref name="combo"/>
+        /// </summary>
+        /// <param name="combo"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public bool Register_Key_Command(KeyCombination combo, Action command)
+        {
+            return KeyCommands.TryAdd(combo, command);
+        }
+
+        /// <summary>
+        /// Returns true if the given key-combination <paramref name="combo"/> was able to be unegistered
+        /// </summary>
+        /// <param name="combo"></param>
+        /// <returns></returns>
+        public bool Unregister_Key_Command(KeyCombination combo)
+        {
+            return KeyCommands.TryRemove(combo, out _);
         }
         #endregion
 
