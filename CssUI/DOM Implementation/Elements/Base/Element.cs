@@ -455,7 +455,7 @@ namespace CssUI.DOM
 
         #region Customizable Steps
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal virtual void run_attribute_change_steps(this Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue newValue, string Namespace)
+        internal virtual void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue newValue, string Namespace)
         {
             if (localName.IsCustom)
             {
