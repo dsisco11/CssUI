@@ -110,6 +110,10 @@ namespace CssUI
         public const char CHAR_REVERSE_SOLIDUS = '\u005C';
 
         /// <summary>
+        /// ,
+        /// </summary>
+        public const char CHAR_COMMA = '\u002C';
+        /// <summary>
         /// :
         /// </summary>
         public const char CHAR_COLON = '\u003A';
@@ -134,6 +138,35 @@ namespace CssUI
         /// </summary>
         [Obsolete("Use CHAR_REVERSE_SOLIDUS")]
         public const char CHAR_BACKSLASH = '\u005C';
+
+        #endregion
+
+
+        #region Modifier Keys
+        /* These are the character representations for common keys */
+        public const char KEY_CTRL_MODIFIER = '⌃';
+        public const char KEY_ALT_MODIFIER = '⌥';
+        public const char KEY_SHIFT_MODIFIER = '⇧';
+        public const char KEY_META_MODIFIER = '⌘';
+
+        public const char KEY_ESCAPE = '⎋';
+        public const char KEY_BACKSPACE = '⌫';
+        public const char KEY_CAPSLOCK = '⇪';
+        public const char KEY_ENTER = '↵';
+        public const char KEY_TAB = '⇥';
+        public const char KEY_SPACE = ' ';
+
+        public const char KEY_DELETE = '⌦';
+        public const char KEY_END = '↘';
+        public const char KEY_INSERT = '↖';
+        public const char KEY_HOME = '↖';
+        public const char KEY_PGDOWN = '⇟';
+        public const char KEY_PGUP = '⇞';
+
+        public const char KEY_UP = '↑';
+        public const char KEY_RIGHT = '→';
+        public const char KEY_DOWN = '↓';
+        public const char KEY_LEFT = '←';
 
         #endregion
 
