@@ -1357,7 +1357,9 @@ namespace CssUI.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IReadOnlyCollection<Element> Get_Elements_By_Class_Name(Node root, string classNames)
         {/* Docs: https://dom.spec.whatwg.org/#concept-getelementsbyclassname */
-            var classes = Parse_Ordered_Set(classNames.ToLowerInvariant()).Cast<AtomicString>();
+
+            classNames = StringCommon.Transform(classNames.AsMemory(), UnicodeCommon.To_ASCII_Lower_Alpha);
+            var classes = Parse_Ordered_Set(classNames.AsMemory()).Cast<AtomicString>();
             /* 2) If classes is the empty set, return an empty HTMLCollection. */
             if (classes.Count() <= 0)
                 return new Element[0];
