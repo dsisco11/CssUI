@@ -50,12 +50,14 @@ namespace CssUI
 
             return true;
         }
+        #endregion
 
+        #region Contains
         /// <summary>
         /// Returns whether <paramref name="str"/> contains any characters matching the given filter
         /// </summary>
         /// <returns>True if string contains a character which the given filter matches</returns>
-        public static bool Scan(ReadOnlySpan<char> str, DataFilter<char> Filter)
+        public static bool Contains(ReadOnlySpan<char> str, DataFilter<char> Filter)
         {
             if (Filter == null)
                 return false;
@@ -74,10 +76,31 @@ namespace CssUI
 
             return false;
         }
+
+        /// <summary>
+        /// Returns whether <paramref name="str"/> contains any characters matching the given filter
+        /// </summary>
+        /// <returns>True if string contains a character which the given filter matches</returns>
+        public static bool Contains(ReadOnlySpan<char> str, char Search)
+        {
+            if (str.Length == 0)
+                return false;
+
+            for (int i = 0; i < str.Length; i++)
+            {
+                if (str[i] == Search)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
         #endregion
 
 
         #region Transformations
+        const string SPACE = " ";
         /// <summary>
         /// Strips leading and trailing whitespace from a string and also collapses groups of whitespace characters with a single space
         /// </summary>
@@ -85,8 +108,7 @@ namespace CssUI
         /// <returns>Altered string</returns>
         public static string Strip_And_Collapse_Whitespace(ReadOnlyMemory<char> buffMem)
         {/* Docs: https://infra.spec.whatwg.org/#strip-and-collapse-ascii-whitespace */
-            var replacement = new string(UnicodeCommon.CHAR_SPACE, 1);
-            return Replace(buffMem, FilterWhitespace.Instance, replacement.AsSpan());
+            return Replace(buffMem, FilterWhitespace.Instance, SPACE.AsSpan(), true);
         }
 
 
@@ -94,7 +116,7 @@ namespace CssUI
         /// Transforms a <c>string</c> into a byte-array
         /// </summary>
         /// <returns>Byte-array containing the string data</returns>
-        public static byte[] ToByteArray(this string str)
+        public static IReadOnlyList<byte> ToByteArray(this string str)
         {
             byte[] bytes = new byte[str.Length * sizeof(char)];
             Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
@@ -330,9 +352,92 @@ namespace CssUI
 
             return newStr;
         }
-
         #endregion
 
+        #region Trimming
+        /// <summary>
+        /// Modifies the given <paramref name="Input"/>, removing any leading or trailing instances of <paramref name="Delim"/> by offsetting its start and end position without modifying its data or creating a new string instance
+        /// </summary>
+        /// <param name="Input">The string memory to trim</param>
+        /// <param name="Delim">The character to trim out of the input</param>
+        /// <returns></returns>
+        public static ReadOnlyMemory<char> Trim(ReadOnlyMemory<char> Input, char Delim = UnicodeCommon.CHAR_SPACE)
+        {
+            /* Trim start */
+            for(int i=0; i<Input.Length; i++)
+            {
+                if (Input.Span[i] != Delim)
+                {
+                    Input = Input.Slice(i);
+                    break;
+                }
+            }
+
+            for(int i=Input.Length-1; i > -1; i--)
+            {
+                if (Input.Span[i] != Delim)
+                {
+                    Input = Input.Slice(0, Input.Length - i);
+                    break;
+                }
+            }
+
+            return Input;
+        }
+
+        /// <summary>
+        /// Modifies the given <paramref name="Input"/>, removing any leading or trailing instances of <paramref name="Delim"/> by offsetting its start and end position without modifying its data or creating a new string instance
+        /// </summary>
+        /// <param name="Input">The string memory to trim</param>
+        /// <param name="Delims">The characters to trim out of the input</param>
+        /// <returns></returns>
+        public static ReadOnlyMemory<char> Trim(ReadOnlyMemory<char> Input, params char[] Delims)
+        {
+            if (Delims.Length <= 0) return Input;
+
+            var span = Input.Span;
+            /* Trim start */
+            for (int i=0; i<Input.Length; i++)
+            {
+                bool found = false;
+                for (int x=0; x<Delims.Length; x++)
+                {
+                    if (Delims[x] == span[i])
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    Input = Input.Slice(i);
+                    break;
+                }
+            }
+
+            for(int i=Input.Length-1; i > -1; i--)
+            {
+                bool found = false;
+                for (int x = 0; x < Delims.Length; x++)
+                {
+                    if (Delims[x] == span[i])
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    Input = Input.Slice(0, Input.Length - i);
+                    break;
+                }
+            }
+
+            return Input;
+        }
+        #endregion
 
         #region Tokenization
         /// <summary>
@@ -341,7 +446,10 @@ namespace CssUI
         /// <param name="Input">The string to tokenize</param>
         /// <param name="Delim">The delimiter(s) that should seperate each token</param>
         /// <returns></returns>
-        public static IReadOnlyList<ReadOnlyMemory<char>> Strtok(ReadOnlyMemory<char> Input, char Delim) => Strtok(Input, new char[1] { Delim });
+        public static IReadOnlyList<ReadOnlyMemory<char>> Strtok(ReadOnlyMemory<char> Input, char Delim)
+        {
+            return Strtok(Input, new char[1] { Delim });
+        }
 
         /// <summary>
         /// Splits a string <paramref name="Input"/> into tokens based on a given delimiter(s)
@@ -432,7 +540,6 @@ namespace CssUI
             return chunks;
         }
 
-
         /// <summary>
         /// Splits a string <paramref name="Input"/> into tokens based on a given delimeter(s)
         /// </summary>
@@ -513,8 +620,11 @@ namespace CssUI
         /// Replaces all characters, for which <paramref name="dataFilter"/> does not return <see cref="EFilterResult.FILTER_ACCEPT"/>, with the characters provided by <paramref name="substituteData"/>
         /// </summary>
         /// <param name="buffMem">String memory</param>
+        /// <param name="dataFilter"></param>
+        /// <param name="substituteData"></param>
+        /// <param name="trim">If <c>True</c> then leading and trailing ends of the returned string will have the <paramref name="substituteData"/> stripped from them</param>
         /// <returns>Altered string</returns>
-        public static string Replace(ReadOnlyMemory<char> buffMem, DataFilter<char> dataFilter, ReadOnlySpan<char> substituteData)
+        public static string Replace(ReadOnlyMemory<char> buffMem, DataFilter<char> dataFilter, ReadOnlySpan<char> substituteData, bool trim = false)
         {
             DataStream<char> Stream = new DataStream<char>(buffMem, UnicodeCommon.EOF);
             /* Create a list of memory chunks that make up the final string */
@@ -577,6 +687,22 @@ namespace CssUI
             }
 
             /* Compile the new string */
+
+            if (trim)
+            {/* To trim we just need to skip any empty chunks at the beginning and end */
+                while (chunks.First.Value.Length <= 0)
+                {
+                    chunks.RemoveFirst();
+                    chunkCount--;
+                }
+
+                while (chunks.Last.Value.Length <= 0)
+                {
+                    chunks.RemoveLast();
+                    chunkCount--;
+                }
+            }
+
             ulong substituteLength = (ulong)substituteData.Length;
             ulong insertCount = (chunkCount - 1);/* Number of substitutes we will insert into new string */
             newLength += insertCount * substituteLength;
