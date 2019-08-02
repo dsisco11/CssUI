@@ -2,6 +2,11 @@
 {
     public struct SimpleColor
     {
+        #region Instances
+        public readonly static SimpleColor MinValue = new SimpleColor(byte.MinValue, byte.MinValue, byte.MinValue, byte.MinValue);
+        public readonly static SimpleColor MaxValue = new SimpleColor(byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue);
+        #endregion
+
         #region Properties
         public byte R, G, B, A;
         #endregion
