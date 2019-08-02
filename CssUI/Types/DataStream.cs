@@ -137,10 +137,10 @@ namespace CssUI
         /// Returns the index of the first item matching the given <paramref name="subject"/>  or -1 if none was found
         /// </summary>
         /// <returns>Index of first item matching the given one or -1 if none was found</returns>
-        public bool Scan(ItemType subject, out ulong outOffset, IEqualityComparer<ItemType> comparer = null)
+        public bool Scan(ItemType subject, out ulong outOffset, ulong startOffset = 0, IEqualityComparer<ItemType> comparer = null)
         {
             comparer = comparer ?? EqualityComparer<ItemType>.Default;
-            ulong offset = 0;
+            ulong offset = startOffset;
 
             while ((offset + Position) < (ulong)Length)
             {
@@ -162,9 +162,9 @@ namespace CssUI
         /// Returns the index of the first item matching the given predicate or -1 if none was found
         /// </summary>
         /// <returns>Index of first item matching the given predicate or -1 if none was found</returns>
-        public bool Scan(Func<ItemType, bool> Predicate, out ulong outOffset)
+        public bool Scan(Func<ItemType, bool> Predicate, out ulong outOffset, ulong startOffset = 0)
         {
-            ulong offset = 0;
+            ulong offset = startOffset;
 
             while ((offset + Position) < (ulong)Length)
             {
