@@ -247,6 +247,7 @@ namespace CssUI.CSS.Parser
             return new StringToken(Buf);
         }
 
+        /* XXX: Update this to use the better parsing from the global parser */
         double Convert_String_To_Number(string Str)
         {
             double S = 1;//Sign
@@ -315,7 +316,6 @@ namespace CssUI.CSS.Parser
             }
 
             return S * (I + (F * Math.Pow(10, -D))) * Math.Pow(10, T*E);
-
         }
 
         void Consume_Number(out string Result, out dynamic Number, out ENumericTokenType Type)
