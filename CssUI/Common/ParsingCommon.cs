@@ -94,7 +94,7 @@ namespace CssUI
                     throw new ArgumentOutOfRangeException($"Input string \"{input.ToString()}\" contains non-hexadecimal characters");
                 }
 
-                var v = Ascii_Hex_To_Value(span[i]);
+                var v = (uint)Ascii_Hex_To_Value(span[i]);
                 result += (v * multiple);
                 multiple *= 10;
             }
