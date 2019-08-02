@@ -13,7 +13,7 @@
         public static readonly Color Transparent = new Color(1.0, 1.0, 1.0, 0.0);
         #endregion
 
-        #region Accessors
+        #region Properties
         /// <summary>Red channel value in the range [0.0 - 1.0]</summary>
         public double R = 1.0;
         /// <summary>Green channel value in the range [0.0 - 1.0]</summary>
@@ -22,6 +22,9 @@
         public double B = 1.0;
         /// <summary>Alpha channel value in the range [0.0 - 1.0]</summary>
         public double A = 0.0;
+        #endregion
+
+        #region Accessors
 
         /// <summary>Red channel value in the range [0-255]</summary>
         public int iR { get { return (int)(R * 255.0); } }
