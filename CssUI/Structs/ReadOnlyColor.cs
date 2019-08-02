@@ -15,6 +15,13 @@
         #endregion
 
         #region Constructors
+        public ReadOnlyColor(byte r, byte g, byte b, byte a)
+        {
+            R = r / 255.0d;
+            G = g / 255.0d;
+            B = b / 255.0d;
+            A = a / 255.0d;
+        }
         public ReadOnlyColor(double r, double g, double b, double a)
         {
             R = r;
