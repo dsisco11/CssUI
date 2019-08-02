@@ -75,6 +75,34 @@ namespace CssUI
         }
         #endregion
 
+        #region Hexadecimal
+        public static ulong Parse_Hex(ReadOnlyMemory<char> input)
+        {
+            ulong result = 0, multiple = 1;
+            var span = input.Span;
+
+            for(int i=0; i<span.Length; i++)
+            {
+                if (!Is_Ascii_Hex_Digit(span[i]))
+                {
+                    if (span[i] == CHAR_NUMBER_SIGN && i == 0)
+                    {
+                        /* it's fine just ignore it */
+                        continue;
+                    }
+
+                    throw new ArgumentOutOfRangeException($"Input string \"{input.ToString()}\" contains non-hexadecimal characters");
+                }
+
+                var v = Ascii_Hex_To_Value(span[i]);
+                result += (v * multiple);
+                multiple *= 10;
+            }
+
+            return result;
+        }
+        #endregion
+
         #region Integer
         public static bool Parse_Integer(ReadOnlyMemory<char> input, out long outValue)
         {
