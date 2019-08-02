@@ -1,8 +1,11 @@
 ﻿using CssUI.DOM.Enums;
+using CssUI.DOM.Serialization;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using static CssUI.UnicodeCommon;
 
 namespace CssUI.DOM
@@ -32,10 +35,25 @@ namespace CssUI.DOM
         #endregion
 
         #region String Transformation
-        public static string Uppercased_Name(ReadOnlyMemory<char> Name)
-        {/* Docs: https://dom.spec.whatwg.org/#element-html-uppercased-qualified-name */
-            return StringCommon.Transform(Name, To_ASCII_Upper_Alpha);
+        static IdnMapping IDN = new IdnMapping();
+        public static bool Is_Valid_Punycode(string unicode)
+        {
+            if (ReferenceEquals(null, unicode))
+                throw new ArgumentNullException(nameof(unicode));
+
+            try
+            {
+                To_Punycode(unicode);
+            }
+            catch(ArgumentException)
+            {
+                return false;
+            }
+
+            return true;
         }
+        public static string To_Punycode(string unicode) => IDN.GetAscii(unicode);
+        public static string From_Punycode(string code) => IDN.GetUnicode(code);
         #endregion
 
         #region Internal Utilities
@@ -59,6 +77,12 @@ namespace CssUI.DOM
         #endregion
 
         #region Validation
+        static Regex email_validation_regex = new Regex(@"/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/", RegexOptions.ECMAScript | RegexOptions.Compiled);
+        public static bool Is_Valid_Email(string email)
+        {
+            return email_validation_regex.IsMatch(email);
+        }
+
         public static bool Is_Valid_Browsing_Context_Name(ReadOnlyMemory<char> data)
         {/* Docs: https://html.spec.whatwg.org/multipage/browsers.html#valid-browsing-context-name */
             if (data.Span[0] == UnicodeCommon.CHAR_UNDERSCORE)
@@ -166,7 +190,7 @@ namespace CssUI.DOM
                 /* 2) Let tokens be the result of splitting the attribute's value on ASCII whitespace. */
                 //var tokens = DOMCommon.Parse_Ordered_Set(autocomplete.Get_String().AsMemory());
                 string acString = StringCommon.Transform(autocomplete.Get_String().AsMemory(), To_ASCII_Lower_Alpha);
-                var tokenList = new List<string>(DOMCommon.Parse_Ordered_Set(acString.AsMemory()));
+                var tokenList = new List<string>(DOMCommon.Parse_Ordered_Set(acString.AsMemory()).Select(o => o.ToString()));
                 tokenList.Reverse();
                 DataStream<string> Stream = new DataStream<string>(tokenList.ToArray(), null);
 
