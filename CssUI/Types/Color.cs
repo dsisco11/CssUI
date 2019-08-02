@@ -75,6 +75,14 @@
             this.B = color.B;
             this.A = color.A;
         }
+
+        public Color(SimpleColor c)
+        {
+            this.R = c.R / 255.0d;
+            this.G = c.G / 255.0d;
+            this.B = c.B / 255.0d;
+            this.A = c.A / 255.0d;
+        }
         #endregion
 
         #region Scaling
@@ -243,6 +251,7 @@
 
         #region Casts
         public static implicit operator ReadOnlyColor(Color color) => new ReadOnlyColor(color.R, color.G, color.B, color.A);
+        public static implicit operator SimpleColor(Color color) => new SimpleColor(color.iR, color.iG, color.iB, color.iA);
         #endregion
     }
 }

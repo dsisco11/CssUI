@@ -14,6 +14,13 @@
             B = b;
             A = a;
         }
+        public SimpleColor(int r, int g, int b, int a)
+        {
+            R = (byte)r;
+            G = (byte)g;
+            B = (byte)b;
+            A = (byte)a;
+        }
         #endregion
     }
 }
