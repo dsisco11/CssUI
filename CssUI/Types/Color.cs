@@ -67,9 +67,17 @@
             this.B = B;
             this.A = A;
         }
+
+        public Color(ReadOnlyColor color)
+        {
+            this.R = color.R;
+            this.G = color.G;
+            this.B = color.B;
+            this.A = color.A;
+        }
         #endregion
 
-        #region Helpers
+        #region Scaling
 
         public Color Scale(double r, double g, double b, double a)
         {
@@ -231,6 +239,10 @@
             double A = a.A - b.A;
             return new Color(R, G, B, A);
         }
+        #endregion
+
+        #region Casts
+        public static implicit operator ReadOnlyColor(Color color) => new ReadOnlyColor(color.R, color.G, color.B, color.A);
         #endregion
     }
 }
