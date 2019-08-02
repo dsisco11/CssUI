@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace CssUI
@@ -65,7 +66,25 @@ namespace CssUI
         public ReadOnlySpan<ItemType> AsSpan() => Data.Span;
         #endregion
 
-        #region Stream Management
+        #region Seeking
+        /// <summary>
+        /// Seeks to a specific position in the stream
+        /// </summary>
+        /// <param name="position"></param>
+        public void Seek(ulong position, bool end = false)
+        {
+            if (end)
+            {
+                Position = ((ulong)Length - position);
+            }
+            else
+            {
+                Position = position;
+            }
+        }
+        #endregion
+
+        #region Peeking
         /// <summary>
         /// Returns the item at +<paramref name="Offset"/> from the current read position
         /// </summary>
@@ -89,6 +108,82 @@ namespace CssUI
             return Stream[(int)index];
         }
 
+        /// <summary>
+        /// Returns the item at +<paramref name="Offset"/> from the current read position
+        /// </summary>
+        /// <param name="Offset">Distance from the current read position at which to peek</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ItemType Peek(ulong Offset = 0)
+        {
+            ulong index = (Position + Offset);
+
+            if (index < 0)
+            {
+                throw new IndexOutOfRangeException();
+            }
+
+            if (index >= (ulong)Stream.Length)
+            {
+                return EOF_ITEM;
+            }
+
+            return Stream[(int)index];
+        }
+        #endregion
+
+        #region Find
+        /// <summary>
+        /// Returns the index of the first item matching the given <paramref name="subject"/>  or -1 if none was found
+        /// </summary>
+        /// <returns>Index of first item matching the given one or -1 if none was found</returns>
+        public bool Scan(ItemType subject, out ulong outOffset, IEqualityComparer<ItemType> comparer = null)
+        {
+            comparer = comparer ?? EqualityComparer<ItemType>.Default;
+            ulong offset = 0;
+
+            while ((offset + Position) < (ulong)Length)
+            {
+                var current = Peek(offset);
+                if (comparer.Equals(current, subject))
+                {
+                    outOffset = offset;
+                    return true;
+                }
+
+                offset++;
+            }
+
+            outOffset = 0;
+            return false;
+        }
+
+        /// <summary>
+        /// Returns the index of the first item matching the given predicate or -1 if none was found
+        /// </summary>
+        /// <returns>Index of first item matching the given predicate or -1 if none was found</returns>
+        public bool Scan(Func<ItemType, bool> Predicate, out ulong outOffset)
+        {
+            ulong offset = 0;
+
+            while ((offset + Position) < (ulong)Length)
+            {
+                var current = Peek(offset);
+                if (Predicate(current))
+                {
+                    outOffset = offset;
+                    return true;
+                }
+
+                offset++;
+            }
+
+            outOffset = 0;
+            return false;
+        }
+        #endregion
+
+        #region Consume
         /// <summary>
         /// Returns the first unconsumed item from the stream and progresses the current reading position
         /// </summary>
@@ -190,7 +285,50 @@ namespace CssUI
         }
 
         /// <summary>
-        /// Consumes items until reaching the first one that does not match the given predicate, then returns all matched items as new stream and progresses this streams reading position by that number
+        /// Pushes the given number of items back onto the front of the stream
+        /// </summary>
+        /// <param name="Count"></param>
+        public void Reconsume(ulong Count = 1)
+        {
+            Position -= Count;
+        }
+
+        #endregion
+
+        #region SubStream
+
+        /// <summary>
+        /// Consumes the number of items specified by <paramref name="count"/> and then returns them as a new stream, progressing this streams reading position to the end of the consumed items
+        /// </summary>
+        /// <param name="Predicate"></param>
+        /// <returns></returns>
+        public DataStream<ItemType> Substream(ulong count)
+        {
+            var consumed = Data.Slice((int)Position, (int)count);
+            Position += count;
+            return new DataStream<ItemType>(consumed, EOF_ITEM);
+        }
+
+        /// <summary>
+        /// Consumes the number of items specified by <paramref name="count"/> and then returns them as a new stream, progressing this streams reading position to the end of the consumed items
+        /// </summary>
+        /// <param name="Predicate"></param>
+        /// <returns></returns>
+        public DataStream<ItemType> Substream(ulong offset = 0, ulong? count = null)
+        {
+            if (!count.HasValue)
+            {
+                count = (ulong)Length - (Position + offset);
+            }
+
+            Position += offset;
+            var consumed = Data.Slice((int)Position, (int)count.Value);
+            Position += count.Value;
+            return new DataStream<ItemType>(consumed, EOF_ITEM);
+        }
+
+        /// <summary>
+        /// Consumes items until reaching the first one that does not match the given <paramref name="Predicate"/>, progressing this streams reading position by that number and then returning all matched items as new stream
         /// </summary>
         /// <param name="Predicate"></param>
         /// <returns></returns>
@@ -208,16 +346,17 @@ namespace CssUI
 
             return new DataStream<ItemType>(consumed, EOF_ITEM);
         }
+        #endregion
 
+        #region Cloning
         /// <summary>
-        /// Pushes the given number of items back onto the front of the stream
+        /// Creates and returns a copy of this stream
         /// </summary>
-        /// <param name="Count"></param>
-        public void Reconsume(ulong Count = 1)
+        /// <returns></returns>
+        public DataStream<ItemType> Clone()
         {
-            Position -= Count;
+            return new DataStream<ItemType>(Data, EOF_ITEM) { Position = this.Position };
         }
-
         #endregion
     }
 }
