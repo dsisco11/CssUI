@@ -58,6 +58,8 @@ namespace CssUI
         /* Ascii Upper Alpha */
         /* Docs: https://infra.spec.whatwg.org/#ascii-upper-alpha */
         public const char CHAR_A_UPPER = '\u0041';
+        public const char CHAR_B_UPPER = '\u0042';
+        public const char CHAR_C_UPPER = '\u0043';
         public const char CHAR_D_UPPER = '\u0044';
         public const char CHAR_E_UPPER = '\u0045';
         public const char CHAR_F_UPPER = '\u0046';
@@ -74,6 +76,8 @@ namespace CssUI
         /* Ascii Lower Alpha */
         /* Docs: https://infra.spec.whatwg.org/#ascii-lower-alpha */
         public const char CHAR_A_LOWER = '\u0061';
+        public const char CHAR_B_LOWER = '\u0062';
+        public const char CHAR_C_LOWER = '\u0063';
         public const char CHAR_D_LOWER = '\u0064';
         public const char CHAR_E_LOWER = '\u0065';
         public const char CHAR_F_LOWER = '\u0066';
@@ -357,6 +361,42 @@ namespace CssUI
                 throw new IndexOutOfRangeException();
 
             return (uint)c - CHAR_DIGIT_0;
+        }
+
+        /// <summary>
+        /// Converts an ASCII hexadecimal character to its numeric value
+        /// </summary>
+        /// <param name="c">Code point to convert</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static uint Ascii_Hex_To_Value(char c)
+        {
+            if (c >= CHAR_DIGIT_0 && c <= CHAR_DIGIT_9)
+                return (uint)c - CHAR_DIGIT_0;
+
+            switch (c)
+            {
+                case CHAR_A_LOWER:
+                case CHAR_A_UPPER:
+                    return 10;
+                case CHAR_B_LOWER:
+                case CHAR_B_UPPER:
+                    return 11;
+                case CHAR_C_LOWER:
+                case CHAR_C_UPPER:
+                    return 12;
+                case CHAR_D_LOWER:
+                case CHAR_D_UPPER:
+                    return 13;
+                case CHAR_E_LOWER:
+                case CHAR_E_UPPER:
+                    return 14;
+                case CHAR_F_LOWER:
+                case CHAR_F_UPPER:
+                    return 15;
+                default:
+                    throw new IndexOutOfRangeException();
+            }
         }
         #endregion
 
