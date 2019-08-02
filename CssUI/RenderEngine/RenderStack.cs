@@ -1,5 +1,4 @@
-﻿using CssUI.CSS;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,13 +13,13 @@ namespace CssUI
     {
         #region Stacks
         Stack<Matrix4> MatrixStack = new Stack<Matrix4>();
-        Stack<cssColor> ColorStack = new Stack<cssColor>();
-        Stack<cssColor> BlendingStack = new Stack<cssColor>();
+        Stack<Color> ColorStack = new Stack<Color>();
+        Stack<Color> BlendingStack = new Stack<Color>();
         #endregion
 
         #region Properties
-        public cssColor Color { get { return ColorStack.DefaultIfEmpty(cssColor.White).First() ?? cssColor.White; } private set { } }
-        public cssColor Blend_Color { get { return BlendingStack.DefaultIfEmpty(cssColor.White).First() ?? cssColor.White; } private set { } }
+        public Color Color { get { return ColorStack.DefaultIfEmpty(Color.White).First() ?? Color.White; } private set { } }
+        public Color Blend_Color { get { return BlendingStack.DefaultIfEmpty(Color.White).First() ?? Color.White; } private set { } }
         public Matrix4 Matrix { get { return MatrixStack.FirstOrDefault(); } private set { } }
         #endregion
 
@@ -34,7 +33,7 @@ namespace CssUI
         /// Sets the current color for the most recent stack item (this color is NOT blended by the stack)
         /// </summary>
         /// <param name="value"></param>
-        public void Set_Color(cssColor value, bool FireChangedEvent = true)
+        public void Set_Color(Color value, bool FireChangedEvent = true)
         {
             // Remove old value from the top of the stack
             if (ColorStack.Count > 0) ColorStack.Pop();
@@ -50,7 +49,7 @@ namespace CssUI
         /// Sets the current blend color for the most recent stack item (this color is blended with all the blending colors before it)
         /// </summary>
         /// <param name="value"></param>
-        public void Set_Blend(cssColor value, bool FireChangedEvent = true)
+        public void Set_Blend(Color value, bool FireChangedEvent = true)
         {
             /*
             // 06-23-2017
@@ -71,7 +70,7 @@ namespace CssUI
             // Remove old value from the top of the stack
             if (BlendingStack.Count > 0) BlendingStack.Pop();
             // Find the value we need to stack the incoming one ontop of (so we can combine them)
-            cssColor clr = BlendingStack.FirstOrDefault();
+            Color clr = BlendingStack.FirstOrDefault();
             // Combine the incoming value with the one before it(if any) in the stack
             if (clr != null) clr *= value;
             else clr = value;

@@ -218,7 +218,7 @@ namespace CssUI.CSS
         
 
         /// <summary>Create an RGBA color value</summary>
-        public static CssValue From_Color(cssColor value) => new CssValue(ECssValueType.COLOR, value);
+        public static CssValue From_Color(Color value) => new CssValue(ECssValueType.COLOR, value);
 
         /// <summary>Create a string value</summary>
         public static CssValue From_String(string value) => new CssValue(ECssValueType.STRING, value);
@@ -644,12 +644,12 @@ namespace CssUI.CSS
         /// Returns the value as a Color4 if possible, or NULL if not possible.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public cssColor AsColor()
+        public Color AsColor()
         {
             switch (Type)
             {
                 case ECssValueType.COLOR:
-                    return ((cssColor)Value);
+                    return ((Color)Value);
                 default:
                     return null;
             }
@@ -761,7 +761,7 @@ namespace CssUI.CSS
                     }
                 case ECssValueType.COLOR:
                     {
-                        return ((cssColor)Value).Serialize();
+                        return ((Color)Value).Serialize();
                     }
                 case ECssValueType.DIMENSION:
                     {

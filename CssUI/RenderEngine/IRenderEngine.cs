@@ -1,5 +1,4 @@
-﻿
-using CssUI.CSS;
+﻿using CssUI.CSS;
 
 namespace CssUI
 {
@@ -55,14 +54,14 @@ namespace CssUI
         /// The 'tint' color refers to the color which the base color multiplies against itsself to obtain the final color value to be used when rendering verticies.
         /// </summary>
         /// <param name="color">The tint color to multiply the base color by.</param>
-        void Set_Blending_Color(cssColor color);
+        void Set_Blending_Color(Color color);
         #endregion
         
         #region Color
         /// <summary>
         /// Sets the current color.
         /// </summary>
-        void Set_Color(cssColor color);
+        void Set_Color(Color color);
         /// <summary>
         /// Sets the current color.
         /// </summary>
@@ -71,7 +70,7 @@ namespace CssUI
         /// <summary>
         /// Uploads the final, blended, color value to whatever system is doing the rendering, be it DirectX, OpenGL, Vulkan, D3D, etc.
         /// </summary>
-        void Upload_Color(cssColor Color);
+        void Upload_Color(Color Color);
         #endregion
 
         #region Texturing

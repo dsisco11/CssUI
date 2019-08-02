@@ -122,12 +122,12 @@ namespace CssUI
             // Just so our scrollbars dont have scrollbars by some chance.
             Style.ImplicitRules.Overflow_X.Set(EOverflowMode.Clip);
             Style.ImplicitRules.Overflow_Y.Set(EOverflowMode.Clip);
-            ColorBackground = new cssColor(0.1f, 0.1f, 0.1f, 1.0f);
+            ColorBackground = new Color(0.1f, 0.1f, 0.1f, 1.0f);
 
 
             Track = new uiTrackBar(this.ownerDocument, this, Dir)
             {
-                ColorBackground = new cssColor(0f, 0f, 0f, 0.1f)
+                ColorBackground = new Color(0f, 0f, 0f, 0.1f)
             };
             Track.ValueChanged += Slider_ValueChanged;
             Track.MouseClick += Track_onMouseClick;

@@ -131,7 +131,7 @@ namespace CssUI
 
         public double LineHeight { get => Cascaded.LineHeight.Actual; }
         public double Opacity { get => Cascaded.Opacity.Actual; }
-        public cssColor Blend_Color { get; private set; } = null;
+        public Color Blend_Color { get; private set; } = null;
         #endregion
         
         #region Block Values
@@ -691,7 +691,7 @@ namespace CssUI
 
             if (Opacity != 1.0)
             {// We have a useful blend color to set
-                Blend_Color = new cssColor(1, 1, 1, Opacity);
+                Blend_Color = new Color(1, 1, 1, Opacity);
             }
             else// We DONT have a useful blend color
             {

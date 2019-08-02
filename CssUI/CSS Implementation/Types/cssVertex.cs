@@ -14,10 +14,10 @@
         /// <summary>
         /// Color of the vertex
         /// </summary>
-        public cssColor Color;
+        public Color Color;
         #endregion
 
-        public cssVertex(cssColor Color, int X, int Y)
+        public cssVertex(Color Color, int X, int Y)
         {
             this.X = X;
             this.Y = Y;

@@ -559,11 +559,11 @@ namespace CssUI
             /// <summary>
             /// Forecolor of the control
             /// </summary>
-            public cssColor Color = cssColor.White;
+            public Color Color = Color.White;
             /// <summary>
             /// Background color of the control, if <c>Null</c> then no background will be drawn
             /// </summary>
-            public cssColor ColorBackground = null;
+            public Color ColorBackground = null;
         #endregion
 
         #region Borders
@@ -821,7 +821,7 @@ namespace CssUI
                 if (Border.Top.IsVisible)
                 {
                     Root.Engine.Set_Color(Border.Top.Color);
-                    Root.Engine.Set_Color(cssColor.White);
+                    Root.Engine.Set_Color(Color.White);
                     Root.Engine.Fill_Rect(hLeft, Box.Border.Top, hWidth, Border.Top.Size);
                 }
                 if (Border.Bottom.IsVisible)

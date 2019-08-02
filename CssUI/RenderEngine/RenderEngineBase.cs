@@ -1,5 +1,4 @@
-﻿
-using CssUI.CSS;
+﻿using CssUI.CSS;
 
 namespace CssUI
 {
@@ -92,14 +91,14 @@ namespace CssUI
         #endregion
         
         #region Blending
-        public cssColor Blending_Color { get { return Stack.Blend_Color; } }
+        public Color Blending_Color { get { return Stack.Blend_Color; } }
 
         /// <summary>
         /// Sets the value of the latest tint color value in the blending stack.
         /// The 'tint' color refers to the color which the base color multiplies against itsself to obtain the final color value to be used when rendering verticies.
         /// </summary>
         /// <param name="color">The tint color to multiply the base color by.</param>
-        public virtual void Set_Blending_Color(cssColor color)
+        public virtual void Set_Blending_Color(Color color)
         {
             Stack.Set_Blend(color);
             Finalize_Color();
@@ -107,12 +106,12 @@ namespace CssUI
         #endregion
 
         #region Color
-        public cssColor Color { get { return Stack.Color; } }
+        public Color Color { get { return Stack.Color; } }
 
         /// <summary>
         /// Sets the current color
         /// </summary>
-        public virtual void Set_Color(cssColor Color)
+        public virtual void Set_Color(Color Color)
         {
             Stack.Set_Color(Color, false);
             Finalize_Color();
@@ -120,14 +119,14 @@ namespace CssUI
 
         public virtual void Set_Color(float R, float G, float B, float A)
         {
-            Stack.Set_Color(new cssColor(R, G, B, A), false);
+            Stack.Set_Color(new Color(R, G, B, A), false);
             Finalize_Color();
         }
 
         /// <summary>
         /// Uploads the final, blended, color value to whatever system is doing the rendering, be it DirectX, OpenGL, Vulkan, D3D, etc.
         /// </summary>
-        public abstract void Upload_Color(cssColor Color);
+        public abstract void Upload_Color(Color Color);
 
         /// <summary>
         /// Performs blending on the base color and then uploads it.
@@ -139,7 +138,7 @@ namespace CssUI
             double B = (Color.B * Stack.Blend_Color.B);
             double A = (Color.A * Stack.Blend_Color.A);
 
-            Upload_Color(new cssColor(R, G, B, A));
+            Upload_Color(new Color(R, G, B, A));
         }
         #endregion
 

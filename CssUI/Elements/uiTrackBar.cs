@@ -86,7 +86,7 @@ namespace CssUI
 
             Thumb = new cssBox(this.ownerDocument, this);
             Thumb.Flags_Add(EElementFlags.Draggable);
-            Thumb.Color = new cssColor(0.4f, 0.4f, 0.4f, 1.0f);
+            Thumb.Color = new Color(0.4f, 0.4f, 0.4f, 1.0f);
             Thumb.DraggingStart += Thumb_DraggingStart;
             Thumb.DraggingUpdate += Thumb_DraggingUpdate;
             Thumb.DraggingEnd += Thumb_DraggingEnd;
