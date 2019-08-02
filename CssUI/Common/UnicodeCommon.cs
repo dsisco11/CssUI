@@ -58,18 +58,29 @@ namespace CssUI
         /* Ascii Upper Alpha */
         /* Docs: https://infra.spec.whatwg.org/#ascii-upper-alpha */
         public const char CHAR_A_UPPER = '\u0041';
+        public const char CHAR_D_UPPER = '\u0044';
         public const char CHAR_E_UPPER = '\u0045';
         public const char CHAR_F_UPPER = '\u0046';
+        public const char CHAR_H_UPPER = '\u0048';
+        public const char CHAR_M_UPPER = '\u004D';
+        public const char CHAR_P_UPPER = '\u0050';
+        public const char CHAR_S_UPPER = '\u0053';
         public const char CHAR_T_UPPER = '\u0054';
         public const char CHAR_W_UPPER = '\u0057';
+        public const char CHAR_Y_UPPER = '\u0059';
         public const char CHAR_Z_UPPER = '\u005A';
 
 
         /* Ascii Lower Alpha */
         /* Docs: https://infra.spec.whatwg.org/#ascii-lower-alpha */
         public const char CHAR_A_LOWER = '\u0061';
+        public const char CHAR_D_LOWER = '\u0064';
         public const char CHAR_E_LOWER = '\u0065';
         public const char CHAR_F_LOWER = '\u0066';
+        public const char CHAR_H_LOWER = '\u0068';
+        public const char CHAR_M_LOWER = '\u006D';
+        public const char CHAR_S_LOWER = '\u0073';
+        public const char CHAR_W_LOWER = '\u0077';
         public const char CHAR_X_LOWER = '\u0078';
         public const char CHAR_Y_LOWER = '\u0079';
         public const char CHAR_Z_LOWER = '\u007A';
@@ -112,6 +123,10 @@ namespace CssUI
         /// \
         /// </summary>
         public const char CHAR_REVERSE_SOLIDUS = '\u005C';
+        /// <summary>
+        /// #
+        /// </summary>
+        public const char CHAR_NUMBER_SIGN = '\u0023';
 
         /// <summary>
         /// ,
@@ -263,6 +278,40 @@ namespace CssUI
         {
             return c >= CHAR_A_UPPER && c <= CHAR_Z_UPPER;
         }
+
+
+        /// <summary>
+        /// True if code point is an ASCII hex-digit character (0-9 | a-f | A-F)
+        /// </summary>
+        /// <param name="c">Code point to check</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Ascii_Hex_Digit(char c)
+        {/* Docs: https://infra.spec.whatwg.org/#ascii-digit */
+            return (c >= CHAR_DIGIT_0 && c <= CHAR_DIGIT_9) || (c >= CHAR_A_LOWER && c <= CHAR_F_LOWER) || (c >= CHAR_A_UPPER && c <= CHAR_F_UPPER);
+        }
+
+        /// <summary>
+        /// True if code point is an ASCII hex-digit character excluding uppercase alpha characters
+        /// </summary>
+        /// <param name="c">Code point to check</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Ascii_Hex_Digit_Lower(char c)
+        {/* Docs: https://infra.spec.whatwg.org/#ascii-digit */
+            return (c >= CHAR_DIGIT_0 && c <= CHAR_DIGIT_9) || (c >= CHAR_A_LOWER && c <= CHAR_F_LOWER);
+        }
+
+        /// <summary>
+        /// True if code point is an ASCII hex-digit character excluding lowercase alpha characters
+        /// </summary>
+        /// <param name="c">Code point to check</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Ascii_Hex_Digit_Upper(char c)
+        {/* Docs: https://infra.spec.whatwg.org/#ascii-digit */
+            return (c >= CHAR_DIGIT_0 && c <= CHAR_DIGIT_9) || (c >= CHAR_A_UPPER && c <= CHAR_F_UPPER);
+        }
         #endregion
 
         #region Character Transformation
@@ -302,12 +351,12 @@ namespace CssUI
         /// <param name="c">Code point to convert</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Ascii_Digit_To_Value(char c)
+        public static uint Ascii_Digit_To_Value(char c)
         {
             if (c < CHAR_DIGIT_0 || c > CHAR_DIGIT_9)
                 throw new IndexOutOfRangeException();
 
-            return c - CHAR_DIGIT_0;
+            return (uint)c - CHAR_DIGIT_0;
         }
         #endregion
 
