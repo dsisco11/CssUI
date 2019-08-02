@@ -10,7 +10,6 @@ namespace CssUI
         #region Utility
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long Digits_To_Base10(ReadOnlyMemory<char> digits) => Digits_To_Base10(digits.Span);
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long Digits_To_Base10(ReadOnlySpan<char> digits)
         {
@@ -30,6 +29,29 @@ namespace CssUI
 
             return Integer;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ulong Digits_To_Base10_Unsigned(ReadOnlyMemory<char> digits) => Digits_To_Base10_Unsigned(digits.Span);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ulong Digits_To_Base10_Unsigned(ReadOnlySpan<char> digits)
+        {
+            if (digits == null)
+            {
+                return 0;
+            }
+
+            ulong Integer = 0;
+            var span = digits;
+            ulong power = 1;
+            for (int i = 0; i < digits.Length; i++)
+            {
+                Integer += power * Ascii_Digit_To_Value(span[i]);
+                power *= 10;
+            }
+
+            return Integer;
+        }
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long ToInteger(int sign, ReadOnlySpan<char> integerDigits, int exponent_sign, ReadOnlySpan<char> exponentDigits)
