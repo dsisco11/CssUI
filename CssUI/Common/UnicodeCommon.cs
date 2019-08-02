@@ -58,13 +58,17 @@ namespace CssUI
         /* Ascii Upper Alpha */
         /* Docs: https://infra.spec.whatwg.org/#ascii-upper-alpha */
         public const char CHAR_A_UPPER = '\u0041';
+        public const char CHAR_E_UPPER = '\u0045';
         public const char CHAR_F_UPPER = '\u0046';
+        public const char CHAR_T_UPPER = '\u0054';
+        public const char CHAR_W_UPPER = '\u0057';
         public const char CHAR_Z_UPPER = '\u005A';
 
 
         /* Ascii Lower Alpha */
         /* Docs: https://infra.spec.whatwg.org/#ascii-lower-alpha */
         public const char CHAR_A_LOWER = '\u0061';
+        public const char CHAR_E_LOWER = '\u0065';
         public const char CHAR_F_LOWER = '\u0066';
         public const char CHAR_X_LOWER = '\u0078';
         public const char CHAR_Y_LOWER = '\u0079';
