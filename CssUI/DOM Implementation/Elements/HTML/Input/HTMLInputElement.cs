@@ -3,9 +3,11 @@ using CssUI.DOM.Events;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Nodes;
 using CssUI.DOM.Serialization;
+using CssUI.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace CssUI.DOM
@@ -21,6 +23,7 @@ namespace CssUI.DOM
         private List<FileBlob> selected_files = new List<FileBlob>();
         private bool _checkedness = false;
         private NodeFilter labelFilter;
+        private Regex patternCompiled = null;
         #endregion
 
         #region Properties
@@ -447,8 +450,40 @@ namespace CssUI.DOM
         }
 
         [CEReactions] public uint height
-        {
-            ...
+        {/* Docs: https://html.spec.whatwg.org/multipage/input.html#dom-input-height */
+            get
+            {
+                switch (type)
+                {
+                    case EInputType.Image:
+                        break;
+                    default:
+                        return 0;
+                }
+
+                /* =====================================================================
+                 * XXX: WIDTH & HEIGHT FOR IMAGES IS THE IMAGE BOUNDS, SEE DOCUMENTATION
+                 * =====================================================================
+                 */
+                return 0;
+            }
+            set
+            {
+                CEReactions.Wrap_CEReaction(this, () => {
+                    switch (type)
+                    {
+                        case EInputType.Image:
+                            break;
+                        default:
+                            {
+                                if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                                else return;
+                            }
+                    }
+
+                    setAttribute(EAttributeName.Height, AttributeValue.From_Integer(value));
+                });
+            }
         }
 
         public HTMLDataListElement list
@@ -459,7 +494,7 @@ namespace CssUI.DOM
                  * If there is no list attribute, or if there is no element with that ID, or if the first element with that ID is not a datalist element, then there is no suggestions source element. */
                 if (hasAttribute(EAttributeName.List, out Attr outList))
                 {
-                    string idValue = outList?.Value?.Get_Atomic();
+                    string idValue = outList?.Value?.Get_String();
                     if (!string.IsNullOrEmpty(idValue))
                     {
                         var found = nodeDocument.getElementByID(idValue);
@@ -639,7 +674,17 @@ namespace CssUI.DOM
                             else return;
                         }
                 }
+
+                patternCompiled = null;
 				setAttribute(EAttributeName.Pattern, AttributeValue.From_String(value));
+                /* The compiled pattern regular expression, when matched against a string, must have its start anchored to the start of the string and its end anchored to the end of the string. */
+                /* This implies that the regular expression language used for this attribute is the same as that used in JavaScript, except that the pattern attribute is matched against the entire value, 
+                 * not just any subset (somewhat as if it implied a ^(?: at the start of the pattern and a )$ at the end). */
+                if (!string.IsNullOrEmpty(value))
+                {
+                    string patternStr = string.Concat("^(?:", value, ")$");
+                    patternCompiled = new Regex(patternStr, RegexOptions.ECMAScript | RegexOptions.Compiled);
+                }
 			});
         }
 
@@ -787,8 +832,40 @@ namespace CssUI.DOM
         }
 
         [CEReactions] public uint width
-        {
-            ...
+        {/* Docs: https://html.spec.whatwg.org/multipage/input.html#dom-input-width */
+            get
+            {
+                switch (type)
+                {
+                    case EInputType.Image:
+                        break;
+                    default:
+                        return 0;
+                }
+
+                /* =====================================================================
+                 * XXX: WIDTH & HEIGHT FOR IMAGES IS THE IMAGE BOUNDS, SEE DOCUMENTATION
+                 * =====================================================================
+                 */
+                return 0;
+            }
+            set
+            {
+                CEReactions.Wrap_CEReaction(this, () => {
+                    switch (type)
+                    {
+                        case EInputType.Image:
+                            break;
+                        default:
+                            {
+                                if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                                else return;
+                            }
+                    }
+
+                    setAttribute(EAttributeName.Width, AttributeValue.From_Integer(value));
+                });
+            }
         }
 
         public override HTMLFormElement form
@@ -843,7 +920,21 @@ namespace CssUI.DOM
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#concept-input-step */
             get
             {
-                ...
+                switch (type)
+                {
+                    case EInputType.Date:
+                    case EInputType.Month:
+                    case EInputType.Week:
+                        return 1;
+                    case EInputType.Time:
+                    case EInputType.Local:
+                        return 60;
+                    case EInputType.Number:
+                    case EInputType.Range:
+                        return 1;
+                    default:
+                        return double.NaN;
+                }
             }
         }
 
@@ -851,7 +942,13 @@ namespace CssUI.DOM
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#concept-input-step */
             get
             {
-                ...
+                switch (type)
+                {
+                    case EInputType.Week:
+                        return -259200000.0;
+                    default:
+                        return null;
+                }
             }
         }
 
@@ -859,7 +956,23 @@ namespace CssUI.DOM
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#concept-input-step */
             get
             {
-                ...
+                switch  (type)
+                {
+                    case EInputType.Date:
+                        return 86400000;
+                    case EInputType.Month:
+                        return 1;
+                    case EInputType.Week:
+                        return 604800000;
+                    case EInputType.Time:
+                    case EInputType.Local:
+                        return 1000;
+                    case EInputType.Number:
+                    case EInputType.Range:
+                        return 1;
+                    default:
+                        return double.NaN;
+                }
             }
         }
 
@@ -1210,47 +1323,71 @@ namespace CssUI.DOM
 
             set
             {
-                switch (Get_Input_Value_Mode(type))
+                CEReactions.Wrap_CEReaction(this, () =>
                 {
-                    case EInputValueMode.Value:
-                        {
-                            var oldValue = _value;
-                            _value = value;
-                            bDirtyValueFlag = true;
-                            run_value_sanitization();
-                            if (!StringCommon.StrEq(_value.AsSpan(), oldValue.AsSpan()))
+                    switch (Get_Input_Value_Mode(type))
+                    {
+                        case EInputValueMode.Value:
                             {
-                                text_entry_cursor_position = value.Length;
-                                selection?.Collapse();
-                                selection.direction = ESelectionDirection.None;
+                                var oldValue = _value;
+                                _value = value;
+                                bDirtyValueFlag = true;
+                                run_value_sanitization();
+                                if (!StringCommon.StrEq(_value.AsSpan(), oldValue.AsSpan()))
+                                {
+                                    text_entry_cursor_position = value.Length;
+                                    selection?.Collapse();
+                                    selection.direction = ESelectionDirection.None;
+                                }
                             }
-                        }
-                        break;
-                    default:
-                    case EInputValueMode.Default:
-                        {
-                            setAttribute(EAttributeName.Value, AttributeValue.From_String(value));
-                        }
-                        break;
-                    case EInputValueMode.Default_ON:
-                        {
-                            setAttribute(EAttributeName.Value, AttributeValue.From_String(value));
-                        }
-                        break;
-                    case EInputValueMode.Filename:
-                        {/* On setting, if the new value is the empty string, empty the list of selected files; otherwise, throw an "InvalidStateError" DOMException. */
-                            if (value.Length <= 0)
+                            break;
+                        default:
+                        case EInputValueMode.Default:
                             {
-                                selected_files.Clear();
+                                setAttribute(EAttributeName.Value, AttributeValue.From_String(value));
                             }
-                            else
+                            break;
+                        case EInputValueMode.Default_ON:
                             {
-                                throw new InvalidStateError("The only valid value for this type of input element is an empty string");
+                                setAttribute(EAttributeName.Value, AttributeValue.From_String(value));
                             }
-                        }
-                        break;
+                            break;
+                        case EInputValueMode.Filename:
+                            {/* On setting, if the new value is the empty string, empty the list of selected files; otherwise, throw an "InvalidStateError" DOMException. */
+                                if (value.Length <= 0)
+                                {
+                                    selected_files.Clear();
+                                }
+                                else
+                                {
+                                    throw new InvalidStateError("The only valid value for this type of input element is an empty string");
+                                }
+                            }
+                            break;
+                    }
+
+                });
+            }
+        }
+
+        /// <summary>
+        /// Returns all of the input elements specified individual values
+        /// </summary>
+        /// <returns></returns>
+        private string[] get_values()
+        {
+            if (multiple)
+            {
+                switch (type)
+                {
+                    case EInputType.File:
+                        return selected_files.Select(o => o.name).ToArray();
+                    case EInputType.Email:
+                        return DOMCommon.Parse_Comma_Seperated_List(value.AsMemory()).Select(o => o.ToString()).ToArray();
                 }
             }
+
+            return new string[1] { value };
         }
         #endregion
 
@@ -1268,8 +1405,11 @@ namespace CssUI.DOM
                 return outValue;
             }
 
+            /* default minimum */
             switch (type)
             {
+                case EInputType.Range:
+                    return 0;
                 default:
                     return null;
             }
@@ -1287,32 +1427,363 @@ namespace CssUI.DOM
                 return outValue;
             }
 
+            /* default maximum */
             switch (type)
             {
+                case EInputType.Range:
+                    return 100;
                 default:
                     return null;
             }
         }
 
-        bool convert_string_to_number(ReadOnlyMemory<char> buffMem, out double outValue)
+        static DateTime EPOCH = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        bool convert_string_to_number(ReadOnlyMemory<char> input, out double outValue)
         {
+            switch (type)
+            {
+                case EInputType.Date:
+                    {
+                        if (!DOMParser.Parse_Date_String(input, out DateTime outDate))
+                        {
+                            outValue = double.NaN;
+                            return false;
+                        }
+
+                        outValue = (outDate - EPOCH).TotalMilliseconds;
+                        return true;
+                    }
+                case EInputType.Month:
+                    {
+                        if (!DOMParser.Parse_Month_String(input, out int year, out int month))
+                        {
+                            outValue = double.NaN;
+                            return false;
+                        }
+
+                        var date = new DateTime(year, month, 1);
+                        int totalMonths = GetTotalMonths(EPOCH, date);
+                        outValue = totalMonths;
+                        return true;
+                    }
+                case EInputType.Week:
+                    {
+                        if (!DOMParser.Parse_Week_String(input, out int week, out int year))
+                        {
+                            outValue = double.NaN;
+                            return false;
+                        }
+
+                        var days = week * 7;
+                        var date = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddDays(days-1);
+                        var delta = date.Subtract(EPOCH);
+
+                        outValue = delta.TotalMilliseconds;
+                        return true;
+                    }
+                case EInputType.Time:
+                    {
+                        if (!DOMParser.Parse_Time_String(input, out TimeSpan time))
+                        {
+                            outValue = double.NaN;
+                            return false;
+                        }
+
+                        outValue = time.TotalMilliseconds;
+                        return true;
+                    }
+                case EInputType.Local:
+                    {
+                        if (!DOMParser.Parse_Local_Date_Time_String(input, out DateTime date))
+                        {
+                            outValue = double.NaN;
+                            return false;
+                        }
+                        var delta = date.Subtract(EPOCH);
+
+                        outValue = delta.TotalMilliseconds;
+                        return true;
+                    }
+                case EInputType.Number:
+                case EInputType.Range:
+                    {
+                        if (!DOMParser.Parse_FloatingPoint(input, out double value))
+                        {
+                            outValue = double.NaN;
+                            return false;
+                        }
+
+                        outValue = value;
+                        return true;
+                    }
+                default:
+                    {
+                        outValue = double.NaN;
+                        return false;
+                    }
+            }
         }
 
         bool convert_number_to_string(double num, out string outValue)
         {
+            switch (type)
+            {
+                case EInputType.Date:
+                    {
+                        var date = EPOCH.AddMilliseconds(num);
+                        outValue = date.ToString(DOMParser.DATE_TIME_FORMAT);
+                        
+                        return true;
+                    }
+                case EInputType.Month:
+                    {
+                        var date = EPOCH.AddMonths((int)num);
+                        outValue = date.ToString(DOMParser.MONTH_FORMAT);
+
+                        return true;
+                    }
+                case EInputType.Week:
+                    {
+                        var delta = TimeSpan.FromMilliseconds(num);
+                        var date = EPOCH.Add(delta);
+                        var week = date.DayOfYear / 7;
+                        outValue = date.ToString($"yyyy-W{week}");
+
+                        return true;
+                    }
+                case EInputType.Time:
+                    {
+                        var time = TimeSpan.FromMilliseconds(num);
+                        outValue = time.ToString(DOMParser.TIME_FORMAT);
+
+                        return true;
+                    }
+                case EInputType.Local:
+                    {
+                        var delta = TimeSpan.FromMilliseconds(num);
+                        var date = EPOCH.Add(delta);
+
+                        outValue = date.ToString(DOMParser.LOCAL_DATE_TIME_FORMAT);
+                        return true;
+                    }
+                case EInputType.Number:
+                case EInputType.Range:
+                    {
+                        outValue = num.ToString();
+                        return true;
+                    }
+                default:
+                    {
+                        outValue = null;
+                        return false;
+                    }
+            }
         }
 
-        bool convert_string_to_date(ReadOnlyMemory<char> buffMem, out DateTime outValue)
+        bool convert_string_to_date(ReadOnlyMemory<char> input, out DateTime outValue)
         {
+            switch (type)
+            {
+                case EInputType.Date:
+                    {
+                        if (!DOMParser.Parse_Date_String(input, out DateTime outDate))
+                        {
+                            outValue = DateTime.MinValue;
+                            return false;
+                        }
+
+                        outValue = outDate;
+                        return true;
+                    }
+                case EInputType.Month:
+                    {
+                        if (!DOMParser.Parse_Month_String(input, out int year, out int month))
+                        {
+                            outValue = DateTime.MinValue;
+                            return false;
+                        }
+
+                        outValue = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc);
+                        return true;
+                    }
+                case EInputType.Week:
+                    {
+                        if (!DOMParser.Parse_Week_String(input, out int week, out int year))
+                        {
+                            outValue = DateTime.MinValue;
+                            return false;
+                        }
+
+                        var days = week * 7;
+                        outValue = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddDays(days-1);
+                        return true;
+                    }
+                case EInputType.Time:
+                    {
+                        if (!DOMParser.Parse_Time_String(input, out TimeSpan time))
+                        {
+                            outValue = DateTime.MinValue;
+                            return false;
+                        }
+                        outValue = EPOCH.Add(time);
+
+                        return true;
+                    }
+                default:
+                    {
+                        outValue = DateTime.MinValue;
+                        return false;
+                    }
+            }
         }
 
-        bool convert_date_to_string(DateTime date, out string outValue)
+        bool convert_date_to_string(DateTimeOffset date, out string outValue)
         {
+            switch (type)
+            {
+                case EInputType.Date:
+                    {
+                        outValue = date.ToString(DOMParser.DATE_TIME_FORMAT);
+                        return true;
+                    }
+                case EInputType.Month:
+                    {
+                        outValue = date.ToString(DOMParser.MONTH_FORMAT);
+                        return true;
+                    }
+                case EInputType.Week:
+                    {
+                        var week = date.DayOfYear / 7;
+                        outValue = date.ToString($"yyyy-W{week}");
+                        return true;
+                    }
+                case EInputType.Time:
+                    {
+                        outValue = date.ToString(DOMParser.TIME_FORMAT);
+                        return true;
+                    }
+                default:
+                    {
+                        outValue = null;
+                        return false;
+                    }
+            }
         }
 
         void run_value_sanitization()
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#value-sanitization-algorithm */
-
+            switch (type)
+            {
+                case EInputType.Text:
+                case EInputType.Search:
+                    {/* The value sanitization algorithm is as follows: Strip newlines from the value. */
+                        _value = StringCommon.Replace(_value.AsMemory(), FilterCRLF.Instance, string.Empty.AsSpan());
+                    }
+                    break;
+                case EInputType.Telephone:
+                    {/* The value sanitization algorithm is as follows: Strip newlines from the value. */
+                        _value = StringCommon.Replace(_value.AsMemory(), FilterCRLF.Instance, string.Empty.AsSpan());
+                    }
+                    break;
+                case EInputType.Url:
+                    {/* The value sanitization algorithm is as follows: Strip newlines from the value, then strip leading and trailing ASCII whitespace from the value. */
+                        _value = StringCommon.Replace(_value.AsMemory(), FilterCRLF.Instance, string.Empty.AsSpan()).Trim();
+                    }
+                    break;
+                case EInputType.Email:
+                    {
+                        if (!multiple)
+                        {/* The value sanitization algorithm is as follows: Strip newlines from the value, then strip leading and trailing ASCII whitespace from the value. */
+                            _value = StringCommon.Replace(_value.AsMemory(), FilterCRLF.Instance, string.Empty.AsSpan()).Trim();
+                        }
+                        else
+                        {/* The value sanitization algorithm is as follows: */
+                         /* 1) Split on commas the element's value, strip leading and trailing ASCII whitespace from each resulting token, 
+                          * if any, and let the element's values be the (possibly empty) resulting list of (possibly empty) tokens, maintaining the original order. */
+                            var list = DOMCommon.Parse_Comma_Seperated_List(_value.AsMemory());
+                            var newList = new ReadOnlyMemory<char>[list.Count];
+                            for (int i=0; i<list.Count; i++)
+                            {
+                                newList[i] = StringCommon.Trim(list[i], UnicodeCommon.CHAR_SPACE);
+                            }
+                            /* 2) Let the element's value be the result of concatenating the element's values, separating each value from the next by a single U+002C COMMA character (,), maintaining the list's order. */
+                            _value = DOMCommon.Serialize_Comma_Seperated_list(newList);
+                        }
+                    }
+                    break;
+                case EInputType.Password:
+                    {/* The value sanitization algorithm is as follows: Strip newlines from the value. */
+                        _value = StringCommon.Replace(_value.AsMemory(), FilterCRLF.Instance, string.Empty.AsSpan());
+                    }
+                    break;
+                case EInputType.Date:
+                    {
+                        if (!DOMParser.Is_Valid_Date_String(_value.AsMemory()))
+                            _value = string.Empty;
+                    }
+                    break;
+                case EInputType.Month:
+                    {
+                        if (!DOMParser.Is_Valid_Month_String(_value.AsMemory()))
+                            _value = string.Empty;
+                    }
+                    break;
+                case EInputType.Week:
+                    {
+                        if (!DOMParser.Is_Valid_Week_String(_value.AsMemory()))
+                            _value = string.Empty;
+                    }
+                    break;
+                case EInputType.Time:
+                    {
+                        if (!DOMParser.Is_Valid_Time_String(_value.AsMemory()))
+                            _value = string.Empty;
+                    }
+                    break;
+                case EInputType.Local:
+                    {
+                        if (!DOMParser.Parse_Local_Date_Time_String(_value.AsMemory(), out DateTime dateTime))
+                            _value = dateTime.ToString(DOMParser.LOCAL_DATE_TIME_FORMAT);
+                        else
+                            _value = string.Empty;
+                    }
+                    break;
+                case EInputType.Number:
+                    {
+                        if (!DOMParser.Is_Valid_FloatingPoint(_value.AsMemory()))
+                            _value = string.Empty;
+                    }
+                    break;
+                case EInputType.Range:
+                    {
+                        if (!DOMParser.Is_Valid_FloatingPoint(_value.AsMemory()))
+                        {
+                            var min = get_minimum().Value;
+                            var max = get_maximum().Value;
+                            if (min < max)
+                            {
+                                _value = (min + ((max - min) * 0.5)).ToString();
+                            }
+                            else
+                            {
+                                _value = min.ToString();
+                            }
+                        }
+                    }
+                    break;
+                case EInputType.Color:
+                    {
+                        if (DOMParser.Is_Valid_Simple_Color(_value.AsMemory()))
+                        {
+                            _value = StringCommon.Transform(_value.AsMemory(), UnicodeCommon.To_ASCII_Lower_Alpha);
+                        }
+                        else
+                        {
+                            _value = "#000000";
+                        }
+                    }
+                    break;
+            }
         }
         #endregion
 
@@ -1322,56 +1793,167 @@ namespace CssUI.DOM
             EValidityState flags = base.query_validity();
 
             /* When a control has no value but has a required attribute (input required, textarea required); or, more complicated rules for select elements and controls in radio button groups, as specified in their sections. */
-            if (hasAttribute(EAttributeName.Required))
+            switch (type)
             {
-                switch (type)
-                {
-                    case EInputType.Checkbox:
+                case EInputType.Url:
+                    {/* Constraint validation: While the value of the element is neither the empty string nor a valid absolute URL, the element is suffering from a type mismatch. */
+                        string val = value;
+                        if (val.Length > 0 && !Uri.IsWellFormedUriString(val, UriKind.Absolute))
                         {
-                            if (!checkedness)
+                            flags |= EValidityState.typeMismatch;
+                        }
+                    }
+                    break;
+                case EInputType.Email:
+                    {
+                        if (!multiple)
+                        {/* Constraint validation: While the value of the element is neither the empty string nor a single valid e-mail address, the element is suffering from a type mismatch. */
+                            string val = value;
+                            if (val.Length > 0 && !HTMLCommon.Is_Valid_Email(val))
+                            {
+                                flags |= EValidityState.typeMismatch;
+                            }
+
+                            /* Constraint validation: While the user interface is representing input that the user agent cannot convert to punycode, the control is suffering from bad input. */
+                            if (!HTMLCommon.Is_Valid_Punycode(val))
+                            {
+                                flags |= EValidityState.badInput;
+                            }
+                        }
+                        else
+                        {/* Constraint validation: While the value of the element is not a valid e-mail address list, the element is suffering from a type mismatch. */
+                            var emailList = DOMCommon.Parse_Comma_Seperated_List(value.AsMemory());
+                            for (int i = 0; i < emailList.Count; i++)
+                            {
+                                string emailStr = emailList[i].ToString();
+                                /* Constraint validation: While the user interface describes a situation where an individual value contains a U+002C COMMA (,) or is representing input that the user agent cannot convert to punycode, the control is suffering from bad input. */
+                                if (StringCommon.Contains(emailList[i].Span, UnicodeCommon.CHAR_COMMA) || !HTMLCommon.Is_Valid_Punycode(emailStr))
+                                {
+                                    flags |= EValidityState.badInput;
+                                }
+
+                                if (!HTMLCommon.Is_Valid_Email(emailStr))
+                                {
+                                    flags |= EValidityState.typeMismatch;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case EInputType.Date:
+                    {
+                        if (!DOMParser.Is_Valid_Date_String(value.AsMemory()))
+                        {
+                            flags |= EValidityState.badInput;
+                        }
+                    }
+                    break;
+                case EInputType.Month:
+                    {
+                        if (!DOMParser.Is_Valid_Month_String(value.AsMemory()))
+                        {
+                            flags |= EValidityState.badInput;
+                        }
+                    }
+                    break;
+                case EInputType.Week:
+                    {
+                        if (!DOMParser.Is_Valid_Week_String(value.AsMemory()))
+                        {
+                            flags |= EValidityState.badInput;
+                        }
+                    }
+                    break;
+                case EInputType.Time:
+                    {
+                        if (!DOMParser.Is_Valid_Time_String(value.AsMemory()))
+                        {
+                            flags |= EValidityState.badInput;
+                        }
+                    }
+                    break;
+                case EInputType.Local:
+                    {
+                        if (!DOMParser.Is_Valid_Normalized_Local_Date_Time_String(value.AsMemory()))
+                        {
+                            flags |= EValidityState.badInput;
+                        }
+                    }
+                    break;
+                case EInputType.Number:
+                    {
+                        if (!DOMParser.Is_Valid_FloatingPoint(value.AsMemory()))
+                        {
+                            flags |= EValidityState.badInput;
+                        }
+                    }
+                    break;
+                case EInputType.Range:
+                    {
+                        if (!DOMParser.Is_Valid_FloatingPoint(value.AsMemory()))
+                        {
+                            flags |= EValidityState.badInput;
+                        }
+                    }
+                    break;
+                case EInputType.Color:
+                    {
+                        if (!DOMParser.Is_Valid_Lowercase_Simple_Color(value.AsMemory()))
+                        {
+                            flags |= EValidityState.badInput;
+                        }
+                    }
+                    break;
+                case EInputType.Checkbox:
+                    {
+                        if (required && !checkedness)
+                        {
+                            flags |= EValidityState.valueMissing;
+                        }
+                    }
+                    break;
+                case EInputType.Radio:
+                    {/* Constraint validation: If an element in the radio button group is required, and all of the input elements in the radio button group have a checkedness that is false, then the element is suffering from being missing. */
+                        if (required && !Checked)
+                        {
+                            var group = Get_Radio_Button_Group();
+                            bool missing = true;
+                            foreach (var input in group)
+                            {
+                                if (input.Checked)
+                                {
+                                    missing = false;
+                                    break;
+                                }
+                            }
+
+                            if (missing)
                             {
                                 flags |= EValidityState.valueMissing;
                             }
                         }
-                        break;
-                    case EInputType.Radio:
-                        {/* Constraint validation: If an element in the radio button group is required, and all of the input elements in the radio button group have a checkedness that is false, then the element is suffering from being missing. */
-                            if (!Checked)
-                            {
-                                var group = Get_Radio_Button_Group();
-                                bool missing = true;
-                                foreach (var input in group)
-                                {
-                                    if (input.Checked)
-                                    {
-                                        missing = false;
-                                        break;
-                                    }
-                                }
-
-                                if (missing)
-                                {
-                                    flags |= EValidityState.valueMissing;
-                                }
-                            }
-                        }
-                        break;
-                    case EInputType.File:
+                    }
+                    break;
+                case EInputType.File:
+                    {
+                        if (required && selected_files.Count <= 0)
                         {
-                            if (selected_files.Count <= 0)
-                            {
-                                flags |= EValidityState.valueMissing;
-                            }
+                            flags |= EValidityState.valueMissing;
                         }
-                        break;
-                }
-
-                if (ReferenceEquals(null, value) || value.Length <= 0)
-                {
-                    flags |= EValidityState.valueMissing;
-                }
+                    }
+                    break;
+                default:
+                    {
+                        if (ReferenceEquals(null, value) || value.Length <= 0)
+                        {
+                            flags |= EValidityState.valueMissing;
+                        }
+                    }
+                    break;
             }
 
+            string value = this.value;
             /* When a control has a value that is too long for the form control maxlength attribute (input maxlength, textarea maxlength). */
             if (value.Length > maxLength)
             {
@@ -1390,31 +1972,120 @@ namespace CssUI.DOM
              * the element is suffering from a step mismatch. */
             if (allowed_value_step.HasValue)
             {
-                if (convert_string_to_number(_value.AsMemory(), out double outValueNumber))
+                if (convert_string_to_number(value.AsMemory(), out double outValueNumber))
                 {
+                    double stepSize = allowed_value_step.Value;
                     double delta = outValueNumber - step_base;
-                    double multiple = allowed_value_step.Value % delta;
-                    if (multiple > 0)
+                    double remainder = stepSize % delta;
+                    if (remainder > 0)
                     {
                         flags |= EValidityState.stepMismatch;
+                        switch (type)
+                        {
+                            case EInputType.Range:
+                                {
+                                    /* When the element is suffering from a step mismatch, the user agent must round the element's value to the nearest number for which the element would not suffer from a step mismatch, 
+                                     * and which is greater than or equal to the minimum, and, if the maximum is not less than the minimum, 
+                                     * which is less than or equal to the maximum, if there is a number that matches these constraints. If two numbers match these constraints, 
+                                     * then user agents must use the one nearest to positive infinity. */
+                                    double multiple = Math.Floor(stepSize / delta);
+
+                                    if (MathExt.Fgteq(remainder, 0.5d))// step up is closest
+                                    {
+                                        double max = get_maximum().Value;
+                                        double upStep = (multiple + 1) * stepSize;
+                                        if (upStep <= max)
+                                        {
+                                            value = upStep.ToString();
+                                            break;
+                                        }
+                                    }
+
+                                    double min = get_maximum().Value;
+                                    double noStep = multiple * stepSize;
+                                    if (noStep >= min)
+                                    {
+                                        value = noStep.ToString();
+                                        break;
+                                    }
+                                }
+                                break;
+                        }
                     }
                 }
             }
 
-            if (!ReferenceEquals(null, value) && value.Length > 0 && convert_string_to_number(value.AsMemory(), out double outValue))
+
+            if (!ReferenceEquals(null, value) && value.Length > 0)/* Value is not null or empty string */
             {
-                /* When a control has a value that is not the empty string and is too low for the min attribute. */
-                var min = get_minimum();
-                if (min.HasValue && outValue < min.Value)
+                if (convert_string_to_number(value.AsMemory(), out double outValue))
                 {
-                    flags |= EValidityState.rangeUnderflow;
+                    switch (type)
+                    {
+                        case EInputType.Date:
+                        case EInputType.Month:
+                        case EInputType.Week:
+                        case EInputType.Time:
+                        case EInputType.Local:
+                        case EInputType.Number:
+                            {
+                                /* When a control has a value that is not the empty string and is too low for the min attribute. */
+                                var min = get_minimum();
+                                if (min.HasValue && outValue < min.Value)
+                                {
+                                    flags |= EValidityState.rangeUnderflow;
+                                }
+
+                                /* When a control has a value that is not the empty string and is too high for the max attribute. */
+                                var max = get_maximum();
+                                if (max.HasValue && outValue > max.Value)
+                                {
+                                    flags |= EValidityState.rangeOverflow;
+                                }
+                            }
+                            break;
+                        case EInputType.Range:
+                            {
+                                /* When a control has a value that is not the empty string and is too low for the min attribute. */
+                                var min = get_minimum();
+                                if (min.HasValue && outValue < min.Value)
+                                {
+                                    flags |= EValidityState.rangeUnderflow;
+                                    value = min.Value.ToString();
+                                }
+
+                                /* When a control has a value that is not the empty string and is too high for the max attribute. */
+                                var max = get_maximum();
+                                if (max.HasValue && outValue > max.Value)
+                                {
+                                    flags |= EValidityState.rangeOverflow;
+                                    value = max.Value.ToString();
+                                }
+                            }
+                            break;
+                    }
                 }
 
-                /*  */
-                var max = get_maximum();
-                if (max.HasValue && outValue > max.Value)
+                if (patternCompiled != null)
                 {
-                    flags |= EValidityState.rangeOverflow;
+                    if (!multiple)
+                    {
+                        if (!patternCompiled.IsMatch(value))
+                        {
+                            flags |= EValidityState.patternMismatch;
+                        }
+                    }
+                    else
+                    {
+                        foreach (string item in get_values())
+                        {
+                            if (!patternCompiled.IsMatch(item))
+                            {
+                                flags |= EValidityState.patternMismatch;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
 
@@ -1459,7 +2130,7 @@ namespace CssUI.DOM
                 }
             }
 
-            if (!StringCommon.Scan(value.AsSpan(), Filters.FilterCharSelectable.Instance))
+            if (!StringCommon.Contains(value.AsSpan(), Filters.FilterCharSelectable.Instance))
             {
                 return;
             }
@@ -1709,8 +2380,8 @@ namespace CssUI.DOM
             bDirtyValueFlag = true;
 
             /* 3) If the method has only one argument, then let start and end have the values of the selectionStart attribute and the selectionEnd attribute respectively. */
-            int start = selectionStart;
-            int end = selectionEnd;
+            int? start = selectionStart;
+            int? end = selectionEnd;
             /* 4) If start is greater than end, then throw an "IndexSizeError" DOMException. */
             if (start > end)
             {
@@ -1729,11 +2400,11 @@ namespace CssUI.DOM
             /* 9) If start is less than end, delete the sequence of characters within the element's relevant value starting with the character at the startth position (in logical order) and ending with the character at the (end-1)th position. */
             if (start < end)
             {
-                relevantValue = relevantValue.Substring(start, (end - start) - 1);
+                relevantValue = relevantValue.Substring(start.Value, (end - start).Value - 1);
             }
 
             /* 10) Insert the value of the first argument into the text of the relevant value of the text control, immediately before the startth character. */
-            relevantValue.Insert(start, replacement);
+            relevantValue.Insert(start.Value, replacement);
 
             var newLength = replacement.Length;
             var newEnd = start + newLength;
@@ -1863,6 +2534,8 @@ namespace CssUI.DOM
             get
             {
                 if (disabled) return false;
+                if (readOnly) return false;
+                if (type == EInputType.Hidden) return false;
 
                 return true;
             }
@@ -1914,6 +2587,14 @@ namespace CssUI.DOM
                 update_radio_button_group();
             }
         }
+
+        /// <summary>
+        /// Returns the total months that occur between two dates. this method does not calculate the number of months using the total elapsed days between the dates, it assumes the two dates both start on the first day of their given month.
+        /// </summary>
+        private int GetTotalMonths(DateTime From, DateTime Till)
+        {
+            return ((Till.Year - From.Year) * 12) + (Till.Month - From.Month);
+        }
         #endregion
 
         #region Rendering
@@ -1922,6 +2603,7 @@ namespace CssUI.DOM
         /// </summary>
         private void update_rendering_for_type(EInputType type)
         {
+            /* XXX: CSS Rendering */
         }
         #endregion
 
@@ -1948,7 +2630,7 @@ namespace CssUI.DOM
                 return;
             switch (localName.EnumValue.Value)
             {
-                case EAttributeName.Value:
+                case EAttributeName.Value:/* Universal logic */
                     {
                         /* When the value content attribute is added, set, or removed, 
                          * if the control's dirty value flag is false, the user agent must set the value of the element to the value of the value content attribute, 
@@ -1960,13 +2642,7 @@ namespace CssUI.DOM
                         }
                     }
                     break;
-                case EAttributeName.Name:
-                case EAttributeName.Form:
-                    {
-                        update_radio_button_group();
-                    }
-                    break;
-                case EAttributeName.Type:
+                case EAttributeName.Type:/* Universal logic */
                     {/* Docs: https://html.spec.whatwg.org/multipage/input.html#input-type-change */
                      /* 1) If the previous state of the element's type attribute put the value IDL attribute in the value mode, 
                       * and the element's value is not the empty string, and the new state of the element's type attribute puts the value IDL attribute in either the default mode or the default/on mode, 
@@ -2011,6 +2687,20 @@ namespace CssUI.DOM
                             text_entry_cursor_position = 0;
                             selection.direction = ESelectionDirection.None;
                         }
+                    }
+                    break;
+                case EAttributeName.Name:
+                case EAttributeName.Form:
+                    {
+                        if (type == EInputType.Radio)
+                        {
+                            update_radio_button_group();
+                        }
+                    }
+                    break;
+                case EAttributeName.Multiple:
+                    {
+                        run_value_sanitization();
                     }
                     break;
             }
