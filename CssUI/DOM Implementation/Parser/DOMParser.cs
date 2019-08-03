@@ -35,8 +35,10 @@ namespace CssUI.DOM.Serialization
         #endregion
 
         #region Dates
-        public const string DATE_TIME_FORMAT = @"yyyy-MM-dd\\THH:mm:ss.0:zzz\\Z";
-        public const string DATE_MONTH_FORMAT = @"yyyy-MM";
+        public const string DATE_TIME_FORMAT = @"yyyy-MM-dd\\THH:mm:ss\.fff\\Z0:zzz";
+        public const string LOCAL_DATE_TIME_FORMAT = @"yyyy-MM-dd\\THH:mm:ss\.fff";
+        public const string MONTH_FORMAT = @"yyyy-MM";
+        public const string TIME_FORMAT = @"HH:mm:ss\.fff";
 
         const long TIME_SCALE_WEEKS = 604800;
         const long TIME_SCALE_DAYS = 86400;
@@ -673,19 +675,14 @@ namespace CssUI.DOM.Serialization
 
             return true;
         }
-        public static bool Parse_Local_Date_Time_String(ReadOnlyMemory<char> input, out int outYear, out int outMonth, out int outDay, out int outHours, out int outMinutes, out float outSeconds)
+        public static bool Parse_Local_Date_Time_String(ReadOnlyMemory<char> input, out DateTime outDateTime)
         {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#parse-a-local-date-and-time-string */
 
             DataStream<char> Stream = new DataStream<char>(input, EOF);
 
             if (!Consume_Date_Component(Stream, out int year, out int month, out int day))
             {
-                outYear = 0;
-                outMonth = 0;
-                outDay = 0;
-                outHours = 0;
-                outMinutes = 0;
-                outSeconds = 0f;
+                outDateTime = DateTime.MinValue;
                 return false;
             }
 
@@ -693,43 +690,23 @@ namespace CssUI.DOM.Serialization
                 Stream.Consume();
             else
             {
-                outYear = 0;
-                outMonth = 0;
-                outDay = 0;
-                outHours = 0;
-                outMinutes = 0;
-                outSeconds = 0f;
+                outDateTime = DateTime.MinValue;
                 return false;
             }
 
-            if (!Consume_Time_Component(Stream, out int hours, out int minutes, out float seconds))
+            if (!Consume_Time_Component(Stream, out int hours, out int minutes, out double seconds))
             {
-                outYear = 0;
-                outMonth = 0;
-                outDay = 0;
-                outHours = 0;
-                outMinutes = 0;
-                outSeconds = 0f;
+                outDateTime = DateTime.MinValue;
                 return false;
             }
 
             if (!Stream.atEOF)
             {
-                outYear = 0;
-                outMonth = 0;
-                outDay = 0;
-                outHours = 0;
-                outMinutes = 0;
-                outSeconds = 0f;
+                outDateTime = DateTime.MinValue;
                 return false;
             }
 
-            outYear = year;
-            outMonth = month;
-            outDay = day;
-            outHours = hours;
-            outMinutes = minutes;
-            outSeconds = seconds;
+            outDateTime = new DateTime(year, month, day, hours, minutes, 0).AddSeconds(seconds);
             return true;
         }
 

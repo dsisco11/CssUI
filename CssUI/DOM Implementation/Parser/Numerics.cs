@@ -11,7 +11,6 @@ namespace CssUI.DOM.Serialization
     public static partial class DOMParser
     {
         #region Integer
-
         public static bool Is_Valid_Integer(ReadOnlyMemory<char> input)
         {
             DataStream<char> Stream = new DataStream<char>(input, EOF);
