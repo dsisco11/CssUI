@@ -35,6 +35,9 @@ namespace CssUI.DOM.Serialization
         #endregion
 
         #region Dates
+        public const string DATE_TIME_FORMAT = @"yyyy-MM-dd\\THH:mm:ss.0:zzz\\Z";
+        public const string DATE_MONTH_FORMAT = @"yyyy-MM";
+
         const long TIME_SCALE_WEEKS = 604800;
         const long TIME_SCALE_DAYS = 86400;
         const long TIME_SCALE_HOURS = 3600;
@@ -919,15 +922,14 @@ namespace CssUI.DOM.Serialization
 
             return false;
         }
-        public static bool Parse_Global_Date_Time_String(ReadOnlyMemory<char> input, out DateTime outTime, out TimeSpan outTimezone)
+        public static bool Parse_Global_Date_Time_String(ReadOnlyMemory<char> input, out DateTimeOffset outTime)
         {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#parse-a-global-date-and-time-string */
 
             var Stream = new DataStream<char>(input, EOF);
 
             if (!Consume_Date_Component(Stream, out int year, out int month, out int day))
             {
-                outTime = DateTime.MinValue;
-                outTimezone = TimeSpan.MinValue;
+                outTime = DateTimeOffset.MinValue;
                 return false;
             }
 
@@ -937,46 +939,39 @@ namespace CssUI.DOM.Serialization
             }
             else
             {
-                outTime = DateTime.MinValue;
-                outTimezone = TimeSpan.MinValue;
+                outTime = DateTimeOffset.MinValue;
                 return false;
             }
 
-            if (!Consume_Time_Component(Stream, out int hours, out int minutes, out float seconds))
+            if (!Consume_Time_Component(Stream, out int hours, out int minutes, out double seconds))
             {
-                outTime = DateTime.MinValue;
-                outTimezone = TimeSpan.MinValue;
+                outTime = DateTimeOffset.MinValue;
                 return false;
             }
 
             if (Stream.atEOF)
             {
-                outTime = DateTime.MinValue;
-                outTimezone = TimeSpan.MinValue;
+                outTime = DateTimeOffset.MinValue;
                 return false;
             }
 
             if (!Consume_TimeZone_Offset_Component(Stream, out int timezoneHours, out int timezoneMinutes))
             {
-                outTime = DateTime.MinValue;
-                outTimezone = TimeSpan.MinValue;
+                outTime = DateTimeOffset.MinValue;
                 return false;
             }
 
             if (!Stream.atEOF)
             {
-                outTime = DateTime.MinValue;
-                outTimezone = TimeSpan.MinValue;
+                outTime = DateTimeOffset.MinValue;
                 return false;
             }
 
-            var timespan = TimeSpan.FromSeconds(seconds);
             var timezoneTimespan = new TimeSpan(timezoneHours, timezoneMinutes, 0);
-            var localTime = new DateTime(year, month, day, hours, minutes, timespan.Seconds, timespan.Milliseconds, DateTimeKind.Utc);
-
+            var timespan = TimeSpan.FromSeconds(seconds);
+            var localTime = new DateTimeOffset(year, month, day, hours, minutes, timespan.Seconds, timespan.Milliseconds, timezoneTimespan);
 
             outTime = localTime.Subtract(timezoneTimespan);
-            outTimezone = timezoneTimespan;
             return true;
         }
 
@@ -1573,16 +1568,15 @@ namespace CssUI.DOM.Serialization
         }
 
 
-        public static bool Parse_Date_Or_Time_String(ReadOnlyMemory<char> input, out DateTime outDateTime, out TimeSpan? outTimeZone)
+        public static bool Parse_Date_Or_Time_String(ReadOnlyMemory<char> input, out DateTimeOffset outDateTime)
         {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#parse-a-date-or-time-string */
 
             var Stream = new DataStream<char>(input, EOF);
-            bool result = Parse_Date_Or_Time_String(Stream, out DateTime dateTime, out TimeSpan? timeZone);
+            bool result = Parse_Date_Or_Time_String(Stream, out DateTimeOffset dateTime);
             outDateTime = dateTime;
-            outTimeZone = timeZone;
             return result;
         }
-        private static bool Parse_Date_Or_Time_String(DataStream<char> Stream, out DateTime outDateTime, out TimeSpan? outTimeZone)
+        private static bool Parse_Date_Or_Time_String(DataStream<char> Stream, out DateTimeOffset outDateTime)
         {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#parse-a-date-or-time-string */
 
             bool bDatePresent = true, bTimePresent = true;
@@ -1617,8 +1611,7 @@ namespace CssUI.DOM.Serialization
             {
                 if (!Consume_Time_Component(Stream, out hours, out minutes, out seconds))
                 {
-                    outDateTime = DateTime.MinValue;
-                    outTimeZone = null;
+                    outDateTime = DateTimeOffset.MinValue;
                     return false;
                 }
             }
@@ -1627,44 +1620,38 @@ namespace CssUI.DOM.Serialization
             {
                 if (Stream.atEOF)
                 {
-                    outDateTime = DateTime.MinValue;
-                    outTimeZone = null;
+                    outDateTime = DateTimeOffset.MinValue;
                     return false;
                 }
 
                 if (!Consume_TimeZone_Offset_Component(Stream, out timezoneHours, out timezoneMinutes))
                 {
-                    outDateTime = DateTime.MinValue;
-                    outTimeZone = null;
+                    outDateTime = DateTimeOffset.MinValue;
                     return false;
                 }
             }
 
             if (!Stream.atEOF)
             {
-                outDateTime = DateTime.MinValue;
-                outTimeZone = null;
+                outDateTime = DateTimeOffset.MinValue;
                 return false;
             }
 
             if (bDatePresent && !bTimePresent)
             {
-                outDateTime = new DateTime(year, month, day);
-                outTimeZone = null;
+                outDateTime = new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Utc);
                 return true;
             }
             else if (bTimePresent && !bDatePresent)
             {
-                outDateTime = new DateTime(0, 0, 0, hours, minutes, 0).AddSeconds(seconds);
-                outTimeZone = null;
+                outDateTime = new DateTime(0, 0, 0, hours, minutes, 0, DateTimeKind.Utc).AddSeconds(seconds);
                 return true;
             }
 
 
-            var tmp = new DateTime(year, month, day, hours, minutes, 0).AddSeconds(seconds);
             var timezone = new TimeSpan(timezoneHours, timezoneMinutes, 0);
+            var tmp = new DateTimeOffset(year, month, day, hours, minutes, 0, timezone).AddSeconds(seconds);
             outDateTime = tmp.Subtract(timezone);
-            outTimeZone = timezone;
             return true;
         }
 
