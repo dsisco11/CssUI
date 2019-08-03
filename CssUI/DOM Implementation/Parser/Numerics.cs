@@ -11,6 +11,41 @@ namespace CssUI.DOM.Serialization
     public static partial class DOMParser
     {
         #region Integer
+
+        public static bool Is_Valid_Integer(ReadOnlyMemory<char> input)
+        {
+            DataStream<char> Stream = new DataStream<char>(input, EOF);
+            return Is_Valid_Integer(Stream);
+        }
+        public static bool Is_Valid_Integer(DataStream<char> Stream)
+        {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#signed-integers */
+
+            /* SKip ASCII whitespace */
+            Stream.Consume_While(Is_Ascii_Whitespace);
+
+            if (Stream.atEOF)
+            {
+                return false;
+            }
+
+            if (Stream.Next == CHAR_HYPHEN_MINUS || Stream.Next == CHAR_PLUS_SIGN)
+            {
+                Stream.Consume();
+            }
+
+
+            /* Collect sequence of ASCII digit codepoints */
+            Stream.Consume_While(Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
+
+            if (!Stream.atEOF && Is_Ascii_Alpha(Stream.Next))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+
         public static bool Parse_Integer(ReadOnlyMemory<char> input, out int outValue)
         {
             DataStream<char> Stream = new DataStream<char>(input, EOF);
@@ -57,6 +92,7 @@ namespace CssUI.DOM.Serialization
             outValue = sign ? parsed : (0 - parsed);
             return true;
         }
+
 
         public static bool Parse_Integer(ReadOnlyMemory<char> input, out long outValue)
         {
@@ -106,6 +142,18 @@ namespace CssUI.DOM.Serialization
         #endregion
 
         #region Decimal
+
+        public static bool Is_Valid_FloatingPoint(ReadOnlyMemory<char> input)
+        {
+            DataStream<char> Stream = new DataStream<char>(input, EOF);
+            return Is_Valid_FloatingPoint(Stream);
+        }
+        public static bool Is_Valid_FloatingPoint(DataStream<char> Stream)
+        {
+            return Parse_FloatingPoint(Stream, out double _);
+        }
+
+
         public static bool Parse_FloatingPoint(ReadOnlyMemory<char> input, out float outValue)
         {
             DataStream<char> Stream = new DataStream<char>(input, EOF);
@@ -119,6 +167,7 @@ namespace CssUI.DOM.Serialization
             outValue = (float)outParsed;
             return result;
         }
+
 
         public static bool Parse_FloatingPoint(ReadOnlyMemory<char> input, out double outValue)
         {
@@ -137,7 +186,7 @@ namespace CssUI.DOM.Serialization
             /* Skip ASCII whitespace */
             Stream.Consume_While(Is_Ascii_Whitespace);
 
-            if (Stream.Next == EOF)
+            if (Stream.atEOF)
                 throw new DomSyntaxError();
 
             switch (Stream.Next)
@@ -156,7 +205,7 @@ namespace CssUI.DOM.Serialization
                     break;
             }
 
-            if (Stream.Next == EOF)
+            if (Stream.atEOF)
                 throw new DomSyntaxError();
 
             /* 9) If the character indicated by position is a U+002E FULL STOP (.), 
@@ -180,14 +229,14 @@ namespace CssUI.DOM.Serialization
             }
 
             /* 12) If position is past the end of input, jump to the step labeled conversion. */
-            if (Stream.Next != EOF)
+            if (!Stream.atEOF)
             {
                 /* 13) Fraction: If the character indicated by position is a U+002E FULL STOP (.), run these substeps: */
                 if (Stream.Next == CHAR_FULL_STOP)
                 {
                     Stream.Consume();
                     /* 2) If position is past the end of input, or if the character indicated by position is not an ASCII digit, U+0065 LATIN SMALL LETTER E (e), or U+0045 LATIN CAPITAL LETTER E (E), then jump to the step labeled conversion. */
-                    if (Stream.Next != EOF && (Is_Ascii_Digit(Stream.Next) || Stream.Next == CHAR_E_LOWER || Stream.Next == CHAR_E_UPPER))
+                    if (!Stream.atEOF && (Is_Ascii_Digit(Stream.Next) || Stream.Next == CHAR_E_LOWER || Stream.Next == CHAR_E_UPPER))
                     {
                         /* 3) If the character indicated by position is a U+0065 LATIN SMALL LETTER E character (e) or a U+0045 LATIN CAPITAL LETTER E character (E), skip the remainder of these substeps. */
                         if (Is_Ascii_Digit(Stream.Next))
