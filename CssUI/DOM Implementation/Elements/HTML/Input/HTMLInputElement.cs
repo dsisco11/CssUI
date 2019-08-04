@@ -2,8 +2,8 @@
 using CssUI.DOM.Events;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Nodes;
-using CssUI.DOM.Serialization;
 using CssUI.Filters;
+using CssUI.HTML.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -7,7 +7,7 @@ using System.Globalization;
 using System.Text;
 using static CssUI.UnicodeCommon;
 
-namespace CssUI.DOM.Serialization
+namespace CssUI.HTML.Serialization
 {
     public static partial class HTMLParser
     {/* Docs: https://www.w3.org/TR/DOM-Parsing/ */
@@ -69,7 +69,7 @@ namespace CssUI.DOM.Serialization
                     }
                 case 2:/* 29 if month is 2 and year is a number divisible by 400, or if year is a number divisible by 4 but not by 100; and 28 otherwise. */
                     {
-                        if (0 == (year % 400) || (0 == (year % 4) && 0 != (year % 100)))
+                        if (0 == year % 400 || 0 == year % 4 && 0 != year % 100)
                             return 29;
                         else
                             return 28;
@@ -320,7 +320,7 @@ namespace CssUI.DOM.Serialization
         {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#parse-a-yearless-date-component */
 
 
-            if (Stream.Consume_While((c) => c == CHAR_HYPHEN_MINUS, out ReadOnlyMemory<char> outHypens) && (outHypens.Length != 0 && outHypens.Length != 2))
+            if (Stream.Consume_While((c) => c == CHAR_HYPHEN_MINUS, out ReadOnlyMemory<char> outHypens) && outHypens.Length != 0 && outHypens.Length != 2)
             {
                 outMonth = 0;
                 outDay = 0;
@@ -882,7 +882,7 @@ namespace CssUI.DOM.Serialization
                 return true;
             }
 
-            if (input.Length==1 && (input.Span[0] == CHAR_T_UPPER || input.Span[0] == CHAR_SPACE))
+            if (input.Length == 1 && (input.Span[0] == CHAR_T_UPPER || input.Span[0] == CHAR_SPACE))
             {
                 return true;
             }
@@ -1088,7 +1088,7 @@ namespace CssUI.DOM.Serialization
                 {
                     Stream.Consume();
                     var days = ParsingCommon.Digits_To_Base10_Unsigned(daysDigits);
-                    totalTime += (days * TIME_SCALE_DAYS);
+                    totalTime += days * TIME_SCALE_DAYS;
                 }
 
                 if (Stream.Next == CHAR_T_UPPER)
@@ -1106,7 +1106,7 @@ namespace CssUI.DOM.Serialization
                         }
 
                         var hours = ParsingCommon.Digits_To_Base10_Unsigned(hoursDigits);
-                        totalTime += (hours * TIME_SCALE_HOURS);
+                        totalTime += hours * TIME_SCALE_HOURS;
 
                         Stream.Consume();
                         Stream.Scan(ch => !Is_Ascii_Digit(ch), out nextNonDigit);
@@ -1120,7 +1120,7 @@ namespace CssUI.DOM.Serialization
                         }
 
                         var minutes = ParsingCommon.Digits_To_Base10_Unsigned(minutesDigits);
-                        totalTime += (minutes * TIME_SCALE_MINUTES);
+                        totalTime += minutes * TIME_SCALE_MINUTES;
                         Stream.Consume();
                     }
 
@@ -1140,12 +1140,12 @@ namespace CssUI.DOM.Serialization
                             }
 
                             var seconds = ParsingCommon.ToDecimal(1, secondsDigits.Span, fracDigits.Span, 1, null);
-                            totalTime += (seconds * TIME_SCALE_SECONDS);
+                            totalTime += seconds * TIME_SCALE_SECONDS;
                         }
                         else
                         {
                             var seconds = ParsingCommon.Digits_To_Base10_Unsigned(secondsDigits);
-                            totalTime += (seconds * TIME_SCALE_SECONDS);
+                            totalTime += seconds * TIME_SCALE_SECONDS;
                         }
 
                         if (Stream.Next != CHAR_S_UPPER)
@@ -1345,7 +1345,7 @@ namespace CssUI.DOM.Serialization
 
                     if (units == EDurationUnit.Months)
                     {
-                        months += (N * multiplier);
+                        months += N * multiplier;
                     }
                     else
                     {
@@ -1373,7 +1373,7 @@ namespace CssUI.DOM.Serialization
                             units = EDurationUnit.Seconds;
                         }
 
-                        seconds += (N * multiplier);
+                        seconds += N * multiplier;
                     }
 
                     Stream.Consume_While(Is_Ascii_Whitespace);
@@ -1523,7 +1523,7 @@ namespace CssUI.DOM.Serialization
 
             var unitsParsed = ParsingCommon.Digits_To_Base10(unitDigits);
 
-            outTimeInSeconds = (unitsParsed * scale);
+            outTimeInSeconds = unitsParsed * scale;
             return true;
         }
 
@@ -1779,9 +1779,9 @@ namespace CssUI.DOM.Serialization
             input = input.Substring(startOffset, Math.Min(input.Length, 128));
 
             /* 10) Replace any character in input that is not an ASCII hex digit with the character U+0030 DIGIT ZERO (0). */
-            input = StringCommon.Transform(input.AsMemory(), (char c) => Is_Ascii_Hex_Digit(c) ? c : CHAR_DIGIT_0);
+            input = StringCommon.Transform(input.AsMemory(), (c) => Is_Ascii_Hex_Digit(c) ? c : CHAR_DIGIT_0);
             /* 11) While input's length is zero or not a multiple of three, append a U+0030 DIGIT ZERO (0) character to input. */
-            var remainder = (input.Length == 0) ? 3 : input.Length % 3;
+            var remainder = input.Length == 0 ? 3 : input.Length % 3;
             if (remainder > 0) input = string.Concat(input, new string(CHAR_DIGIT_0, remainder));
 
             var length = input.Length / 3;
@@ -1794,7 +1794,7 @@ namespace CssUI.DOM.Serialization
             /* 13) If length is greater than 8, then remove the leading length-8 characters in each component, and let length be 8. */
             if (length > 8)
             {
-                for (int i=0; i<split.Length; i++)
+                for (int i = 0; i < split.Length; i++)
                 {
                     split[i] = split[i].Substring(split[i].Length - 8);
                 }

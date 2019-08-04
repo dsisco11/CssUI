@@ -4,7 +4,7 @@ using CssUI.DOM.Enums;
 using CssUI.DOM.Exceptions;
 using System.Runtime.CompilerServices;
 using System.Linq;
-using CssUI.DOM.Serialization;
+using CssUI.HTML.Serialization;
 
 namespace CssUI.DOM
 {

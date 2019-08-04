@@ -1,12 +1,9 @@
 ﻿using CssUI.DOM.Enums;
 using CssUI.DOM.Exceptions;
 using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text;
 using static CssUI.UnicodeCommon;
 
-namespace CssUI.DOM.Serialization
+namespace CssUI.HTML.Serialization
 {
     public static partial class HTMLParser
     {
@@ -49,7 +46,7 @@ namespace CssUI.DOM.Serialization
         {
             DataStream<char> Stream = new DataStream<char>(input, EOF);
             bool result = Parse_Integer(Stream, out int outParsed);
-            outValue = (int)outParsed;
+            outValue = outParsed;
             return result;
         }
         public static bool Parse_Integer(DataStream<char> Stream, out int outValue)
@@ -88,7 +85,7 @@ namespace CssUI.DOM.Serialization
 
             var parsed = (int)ParsingCommon.Digits_To_Base10(outDigits);
 
-            outValue = sign ? parsed : (0 - parsed);
+            outValue = sign ? parsed : 0 - parsed;
             return true;
         }
 
@@ -135,7 +132,7 @@ namespace CssUI.DOM.Serialization
 
             var parsed = ParsingCommon.Digits_To_Base10(outDigits);
 
-            outValue = sign ? parsed : (0 - parsed);
+            outValue = sign ? parsed : 0 - parsed;
             return true;
         }
         #endregion
@@ -342,7 +339,7 @@ namespace CssUI.DOM.Serialization
                 }
                 else if (!Is_Ascii_Digit(Stream.Next))
                 {
-                    outType = (Stream.Next == CHAR_PERCENT) ? EAttributeType.Percentage : EAttributeType.Length;
+                    outType = Stream.Next == CHAR_PERCENT ? EAttributeType.Percentage : EAttributeType.Length;
                     outValue = value;
                     return true;
                 }
@@ -354,14 +351,14 @@ namespace CssUI.DOM.Serialization
                 {
                     divisor *= 10;
                     /* 2) Add the value of the code point at position within input, interpreted as a base-ten digit (0..9) and divided by divisor, to value. */
-                    double n = (double)Ascii_Digit_To_Value(Stream.Next) / divisor;
+                    double n = Ascii_Digit_To_Value(Stream.Next) / divisor;
                     value += n;
                     Stream.Consume();
                 }
             }
 
             /* 8) Return the current dimension value with value, input, and position. */
-            outType = (Stream.Next == CHAR_PERCENT) ? EAttributeType.Percentage : EAttributeType.Length;
+            outType = Stream.Next == CHAR_PERCENT ? EAttributeType.Percentage : EAttributeType.Length;
             outValue = value;
             return true;
         }
