@@ -8,6 +8,11 @@ namespace CssUI
     {
 
         #region Utility
+        public static string Get_Location(DataStream<char> Stream)
+        {
+            return Stream.AsMemory().Slice((int)Stream.Position, 32).ToString();
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long Digits_To_Base10(ReadOnlyMemory<char> digits) => Digits_To_Base10(digits.Span);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
