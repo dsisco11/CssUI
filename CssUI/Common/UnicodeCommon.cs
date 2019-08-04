@@ -7,15 +7,16 @@ namespace CssUI
     public static class UnicodeCommon
     {
         #region Constants
-        /* Specials */
+
+        #region /* Specials */
         public const char CHAR_MAX = char.MaxValue;
         public const char EOF = '\u0000';
         public const char CHAR_NULL = '\u0000';
         public const char CHAR_REPLACEMENT = '\uFFFD';// U+FFFD
+        #endregion
 
 
-
-        /* Ascii whitespace */
+        #region /* Ascii whitespace */
         /* Docs: https://infra.spec.whatwg.org/#ascii-whitespace */
         public const char CHAR_TAB = '\u0009';
         /// <summary>
@@ -34,12 +35,10 @@ namespace CssUI
         /// " "
         /// </summary>
         public const char CHAR_SPACE = '\u0020';
-
-        [Obsolete("Use CHAR_LINE_FEED")]
-        public const char CHAR_NEWLINE = '\n';
+        #endregion
 
 
-        /* C0 Control codes */
+        #region /* C0 Control codes */
         /* Docs: https://infra.spec.whatwg.org/#c0-control */
         /// <summary>
         /// C0 Control code: INFORMATION SEPARATOR ONE
@@ -47,15 +46,58 @@ namespace CssUI
         public const char CHAR_C0_INFO_SEPERATOR = '\u001F';
         public const char CHAR_C0_DELETE = '\u007F';
         public const char CHAR_C0_APPLICATION_PROGRAM_COMMAND = '\u009F';
+        #endregion
 
 
-        /* Ascii digits */
+        #region /* Ascii Symbols */
+
+        /// <summary>
+        /// !
+        /// </summary>
+        public const char CHAR_EXCLAMATION_POINT = '\u0021';
+        /// <summary>
+        /// $
+        /// </summary>
+        public const char CHAR_DOLLAR_SIGN = '\u0024';
+        /// <summary>
+        /// &
+        /// </summary>
+        public const char CHAR_AMPERSAND = '\u0026';
+        /// <summary>
+        /// *
+        /// </summary>
+        public const char CHAR_ASTERISK = '\u002A';
+        /// <summary>
+        /// ^
+        /// </summary>
+        public const char CHAR_CARET = '\u005E';
+        /// <summary>
+        /// `
+        /// </summary>
+        public const char CHAR_BACKTICK = '\u0060';
+        /// <summary>
+        /// ~
+        /// </summary>
+        public const char CHAR_TILDE = '\u007E';
+        /// <summary>
+        /// |
+        /// </summary>
+        public const char CHAR_PIPE = '\u007C';
+        /// <summary>
+        /// >
+        /// </summary>
+        public const char CHAR_RIGHT_CHEVRON = '\u003E';
+        #endregion
+
+
+        #region /* Ascii digits */
         /* Docs: https://infra.spec.whatwg.org/#ascii-digit */
         public const char CHAR_DIGIT_0 = '\u0030';
         public const char CHAR_DIGIT_9 = '\u0039';
+        #endregion
 
 
-        /* Ascii Upper Alpha */
+        #region /* Ascii Upper Alpha */
         /* Docs: https://infra.spec.whatwg.org/#ascii-upper-alpha */
         public const char CHAR_A_UPPER = '\u0041';
         public const char CHAR_B_UPPER = '\u0042';
@@ -71,9 +113,10 @@ namespace CssUI
         public const char CHAR_W_UPPER = '\u0057';
         public const char CHAR_Y_UPPER = '\u0059';
         public const char CHAR_Z_UPPER = '\u005A';
+        #endregion
 
 
-        /* Ascii Lower Alpha */
+        #region /* Ascii Lower Alpha */
         /* Docs: https://infra.spec.whatwg.org/#ascii-lower-alpha */
         public const char CHAR_A_LOWER = '\u0061';
         public const char CHAR_B_LOWER = '\u0062';
@@ -88,9 +131,10 @@ namespace CssUI
         public const char CHAR_X_LOWER = '\u0078';
         public const char CHAR_Y_LOWER = '\u0079';
         public const char CHAR_Z_LOWER = '\u007A';
+        #endregion
 
 
-        /* Common */
+        #region /* Common */
         /// <summary>
         /// "
         /// </summary>
@@ -161,6 +205,7 @@ namespace CssUI
         /// </summary>
         [Obsolete("Use CHAR_REVERSE_SOLIDUS")]
         public const char CHAR_BACKSLASH = '\u005C';
+        #endregion
 
         #endregion
 
