@@ -78,7 +78,7 @@ namespace CssUI.DOM
 
         public virtual string value { get; set; }
 
-        public virtual string type { get; } = null;
+        public virtual string type { get; set; } = null;
 
         public EValidityState validity
         {
