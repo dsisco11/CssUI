@@ -8,21 +8,18 @@ using System.Linq;
 
 namespace CssUI.DOM
 {
-    public class HTMLOptionsCollection  : IEnumerable<HTMLOptionElement>
+    public class HTMLOptionsCollection  : HTMLCollection<HTMLOptionElement>
     {/* Docs: https://html.spec.whatwg.org/multipage/common-dom-interfaces.html#htmloptionscollection */
         #region Properties
-        public readonly HTMLSelectElement root;
         #endregion
 
         #region Constructor
-        public HTMLOptionsCollection(HTMLSelectElement root)
+        public HTMLOptionsCollection(HTMLSelectElement root) : base(root)
         {
-            this.root = root;
         }
         #endregion
 
         #region Accessors
-        private IReadOnlyList<HTMLOptionElement> Collection => DOMCommon.Get_Descendents_OfType<HTMLOptionElement>(root, null, Enums.ENodeFilterMask.SHOW_ELEMENT).ToArray();
         #endregion
 
         /// <summary>
@@ -31,7 +28,7 @@ namespace CssUI.DOM
         /// When set to a greater number, adds new blank option elements to that container.
         /// </summary>
         [CEReactions]
-        public int length// shadows inherited length
+        public override int length// shadows inherited length
         {
             get => Collection.Count;
             set
@@ -71,7 +68,7 @@ namespace CssUI.DOM
         /// <param name="index"></param>
         /// <returns></returns>
         [CEReactions]
-        public HTMLOptionElement this[int index]
+        public override HTMLOptionElement this[int index]
         {
             get => Collection[index];
             set
@@ -106,26 +103,6 @@ namespace CssUI.DOM
                         root.replaceChild(value, Collection[index]);
                     }
                 });
-            }
-        }
-
-        /// <summary>
-        /// Returns the item with ID or name name from the collection.
-        /// If there are multiple matching items, then the first is returned.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public HTMLOptionElement this[string name]
-        {
-            get
-            {
-                if (name[0] == '#')
-                {
-                    name = name.Substring(1);
-                }
-
-                return DOMCommon.Get_Nth_Descendant_OfType<HTMLOptionElement>(root, 1, new FilterAttribute(EAttributeName.ID, AttributeValue.From_String(name)), Enums.ENodeFilterMask.SHOW_ELEMENT);
-                // return Collection.FirstOrDefault(o => StringCommon.Streq(o.id.AsSpan(), name.AsSpan()));
             }
         }
 
@@ -325,19 +302,6 @@ namespace CssUI.DOM
             get => root.selectedIndex;
             set => root.selectedIndex = value;
         }
-
-
-        #region IEnumerable Implementation
-        public IEnumerator<HTMLOptionElement> GetEnumerator()
-        {
-            return ((IEnumerable<HTMLOptionElement>)Collection).GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return ((IEnumerable<HTMLOptionElement>)Collection).GetEnumerator();
-        }
-        #endregion
-
+        
     }
 }
