@@ -245,6 +245,21 @@ namespace CssUI.DOM
             return false;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static bool Is_Submit_Button(Element element)
+        {/* Docs: https://html.spec.whatwg.org/multipage/forms.html#category-submit */
+
+            if (element is HTMLInputElement input)
+            {
+                if (input.type == EInputType.Submit || input.type == EInputType.Image)
+                    return true;
+            }
+
+            if (element is HTMLButtonElement button && button.type == "submit")
+                return true;
+
+            return false;
+        }
         #endregion
 
         #region Ordered Sets
