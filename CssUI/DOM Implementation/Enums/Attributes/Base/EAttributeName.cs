@@ -102,6 +102,10 @@ namespace CssUI.DOM
         [MetaKeyword("target")]
         Target,
 
+        /* LINK ATTRIBUTES */
+        [MetaKeyword("rel")]
+        Rel,
+
         /* LABEL ATTRIBUTES */
         [MetaKeyword("for")]
         For,
@@ -112,7 +116,6 @@ namespace CssUI.DOM
 
 
         /* TABLE ATTRIBUTES */
-
         [MetaKeyword("span")]
         Span,
         [MetaKeyword("colspan")]
@@ -200,5 +203,7 @@ namespace CssUI.DOM
 
 
         /* FORMS */
+        [MetaKeyword("accept-charset")]
+        AcceptCharset,
     }
 }

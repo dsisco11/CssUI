@@ -62,6 +62,10 @@ namespace CssUI.DOM
                 new AttributeDefinition(EAttributeName.Target, EAttributeType.String, null, null, EAttributeFlags.None),
 
 
+                /* Link Attributes */
+                new AttributeDefinition(EAttributeName.Rel, EAttributeType.String, null, null, EAttributeFlags.None),
+
+
                 /* Dialog Attributes */
                 new AttributeDefinition(EAttributeName.Open, EAttributeType.Boolean, null, null, EAttributeFlags.None),
 
@@ -95,7 +99,7 @@ namespace CssUI.DOM
                 new AttributeDefinition(EAttributeName.Type, EAttributeType.Enumerated, AttributeValue.From_Enum(EInputType.Text), AttributeValue.From_Enum(EInputType.Text), EAttributeFlags.None, Lookup.Get_Keywords<EInputType>()),
                 new AttributeDefinition(EAttributeName.InputMode, EAttributeType.Enumerated, null, null, EAttributeFlags.None, Lookup.Get_Keywords<EInputMode>()),
                 new AttributeDefinition(EAttributeName.EnterKeyHint, EAttributeType.Enumerated, null, null, EAttributeFlags.None, Lookup.Get_Keywords<EEnterKeyHint>()),
-                new AttributeDefinition(EAttributeName.Autocomplete, EAttributeType.String, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.Autocomplete, EAttributeType.Enumerated, AttributeValue.From_Enum(EAutoComplete.On), AttributeValue.From_Enum(EAutoComplete.On), EAttributeFlags.None, Lookup.Get_Keywords<EAutoComplete>()),
                 new AttributeDefinition(EAttributeName.Autofocus, EAttributeType.Boolean, null, null, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.Multiple, EAttributeType.Boolean, null, null, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.Required, EAttributeType.Boolean, null, null, EAttributeFlags.None),
@@ -128,6 +132,7 @@ namespace CssUI.DOM
                 new AttributeDefinition(EAttributeName.Value, EAttributeType.String, null, null, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.Selected, EAttributeType.Boolean, null, null, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.Dirname, EAttributeType.Enumerated, null, null, EAttributeFlags.None, Lookup.Get_Keywords<EDirName>()),
+                new AttributeDefinition(EAttributeName.AcceptCharset, EAttributeType.String, null, null, EAttributeFlags.None),
 
             };
         }
