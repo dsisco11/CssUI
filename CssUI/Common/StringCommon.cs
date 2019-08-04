@@ -82,6 +82,29 @@ namespace CssUI
         /// Returns whether <paramref name="str"/> contains any characters matching the given filter
         /// </summary>
         /// <returns>True if string contains a character which the given filter matches</returns>
+        public static bool Contains(ReadOnlySpan<char> str, Func<char, bool> Predicate)
+        {
+            if (Predicate == null)
+                return false;
+
+            if (str.Length == 0)
+                return false;
+
+            for (int i = 0; i < str.Length; i++)
+            {
+                if (Predicate(str[i]))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Returns whether <paramref name="str"/> contains any characters matching the given filter
+        /// </summary>
+        /// <returns>True if string contains a character which the given filter matches</returns>
         public static bool Contains(ReadOnlySpan<char> str, char Search)
         {
             if (str.Length == 0)
