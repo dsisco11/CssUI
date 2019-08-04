@@ -1,6 +1,7 @@
 ﻿using CssUI.DOM.Exceptions;
 using CssUI.DOM.Internal;
 using CssUI.DOM.Nodes;
+using CssUI.HTML;
 using System;
 using System.Collections.Generic;
 using System.Linq;

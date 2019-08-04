@@ -3,6 +3,7 @@ using CssUI.DOM.Events;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Nodes;
 using CssUI.Filters;
+using CssUI.HTML;
 using CssUI.HTML.Serialization;
 using System;
 using System.Collections.Generic;

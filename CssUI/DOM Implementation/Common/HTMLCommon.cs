@@ -1,4 +1,5 @@
-﻿using CssUI.DOM.Enums;
+﻿using CssUI.DOM;
+using CssUI.DOM.Enums;
 using CssUI.DOM.Serialization;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using static CssUI.UnicodeCommon;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     /// <summary>
     /// Provides common functions outlined in the HTML specifications
@@ -46,7 +47,7 @@ namespace CssUI.DOM
             {
                 To_Punycode(unicode);
             }
-            catch(ArgumentException)
+            catch (ArgumentException)
             {
                 return false;
             }
@@ -87,7 +88,7 @@ namespace CssUI.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_HTML_Tab_Or_Space(char c)
         {
-            return (c == CHAR_TAB || c == CHAR_SPACE);
+            return c == CHAR_TAB || c == CHAR_SPACE;
         }
 
         /// <summary>
@@ -97,7 +98,7 @@ namespace CssUI.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_HTML_Whitespace(char c)
         {
-            return (c == CHAR_LINE_FEED || c == CHAR_CARRIAGE_RETURN) || Is_HTML_Tab_Or_Space(c);
+            return c == CHAR_LINE_FEED || c == CHAR_CARRIAGE_RETURN || Is_HTML_Tab_Or_Space(c);
         }
 
         /// <summary>
@@ -107,7 +108,7 @@ namespace CssUI.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_HTML_Newline(char c)
         {
-            return (c == CHAR_LINE_FEED || c == CHAR_CARRIAGE_RETURN);
+            return c == CHAR_LINE_FEED || c == CHAR_CARRIAGE_RETURN;
         }
 
         /// <summary>
@@ -117,7 +118,7 @@ namespace CssUI.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_HTML_Newline_Byte(byte b)
         {
-            return (b == 0x0A || b == 0x0D);
+            return b == 0x0A || b == 0x0D;
         }
 
         /// <summary>
@@ -127,7 +128,7 @@ namespace CssUI.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_HTML_Tab_Or_Space_Byte(byte b)
         {
-            return (b == 0x09 || b == 0x20);
+            return b == 0x09 || b == 0x20;
         }
 
         /// <summary>
@@ -151,7 +152,7 @@ namespace CssUI.DOM
 
         public static bool Is_Valid_Browsing_Context_Name(ReadOnlyMemory<char> data)
         {/* Docs: https://html.spec.whatwg.org/multipage/browsers.html#valid-browsing-context-name */
-            if (data.Span[0] == UnicodeCommon.CHAR_UNDERSCORE)
+            if (data.Span[0] == CHAR_UNDERSCORE)
             {
                 return false;
             }

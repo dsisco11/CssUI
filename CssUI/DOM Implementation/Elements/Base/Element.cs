@@ -7,6 +7,7 @@ using CssUI.DOM.Geometry;
 using CssUI.DOM.Interfaces;
 using CssUI.DOM.Mutation;
 using CssUI.DOM.Nodes;
+using CssUI.HTML;
 using CssUI.Internal;
 using System;
 using System.Collections.Generic;
