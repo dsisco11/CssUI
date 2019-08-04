@@ -12,7 +12,7 @@ namespace CssUI.CSS.Serialization
     public static class ParserCommon
     {
 
-        #region Common
+        #region Utility
         public static string Get_Location(ReadOnlySpan<CssToken> Stream)
         {
             return string.Join("", Stream.Slice(0, 6).ToArray().Select(tok => tok.Encode()));
