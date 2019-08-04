@@ -184,6 +184,10 @@ namespace CssUI
         /// :
         /// </summary>
         public const char CHAR_COLON = '\u003A';
+        /// <summary>
+        /// ;
+        /// </summary>
+        public const char CHAR_SEMICOLON = '\u003B';
 
         /// <summary>
         /// (
