@@ -379,6 +379,8 @@ namespace CssUI
         #endregion
 
         #region Trimming
+
+        #region Trim
         /// <summary>
         /// Modifies the given <paramref name="Input"/>, removing any leading or trailing instances of <paramref name="Delim"/> by offsetting its start and end position without modifying its data or creating a new string instance
         /// </summary>
@@ -397,7 +399,8 @@ namespace CssUI
                 }
             }
 
-            for(int i=Input.Length-1; i > -1; i--)
+            /* Trim end */
+            for (int i=Input.Length-1; i > -1; i--)
             {
                 if (Input.Span[i] != Delim)
                 {
@@ -440,7 +443,8 @@ namespace CssUI
                 }
             }
 
-            for(int i=Input.Length-1; i > -1; i--)
+            /* Trim end */
+            for (int i=Input.Length-1; i > -1; i--)
             {
                 bool found = false;
                 for (int x = 0; x < Delims.Length; x++)
@@ -466,7 +470,7 @@ namespace CssUI
         /// Modifies the given <paramref name="Input"/>, removing any leading or trailing code points which do not match the given <paramref name="Filter"/> by offsetting its start and end position without modifying its data or creating a new string instance
         /// </summary>
         /// <param name="Input">The string memory to trim</param>
-        /// <param name="Delim">The character to trim out of the input</param>
+        /// <param name="Filter">The filter used to trim characters out of the input</param>
         /// <returns></returns>
         public static ReadOnlyMemory<char> Trim(ReadOnlyMemory<char> Input, DataFilter<char> Filter)
         {
@@ -480,6 +484,7 @@ namespace CssUI
                 }
             }
 
+            /* Trim end */
             for (int i = Input.Length - 1; i > -1; i--)
             {
                 if (Filter.acceptData(Input.Span[i]) == EFilterResult.FILTER_ACCEPT)
@@ -491,6 +496,162 @@ namespace CssUI
 
             return Input;
         }
+        #endregion
+
+        #region Trim Start
+        /// <summary>
+        /// Modifies the given <paramref name="Input"/>, removing any leading instances of <paramref name="Delim"/> by offsetting its start position without modifying its data or creating a new string instance
+        /// </summary>
+        /// <param name="Input">The string memory to trim</param>
+        /// <param name="Delim">The character to trim out of the input</param>
+        /// <returns></returns>
+        public static ReadOnlyMemory<char> TrimStart(ReadOnlyMemory<char> Input, char Delim = UnicodeCommon.CHAR_SPACE)
+        {
+            /* Trim start */
+            for (int i = 0; i < Input.Length; i++)
+            {
+                if (Input.Span[i] != Delim)
+                {
+                    Input = Input.Slice(i);
+                    break;
+                }
+            }
+            
+            return Input;
+        }
+
+        /// <summary>
+        /// Modifies the given <paramref name="Input"/>, removing any leading instances of <paramref name="Delims"/> by offsetting its start position without modifying its data or creating a new string instance
+        /// </summary>
+        /// <param name="Input">The string memory to trim</param>
+        /// <param name="Delims">The characters to trim out of the input</param>
+        /// <returns></returns>
+        public static ReadOnlyMemory<char> TrimStart(ReadOnlyMemory<char> Input, params char[] Delims)
+        {
+            if (Delims.Length <= 0) return Input;
+
+            var span = Input.Span;
+            /* Trim start */
+            for (int i = 0; i < Input.Length; i++)
+            {
+                bool found = false;
+                for (int x = 0; x < Delims.Length; x++)
+                {
+                    if (Delims[x] == span[i])
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    Input = Input.Slice(i);
+                    break;
+                }
+            }
+            
+            return Input;
+        }
+
+        /// <summary>
+        /// Modifies the given <paramref name="Input"/>, removing any leading code points which do not match the given <paramref name="Filter"/> by offsetting its start position without modifying its data or creating a new string instance
+        /// </summary>
+        /// <param name="Input">The string memory to trim</param>
+        /// <param name="Filter">The filter used to trim characters out of the input</param>
+        /// <returns></returns>
+        public static ReadOnlyMemory<char> TrimStart(ReadOnlyMemory<char> Input, DataFilter<char> Filter)
+        {
+            /* Trim start */
+            for (int i = 0; i < Input.Length; i++)
+            {
+                if (Filter.acceptData(Input.Span[i]) == EFilterResult.FILTER_ACCEPT)
+                {
+                    Input = Input.Slice(i);
+                    break;
+                }
+            }
+
+            return Input;
+        }
+        #endregion
+
+        #region Trim End
+        /// <summary>
+        /// Modifies the given <paramref name="Input"/>, removing any trailing instances of <paramref name="Delim"/> by offsetting its end position without modifying its data or creating a new string instance
+        /// </summary>
+        /// <param name="Input">The string memory to trim</param>
+        /// <param name="Delim">The character to trim out of the input</param>
+        /// <returns></returns>
+        public static ReadOnlyMemory<char> TrimEnd(ReadOnlyMemory<char> Input, char Delim = UnicodeCommon.CHAR_SPACE)
+        {
+            /* Trim end */
+            for (int i = Input.Length - 1; i > -1; i--)
+            {
+                if (Input.Span[i] != Delim)
+                {
+                    Input = Input.Slice(0, Input.Length - i);
+                    break;
+                }
+            }
+
+            return Input;
+        }
+
+        /// <summary>
+        /// Modifies the given <paramref name="Input"/>, removing any trailing instances of <paramref name="Delims"/> by offsetting its end position without modifying its data or creating a new string instance
+        /// </summary>
+        /// <param name="Input">The string memory to trim</param>
+        /// <param name="Delims">The characters to trim out of the input</param>
+        /// <returns></returns>
+        public static ReadOnlyMemory<char> TrimEnd(ReadOnlyMemory<char> Input, params char[] Delims)
+        {
+            if (Delims.Length <= 0) return Input;
+            
+            /* Trim end */
+            for (int i = Input.Length - 1; i > -1; i--)
+            {
+                bool found = false;
+                for (int x = 0; x < Delims.Length; x++)
+                {
+                    if (Delims[x] == span[i])
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    Input = Input.Slice(0, Input.Length - i);
+                    break;
+                }
+            }
+
+            return Input;
+        }
+
+        /// <summary>
+        /// Modifies the given <paramref name="Input"/>, removing any trailing code points which do not match the given <paramref name="Filter"/> by offsetting its end position without modifying its data or creating a new string instance
+        /// </summary>
+        /// <param name="Input">The string memory to trim</param>
+        /// <param name="Filter">The filter used to trim characters out of the input</param>
+        /// <returns></returns>
+        public static ReadOnlyMemory<char> TrimEnd(ReadOnlyMemory<char> Input, DataFilter<char> Filter)
+        {
+            /* Trim end */
+            for (int i = Input.Length - 1; i > -1; i--)
+            {
+                if (Filter.acceptData(Input.Span[i]) == EFilterResult.FILTER_ACCEPT)
+                {
+                    Input = Input.Slice(0, Input.Length - i);
+                    break;
+                }
+            }
+
+            return Input;
+        }
+        #endregion
         #endregion
 
         #region Tokenization
