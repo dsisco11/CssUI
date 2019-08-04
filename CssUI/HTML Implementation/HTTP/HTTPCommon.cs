@@ -30,6 +30,48 @@ namespace CssUI.HTML
             return c == CHAR_LINE_FEED || c == CHAR_CARRIAGE_RETURN || Is_HTTP_Tab_Or_Space(c);
         }
 
+        /// <summary>
+        /// Returns <c>True</c> if the given code point is an HTML token character
+        /// </summary>
+        /// <param name="c">The character to check</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_HTTP_Token(char c)
+        {/* Docs: https://mimesniff.spec.whatwg.org/#http-token-code-point */
+            if (Is_Ascii_Alphanumeric(c)) return true;
+
+            switch (c)
+            {
+                case CHAR_EXCLAMATION_POINT:
+                case CHAR_NUMBER_SIGN:
+                case CHAR_DOLLAR_SIGN:
+                case CHAR_PERCENT:
+                case CHAR_AMPERSAND:
+                case CHAR_COMMA:
+                case CHAR_ASTERISK:
+                case CHAR_PLUS_SIGN:
+                case CHAR_HYPHEN_MINUS:
+                case CHAR_FULL_STOP:
+                case CHAR_CARET:
+                case CHAR_UNDERSCORE:
+                case CHAR_BACKTICK:
+                case CHAR_PIPE:
+                case CHAR_TILDE:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns <c>True</c> if the given code point is an HTML quoted-string token character
+        /// </summary>
+        /// <param name="c">The character to check</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_HTTP_Quoted_String_Token(char c)
+        {/* Docs: https://mimesniff.spec.whatwg.org/#http-quoted-string-token-code-point */
+            return (c == CHAR_TAB) || (c >= CHAR_SPACE && c <= CHAR_TILDE) || (c >= '\u0080' && c <= '\u00FF');
+        }
+
         #endregion
 
 
