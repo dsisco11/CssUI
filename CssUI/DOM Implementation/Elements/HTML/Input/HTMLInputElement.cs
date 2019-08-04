@@ -1018,7 +1018,7 @@ namespace CssUI.DOM
 
                 /* 3) Otherwise, if the rules for parsing floating-point number values, when they are applied to the attribute's value, 
                  * return an error, zero, or a number less than zero, then the allowed value step is the default step multiplied by the step scale factor. */
-                if (!HTMLParser.Parse_FloatingPoint(value.AsMemory(), out double outParsed) || MathExt.Flteq(outParsed, 0.0))
+                if (!HTMLParserCommon.Parse_FloatingPoint(value.AsMemory(), out double outParsed) || MathExt.Flteq(outParsed, 0.0))
                 {
                     return default_step * step_scale_factor;
                 }
@@ -1445,7 +1445,7 @@ namespace CssUI.DOM
             {
                 case EInputType.Date:
                     {
-                        if (!HTMLParser.Parse_Date_String(input, out DateTime outDate))
+                        if (!HTMLParserCommon.Parse_Date_String(input, out DateTime outDate))
                         {
                             outValue = double.NaN;
                             return false;
@@ -1456,7 +1456,7 @@ namespace CssUI.DOM
                     }
                 case EInputType.Month:
                     {
-                        if (!HTMLParser.Parse_Month_String(input, out int year, out int month))
+                        if (!HTMLParserCommon.Parse_Month_String(input, out int year, out int month))
                         {
                             outValue = double.NaN;
                             return false;
@@ -1469,7 +1469,7 @@ namespace CssUI.DOM
                     }
                 case EInputType.Week:
                     {
-                        if (!HTMLParser.Parse_Week_String(input, out int week, out int year))
+                        if (!HTMLParserCommon.Parse_Week_String(input, out int week, out int year))
                         {
                             outValue = double.NaN;
                             return false;
@@ -1484,7 +1484,7 @@ namespace CssUI.DOM
                     }
                 case EInputType.Time:
                     {
-                        if (!HTMLParser.Parse_Time_String(input, out TimeSpan time))
+                        if (!HTMLParserCommon.Parse_Time_String(input, out TimeSpan time))
                         {
                             outValue = double.NaN;
                             return false;
@@ -1495,7 +1495,7 @@ namespace CssUI.DOM
                     }
                 case EInputType.Local:
                     {
-                        if (!HTMLParser.Parse_Local_Date_Time_String(input, out DateTime date))
+                        if (!HTMLParserCommon.Parse_Local_Date_Time_String(input, out DateTime date))
                         {
                             outValue = double.NaN;
                             return false;
@@ -1508,7 +1508,7 @@ namespace CssUI.DOM
                 case EInputType.Number:
                 case EInputType.Range:
                     {
-                        if (!HTMLParser.Parse_FloatingPoint(input, out double value))
+                        if (!HTMLParserCommon.Parse_FloatingPoint(input, out double value))
                         {
                             outValue = double.NaN;
                             return false;
@@ -1532,14 +1532,14 @@ namespace CssUI.DOM
                 case EInputType.Date:
                     {
                         var date = EPOCH.AddMilliseconds(num);
-                        outValue = date.ToString(HTMLParser.DATE_TIME_FORMAT);
+                        outValue = date.ToString(HTMLParserCommon.DATE_TIME_FORMAT);
                         
                         return true;
                     }
                 case EInputType.Month:
                     {
                         var date = EPOCH.AddMonths((int)num);
-                        outValue = date.ToString(HTMLParser.MONTH_FORMAT);
+                        outValue = date.ToString(HTMLParserCommon.MONTH_FORMAT);
 
                         return true;
                     }
@@ -1555,7 +1555,7 @@ namespace CssUI.DOM
                 case EInputType.Time:
                     {
                         var time = TimeSpan.FromMilliseconds(num);
-                        outValue = time.ToString(HTMLParser.TIME_FORMAT);
+                        outValue = time.ToString(HTMLParserCommon.TIME_FORMAT);
 
                         return true;
                     }
@@ -1564,7 +1564,7 @@ namespace CssUI.DOM
                         var delta = TimeSpan.FromMilliseconds(num);
                         var date = EPOCH.Add(delta);
 
-                        outValue = date.ToString(HTMLParser.LOCAL_DATE_TIME_FORMAT);
+                        outValue = date.ToString(HTMLParserCommon.LOCAL_DATE_TIME_FORMAT);
                         return true;
                     }
                 case EInputType.Number:
@@ -1587,7 +1587,7 @@ namespace CssUI.DOM
             {
                 case EInputType.Date:
                     {
-                        if (!HTMLParser.Parse_Date_String(input, out DateTime outDate))
+                        if (!HTMLParserCommon.Parse_Date_String(input, out DateTime outDate))
                         {
                             outValue = DateTime.MinValue;
                             return false;
@@ -1598,7 +1598,7 @@ namespace CssUI.DOM
                     }
                 case EInputType.Month:
                     {
-                        if (!HTMLParser.Parse_Month_String(input, out int year, out int month))
+                        if (!HTMLParserCommon.Parse_Month_String(input, out int year, out int month))
                         {
                             outValue = DateTime.MinValue;
                             return false;
@@ -1609,7 +1609,7 @@ namespace CssUI.DOM
                     }
                 case EInputType.Week:
                     {
-                        if (!HTMLParser.Parse_Week_String(input, out int week, out int year))
+                        if (!HTMLParserCommon.Parse_Week_String(input, out int week, out int year))
                         {
                             outValue = DateTime.MinValue;
                             return false;
@@ -1621,7 +1621,7 @@ namespace CssUI.DOM
                     }
                 case EInputType.Time:
                     {
-                        if (!HTMLParser.Parse_Time_String(input, out TimeSpan time))
+                        if (!HTMLParserCommon.Parse_Time_String(input, out TimeSpan time))
                         {
                             outValue = DateTime.MinValue;
                             return false;
@@ -1644,12 +1644,12 @@ namespace CssUI.DOM
             {
                 case EInputType.Date:
                     {
-                        outValue = date.ToString(HTMLParser.DATE_TIME_FORMAT);
+                        outValue = date.ToString(HTMLParserCommon.DATE_TIME_FORMAT);
                         return true;
                     }
                 case EInputType.Month:
                     {
-                        outValue = date.ToString(HTMLParser.MONTH_FORMAT);
+                        outValue = date.ToString(HTMLParserCommon.MONTH_FORMAT);
                         return true;
                     }
                 case EInputType.Week:
@@ -1660,7 +1660,7 @@ namespace CssUI.DOM
                     }
                 case EInputType.Time:
                     {
-                        outValue = date.ToString(HTMLParser.TIME_FORMAT);
+                        outValue = date.ToString(HTMLParserCommon.TIME_FORMAT);
                         return true;
                     }
                 default:
@@ -1719,45 +1719,45 @@ namespace CssUI.DOM
                     break;
                 case EInputType.Date:
                     {
-                        if (!HTMLParser.Is_Valid_Date_String(_value.AsMemory()))
+                        if (!HTMLParserCommon.Is_Valid_Date_String(_value.AsMemory()))
                             _value = string.Empty;
                     }
                     break;
                 case EInputType.Month:
                     {
-                        if (!HTMLParser.Is_Valid_Month_String(_value.AsMemory()))
+                        if (!HTMLParserCommon.Is_Valid_Month_String(_value.AsMemory()))
                             _value = string.Empty;
                     }
                     break;
                 case EInputType.Week:
                     {
-                        if (!HTMLParser.Is_Valid_Week_String(_value.AsMemory()))
+                        if (!HTMLParserCommon.Is_Valid_Week_String(_value.AsMemory()))
                             _value = string.Empty;
                     }
                     break;
                 case EInputType.Time:
                     {
-                        if (!HTMLParser.Is_Valid_Time_String(_value.AsMemory()))
+                        if (!HTMLParserCommon.Is_Valid_Time_String(_value.AsMemory()))
                             _value = string.Empty;
                     }
                     break;
                 case EInputType.Local:
                     {
-                        if (!HTMLParser.Parse_Local_Date_Time_String(_value.AsMemory(), out DateTime dateTime))
-                            _value = dateTime.ToString(HTMLParser.LOCAL_DATE_TIME_FORMAT);
+                        if (!HTMLParserCommon.Parse_Local_Date_Time_String(_value.AsMemory(), out DateTime dateTime))
+                            _value = dateTime.ToString(HTMLParserCommon.LOCAL_DATE_TIME_FORMAT);
                         else
                             _value = string.Empty;
                     }
                     break;
                 case EInputType.Number:
                     {
-                        if (!HTMLParser.Is_Valid_FloatingPoint(_value.AsMemory()))
+                        if (!HTMLParserCommon.Is_Valid_FloatingPoint(_value.AsMemory()))
                             _value = string.Empty;
                     }
                     break;
                 case EInputType.Range:
                     {
-                        if (!HTMLParser.Is_Valid_FloatingPoint(_value.AsMemory()))
+                        if (!HTMLParserCommon.Is_Valid_FloatingPoint(_value.AsMemory()))
                         {
                             var min = get_minimum().Value;
                             var max = get_maximum().Value;
@@ -1774,7 +1774,7 @@ namespace CssUI.DOM
                     break;
                 case EInputType.Color:
                     {
-                        if (HTMLParser.Is_Valid_Simple_Color(_value.AsMemory()))
+                        if (HTMLParserCommon.Is_Valid_Simple_Color(_value.AsMemory()))
                         {
                             _value = StringCommon.Transform(_value.AsMemory(), UnicodeCommon.To_ASCII_Lower_Alpha);
                         }
@@ -1844,7 +1844,7 @@ namespace CssUI.DOM
                     break;
                 case EInputType.Date:
                     {
-                        if (!HTMLParser.Is_Valid_Date_String(value.AsMemory()))
+                        if (!HTMLParserCommon.Is_Valid_Date_String(value.AsMemory()))
                         {
                             flags |= EValidityState.badInput;
                         }
@@ -1852,7 +1852,7 @@ namespace CssUI.DOM
                     break;
                 case EInputType.Month:
                     {
-                        if (!HTMLParser.Is_Valid_Month_String(value.AsMemory()))
+                        if (!HTMLParserCommon.Is_Valid_Month_String(value.AsMemory()))
                         {
                             flags |= EValidityState.badInput;
                         }
@@ -1860,7 +1860,7 @@ namespace CssUI.DOM
                     break;
                 case EInputType.Week:
                     {
-                        if (!HTMLParser.Is_Valid_Week_String(value.AsMemory()))
+                        if (!HTMLParserCommon.Is_Valid_Week_String(value.AsMemory()))
                         {
                             flags |= EValidityState.badInput;
                         }
@@ -1868,7 +1868,7 @@ namespace CssUI.DOM
                     break;
                 case EInputType.Time:
                     {
-                        if (!HTMLParser.Is_Valid_Time_String(value.AsMemory()))
+                        if (!HTMLParserCommon.Is_Valid_Time_String(value.AsMemory()))
                         {
                             flags |= EValidityState.badInput;
                         }
@@ -1876,7 +1876,7 @@ namespace CssUI.DOM
                     break;
                 case EInputType.Local:
                     {
-                        if (!HTMLParser.Is_Valid_Normalized_Local_Date_Time_String(value.AsMemory()))
+                        if (!HTMLParserCommon.Is_Valid_Normalized_Local_Date_Time_String(value.AsMemory()))
                         {
                             flags |= EValidityState.badInput;
                         }
@@ -1884,7 +1884,7 @@ namespace CssUI.DOM
                     break;
                 case EInputType.Number:
                     {
-                        if (!HTMLParser.Is_Valid_FloatingPoint(value.AsMemory()))
+                        if (!HTMLParserCommon.Is_Valid_FloatingPoint(value.AsMemory()))
                         {
                             flags |= EValidityState.badInput;
                         }
@@ -1892,7 +1892,7 @@ namespace CssUI.DOM
                     break;
                 case EInputType.Range:
                     {
-                        if (!HTMLParser.Is_Valid_FloatingPoint(value.AsMemory()))
+                        if (!HTMLParserCommon.Is_Valid_FloatingPoint(value.AsMemory()))
                         {
                             flags |= EValidityState.badInput;
                         }
@@ -1900,7 +1900,7 @@ namespace CssUI.DOM
                     break;
                 case EInputType.Color:
                     {
-                        if (!HTMLParser.Is_Valid_Lowercase_Simple_Color(value.AsMemory()))
+                        if (!HTMLParserCommon.Is_Valid_Lowercase_Simple_Color(value.AsMemory()))
                         {
                             flags |= EValidityState.badInput;
                         }

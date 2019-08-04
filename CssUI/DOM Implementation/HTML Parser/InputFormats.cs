@@ -9,7 +9,7 @@ using static CssUI.UnicodeCommon;
 
 namespace CssUI.HTML.Serialization
 {
-    public static partial class HTMLParser
+    public static partial class HTMLParserCommon
     {/* Docs: https://www.w3.org/TR/DOM-Parsing/ */
      /* https://html.spec.whatwg.org/multipage/parsing.html#overview-of-the-parsing-model */
 

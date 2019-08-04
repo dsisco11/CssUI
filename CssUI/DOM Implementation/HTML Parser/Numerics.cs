@@ -5,7 +5,7 @@ using static CssUI.UnicodeCommon;
 
 namespace CssUI.HTML.Serialization
 {
-    public static partial class HTMLParser
+    public static partial class HTMLParserCommon
     {
         #region Integer
         public static bool Is_Valid_Integer(ReadOnlyMemory<char> input)
