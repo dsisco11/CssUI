@@ -311,10 +311,63 @@ namespace CssUI.DOM
         }
 
 
-        public static bool Check_Form_Validity(HTMLFormElement element)
+        public static bool Statically_Validate_Form_Constraints(HTMLFormElement form, out IReadOnlyCollection<HTMLElement> outInvalidControls)
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#statically-validate-the-constraints */
 
+            var controls = (IEnumerable<FormAssociatedElement>)DOMCommon.Get_Descendents(form, FilterIsSubmittable.Instance, ENodeFilterMask.SHOW_ELEMENT).Where(child => child is ISubmittableElement childElement && ReferenceEquals(form, childElement.form));
+            LinkedList<HTMLElement> invalidElements = new LinkedList<HTMLElement>();
+
+            foreach (var field in controls)
+            {
+                if (Is_Barred_From_Validation(field)) continue;
+                if (field.check_satisfies_constraints()) continue;
+                invalidElements.AddLast(field);
+            }
+
+            if (!invalidElements.Any())
+            {
+                outInvalidControls = new HTMLElement[0];
+                return true;
+            }
+
+            LinkedList<HTMLElement> unhandledInvalidElements = new LinkedList<HTMLElement>();
+
+            foreach (var field in invalidElements)
+            {
+                var notCanceled = field.dispatchEvent(new Event(EEventName.Invalid, new EventInit() { cancelable = true }));
+                if (notCanceled)
+                {
+                    unhandledInvalidElements.AddLast(field);
+                }
+            }
+
+            outInvalidControls = unhandledInvalidElements;
+            return false;
         }
+
+        public static bool Interactively_Validate_Form_Constraints(HTMLFormElement form)
+        {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#interactively-validate-the-constraints */
+            if (Statically_Validate_Form_Constraints(form, out IReadOnlyCollection<HTMLElement> unhandledInvalidControls))
+            {
+                return true;
+            }
+
+            /* XXX: Finish invalid input constraint reporting */
+            /* 3) Report the problems with the constraints of at least one of the elements given in unhandled invalid controls to the user. */
+
+            /* User agents may focus one of those elements in the process, by running the focusing steps for that element, and may change the scrolling position of the document, 
+             * or perform some other action that brings the element to the user's attention. 
+             * For elements that are form-associated custom elements, user agents should use their validation anchor instead, for the purposes of these actions. */
+
+            /* User agents may report more than one constraint violation. */
+
+            /* User agents may coalesce related constraint violation reports if appropriate (e.g. if multiple radio buttons in a group are marked as required, only one error need be reported). */
+
+            /* If one of the controls is not being rendered (e.g. it has the hidden attribute set) then user agents may report a script error. */
+
+            return false;
+        }
+
 
 
         public static bool Is_Barred_From_Validation(HTMLElement element)
