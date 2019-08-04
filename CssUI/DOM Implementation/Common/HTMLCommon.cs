@@ -13,7 +13,7 @@ namespace CssUI.DOM
     /// <summary>
     /// Provides common functions outlined in the HTML specifications
     /// </summary>
-    public static class HTMLCommon
+    public static partial class HTMLCommon
     {
         #region Metadata
         /// <summary>
@@ -33,6 +33,7 @@ namespace CssUI.DOM
             "missing-glyph",
         };
         #endregion
+
 
         #region String Transformation
         static IdnMapping IDN = new IdnMapping();
@@ -56,6 +57,7 @@ namespace CssUI.DOM
         public static string From_Punycode(string code) => IDN.GetUnicode(code);
         #endregion
 
+
         #region Internal Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_PCEN_Char(char c)
@@ -75,6 +77,70 @@ namespace CssUI.DOM
             }
         }
         #endregion
+
+
+        #region Checks
+        /// <summary>
+        /// Returns <c>True</c> if the given code point is an HTML tab or space character
+        /// </summary>
+        /// <param name="c">The character to check</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_HTML_Tab_Or_Space(char c)
+        {
+            return (c == CHAR_TAB || c == CHAR_SPACE);
+        }
+
+        /// <summary>
+        /// Returns <c>True</c> if the given code point is an HTML whitespace character
+        /// </summary>
+        /// <param name="c">The character to check</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_HTML_Whitespace(char c)
+        {
+            return (c == CHAR_LINE_FEED || c == CHAR_CARRIAGE_RETURN) || Is_HTML_Tab_Or_Space(c);
+        }
+
+        /// <summary>
+        /// Returns <c>True</c> if the given code point is an HTML newline character
+        /// </summary>
+        /// <param name="c">The character to check</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_HTML_Newline(char c)
+        {
+            return (c == CHAR_LINE_FEED || c == CHAR_CARRIAGE_RETURN);
+        }
+
+        /// <summary>
+        /// Returns <c>True</c> if the given code point is an HTML newline(0x0A or 0x0D) byte
+        /// </summary>
+        /// <param name="b">The character to check</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_HTML_Newline_Byte(byte b)
+        {
+            return (b == 0x0A || b == 0x0D);
+        }
+
+        /// <summary>
+        /// Returns <c>True</c> if the given code point is an HTML tab(0x09) or space(0x20) byte
+        /// </summary>
+        /// <param name="b">The character to check</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_HTML_Tab_Or_Space_Byte(byte b)
+        {
+            return (b == 0x09 || b == 0x20);
+        }
+
+        /// <summary>
+        /// Returns <c>True</c> if the given code point is an HTML whitespace byte
+        /// </summary>
+        /// <param name="b">The character to check</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_HTML_Whitepace_Byte(byte b)
+        {
+            return Is_HTML_Newline_Byte(b) || Is_HTML_Tab_Or_Space_Byte(b);
+        }
+        #endregion
+
 
         #region Validation
         static Regex email_validation_regex = new Regex(@"/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/", RegexOptions.ECMAScript | RegexOptions.Compiled);
@@ -160,6 +226,7 @@ namespace CssUI.DOM
             return true;
         }
         #endregion
+
 
         #region Attribute Resolution
         public static EAutofillMantle Get_Autofill_Mantle(Element element)
