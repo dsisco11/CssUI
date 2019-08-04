@@ -1,4 +1,5 @@
-﻿using CssUI.Filters;
+﻿using CssUI.DOM;
+using CssUI.Filters;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -429,6 +430,36 @@ namespace CssUI
                 }
 
                 if (!found)
+                {
+                    Input = Input.Slice(0, Input.Length - i);
+                    break;
+                }
+            }
+
+            return Input;
+        }
+
+        /// <summary>
+        /// Modifies the given <paramref name="Input"/>, removing any leading or trailing code points which do not match the given <paramref name="Filter"/> by offsetting its start and end position without modifying its data or creating a new string instance
+        /// </summary>
+        /// <param name="Input">The string memory to trim</param>
+        /// <param name="Delim">The character to trim out of the input</param>
+        /// <returns></returns>
+        public static ReadOnlyMemory<char> Trim(ReadOnlyMemory<char> Input, DataFilter<char> Filter)
+        {
+            /* Trim start */
+            for (int i = 0; i < Input.Length; i++)
+            {
+                if (Filter.acceptData(Input.Span[i]) == EFilterResult.FILTER_ACCEPT)
+                {
+                    Input = Input.Slice(i);
+                    break;
+                }
+            }
+
+            for (int i = Input.Length - 1; i > -1; i--)
+            {
+                if (Filter.acceptData(Input.Span[i]) == EFilterResult.FILTER_ACCEPT)
                 {
                     Input = Input.Slice(0, Input.Length - i);
                     break;
