@@ -87,6 +87,10 @@ namespace CssUI
         /// >
         /// </summary>
         public const char CHAR_RIGHT_CHEVRON = '\u003E';
+        /// <summary>
+        /// =
+        /// </summary>
+        public const char CHAR_EQUALS = '\u003D';
         #endregion
 
 
