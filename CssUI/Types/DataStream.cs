@@ -62,7 +62,14 @@ namespace CssUI
         #endregion
 
         #region Data
+        /// <summary>
+        /// Direct accessor to the Data <see cref="Memory{T}"/> instance
+        /// </summary>
         public ReadOnlyMemory<ItemType> AsMemory() => Data;
+        /// <summary>
+        /// Direct accessor to the Data <see cref="Memory{T}"/> instances' span
+        /// </summary>
+        /// <returns></returns>
         public ReadOnlySpan<ItemType> AsSpan() => Data.Span;
         #endregion
 
