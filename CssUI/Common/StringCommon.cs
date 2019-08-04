@@ -496,6 +496,37 @@ namespace CssUI
 
             return Input;
         }
+
+        /// <summary>
+        /// Modifies the given <paramref name="Input"/>, removing any leading or trailing code points which match the given <paramref name="Predicate"/> by offsetting its start and end position without modifying its data or creating a new string instance
+        /// </summary>
+        /// <param name="Input">The string memory to trim</param>
+        /// <param name="Predicate">The filter used to trim characters out of the input</param>
+        /// <returns></returns>
+        public static ReadOnlyMemory<char> Trim(ReadOnlyMemory<char> Input, Func<char, bool> Predicate)
+        {
+            /* Trim start */
+            for (int i = 0; i < Input.Length; i++)
+            {
+                if (!Predicate(Input.Span[i]))
+                {
+                    Input = Input.Slice(i);
+                    break;
+                }
+            }
+
+            /* Trim end */
+            for (int i = Input.Length - 1; i > -1; i--)
+            {
+                if (!Predicate(Input.Span[i]))
+                {
+                    Input = Input.Slice(0, Input.Length - i);
+                    break;
+                }
+            }
+
+            return Input;
+        }
         #endregion
 
         #region Trim Start
@@ -574,6 +605,27 @@ namespace CssUI
 
             return Input;
         }
+
+        /// <summary>
+        /// Modifies the given <paramref name="Input"/>, removing any leading code points which match the given <paramref name="Predicate"/> by offsetting its start position without modifying its data or creating a new string instance
+        /// </summary>
+        /// <param name="Input">The string memory to trim</param>
+        /// <param name="Predicate">The filter used to trim characters out of the input</param>
+        /// <returns></returns>
+        public static ReadOnlyMemory<char> TrimStart(ReadOnlyMemory<char> Input, Func<char, bool> Predicate)
+        {
+            /* Trim start */
+            for (int i = 0; i < Input.Length; i++)
+            {
+                if (!Predicate(Input.Span[i]))
+                {
+                    Input = Input.Slice(i);
+                    break;
+                }
+            }
+
+            return Input;
+        }
         #endregion
 
         #region Trim End
@@ -643,6 +695,27 @@ namespace CssUI
             for (int i = Input.Length - 1; i > -1; i--)
             {
                 if (Filter.acceptData(Input.Span[i]) == EFilterResult.FILTER_ACCEPT)
+                {
+                    Input = Input.Slice(0, Input.Length - i);
+                    break;
+                }
+            }
+
+            return Input;
+        }
+
+        /// <summary>
+        /// Modifies the given <paramref name="Input"/>, removing any trailing code points which match the given <paramref name="Predicate"/> by offsetting its end position without modifying its data or creating a new string instance
+        /// </summary>
+        /// <param name="Input">The string memory to trim</param>
+        /// <param name="Predicate">The filter used to trim characters out of the input</param>
+        /// <returns></returns>
+        public static ReadOnlyMemory<char> TrimEnd(ReadOnlyMemory<char> Input, Func<char, bool> Predicate)
+        {
+            /* Trim end */
+            for (int i = Input.Length - 1; i > -1; i--)
+            {
+                if (!Predicate(Input.Span[i]))
                 {
                     Input = Input.Slice(0, Input.Length - i);
                     break;
