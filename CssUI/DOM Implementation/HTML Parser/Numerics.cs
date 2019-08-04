@@ -8,7 +8,7 @@ using static CssUI.UnicodeCommon;
 
 namespace CssUI.DOM.Serialization
 {
-    public static partial class DOMParser
+    public static partial class HTMLParser
     {
         #region Integer
         public static bool Is_Valid_Integer(ReadOnlyMemory<char> input)
