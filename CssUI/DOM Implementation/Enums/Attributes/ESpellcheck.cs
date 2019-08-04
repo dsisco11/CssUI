@@ -1,26 +1,26 @@
-﻿using CssUI.DOM.Internal;
+﻿using CssUI.Internal;
 
 namespace CssUI.DOM
 {
-    [DomEnum]
+    [MetaEnum]
     public enum ESpellcheck : int
     {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#spelling-and-grammar-checking */
         /// <summary>
         /// 
         /// </summary>
-        [DomKeyword("")]
+        [MetaKeyword("")]
         Default = 0,
 
         /// <summary>
         /// 
         /// </summary>
-        [DomKeyword("true")]
+        [MetaKeyword("true")]
         True,
 
         /// <summary>
         /// 
         /// </summary>
-        [DomKeyword("false")]
+        [MetaKeyword("false")]
         False,
     }
 }

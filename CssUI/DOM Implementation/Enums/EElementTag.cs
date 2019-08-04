@@ -1,24 +1,24 @@
-﻿using CssUI.DOM.Internal;
+﻿using CssUI.Internal;
 
 namespace CssUI.DOM.Enums
 {
     /// <summary>
     /// Lists all of the (currently) implemented HTML element-types
     /// </summary>
-    [DomEnum]
+    [MetaEnum]
     public enum EElementTag : int
     {
-        [DomKeyword("div")]
+        [MetaKeyword("div")]
         Div,
-        [DomKeyword("html")]
+        [MetaKeyword("html")]
         Html,
-        [DomKeyword("body")]
+        [MetaKeyword("body")]
         Body,
-        [DomKeyword("head")]
+        [MetaKeyword("head")]
         Head,
-        [DomKeyword("template")]
+        [MetaKeyword("template")]
         Template,
-        [DomKeyword("slot")]
+        [MetaKeyword("slot")]
         Slot,
     }
 }

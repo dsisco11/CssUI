@@ -1,29 +1,29 @@
-﻿using CssUI.DOM.Internal;
+﻿using CssUI.Internal;
 
 namespace CssUI.DOM.Enums
 {
     /// <summary>
     /// Describes the <see cref="Document"/>s quirks mode.
     /// </summary>
-    [DomEnum]
+    [MetaEnum]
     public enum EQuirksMode
     {
         /// <summary>
         /// 
         /// </summary>
-        [DomKeyword("quirks")]
+        [MetaKeyword("quirks")]
         Quirks,
 
         /// <summary>
         /// 
         /// </summary>
-        [DomKeyword("no-quirks")]
+        [MetaKeyword("no-quirks")]
         NoQuirks,
 
         /// <summary>
         /// 
         /// </summary>
-        [DomKeyword("limited-quirks")]
+        [MetaKeyword("limited-quirks")]
         LimitedQuirks
     }
 }
