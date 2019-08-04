@@ -250,10 +250,61 @@ namespace CssUI
 
         #region Character Checks
         /// <summary>
+        /// True if char is an ASCII non-character
+        /// </summary>
+        /// <param name="c">Code point to check</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Ascii_NonCharacter(char c)
+        {/* Docs: https://infra.spec.whatwg.org/#noncharacter */
+
+            if (c >= '\uFDD0' && c <= '\uFDEF') return true;
+
+            switch ((int)c)
+            {
+                case 0xFFFE:
+                case 0xFFFF:
+                case 0x1FFFE:
+                case 0x1FFFF:
+                case 0x2FFFE:
+                case 0x2FFFF:
+                case 0x3FFFE:
+                case 0x3FFFF:
+                case 0x4FFFE:
+                case 0x4FFFF:
+                case 0x5FFFE:
+                case 0x5FFFF:
+                case 0x6FFFE:
+                case 0x6FFFF:
+                case 0x7FFFE:
+                case 0x7FFFF:
+                case 0x8FFFE:
+                case 0x8FFFF:
+                case 0x9FFFE:
+                case 0x9FFFF:
+                case 0xAFFFE:
+                case 0xAFFFF:
+                case 0xBFFFE:
+                case 0xBFFFF:
+                case 0xCFFFE:
+                case 0xCFFFF:
+                case 0xDFFFE:
+                case 0xDFFFF:
+                case 0xEFFFE:
+                case 0xEFFFF:
+                case 0xFFFFE:
+                case 0xFFFFF:
+                case 0x10FFFE:
+                case 0x10FFFF:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
         /// True if char is an ASCII whitespace character
         /// </summary>
-        /// <param name="c"></param>
-        /// <returns></returns>
+        /// <param name="c">Code point to check</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_Ascii_Whitespace(char c)
         {/* Docs: https://infra.spec.whatwg.org/#ascii-whitespace */
