@@ -106,6 +106,10 @@ namespace CssUI.DOM
         [MetaKeyword("rel")]
         Rel,
 
+        /* QUOTE ATTRIBUTES */
+        [MetaKeyword("cite")]
+        Cite,
+
         /* LABEL ATTRIBUTES */
         [MetaKeyword("for")]
         For,

@@ -83,6 +83,9 @@ namespace CssUI.DOM
                 
                 /* LABEL ATTRIBUTES */
                 new AttributeDefinition(EAttributeName.For, EAttributeType.String, null, null, EAttributeFlags.None),
+                
+                /* QUOTE ATTRIBUTES */
+                new AttributeDefinition(EAttributeName.Cite, EAttributeType.String, null, null, EAttributeFlags.None),
 
 
                 /* Table Attributes */
