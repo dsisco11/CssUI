@@ -6,16 +6,24 @@ namespace CssUI.DOM
 {
     public static class DomDefinitions
     {
-        internal static readonly ReadOnlyDictionary<AtomicName<EAttributeName>, AttributeDefinition> AttributeDefinitions;
+        internal static readonly ReadOnlyDictionary<AtomicName<EAttributeName>, List<AttributeDefinition>> AttributeDefinitions;
 
         static DomDefinitions()
         {
             var AttrDefs = Create_Attribute_Definitions();
             // Add all of our definitions to a backing dictionary
-            var AttrDict = new Dictionary<AtomicName<EAttributeName>, AttributeDefinition>();
-            foreach (var def in AttrDefs) { AttrDict.Add(def.Name, def); }
+            var AttrDict = new Dictionary<AtomicName<EAttributeName>, List<AttributeDefinition>>();
+            foreach (var def in AttrDefs)
+            {
+                if (!AttrDict.ContainsKey(def.Name))
+                {
+                    AttrDict.Add(def.Name, new List<AttributeDefinition>(3));
+                }
+
+                AttrDict[def.Name].Add(def);
+            }
             // Finally all of our definitions go into this global readonly map of attribute definitions!
-            AttributeDefinitions = new ReadOnlyDictionary<AtomicName<EAttributeName>, AttributeDefinition>(AttrDict);
+            AttributeDefinitions = new ReadOnlyDictionary<AtomicName<EAttributeName>, List<AttributeDefinition>>(AttrDict);
         }
 
 
@@ -99,7 +107,7 @@ namespace CssUI.DOM
 
 
                 /* Input Attributes */
-                new AttributeDefinition(EAttributeName.Type, EAttributeType.Enumerated, AttributeValue.From_Enum(EInputType.Text), AttributeValue.From_Enum(EInputType.Text), EAttributeFlags.None, Lookup.Get_Keywords<EInputType>()),
+                new AttributeDefinition(typeof(HTMLInputElement), EAttributeName.Type, EAttributeType.Enumerated, AttributeValue.From_Enum(EInputType.Text), AttributeValue.From_Enum(EInputType.Text), EAttributeFlags.None, Lookup.Get_Keywords<EInputType>()),
                 new AttributeDefinition(EAttributeName.InputMode, EAttributeType.Enumerated, null, null, EAttributeFlags.None, Lookup.Get_Keywords<EInputMode>()),
                 new AttributeDefinition(EAttributeName.EnterKeyHint, EAttributeType.Enumerated, null, null, EAttributeFlags.None, Lookup.Get_Keywords<EEnterKeyHint>()),
                 new AttributeDefinition(EAttributeName.Autocomplete, EAttributeType.Enumerated, AttributeValue.From_Enum(EAutoComplete.On), AttributeValue.From_Enum(EAutoComplete.On), EAttributeFlags.None, Lookup.Get_Keywords<EAutoComplete>()),
@@ -137,6 +145,10 @@ namespace CssUI.DOM
                 new AttributeDefinition(EAttributeName.Dirname, EAttributeType.Enumerated, null, null, EAttributeFlags.None, Lookup.Get_Keywords<EDirName>()),
                 new AttributeDefinition(EAttributeName.AcceptCharset, EAttributeType.String, null, null, EAttributeFlags.None),
 
+
+                /* Object Attributes */
+                new AttributeDefinition(EAttributeName.Data, EAttributeType.String, null, null, EAttributeFlags.None),
+                new AttributeDefinition(typeof(HTMLObjectElement), EAttributeName.Type, EAttributeType.String, null, null, EAttributeFlags.None),
             };
         }
     }

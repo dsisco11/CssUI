@@ -52,11 +52,13 @@ namespace CssUI.DOM
             {
                 if (_definition == null)
                 {
-                    _definition = new WeakReference<AttributeDefinition>(AttributeDefinition.Lookup(localName));
+                    _definition = new WeakReference<AttributeDefinition>(AttributeDefinition.Lookup(localName, ownerElement.GetType()));
                 }
 
                 if (_definition.TryGetTarget(out AttributeDefinition outDef))
+                {
                     return outDef;
+                }
 
                 return null;
             }

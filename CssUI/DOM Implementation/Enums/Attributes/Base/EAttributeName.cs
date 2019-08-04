@@ -209,5 +209,10 @@ namespace CssUI.DOM
         /* FORMS */
         [MetaKeyword("accept-charset")]
         AcceptCharset,
+
+
+        /* OBJECT */
+        [MetaKeyword("data")]
+        Data,
     }
 }

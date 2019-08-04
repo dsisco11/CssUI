@@ -39,6 +39,7 @@ namespace CssUI.DOM
         public readonly HashSet<string> Keywords = null;
 
         public readonly Type enumType = null;
+        public readonly Type ElementType = null;
 
         /// <summary>
         /// The minimum value (if any) that can be assigned to this attribute
@@ -67,6 +68,7 @@ namespace CssUI.DOM
         /// <param name="Keywords">List of keywords which can be assigned to this attribute</param>
         public AttributeDefinition(AtomicName<EAttributeName> Name, EAttributeType Type = 0x0, AttributeValue MissingValueDefault = null, AttributeValue InvalidValueDefault = null, EAttributeFlags Flags = 0x0, string[] Keywords = null, Type enumType = null, dynamic lowerRange = null, dynamic upperRange = null)
         {
+            this.ElementType = typeof(Element);
             this.Name = Name;
             this.Flags = Flags;
             this.MissingValueDefault = MissingValueDefault;
@@ -86,7 +88,37 @@ namespace CssUI.DOM
 
             // Append the specified allowed types to our defaults
             this.Type |= Type;
+        }
 
+        /// <summary>
+        /// Creates a DOM attribute definition
+        /// </summary>
+        /// <param name="Name">DOM attribute name</param>
+        /// <param name="Flags">Indicates what aspects of an element this property affects</param>
+        /// <param name="MissingValueDefault">Default value for the attribute</param>
+        /// <param name="Keywords">List of keywords which can be assigned to this attribute</param>
+        public AttributeDefinition(Type ElementType, AtomicName<EAttributeName> Name, EAttributeType Type = 0x0, AttributeValue MissingValueDefault = null, AttributeValue InvalidValueDefault = null, EAttributeFlags Flags = 0x0, string[] Keywords = null, Type enumType = null, dynamic lowerRange = null, dynamic upperRange = null)
+        {
+            this.ElementType = ElementType;
+            this.Name = Name;
+            this.Flags = Flags;
+            this.MissingValueDefault = MissingValueDefault;
+            this.InvalidValueDefault = InvalidValueDefault;
+            this.enumType = enumType;
+            this.LowerRange = lowerRange;
+            this.UpperRange = upperRange;
+
+            if (Keywords == null)
+            {
+                this.Keywords = new HashSet<string>(new string[0]);
+            }
+            else
+            {
+                this.Keywords = new HashSet<string>(Keywords.Select(word => word.ToLowerInvariant()));
+            }
+
+            // Append the specified allowed types to our defaults
+            this.Type |= Type;
         }
 
         #endregion
@@ -273,9 +305,38 @@ namespace CssUI.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static AttributeDefinition Lookup(AtomicName<EAttributeName> Name)
         {
-            if (DomDefinitions.AttributeDefinitions.TryGetValue(Name, out AttributeDefinition def))
+            if (DomDefinitions.AttributeDefinitions.TryGetValue(Name, out List<AttributeDefinition> definitionList))
             {
-                return def;
+                if (definitionList.Count > 1)
+                {
+                    throw new Exception($"The content attribute \"{Name}\" has multiple definitions, an element type must be specified to determine the correct definition");
+                }
+
+                return definitionList[0];
+            }
+
+            return null;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static AttributeDefinition Lookup(AtomicName<EAttributeName> Name, Type elementType)
+        {
+            if (elementType == null)
+            {
+                throw new ArgumentNullException(nameof(elementType));
+            }
+
+            if (DomDefinitions.AttributeDefinitions.TryGetValue(Name, out List<AttributeDefinition> definitionList))
+            {
+                foreach (var def in definitionList)
+                {
+                    if (elementType.IsAssignableFrom(def.ElementType))
+                    {
+                        return def;
+                    }
+                }
+
+                throw new Exception($"Unable to find the content attribute(\"{Name}\") definition for the element type \"{eType.Name}\"");
             }
 
             return null;
