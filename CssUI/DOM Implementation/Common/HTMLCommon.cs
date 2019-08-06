@@ -79,71 +79,6 @@ namespace CssUI.HTML
         #endregion
 
 
-        #region CodePoint Checks
-        /// <summary>
-        /// Returns <c>True</c> if the given code point is an HTML tab or space character
-        /// </summary>
-        /// <param name="c">The character to check</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_HTML_Tab_Or_Space(char c)
-        {
-            return c == CHAR_TAB || c == CHAR_SPACE;
-        }
-
-        /// <summary>
-        /// Returns <c>True</c> if the given code point is an HTML whitespace character
-        /// </summary>
-        /// <param name="c">The character to check</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_HTML_Whitespace(char c)
-        {
-            return c == CHAR_LINE_FEED || c == CHAR_CARRIAGE_RETURN || Is_HTML_Tab_Or_Space(c);
-        }
-
-        /// <summary>
-        /// Returns <c>True</c> if the given code point is an HTML newline character
-        /// </summary>
-        /// <param name="c">The character to check</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_HTML_Newline(char c)
-        {
-            return c == CHAR_LINE_FEED || c == CHAR_CARRIAGE_RETURN;
-        }
-
-        /// <summary>
-        /// Returns <c>True</c> if the given code point is an HTML token character
-        /// </summary>
-        /// <param name="c">The character to check</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_HTML_Token(char c)
-        {
-            if (Is_Ascii_Alphanumeric(c)) return true;
-
-            switch (c)
-            {
-                case CHAR_EXCLAMATION_POINT:
-                case CHAR_NUMBER_SIGN:
-                case CHAR_DOLLAR_SIGN:
-                case CHAR_PERCENT:
-                case CHAR_AMPERSAND:
-                case CHAR_COMMA:
-                case CHAR_ASTERISK:
-                case CHAR_PLUS_SIGN:
-                case CHAR_HYPHEN_MINUS:
-                case CHAR_FULL_STOP:
-                case CHAR_CARET:
-                case CHAR_UNDERSCORE:
-                case CHAR_BACKTICK:
-                case CHAR_PIPE:
-                case CHAR_TILDE:
-                    return true;
-                default:
-                    return false;
-            }
-        }
-        #endregion
-
-
         #region Byte Checks
         /// <summary>
         /// Returns <c>True</c> if the given code point is an HTML newline(0x0A or 0x0D) byte
@@ -165,15 +100,6 @@ namespace CssUI.HTML
             return b == 0x09 || b == 0x20;
         }
 
-        /// <summary>
-        /// Returns <c>True</c> if the given code point is an HTML whitespace byte
-        /// </summary>
-        /// <param name="b">The character to check</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_HTML_Whitepace_Byte(byte b)
-        {
-            return Is_HTML_Newline_Byte(b) || Is_HTML_Tab_Or_Space_Byte(b);
-        }
         #endregion
 
 
