@@ -41,6 +41,7 @@ namespace CssUI
 
         #region Accessors
         public int Length => Data.Length;
+        public ulong LongLength => (ulong)Data.Length;
         public ulong Remaining => ((ulong)Data.Length - Position);
         /// <summary>
         /// Returns the next item to be consumed, equivalent to calling Peek(0)
@@ -58,7 +59,7 @@ namespace CssUI
         /// <summary>
         /// Returns whether the stream position is currently at the end of the stream
         /// </summary>
-        public bool atEnd => Position >= (ulong)Data.Length;
+        public bool atEnd => Position >= LongLength;
         #endregion
 
         #region Data
@@ -352,6 +353,31 @@ namespace CssUI
             var consumed = Data.Slice((int)startIndex, (int)count);
 
             return new DataStream<ItemType>(consumed, EOF_ITEM);
+        }
+        #endregion
+
+        #region Slicing
+        /// <summary>
+        /// Returns a slice of this streams memory containing all of the data after current stream position + <paramref name="offset"/>
+        /// </summary>
+        /// <param name="offset">Offset from the current stream position where the memory slice to begin</param>
+        /// <returns></returns>
+        public ReadOnlyMemory<ItemType> Slice(ulong offset = 0)
+        {
+            var index = MathExt.Max(LongLength, Position + offset);
+            return Data.Slice((int)index, (int)(LongLength - index));
+        }
+
+        /// <summary>
+        /// Returns a slice of this streams memory containing all of the data after current stream position + <paramref name="offset"/>
+        /// </summary>
+        /// <param name="offset">Offset from the current stream position where the memory slice to begin</param>
+        /// <param name="count">The number of items to include in the slice</param>
+        /// <returns></returns>
+        public ReadOnlyMemory<ItemType> Slice(ulong offset, ulong count)
+        {
+            var index = MathExt.Max(LongLength, Position + offset);
+            return Data.Slice((int)index, (int)(LongLength - index));
         }
         #endregion
 
