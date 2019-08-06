@@ -327,7 +327,7 @@ namespace CssUI.CSS
             };
         }
 
-        public DOMRect Get_Bounds()
+        public DOMRect getBoundingClientRect()
         {
             return new DOMRect(X, Y, Width, Height);
         }

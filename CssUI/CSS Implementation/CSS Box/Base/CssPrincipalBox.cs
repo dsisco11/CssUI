@@ -11,6 +11,7 @@ using CssUI.DOM;
 using CssUI.DOM.Nodes;
 using CssUI.CSS.Formatting;
 using CssUI.CSS.Internal;
+using CssUI.DOM.Geometry;
 
 namespace CssUI
 {
@@ -144,7 +145,7 @@ namespace CssUI
         /// </summary>
         public bool IsHeightExplicit => (0 != (Style.Cascaded.Height.Specified.Type & (ECssValueType.DIMENSION | ECssValueType.PERCENT)) && !this.DependsOnChildren);
 
-
+        /* XXX: Scrollbar : replace with the native DOM element code for scrollboxes */
         /// <summary>
         /// The size of our Elements scrollbar (if any)
         /// </summary>
@@ -464,6 +465,8 @@ namespace CssUI
             /* Account for scrollbars */
             if (Owner is cssScrollableElement scrollable)
             {
+                /* XXX: Create a CSSCommon class to help with the LogicalWidth & LogicalHeight determination */
+                /* XXX: Replace this old scrollable element crap with the new native DOM element scrollboxes */
                 this.Scrollbar_Size.Width = scrollable.SB_Vertical?.Box.Margin.LogicalWidth ?? 0;
                 this.Scrollbar_Size.Height = scrollable.SB_Horizontal?.Box.Margin.LogicalHeight ?? 0;
             }
@@ -776,6 +779,17 @@ namespace CssUI
             this.Flag(EBoxInvalidationReason.Content_Changed);
         }
 
+        #endregion
+
+        #region Hit Testing
+        /// <summary>
+        /// Returns <c>True</c> if the given x/y coordinates lie within the click area of this box
+        /// </summary>
+        public bool HitTest(double x, double y)
+        {
+            DOMRect rect = ClickArea.getBoundingClientRect();
+            return (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom);
+        }
         #endregion
     }
 }

@@ -1145,7 +1145,7 @@ namespace CssUI.DOM
 
         public DOMRect getBoundingClientRect()
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-element-getboundingclientrect */
-            return DOMCommon.getBoundingClientRect(this.getClientRects());
+            return DOMCommon.getBoundingClientRect(getClientRects());
         }
         #endregion
 

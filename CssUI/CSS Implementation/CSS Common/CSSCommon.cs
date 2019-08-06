@@ -311,7 +311,7 @@ namespace CssUI.CSS.Internal
                             {
                                 if (element.Box.OuterDisplayType == EOuterDisplayType.Block || element.Box.FormattingContext != null)
                                 {
-                                    return element.Box.Content.Get_Bounds();
+                                    return element.Box.Content.getBoundingClientRect();
                                 }
                             }
                             node = tree.parentNode();
@@ -377,7 +377,7 @@ namespace CssUI.CSS.Internal
                                     }
                                     else
                                     {
-                                        return ancestor.Box.Padding.Get_Bounds();
+                                        return ancestor.Box.Padding.getBoundingClientRect();
                                     }
                                 }
                             }
@@ -385,11 +385,11 @@ namespace CssUI.CSS.Internal
                         }
                         /* If there is no such ancestor, the containing block is the initial containing block. */
                         Node rootNode = Target.getRootNode();
-                        return (rootNode as Element).Box.Content.Get_Bounds();
+                        return (rootNode as Element).Box.Content.getBoundingClientRect();
                     }
                 default:
                     {
-                        return Target.parentElement?.Box.Content.Get_Bounds();
+                        return Target.parentElement?.Box.Content.getBoundingClientRect();
                     }
             }
 
