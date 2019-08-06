@@ -3,7 +3,6 @@ using CssUI.DOM.Events;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Internal;
 using CssUI.DOM.Nodes;
-using CssUI.DOM.Serialization;
 using System;
 
 namespace CssUI.DOM
@@ -783,14 +782,9 @@ namespace CssUI.DOM
         #endregion
 
         #region Overrides
-        internal override void run_attribute_change_steps(this Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue newValue, string Namespace)
+        internal override void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue newValue, string Namespace)
         {
             base.run_attribute_change_steps(element, localName, oldValue, newValue, Namespace);
-
-            if (localName == EAttributeName.AccessKey)
-            {
-            }
-
         }
         #endregion
 
