@@ -7,6 +7,7 @@ namespace CssUI
     class MathExt
     {
         #region Min
+        /* We use these instead of the normal Math class because these are aggressively inlined and avoid a jmp call and an eq comparison (usually negligable but its an effortless improvement nonetheless) */
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Min(int A, int B) => (A < B ? A : B);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -22,6 +23,7 @@ namespace CssUI
         #endregion
 
         #region Max
+        /* We use these instead of the normal Math class because these are aggressively inlined and avoid a jmp call and an eq comparison (usually negligable but its an effortless improvement nonetheless) */
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Max(int A, int B) => (A > B ? A : B);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
