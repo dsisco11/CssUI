@@ -286,7 +286,7 @@ namespace CssUI.DOM
 
             for (int i=0; i < Tokens.Count; i++)
             {
-                newList[i] = StringCommon.Trim(Tokens[i]);
+                newList[i] = StringCommon.Trim(Tokens[i], UnicodeCommon.CHAR_SPACE);
             }
 
             return newList;
