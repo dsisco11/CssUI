@@ -29,18 +29,6 @@ namespace CssUI.DOM
         [MetaKeyword("application/xml")]
         XmlApplication,
 
-        [MetaKeyword("image/gif")]
-        GIF,
-
-        [MetaKeyword("image/jpeg")]
-        JPEG,
-
-        [MetaKeyword("image/png")]
-        PNG,
-
-        [MetaKeyword("image/svg+xml")]
-        SVG,
-
         /// <summary>
         /// </summary>
         [MetaKeyword("multipart/form-data")]
@@ -90,10 +78,69 @@ namespace CssUI.DOM
         [MetaKeyword("text/xml")]
         XML,
 
+        [MetaKeyword("application/pdf")]
+        PDF,
+
+        [MetaKeyword("application/postscript")]
+        AdobePostscript,
+
+
+
+        [MetaKeyword("application/x-gzip")]
+        GZIP,
+        [MetaKeyword("application/zip")]
+        ZIP,
+        [MetaKeyword("application/x-rar-compressed")]
+        RAR,
+
+
+        [MetaKeyword("audio/basic")]
+        AudioBasic,
+        [MetaKeyword("audio/aiff")]
+        AIFF,
+        [MetaKeyword("audio/mpeg")]
+        MP3,
+        [MetaKeyword("audio/ogg")]
+        OGG,
+        [MetaKeyword("audio/midi")]
+        MIDI,
+        [MetaKeyword("audio/avi")]
+        AVI,
+        [MetaKeyword("audio/wave")]
+        WAVE,
+
+
+
         [MetaKeyword("video/mp4")]
         MPEG4,
-
+        [MetaKeyword("video/webm")]
+        WEBM,
         [MetaKeyword("video/mpeg")]
         MPEG,
+
+
+
+        [MetaKeyword("image/x-icon")]
+        XIcon,
+
+        [MetaKeyword("image/bmp")]
+        BMP,
+
+        [MetaKeyword("image/gif")]
+        GIF,
+
+        [MetaKeyword("image/webp")]
+        WebP,
+
+        [MetaKeyword("image/jpeg")]
+        JPEG,
+
+        [MetaKeyword("image/png")]
+        PNG,
+
+        [MetaKeyword("image/svg+xml")]
+        SVG,
+
+
     }
 }
