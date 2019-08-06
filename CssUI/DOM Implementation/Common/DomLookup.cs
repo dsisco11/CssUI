@@ -32,7 +32,7 @@ namespace CssUI
             }
 
             /* /!\ This conversion will fucking EXPLODE if the given generic type does not have an integer backing type /!\ */
-            outKeyword = DomEnumTables.TABLE[index][CastTo<int>.From<Ty>(Value)];
+            outKeyword = DomEnumTables.TABLE[index][CastTo<int>.From<Ty>(Value)].Keyword;
             return true;
         }
 
@@ -52,7 +52,7 @@ namespace CssUI
             if (index > -1)
             {
                 /* /!\ This conversion will fucking EXPLODE if the given generic type does not have an integer backing type /!\ */
-                string keyword = DomEnumTables.TABLE[index][CastTo<int>.From<Ty>(Value)];
+                string keyword = DomEnumTables.TABLE[index][CastTo<int>.From<Ty>(Value)].Keyword;
                 if (!ReferenceEquals(null, keyword))
                 {
                     return keyword;
@@ -161,7 +161,7 @@ namespace CssUI
         #endregion
 
 
-
+        #region 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
         [Obsolete("Use CssUI.Internal.Lookup")]
         public static bool Is_Declared(Type enumType, AtomicString Keyword)
