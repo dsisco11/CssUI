@@ -1,26 +1,42 @@
 ﻿using CssUI.DOM.CustomElements;
+using CssUI.DOM.Internal;
+using System;
 
 namespace CssUI.DOM
 {
-    public class HTMLObjectElement : FormAssociatedElement, IListedElement, ISubmittableElement
+    public class HTMLObjectElement : FormAssociatedElement, IListedElement, ISubmittableElement, IBrowsingContextContainer
     {
+        #region Backing Values
+        #endregion
+
         #region Properties
-        public readonly Document contentDocument;
+        public BrowsingContext Nested_Browsing_Context { get; private set; }
         #endregion
 
         #region Constructors
-        public HTMLObjectElement(Document document, Document contentDocument) : this(document, "object", contentDocument)
+        public HTMLObjectElement(Document document) : this(document, "object")
         {
         }
 
-        public HTMLObjectElement(Document document, string localName, Document contentDocument) : base(document, localName)
+        public HTMLObjectElement(Document document, string localName) : base(document, localName)
         {
-            this.contentDocument = contentDocument;
+            // this.nestedBrowsingContext = 
         }
         #endregion
 
         #region Accessors
-        public Window contentWindow => contentDocument.defaultView;
+        public Window contentWindow => Nested_Browsing_Context?.WindowProxy;
+
+        public Document contentDocument
+        {/* Docs: https://html.spec.whatwg.org/multipage/browsers.html#concept-bcc-content-document */
+            get
+            {
+                if (Nested_Browsing_Context == null) return null;
+                var document = Nested_Browsing_Context.activeDocument;
+                if (!StringCommon.StrEq(document.Origin.AsSpan(), nodeDocument.Origin.AsSpan())) return null;
+                return document;
+            }
+        }
         #endregion
 
         #region Content Attributes
@@ -51,12 +67,32 @@ namespace CssUI.DOM
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.UseMap, AttributeValue.From_String(value)));
         }
 
-        [CEReactions] public int width;
-        [CEReactions] public int height;
+
+        [CEReactions] public int width
+        {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content-other.html#dimension-attributes */
+            get => getAttribute(EAttributeName.Width).Get_Int();
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Width, AttributeValue.From_Integer(value)));
+        }
+        [CEReactions] public int height
+        {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content-other.html#dimension-attributes */
+            get => getAttribute(EAttributeName.Height).Get_Int();
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Height, AttributeValue.From_Integer(value)));
+        }
+
         #endregion
 
 
-        public Document getSVGDocument();
+        public Document getSVGDocument()
+        {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content-other.html#dom-media-getsvgdocument */
+            if (Nested_Browsing_Context == null)
+                return null;
+
+            if (!StringCommon.StrEq(nodeDocument.Origin.AsSpan(), Nested_Browsing_Context.activeDocument.Origin.AsSpan()))
+                return null;
+
+            /* XXX: finish the get SVG document stuff */
+            throw new NotImplementedException();
+        }
 
     }
 }
