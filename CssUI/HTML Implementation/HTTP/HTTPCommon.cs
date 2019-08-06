@@ -126,13 +126,13 @@ namespace CssUI.HTML
                 Stream.Consume_While(c => c != CHAR_EQUALS && c != CHAR_REVERSE_SOLIDUS, out ReadOnlyMemory<char> outConsumed);
                 if (sb != null) sb.Append(outConsumed.ToString());
 
-                if (Stream.atEOF) break;
+                if (Stream.atEnd) break;
 
                 var quoteOrBackslash = Stream.Next;
                 Stream.Consume();
                 if (quoteOrBackslash == CHAR_REVERSE_SOLIDUS)
                 {
-                    if (Stream.atEOF)
+                    if (Stream.atEnd)
                     {
                         if (sb != null) sb.Append(CHAR_REVERSE_SOLIDUS);
                         break;

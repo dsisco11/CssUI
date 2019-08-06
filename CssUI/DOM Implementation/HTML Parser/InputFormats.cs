@@ -143,7 +143,7 @@ namespace CssUI.HTML.Serialization
 
             outYear = yearParsed;
 
-            if (!Stream.atEOF && Stream.Next == CHAR_HYPHEN_MINUS)
+            if (!Stream.atEnd && Stream.Next == CHAR_HYPHEN_MINUS)
                 Stream.Consume();
             else
             {
@@ -180,7 +180,7 @@ namespace CssUI.HTML.Serialization
                 return false;
             }
 
-            if (!Stream.atEOF)
+            if (!Stream.atEnd)
             {
                 outYear = 0;
                 outMonth = 0;
@@ -206,7 +206,7 @@ namespace CssUI.HTML.Serialization
                 return false;
             }
 
-            if (!Stream.atEOF && Stream.Next == CHAR_HYPHEN_MINUS)
+            if (!Stream.atEnd && Stream.Next == CHAR_HYPHEN_MINUS)
                 Stream.Consume();
             else
                 return false;
@@ -231,7 +231,7 @@ namespace CssUI.HTML.Serialization
                 return false;
             }
 
-            if (!Stream.atEOF || Stream.Next == CHAR_HYPHEN_MINUS)
+            if (!Stream.atEnd || Stream.Next == CHAR_HYPHEN_MINUS)
                 Stream.Consume();
             else
             {
@@ -272,7 +272,7 @@ namespace CssUI.HTML.Serialization
                 return false;
             }
 
-            if (!Stream.atEOF)
+            if (!Stream.atEnd)
             {
                 outDate = DateTime.MinValue;
                 return false;
@@ -382,7 +382,7 @@ namespace CssUI.HTML.Serialization
                 return false;
             }
 
-            if (!Stream.atEOF)
+            if (!Stream.atEnd)
             {
                 outMonth = 0;
                 outDay = 0;
@@ -619,7 +619,7 @@ namespace CssUI.HTML.Serialization
                 return false;
             }
 
-            if (!Stream.atEOF)
+            if (!Stream.atEnd)
             {
                 outTime = TimeSpan.MinValue;
                 return false;
@@ -686,7 +686,7 @@ namespace CssUI.HTML.Serialization
                 return false;
             }
 
-            if (!Stream.atEOF && (Stream.Next == CHAR_T_UPPER || Stream.Next == CHAR_SPACE))
+            if (!Stream.atEnd && (Stream.Next == CHAR_T_UPPER || Stream.Next == CHAR_SPACE))
                 Stream.Consume();
             else
             {
@@ -700,7 +700,7 @@ namespace CssUI.HTML.Serialization
                 return false;
             }
 
-            if (!Stream.atEOF)
+            if (!Stream.atEnd)
             {
                 outDateTime = DateTime.MinValue;
                 return false;
@@ -789,7 +789,7 @@ namespace CssUI.HTML.Serialization
                 {
                     timezoneHours = (int)ParsingCommon.Digits_To_Base10(sDigits);
 
-                    if (Stream.atEOF || Stream.Next != CHAR_COLON)
+                    if (Stream.atEnd || Stream.Next != CHAR_COLON)
                     {
                         outTimezoneHours = 0;
                         outTimezoneMinutes = 0;
@@ -859,7 +859,7 @@ namespace CssUI.HTML.Serialization
                 return false;
             }
 
-            if (!Stream.atEOF)
+            if (!Stream.atEnd)
             {
                 outTimezoneHours = 0;
                 outTimezoneMinutes = 0;
@@ -910,7 +910,7 @@ namespace CssUI.HTML.Serialization
                 return false;
             }
 
-            if (!Stream.atEOF && (Stream.Next == CHAR_T_UPPER || Stream.Next == CHAR_SPACE))
+            if (!Stream.atEnd && (Stream.Next == CHAR_T_UPPER || Stream.Next == CHAR_SPACE))
             {
                 Stream.Consume();
             }
@@ -926,7 +926,7 @@ namespace CssUI.HTML.Serialization
                 return false;
             }
 
-            if (Stream.atEOF)
+            if (Stream.atEnd)
             {
                 outTime = DateTimeOffset.MinValue;
                 return false;
@@ -938,7 +938,7 @@ namespace CssUI.HTML.Serialization
                 return false;
             }
 
-            if (!Stream.atEOF)
+            if (!Stream.atEnd)
             {
                 outTime = DateTimeOffset.MinValue;
                 return false;
@@ -1021,7 +1021,7 @@ namespace CssUI.HTML.Serialization
                 return false;
             }
 
-            if (!Stream.atEOF && Stream.Next == CHAR_HYPHEN_MINUS)
+            if (!Stream.atEnd && Stream.Next == CHAR_HYPHEN_MINUS)
                 Stream.Consume();
             else
             {
@@ -1030,7 +1030,7 @@ namespace CssUI.HTML.Serialization
                 return false;
             }
 
-            if (!Stream.atEOF && Stream.Next == CHAR_W_UPPER)
+            if (!Stream.atEnd && Stream.Next == CHAR_W_UPPER)
                 Stream.Consume();
             else
             {
@@ -1054,7 +1054,7 @@ namespace CssUI.HTML.Serialization
                 return false;
             }
 
-            if (!Stream.atEOF)
+            if (!Stream.atEnd)
             {
                 outWeek = 0;
                 outYear = 0;
@@ -1193,7 +1193,7 @@ namespace CssUI.HTML.Serialization
 
             Stream.Consume_While(Is_Ascii_Whitespace);
 
-            if (Stream.atEOF)
+            if (Stream.atEnd)
             {
                 outDurationSecs = double.NaN;
                 return false;
@@ -1209,7 +1209,7 @@ namespace CssUI.HTML.Serialization
             double N = 0;
             while (true)
             {
-                if (Stream.atEOF) break;
+                if (Stream.atEnd) break;
                 EDurationUnit units;
 
                 if (Stream.Next == CHAR_T_UPPER)
@@ -1239,7 +1239,7 @@ namespace CssUI.HTML.Serialization
                     return false;
                 }
 
-                if (Stream.atEOF)
+                if (Stream.atEnd)
                 {
                     outDurationSecs = double.NaN;
                     return false;
@@ -1265,7 +1265,7 @@ namespace CssUI.HTML.Serialization
                     N += fraction;
 
                     Stream.Consume_While(Is_Ascii_Whitespace);
-                    if (Stream.atEOF)
+                    if (Stream.atEnd)
                     {
                         outDurationSecs = double.NaN;
                         return false;
@@ -1568,11 +1568,11 @@ namespace CssUI.HTML.Serialization
                 bDatePresent = false;
             }
 
-            if (bDatePresent && !Stream.atEOF && (Stream.Next == CHAR_T_UPPER || Stream.Next == CHAR_SPACE))
+            if (bDatePresent && !Stream.atEnd && (Stream.Next == CHAR_T_UPPER || Stream.Next == CHAR_SPACE))
             {
                 Stream.Consume();
             }
-            else if (bDatePresent && (Stream.atEOF || !(Stream.Next == CHAR_T_UPPER && Stream.Next == CHAR_SPACE)))
+            else if (bDatePresent && (Stream.atEnd || !(Stream.Next == CHAR_T_UPPER && Stream.Next == CHAR_SPACE)))
             {
                 bTimePresent = false;
             }
@@ -1595,7 +1595,7 @@ namespace CssUI.HTML.Serialization
 
             if (bDatePresent && bTimePresent)
             {
-                if (Stream.atEOF)
+                if (Stream.atEnd)
                 {
                     outDateTime = DateTimeOffset.MinValue;
                     return false;
@@ -1608,7 +1608,7 @@ namespace CssUI.HTML.Serialization
                 }
             }
 
-            if (!Stream.atEOF)
+            if (!Stream.atEnd)
             {
                 outDateTime = DateTimeOffset.MinValue;
                 return false;
@@ -1743,7 +1743,7 @@ namespace CssUI.HTML.Serialization
         private static bool Parse_Legacy_Color_String(DataStream<char> Stream, out SimpleColor outColor)
         {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#rules-for-parsing-a-legacy-colour-value */
 
-            Stream = new DataStream<char>(StringCommon.Trim(Stream.AsMemory()), EOF);
+            Stream = new DataStream<char>(StringCommon.Trim(Stream.AsMemory(), UnicodeCommon.CHAR_SPACE), EOF);
 
             var mem = Stream.AsMemory();
             if (StringCommon.StriEq(mem.Span, "transparent".AsSpan()))

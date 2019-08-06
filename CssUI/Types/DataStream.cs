@@ -56,9 +56,9 @@ namespace CssUI
         public ItemType NextNextNext => Peek(2);
 
         /// <summary>
-        /// Returns whether the stream position is currently at the EOF
+        /// Returns whether the stream position is currently at the end of the stream
         /// </summary>
-        public bool atEOF => Peek(0).Equals(EOF_ITEM);
+        public bool atEnd => Position >= (ulong)Data.Length;
         #endregion
 
         #region Data

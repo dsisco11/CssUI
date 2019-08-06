@@ -730,7 +730,7 @@ namespace CssUI
             ulong chunkCount = 0;
             var chunks = new List<ReadOnlyMemory<char>>(16);
 
-            while (!Stream.atEOF)
+            while (!Stream.atEnd)
             {
                 EFilterResult filterResult = EFilterResult.FILTER_ACCEPT;
                 if (Delims.Length == 1)
@@ -784,7 +784,7 @@ namespace CssUI
 
 
                 Stream.Consume();
-                if (end_chunk || Stream.atEOF)
+                if (end_chunk || Stream.atEnd)
                 {
                     if (!chunkStart.HasValue) chunkStart = Stream.Position - 1;
 
@@ -819,7 +819,7 @@ namespace CssUI
             ulong chunkCount = 0;
             var chunks = new List<ReadOnlyMemory<char>>(16);
 
-            while (!Stream.atEOF)
+            while (!Stream.atEnd)
             {
                 EFilterResult filterResult = Filter.acceptData(Stream.Next);
 
@@ -856,7 +856,7 @@ namespace CssUI
                 }
 
                 Stream.Consume();
-                if (end_chunk || Stream.atEOF)
+                if (end_chunk || Stream.atEnd)
                 {
                     if (!chunkStart.HasValue) chunkStart = Stream.Position - 1;
 
@@ -896,7 +896,7 @@ namespace CssUI
 
             /* Scan for CR characters, when encountered create a new chunk(non inclusive for CR).
              * Scan for LF characters, when encountered if not preceeded by a CR create a new chunk (non inclusive). */
-            while (!Stream.atEOF)
+            while (!Stream.atEnd)
             {
                 EFilterResult filterResult = EFilterResult.FILTER_ACCEPT;
                 int replacementIndex = -1;
@@ -1023,7 +1023,7 @@ namespace CssUI
 
             /* Scan for CR characters, when encountered create a new chunk(non inclusive for CR).
              * Scan for LF characters, when encountered if not preceeded by a CR create a new chunk (non inclusive). */
-            while (!Stream.atEOF)
+            while (!Stream.atEnd)
             {
                 EFilterResult filterResult = dataFilter.acceptData(Stream.Next);
                 /* When filter result:
@@ -1059,7 +1059,7 @@ namespace CssUI
                 }
 
                 Stream.Consume();
-                if (end_chunk || Stream.atEOF)
+                if (end_chunk || Stream.atEnd)
                 {
                     if (!chunkStart.HasValue) chunkStart = Stream.Position - 1;
 
@@ -1132,7 +1132,7 @@ namespace CssUI
 
             /* Scan for CR characters, when encountered create a new chunk(non inclusive for CR).
              * Scan for LF characters, when encountered if not preceeded by a CR create a new chunk (non inclusive). */
-            while (!Stream.atEOF)
+            while (!Stream.atEnd)
             {
                 EFilterResult filterResult = EFilterResult.FILTER_ACCEPT;
                 int replacementIndex = -1;
@@ -1256,7 +1256,7 @@ namespace CssUI
             var buff = data.Span;
             int idx = 0;
 
-            while (!Stream.atEOF)
+            while (!Stream.atEnd)
             {
                 char ch = Transform(Stream.Next);
                 if (ch != CHAR_NULL)

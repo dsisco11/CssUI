@@ -19,7 +19,7 @@ namespace CssUI.HTML.Serialization
             /* SKip ASCII whitespace */
             Stream.Consume_While(Is_Ascii_Whitespace);
 
-            if (Stream.atEOF)
+            if (Stream.atEnd)
             {
                 return false;
             }
@@ -33,7 +33,7 @@ namespace CssUI.HTML.Serialization
             /* Collect sequence of ASCII digit codepoints */
             Stream.Consume_While(Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
 
-            if (!Stream.atEOF && Is_Ascii_Alpha(Stream.Next))
+            if (!Stream.atEnd && Is_Ascii_Alpha(Stream.Next))
             {
                 return false;
             }
@@ -182,7 +182,7 @@ namespace CssUI.HTML.Serialization
             /* Skip ASCII whitespace */
             Stream.Consume_While(Is_Ascii_Whitespace);
 
-            if (Stream.atEOF)
+            if (Stream.atEnd)
                 throw new DomSyntaxError();
 
             switch (Stream.Next)
@@ -201,7 +201,7 @@ namespace CssUI.HTML.Serialization
                     break;
             }
 
-            if (Stream.atEOF)
+            if (Stream.atEnd)
                 throw new DomSyntaxError();
 
             /* 9) If the character indicated by position is a U+002E FULL STOP (.), 
@@ -225,14 +225,14 @@ namespace CssUI.HTML.Serialization
             }
 
             /* 12) If position is past the end of input, jump to the step labeled conversion. */
-            if (!Stream.atEOF)
+            if (!Stream.atEnd)
             {
                 /* 13) Fraction: If the character indicated by position is a U+002E FULL STOP (.), run these substeps: */
                 if (Stream.Next == CHAR_FULL_STOP)
                 {
                     Stream.Consume();
                     /* 2) If position is past the end of input, or if the character indicated by position is not an ASCII digit, U+0065 LATIN SMALL LETTER E (e), or U+0045 LATIN CAPITAL LETTER E (E), then jump to the step labeled conversion. */
-                    if (!Stream.atEOF && (Is_Ascii_Digit(Stream.Next) || Stream.Next == CHAR_E_LOWER || Stream.Next == CHAR_E_UPPER))
+                    if (!Stream.atEnd && (Is_Ascii_Digit(Stream.Next) || Stream.Next == CHAR_E_LOWER || Stream.Next == CHAR_E_UPPER))
                     {
                         /* 3) If the character indicated by position is a U+0065 LATIN SMALL LETTER E character (e) or a U+0045 LATIN CAPITAL LETTER E character (E), skip the remainder of these substeps. */
                         if (Is_Ascii_Digit(Stream.Next))
