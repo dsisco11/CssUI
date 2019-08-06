@@ -184,7 +184,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Returns the slot name
         /// </summary>
-        internal string Slot_Name
+        public string Slot_Name
         {/* Docs: https://dom.spec.whatwg.org/#slotable-name */
             get => _slot_Name;
             set
