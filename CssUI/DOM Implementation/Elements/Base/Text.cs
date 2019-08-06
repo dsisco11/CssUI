@@ -144,9 +144,8 @@ namespace CssUI.DOM
         /// may ignore the node for the purposes of text search user interfaces (commonly known as "find in page"), 
         /// and may prevent the user from selecting text in that node. User agents should allow the user to override the restrictions on search and text selection, however.
         /// </summary>
-        internal bool inert = false;
         //internal bool is_expressly_inert => (this.inert && !(parentNode is Element E && E.inert) && !(parentNode is Text T && T.inert));
-        internal bool is_expressly_inert => (this.inert && !parentElement.inert);
+        internal new bool is_expressly_inert => (base.is_expressly_inert || parentElement.inert);
         #endregion
 
         #region Internal Utility
