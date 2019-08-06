@@ -54,7 +54,7 @@ namespace CssUI.DOM
         {/* Docs: https://www.w3.org/TR/css-display-3/#initial-containing-block */
             get
             {
-                return documentElement?.Box.Content.Get_Bounds();
+                return documentElement?.Box.Content.getBoundingClientRect();
             }
         }
         #endregion
@@ -459,6 +459,85 @@ namespace CssUI.DOM
         }
         #endregion
 
+        #region CSSOM Extensions
+        public Element elementFromPoint(double x, double y)
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-document-elementfrompoint */
+
+            /* 1) If either argument is negative, x is greater than the viewport width excluding the size of a rendered scroll bar (if any), or y is greater than the viewport height excluding the size of a rendered scroll bar (if any), or there is no viewport associated with the document, return null and terminate these steps. */
+            if (Viewport == null) return null;
+
+            var vWidth = Viewport.Width - Viewport.ScrollBox?.VScrollBar.width ?? 0;
+            var vHeight = Viewport.Height - Viewport.ScrollBox?.HScrollBar.height ?? 0;
+            if (x < 0 || y < 0 || x > vWidth || y > vHeight)
+            {
+                return null;
+            }
+
+            /* 2) If there is a layout box in the viewport that would be a target for hit testing at coordinates x,y, when applying the transforms that apply to the descendants of the viewport, return the associated element and terminate these steps. */
+            var filter = new FilterLayoutBoxHitTest(x, y);
+            var hit = DOMCommon.Get_Nth_Descendant_OfType<Element>(this, 1, filter, ENodeFilterMask.SHOW_ELEMENT);
+            if (hit != null)
+            {
+                return hit;
+            }
+
+            return documentElement;
+        }
+
+        public IReadOnlyCollection<Element> elementsFromPoint(double x, double y)
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-document-elementsfrompoint */
+
+            /* 1) If either argument is negative, x is greater than the viewport width excluding the size of a rendered scroll bar (if any), or y is greater than the viewport height excluding the size of a rendered scroll bar (if any), or there is no viewport associated with the document, return null and terminate these steps. */
+            /*if (Viewport == null) return null;
+
+            var vWidth = Viewport.Width - Viewport.ScrollBox?.VScrollBar.width ?? 0;
+            var vHeight = Viewport.Height - Viewport.ScrollBox?.HScrollBar.height ?? 0;
+            if (x < 0 || y < 0 || x > vWidth || y > vHeight)
+            {
+                return null;
+            }
+
+            var hits = new LinkedList<Element>();
+            */
+            /* XXX: Finish this sometime after CSS painting system is done */
+            throw new NotImplementedException();
+        }
+
+        public CaretPosition caretPositionFromPoint(double x, double y)
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-document-caretpositionfrompoint */
+
+            /* 1) If there is no viewport associated with the document, return null. */
+            /*if (Viewport == null) return null;
+            *//* 2) If either argument is negative, x is greater than the viewport width excluding the size of a rendered scroll bar (if any), y is greater than the viewport height excluding the size of a rendered scroll bar (if any) return null. *//*
+            var vWidth = Viewport.Width - Viewport.ScrollBox?.VScrollBar.width ?? 0;
+            var vHeight = Viewport.Height - Viewport.ScrollBox?.HScrollBar.height ?? 0;
+            if (x < 0 || y < 0 || x > vWidth || y > vHeight)
+            {
+                return null;
+            }
+            */
+
+            /* XXX: Finish this sometime after CSS painting system is done */
+            throw new NotImplementedException();
+        }
+
+        public Element scrollingElement
+        {
+            get
+            {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-document-scrollingelement */
+                if (Mode == EQuirksMode.Quirks)
+                {
+                    /* 1) If the HTML body element exists, and it is not potentially scrollable, return the HTML body element and abort these steps. */
+                    if (body != null && !body.is_potentially_scrollable) return body;
+                    /* 2) Return null and abort these steps. */
+                    return null;
+                }
+
+                return documentElement;
+            }
+        }
+        #endregion
+
         #region ID Map
         Dictionary<AtomicString, WeakReference<Element>> Element_ID_Map = new Dictionary<AtomicString, WeakReference<Element>>();
 
@@ -512,7 +591,7 @@ namespace CssUI.DOM
         #region Event Loop
         public void Run_Event_Loop()
         {
-
+            /* XXX: Event loop */
         }
         #endregion
 
