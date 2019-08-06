@@ -4,7 +4,6 @@ using CssUI.HTML;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.Mime;
 using System.Runtime.CompilerServices;
 using System.Text;
 using static CssUI.UnicodeCommon;
@@ -228,7 +227,7 @@ namespace CssUI.DOM
                 return false;
             }
 
-            if (Stream.atEOF)
+            if (Stream.atEnd)
             {
                 outMimeType = default;
                 return false;
@@ -253,7 +252,7 @@ namespace CssUI.DOM
             var Parameters = new Dictionary<string, string>();
 
             /* 11) While position is not past the end of input: */
-            while (!Stream.atEOF)
+            while (!Stream.atEnd)
             {
                 /* 1) Advance position by 1. (This skips past U+003B (;).) */
                 Stream.Consume();
@@ -265,7 +264,7 @@ namespace CssUI.DOM
                 string parameterName = StringCommon.Transform(paramName, To_ASCII_Lower_Alpha);
                 string parameterValue = null;
 
-                if (!Stream.atEOF)
+                if (!Stream.atEnd)
                 {
                     if (Stream.Next == CHAR_SEMICOLON)
                         continue;
@@ -273,7 +272,7 @@ namespace CssUI.DOM
                     Stream.Consume();/* Skip '=' sign */
                 }
 
-                if (Stream.atEOF)
+                if (Stream.atEnd)
                     break;
 
                 if (Stream.Next == CHAR_QUOTATION_MARK)
@@ -586,7 +585,8 @@ namespace CssUI.DOM
             {
                 /* XXX: Implement feed sniffing */
                 /* https://mimesniff.spec.whatwg.org/#sniffing-a-mislabeled-feed */
-                throw new NotImplementedException();
+                outMIME = Identify_Mislabeled_Feed(Header, suppliedMimeType);
+                return true;
             }
 
             if (0 != (groups & EMimeGroup.Image))
@@ -610,11 +610,179 @@ namespace CssUI.DOM
             outMIME = suppliedMimeType;
             return false;
         }
+        #endregion
 
-        private static EMimeType Identify_Mislabeled_Feed(ReadOnlyMemory<byte> Header)
+        #region Mislabeled Feed Identification
+        static byte[] seq_comment_begin = new byte[] { 0x21, 0x2D, 0x2D };/* !-- */
+        static byte[] seq_comment_end = new byte[] { 0x2D, 0x2D, 0x3E };/* --> */
+        static byte[] seq_code_tag_end = new byte[] { 0x3F, 0x3E };/* ?> */
+        static byte[] seq_rss = new byte[] { 0x72, 0x73, 0x73 };/* rss */
+        static byte[] seq_feed = new byte[] { 0x66, 0x65, 0x65, 0x64 };/* feed */
+        static byte[] seq_rdf = new byte[] { 0x72, 0x64, 0x66, 0x3A, 0x52, 0x44, 0x46 };/* rdf:RDF */
+        static byte[] seq_purl_namespace = new byte[] { 0x68, 0x74, 0x74, 0x70, 0x3A, 0x2F, 0x2F, 0x70, 0x75, 0x72, 0x6C, 0x2E, 0x6F, 0x72, 0x67, 0x2F, 0x72, 0x73, 0x73, 0x2F, 0x31, 0x2E, 0x30, 0x2F };/* http://purl.org/rss/1.0/ */
+        static byte[] seq_rdf_syntax = new byte[] { 0x68, 0x74, 0x74, 0x70, 0x3A, 0x2F, 0x2F, 0x77, 0x77, 0x77, 0x2E, 0x77, 0x33, 0x2E, 0x6F, 0x72, 0x67, 0x2F, 0x31, 0x39, 0x39, 0x39, 0x2F, 0x30, 0x32, 0x2F, 0x32, 0x32, 0x2D, 0x72, 0x64, 0x66, 0x2D, 0x73, 0x79, 0x6E, 0x74, 0x61, 0x78, 0x2D, 0x6E, 0x73, 0x23 };/* http://www.w3.org/1999/02/22-rdf-syntax-ns# */
+
+        private static string Identify_Mislabeled_Feed(ReadOnlyMemory<byte> Header, string suppliedMIMEType)
         {/* Docs: https://mimesniff.spec.whatwg.org/#sniffing-a-mislabeled-feed */
-        }
 
+            int s = 0;
+            var Stream = new DataStream<byte>(Header, byte.MinValue);
+            if (Stream.Remaining >= 3 && Stream.Slice(0, 3).Span.SequenceEqual(PATTERN_UTF8_BOM.Span))
+            {
+                Stream.Consume(3);
+            }
+
+
+            while (!Stream.atEnd)
+            {
+                while (!Stream.atEnd)/* LOOP: L */
+                {
+                    /* 1) If sequence[s] is undefined, the computed MIME type is the supplied MIME type.*/
+                    /* What would undefined even mean here? I'm going to guess its 0x0 */
+                    if (Stream.Next == 0x0)
+                        return suppliedMIMEType;
+
+                    if (Stream.Next == 0x3C)
+                    {
+                        Stream.Consume();
+                        break;
+                    }
+
+                    if (!Is_Whitepace_Byte(Stream.Next))
+                        return suppliedMIMEType;
+
+                    Stream.Consume();
+                }
+
+                while (!Stream.atEnd)/* LOOP: L */
+                {
+                    bool EXIT_L = false;
+                    /* 1) If sequence[s] is undefined, the computed MIME type is the supplied MIME type. */
+                    if (Stream.Next == 0x0) return suppliedMIMEType;
+
+                    /* 2)  */
+                    if (Stream.Remaining >= 3 && Stream.Slice(0, 3).Span.SequenceEqual(seq_comment_begin))
+                    {
+                        Stream.Consume(3);
+                        while (!Stream.atEnd)/* LOOP: M */
+                        {
+                            /* 1) If sequence[s] is undefined, the computed MIME type is the supplied MIME type. */
+                            if (Stream.Next == 0x0) return suppliedMIMEType;
+
+                            if (Stream.Remaining >= 3 && Stream.Slice(0,3).Span.SequenceEqual(seq_comment_end))
+                            {
+                                Stream.Consume(3);
+                                EXIT_L = true;
+                                break;
+                            }
+
+                            Stream.Consume();
+                        }
+                    }
+                    if (EXIT_L) break;
+
+                    /* 3)  */
+                    if (Stream.Remaining >= 1 && Stream.Next == 0x21)// == '!'
+                    {
+                        Stream.Consume();
+                        while (!Stream.atEnd)/* LOOP: M */
+                        {
+                            /* 1) If sequence[s] is undefined, the computed MIME type is the supplied MIME type. */
+                            if (Stream.Next == 0x0) return suppliedMIMEType;
+
+                            if (Stream.Remaining >= 1 && Stream.Next == 0x3E)// == '>'
+                            {
+                                Stream.Consume();
+                                EXIT_L = true;
+                                break;
+                            }
+
+                            Stream.Consume();
+                        }
+                    }
+                    if (EXIT_L) break;
+
+                    /* 4)  */
+                    if (Stream.Remaining >= 1 && Stream.Next == 0x3F)// == '?'
+                    {
+                        Stream.Consume();
+                        while (!Stream.atEnd)/* LOOP: M */
+                        {
+                            /* 1) If sequence[s] is undefined, the computed MIME type is the supplied MIME type. */
+                            if (Stream.Next == 0x0) return suppliedMIMEType;
+
+                            if (Stream.Remaining >= 2 && Stream.Slice(0, 2).Span.SequenceEqual(seq_code_tag_end))
+                            {
+                                Stream.Consume(2);
+                                EXIT_L = true;
+                                break;
+                            }
+
+                            Stream.Consume();
+                        }
+                    }
+                    if (EXIT_L) break;
+
+                    /* 5)  */
+                    if (Stream.Remaining >= 3 && Stream.Slice(0, 3).Span.SequenceEqual(seq_rss))
+                        return "application/rss+xml";
+
+                    /* 6)  */
+                    if (Stream.Remaining >= 3 && Stream.Slice(0, 3).Span.SequenceEqual(seq_feed))
+                        return "application/atom+xml";
+
+                    /* 7)  */
+                    if (Stream.Remaining >= 7 && Stream.Slice(0, 6).Span.SequenceEqual(seq_rdf))
+                    {
+                        Stream.Consume(7);
+                        while (!Stream.atEnd)
+                        {
+                            /* 1) If sequence[s] is undefined, the computed MIME type is the supplied MIME type. */
+                            if (Stream.Next == 0x0) return suppliedMIMEType;
+
+                            if (Stream.Remaining >= 24 && Stream.Slice(0, 24).Span.SequenceEqual(seq_purl_namespace))
+                            {
+                                Stream.Consume(24);
+                                while (!Stream.atEnd)/* LOOP: N */
+                                {
+                                    /* 1) If sequence[s] is undefined, the computed MIME type is the supplied MIME type. */
+                                    if (Stream.Next == 0x0) return suppliedMIMEType;
+
+                                    if (Stream.Remaining >= 43 && Stream.Slice(0, 43).Span.SequenceEqual(seq_rdf_syntax))
+                                        return "application/rss+xml";
+
+                                    Stream.Consume();
+                                }
+                            }
+
+                            if (Stream.Remaining >= 24 && Stream.Slice(0, 24).Span.SequenceEqual(seq_rdf_syntax))
+                            {
+                                Stream.Consume(24);
+                                while (!Stream.atEnd)
+                                {
+                                    /* 1) If sequence[s] is undefined, the computed MIME type is the supplied MIME type. */
+                                    if (Stream.Next == 0x0) return suppliedMIMEType;
+                                    if (Stream.Remaining >= 43 && Stream.Slice(0, 43).Span.SequenceEqual(seq_purl_namespace))
+                                        return "application/rss+xml";
+
+                                    Stream.Consume();
+                                }
+                            }
+
+                            Stream.Consume();
+                        }
+                    }
+
+                    /* 8)  */
+                    return suppliedMIMEType;
+                }
+            }
+
+            return suppliedMIMEType;
+        }
+        #endregion
+
+        #region MIMEType Pattern Detection
         private static EMimeType Identify_Unknown_MIME_Type(ReadOnlyMemory<byte> Header, bool bSniffScriptableFlag = false)
         {/* Docs: https://mimesniff.spec.whatwg.org/#rules-for-identifying-an-unknown-mime-type */
 
@@ -642,10 +810,10 @@ namespace CssUI.DOM
             }
 
 
-            if (PatternMatch(Header, PATTERN_ADOBE_POSTSCRIPT, MASK_ADOBE_POSTSCRIPT, null, true)) return EMimeType.AdobePostscript;
-            if (PatternMatch(Header, PATTERN_UTF16BE_BOM, MASK_UTF16BE_BOM, null, true)) return EMimeType.Plain;
-            if (PatternMatch(Header, PATTERN_UTF16LE_BOM, MASK_UTF16LE_BOM, null, true)) return EMimeType.Plain;
-            if (PatternMatch(Header, PATTERN_UTF8_BOM, MASK_UTF8_BOM, null, true)) return EMimeType.Plain;
+            if (PatternMatch(Header, PATTERN_ADOBE_POSTSCRIPT, MASK_ADOBE_POSTSCRIPT, null, false)) return EMimeType.AdobePostscript;
+            if (PatternMatch(Header, PATTERN_UTF16BE_BOM, MASK_UTF16BE_BOM, null, false)) return EMimeType.Plain;
+            if (PatternMatch(Header, PATTERN_UTF16LE_BOM, MASK_UTF16LE_BOM, null, false)) return EMimeType.Plain;
+            if (PatternMatch(Header, PATTERN_UTF8_BOM, MASK_UTF8_BOM, null, false)) return EMimeType.Plain;
 
             if (Identify_Image_MIME_Type(Header, out EMimeType outImageMIME))
                 return outImageMIME;
@@ -675,15 +843,15 @@ namespace CssUI.DOM
 
 
         private static bool Identify_Image_MIME_Type(ReadOnlyMemory<byte> Header, out EMimeType outMIME)
-        {
-            if (PatternMatch(Header, PATTERN_WINDOWS_ICON, MASK_WINDOWS_ICON, null, true)) { outMIME = EMimeType.XIcon; return true; }
-            if (PatternMatch(Header, PATTERN_WINDOWS_CURSOR, MASK_WINDOWS_CURSOR, null, true)) { outMIME = EMimeType.XIcon; return true; }
-            if (PatternMatch(Header, PATTERN_IMAGE_BMP, MASK_IMAGE_BMP, null, true)) { outMIME = EMimeType.BMP; return true; }
-            if (PatternMatch(Header, PATTERN_IMAGE_GIF87a, MASK_IMAGE_GIF87a, null, true)) { outMIME = EMimeType.GIF; return true; }
-            if (PatternMatch(Header, PATTERN_IMAGE_GIF89a, MASK_IMAGE_GIF89a, null, true)) { outMIME = EMimeType.GIF; return true; }
-            if (PatternMatch(Header, PATTERN_IMAGE_WEBP, MASK_IMAGE_WEBP, null, true)) { outMIME = EMimeType.WebP; return true; }
-            if (PatternMatch(Header, PATTERN_IMAGE_PNG, MASK_IMAGE_PNG, null, true)) { outMIME = EMimeType.PNG; return true; }
-            if (PatternMatch(Header, PATTERN_IMAGE_JPEG, MASK_IMAGE_JPEG, null, true)) { outMIME = EMimeType.JPEG; return true; }
+        {/* Docs: https://mimesniff.spec.whatwg.org/#matching-an-image-type-pattern */
+            if (PatternMatch(Header, PATTERN_WINDOWS_ICON, MASK_WINDOWS_ICON, null, false)) { outMIME = EMimeType.XIcon; return true; }
+            if (PatternMatch(Header, PATTERN_WINDOWS_CURSOR, MASK_WINDOWS_CURSOR, null, false)) { outMIME = EMimeType.XIcon; return true; }
+            if (PatternMatch(Header, PATTERN_IMAGE_BMP, MASK_IMAGE_BMP, null, false)) { outMIME = EMimeType.BMP; return true; }
+            if (PatternMatch(Header, PATTERN_IMAGE_GIF87a, MASK_IMAGE_GIF87a, null, false)) { outMIME = EMimeType.GIF; return true; }
+            if (PatternMatch(Header, PATTERN_IMAGE_GIF89a, MASK_IMAGE_GIF89a, null, false)) { outMIME = EMimeType.GIF; return true; }
+            if (PatternMatch(Header, PATTERN_IMAGE_WEBP, MASK_IMAGE_WEBP, null, false)) { outMIME = EMimeType.WebP; return true; }
+            if (PatternMatch(Header, PATTERN_IMAGE_PNG, MASK_IMAGE_PNG, null, false)) { outMIME = EMimeType.PNG; return true; }
+            if (PatternMatch(Header, PATTERN_IMAGE_JPEG, MASK_IMAGE_JPEG, null, false)) { outMIME = EMimeType.JPEG; return true; }
 
             outMIME = 0x0;
             return false;
@@ -691,14 +859,14 @@ namespace CssUI.DOM
 
 
         private static bool Identify_Audio_Or_Video_MIME_Type(ReadOnlyMemory<byte> Header, out EMimeType outMIME)
-        {
-            if (PatternMatch(Header, PATTERN_SND, MASK_SND, null, true)) { outMIME = EMimeType.AudioBasic; return true; }
-            if (PatternMatch(Header, PATTERN_AIFF, MASK_AIFF, null, true)) { outMIME = EMimeType.AIFF; return true; }
-            if (PatternMatch(Header, PATTERN_MP3, MASK_MP3, null, true)) { outMIME = EMimeType.MP3; return true; }
-            if (PatternMatch(Header, PATTERN_OGG, MASK_OGG, null, true)) { outMIME = EMimeType.OGG; return true; }
-            if (PatternMatch(Header, PATTERN_MIDI, MASK_MIDI, null, true)) { outMIME = EMimeType.MIDI; return true; }
-            if (PatternMatch(Header, PATTERN_AVI, MASK_AVI, null, true)) { outMIME = EMimeType.AVI; return true; }
-            if (PatternMatch(Header, PATTERN_WAVE, MASK_WAVE, null, true)) { outMIME = EMimeType.WAVE; return true; }
+        {/* Docs: https://mimesniff.spec.whatwg.org/#matching-an-audio-or-video-type-pattern */
+            if (PatternMatch(Header, PATTERN_SND, MASK_SND, null, false)) { outMIME = EMimeType.AudioBasic; return true; }
+            if (PatternMatch(Header, PATTERN_AIFF, MASK_AIFF, null, false)) { outMIME = EMimeType.AIFF; return true; }
+            if (PatternMatch(Header, PATTERN_MP3, MASK_MP3, null, false)) { outMIME = EMimeType.MP3; return true; }
+            if (PatternMatch(Header, PATTERN_OGG, MASK_OGG, null, false)) { outMIME = EMimeType.OGG; return true; }
+            if (PatternMatch(Header, PATTERN_MIDI, MASK_MIDI, null, false)) { outMIME = EMimeType.MIDI; return true; }
+            if (PatternMatch(Header, PATTERN_AVI, MASK_AVI, null, false)) { outMIME = EMimeType.AVI; return true; }
+            if (PatternMatch(Header, PATTERN_WAVE, MASK_WAVE, null, false)) { outMIME = EMimeType.WAVE; return true; }
 
             /* 2) If input matches the signature for MP4, return "video/mp4". */
             if (Is_MP4_Header(Header)) { outMIME = EMimeType.MPEG4; return true; }
@@ -711,11 +879,8 @@ namespace CssUI.DOM
             return false;
         }
 
-        static ReadOnlyMemory<byte> PATTERN_MP4_FTYP = new ReadOnlyMemory<byte>(new byte[] { 0x66, 0x74, 0x79, 0x70 });
-        static ReadOnlyMemory<byte> MASK_MP4_FTYP = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
-
-        static ReadOnlyMemory<byte> PATTERN_MP4_MP4 = new ReadOnlyMemory<byte>(new byte[] { 0x6D, 0x70, 0x34 });
-        static ReadOnlyMemory<byte> MASK_MP4_MP4 = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF });
+        static byte[] PATTERN_MP4_FTYP = (new byte[] { 0x66, 0x74, 0x79, 0x70 });
+        static byte[] PATTERN_MP4_MP4 = (new byte[] { 0x6D, 0x70, 0x34 });
 
         private static bool Is_MP4_Header(ReadOnlyMemory<byte> Header)
         {/* Docs: https://mimesniff.spec.whatwg.org/#signature-for-mp4 */
@@ -725,13 +890,13 @@ namespace CssUI.DOM
             UInt32 boxSize = (UInt32)IPAddress.NetworkToHostOrder(BitConverter.ToInt32(data, 0));
             if (Header.Length < boxSize || (boxSize % 4) != 0) return false;
 
-            if (PatternMatch(Header.Slice(4, 4), PATTERN_MP4_FTYP, MASK_MP4_FTYP, null, false)) return true;
-            if (PatternMatch(Header.Slice(8, 3), PATTERN_MP4_MP4, MASK_MP4_MP4, null, false)) return true;
+            if (Header.Slice(4, 4).Span.SequenceEqual(PATTERN_MP4_FTYP)) return true;
+            if (Header.Slice(8, 3).Span.SequenceEqual(PATTERN_MP4_MP4)) return true;
 
             var bytesRead = 16;
             while(bytesRead < boxSize)
             {
-                if (PatternMatch(Header.Slice(bytesRead, 3), PATTERN_MP4_MP4, MASK_MP4_MP4, null, false)) return true;
+                if (Header.Slice(bytesRead, 3).Span.SequenceEqual(PATTERN_MP4_MP4)) return true;
                 bytesRead += 4;
             }
 
