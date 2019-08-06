@@ -353,9 +353,7 @@ namespace CssUI.DOM
                  * An element that has a descendant that the user indicates using a pointing device.
                  * An element that is the labeled control of a label element that is currently matching :hover.
                  */
-                 // Get mouse coords
-                 // test if they intersect our bounding rect
-                 return this.getBoundingClientRect()
+                return Geometry.Geometry.Point_Within_Rect(ownerDocument.defaultView.Mouse.Position, getBoundingClientRect());
             }
         }
 
