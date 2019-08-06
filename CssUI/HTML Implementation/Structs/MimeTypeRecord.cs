@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using CssUI.DOM;
+using System;
+using System.Collections.Generic;
 
 namespace CssUI.HTML
 {
@@ -8,6 +10,7 @@ namespace CssUI.HTML
         public readonly string Type;
         public readonly string SubType;
         public readonly Dictionary<string, string> Parameters;
+        public readonly EMimeGroup Groups;
         #endregion
 
         #region Constructors
@@ -16,6 +19,7 @@ namespace CssUI.HTML
             Type = type;
             SubType = subType;
             Parameters = parameters;
+            Groups = MimeType.Determine_Groups(Type, SubType.AsMemory());
         }
         #endregion
     }
