@@ -16,41 +16,13 @@ namespace CssUI
         /// Returns whether <paramref name="p"/> and <paramref name="q"/> contain the same values
         /// </summary>
         /// <returns>True if both strings are an exact match</returns>
-        public static bool StrEq(ReadOnlySpan<char> p, ReadOnlySpan<char> q)
-        {
-            if (p.Length != q.Length)
-                return false;
-
-            for (int i = 0; i < p.Length; i++)
-            {
-                if (p[i] != q[i])
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
+        public static bool StrEq(ReadOnlySpan<char> p, ReadOnlySpan<char> q) => p.Equals(q, StringComparison.Ordinal);
 
         /// <summary>
         /// Returns whether <paramref name="p"/> and <paramref name="q"/> contain the same (case-insensitive) values
         /// </summary>
         /// <returns>True if both strings are an case-insensitive match</returns>
-        public static bool StriEq(ReadOnlySpan<char> p, ReadOnlySpan<char> q)
-        {
-            if (p.Length != q.Length)
-                return false;
-
-            for (int i = 0; i < p.Length; i++)
-            {
-                if (To_ASCII_Lower_Alpha(p[i]) != To_ASCII_Lower_Alpha(q[i]))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
+        public static bool StriEq(ReadOnlySpan<char> p, ReadOnlySpan<char> q) => p.Equals(q, StringComparison.OrdinalIgnoreCase);
         #endregion
 
         #region Contains
@@ -387,7 +359,7 @@ namespace CssUI
         /// <param name="Input">The string memory to trim</param>
         /// <param name="Delim">The character to trim out of the input</param>
         /// <returns></returns>
-        public static ReadOnlyMemory<char> Trim(ReadOnlyMemory<char> Input, char Delim = UnicodeCommon.CHAR_SPACE)
+        public static ReadOnlyMemory<char> Trim(ReadOnlyMemory<char> Input, char Delim)
         {
             /* Trim start */
             for(int i=0; i<Input.Length; i++)
@@ -536,7 +508,7 @@ namespace CssUI
         /// <param name="Input">The string memory to trim</param>
         /// <param name="Delim">The character to trim out of the input</param>
         /// <returns></returns>
-        public static ReadOnlyMemory<char> TrimStart(ReadOnlyMemory<char> Input, char Delim = UnicodeCommon.CHAR_SPACE)
+        public static ReadOnlyMemory<char> TrimStart(ReadOnlyMemory<char> Input, char Delim)
         {
             /* Trim start */
             for (int i = 0; i < Input.Length; i++)
@@ -635,7 +607,7 @@ namespace CssUI
         /// <param name="Input">The string memory to trim</param>
         /// <param name="Delim">The character to trim out of the input</param>
         /// <returns></returns>
-        public static ReadOnlyMemory<char> TrimEnd(ReadOnlyMemory<char> Input, char Delim = UnicodeCommon.CHAR_SPACE)
+        public static ReadOnlyMemory<char> TrimEnd(ReadOnlyMemory<char> Input, char Delim)
         {
             /* Trim end */
             for (int i = Input.Length - 1; i > -1; i--)
@@ -810,19 +782,19 @@ namespace CssUI
                         break;
                 }
 
-                if (end_chunk)
+
+                Stream.Consume();
+                if (end_chunk || Stream.atEOF)
                 {
-                    if (!chunkStart.HasValue) chunkStart = Stream.Position;
+                    if (!chunkStart.HasValue) chunkStart = Stream.Position - 1;
 
                     /* Push new chunk to our list */
-                    var chunkSize = Stream.Position - chunkStart.Value;
+                    var chunkSize = (Stream.Position - 1) - chunkStart.Value;
                     chunks.Add(Input.Slice((int)chunkStart.Value, (int)chunkSize));
 
                     chunkCount++;
                     chunkStart = null;
                 }
-
-                Stream.Consume();
             }
 
             return chunks;
@@ -883,19 +855,19 @@ namespace CssUI
                         break;
                 }
 
-                if (end_chunk)
+                Stream.Consume();
+                if (end_chunk || Stream.atEOF)
                 {
-                    if (!chunkStart.HasValue) chunkStart = Stream.Position;
+                    if (!chunkStart.HasValue) chunkStart = Stream.Position - 1;
 
                     /* Push new chunk to our list */
-                    var chunkSize = Stream.Position - chunkStart.Value;
+                    var chunkSize = (Stream.Position -1) - chunkStart.Value;
                     chunks.Add(Input.Slice((int)chunkStart.Value, (int)chunkSize));
 
                     chunkCount++;
                     chunkStart = null;
                 }
 
-                Stream.Consume();
             }
 
             return chunks;
@@ -904,6 +876,134 @@ namespace CssUI
 
 
         #region Mutation
+
+        /// <summary>
+        /// Replaces all characters indicated by the first value for each of the <paramref name="Replacements"/>, with the characters provided by their second value
+        /// </summary>
+        /// <param name="buffMem">String memory</param>
+        /// <param name="trim">If <c>True</c> then leading and trailing ends of the returned string will have the <paramref name="substituteData"/> stripped from them</param>
+        /// <param name="Replacements">A series of tuples containing characters to be replaced and the characters which will replace each of them</param>
+        /// <returns>Altered string</returns>
+        public static string Replace(ReadOnlyMemory<char> buffMem, bool trim = false, params Tuple<char, ReadOnlyMemory<char>>[] Replacements)
+        {
+            DataStream<char> Stream = new DataStream<char>(buffMem, UnicodeCommon.EOF);
+            /* Create a list of memory chunks that make up the final string */
+            ulong newLength = 0;
+            ulong? chunkStart = null;
+            ulong chunkCount = 0;
+            var chunks = new LinkedList<Tuple<ReadOnlyMemory<char>, int>>();
+            ulong substituteLength = 0;
+
+            /* Scan for CR characters, when encountered create a new chunk(non inclusive for CR).
+             * Scan for LF characters, when encountered if not preceeded by a CR create a new chunk (non inclusive). */
+            while (!Stream.atEOF)
+            {
+                EFilterResult filterResult = EFilterResult.FILTER_ACCEPT;
+                int replacementIndex = -1;
+
+                for (int i = 0; i < Replacements.Length; i++)
+                {
+                    var replace = Replacements[i];
+                    if (Stream.Next == replace.Item1)
+                    {
+                        filterResult = EFilterResult.FILTER_SKIP;
+                        replacementIndex = i;
+                        substituteLength += (ulong)replace.Item2.Length;
+                        break;
+                    }
+                }
+                /* When filter result:
+                 * ACCEPT: Char should be included in chunk
+                 * SKIP: Char should not be included in chunk, if at chunk-start shift chunk-start past char, otherwise end chunk
+                 * REJECT: Char should not be included in chunk, current chunk ends
+                 */
+                bool end_chunk = false;
+                switch (filterResult)
+                {
+                    case EFilterResult.FILTER_ACCEPT:// Char should be included in the chunk
+                        {
+                            if (!chunkStart.HasValue) chunkStart = Stream.Position;/* Start new chunk (if one isnt started yet) */
+                        }
+                        break;
+                    case EFilterResult.FILTER_REJECT:// Char should not be included in chunk, current chunk ends
+                        {
+                            end_chunk = true;
+                        }
+                        break;
+                    case EFilterResult.FILTER_SKIP:// Char should not be included in chunk, if at chunk-start shift chunk-start past char, otherwise end chunk
+                        {
+                            if (!chunkStart.HasValue)
+                            {
+                                chunkStart = Stream.Position + 1;/* At chunk-start */
+                            }
+                            else
+                            {
+                                end_chunk = true;
+                            }
+                        }
+                        break;
+                }
+
+                if (end_chunk || Stream.NextNext == Stream.EOF_ITEM)
+                {
+                    if (!chunkStart.HasValue) chunkStart = Stream.Position;
+
+                    /* Push new chunk to our list */
+                    var chunkSize = Stream.Position - chunkStart.Value;
+                    var Mem = buffMem.Slice((int)chunkStart.Value, (int)chunkSize);
+                    var chunk = new Tuple<ReadOnlyMemory<char>, int>(Mem, replacementIndex);
+                    chunks.AddLast(chunk);
+
+                    chunkCount++;
+                    chunkStart = null;
+                    newLength += chunkSize;
+                }
+
+                Stream.Consume();
+            }
+
+            /* Compile the new string */
+
+            if (trim)
+            {/* To trim we just need to skip any empty chunks at the beginning and end */
+                while (chunks.First.Value.Item1.Length <= 0)
+                {
+                    chunks.RemoveFirst();
+                    chunkCount--;
+                }
+
+                while (chunks.Last.Value.Item1.Length <= 0)
+                {
+                    chunks.RemoveLast();
+                    chunkCount--;
+                }
+            }
+
+            ulong insertCount = (chunkCount - 1);/* Number of substitutes we will insert into new string */
+            newLength += insertCount * substituteLength;
+
+            char[] dataPtr = new char[newLength];
+            Memory<char> data = new Memory<char>(dataPtr);
+
+            ulong index = 0;
+            foreach (var tpl in chunks)
+            {
+                var chunk = tpl.Item1;
+                /* Copy substring */
+                chunk.CopyTo(data.Slice((int)index));
+                index += (ulong)chunk.Length;
+
+                /* Insert substitute */
+                var replaceIndex = tpl.Item2;
+                var replaceTarget = data.Slice((int)index);
+                var replaceSource = Replacements[replaceIndex].Item2;
+                replaceSource.CopyTo(replaceTarget);
+                index += (ulong)replaceSource.Length;
+            }
+
+            return new string(dataPtr);
+        }
+
         /// <summary>
         /// Replaces all characters, for which <paramref name="dataFilter"/> does not return <see cref="EFilterResult.FILTER_ACCEPT"/>, with the characters provided by <paramref name="substituteData"/>
         /// </summary>
@@ -958,12 +1058,13 @@ namespace CssUI
                         break;
                 }
 
-                if (end_chunk)
+                Stream.Consume();
+                if (end_chunk || Stream.atEOF)
                 {
-                    if (!chunkStart.HasValue) chunkStart = Stream.Position;
+                    if (!chunkStart.HasValue) chunkStart = Stream.Position - 1;
 
                     /* Push new chunk to our list */
-                    var chunkSize = Stream.Position - chunkStart.Value;
+                    var chunkSize = (Stream.Position - 1) - chunkStart.Value;
                     chunks.AddLast(buffMem.Slice((int)chunkStart.Value, (int)chunkSize));
 
                     chunkCount++;
@@ -971,7 +1072,6 @@ namespace CssUI
                     newLength += chunkSize;
                 }
 
-                Stream.Consume();
             }
 
             /* Compile the new string */
@@ -997,7 +1097,6 @@ namespace CssUI
 
             char[] dataPtr = new char[newLength];
             Memory<char> data = new Memory<char>(dataPtr);
-            string newStr = new string(dataPtr);
 
             ulong index = 0;
             foreach (var chunk in chunks)
@@ -1011,7 +1110,134 @@ namespace CssUI
                 index += substituteLength;
             }
 
-            return newStr;
+            return new string(dataPtr);
+        }
+
+        /// <summary>
+        /// Replaces all characters indicated by each of the data-filters in <paramref name="Replacements"/> does not return <see cref="EFilterResult.FILTER_ACCEPT"/>, with the characters provided by their second value
+        /// </summary>
+        /// <param name="buffMem">String memory</param>
+        /// <param name="trim">If <c>True</c> then leading and trailing ends of the returned string will have the <paramref name="substituteData"/> stripped from them</param>
+        /// <param name="Replacements">A series of tuples containing data filters and the characters to replace them.</param>
+        /// <returns>Altered string</returns>
+        public static string Replace(ReadOnlyMemory<char> buffMem, bool trim = false, params Tuple<DataFilter<char>, ReadOnlyMemory<char>>[] Replacements)
+        {
+            DataStream<char> Stream = new DataStream<char>(buffMem, UnicodeCommon.EOF);
+            /* Create a list of memory chunks that make up the final string */
+            ulong newLength = 0;
+            ulong? chunkStart = null;
+            ulong chunkCount = 0;
+            var chunks = new LinkedList<Tuple<ReadOnlyMemory<char>, int>>();
+            ulong substituteLength = 0;
+
+            /* Scan for CR characters, when encountered create a new chunk(non inclusive for CR).
+             * Scan for LF characters, when encountered if not preceeded by a CR create a new chunk (non inclusive). */
+            while (!Stream.atEOF)
+            {
+                EFilterResult filterResult = EFilterResult.FILTER_ACCEPT;
+                int replacementIndex = -1;
+
+                for (int i=0; i<Replacements.Length; i++)
+                {
+                    var replace = Replacements[i];
+                    filterResult = replace.Item1.acceptData(Stream.Next);
+                    if (filterResult != EFilterResult.FILTER_ACCEPT)
+                    {
+                        replacementIndex = i;
+                        substituteLength += (ulong)replace.Item2.Length;
+                        break;
+                    }
+                }
+                /* When filter result:
+                 * ACCEPT: Char should be included in chunk
+                 * SKIP: Char should not be included in chunk, if at chunk-start shift chunk-start past char, otherwise end chunk
+                 * REJECT: Char should not be included in chunk, current chunk ends
+                 */
+                bool end_chunk = false;
+                switch (filterResult)
+                {
+                    case EFilterResult.FILTER_ACCEPT:// Char should be included in the chunk
+                        {
+                            if (!chunkStart.HasValue) chunkStart = Stream.Position;/* Start new chunk (if one isnt started yet) */
+                        }
+                        break;
+                    case EFilterResult.FILTER_REJECT:// Char should not be included in chunk, current chunk ends
+                        {
+                            end_chunk = true;
+                        }
+                        break;
+                    case EFilterResult.FILTER_SKIP:// Char should not be included in chunk, if at chunk-start shift chunk-start past char, otherwise end chunk
+                        {
+                            if (!chunkStart.HasValue)
+                            {
+                                chunkStart = Stream.Position + 1;/* At chunk-start */
+                            }
+                            else
+                            {
+                                end_chunk = true;
+                            }
+                        }
+                        break;
+                }
+
+                if (end_chunk || Stream.NextNext == Stream.EOF_ITEM)
+                {
+                    if (!chunkStart.HasValue) chunkStart = Stream.Position;
+
+                    /* Push new chunk to our list */
+                    var chunkSize = Stream.Position - chunkStart.Value;
+                    var Mem = buffMem.Slice((int)chunkStart.Value, (int)chunkSize);
+                    var chunk = new Tuple<ReadOnlyMemory<char>, int>(Mem, replacementIndex);
+                    chunks.AddLast(chunk);
+
+                    chunkCount++;
+                    chunkStart = null;
+                    newLength += chunkSize;
+                }
+
+                Stream.Consume();
+            }
+
+            /* Compile the new string */
+
+            if (trim)
+            {/* To trim we just need to skip any empty chunks at the beginning and end */
+                while (chunks.First.Value.Item1.Length <= 0)
+                {
+                    chunks.RemoveFirst();
+                    chunkCount--;
+                }
+
+                while (chunks.Last.Value.Item1.Length <= 0)
+                {
+                    chunks.RemoveLast();
+                    chunkCount--;
+                }
+            }
+
+            ulong insertCount = (chunkCount - 1);/* Number of substitutes we will insert into new string */
+            newLength += insertCount * substituteLength;
+
+            char[] dataPtr = new char[newLength];
+            Memory<char> data = new Memory<char>(dataPtr);
+
+            ulong index = 0;
+            foreach (var tpl in chunks)
+            {
+                var chunk = tpl.Item1;
+                /* Copy substring */
+                chunk.CopyTo(data.Slice((int)index));
+                index += (ulong)chunk.Length;
+
+                /* Insert substitute */
+                var replaceIndex = tpl.Item2;
+                var replaceTarget = data.Slice((int)index);
+                var replaceSource = Replacements[replaceIndex].Item2;
+                replaceSource.CopyTo(replaceTarget);
+                index += (ulong)replaceSource.Length;
+            }
+
+            return new string(dataPtr);
         }
                
         /// <summary>
@@ -1033,7 +1259,7 @@ namespace CssUI
             while (!Stream.atEOF)
             {
                 char ch = Transform(Stream.Next);
-                if (ch != UnicodeCommon.CHAR_NULL)
+                if (ch != CHAR_NULL)
                 {
                     buff[idx++] = ch;
                 }
