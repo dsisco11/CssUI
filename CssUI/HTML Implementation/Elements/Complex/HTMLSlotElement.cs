@@ -1,8 +1,9 @@
-﻿using CssUI.DOM.Nodes;
+﻿using CssUI.DOM;
+using CssUI.DOM.Nodes;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     public class HTMLSlotElement : HTMLElement, ISlot
     {/* Docs: https://html.spec.whatwg.org/multipage/scripting.html#htmlslotelement */

@@ -8,6 +8,7 @@ using CssUI.DOM.Internal;
 using CssUI.DOM.Media;
 using CssUI.DOM.Mutation;
 using CssUI.DOM.Nodes;
+using CssUI.HTML;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

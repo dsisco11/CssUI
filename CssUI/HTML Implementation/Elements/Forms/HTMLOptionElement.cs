@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CssUI.DOM;
 using CssUI.DOM.CustomElements;
+using CssUI.DOM.Enums;
 using CssUI.DOM.Nodes;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     /// <summary>
     /// The option element represents an option in a select element or as part of a list of suggestions in a datalist element.
@@ -21,7 +23,6 @@ namespace CssUI.DOM
         /* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#concept-option-selectedness */
         internal bool selectedness { get; set; } = false;
         #endregion
-
 
         #region Constructors
         /// <summary>
@@ -63,7 +64,6 @@ namespace CssUI.DOM
         }
         #endregion
 
-
         #region Utility
         private HTMLSelectElement get_select()
         {
@@ -80,7 +80,6 @@ namespace CssUI.DOM
             return null;
         }
         #endregion
-
 
         #region Accessors
         public override HTMLFormElement form
@@ -125,7 +124,7 @@ namespace CssUI.DOM
                 }
 
                 var optionsList = select.options;
-                for (int i = 0; i < optionsList.Count; i++)
+                for (int i = 0; i < optionsList.length; i++)
                 {
                     if (ReferenceEquals(this, optionsList.ElementAt(i)))
                     {
@@ -201,7 +200,7 @@ namespace CssUI.DOM
                  * in tree order, excluding any that are descendants of descendants of the option element that are themselves script or SVG script elements. */
                 StringBuilder sb = new StringBuilder();
                 LinkedList<Text> textList = new LinkedList<Text>();
-                var tree = new TreeWalker(this, Enums.ENodeFilterMask.SHOW_ALL);
+                var tree = new TreeWalker(this, ENodeFilterMask.SHOW_ALL);
 
                 Node descendant = tree.nextNode();
                 while (descendant != null)

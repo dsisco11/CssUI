@@ -1,14 +1,15 @@
-﻿using CssUI.DOM.CustomElements;
+﻿using CssUI.DOM;
+using CssUI.DOM.CustomElements;
+using CssUI.DOM.Enums;
 using CssUI.DOM.Events;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Nodes;
-using CssUI.HTML;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     public class HTMLTextAreaElement : FormAssociatedElement, IListedElement, ILableableElement, ISubmittableElement, IResettableElement, IAutoCapitalizeInheritingElement
     {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#the-textarea-element */
@@ -35,7 +36,8 @@ namespace CssUI.DOM
         #endregion
 
         #region Content Attributes
-        [CEReactions] public string autocomplete
+        [CEReactions]
+        public string autocomplete
         {
             get
             {
@@ -45,67 +47,78 @@ namespace CssUI.DOM
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Autocomplete, AttributeValue.From_String(value)));
         }
 
-        [CEReactions] public bool autofocus
+        [CEReactions]
+        public bool autofocus
         {
             get => hasAttribute(EAttributeName.Autofocus);
             set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Autofocus, value));
         }
 
-        [CEReactions] public uint cols
+        [CEReactions]
+        public uint cols
         {
             get => getAttribute(EAttributeName.Cols).Get_UInt();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Cols, AttributeValue.From_Integer(value)));
         }
 
-        [CEReactions] public string dirName
+        [CEReactions]
+        public string dirName
         {
             get => getAttribute(EAttributeName.Dirname).Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Dirname, AttributeValue.From_String(value)));
         }
 
-        [CEReactions] public string name
+        [CEReactions]
+        public string name
         {
             get => getAttribute(EAttributeName.Name).Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Name, AttributeValue.From_String(value)));
         }
 
-        [CEReactions] public string placeholder
+        [CEReactions]
+        public string placeholder
         {
             get => getAttribute(EAttributeName.Placeholder).Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Placeholder, AttributeValue.From_String(value)));
         }
 
-        [CEReactions] public bool readOnly
+        [CEReactions]
+        public bool readOnly
         {
             get => hasAttribute(EAttributeName.ReadOnly);
             set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.ReadOnly, value));
         }
 
-        [CEReactions] public bool required
+        [CEReactions]
+        public bool required
         {
             get => hasAttribute(EAttributeName.Required);
             set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Required, value));
         }
 
-        [CEReactions] public uint rows
+        [CEReactions]
+        public uint rows
         {
             get => getAttribute(EAttributeName.Rows).Get_UInt();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Rows, AttributeValue.From_Integer(value)));
         }
 
-        [CEReactions] public string wrap
+        [CEReactions]
+        public string wrap
         {
             get => getAttribute(EAttributeName.Wrap).Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Wrap, AttributeValue.From_String(value)));
         }
 
-        [CEReactions] public int maxLength
+        [CEReactions]
+        public int maxLength
         {
             get => getAttribute(EAttributeName.MaxLength).Get_Int();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.MaxLength, AttributeValue.From_Integer(value)));
         }
 
-        [CEReactions] public int minLength
+        [CEReactions]
+        public int minLength
         {
             get => getAttribute(EAttributeName.MinLength).Get_Int();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.MinLength, AttributeValue.From_Integer(value)));
@@ -140,7 +153,7 @@ namespace CssUI.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal string get_api_value()
         {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#the-textarea-element:concept-fe-api-value-2 */
-            return StringCommon.Replace(base.value.AsMemory(), CssUI.Filters.FilterCRLF.Instance, CssUI.Filters.FilterCRLF.LF.AsSpan());
+            return StringCommon.Replace(base.value.AsMemory(), Filters.FilterCRLF.Instance, Filters.FilterCRLF.LF.AsSpan());
         }
 
         #region Overrides
@@ -170,7 +183,7 @@ namespace CssUI.DOM
 
         public IReadOnlyCollection<HTMLLabelElement> labels
         {
-            get => (IReadOnlyCollection<HTMLLabelElement>)DOMCommon.Get_Descendents(form, labelFilter, Enums.ENodeFilterMask.SHOW_ELEMENT);
+            get => (IReadOnlyCollection<HTMLLabelElement>)DOMCommon.Get_Descendents(form, labelFilter, ENodeFilterMask.SHOW_ELEMENT);
         }
 
         #region Form-Associated Element Overrides
@@ -370,7 +383,7 @@ namespace CssUI.DOM
             /* 9) If start is less than end, delete the sequence of characters within the element's relevant value starting with the character at the startth position (in logical order) and ending with the character at the (end-1)th position. */
             if (start < end)
             {
-                relevantValue = relevantValue.Substring(start, (end - start) - 1);
+                relevantValue = relevantValue.Substring(start, end - start - 1);
             }
 
             /* 10) Insert the value of the first argument into the text of the relevant value of the text control, immediately before the startth character. */
@@ -424,7 +437,7 @@ namespace CssUI.DOM
             /* 9) If start is less than end, delete the sequence of characters within the element's relevant value starting with the character at the startth position (in logical order) and ending with the character at the (end-1)th position. */
             if (start < end)
             {
-                relevantValue = relevantValue.Substring(start, (end - start) - 1);
+                relevantValue = relevantValue.Substring(start, end - start - 1);
             }
 
             /* 10) Insert the value of the first argument into the text of the relevant value of the text control, immediately before the startth character. */

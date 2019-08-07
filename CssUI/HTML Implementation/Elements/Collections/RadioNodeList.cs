@@ -1,9 +1,10 @@
-﻿using CssUI.DOM.Nodes;
+﻿using CssUI.DOM;
+using CssUI.DOM.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     public class RadioNodeList : List<Node>
     {/* Docs: https://html.spec.whatwg.org/multipage/common-dom-interfaces.html#radionodelist */

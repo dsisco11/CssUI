@@ -1,4 +1,6 @@
-﻿namespace CssUI.DOM
+﻿using CssUI.DOM;
+
+namespace CssUI.HTML
 {
     /// <summary>
     /// The tfoot element represents the block of rows that consist of the column summaries (footers) for the parent table element, if the tfoot element has a parent and it is a table.
@@ -9,7 +11,7 @@
         public HTMLTableFootElement(Document document) : base(document, "tfoot")
         {
         }
-        
+
         public HTMLTableFootElement(Document document, string localName) : base(document, localName)
         {
         }

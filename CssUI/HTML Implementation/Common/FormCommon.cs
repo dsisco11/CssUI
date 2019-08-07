@@ -1,11 +1,12 @@
-﻿using CssUI.DOM.Enums;
+﻿using CssUI.DOM;
+using CssUI.DOM.Enums;
 using CssUI.DOM.Events;
 using CssUI.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     /// <summary>
     /// Provides utility functions for form and form-related elements
@@ -127,7 +128,7 @@ namespace CssUI.DOM
                 var nearestForm = DOMCommon.Get_Nth_Ancestor_OfType<HTMLFormElement>(element, 1, null, ENodeFilterMask.SHOW_ELEMENT);
                 if (nearestForm != null)
                 {
-                    element.form = (HTMLFormElement)nearestForm;
+                    element.form = nearestForm;
                 }
             }
         }
@@ -415,7 +416,12 @@ namespace CssUI.DOM
             else if (element is HTMLButtonElement buttonElement)
             {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#the-button-element:barred-from-constraint-validation */
                 /* XXX: finish this */
-                ...
+                switch (buttonElement.type)
+                {
+                    case EButtonType.Button:
+                    case EButtonType.Reset:
+                        return true;
+                }
             }
 
             /* Constraint validation: If an element has a datalist element ancestor, it is barred from constraint validation. */

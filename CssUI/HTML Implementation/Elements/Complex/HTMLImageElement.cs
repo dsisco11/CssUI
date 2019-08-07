@@ -1,38 +1,45 @@
-﻿using CssUI.DOM.CustomElements;
+﻿using CssUI.DOM;
+using CssUI.DOM.CustomElements;
+using CssUI.DOM.Enums;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Internal;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     /* Docs: https://html.spec.whatwg.org/multipage/images.html */
 
     public class HTMLImageElement : HTMLElement
     {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content.html#htmlimageelement */
         #region Properties
-        [CEReactions] public string alt
+        [CEReactions]
+        public string alt
         {
             get => getAttribute(EAttributeName.Alt)?.Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Alt, AttributeValue.From_String(value)));
         }
-        [CEReactions] public string src
+        [CEReactions]
+        public string src
         {
             get => getAttribute(EAttributeName.Src)?.Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Src, AttributeValue.From_String(value)));
         }
-        [CEReactions] public string srcset
+        [CEReactions]
+        public string srcset
         {
             get => getAttribute(EAttributeName.SrcSet)?.Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.SrcSet, AttributeValue.From_String(value)));
         }
-        [CEReactions] public string sizes
+        [CEReactions]
+        public string sizes
         {
             get => getAttribute(EAttributeName.Sizes)?.Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Sizes, AttributeValue.From_String(value)));
         }
-        [CEReactions] public string crossOrigin
+        [CEReactions]
+        public string crossOrigin
         {
             get => getAttribute(EAttributeName.CrossOrigin)?.Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.CrossOrigin, AttributeValue.From_String(value)));
@@ -41,7 +48,8 @@ namespace CssUI.DOM
         /// <summary>
         /// The usemap attribute, if present, can indicate that the image has an associated image map.
         /// </summary>
-        [CEReactions] public string useMap
+        [CEReactions]
+        public string useMap
         {
             get => getAttribute(EAttributeName.UseMap)?.Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.UseMap, AttributeValue.From_String(value)));
@@ -51,7 +59,8 @@ namespace CssUI.DOM
         /// The ismap attribute, when used on an element that is a descendant of an a element with an href attribute, indicates by its presence that the element provides access to a server-side image map. 
         /// This affects how events are handled on the corresponding a element.
         /// </summary>
-        [CEReactions] public bool isMap
+        [CEReactions]
+        public bool isMap
         {
             get => hasAttribute(EAttributeName.IsMap);
             set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.IsMap, value));
@@ -63,23 +72,27 @@ namespace CssUI.DOM
          */
 
 
-        [CEReactions] public uint width
+        [CEReactions]
+        public uint width
         {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content.html#dom-img-width */
-            get => (uint)MathExt.Max(0, getAttribute(EAttributeName.Width)?.Get_UInt() ?? 0);
+            get => MathExt.Max(0, getAttribute(EAttributeName.Width)?.Get_UInt() ?? 0);
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Width, AttributeValue.From_Integer(value)));
         }
-        [CEReactions] public uint height
+        [CEReactions]
+        public uint height
         {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content.html#dom-img-width */
-            get => (uint)MathExt.Max(0, getAttribute(EAttributeName.Height)?.Get_UInt() ?? 0);
+            get => MathExt.Max(0, getAttribute(EAttributeName.Height)?.Get_UInt() ?? 0);
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Height, AttributeValue.From_Integer(value)));
         }
 
-        [CEReactions] public string referrerPolicy
+        [CEReactions]
+        public string referrerPolicy
         {
             get => getAttribute(EAttributeName.ReferrerPolicy).Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.ReferrerPolicy, AttributeValue.From_String(value)));
         }
-        [CEReactions] public string decoding
+        [CEReactions]
+        public string decoding
         {
             get => getAttribute(EAttributeName.Decoding).Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Decoding, AttributeValue.From_String(value)));
@@ -114,11 +127,11 @@ namespace CssUI.DOM
                 if (!hasAttribute(EAttributeName.Src) && srcsetOmitted)
                     return true;
 
-                if (srcsetOmitted && string.IsNullOrEmpty(this.src))
+                if (srcsetOmitted && string.IsNullOrEmpty(src))
                     return true;
 
                 /* The final task that is queued by the networking task source once the resource has been fetched has been queued. */
-                if (currentRequest.State == Enums.EDataRequestState.Broken || currentRequest.State == Enums.EDataRequestState.CompletelyAvailable)
+                if (currentRequest.State == EDataRequestState.Broken || currentRequest.State == EDataRequestState.CompletelyAvailable)
                     return true;
 
                 return false;
@@ -195,7 +208,7 @@ namespace CssUI.DOM
                     return;
                 }
                 /* XXX: IF the current requests state is broken then throw an EncodingError on tcs */
-                else if (currentRequest.State == Enums.EDataRequestState.Broken)
+                else if (currentRequest.State == EDataRequestState.Broken)
                 {
                     tcs.TrySetException(new EncodingError());
                 }
@@ -210,12 +223,12 @@ namespace CssUI.DOM
                     while (true)
                     {
                         WaitHandle.WaitAny(new WaitHandle[] { currentRequest.State_Change_Signal, nodeDocument.Active_State_Change_Signal });
-                        if (!nodeDocument.Is_FullyActive || currentRequest.State == Enums.EDataRequestState.Broken)
+                        if (!nodeDocument.Is_FullyActive || currentRequest.State == EDataRequestState.Broken)
                         {
                             tcs.TrySetException(new EncodingError());
                             return;
                         }
-                        else if (currentRequest.State == Enums.EDataRequestState.CompletelyAvailable)
+                        else if (currentRequest.State == EDataRequestState.CompletelyAvailable)
                         {
                             run_decoder(currentRequest);
                             /* If the decoding process completes successfully, resolve promise with undefined. */

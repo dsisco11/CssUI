@@ -1,4 +1,6 @@
-﻿namespace CssUI.DOM
+﻿using CssUI.DOM;
+
+namespace CssUI.HTML
 {
     /* XXX: Implement canvas element */
     public class HTMLCanvasElement : HTMLElement
@@ -10,7 +12,7 @@
         public HTMLCanvasElement(Document document) : base(document, "canvas")
         {
         }
-        
+
         public HTMLCanvasElement(Document document, string localName) : base(document, localName)
         {
         }

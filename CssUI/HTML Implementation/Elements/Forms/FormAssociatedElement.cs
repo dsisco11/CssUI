@@ -1,7 +1,8 @@
-﻿using CssUI.DOM.Events;
+﻿using CssUI.DOM;
+using CssUI.DOM.Events;
 using System.Text;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     public abstract class FormAssociatedElement : HTMLElement
     {
@@ -9,7 +10,6 @@ namespace CssUI.DOM
         HTMLFormElement _form = null;
         EValidityState _validity = 0x0;
         #endregion
-
 
         #region Internal Properties
         internal bool bParserInserted { get; set; }
@@ -42,7 +42,6 @@ namespace CssUI.DOM
         /// </summary>
         internal FormSubmissionValue submission_value { get; set; }
         #endregion
-
 
         #region Properties
 
@@ -82,18 +81,16 @@ namespace CssUI.DOM
 
         public EValidityState validity
         {
-            get => (_validity | query_validity());
+            get => _validity | query_validity();
             internal set => _validity = value;
         }
         #endregion
-
 
         #region Constructors
         public FormAssociatedElement(Document document, string localName) : base(document, localName)
         {
         }
         #endregion
-
 
         #region Accessors
         public bool willValidate => !FormCommon.Is_Barred_From_Validation(this);
@@ -120,52 +117,52 @@ namespace CssUI.DOM
                     sb.AppendLine(custom_validity_message);
                 }
 
-                if (0!=(validity & EValidityState.customError))
+                if (0 != (validity & EValidityState.customError))
                 {
                     sb.AppendLine(custom_validity_error_message);
                 }
 
-                if (0!=(validity & EValidityState.valueMissing))
+                if (0 != (validity & EValidityState.valueMissing))
                 {
                     sb.AppendLine($"A value is required for this field.");
                 }
 
-                if (0!=(validity & EValidityState.tooLong))
+                if (0 != (validity & EValidityState.tooLong))
                 {
                     sb.AppendLine($"Value exceeds maximum length.");
                 }
 
-                if (0!=(validity & EValidityState.tooShort))
+                if (0 != (validity & EValidityState.tooShort))
                 {
                     sb.AppendLine($"Value is under minimum length.");
                 }
 
-                if (0!=(validity & EValidityState.typeMismatch))
+                if (0 != (validity & EValidityState.typeMismatch))
                 {
                     sb.AppendLine($"Value is not in the correct format for this element.");
                 }
 
-                if (0!=(validity & EValidityState.stepMismatch))
+                if (0 != (validity & EValidityState.stepMismatch))
                 {
                     sb.AppendLine($"Value does not adhere to the step rules for this element.");
                 }
 
-                if (0!=(validity & EValidityState.patternMismatch))
+                if (0 != (validity & EValidityState.patternMismatch))
                 {
                     sb.AppendLine($"Value does not adhere to the pattern rules for this element.");
                 }
 
-                if (0!=(validity & EValidityState.rangeUnderflow))
+                if (0 != (validity & EValidityState.rangeUnderflow))
                 {
                     sb.AppendLine($"Value exceeds the max range for this element.");
                 }
 
-                if (0!=(validity & EValidityState.rangeOverflow))
+                if (0 != (validity & EValidityState.rangeOverflow))
                 {
                     sb.AppendLine($"Value is below the minimum range for this element.");
                 }
 
-                if (0!=(validity & EValidityState.badInput))
+                if (0 != (validity & EValidityState.badInput))
                 {
                     sb.AppendLine($"Value is incomplete.");
                 }

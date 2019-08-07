@@ -1,11 +1,12 @@
-﻿using CssUI.DOM.Exceptions;
+﻿using CssUI.DOM;
+using CssUI.DOM.Exceptions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     public class FormData : IEnumerable<Tuple<string, FormDataEntryValue>>
     {/* Docs: https://xhr.spec.whatwg.org/#formdata */

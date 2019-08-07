@@ -12,6 +12,7 @@ using System;
 using CssUI.DOM.Geometry;
 using CssUI.DOM.CustomElements;
 using CssUI.Filters;
+using CssUI.HTML;
 
 namespace CssUI.DOM
 {

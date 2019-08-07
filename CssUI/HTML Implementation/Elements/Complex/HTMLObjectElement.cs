@@ -1,8 +1,9 @@
-﻿using CssUI.DOM.CustomElements;
+﻿using CssUI.DOM;
+using CssUI.DOM.CustomElements;
 using CssUI.DOM.Internal;
 using System;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     public class HTMLObjectElement : FormAssociatedElement, IListedElement, ISubmittableElement, IBrowsingContextContainer
     {
@@ -40,7 +41,8 @@ namespace CssUI.DOM
         #endregion
 
         #region Content Attributes
-        [CEReactions] public string data
+        [CEReactions]
+        public string data
         {
             get => getAttribute(EAttributeName.Data)?.Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Data, AttributeValue.From_String(value)));
@@ -49,31 +51,36 @@ namespace CssUI.DOM
         /// <summary>
         /// A valid MIME-type
         /// </summary>
-        [CEReactions] public override string type
+        [CEReactions]
+        public override string type
         {
             get => getAttribute(EAttributeName.Type)?.Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Type, AttributeValue.From_String(value)));
         }
 
-        [CEReactions] public string name
+        [CEReactions]
+        public string name
         {
             get => getAttribute(EAttributeName.Name)?.Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Name, AttributeValue.From_String(value)));
         }
 
-        [CEReactions] public string useMap
+        [CEReactions]
+        public string useMap
         {
             get => getAttribute(EAttributeName.UseMap)?.Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.UseMap, AttributeValue.From_String(value)));
         }
 
 
-        [CEReactions] public int width
+        [CEReactions]
+        public int width
         {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content-other.html#dimension-attributes */
             get => getAttribute(EAttributeName.Width).Get_Int();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Width, AttributeValue.From_Integer(value)));
         }
-        [CEReactions] public int height
+        [CEReactions]
+        public int height
         {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content-other.html#dimension-attributes */
             get => getAttribute(EAttributeName.Height).Get_Int();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Height, AttributeValue.From_Integer(value)));
@@ -87,7 +94,7 @@ namespace CssUI.DOM
             if (Nested_Browsing_Context == null)
                 return null;
 
-            if (!StringCommon.StrEq(nodeDocument.Origin.AsSpan(), Nested_Browsing_Context.activeDocument.Origin.AsSpan()))
+            if (!nodeDocument.Origin.AsSpan().Equals(Nested_Browsing_Context.activeDocument.Origin.AsSpan(), StringComparison.Ordinal))
                 return null;
 
             /* XXX: finish the get SVG document stuff */

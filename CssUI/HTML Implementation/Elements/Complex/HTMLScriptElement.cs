@@ -1,6 +1,7 @@
-﻿using CssUI.DOM.CustomElements;
+﻿using CssUI.DOM;
+using CssUI.DOM.CustomElements;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     /// <summary>
     /// Please note that CSSUI will likely never support javascript, this class is only here as a courtesy

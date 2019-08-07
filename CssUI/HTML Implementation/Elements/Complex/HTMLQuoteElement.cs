@@ -1,6 +1,7 @@
-﻿using CssUI.DOM.CustomElements;
+﻿using CssUI.DOM;
+using CssUI.DOM.CustomElements;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     public class HTMLQuoteElement : HTMLElement
     {/* Docs: https://html.spec.whatwg.org/multipage/grouping-content.html#the-blockquote-element */
@@ -18,7 +19,8 @@ namespace CssUI.DOM
         #endregion
 
         #region Content Attributes
-        [CEReactions] public string cite
+        [CEReactions]
+        public string cite
         {
             get => getAttribute(EAttributeName.Cite).Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Cite, AttributeValue.From_String(value)));

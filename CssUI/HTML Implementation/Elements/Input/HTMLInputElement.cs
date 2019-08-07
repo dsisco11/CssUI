@@ -1,9 +1,10 @@
-﻿using CssUI.DOM.CustomElements;
+﻿using CssUI.DOM;
+using CssUI.DOM.CustomElements;
+using CssUI.DOM.Enums;
 using CssUI.DOM.Events;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Nodes;
 using CssUI.Filters;
-using CssUI.HTML;
 using CssUI.HTML.Serialization;
 using System;
 using System.Collections.Generic;
@@ -11,10 +12,10 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
 
-    public class HTMLInputElement : FormAssociatedElement, IListedElement, ISubmittableElement, IResettableElement, ILableableElement, IAutoCapitalizeInheritingElement
+    public class HTMLInputElement : FormAssociatedElement, IListedElement, ISubmittableElement, IResettableElement, ILableableElement, IAutoCapitalizeInheritingElement, IPossibleFlowContent, IPossiblePhrasingContent, IPossiblePalpableContent, IPossibleInteractiveContent
     {/* Docs: https://html.spec.whatwg.org/multipage/input.html#the-input-element */
         const bool THROW_FOR_ATTR_INVALID_TYPES = false;
         const bool THROW_FOR_METHOD_INVALID_TYPES = false;
@@ -183,12 +184,14 @@ namespace CssUI.DOM
         /// Hint for expected file type in file upload controls
         /// <para>The accept attribute may be specified to provide user agents with a hint of what file types will be accepted.</para>
         /// </summary>
-        [CEReactions] public string accept
+        [CEReactions]
+        public string accept
         {
             get => getAttribute(EAttributeName.Accept).Get_String();
             set
             {
-                CEReactions.Wrap_CEReaction(this, () => {
+                CEReactions.Wrap_CEReaction(this, () =>
+                {
                     switch (type)
                     {
                         case EInputType.File:
@@ -209,15 +212,17 @@ namespace CssUI.DOM
         /// Replacement text for use when images are not available
         /// <para>The alt attribute provides the textual label for the button for users and user agents who cannot use the image. The alt attribute must be present, and must contain a non-empty string giving the label that would be appropriate for an equivalent button if the image was unavailable.</para>
         /// </summary>
-        [CEReactions] public string alt
+        [CEReactions]
+        public string alt
         {
             get
             {
                 HTMLCommon.Resolve_Autofill(this, out _, out _, out _, out string outValue);
                 return outValue;
             }
-            set => CEReactions.Wrap_CEReaction(this, () => {
-				switch(type)
+            set => CEReactions.Wrap_CEReaction(this, () =>
+            {
+                switch (type)
                 {
                     case EInputType.Image:
                         break;
@@ -227,18 +232,20 @@ namespace CssUI.DOM
                             else return;
                         }
                 }
-				setAttribute(EAttributeName.Alt, AttributeValue.From_String(value));
-			});
+                setAttribute(EAttributeName.Alt, AttributeValue.From_String(value));
+            });
         }
 
         /// <summary>
         /// Hint for form autofill feature
         /// </summary>
-        [CEReactions] public string autocomplete
+        [CEReactions]
+        public string autocomplete
         {
             get => getAttribute(EAttributeName.Autocomplete).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => {
-				switch(type)
+            set => CEReactions.Wrap_CEReaction(this, () =>
+            {
+                switch (type)
                 {
                     case EInputType.Hidden:
                     case EInputType.Text:
@@ -262,24 +269,27 @@ namespace CssUI.DOM
                             else return;
                         }
                 }
-				setAttribute(EAttributeName.Autocomplete, AttributeValue.From_String(value));
-			});
+                setAttribute(EAttributeName.Autocomplete, AttributeValue.From_String(value));
+            });
         }
 
         /// <summary>
         /// Automatically focus the form control when the page is loaded
         /// </summary>
-        [CEReactions] public bool autofocus
+        [CEReactions]
+        public bool autofocus
         {
             get => hasAttribute(EAttributeName.Autofocus);
             set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Autofocus, value));
         }
 
-        [CEReactions] public bool defaultChecked
+        [CEReactions]
+        public bool defaultChecked
         {
             get => hasAttribute(EAttributeName.Checked);
-            set => CEReactions.Wrap_CEReaction(this, () => {
-				switch(type)
+            set => CEReactions.Wrap_CEReaction(this, () =>
+            {
+                switch (type)
                 {
                     case EInputType.Checkbox:
                     case EInputType.Radio:
@@ -290,15 +300,17 @@ namespace CssUI.DOM
                             else return;
                         }
                 }
-				toggleAttribute(EAttributeName.Checked, value);
-			});
+                toggleAttribute(EAttributeName.Checked, value);
+            });
         }
 
-        [CEReactions] public string dirName
+        [CEReactions]
+        public string dirName
         {
             get => getAttribute(EAttributeName.Dirname)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => {
-				switch(type)
+            set => CEReactions.Wrap_CEReaction(this, () =>
+            {
+                switch (type)
                 {
                     case EInputType.Text:
                     case EInputType.Search:
@@ -309,8 +321,8 @@ namespace CssUI.DOM
                             else return;
                         }
                 }
-				setAttribute(EAttributeName.Dirname, AttributeValue.From_String(value));
-			});
+                setAttribute(EAttributeName.Dirname, AttributeValue.From_String(value));
+            });
         }
 
         //[CEReactions] public bool disabled; /* Redundant */
@@ -335,7 +347,8 @@ namespace CssUI.DOM
             }
         }
 
-        [CEReactions] public string formAction
+        [CEReactions]
+        public string formAction
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#dom-fs-formaction */
             get
             {
@@ -347,8 +360,9 @@ namespace CssUI.DOM
 
                 return attrValue;
             }
-            set => CEReactions.Wrap_CEReaction(this, () => {
-				switch(type)
+            set => CEReactions.Wrap_CEReaction(this, () =>
+            {
+                switch (type)
                 {
                     case EInputType.Submit:
                     case EInputType.Image:
@@ -359,15 +373,17 @@ namespace CssUI.DOM
                             else return;
                         }
                 }
-				setAttribute(EAttributeName.FormAction, AttributeValue.From_String(value));
-			});
+                setAttribute(EAttributeName.FormAction, AttributeValue.From_String(value));
+            });
         }
 
-        [CEReactions] public EEncType? formEnctype
+        [CEReactions]
+        public EEncType? formEnctype
         {
             get => getAttribute(EAttributeName.FormEncType)?.Get_Enum<EEncType>();
-            set => CEReactions.Wrap_CEReaction(this, () => {
-				switch(type)
+            set => CEReactions.Wrap_CEReaction(this, () =>
+            {
+                switch (type)
                 {
                     case EInputType.Submit:
                     case EInputType.Image:
@@ -379,15 +395,17 @@ namespace CssUI.DOM
                         }
                 }
 
-				setAttribute(EAttributeName.FormEncType, !value.HasValue ? null : AttributeValue.From_Enum(value.Value));
-			});
+                setAttribute(EAttributeName.FormEncType, !value.HasValue ? null : AttributeValue.From_Enum(value.Value));
+            });
         }
 
-        [CEReactions] public EFormMethod? formMethod
+        [CEReactions]
+        public EFormMethod? formMethod
         {
             get => getAttribute(EAttributeName.FormMethod)?.Get_Enum<EFormMethod>();
-            set => CEReactions.Wrap_CEReaction(this, () => {
-				switch(type)
+            set => CEReactions.Wrap_CEReaction(this, () =>
+            {
+                switch (type)
                 {
                     case EInputType.Submit:
                     case EInputType.Image:
@@ -399,15 +417,17 @@ namespace CssUI.DOM
                         }
                 }
 
-				setAttribute(EAttributeName.FormMethod, !value.HasValue ? null : AttributeValue.From_Enum(value.Value));
-			});
+                setAttribute(EAttributeName.FormMethod, !value.HasValue ? null : AttributeValue.From_Enum(value.Value));
+            });
         }
 
-        [CEReactions] public bool formNoValidate
+        [CEReactions]
+        public bool formNoValidate
         {
             get => hasAttribute(EAttributeName.FormNoValidate);
-            set => CEReactions.Wrap_CEReaction(this, () => {
-				switch(type)
+            set => CEReactions.Wrap_CEReaction(this, () =>
+            {
+                switch (type)
                 {
                     case EInputType.Submit:
                     case EInputType.Image:
@@ -418,17 +438,19 @@ namespace CssUI.DOM
                             else return;
                         }
                 }
-				toggleAttribute(EAttributeName.NoValidate, value);
-			});
+                toggleAttribute(EAttributeName.NoValidate, value);
+            });
         }
 
-        [CEReactions] public string formTarget
+        [CEReactions]
+        public string formTarget
         {
             get => getAttribute(EAttributeName.FormTarget).Get_String();
             set
             {
-                CEReactions.Wrap_CEReaction(this, () => {
-				    switch(type)
+                CEReactions.Wrap_CEReaction(this, () =>
+                {
+                    switch (type)
                     {
                         case EInputType.Submit:
                         case EInputType.Image:
@@ -450,7 +472,8 @@ namespace CssUI.DOM
             }
         }
 
-        [CEReactions] public uint height
+        [CEReactions]
+        public uint height
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#dom-input-height */
             get
             {
@@ -470,7 +493,8 @@ namespace CssUI.DOM
             }
             set
             {
-                CEReactions.Wrap_CEReaction(this, () => {
+                CEReactions.Wrap_CEReaction(this, () =>
+                {
                     switch (type)
                     {
                         case EInputType.Image:
@@ -510,7 +534,7 @@ namespace CssUI.DOM
             }
             private set
             {
-                switch(type)
+                switch (type)
                 {
                     case EInputType.Text:
                     case EInputType.Search:
@@ -537,11 +561,13 @@ namespace CssUI.DOM
             }
         }
 
-        [CEReactions] public string max
+        [CEReactions]
+        public string max
         {
             get => getAttribute(EAttributeName.Max)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => {
-				switch(type)
+            set => CEReactions.Wrap_CEReaction(this, () =>
+            {
+                switch (type)
                 {
                     case EInputType.Date:
                     case EInputType.Month:
@@ -557,15 +583,17 @@ namespace CssUI.DOM
                             else return;
                         }
                 }
-				setAttribute(EAttributeName.Max, AttributeValue.From_String(value));
-			});
+                setAttribute(EAttributeName.Max, AttributeValue.From_String(value));
+            });
         }
 
-        [CEReactions] public int maxLength
+        [CEReactions]
+        public int maxLength
         {
             get => getAttribute(EAttributeName.MaxLength).Get_Int();
-            set => CEReactions.Wrap_CEReaction(this, () => {
-				switch(type)
+            set => CEReactions.Wrap_CEReaction(this, () =>
+            {
+                switch (type)
                 {
                     case EInputType.Text:
                     case EInputType.Search:
@@ -580,15 +608,17 @@ namespace CssUI.DOM
                             else return;
                         }
                 }
-				setAttribute(EAttributeName.MaxLength, AttributeValue.From_Integer(value));
-			});
+                setAttribute(EAttributeName.MaxLength, AttributeValue.From_Integer(value));
+            });
         }
 
-        [CEReactions] public string min
+        [CEReactions]
+        public string min
         {
             get => getAttribute(EAttributeName.Min)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => {
-				switch(type)
+            set => CEReactions.Wrap_CEReaction(this, () =>
+            {
+                switch (type)
                 {
                     case EInputType.Date:
                     case EInputType.Month:
@@ -604,15 +634,17 @@ namespace CssUI.DOM
                             else return;
                         }
                 }
-				setAttribute(EAttributeName.Min, AttributeValue.From_String(value));
-			});
+                setAttribute(EAttributeName.Min, AttributeValue.From_String(value));
+            });
         }
 
-        [CEReactions] public int minLength
+        [CEReactions]
+        public int minLength
         {
             get => getAttribute(EAttributeName.MinLength).Get_Int();
-            set => CEReactions.Wrap_CEReaction(this, () => {
-				switch(type)
+            set => CEReactions.Wrap_CEReaction(this, () =>
+            {
+                switch (type)
                 {
                     case EInputType.Text:
                     case EInputType.Search:
@@ -627,15 +659,17 @@ namespace CssUI.DOM
                             else return;
                         }
                 }
-				setAttribute(EAttributeName.MinLength, AttributeValue.From_Integer(value));
-			});
+                setAttribute(EAttributeName.MinLength, AttributeValue.From_Integer(value));
+            });
         }
 
-        [CEReactions] public bool multiple
+        [CEReactions]
+        public bool multiple
         {
             get => hasAttribute(EAttributeName.Multiple);
-            set => CEReactions.Wrap_CEReaction(this, () => {
-				switch(type)
+            set => CEReactions.Wrap_CEReaction(this, () =>
+            {
+                switch (type)
                 {
                     case EInputType.Email:
                     case EInputType.File:
@@ -646,21 +680,24 @@ namespace CssUI.DOM
                             else return;
                         }
                 }
-				toggleAttribute(EAttributeName.Multiple, value);
-			});
+                toggleAttribute(EAttributeName.Multiple, value);
+            });
         }
 
-        [CEReactions] public string name
+        [CEReactions]
+        public string name
         {
             get => getAttribute(EAttributeName.Name).Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Name, AttributeValue.From_String(value)));
         }
 
-        [CEReactions] public string pattern
+        [CEReactions]
+        public string pattern
         {
             get => getAttribute(EAttributeName.Pattern)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => {
-				switch(type)
+            set => CEReactions.Wrap_CEReaction(this, () =>
+            {
+                switch (type)
                 {
                     case EInputType.Text:
                     case EInputType.Search:
@@ -677,7 +714,7 @@ namespace CssUI.DOM
                 }
 
                 patternCompiled = null;
-				setAttribute(EAttributeName.Pattern, AttributeValue.From_String(value));
+                setAttribute(EAttributeName.Pattern, AttributeValue.From_String(value));
                 /* The compiled pattern regular expression, when matched against a string, must have its start anchored to the start of the string and its end anchored to the end of the string. */
                 /* This implies that the regular expression language used for this attribute is the same as that used in JavaScript, except that the pattern attribute is matched against the entire value, 
                  * not just any subset (somewhat as if it implied a ^(?: at the start of the pattern and a )$ at the end). */
@@ -686,14 +723,16 @@ namespace CssUI.DOM
                     string patternStr = string.Concat("^(?:", value, ")$");
                     patternCompiled = new Regex(patternStr, RegexOptions.ECMAScript | RegexOptions.Compiled);
                 }
-			});
+            });
         }
 
-        [CEReactions] public string placeholder
+        [CEReactions]
+        public string placeholder
         {
             get => getAttribute(EAttributeName.Placeholder)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => {
-				switch(type)
+            set => CEReactions.Wrap_CEReaction(this, () =>
+            {
+                switch (type)
                 {
                     case EInputType.Text:
                     case EInputType.Search:
@@ -709,16 +748,18 @@ namespace CssUI.DOM
                             else return;
                         }
                 }
-				setAttribute(EAttributeName.Placeholder, AttributeValue.From_String(value));
-			});
+                setAttribute(EAttributeName.Placeholder, AttributeValue.From_String(value));
+            });
         }
 
-        [CEReactions] public bool readOnly
+        [CEReactions]
+        public bool readOnly
         {
             get => hasAttribute(EAttributeName.ReadOnly);
             set
             {
-                CEReactions.Wrap_CEReaction(this, () => {
+                CEReactions.Wrap_CEReaction(this, () =>
+                {
                     switch (type)
                     {
                         case EInputType.Text:
@@ -746,43 +787,47 @@ namespace CssUI.DOM
             }
         }
 
-        [CEReactions] public bool required
+        [CEReactions]
+        public bool required
         {
             get => hasAttribute(EAttributeName.Required);
-            set => CEReactions.Wrap_CEReaction(this, () => {
-				switch(type)
-				{
-                        case EInputType.Text:
-                        case EInputType.Search:
-                        case EInputType.Url:
-                        case EInputType.Telephone:
-                        case EInputType.Email:
-                        case EInputType.Password:
-                        case EInputType.Date:
-                        case EInputType.Month:
-                        case EInputType.Week:
-                        case EInputType.Time:
-                        case EInputType.Local:
-                        case EInputType.Number:
-                        case EInputType.Checkbox:
-                        case EInputType.Radio:
-                        case EInputType.File:
-                            break;
-                        default:
-                            {
-                                if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
-                                else return;
-                            }
-				}
-				toggleAttribute(EAttributeName.Required, value);
-			});
+            set => CEReactions.Wrap_CEReaction(this, () =>
+            {
+                switch (type)
+                {
+                    case EInputType.Text:
+                    case EInputType.Search:
+                    case EInputType.Url:
+                    case EInputType.Telephone:
+                    case EInputType.Email:
+                    case EInputType.Password:
+                    case EInputType.Date:
+                    case EInputType.Month:
+                    case EInputType.Week:
+                    case EInputType.Time:
+                    case EInputType.Local:
+                    case EInputType.Number:
+                    case EInputType.Checkbox:
+                    case EInputType.Radio:
+                    case EInputType.File:
+                        break;
+                    default:
+                        {
+                            if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError($"This attribute cannot be specified for an input element of this type({Enum.GetName(typeof(EInputType), type)})");
+                            else return;
+                        }
+                }
+                toggleAttribute(EAttributeName.Required, value);
+            });
         }
 
-        [CEReactions] public uint size
+        [CEReactions]
+        public uint size
         {
             get => getAttribute(EAttributeName.Size).Get_UInt();
-            set => CEReactions.Wrap_CEReaction(this, () => {
-				switch(type)
+            set => CEReactions.Wrap_CEReaction(this, () =>
+            {
+                switch (type)
                 {
                     case EInputType.Text:
                     case EInputType.Search:
@@ -798,15 +843,17 @@ namespace CssUI.DOM
                             else return;
                         }
                 }
-				setAttribute(EAttributeName.Size, AttributeValue.From_Integer(value));
-			});
+                setAttribute(EAttributeName.Size, AttributeValue.From_Integer(value));
+            });
         }
 
-        [CEReactions] public string src
+        [CEReactions]
+        public string src
         {
             get => getAttribute(EAttributeName.Src)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => {
-				switch(type)
+            set => CEReactions.Wrap_CEReaction(this, () =>
+            {
+                switch (type)
                 {
                     case EInputType.Image:
                         break;
@@ -816,23 +863,26 @@ namespace CssUI.DOM
                             else return;
                         }
                 }
-				setAttribute(EAttributeName.Src, AttributeValue.From_String(value));
-			});
+                setAttribute(EAttributeName.Src, AttributeValue.From_String(value));
+            });
         }
 
-        [CEReactions] public new EInputType type
+        [CEReactions]
+        public new EInputType type
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#dom-input-type */
             get => getAttribute(EAttributeName.Type).Get_Enum<EInputType>();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Type, AttributeValue.From_Enum(value)));
         }
 
-        [CEReactions] public string defaultValue
+        [CEReactions]
+        public string defaultValue
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#dom-input-defaultvalue */
             get => getAttribute(EAttributeName.Value)?.Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Value, AttributeValue.From_String(value)));
         }
 
-        [CEReactions] public uint width
+        [CEReactions]
+        public uint width
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#dom-input-width */
             get
             {
@@ -852,7 +902,8 @@ namespace CssUI.DOM
             }
             set
             {
-                CEReactions.Wrap_CEReaction(this, () => {
+                CEReactions.Wrap_CEReaction(this, () =>
+                {
                     switch (type)
                     {
                         case EInputType.Image:
@@ -887,16 +938,18 @@ namespace CssUI.DOM
                 if (type == EInputType.Hidden)
                     return null;
 
-                return (IReadOnlyCollection<HTMLLabelElement>)DOMCommon.Get_Descendents(form, labelFilter, Enums.ENodeFilterMask.SHOW_ELEMENT);
+                return DOMCommon.Get_Descendents_OfType<HTMLLabelElement>(form, labelFilter, ENodeFilterMask.SHOW_ELEMENT);
             }
         }
 
         #region Input Step
-        [CEReactions] public string step
+        [CEReactions]
+        public string step
         {
             get => getAttribute(EAttributeName.Step)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => {
-				switch(type)
+            set => CEReactions.Wrap_CEReaction(this, () =>
+            {
+                switch (type)
                 {
                     case EInputType.Date:
                     case EInputType.Month:
@@ -913,8 +966,8 @@ namespace CssUI.DOM
                             else return;
                         }
                 }
-				setAttribute(EAttributeName.Step, AttributeValue.From_String(value));
-			});
+                setAttribute(EAttributeName.Step, AttributeValue.From_String(value));
+            });
         }
 
         double default_step
@@ -957,7 +1010,7 @@ namespace CssUI.DOM
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#concept-input-step */
             get
             {
-                switch  (type)
+                switch (type)
                 {
                     case EInputType.Date:
                         return 86400000;
@@ -1071,7 +1124,7 @@ namespace CssUI.DOM
                 var delta = maxMult - minMult;
                 if ((int)delta == 0) // these two values fall within the same multiple of the allowed-step
                 {
-                    if (!MathExt.Feq(0, (allowed_step % mn)))
+                    if (!MathExt.Feq(0, allowed_step % mn))
                     {
                         return;
                     }
@@ -1095,7 +1148,7 @@ namespace CssUI.DOM
             double mult = allowed_step / value;
             if (!MathExt.Feq(0, mult))
             {
-                value = step_base + (Math.Floor(mult) * allowed_step);
+                value = step_base + Math.Floor(mult) * allowed_step;
                 if (value < valueBeforeStepping)
                 {
                     value += allowed_step;
@@ -1183,7 +1236,7 @@ namespace CssUI.DOM
                 var delta = maxMult - minMult;
                 if ((int)delta == 0) // these two values fall within the same multiple of the allowed-step
                 {
-                    if (!MathExt.Feq(0, (allowed_step % mn)))
+                    if (!MathExt.Feq(0, allowed_step % mn))
                     {
                         return;
                     }
@@ -1208,7 +1261,7 @@ namespace CssUI.DOM
             double mult = allowed_step / value;
             if (!MathExt.Feq(0, mult))
             {
-                value = step_base + (Math.Floor(mult) * allowed_step);
+                value = step_base + Math.Floor(mult) * allowed_step;
                 if (value > valueBeforeStepping)
                 {
                     value -= allowed_step;
@@ -1294,7 +1347,8 @@ namespace CssUI.DOM
             return EInputValueMode.Default;
         }
 
-        [CEReactions] public override string value
+        [CEReactions]
+        public new string value
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#dom-input-value */
             get
             {
@@ -1476,7 +1530,7 @@ namespace CssUI.DOM
                         }
 
                         var days = week * 7;
-                        var date = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddDays(days-1);
+                        var date = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddDays(days - 1);
                         var delta = date.Subtract(EPOCH);
 
                         outValue = delta.TotalMilliseconds;
@@ -1533,7 +1587,7 @@ namespace CssUI.DOM
                     {
                         var date = EPOCH.AddMilliseconds(num);
                         outValue = date.ToString(HTMLParserCommon.DATE_TIME_FORMAT);
-                        
+
                         return true;
                     }
                 case EInputType.Month:
@@ -1616,7 +1670,7 @@ namespace CssUI.DOM
                         }
 
                         var days = week * 7;
-                        outValue = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddDays(days-1);
+                        outValue = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddDays(days - 1);
                         return true;
                     }
                 case EInputType.Time:
@@ -1703,7 +1757,7 @@ namespace CssUI.DOM
                           * if any, and let the element's values be the (possibly empty) resulting list of (possibly empty) tokens, maintaining the original order. */
                             var list = DOMCommon.Parse_Comma_Seperated_List(_value.AsMemory());
                             var newList = new ReadOnlyMemory<char>[list.Count];
-                            for (int i=0; i<list.Count; i++)
+                            for (int i = 0; i < list.Count; i++)
                             {
                                 newList[i] = StringCommon.Trim(list[i], UnicodeCommon.CHAR_SPACE);
                             }
@@ -1763,7 +1817,7 @@ namespace CssUI.DOM
                             var max = get_maximum().Value;
                             if (min < max)
                             {
-                                _value = (min + ((max - min) * 0.5)).ToString();
+                                _value = (min + (max - min) * 0.5).ToString();
                             }
                             else
                             {
@@ -1792,13 +1846,14 @@ namespace CssUI.DOM
         internal override EValidityState query_validity()
         {
             EValidityState flags = base.query_validity();
+            string cValue = this.value;/* Cache this so we dont keep resolving it */
 
             /* When a control has no value but has a required attribute (input required, textarea required); or, more complicated rules for select elements and controls in radio button groups, as specified in their sections. */
             switch (type)
             {
                 case EInputType.Url:
                     {/* Constraint validation: While the value of the element is neither the empty string nor a valid absolute URL, the element is suffering from a type mismatch. */
-                        string val = value;
+                        string val = cValue;
                         if (val.Length > 0 && !Uri.IsWellFormedUriString(val, UriKind.Absolute))
                         {
                             flags |= EValidityState.typeMismatch;
@@ -1809,7 +1864,7 @@ namespace CssUI.DOM
                     {
                         if (!multiple)
                         {/* Constraint validation: While the value of the element is neither the empty string nor a single valid e-mail address, the element is suffering from a type mismatch. */
-                            string val = value;
+                            string val = cValue;
                             if (val.Length > 0 && !HTMLCommon.Is_Valid_Email(val))
                             {
                                 flags |= EValidityState.typeMismatch;
@@ -1823,7 +1878,7 @@ namespace CssUI.DOM
                         }
                         else
                         {/* Constraint validation: While the value of the element is not a valid e-mail address list, the element is suffering from a type mismatch. */
-                            var emailList = DOMCommon.Parse_Comma_Seperated_List(value.AsMemory());
+                            var emailList = DOMCommon.Parse_Comma_Seperated_List(cValue.AsMemory());
                             for (int i = 0; i < emailList.Count; i++)
                             {
                                 string emailStr = emailList[i].ToString();
@@ -1844,7 +1899,7 @@ namespace CssUI.DOM
                     break;
                 case EInputType.Date:
                     {
-                        if (!HTMLParserCommon.Is_Valid_Date_String(value.AsMemory()))
+                        if (!HTMLParserCommon.Is_Valid_Date_String(cValue.AsMemory()))
                         {
                             flags |= EValidityState.badInput;
                         }
@@ -1852,7 +1907,7 @@ namespace CssUI.DOM
                     break;
                 case EInputType.Month:
                     {
-                        if (!HTMLParserCommon.Is_Valid_Month_String(value.AsMemory()))
+                        if (!HTMLParserCommon.Is_Valid_Month_String(cValue.AsMemory()))
                         {
                             flags |= EValidityState.badInput;
                         }
@@ -1860,7 +1915,7 @@ namespace CssUI.DOM
                     break;
                 case EInputType.Week:
                     {
-                        if (!HTMLParserCommon.Is_Valid_Week_String(value.AsMemory()))
+                        if (!HTMLParserCommon.Is_Valid_Week_String(cValue.AsMemory()))
                         {
                             flags |= EValidityState.badInput;
                         }
@@ -1868,7 +1923,7 @@ namespace CssUI.DOM
                     break;
                 case EInputType.Time:
                     {
-                        if (!HTMLParserCommon.Is_Valid_Time_String(value.AsMemory()))
+                        if (!HTMLParserCommon.Is_Valid_Time_String(cValue.AsMemory()))
                         {
                             flags |= EValidityState.badInput;
                         }
@@ -1876,7 +1931,7 @@ namespace CssUI.DOM
                     break;
                 case EInputType.Local:
                     {
-                        if (!HTMLParserCommon.Is_Valid_Normalized_Local_Date_Time_String(value.AsMemory()))
+                        if (!HTMLParserCommon.Is_Valid_Normalized_Local_Date_Time_String(cValue.AsMemory()))
                         {
                             flags |= EValidityState.badInput;
                         }
@@ -1884,7 +1939,7 @@ namespace CssUI.DOM
                     break;
                 case EInputType.Number:
                     {
-                        if (!HTMLParserCommon.Is_Valid_FloatingPoint(value.AsMemory()))
+                        if (!HTMLParserCommon.Is_Valid_FloatingPoint(cValue.AsMemory()))
                         {
                             flags |= EValidityState.badInput;
                         }
@@ -1892,7 +1947,7 @@ namespace CssUI.DOM
                     break;
                 case EInputType.Range:
                     {
-                        if (!HTMLParserCommon.Is_Valid_FloatingPoint(value.AsMemory()))
+                        if (!HTMLParserCommon.Is_Valid_FloatingPoint(cValue.AsMemory()))
                         {
                             flags |= EValidityState.badInput;
                         }
@@ -1900,7 +1955,7 @@ namespace CssUI.DOM
                     break;
                 case EInputType.Color:
                     {
-                        if (!HTMLParserCommon.Is_Valid_Lowercase_Simple_Color(value.AsMemory()))
+                        if (!HTMLParserCommon.Is_Valid_Lowercase_Simple_Color(cValue.AsMemory()))
                         {
                             flags |= EValidityState.badInput;
                         }
@@ -1946,7 +2001,7 @@ namespace CssUI.DOM
                     break;
                 default:
                     {
-                        if (ReferenceEquals(null, value) || value.Length <= 0)
+                        if (ReferenceEquals(null, cValue) || cValue.Length <= 0)
                         {
                             flags |= EValidityState.valueMissing;
                         }
@@ -1954,15 +2009,14 @@ namespace CssUI.DOM
                     break;
             }
 
-            string value = this.value;
             /* When a control has a value that is too long for the form control maxlength attribute (input maxlength, textarea maxlength). */
-            if (value.Length > maxLength)
+            if (cValue.Length > maxLength)
             {
                 flags |= EValidityState.tooLong;
             }
 
             /* When a control has a value that is too short for the form control minlength attribute (input minlength, textarea minlength). */
-            if (value.Length < minLength)
+            if (cValue.Length < minLength)
             {
                 flags |= EValidityState.tooShort;
             }
@@ -1973,7 +2027,7 @@ namespace CssUI.DOM
              * the element is suffering from a step mismatch. */
             if (allowed_value_step.HasValue)
             {
-                if (convert_string_to_number(value.AsMemory(), out double outValueNumber))
+                if (convert_string_to_number(cValue.AsMemory(), out double outValueNumber))
                 {
                     double stepSize = allowed_value_step.Value;
                     double delta = outValueNumber - step_base;
@@ -1997,7 +2051,7 @@ namespace CssUI.DOM
                                         double upStep = (multiple + 1) * stepSize;
                                         if (upStep <= max)
                                         {
-                                            value = upStep.ToString();
+                                            cValue = upStep.ToString();
                                             break;
                                         }
                                     }
@@ -2006,7 +2060,7 @@ namespace CssUI.DOM
                                     double noStep = multiple * stepSize;
                                     if (noStep >= min)
                                     {
-                                        value = noStep.ToString();
+                                        cValue = noStep.ToString();
                                         break;
                                     }
                                 }
@@ -2017,9 +2071,9 @@ namespace CssUI.DOM
             }
 
 
-            if (!ReferenceEquals(null, value) && value.Length > 0)/* Value is not null or empty string */
+            if (!ReferenceEquals(null, cValue) && cValue.Length > 0)/* Value is not null or empty string */
             {
-                if (convert_string_to_number(value.AsMemory(), out double outValue))
+                if (convert_string_to_number(cValue.AsMemory(), out double outValue))
                 {
                     switch (type)
                     {
@@ -2052,7 +2106,7 @@ namespace CssUI.DOM
                                 if (min.HasValue && outValue < min.Value)
                                 {
                                     flags |= EValidityState.rangeUnderflow;
-                                    value = min.Value.ToString();
+                                    cValue = min.Value.ToString();
                                 }
 
                                 /* When a control has a value that is not the empty string and is too high for the max attribute. */
@@ -2060,7 +2114,7 @@ namespace CssUI.DOM
                                 if (max.HasValue && outValue > max.Value)
                                 {
                                     flags |= EValidityState.rangeOverflow;
-                                    value = max.Value.ToString();
+                                    cValue = max.Value.ToString();
                                 }
                             }
                             break;
@@ -2071,7 +2125,7 @@ namespace CssUI.DOM
                 {
                     if (!multiple)
                     {
-                        if (!patternCompiled.IsMatch(value))
+                        if (!patternCompiled.IsMatch(cValue))
                         {
                             flags |= EValidityState.patternMismatch;
                         }
@@ -2131,7 +2185,7 @@ namespace CssUI.DOM
                 }
             }
 
-            if (!StringCommon.Contains(value.AsSpan(), Filters.FilterCharSelectable.Instance))
+            if (!StringCommon.Contains(value.AsSpan(), FilterCharSelectable.Instance))
             {
                 return;
             }
@@ -2350,7 +2404,7 @@ namespace CssUI.DOM
             /* 6) If the previous steps caused the selection of the text control to be modified (in either extent or direction), then queue a task, using the user interaction task source, to fire an event named select at the element, with the bubbles attribute initialized to true. */
             if (!oldSelection.Equals(selection))
             {
-                System.Threading.Tasks.Task.Factory.StartNew(() =>
+                Task.Factory.StartNew(() =>
                 {
                     dispatchEvent(new Event(EEventName.Select, new EventInit() { bubbles = true }));
                 }).ConfigureAwait(continueOnCapturedContext: false);
@@ -2473,7 +2527,7 @@ namespace CssUI.DOM
             /* 9) If start is less than end, delete the sequence of characters within the element's relevant value starting with the character at the startth position (in logical order) and ending with the character at the (end-1)th position. */
             if (start < end)
             {
-                relevantValue = relevantValue.Substring(start, (end - start) - 1);
+                relevantValue = relevantValue.Substring(start, end - start - 1);
             }
 
             /* 10) Insert the value of the first argument into the text of the relevant value of the text control, immediately before the startth character. */
@@ -2563,7 +2617,7 @@ namespace CssUI.DOM
             if (root == null) root = ownerDocument;
             if (root == null) return new HTMLInputElement[0];
 
-            return DOMCommon.Get_Descendents_OfType<HTMLInputElement>(root, new FilterRadioGroup(this), Enums.ENodeFilterMask.SHOW_ELEMENT);
+            return DOMCommon.Get_Descendents_OfType<HTMLInputElement>(root, new FilterRadioGroup(this), ENodeFilterMask.SHOW_ELEMENT);
         }
 
         /// <summary>
@@ -2594,7 +2648,7 @@ namespace CssUI.DOM
         /// </summary>
         private int GetTotalMonths(DateTime From, DateTime Till)
         {
-            return ((Till.Year - From.Year) * 12) + (Till.Month - From.Month);
+            return (Till.Year - From.Year) * 12 + (Till.Month - From.Month);
         }
         #endregion
 
@@ -2638,7 +2692,7 @@ namespace CssUI.DOM
                          * if there is one, or the empty string otherwise, and then run the current value sanitization algorithm, if one is defined. */
                         if (!bDirtyValueFlag)
                         {
-                            this._value = getAttribute(EAttributeName.Value)?.Get_String() ?? string.Empty;
+                            _value = getAttribute(EAttributeName.Value)?.Get_String() ?? string.Empty;
                             run_value_sanitization();
                         }
                     }
@@ -2652,7 +2706,7 @@ namespace CssUI.DOM
                         EInputType newType = newValue.Get_Enum<EInputType>();
                         var oldMode = Get_Input_Value_Mode(oldType);
                         var newMode = Get_Input_Value_Mode(newType);
-                        if (oldMode == EInputValueMode.Value && !string.IsNullOrEmpty(this.value) && (newMode == EInputValueMode.Default || newMode == EInputValueMode.Default_ON))
+                        if (oldMode == EInputValueMode.Value && !string.IsNullOrEmpty(value) && (newMode == EInputValueMode.Default || newMode == EInputValueMode.Default_ON))
                         {
                             setAttribute(EAttributeName.Value, AttributeValue.From_String(_value));
                         }
@@ -2662,15 +2716,15 @@ namespace CssUI.DOM
                         * if there is one, or the empty string otherwise, and then set the control's dirty value flag to false. */
                         else if (oldMode != EInputValueMode.Value && newMode == EInputValueMode.Value)
                         {
-                    
-                            this._value = getAttribute(EAttributeName.Value)?.Get_String() ?? string.Empty;
+
+                            _value = getAttribute(EAttributeName.Value)?.Get_String() ?? string.Empty;
                             bDirtyValueFlag = false;
                         }
                         /* 3) Otherwise, if the previous state of the element's type attribute put the value IDL attribute in any mode other than the filename mode, 
                          * and the new state of the element's type attribute puts the value IDL attribute in the filename mode, then set the value of the element to the empty string. */
                         else if (oldMode != EInputValueMode.Filename && newMode == EInputValueMode.Filename)
                         {
-                            this._value = string.Empty;
+                            _value = string.Empty;
                         }
                         /* 4) Update the element's rendering and behavior to the new state's. */
                         update_rendering_for_type(newType);

@@ -6,6 +6,7 @@ using CssUI.DOM.Geometry;
 using CssUI.DOM.Internal;
 using CssUI.DOM.Media;
 using CssUI.DOM.Nodes;
+using CssUI.HTML;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

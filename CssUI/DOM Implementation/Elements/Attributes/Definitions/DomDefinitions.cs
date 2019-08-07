@@ -1,4 +1,5 @@
 ﻿using CssUI.DOM.Enums;
+using CssUI.HTML;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -149,6 +150,10 @@ namespace CssUI.DOM
                 /* Object Attributes */
                 new AttributeDefinition(EAttributeName.Data, EAttributeType.String, null, null, EAttributeFlags.None),
                 new AttributeDefinition(typeof(HTMLObjectElement), EAttributeName.Type, EAttributeType.String, null, null, EAttributeFlags.None),
+
+
+                /* Button Attributes */
+                new AttributeDefinition(typeof(HTMLButtonElement), EAttributeName.Type, EAttributeType.Enumerated, AttributeValue.From_Enum(EButtonType.Submit), AttributeValue.From_Enum(EButtonType.Submit), EAttributeFlags.None, Lookup.Get_Keywords<EButtonType>()),
             };
         }
     }

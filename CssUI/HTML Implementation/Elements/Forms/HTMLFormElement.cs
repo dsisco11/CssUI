@@ -1,7 +1,8 @@
-﻿using CssUI.DOM.CustomElements;
+﻿using CssUI.DOM;
+using CssUI.DOM.CustomElements;
 using CssUI.DOM.Exceptions;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     /* XXX: I dont see too much of a point in the past names map aside from static code references being able to reference elements even after they change identities.
      * So I classify the past names map as low priority */
@@ -33,65 +34,75 @@ namespace CssUI.DOM
         #endregion
 
         #region Content Attributes
-        [CEReactions] public string acceptCharset
+        [CEReactions]
+        public string acceptCharset
         {
             get => getAttribute(EAttributeName.AcceptCharset).Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.AcceptCharset, AttributeValue.From_String(value)));
         }
 
-        [CEReactions] public string action
+        [CEReactions]
+        public string action
         {
             get => getAttribute(EAttributeName.Action)?.Get_String() ?? nodeDocument.URL;
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Action, AttributeValue.From_String(value)));
         }
 
-        [CEReactions] public EAutoComplete autocomplete
+        [CEReactions]
+        public EAutoComplete autocomplete
         {
             get => getAttribute(EAttributeName.Autocomplete).Get_Enum<EAutoComplete>();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Autocomplete, AttributeValue.From_Enum(value)));
         }
 
-        [CEReactions] public EEncType enctype
+        [CEReactions]
+        public EEncType enctype
         {
             get => getAttribute(EAttributeName.EncType).Get_Enum<EEncType>();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.EncType, AttributeValue.From_Enum(value)));
         }
 
-        [CEReactions] public EEncType encoding
+        [CEReactions]
+        public EEncType encoding
         {
             get => getAttribute(EAttributeName.EncType).Get_Enum<EEncType>();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.EncType, AttributeValue.From_Enum(value)));
         }
 
-        [CEReactions] public EFormMethod method
+        [CEReactions]
+        public EFormMethod method
         {
             get => getAttribute(EAttributeName.Method).Get_Enum<EFormMethod>();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Method, AttributeValue.From_Enum(value)));
         }
 
-        [CEReactions] public string name
+        [CEReactions]
+        public string name
         {
             get => getAttribute(EAttributeName.Name).Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Name, AttributeValue.From_String(value)));
         }
 
-        [CEReactions] public bool noValidate
+        [CEReactions]
+        public bool noValidate
         {
             get => hasAttribute(EAttributeName.NoValidate);
             set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.NoValidate, value));
         }
 
-        [CEReactions] public string target
+        [CEReactions]
+        public string target
         {
             get => getAttribute(EAttributeName.Target).Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Target, AttributeValue.From_String(value)));
         }
 
-        [CEReactions] public string rel
+        [CEReactions]
+        public string rel
         {
             get => getAttribute(EAttributeName.Rel).Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Rel, AttributeValue.From_String(value)));
-        }        
+        }
         #endregion
 
         #region Accessors

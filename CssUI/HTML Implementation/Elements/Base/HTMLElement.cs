@@ -1,11 +1,12 @@
-﻿using CssUI.DOM.CustomElements;
+﻿using CssUI.DOM;
+using CssUI.DOM.CustomElements;
 using CssUI.DOM.Events;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Internal;
 using CssUI.DOM.Nodes;
 using System;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     /// <summary>
     /// The basic interface, from which all the HTML elements' interfaces inherit, and which must be used by elements that have no additional requirements, is the HTMLElement interface.
@@ -92,7 +93,7 @@ namespace CssUI.DOM
                 */
 
                 /* XXX: Finish this */
-                if (dirValue == EDir.Auto || (!attr.IsDefined && this is HTMLBdiElement))
+                if (dirValue == EDir.Auto || !attr.IsDefined && this is HTMLBdiElement)
                 {
                     /* Find the first character in tree order that matches the following criteria:
                      * The character is from a Text node that is a descendant of the element whose directionality is being determined.
@@ -510,7 +511,7 @@ namespace CssUI.DOM
 
             if (!DOMCommon.Is_Focusable(this))
             {
-                /* XXX: */
+                /* XXX: Focus */
             }
         }
 
@@ -562,21 +563,21 @@ namespace CssUI.DOM
                     /* Test all ctrl, alt, & shift modifier keys */
 
                     combo = new KeyCombination(altKey: true, keys: keyCode);
-                    if (nodeDocument.Register_Key_Command(combo, () => this.Focus()))
+                    if (nodeDocument.Register_Key_Command(combo, () => Focus()))
                     {
                         assignedAccessKey = combo;
                         return;
                     }
 
                     combo = new KeyCombination(ctrlKey: true, keys: keyCode);
-                    if (nodeDocument.Register_Key_Command(combo, () => this.Focus()))
+                    if (nodeDocument.Register_Key_Command(combo, () => Focus()))
                     {
                         assignedAccessKey = combo;
                         return;
                     }
 
                     combo = new KeyCombination(shiftKey: true, keys: keyCode);
-                    if (nodeDocument.Register_Key_Command(combo, () => this.Focus()))
+                    if (nodeDocument.Register_Key_Command(combo, () => Focus()))
                     {
                         assignedAccessKey = combo;
                         return;

@@ -1,6 +1,8 @@
-﻿using CssUI.DOM.CustomElements;
+﻿using CssUI.DOM;
+using CssUI.DOM.CustomElements;
+using CssUI.DOM.Enums;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     /// <summary>
     /// The label element represents a caption in a user interface. The caption can be associated with a specific form control, known as the label element's labeled control, either using the for attribute, or by putting the form control inside the label element itself.
@@ -42,7 +44,7 @@ namespace CssUI.DOM
                     return (HTMLElement)ownerDocument.getElementByID(forAttr?.Value?.Get_Atomic());
                 }
 
-                return (HTMLElement)DOMCommon.Get_Nth_Descendant(this, 1, FilterIsLableable.Instance, Enums.ENodeFilterMask.SHOW_ELEMENT);
+                return (HTMLElement)DOMCommon.Get_Nth_Descendant(this, 1, FilterIsLableable.Instance, ENodeFilterMask.SHOW_ELEMENT);
             }
         }
         #endregion
@@ -51,7 +53,7 @@ namespace CssUI.DOM
         public HTMLLabelElement(Document document) : base(document, "label")
         {
         }
-        
+
         public HTMLLabelElement(Document document, string localName) : base(document, localName)
         {
         }

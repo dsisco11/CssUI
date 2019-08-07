@@ -1,11 +1,12 @@
-﻿using CssUI.DOM.CustomElements;
+﻿using CssUI.DOM;
+using CssUI.DOM.CustomElements;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Internal;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     public abstract class HTMLTableSectionElement : HTMLElement
     {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#htmltablesectionelement */
@@ -74,7 +75,8 @@ namespace CssUI.DOM
         /// </summary>
         /// <exception cref="IndexSizeError"></exception>
         /// <param name="index"></param>
-        [CEReactions] void deleteRow(int index)
+        [CEReactions]
+        void deleteRow(int index)
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-tbody-deleterow */
             CEReactions.Wrap_CEReaction(this, () =>
             {

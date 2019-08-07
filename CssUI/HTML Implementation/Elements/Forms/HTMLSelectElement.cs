@@ -1,11 +1,12 @@
-﻿using CssUI.DOM.CustomElements;
+﻿using CssUI.DOM;
+using CssUI.DOM.CustomElements;
+using CssUI.DOM.Enums;
 using CssUI.DOM.Nodes;
-using CssUI.HTML;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     public class HTMLSelectElement : FormAssociatedElement, IListedElement, ILableableElement, ISubmittableElement, IResettableElement, IAutoCapitalizeInheritingElement
     {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#htmlselectelement */
@@ -27,7 +28,8 @@ namespace CssUI.DOM
         #endregion
 
         #region Content Attributes
-        [CEReactions] public string autocomplete
+        [CEReactions]
+        public string autocomplete
         {
             get
             {
@@ -37,31 +39,36 @@ namespace CssUI.DOM
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Autocomplete, AttributeValue.From_String(value)));
         }
 
-        [CEReactions] public bool autofocus
+        [CEReactions]
+        public bool autofocus
         {
             get => hasAttribute(EAttributeName.Autofocus);
             set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Autofocus, value));
         }
 
-        [CEReactions] public bool multiple
+        [CEReactions]
+        public bool multiple
         {
             get => hasAttribute(EAttributeName.Multiple);
             set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Multiple, value));
         }
 
-        [CEReactions] public string name
+        [CEReactions]
+        public string name
         {
             get => getAttribute(EAttributeName.Name).Get_String();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Name, AttributeValue.From_String(value)));
         }
 
-        [CEReactions] public bool required
+        [CEReactions]
+        public bool required
         {
             get => hasAttribute(EAttributeName.Required);
             set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Required, value));
         }
 
-        [CEReactions] public int size
+        [CEReactions]
+        public int size
         {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#dom-select-size */
             get => getAttribute(EAttributeName.Size).Get_Int();
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Size, AttributeValue.From_Integer(value)));
@@ -153,7 +160,8 @@ namespace CssUI.DOM
         #endregion
 
         #region Accessors
-        [CEReactions] public int length
+        [CEReactions]
+        public int length
         {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#dom-select-length */
             get => options.length;
             set => CEReactions.Wrap_CEReaction(this, () => options.length = value);
@@ -161,21 +169,21 @@ namespace CssUI.DOM
 
         public IReadOnlyCollection<HTMLOptionElement> selectedOptions
         {
-            get => (IReadOnlyCollection<HTMLOptionElement>)DOMCommon.Get_Descendents(this, FilterOptionElementSelected.Instance, Enums.ENodeFilterMask.SHOW_ELEMENT);
+            get => (IReadOnlyCollection<HTMLOptionElement>)DOMCommon.Get_Descendents(this, FilterOptionElementSelected.Instance, ENodeFilterMask.SHOW_ELEMENT);
         }
 
         public int selectedIndex
         {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#dom-select-selectedindex */
             get
             {
-                var element = DOMCommon.Get_Nth_Descendant(this, 1, FilterOptionElementSelected.Instance, Enums.ENodeFilterMask.SHOW_ELEMENT);
+                var element = DOMCommon.Get_Nth_Descendant(this, 1, FilterOptionElementSelected.Instance, ENodeFilterMask.SHOW_ELEMENT);
                 return element.index;
             }
         }
 
         public IReadOnlyCollection<HTMLLabelElement> labels
         {
-            get => (IReadOnlyCollection<HTMLLabelElement>)DOMCommon.Get_Descendents(form, new FilterLabelFor(this), Enums.ENodeFilterMask.SHOW_ELEMENT);
+            get => (IReadOnlyCollection<HTMLLabelElement>)DOMCommon.Get_Descendents(form, new FilterLabelFor(this), ENodeFilterMask.SHOW_ELEMENT);
         }
         #endregion
 
@@ -247,7 +255,7 @@ namespace CssUI.DOM
             if (required)
             {
                 /* Reset the valueMissing flag first */
-                flags &= ~(EValidityState.valueMissing);
+                flags &= ~EValidityState.valueMissing;
                 /* Calculate the valueMissing constraint using this specific elements logic */
                 var selected = selectedOptions;
                 if (selected.Count == 0)
@@ -297,7 +305,7 @@ namespace CssUI.DOM
                 if (display_size == 1 && selected.Count == 0)
                 {
                     /* Set the selectedness of the first option element in the list of options in tree order that is not disabled, if any, to true. */
-                    var first = DOMCommon.Get_Nth_Descendant_OfType<HTMLOptionElement>(this, 1, FilterNotDisabled.Instance, Enums.ENodeFilterMask.SHOW_ELEMENT);
+                    var first = DOMCommon.Get_Nth_Descendant_OfType<HTMLOptionElement>(this, 1, FilterNotDisabled.Instance, ENodeFilterMask.SHOW_ELEMENT);
                     if (first != null)
                     {
                         first.selectedness = true;

@@ -1,8 +1,9 @@
-﻿using CssUI.DOM.CustomElements;
+﻿using CssUI.DOM;
+using CssUI.DOM.CustomElements;
 using CssUI.DOM.Events;
 using System.Threading.Tasks;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     /// <summary>
     /// The details element represents a disclosure widget from which the user can obtain additional information or controls.
@@ -16,7 +17,7 @@ namespace CssUI.DOM
         public HTMLDetailsElement(Document document) : base(document, "details")
         {
         }
-        
+
         public HTMLDetailsElement(Document document, string localName) : base(document, localName)
         {
         }

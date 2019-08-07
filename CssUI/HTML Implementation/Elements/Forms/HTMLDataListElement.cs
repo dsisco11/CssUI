@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using CssUI.DOM;
+using CssUI.DOM.Enums;
+using System.Collections.Generic;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     /// <summary>
     /// The datalist element represents a set of option elements that represent predefined options for other controls.
@@ -8,22 +10,18 @@ namespace CssUI.DOM
     public class HTMLDataListElement : HTMLElement
     {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#the-datalist-element */
         #region Properties
-        public IReadOnlyCollection<Element> options
-        {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#dom-datalist-options */
-            get
-            {
-                return (IReadOnlyCollection<Element>)DOMCommon.Get_Descendents_OfType<HTMLOptionElement>(this, null, Enums.ENodeFilterMask.SHOW_ELEMENT);
-            }
-        }
+        /* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#dom-datalist-options */
+        public readonly HTMLCollection<HTMLOptionElement> options;
         #endregion
 
         #region Constructor
-        public HTMLDataListElement(Document document) : base(document, "datalist")
+        public HTMLDataListElement(Document document) : this(document, "datalist")
         {
         }
 
         public HTMLDataListElement(Document document, string localName) : base(document, localName)
         {
+            options = new HTMLCollection<HTMLOptionElement>(this);
         }
         #endregion
     }

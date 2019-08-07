@@ -1,7 +1,6 @@
-﻿
-using CssUI.DOM.Events;
+﻿using CssUI.DOM.Events;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     /// <summary>
     /// Denotes elements that can be affected when a form element is reset.

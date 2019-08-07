@@ -1,10 +1,11 @@
-﻿using CssUI.DOM.CustomElements;
+﻿using CssUI.DOM;
+using CssUI.DOM.CustomElements;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Nodes;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     public class HTMLTableElement : HTMLElement
     {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#the-table-element */
@@ -14,7 +15,8 @@ namespace CssUI.DOM
         /// Returns the table's caption element.
         /// Can be set, to replace the caption element.
         /// /// </summary>
-        [CEReactions] public HTMLTableCaptionElement caption
+        [CEReactions]
+        public HTMLTableCaptionElement caption
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-caption */
 
             get => DOMCommon.Get_First_Element_Child_OfType<HTMLTableCaptionElement>(this);
@@ -45,13 +47,14 @@ namespace CssUI.DOM
         /// Returns the table's thead element.
         /// Can be set, to replace the thead element.If the new value is not a thead element, throws a "HierarchyRequestError" DOMException.
         /// </summary>
-        [CEReactions] public HTMLTableHeadElement tHead
+        [CEReactions]
+        public HTMLTableHeadElement tHead
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-thead */
 
             get => DOMCommon.Get_First_Element_Child_OfType<HTMLTableHeadElement>(this);
             set
             {
-                CEReactions.Wrap_CEReaction(this, () => 
+                CEReactions.Wrap_CEReaction(this, () =>
                 {
                     HTMLTableHeadElement firstOfType = tHead;
                     if (firstOfType != null)
@@ -89,7 +92,8 @@ namespace CssUI.DOM
         /// Returns the table's tfoot element.
         /// Can be set, to replace the tfoot element.If the new value is not a tfoot element, throws a "HierarchyRequestError" DOMException.
         /// </summary>
-        [CEReactions] public HTMLTableFootElement tFoot
+        [CEReactions]
+        public HTMLTableFootElement tFoot
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-tfoot */
             get => DOMCommon.Get_First_Element_Child_OfType<HTMLTableFootElement>(this);
             set
@@ -286,7 +290,8 @@ namespace CssUI.DOM
         /// <summary>
         /// Ensures the table does not have a caption element.
         /// </summary>
-        [CEReactions] public void deleteCaption()
+        [CEReactions]
+        public void deleteCaption()
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-deletecaption */
 
             CEReactions.Wrap_CEReaction(this, () =>
@@ -302,7 +307,8 @@ namespace CssUI.DOM
         /// <summary>
         /// Ensures the table does not have a thead element.
         /// </summary>
-        [CEReactions] public void deleteTHead()
+        [CEReactions]
+        public void deleteTHead()
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-deletethead */
 
             CEReactions.Wrap_CEReaction(this, () =>
@@ -318,7 +324,8 @@ namespace CssUI.DOM
         /// <summary>
         /// Ensures the table does not have a tfoot element.
         /// </summary>
-        [CEReactions] public void deleteTFoot()
+        [CEReactions]
+        public void deleteTFoot()
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-deletetfoot */
 
             CEReactions.Wrap_CEReaction(this, () =>
@@ -337,7 +344,8 @@ namespace CssUI.DOM
         /// If the given position is less than −1 or greater than the index of the last row, or if there are no rows, throws an "IndexSizeError" DOMException.
         /// </summary>
         /// <param name="index"></param>
-        [CEReactions] public void deleteRow(int index)
+        [CEReactions]
+        public void deleteRow(int index)
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-deleterow */
 
             CEReactions.Wrap_CEReaction(this, () =>

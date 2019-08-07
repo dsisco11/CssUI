@@ -1,14 +1,13 @@
-﻿using CssUI.DOM.CustomElements;
-using CssUI.DOM.Exceptions;
-using CssUI.DOM.Nodes;
-using System;
+﻿using CssUI.DOM;
+using CssUI.DOM.CustomElements;
+using CssUI.DOM.Enums;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
-    public abstract class HTMLCollection<ElementType> : IEnumerable<ElementType> where ElementType : HTMLElement
+    public class HTMLCollection<ElementType> : IEnumerable<ElementType> where ElementType : HTMLElement
     {/* Docs: https://html.spec.whatwg.org/multipage/common-dom-interfaces.html#htmloptionscollection */
         #region Properties
         public readonly HTMLElement root;
@@ -28,7 +27,7 @@ namespace CssUI.DOM
         #endregion
 
         #region Accessors
-        protected IReadOnlyList<ElementType> Collection => DOMCommon.Get_Descendents_OfType<ElementType>(root, CollectionFilter, Enums.ENodeFilterMask.SHOW_ELEMENT).ToArray();
+        protected IReadOnlyList<ElementType> Collection => DOMCommon.Get_Descendents_OfType<ElementType>(root, CollectionFilter, ENodeFilterMask.SHOW_ELEMENT).ToArray();
         #endregion
 
         /// <summary>
@@ -48,7 +47,8 @@ namespace CssUI.DOM
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        [CEReactions] public virtual ElementType this[int index]
+        [CEReactions]
+        public virtual ElementType this[int index]
         {
             get => Collection[index];
             set { }
@@ -69,7 +69,7 @@ namespace CssUI.DOM
                     return null;
                 }
 
-                return DOMCommon.Get_Nth_Descendant_OfType<ElementType>(root, 1, new FilterNamedElement(name), Enums.ENodeFilterMask.SHOW_ELEMENT);
+                return DOMCommon.Get_Nth_Descendant_OfType<ElementType>(root, 1, new FilterNamedElement(name), ENodeFilterMask.SHOW_ELEMENT);
             }
         }
 
@@ -77,12 +77,12 @@ namespace CssUI.DOM
         #region IEnumerable Implementation
         public IEnumerator<ElementType> GetEnumerator()
         {
-            return ((IEnumerable<ElementType>)Collection).GetEnumerator();
+            return Collection.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable<ElementType>)Collection).GetEnumerator();
+            return Collection.GetEnumerator();
         }
         #endregion
 

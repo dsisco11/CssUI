@@ -1,4 +1,5 @@
-﻿using CssUI.DOM.CustomElements;
+﻿using CssUI.DOM;
+using CssUI.DOM.CustomElements;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Nodes;
 using System;
@@ -6,9 +7,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
-    public class HTMLOptionsCollection  : HTMLCollection<HTMLOptionElement>
+    public class HTMLOptionsCollection : HTMLCollection<HTMLOptionElement>
     {/* Docs: https://html.spec.whatwg.org/multipage/common-dom-interfaces.html#htmloptionscollection */
         #region Properties
         #endregion
@@ -41,7 +42,7 @@ namespace CssUI.DOM
                     /* When set to a smaller number, truncates the number of option elements in the corresponding container. */
                     if (value < len)
                     {
-                        for (int i =len-1; i>value; i--)
+                        for (int i = len - 1; i > value; i--)
                         {
                             var rmv = items[i];
                             root.removeChild(rmv);
@@ -52,7 +53,7 @@ namespace CssUI.DOM
                     if (value > len)
                     {
                         var add = value - len;
-                        for (int i=0; i<add; i++)
+                        for (int i = 0; i < add; i++)
                         {
                             var opt = new HTMLOptionElement(root.nodeDocument);
                             root.appendChild(opt);
@@ -85,7 +86,7 @@ namespace CssUI.DOM
                     if (n > 0)
                     {
                         var frag = new DocumentFragment(root, root.nodeDocument);
-                        for(int i=0; i<=n-1; i++)
+                        for (int i = 0; i <= n - 1; i++)
                         {
                             var opt = new HTMLOptionElement(root.nodeDocument);
                             frag.append(opt);
@@ -276,7 +277,8 @@ namespace CssUI.DOM
         /// Removes the item with index index from the collection.
         /// </summary>
         /// <param name="index"></param>
-        [CEReactions] public void remove(long index)
+        [CEReactions]
+        public void remove(long index)
         {/* Docs: https://html.spec.whatwg.org/multipage/common-dom-interfaces.html#dom-htmloptionscollection-remove */
             var items = Collection;
             if (items.Count == 0)
@@ -302,6 +304,6 @@ namespace CssUI.DOM
             get => root.selectedIndex;
             set => root.selectedIndex = value;
         }
-        
+
     }
 }

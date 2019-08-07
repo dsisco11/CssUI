@@ -1,4 +1,6 @@
-﻿namespace CssUI.DOM
+﻿using CssUI.DOM;
+
+namespace CssUI.HTML
 {
     /// <summary>
     /// The tbody element represents a block of rows that consist of a body of data for the parent table element, if the tbody element has a parent and it is a table.

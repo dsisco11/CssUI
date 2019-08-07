@@ -1,10 +1,11 @@
-﻿using CssUI.DOM.CustomElements;
+﻿using CssUI.DOM;
+using CssUI.DOM.CustomElements;
 using CssUI.DOM.Events;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Nodes;
 using System.Threading.Tasks;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     /// <summary>
     /// The dialog element represents a part of an application that a user interacts with to perform a task, for example a dialog box, inspector, or window.
@@ -53,9 +54,10 @@ namespace CssUI.DOM
                 /* XXX: Finish */
             }
         }
-        
 
-        [CEReactions] void show()
+
+        [CEReactions]
+        void show()
         {/* Docs: https://html.spec.whatwg.org/multipage/interactive-elements.html#dom-dialog-show */
 
             CEReactions.Wrap_CEReaction(this, () =>
@@ -68,7 +70,8 @@ namespace CssUI.DOM
             });
         }
 
-        [CEReactions] void showModal()
+        [CEReactions]
+        void showModal()
         {/* Docs: https://html.spec.whatwg.org/multipage/interactive-elements.html#dom-dialog-showmodal */
             CEReactions.Wrap_CEReaction(this, () =>
             {
@@ -90,7 +93,8 @@ namespace CssUI.DOM
             });
         }
 
-        [CEReactions] void close(string result = null)
+        [CEReactions]
+        void close(string result = null)
         {/* Docs: https://html.spec.whatwg.org/multipage/interactive-elements.html#dom-dialog-close */
             CEReactions.Wrap_CEReaction(this, () =>
             {

@@ -1,4 +1,6 @@
-﻿namespace CssUI.DOM.Events
+﻿using CssUI.HTML;
+
+namespace CssUI.DOM.Events
 {
     public class FormDataEventInit : EventInit
     {

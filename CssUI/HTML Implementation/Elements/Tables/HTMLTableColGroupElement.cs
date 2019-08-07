@@ -1,6 +1,7 @@
-﻿using CssUI.DOM.CustomElements;
+﻿using CssUI.DOM;
+using CssUI.DOM.CustomElements;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     /// <summary>
     /// The colgroup element represents a group of one or more columns in the table that is its parent, if it has a parent and that is a table element.

@@ -1,4 +1,6 @@
-﻿namespace CssUI.DOM
+﻿using CssUI.DOM;
+
+namespace CssUI.HTML
 {
     public sealed class HTMLTemplateElement : HTMLElement
     {

@@ -1,6 +1,7 @@
-﻿using CssUI.DOM.CustomElements;
+﻿using CssUI.DOM;
+using CssUI.DOM.CustomElements;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     /// <summary>
     /// The area element represents either a hyperlink with some text and a corresponding area on an image map, or a dead area on an image map.

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Internal;
 using CssUI.DOM.CustomElements;
+using CssUI.DOM;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     public class HTMLTableRowElement : HTMLElement
     {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#htmltablerowelement */
@@ -131,7 +132,8 @@ namespace CssUI.DOM
         /// If the given position is less than −1 or greater than the index of the last cell, or if there are no cells, throws an "IndexSizeError" DOMException.
         /// </summary>
         /// <param name="index"></param>
-        [CEReactions] public void deleteCell(int index)
+        [CEReactions]
+        public void deleteCell(int index)
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-tr-deletecell */
             CEReactions.Wrap_CEReaction(this, () =>
             {

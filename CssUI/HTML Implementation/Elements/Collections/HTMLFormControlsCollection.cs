@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using CssUI.DOM;
+using CssUI.DOM.Enums;
+using System.Linq;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     public class HTMLFormControlsCollection : HTMLCollection<HTMLElement>
     {/* Docs: https://html.spec.whatwg.org/multipage/common-dom-interfaces.html#htmlformcontrolscollection */
@@ -24,7 +26,7 @@ namespace CssUI.DOM
                     return null;
                 }
 
-                var matched = DOMCommon.Get_Descendents_OfType<HTMLElement>(root, new FilterNamedElement(name), Enums.ENodeFilterMask.SHOW_ELEMENT);
+                var matched = DOMCommon.Get_Descendents_OfType<HTMLElement>(root, new FilterNamedElement(name), ENodeFilterMask.SHOW_ELEMENT);
                 if (matched.Count <= 0)
                 {
                     return null;

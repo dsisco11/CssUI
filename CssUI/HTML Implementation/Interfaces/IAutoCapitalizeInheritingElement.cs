@@ -1,6 +1,6 @@
 ﻿using CssUI.DOM.Events;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     /// <summary>
     /// Denotes elements that inherit the autocapitalize attribute from their form owner.

@@ -1,9 +1,11 @@
-﻿using CssUI.DOM.Exceptions;
+﻿using CssUI.DOM;
+using CssUI.DOM.Enums;
+using CssUI.DOM.Exceptions;
 using CssUI.DOM.Nodes;
 using System;
 using System.Collections.Generic;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     public class ElementInternals
     {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#elementinternals */
@@ -11,12 +13,30 @@ namespace CssUI.DOM
         #region Properties
         public readonly HTMLElement TargetElement = null;
         public HTMLFormElement form { get; internal set; }
+        private readonly NodeFilter labelFilter;
         #endregion
 
         #region Constructor
         public ElementInternals(HTMLElement targetElement)
         {
             TargetElement = targetElement;
+            labelFilter = new FilterLabelFor(TargetElement);
+        }
+        #endregion
+
+        #region Accessors
+
+        public IReadOnlyCollection<HTMLLabelElement> labels
+        {/* Docs: https://html.spec.whatwg.org/multipage/forms.html#dom-elementinternals-labels */
+            get
+            {
+                if (!DOMCommon.Is_Form_Associated_Custom_Element(TargetElement))
+                {
+                    throw new NotSupportedError($"Element internals may only function on custom form-associated elements");
+                }
+
+                return DOMCommon.Get_Descendents_OfType<HTMLLabelElement>(form, labelFilter, ENodeFilterMask.SHOW_ELEMENT);
+            }
         }
         #endregion
 
@@ -168,19 +188,6 @@ namespace CssUI.DOM
 
             var element = (FormAssociatedElement)TargetElement;
             return element.reportValidity();
-        }
-
-        public IReadOnlyCollection<HTMLLabelElement> labels
-        {/* Docs: https://html.spec.whatwg.org/multipage/forms.html#dom-elementinternals-labels */
-            get
-            {
-                if (!DOMCommon.Is_Form_Associated_Custom_Element(TargetElement))
-                {
-                    throw new NotSupportedError($"Element internals may only function on custom form-associated elements");
-                }
-
-                return (IReadOnlyCollection<HTMLLabelElement>)DOMCommon.Get_Descendents(form, new FilterLabelFor(TargetElement), Enums.ENodeFilterMask.SHOW_ELEMENT);
-            }
         }
 
     }

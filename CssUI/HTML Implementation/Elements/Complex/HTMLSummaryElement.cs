@@ -1,6 +1,8 @@
-﻿using CssUI.DOM.Events;
+﻿using CssUI.DOM;
+using CssUI.DOM.Enums;
+using CssUI.DOM.Events;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     /// <summary>
     /// The summary element represents a summary, caption, or legend for the rest of the contents of the summary element's parent details element, if any.
@@ -30,7 +32,7 @@ namespace CssUI.DOM
                 if (parent == null || !(parent is HTMLDetailsElement parentDetails))
                     return false;
 
-                var firstSummary = DOMCommon.Get_Nth_Descendant_OfType<HTMLSummaryElement>(parentDetails, 1, null, Enums.ENodeFilterMask.SHOW_ELEMENT);
+                var firstSummary = DOMCommon.Get_Nth_Descendant_OfType<HTMLSummaryElement>(parentDetails, 1, null, ENodeFilterMask.SHOW_ELEMENT);
                 if (!ReferenceEquals(this, firstSummary))
                     return false;
 

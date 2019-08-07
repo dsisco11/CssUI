@@ -1,16 +1,19 @@
-﻿using CssUI.DOM.CustomElements;
+﻿using CssUI.DOM;
+using CssUI.DOM.CustomElements;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     public class HTMLTableCellHeadElement : HTMLTableCellElement
     {
         #region Properties
-        [CEReactions] public string scope
+        [CEReactions]
+        public string scope
         {
             get => getAttribute(EAttributeName.Scope)?.Get_String();
             set => setAttribute(EAttributeName.Scope, AttributeValue.From_String(value));
         }
-        [CEReactions] public string abbr
+        [CEReactions]
+        public string abbr
         {
             get => getAttribute(EAttributeName.Abbr).Get_String();
             set => setAttribute(EAttributeName.Abbr, AttributeValue.From_String(value));

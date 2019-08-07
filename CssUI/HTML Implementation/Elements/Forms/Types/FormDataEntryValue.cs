@@ -1,4 +1,6 @@
-﻿namespace CssUI.DOM
+﻿using CssUI.DOM;
+
+namespace CssUI.HTML
 {
     /// <summary>
     /// Represents a single entry within a forms data

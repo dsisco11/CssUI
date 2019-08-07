@@ -1,8 +1,9 @@
-﻿using CssUI.DOM.CustomElements;
+﻿using CssUI.DOM;
+using CssUI.DOM.CustomElements;
 using CssUI.DOM.Internal;
 using System.Linq;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     public class HTMLTableCellElement : HTMLElement
     {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#htmltablecellelement */
@@ -10,20 +11,22 @@ namespace CssUI.DOM
         /// <summary>
         /// Number of columns that the cell is to span
         /// </summary>
-        [CEReactions] public uint colSpan
+        [CEReactions]
+        public uint colSpan
         {/* The td and th elements may have a colspan content attribute specified, whose value must be a valid non-negative integer greater than zero and less than or equal to 1000. */
-            get => (uint)MathExt.Clamp(getAttribute(EAttributeName.ColSpan)?.Get_UInt() ?? 0, 0, 1000);
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.ColSpan, AttributeValue.From_Integer((uint)MathExt.Clamp(value, 0, 1000))));
+            get => MathExt.Clamp(getAttribute(EAttributeName.ColSpan)?.Get_UInt() ?? 0, 0, 1000);
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.ColSpan, AttributeValue.From_Integer(MathExt.Clamp(value, 0, 1000))));
         }
         /// <summary>
         /// Number of rows that the cell is to span
         /// </summary>
-        [CEReactions] public uint rowSpan
+        [CEReactions]
+        public uint rowSpan
         {
             /* The td and th elements may also have a rowspan content attribute specified, whose value must be a valid non-negative integer less than or equal to 65534. 
              * For this attribute, the value zero means that the cell is to span all the remaining rows in the row group. */
-            get => (uint)MathExt.Clamp(getAttribute(EAttributeName.RowSpan)?.Get_UInt() ?? 0, 0, ushort.MaxValue);
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.RowSpan, AttributeValue.From_Integer((uint)MathExt.Clamp(value, 0, ushort.MaxValue))));
+            get => MathExt.Clamp(getAttribute(EAttributeName.RowSpan)?.Get_UInt() ?? 0, 0, ushort.MaxValue);
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.RowSpan, AttributeValue.From_Integer(MathExt.Clamp(value, 0, ushort.MaxValue))));
         }
         /// <summary>
         /// The header cells for this cell
