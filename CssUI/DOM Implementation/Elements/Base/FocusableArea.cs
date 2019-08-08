@@ -1,6 +1,7 @@
 ﻿using CssUI.DOM.Events;
 using CssUI.DOM.Internal;
 using CssUI.DOM.Nodes;
+using CssUI.HTML;
 
 namespace CssUI.DOM
 {
@@ -37,6 +38,70 @@ namespace CssUI.DOM
             this.DOMAnchor = DOMAnchor;
         }
         #endregion
+
+        /// <summary>
+        /// Returns <c>True</c> if the given <paramref name="target"/> is a valid focusable area
+        /// </summary>
+        public static bool Is_Focusable(EventTarget target)
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#focusable-area */
+
+            /* This list may be incomplete, there may be other valid focusable areas not accounted for here */
+
+            /* Elements that have their tabindex focus flag set, that are not actually disabled, that are not expressly inert, and that are either being rendered or being used as relevant canvas fallback content. */
+            if (target is HTMLElement htmlElement)
+            {
+                if (htmlElement.tabindex_focus_flag && !htmlElement.is_actually_disabled && !htmlElement.is_expressly_inert)
+                {
+                    if (htmlElement.is_being_rendered || DOMCommon.Is_Being_Used_As_Canvas_Fallback_Content(htmlElement))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            /* The shapes of area elements in an image map associated with an img element that is being rendered and is not expressly inert. */
+            if (target is HTMLAreaElement areaElement)
+            {
+                /* XXX: figure this out */
+            }
+
+            if (target is Element element)
+            {
+                /* The contents of an iframe */
+                if (element.parentElement is HTMLIFrameElement)
+                {
+                    return true;
+                }
+            }
+
+            /* The scrollable regions of elements that are being rendered and are not expressly inert. */
+            if (target is ScrollBox scrollbox && scrollbox.Owner.is_being_rendered && !scrollbox.Owner.is_expressly_inert)
+            {
+                return true;
+            }
+
+            /* The viewport of a Document that has a non-null browsing context and is not inert. */
+            if (target is IViewport viewport && viewport.document.BrowsingContext != null)
+            {
+                return true;
+            }
+
+
+            if (target is Document document) return true;
+            if (target is BrowsingContext context) return true;
+
+
+
+            /* The user-agent provided subwidgets of elements that are being rendered and are not actually disabled or expressly inert. */
+            /* XXX: dont forget these */
+
+
+            /* Any other element or part of an element, especially to aid with accessibility or to better match platform conventions. */
+            /* XXX: This seems to contradict the fact that elements must have the tabindex_focus_flag set */
+
+
+            return false;
+        }
 
         #region Implicit
         public static implicit operator FocusableArea(EventTarget target)
