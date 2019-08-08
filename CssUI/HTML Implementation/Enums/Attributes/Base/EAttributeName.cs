@@ -222,5 +222,15 @@ namespace CssUI.DOM
         Srcdoc,
         [MetaKeyword("allow")]
         Allow,
+
+        /* AREA */
+        [MetaKeyword("coords")]
+        Coords,
+        [MetaKeyword("shape")]
+        Shape,
+        [MetaKeyword("ping")]
+        Ping,
+        [MetaKeyword("download")]
+        Download,
     }
 }
