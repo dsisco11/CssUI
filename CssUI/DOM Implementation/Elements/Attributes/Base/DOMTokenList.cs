@@ -1,4 +1,5 @@
-﻿using CssUI.DOM.Exceptions;
+﻿using CssUI.DOM.CustomElements;
+using CssUI.DOM.Exceptions;
 using CssUI.Enums;
 using System;
 using System.Collections;
@@ -6,23 +7,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+using System.Text;
 
 namespace CssUI.DOM
 {
-    public class DOMTokenList : IEnumerable<AtomicString>, ISerializable
-    {
+    public class DOMTokenList : IEnumerable<AtomicString>
+    {/* Docs: https://dom.spec.whatwg.org/#interface-domtokenlist */
         #region Backing List
         private List<AtomicString> TokenSet = new List<AtomicString>();
         #endregion
 
         #region Properties
-        public int Length { get => this.TokenSet.Count; }
-        public AtomicString Value { get; private set; }
         private readonly Element ownerElement;
         /// <summary>
         /// Name of the attribute this token list represents
         /// </summary>
         public readonly AtomicName<EAttributeName> localName;
+        private readonly string[] SupportedTokens = null;
         #endregion
 
         #region Constructor
@@ -32,50 +33,46 @@ namespace CssUI.DOM
             this.ownerElement = ownerElement;
             /* 2) Let localName be associated attribute’s local name. */
             this.localName = localName;
-            /* 3) Let value be the result of getting an attribute value given element and localName. */
-            this.ownerElement.find_attribute(localName, out Attr attr);
-            this.Value = attr?.Value.Get_String();
-            /* 4) Run the attribute change steps for element, localName, value, value, and null. */
-            
-            /* 1) If localName is associated attribute’s local name, namespace is null, and value is null, then empty token set. */
-            if (ReferenceEquals(Value, null))
+
+            if (ownerElement.tokenListMap.ContainsKey(localName))
             {
-                TokenSet = new List<AtomicString>();
+                throw new DOMException($"Cannot link {nameof(DOMTokenList)} to element because it already has one defined for attribute \"{localName}\"");
             }
             else
             {
-                /* 2) Otherwise, if localName is associated attribute’s local name, namespace is null, then set token set to value, parsed. */
-                TokenSet = new List<AtomicString>();
-                var valueMem = Value.ToString().AsMemory();
-                var rawTokens = DOMCommon.Parse_Ordered_Set(valueMem);
-                var tokens = rawTokens.Select(o => o.ToString());
-
-                foreach (var token in tokens)
-                {
-                    TokenSet.Add(new AtomicString(token, EAtomicStringFlags.CaseInsensitive));
-                }
+                ownerElement.tokenListMap.Add(localName, this);
             }
+            /* 3) Let value be the result of getting an attribute value given element and localName. */
+            this.ownerElement.find_attribute(localName, out Attr attr);
+            var value = attr?.Value.Get_String();
+            /* 4) Run the attribute change steps for element, localName, value, value, and null. */
+            run_attribute_change_steps(ownerElement, localName, attr.Value, attr.Value, null);
+        }
+
+        public DOMTokenList(Element ownerElement, AtomicName<EAttributeName> localName, string[] supportedTokens)
+        {
+            SupportedTokens = supportedTokens;
+            /* 1) Let element be associated element. */
+            this.ownerElement = ownerElement;
+            /* 2) Let localName be associated attribute’s local name. */
+            this.localName = localName;
+
+            if (ownerElement.tokenListMap.ContainsKey(localName))
+            {
+                throw new DOMException($"Cannot link {nameof(DOMTokenList)} to element because it already has one defined for attribute \"{localName}\"");
+            }
+            else
+            {
+                ownerElement.tokenListMap.Add(localName, this);
+            }
+            /* 3) Let value be the result of getting an attribute value given element and localName. */
+            this.ownerElement.find_attribute(localName, out Attr attr);
+            var value = attr?.Value.Get_String();
+            /* 4) Run the attribute change steps for element, localName, value, value, and null. */
+            run_attribute_change_steps(ownerElement, localName, attr.Value, attr.Value, null);
         }
         #endregion
 
-        #region IEnumerable Implementation
-        public IEnumerator<AtomicString> GetEnumerator()
-        {
-            return ((IEnumerable<AtomicString>)TokenSet).GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return ((IEnumerable<AtomicString>)TokenSet).GetEnumerator();
-        }
-        #endregion
-
-        #region Serialization
-        void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            throw new NotImplementedException();
-        }
-        #endregion
 
         #region Utility
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -84,8 +81,7 @@ namespace CssUI.DOM
             /* A DOMTokenList object’s update steps are: */
             /* 1) If the associated element does not have an associated attribute and token set is empty, then return. */
             string name = localName.ToString();
-            string lowerName = StringCommon.Transform(name.AsMemory(), UnicodeCommon.To_ASCII_Lower_Alpha);
-            if (!ownerElement.AttributeList.ContainsKey(lowerName) && TokenSet.Count <= 0)
+            if (!ownerElement.AttributeList.ContainsKey(name) && TokenSet.Count <= 0)
                 return;
 
             /* 2) Set an attribute value for the associated element using associated attribute’s local name and the result of running the ordered set serializer for token set. */
@@ -93,6 +89,14 @@ namespace CssUI.DOM
         }
         #endregion
 
+        #region Accessors
+        public int Length => TokenSet.Count;
+
+        [CEReactions] public AtomicString Value
+        {
+            get => ownerElement.getAttribute(localName).Get_String();
+            set => CEReactions.Wrap_CEReaction(ownerElement, () => ownerElement.setAttribute(localName, AttributeValue.From_String(value)));
+        }
 
         public string item(int index)
         {
@@ -104,6 +108,37 @@ namespace CssUI.DOM
             /* 2) Return context object’s token set[index]. */
             return TokenSet[index];
         }
+        #endregion
+
+        #region Internal
+        internal void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue newValue, string Namespace)
+        {
+            if (localName != this.localName) return;
+            if (!ReferenceEquals(null, Namespace)) return;
+
+            var value = newValue.Get_String();
+            /* 1) If localName is associated attribute’s local name, namespace is null, and value is null, then empty token set. */
+            if (ReferenceEquals(null, value))
+            {
+                TokenSet = new List<AtomicString>();
+            }
+            else
+            {
+                /* 2) Otherwise, if localName is associated attribute’s local name, namespace is null, then set token set to value, parsed. */
+                TokenSet = new List<AtomicString>();
+                var valueMem = value.AsMemory();
+                var rawTokens = DOMCommon.Parse_Ordered_Set(valueMem);
+                var tokens = rawTokens.Select(o => o.ToString());
+
+                foreach (var token in tokens)
+                {
+                    TokenSet.Add(new AtomicString(token, EAtomicStringFlags.CaseInsensitive));
+                }
+            }
+        }
+        #endregion
+
+
 
         public bool Contains(AtomicString token)
         {
@@ -223,5 +258,38 @@ namespace CssUI.DOM
             /* 6) Return true. */
             return true;
         }
+
+        public bool Supports(AtomicString token)
+        {/* Docs: https://dom.spec.whatwg.org/#dom-domtokenlist-supports */
+            if (ownerElement.find_attribute(localName, out Attr outAttr))
+            {
+                if (outAttr.Definition.SupportedTokens == null)
+                {
+                    throw new TypeError($"Content attribute \"{localName}\" does not define supported tokens");
+                }
+
+                if (outAttr.Definition.SupportedTokens.Contains(token))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+
+
+
+        #region IEnumerable Implementation
+        public IEnumerator<AtomicString> GetEnumerator()
+        {
+            return ((IEnumerable<AtomicString>)TokenSet).GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ((IEnumerable<AtomicString>)TokenSet).GetEnumerator();
+        }
+        #endregion
     }
 }
