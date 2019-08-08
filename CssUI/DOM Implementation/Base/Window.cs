@@ -344,7 +344,7 @@ namespace CssUI.DOM
             get
             {
                 /* 1) Let candidate be the Document of the top-level browsing context. */
-                var candidate = document;
+                var candidate = this.Get_Top_Level_Browsing_Context().activeDocument;
                 while (true)
                 {
                     /* 2) If the designated focused area of the document is a browsing context container with a non-null nested browsing context, 

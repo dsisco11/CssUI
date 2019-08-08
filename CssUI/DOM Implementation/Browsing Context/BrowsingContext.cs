@@ -26,7 +26,19 @@ namespace CssUI.DOM.Internal
 
         #endregion
 
+        #region Constructors
+        protected BrowsingContext(BrowsingContext opener = null)
+        {
+            _opener.SetTarget(opener);
+        }
+        #endregion
+
         #region Accessors
+        public bool IsTopLevel
+        {
+            get => (Opener == null);
+        }
+
         public Document activeDocument
         {/* A browsing context's active document is its WindowProxy object's [[Window]] internal slot value's associated Document. */
             get
@@ -50,11 +62,17 @@ namespace CssUI.DOM.Internal
         }
         #endregion
 
-        #region Constructors
-        protected BrowsingContext(BrowsingContext opener = null)
+
+        public BrowsingContext Get_Top_Level_Browsing_Context()
         {
-            _opener.SetTarget(opener);
+            BrowsingContext context = this;
+
+            while (!context.IsTopLevel)
+            {
+                context = context.Opener;
+            }
+
+            return context;
         }
-        #endregion
     }
 }
