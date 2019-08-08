@@ -154,6 +154,12 @@ namespace CssUI.DOM
 
                 /* Button Attributes */
                 new AttributeDefinition(typeof(HTMLButtonElement), EAttributeName.Type, EAttributeType.Enumerated, AttributeValue.From_Enum(EButtonType.Submit), AttributeValue.From_Enum(EButtonType.Submit), EAttributeFlags.None, Lookup.Get_Keywords<EButtonType>()),
+
+
+                /* IFrame Attributes */
+                new AttributeDefinition(typeof(HTMLIFrameElement), EAttributeName.Sandbox, EAttributeType.Enumerated, null, null, EAttributeFlags.None, null, null, null, null, Lookup.Get_Keywords<ESandbox>()),
+                new AttributeDefinition(typeof(HTMLIFrameElement), EAttributeName.Srcdoc, EAttributeType.String, null, null, EAttributeFlags.None),
+                new AttributeDefinition(typeof(HTMLIFrameElement), EAttributeName.Allow, EAttributeType.String, null, null, EAttributeFlags.None),
             };
         }
     }
