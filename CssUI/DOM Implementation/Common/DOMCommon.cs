@@ -92,24 +92,6 @@ namespace CssUI.DOM
         #endregion
 
         #region Checks
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static bool Is_Focusable(HTMLElement element)
-        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#focusable-area */
-            if (element.tabindex_focus_flag && !element.is_actually_disabled && !element.is_expressly_inert && element.is_being_rendered)
-                return true;
-
-            /* XXX: add others */
-
-            return false;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static bool Has_Focus(Document target)
-        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#has-focus-steps */
-            return true;
-        }
-
         /// <summary>
         /// Returns true if the element is a form-associated-custom-element
         /// </summary>
@@ -261,6 +243,106 @@ namespace CssUI.DOM
 
             return false;
         }
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static bool Is_Same_Origin(string originA, string originB)
+        {/* Docs: https://html.spec.whatwg.org/multipage/origin.html#same-origin */
+            if (ReferenceEquals(null, originA) || ReferenceEquals(null, originB))
+            {
+                return ReferenceEquals(originA, originB);
+            }
+
+            if (!Uri.TryCreate(originA, UriKind.RelativeOrAbsolute, out Uri A) || !Uri.TryCreate(originB, UriKind.RelativeOrAbsolute, out Uri B))
+            {
+                return ReferenceEquals(originA, originB) || originA.AsSpan().Equals(originB.AsSpan(), StringComparison.OrdinalIgnoreCase);
+            }
+
+            return (A.Scheme == B.Scheme) && A.Host.AsSpan().Equals(B.Host.AsSpan(), StringComparison.OrdinalIgnoreCase) && (A.Port == B.Port);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static bool Is_Same_Origin_Domain(string originA, string originB)
+        {/* Docs: https://html.spec.whatwg.org/multipage/origin.html#same-origin-domain */
+            if (ReferenceEquals(null, originA) || ReferenceEquals(null, originB))
+            {
+                return ReferenceEquals(originA, originB);
+            }
+
+            if (!Uri.TryCreate(originA, UriKind.RelativeOrAbsolute, out Uri A) || !Uri.TryCreate(originB, UriKind.RelativeOrAbsolute, out Uri B))
+            {
+                return ReferenceEquals(originA, originB) || originA.AsSpan().Equals(originB.AsSpan(), StringComparison.OrdinalIgnoreCase);
+            }
+
+            if (A.Scheme == B.Scheme)
+            {
+                if (!ReferenceEquals(null, A.Host) && !ReferenceEquals(null, B.Host))
+                {
+                    if (A.Host.AsSpan().Equals(B.Host.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            if (Is_Same_Origin(originA, originB) && ReferenceEquals(null, A.Host) && ReferenceEquals(null, B.Host))
+            {
+                return true;
+            }
+
+            return false;
+        }
+        #endregion
+
+        #region Classifications
+        /// <summary>
+        /// Returns True if the specified document is the active one
+        /// </summary>
+        /// <param name="document"></param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Active_Document(Document document)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Returns true if the node is one of the 3 common text node types: <see cref="Text"/>, <see cref="ProcessingInstruction"/>, or <see cref="Comment"/>
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_CommonTextNode(Node node)
+        {
+            return node is Text || node is ProcessingInstruction || node is Comment;
+        }
+
+        /// <summary>
+        /// Returns true if the event was triggered by a user action
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Triggered_By_UserActivation(Event @event)
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#triggered-by-user-activation */
+            if (!@event.isTrusted)
+                return false;
+
+            switch (@event.type.EnumValue)
+            {
+                case EEventName.Change:
+                case EEventName.Click:
+                case EEventName.ContextMenu:
+                case EEventName.DoubleClick:
+                case EEventName.MouseUp:
+                case EEventName.PointerUp:
+                case EEventName.Reset:
+                case EEventName.Submit:
+                case EEventName.TouchEnd:
+                    return true;
+                default:
+                    return false;
+            }
+        }
         #endregion
 
         #region Ordered Sets
@@ -334,59 +416,6 @@ namespace CssUI.DOM
             /* 3) Return the result of match a selector against a tree with s and node’s root using scoping root node. [SELECTORS4]. */
             return Selector.Match_Against_Tree(new Node[] { node }, node.getRootNode());
         }
-        #endregion
-
-        #region Classifications
-        /// <summary>
-        /// Returns True if the specified document is the active one
-        /// </summary>
-        /// <param name="document"></param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Active_Document(Document document)
-        {
-            return true;
-        }
-
-        /// <summary>
-        /// Returns true if the node is one of the 3 common text node types: <see cref="Text"/>, <see cref="ProcessingInstruction"/>, or <see cref="Comment"/>
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_CommonTextNode(Node node)
-        {
-            return node is Text || node is ProcessingInstruction || node is Comment;
-        }
-
-        /// <summary>
-        /// Returns true if the event was triggered by a user action
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Triggered_By_UserActivation(Event @event)
-        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#triggered-by-user-activation */
-            if (!@event.isTrusted)
-                return false;
-
-            switch (@event.type.EnumValue)
-            {
-                case EEventName.Change:
-                case EEventName.Click:
-                case EEventName.ContextMenu:
-                case EEventName.DoubleClick:
-                case EEventName.MouseUp:
-                case EEventName.PointerUp:
-                case EEventName.Reset:
-                case EEventName.Submit:
-                case EEventName.TouchEnd:
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-
         #endregion
 
         #region Slottables
@@ -1834,6 +1863,14 @@ namespace CssUI.DOM
         #endregion
 
         #region Focus
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static bool Has_Focus(Document target)
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#has-focus-steps */
+
+
+        }
+
         /// <summary>
         /// Returns <c>True</c> is the given target is a valid focusable area
         /// </summary>
@@ -1842,41 +1879,6 @@ namespace CssUI.DOM
         internal static bool Is_Focusable_Area(EventTarget target)
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#focusable-area */
 
-            /* Elements that have their tabindex focus flag set, that are not actually disabled, that are not expressly inert, and that are either being rendered or being used as relevant canvas fallback content. */
-            if (target is HTMLElement element)
-            {
-                if (element.tabindex_focus_flag && !element.is_actually_disabled && !element.is_expressly_inert)
-                {
-                    if (element.is_being_rendered || Is_Being_Used_As_Canvas_Fallback_Content(element))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            /* The shapes of area elements in an image map associated with an img element that is being rendered and is not expressly inert. */
-            if (target is HTMLAreaElement areaElement)
-            {
-                /* XXX: figure this out */
-            }
-
-            /* The user-agent provided subwidgets of elements that are being rendered and are not actually disabled or expressly inert. */
-            /* XXX: dont forget these */
-
-            /* The scrollable regions of elements that are being rendered and are not expressly inert. */
-            if (target is ScrollBox scrollbox && scrollbox.Owner.is_being_rendered && !scrollbox.Owner.is_expressly_inert)
-            {
-                return true;
-            }
-
-            /* The viewport of a Document that has a non-null browsing context and is not inert. */
-            if (target is IViewport viewport && viewport.document.BrowsingContext != null)
-            {
-                return true;
-            }
-
-            /* Any other element or part of an element, especially to aid with accessibility or to better match platform conventions. */
-            /* XXX: This seems to contradict the fact that elements must have the tabindex_focus_flag set */
 
             return false;
         }
