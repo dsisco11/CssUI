@@ -22,9 +22,10 @@ namespace CssUI.DOM
     {/* Docs: https://dom.spec.whatwg.org/#interface-element */
         #region Internal Properties
         internal OrderedDictionary<AtomicName<EAttributeName>, Attr> AttributeList { get; private set; } = new OrderedDictionary<AtomicName<EAttributeName>, Attr>();
-
         internal readonly Queue<IElementReaction> Custom_Element_Reaction_Queue = new Queue<IElementReaction>();
+        internal OrderedDictionary<AtomicName<EAttributeName>, DOMTokenList> tokenListMap = new OrderedDictionary<AtomicName<EAttributeName>, DOMTokenList>();
         #endregion
+
 
         #region Properties
         /// <summary>
@@ -456,6 +457,15 @@ namespace CssUI.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal virtual void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue newValue, string Namespace)
         {
+            if (tokenListMap.Count > 0)
+            {
+                if (tokenListMap.TryGetValue(localName, out DOMTokenList tokenList))
+                {
+                    tokenList.run_attribute_change_steps(element, localName, oldValue, newValue, Namespace);
+                }
+            }
+
+
             if (localName.IsCustom)
             {
                 return;
