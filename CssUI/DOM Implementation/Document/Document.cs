@@ -78,6 +78,7 @@ namespace CssUI.DOM
         public readonly EQuirksMode Mode = EQuirksMode.NoQuirks;
         public readonly string URL = "/";
         public readonly string Origin = null;
+
         public readonly DocumentType doctype;
         public readonly string contentType;
         public readonly DOMImplementation implementation = new DOMImplementation();
@@ -113,6 +114,7 @@ namespace CssUI.DOM
         /// </summary>
         public Element documentElement { get; private set; }
 
+        /* XXX: */
         public LinkedList<HTMLImageElement> Images = new LinkedList<HTMLImageElement>();
 
         private ConcurrentDictionary<KeyCombination, Action> KeyCommands = new ConcurrentDictionary<KeyCombination, Action>();
@@ -157,7 +159,10 @@ namespace CssUI.DOM
         /// The root CssUI element
         /// </summary>
         /* The body element of a document is the first of the html element's children that is either a body element or a frameset element, or null if there is no such element. */
-        public HTMLElement body { get; }
+        public HTMLElement body
+        {
+            get => DOMCommon.Get_Nth_Child_OfType<HTMLBodyElement>(documentElement, 1);
+        }
 
 
         /// <summary>
@@ -356,8 +361,23 @@ namespace CssUI.DOM
         /// </summary>
         /// <returns></returns>
         public bool hasFocus()
-        {
-            return DOMCommon.Has_Focus(this);
+        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#has-focus-steps */
+            var candidate = BrowsingContext.Get_Top_Level_Browsing_Context().activeDocument;
+            while (true)
+            {
+                if (ReferenceEquals(this, candidate))
+                {
+                    return true;
+                }
+                else if (candidate.focusedArea is IBrowsingContextContainer contextContainer && contextContainer.Nested_Browsing_Context != null)
+                {
+                    candidate = contextContainer.Nested_Browsing_Context.activeDocument;
+                }
+                else
+                {
+                    return false;
+                }
+            }
         }
 
         // [CEReactions] boolean execCommand(string commandId, optional boolean showUI = false, optional DOMString value = "");
