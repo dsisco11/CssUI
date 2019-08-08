@@ -23,7 +23,7 @@ namespace CssUI
         {
             get
             {
-                if (!ReferenceEquals(null, _name))
+                if (ReferenceEquals(null, _name))
                 {/* Resolve the backing value */
                     if (IsCustom)
                         throw new Exception("Name backing-value for custom event type is not set!");
@@ -33,12 +33,20 @@ namespace CssUI
                         throw new Exception($"Unable to convert \"{typeof(Ty).Name}\" value to string");
 
                     _name = name;
+                    NameLower = name.ToLowerInvariant();
                 }
 
                 return _name;
             }
-            private set => _name = value;
+            private set
+            {
+                _name = value;
+                NameLower = value.ToLowerInvariant();
+            }
         }
+
+        public string NameLower { get; private set; } = null;
+
         /// <summary>
         /// The value of this name for comparison purposes
         /// </summary>
@@ -88,14 +96,9 @@ namespace CssUI
                 /* /!\ These conversions will fucking EXPLODE if the given generic type does not have an integer backing type /!\ */
                 Ty enumValue = CastTo<Ty>.From<int>(value);
 
-                if (DomLookup.TryKeyword<Ty>(enumValue, out string domLUT) && !ReferenceEquals(null, domLUT))
+                if (Lookup.TryKeyword<Ty>(enumValue, out string LUT) && !ReferenceEquals(null, LUT))
                 {
-                    return domLUT;
-                }
-
-                if (CssLookup.TryKeyword<Ty>(enumValue, out string cssLUT) && !ReferenceEquals(null, cssLUT))
-                {
-                    return cssLUT;
+                    return LUT;
                 }
             }
 
