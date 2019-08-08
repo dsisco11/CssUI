@@ -49,7 +49,11 @@ namespace CssUI.HTML
                 return document;
             }
         }
-        readonly public Window contentWindow;
+
+        public Window contentWindow
+        {/* Docs: https://html.spec.whatwg.org/multipage/iframe-embed-object.html#dom-iframe-contentwindow */
+            get => Nested_Browsing_Context?.WindowProxy;
+        }
         #endregion
 
         #region Content publics
@@ -81,8 +85,9 @@ namespace CssUI.HTML
         #endregion
 
         Document getSVGDocument()
-        {/* Docs:  */
-
+        {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content-other.html#dom-media-getsvgdocument */
+            /* XXX: SVG */
+            throw new NotImplementedException();
         }
 
 
