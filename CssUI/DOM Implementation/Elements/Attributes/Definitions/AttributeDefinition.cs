@@ -36,7 +36,11 @@ namespace CssUI.DOM
         /// <summary>
         /// A list of all keywords that can be assigned to this property
         /// </summary>
-        public readonly HashSet<string> Keywords = null;
+        public readonly HashSet<AtomicString> Keywords = null;
+        /// <summary>
+        /// A list of all tokens that can be assigned to this property
+        /// </summary>
+        public readonly HashSet<AtomicString> SupportedTokens = null;
 
         public readonly Type enumType = null;
         public readonly Type ElementType = null;
@@ -59,6 +63,29 @@ namespace CssUI.DOM
         #endregion
 
         #region Constructors
+        private AttributeDefinition(string[] Keywords, string[] SupportedTokens)
+        {
+            if (Keywords == null)
+            {
+                this.Keywords = new HashSet<AtomicString>(new AtomicString[0]);
+            }
+            else
+            {
+                var set = Keywords.Select(word => word.ToLowerInvariant()).Cast<AtomicString>();
+                this.Keywords = new HashSet<AtomicString>(set);
+            }
+
+            if (SupportedTokens == null)
+            {
+                this.SupportedTokens = new HashSet<AtomicString>(new AtomicString[0]);
+            }
+            else
+            {
+                var set = SupportedTokens.Select(word => word.ToLowerInvariant()).Cast<AtomicString>();
+                this.SupportedTokens = new HashSet<AtomicString>(set);
+            }
+        }
+
         /// <summary>
         /// Creates a DOM attribute definition
         /// </summary>
@@ -66,7 +93,8 @@ namespace CssUI.DOM
         /// <param name="Flags">Indicates what aspects of an element this property affects</param>
         /// <param name="MissingValueDefault">Default value for the attribute</param>
         /// <param name="Keywords">List of keywords which can be assigned to this attribute</param>
-        public AttributeDefinition(AtomicName<EAttributeName> Name, EAttributeType Type = 0x0, AttributeValue MissingValueDefault = null, AttributeValue InvalidValueDefault = null, EAttributeFlags Flags = 0x0, string[] Keywords = null, Type enumType = null, dynamic lowerRange = null, dynamic upperRange = null)
+        public AttributeDefinition(AtomicName<EAttributeName> Name, EAttributeType Type = 0x0, AttributeValue MissingValueDefault = null, AttributeValue InvalidValueDefault = null, EAttributeFlags Flags = 0x0, string[] Keywords = null, Type enumType = null, dynamic lowerRange = null, dynamic upperRange = null, string[] SupportedTokens = null)
+            : this(Keywords, SupportedTokens)
         {
             this.ElementType = typeof(Element);
             this.Name = Name;
@@ -76,15 +104,6 @@ namespace CssUI.DOM
             this.enumType = enumType;
             this.LowerRange = lowerRange;
             this.UpperRange = upperRange;
-
-            if (Keywords == null)
-            {
-                this.Keywords = new HashSet<string>(new string[0]);
-            }
-            else
-            {
-                this.Keywords = new HashSet<string>(Keywords.Select(word => word.ToLowerInvariant()));
-            }
 
             // Append the specified allowed types to our defaults
             this.Type |= Type;
@@ -97,7 +116,8 @@ namespace CssUI.DOM
         /// <param name="Flags">Indicates what aspects of an element this property affects</param>
         /// <param name="MissingValueDefault">Default value for the attribute</param>
         /// <param name="Keywords">List of keywords which can be assigned to this attribute</param>
-        public AttributeDefinition(Type ElementType, AtomicName<EAttributeName> Name, EAttributeType Type = 0x0, AttributeValue MissingValueDefault = null, AttributeValue InvalidValueDefault = null, EAttributeFlags Flags = 0x0, string[] Keywords = null, Type enumType = null, dynamic lowerRange = null, dynamic upperRange = null)
+        public AttributeDefinition(Type ElementType, AtomicName<EAttributeName> Name, EAttributeType Type = 0x0, AttributeValue MissingValueDefault = null, AttributeValue InvalidValueDefault = null, EAttributeFlags Flags = 0x0, string[] Keywords = null, Type enumType = null, dynamic lowerRange = null, dynamic upperRange = null, string[] SupportedTokens = null)
+            : this(Keywords, SupportedTokens)
         {
             this.ElementType = ElementType;
             this.Name = Name;
@@ -107,15 +127,6 @@ namespace CssUI.DOM
             this.enumType = enumType;
             this.LowerRange = lowerRange;
             this.UpperRange = upperRange;
-
-            if (Keywords == null)
-            {
-                this.Keywords = new HashSet<string>(new string[0]);
-            }
-            else
-            {
-                this.Keywords = new HashSet<string>(Keywords.Select(word => word.ToLowerInvariant()));
-            }
 
             // Append the specified allowed types to our defaults
             this.Type |= Type;
