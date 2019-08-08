@@ -1,7 +1,6 @@
 ﻿using CssUI.DOM;
 using CssUI.DOM.CustomElements;
 using CssUI.DOM.Exceptions;
-using CssUI.DOM.Internal;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -10,6 +9,13 @@ namespace CssUI.HTML
 {
     public abstract class HTMLTableSectionElement : HTMLElement
     {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#htmltablesectionelement */
+
+        #region Constructor
+        public HTMLTableSectionElement(Document document, string localName) : base(document, localName)
+        {
+        }
+        #endregion
+
         #region Accessors
         public IReadOnlyCollection<HTMLElement> rows
         {/* The rows attribute must return an HTMLCollection rooted at this element, whose filter matches only tr elements that are children of this element. */
@@ -27,12 +33,6 @@ namespace CssUI.HTML
 
                 return rowList;
             }
-        }
-        #endregion
-
-        #region Constructor
-        public HTMLTableSectionElement(Document document, string localName) : base(document, localName)
-        {
         }
         #endregion
 
@@ -76,7 +76,7 @@ namespace CssUI.HTML
         /// <exception cref="IndexSizeError"></exception>
         /// <param name="index"></param>
         [CEReactions]
-        void deleteRow(int index)
+        public void deleteRow(int index)
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-tbody-deleterow */
             CEReactions.Wrap_CEReaction(this, () =>
             {

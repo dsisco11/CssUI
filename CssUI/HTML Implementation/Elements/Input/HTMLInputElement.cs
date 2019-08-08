@@ -15,10 +15,30 @@ using System.Threading.Tasks;
 namespace CssUI.HTML
 {
 
-    public class HTMLInputElement : FormAssociatedElement, IListedElement, ISubmittableElement, IResettableElement, ILableableElement, IAutoCapitalizeInheritingElement, IPossibleFlowContent, IPossiblePhrasingContent, IPossiblePalpableContent, IPossibleInteractiveContent
+    /// <summary>
+    /// The input element represents a typed data field, usually with a form control to allow the user to edit the data.
+    /// </summary>
+    [MetaElement("input")]
+    public class HTMLInputElement : FormAssociatedElement, IListedElement, ISubmittableElement, IResettableElement, ILableableElement, IAutoCapitalizeInheritingElement
     {/* Docs: https://html.spec.whatwg.org/multipage/input.html#the-input-element */
         const bool THROW_FOR_ATTR_INVALID_TYPES = false;
         const bool THROW_FOR_METHOD_INVALID_TYPES = false;
+
+        #region Definitions
+        public override EContentCategories Categories
+        {
+            get
+            {
+                var model = EContentCategories.Flow | EContentCategories.Phrasing;
+                if (type != EInputType.Hidden)
+                {
+                    model |= EContentCategories.Interactive | EContentCategories.Palpable;
+                }
+
+                return model;
+            }
+        }
+        #endregion
 
         #region Backing Values
         private string _value = string.Empty;
@@ -57,6 +77,7 @@ namespace CssUI.HTML
             }
         }
         #endregion
+
 
         #region Accessors
         private bool checkedness
@@ -177,7 +198,19 @@ namespace CssUI.HTML
                 }
             }
         }
+
+        public IReadOnlyCollection<HTMLLabelElement> labels
+        {
+            get
+            {
+                if (type == EInputType.Hidden)
+                    return null;
+
+                return DOMCommon.Get_Descendents_OfType<HTMLLabelElement>(form, labelFilter, ENodeFilterMask.SHOW_ELEMENT);
+            }
+        }
         #endregion
+
 
         #region Content Attributes
         /// <summary>
@@ -931,16 +964,6 @@ namespace CssUI.HTML
         }
         #endregion
 
-        public IReadOnlyCollection<HTMLLabelElement> labels
-        {
-            get
-            {
-                if (type == EInputType.Hidden)
-                    return null;
-
-                return DOMCommon.Get_Descendents_OfType<HTMLLabelElement>(form, labelFilter, ENodeFilterMask.SHOW_ELEMENT);
-            }
-        }
 
         #region Input Step
         [CEReactions]
@@ -1308,9 +1331,9 @@ namespace CssUI.HTML
         }
         #endregion
 
+
         #region Input Value
         private enum EInputValueMode { Value, Default, Default_ON, Filename };
-
         private static EInputValueMode Get_Input_Value_Mode(EInputType type)
         {
             switch (type)
@@ -1352,11 +1375,21 @@ namespace CssUI.HTML
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#dom-input-value */
             get
             {
+                /* If the name attribute is present and has a value that is a case-sensitive match for the string "_charset_", then the element's value attribute must be omitted. */
+                if (type == EInputType.Hidden && hasAttribute(EAttributeName.Name, out Attr nameAttr))
+                {
+                    if (nameAttr.Value.Get_String().AsSpan().Equals("_charset_".AsSpan(), StringComparison.OrdinalIgnoreCase))
+                    {
+                        return string.Empty;
+                    }
+                }
+
+
                 switch (Get_Input_Value_Mode(type))
                 {
                     case EInputValueMode.Value:
                         {
-                            return _value;
+                            return _value ?? string.Empty;
                         }
                     default:
                     case EInputValueMode.Default:
@@ -1469,7 +1502,6 @@ namespace CssUI.HTML
                     return null;
             }
         }
-
         double? get_maximum()
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#attr-input-max */
          /* If the element has a max attribute, 
@@ -1578,7 +1610,6 @@ namespace CssUI.HTML
                     }
             }
         }
-
         bool convert_number_to_string(double num, out string outValue)
         {
             switch (type)
@@ -1634,7 +1665,6 @@ namespace CssUI.HTML
                     }
             }
         }
-
         bool convert_string_to_date(ReadOnlyMemory<char> input, out DateTime outValue)
         {
             switch (type)
@@ -1691,7 +1721,6 @@ namespace CssUI.HTML
                     }
             }
         }
-
         bool convert_date_to_string(DateTimeOffset date, out string outValue)
         {
             switch (type)
@@ -1724,7 +1753,6 @@ namespace CssUI.HTML
                     }
             }
         }
-
         void run_value_sanitization()
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#value-sanitization-algorithm */
             switch (type)
@@ -1841,6 +1869,7 @@ namespace CssUI.HTML
             }
         }
         #endregion
+
 
         #region Form-Associated Element Overrides
         internal override EValidityState query_validity()
@@ -2009,6 +2038,14 @@ namespace CssUI.HTML
                     break;
             }
 
+            /* Constraint validation: If the element is required, and its value IDL attribute applies and is in the mode value, and the element is mutable, and the element's value is the empty string, then the element is suffering from being missing. */
+            if (0 == (flags & EValidityState.valueMissing))
+            {
+                if (Get_Input_Value_Mode(type) == EInputValueMode.Value && isMutable && cValue.Length <= 0)
+                {
+                    flags |= EValidityState.valueMissing;
+                }
+            }
             /* When a control has a value that is too long for the form control maxlength attribute (input maxlength, textarea maxlength). */
             if (cValue.Length > maxLength)
             {
@@ -2148,6 +2185,20 @@ namespace CssUI.HTML
         }
         #endregion
 
+
+        #region Resettable
+        public void Reset()
+        {/* Docs: https://html.spec.whatwg.org/multipage/input.html#the-input-element:concept-form-reset-control */
+            bDirtyValueFlag = false;
+            bDirtyCheckednessFlag = false;
+            _value = defaultValue ?? string.Empty;
+            checkedness = hasAttribute(EAttributeName.Checked);
+            selected_files.Clear();
+            run_value_sanitization();
+        }
+        #endregion
+
+
         #region Text Selection
         /* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#textFieldSelection:concept-textarea/input-selection */
 
@@ -2193,7 +2244,6 @@ namespace CssUI.HTML
             /* 2) Set the selection range with 0 and infinity. */
             setSelectionRange(0, int.MaxValue);
         }
-
         public int? selectionStart
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#dom-textarea/input-selectionstart */
             get
@@ -2247,7 +2297,6 @@ namespace CssUI.HTML
                 setSelectionRange(value, end, selectionDirection);
             }
         }
-
         public int? selectionEnd
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#dom-textarea/input-selectionend */
             get
@@ -2297,7 +2346,6 @@ namespace CssUI.HTML
                 setSelectionRange(selectionStart, value, selectionDirection);
             }
         }
-
         public ESelectionDirection? selectionDirection
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#dom-textarea/input-selectiondirection */
             get
@@ -2410,7 +2458,6 @@ namespace CssUI.HTML
                 }).ConfigureAwait(continueOnCapturedContext: false);
             }
         }
-
         public void setRangeText(string replacement)
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#dom-textarea/input-setrangetext */
          /* 1) If this element is an input element, and selectionStart does not apply to this element, throw an "InvalidStateError" DOMException. */
@@ -2486,7 +2533,6 @@ namespace CssUI.HTML
 
             setSelectionRange(selection_start, selection_end);
         }
-
         public void setRangeText(string replacement, int start, int end, ESelectionMode selectionMode = ESelectionMode.Preserve)
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#dom-textarea/input-setrangetext */
          /* 1) If this element is an input element, and selectionStart does not apply to this element, throw an "InvalidStateError" DOMException. */
@@ -2583,8 +2629,9 @@ namespace CssUI.HTML
         }
         #endregion
 
+
         #region Utility
-        internal bool isMutable
+        public override bool isMutable
         {
             get
             {
@@ -2595,7 +2642,6 @@ namespace CssUI.HTML
                 return true;
             }
         }
-
         private static bool is_type_text_selectable(EInputType type)
         {
             switch (type)
@@ -2610,7 +2656,6 @@ namespace CssUI.HTML
                     return false;
             }
         }
-
         internal IReadOnlyCollection<HTMLInputElement> Get_Radio_Button_Group()
         {
             Node root = form;
@@ -2619,7 +2664,6 @@ namespace CssUI.HTML
 
             return DOMCommon.Get_Descendents_OfType<HTMLInputElement>(root, new FilterRadioGroup(this), ENodeFilterMask.SHOW_ELEMENT);
         }
-
         /// <summary>
         /// If this is a radio button input type and its checkedness is currently true then this function will set the checkedness of all other buttons within its group to false.
         /// </summary>
@@ -2634,7 +2678,6 @@ namespace CssUI.HTML
                 }
             }
         }
-
         internal void signal_type_change()
         {
             if (type == EInputType.Radio)
@@ -2642,7 +2685,6 @@ namespace CssUI.HTML
                 update_radio_button_group();
             }
         }
-
         /// <summary>
         /// Returns the total months that occur between two dates. this method does not calculate the number of months using the total elapsed days between the dates, it assumes the two dates both start on the first day of their given month.
         /// </summary>
@@ -2651,6 +2693,7 @@ namespace CssUI.HTML
             return (Till.Year - From.Year) * 12 + (Till.Month - From.Month);
         }
         #endregion
+
 
         #region Rendering
         /// <summary>
@@ -2661,6 +2704,7 @@ namespace CssUI.HTML
             /* XXX: CSS Rendering */
         }
         #endregion
+
 
         #region Overrides
         internal override void run_cloning_steps(ref Node copy, Document document, bool clone_children = false)

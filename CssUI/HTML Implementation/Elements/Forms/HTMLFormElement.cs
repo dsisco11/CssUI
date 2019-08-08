@@ -10,8 +10,16 @@ namespace CssUI.HTML
 
 
 
+    /// <summary>
+    /// The form element represents a hyperlink that can be manipulated through a collection of form-associated elements, some of which can represent editable values that can be submitted to a server for processing.
+    /// </summary>
+    [MetaElement("form")]
     public class HTMLFormElement : HTMLElement
     {/* Docs: https://html.spec.whatwg.org/multipage/forms.html#htmlformelement */
+
+        #region Definition
+        public override EContentCategories Categories => EContentCategories.Flow | EContentCategories.Palpable;
+        #endregion
 
         #region Properties
         private bool bLockedForReset = false;

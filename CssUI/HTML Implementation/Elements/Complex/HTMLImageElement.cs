@@ -11,8 +11,29 @@ namespace CssUI.HTML
 {
     /* Docs: https://html.spec.whatwg.org/multipage/images.html */
 
-    public class HTMLImageElement : HTMLElement
+    /// <summary>
+    /// An img element represents an image.
+    /// </summary>
+    [MetaElement("img")]
+    public class HTMLImageElement : FormAssociatedElement
     {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content.html#htmlimageelement */
+
+        #region Definition
+        public override EContentCategories Categories
+        {
+            get
+            {
+                var flags = EContentCategories.Flow | EContentCategories.Phrasing | EContentCategories.Embedded | EContentCategories.Palpable;
+                if (hasAttribute(EAttributeName.UseMap))
+                {
+                    flags |= EContentCategories.Interactive;
+                }
+
+                return flags;
+            }
+        }
+        #endregion
+
         #region Properties
         [CEReactions]
         public string alt
@@ -102,6 +123,15 @@ namespace CssUI.HTML
         protected DataRequest pendingRequest;
         #endregion
 
+        #region Constructors
+        public HTMLImageElement(Document document) : this(document, "img")
+        {
+        }
+        public HTMLImageElement(Document document, string localName) : base(document, localName)
+        {
+        }
+        #endregion
+
         #region Accessors
         /// <summary>
         /// Returns the image's absolute URL.
@@ -137,9 +167,7 @@ namespace CssUI.HTML
                 return false;
             }
         }
-        #endregion
 
-        #region Accessors
         /// <summary>
         /// X-coordinate offset of this element relative to its root element
         /// </summary>
@@ -159,12 +187,6 @@ namespace CssUI.HTML
             {
                 return (long)(Box.Border.Top - ownerDocument.Initial_Containing_Block.top);
             }
-        }
-        #endregion
-
-        #region Constructors
-        public HTMLImageElement(Document document, string localName, string prefix, string Namespace) : base(document, localName)
-        {
         }
         #endregion
 

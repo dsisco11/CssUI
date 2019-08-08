@@ -8,8 +8,14 @@ namespace CssUI.HTML
     /// <summary>
     /// The details element represents a disclosure widget from which the user can obtain additional information or controls.
     /// </summary>
+    [MetaElement("details")]
     public class HTMLDetailsElement : HTMLElement
     {/* Docs: https://html.spec.whatwg.org/multipage/interactive-elements.html#the-details-element */
+
+        #region Definition
+        public override EContentCategories Categories => EContentCategories.Flow | EContentCategories.SectioningRoot | EContentCategories.Phrasing | EContentCategories.Palpable;
+        #endregion
+
         #region Properties
         #endregion
 

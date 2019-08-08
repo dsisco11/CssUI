@@ -44,7 +44,6 @@ namespace CssUI.HTML
         #endregion
 
         #region Properties
-
         public virtual HTMLFormElement form
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#form-owner */
             get
@@ -74,11 +73,8 @@ namespace CssUI.HTML
                 _form = value;
             }
         }
-
         public virtual string value { get; set; }
-
         public virtual string type { get; set; } = null;
-
         public EValidityState validity
         {
             get => _validity | query_validity();
@@ -93,8 +89,8 @@ namespace CssUI.HTML
         #endregion
 
         #region Accessors
+        public virtual bool isMutable => false;
         public bool willValidate => !FormCommon.Is_Barred_From_Validation(this);
-
         internal string validationMessage
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#dom-cva-validationmessage */
             get

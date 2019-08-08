@@ -1,5 +1,6 @@
 ﻿using CssUI.DOM;
 using CssUI.DOM.CustomElements;
+using CssUI.DOM.Enums;
 using CssUI.DOM.Events;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Internal;
@@ -11,7 +12,7 @@ namespace CssUI.HTML
     /// <summary>
     /// The basic interface, from which all the HTML elements' interfaces inherit, and which must be used by elements that have no additional requirements, is the HTMLElement interface.
     /// </summary>
-    public class HTMLElement : Element, IGlobalEventCallbacks, IDocumentAndElementEventCallbacks
+    public abstract class HTMLElement : Element, IGlobalEventCallbacks, IDocumentAndElementEventCallbacks
     {/* Docs: https://html.spec.whatwg.org/multipage/dom.html#htmlelement */
         # region Metadata Attributes
 
@@ -133,6 +134,13 @@ namespace CssUI.HTML
         public readonly DOMStringMap dataset;
         #endregion
 
+        #region Definition
+        /// <summary>
+        /// All of the content categories to which this html element belongs
+        /// </summary>
+        public abstract EContentCategories Categories { get; }
+        #endregion
+
         #region Constructors
         /// <summary>
         /// Instantiates a new HTML element
@@ -251,8 +259,7 @@ namespace CssUI.HTML
                 }
 
                 /* - If the element has a descendant that is currently matching the :active pseudo-class */
-                var tree = new TreeWalker(this, Enums.ENodeFilterMask.SHOW_ELEMENT, FilterIsActive.Instance);
-                if (tree.nextNode() != null)
+                if (DOMCommon.Get_Nth_Descendant(this, 1, FilterIsActive.Instance, ENodeFilterMask.SHOW_ELEMENT) != null)
                     return true;
 
                 /* If the element is being actively pointed at */
@@ -509,7 +516,7 @@ namespace CssUI.HTML
             if (locked_for_focus) return;
             locked_for_focus = true;
 
-            if (!DOMCommon.Is_Focusable(this))
+            if (!FocusableArea.Is_Focusable(this))
             {
                 /* XXX: Focus */
             }

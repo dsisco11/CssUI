@@ -7,10 +7,29 @@ using System.Linq;
 
 namespace CssUI.HTML
 {
+
+    /// <summary>
+    /// The table element represents data with more than one dimension, in the form of a table.
+    /// </summary>
+    [MetaElement("table")]
     public class HTMLTableElement : HTMLElement
     {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#the-table-element */
-        #region Accessors
 
+        #region Definition
+        public override EContentCategories Categories => EContentCategories.Flow | EContentCategories.Palpable;
+        #endregion
+
+        #region Constructor
+        public HTMLTableElement(Document document) : base(document, "table")
+        {
+        }
+
+        public HTMLTableElement(Document document, string localName) : base(document, localName)
+        {
+        }
+        #endregion
+
+        #region Content Attributes
         /// <summary>
         /// Returns the table's caption element.
         /// Can be set, to replace the caption element.
@@ -135,12 +154,6 @@ namespace CssUI.HTML
             get => DOMCommon.Get_Children_OfType<HTMLTableRowElement>(this);
         }
 
-        #endregion
-
-        #region Constructor
-        public HTMLTableElement(Document document, string localName, string prefix, string Namespace) : base(document, localName)
-        {
-        }
         #endregion
 
         /// <summary>

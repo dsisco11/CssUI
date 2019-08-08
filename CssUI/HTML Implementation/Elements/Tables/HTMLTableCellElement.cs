@@ -1,13 +1,31 @@
 ﻿using CssUI.DOM;
 using CssUI.DOM.CustomElements;
-using CssUI.DOM.Internal;
 using System.Linq;
 
 namespace CssUI.HTML
 {
+    /// <summary>
+    /// The td element represents a data cell in a table.
+    /// </summary>
+    [MetaElement("td")]
     public class HTMLTableCellElement : HTMLElement
     {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#htmltablecellelement */
-        #region Properties
+
+        #region Definition
+        public override EContentCategories Categories => EContentCategories.SectioningRoot;
+        #endregion
+
+        #region Constructors
+        public HTMLTableCellElement(Document document) : base(document, "td")
+        {
+        }
+
+        public HTMLTableCellElement(Document document, string localName) : base(document, localName)
+        {
+        }
+        #endregion
+
+        #region Content Attributes
         /// <summary>
         /// Number of columns that the cell is to span
         /// </summary>
@@ -55,16 +73,6 @@ namespace CssUI.HTML
 
                 return -1;
             }
-        }
-        #endregion
-
-        #region Constructors
-        public HTMLTableCellElement(Document document) : base(document, "td")
-        {
-        }
-
-        public HTMLTableCellElement(Document document, string localName) : base(document, localName)
-        {
         }
         #endregion
     }

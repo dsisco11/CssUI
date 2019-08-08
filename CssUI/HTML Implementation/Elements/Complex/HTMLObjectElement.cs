@@ -5,12 +5,30 @@ using System;
 
 namespace CssUI.HTML
 {
+    /// <summary>
+    /// The object element can represent an external resource, which, depending on the type of the resource, will either be treated as an image, as a nested browsing context, or as an external resource to be processed by a plugin.
+    /// </summary>
+    [MetaElement("object")]
     public class HTMLObjectElement : FormAssociatedElement, IListedElement, ISubmittableElement, IBrowsingContextContainer
-    {
-        #region Backing Values
+    {/* Docs: https://html.spec.whatwg.org/multipage/iframe-embed-object.html#the-object-element */
+
+        #region Definition
+        public override EContentCategories Categories
+        {
+            get
+            {
+                var flags = EContentCategories.Flow | EContentCategories.Phrasing | EContentCategories.Embedded | EContentCategories.Palpable;
+                if (hasAttribute(EAttributeName.UseMap))
+                {
+                    flags |= EContentCategories.Interactive;
+                }
+
+                return flags;
+            }
+        }
         #endregion
 
-        #region Properties
+        #region Browsing Context Container
         public BrowsingContext Nested_Browsing_Context { get; private set; }
         #endregion
 
@@ -76,14 +94,14 @@ namespace CssUI.HTML
         [CEReactions]
         public int width
         {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content-other.html#dimension-attributes */
-            get => getAttribute(EAttributeName.Width).Get_Int();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Width, AttributeValue.From_Integer(value)));
+            //get => getAttribute(EAttributeName.Width).Get_Int();
+            //set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Width, AttributeValue.From_Integer(value)));
         }
         [CEReactions]
         public int height
         {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content-other.html#dimension-attributes */
-            get => getAttribute(EAttributeName.Height).Get_Int();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Height, AttributeValue.From_Integer(value)));
+            //get => getAttribute(EAttributeName.Height).Get_Int();
+            //set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Height, AttributeValue.From_Integer(value)));
         }
 
         #endregion

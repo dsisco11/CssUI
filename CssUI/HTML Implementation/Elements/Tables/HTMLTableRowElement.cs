@@ -7,10 +7,28 @@ using CssUI.DOM;
 
 namespace CssUI.HTML
 {
+    /// <summary>
+    /// The tr element represents a row of cells in a table.
+    /// </summary>
+    [MetaElement("tr")]
     public class HTMLTableRowElement : HTMLElement
     {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#htmltablerowelement */
 
-        #region Accessors
+        #region Definition
+        public override EContentCategories Categories => EContentCategories.None;
+        #endregion
+
+        #region Constructor
+        public HTMLTableRowElement(Document document) : base(document, "tr")
+        {
+        }
+
+        public HTMLTableRowElement(Document document, string localName) : base(document, localName)
+        {
+        }
+        #endregion
+
+        #region Content Attributes
         /// <summary>
         /// Returns the position of the row in the table's rows list.
         /// Returns −1 if the element isn't in a table.
@@ -83,16 +101,6 @@ namespace CssUI.HTML
 
                 return cellList;
             }
-        }
-        #endregion
-
-        #region Constructor
-        public HTMLTableRowElement(Document document) : base(document, "tr")
-        {
-        }
-
-        public HTMLTableRowElement(Document document, string localName) : base(document, localName)
-        {
         }
         #endregion
 

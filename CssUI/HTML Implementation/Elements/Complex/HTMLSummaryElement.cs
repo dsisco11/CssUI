@@ -7,8 +7,13 @@ namespace CssUI.HTML
     /// <summary>
     /// The summary element represents a summary, caption, or legend for the rest of the contents of the summary element's parent details element, if any.
     /// </summary>
+    [MetaElement("summary")]
     public class HTMLSummaryElement : HTMLElement
     {/* Docs: https://html.spec.whatwg.org/multipage/interactive-elements.html#the-summary-element */
+
+        #region Definition
+        public override EContentCategories Categories => EContentCategories.None;
+        #endregion
 
         #region Properties
         internal override bool has_activation_behaviour => true;

@@ -214,5 +214,13 @@ namespace CssUI.DOM
         /* OBJECT */
         [MetaKeyword("data")]
         Data,
+
+        /* IFRAME */
+        [MetaKeyword("sandbox")]
+        Sandbox,
+        [MetaKeyword("srcdoc")]
+        Srcdoc,
+        [MetaKeyword("allow")]
+        Allow,
     }
 }

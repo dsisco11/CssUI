@@ -23,7 +23,7 @@ namespace CssUI.DOM.Nodes
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
-        IEnumerable<Element> assignedElements(AssignedNodesOptions options = null);
+        IReadOnlyCollection<Element> assignedElements(AssignedNodesOptions options = null);
 
 
         void Signal_Slot_Change();

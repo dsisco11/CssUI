@@ -11,8 +11,21 @@ using System.Runtime.CompilerServices;
 
 namespace CssUI.HTML
 {
+    /// <summary>
+    /// The textarea element represents a multiline plain text edit control for the element's raw value. The contents of the control represent the control's default value.
+    /// </summary>
+    [MetaElement("textarea")]
     public class HTMLTextAreaElement : FormAssociatedElement, IListedElement, ILableableElement, ISubmittableElement, IResettableElement, IAutoCapitalizeInheritingElement
     {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#the-textarea-element */
+
+        #region Definition
+        public override EContentCategories Categories => EContentCategories.Flow | EContentCategories.Phrasing | EContentCategories.Interactive | EContentCategories.Palpable;
+        #endregion
+
+        #region Backing Values
+        private string raw_value = string.Empty;
+        #endregion
+
         #region Properties
         private readonly FilterLabelFor labelFilter;
         /// <summary>
@@ -22,16 +35,13 @@ namespace CssUI.HTML
         #endregion
 
         #region Constructors
-        public HTMLTextAreaElement(Document document) : base(document, "textarea")
+        public HTMLTextAreaElement(Document document) : this(document, "textarea")
         {
-            labelFilter = new FilterLabelFor(this);
-            //selection = new Range(document);
         }
 
         public HTMLTextAreaElement(Document document, string localName) : base(document, localName)
         {
             labelFilter = new FilterLabelFor(this);
-            //selection = new Range(document);
         }
         #endregion
 
@@ -153,7 +163,7 @@ namespace CssUI.HTML
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal string get_api_value()
         {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#the-textarea-element:concept-fe-api-value-2 */
-            return StringCommon.Replace(base.value.AsMemory(), Filters.FilterCRLF.Instance, Filters.FilterCRLF.LF.AsSpan());
+            return StringCommon.Replace(raw_value.AsMemory(), Filters.FilterCRLF.Instance, Filters.FilterCRLF.LF.AsSpan());
         }
 
         #region Overrides
@@ -165,11 +175,11 @@ namespace CssUI.HTML
             }
             set
             {
-                string oldAPIValue = this.value;
-                base.value = value;
+                string oldAPIValue = get_api_value();
+                raw_value = value;
                 bDirtyValueFlag = true;
                 /* 4) If the new API value is different from oldAPIValue, then move the text entry cursor position to the end of the text control, unselecting any selected text and resetting the selection direction to "none". */
-                if (!StringCommon.StrEq(oldAPIValue.AsSpan(), get_api_value().AsSpan()))
+                if (!oldAPIValue.AsSpan().Equals(get_api_value().AsSpan(), StringComparison.Ordinal))
                 {
                     text_entry_cursor_position = value.Length;
                     selection.Collapse();
@@ -215,13 +225,19 @@ namespace CssUI.HTML
 
             return flags;
         }
+        /// <summary>
+        /// </summary>
+        /// Docs: https://html.spec.whatwg.org/multipage/form-elements.html#the-textarea-element:concept-fe-mutable
+        public override bool isMutable => (!disabled && !readOnly);
         #endregion
 
+        #region Resettable
         public void Reset()
         {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#the-textarea-element:concept-form-reset-control */
             bDirtyValueFlag = false;
             value = defaultValue;
         }
+        #endregion
 
         #region Overrides
         internal override void run_child_text_node_change_steps(Node node)

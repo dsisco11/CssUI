@@ -3,9 +3,28 @@ using CssUI.DOM.CustomElements;
 
 namespace CssUI.HTML
 {
+    /// <summary>
+    /// The th element represents a header cell in a table.
+    /// </summary>
+    [MetaElement("th")]
     public class HTMLTableCellHeadElement : HTMLTableCellElement
-    {
-        #region Properties
+    {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#the-th-element */
+
+        #region Definition
+        public override EContentCategories Categories => EContentCategories.None;
+        #endregion
+
+        #region Constructors
+        public HTMLTableCellHeadElement(Document document) : base(document, "th")
+        {
+        }
+
+        public HTMLTableCellHeadElement(Document document, string localName) : base(document, localName)
+        {
+        }
+        #endregion
+
+        #region Content Attribute
         [CEReactions]
         public string scope
         {
@@ -17,16 +36,6 @@ namespace CssUI.HTML
         {
             get => getAttribute(EAttributeName.Abbr).Get_String();
             set => setAttribute(EAttributeName.Abbr, AttributeValue.From_String(value));
-        }
-        #endregion
-
-        #region Constructors
-        public HTMLTableCellHeadElement(Document document) : base(document, "th")
-        {
-        }
-
-        public HTMLTableCellHeadElement(Document document, string localName) : base(document, localName)
-        {
         }
         #endregion
     }

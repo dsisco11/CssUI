@@ -10,10 +10,14 @@ namespace CssUI.HTML
     /// <summary>
     /// The dialog element represents a part of an application that a user interacts with to perform a task, for example a dialog box, inspector, or window.
     /// </summary>
+    [MetaElement("dialog")]
     public sealed class HTMLDialogElement : HTMLElement
     {/* Docs: https://html.spec.whatwg.org/multipage/interactive-elements.html#the-dialog-element */
 
         /* XXX: If at any time a dialog element is removed from a Document, then if that dialog is in that Document's top layer, it must be removed from it. */
+        #region Definition
+        public override EContentCategories Categories => EContentCategories.Flow | EContentCategories.SectioningRoot;
+        #endregion
 
         #region Properties
         public string returnValue { get; set; } = string.Empty;

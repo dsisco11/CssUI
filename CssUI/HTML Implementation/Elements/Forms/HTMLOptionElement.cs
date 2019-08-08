@@ -12,8 +12,14 @@ namespace CssUI.HTML
     /// <summary>
     /// The option element represents an option in a select element or as part of a list of suggestions in a datalist element.
     /// </summary>
+    [MetaElement("option")]
     public class HTMLOptionElement : FormAssociatedElement
     {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#the-option-element */
+
+        #region Definition
+        public override EContentCategories Categories => EContentCategories.None;
+        #endregion
+
         #region Properties
         /// <summary>
         /// The dirtiness of an option element is a boolean state, initially false. It controls whether adding or removing the selected content attribute has any effect.
@@ -33,7 +39,11 @@ namespace CssUI.HTML
         /// <param name="value">The value argument sets the value attribute.</param>
         /// <param name="defaultSelected">The defaultSelected argument sets the selected attribute.</param>
         /// <param name="selected">The selected argument sets whether or not the element is selected.If it is omitted, even if the defaultSelected argument is true, the element is not selected.</param>
-        public HTMLOptionElement(Document document, string text = null, string value = null, bool defaultSelected = false, bool selected = false) : base(document, "option")
+        public HTMLOptionElement(Document document, string text = null, string value = null, bool defaultSelected = false, bool selected = false) : this(document, "option", text, value, defaultSelected, selected)
+        {
+        }
+
+        public HTMLOptionElement(Document document, string localName, string text = null, string value = null, bool defaultSelected = false, bool selected = false) : base(document, localName)
         {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#dom-option */
 
             /* 3) If text is not the empty string, then append to option a new Text node whose data is text. */
@@ -52,15 +62,11 @@ namespace CssUI.HTML
             /* 5) If defaultSelected is true, then set an attribute value for option using "selected" and the empty string. */
             if (defaultSelected)
             {
-                setAttribute(EAttributeName.Selected, AttributeValue.From_String(""));
+                setAttribute(EAttributeName.Selected, AttributeValue.From_String(string.Empty));
             }
 
             /* 6) If selected is true, then set option's selectedness to true; otherwise set its selectedness to false (even if defaultSelected is true). */
             this.selected = selected;
-        }
-
-        public HTMLOptionElement(Document document, string localName, string text = null, string value = null, bool defaultSelected = false, bool selected = false) : this(document, text, value, defaultSelected, selected)
-        {
         }
         #endregion
 

@@ -10,8 +10,14 @@ namespace CssUI.HTML
     /// <summary>
     /// The button element represents a button labeled by its contents.
     /// </summary>
+    [MetaElement("button")]
     public class HTMLButtonElement : FormAssociatedElement, IListedElement, ILableableElement, ISubmittableElement, IAutoCapitalizeInheritingElement
     {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#the-button-element */
+
+        #region Definition
+        public override EContentCategories Categories => EContentCategories.Flow | EContentCategories.Phrasing | EContentCategories.Interactive | EContentCategories.Palpable;
+        #endregion
+
         #region Properties
         private readonly NodeFilter labelFilter;
         #endregion

@@ -8,17 +8,24 @@ using System.Linq;
 
 namespace CssUI.HTML
 {
+    /// <summary>
+    /// The select element represents a control for selecting amongst a set of options.
+    /// </summary>
+    [MetaElement("select")]
     public class HTMLSelectElement : FormAssociatedElement, IListedElement, ILableableElement, ISubmittableElement, IResettableElement, IAutoCapitalizeInheritingElement
     {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#htmlselectelement */
+
+        #region Definition
+        public override EContentCategories Categories => EContentCategories.Flow | EContentCategories.Phrasing | EContentCategories.Interactive | EContentCategories.Palpable;
+        #endregion
 
         #region Properties
         public readonly HTMLOptionsCollection options;
         #endregion
 
         #region Constructor
-        public HTMLSelectElement(Document document) : base(document, "select")
+        public HTMLSelectElement(Document document) : this(document, "select")
         {
-            options = new HTMLOptionsCollection(this);
         }
 
         public HTMLSelectElement(Document document, string localName) : base(document, localName)
@@ -273,6 +280,13 @@ namespace CssUI.HTML
 
             return flags;
         }
+        #endregion
+
+        #region Form-Associated Element Overrides
+        /// <summary>
+        /// </summary>
+        /// Docs: https://html.spec.whatwg.org/multipage/form-elements.html#the-select-element:concept-fe-mutable
+        public override bool isMutable => !disabled;
         #endregion
 
         #region IResettable
