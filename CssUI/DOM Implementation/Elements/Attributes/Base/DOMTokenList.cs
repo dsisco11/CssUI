@@ -71,6 +71,11 @@ namespace CssUI.DOM
             /* 4) Run the attribute change steps for element, localName, value, value, and null. */
             run_attribute_change_steps(ownerElement, localName, attr.Value, attr.Value, null);
         }
+
+        ~DOMTokenList()
+        {
+            ownerElement?.tokenListMap.Remove(localName);
+        }
         #endregion
 
 
