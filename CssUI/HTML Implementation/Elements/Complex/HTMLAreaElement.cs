@@ -50,7 +50,7 @@ namespace CssUI.HTML
                 var numbers = new double[set.Count];
                 for (int i=0; i<set.Count; i++)
                 {
-                    if (!Serialization.HTMLParserCommon.Parse_FloatingPoint(set[i], out double outValue))
+                    if (!Serialization.HTMLParserCommon.Try_Parse_FloatingPoint(set[i], out double outValue))
                     {
                         throw new DomSyntaxError($"Cannot convert \"{set[i].ToString()}\" into number");
                     }

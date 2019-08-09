@@ -1094,7 +1094,7 @@ namespace CssUI.HTML
 
                 /* 3) Otherwise, if the rules for parsing floating-point number values, when they are applied to the attribute's value, 
                  * return an error, zero, or a number less than zero, then the allowed value step is the default step multiplied by the step scale factor. */
-                if (!HTMLParserCommon.Parse_FloatingPoint(value.AsMemory(), out double outParsed) || MathExt.Flteq(outParsed, 0.0))
+                if (!HTMLParserCommon.Try_Parse_FloatingPoint(value.AsMemory(), out double outParsed) || MathExt.Flteq(outParsed, 0.0))
                 {
                     return default_step * step_scale_factor;
                 }
@@ -1594,7 +1594,7 @@ namespace CssUI.HTML
                 case EInputType.Number:
                 case EInputType.Range:
                     {
-                        if (!HTMLParserCommon.Parse_FloatingPoint(input, out double value))
+                        if (!HTMLParserCommon.Try_Parse_FloatingPoint(input, out double value))
                         {
                             outValue = double.NaN;
                             return false;

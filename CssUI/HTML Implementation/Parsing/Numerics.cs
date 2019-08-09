@@ -41,70 +41,92 @@ namespace CssUI.HTML.Serialization
             return true;
         }
 
-
-        public static bool Parse_Integer(ReadOnlyMemory<char> input, out int outValue)
+        /* 32-bit */
+        public static void Parse_Integer(ReadOnlyMemory<char> input, out int outValue)
         {
             DataStream<char> Stream = new DataStream<char>(input, EOF);
-            bool result = Parse_Integer(Stream, out int outParsed);
+            if (Try_Parse_Integer(Stream, out long outParsed))
+            {
+                outValue = (Int32)outParsed;
+                return;
+            }
+            else
+            {
+                throw new DomSyntaxError($"Unable to parse \"{Stream.AsSpan().ToString()}\" as integer");
+            }
+        }
+        public static void Parse_Integer(DataStream<char> Stream, out int outValue)
+        {
+            if (Try_Parse_Integer(Stream, out long outParsed))
+            {
+                outValue = (Int32)outParsed;
+                return;
+            }
+            else
+            {
+                throw new DomSyntaxError($"Unable to parse \"{Stream.AsSpan().ToString()}\" as integer");
+            }
+        }
+
+
+        public static bool Try_Parse_Integer(ReadOnlyMemory<char> input, out int outValue)
+        {
+            DataStream<char> Stream = new DataStream<char>(input, EOF);
+            bool result = Try_Parse_Integer(Stream, out long outParsed);
+            outValue = (Int32)outParsed;
+            return result;
+        }
+        public static bool Try_Parse_Integer(DataStream<char> Stream, out int outValue)
+        {
+            bool result = Try_Parse_Integer(Stream, out long outParsed);
+            outValue = (Int32)outParsed;
+            return result;
+        }
+
+        /* 64-bit */
+        public static void Parse_Integer(ReadOnlyMemory<char> input, out long outValue)
+        {
+            DataStream<char> Stream = new DataStream<char>(input, EOF);
+            if (Try_Parse_Integer(Stream, out int outParsed))
+            {
+                outValue = outParsed;
+                return;
+            }
+            else
+            {
+                throw new DomSyntaxError($"Unable to parse \"{Stream.AsSpan().ToString()}\" as integer");
+            }
+        }
+        public static void Parse_Integer(DataStream<char> Stream, out long outValue)
+        {
+            if (Try_Parse_Integer(Stream, out int outParsed))
+            {
+                outValue = outParsed;
+                return;
+            }
+            else
+            {
+                throw new DomSyntaxError($"Unable to parse \"{Stream.AsSpan().ToString()}\" as integer");
+            }
+        }
+
+
+        public static bool Try_Parse_Integer(ReadOnlyMemory<char> input, out long outValue)
+        {
+            DataStream<char> Stream = new DataStream<char>(input, EOF);
+            bool result = Try_Parse_Integer(Stream, out long outParsed);
             outValue = outParsed;
             return result;
         }
-        public static bool Parse_Integer(DataStream<char> Stream, out int outValue)
-        {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#signed-integers */
 
-            bool sign = true;//Sign
-
-            /* SKip ASCII whitespace */
-            Stream.Consume_While(Is_Ascii_Whitespace);
-
-            if (Stream.Next == EOF)
-            {
-                outValue = int.MaxValue;
-                return false;
-            }
-
-            if (Stream.Next == CHAR_HYPHEN_MINUS)
-            {
-                sign = false;
-                Stream.Consume();
-            }
-            else if (Stream.Next == CHAR_PLUS_SIGN)
-            {
-                Stream.Consume();
-            }
-
-
-            /* Collect sequence of ASCII digit codepoints */
-            Stream.Consume_While(Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
-
-            if (Stream.Next != EOF && Is_Ascii_Alpha(Stream.Next))
-            {
-                outValue = int.MaxValue;
-                return false;
-            }
-
-            var parsed = (int)ParsingCommon.Digits_To_Base10(outDigits);
-
-            outValue = sign ? parsed : 0 - parsed;
-            return true;
-        }
-
-
-        public static bool Parse_Integer(ReadOnlyMemory<char> input, out long outValue)
-        {
-            DataStream<char> Stream = new DataStream<char>(input, EOF);
-            bool result = Parse_Integer(Stream, out long outParsed);
-            outValue = outParsed;
-            return result;
-        }
-        public static bool Parse_Integer(DataStream<char> Stream, out long outValue)
+        public static bool Try_Parse_Integer(DataStream<char> Stream, out long outValue)
         {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#signed-integers */
             bool sign = true;
 
             /* SKip ASCII whitespace */
             Stream.Consume_While(Is_Ascii_Whitespace);
 
-            if (Stream.Next == EOF)
+            if (Stream.atEnd)
             {
                 outValue = long.MaxValue;
                 return false;
@@ -124,7 +146,7 @@ namespace CssUI.HTML.Serialization
             /* Collect sequence of ASCII digit codepoints */
             Stream.Consume_While(Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
 
-            if (Stream.Next != EOF && Is_Ascii_Alpha(Stream.Next))
+            if (!Stream.atEnd && Is_Ascii_Alpha(Stream.Next))
             {
                 outValue = long.MaxValue;
                 return false;
@@ -146,33 +168,73 @@ namespace CssUI.HTML.Serialization
         }
         public static bool Is_Valid_FloatingPoint(DataStream<char> Stream)
         {
-            return Parse_FloatingPoint(Stream, out double _);
+            return Try_Parse_FloatingPoint(Stream, out double _);
+        }
+
+        /* 32-bit */
+        public static void Parse_FloatingPoint(ReadOnlyMemory<char> input, out float outValue)
+        {
+            DataStream<char> Stream = new DataStream<char>(input, EOF);
+            Parse_FloatingPoint(Stream, out float outParsed);
+            outValue = outParsed;
+        }
+        public static void Parse_FloatingPoint(DataStream<char> Stream, out float outValue)
+        {
+            if (Try_Parse_FloatingPoint(Stream, out double outParsed))
+            {
+                outValue = (float)outParsed;
+                return;
+            }
+            else
+            {
+                throw new DomSyntaxError($"Unable to parse \"{Stream.AsSpan().ToString()}\" as floating-point number");
+            }
         }
 
 
-        public static bool Parse_FloatingPoint(ReadOnlyMemory<char> input, out float outValue)
+        public static bool Try_Parse_FloatingPoint(ReadOnlyMemory<char> input, out float outValue)
         {
             DataStream<char> Stream = new DataStream<char>(input, EOF);
-            bool result = Parse_FloatingPoint(Stream, out double outParsed);
+            bool result = Try_Parse_FloatingPoint(Stream, out double outParsed);
             outValue = (float)outParsed;
             return result;
         }
-        public static bool Parse_FloatingPoint(DataStream<char> Stream, out float outValue)
+        public static bool Try_Parse_FloatingPoint(DataStream<char> Stream, out float outValue)
         {
-            bool result = Parse_FloatingPoint(Stream, out double outParsed);
+            bool result = Try_Parse_FloatingPoint(Stream, out double outParsed);
             outValue = (float)outParsed;
             return result;
         }
 
-
-        public static bool Parse_FloatingPoint(ReadOnlyMemory<char> input, out double outValue)
+        /* 64-bit */
+        public static void Parse_FloatingPoint(ReadOnlyMemory<char> input, out double outValue)
         {
             DataStream<char> Stream = new DataStream<char>(input, EOF);
-            bool result = Parse_FloatingPoint(Stream, out double outParsed);
+            Parse_FloatingPoint(Stream, out double outParsed);
+            outValue = outParsed;
+        }
+        public static void Parse_FloatingPoint(DataStream<char> Stream, out double outValue)
+        {
+            if (Try_Parse_FloatingPoint(Stream, out double outParsed))
+            {
+                outValue = outParsed;
+                return;
+            }
+            else
+            {
+                throw new DomSyntaxError($"Unable to parse \"{Stream.AsSpan().ToString()}\" as floating-point number");
+            }
+        }
+
+
+        public static bool Try_Parse_FloatingPoint(ReadOnlyMemory<char> input, out double outValue)
+        {
+            DataStream<char> Stream = new DataStream<char>(input, EOF);
+            bool result = Try_Parse_FloatingPoint(Stream, out double outParsed);
             outValue = outParsed;
             return result;
         }
-        public static bool Parse_FloatingPoint(DataStream<char> Stream, out double outValue)
+        public static bool Try_Parse_FloatingPoint(DataStream<char> Stream, out double outValue)
         {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#rules-for-parsing-floating-point-number-values */
 
             double value = 1;
@@ -183,7 +245,10 @@ namespace CssUI.HTML.Serialization
             Stream.Consume_While(Is_Ascii_Whitespace);
 
             if (Stream.atEnd)
-                throw new DomSyntaxError();
+            {
+                outValue = double.NaN;
+                return false;
+            }
 
             switch (Stream.Next)
             {
@@ -202,13 +267,16 @@ namespace CssUI.HTML.Serialization
             }
 
             if (Stream.atEnd)
-                throw new DomSyntaxError();
+            {
+                outValue = double.NaN;
+                return false;
+            }
 
             /* 9) If the character indicated by position is a U+002E FULL STOP (.), 
              * and that is not the last character in input, 
              * and the character after the character indicated by position is an ASCII digit, 
              * then set value to zero and jump to the step labeled fraction. */
-            if (Stream.Next == CHAR_FULL_STOP && Stream.NextNext != EOF && Is_Ascii_Digit(Stream.NextNext))
+            if (Stream.Remaining > 1 && Stream.Next == CHAR_FULL_STOP && Is_Ascii_Digit(Stream.NextNext))
             {
                 value = 0;
             }
@@ -248,7 +316,7 @@ namespace CssUI.HTML.Serialization
                                 Stream.Consume();
                                 /* 7) If position is past the end of input, then jump to the step labeled conversion. */
 
-                                if (Stream.Next == EOF)
+                                if (Stream.atEnd)
                                     break;
                             }
                         }
@@ -302,12 +370,75 @@ namespace CssUI.HTML.Serialization
         #endregion
 
         #region Lengths
-        public static bool Parse_Length(ReadOnlyMemory<char> input, out double outValue, out EAttributeType outType)
+
+        public static bool Is_Valid_Length(ReadOnlyMemory<char> input)
         {
             DataStream<char> Stream = new DataStream<char>(input, EOF);
+            return Try_Parse_Length(Stream, out _, out _);
+        }
+        public static bool Is_Valid_Length(DataStream<char> Stream)
+        {
+            return Try_Parse_Length(Stream, out _, out _);
+        }
+
+        /* 32-bit */
+        public static void Parse_Length(ReadOnlyMemory<char> input, out float outValue, out EAttributeType outType)
+        {
+            DataStream<char> Stream = new DataStream<char>(input, EOF);
+            Parse_Length(Stream, out double outParsedValue, out EAttributeType outParsedType);
+            outValue = (float)outParsedValue;
+            outType = outParsedType;
+        }
+        public static void Parse_Length(DataStream<char> Stream, out float outValue, out EAttributeType outType)
+        {
+            if (Try_Parse_Length(Stream, out double outParsedValue, out EAttributeType outParsedType))
+            {
+                outValue = (float)outParsedValue;
+                outType = outParsedType;
+                return;
+            }
+            else
+            {
+                throw new DomSyntaxError($"Unable to parse \"{Stream.AsSpan().ToString()}\" as length");
+            }
+        }
+
+
+        /* 64-bit */
+        public static void Parse_Length(ReadOnlyMemory<char> input, out double outValue, out EAttributeType outType)
+        {
+            DataStream<char> Stream = new DataStream<char>(input, EOF);
+            Parse_Length(Stream, out double outParsedValue, out EAttributeType outParsedType);
+            outValue = outParsedValue;
+            outType = outParsedType;
+        }
+        public static void Parse_Length(DataStream<char> Stream, out double outValue, out EAttributeType outType)
+        {
+            if (Try_Parse_Length(Stream, out double outParsedValue, out EAttributeType outParsedType))
+            {
+                outValue = outParsedValue;
+                outType = outParsedType;
+                return;
+            }
+            else
+            {
+                throw new DomSyntaxError($"Unable to parse \"{Stream.AsSpan().ToString()}\" as length");
+            }
+        }
+
+        public static bool Try_Parse_Length(ReadOnlyMemory<char> input, out double outValue, out EAttributeType outType)
+        {
+            DataStream<char> Stream = new DataStream<char>(input, EOF);
+            bool res = Try_Parse_Length(Stream, out double outParsedValue, out EAttributeType outParsedType);
+            outValue = outParsedValue;
+            outType = outParsedType;
+            return res;
+        }
+        public static bool Try_Parse_Length(DataStream<char> Stream, out double outValue, out EAttributeType outType)
+        {
             /* 3) Skip ASCII whitespace within input given position. */
             Stream.Consume_While(Is_Ascii_Whitespace);
-            if (Stream.Next == EOF)
+            if (Stream.atEnd)
             {
                 outValue = double.NaN;
                 outType = EAttributeType.Length;
@@ -319,7 +450,7 @@ namespace CssUI.HTML.Serialization
             double value = ParsingCommon.Digits_To_Base10(outDigits);
 
             /* 6) If position is past the end of input, then return value as a length. */
-            if (Stream.Next == EOF)
+            if (Stream.atEnd)
             {
                 outValue = value;
                 outType = EAttributeType.Length;
@@ -331,7 +462,7 @@ namespace CssUI.HTML.Serialization
             {
                 Stream.Consume();
                 /* 2) If position is past the end of input or the code point at position within input is not an ASCII digit, then return the current dimension value with value, input, and position. */
-                if (Stream.Next == EOF)
+                if (Stream.atEnd)
                 {
                     outValue = value;
                     outType = EAttributeType.Length;
