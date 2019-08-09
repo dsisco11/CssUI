@@ -14,10 +14,6 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public CacheableValue()
-        {
-        }
-
         public CacheableValue(Func<Ty> Resolver)
         {
             this.Resolver = Resolver;
@@ -64,5 +60,54 @@ namespace CssUI
 
             return value;
         }
+
+        #region Operators
+
+        public static bool operator ==(CacheableValue<Ty> A, CacheableValue<Ty> B)
+        {
+            // If both objects are NULL they match
+            if (ReferenceEquals(null, A) && ReferenceEquals(null, B)) return true;
+            // If one object is null and not the other they do not match
+            if (ReferenceEquals(null, A) ^ ReferenceEquals(null, B)) return false;
+            // Check if values match
+            return A.Get().Equals(B.Get());
+        }
+
+        public static bool operator !=(CacheableValue<Ty> A, CacheableValue<Ty> B)
+        {
+            // If both objects are null they do not match
+            if (ReferenceEquals(null, A) && ReferenceEquals(null, B)) return false;
+            // If one object is null and not the other they do match
+            if (ReferenceEquals(null, A) ^ ReferenceEquals(null, B)) return true;
+            // Check if values match
+            return !A.Get().Equals(B.Get());
+        }
+
+        public bool Equals(CacheableValue<Ty> other)
+        {
+            if (other == null) return false;
+
+            return Get().Equals(other.Get());
+        }
+
+        public override bool Equals(object other)
+        {
+            if (other == null) return false;
+            if (other is CacheableValue<Ty> cache)
+            {
+                return Get().Equals(cache.Get());
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return Get().GetHashCode();
+        }
+        public override string ToString()
+        {
+            return Get().ToString();
+        }
+        #endregion
     }
 }
