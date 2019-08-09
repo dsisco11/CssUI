@@ -23,7 +23,7 @@ namespace CssUI.DOM
         #region Internal Properties
         internal OrderedDictionary<AtomicName<EAttributeName>, Attr> AttributeList { get; private set; } = new OrderedDictionary<AtomicName<EAttributeName>, Attr>();
         internal readonly Queue<IElementReaction> Custom_Element_Reaction_Queue = new Queue<IElementReaction>();
-        internal OrderedDictionary<AtomicName<EAttributeName>, DOMTokenList> tokenListMap = new OrderedDictionary<AtomicName<EAttributeName>, DOMTokenList>();
+        internal OrderedDictionary<AtomicName<EAttributeName>, IAttributeTokenList> tokenListMap = new OrderedDictionary<AtomicName<EAttributeName>, IAttributeTokenList>();
         #endregion
 
 
@@ -455,11 +455,11 @@ namespace CssUI.DOM
 
         #region Customizable Steps
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal virtual void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue newValue, string Namespace)
+        internal virtual void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue newValue, ReadOnlyMemory<char> Namespace)
         {
             if (tokenListMap.Count > 0)
             {
-                if (tokenListMap.TryGetValue(localName, out DOMTokenList tokenList))
+                if (tokenListMap.TryGetValue(localName, out IAttributeTokenList tokenList))
                 {
                     tokenList.run_attribute_change_steps(element, localName, oldValue, newValue, Namespace);
                 }
@@ -548,7 +548,7 @@ namespace CssUI.DOM
             CEReactions.Enqueue_Reaction(this, EReactionName.AttributeChanged, attr.localName, attr.Value, attr.namespaceURI);
 
             /* 3) Run the attribute change steps with element, attribute’s local name, attribute’s value, value, and attribute’s namespace. */
-            run_attribute_change_steps(this, attr.localName, attr.Value, newValue, attr.namespaceURI);
+            run_attribute_change_steps(this, attr.localName, attr.Value, newValue, attr.namespaceURI.AsMemory());
             /* 4) Set attribute’s value to value. */
             attr.Value = newValue;
         }
