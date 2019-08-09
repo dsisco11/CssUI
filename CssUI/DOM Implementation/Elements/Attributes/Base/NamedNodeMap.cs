@@ -1,5 +1,6 @@
 ﻿using CssUI.DOM.Exceptions;
 using CssUI.DOM.Nodes;
+using System;
 using System.Linq;
 
 namespace CssUI.DOM
@@ -7,7 +8,7 @@ namespace CssUI.DOM
     public class NamedNodeMap
     {/* Docs: https://dom.spec.whatwg.org/#namednodemap */
         #region Properties
-        public int length { get => ownerElement.AttributeList.Count; }
+        public int Length { get => ownerElement.AttributeList.Count; }
         public Element ownerElement { get; private set; }
         #endregion
 
@@ -41,13 +42,21 @@ namespace CssUI.DOM
             return ownerElement.AttributeList[index];
         }
 
-        public Attr getNamedItem(string qualifiedName)
+        public Attr getNamedItem(ReadOnlyMemory<char> qualifiedName)
         {
             /* To get an attribute by name given a qualifiedName and element element, run these steps: */
             /* 1) If element is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase. */
-            qualifiedName = qualifiedName.ToLowerInvariant();
+            //qualifiedName = qualifiedName.ToLowerInvariant();
             /* 2) Return the first attribute in element’s attribute list whose qualified name is qualifiedName, and null otherwise. */
-            return ownerElement.AttributeList.FirstOrDefault(a => 0==string.Compare(a.Name, qualifiedName));
+            for (int i=0; i<ownerElement.AttributeList.Count; i++)
+            {
+                var a = ownerElement.AttributeList[i];
+                if (qualifiedName.Span.Equals(a.Name.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                {
+                    return a;
+                }
+            }
+            return null;
         }
 
         public Attr setNamedItem(Attr attr)
@@ -60,7 +69,7 @@ namespace CssUI.DOM
             /* 3) If oldAttr is attr, return attr. */
             if (ReferenceEquals(oldAttr, attr)) return attr;
             /* 4) If oldAttr is non-null, replace it by attr in element. */
-            if (!ReferenceEquals(oldAttr, null))
+            if (oldAttr != null)
             {
                 ownerElement.AttributeList[oldAttr.Name.ToLowerInvariant()] = attr;
             }
@@ -73,7 +82,7 @@ namespace CssUI.DOM
             return oldAttr;
         }
 
-        public Attr removeNamedItem(string qualifiedName)
+        public Attr removeNamedItem(AtomicString qualifiedName)
         {
             /* The removeNamedItem(qualifiedName) method, when invoked, must run these steps: */
             /* 1) Let attr be the result of removing an attribute given qualifiedName and element. */
@@ -82,12 +91,12 @@ namespace CssUI.DOM
             /* 1) Let attr be the result of getting an attribute given qualifiedName and element. */
             ownerElement.find_attribute(qualifiedName, out Attr attr);
                 /* 2) If attr is non-null, remove it from element. */
-                if (!ReferenceEquals(attr, null))
+                if (attr != null)
                 {
                     ownerElement.AttributeList.Remove(attr.Name.ToLowerInvariant());
                 }
             /* 2) If attr is null, then throw a "NotFoundError" DOMException. */
-            if (ReferenceEquals(attr, null))
+            if (attr == null)
             {
                 throw new NotFoundError($"Cannot find attribute \"{qualifiedName}\"");
             }

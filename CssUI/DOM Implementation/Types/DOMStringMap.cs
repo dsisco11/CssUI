@@ -1,11 +1,12 @@
 ﻿using CssUI.DOM.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace CssUI.DOM
 {
     public class DOMStringMap
-    {/* DOcs: https://html.spec.whatwg.org/multipage/dom.html#domstringmap */
+    {/* Docs: https://html.spec.whatwg.org/multipage/dom.html#domstringmap */
         #region Properties
         private readonly Element Owner;
         #endregion
@@ -23,7 +24,7 @@ namespace CssUI.DOM
             get
             {
                 string safeName = To_XML_Safe_Name(Name);
-                string Value = Owner.Attributes.getNamedItem(safeName)?.Value?.Get_String();
+                string Value = Owner.Attributes.getNamedItem(safeName.AsMemory())?.Value?.Get_String();
                 return ReferenceEquals(null, Value) ? string.Empty : Value;
             }
             set
