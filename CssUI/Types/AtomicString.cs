@@ -13,67 +13,87 @@ namespace CssUI
         /// <summary>
         /// Stores the case sensitive hash
         /// </summary>
-        private int? Hash = null;
-        private int? _caseless_hash = null;
+        private CacheableValue<int> Hash = null;
         /// <summary>
         /// Stores the case-insensitive hash
         /// </summary>
-        private int Hash_Lower
-        {
-            get
-            {
-                if (_caseless_hash.HasValue)
-                    return _caseless_hash.Value;
+        private CacheableValue<int> Hash_Lower = null;
 
-                if (0 != (Flags & EAtomicStringFlags.HasUppercase))
-                {// This atomic string has uppercase characters so we do infact need to create the caseless-hash
-                    _caseless_hash = String.ToLowerInvariant().GetHashCode();
-                }
-
-                return GetHashCode();
-            }
-        }
         private readonly string String = string.Empty;
+        private readonly ReadOnlyMemory<char> Data = null;
         private readonly EAtomicStringFlags Flags = 0x0;
         #endregion
 
         #region Constructors
-        public AtomicString(string String)
+        public AtomicString(ReadOnlyMemory<char> Data, EAtomicStringFlags Flags)
         {
-            this.String = String;
-        }
-        public AtomicString(string String, EAtomicStringFlags Flags)
-        {
-            this.String = String;
+            Hash = new CacheableValue<int>(() => {
+                if (0 != (Flags & EAtomicStringFlags.CaseInsensitive | EAtomicStringFlags.HasUppercase))
+                {// This atomic-string wants to always be compared case insensitevly, but has uppercase character in it's string
+                    return StringCommon.Transform(Data, UnicodeCommon.To_ASCII_Lower_Alpha).GetHashCode();
+                }
+                else
+                {
+                    return new string(Data.ToArray()).GetHashCode();
+                }
+            });
+
+            Hash_Lower = new CacheableValue<int>(() =>
+            {
+                /* Check if our string actually has uppercased characters, if it does then we need to lowercase it and get its hash */
+                if (0 != (Flags & EAtomicStringFlags.HasUppercase))
+                {// This atomic string has uppercase characters so we do infact need to create the caseless-hash
+                    return StringCommon.Transform(Data, UnicodeCommon.To_ASCII_Lower_Alpha).GetHashCode();
+                }
+
+                return GetHashCode();
+            });
+
+            this.Data = Data;
+            /*this.Data = new Memory<char>(Data.Length);
+            Data.CopyTo(this.Data);*/
+
             this.Flags = Flags;
 
-            if (String.ToCharArray().Where(c => char.IsUpper(c)).Any())
+            if (StringCommon.Contains(Data.Span, c => char.IsUpper(c)))
+            {
                 Flags |= EAtomicStringFlags.HasUppercase;
+            }
         }
+
+        public AtomicString(ReadOnlyMemory<char> Data) : this(Data, 0x0) { }
+        public AtomicString(string String) : this(String.AsMemory()) { }
+        public AtomicString(string String, EAtomicStringFlags Flags) : this(String.AsMemory(), Flags) { }
 
         #endregion
 
         #region String casting
-        public override string ToString() { return String; }
-        public static implicit operator string(AtomicString atom) { return atom.String; }
-        public static implicit operator AtomicString(string str) { return new AtomicString(str); }
+        public override string ToString() { return Data.ToString(); }
+
+        public static implicit operator string(AtomicString atom) { return atom.Data.ToString(); }
+        public static implicit operator ReadOnlyMemory<char>(AtomicString atom) { return atom.Data; }
+
+        public static implicit operator AtomicString(string str) { return new AtomicString(str.AsMemory()); }
+        public static implicit operator AtomicString(ReadOnlyMemory<char> memory) { return new AtomicString(memory); }
         #endregion
 
-
+        #region Equality
         public override int GetHashCode()
         {
-            if (!Hash.HasValue)
-            {
-                if (0 != (Flags & EAtomicStringFlags.CaseInsensitive | EAtomicStringFlags.HasUppercase))
-                {// This atomic-string wants to always be compared case insensitevly, but has uppercase character in it's string
-                    Hash = String.ToLowerInvariant().GetHashCode();
-                }
-                else
-                {
-                    Hash = String.GetHashCode();
-                }
+            return Hash.Get();
+        }
+
+        public bool Equals(AtomicString other)
+        {
+            // Check if hashes match
+            if (0 != ((other.Flags ^ Flags) & EAtomicStringFlags.CaseInsensitive))
+            {/* Flag mismatch: the XOR of both flags still returned CaseInsensitive, meaning only one of these atomic-strings is trying to be case-insensitive */
+                return Hash_Lower == other.Hash_Lower;
             }
-            return Hash.Value;
+            else
+            {
+                return other.GetHashCode() == GetHashCode();
+            }
         }
 
         public override bool Equals(object obj)
@@ -83,7 +103,7 @@ namespace CssUI
                 // Check if hashes match
                 if (0 != ((atom.Flags ^ Flags) & EAtomicStringFlags.CaseInsensitive))
                 {/* Flag mismatch: the XOR of both flags still returned CaseInsensitive, meaning only one of these atomic-strings is trying to be case-insensitive */
-                    return atom.Hash_Lower == Hash_Lower;
+                    return Hash_Lower == atom.Hash_Lower;
                 }
                 else
                 {
@@ -113,9 +133,9 @@ namespace CssUI
 
         public static bool operator !=(AtomicString A, AtomicString B)
         {
-            // If both object are null they match
+            // If both object are null they do not match
             if (ReferenceEquals(null, A) && ReferenceEquals(null, B)) return false;
-            // If one object is null and not the other they do not match
+            // If one object is null and not the other they do match
             if (ReferenceEquals(null, A) ^ ReferenceEquals(null, B)) return true;
             // Check if hashes match
             if (0 != ((A.Flags ^ B.Flags) & EAtomicStringFlags.CaseInsensitive))
@@ -127,5 +147,6 @@ namespace CssUI
                 return A.GetHashCode() != B.GetHashCode();
             }
         }
+        #endregion
     }
 }
