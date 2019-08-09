@@ -51,6 +51,7 @@ namespace CssUI.DOM
                 new AttributeDefinition(EAttributeName.Translate, EAttributeType.Boolean, null, null, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.Dir, EAttributeType.Enumerated, null, null, EAttributeFlags.None, Lookup.Get_Keywords<EDir>()),
                 new AttributeDefinition(EAttributeName.Nonce, EAttributeType.String, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.ItemProp, EAttributeType.String, null, null, EAttributeFlags.None),
 
                 /* The tabIndex IDL attribute must reflect the value of the tabindex content attribute. The default value is 0 if the element is an a, area, button, iframe, input, select, or textarea element, or is a summary element that is a summary for its parent details. The default value is −1 otherwise. */
                 new AttributeDefinition(EAttributeName.TabIndex, EAttributeType.Integer, AttributeValue.NegativeOne, AttributeValue.NegativeOne, EAttributeFlags.None),
@@ -68,15 +69,22 @@ namespace CssUI.DOM
                 new AttributeDefinition(EAttributeName.EncType, EAttributeType.Enumerated, AttributeValue.From_Enum(EEncType.FormData), AttributeValue.From_Enum(EEncType.FormData), EAttributeFlags.None, Lookup.Get_Keywords<EEncType>(), typeof(EEncType)),
                 new AttributeDefinition(EAttributeName.Method, EAttributeType.Enumerated, AttributeValue.From_Enum(EFormMethod.Get), AttributeValue.From_Enum(EFormMethod.Get), EAttributeFlags.None, Lookup.Get_Keywords<EFormMethod>(), typeof(EFormMethod)),
                 new AttributeDefinition(EAttributeName.NoValidate, EAttributeType.Boolean, null, null, EAttributeFlags.None),
-                new AttributeDefinition(EAttributeName.Target, EAttributeType.String, null, null, EAttributeFlags.None),
 
 
                 /* Link Attributes */
                 new AttributeDefinition(EAttributeName.Rel, EAttributeType.String, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.Href, EAttributeType.String, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.HrefLang, EAttributeType.String, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.Type, EAttributeType.String, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.Target, EAttributeType.String, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.Download, EAttributeType.String, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.Ping, EAttributeType.String, null, null, EAttributeFlags.None),
+                new AttributeDefinition(EAttributeName.ReferrerPolicy, EAttributeType.Enumerated, AttributeValue.From_Enum(EReferrerPolicy.None), AttributeValue.From_Enum(EReferrerPolicy.None), EAttributeFlags.None, Lookup.Get_Keywords<EReferrerPolicy>()),
 
 
                 /* Dialog Attributes */
                 new AttributeDefinition(EAttributeName.Open, EAttributeType.Boolean, null, null, EAttributeFlags.None),
+
 
                 /* Image Attributes */
                 new AttributeDefinition(EAttributeName.Src, EAttributeType.String, null, null, EAttributeFlags.None),
@@ -86,7 +94,6 @@ namespace CssUI.DOM
                 new AttributeDefinition(EAttributeName.CrossOrigin, EAttributeType.String, null, null, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.UseMap, EAttributeType.String, null, null, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.IsMap, EAttributeType.Boolean, null, null, EAttributeFlags.None),
-                new AttributeDefinition(EAttributeName.ReferrerPolicy, EAttributeType.String, null, null, EAttributeFlags.None),
                 new AttributeDefinition(EAttributeName.Decoding, EAttributeType.String, null, null, EAttributeFlags.None),
 
                 
@@ -160,6 +167,10 @@ namespace CssUI.DOM
                 new AttributeDefinition(typeof(HTMLIFrameElement), EAttributeName.Sandbox, EAttributeType.Enumerated, null, null, EAttributeFlags.None, null, null, null, null, Lookup.Get_Keywords<ESandbox>()),
                 new AttributeDefinition(typeof(HTMLIFrameElement), EAttributeName.Srcdoc, EAttributeType.String, null, null, EAttributeFlags.None),
                 new AttributeDefinition(typeof(HTMLIFrameElement), EAttributeName.Allow, EAttributeType.String, null, null, EAttributeFlags.None),
+
+                /* Area Attributes */
+                new AttributeDefinition(EAttributeName.Shape, EAttributeType.Enumerated, AttributeValue.From_Enum(EAreaShape.Rectangle), AttributeValue.From_Enum(EAreaShape.Rectangle), EAttributeFlags.None, Lookup.Get_Keywords<EAreaShape>()),
+                new AttributeDefinition(EAttributeName.Coords, EAttributeType.String, null, null, EAttributeFlags.None),
             };
         }
     }

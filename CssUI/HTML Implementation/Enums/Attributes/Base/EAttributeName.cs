@@ -41,6 +41,12 @@ namespace CssUI.DOM
         Text,
         [MetaKeyword("label")]
         Label,
+        /// <summary>
+        /// Every HTML element may have an itemprop attribute specified, if doing so adds one or more properties to one or more items (as defined below).
+        /// <para>ReadMore: https://html.spec.whatwg.org/multipage/microdata.html#names:-the-itemprop-attribute</para>
+        /// </summary>
+        [MetaKeyword("itemprop")]
+        ItemProp,
 
 
         [MetaKeyword("accesskey")]
@@ -80,6 +86,8 @@ namespace CssUI.DOM
         SrcSet,
         [MetaKeyword("href")]
         Href,
+        [MetaKeyword("hreflang")]
+        HrefLang,
         [MetaKeyword("sizes")]
         Sizes,
         [MetaKeyword("usemap")]
