@@ -64,7 +64,7 @@ namespace CssUI.CSS.Media
 
             StringBuilder sb = new StringBuilder();
 
-            sb.Append(UnicodeCommon.CHAR_PARENTHESES_OPEN);
+            sb.Append(UnicodeCommon.CHAR_LEFT_PARENTHESES);
 
             bool first = true;
             foreach (IMediaCondition Condition in Conditions)
@@ -80,7 +80,7 @@ namespace CssUI.CSS.Media
                 first = false;
             }
 
-            sb.Append(UnicodeCommon.CHAR_PARENTHESES_CLOSE);
+            sb.Append(UnicodeCommon.CHAR_RIGHT_PARENTHESES);
             return sb.ToString();
         }
 

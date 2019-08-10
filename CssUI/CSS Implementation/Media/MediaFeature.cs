@@ -393,7 +393,7 @@ namespace CssUI.CSS.Media
 
             StringBuilder sb = new StringBuilder();
             /* 1) Append a "(" (U+0028), followed by the media feature name, converted to ASCII lowercase, to s. */
-            sb.Append(UnicodeCommon.CHAR_PARENTHESES_OPEN);
+            sb.Append(UnicodeCommon.CHAR_LEFT_PARENTHESES);
 
             if (Context == EMediaFeatureContext.Boolean)
             {
@@ -428,7 +428,7 @@ namespace CssUI.CSS.Media
                 }
             }
             /* 3) Append a ")" (U+0029) to s. */
-            sb.Append(UnicodeCommon.CHAR_PARENTHESES_CLOSE);
+            sb.Append(UnicodeCommon.CHAR_RIGHT_PARENTHESES);
 
             return sb.ToString();
         }

@@ -5,7 +5,7 @@ using System.Text;
 namespace CssUI
 {
     public static class UnicodeCommon
-    {
+    {/* https://en.wikipedia.org/wiki/List_of_Unicode_characters */
         #region Constants
 
         #region /* Specials */
@@ -55,11 +55,14 @@ namespace CssUI
         /// !
         /// </summary>
         public const char CHAR_EXCLAMATION_POINT = '\u0021';
-
         /// <summary>
         /// ?
         /// </summary>
         public const char CHAR_QUESTION_MARK = '\u003F';
+        /// <summary>
+        /// @
+        /// </summary>
+        public const char CHAR_AT_SIGN = '\u0040';
         /// <summary>
         /// $
         /// </summary>
@@ -89,13 +92,45 @@ namespace CssUI
         /// </summary>
         public const char CHAR_PIPE = '\u007C';
         /// <summary>
-        /// >
-        /// </summary>
-        public const char CHAR_RIGHT_CHEVRON = '\u003E';
-        /// <summary>
         /// =
         /// </summary>
         public const char CHAR_EQUALS = '\u003D';
+
+        /// <summary>
+        /// <
+        /// </summary>
+        public const char CHAR_LEFT_CHEVRON = '\u003C';
+        /// <summary>
+        /// >
+        /// </summary>
+        public const char CHAR_RIGHT_CHEVRON = '\u003E';
+
+        /// <summary>
+        /// {
+        /// </summary>
+        public const char CHAR_LEFT_CURLY_BRACKET = '\u007B';
+        /// <summary>
+        /// }
+        /// </summary>
+        public const char CHAR_RIGHT_CURLY_BRACKET = '\u007D';
+
+        /// <summary>
+        /// [
+        /// </summary>
+        public const char CHAR_LEFT_SQUARE_BRACKET = '\u005B';
+        /// <summary>
+        /// ]
+        /// </summary>
+        public const char CHAR_RIGHT_SQUARE_BRACKET = '\u005D';
+
+        /// <summary>
+        /// (
+        /// </summary>
+        public const char CHAR_LEFT_PARENTHESES = '\u0028';
+        /// <summary>
+        /// )
+        /// </summary>
+        public const char CHAR_RIGHT_PARENTHESES = '\u0029';
         #endregion
 
 
@@ -199,14 +234,9 @@ namespace CssUI
         public const char CHAR_SEMICOLON = '\u003B';
 
         /// <summary>
-        /// (
+        /// &nbsp
         /// </summary>
-        public const char CHAR_PARENTHESES_OPEN = '\u0028';
-
-        /// <summary>
-        /// )
-        /// </summary>
-        public const char CHAR_PARENTHESES_CLOSE = '\u0029';
+        public const char CHAR_NBSP = '\u00A0';
 
         /// <summary>
         /// Same as: <see cref="CHAR_SOLIDUS"/>
@@ -585,6 +615,64 @@ namespace CssUI
 
         #endregion
 
+        #region Encoding Sets
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_C0_Control_Percent_Encode_Set(char c)
+        {/* Docs: https://url.spec.whatwg.org/#c0-control-percent-encode-set */
+            return (c >= CHAR_C0_DELETE && c <= CHAR_C0_APPLICATION_PROGRAM_COMMAND) || (c > CHAR_TILDE);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Fragment_Percent_Encode_Set(char c)
+        {/* Docs: https://url.spec.whatwg.org/#fragment-percent-encode-set */
+            if (Is_C0_Control_Percent_Encode_Set(c)) return true;
+            switch (c)
+            {
+                case CHAR_SPACE:
+                case CHAR_QUOTATION_MARK:
+                case CHAR_LEFT_CHEVRON:
+                case CHAR_RIGHT_CHEVRON:
+                case CHAR_BACKTICK:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Path_Percent_Encode_Set(char c)
+        {/* Docs: https://url.spec.whatwg.org/#path-percent-encode-set */
+            if (Is_Fragment_Percent_Encode_Set(c)) return true;
+            switch (c)
+            {
+                case CHAR_HASH:
+                case CHAR_QUESTION_MARK:
+                case CHAR_LEFT_CHEVRON:
+                case :
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Userinfo_Percent_Encode_Set(char c)
+        {/* Docs: https://url.spec.whatwg.org/#userinfo-percent-encode-set */
+            if (Is_C0_Control_Percent_Encode_Set(c)) return true;
+            switch (c)
+            {
+                case CHAR_SPACE:
+                case CHAR_QUOTATION_MARK:
+                case CHAR_LEFT_CHEVRON:
+                case CHAR_RIGHT_CHEVRON:
+                case CHAR_BACKTICK:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        #endregion
+
         #region Unicode String Transformations
 
         /// <summary>
@@ -647,6 +735,13 @@ namespace CssUI
 
 
             return U.ToString();
+        }
+        #endregion
+
+        #region UTF8
+        public static byte[] UTF8_Percent_Encode(char codePoint, Func<char, bool> percentEncodePredicate)
+        {
+
         }
         #endregion
 
