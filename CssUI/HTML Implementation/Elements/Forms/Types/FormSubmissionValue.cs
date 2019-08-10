@@ -1,6 +1,4 @@
-﻿using CssUI.DOM;
-
-namespace CssUI.HTML
+﻿namespace CssUI.HTML
 {
     /// <summary>
     /// Represents one of the data types that can be handled by a form.
