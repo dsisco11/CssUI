@@ -55,6 +55,11 @@ namespace CssUI
         /// !
         /// </summary>
         public const char CHAR_EXCLAMATION_POINT = '\u0021';
+
+        /// <summary>
+        /// ?
+        /// </summary>
+        public const char CHAR_QUESTION_MARK = '\u003F';
         /// <summary>
         /// $
         /// </summary>
@@ -178,7 +183,7 @@ namespace CssUI
         /// <summary>
         /// #
         /// </summary>
-        public const char CHAR_NUMBER_SIGN = '\u0023';
+        public const char CHAR_HASH = '\u0023';
 
         /// <summary>
         /// ,

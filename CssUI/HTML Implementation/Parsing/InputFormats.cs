@@ -1647,7 +1647,7 @@ namespace CssUI.HTML.Serialization
                 return false;
             }
 
-            if (Stream.Next != CHAR_NUMBER_SIGN)
+            if (Stream.Next != CHAR_HASH)
             {
                 return false;
             }
@@ -1677,7 +1677,7 @@ namespace CssUI.HTML.Serialization
                 return false;
             }
 
-            if (Stream.Next != CHAR_NUMBER_SIGN)
+            if (Stream.Next != CHAR_HASH)
             {
                 return false;
             }
@@ -1709,7 +1709,7 @@ namespace CssUI.HTML.Serialization
                 return false;
             }
 
-            if (Stream.Next != CHAR_NUMBER_SIGN)
+            if (Stream.Next != CHAR_HASH)
             {
                 outColor = SimpleColor.MinValue;
                 return false;
@@ -1762,7 +1762,7 @@ namespace CssUI.HTML.Serialization
                 }
             }
 
-            if (Stream.Length == 4 && Stream.Next == CHAR_NUMBER_SIGN && !Stream.Scan(c => !Is_Ascii_Hex_Digit(c), out _, 1))
+            if (Stream.Length == 4 && Stream.Next == CHAR_HASH && !Stream.Scan(c => !Is_Ascii_Hex_Digit(c), out _, 1))
             {
                 Stream.Consume();
                 int _r = 17 * (int)Ascii_Hex_To_Value(Stream.Consume());
@@ -1775,7 +1775,7 @@ namespace CssUI.HTML.Serialization
 
             string input = StringCommon.Replace(mem, FilterUnicodeOOB.Instance, "00".AsSpan(), true);
 
-            int startOffset = input[0] == CHAR_NUMBER_SIGN ? 1 : 0;
+            int startOffset = input[0] == CHAR_HASH ? 1 : 0;
             input = input.Substring(startOffset, Math.Min(input.Length, 128));
 
             /* 10) Replace any character in input that is not an ASCII hex digit with the character U+0030 DIGIT ZERO (0). */

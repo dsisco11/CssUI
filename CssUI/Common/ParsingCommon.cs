@@ -90,7 +90,7 @@ namespace CssUI
             {
                 if (!Is_Ascii_Hex_Digit(span[i]))
                 {
-                    if (span[i] == CHAR_NUMBER_SIGN && i == 0)
+                    if (span[i] == CHAR_HASH && i == 0)
                     {
                         /* it's fine just ignore it */
                         continue;

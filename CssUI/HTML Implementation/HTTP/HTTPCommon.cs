@@ -42,7 +42,7 @@ namespace CssUI.HTML
             switch (c)
             {
                 case CHAR_EXCLAMATION_POINT:
-                case CHAR_NUMBER_SIGN:
+                case CHAR_HASH:
                 case CHAR_DOLLAR_SIGN:
                 case CHAR_PERCENT:
                 case CHAR_AMPERSAND:
