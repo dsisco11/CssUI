@@ -10,6 +10,7 @@ using CssUI.HTML;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using xLog;
 
@@ -78,6 +79,7 @@ namespace CssUI.DOM
         public readonly EQuirksMode Mode = EQuirksMode.NoQuirks;
         public readonly string URL = "/";
         public readonly string Origin = null;
+        public readonly Encoding characterEncoding = Encoding.UTF8;
 
         public readonly DocumentType doctype;
         public readonly string contentType;
