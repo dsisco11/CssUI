@@ -5,8 +5,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CssUI.Filters;
+using CssUI.DOM;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     public class Blob
     {/* Docs: https://w3c.github.io/FileAPI/#dfn-Blob */
@@ -103,8 +104,8 @@ namespace CssUI.DOM
                 relativeContentType = StringCommon.Transform(contentType.AsMemory(), UnicodeCommon.To_ASCII_Lower_Alpha);
             }
 
-            ulong span = MathExt.Max(0, (relativeEnd - relativeStart));
-            return new Blob(new BlobPart[] { this.AsMemory().Slice((int)relativeStart, (int)span) }, new BlobPropertyBag(relativeContentType));
+            ulong span = MathExt.Max(0, relativeEnd - relativeStart);
+            return new Blob(new BlobPart[] { AsMemory().Slice((int)relativeStart, (int)span) }, new BlobPropertyBag(relativeContentType));
         }
 
         // read from the Blob.

@@ -1,8 +1,9 @@
-﻿using System;
+﻿using CssUI.DOM;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     /// <summary>
     /// Represents files data as well as its name and the time it was last modified
@@ -15,7 +16,7 @@ namespace CssUI.DOM
         #endregion
 
         #region Constructors
-        public FileBlob(ReadOnlyMemory<byte> data, string name, FilePropertyBag options = null) : base(new ReadOnlyMemory<byte>[] { data }, options)
+        public FileBlob(ReadOnlyMemory<byte> data, string name, FilePropertyBag options = null) : base(new BlobPart[] { data }, options)
         {
             this.name = name;
             if (ReferenceEquals(null, data) || data.IsEmpty)
