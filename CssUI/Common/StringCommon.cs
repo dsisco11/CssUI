@@ -894,8 +894,7 @@ namespace CssUI
             var chunks = new LinkedList<Tuple<ReadOnlyMemory<char>, int>>();
             ulong substituteLength = 0;
 
-            /* Scan for CR characters, when encountered create a new chunk(non inclusive for CR).
-             * Scan for LF characters, when encountered if not preceeded by a CR create a new chunk (non inclusive). */
+            /* Scan for replacement characters, when encountered create a new chunk (non inclusive). */
             while (!Stream.atEnd)
             {
                 EFilterResult filterResult = EFilterResult.FILTER_ACCEPT;
@@ -1021,8 +1020,7 @@ namespace CssUI
             ulong chunkCount = 0;
             var chunks = new LinkedList<ReadOnlyMemory<char>>();
 
-            /* Scan for CR characters, when encountered create a new chunk(non inclusive for CR).
-             * Scan for LF characters, when encountered if not preceeded by a CR create a new chunk (non inclusive). */
+            /* Scan for replacement characters, when encountered create a new chunk (non inclusive). */
             while (!Stream.atEnd)
             {
                 EFilterResult filterResult = dataFilter.acceptData(Stream.Next);
@@ -1130,8 +1128,7 @@ namespace CssUI
             var chunks = new LinkedList<Tuple<ReadOnlyMemory<char>, int>>();
             ulong substituteLength = 0;
 
-            /* Scan for CR characters, when encountered create a new chunk(non inclusive for CR).
-             * Scan for LF characters, when encountered if not preceeded by a CR create a new chunk (non inclusive). */
+            /* Scan for replacement characters, when encountered create a new chunk (non inclusive). */
             while (!Stream.atEnd)
             {
                 EFilterResult filterResult = EFilterResult.FILTER_ACCEPT;
