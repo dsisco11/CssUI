@@ -60,6 +60,11 @@ namespace CssUI
         /// Returns whether the stream position is currently at the end of the stream
         /// </summary>
         public bool atEnd => Position >= LongLength;
+
+        /// <summary>
+        /// Returns whether the next character in the stream is the EOF character
+        /// </summary>
+        public bool atEOF => Peek(0).Equals(EOF_ITEM);
         #endregion
 
         #region Data
