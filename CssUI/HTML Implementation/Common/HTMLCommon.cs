@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using static CssUI.UnicodeCommon;
 
@@ -389,6 +390,22 @@ namespace CssUI.HTML
             {
                 outFieldName = EAutofill.On;
             }
+        }
+        #endregion
+
+        #region Encoding
+        /// <summary>
+        /// Translates a given encoding into a valid one for HTTP Form submission or URL parsing
+        /// </summary>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static Encoding Get_Output_Encoding(Encoding encoding)
+        {/* Docs: https://encoding.spec.whatwg.org/#get-an-output-encoding */
+
+            if (encoding == Encoding.BigEndianUnicode || encoding == Encoding.Unicode)
+                return Encoding.UTF8;
+
+            return encoding;
         }
         #endregion
     }
