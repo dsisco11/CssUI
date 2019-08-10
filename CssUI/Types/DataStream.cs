@@ -301,6 +301,15 @@ namespace CssUI
         /// Pushes the given number of items back onto the front of the stream
         /// </summary>
         /// <param name="Count"></param>
+        public void Reconsume(long Count = 1)
+        {
+            Position -= (ulong)Count;
+        }
+
+        /// <summary>
+        /// Pushes the given number of items back onto the front of the stream
+        /// </summary>
+        /// <param name="Count"></param>
         public void Reconsume(ulong Count = 1)
         {
             Position -= Count;
