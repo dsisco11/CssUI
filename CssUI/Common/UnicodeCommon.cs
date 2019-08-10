@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -542,6 +543,10 @@ namespace CssUI
             return (uint)c - CHAR_DIGIT_0;
         }
 
+        #endregion
+
+
+        #region Hexadecimal
         /// <summary>
         /// Converts an ASCII hexadecimal character to its numeric value
         /// </summary>
@@ -576,6 +581,85 @@ namespace CssUI
                 default:
                     throw new IndexOutOfRangeException();
             }
+        }
+
+        /// <summary>
+        /// Converts a numeric value to its ASCII hexadecimal character(s)
+        /// </summary>
+        /// <param name="codePoint">Code point to convert</param>
+        /// <param name="Digits">Minimum number of digits to include</param>
+        /// <returns>Characters representing the hexadecimal form of the given value</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static char[] Ascii_Value_To_Hex(char codePoint, UInt32 Digits = 0)
+        {
+            return Ascii_Value_To_Hex((UInt64)codePoint, Digits);
+        }
+
+        /// <summary>
+        /// Converts a numeric value to its ASCII hexadecimal character(s)
+        /// </summary>
+        /// <param name="value">Value to convert</param>
+        /// <param name="Digits">Minimum number of digits to include</param>
+        /// <returns>Characters representing the hexadecimal form of the given value</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static char[] Ascii_Value_To_Hex(Int32 value, UInt32 Digits = 0)
+        {
+            return Ascii_Value_To_Hex((UInt64)value, Digits);
+        }
+
+        /// <summary>
+        /// Converts a numeric value to its ASCII hexadecimal character(s)
+        /// </summary>
+        /// <param name="value">Value to convert</param>
+        /// <param name="Digits">Minimum number of digits to include</param>
+        /// <returns>Characters representing the hexadecimal form of the given value</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static char[] Ascii_Value_To_Hex(UInt32 value, UInt32 Digits = 0)
+        {
+            return Ascii_Value_To_Hex((UInt64)value, Digits);
+        }
+
+        /// <summary>
+        /// Converts a numeric value to its ASCII hexadecimal character(s)
+        /// </summary>
+        /// <param name="value">Value to convert</param>
+        /// <param name="Digits">Minimum number of digits to include</param>
+        /// <returns>Characters representing the hexadecimal form of the given value</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static char[] Ascii_Value_To_Hex(Int64 value, UInt32 Digits = 0)
+        {
+            return Ascii_Value_To_Hex((UInt64)value, Digits);
+        }
+
+        /// <summary>
+        /// Converts a numeric value to its ASCII hexadecimal character(s)
+        /// </summary>
+        /// <param name="value">Value to convert</param>
+        /// <param name="Digits">Minimum number of digits to include</param>
+        /// <returns>Characters representing the hexadecimal form of the given value</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static char[] Ascii_Value_To_Hex(UInt64 value, UInt32 Digits = 0)
+        {
+            /* To determine how many hexidecimal chars we will need to represent this value:
+             * Find the index of the values most significant bit and divide it by 4(rounded up) */
+            int msb = (int)Math.Ceiling(BitScanner.BitScanForward(value) / 4.0d);
+            int charCount = MathExt.Max(1, msb);
+            char[] result = new char[MathExt.Max(charCount, Digits)];
+            int padding = (int)((charCount > Digits) ? 0 : (Digits - charCount));
+
+            for (int i=0; i<charCount; i++)
+            {
+                var digit = (value & 0xF);
+                value = value >> 4;
+                result[padding+i] = (char)((digit < 10) ? (digit + CHAR_DIGIT_0) : (digit + CHAR_A_UPPER));
+            }
+
+            for (int i = 0; i < padding; i++)
+            {
+                result[i] = CHAR_DIGIT_0;
+            }
+
+            return result;
         }
         #endregion
 
@@ -617,15 +701,15 @@ namespace CssUI
 
         #region Encoding Sets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_C0_Control_Percent_Encode_Set(char c)
+        public static bool Percent_Encode_Set_C0_Control(char c)
         {/* Docs: https://url.spec.whatwg.org/#c0-control-percent-encode-set */
             return (c >= CHAR_C0_DELETE && c <= CHAR_C0_APPLICATION_PROGRAM_COMMAND) || (c > CHAR_TILDE);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Fragment_Percent_Encode_Set(char c)
+        public static bool Percent_Encode_Set_Fragment(char c)
         {/* Docs: https://url.spec.whatwg.org/#fragment-percent-encode-set */
-            if (Is_C0_Control_Percent_Encode_Set(c)) return true;
+            if (Percent_Encode_Set_C0_Control(c)) return true;
             switch (c)
             {
                 case CHAR_SPACE:
@@ -640,15 +724,15 @@ namespace CssUI
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Path_Percent_Encode_Set(char c)
+        public static bool Percent_Encode_Set_Path(char c)
         {/* Docs: https://url.spec.whatwg.org/#path-percent-encode-set */
-            if (Is_Fragment_Percent_Encode_Set(c)) return true;
+            if (Percent_Encode_Set_Fragment(c)) return true;
             switch (c)
             {
                 case CHAR_HASH:
                 case CHAR_QUESTION_MARK:
-                case CHAR_LEFT_CHEVRON:
-                case :
+                case CHAR_LEFT_CURLY_BRACKET:
+                case CHAR_RIGHT_CURLY_BRACKET:
                     return true;
                 default:
                     return false;
@@ -656,16 +740,21 @@ namespace CssUI
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Userinfo_Percent_Encode_Set(char c)
+        public static bool Percent_Encode_Set_Userinfo(char c)
         {/* Docs: https://url.spec.whatwg.org/#userinfo-percent-encode-set */
-            if (Is_C0_Control_Percent_Encode_Set(c)) return true;
+            if (Percent_Encode_Set_Path(c)) return true;
             switch (c)
             {
-                case CHAR_SPACE:
-                case CHAR_QUOTATION_MARK:
-                case CHAR_LEFT_CHEVRON:
-                case CHAR_RIGHT_CHEVRON:
-                case CHAR_BACKTICK:
+                case CHAR_SOLIDUS:
+                case CHAR_COLON:
+                case CHAR_SEMICOLON:
+                case CHAR_EQUALS:
+                case CHAR_AT_SIGN:
+                case CHAR_LEFT_SQUARE_BRACKET:
+                case CHAR_REVERSE_SOLIDUS:
+                case CHAR_RIGHT_SQUARE_BRACKET:
+                case CHAR_CARET:
+                case CHAR_PIPE:
                     return true;
                 default:
                     return false;
@@ -738,10 +827,127 @@ namespace CssUI
         }
         #endregion
 
-        #region UTF8
-        public static byte[] UTF8_Percent_Encode(char codePoint, Func<char, bool> percentEncodePredicate)
-        {
+        #region Percent Encoding
+        public static char[] Percent_Encode(byte b)
+        {/* Docs: https://url.spec.whatwg.org/#percent-encode */
+            char[] hex = Ascii_Value_To_Hex((ulong)b, 2);
+            return new char[3] { CHAR_PERCENT, hex[0], hex[1] };
+        }
 
+        public static byte[] Percent_Decode(ReadOnlyMemory<byte> input)
+        {/* Docs: https://url.spec.whatwg.org/#percent-decode */
+            DataStream<byte> Stream = new DataStream<byte>(input, byte.MinValue);
+            /* Create a list of memory chunks that make up the final string */
+            ulong newLength = 0;
+            ulong? chunkStart = null;
+            ulong chunkCount = 0;
+            var chunks = new LinkedList<Tuple<ReadOnlyMemory<byte>, byte?>>();
+
+            while (!Stream.atEnd)
+            {
+                EFilterResult filterResult = EFilterResult.FILTER_ACCEPT;
+                byte? bytePoint = null;
+
+                if (Stream.Next == CHAR_PERCENT && Is_Ascii_Hex_Digit((char)Stream.NextNext) && Is_Ascii_Hex_Digit((char)Stream.NextNextNext))
+                {
+                    filterResult = EFilterResult.FILTER_SKIP;
+                    uint low = Ascii_Hex_To_Value((char)Stream.NextNext);
+                    uint high = Ascii_Hex_To_Value((char)Stream.NextNextNext);
+                    bytePoint = (byte)(low | (high >> 4));
+                    Stream.Consume(2);
+                    break;
+                }
+                /* When filter result:
+                 * ACCEPT: Char should be included in chunk
+                 * SKIP: Char should not be included in chunk, if at chunk-start shift chunk-start past char, otherwise end chunk
+                 * REJECT: Char should not be included in chunk, current chunk ends
+                 */
+                bool end_chunk = false;
+                switch (filterResult)
+                {
+                    case EFilterResult.FILTER_ACCEPT:// Char should be included in the chunk
+                        {
+                            if (!chunkStart.HasValue) chunkStart = Stream.Position;/* Start new chunk (if one isnt started yet) */
+                        }
+                        break;
+                    case EFilterResult.FILTER_REJECT:// Char should not be included in chunk, current chunk ends
+                        {
+                            end_chunk = true;
+                        }
+                        break;
+                    case EFilterResult.FILTER_SKIP:// Char should not be included in chunk, if at chunk-start shift chunk-start past char, otherwise end chunk
+                        {
+                            if (!chunkStart.HasValue)
+                            {
+                                chunkStart = Stream.Position + 1;/* At chunk-start */
+                            }
+                            else
+                            {
+                                end_chunk = true;
+                            }
+                        }
+                        break;
+                }
+
+                if (end_chunk || Stream.Remaining <= 1)
+                {
+                    if (!chunkStart.HasValue) chunkStart = Stream.Position;
+
+                    /* Push new chunk to our list */
+                    var chunkSize = Stream.Position - chunkStart.Value;
+                    var Mem = Stream.AsMemory().Slice((int)chunkStart.Value, (int)chunkSize);
+                    var chunk = new Tuple<ReadOnlyMemory<byte>, byte?>(Mem, bytePoint);
+                    chunks.AddLast(chunk);
+
+                    chunkCount++;
+                    chunkStart = null;
+                    newLength += chunkSize;
+                    /* If we actually decoded a byte then account for it in the newLength */
+                    if (filterResult != EFilterResult.FILTER_ACCEPT) newLength++;
+                }
+
+                Stream.Consume();
+            }
+
+            /* Compile the string */
+            var dataPtr = new byte[newLength];
+            Memory<byte> data = new Memory<byte>(dataPtr);
+
+            ulong index = 0;
+            foreach (var tpl in chunks)
+            {
+                var chunk = tpl.Item1;
+                /* Copy chunk data */
+                chunk.CopyTo(data.Slice((int)index));
+                index += (ulong)chunk.Length;
+
+                if (tpl.Item2.HasValue)
+                {
+                    data.Span[(int)index] = tpl.Item2.Value;
+                    index++;
+                }
+            }
+
+            return dataPtr;
+        }
+
+        public static string UTF8_Percent_Encode(char codePoint, Predicate<char> percentEncodePredicate)
+        {/* Docs: https://url.spec.whatwg.org/#utf-8-percent-encode */
+            if (!percentEncodePredicate(codePoint)) return codePoint.ToString();
+
+            var bytes = Encoding.UTF8.GetBytes(new char[1] { codePoint });
+            char[] data = new char[bytes.Length * 3];
+
+            for (int i=0; i<bytes.Length; i++)
+            {
+                var enc = Percent_Encode(bytes[i]);
+                int j = i * 3;
+                data[j + 0] = enc[0];
+                data[j + 1] = enc[1];
+                data[j + 2] = enc[2];
+            }
+
+            return new string(data);
         }
         #endregion
 
