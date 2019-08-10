@@ -322,14 +322,44 @@ namespace CssUI
         }
 
         /// <summary>
+        /// True if code point is an ASCII tab or newline character
+        /// </summary>
+        /// <param name="c">Code point to check</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Ascii_Tab_Or_Newline(char c)
+        {/* Docs: https://infra.spec.whatwg.org/#ascii-tab-or-newline */
+            switch (c)
+            {
+                case CHAR_TAB:
+                case CHAR_LINE_FEED:
+                case CHAR_CARRIAGE_RETURN:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
         /// True if code point is an ASCII control character
         /// </summary>
         /// <param name="c">Code point to check</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_Ascii_Control(char c)
-        {/* Docs: https://infra.spec.whatwg.org/#ascii-digit */
-            return c >= CHAR_C0_DELETE && c <= CHAR_C0_APPLICATION_PROGRAM_COMMAND;
+        {/* Docs: https://infra.spec.whatwg.org/#c0-control */
+            return (c >= CHAR_C0_DELETE && c <= CHAR_C0_APPLICATION_PROGRAM_COMMAND);
+        }
+
+        /// <summary>
+        /// True if code point is an ASCII control or space character
+        /// </summary>
+        /// <param name="c">Code point to check</param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Ascii_Control_Or_Space(char c)
+        {/* Docs: https://infra.spec.whatwg.org/#c0-control-or-space */
+            return (c >= CHAR_C0_DELETE && c <= CHAR_C0_APPLICATION_PROGRAM_COMMAND) || c == CHAR_SPACE;
         }
 
         /// <summary>
@@ -419,6 +449,16 @@ namespace CssUI
         public static bool Is_Ascii_Hex_Digit_Upper(char c)
         {/* Docs: https://infra.spec.whatwg.org/#ascii-digit */
             return (c >= CHAR_DIGIT_0 && c <= CHAR_DIGIT_9) || (c >= CHAR_A_UPPER && c <= CHAR_F_UPPER);
+        }
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Selectable_Char(char c)
+        {
+            if (Is_Ascii_Control(c))
+                return false;
+
+            return true;
         }
         #endregion
 
@@ -604,15 +644,6 @@ namespace CssUI
             return U.ToString();
         }
         #endregion
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Selectable_Char(char c)
-        {
-            if (Is_Ascii_Control(c))
-                return false;
-
-            return true;
-        }
 
     }
 }
