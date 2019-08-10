@@ -81,6 +81,10 @@ namespace CssUI
             this.Name = Name;
             this.Value = Get_Or_Register_Name(Name, out bool outIsCustom);
             this.IsCustom = outIsCustom;
+            if (!IsCustom)
+            {
+                EnumValue = Name_To_Enum(Name);
+            }
         }
         #endregion
 
@@ -88,7 +92,6 @@ namespace CssUI
         /// Converts our integer value into its string name, supposedly through an enum lookup table
         /// </summary>
         /// <param name="value"></param>
-        /// <returns></returns>
         protected virtual string Value_To_Name(int value)
         {
             if (!IsCustom)
@@ -114,10 +117,13 @@ namespace CssUI
         /// Converts a string name into a positive integer value, preferrably via enum lookup.
         /// A return value of <c>null</c> will cause the name to be registered as a custom one.
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        protected virtual int? Name_To_Value(string name)
+        /// <param name="Name"></param>
+        protected virtual int? Name_To_Value(string Name)
         {
+            if (Lookup.TryEnum<Ty>(Name, out Ty outEnum))
+            {
+                return CastTo<Int32>.From<Ty>(outEnum);
+            }
             return null;// name.GetHashCode();
         }
 
@@ -125,10 +131,23 @@ namespace CssUI
         /// Converts an enum value into a positive integer value, preferrably via LUT lookup or else this class wont be performant.
         /// </summary>
         /// <param name="enumValue"></param>
-        /// <returns></returns>
         protected virtual int? Enum_To_Value(Ty enumValue)
         {
-            return Convert.ToInt32(enumValue);
+            //return Convert.ToInt32(enumValue);
+            return CastTo<Int32>.From<Ty>(enumValue);
+        }
+
+        /// <summary>
+        /// Converts a string name into an enum value, preferrably via LUT lookup or else this class wont be performant.
+        /// </summary>
+        /// <param name="Name"></param>
+        protected virtual Ty? Name_To_Enum(string Name)
+        {
+            if (Lookup.TryEnum<Ty>(Name, out Ty outEnum))
+            {
+                return outEnum;
+            }
+            return null;
         }
 
         #region Name Registry
