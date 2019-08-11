@@ -248,11 +248,12 @@ namespace CssUI
         /// </summary>
         /// <param name="Predicate"></param>
         /// <returns>True if atleast a single item was consumed</returns>
-        public bool Consume_While(Predicate<ItemType> Predicate)
+        public bool Consume_While(Predicate<ItemType> Predicate, int? limit = null)
         {
             bool consumed = Predicate(Next);
-            while (Predicate(Next))
+            while (Predicate(Next) && (!limit.HasValue || limit.Value >= 0))
             {
+                if (limit.HasValue) limit--;
                 Consume();
             }
 
@@ -264,12 +265,13 @@ namespace CssUI
         /// </summary>
         /// <param name="Predicate"></param>
         /// <returns>True if atleast a single item was consumed</returns>
-        public bool Consume_While(Predicate<ItemType> Predicate, out ReadOnlyMemory<ItemType> outConsumed)
+        public bool Consume_While(Predicate<ItemType> Predicate, out ReadOnlyMemory<ItemType> outConsumed, int? limit = null)
         {
             var startIndex = Position;
 
-            while (Predicate(Next))
+            while (Predicate(Next) && (!limit.HasValue || limit.Value >= 0))
             {
+                if (limit.HasValue) limit--;
                 Consume();
             }
 
@@ -283,12 +285,13 @@ namespace CssUI
         /// </summary>
         /// <param name="Predicate"></param>
         /// <returns>True if atleast a single item was consumed</returns>
-        public bool Consume_While(Predicate<ItemType> Predicate, out ReadOnlySpan<ItemType> outConsumed)
+        public bool Consume_While(Predicate<ItemType> Predicate, out ReadOnlySpan<ItemType> outConsumed, int? limit = null)
         {
             var startIndex = Position;
 
-            while (Predicate(Next))
+            while (Predicate(Next) && (!limit.HasValue || limit.Value >= 0))
             {
+                if (limit.HasValue) limit--;
                 Consume();
             }
 
