@@ -54,7 +54,7 @@ namespace CssUI
         /// Returns whether <paramref name="str"/> contains any characters matching the given filter
         /// </summary>
         /// <returns>True if string contains a character which the given filter matches</returns>
-        public static bool Contains(ReadOnlySpan<char> str, Func<char, bool> Predicate)
+        public static bool Contains(ReadOnlySpan<char> str, Predicate<char> Predicate)
         {
             if (Predicate == null)
                 return false;
@@ -475,7 +475,7 @@ namespace CssUI
         /// <param name="Input">The string memory to trim</param>
         /// <param name="Predicate">The filter used to trim characters out of the input</param>
         /// <returns></returns>
-        public static ReadOnlyMemory<char> Trim(ReadOnlyMemory<char> Input, Func<char, bool> Predicate)
+        public static ReadOnlyMemory<char> Trim(ReadOnlyMemory<char> Input, Predicate<char> Predicate)
         {
             /* Trim start */
             for (int i = 0; i < Input.Length; i++)
@@ -584,7 +584,7 @@ namespace CssUI
         /// <param name="Input">The string memory to trim</param>
         /// <param name="Predicate">The filter used to trim characters out of the input</param>
         /// <returns></returns>
-        public static ReadOnlyMemory<char> TrimStart(ReadOnlyMemory<char> Input, Func<char, bool> Predicate)
+        public static ReadOnlyMemory<char> TrimStart(ReadOnlyMemory<char> Input, Predicate<char> Predicate)
         {
             /* Trim start */
             for (int i = 0; i < Input.Length; i++)
@@ -682,7 +682,7 @@ namespace CssUI
         /// <param name="Input">The string memory to trim</param>
         /// <param name="Predicate">The filter used to trim characters out of the input</param>
         /// <returns></returns>
-        public static ReadOnlyMemory<char> TrimEnd(ReadOnlyMemory<char> Input, Func<char, bool> Predicate)
+        public static ReadOnlyMemory<char> TrimEnd(ReadOnlyMemory<char> Input, Predicate<char> Predicate)
         {
             /* Trim end */
             for (int i = Input.Length - 1; i > -1; i--)
