@@ -535,12 +535,12 @@ namespace CssUI
         /// <param name="c">Code point to convert</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static uint Ascii_Digit_To_Value(char c)
+        public static int Ascii_Digit_To_Value(char c)
         {
             if (c < CHAR_DIGIT_0 || c > CHAR_DIGIT_9)
                 throw new IndexOutOfRangeException();
 
-            return (uint)c - CHAR_DIGIT_0;
+            return (int)c - CHAR_DIGIT_0;
         }
 
         #endregion
@@ -553,10 +553,10 @@ namespace CssUI
         /// <param name="c">Code point to convert</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static uint Ascii_Hex_To_Value(char c)
+        public static int Ascii_Hex_To_Value(char c)
         {
             if (c >= CHAR_DIGIT_0 && c <= CHAR_DIGIT_9)
-                return (uint)c - CHAR_DIGIT_0;
+                return (int)c - CHAR_DIGIT_0;
 
             switch (c)
             {
@@ -851,8 +851,8 @@ namespace CssUI
                 if (Stream.Next == CHAR_PERCENT && Is_Ascii_Hex_Digit((char)Stream.NextNext) && Is_Ascii_Hex_Digit((char)Stream.NextNextNext))
                 {
                     filterResult = EFilterResult.FILTER_SKIP;
-                    uint low = Ascii_Hex_To_Value((char)Stream.NextNext);
-                    uint high = Ascii_Hex_To_Value((char)Stream.NextNextNext);
+                    uint low = (uint)Ascii_Hex_To_Value((char)Stream.NextNext);
+                    uint high = (uint)Ascii_Hex_To_Value((char)Stream.NextNextNext);
                     bytePoint = (byte)(low | (high >> 4));
                     Stream.Consume(2);
                     break;
