@@ -156,6 +156,7 @@ namespace CssUI
         public const char CHAR_S_UPPER = '\u0053';
         public const char CHAR_T_UPPER = '\u0054';
         public const char CHAR_W_UPPER = '\u0057';
+        public const char CHAR_X_UPPER = '\u0058';
         public const char CHAR_Y_UPPER = '\u0059';
         public const char CHAR_Z_UPPER = '\u005A';
         #endregion
@@ -641,7 +642,7 @@ namespace CssUI
         public static char[] Ascii_Value_To_Hex(UInt64 value, UInt32 Digits = 0)
         {
             /* To determine how many hexidecimal chars we will need to represent this value:
-             * Find the index of the values most significant bit and divide it by 4(rounded up) */
+             * Find the index of the values most significant bit and divide it by 4and then round it up */
             int msb = (int)Math.Ceiling(BitScanner.BitScanForward(value) / 4.0d);
             int charCount = MathExt.Max(1, msb);
             char[] result = new char[MathExt.Max(charCount, Digits)];
@@ -649,9 +650,9 @@ namespace CssUI
 
             for (int i=0; i<charCount; i++)
             {
-                var digit = (value & 0xF);
+                var halfByte = (value & 0xF);
                 value = value >> 4;
-                result[padding+i] = (char)((digit < 10) ? (digit + CHAR_DIGIT_0) : (digit + CHAR_A_UPPER));
+                result[padding+i] = (char)((halfByte < 10) ? (halfByte + CHAR_DIGIT_0) : (halfByte + CHAR_A_UPPER));
             }
 
             for (int i = 0; i < padding; i++)
