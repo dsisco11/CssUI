@@ -175,7 +175,7 @@ namespace CssUI
         /// Returns the index of the first item matching the given predicate or -1 if none was found
         /// </summary>
         /// <returns>Index of first item matching the given predicate or -1 if none was found</returns>
-        public bool Scan(Func<ItemType, bool> Predicate, out ulong outOffset, ulong startOffset = 0)
+        public bool Scan(Predicate<ItemType> Predicate, out ulong outOffset, ulong startOffset = 0)
         {
             ulong offset = startOffset;
 
@@ -248,7 +248,7 @@ namespace CssUI
         /// </summary>
         /// <param name="Predicate"></param>
         /// <returns>True if atleast a single item was consumed</returns>
-        public bool Consume_While(Func<ItemType, bool> Predicate)
+        public bool Consume_While(Predicate<ItemType> Predicate)
         {
             bool consumed = Predicate(Next);
             while (Predicate(Next))
@@ -264,7 +264,7 @@ namespace CssUI
         /// </summary>
         /// <param name="Predicate"></param>
         /// <returns>True if atleast a single item was consumed</returns>
-        public bool Consume_While(Func<ItemType, bool> Predicate, out ReadOnlyMemory<ItemType> outConsumed)
+        public bool Consume_While(Predicate<ItemType> Predicate, out ReadOnlyMemory<ItemType> outConsumed)
         {
             var startIndex = Position;
 
@@ -283,7 +283,7 @@ namespace CssUI
         /// </summary>
         /// <param name="Predicate"></param>
         /// <returns>True if atleast a single item was consumed</returns>
-        public bool Consume_While(Func<ItemType, bool> Predicate, out ReadOnlySpan<ItemType> outConsumed)
+        public bool Consume_While(Predicate<ItemType> Predicate, out ReadOnlySpan<ItemType> outConsumed)
         {
             var startIndex = Position;
 
@@ -354,7 +354,7 @@ namespace CssUI
         /// </summary>
         /// <param name="Predicate"></param>
         /// <returns></returns>
-        public DataStream<ItemType> Substream(Func<ItemType, bool> Predicate)
+        public DataStream<ItemType> Substream(Predicate<ItemType> Predicate)
         {
             var startIndex = Position;
 
