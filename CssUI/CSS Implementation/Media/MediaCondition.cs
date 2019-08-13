@@ -72,7 +72,7 @@ namespace CssUI.CSS.Media
                 if (!first)
                 {
                     sb.Append(UnicodeCommon.CHAR_SPACE);
-                    sb.Append(CssLookup.Keyword(Op));
+                    sb.Append(Lookup.Keyword(Op));
                     sb.Append(UnicodeCommon.CHAR_SPACE);
                 }
 

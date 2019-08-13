@@ -61,6 +61,18 @@ namespace CssUI.CSS.Internal
 
         #endregion
 
+        #region Lookup
+        public static MediaDefinition Lookup(EMediaFeatureName Name)
+        {
+            if (CssDefinitions.MediaDefinitions.TryGetValue(Name, out MediaDefinition def))
+            {
+                return def;
+            }
+
+            return null;
+        }
+        #endregion
+
         #region Value Checking
 
         /// <summary>

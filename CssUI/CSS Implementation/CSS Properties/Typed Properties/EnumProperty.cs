@@ -16,7 +16,7 @@ namespace CssUI.CSS
         {
             get
             {
-                return CssLookup.Enum<Ty>((string)base.Actual.Value);
+                return Lookup.Enum<Ty>((string)base.Actual.Value);
             }
         }
         #endregion
@@ -33,7 +33,7 @@ namespace CssUI.CSS
         public void Set(Ty Value)
         {
             /* Convert type value into its CSS Keyword */
-            base.Assigned = CssValue.From_Keyword( CssLookup.Keyword<Ty>(Value) );
+            base.Assigned = CssValue.From_Keyword( Lookup.Keyword<Ty>(Value) );
         }
         #endregion
 

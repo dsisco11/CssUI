@@ -31,7 +31,7 @@ namespace CssUI.CSS.Media
         {
             Context = EMediaFeatureContext.Boolean;
 
-            MediaDefinition def = CssLookup.Lookup_Def(Name);
+            MediaDefinition def = MediaDefinition.Lookup(Name);
             if (def != null)
             {
                 IsValid = true;
@@ -116,7 +116,7 @@ namespace CssUI.CSS.Media
                          * Otherwise, it evaluates to false.
                          */
                         CssValue value = Values[0];
-                        if (!CssLookup.TryEnum((string)value.Value, out EMediaFeatureName nameLookup))
+                        if (!Lookup.TryEnum((string)value.Value, out EMediaFeatureName nameLookup))
                         {/* This feature is not supported (or maybe valid) so we need to treat it as if it simply doesnt match */
                             IsValid = false;
                             return false;
@@ -265,7 +265,7 @@ namespace CssUI.CSS.Media
 
             if (ValueA.Type == ECssValueType.KEYWORD)
             {
-                if (!CssLookup.TryEnum<EMediaFeatureName>(ValueA.Value, out EMediaFeatureName nameLookup))
+                if (!Lookup.TryEnum<EMediaFeatureName>(ValueA.Value, out EMediaFeatureName nameLookup))
                 {/* If we cant find this keyword then we treat it as if it were an unsupported feature */
                     return false;
                 }
@@ -280,7 +280,7 @@ namespace CssUI.CSS.Media
 
             if (ValueB.Type == ECssValueType.KEYWORD)
             {
-                if (!CssLookup.TryEnum<EMediaFeatureName>(ValueB.Value, out EMediaFeatureName nameLookup))
+                if (!Lookup.TryEnum<EMediaFeatureName>(ValueB.Value, out EMediaFeatureName nameLookup))
                 {/* If we cant find this keyword then we treat it as if it were an unsupported feature */
                     return false;
                 }
@@ -385,7 +385,7 @@ namespace CssUI.CSS.Media
                 return string.Empty;
             }
 
-            if (!CssLookup.TryKeyword(Values[0].AsEnum<EMediaFeatureName>(), out string Name))
+            if (!Lookup.TryKeyword(Values[0].AsEnum<EMediaFeatureName>(), out string Name))
             {
                 throw new CssSyntaxErrorException($"Could not find media-feature name");
             }
@@ -417,7 +417,7 @@ namespace CssUI.CSS.Media
                     {
                         CssValue B = Values[i];
                         EMediaOperator op = Operators[i - 1];
-                        if (!CssLookup.TryKeyword(op, out string outComparator))
+                        if (!Lookup.TryKeyword(op, out string outComparator))
                         {
                             throw new CssSyntaxErrorException("Unable to find the specified comparator within the CSS enum LUT");
                         }

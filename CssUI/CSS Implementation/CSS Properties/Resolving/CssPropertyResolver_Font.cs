@@ -46,7 +46,7 @@ namespace CssUI.Internal
                         case ECssValueType.KEYWORD:
                             {
                                 string keyword = value.Value;
-                                if (!CssLookup.TryEnum(keyword, out EFontSize outFontSize))
+                                if (!Lookup.TryEnum(keyword, out EFontSize outFontSize))
                                 {
                                     throw new CssException($"");
                                     throw new CssException($"Unable to resolve absolute length for Computed \"{Property.CssName}\" value.");
@@ -119,7 +119,7 @@ namespace CssUI.Internal
             // handle font-weight related keywords
             // This function wouldnt even be called if the value werent a keyword
             string keyword = ((Property as CssProperty).Specified.Value as string).ToLower();
-            if (!CssLookup.TryEnum(keyword, out EFontWeight outEnum))
+            if (!Lookup.TryEnum(keyword, out EFontWeight outEnum))
             {
                 throw new CssException($"Unable to resolve absolute length for Computed \"{Property.CssName}\" value.");
             }
@@ -182,7 +182,7 @@ namespace CssUI.Internal
                     case ECssValueType.KEYWORD:
                         {// Replace generic font-family keywords with a list of our fallback font-familys for that family
                             string familyKeyword = val.Value as string;
-                            if (!CssLookup.TryEnum(familyKeyword, out EGenericFontFamily outFamily))
+                            if (!Lookup.TryEnum(familyKeyword, out EGenericFontFamily outFamily))
                             {
                                 throw new CssException($"Unable to resolve absolute length for Used \"{Property.CssName}\" value.");
                             }

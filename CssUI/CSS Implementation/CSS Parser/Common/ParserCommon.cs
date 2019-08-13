@@ -37,7 +37,7 @@ namespace CssUI.CSS.Serialization
                 return false;
 
             string tokStr = (A as IdentToken).Value;
-            return CssLookup.Is_Declared(typeof(EMediaCombinator), tokStr);
+            return Lookup.Is_Declared(typeof(EMediaCombinator), tokStr);
         }
 
         /// <summary>

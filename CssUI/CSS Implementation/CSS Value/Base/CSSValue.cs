@@ -144,7 +144,7 @@ namespace CssUI.CSS
             if (type == ECssValueType.KEYWORD)// Try and catch some common IMPORTANT keywords
             {
                 /* If our keyword can be resolved to another ECssValueType then its an global keyword */
-                if (!CssLookup.TryEnum(value as string, out ECssValueType outType))
+                if (!Lookup.TryEnum(value as string, out ECssValueType outType))
                 {
                     Type = outType;
                 }
@@ -185,7 +185,7 @@ namespace CssUI.CSS
         /// <summary>Create an integer value from an enum</summary>
         public static CssValue From_Enum<Ty>(Ty value) where Ty : struct
         {
-            if (!CssLookup.TryKeyword<Ty>(value, out string outKeyword))
+            if (!Lookup.TryKeyword<Ty>(value, out string outKeyword))
             {
                 throw new CssException($"Unable to find keyword for enum value {value} in CSS enum table");
             }
@@ -740,7 +740,7 @@ namespace CssUI.CSS
                 case ECssValueType.UNSET:
                 case ECssValueType.NONE:
                     {
-                        if (!CssLookup.TryKeyword(Type, out string outKeyword))
+                        if (!Lookup.TryKeyword(Type, out string outKeyword))
                         {
                             throw new CssException($"Unable to find keyword for enum value {Type} in CSS enum table");
                         }
@@ -771,7 +771,7 @@ namespace CssUI.CSS
                         }
                         else
                         {
-                            if (!CssLookup.TryKeyword(Unit, out string unitStr))
+                            if (!Lookup.TryKeyword(Unit, out string unitStr))
                             {
                                 throw new CssException($"Unable to find enum value {Unit} in CSS enum table");
                             }

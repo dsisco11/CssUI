@@ -55,7 +55,7 @@ namespace CssUI.CSS.Serialization
         #region Identifiers
         public static string Identifier<Ty>(Ty ident) where Ty : struct
         {
-            string keyword = CssLookup.Keyword<Ty>(ident);
+            string keyword = Lookup.Keyword<Ty>(ident);
             return Identifier(keyword);
         }
 

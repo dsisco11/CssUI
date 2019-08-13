@@ -492,7 +492,7 @@ namespace CssUI.CSS.Serialization
 
                         if (!string.IsNullOrEmpty(tok.Unit))
                         {
-                            EUnit unitLookup = CssLookup.Enum<EUnit>(tok.Unit);
+                            EUnit unitLookup = Lookup.Enum<EUnit>(tok.Unit);
                             unit = unitLookup;
                         }
 
@@ -540,7 +540,7 @@ namespace CssUI.CSS.Serialization
                     break;
             }
 
-            throw new CssParserException($"Unhandled token type cannot be interpreted as css-value: \"{CssLookup.Keyword(Token.Type)}\"");
+            throw new CssParserException($"Unhandled token type cannot be interpreted as css-value: \"{Lookup.Keyword(Token.Type)}\"");
         }
         #endregion
 
@@ -584,7 +584,7 @@ namespace CssUI.CSS.Serialization
             {
                 throw new CssSyntaxErrorException("Expected ident token", Stream);
             }
-            if (CssLookup.TryEnum((Stream.Next as IdentToken).Value, out EMediaQueryModifier mod))
+            if (Lookup.TryEnum((Stream.Next as IdentToken).Value, out EMediaQueryModifier mod))
             {
                 Stream.Consume();// consume this token
                 modifier = mod;
@@ -602,7 +602,7 @@ namespace CssUI.CSS.Serialization
                 throw new CssSyntaxErrorException("Expected media type", Stream);
             }
 
-            if (!CssLookup.TryEnum((Stream.Next as IdentToken).Value, out EMediaType type))
+            if (!Lookup.TryEnum((Stream.Next as IdentToken).Value, out EMediaType type))
             {
                 throw new CssParserException($"Unrecognized media type: \"{(Stream.Next as IdentToken).Value}\" @\"{ParserCommon.Get_Location(Stream)}\"");
             }
@@ -703,7 +703,7 @@ namespace CssUI.CSS.Serialization
                     {
                         /* Consume combinator */
                         IdentToken combinatorToken = Stream.Consume() as IdentToken;
-                        if (!CssLookup.TryEnum(combinatorToken.Value, out EMediaCombinator combLookup))
+                        if (!Lookup.TryEnum(combinatorToken.Value, out EMediaCombinator combLookup))
                         {
                             throw new CssSyntaxErrorException($"Unrecognized combinator keyword \"{combinatorToken.Value}\" in media query @\"{ParserCommon.Get_Location(Stream)}\"");
                         }
@@ -753,7 +753,7 @@ namespace CssUI.CSS.Serialization
                 IdentToken nameTok = Stream.Consume() as IdentToken;
 
                 /* Resolve the name */
-                if (!CssLookup.TryEnum(nameTok.Value, out EMediaFeatureName Name))
+                if (!Lookup.TryEnum(nameTok.Value, out EMediaFeatureName Name))
                 {
                     throw new CssParserException($"Unrecognized media type: \"{nameTok.Value}\"");
                 }
@@ -766,7 +766,7 @@ namespace CssUI.CSS.Serialization
                 IdentToken nameTok = Stream.Consume() as IdentToken;
 
                 /* Resolve the name */
-                if (!CssLookup.TryEnum(nameTok.Value, out EMediaFeatureName Name))
+                if (!Lookup.TryEnum(nameTok.Value, out EMediaFeatureName Name))
                 {
                     throw new CssParserException($"Unrecognized media type: \"{nameTok.Value}\"");
                 }
@@ -803,7 +803,7 @@ namespace CssUI.CSS.Serialization
 
                         var nameTok = (IdentToken)Stream.Consume();
                         /* Resolve the name */
-                        if (!CssLookup.TryEnum(nameTok.Value, out EMediaFeatureName Name))
+                        if (!Lookup.TryEnum(nameTok.Value, out EMediaFeatureName Name))
                         {
                             throw new CssParserException($"Unrecognized media type: \"{nameTok.Value}\"");
                         }
@@ -831,7 +831,7 @@ namespace CssUI.CSS.Serialization
                         }
 
                         var comparatorTok = (ValuedTokenBase)Stream.Consume();
-                        if (!CssLookup.TryEnum(comparatorTok.Value, out EMediaOperator outComparator))
+                        if (!Lookup.TryEnum(comparatorTok.Value, out EMediaOperator outComparator))
                         {
                             throw new CssParserException($"Unable to interpret keyword \"{comparatorTok.Value}\" as enum value");
                         }
