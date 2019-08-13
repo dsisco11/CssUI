@@ -104,21 +104,5 @@ namespace CssUI.HTML
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.ReferrerPolicy, AttributeValue.From_Enum(value)));
         }
         #endregion
-
-        #region HyperlinkUtils Implementation
-        /* Docs: https://html.spec.whatwg.org/multipage/links.html#htmlhyperlinkelementutils */
-
-        [CEReactions] public string href;
-        readonly public string origin;
-        [CEReactions] public string protocol;
-        [CEReactions] public string username;
-        [CEReactions] public string password;
-        [CEReactions] public string host;
-        [CEReactions] public string hostname;
-        [CEReactions] public string port;
-        [CEReactions] public string pathname;
-        [CEReactions] public string search;
-        [CEReactions] public string hash;
-        #endregion
     }
 }
