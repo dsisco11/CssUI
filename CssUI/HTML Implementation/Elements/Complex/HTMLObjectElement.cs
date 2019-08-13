@@ -52,7 +52,7 @@ namespace CssUI.HTML
             {
                 if (Nested_Browsing_Context == null) return null;
                 var document = Nested_Browsing_Context.activeDocument;
-                if (!StringCommon.StrEq(document.Origin.AsSpan(), nodeDocument.Origin.AsSpan())) return null;
+                if (!document.Origin.IsSameOriginDomain(nodeDocument.Origin)) return null;
                 return document;
             }
         }
@@ -112,7 +112,7 @@ namespace CssUI.HTML
             if (Nested_Browsing_Context == null)
                 return null;
 
-            if (!nodeDocument.Origin.AsSpan().Equals(Nested_Browsing_Context.activeDocument.Origin.AsSpan(), StringComparison.Ordinal))
+            if (!nodeDocument.Origin.IsSameOriginDomain(Nested_Browsing_Context.activeDocument.Origin))
                 return null;
 
             /* XXX: finish the get SVG document stuff */
