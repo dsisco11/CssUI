@@ -1,22 +1,22 @@
-﻿using CssUI.CSS.Internal;
+﻿using CssUI.Internal;
 
 namespace CssUI.CSS
 {
     /// <summary>
     /// Describes all of the box sizing modes <see cref="cssElement"/>'s can use
     /// </summary>
-    [CssEnum]
+    [MetaEnum]
     public enum EBoxSizingMode : int
     {
         /// <summary>
         /// Width/Height describe the size of the content area, not including the padding, border, or margins
         /// </summary>
-        [CssKeyword("content-box")]
+        [MetaKeyword("content-box")]
         ContentBox,
         /// <summary>
         /// Width/Height describe the border area, including the content size, padding, and border size but not the margins
         /// </summary>
-        [CssKeyword("border-box")]
+        [MetaKeyword("border-box")]
         BorderBox,
     }
 }

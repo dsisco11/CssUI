@@ -1,70 +1,70 @@
-﻿using CssUI.CSS.Internal;
+﻿using CssUI.Internal;
 
 namespace CssUI.CSS
 {
     /// <summary>
     /// Defines all of the CSS length unit types
     /// </summary>
-    [CssEnum]
+    [MetaEnum]
     public enum EUnit : byte
     {
         /// <summary>
         /// Specified no unit length
         /// </summary>
-        [CssKeyword("")]
+        [MetaKeyword("")]
         None = 0,
         /* Physical Units */
         /// <summary>
         /// 1/96th of 1in
         /// </summary>
-        [CssKeyword("px")]
+        [MetaKeyword("px")]
         PX,
         /// <summary>
         /// Points (1pt = 1/72th of 1in)
         /// </summary>
-        [CssKeyword("pt")]
+        [MetaKeyword("pt")]
         PT,
         /// <summary>
         /// Picas (1pc = 1/6th of 1in)
         /// </summary>
-        [CssKeyword("pc")]
+        [MetaKeyword("pc")]
         PC,
         /// <summary>
         /// Inches (1in = 2.54cm = 96px)
         /// </summary>
-        [CssKeyword("in")]
+        [MetaKeyword("in")]
         IN,
         /// <summary>
         /// Quarter-Millimeters (1Q = 12/40th of 1cm)
         /// </summary>
-        [CssKeyword("q")]
+        [MetaKeyword("q")]
         Q,
         /// <summary>
         /// Millimeters (1mm = 1/10th of 1cm)
         /// </summary>
-        [CssKeyword("mm")]
+        [MetaKeyword("mm")]
         MM,
         /// <summary>
         /// Centimeters (1cm = 96px / 2.54)
         /// </summary>
-        [CssKeyword("cm")]
+        [MetaKeyword("cm")]
         CM,
 
         /* <Resolution> Units */
         /// <summary>
         /// Dots per inch
         /// </summary>
-        [CssKeyword("dpi")]
+        [MetaKeyword("dpi")]
         DPI,
         /// <summary>
         /// Dots per centimeter
         /// </summary>
-        [CssKeyword("dpcm")]
+        [MetaKeyword("dpcm")]
         DPCM,
         /// <summary>
         /// Dots per 'px' unit
         /// </summary>
-        [CssKeyword("dppx")]
+        [MetaKeyword("dppx")]
         DPPX,
 
         /* Time Units*/
@@ -72,12 +72,12 @@ namespace CssUI.CSS
         /// <summary>
         /// Seconds
         /// </summary>
-        [CssKeyword("s")]
+        [MetaKeyword("s")]
         S,
         /// <summary>
         /// Milliseconds
         /// </summary>
-        [CssKeyword("ms")]
+        [MetaKeyword("ms")]
         MS,
 
         /* Frequency Units*/
@@ -85,75 +85,75 @@ namespace CssUI.CSS
         /// <summary>
         /// Hertz
         /// </summary>
-        [CssKeyword("hz")]
+        [MetaKeyword("hz")]
         HZ,
         /// <summary>
         /// KiloHertz
         /// </summary>
-        [CssKeyword("khz")]
+        [MetaKeyword("khz")]
         KHZ,
 
         /* Font Units */
         /// <summary>
         /// Relative to font size
         /// </summary>
-        [CssKeyword("em")]
+        [MetaKeyword("em")]
         EM,
         /// <summary>
         /// Relative to x-height of the elements font
         /// </summary>
-        [CssKeyword("ex")]
+        [MetaKeyword("ex")]
         EX,
         /// <summary>
         /// Relative to the width of the "0" glyph in the elements font
         /// </summary>
-        [CssKeyword("ch")]
+        [MetaKeyword("ch")]
         CH,
         /// <summary>
         /// Relative to font size of the root element
         /// </summary>
-        [CssKeyword("rem")]
+        [MetaKeyword("rem")]
         REM,
         /// <summary>
         /// Relative to viewports width
         /// </summary>
-        [CssKeyword("vw")]
+        [MetaKeyword("vw")]
         VW,
         /// <summary>
         /// Relative to viewports height
         /// </summary>
-        [CssKeyword("vh")]
+        [MetaKeyword("vh")]
         VH,
         /// <summary>
         /// Relative to the minimum of the viewports height and width
         /// </summary>
-        [CssKeyword("vmin")]
+        [MetaKeyword("vmin")]
         VMIN,
         /// <summary>
         /// Relative to the maximum of the viewports height and width
         /// </summary>
-        [CssKeyword("vmax")]
+        [MetaKeyword("vmax")]
         VMAX,
 
         /// <summary>
         /// Degrees. There are 360 degrees in a full circle.
         /// </summary>
-        [CssKeyword("deg")]
+        [MetaKeyword("deg")]
         DEG,
         /// <summary>
         /// Gradians, also known as 'gons' or 'grades'. There are 400 gradians in a full circle
         /// </summary>
-        [CssKeyword("grad")]
+        [MetaKeyword("grad")]
         GRAD,
         /// <summary>
         /// Radians. There are 2PI radians in a full circle
         /// </summary>
-        [CssKeyword("rad")]
+        [MetaKeyword("rad")]
         RAD,
         /// <summary>
         /// Turns. There is 1 turn in a full circle
         /// </summary>
-        [CssKeyword("turn")]
+        [MetaKeyword("turn")]
         TURN,
 
 

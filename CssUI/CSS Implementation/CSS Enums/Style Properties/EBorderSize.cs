@@ -1,26 +1,26 @@
-﻿using CssUI.CSS.Internal;
+﻿using CssUI.Internal;
 
 namespace CssUI.CSS
 {
-    [CssEnum]
+    [MetaEnum]
     public enum EBorderSize : int
     {
         /// <summary>
         /// 
         /// </summary>
-        [CssKeyword("thin")]
+        [MetaKeyword("thin")]
         Thin,
 
         /// <summary>
         /// 
         /// </summary>
-        [CssKeyword("medium")]
+        [MetaKeyword("medium")]
         Medium,
 
         /// <summary>
         /// 
         /// </summary>
-        [CssKeyword("thick")]
+        [MetaKeyword("thick")]
         Thick,
     }
 }

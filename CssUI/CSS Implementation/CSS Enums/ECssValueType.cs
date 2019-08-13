@@ -1,12 +1,12 @@
 ﻿using System;
-using CssUI.CSS.Internal;
+using CssUI.Internal;
 
 namespace CssUI.CSS
 {
     /// <summary>
     /// Style value types
     /// </summary>
-    [Flags, CssEnum]
+    [Flags, MetaEnum]
     public enum ECssValueType : ulong
     {/* Docs: https://www.w3.org/TR/css-values-3/ */
         /// <summary>
@@ -16,37 +16,37 @@ namespace CssUI.CSS
         /// <summary>
         /// CSS Keyword Used to override declerations, forcing a value to resolve to its inherited or initial values
         /// </summary>
-        [CssKeyword("unset")]
+        [MetaKeyword("unset")]
         UNSET = (1 << 2),
         /// <summary>
         /// CSS Keyword
         /// Value should use whatever 'auto' logic is applicable to determine it's used value
         /// </summary>
-        [CssKeyword("auto")]
+        [MetaKeyword("auto")]
         AUTO = (1 << 3),
         /// <summary>
         /// CSS Keyword
         /// Value should resolve to it's definitions default value
         /// </summary>
-        [CssKeyword("initial")]
+        [MetaKeyword("initial")]
         INITIAL = (1 << 4),
         /// <summary>
         /// CSS Keyword
         /// Value is inherited from ancestor
         /// </summary>
-        [CssKeyword("inherit")]
+        [MetaKeyword("inherit")]
         INHERIT = (1 << 5),
         /// <summary>
         /// CSS Keyword
         /// Used by specific properties, for instance; max-width & max-height use it to specify having no limit
         /// </summary>
-        [CssKeyword("none")]
+        [MetaKeyword("none")]
         NONE = (1 << 6),
         /// <summary>
         /// CSS Keyword
         /// 
         /// </summary>
-        [CssKeyword("default")]
+        [MetaKeyword("default")]
         DEFAULT = (1 << 7),
 
         /// <summary>

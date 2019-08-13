@@ -1,8 +1,8 @@
-﻿using CssUI.CSS.Internal;
+﻿using CssUI.Internal;
 
 namespace CssUI.CSS
 {
-    [CssEnum]
+    [MetaEnum]
     public enum EFontSize : int
     {/* Docs: https://www.w3.org/TR/css-fonts-3/#font-size-prop */
 
@@ -10,43 +10,43 @@ namespace CssUI.CSS
         /// <summary>
         /// 
         /// </summary>
-        [CssKeyword("xx-small")]
+        [MetaKeyword("xx-small")]
         XXSmall = 0,
 
         /// <summary>
         /// 
         /// </summary>
-        [CssKeyword("x-small")]
+        [MetaKeyword("x-small")]
         XSmall,
 
         /// <summary>
         /// 
         /// </summary>
-        [CssKeyword("small")]
+        [MetaKeyword("small")]
         Small,
 
         /// <summary>
         /// 
         /// </summary>
-        [CssKeyword("medium")]
+        [MetaKeyword("medium")]
         Medium,
 
         /// <summary>
         /// 
         /// </summary>
-        [CssKeyword("large")]
+        [MetaKeyword("large")]
         Large,
 
         /// <summary>
         /// 
         /// </summary>
-        [CssKeyword("x-large")]
+        [MetaKeyword("x-large")]
         XLarge,
 
         /// <summary>
         /// 
         /// </summary>
-        [CssKeyword("xx-large")]
+        [MetaKeyword("xx-large")]
         XXLarge,
 
 
@@ -56,13 +56,13 @@ namespace CssUI.CSS
         /// <summary>
         /// 
         /// </summary>
-        [CssKeyword("smaller")]
+        [MetaKeyword("smaller")]
         Smaller,
 
         /// <summary>
         /// 
         /// </summary>
-        [CssKeyword("larger")]
+        [MetaKeyword("larger")]
         Larger,
 
     }

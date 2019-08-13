@@ -1,8 +1,8 @@
-﻿using CssUI.CSS.Internal;
+﻿using CssUI.Internal;
 
 namespace CssUI.CSS.Media
 {
-    [CssEnum]
+    [MetaEnum]
     public enum EMediaOverflowBlock
     {
 
@@ -10,14 +10,14 @@ namespace CssUI.CSS.Media
         /// There is no affordance for overflow in the block axis; any overflowing content is simply not displayed. 
         /// Examples: billboards
         /// </summary>
-        [CssKeyword("none")]
+        [MetaKeyword("none")]
         None,
 
         /// <summary>
         /// Overflowing content in the block axis is exposed by allowing users to scroll to it. 
         /// Examples: computer screens
         /// </summary>
-        [CssKeyword("scroll")]
+        [MetaKeyword("scroll")]
         Scroll,
 
         /// <summary>
@@ -25,14 +25,14 @@ namespace CssUI.CSS.Media
         /// but page breaks can be manually triggered (such as via break-inside, etc) to cause the following content to display on the following page. 
         /// Examples: slideshows
         /// </summary>
-        [CssKeyword("optional-paged")]
+        [MetaKeyword("optional-paged")]
         Optional_Paged,
 
         /// <summary>
         /// Content is broken up into discrete pages; content that overflows one page in the block axis is displayed on the following page. 
         /// Examples: printers, ebook readers
         /// </summary>
-        [CssKeyword("paged")]
+        [MetaKeyword("paged")]
         Paged,
     }
 }

@@ -1,26 +1,26 @@
-﻿using CssUI.CSS.Internal;
+﻿using CssUI.Internal;
 
 namespace CssUI.CSS.Enums
 {
-    [CssEnum]
+    [MetaEnum]
     public enum EPseudoElement : int
     {
-        [CssKeyword("::before")]
+        [MetaKeyword("::before")]
         Before,
 
-        [CssKeyword("::after")]
+        [MetaKeyword("::after")]
         After,
 
-        [CssKeyword("::first-letter")]
+        [MetaKeyword("::first-letter")]
         First_Letter,
 
-        [CssKeyword("::first-line")]
+        [MetaKeyword("::first-line")]
         First_Line,
 
-        [CssKeyword("::marker")]
+        [MetaKeyword("::marker")]
         Marker,
 
-        [CssKeyword("::placeholder")]
+        [MetaKeyword("::placeholder")]
         Placeholder,
     }
 }

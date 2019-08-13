@@ -1,39 +1,39 @@
 ﻿using System;
-using CssUI.CSS.Internal;
+using CssUI.Internal;
 
 namespace CssUI.CSS
 {
     /// <summary>
     /// Defines all the possible border styles
     /// </summary>
-    [Flags, CssEnum]
+    [Flags, MetaEnum]
     public enum EBorderStyle : int
     {
         /// <summary>
         /// No border, Color and width are ignored.
         /// </summary>
-        [CssKeyword("none")]
+        [MetaKeyword("none")]
         None = (1 << 0),
         /// <summary>
         /// Same as 'None' but with different conflict resolution for border-collapsed tables
         /// </summary>
-        [CssKeyword("hidden")]
+        [MetaKeyword("hidden")]
         Hidden = (1 << 1),
-        [CssKeyword("dotted")]
+        [MetaKeyword("dotted")]
         Dotted = (1 << 2),
-        [CssKeyword("dashed")]
+        [MetaKeyword("dashed")]
         Dashed = (1 << 3),
-        [CssKeyword("solid")]
+        [MetaKeyword("solid")]
         Solid = (1 << 4),
-        [CssKeyword("double")]
+        [MetaKeyword("double")]
         Double = (1 << 5),
-        [CssKeyword("groove")]
+        [MetaKeyword("groove")]
         Groove = (1 << 6),
-        [CssKeyword("ridge")]
+        [MetaKeyword("ridge")]
         Ridge = (1 << 7),
-        [CssKeyword("inset")]
+        [MetaKeyword("inset")]
         Inset = (1 << 8),
-        [CssKeyword("outset")]
+        [MetaKeyword("outset")]
         Outset = (1 << 9),
     };
 }

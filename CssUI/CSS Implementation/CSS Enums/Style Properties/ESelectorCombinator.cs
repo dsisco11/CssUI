@@ -1,7 +1,8 @@
-﻿
+﻿using CssUI.Internal;
+
 namespace CssUI.CSS.Internal
 {
-    [CssEnum]
+    [MetaEnum]
     public enum ESelectorCombinator
     {/* Docs: https://www.w3.org/TR/2018/REC-selectors-3-20181106/#combinators */
 
@@ -13,7 +14,7 @@ namespace CssUI.CSS.Internal
         /// A descendant combinator is whitespace that separates two sequences of simple selectors. 
         /// A selector of the form "A B" represents an element B that is an arbitrary descendant of some ancestor element A.
         /// </summary>
-        [CssKeyword(">>")]
+        [MetaKeyword(">>")]
         Descendant,
 
         /// <summary>
@@ -21,7 +22,7 @@ namespace CssUI.CSS.Internal
         /// A child combinator describes a childhood relationship between two elements. 
         /// A child combinator is made of the "greater-than sign" (U+003E, >) character and separates two sequences of simple selectors.
         /// </summary>
-        [CssKeyword(">")]
+        [MetaKeyword(">")]
         Child,
 
         /// <summary>
@@ -30,7 +31,7 @@ namespace CssUI.CSS.Internal
         /// The elements represented by the two sequences share the same parent in the document tree and the element represented by 
         /// the first sequence immediately precedes the element represented by the second one.
         /// </summary>
-        [CssKeyword("+")]
+        [MetaKeyword("+")]
         Sibling_Adjacent,
 
         /// <summary>
@@ -39,7 +40,7 @@ namespace CssUI.CSS.Internal
         /// The elements represented by the two sequences share the same parent in the document tree and the element represented 
         /// by the first sequence precedes (not necessarily immediately) the element represented by the second one.
         /// </summary>
-        [CssKeyword("~")]
+        [MetaKeyword("~")]
         Sibling_Subsequent,
     }
 }

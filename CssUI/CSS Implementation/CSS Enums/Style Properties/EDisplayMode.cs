@@ -1,102 +1,102 @@
-﻿using CssUI.CSS.Internal;
+﻿using CssUI.Internal;
 using System;
 
 namespace CssUI.CSS
 {
-    [Flags, CssEnum]
+    [Flags, MetaEnum]
     public enum EDisplayMode : int
     {
         /// <summary>This value causes an element to generate no boxes (i.e., the element has no effect on layout). Descendant elements do not generate any boxes either; this behavior cannot be overridden by setting the ‘display’ property on the descendants.</summary>
-        [CssKeyword("none")]
+        [MetaKeyword("none")]
         NONE = (1 << 0),
-        [CssKeyword("content")]
+        [MetaKeyword("content")]
         CONTENT = (1 << 1),
 
         /// <summary>Element takes up only as much space as it needs, inline elements cannot specify an explicit width or height, their dimensions are completely determined by their content.</summary>
-        [CssKeyword("inline")]
+        [MetaKeyword("inline")]
         INLINE = (1 << 2),
         /// <summary></summary>
-        [CssKeyword("run-in")]
+        [MetaKeyword("run-in")]
         RUN_IN = (1 << 3),
         /// <summary>Element takes up an entire line by itself</summary>
-        [CssKeyword("block")]
+        [MetaKeyword("block")]
         BLOCK = (1 << 4),
 
 
-        [CssKeyword("list-item")]
+        [MetaKeyword("list-item")]
         LIST_ITEM = (1 << 5),
 
 
         /// <summary></summary>
-        [CssKeyword("flex")]
+        [MetaKeyword("flex")]
         FLEX = (1 << 6),
         /// <summary></summary>
-        [CssKeyword("flow")]
+        [MetaKeyword("flow")]
         FLOW = (1 << 7),
         /// <summary></summary>
-        [CssKeyword("flow-root")]
+        [MetaKeyword("flow-root")]
         FLOW_ROOT = (1 << 8),
         /// <summary></summary>
-        [CssKeyword("grid")]
+        [MetaKeyword("grid")]
         GRID = (1 << 9),
         /*/// <summary></summary>
-        [CssKeyword("ruby")]
+        [MetaKeyword("ruby")]
         RUBY,*/
 
 
         /// <summary></summary>
-        [CssKeyword("table")]
+        [MetaKeyword("table")]
         TABLE = (1 << 10),
         /// <summary></summary>
-        [CssKeyword("table-row-group")]
+        [MetaKeyword("table-row-group")]
         TABLE_ROW_GROUP = (1 << 11),
         /// <summary></summary>
-        [CssKeyword("table-header-group")]
+        [MetaKeyword("table-header-group")]
         TABLE_HEADER_GROUP = (1 << 12),
         /// <summary></summary>
-        [CssKeyword("table-footer-group")]
+        [MetaKeyword("table-footer-group")]
         TABLE_FOOTER_GROUP = (1 << 13),
         /// <summary></summary>
-        [CssKeyword("table-row")]
+        [MetaKeyword("table-row")]
         TABLE_ROW = (1 << 14),
         /// <summary></summary>
-        [CssKeyword("table-cell")]
+        [MetaKeyword("table-cell")]
         TABLE_CELL = (1 << 15),
         /// <summary></summary>
-        [CssKeyword("table-column-group")]
+        [MetaKeyword("table-column-group")]
         TABLE_COLUMN_GROUP = (1 << 16),
         /// <summary></summary>
-        [CssKeyword("table-column")]
+        [MetaKeyword("table-column")]
         TABLE_COLUMN = (1 << 17),
         /// <summary></summary>
-        [CssKeyword("table-caption")]
+        [MetaKeyword("table-caption")]
         TABLE_CAPTION = (1 << 18),
         /*/// <summary></summary>
-        [CssKeyword("ruby-base")]
+        [MetaKeyword("ruby-base")]
         RUBY_BASE,
         /// <summary></summary>
-        [CssKeyword("ruby-text")]
+        [MetaKeyword("ruby-text")]
         RUBY_TEXT,
         /// <summary></summary>
-        [CssKeyword("ruby-base-container")]
+        [MetaKeyword("ruby-base-container")]
         RUBY_BASE_CONTAINER,
         /// <summary></summary>
-        [CssKeyword("ruby-text-container")]
+        [MetaKeyword("ruby-text-container")]
         RUBY_TEXT_CONTAINER,
 */
 
 
         /// <summary></summary>
-        [CssKeyword("inline-block")]
+        [MetaKeyword("inline-block")]
         INLINE_BLOCK = (1 << 19),
         /// <summary></summary>
-        [CssKeyword("inline-table")]
+        [MetaKeyword("inline-table")]
         INLINE_TABLE = (1 << 20),
         /// <summary></summary>
-        [CssKeyword("inline-flex")]
+        [MetaKeyword("inline-flex")]
         INLINE_FLEX = (1 << 21),
         /// <summary></summary>
-        [CssKeyword("inline-grid")]
+        [MetaKeyword("inline-grid")]
         INLINE_GRID = (1 << 22),
 
     }

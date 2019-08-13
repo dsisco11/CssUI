@@ -1,8 +1,8 @@
-﻿using CssUI.CSS.Internal;
+﻿using CssUI.Internal;
 
 namespace CssUI.CSS.Media
 {
-    [CssEnum]
+    [MetaEnum]
     public enum EMediaQueryModifier : int
     {/* Docs: https://drafts.csswg.org/mediaqueries-4/#media-query-modifier */
 
@@ -10,12 +10,12 @@ namespace CssUI.CSS.Media
         /// <summary>
         /// Negates the media query result
         /// </summary>
-        [CssKeyword("not")]
+        [MetaKeyword("not")]
         Not,
         /// <summary>
         /// The only keyword has no effect on the media query’s result, but will cause the media query to be parsed by legacy user agents as specifying the unknown media type “only”, and thus be ignored.
         /// </summary>
-        [CssKeyword("only")]
+        [MetaKeyword("only")]
         Only,
     }
 }

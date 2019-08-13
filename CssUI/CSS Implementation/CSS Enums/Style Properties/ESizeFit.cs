@@ -1,27 +1,26 @@
-﻿
-using CssUI.CSS.Internal;
+﻿using CssUI.Internal;
 
 namespace CssUI.CSS
 {
-    [CssEnum]
+    [MetaEnum]
     public enum ESizeFit
     {
         /// <summary>
         /// 
         /// </summary>
-        [CssKeyword("min-content")]
+        [MetaKeyword("min-content")]
         Min_Content,
 
         /// <summary>
         /// 
         /// </summary>
-        [CssKeyword("max-content")]
+        [MetaKeyword("max-content")]
         Max_Content,
 
         /// <summary>
         /// 
         /// </summary>
-        [CssKeyword("fit-content")]
+        [MetaKeyword("fit-content")]
         Fit_Content,
     }
 }

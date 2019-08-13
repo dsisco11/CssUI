@@ -1,8 +1,8 @@
-﻿using CssUI.CSS.Internal;
+﻿using CssUI.Internal;
 
 namespace CssUI.CSS.Media
 {
-    [CssEnum]
+    [MetaEnum]
     public enum EMediaType : int
     {/* Docs: https://drafts.csswg.org/mediaqueries-4/#media-types */
 
@@ -10,39 +10,39 @@ namespace CssUI.CSS.Media
         /// <summary>
         /// Matches all devices
         /// </summary>
-        [CssKeyword("all")]
+        [MetaKeyword("all")]
         All,
         /// <summary>
         /// Matches printers, and devices intended to reproduce a printed display, such as a web browser showing a document in “Print Preview”.
         /// </summary>
-        [CssKeyword("print")]
+        [MetaKeyword("print")]
         Print,
         /// <summary>
         /// Matches all devices that aren’t matched by print or speech.
         /// </summary>
-        [CssKeyword("screen")]
+        [MetaKeyword("screen")]
         Screen,
         /// <summary>
         /// Matches devices that similar devices that “read out” a page.
         /// </summary>
-        [CssKeyword("speech")]
+        [MetaKeyword("speech")]
         Speech,
 
         /* The following are DEPRECIATED values. they must be recognized, but ignored. */
 
-        [CssKeyword("tty")]
+        [MetaKeyword("tty")]
         tty,
-        [CssKeyword("tv")]
+        [MetaKeyword("tv")]
         tv,
-        [CssKeyword("projection")]
+        [MetaKeyword("projection")]
         projection,
-        [CssKeyword("handheld")]
+        [MetaKeyword("handheld")]
         handheld,
-        [CssKeyword("braille")]
+        [MetaKeyword("braille")]
         braille,
-        [CssKeyword("embossed")]
+        [MetaKeyword("embossed")]
         embossed,
-        [CssKeyword("aural")]
+        [MetaKeyword("aural")]
         aural,
     }
 }

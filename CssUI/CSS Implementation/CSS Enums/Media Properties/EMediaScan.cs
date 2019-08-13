@@ -1,8 +1,8 @@
-﻿using CssUI.CSS.Internal;
+﻿using CssUI.Internal;
 
 namespace CssUI.CSS.Media
 {
-    [CssEnum]
+    [MetaEnum]
     public enum EMediaScan
     {
         /// <summary>
@@ -11,14 +11,14 @@ namespace CssUI.CSS.Media
         /// exploiting various automatic mental image-correction abilities to produce smooth motion. 
         /// This allowed them to simulate a higher FPS broadcast at half the bandwidth cost.
         /// </summary>
-        [CssKeyword("interlace")]
+        [MetaKeyword("interlace")]
         Interlace,
 
         /// <summary>
         /// A screen using “progressive” rendering displays each screen fully, and needs no special treatment.
         /// Most modern screens, and all computer screens, use progressive rendering.
         /// </summary>
-        [CssKeyword("progressive")]
+        [MetaKeyword("progressive")]
         Progressive,
     }
 }
