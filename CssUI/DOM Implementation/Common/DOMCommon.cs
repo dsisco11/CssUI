@@ -238,7 +238,7 @@ namespace CssUI.DOM
                     return true;
             }
 
-            if (element is HTMLButtonElement button && button.type == "submit")
+            if (element is HTMLButtonElement button && button.type == EButtonType.Submit)
                 return true;
 
             return false;
@@ -311,7 +311,7 @@ namespace CssUI.DOM
 
         public static string Serialize_Comma_Seperated_list(IEnumerable<ReadOnlyMemory<char>> list)
         {
-            return StringCommon.Concat(UnicodeCommon.CHAR_SPACE, list.Select(str => str.AsMemory()));
+            return StringCommon.Concat(UnicodeCommon.CHAR_SPACE, list);
         }
 
         public static IReadOnlyList<ReadOnlyMemory<char>> Parse_Comma_Seperated_List(ReadOnlyMemory<char> Input)
@@ -1815,25 +1815,6 @@ namespace CssUI.DOM
         #endregion
 
         #region Focus
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static bool Has_Focus(Document target)
-        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#has-focus-steps */
-
-
-        }
-
-        /// <summary>
-        /// Returns <c>True</c> is the given target is a valid focusable area
-        /// </summary>
-        /// <param name="target"></param>
-        /// <returns></returns>
-        internal static bool Is_Focusable_Area(EventTarget target)
-        {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#focusable-area */
-
-
-            return false;
-        }
 
         /// <summary>
         /// Returns the chain of focus up through the hierarchy from the given node to it's owning document
