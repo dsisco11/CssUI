@@ -3,6 +3,7 @@ using CssUI.DOM.CustomElements;
 using CssUI.DOM.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CssUI.HTML
 {
@@ -50,17 +51,21 @@ namespace CssUI.HTML
                 var numbers = new double[set.Count];
                 for (int i=0; i<set.Count; i++)
                 {
-                    if (!Serialization.HTMLParserCommon.Try_Parse_FloatingPoint(set[i], out double outValue))
-                    {
-                        throw new DomSyntaxError($"Cannot convert \"{set[i].ToString()}\" into number");
-                    }
-
+                    Serialization.HTMLParserCommon.Parse_FloatingPoint(set[i], out double outValue);
                     numbers[i] = outValue;
                 }
 
                 return numbers;
             }
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Coords, AttributeValue.From_String(value)));
+            set
+            {
+                CEReactions.Wrap_CEReaction(this, () => 
+                {
+                    var set = value.Select(o => o.ToString().AsMemory());
+                    var serialized = DOMCommon.Serialize_Comma_Seperated_list(set);
+                    setAttribute(EAttributeName.Coords, AttributeValue.From_String(serialized)); ;
+                });
+            }
         }
 
         [CEReactions] public EAreaShape shape
@@ -93,10 +98,10 @@ namespace CssUI.HTML
             set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Rel, AttributeValue.From_String(value)));
         }
 
-        [CEReactions] public string referrerPolicy
+        [CEReactions] public EReferrerPolicy referrerPolicy
         {
-            get => getAttribute(EAttributeName.ReferrerPolicy)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.ReferrerPolicy, AttributeValue.From_String(value)));
+            get => getAttribute(EAttributeName.ReferrerPolicy).Get_Enum<EReferrerPolicy>();
+            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.ReferrerPolicy, AttributeValue.From_Enum(value)));
         }
         #endregion
 
