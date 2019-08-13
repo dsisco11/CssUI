@@ -77,7 +77,7 @@ namespace CssUI.DOM
         public readonly Viewport Viewport;
 
         public readonly EQuirksMode Mode = EQuirksMode.NoQuirks;
-        public readonly string URL = "/";
+        public readonly Url URL = Url.Parse("/".AsMemory(), );
         public readonly string Origin = null;
         public readonly Encoding characterEncoding = Encoding.UTF8;
 
