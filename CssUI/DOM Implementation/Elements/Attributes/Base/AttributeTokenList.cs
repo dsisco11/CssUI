@@ -136,6 +136,18 @@ namespace CssUI.DOM
             return TokenSet.Contains(token);
         }
 
+        public bool ContainsAll(IEnumerable<TokenType> tokens)
+        {
+            /* The contains(token) method, when invoked, must return true if context object’s token set[token] exists, and false otherwise. */
+            foreach (TokenType token in tokens)
+            {
+                if (!TokenSet.Contains(token))
+                    return false;
+            }
+
+            return true;
+        }
+
         public bool ContainsAll(params TokenType[] tokens)
         {
             /* The contains(token) method, when invoked, must return true if context object’s token set[token] exists, and false otherwise. */
