@@ -26,7 +26,7 @@ namespace CssUI.HTML
         /// </summary>
         public AtomicName<EUrlScheme> Scheme = string.Empty;
 
-        public Host Host = null;
+        public UrlHost Host = null;
         public ushort? Port = null;
 
         public List<string> Path = new List<string>();
@@ -78,6 +78,26 @@ namespace CssUI.HTML
         {/* Docs: https://url.spec.whatwg.org/#concept-url-origin */
             get
             {
+                if (Scheme == "blob")
+                {
+                }
+
+                if (Scheme.EnumValue.HasValue)
+                {
+                    switch (Scheme.EnumValue.Value)
+                    {
+                        case EUrlScheme.Ftp:
+                        case EUrlScheme.Gopher:
+                        case EUrlScheme.Http:
+                        case EUrlScheme.Https:
+                        case EUrlScheme.Ws:
+                        case EUrlScheme.Wss:
+                            {
+                            }
+                            break;
+                    }
+                }
+
 
             }
         }

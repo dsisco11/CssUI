@@ -3,7 +3,7 @@
 namespace CssUI.HTML
 {
 
-    public class Host
+    public class UrlHost
     {/* Docs: https://url.spec.whatwg.org/#concept-host */
 
         #region Properties
@@ -12,7 +12,7 @@ namespace CssUI.HTML
         #endregion
 
         #region Constructors
-        public Host(string host)
+        public UrlHost(string host)
         {
             Value = host;
             if (ReferenceEquals(null, host) || host.Length <= 0)
@@ -29,13 +29,13 @@ namespace CssUI.HTML
             }
         }
 
-        public Host(IPV4Address address)
+        public UrlHost(IPV4Address address)
         {
             Value = address;
             Type = EHostType.IPV4Address;
         }
 
-        public Host(IPV6Address address)
+        public UrlHost(IPV6Address address)
         {
             Value = address;
             Type = EHostType.IPV6Address;
