@@ -11,7 +11,7 @@ namespace CssUI.HTML
     /// The area element represents either a hyperlink with some text and a corresponding area on an image map, or a dead area on an image map.
     /// </summary>
     [MetaElement("area")]
-    public class HTMLAreaElement : HTMLElement
+    public class HTMLAreaElement : HyperlinkElement
     {/* Docs: https://html.spec.whatwg.org/multipage/image-maps.html#the-area-element */
 
         #region Definition
