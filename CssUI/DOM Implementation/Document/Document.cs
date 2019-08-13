@@ -77,8 +77,8 @@ namespace CssUI.DOM
         public readonly Viewport Viewport;
 
         public readonly EQuirksMode Mode = EQuirksMode.NoQuirks;
-        public readonly Url URL = Url.Parse("/".AsMemory(), );
-        public readonly string Origin = null;
+        public readonly Url URL = Url.Parse("/".AsMemory());
+        public readonly UrlOrigin Origin = null;
         public readonly Encoding characterEncoding = Encoding.UTF8;
 
         public readonly DocumentType doctype;
@@ -134,11 +134,11 @@ namespace CssUI.DOM
         #endregion
 
         #region Constructor
-        protected Document(DocumentType doctype, string contentType = null, string origin = null)
+        protected Document(DocumentType doctype, string contentType = null)
         {
             this.doctype = doctype;
             this.contentType = contentType;
-            this.Origin = origin;
+            this.Origin = UrlOrigin.Default;
             cssUnitResolver = new CssUnitResolver(this, true);
         }
         #endregion
