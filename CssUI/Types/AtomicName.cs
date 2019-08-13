@@ -15,9 +15,12 @@ namespace CssUI
         private static ConcurrentReversableDictionary<AtomicString, int> NameRegistry = new ConcurrentReversableDictionary<AtomicString, int>();
         #endregion
 
-        #region Properties
-        /* Backing type for Name */
+        #region Backing Values
         private string _name = null;
+        private string _name_lower = null;
+        #endregion
+
+        #region Properties
         /* AtomicName instances wont always need their string names to be referenced, so we dont resolve it until we are asked. */
         public string Name
         {
@@ -25,15 +28,13 @@ namespace CssUI
             {
                 if (ReferenceEquals(null, _name))
                 {/* Resolve the backing value */
-                    if (IsCustom)
-                        throw new Exception("Name backing-value for custom event type is not set!");
+                    if (IsCustom) throw new Exception("Name backing-value for custom event type is not set!");
 
                     string name = Value_To_Name( Value );
-                    if (ReferenceEquals(null, name))
-                        throw new Exception($"Unable to convert \"{typeof(Ty).Name}\" value to string");
+                    if (ReferenceEquals(null, name)) throw new Exception($"Unable to convert \"{typeof(Ty).Name}\" value to string");
 
                     _name = name;
-                    NameLower = name.ToLowerInvariant();
+                    _name_lower = name.ToLowerInvariant();
                 }
 
                 return _name;
@@ -45,7 +46,22 @@ namespace CssUI
             }
         }
 
-        public string NameLower { get; private set; } = null;
+        public string NameLower
+        {
+            get
+            {
+                if (ReferenceEquals(null, _name_lower))
+                {
+                    _name_lower = Name.ToLowerInvariant();
+                }
+
+                return _name_lower;
+            }
+            private set
+            {
+                _name_lower = value;
+            }
+        }
 
         /// <summary>
         /// The value of this name for comparison purposes
@@ -226,9 +242,9 @@ namespace CssUI
         #endregion
 
         #region Overrides
-        public override int GetHashCode() => this.Value;
+        public override int GetHashCode() => Value;
 
-        public override string ToString() => this.Name;
+        public override string ToString() => Name;
         #endregion
 
         #region Comparable
