@@ -45,12 +45,12 @@ namespace CssUI.HTML
         /// Returns the hyperlink's URL's origin.
         /// </summary>
         public string origin
-        {
+        {/* Docs: https://html.spec.whatwg.org/multipage/links.html#dom-hyperlink-origin */
             get
             {
                 reinitialize_url();
                 if (url == null) return string.Empty;
-                return url.Origin;
+                return url?.Origin?.Serialize() ?? string.Empty;
             }
         }
 
