@@ -11,7 +11,7 @@ namespace CssUI.HTML
 
         public static bool Resolve(Url url, out BlobURLEntry outBlob)
         {/* Docs: https://w3c.github.io/FileAPI/#blob-url-resolve */
-            Debug.Assert(url.Scheme == (AtomicName<EUrlScheme>)"blob");
+            Debug.Assert(url.Scheme == "blob");
             string urlString = url.Serialize(true);
 
             if (BlobURLStore.TryGetValue(urlString, out BlobURLEntry blob))
