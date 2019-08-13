@@ -45,7 +45,7 @@ namespace CssUI.HTML
                 var document = context.activeDocument;
                 var topContext = ownerDocument.BrowsingContext.Get_Top_Level_Browsing_Context();
 
-                if (!DOMCommon.Is_Same_Origin_Domain(document.Origin, topContext.activeDocument.Origin)) return null;
+                if (!document.Origin.IsSameOriginDomain(topContext.activeDocument.Origin)) return null;
                 return document;
             }
         }
