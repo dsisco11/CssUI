@@ -244,54 +244,6 @@ namespace CssUI.DOM
             return false;
         }
 
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static bool Is_Same_Origin(string originA, string originB)
-        {/* Docs: https://html.spec.whatwg.org/multipage/origin.html#same-origin */
-            if (ReferenceEquals(null, originA) || ReferenceEquals(null, originB))
-            {
-                return ReferenceEquals(originA, originB);
-            }
-
-            if (!Uri.TryCreate(originA, UriKind.RelativeOrAbsolute, out Uri A) || !Uri.TryCreate(originB, UriKind.RelativeOrAbsolute, out Uri B))
-            {
-                return ReferenceEquals(originA, originB) || originA.AsSpan().Equals(originB.AsSpan(), StringComparison.OrdinalIgnoreCase);
-            }
-
-            return (A.Scheme == B.Scheme) && A.Host.AsSpan().Equals(B.Host.AsSpan(), StringComparison.OrdinalIgnoreCase) && (A.Port == B.Port);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static bool Is_Same_Origin_Domain(string originA, string originB)
-        {/* Docs: https://html.spec.whatwg.org/multipage/origin.html#same-origin-domain */
-            if (ReferenceEquals(null, originA) || ReferenceEquals(null, originB))
-            {
-                return ReferenceEquals(originA, originB);
-            }
-
-            if (!Uri.TryCreate(originA, UriKind.RelativeOrAbsolute, out Uri A) || !Uri.TryCreate(originB, UriKind.RelativeOrAbsolute, out Uri B))
-            {
-                return ReferenceEquals(originA, originB) || originA.AsSpan().Equals(originB.AsSpan(), StringComparison.OrdinalIgnoreCase);
-            }
-
-            if (A.Scheme == B.Scheme)
-            {
-                if (!ReferenceEquals(null, A.Host) && !ReferenceEquals(null, B.Host))
-                {
-                    if (A.Host.AsSpan().Equals(B.Host.AsSpan(), StringComparison.OrdinalIgnoreCase))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            if (Is_Same_Origin(originA, originB) && ReferenceEquals(null, A.Host) && ReferenceEquals(null, B.Host))
-            {
-                return true;
-            }
-
-            return false;
-        }
         #endregion
 
         #region Classifications
