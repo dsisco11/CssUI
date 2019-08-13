@@ -6,6 +6,11 @@ namespace CssUI.HTML
     public class UrlOrigin
     {/* Docs: https://html.spec.whatwg.org/multipage/origin.html#concept-origin-opaque */
 
+        #region Static 
+        public static UrlOrigin Opaque = new UrlOrigin();
+        public static UrlOrigin Default = new UrlOrigin(null, null, null, "CSSUI");
+        #endregion
+
         #region Properties
         public readonly EOriginType Type;
         public readonly AtomicName<EUrlScheme> Scheme = null;
@@ -27,6 +32,28 @@ namespace CssUI.HTML
             Host = host;
             Port = port;
             Domain = domain;
+        }
+        #endregion
+
+        #region Serialization
+        public string Serialize()
+        {/* Docs: https://html.spec.whatwg.org/multipage/origin.html#ascii-serialisation-of-an-origin */
+            if (Type == EOriginType.Opaque)
+            {
+                return "null";
+            }
+
+            StringBuilder result = new StringBuilder();
+            result.Append(Scheme.NameLower);
+            result.Append("://");
+            result.Append(Host.Serialize());
+            if (Port.HasValue)
+            {
+                result.Append(":");
+                result.Append(Port.Value);
+            }
+
+            return result.ToString();
         }
         #endregion
 
@@ -65,28 +92,4 @@ namespace CssUI.HTML
             return false;
         }
     }
-
-    public static class UrlOriginExt
-    {
-        public static string Serialize(this UrlOrigin origin)
-        {
-            if (origin == null || origin.Type == EOriginType.Opaque)
-            {
-                return "null";
-            }
-
-            StringBuilder result = new StringBuilder();
-            result.Append(origin.Scheme.NameLower);
-            result.Append("://");
-            result.Append(origin.Host.Serialize());
-            if (origin.Port.HasValue)
-            {
-                result.Append(":");
-                result.Append(origin.Port.Value);
-            }
-
-            return result.ToString();
-        }
-    }
-
 }
