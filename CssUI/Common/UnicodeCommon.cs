@@ -98,11 +98,9 @@ namespace CssUI
         public const char CHAR_EQUALS = '\u003D';
 
         /// <summary>
-        /// <
         /// </summary>
         public const char CHAR_LEFT_CHEVRON = '\u003C';
         /// <summary>
-        /// >
         /// </summary>
         public const char CHAR_RIGHT_CHEVRON = '\u003E';
 
@@ -138,6 +136,14 @@ namespace CssUI
         #region /* Ascii digits */
         /* Docs: https://infra.spec.whatwg.org/#ascii-digit */
         public const char CHAR_DIGIT_0 = '\u0030';
+        public const char CHAR_DIGIT_1 = '\u0031';
+        public const char CHAR_DIGIT_2 = '\u0032';
+        public const char CHAR_DIGIT_3 = '\u0033';
+        public const char CHAR_DIGIT_4 = '\u0034';
+        public const char CHAR_DIGIT_5 = '\u0035';
+        public const char CHAR_DIGIT_6 = '\u0036';
+        public const char CHAR_DIGIT_7 = '\u0037';
+        public const char CHAR_DIGIT_8 = '\u0038';
         public const char CHAR_DIGIT_9 = '\u0039';
         #endregion
 
@@ -212,7 +218,7 @@ namespace CssUI
         /// <summary>
         /// /
         /// </summary>
-        public const char CHAR_SOLIDUS = '/';
+        public const char CHAR_SOLIDUS = '\u002F';
         /// <summary>
         /// \
         /// </summary>
@@ -239,17 +245,6 @@ namespace CssUI
         /// &nbsp
         /// </summary>
         public const char CHAR_NBSP = '\u00A0';
-
-        /// <summary>
-        /// Same as: <see cref="CHAR_SOLIDUS"/>
-        /// </summary>
-        [Obsolete("Use CHAR_SOLIDUS")]
-        public const char CHAR_SLASH = '/';
-        /// <summary>
-        /// Same as: <see cref="CHAR_REVERSE_SOLIDUS"/>
-        /// </summary>
-        [Obsolete("Use CHAR_REVERSE_SOLIDUS")]
-        public const char CHAR_BACKSLASH = '\u005C';
         #endregion
 
         #endregion
@@ -287,11 +282,21 @@ namespace CssUI
 
         #region Character Checks
         /// <summary>
-        /// True if char is an ASCII non-character
+        /// A surrogate is a code point that is in the range U+D800 to U+DFFF, inclusive.
         /// </summary>
         /// <param name="c">Code point to check</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Ascii_NonCharacter(char c)
+        public static bool Is_Surrogate_Code_Point(char c)
+        {/* Docs: https://infra.spec.whatwg.org/#surrogate */
+            return (c >= '\uD800' && c <= '\uDFFF');
+        }
+
+        /// <summary>
+        /// True if char is an non-character code point
+        /// </summary>
+        /// <param name="c">Code point to check</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_NonCharacter_Code_Point(char c)
         {/* Docs: https://infra.spec.whatwg.org/#noncharacter */
 
             if (c >= '\uFDD0' && c <= '\uFDEF') return true;
@@ -338,6 +343,7 @@ namespace CssUI
             }
         }
 
+
         /// <summary>
         /// True if char is an ASCII whitespace character
         /// </summary>
@@ -359,10 +365,19 @@ namespace CssUI
         }
 
         /// <summary>
+        /// True if code point is in the range U+0000 NULL to U+007F DELETE, inclusive.
+        /// </summary>
+        /// <param name="c">Code point to check</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Ascii_Code_Point(char c)
+        {/* Docs: https://infra.spec.whatwg.org/#ascii-code-point */
+            return (c >= 0x0000 && c <= 0x007F);
+        }
+
+        /// <summary>
         /// True if code point is an ASCII tab or newline character
         /// </summary>
         /// <param name="c">Code point to check</param>
-        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_Ascii_Tab_Or_Newline(char c)
         {/* Docs: https://infra.spec.whatwg.org/#ascii-tab-or-newline */
@@ -381,7 +396,6 @@ namespace CssUI
         /// True if code point is an ASCII control character
         /// </summary>
         /// <param name="c">Code point to check</param>
-        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_Ascii_Control(char c)
         {/* Docs: https://infra.spec.whatwg.org/#c0-control */
@@ -392,7 +406,6 @@ namespace CssUI
         /// True if code point is an ASCII control or space character
         /// </summary>
         /// <param name="c">Code point to check</param>
-        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_Ascii_Control_Or_Space(char c)
         {/* Docs: https://infra.spec.whatwg.org/#c0-control-or-space */
@@ -403,7 +416,6 @@ namespace CssUI
         /// True if code point is an ASCII alphabet or digit character
         /// </summary>
         /// <param name="c">Code point to check</param>
-        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_Ascii_Alphanumeric(char c)
         {
@@ -414,7 +426,6 @@ namespace CssUI
         /// True if code point is an ASCII digit character
         /// </summary>
         /// <param name="c">Code point to check</param>
-        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_Ascii_Digit(char c)
         {/* Docs: https://infra.spec.whatwg.org/#ascii-digit */
@@ -425,7 +436,6 @@ namespace CssUI
         /// True if code point is an ASCII alphabet character
         /// </summary>
         /// <param name="c">Code point to check</param>
-        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_Ascii_Alpha(char c)
         {
@@ -436,7 +446,6 @@ namespace CssUI
         /// True if code point is ASCII alpha lowercase character
         /// </summary>
         /// <param name="c">Code point to check</param>
-        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_ASCII_Lower_Alpha(char c)
         {
@@ -447,7 +456,6 @@ namespace CssUI
         /// True if code point is ASCII alpha uppercase character
         /// </summary>
         /// <param name="c">Code point to check</param>
-        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_ASCII_Upper_Alpha(char c)
         {
@@ -459,7 +467,6 @@ namespace CssUI
         /// True if code point is an ASCII hex-digit character (0-9 | a-f | A-F)
         /// </summary>
         /// <param name="c">Code point to check</param>
-        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_Ascii_Hex_Digit(char c)
         {/* Docs: https://infra.spec.whatwg.org/#ascii-digit */
@@ -470,7 +477,6 @@ namespace CssUI
         /// True if code point is an ASCII hex-digit character excluding uppercase alpha characters
         /// </summary>
         /// <param name="c">Code point to check</param>
-        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_Ascii_Hex_Digit_Lower(char c)
         {/* Docs: https://infra.spec.whatwg.org/#ascii-digit */
@@ -481,7 +487,6 @@ namespace CssUI
         /// True if code point is an ASCII hex-digit character excluding lowercase alpha characters
         /// </summary>
         /// <param name="c">Code point to check</param>
-        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_Ascii_Hex_Digit_Upper(char c)
         {/* Docs: https://infra.spec.whatwg.org/#ascii-digit */
@@ -505,7 +510,6 @@ namespace CssUI
         /// Converts an ASCII uppercase character to its lowecase form
         /// </summary>
         /// <param name="c">Code point to transform</param>
-        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char To_ASCII_Lower_Alpha(char c)
         {
@@ -520,7 +524,6 @@ namespace CssUI
         /// Converts an ASCII lowercase character to its uppercase form
         /// </summary>
         /// <param name="c">Code point to transform</param>
-        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char To_ASCII_Upper_Alpha(char c)
         {
@@ -534,7 +537,6 @@ namespace CssUI
         /// Converts an ASCII digit character to its numeric value
         /// </summary>
         /// <param name="c">Code point to convert</param>
-        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Ascii_Digit_To_Value(char c)
         {
@@ -552,7 +554,6 @@ namespace CssUI
         /// Converts an ASCII hexadecimal character to its numeric value
         /// </summary>
         /// <param name="c">Code point to convert</param>
-        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Ascii_Hex_To_Value(char c)
         {
@@ -669,7 +670,6 @@ namespace CssUI
         /// <summary>
         /// True if string contains ASCII alpha lowercase characters
         /// </summary>
-        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Has_ASCII_Lower_Alpha(ReadOnlySpan<char> str)
         {
@@ -685,7 +685,6 @@ namespace CssUI
         /// <summary>
         /// True if string contains ASCII alpha uppercase characters
         /// </summary>
-        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Has_ASCII_Upper_Alpha(ReadOnlySpan<char> str)
         {
@@ -769,7 +768,6 @@ namespace CssUI
         /// Converts a given string into unicode scalar values
         /// </summary>
         /// <param name="stringMem"></param>
-        /// <returns></returns>
         public static string Convert_To_Scalar_Values(ReadOnlyMemory<char> stringMem)
         {/* Docs: https://heycam.github.io/webidl/#dfn-obtain-unicode */
             /* XXX: Optimize this */
@@ -950,7 +948,12 @@ namespace CssUI
 
             return new string(data);
         }
-        #endregion
 
+        public static byte[] String_Percent_Decode(ReadOnlyMemory<char> input)
+        {/* Docs: https://url.spec.whatwg.org/#string-percent-decode */
+            var bytes = Encoding.UTF8.GetBytes(input.ToArray());
+            return Percent_Decode(bytes);
+        }
+        #endregion
     }
 }
