@@ -1,4 +1,6 @@
-﻿namespace CssUI.HTML
+﻿using System.Text;
+
+namespace CssUI.HTML
 {
     public struct IPV6Address
     {/* Docs: https://url.spec.whatwg.org/#concept-ipv6 */
@@ -49,6 +51,62 @@
             address[15] = (byte)((Parts[7] << 4) & 0xFF);
 
             return address;
+        }
+
+        public string Serialize()
+        {/* Docs: https://url.spec.whatwg.org/#concept-ipv6-serializer */
+            StringBuilder output = new StringBuilder();
+            int? compress = null;
+            bool bCompress = false;
+            for (int i=0; i<Parts.Length; i++)
+            {
+                var part = Parts[i];
+                if (part == 0)
+                {
+                    if (bCompress)
+                    {
+                        compress = i;
+                        break;
+                    }
+                }
+                else if (!bCompress)
+                {
+                    bCompress = true;
+                    continue;
+                }
+            }
+
+            bool ignore0 = false;
+            for (int pieceIndex = 0; pieceIndex < Parts.Length; pieceIndex++)
+            {
+                if (ignore0 && Parts[pieceIndex] == 0) continue;
+                else if (ignore0)
+                {
+                    ignore0 = false;
+                }
+
+                if (compress == pieceIndex)
+                {
+                    if (pieceIndex == 0)
+                    {
+                        output.Append(UnicodeCommon.CHAR_COLON);
+                        output.Append(UnicodeCommon.CHAR_COLON);
+                    }
+                    else
+                    {
+                        output.Append(UnicodeCommon.CHAR_COLON);
+                    }
+
+                    ignore0 = true;
+                    continue;
+                }
+
+                output.Append(UnicodeCommon.Ascii_Value_To_Hex(Parts[pieceIndex]));
+
+                if (pieceIndex != 7) output.Append(UnicodeCommon.CHAR_COLON);
+            }
+
+            return output.ToString();
         }
     }
 }

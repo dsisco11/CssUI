@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace CssUI.HTML
 {
@@ -23,6 +24,18 @@ namespace CssUI.HTML
         public UInt32 Address
         {
             get => (UInt32)((Part[0] << 0) | (Part[1] << 8) | (Part[2] << 16) | (Part[3] << 24));
+        }
+
+        public string Serialize()
+        {/* Docs: https://url.spec.whatwg.org/#concept-ipv4-serializer */
+            StringBuilder output = new StringBuilder();
+            for (int i=0; i<4; i++)
+            {
+                output.Append(Part[i] % 256);
+                if (i != 3) output.Append(UnicodeCommon.CHAR_FULL_STOP);
+            }
+
+            return output.ToString();
         }
 
     }
