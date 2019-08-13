@@ -408,5 +408,26 @@ namespace CssUI.HTML
             return encoding;
         }
         #endregion
+
+        #region URL
+        public static bool Parse_URL(ReadOnlyMemory<char> href, Document document, out Url outUrl, out string outUrlString)
+        {/* Docs: https://html.spec.whatwg.org/multipage/urls-and-fetching.html#parse-a-url */
+
+            var encoding = document.characterEncoding;
+            var baseURL = document.URL;
+            if (!Url.TryParse(href, out Url urlRecord, baseURL, encoding))
+            {
+                outUrl = null;
+                outUrlString = null;
+                return false;
+            }
+
+            var urlString = urlRecord.Serialize();
+
+            outUrl = urlRecord;
+            outUrlString = urlString;
+            return true;
+        }
+        #endregion
     }
 }
