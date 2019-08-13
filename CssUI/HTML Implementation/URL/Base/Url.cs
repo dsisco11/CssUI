@@ -74,12 +74,23 @@ namespace CssUI.HTML
             }
         }
 
-        public string Origin
+        public UrlOrigin Origin
         {/* Docs: https://url.spec.whatwg.org/#concept-url-origin */
             get
             {
                 if (Scheme == "blob")
                 {
+                    if (blobURLEntry != null)
+                    {
+                        return UrlOrigin.Default;
+                    }
+
+                    if (Parse_Basic(Path[0].AsMemory(), null, out Url parsedUrl))
+                    {
+                        return parsedUrl.Origin;
+                    }
+
+                    return UrlOrigin.Opaque;
                 }
 
                 if (Scheme.EnumValue.HasValue)
@@ -93,12 +104,14 @@ namespace CssUI.HTML
                         case EUrlScheme.Ws:
                         case EUrlScheme.Wss:
                             {
+                                return new UrlOrigin(Scheme, Host, Port, null);
                             }
-                            break;
+                        case EUrlScheme.File:
+                            return UrlOrigin.Opaque;
                     }
                 }
 
-
+                return UrlOrigin.Opaque;
             }
         }
 
