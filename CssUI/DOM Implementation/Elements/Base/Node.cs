@@ -31,10 +31,10 @@ namespace CssUI.DOM.Nodes
         public abstract string nodeName { get; }
 
         /* Docs: https://dom.spec.whatwg.org/#dom-node-nodevalue */
-        public abstract string nodeValue { get; set; }
+        [CEReactions] public abstract string nodeValue { get; set; }
 
         /* Docs: https://dom.spec.whatwg.org/#dom-node-textcontent */
-        public abstract string textContent { get; set; }
+        [CEReactions] public abstract string textContent { get; set; }
 
         /* Docs: https://dom.spec.whatwg.org/#concept-node-length */
         public abstract int nodeLength { get; }
@@ -99,88 +99,96 @@ namespace CssUI.DOM.Nodes
         /// <returns></returns>
         public bool hasChildNodes() => (childNodes.Count > 0);
 
+        [CEReactions]
         public void normalize()
         {/* Docs: https://dom.spec.whatwg.org/#dom-node-normalize */
-            /* The normalize() method, when invoked, must run these steps for each descendant exclusive Text node node of context object: */
-            foreach (Text node in DOMCommon.Get_Descendents(this, new TextNodeFilter()))
+            CEReactions.Wrap_CEReaction_Node(this, () =>
             {
-                var length = node.Length;
-                /* 2) If length is zero, then remove node and continue with the next exclusive Text node, if any. */
-                if (length <= 0)
+                /* The normalize() method, when invoked, must run these steps for each descendant exclusive Text node node of context object: */
+                foreach (Text node in DOMCommon.Get_Descendents(this, new TextNodeFilter()))
                 {
-                    _remove_node_from_parent(node, this);
-                    continue;
-                }
-                /* 3) Let data be the concatenation of the data of node’s contiguous exclusive Text nodes (excluding itself), in tree order. */
-                var textNodes = Text.get_contiguous_text_nodes(node, true);
-                StringBuilder sb = new StringBuilder();
-                foreach (Text txt in textNodes)
-                {
-                    sb.Append(txt.textContent);
-                }
-                string data = sb.ToString();
-                /* 4) Replace data with node node, offset length, count 0, and data data. */
-                node.replaceData(length, 0, data);
-                /* 5) Let currentNode be node’s next sibling. */
-                var currentNode = node.nextSibling;
-                /* 6) While currentNode is an exclusive Text node: */
-                while (currentNode is Text)
-                {
-
-                    foreach (WeakReference<Range> weakRef in Range.LIVE_RANGES)
+                    var length = node.Length;
+                    /* 2) If length is zero, then remove node and continue with the next exclusive Text node, if any. */
+                    if (length <= 0)
                     {
-                        if (weakRef.TryGetTarget(out Range liveRange))
+                        _remove_node_from_parent(node, this);
+                        continue;
+                    }
+                    /* 3) Let data be the concatenation of the data of node’s contiguous exclusive Text nodes (excluding itself), in tree order. */
+                    var textNodes = Text.get_contiguous_text_nodes(node, true);
+                    StringBuilder sb = new StringBuilder();
+                    foreach (Text txt in textNodes)
+                    {
+                        sb.Append(txt.textContent);
+                    }
+                    string data = sb.ToString();
+                    /* 4) Replace data with node node, offset length, count 0, and data data. */
+                    node.replaceData(length, 0, data);
+                    /* 5) Let currentNode be node’s next sibling. */
+                    var currentNode = node.nextSibling;
+                    /* 6) While currentNode is an exclusive Text node: */
+                    while (currentNode is Text)
+                    {
+
+                        foreach (WeakReference<Range> weakRef in Range.LIVE_RANGES)
                         {
-                            /* 1) For each live range whose start node is currentNode, add length to its start offset and set its start node to node. */
-                            if (ReferenceEquals(currentNode, liveRange.startContainer))
+                            if (weakRef.TryGetTarget(out Range liveRange))
                             {
-                                liveRange.startContainer = node;
-                                liveRange.startOffset += length;
-                            }
-                            /* 2) For each live range whose end node is currentNode, add length to its end offset and set its end node to node. */
-                            if (ReferenceEquals(currentNode, liveRange.endContainer))
-                            {
-                                liveRange.endContainer = node;
-                                liveRange.endOffset += length;
-                            }
-                            /* 3) For each live range whose start node is currentNode’s parent and start offset is currentNode’s index, set its start node to node and its start offset to length. */
-                            if (ReferenceEquals(currentNode.parentNode, liveRange.startContainer) && liveRange.startOffset == currentNode.index)
-                            {
-                                liveRange.startContainer = node;
-                                liveRange.startOffset += length;
-                            }
-                            /* 4) For each live range whose end node is currentNode’s parent and end offset is currentNode’s index, set its end node to node and its end offset to length. */
-                            if (ReferenceEquals(currentNode.parentNode, liveRange.endContainer) && liveRange.endOffset == currentNode.index)
-                            {
-                                liveRange.endContainer = node;
-                                liveRange.endOffset += length;
+                                /* 1) For each live range whose start node is currentNode, add length to its start offset and set its start node to node. */
+                                if (ReferenceEquals(currentNode, liveRange.startContainer))
+                                {
+                                    liveRange.startContainer = node;
+                                    liveRange.startOffset += length;
+                                }
+                                /* 2) For each live range whose end node is currentNode, add length to its end offset and set its end node to node. */
+                                if (ReferenceEquals(currentNode, liveRange.endContainer))
+                                {
+                                    liveRange.endContainer = node;
+                                    liveRange.endOffset += length;
+                                }
+                                /* 3) For each live range whose start node is currentNode’s parent and start offset is currentNode’s index, set its start node to node and its start offset to length. */
+                                if (ReferenceEquals(currentNode.parentNode, liveRange.startContainer) && liveRange.startOffset == currentNode.index)
+                                {
+                                    liveRange.startContainer = node;
+                                    liveRange.startOffset += length;
+                                }
+                                /* 4) For each live range whose end node is currentNode’s parent and end offset is currentNode’s index, set its end node to node and its end offset to length. */
+                                if (ReferenceEquals(currentNode.parentNode, liveRange.endContainer) && liveRange.endOffset == currentNode.index)
+                                {
+                                    liveRange.endContainer = node;
+                                    liveRange.endOffset += length;
+                                }
                             }
                         }
+                        /* 5) Add currentNode’s length to length. */
+                        length += currentNode.nodeLength;
+                        /* 6) Set currentNode to its next sibling. */
+                        currentNode = currentNode.nextSibling;
                     }
-                    /* 5) Add currentNode’s length to length. */
-                    length += currentNode.nodeLength;
-                    /* 6) Set currentNode to its next sibling. */
-                    currentNode = currentNode.nextSibling;
+                    /* 7) Remove node’s contiguous exclusive Text nodes (excluding itself), in tree order. */
+                    foreach (Node cnode in textNodes)
+                    {
+                        _remove_node_from_parent(cnode, this);
+                    }
                 }
-                /* 7) Remove node’s contiguous exclusive Text nodes (excluding itself), in tree order. */
-                foreach (Node cnode in textNodes)
-                {
-                    _remove_node_from_parent(cnode, this);
-                }
-            }
+            });
         }
 
+        [CEReactions]
         public Node cloneNode(bool deep = false)
         {/* Docs: https://dom.spec.whatwg.org/#dom-node-clonenode */
-            /* 1) If context object is a shadow root, then throw a "NotSupportedError" DOMException. */
-            if (this is ShadowRoot)
+            return CEReactions.Wrap_CEReaction_Node(this, () =>
             {
-                throw new NotSupportedError("Cannot clone a shadow-root");
-            }
+                /* 1) If context object is a shadow root, then throw a "NotSupportedError" DOMException. */
+                if (this is ShadowRoot)
+                {
+                    throw new NotSupportedError("Cannot clone a shadow-root");
+                }
 
-            /* 2) Return a clone of the context object, with the clone children flag set if deep is true. */
-            /* Docs: https://dom.spec.whatwg.org/#concept-node-clone */
-            return _clone_node(this, null, deep);
+                /* 2) Return a clone of the context object, with the clone children flag set if deep is true. */
+                /* Docs: https://dom.spec.whatwg.org/#concept-node-clone */
+                return _clone_node(this, null, deep);
+            });
         }
         
         public EDocumentPosition compareDocumentPosition(Node other)
@@ -252,9 +260,13 @@ namespace CssUI.DOM.Nodes
         /// </summary>
         /// <param name="newNode"></param>
         /// <returns></returns>
+        [CEReactions]
         internal Node insertFirst(Node newNode)
         {
-            return _pre_insert_node(newNode, this, null);
+            return CEReactions.Wrap_CEReaction_Node(this, () =>
+            {
+                return _pre_insert_node(newNode, this, null);
+            });
         }
 
         /// <summary>
@@ -263,24 +275,40 @@ namespace CssUI.DOM.Nodes
         /// <param name="newNode"></param>
         /// <param name="before"></param>
         /// <returns></returns>
+        [CEReactions]
         public Node insertBefore(Node newNode, Node before)
         {
-            return _pre_insert_node(newNode, this, before);
+            return CEReactions.Wrap_CEReaction_Node(this, () =>
+            {
+                return _pre_insert_node(newNode, this, before);
+            });
         }
 
+        [CEReactions]
         public Node appendChild(Node node)
         {
-            return _pre_insert_node(node, this, null);
+            return CEReactions.Wrap_CEReaction_Node(this, () =>
+            {
+                return _pre_insert_node(node, this, null);
+            });
         }
 
+        [CEReactions]
         public Node replaceChild(Node node, Node child)
         {
-            return _replace_node_within_parent(node, this, child);
+            return CEReactions.Wrap_CEReaction_Node(this, () =>
+            {
+                return _replace_node_within_parent(node, this, child);
+            });
         }
 
+        [CEReactions]
         public Node removeChild(Node child)
         {
-            return _pre_remove_node(child, this);
+            return CEReactions.Wrap_CEReaction_Node(this, () =>
+            {
+                return _pre_remove_node(child, this);
+            });
         }
 
         #endregion
