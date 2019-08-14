@@ -21,6 +21,8 @@ namespace CssUI.DOM
 
         #region Backing Values
         private EDesignMode _designMode = EDesignMode.OFF;
+        private Url _url = Url.Parse("about:blank".AsMemory());
+        private UrlOrigin _origin = UrlOrigin.Default;
         #endregion
 
         #region Rendering
@@ -39,7 +41,7 @@ namespace CssUI.DOM
         internal LinkedList<MediaQueryList> _mediaQueryLists = new LinkedList<MediaQueryList>();
         internal BrowsingContext BrowsingContext = null;
 
-        [Obsolete("Use defaultView in stead", true)]
+        [Obsolete("Use defaultView instead", true)]
         internal Window window
         {/* https://html.spec.whatwg.org/multipage/window-object.html#dom-document-defaultview */
             get
@@ -77,13 +79,20 @@ namespace CssUI.DOM
         public readonly Viewport Viewport;
 
         public readonly EQuirksMode Mode = EQuirksMode.NoQuirks;
-        public readonly string URL = "/";
-        public readonly UrlOrigin Origin = null;
+        /// <summary>
+        /// Returns document’s DOMImplementation object.
+        /// </summary>
+        public readonly DOMImplementation implementation = new DOMImplementation();
         public readonly Encoding characterEncoding = Encoding.UTF8;
 
-        public readonly DocumentType doctype;
-        public readonly string contentType;
-        public readonly DOMImplementation implementation = new DOMImplementation();
+        /// <summary>
+        /// Returns the doctype or null if there is none.
+        /// </summary>
+        public DocumentType doctype => DOMCommon.Get_First_Child_OfType<DocumentType>(this);
+        /// <summary>
+        /// Returns document’s content type.
+        /// </summary>
+        public readonly string contentType = "application/xml";
 
         public EDesignMode DesignMode
         {
@@ -122,6 +131,13 @@ namespace CssUI.DOM
         private ConcurrentDictionary<KeyCombination, Action> KeyCommands = new ConcurrentDictionary<KeyCombination, Action>();
         #endregion
 
+        #region Accessors
+        public string URL => _url.Serialize();
+        public string documentURI => _url.Serialize();
+        public string Origin => _origin.Serialize();
+        public string characterSet => characterEncoding.WebName;
+        #endregion
+
         #region Node Implementation
         public override ENodeType nodeType => ENodeType.DOCUMENT_NODE;
         public override string nodeName => "#document";
@@ -138,7 +154,8 @@ namespace CssUI.DOM
         {
             this.doctype = doctype;
             this.contentType = contentType;
-            this.Origin = UrlOrigin.Default;
+            this._origin = UrlOrigin.Default;
+            this._url = new Url("/");
             cssUnitResolver = new CssUnitResolver(this, true);
         }
         #endregion
