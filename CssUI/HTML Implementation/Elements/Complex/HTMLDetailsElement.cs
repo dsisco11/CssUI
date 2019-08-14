@@ -1,6 +1,7 @@
 ﻿using CssUI.DOM;
 using CssUI.DOM.CustomElements;
 using CssUI.DOM.Events;
+using System;
 using System.Threading.Tasks;
 
 namespace CssUI.HTML
@@ -39,9 +40,9 @@ namespace CssUI.HTML
         #endregion
 
         #region Overrides
-        internal override void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue value, string Namespace)
+        internal override void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue newValue, ReadOnlyMemory<char> Namespace)
         {
-            base.run_attribute_change_steps(element, localName, oldValue, value, Namespace);
+            base.run_attribute_change_steps(element, localName, oldValue, newValue, Namespace);
 
             /* Whenever the open attribute is added to or removed from a details element, the user agent must queue a task that runs the following steps, 
              * which are known as the details notification task steps, for this details element: */

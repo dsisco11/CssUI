@@ -254,9 +254,9 @@ namespace CssUI.HTML
         #region Overrides
         internal override bool has_activation_behaviour => true;
 
-        internal override void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue value, string Namespace)
+        internal override void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue newValue, ReadOnlyMemory<char> Namespace)
         {
-            base.run_attribute_change_steps(element, localName, oldValue, value, Namespace);
+            base.run_attribute_change_steps(element, localName, oldValue, newValue, Namespace);
 
             /* Whenever an option element's selected attribute is added, if its dirtiness is false, its selectedness must be set to true. 
              * Whenever an option element's selected attribute is removed, if its dirtiness is false, its selectedness must be set to false. */

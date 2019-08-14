@@ -2720,7 +2720,8 @@ namespace CssUI.HTML
             }
         }
 
-        internal override void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue newValue, string Namespace)
+
+        internal override void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue newValue, ReadOnlyMemory<char> Namespace)
         {
             base.run_attribute_change_steps(element, localName, oldValue, newValue, Namespace);
 
