@@ -57,6 +57,8 @@ namespace CssUI.HTML
         }
         #endregion
 
+        #region Equality
+
         public bool IsSameOrigin(UrlOrigin other)
         {/* Docs: https://html.spec.whatwg.org/multipage/origin.html#same-origin */
             if (other == null) return false;
@@ -91,5 +93,28 @@ namespace CssUI.HTML
 
             return false;
         }
+
+
+
+        public static bool IsSameOrigin(string A, string B)
+        {
+            var urlA = new Url(A);
+            var urlB = new Url(B);
+            var originA = urlA.Origin;
+            var originB = urlB.Origin;
+
+            return originA.IsSameOrigin(originB);
+        }
+
+        public static bool IsSameOriginDomain(string A, string B)
+        {
+            var urlA = new Url(A);
+            var urlB = new Url(B);
+            var originA = urlA.Origin;
+            var originB = urlB.Origin;
+
+            return originA.IsSameOriginDomain(originB);
+        }
+        #endregion
     }
 }
