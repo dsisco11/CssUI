@@ -2,6 +2,7 @@
 using CssUI.DOM.Nodes;
 using System.Collections.Generic;
 using CssUI.DOM.Exceptions;
+using CssUI.DOM.CustomElements;
 
 namespace CssUI.DOM
 {
@@ -18,23 +19,30 @@ namespace CssUI.DOM
         #region Accessors
         #endregion
 
-
+        [CEReactions]
         public void prepend(params object[] nodes)
         {
-            if (nodes.Count(c=> !(c is Node) && !(c is string)) > 0)
-                throw new TypeError("Only Node and string types are accepted types.");
+            CEReactions.Wrap_CEReaction_Node(this, () =>
+            {
+                if (nodes.Count(c=> !(c is Node) && !(c is string)) > 0)
+                    throw new TypeError("Only Node and string types are accepted types.");
 
-            var node = Node._convert_nodes_into_node(ownerDocument, nodes);
-            Node._pre_insert_node(node, this, firstChild);
+                var node = _convert_nodes_into_node(ownerDocument, nodes);
+                _pre_insert_node(node, this, firstChild);
+            });
         }
 
+        [CEReactions]
         public void append(params object[] nodes)
         {
-            if (nodes.Count(c => !(c is Node) && !(c is string)) > 0)
-                throw new TypeError("Only Node and string types are accepted types.");
+            CEReactions.Wrap_CEReaction_Node(this, () =>
+            {
+                if (nodes.Count(c => !(c is Node) && !(c is string)) > 0)
+                    throw new TypeError("Only Node and string types are accepted types.");
 
-            var node = Node._convert_nodes_into_node(ownerDocument, nodes);
-            appendChild(node);
+                var node = _convert_nodes_into_node(ownerDocument, nodes);
+                appendChild(node);
+            });
         }
 
         /// <summary>
