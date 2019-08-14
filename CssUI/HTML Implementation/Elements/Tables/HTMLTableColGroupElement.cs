@@ -32,7 +32,7 @@ namespace CssUI.HTML
         public uint span
         {
             get => MathExt.Clamp(getAttribute(EAttributeName.Span).Get_UInt(), 1, 1000);
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Span, AttributeValue.From_Integer(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Span, AttributeValue.From_Integer(value)));
         }
         #endregion
     }

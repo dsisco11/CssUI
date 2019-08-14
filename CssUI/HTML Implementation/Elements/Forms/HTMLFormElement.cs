@@ -46,70 +46,70 @@ namespace CssUI.HTML
         public string acceptCharset
         {
             get => getAttribute(EAttributeName.AcceptCharset).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.AcceptCharset, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.AcceptCharset, AttributeValue.From_String(value)));
         }
 
         [CEReactions]
         public string action
         {
             get => getAttribute(EAttributeName.Action)?.Get_String() ?? nodeDocument.URL;
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Action, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Action, AttributeValue.From_String(value)));
         }
 
         [CEReactions]
         public EAutoComplete autocomplete
         {
             get => getAttribute(EAttributeName.Autocomplete).Get_Enum<EAutoComplete>();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Autocomplete, AttributeValue.From_Enum(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Autocomplete, AttributeValue.From_Enum(value)));
         }
 
         [CEReactions]
         public EEncType enctype
         {
             get => getAttribute(EAttributeName.EncType).Get_Enum<EEncType>();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.EncType, AttributeValue.From_Enum(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.EncType, AttributeValue.From_Enum(value)));
         }
 
         [CEReactions]
         public EEncType encoding
         {
             get => getAttribute(EAttributeName.EncType).Get_Enum<EEncType>();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.EncType, AttributeValue.From_Enum(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.EncType, AttributeValue.From_Enum(value)));
         }
 
         [CEReactions]
         public EFormMethod method
         {
             get => getAttribute(EAttributeName.Method).Get_Enum<EFormMethod>();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Method, AttributeValue.From_Enum(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Method, AttributeValue.From_Enum(value)));
         }
 
         [CEReactions]
         public string name
         {
             get => getAttribute(EAttributeName.Name).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Name, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Name, AttributeValue.From_String(value)));
         }
 
         [CEReactions]
         public bool noValidate
         {
             get => hasAttribute(EAttributeName.NoValidate);
-            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.NoValidate, value));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => toggleAttribute(EAttributeName.NoValidate, value));
         }
 
         [CEReactions]
         public string target
         {
             get => getAttribute(EAttributeName.Target).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Target, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Target, AttributeValue.From_String(value)));
         }
 
         [CEReactions]
         public string rel
         {
             get => getAttribute(EAttributeName.Rel).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Rel, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Rel, AttributeValue.From_String(value)));
         }
         #endregion
 
@@ -156,7 +156,7 @@ namespace CssUI.HTML
         [CEReactions]
         public void reset()
         {
-            CEReactions.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 if (bLockedForReset) return;
 

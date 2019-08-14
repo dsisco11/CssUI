@@ -41,7 +41,7 @@ namespace CssUI.HTML
         [CEReactions] public string Name
         {
             get => getAttribute(EAttributeName.Name).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Name, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Name, AttributeValue.From_String(value)));
         }
         #endregion
 

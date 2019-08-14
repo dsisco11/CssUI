@@ -43,42 +43,42 @@ namespace CssUI.HTML
                 HTMLCommon.Resolve_Autofill(this, out _, out _, out _, out string outValue);
                 return outValue;
             }
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Autocomplete, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Autocomplete, AttributeValue.From_String(value)));
         }
 
         [CEReactions]
         public bool autofocus
         {
             get => hasAttribute(EAttributeName.Autofocus);
-            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Autofocus, value));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => toggleAttribute(EAttributeName.Autofocus, value));
         }
 
         [CEReactions]
         public bool multiple
         {
             get => hasAttribute(EAttributeName.Multiple);
-            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Multiple, value));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => toggleAttribute(EAttributeName.Multiple, value));
         }
 
         [CEReactions]
         public string name
         {
             get => getAttribute(EAttributeName.Name).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Name, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Name, AttributeValue.From_String(value)));
         }
 
         [CEReactions]
         public bool required
         {
             get => hasAttribute(EAttributeName.Required);
-            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Required, value));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => toggleAttribute(EAttributeName.Required, value));
         }
 
         [CEReactions]
         public int size
         {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#dom-select-size */
             get => getAttribute(EAttributeName.Size).Get_Int();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Size, AttributeValue.From_Integer(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Size, AttributeValue.From_Integer(value)));
         }
         #endregion
 
@@ -171,7 +171,7 @@ namespace CssUI.HTML
         public int length
         {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#dom-select-length */
             get => options.length;
-            set => CEReactions.Wrap_CEReaction(this, () => options.length = value);
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => options.length = value);
         }
 
         public IReadOnlyCollection<HTMLOptionElement> selectedOptions
@@ -199,7 +199,7 @@ namespace CssUI.HTML
         public HTMLOptionElement this[int index]
         {
             get => options[index];
-            set => CEReactions.Wrap_CEReaction(this, () => options[index] = value);
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => options[index] = value);
         }
 
         public HTMLOptionElement this[string name] => options[name];
@@ -348,31 +348,31 @@ namespace CssUI.HTML
         [CEReactions]
         public void add(HTMLOptionElement element, long before)
         {
-            CEReactions.Wrap_CEReaction(this, () => options.add(element, before));
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => options.add(element, before));
         }
 
         [CEReactions]
         public void add(HTMLOptionElement element, HTMLElement before = null)
         {
-            CEReactions.Wrap_CEReaction(this, () => options.add(element, before));
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => options.add(element, before));
         }
 
         [CEReactions]
         public void add(HTMLOptGroupElement element, long before)
         {
-            CEReactions.Wrap_CEReaction(this, () => options.add(element, before));
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => options.add(element, before));
         }
 
         [CEReactions]
         public void add(HTMLOptGroupElement element, HTMLElement before = null)
         {
-            CEReactions.Wrap_CEReaction(this, () => options.add(element, before));
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => options.add(element, before));
         }
 
         [CEReactions]
         public void remove(long index)
         {
-            CEReactions.Wrap_CEReaction(this, () => options.remove(index));
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => options.remove(index));
         }
     }
 

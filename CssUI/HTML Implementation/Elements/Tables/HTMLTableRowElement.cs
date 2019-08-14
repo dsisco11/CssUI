@@ -133,7 +133,7 @@ namespace CssUI.HTML
 
             return tableCell;
         }
-
+        
         /// <summary>
         /// Removes the td or th element with the given position in the row.
         /// The position is relative to the cells in the row.The index −1 is equivalent to deleting the last cell of the row.
@@ -143,7 +143,7 @@ namespace CssUI.HTML
         [CEReactions]
         public void deleteCell(int index)
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-tr-deletecell */
-            CEReactions.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 int cellCount = cells.Count;
                 if (index < -1 || index > cellCount)

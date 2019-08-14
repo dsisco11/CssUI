@@ -41,7 +41,7 @@ namespace CssUI.HTML
         [CEReactions] public bool autofocus
         {
             get => hasAttribute(EAttributeName.Autofocus);
-            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Autofocus, value));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => toggleAttribute(EAttributeName.Autofocus, value));
         }
 
         [CEReactions] public string formAction
@@ -55,43 +55,43 @@ namespace CssUI.HTML
                 
                 return attr.Value.Get_String();
             }
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.FormAction, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.FormAction, AttributeValue.From_String(value)));
         }
 
         [CEReactions] public EEncType formEnctype
         {
             get => getAttribute(EAttributeName.FormEncType).Get_Enum<EEncType>();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.FormEncType, AttributeValue.From_Enum(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.FormEncType, AttributeValue.From_Enum(value)));
         }
 
         [CEReactions] public EFormMethod formMethod
         {
             get => getAttribute(EAttributeName.FormMethod).Get_Enum<EFormMethod>();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.FormMethod, AttributeValue.From_Enum(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.FormMethod, AttributeValue.From_Enum(value)));
         }
 
         [CEReactions] public bool formNoValidate
         {
             get => hasAttribute(EAttributeName.FormNoValidate);
-            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.FormNoValidate, value));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => toggleAttribute(EAttributeName.FormNoValidate, value));
         }
 
         [CEReactions] public string formTarget
         {
             get => getAttribute(EAttributeName.FormTarget).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.FormTarget, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.FormTarget, AttributeValue.From_String(value)));
         }
 
         [CEReactions] public string name
         {
             get => getAttribute(EAttributeName.Name).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Name, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Name, AttributeValue.From_String(value)));
         }
 
         [CEReactions] public new EButtonType type
         {
             get => getAttribute(EAttributeName.Type).Get_Enum<EButtonType>();
-            set => CEReactions.Wrap_CEReaction(this, () => { setAttribute(EAttributeName.Type, AttributeValue.From_Enum(value)); });
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => { setAttribute(EAttributeName.Type, AttributeValue.From_Enum(value)); });
         }
 
         #endregion

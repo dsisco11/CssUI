@@ -46,7 +46,7 @@ namespace CssUI.DOM
             var delete = offset + nodeLength;
             /* 7) Starting from delete offset code units, remove count code units from node’s data. */
             this.data = newData.Remove((int)delete, (int)count);
-            foreach (var weakRef in Range.LIVE_RANGES)
+            foreach (var weakRef in nodeDocument.LIVE_RANGES)
             {
                 if (weakRef.TryGetTarget(out Range liveRange))
                 {

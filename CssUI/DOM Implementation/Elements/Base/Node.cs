@@ -102,7 +102,7 @@ namespace CssUI.DOM.Nodes
         [CEReactions]
         public void normalize()
         {/* Docs: https://dom.spec.whatwg.org/#dom-node-normalize */
-            CEReactions.Wrap_CEReaction_Node(this, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 /* The normalize() method, when invoked, must run these steps for each descendant exclusive Text node node of context object: */
                 foreach (Text node in DOMCommon.Get_Descendents(this, new TextNodeFilter()))
@@ -130,7 +130,7 @@ namespace CssUI.DOM.Nodes
                     while (currentNode is Text)
                     {
 
-                        foreach (WeakReference<Range> weakRef in Range.LIVE_RANGES)
+                        foreach (WeakReference<Range> weakRef in nodeDocument.LIVE_RANGES)
                         {
                             if (weakRef.TryGetTarget(out Range liveRange))
                             {
@@ -177,7 +177,7 @@ namespace CssUI.DOM.Nodes
         [CEReactions]
         public Node cloneNode(bool deep = false)
         {/* Docs: https://dom.spec.whatwg.org/#dom-node-clonenode */
-            return CEReactions.Wrap_CEReaction_Node(this, () =>
+            return CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 /* 1) If context object is a shadow root, then throw a "NotSupportedError" DOMException. */
                 if (this is ShadowRoot)
@@ -263,7 +263,7 @@ namespace CssUI.DOM.Nodes
         [CEReactions]
         internal Node insertFirst(Node newNode)
         {
-            return CEReactions.Wrap_CEReaction_Node(this, () =>
+            return CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 return _pre_insert_node(newNode, this, null);
             });
@@ -278,7 +278,7 @@ namespace CssUI.DOM.Nodes
         [CEReactions]
         public Node insertBefore(Node newNode, Node before)
         {
-            return CEReactions.Wrap_CEReaction_Node(this, () =>
+            return CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 return _pre_insert_node(newNode, this, before);
             });
@@ -287,7 +287,7 @@ namespace CssUI.DOM.Nodes
         [CEReactions]
         public Node appendChild(Node node)
         {
-            return CEReactions.Wrap_CEReaction_Node(this, () =>
+            return CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 return _pre_insert_node(node, this, null);
             });
@@ -296,7 +296,7 @@ namespace CssUI.DOM.Nodes
         [CEReactions]
         public Node replaceChild(Node node, Node child)
         {
-            return CEReactions.Wrap_CEReaction_Node(this, () =>
+            return CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 return _replace_node_within_parent(node, this, child);
             });
@@ -305,7 +305,7 @@ namespace CssUI.DOM.Nodes
         [CEReactions]
         public Node removeChild(Node child)
         {
-            return CEReactions.Wrap_CEReaction_Node(this, () =>
+            return CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 return _pre_remove_node(child, this);
             });
@@ -575,7 +575,7 @@ namespace CssUI.DOM.Nodes
         {/* Docs: https://dom.spec.whatwg.org/#concept-node-remove */
             /* 1) Let index be node’s index. */
             int index = node.index;
-            foreach (WeakReference<Range> weakRef in Range.LIVE_RANGES)
+            foreach (WeakReference<Range> weakRef in nodeDocument.LIVE_RANGES)
             {
                 if (weakRef.TryGetTarget(out Range liveRange))
                 {
@@ -705,7 +705,7 @@ namespace CssUI.DOM.Nodes
             /* 2) If child is non-null, then: */
             if (child != null)
             {
-                foreach (WeakReference<Range> weakRef in Range.LIVE_RANGES)
+                foreach (WeakReference<Range> weakRef in parent.nodeDocument.LIVE_RANGES)
                 {
                     if (weakRef.TryGetTarget(out Range liveRange))
                     {

@@ -52,7 +52,7 @@ namespace CssUI.HTML
             {
                 if (Nested_Browsing_Context == null) return null;
                 var document = Nested_Browsing_Context.activeDocument;
-                if (!document.Origin.IsSameOriginDomain(nodeDocument.Origin)) return null;
+                if (!UrlOrigin.IsSameOriginDomain(document.Origin, nodeDocument.Origin)) return null;
                 return document;
             }
         }
@@ -63,7 +63,7 @@ namespace CssUI.HTML
         public string data
         {
             get => getAttribute(EAttributeName.Data)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Data, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Data, AttributeValue.From_String(value)));
         }
 
         /// <summary>
@@ -73,21 +73,21 @@ namespace CssUI.HTML
         public override string type
         {
             get => getAttribute(EAttributeName.Type)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Type, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Type, AttributeValue.From_String(value)));
         }
 
         [CEReactions]
         public string name
         {
             get => getAttribute(EAttributeName.Name)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Name, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Name, AttributeValue.From_String(value)));
         }
 
         [CEReactions]
         public string useMap
         {
             get => getAttribute(EAttributeName.UseMap)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.UseMap, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.UseMap, AttributeValue.From_String(value)));
         }
 
 
@@ -95,13 +95,13 @@ namespace CssUI.HTML
         public int width
         {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content-other.html#dimension-attributes */
             //get => getAttribute(EAttributeName.Width).Get_Int();
-            //set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Width, AttributeValue.From_Integer(value)));
+            //set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Width, AttributeValue.From_Integer(value)));
         }
         [CEReactions]
         public int height
         {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content-other.html#dimension-attributes */
             //get => getAttribute(EAttributeName.Height).Get_Int();
-            //set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Height, AttributeValue.From_Integer(value)));
+            //set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Height, AttributeValue.From_Integer(value)));
         }
 
         #endregion

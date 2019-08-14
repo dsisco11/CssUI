@@ -34,7 +34,7 @@ namespace CssUI.HTML
             get => Collection.Count;
             set
             {
-                CEReactions.Wrap_CEReaction(root, () =>
+                CEReactions.Wrap_CEReaction(root.nodeDocument.defaultView, () =>
                 {
                     var items = Collection;
                     int len = items.Count;
@@ -74,7 +74,7 @@ namespace CssUI.HTML
             get => Collection[index];
             set
             {/* Docs: https://html.spec.whatwg.org/multipage/common-dom-interfaces.html#dom-htmloptionscollection-setter */
-                CEReactions.Wrap_CEReaction(root, () =>
+                CEReactions.Wrap_CEReaction(root.nodeDocument.defaultView, () =>
                 {
                     if (value == null)
                     {
@@ -119,7 +119,7 @@ namespace CssUI.HTML
         [CEReactions]
         public void add(HTMLOptionElement element, long before)
         {/* Docs: https://html.spec.whatwg.org/multipage/common-dom-interfaces.html#dom-htmloptionscollection-add */
-            CEReactions.Wrap_CEReaction(root, () =>
+            CEReactions.Wrap_CEReaction(root.nodeDocument.defaultView, () =>
             {
                 if (DOMCommon.Is_Ancestor(element, root))
                 {
@@ -158,7 +158,7 @@ namespace CssUI.HTML
         [CEReactions]
         public void add(HTMLOptionElement element, HTMLElement before = null)
         {/* Docs: https://html.spec.whatwg.org/multipage/common-dom-interfaces.html#dom-htmloptionscollection-add */
-            CEReactions.Wrap_CEReaction(root, () =>
+            CEReactions.Wrap_CEReaction(root.nodeDocument.defaultView, () =>
             {
                 if (DOMCommon.Is_Ancestor(element, root))
                 {
@@ -201,7 +201,7 @@ namespace CssUI.HTML
         [CEReactions]
         public void add(HTMLOptGroupElement element, long before)
         {/* Docs: https://html.spec.whatwg.org/multipage/common-dom-interfaces.html#dom-htmloptionscollection-add */
-            CEReactions.Wrap_CEReaction(root, () =>
+            CEReactions.Wrap_CEReaction(root.nodeDocument.defaultView, () =>
             {
                 if (DOMCommon.Is_Ancestor(element, root))
                 {
@@ -240,7 +240,7 @@ namespace CssUI.HTML
         [CEReactions]
         public void add(HTMLOptGroupElement element, HTMLElement before = null)
         {/* Docs: https://html.spec.whatwg.org/multipage/common-dom-interfaces.html#dom-htmloptionscollection-add */
-            CEReactions.Wrap_CEReaction(root, () =>
+            CEReactions.Wrap_CEReaction(root.nodeDocument.defaultView, () =>
             {
                 if (DOMCommon.Is_Ancestor(element, root))
                 {

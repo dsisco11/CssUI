@@ -54,84 +54,84 @@ namespace CssUI.HTML
                 HTMLCommon.Resolve_Autofill(this, out _, out _, out _, out string outValue);
                 return outValue;
             }
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Autocomplete, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Autocomplete, AttributeValue.From_String(value)));
         }
 
         [CEReactions]
         public bool autofocus
         {
             get => hasAttribute(EAttributeName.Autofocus);
-            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Autofocus, value));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => toggleAttribute(EAttributeName.Autofocus, value));
         }
 
         [CEReactions]
         public uint cols
         {
             get => getAttribute(EAttributeName.Cols).Get_UInt();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Cols, AttributeValue.From_Integer(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Cols, AttributeValue.From_Integer(value)));
         }
 
         [CEReactions]
         public string dirName
         {
             get => getAttribute(EAttributeName.Dirname).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Dirname, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Dirname, AttributeValue.From_String(value)));
         }
 
         [CEReactions]
         public string name
         {
             get => getAttribute(EAttributeName.Name).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Name, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Name, AttributeValue.From_String(value)));
         }
 
         [CEReactions]
         public string placeholder
         {
             get => getAttribute(EAttributeName.Placeholder).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Placeholder, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Placeholder, AttributeValue.From_String(value)));
         }
 
         [CEReactions]
         public bool readOnly
         {
             get => hasAttribute(EAttributeName.ReadOnly);
-            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.ReadOnly, value));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => toggleAttribute(EAttributeName.ReadOnly, value));
         }
 
         [CEReactions]
         public bool required
         {
             get => hasAttribute(EAttributeName.Required);
-            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Required, value));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => toggleAttribute(EAttributeName.Required, value));
         }
 
         [CEReactions]
         public uint rows
         {
             get => getAttribute(EAttributeName.Rows).Get_UInt();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Rows, AttributeValue.From_Integer(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Rows, AttributeValue.From_Integer(value)));
         }
 
         [CEReactions]
         public string wrap
         {
             get => getAttribute(EAttributeName.Wrap).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Wrap, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Wrap, AttributeValue.From_String(value)));
         }
 
         [CEReactions]
         public int maxLength
         {
             get => getAttribute(EAttributeName.MaxLength).Get_Int();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.MaxLength, AttributeValue.From_Integer(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.MaxLength, AttributeValue.From_Integer(value)));
         }
 
         [CEReactions]
         public int minLength
         {
             get => getAttribute(EAttributeName.MinLength).Get_Int();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.MinLength, AttributeValue.From_Integer(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.MinLength, AttributeValue.From_Integer(value)));
         }
         #endregion
 
@@ -148,7 +148,7 @@ namespace CssUI.HTML
             }
             set
             {
-                CEReactions.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
                 {
                     Node node = null;
                     if (!ReferenceEquals(null, value) && value.Length > 0)

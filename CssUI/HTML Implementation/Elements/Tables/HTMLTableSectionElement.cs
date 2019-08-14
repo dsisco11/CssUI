@@ -78,7 +78,7 @@ namespace CssUI.HTML
         [CEReactions]
         public void deleteRow(int index)
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-tbody-deleterow */
-            CEReactions.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 int rowCount = rows.Count;
                 if (index < -1 || index > rowCount)

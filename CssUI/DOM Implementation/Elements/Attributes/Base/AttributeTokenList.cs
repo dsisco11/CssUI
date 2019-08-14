@@ -82,7 +82,7 @@ namespace CssUI.DOM
         public AtomicString Value
         {
             get => ownerElement.getAttribute(localName).Get_String();
-            set => CEReactions.Wrap_CEReaction(ownerElement, () => ownerElement.setAttribute(localName, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(ownerElement.nodeDocument.defaultView, () => ownerElement.setAttribute(localName, AttributeValue.From_String(value)));
         }
 
         public string item(int index)

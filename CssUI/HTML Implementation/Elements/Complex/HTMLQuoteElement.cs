@@ -32,7 +32,7 @@ namespace CssUI.HTML
         public string cite
         {
             get => getAttribute(EAttributeName.Cite).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Cite, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Cite, AttributeValue.From_String(value)));
         }
         #endregion
     }

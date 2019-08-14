@@ -266,7 +266,7 @@ namespace CssUI.DOM.CustomElements
             foreach (Node candidate in candidates)
             {
                 Element element = candidate as Element;
-                CEReactions.Wrap_CEReaction(element, () =>
+                CEReactions.Wrap_CEReaction(element.nodeDocument.defaultView, () =>
                 {
                     CEReactions.Try_Upgrade_Element(element);
                 });

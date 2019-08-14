@@ -37,7 +37,7 @@ namespace CssUI.HTML
         [CEReactions] public string alt
         {
             get => getAttribute(EAttributeName.Alt)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Alt, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Alt, AttributeValue.From_String(value)));
         }
 
         [CEReactions] public IReadOnlyList<double> coords
@@ -59,7 +59,7 @@ namespace CssUI.HTML
             }
             set
             {
-                CEReactions.Wrap_CEReaction(this, () => 
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => 
                 {
                     var set = value.Select(o => o.ToString().AsMemory());
                     var serialized = DOMCommon.Serialize_Comma_Seperated_list(set);
@@ -71,37 +71,37 @@ namespace CssUI.HTML
         [CEReactions] public EAreaShape shape
         {
             get => getAttribute(EAttributeName.Shape).Get_Enum<EAreaShape>();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Shape, AttributeValue.From_Enum(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Shape, AttributeValue.From_Enum(value)));
         }
 
         [CEReactions] public string target
         {
             get => getAttribute(EAttributeName.Target)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Target, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Target, AttributeValue.From_String(value)));
         }
 
         [CEReactions] public string download
         {
             get => getAttribute(EAttributeName.Download)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Download, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Download, AttributeValue.From_String(value)));
         }
 
         [CEReactions] public string ping
         {
             get => getAttribute(EAttributeName.Ping)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Ping, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Ping, AttributeValue.From_String(value)));
         }
 
         [CEReactions] public string rel
         {
             get => getAttribute(EAttributeName.Rel)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Rel, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Rel, AttributeValue.From_String(value)));
         }
 
         [CEReactions] public EReferrerPolicy referrerPolicy
         {
             get => getAttribute(EAttributeName.ReferrerPolicy).Get_Enum<EReferrerPolicy>();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.ReferrerPolicy, AttributeValue.From_Enum(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.ReferrerPolicy, AttributeValue.From_Enum(value)));
         }
         #endregion
     }

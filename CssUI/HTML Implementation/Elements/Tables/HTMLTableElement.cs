@@ -41,7 +41,7 @@ namespace CssUI.HTML
             get => DOMCommon.Get_First_Element_Child_OfType<HTMLTableCaptionElement>(this);
             set
             {
-                CEReactions.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
                 {
                     HTMLTableCaptionElement target = caption;
                     if (target != null)
@@ -73,7 +73,7 @@ namespace CssUI.HTML
             get => DOMCommon.Get_First_Element_Child_OfType<HTMLTableHeadElement>(this);
             set
             {
-                CEReactions.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
                 {
                     HTMLTableHeadElement firstOfType = tHead;
                     if (firstOfType != null)
@@ -117,7 +117,7 @@ namespace CssUI.HTML
             get => DOMCommon.Get_First_Element_Child_OfType<HTMLTableFootElement>(this);
             set
             {
-                CEReactions.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
                 {
                     /* On setting, if the new value is null or a tfoot element, the first tfoot element child of the table element, 
                      * if any, must be removed, and the new value, if not null, must be inserted at the end of the table. 
@@ -307,7 +307,7 @@ namespace CssUI.HTML
         public void deleteCaption()
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-deletecaption */
 
-            CEReactions.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 var firstOfType = DOMCommon.Get_First_Element_Child_OfType<HTMLTableCaptionElement>(this);
                 if (firstOfType != null)
@@ -324,7 +324,7 @@ namespace CssUI.HTML
         public void deleteTHead()
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-deletethead */
 
-            CEReactions.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 var firstOfType = DOMCommon.Get_First_Element_Child_OfType<HTMLTableHeadElement>(this);
                 if (firstOfType != null)
@@ -341,7 +341,7 @@ namespace CssUI.HTML
         public void deleteTFoot()
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-deletetfoot */
 
-            CEReactions.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 var firstOfType = DOMCommon.Get_First_Element_Child_OfType<HTMLTableFootElement>(this);
                 if (firstOfType != null)
@@ -361,7 +361,7 @@ namespace CssUI.HTML
         public void deleteRow(int index)
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-deleterow */
 
-            CEReactions.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 int rowCount = rows.Count;
                 if (index < -1 || index > rowCount)

@@ -65,7 +65,7 @@ namespace CssUI.DOM
             {
                 /* 1) Insert new node into parent before node’s next sibling. */
                 Node._insert_node_into_parent_before(newNode, parent, this.nextSibling);
-                foreach (WeakReference<Range> weakRef in Range.LIVE_RANGES)
+                foreach (WeakReference<Range> weakRef in nodeDocument.LIVE_RANGES)
                 {
                     if (weakRef.TryGetTarget(out Range liveRange))
                     {

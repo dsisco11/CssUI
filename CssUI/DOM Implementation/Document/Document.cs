@@ -61,6 +61,8 @@ namespace CssUI.DOM
                 return documentElement?.Box.Content.getBoundingClientRect();
             }
         }
+
+        internal LinkedList<WeakReference<Range>> LIVE_RANGES = new LinkedList<WeakReference<Range>>();
         #endregion
 
         #region Properties
@@ -152,10 +154,10 @@ namespace CssUI.DOM
         #region Constructor
         protected Document(DocumentType doctype, string contentType = null)
         {
-            this.doctype = doctype;
             this.contentType = contentType;
             this._origin = UrlOrigin.Default;
             this._url = new Url("/");
+            this.appendChild(doctype);
             cssUnitResolver = new CssUnitResolver(this, true);
         }
         #endregion

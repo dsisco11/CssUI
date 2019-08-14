@@ -56,7 +56,7 @@ namespace CssUI.HTML
         public string htmlFor
         {/* Docs: https://html.spec.whatwg.org/multipage/forms.html#dom-label-htmlfor */
             get => getAttribute(EAttributeName.For)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.For, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.For, AttributeValue.From_String(value)));
         }
         #endregion
 

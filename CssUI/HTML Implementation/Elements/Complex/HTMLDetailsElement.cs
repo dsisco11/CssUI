@@ -35,7 +35,7 @@ namespace CssUI.HTML
         public bool open
         {
             get => hasAttribute(EAttributeName.Open);
-            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Open, value));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => toggleAttribute(EAttributeName.Open, value));
         }
         #endregion
 

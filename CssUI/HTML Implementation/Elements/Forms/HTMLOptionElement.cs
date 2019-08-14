@@ -155,14 +155,14 @@ namespace CssUI.HTML
 
                 return false;
             }
-            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Disabled, value));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => toggleAttribute(EAttributeName.Disabled, value));
         }
 
         [CEReactions]
         public bool defaultSelected
         {
             get => hasAttribute(EAttributeName.Selected);
-            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Selected, value));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => toggleAttribute(EAttributeName.Selected, value));
         }
 
         [CEReactions]
@@ -178,7 +178,7 @@ namespace CssUI.HTML
 
                 return text;
             }
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Label, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Label, AttributeValue.From_String(value)));
         }
 
         [CEReactions]
@@ -194,7 +194,7 @@ namespace CssUI.HTML
 
                 return text;
             }
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Value, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Value, AttributeValue.From_String(value)));
         }
 
         [CEReactions]
@@ -235,7 +235,7 @@ namespace CssUI.HTML
 
             set
             {
-                CEReactions.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
                 {
                     if (!ReferenceEquals(null, value) && value.Length > 0)
                     {

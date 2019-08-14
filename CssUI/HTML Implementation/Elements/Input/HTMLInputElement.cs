@@ -223,7 +223,7 @@ namespace CssUI.HTML
             get => getAttribute(EAttributeName.Accept).Get_String();
             set
             {
-                CEReactions.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
                 {
                     switch (type)
                     {
@@ -253,7 +253,7 @@ namespace CssUI.HTML
                 HTMLCommon.Resolve_Autofill(this, out _, out _, out _, out string outValue);
                 return outValue;
             }
-            set => CEReactions.Wrap_CEReaction(this, () =>
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 switch (type)
                 {
@@ -276,7 +276,7 @@ namespace CssUI.HTML
         public string autocomplete
         {
             get => getAttribute(EAttributeName.Autocomplete).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () =>
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 switch (type)
                 {
@@ -313,14 +313,14 @@ namespace CssUI.HTML
         public bool autofocus
         {
             get => hasAttribute(EAttributeName.Autofocus);
-            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Autofocus, value));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => toggleAttribute(EAttributeName.Autofocus, value));
         }
 
         [CEReactions]
         public bool defaultChecked
         {
             get => hasAttribute(EAttributeName.Checked);
-            set => CEReactions.Wrap_CEReaction(this, () =>
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 switch (type)
                 {
@@ -341,7 +341,7 @@ namespace CssUI.HTML
         public string dirName
         {
             get => getAttribute(EAttributeName.Dirname)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () =>
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 switch (type)
                 {
@@ -393,7 +393,7 @@ namespace CssUI.HTML
 
                 return attrValue;
             }
-            set => CEReactions.Wrap_CEReaction(this, () =>
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 switch (type)
                 {
@@ -414,7 +414,7 @@ namespace CssUI.HTML
         public EEncType? formEnctype
         {
             get => getAttribute(EAttributeName.FormEncType)?.Get_Enum<EEncType>();
-            set => CEReactions.Wrap_CEReaction(this, () =>
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 switch (type)
                 {
@@ -436,7 +436,7 @@ namespace CssUI.HTML
         public EFormMethod? formMethod
         {
             get => getAttribute(EAttributeName.FormMethod)?.Get_Enum<EFormMethod>();
-            set => CEReactions.Wrap_CEReaction(this, () =>
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 switch (type)
                 {
@@ -458,7 +458,7 @@ namespace CssUI.HTML
         public bool formNoValidate
         {
             get => hasAttribute(EAttributeName.FormNoValidate);
-            set => CEReactions.Wrap_CEReaction(this, () =>
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 switch (type)
                 {
@@ -481,7 +481,7 @@ namespace CssUI.HTML
             get => getAttribute(EAttributeName.FormTarget).Get_String();
             set
             {
-                CEReactions.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
                 {
                     switch (type)
                     {
@@ -526,7 +526,7 @@ namespace CssUI.HTML
             }
             set
             {
-                CEReactions.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
                 {
                     switch (type)
                     {
@@ -598,7 +598,7 @@ namespace CssUI.HTML
         public string max
         {
             get => getAttribute(EAttributeName.Max)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () =>
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 switch (type)
                 {
@@ -624,7 +624,7 @@ namespace CssUI.HTML
         public int maxLength
         {
             get => getAttribute(EAttributeName.MaxLength).Get_Int();
-            set => CEReactions.Wrap_CEReaction(this, () =>
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 switch (type)
                 {
@@ -649,7 +649,7 @@ namespace CssUI.HTML
         public string min
         {
             get => getAttribute(EAttributeName.Min)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () =>
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 switch (type)
                 {
@@ -675,7 +675,7 @@ namespace CssUI.HTML
         public int minLength
         {
             get => getAttribute(EAttributeName.MinLength).Get_Int();
-            set => CEReactions.Wrap_CEReaction(this, () =>
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 switch (type)
                 {
@@ -700,7 +700,7 @@ namespace CssUI.HTML
         public bool multiple
         {
             get => hasAttribute(EAttributeName.Multiple);
-            set => CEReactions.Wrap_CEReaction(this, () =>
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 switch (type)
                 {
@@ -721,14 +721,14 @@ namespace CssUI.HTML
         public string name
         {
             get => getAttribute(EAttributeName.Name).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Name, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Name, AttributeValue.From_String(value)));
         }
 
         [CEReactions]
         public string pattern
         {
             get => getAttribute(EAttributeName.Pattern)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () =>
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 switch (type)
                 {
@@ -763,7 +763,7 @@ namespace CssUI.HTML
         public string placeholder
         {
             get => getAttribute(EAttributeName.Placeholder)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () =>
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 switch (type)
                 {
@@ -791,7 +791,7 @@ namespace CssUI.HTML
             get => hasAttribute(EAttributeName.ReadOnly);
             set
             {
-                CEReactions.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
                 {
                     switch (type)
                     {
@@ -824,7 +824,7 @@ namespace CssUI.HTML
         public bool required
         {
             get => hasAttribute(EAttributeName.Required);
-            set => CEReactions.Wrap_CEReaction(this, () =>
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 switch (type)
                 {
@@ -858,7 +858,7 @@ namespace CssUI.HTML
         public uint size
         {
             get => getAttribute(EAttributeName.Size).Get_UInt();
-            set => CEReactions.Wrap_CEReaction(this, () =>
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 switch (type)
                 {
@@ -884,7 +884,7 @@ namespace CssUI.HTML
         public string src
         {
             get => getAttribute(EAttributeName.Src)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () =>
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 switch (type)
                 {
@@ -904,14 +904,14 @@ namespace CssUI.HTML
         public new EInputType type
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#dom-input-type */
             get => getAttribute(EAttributeName.Type).Get_Enum<EInputType>();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Type, AttributeValue.From_Enum(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Type, AttributeValue.From_Enum(value)));
         }
 
         [CEReactions]
         public string defaultValue
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#dom-input-defaultvalue */
             get => getAttribute(EAttributeName.Value)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Value, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Value, AttributeValue.From_String(value)));
         }
 
         [CEReactions]
@@ -935,7 +935,7 @@ namespace CssUI.HTML
             }
             set
             {
-                CEReactions.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
                 {
                     switch (type)
                     {
@@ -970,7 +970,7 @@ namespace CssUI.HTML
         public string step
         {
             get => getAttribute(EAttributeName.Step)?.Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () =>
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 switch (type)
                 {
@@ -1411,7 +1411,7 @@ namespace CssUI.HTML
 
             set
             {
-                CEReactions.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
                 {
                     switch (Get_Input_Value_Mode(type))
                     {

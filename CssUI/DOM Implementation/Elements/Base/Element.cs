@@ -146,7 +146,7 @@ namespace CssUI.DOM
         public string id
         {/* The id attribute must reflect the "id" content attribute. */
             get => getAttribute(EAttributeName.ID).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.ID, AttributeValue.Parse(EAttributeName.ID, value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.ID, AttributeValue.Parse(EAttributeName.ID, value)));
         }
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace CssUI.DOM
         public string className
         {/* The className attribute must reflect the "class" content attribute. */
             get => getAttribute(EAttributeName.Class).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Class, AttributeValue.Parse(EAttributeName.Class, value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Class, AttributeValue.Parse(EAttributeName.Class, value)));
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace CssUI.DOM
         public string slot
         {/* The slot attribute must reflect the "slot" content attribute. */
             get => getAttribute(EAttributeName.Slot).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Slot, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Slot, AttributeValue.From_String(value)));
         }
         #endregion
 
@@ -642,7 +642,7 @@ namespace CssUI.DOM
         [CEReactions]
         public void setAttribute(AtomicName<EAttributeName> Name, AttributeValue value)
         {
-            CEReactions.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 find_attribute(Name, out Attr attr);
 
@@ -660,7 +660,7 @@ namespace CssUI.DOM
         [CEReactions]
         public Attr setAttributeNode(Attr attr)
         {
-            return CEReactions.Wrap_CEReaction(this, () =>
+            return CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 find_attribute(attr.Name, out Attr oldAttr);
                 if (ReferenceEquals(attr, oldAttr))
@@ -683,7 +683,7 @@ namespace CssUI.DOM
         [CEReactions]
         public void removeAttribute(AtomicName<EAttributeName> Name)
         {
-            CEReactions.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 find_attribute(Name, out Attr attr);
                 if (!ReferenceEquals(attr, null))
@@ -695,7 +695,7 @@ namespace CssUI.DOM
         [CEReactions]
         public Attr removeAttributeNode(Attr attr)
         {
-            return CEReactions.Wrap_CEReaction(this, () =>
+            return CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 find_attribute(attr.Name, out Attr outAttr);
                 if (!ReferenceEquals(attr, null))
@@ -711,7 +711,7 @@ namespace CssUI.DOM
         [CEReactions]
         public bool toggleAttribute(AtomicName<EAttributeName> Name, bool? force = null)
         {
-            return CEReactions.Wrap_CEReaction(this, () =>
+            return CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 /* 1) If qualifiedName does not match the Name production in XML, then throw an "InvalidCharacterError" DOMException. */
                 if (!XMLCommon.Is_Valid(Name.Name))
@@ -927,7 +927,7 @@ namespace CssUI.DOM
         /// <exception cref="HierarchyRequestError">if the constraints of the node tree are violated.</exception>
         [CEReactions] public void before(params Node[] nodes)
         {/* Docs: https://dom.spec.whatwg.org/#dom-childnode-before */
-            CEReactions.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 var parent = parentNode;
                 if (parent == null)
@@ -956,7 +956,7 @@ namespace CssUI.DOM
         /// <exception cref="HierarchyRequestError">if the constraints of the node tree are violated.</exception>
         [CEReactions] public void before(params string[] nodes)
         {/* Docs: https://dom.spec.whatwg.org/#dom-childnode-before */
-            CEReactions.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 var parent = parentNode;
                 if (parent == null)
@@ -985,7 +985,7 @@ namespace CssUI.DOM
         /// <exception cref="HierarchyRequestError">if the constraints of the node tree are violated.</exception>
         [CEReactions] public void after(params Node[] nodes)
         {/* Docs: https://dom.spec.whatwg.org/#dom-childnode-after */
-            CEReactions.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 var parent = parentNode;
                 if (parent == null)
@@ -1014,7 +1014,7 @@ namespace CssUI.DOM
         /// <exception cref="HierarchyRequestError">if the constraints of the node tree are violated.</exception>
         [CEReactions] public void after(params string[] nodes)
         {/* Docs: https://dom.spec.whatwg.org/#dom-childnode-after */
-            CEReactions.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 var parent = parentNode;
                 if (parent == null)
@@ -1043,7 +1043,7 @@ namespace CssUI.DOM
         /// <exception cref="HierarchyRequestError">if the constraints of the node tree are violated.</exception>
         [CEReactions] public void replaceWith(params Node[] nodes)
         {/* Docs: https://dom.spec.whatwg.org/#dom-childnode-replacewith */
-            CEReactions.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 var parent = parentNode;
                 if (parent == null)
@@ -1073,7 +1073,7 @@ namespace CssUI.DOM
         /// <exception cref="HierarchyRequestError">if the constraints of the node tree are violated.</exception>
         [CEReactions] public void replaceWith(params string[] nodes)
         {/* Docs: https://dom.spec.whatwg.org/#dom-childnode-replacewith */
-            CEReactions.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 var parent = parentNode;
                 if (parent == null)
@@ -1102,7 +1102,7 @@ namespace CssUI.DOM
         /// </summary>
         [CEReactions] public void remove()
         {/* Docs: https://dom.spec.whatwg.org/#dom-childnode-remove */
-            CEReactions.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 if (parentNode == null)
                 {

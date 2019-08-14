@@ -45,7 +45,7 @@ namespace CssUI.HTML
                 var document = context.activeDocument;
                 var topContext = ownerDocument.BrowsingContext.Get_Top_Level_Browsing_Context();
 
-                if (!document.Origin.IsSameOriginDomain(topContext.activeDocument.Origin)) return null;
+                if (!UrlOrigin.IsSameOriginDomain(document.Origin, topContext.activeDocument.Origin)) return null;
                 return document;
             }
         }
@@ -60,7 +60,7 @@ namespace CssUI.HTML
         [CEReactions] public string src
         {
             get => getAttribute(EAttributeName.Src).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Src, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Src, AttributeValue.From_String(value)));
         }
 
         [CEReactions] public string srcdoc;
@@ -68,13 +68,13 @@ namespace CssUI.HTML
         [CEReactions] public string name
         {
             get => getAttribute(EAttributeName.Name).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Name, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Name, AttributeValue.From_String(value)));
         }
 
         [CEReactions] public string allow
         {
             get => getAttribute(EAttributeName.Allow).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Allow, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Allow, AttributeValue.From_String(value)));
         }
 
         [CEReactions] public bool allowFullscreen;

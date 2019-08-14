@@ -38,7 +38,7 @@ namespace CssUI.HTML
                 if (url == null) return outAttr.Value?.Get_String();
                 return url.Serialize();
             }
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Href, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Href, AttributeValue.From_String(value)));
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace CssUI.HTML
             }
             set
             {
-                CEReactions.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
                 {
                     reinitialize_url();
                     if (url == null) return;
@@ -97,7 +97,7 @@ namespace CssUI.HTML
             }
             set
             {
-                CEReactions.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
                 {
                     reinitialize_url();
                     if (url == null || url.CannotHaveCredentials) return;
@@ -120,7 +120,7 @@ namespace CssUI.HTML
             }
             set
             {
-                CEReactions.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
                 {
                     reinitialize_url();
                     if (url == null || url.CannotHaveCredentials) return;
@@ -145,7 +145,7 @@ namespace CssUI.HTML
             }
             set
             {
-                CEReactions.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
                 {
                     reinitialize_url();
                     if (url == null || url.bCannotBeBaseURLFlag) return;
@@ -171,7 +171,7 @@ namespace CssUI.HTML
             }
             set
             {
-                CEReactions.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
                 {
                     reinitialize_url();
                     if (url == null || url.bCannotBeBaseURLFlag) return;
@@ -198,7 +198,7 @@ namespace CssUI.HTML
             }
             set
             {
-                CEReactions.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
                 {
                     reinitialize_url();
                     if (url == null || url.CannotHaveCredentials) return;
@@ -235,7 +235,7 @@ namespace CssUI.HTML
             }
             set
             {
-                CEReactions.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
                 {
                     reinitialize_url();
                     if (url == null || url.bCannotBeBaseURLFlag) return;
@@ -263,7 +263,7 @@ namespace CssUI.HTML
             }
             set
             {
-                CEReactions.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
                 {
                     reinitialize_url();
                     if (url == null) return;
@@ -299,7 +299,7 @@ namespace CssUI.HTML
             }
             set
             {
-                CEReactions.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
                 {
                     reinitialize_url();
                     if (url == null) return;

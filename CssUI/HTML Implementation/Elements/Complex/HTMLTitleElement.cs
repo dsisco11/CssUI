@@ -38,7 +38,7 @@ namespace CssUI.HTML
             }
             set
             {
-                CEReactions.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
                 {
                     Node node = null;
                     if (!ReferenceEquals(null, value) && value.Length > 0)

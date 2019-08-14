@@ -42,7 +42,7 @@ namespace CssUI.HTML
         public bool open
         {
             get => hasAttribute(EAttributeName.Open);
-            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Open, value));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => toggleAttribute(EAttributeName.Open, value));
         }
         #endregion
 
@@ -64,7 +64,7 @@ namespace CssUI.HTML
         void show()
         {/* Docs: https://html.spec.whatwg.org/multipage/interactive-elements.html#dom-dialog-show */
 
-            CEReactions.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 if (open) return;
 
@@ -77,7 +77,7 @@ namespace CssUI.HTML
         [CEReactions]
         void showModal()
         {/* Docs: https://html.spec.whatwg.org/multipage/interactive-elements.html#dom-dialog-showmodal */
-            CEReactions.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 /* 1) Let subject be the dialog element on which the method was invoked. */
                 /* 2) If subject already has an open attribute, then throw an "InvalidStateError" DOMException. */
@@ -100,7 +100,7 @@ namespace CssUI.HTML
         [CEReactions]
         void close(string result = null)
         {/* Docs: https://html.spec.whatwg.org/multipage/interactive-elements.html#dom-dialog-close */
-            CEReactions.Wrap_CEReaction(this, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 if (!open) return;
                 open = false;

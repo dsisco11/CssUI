@@ -24,21 +24,21 @@ namespace CssUI.HTML
         public string Title
         {
             get => getAttribute(EAttributeName.Title).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Title, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Title, AttributeValue.From_String(value)));
         }
 
         [CEReactions]
         public string Lang
         {
             get => getAttribute(EAttributeName.Lang).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Lang, AttributeValue.From_String(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Lang, AttributeValue.From_String(value)));
         }
 
         [CEReactions]
         public bool Translate
         {
             get => hasAttribute(EAttributeName.Translate);
-            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Translate, value));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => toggleAttribute(EAttributeName.Translate, value));
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace CssUI.HTML
         public EDir Dir
         {
             get => getAttribute(EAttributeName.Dir).Get_Enum<EDir>();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Dir, AttributeValue.From_Enum(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Dir, AttributeValue.From_Enum(value)));
         }
 
         /// <summary>
@@ -469,7 +469,7 @@ namespace CssUI.HTML
 
                 return attrValue;
             }
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.TabIndex, AttributeValue.From_Integer(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.TabIndex, AttributeValue.From_Integer(value)));
         }
 
         /// <summary>
@@ -479,7 +479,7 @@ namespace CssUI.HTML
         public virtual bool disabled
         {
             get => hasAttribute(EAttributeName.Disabled);
-            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Disabled, value));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => toggleAttribute(EAttributeName.Disabled, value));
         }
 
         /// <summary>
@@ -489,7 +489,7 @@ namespace CssUI.HTML
         public bool Hidden
         {
             get => hasAttribute(EAttributeName.Hidden);
-            set => CEReactions.Wrap_CEReaction(this, () => toggleAttribute(EAttributeName.Hidden, value));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => toggleAttribute(EAttributeName.Hidden, value));
         }
 
         protected bool click_in_progress = false;
@@ -535,7 +535,7 @@ namespace CssUI.HTML
         public string AccessKey
         {
             get => getAttribute(EAttributeName.AccessKey).Get_String();
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.AccessKey, AttributeValue.Parse(EAttributeName.AccessKey, value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.AccessKey, AttributeValue.Parse(EAttributeName.AccessKey, value)));
         }
 
         /* This has been removed from HTML5.1 because it's not a good solution to the problem of user discovery */
@@ -624,7 +624,7 @@ namespace CssUI.HTML
 
                 return false;
             }
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Draggable, AttributeValue.From_Enum(value ? EDraggable.True : EDraggable.False)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Draggable, AttributeValue.From_Enum(value ? EDraggable.True : EDraggable.False)));
         }
 
         /* XXX: Spellcheck implementation */
@@ -675,7 +675,7 @@ namespace CssUI.HTML
                 /* otherwise, if none of those conditions applies, then the attribute must instead return false. */
                 return false;
             }
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Spellcheck, AttributeValue.From_Enum(value ? ESpellcheck.True : ESpellcheck.False)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Spellcheck, AttributeValue.From_Enum(value ? ESpellcheck.True : ESpellcheck.False)));
         }
 
         /// <summary>
@@ -718,7 +718,7 @@ namespace CssUI.HTML
 
                 return EAutoCapitalizationHint.Default;
             }
-            set => CEReactions.Wrap_CEReaction(this, () => setAttribute(EAttributeName.Autocapitalize, AttributeValue.From_Enum(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Autocapitalize, AttributeValue.From_Enum(value)));
         }
 
         [CEReactions]
@@ -739,7 +739,7 @@ namespace CssUI.HTML
             get => getAttribute(EAttributeName.ContentEditable).Get_Enum<EContentEditable>();
             set
             {
-                CEReactions.Wrap_CEReaction(this, () =>
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
                 {
                     setAttribute(EAttributeName.ContentEditable, AttributeValue.From_Enum(value));
                 });
