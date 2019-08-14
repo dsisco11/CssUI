@@ -201,6 +201,44 @@ namespace CssUI.DOM.CustomElements
         /// </summary>
         /// <param name="element">Element to queue this reaction for</param>
         /// <param name="wrappedMethod">The specifications dictate that for any [CEReaction] attributed method, the original steps given for said method must be encompassed by the callback reaction steps, this method is those original steps</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ReturnType Wrap_CEReaction<ReturnType>(Element element, Func<ReturnType> wrappedMethod)
+        {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#cereactions */
+            /* 1) Push a new element queue onto this object's relevant agent's custom element reactions stack. */
+            var window = element.ownerDocument.defaultView;
+            window.Reactions.Stack.Push(new Queue<Element>());
+
+            /* 2) Run the originally-specified steps for this construct, catching any exceptions. If the steps return a value, let value be the returned value. If they throw an exception, let exception be the thrown exception. */
+            Exception exception = null;
+            ReturnType retValue = default;
+            try
+            {
+                retValue = wrappedMethod.Invoke();
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+            }
+
+            /* 3) Let queue be the result of popping from this object's relevant agent's custom element reactions stack. */
+            var queue = window.Reactions.Stack.Pop();
+            /* 4) Invoke custom element reactions in queue. */
+            window.Reactions.Invoke_Reactions(queue);
+            /* 5) If an exception exception was thrown by the original steps, rethrow exception. */
+            if (exception != null)
+            {
+                throw exception;
+            }
+
+            /* 6) If a value value was returned from the original steps, return value. */
+            return retValue;
+        }
+
+        /// <summary>
+        /// Convenient wrapper for any Operations, attributes, setters, or deleters marked with [<see cref="CEReactions"/>]
+        /// </summary>
+        /// <param name="element">Element to queue this reaction for</param>
+        /// <param name="wrappedMethod">The specifications dictate that for any [CEReaction] attributed method, the original steps given for said method must be encompassed by the callback reaction steps, this method is those original steps</param>
         /// <returns>The returned value of <paramref name="wrappedMethod"/></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static dynamic Wrap_CEReaction(Element element, Func<dynamic> wrappedMethod)
@@ -233,6 +271,95 @@ namespace CssUI.DOM.CustomElements
 
             /* 6) If a value value was returned from the original steps, return value. */
             return retValue;
+        }
+
+
+
+
+        /// <summary>
+        /// Convenient wrapper for any Operations, attributes, setters, or deleters marked with [<see cref="CEReactions"/>]
+        /// </summary>
+        /// <param name="element">Element to queue this reaction for</param>
+        /// <param name="wrappedMethod">The specifications dictate that for any [CEReaction] attributed method, the original steps given for said method must be encompassed by the callback reaction steps, this method is those original steps</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Wrap_CEReaction_Node(Node node, Action wrappedMethod)
+        {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#cereactions */
+            if (node is Element element)
+            {
+                /* 1) Push a new element queue onto this object's relevant agent's custom element reactions stack. */
+                var window = element.ownerDocument.defaultView;
+                window.Reactions.Stack.Push(new Queue<Element>());
+
+                /* 2) Run the originally-specified steps for this construct, catching any exceptions. If the steps return a value, let value be the returned value. If they throw an exception, let exception be the thrown exception. */
+                Exception exception = null;
+                try
+                {
+                    wrappedMethod.Invoke();
+                }
+                catch (Exception ex)
+                {
+                    exception = ex;
+                }
+
+                /* 3) Let queue be the result of popping from this object's relevant agent's custom element reactions stack. */
+                var queue = window.Reactions.Stack.Pop();
+                /* 4) Invoke custom element reactions in queue. */
+                window.Reactions.Invoke_Reactions(queue);
+                /* 5) If an exception exception was thrown by the original steps, rethrow exception. */
+                if (exception != null)
+                {
+                    throw exception;
+                }
+            }
+            else
+            {
+                wrappedMethod.Invoke();
+            }
+        }
+
+        /// <summary>
+        /// Convenient wrapper for any Operations, attributes, setters, or deleters marked with [<see cref="CEReactions"/>]
+        /// </summary>
+        /// <param name="element">Element to queue this reaction for</param>
+        /// <param name="wrappedMethod">The specifications dictate that for any [CEReaction] attributed method, the original steps given for said method must be encompassed by the callback reaction steps, this method is those original steps</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ReturnType Wrap_CEReaction_Node<ReturnType>(Node node, Func<ReturnType> wrappedMethod)
+        {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#cereactions */
+            if (node is Element element)
+            {
+                /* 1) Push a new element queue onto this object's relevant agent's custom element reactions stack. */
+                var window = element.ownerDocument.defaultView;
+                window.Reactions.Stack.Push(new Queue<Element>());
+
+                /* 2) Run the originally-specified steps for this construct, catching any exceptions. If the steps return a value, let value be the returned value. If they throw an exception, let exception be the thrown exception. */
+                Exception exception = null;
+                ReturnType retValue = default;
+                try
+                {
+                    retValue = wrappedMethod.Invoke();
+                }
+                catch (Exception ex)
+                {
+                    exception = ex;
+                }
+
+                /* 3) Let queue be the result of popping from this object's relevant agent's custom element reactions stack. */
+                var queue = window.Reactions.Stack.Pop();
+                /* 4) Invoke custom element reactions in queue. */
+                window.Reactions.Invoke_Reactions(queue);
+                /* 5) If an exception exception was thrown by the original steps, rethrow exception. */
+                if (exception != null)
+                {
+                    throw exception;
+                }
+
+                /* 6) If a value value was returned from the original steps, return value. */
+                return retValue;
+            }
+            else
+            {
+                return wrappedMethod.Invoke();
+            }
         }
     }
 }
