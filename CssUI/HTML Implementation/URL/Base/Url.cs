@@ -37,6 +37,30 @@ namespace CssUI.HTML
         #endregion
 
         #region Constructors
+        public Url(string urlString)
+        {
+            if (!TryParse(urlString.AsMemory(), out _, null, null, this))
+            {
+                throw new Exception($"Failed to parse url string: \"{urlString}\"");
+            }
+        }
+
+        public Url(string relativeUrl, Url urlBase)
+        {
+            if (!TryParse(relativeUrl.AsMemory(), out _, urlBase, null, this))
+            {
+                throw new Exception($"Failed to parse url string: \"{relativeUrl}\"");
+            }
+        }
+
+        public Url(string relativeUrl, string urlBase)
+        {
+            var Base = Parse(urlBase.AsMemory());
+            if (!TryParse(relativeUrl.AsMemory(), out _, Base, null, this))
+            {
+                throw new Exception($"Failed to parse url string: \"{relativeUrl}\"");
+            }
+        }
         #endregion
 
         #region Accessors
@@ -171,28 +195,28 @@ namespace CssUI.HTML
 
             return null;
         }
-        public static bool TryParse(ReadOnlyMemory<char> input, out Url outUrl, Url urlBase = null, Encoding encodingOverride = null)
+        public static bool TryParse(ReadOnlyMemory<char> input, out Url outUrl, Url urlBase = null, Encoding encodingOverride = null, Url url = null)
         {/* Docs: https://url.spec.whatwg.org/#concept-url-parser */
-            if (Parse_Basic(input, urlBase, out Url url, encodingOverride))
+            if (Parse_Basic(input, urlBase, out Url parsedUrl, encodingOverride, url))
             {
                 outUrl = null;
                 return false;
             }
 
-            if (url.Scheme != (AtomicName<EUrlScheme>)"blob")
+            if (parsedUrl.Scheme != (AtomicName<EUrlScheme>)"blob")
             {
-                outUrl = url;
+                outUrl = parsedUrl;
                 return true;
             }
 
-            if (!BlobURLEntry.Resolve(url, out BlobURLEntry outBlob))
+            if (!BlobURLEntry.Resolve(parsedUrl, out BlobURLEntry outBlob))
             {
                 outUrl = null;
                 return false;
             }
 
-            url.blobURLEntry = outBlob;
-            outUrl = url;
+            parsedUrl.blobURLEntry = outBlob;
+            outUrl = parsedUrl;
             return true;
         }
         public static bool Parse_Basic(ReadOnlyMemory<char> input, Url Base, out Url outUrl, Encoding encodingOverride = null, Url url = null, ESchemeState? stateOverride = null)
