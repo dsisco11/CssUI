@@ -21,11 +21,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>CssUIEnumTables.tt</DependentUpon>
     </None>
-    <None Include="CSS Implementation\CSS Common\CssEnumTables.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>CssEnumTables.tt</DependentUpon>
-    </None>
     <None Include="DOM Implementation\Common\DomEnumTables.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -59,11 +54,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>CssUIEnumTables.tt</DependentUpon>
     </Compile>
-    <Compile Update="CSS Implementation\CSS Common\CssEnumTables.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>CssEnumTables.tt</DependentUpon>
-    </Compile>
     <Compile Update="DOM Implementation\Common\DomEnumTables.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -85,10 +75,6 @@
     <None Update="Common\CssUIEnumTables.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>CssUIEnumTables.cs</LastGenOutput>
-    </None>
-    <None Update="CSS Implementation\CSS Common\CssEnumTables.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>CssEnumTables.cs</LastGenOutput>
     </None>
     <None Update="DOM Implementation\Common\DomEnumTables.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
