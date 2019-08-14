@@ -1372,7 +1372,7 @@ namespace CssUI.DOM
                 if (node is Element ancestor)
                 {
                     /* 1) If the Document associated with element is not same origin with the Document associated with the element or viewport associated with box, terminate these steps. */
-                    if (!ancestor.ownerDocument.Origin.IsSameOrigin(ownerDocument.Origin))
+                    if (!UrlOrigin.IsSameOrigin(ancestor.ownerDocument.Origin, ownerDocument.Origin))
                         break;
 
                     scroll_bounds_into_view(ancestor, this.getBoundingClientRect(), ancestor.ScrollBox, block, inline, behavior);
