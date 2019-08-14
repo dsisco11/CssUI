@@ -10,6 +10,7 @@ using CssUI.DOM;
 using CssUI.Enums;
 using CssUI.CSS.Enums;
 using System.Linq;
+using CssUI.HTML;
 
 namespace CssUI
 {
@@ -36,7 +37,7 @@ namespace CssUI
         /// <summary>
         /// Allows us to resolve the fullpath just once.
         /// </summary>
-        CacheableValue<string> Cached_FullPath = new CacheableValue<string>();
+        CacheableValue<string> Cached_FullPath = new CacheableValue<string>(null);
 
         protected ILogger Logs { get; }
 
@@ -620,7 +621,8 @@ namespace CssUI
                 {
                     if (hasAttribute(EAttributeName.Dropzone, out Attr outAttr))
                     {
-                        ICollection<string> spl = DOMCommon.Parse_Ordered_Set(outAttr.Value.Get_String().AsMemory());
+                        var set = DOMCommon.Parse_Ordered_Set(outAttr.Value.Get_String().AsMemory());
+                        ICollection<string> spl = set.Select(o => o.ToString()).ToList();
                         if (spl == null) spl = new string[] { "*" };
                         return spl;
                     }
