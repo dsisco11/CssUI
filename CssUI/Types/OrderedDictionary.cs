@@ -208,52 +208,52 @@ namespace CssUI
             return ((IList<ValueTy>)Items).GetEnumerator();
         }
 
-        IEnumerator<ValueTy> IEnumerable<ValueTy>.GetEnumerator()
+        IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IEnumerable<ValueTy>)Items).GetEnumerator();
         }
         /*
-       /// <summary>
-       /// Enumerates the elements of an ordered dictionary
-       /// </summary>
-       public struct Enumerator : IEnumerator<KeyValuePair<KeyTy, ValueTy>>, IEnumerator, IDisposable, IDictionaryEnumerator
-       {
-           /// <summary>
-           /// Gets the element at the current position of the enumerator.
-           /// </summary>
-           /// <returns>The element in the <see cref="OrderedDictionary{keyTy, valueTy}"/> at the current position of the enumerator</returns>
-           public KeyValuePair<KeyTy, ValueTy> Current { get => new KeyValuePair<KeyTy, ValueTy>((KeyTy)Key, (ValueTy)Value); }
+/// <summary>
+/// Enumerates the elements of an ordered dictionary
+/// </summary>
+public struct Enumerator : IEnumerator<KeyValuePair<KeyTy, ValueTy>>, IEnumerator, IDisposable, IDictionaryEnumerator
+{
+  /// <summary>
+  /// Gets the element at the current position of the enumerator.
+  /// </summary>
+  /// <returns>The element in the <see cref="OrderedDictionary{keyTy, valueTy}"/> at the current position of the enumerator</returns>
+  public KeyValuePair<KeyTy, ValueTy> Current { get => new KeyValuePair<KeyTy, ValueTy>((KeyTy)Key, (ValueTy)Value); }
 
-           public DictionaryEntry Entry;
+  public DictionaryEntry Entry;
 
-           public object Key => Entry.Key;
+  public object Key => Entry.Key;
 
-           public object Value => Entry.Value;
+  public object Value => Entry.Value;
 
-           object IEnumerator.Current => Current;
+  object IEnumerator.Current => Current;
 
-           private IEnumerator<KeyValuePair<KeyTy, uint>> enumerator;
+  private IEnumerator<KeyValuePair<KeyTy, uint>> enumerator;
 
-           /// <summary>
-           /// Releases all resources used by the <see cref="OrderedDictionary{keyTy, valueTy}.Enumerator"/>
-           /// </summary>
-           public void Dispose()
-           {
-           }
+  /// <summary>
+  /// Releases all resources used by the <see cref="OrderedDictionary{keyTy, valueTy}.Enumerator"/>
+  /// </summary>
+  public void Dispose()
+  {
+  }
 
-           /// <summary>
-           /// Advances the enumerator to the next element of the <see cref="OrderedDictionary{KeyTy, ValueTy}"/>
-           /// </summary>
-           /// <returns><c>True</c> if the enumerator was successfully advanced to the next element; <c>False</c> if the enumerator has passed the end of the collection.</returns>
-           /// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-           public bool MoveNext()
-           {
-           }
+  /// <summary>
+  /// Advances the enumerator to the next element of the <see cref="OrderedDictionary{KeyTy, ValueTy}"/>
+  /// </summary>
+  /// <returns><c>True</c> if the enumerator was successfully advanced to the next element; <c>False</c> if the enumerator has passed the end of the collection.</returns>
+  /// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+  public bool MoveNext()
+  {
+  }
 
-           public void Reset()
-           {
-           }
-       }
+  public void Reset()
+  {
+  }
+}
 */
         #endregion
 
