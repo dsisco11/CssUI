@@ -11,7 +11,7 @@ namespace CssUI.CSS
     /// <para>Only used by certain CSS functions</para>
     /// </summary>
     public class CssAnBMatcher
-    {// SEE:  https://www.w3.org/TR/css-syntax-3/#anb-syntax
+    {/* Docs: https://www.w3.org/TR/css-syntax-3/#anb-syntax */
 
         readonly int A;
         readonly int B;
@@ -36,8 +36,8 @@ namespace CssUI.CSS
             if (Stream.Next.Type == ECssTokenType.Ident)// this token is a word, but we only accept 'even' or 'odd'
             {
                 IdentToken word = Stream.Consume<IdentToken>();
-                if (string.Compare("even", word.Value, true) == 0) return new CssAnBMatcher(2, 0);//{ A = 2; B = 0; }
-                else if (string.Compare("odd", word.Value, true) == 0) return new CssAnBMatcher(2, 1);//{ A = 2; B = 1; }
+                if (word.Value.AsSpan().Equals("even".AsSpan(), StringComparison.OrdinalIgnoreCase)) return new CssAnBMatcher(2, 0);//{ A = 2; B = 0; }
+                else if (word.Value.AsSpan().Equals("odd".AsSpan(), StringComparison.OrdinalIgnoreCase)) return new CssAnBMatcher(2, 1);//{ A = 2; B = 1; }
                 else throw new CssSyntaxErrorException(string.Concat("Invalid identity token (", word.Value, ") within An+B syntax"));
 
                 // if (Stream.Next != Stream.EOF_ITEM) throw new CssSyntaxError("Expected EOF!");
