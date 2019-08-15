@@ -12,9 +12,11 @@ using System.Linq;
 using CssUI.Internal;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using CssUI.Devices;
+
 namespace CssUI
 {
-	internal static class CSSUIEnumTables
+    internal static class CSSUIEnumTables
 	{
 		static Dictionary<RuntimeTypeHandle, int> TypeHandleMap = CreateTypeMap();
 		
@@ -38,7 +40,7 @@ namespace CssUI
 			typeMap[typeof(CssUI.DOM.EFormMethod).TypeHandle] = 13;
 			typeMap[typeof(CssUI.DOM.EInputType).TypeHandle] = 14;
 			typeMap[typeof(CssUI.DOM.Events.EEventName).TypeHandle] = 15;
-			typeMap[typeof(CssUI.DOM.Events.EKeyboardCode).TypeHandle] = 16;
+			typeMap[typeof(EKeyboardCode).TypeHandle] = 16;
 			
 			return typeMap;
 		}
@@ -233,7 +235,7 @@ namespace CssUI
 
 			/* CssUI.DOM.Events.EKeyboardCode */
 			#region CssUI.DOM.Events.EKeyboardCode
-			maxIndex = (int)Enum.GetValues(typeof(CssUI.DOM.Events.EKeyboardCode)).Cast<CssUI.DOM.Events.EKeyboardCode>().Max();
+			maxIndex = (int)Enum.GetValues(typeof(EKeyboardCode)).Cast<EKeyboardCode>().Max();
 			TABLE[16] = new EnumData[maxIndex+1];
 			#endregion
 			
