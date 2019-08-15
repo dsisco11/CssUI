@@ -26,6 +26,10 @@ namespace CssUI.HTML
         #endregion
 
         #region Accessors
+        /// <summary>
+        /// Returns the form owner of the form control that is associated with this element.
+        /// Returns null if there isn't one.
+        /// </summary>
         public HTMLFormElement form
         {/* Docs: https://html.spec.whatwg.org/multipage/forms.html#dom-label-form */
             get
@@ -37,6 +41,9 @@ namespace CssUI.HTML
             }
         }
 
+        /// <summary>
+        /// Returns the form control that is associated with this element.
+        /// </summary>
         public HTMLElement control
         {/* Docs: https://html.spec.whatwg.org/multipage/forms.html#attr-label-for */
             get
