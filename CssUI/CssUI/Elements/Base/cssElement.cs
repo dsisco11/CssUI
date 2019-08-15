@@ -21,7 +21,7 @@ namespace CssUI
     /// </summary>
     public abstract class cssElement : HTMLElement, IDisposable
     {
-
+        public override EContentCategories Categories => EContentCategories.Flow;
         /// <summary>
         /// The CSS type-name used when referencing this element from within a StyleSheet, 
         /// this is set by all element classes which inherit from the uiElement type

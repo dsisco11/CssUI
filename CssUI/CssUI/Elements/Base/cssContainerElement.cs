@@ -13,25 +13,6 @@ namespace CssUI
         {
         }
         #endregion
-
-        #region Child Management
-
-        /// <summary>
-        /// Fetches the first child-element matching a given CSS selector
-        /// </summary>
-        new public cssElement Get(string Selector)
-        {
-            return Find(Selector).SingleOrDefault();
-        }
-
-        /// <summary>
-        /// Fetches the first child-element matching a given CSS selector
-        /// </summary>
-        new public Ty Get<Ty>(string Selector) where Ty : cssElement
-        {
-            return (Ty)Find(Selector).SingleOrDefault();
-        }
-        #endregion
-
+        
     }
 }

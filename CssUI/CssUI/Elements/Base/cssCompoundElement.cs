@@ -310,38 +310,6 @@ namespace CssUI
             return List;
         }
 
-        /// <summary>
-        /// Finds all elements in our hierarchy that match the given selector
-        /// </summary>
-        /// <param name="Selector_String">CSS selector string</param>
-        /// <returns><see cref="cssElement"/> or <c>NULL</c></returns>
-        public IEnumerable<cssElement> Find(string Selector_String)
-        {
-            if (string.IsNullOrEmpty(Selector_String)) throw new ArgumentNullException("Selector cannot be NULL!");
-            // TODO: Implement a full CSS selector parsing system
-            return Find(new CssSelector(Selector_String));
-        }
-
-        /// <summary>
-        /// Finds all elements in our hierarchy that match the given selector
-        /// </summary>
-        /// <returns><see cref="cssElement"/> or <c>NULL</c></returns>
-        public IEnumerable<cssElement> Find(CssSelector Selector)
-        {
-            if (Selector == null) throw new ArgumentNullException("Selector cannot be NULL!");
-            List<cssElement> list = new List<cssElement>();
-
-            foreach (var C in Children)
-            {
-                if (Selector.QuerySingle(C)) list.Add(C);
-                if (C is cssCompoundElement)
-                {
-                    list.AddRange(((cssCompoundElement)C).Find(Selector));
-                }
-            }
-
-            return list;
-        }
 
         /// <summary>
         /// Adds an element to this one
@@ -350,7 +318,7 @@ namespace CssUI
         {
             if (Children.Contains(element))
                 throw new Exception("Cannot add element which is already present!");
-            if (Root != null && !string.IsNullOrEmpty(element.ID) && Root.Find_ID(element.ID) != null)
+            if (Root != null && !string.IsNullOrEmpty(element.id) && Root.Find_ID(element.id) != null)
                 throw new Exception("Cannot add element, another element with the same ID already exists!");
 
             ((IList<cssElement>)Children).Insert(index, element);
@@ -423,16 +391,6 @@ namespace CssUI
             return false;
         }
 
-        /// <summary>
-        /// Removes a given element, specified by it's ID, from this one 
-        /// </summary>
-        /// <param name="ID">ID of the element to be removed</param>
-        /// <param name="preserve">If TRUE then the element will not be disposed of immediately</param>
-        /// <returns>Success</returns>
-        public bool Remove(string ID, bool preserve = false)
-        {
-            return Remove(Get(ID), preserve);
-        }
 
         /// <summary>
         /// Clears and disposes of all child elements
@@ -454,22 +412,6 @@ namespace CssUI
         void ICollection<cssElement>.Clear()
         {
             (this as cssCompoundElement).Clear();
-        }
-
-        /// <summary>
-        /// Fetches the first child-element matching a given CSS selector
-        /// </summary>
-        protected cssElement Get(string Selector)
-        {
-            return Find(Selector).SingleOrDefault();
-        }
-
-        /// <summary>
-        /// Fetches the first child-element matching a given CSS selector
-        /// </summary>
-        protected Ty Get<Ty>(string Selector) where Ty : cssElement
-        {
-            return (Ty)Find(Selector).SingleOrDefault();
         }
         
         public int IndexOf(cssElement item)
@@ -610,234 +552,6 @@ namespace CssUI
         #endregion
         
 
-        #region Keyboard Event Handlers
-
-        /// <summary>
-        /// Called whenever the user presses a character key while the element has input-focus
-        /// </summary>
-        public override bool Handle_KeyPress(cssElement Sender, DomKeyboardKeyEventArgs Args)
-        {
-            if (!base.Handle_KeyPress(Sender, Args)) return false;// Abort
-            // Pass the event to all applicable child-elements
-            for (int i = 0; i < Children.Count; i++)
-            {
-                var C = Children[i];
-                C.Handle_KeyPress(this, Args);
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Called whenever a keyboard key is depressed while the element has input-focus
-        /// </summary>
-        public override bool Handle_KeyUp(cssElement Sender, DomKeyboardKeyEventArgs Args)
-        {
-            if (!base.Handle_KeyUp(Sender, Args)) return false;// Abort
-            // Pass the event to all applicable child-elements
-            for (int i = 0; i < Children.Count; i++)
-            {
-                var C = Children[i];
-                C.Handle_KeyUp(this, Args);
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Called whenever a keyboard key is pressed while the element has input-focus
-        /// </summary>
-        public override bool Handle_KeyDown(cssElement Sender, DomKeyboardKeyEventArgs Args)
-        {
-            if (!base.Handle_KeyDown(Sender, Args)) return false;// Abort
-            // Pass the event to all applicable child-elements
-            for (int i = 0; i < Children.Count; i++)
-            {
-                var C = Children[i];
-                C.Handle_KeyDown(this, Args);
-            }
-
-            return true;
-        }
-        #endregion
-
-
-        #region Tunneling Events
-
-        /*
-        /// <summary>
-        /// Called whenever the mouse releases a button whilst over the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public override void Handle_PreviewMouseUp(uiElement Sender, PreviewMouseButtonEventArgs Args)
-        {
-            base.Handle_PreviewMouseUp(this, Args);
-            if (Args.Handled) return;
-            // Pass the event to all applicable child-elements
-            List<uiElement> Hits = Get_Children_Hit(Args.Position);
-            foreach (var C in Hits)
-            {
-                C.Handle_PreviewMouseUp(this, Args);
-                if (Args.Handled) return;
-            }
-        }
-        /// <summary>
-        /// Called whenever the mouse presses a button whilst over the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public override void Handle_PreviewMouseDown(uiElement Sender, PreviewMouseButtonEventArgs Args)
-        {
-            base.Handle_PreviewMouseDown(this, Args);
-            if (Args.Handled) return;
-            // Pass the event to all applicable child-elements
-            List<uiElement> Hits = Get_Children_Hit(Args.Position);
-            foreach (var C in Hits)
-            {
-                C.Handle_PreviewMouseDown(this, Args);
-                if (Args.Handled) return;
-            }
-
-        }
-
-        /// <summary>
-        /// Called whenever the mouse wheel scrolls whilst over the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public override void Handle_PreviewMouseWheel(uiElement Sender, PreviewMouseWheelEventArgs Args)
-        {
-            base.Handle_PreviewMouseWheel(this, Args);
-            if (Args.Handled) return;
-            // Pass the event to all applicable child-elements
-            List<uiElement> Hits = Get_Children_Hit(Args.Position);
-            foreach (var C in Hits)
-            {
-                C.Handle_PreviewMouseWheel(this, Args);
-                if (Args.Handled) return;
-            }
-
-        }
-        /// <summary>
-        /// Called whenever the mouse moves whilst over the element.
-        /// <para>Fires after MouseEnter</para>
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public override void Handle_PreviewMouseMove(uiElement Sender, PreviewMouseMoveEventArgs Args)
-        {
-            base.Handle_PreviewMouseMove(this, Args);
-            if (Args.Handled) return;
-            // Pass the event to all applicable child-elements
-            List<uiElement> Hits = Get_Children_Hit(Args.Position);
-            foreach (var C in Hits)
-            {
-                C.Handle_PreviewMouseMove(this, Args);
-                if (Args.Handled) return;
-            }
-
-        }
-
-        /// <summary>
-        /// Called whenever the mouse moves onto the element.
-        /// <para>Fires before MouseMove</para>
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public override void Handle_PreviewMouseEnter(uiElement Sender, PreviewMouseEventArgs Args)
-        {
-            base.Handle_PreviewMouseEnter(this, Args);
-            if (Args.Handled) return;
-            // Pass the event to all applicable child-elements
-            List<uiElement> Hits = Get_Children_Hit(Args.Position);
-            foreach (var C in Hits)
-            {
-                C.Handle_PreviewMouseEnter(this, Args);
-                if (Args.Handled) return;
-            }
-
-        }
-        /// <summary>
-        /// Called whenever the mouse moves out of the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public override void Handle_PreviewMouseLeave(uiElement Sender, PreviewMouseEventArgs Args)
-        {
-            base.Handle_PreviewMouseLeave(this, Args);
-            if (Args.Handled) return;
-            // Pass event to all applicable children
-            foreach(var C in Children)
-            {
-                if (C.IsMousedOver) C.Handle_PreviewMouseLeave(this, Args);
-                if (Args.Handled) return;
-            }
-        }
-
-        /// <summary>
-        /// Called whenever the element is 'clicked' by mouse input or otherwise
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public override void Handle_PreviewClick(uiElement Sender, PreviewEventArgs Args)
-        {
-            base.Handle_PreviewClick(this, Args);
-            if (Args.Handled) return;
-            // Pass event to all children
-            foreach (var C in Children)
-            {
-                C.Handle_PreviewClick(this, Args);
-                if (Args.Handled) return;
-            }
-        }
-        /// <summary>
-        /// Called whenever the element is 'double clicked' by mouse input or otherwise
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public override void Handle_PreviewDoubleClick(uiElement Sender, PreviewEventArgs Args)
-        {
-            base.Handle_PreviewDoubleClick(this, Args);
-            if (Args.Handled) return;
-            // Pass event to all children
-            foreach (var C in Children)
-            {
-                C.Handle_PreviewDoubleClick(this, Args);
-                if (Args.Handled) return;
-            }
-        }
-
-        /// <summary>
-        /// Called whenever the mouse clicks the element.
-        /// Two single clicks that occur close enough in time, as determined by the mouse settings of the user's operating system, will generate a MouseDoubleClick event instead of the second MouseClick event.
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public override void Handle_PreviewMouseClick(uiElement Sender, PreviewMouseButtonEventArgs Args)
-        {
-            base.Handle_PreviewMouseClick(this, Args);
-            if (Args.Handled) return;
-            // Pass the event to all applicable child-elements
-            List<uiElement> Hits = Get_Children_Hit(Args.Position);
-            foreach (var C in Hits)
-            {
-                C.Handle_PreviewMouseClick(this, Args);
-                if (Args.Handled) return;
-            }
-
-        }
-        /// <summary>
-        /// Called whenever the mouse double clicks the element
-        /// </summary>
-        /// <param name="Sender">The UI element sending us this event, or NULL if we are the first element to receive it.</param>
-        public override void Handle_PreviewMouseDoubleClick(uiElement Sender, PreviewMouseButtonEventArgs Args)
-        {
-            base.Handle_PreviewMouseDoubleClick(this, Args);
-            if (Args.Handled) return;
-            // Pass the event to all applicable child-elements
-            List<uiElement> Hits = Get_Children_Hit(Args.Position);
-            foreach (var C in Hits)
-            {
-                C.Handle_PreviewMouseDoubleClick(this, Args);
-                if (Args.Handled) return;
-            }
-
-        }
-        */
-
-        #endregion
 
     }
 }
