@@ -1,5 +1,6 @@
 ﻿using CssUI.CSS;
 using CssUI.CSS.Internal;
+using CssUI.Devices;
 using CssUI.DOM.CustomElements;
 using CssUI.DOM.Enums;
 using CssUI.DOM.Exceptions;
@@ -339,6 +340,15 @@ namespace CssUI.DOM
                  * An element is said to be being actively pointed at while the user indicates the element using a pointing device while that pointing device is in the "down" state 
                  * (e.g. for a mouse, between the time the mouse button is pressed and the time it is depressed; for a finger in a multitouch environment, while the finger is touching the display surface).
                  */
+                foreach (PointerDevice pointer in PointerDevice.Get_All())
+                {
+                    if (0 != (pointer.Buttons & EPointerButtonFlags.Left)) continue;/* Skip any pointing device that isnt in the "down" state */
+
+                    if (Box.ClickArea.Intersects(pointer.GetBoundingClientRect()))
+                        return true;
+                }
+
+                return false;
             }
         }
 
@@ -354,7 +364,41 @@ namespace CssUI.DOM
                  * An element that has a descendant that the user indicates using a pointing device.
                  * An element that is the labeled control of a label element that is currently matching :hover.
                  */
-                return Geometry.Geometry.Point_Within_Rect(ownerDocument.defaultView.Mouse.Position, getBoundingClientRect());
+
+                foreach (PointerDevice pointer in PointerDevice.Get_All())
+                {
+                    if (Box.ClickArea.Intersects(pointer.GetBoundingClientRect()))
+                        return true;
+                }
+
+                if (this is ILableableElement labelable)
+                {
+                    CssSelector hoverSelector = new CssSelector(":hover");
+                    var labels = labelable.labels;
+                    foreach (HTMLLabelElement lbl in labels)
+                    {
+                        if (hoverSelector.Match(lbl))
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                var tree = new TreeWalker(this, ENodeFilterMask.SHOW_ELEMENT);
+                var descendant = tree.nextNode();
+                while (descendant != null)
+                {
+                    if (descendant is Element descendantElement)
+                    {
+                        foreach (PointerDevice pointer in PointerDevice.Get_All())
+                        {
+                            if (descendantElement.Box.ClickArea.Intersects(pointer.GetBoundingClientRect()))
+                                return true;
+                        }
+                    }
+                }
+
+                return false;
             }
         }
 
@@ -815,7 +859,7 @@ namespace CssUI.DOM
             /* 2) If s is failure, throw a "SyntaxError" DOMException. */
             if (ReferenceEquals(s, null))
             {
-                throw new DomSyntaxError("Could not parse selector.");
+                throw new DomSyntaxError($"Could not parse selector: \"{selectors}\"");
             }
             /* 3) Return true if the result of match a selector against an element, using s, element, and :scope element context object, returns success, and false otherwise. [SELECTORS4] */
             return s.Match(this, this);
