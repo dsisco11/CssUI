@@ -9,13 +9,13 @@ namespace CssUI.Devices
     {
         #region Properties
         public DOMPoint Position { get; protected set; }
+        public EMouseButtonFlags Buttons { get; protected set; }
         #endregion
 
 
         #region Accessors
-
-        public double x => Position.x;
-        public double y => Position.y;
+        public double X => Position.x;
+        public double Y => Position.y;
         #endregion
     }
 }
