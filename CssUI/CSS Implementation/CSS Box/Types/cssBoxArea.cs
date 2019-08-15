@@ -336,34 +336,41 @@ namespace CssUI.CSS
 
         #region Intersection
         /// <summary>
-        /// Returns True if the given point lies within this block
+        /// Returns True if the given point lies within this area
         /// </summary>
-        /// <param name="point"></param>
-        /// <returns></returns>
         public bool Intersects(Vec2i point)
         {
             return Left <= point.X && Right >= point.X && Top <= point.Y && Bottom >= point.Y;
         }
 
         /// <summary>
-        /// Returns True if the given point lies within this block
+        /// Returns True if the given point lies within this area
         /// </summary>
-        /// <param name="point"></param>
-        /// <returns></returns>
         public bool Intersects(int X, int Y)
         {
             return Left <= X && Right >= X && Top <= Y && Bottom >= Y;
         }
 
         /// <summary>
-        /// Returns True if the given block intersects this block
+        /// Returns True if the given <see cref="CssBoxArea"/> intersects this area
         /// </summary>
-        /// <param name="point"></param>
-        /// <returns></returns>
         public bool Intersects(CssBoxArea box)
         {
-            return Math.Abs(CenterX - box.CenterX) <= Half_Width + box.Half_Width &&
-                   Math.Abs(CenterY - box.CenterY) <= Half_Height + box.Half_Height;
+            bool intersectsX = MathExt.Flteq(Left, box.Right) && MathExt.Fgteq(Right, box.Left);
+            bool intersectsY = MathExt.Flteq(Bottom, box.Top) && MathExt.Fgteq(Top, box.Bottom);
+            return intersectsX && intersectsY;
+            /*return Math.Abs(CenterX - box.CenterX) <= Half_Width + box.Half_Width &&
+                   Math.Abs(CenterY - box.CenterY) <= Half_Height + box.Half_Height;*/
+        }
+
+        /// <summary>
+        /// Returns True if the given <see cref="DOMRect"/> intersects this area
+        /// </summary>
+        public bool Intersects(DOMRectReadOnly rect)
+        {
+            bool intersectsX = MathExt.Flteq(Left, rect.right) && MathExt.Fgteq(Right, rect.left);
+            bool intersectsY = MathExt.Flteq(Bottom, rect.top) && MathExt.Fgteq(Top, rect.bottom);
+            return intersectsX && intersectsY;
         }
 
         #endregion
