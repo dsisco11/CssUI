@@ -51,7 +51,7 @@ namespace CssUI
                     if (Parent?.FullPath != null)
                         str += Parent?.FullPath + "/";
                     //str += (ID != null ? ID : TypeName);
-                    str += string.Concat(CssTagName, "-", UID);
+                    str += string.Concat(tagName, "-", UID);
                     return str;
                 });
             }
