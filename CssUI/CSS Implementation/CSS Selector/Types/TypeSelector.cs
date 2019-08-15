@@ -1,12 +1,13 @@
 ﻿using CssUI.DOM;
 using CssUI.DOM.Nodes;
+using System;
 using System.Runtime.CompilerServices;
 
 namespace CssUI.CSS.Selectors
 {
 
     /// <summary>
-    /// A type-selector matches an elements <see cref="cssElement.CssTagName"/>
+    /// A type-selector matches an elements <see cref="Element.tagName"/>
     /// </summary>
     public class TypeSelector : SimpleSelector
     {
@@ -47,10 +48,9 @@ namespace CssUI.CSS.Selectors
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         override public bool Matches(Element E, params Node[] scopeElements)
         {
-            // Note: not even sure the UI system will ever HAVE the concept of "namespaces" as those are really for web domain names
-            if (Namespace != null)
+            if (!ReferenceEquals(null, Namespace))
             {
-                if (string.Compare(Namespace, "*") != 0)
+                if (!Namespace.AsSpan().Equals("*".AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {// Perform namespace matching
                 }
             }
@@ -58,7 +58,7 @@ namespace CssUI.CSS.Selectors
             {// ONLY match null namespaces (what?!?)
             }
 
-            return string.Compare(TypeName, E.tagName, true) == 0;
+            return TypeName.AsSpan().Equals(E.tagName.AsSpan(), StringComparison.OrdinalIgnoreCase);
         }
     }
 }
