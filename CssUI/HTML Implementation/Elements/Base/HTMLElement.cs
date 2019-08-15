@@ -1,4 +1,5 @@
-﻿using CssUI.DOM;
+﻿using CssUI.Devices;
+using CssUI.DOM;
 using CssUI.DOM.CustomElements;
 using CssUI.DOM.Enums;
 using CssUI.DOM.Events;

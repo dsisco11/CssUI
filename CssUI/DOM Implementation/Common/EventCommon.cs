@@ -1,4 +1,5 @@
-﻿using CssUI.DOM.Events;
+﻿using CssUI.Devices;
+using CssUI.DOM.Events;
 using CssUI.DOM.Nodes;
 using System;
 using System.Collections.Generic;

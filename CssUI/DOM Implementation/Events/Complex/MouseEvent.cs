@@ -1,4 +1,5 @@
-﻿using CssUI.DOM.Interfaces;
+﻿using CssUI.Devices;
+using CssUI.DOM.Interfaces;
 using System;
 
 namespace CssUI.DOM.Events

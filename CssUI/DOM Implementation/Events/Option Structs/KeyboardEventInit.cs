@@ -1,4 +1,6 @@
-﻿namespace CssUI.DOM.Events
+﻿using CssUI.Devices;
+
+namespace CssUI.DOM.Events
 {
     public class KeyboardEventInit : EventModifierInit
     {
