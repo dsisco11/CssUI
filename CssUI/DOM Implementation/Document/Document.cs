@@ -111,7 +111,7 @@ namespace CssUI.DOM
                  * and then run the focusing steps for the document element of the Document, if non-null. */
                 if (value == EDesignMode.ON && oldValue == EDesignMode.OFF)
                 {
-                    Range activeRange = getSelection();
+                    Range activeRange = getSelection()?.GetRangeAt(0);
                     if (activeRange != null)
                     {
                         activeRange.collapse(true);
@@ -161,13 +161,17 @@ namespace CssUI.DOM
         #endregion
 
         #region Constructor
-        protected Document(DocumentType doctype, string contentType = null)
+        private Document()
+        {
+            _selection = new Selection(this);
+            document_url = new Url("/");
+            cssUnitResolver = new CssUnitResolver(this, true);
+        }
+
+        protected Document(DocumentType doctype, string contentType = null) : this()
         {
             this.contentType = contentType;
-            //this.document_origin = UrlOrigin.Default;
-            this.document_url = new Url("/");
-            this.appendChild(doctype);
-            cssUnitResolver = new CssUnitResolver(this, true);
+            appendChild(doctype);
         }
         #endregion
 
@@ -410,7 +414,8 @@ namespace CssUI.DOM
         #endregion
 
         public Selection getSelection()
-        {
+        {/* Docs: https://www.w3.org/TR/selection-api/#extensions-to-document-interface */
+            if (BrowsingContext == null) return null;
             return _selection;
         }
 
