@@ -19,7 +19,7 @@ namespace CssUI.DOM
 
         #region Properties
         public string data;
-        public int Length { get; private set; }
+        public int Length => data.Length;//{ get; private set; }
         #endregion
 
         #region Constructors
@@ -41,11 +41,11 @@ namespace CssUI.DOM
             /* 4) Queue a mutation record of "characterData" for node with null, null, node’s data, « », « », null, and null. */
             MutationRecord.Queue_Text_Mutation_Record(this, this.data);
             /* 5) Insert data into node’s data after offset code units. */
-            string newData = this.data.Insert((int)offset, data);
+            string newData = this.data.Insert(offset, data);
             /* 6) Let delete offset be offset + data’s length. */
             var delete = offset + nodeLength;
             /* 7) Starting from delete offset code units, remove count code units from node’s data. */
-            this.data = newData.Remove((int)delete, (int)count);
+            this.data = newData.Remove(delete, count);
             foreach (var weakRef in nodeDocument.LIVE_RANGES)
             {
                 if (weakRef.TryGetTarget(out Range liveRange))
@@ -115,10 +115,10 @@ namespace CssUI.DOM
             /* 3) If offset plus count is greater than length, return a string whose value is the code units from the offsetth code unit to the end of node’s data, and then return. */
             if ((offset + count) > Length)
             {
-                return data.Substring((int)offset, (int)(Length - offset));
+                return data.Substring(offset, (Length - offset));
             }
             /* 4) Return a string whose value is the code units from the offsetth code unit to the offset+countth code unit in node’s data. */
-            return data.Substring((int)offset, (int)count);
+            return data.Substring(offset, count);
         }
 
         public void appendData(string data)
