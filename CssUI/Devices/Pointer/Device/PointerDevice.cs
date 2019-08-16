@@ -28,7 +28,7 @@ namespace CssUI.Devices
         /// <summary>
         /// All of the currently pressed buttons for this pointer device
         /// </summary>
-        public readonly EPointerDeviceType Type;
+        public readonly EPointerType Type;
         public EPointerButtonFlags Buttons { get; protected set; }
         public DOMPoint Position { get; protected set; }
 
