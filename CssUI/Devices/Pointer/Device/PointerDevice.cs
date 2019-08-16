@@ -1,5 +1,4 @@
-﻿
-using CssUI.DOM.Geometry;
+﻿using CssUI.DOM.Geometry;
 using System.Collections.Generic;
 
 namespace CssUI.Devices
@@ -29,6 +28,7 @@ namespace CssUI.Devices
         /// <summary>
         /// All of the currently pressed buttons for this pointer device
         /// </summary>
+        public readonly EPointerDeviceType Type;
         public EPointerButtonFlags Buttons { get; protected set; }
         public DOMPoint Position { get; protected set; }
 
