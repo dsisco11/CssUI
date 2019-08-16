@@ -414,7 +414,7 @@ namespace CssUI.HTML
         {/* Docs: https://html.spec.whatwg.org/multipage/urls-and-fetching.html#parse-a-url */
 
             var encoding = document.characterEncoding;
-            var baseURL = document.URL;
+            var baseURL = document.document_url;
             if (!Url.TryParse(href, out Url urlRecord, baseURL, encoding))
             {
                 outUrl = null;
