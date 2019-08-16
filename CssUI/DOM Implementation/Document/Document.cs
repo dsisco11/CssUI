@@ -21,8 +21,7 @@ namespace CssUI.DOM
 
         #region Backing Values
         private EDesignMode _designMode = EDesignMode.OFF;
-        private Url _url = Url.Parse("about:blank".AsMemory());
-        private UrlOrigin _origin = UrlOrigin.Default;
+        internal Selection _selection = null;
         #endregion
 
         #region Rendering
@@ -96,6 +95,9 @@ namespace CssUI.DOM
         /// </summary>
         public readonly string contentType = "application/xml";
 
+        public Url document_url = Url.Parse("about:blank".AsMemory());
+        public UrlOrigin document_origin => document_url.Origin;// UrlOrigin.Default;
+
         public EDesignMode DesignMode
         {
             get => _designMode;
@@ -134,9 +136,9 @@ namespace CssUI.DOM
         #endregion
 
         #region Accessors
-        public string URL => _url.Serialize();
-        public string documentURI => _url.Serialize();
-        public string Origin => _origin.Serialize();
+        public string URL => document_url.Serialize();
+        public string documentURI => document_url.Serialize();
+        public string Origin => document_origin.Serialize();
         public string characterSet => characterEncoding.WebName;
         #endregion
 
@@ -146,17 +148,24 @@ namespace CssUI.DOM
         public override string nodeValue { get => null; set { /* specs say do nothing */ } }
         public override string textContent { get => null; set { /* specs say do nothing */ } }
 
-        public override int nodeLength => this.childNodes.Count;
+        public override int nodeLength => childNodes.Count;
 
         public readonly new Document ownerDocument;
+        #endregion
+
+        #region Internal States
+        internal bool Is_FullyActive
+        {/* Docs: https://html.spec.whatwg.org/multipage/#fully-active */
+            get => (BrowsingContext != null) && ReferenceEquals(this, BrowsingContext.activeDocument);
+        }
         #endregion
 
         #region Constructor
         protected Document(DocumentType doctype, string contentType = null)
         {
             this.contentType = contentType;
-            this._origin = UrlOrigin.Default;
-            this._url = new Url("/");
+            //this.document_origin = UrlOrigin.Default;
+            this.document_url = new Url("/");
             this.appendChild(doctype);
             cssUnitResolver = new CssUnitResolver(this, true);
         }
@@ -222,7 +231,6 @@ namespace CssUI.DOM
         #endregion
 
         #region Element Creation
-
         /// <summary>
         /// Returns an element with localName as local name (if document is an HTML document, localName gets lowercased). 
         /// The element’s namespace is the HTML namespace when document is an HTML document or document’s content type is "application/xhtml+xml", and null otherwise.
@@ -332,13 +340,6 @@ namespace CssUI.DOM
         }
         #endregion
 
-        #region Internal States
-        internal bool Is_FullyActive
-        {/* Docs: https://html.spec.whatwg.org/multipage/#fully-active */
-            get => (BrowsingContext != null) && ReferenceEquals(this, BrowsingContext.activeDocument);
-        }
-        #endregion
-
         #region Keyboard Commands
         /* XXX: KeyCommand processing on keyboard input */
 
@@ -370,8 +371,7 @@ namespace CssUI.DOM
         /// </summary>
         /// Docs: https://html.spec.whatwg.org/multipage/interaction.html#focused-area-of-the-document
         internal FocusableArea focusedArea = null;
-
-
+        
         /// <summary>
         /// Returns the deepest element in the document through which or to which key events are being routed. This is, roughly speaking, the focused element in the document.
         /// </summary>
@@ -408,6 +408,11 @@ namespace CssUI.DOM
         bool queryCommandSupported(string commandId);
         string queryCommandValue(string commandId);*/
         #endregion
+
+        public Selection getSelection()
+        {
+            return _selection;
+        }
 
         /// <summary>
         /// Returns a new <see cref="Range"/> object for the document.
