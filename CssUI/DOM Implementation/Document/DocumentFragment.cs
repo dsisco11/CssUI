@@ -40,12 +40,12 @@ namespace CssUI.DOM
         }
         #endregion
 
-        public override int nodeLength => this.childNodes.Count;
+        public override int nodeLength => childNodes.Count;
 
         public DocumentFragment(Element Host, Document ownerDocument = null)
         {
             this.Host = Host;
-            this.ownerDocument = ownerDocument;
+            nodeDocument = ownerDocument;
         }
     }
 }
