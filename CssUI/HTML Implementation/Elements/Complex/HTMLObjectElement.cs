@@ -9,7 +9,7 @@ namespace CssUI.HTML
     /// The object element can represent an external resource, which, depending on the type of the resource, will either be treated as an image, as a nested browsing context, or as an external resource to be processed by a plugin.
     /// </summary>
     [MetaElement("object")]
-    public class HTMLObjectElement : FormAssociatedElement, IListedElement, ISubmittableElement, IBrowsingContextContainer
+    public sealed class HTMLObjectElement : FormAssociatedElement, IListedElement, ISubmittableElement, IBrowsingContextContainer
     {/* Docs: https://html.spec.whatwg.org/multipage/iframe-embed-object.html#the-object-element */
 
         #region Definition
@@ -28,8 +28,12 @@ namespace CssUI.HTML
         }
         #endregion
 
-        #region Browsing Context Container
+        #region Properties
         public BrowsingContext Nested_Browsing_Context { get; private set; }
+        internal EmbeddedContent Content { get; private set; }
+        #endregion
+
+        #region Browsing Context Container
         #endregion
 
         #region Constructors
@@ -52,9 +56,28 @@ namespace CssUI.HTML
             {
                 if (Nested_Browsing_Context == null) return null;
                 var document = Nested_Browsing_Context.activeDocument;
-                if (!UrlOrigin.IsSameOriginDomain(document.Origin, nodeDocument.Origin)) return null;
+                if (!document.document_origin.IsSameOriginDomain(nodeDocument.document_origin)) return null;
                 return document;
             }
+        }
+
+        internal override int? Get_Intrinsic_Width()
+        {/* XXX: return the replaced contents intrinsic width/height or NULL */
+            if (Content != null)
+            {
+                return Content.Intrinsic_Width;
+            }
+
+            return null;
+        }
+        internal override int? Get_Intrinsic_Height()
+        {/* XXX: return the replaced contents intrinsic width/height or NULL */
+            if (Content != null)
+            {
+                return Content.Intrinsic_Height;
+            }
+
+            return null;
         }
         #endregion
 
@@ -91,17 +114,30 @@ namespace CssUI.HTML
         }
 
 
+
         [CEReactions]
-        public int width
+        public int? width
         {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content-other.html#dimension-attributes */
-            //get => getAttribute(EAttributeName.Width).Get_Int();
-            //set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Width, AttributeValue.From_Integer(value)));
+            get
+            {
+                return getAttribute(EAttributeName.Width)?.Get_Int();
+            }
+            set
+            {
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Width, !value.HasValue ? null : AttributeValue.From_Integer(value.Value)));
+            }
         }
         [CEReactions]
-        public int height
+        public int? height
         {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content-other.html#dimension-attributes */
-            //get => getAttribute(EAttributeName.Height).Get_Int();
-            //set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Height, AttributeValue.From_Integer(value)));
+            get
+            {
+                return getAttribute(EAttributeName.Height)?.Get_Int();
+            }
+            set
+            {
+                CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Height, !value.HasValue ? null : AttributeValue.From_Integer(value.Value)));
+            }
         }
 
         #endregion
@@ -112,10 +148,10 @@ namespace CssUI.HTML
             if (Nested_Browsing_Context == null)
                 return null;
 
-            if (!nodeDocument.Origin.IsSameOriginDomain(Nested_Browsing_Context.activeDocument.Origin))
+            if (!nodeDocument.document_origin.IsSameOriginDomain(Nested_Browsing_Context.activeDocument.document_origin))
                 return null;
 
-            /* XXX: finish the get SVG document stuff */
+            /* XXX: Finish the SVG document stuff */
             throw new NotImplementedException();
         }
 
