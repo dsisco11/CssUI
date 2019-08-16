@@ -66,7 +66,7 @@ namespace CssUI.DOM
 
         public override string nodeValue { get => Value.Data; set => _set_value(AttributeValue.Parse(localName, value)); }
         public override string textContent { get => Value.Data; set => _set_value(AttributeValue.Parse(localName, value)); }
-        public override int nodeLength { get => childNodes.Count; }
+        public override int nodeLength => childNodes.Count;
 
         /// <summary>
         /// Qualified Name
