@@ -37,6 +37,10 @@ namespace CssUI.HTML
         #endregion
 
         #region Constructors
+        public Url()
+        {
+        }
+
         public Url(string urlString)
         {
             if (!TryParse(urlString.AsMemory(), out _, null, null, this))
