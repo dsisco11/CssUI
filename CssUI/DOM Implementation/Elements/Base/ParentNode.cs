@@ -22,7 +22,7 @@ namespace CssUI.DOM
         [CEReactions]
         public void prepend(params object[] nodes)
         {
-            CEReactions.Wrap_CEReaction_Node(this, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 if (nodes.Count(c=> !(c is Node) && !(c is string)) > 0)
                     throw new TypeError("Only Node and string types are accepted types.");
@@ -35,7 +35,7 @@ namespace CssUI.DOM
         [CEReactions]
         public void append(params object[] nodes)
         {
-            CEReactions.Wrap_CEReaction_Node(this, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 if (nodes.Count(c => !(c is Node) && !(c is string)) > 0)
                     throw new TypeError("Only Node and string types are accepted types.");
