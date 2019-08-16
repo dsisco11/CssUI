@@ -285,6 +285,13 @@ namespace CssUI.DOM
         #endregion
 
 
+        #region Selection
+        public Selection getSelection()
+        {/* Docs: https://www.w3.org/TR/selection-api/#extensions-to-window-interface */
+            return document?.getSelection();
+        }
+        #endregion
+
         #region Keyboard Commands
         /* XXX: KeyCommand processing on keyboard input */
 

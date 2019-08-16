@@ -413,6 +413,7 @@ namespace CssUI.DOM
         string queryCommandValue(string commandId);*/
         #endregion
 
+        #region Selection
         public Selection getSelection()
         {/* Docs: https://www.w3.org/TR/selection-api/#extensions-to-document-interface */
             if (BrowsingContext == null) return null;
@@ -427,7 +428,9 @@ namespace CssUI.DOM
         {
             return new Range(this);
         }
+        #endregion
 
+        #region EventTarget Overrides
         public override EventTarget get_the_parent(Event @event)
         {
             /* A document’s get the parent algorithm, given an event, returns null if event’s type attribute value is "load" or document does not have a browsing context, and the document’s relevant global object otherwise. */
@@ -438,6 +441,7 @@ namespace CssUI.DOM
 
             return this;
         }
+        #endregion
 
         #region Node importing
         /// <summary>
