@@ -102,11 +102,11 @@ namespace CssUI.DOM
                 return false;
 
             var st = new BoundaryPoint() { node = node, offset = 0 };
-            if (get_boundary_position(this.start, st) != EBoundaryPosition.After)
+            if (Get_Boundary_Position(this.start, st) != EBoundaryPosition.After)
                 return false;
 
             var en = new BoundaryPoint() { node = node, offset = node.nodeLength };
-            if (get_boundary_position(this.end, en) != EBoundaryPosition.Before)
+            if (Get_Boundary_Position(this.end, en) != EBoundaryPosition.Before)
                 return false;
 
             return true;
@@ -119,7 +119,7 @@ namespace CssUI.DOM
         /// <param name="B"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private EBoundaryPosition get_boundary_position(BoundaryPoint A, BoundaryPoint B)
+        internal static EBoundaryPosition Get_Boundary_Position(BoundaryPoint A, BoundaryPoint B)
         {
             Node nodeA = A.node;
             Node nodeB = B.node;
@@ -139,7 +139,7 @@ namespace CssUI.DOM
             var docPos = nodeB.compareDocumentPosition(nodeA);
             if (docPos == Enums.EDocumentPosition.FOLLOWING)
             {
-                EBoundaryPosition pos = get_boundary_position(B, A);
+                EBoundaryPosition pos = Get_Boundary_Position(B, A);
                 if (pos == EBoundaryPosition.Before) return EBoundaryPosition.After;
                 else if (pos == EBoundaryPosition.After) return EBoundaryPosition.Before;
             }
@@ -153,21 +153,21 @@ namespace CssUI.DOM
                     child = child.parentNode;
                 }
                 /* 3) If child’s index is less than offsetA, then return after. */
-                if (child.index < offsetA) return EBoundaryPosition.After;
+                if (offsetA > child.index) return EBoundaryPosition.After;
             }
 
             return EBoundaryPosition.Before;
         }
         #endregion
 
-        public void setStart(Node node, ulong offset)
+        public void setStart(Node node, int offset)
         {
             if (node is DocumentType) throw new InvalidNodeTypeError();
             if (offset > node.nodeLength) throw new IndexSizeError();
 
-            var bp = new BoundaryPoint() { node = node, offset = offset };
+            var bp = new BoundaryPoint(node, offset);
             /* 1) If bp is after the range’s end, or if range’s root is not equal to node’s root, set range’s end to bp. */
-            var bpPos = get_boundary_position(bp, new BoundaryPoint() { node = endContainer, offset = endOffset });
+            var bpPos = Get_Boundary_Position(bp, new BoundaryPoint() { node = endContainer, offset = endOffset });
             if (bpPos == EBoundaryPosition.After || !ReferenceEquals(node.getRootNode(), this.root))
             {
                 endContainer = bp.node;
@@ -180,14 +180,14 @@ namespace CssUI.DOM
             }
         }
 
-        public void setEnd(Node node, ulong offset)
+        public void setEnd(Node node, int offset)
         {
             if (node is DocumentType) throw new InvalidNodeTypeError();
             if (offset > node.nodeLength) throw new IndexSizeError();
 
             var bp = new BoundaryPoint() { node = node, offset = offset };
             /* 1) If bp is before the range’s start, or if range’s root is not equal to node’s root, set range’s start to bp. */
-            var bpPos = get_boundary_position(bp, new BoundaryPoint() { node = startContainer, offset = startOffset });
+            var bpPos = Get_Boundary_Position(bp, new BoundaryPoint() { node = startContainer, offset = startOffset });
             if (bpPos == EBoundaryPosition.Before || !ReferenceEquals(node.getRootNode(), this.root))
             {
                 startContainer = bp.node;
@@ -751,7 +751,7 @@ namespace CssUI.DOM
 
             BoundaryPoint newPoint = new BoundaryPoint() { node = node, offset = offset };
             /* 4) If (node, offset) is before start or after end, return false. */
-            if (get_boundary_position(newPoint, this.start) == EBoundaryPosition.Before || get_boundary_position(newPoint, this.end) == EBoundaryPosition.After)
+            if (Get_Boundary_Position(newPoint, this.start) == EBoundaryPosition.Before || Get_Boundary_Position(newPoint, this.end) == EBoundaryPosition.After)
                 return false;
 
             return true;
@@ -767,9 +767,9 @@ namespace CssUI.DOM
                 throw new IndexSizeError();
 
             BoundaryPoint newPoint = new BoundaryPoint() { node = node, offset = offset };
-            if (get_boundary_position(newPoint, start) == EBoundaryPosition.Before)
+            if (Get_Boundary_Position(newPoint, start) == EBoundaryPosition.Before)
                 return -1;
-            if (get_boundary_position(newPoint, end) == EBoundaryPosition.After)
+            if (Get_Boundary_Position(newPoint, end) == EBoundaryPosition.After)
                 return 1;
 
             return 0;
@@ -788,7 +788,7 @@ namespace CssUI.DOM
             var point1 = new BoundaryPoint() { node = parent, offset = offset };
             var point2 = new BoundaryPoint() { node = parent, offset = offset+1 };
             /* 5) If (parent, offset) is before end and (parent, offset plus 1) is after start, return true. */
-            if (get_boundary_position(point1, end) == EBoundaryPosition.Before && get_boundary_position(point2, start) == EBoundaryPosition.After)
+            if (Get_Boundary_Position(point1, end) == EBoundaryPosition.Before && Get_Boundary_Position(point2, start) == EBoundaryPosition.After)
                 return true;
 
             return false;
