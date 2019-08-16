@@ -268,6 +268,9 @@ namespace CssUI.HTML
             }
 
         }
+
+        internal virtual int? Get_Intrinsic_Width() => null;
+        internal virtual int? Get_Intrinsic_Height() => null;
         #endregion
 
         #region CSS Object Model
@@ -279,7 +282,7 @@ namespace CssUI.HTML
                     return null;
 
                 /* 2) Return the nearest ancestor element of the element for which at least one of the following is true and terminate this algorithm if such an ancestor is found: */
-                var tree = new TreeWalker(this, Enums.ENodeFilterMask.SHOW_ELEMENT);
+                var tree = new TreeWalker(this, ENodeFilterMask.SHOW_ELEMENT);
                 Element ancestor = tree.parentNode() as Element;
                 while (ancestor != null)
                 {
