@@ -1,8 +1,7 @@
-﻿using System;
+﻿using CssUI.Rendering;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CssUI
 {
@@ -50,23 +49,7 @@ namespace CssUI
         /// </summary>
         /// <param name="value"></param>
         public void Set_Blend(Color value, bool FireChangedEvent = true)
-        {
-            /*
-            // 06-23-2017
-            uiColor c = uiColor.White;
-            if (BlendingStack.Count > 0)
-            {
-                c = BlendingStack.Pop();
-                //var clr = BlendingStack.Last();
-                //if (clr != null) c = clr;
-                if (c == null) c = uiColor.White;
-            }
-
-            uiColor blendedColor = (c * value);
-            BlendingStack.Push(blendedColor);
-            Update_Blend_Color();
-            */
-            
+        {            
             // Remove old value from the top of the stack
             if (BlendingStack.Count > 0) BlendingStack.Pop();
             // Find the value we need to stack the incoming one ontop of (so we can combine them)
@@ -84,20 +67,6 @@ namespace CssUI
 
         public void Set_Matrix(Matrix4 value, bool FireChangedEvent = true)
         {
-            // 06-23-2017
-            /*
-            eMatrix mtx = null;
-            if (MatrixStack.Count > 0)
-            {
-                mtx = MatrixStack.Pop();
-            }
-
-            if (mtx == null) mtx = value;
-            else mtx *= value;
-
-            MatrixStack.Push(mtx);
-            */
-
             // Remove the current matrix value from the stack so we can replace it
             if (MatrixStack.Count > 0) MatrixStack.Pop();
             // Find the value we need to stack the incoming one ontop of (so we can combine them)

@@ -1,4 +1,4 @@
-﻿namespace CssUI
+﻿namespace CssUI.Rendering
 {
     /// <summary>
     /// Encapsulates an RGBA color.
@@ -21,7 +21,7 @@
         /// <summary>Blue channel value in the range [0.0 - 1.0]</summary>
         public double B = 1.0;
         /// <summary>Alpha channel value in the range [0.0 - 1.0]</summary>
-        public double A = 0.0;
+        public double A = 1.0;
         #endregion
 
         #region Accessors
@@ -70,18 +70,18 @@
 
         public Color(ReadOnlyColor color)
         {
-            this.R = color.R;
-            this.G = color.G;
-            this.B = color.B;
-            this.A = color.A;
+            R = color.R;
+            G = color.G;
+            B = color.B;
+            A = color.A;
         }
 
         public Color(SimpleColor c)
         {
-            this.R = c.R / 255.0d;
-            this.G = c.G / 255.0d;
-            this.B = c.B / 255.0d;
-            this.A = c.A / 255.0d;
+            R = c.R / 255.0d;
+            G = c.G / 255.0d;
+            B = c.B / 255.0d;
+            A = 1.0d;
         }
         #endregion
 
@@ -251,7 +251,7 @@
 
         #region Casts
         public static implicit operator ReadOnlyColor(Color color) => new ReadOnlyColor(color.R, color.G, color.B, color.A);
-        public static implicit operator SimpleColor(Color color) => new SimpleColor(color.iR, color.iG, color.iB, color.iA);
+        public static implicit operator SimpleColor(Color color) => new SimpleColor(color.iR, color.iG, color.iB);
         #endregion
     }
 }

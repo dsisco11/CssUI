@@ -61,12 +61,12 @@ namespace CssUI
 
         public static bool operator ==(Vec2 A, Vec2 B)
         {
-            return (MathExt.floatEq(A.X, B.X) && MathExt.floatEq(A.Y, B.Y));
+            return (MathExt.Feq(A.X, B.X) && MathExt.Feq(A.Y, B.Y));
         }
 
         public static bool operator !=(Vec2 A, Vec2 B)
         {
-            return !(MathExt.floatEq(A.X, B.X) && MathExt.floatEq(A.Y, B.Y));
+            return !(MathExt.Feq(A.X, B.X) && MathExt.Feq(A.Y, B.Y));
         }
 
         public override bool Equals(object o)
@@ -76,15 +76,21 @@ namespace CssUI
 
         public override int GetHashCode()
         {
-            return (int)X ^ (int)Y;
+            int hash = 17;
+            hash = (hash * 31 + X.GetHashCode());
+            hash = (hash * 31 + Y.GetHashCode());
+            return hash;
         }
 
         public override string ToString()
         {
-            return $"{nameof(Vec2)}<{X}, {Y}>";
+            return $"{GetType().Name}<{X}, {Y}>";
         }
         #endregion
 
+        #region Casts
+        public static implicit operator ReadOnlyVec2f(Vec2 vec) => new ReadOnlyVec2f(vec.X, vec.Y);
+        #endregion
 
     }
 }

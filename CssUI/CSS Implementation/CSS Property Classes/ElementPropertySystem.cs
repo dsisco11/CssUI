@@ -11,6 +11,7 @@ using CssUI.CSS.Internal;
 using CssUI.DOM;
 using CssUI.Enums;
 using CssUI.Fonts;
+using CssUI.Rendering;
 using SixLabors.Fonts;
 
 namespace CssUI

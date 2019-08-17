@@ -70,12 +70,15 @@ namespace CssUI
 
         public override int GetHashCode()
         {
-            return (int)Width ^ (int)Height;
+            int hash = 17;
+            hash = (hash * 31 + Width.GetHashCode());
+            hash = (hash * 31 + Height.GetHashCode());
+            return hash;
         }
 
         public override string ToString()
         {
-            return $"{nameof(Size2D)}<{Width}, {Height}>";
+            return $"{GetType().Name}<{Width}, {Height}>";
         }
         #endregion
 
@@ -150,6 +153,11 @@ namespace CssUI
                 };
             }
         }
+        #endregion
+
+
+        #region Casts
+        public static implicit operator ReadOnlySize2i(Size2D size) => new ReadOnlySize2i(size.Width, size.Height);
         #endregion
     }
 }

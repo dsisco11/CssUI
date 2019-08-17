@@ -68,13 +68,20 @@ namespace CssUI
 
         public override int GetHashCode()
         {
-            return (int)X ^ (int)Y;
+            int hash = 17;
+            hash = (hash * 31 + X.GetHashCode());
+            hash = (hash * 31 + Y.GetHashCode());
+            return hash;
         }
 
         public override string ToString()
         {
-            return $"{nameof(Vec2i)}<{X}, {Y}>";
+            return $"{GetType().Name}<{X}, {Y}>";
         }
+        #endregion
+
+        #region Casts
+        public static implicit operator ReadOnlyVec2i(Vec2i vec) => new ReadOnlyVec2i(vec.X, vec.Y);
         #endregion
 
     }

@@ -1,12 +1,14 @@
-﻿namespace CssUI
+﻿using System.Runtime.InteropServices;
+
+namespace CssUI
 {
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct ReadOnlyColor
     {
         #region Instances
         public static ReadOnlyColor NaN = new ReadOnlyColor(double.NaN, double.NaN, double.NaN, double.NaN);
         #endregion
-
-
+        
         #region Properties
         public readonly double R;
         public readonly double G;
@@ -30,5 +32,10 @@
             A = a;
         }
         #endregion
+
+        public override string ToString()
+        {
+            return $"{GetType().Name}<{R.ToString("0.###")}, {G.ToString("0.###")}, {B.ToString("0.###")}, {A.ToString("0.###")}>";
+        }
     }
 }

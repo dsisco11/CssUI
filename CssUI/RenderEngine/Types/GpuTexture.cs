@@ -1,22 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Advanced;
 using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.PixelFormats;
 using System.Threading.Tasks;
-using CssUI.Rendering;
 
-namespace CssUI
+namespace CssUI.Rendering
 {
     /// <summary>
     /// Abstracted representation of a multi-frame animated texture used by UI elements.
     /// </summary>
-    [Obsolete("use GpuTexture")]
-    public class cssTexture : IDisposable
+    public class GpuTexture : IDisposable
     {
         #region Properties
         public bool IsAnimated { get; private set; } = false;
@@ -39,14 +36,14 @@ namespace CssUI
         /// <summary>
         /// All frames for this (possibly animated) image texture...
         /// </summary>
-        public readonly List<cssTextureFrame> FrameAtlas = new List<cssTextureFrame>(1);
+        public readonly List<GpuTextureFrame> FrameAtlas = new List<GpuTextureFrame>(1);
         #endregion
 
         #region Accessors
         /// <summary>
         /// Returns the frame object which should be currently displayed for this texture.
         /// </summary>
-        public cssTextureFrame Frame { get { return FrameAtlas[CurrentFrame]; } }
+        public GpuTextureFrame Frame => FrameAtlas[CurrentFrame];
         /// <summary>
         /// Size of the current texture
         /// </summary>
@@ -54,23 +51,23 @@ namespace CssUI
         #endregion
 
         #region Constructors
-        public cssTexture(byte[] imgData) : this(SixLabors.ImageSharp.Image.Load<Rgba32>(imgData))
+        public GpuTexture(ReadOnlySpan<byte> imgData) : this(Image.Load<Rgba32>(imgData.ToArray()))
         {
         }
 
-        public cssTexture(MemoryStream imgData) : this(SixLabors.ImageSharp.Image.Load<Rgba32>(imgData.ToArray()))
+        public GpuTexture(MemoryStream imgData) : this(Image.Load<Rgba32>(imgData.ToArray()))
         {
         }
 
-        public cssTexture(byte[] Data, Size2D Size, EPixelFormat Format)
+        public GpuTexture(ReadOnlySpan<byte> Data, Size2D Size, EPixelFormat Format)
         {
             this.Size = Size;
             Push_Frame(Data, Size, Format);
         }
 
-        internal cssTexture(Image<Rgba32> image)
+        internal GpuTexture(Image<Rgba32> image)
         {
-            this.Size = new Size2D(image.Width, image.Height);
+            Size = new Size2D(image.Width, image.Height);
 
             if (image.Frames.Count > 1)
             {
@@ -89,26 +86,29 @@ namespace CssUI
                     }
                     finally
                     {
-                        byte[] rgbaBytes = MemoryMarshal.AsBytes(frame.GetPixelSpan()).ToArray();
-                        Push_Frame(rgbaBytes, new Size2D(frame.Width, frame.Height), EPixelFormat.RGBA, (delay / 1000.0f));
+                        Span<byte> rgbaBytes = MemoryMarshal.AsBytes(frame.GetPixelSpan()).ToArray();
+                        var size = new Size2D(frame.Width, frame.Height);
+                        var duration = delay / 1000.0f;
+                        Push_Frame(rgbaBytes, size, EPixelFormat.RGBA, duration);
                     }
                 }
             }
             else
             {
-                byte[] rgbaBytes = MemoryMarshal.AsBytes(image.GetPixelSpan()).ToArray();
-                Push_Frame(rgbaBytes, new Size2D(image.Width, image.Height), EPixelFormat.RGBA);
+                Span<byte> rgbaBytes = MemoryMarshal.AsBytes(image.GetPixelSpan()).ToArray();
+                var size = new Size2D(image.Width, image.Height);
+                Push_Frame(rgbaBytes, size, EPixelFormat.RGBA);
             }
         }
         #endregion
 
         #region Image Loading
-        public static async Task<cssTexture> fromFile(string path)
+        public static async Task<GpuTexture> fromFile(string path)
         {
             return await Task.Factory.StartNew(() =>
             {
-                var img = SixLabors.ImageSharp.Image.Load<Rgba32>(path);
-                return new cssTexture(img);
+                var img = Image.Load<Rgba32>(path);
+                return new GpuTexture(img);
             });
         }
         #endregion
@@ -116,7 +116,7 @@ namespace CssUI
         #region Destructor
         public void Dispose()
         {
-            foreach(var frame in FrameAtlas)
+            foreach (var frame in FrameAtlas)
             {
                 frame.Dispose();
             }
@@ -124,9 +124,9 @@ namespace CssUI
         #endregion
 
         #region Frame Pushing
-        public void Push_Frame(byte[] Data, Size2D Size, EPixelFormat Format, float Time = 0f)
+        public void Push_Frame(ReadOnlySpan<byte> Data, Size2D Size, EPixelFormat Format, float Time = 0f)
         {
-            FrameAtlas.Add(new cssTextureFrame(Data, Size, Format) { Duration = Time });
+            FrameAtlas.Add(new GpuTextureFrame(Data, Size, Format, Time));
             Build_Timeline();
         }
         #endregion
@@ -139,22 +139,6 @@ namespace CssUI
         #endregion
 
         #region Frame Progression
-        int? lastUpdate = null;
-        /// <summary>
-        /// Progresses the current frame number based on the number of seconds which have passed since it was last updated
-        /// </summary>
-        public void Update()
-        {
-            if (!IsAnimated) return;
-            if (!lastUpdate.HasValue) lastUpdate = Environment.TickCount;
-            
-            int delta = (Environment.TickCount - lastUpdate.Value);
-            lastUpdate = Environment.TickCount;
-            float dT = ((float)delta / 1000.0f);
-
-            Update(dT);
-        }
-
         /// <summary>
         /// Progresses the current frame number based on the number of seconds which have passed since it was last updated, given by deltaTime
         /// </summary>
@@ -169,8 +153,8 @@ namespace CssUI
                 CurrentFrame = 0;// Start frame searching from the beginning again because we are progressing backwards, a rare case.
             else if (Time >= Duration)
                 CurrentFrame = 0;// Start frame searching back from the beginning as we probably looped back around here
-            
-            Time = (Time % Duration);// Loop the animation
+
+            Time = Time % Duration;// Loop the animation
             if (Time < 0) Time += Duration;// Loop back to the beginning 
 
             // Find the current frame number using our timeline, but start searching from the last frame we were at.
@@ -190,10 +174,10 @@ namespace CssUI
         /// </summary>
         void Build_Timeline()
         {
-            IsAnimated = (FrameAtlas.Count > 1);
+            IsAnimated = FrameAtlas.Count > 1;
             List<float> timeline = new List<float>(FrameAtlas.Count);
             Duration = 0f;
-            for(int i=0; i<FrameAtlas.Count; i++)
+            for (int i = 0; i < FrameAtlas.Count; i++)
             {
                 var Frame = FrameAtlas[i];
                 timeline.Add(Duration);
@@ -201,51 +185,6 @@ namespace CssUI
             }
 
             Timeline = timeline.ToArray();
-        }
-        #endregion
-    }
-
-    /// <summary>
-    /// Single frame of a <see cref="cssTexture"/> instance.
-    /// Effectively just serves as a convenient pass-through between RGBA pixel-data and the UI's current <see cref="IRenderEngine"/> implementation, which actually does all the handling/uploading of image data
-    /// For example; an OpenGL rendering engine implementation would store a texture ID as an integer within a frame's <see cref="Instance"/> instance, while some other engine might store something else which it uses to draw the image.
-    /// </summary>
-    public class cssTextureFrame : IDisposable
-    {
-        #region Accessors
-        /// <summary>
-        /// Instance object given to us by the <see cref="IRenderEngine"/> implementation, which it uses to actually handle the texture.
-        /// </summary>
-        public dynamic Instance { get; private set; } = null;
-        /// <summary>
-        /// Time (in seconds) this frame should be onscreen for
-        /// </summary>
-        public float Duration = 0f;
-        public readonly EPixelFormat Format;
-        private byte[] Data = null;
-        /// <summary>
-        /// Returns whether this frame is ready for the <see cref="IRenderEngine"/> instance to draw it, or if it still needs to be created.
-        /// </summary>
-        public bool IsReady => (Instance != null);
-        #endregion
-
-        #region Constructors
-        public cssTextureFrame(byte[] Data, Size2D Size, EPixelFormat Format)
-        {
-            this.Format = Format;
-            this.Data = Data;
-        }
-        #endregion
-
-        public void Upload(cssTexture Owner, IRenderEngine Engine)
-        {
-            Instance = Engine.Create_Texture(Data, Owner.Size, Format);
-        }
-
-        #region Destructor
-        public void Dispose()
-        {
-            Instance = null;
         }
         #endregion
     }

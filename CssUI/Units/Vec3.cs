@@ -114,5 +114,11 @@ namespace CssUI
             return hash;
         }
         #endregion
+
+
+
+        #region Casts
+        public static implicit operator ReadOnlyVec3f(Vec3 vec) => new ReadOnlyVec3f(vec.X, vec.Y, vec.Z);
+        #endregion
     }
 }

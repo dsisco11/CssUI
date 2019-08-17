@@ -1,8 +1,9 @@
-﻿using CssUI.Rendering;
+﻿using System.Runtime.InteropServices;
 
 namespace CssUI.CSS
 {
-    public struct cssVertex
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct Vertex2i
     {
         #region Properties
         /// <summary>
@@ -16,10 +17,10 @@ namespace CssUI.CSS
         /// <summary>
         /// Color of the vertex
         /// </summary>
-        public Color Color;
+        public ReadOnlyColor Color;
         #endregion
 
-        public cssVertex(Color Color, int X, int Y)
+        public Vertex2i(int X, int Y, ReadOnlyColor Color)
         {
             this.X = X;
             this.Y = Y;

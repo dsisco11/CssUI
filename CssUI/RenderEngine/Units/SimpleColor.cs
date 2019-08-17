@@ -28,5 +28,10 @@ namespace CssUI
             B = (byte)b;
         }
         #endregion
+
+        public override string ToString()
+        {
+            return $"{GetType().Name}<{R.ToString("0.###")}, {G.ToString("0.###")}, {B.ToString("0.###")}>";
+        }
     }
 }
