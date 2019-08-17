@@ -35,6 +35,109 @@ namespace CssUI.HTML
         #endregion
 
         #region Properties
+        protected double? currentPixelDensity = null;
+        protected DataRequest currentRequest;
+        protected DataRequest pendingRequest;
+        internal EmbeddedImage Content = null;
+        #endregion
+
+        #region Constructors
+        public HTMLImageElement(Document document) : this(document, "img")
+        {
+        }
+        public HTMLImageElement(Document document, string localName) : base(document, localName)
+        {
+        }
+        #endregion
+
+        #region Accessors
+        /// <summary>
+        /// Returns the image's absolute URL.
+        /// </summary>
+        public string currentSrc => currentRequest.currentURL;
+
+        /// <summary>
+        /// Return the intrinsic width of the image, or zero if not known.
+        /// </summary>
+        public uint naturalWidth
+        {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content.html#dom-img-naturalwidth */
+            get
+            {
+                if (Content == null) return 0;
+
+                if (!currentPixelDensity.HasValue)
+                {
+                    return (uint?)Content?.Intrinsic_Width ?? 0;
+                }
+
+                return (uint)(Content.Intrinsic_Width * currentPixelDensity.Value);
+            }
+        }
+        /// <summary>
+        /// Return the intrinsic height of the image, or zero if not known.
+        /// </summary>
+        public uint naturalHeight
+        {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content.html#dom-img-naturalheight */
+            get
+            {
+                if (Content == null) return 0;
+
+                if (!currentPixelDensity.HasValue)
+                {
+                    return (uint?)Content?.Intrinsic_Height ?? 0;
+                }
+
+                return (uint)(Content.Intrinsic_Height * currentPixelDensity.Value);
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the image has been completely downloaded or if no image is specified; otherwise, returns false.
+        /// </summary>
+        public bool complete
+        {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content.html#dom-img-complete */
+            get
+            {
+                /* The IDL attribute complete must return true if any of the following conditions is true: */
+                bool srcsetOmitted = !hasAttribute(EAttributeName.SrcSet);
+                if (!hasAttribute(EAttributeName.Src) && srcsetOmitted)
+                    return true;
+
+                if (srcsetOmitted && string.IsNullOrEmpty(src))
+                    return true;
+
+                /* The final task that is queued by the networking task source once the resource has been fetched has been queued. */
+                if (currentRequest.State == EDataRequestState.Broken || currentRequest.State == EDataRequestState.CompletelyAvailable)
+                    return true;
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// X-coordinate offset of this element relative to its root element
+        /// </summary>
+        public long x
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#extensions-to-the-htmlimageelement-interface */
+            get
+            {
+                return (long)(Box.Border.Left - ownerDocument.Initial_Containing_Block.left);
+            }
+        }
+        /// <summary>
+        /// Y-coordinate offset of this element relative to its root element
+        /// </summary>
+        public long y
+        {/* Docs: https://www.w3.org/TR/cssom-view-1/#extensions-to-the-htmlimageelement-interface */
+            get
+            {
+                return (long)(Box.Border.Top - ownerDocument.Initial_Containing_Block.top);
+            }
+        }
+        #endregion
+
+        #region Content Attributes
+
         [CEReactions]
         public string alt
         {
@@ -91,18 +194,16 @@ namespace CssUI.HTML
          * XXX: WIDTH & HEIGHT FOR IMAGES IS THE IMAGE BOUNDS, SEE DOCUMENTATION
          * =====================================================================
          */
-
-
         [CEReactions]
         public uint width
         {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content.html#dom-img-width */
-            get => MathExt.Max(0, getAttribute(EAttributeName.Width)?.Get_UInt() ?? 0);
+            get => getAttribute(EAttributeName.Width)?.Get_UInt() ?? naturalWidth;
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Width, AttributeValue.From_Integer(value)));
         }
         [CEReactions]
         public uint height
-        {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content.html#dom-img-width */
-            get => MathExt.Max(0, getAttribute(EAttributeName.Height)?.Get_UInt() ?? 0);
+        {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content.html#dom-img-height */
+            get => getAttribute(EAttributeName.Height)?.Get_UInt() ?? naturalHeight;
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Height, AttributeValue.From_Integer(value)));
         }
 
@@ -119,75 +220,6 @@ namespace CssUI.HTML
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Decoding, AttributeValue.From_String(value)));
         }
 
-        protected DataRequest currentRequest;
-        protected DataRequest pendingRequest;
-        #endregion
-
-        #region Constructors
-        public HTMLImageElement(Document document) : this(document, "img")
-        {
-        }
-        public HTMLImageElement(Document document, string localName) : base(document, localName)
-        {
-        }
-        #endregion
-
-        #region Accessors
-        /// <summary>
-        /// Returns the image's absolute URL.
-        /// </summary>
-        public string currentSrc => currentRequest.currentURL;
-        /// <summary>
-        /// Return the intrinsic width of the image, or zero if not known.
-        /// </summary>
-        public ulong naturalWidth { get; }
-        /// <summary>
-        /// Return the intrinsic height of the image, or zero if not known.
-        /// </summary>
-        public ulong naturalHeight { get; }
-        /// <summary>
-        /// Returns true if the image has been completely downloaded or if no image is specified; otherwise, returns false.
-        /// </summary>
-        public bool complete
-        {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content.html#dom-img-complete */
-            get
-            {
-                /* The IDL attribute complete must return true if any of the following conditions is true: */
-                bool srcsetOmitted = !hasAttribute(EAttributeName.SrcSet);
-                if (!hasAttribute(EAttributeName.Src) && srcsetOmitted)
-                    return true;
-
-                if (srcsetOmitted && string.IsNullOrEmpty(src))
-                    return true;
-
-                /* The final task that is queued by the networking task source once the resource has been fetched has been queued. */
-                if (currentRequest.State == EDataRequestState.Broken || currentRequest.State == EDataRequestState.CompletelyAvailable)
-                    return true;
-
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// X-coordinate offset of this element relative to its root element
-        /// </summary>
-        public long x
-        {/* Docs: https://www.w3.org/TR/cssom-view-1/#extensions-to-the-htmlimageelement-interface */
-            get
-            {
-                return (long)(Box.Border.Left - ownerDocument.Initial_Containing_Block.left);
-            }
-        }
-        /// <summary>
-        /// Y-coordinate offset of this element relative to its root element
-        /// </summary>
-        public long y
-        {/* Docs: https://www.w3.org/TR/cssom-view-1/#extensions-to-the-htmlimageelement-interface */
-            get
-            {
-                return (long)(Box.Border.Top - ownerDocument.Initial_Containing_Block.top);
-            }
-        }
         #endregion
 
         /// <summary>
@@ -206,6 +238,8 @@ namespace CssUI.HTML
         /// <param name="Stream"></param>
         protected virtual void run_decoder(DataRequest dataRequest)
         {/* Docs: https://html.spec.whatwg.org/multipage/images.html#img-decoding-process */
+
+
         }
 
         /// <summary>

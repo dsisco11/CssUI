@@ -17,6 +17,11 @@ namespace CssUI.HTML
         }
         #endregion
 
+        #region Accessors
+        internal override int? Intrinsic_Width => Image?.Size.Width;
+        internal override int? Intrinsic_Height => Image?.Size.Height;
+        #endregion
+
 
     }
 }
