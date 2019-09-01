@@ -3,6 +3,7 @@ using CssUI.DOM.CustomElements;
 using CssUI.DOM.Enums;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Internal;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -228,7 +229,7 @@ namespace CssUI.HTML
         /// <returns></returns>
         protected virtual DataRequest get_data_request(string location)
         {
-            return new DataRequest(location);
+            return DataRequestFactory.Create(location);
         }
 
 

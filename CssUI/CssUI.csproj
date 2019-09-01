@@ -92,6 +92,7 @@
 
   <ItemGroup>
     <Folder Include="DOM Implementation\Events\Interfaces\" />
+    <Folder Include="Structs\" />
   </ItemGroup>
 
 </Project>

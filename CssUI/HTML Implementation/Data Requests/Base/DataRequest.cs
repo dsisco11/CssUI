@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading;
 
-namespace CssUI.DOM
+namespace CssUI.HTML
 {
     /// <summary>
     /// Represents a request for data of some sort, it could be from a local file or from the web.
@@ -18,6 +18,16 @@ namespace CssUI.DOM
         public readonly AutoResetEvent State_Change_Signal = new AutoResetEvent(false);
 
         private volatile EDataRequestState _state = EDataRequestState.Unavailable;
+        #endregion
+
+        #region Constructor
+        public DataRequest(string currentURL)
+        {
+            this.currentURL = currentURL;
+        }
+        #endregion
+
+        #region Accessors
         public EDataRequestState State
         {
             get => _state;
@@ -29,13 +39,6 @@ namespace CssUI.DOM
                     State_Change_Signal.Set();
                 }
             }
-        }
-        #endregion
-
-        #region Constructor
-        public DataRequest(string currentURL)
-        {
-            this.currentURL = currentURL;
         }
         #endregion
 
