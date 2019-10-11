@@ -1,0 +1,105 @@
+﻿<#@ template debug="true" hostspecific="true" language="C#" compilerOptions="optimize+" #>
+<#@ assembly name="EnvDTE" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="EnvDTE" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
+<#@ output extension=".cs" #>
+<#
+
+var visualStudio = (this.Host as IServiceProvider).GetCOMService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+var project = visualStudio.Solution.FindProjectItem(this.Host.TemplateFile).ContainingProject as EnvDTE.Project;
+List<Tuple<EnvDTE.CodeType, string>> allElements = new List<Tuple<EnvDTE.CodeType, string>>();
+#>
+<#  
+/* Compile a list of all classes marked with the MetaElement attribute */  
+var projectItems = GetProjectItemsRecursively(project.ProjectItems);
+foreach(EnvDTE.ProjectItem item in projectItems)
+	{
+		 // if (item == null || item.FileCodeModel == null) continue;
+		 if (item != null)
+		 {
+			if (item.FileCodeModel == null) 
+				continue;
+			foreach(EnvDTE.CodeElement elem in item.FileCodeModel.CodeElements)
+			{
+				if (elem.Kind == EnvDTE.vsCMElement.vsCMElementNamespace)
+				{
+					foreach(EnvDTE.CodeElement child in elem.Children)
+					{
+						if (child.Kind == EnvDTE.vsCMElement.vsCMElementClass)
+						{
+							var E = (EnvDTE.CodeType) child;
+							bool isTarget = false;
+							foreach(EnvDTE.CodeAttribute Attr in E.Attributes) 
+							{ 
+								if (Attr.Name == "MetaElement") 
+								{ 
+									allElements.Add( new Tuple<EnvDTE.CodeType, string>(E, Attr.Value) );
+									break;
+								} 
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+#>
+
+/* 
+* =====================================================
+*		   	THIS CODE IS GENERATED, 
+*	ANY CHANGES ARE SUBJECT TO BEING OVERWRITTEN
+* =====================================================
+*/
+using CssUI.Internal;
+namespace CssUI
+{
+	[MetaEnum]
+   public enum EElementTag : int
+   {
+   <#
+		PushIndent("\t\t");
+		int index = 0;
+		foreach(var tpl in allElements)
+		{
+			var E = tpl.Item1;
+			string className = tpl.Item1.Name;
+			string tagName = tpl.Item2.Trim('\"');
+
+			WriteLine("");
+			WriteLine($"///<summary> {className}</summary>");
+			WriteLine($"[MetaKeyword(\"{tagName}\")]");
+			WriteLine($"{System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase( tagName )} = { index },");
+			index++;
+		}
+		PopIndent();
+	#>
+	}
+}
+
+<#+	
+
+public List<EnvDTE.ProjectItem> GetProjectItemsRecursively(EnvDTE.ProjectItems items)
+{
+
+    var ret = new List<EnvDTE.ProjectItem>();
+    if (items == null) return ret;
+    foreach(EnvDTE.ProjectItem item in items)
+    {
+		if (item is null) continue;
+		ret.Add(item);
+		if (item.ProjectItems != null)
+		{
+			ret.AddRange(GetProjectItemsRecursively(item.ProjectItems));
+		}
+    }
+    return ret;
+}
+
+
+#>

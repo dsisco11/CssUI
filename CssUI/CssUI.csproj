@@ -1,47 +1,95 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
 	<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 	<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 	<RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+	<Configurations>CssUI - Debug;CssUI - Release;Core - Debug;Core - Release</Configurations>
+	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Core - Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE;WINDOWS;ENABLE_HEADLESS;DISABLE_FONT_SYSTEM</DefineConstants>
+    <DocumentationFile></DocumentationFile>
+    <Optimize>false</Optimize>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Core - Release|AnyCPU'">
+    <DefineConstants>TRACE;WINDOWS;ENABLE_HEADLESS;DISABLE_FONT_SYSTEM </DefineConstants>
+    <DocumentationFile>G:\CODE\CssUI\CssUI\CssUI.Core.xml</DocumentationFile>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='CssUI - Debug|AnyCPU'">
+    <DefineConstants>TRACE;WINDOWS;ENABLE_HTML; </DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='CssUI - Release|AnyCPU'">
+    <DefineConstants>TRACE;WINDOWS;ENABLE_HTML; </DefineConstants>
+    <DocumentationFile>G:\CODE\CssUI\CssUI\CssUI.xml</DocumentationFile>
+  </PropertyGroup>
+
 
   <ItemGroup>
-    <None Include="Common\CssUIEnumTables.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>CssUIEnumTables.tt</DependentUpon>
-    </None>
-    <None Include="DOM Implementation\Common\DomEnumTables.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>DomEnumTables.tt</DependentUpon>
-    </None>
-    <None Include="Localization\ISO-639\Enum_ISO639.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Enum_ISO639.tt</DependentUpon>
-    </None>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.6">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CSharp" Version="4.6.0" />
+    <PackageReference Include="Sisco.LogEngine" Version="1.2.1" />
+    <PackageReference Include="System.Memory" Version="4.5.3" />
+    <PackageReference Include="System.Text.Json" Version="4.6.0" />
+    <PackageReference Include="xunit.runner.msbuild" Version="2.4.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+  <ItemGroup Condition="!$(DefineConstants.Contains('ENABLE_HTML'))">
+    <Compile Remove="HTML\**" />
+    <EmbeddedResource Remove="HTML\**" />
+    <None Remove="HTML\**" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(DefineConstants.Contains('DISABLE_FONT_SYSTEM'))">
+    <Compile Remove="Fonts\Core\**" />
+    <EmbeddedResource Remove="Fonts\Core\**" />
+    <None Remove="Fonts\Core\**" />
+
+    <Compile Remove="Fonts\Types\**" />
+    <EmbeddedResource Remove="Fonts\Types\**" />
+    <None Remove="Fonts\Types\**" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="!$(DefineConstants.Contains('ENABLE_HEADLESS'))">
     <PackageReference Include="SixLabors.Core" Version="1.0.0-beta0007" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0006" />
     <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta0006" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\xLog\xLog\xLog.csproj" />
+    <Compile Remove="CSS\Layouts\**" />
+    <EmbeddedResource Remove="CSS\Layouts\**" />
+    <None Remove="CSS\Layouts\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Common\EElementTag.cs" />
+    <Compile Remove="Common\EnumTables.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Common\EElementTag.tt" />
+    <None Remove="Common\EnumTables.tt" />
+    <None Remove="HTML\Common\HTMLElementTable.tt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="CORE\Localization\ISO-639\Enum_ISO639.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Enum_ISO639.tt</DependentUpon>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -49,50 +97,65 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Common\CssUIEnumTables.cs">
+    <Compile Update="Common\Exceptions\ParserErrors.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>CssUIEnumTables.tt</DependentUpon>
+      <DependentUpon>ParserErrors.resx</DependentUpon>
     </Compile>
-    <Compile Update="DOM Implementation\Common\DomEnumTables.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>DomEnumTables.tt</DependentUpon>
-    </Compile>
-    <Compile Update="Localization\ISO-639\Enum_ISO639.cs">
+    <Compile Update="CORE\Localization\ISO-639\Enum_ISO639.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Enum_ISO639.tt</DependentUpon>
     </Compile>
-    <Compile Update="Localization\ISO-15924\EISO_15924.cs">
+    <Compile Update="CORE\Localization\ISO-15924\EISO_15924.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>EISO_15924.tt</DependentUpon>
     </Compile>
+    <Compile Update="CSS\Exceptions\CssErrors.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CssErrors.resx</DependentUpon>
+    </Compile>
+    <Compile Update="ExceptionMessages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ExceptionMessages.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Common\CssUIEnumTables.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>CssUIEnumTables.cs</LastGenOutput>
-    </None>
-    <None Update="DOM Implementation\Common\DomEnumTables.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>DomEnumTables.cs</LastGenOutput>
-    </None>
-    <None Update="Localization\ISO-639\Enum_ISO639.tt">
+    <None Update="CORE\Localization\ISO-639\Enum_ISO639.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Enum_ISO639.cs</LastGenOutput>
     </None>
-    <None Update="Localization\ISO-15924\EISO_15924.tt">
+    <None Update="CORE\Localization\ISO-15924\EISO_15924.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>EISO_15924.cs</LastGenOutput>
     </None>
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DOM Implementation\Events\Interfaces\" />
-    <Folder Include="Structs\" />
+    <Folder Include="CORE\Debug\" />
+    <Folder Include="CORE\Units\Interface\" />
+    <Folder Include="DOM\Base\" />
+    <Folder Include="DOM\Events\Interfaces\" />
+    <Folder Include="CORE\Structs\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Common\Exceptions\ParserErrors.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ParserErrors.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="CSS\Exceptions\CssErrors.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>CssErrors.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ExceptionMessages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ExceptionMessages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

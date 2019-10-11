@@ -1,8 +1,7 @@
-﻿using CssUI.CSS;
-using CssUI.Rendering;
-using System;
+﻿using System;
+using CssUI.CSS;
 
-namespace CssUI
+namespace CssUI.Rendering
 {
 
     /// <summary>
@@ -108,39 +107,35 @@ namespace CssUI
         #endregion
 
         #region Color
-        public ReadOnlyColor ReadOnlyColor => Stack.Color;
+        public Color Color => Stack.Color;
 
         /// <summary>
         /// Sets the current color
         /// </summary>
-        public virtual void Set_Color(ReadOnlyColor ReadOnlyColor)
+        public virtual void Set_Color(ReadOnlyColor color)
         {
-            Stack.Set_Color(ReadOnlyColor, false);
+            Stack.Set_Color(new Color(color), false);
             Finalize_Color();
         }
 
         public virtual void Set_Color(float R, float G, float B, float A)
         {
-            Stack.Set_Color(new ReadOnlyColor(R, G, B, A), false);
+            Stack.Set_Color(new Color(R, G, B, A), false);
             Finalize_Color();
         }
 
         /// <summary>
         /// Uploads the final, blended, color value to whatever system is doing the rendering, be it DirectX, OpenGL, Vulkan, D3D, etc.
         /// </summary>
-        public abstract void Upload_Color(ReadOnlyColor ReadOnlyColor);
+        public abstract void Upload_Color(ReadOnlyColor color);
 
         /// <summary>
         /// Performs blending on the base color and then uploads it.
         /// </summary>
         private void Finalize_Color()
         {
-            double R = (ReadOnlyColor.R * Stack.Blend_Color.R);
-            double G = (ReadOnlyColor.G * Stack.Blend_Color.G);
-            double B = (ReadOnlyColor.B * Stack.Blend_Color.B);
-            double A = (ReadOnlyColor.A * Stack.Blend_Color.A);
-
-            Upload_Color(new ReadOnlyColor(R, G, B, A));
+            var color = Color * Stack.Blend_Color;
+            Upload_Color(color);
         }
         #endregion
 
@@ -155,7 +150,7 @@ namespace CssUI
         /// <param name="Data">Pixel data for the texture</param>
         /// <param name="Size">Pixel dimensions of the texture</param>
         /// <param name="Format">Format for the pixels in Data</param>
-        public abstract object Create_Texture(ReadOnlySpan<byte> Data, ReadOnlySize2i Size, EPixelFormat Format);
+        public abstract object Create_Texture(ReadOnlySpan<byte> Data, ReadOnlyRect2i Size, EPixelFormat Format);
         /// <summary>
         /// Destroy a texture, ensuring it cannot be used again unless recreated.
         /// </summary>
@@ -191,7 +186,7 @@ namespace CssUI
         /// <param name="LineThickness">Thickness of the line in pixels</param>
         /// <param name="pos">Origin location of the area</param>
         /// <param name="size">Size of the area</param>
-        public abstract void Draw_Rect(int LineThickness, ReadOnlyVec2i Pos, ReadOnlySize2i Size);
+        public abstract void Draw_Rect(int LineThickness, ReadOnlyPoint2i Pos, ReadOnlyRect2i Size);
         /// <summary>
         /// Outlines a rectangular area with the currently set color
         /// </summary>
@@ -246,7 +241,7 @@ namespace CssUI
         /// </summary>
         /// <param name="pos">Origin location of the area</param>
         /// <param name="size">Size of the area</param>
-        public abstract void Fill_Rect(ReadOnlyVec2i Pos, ReadOnlySize2i Size);
+        public abstract void Fill_Rect(ReadOnlyPoint2i Pos, ReadOnlyRect2i Size);
         /// <summary>
         /// Fills a rectangular area with the currently set color
         /// </summary>

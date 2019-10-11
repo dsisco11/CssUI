@@ -26,6 +26,13 @@ namespace CssUI
             return Cache<S>.caster(s);
         }
 
+        public static T From(Type originalType, object value)
+        {
+            var p = Expression.Parameter(originalType);
+            var c = Expression.ConvertChecked(p, typeof(T));
+            return Expression.Lambda<Func<object, T>>(c, p).Compile().Invoke(value);
+        }
+
         private static class Cache<S>
         {
             public static readonly Func<S, T> caster = Get();

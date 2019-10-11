@@ -17,9 +17,9 @@ namespace CssUI
         #endregion
 
         #region Properties
-        public Color Color { get { return ColorStack.DefaultIfEmpty(Color.White).First() ?? Color.White; } private set { } }
-        public Color Blend_Color { get { return BlendingStack.DefaultIfEmpty(Color.White).First() ?? Color.White; } private set { } }
-        public Matrix4 Matrix { get { return MatrixStack.FirstOrDefault(); } private set { } }
+        public Color Color => ColorStack.Peek() ?? Color.White;
+        public Color Blend_Color => BlendingStack.Peek() ?? Color.White;
+        public Matrix4 Matrix => MatrixStack.FirstOrDefault();
         #endregion
 
         #region Events
@@ -48,7 +48,7 @@ namespace CssUI
         /// Sets the current blend color for the most recent stack item (this color is blended with all the blending colors before it)
         /// </summary>
         /// <param name="value"></param>
-        public void Set_Blend(Color value, bool FireChangedEvent = true)
+        public void Set_Blend(ReadOnlyColor value, bool FireChangedEvent = true)
         {            
             // Remove old value from the top of the stack
             if (BlendingStack.Count > 0) BlendingStack.Pop();
@@ -56,7 +56,7 @@ namespace CssUI
             Color clr = BlendingStack.FirstOrDefault();
             // Combine the incoming value with the one before it(if any) in the stack
             if (clr != null) clr *= value;
-            else clr = value;
+            else clr = new Color(value);
 
             BlendingStack.Push(clr);
             if (FireChangedEvent)

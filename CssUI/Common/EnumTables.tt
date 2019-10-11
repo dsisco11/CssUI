@@ -1,0 +1,242 @@
+﻿<#@ template debug="true" hostspecific="true" language="C#" visibility="internal" compilerOptions="optimize+" #>
+<#@ output extension=".cs" #>
+<#@ assembly name="EnvDTE" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="EnvDTE" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
+
+<# // Get the Visual Studio API as a service:
+IServiceProvider serviceProvider = (IServiceProvider)this.Host;
+EnvDTE.DTE dte = (EnvDTE.DTE) serviceProvider.GetService(typeof(EnvDTE.DTE));
+
+//var visualStudio = (this.Host as IServiceProvider).GetCOMService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+var project = dte.Solution.FindProjectItem(this.Host.TemplateFile).ContainingProject as EnvDTE.Project;
+List<EnvDTE.CodeEnum> allEnums = new List<EnvDTE.CodeEnum>();
+Dictionary<int, List<Tuple<EnvDTE.CodeVariable, string>>> EnumMap = new Dictionary<int, List<Tuple<EnvDTE.CodeVariable, string>>>();
+#>
+<#
+foreach(EnvDTE.ProjectItem item in GetProjectItemsRecursively(project.ProjectItems))
+	{
+		if (item.FileCodeModel is null) continue;
+		foreach(EnvDTE.CodeElement elem in item.FileCodeModel.CodeElements)
+		{
+			if (elem.Kind == EnvDTE.vsCMElement.vsCMElementNamespace)
+			{
+				foreach(EnvDTE.CodeElement child in elem.Children)
+				{
+					if (child.Kind == EnvDTE.vsCMElement.vsCMElementEnum)
+					{
+						EnvDTE.CodeEnum E = (EnvDTE.CodeEnum) child;
+						bool isTarget = false;
+						foreach(EnvDTE.CodeElement Attr in E.Attributes) 
+						{ 
+							if (Attr.Name == "MetaEnum") 
+							{ 
+								isTarget = true; break; 
+							} 
+						}
+
+						if (isTarget) 
+						{
+							allEnums.Add( E );
+						}
+					}
+				}
+			}
+		}
+	}
+#>
+
+
+<#
+int enumIndex = 0;
+foreach(EnvDTE.CodeEnum E in allEnums)
+{
+/* Setup this enum in the map */
+	EnumMap.Add(enumIndex, new List<Tuple<EnvDTE.CodeVariable, string>>());
+
+	foreach(EnvDTE.CodeElement enumChild in E.Children)
+	{
+		if (enumChild.Kind == EnvDTE.vsCMElement.vsCMElementVariable)
+		{
+			EnvDTE.CodeVariable enumValue = (EnvDTE.CodeVariable)enumChild;
+
+			foreach(EnvDTE.CodeAttribute attr in enumValue.Attributes)
+			{
+				if (attr.Name.Equals("EnumKeyword"))
+				{
+					EnumMap[enumIndex].Add(new Tuple<EnvDTE.CodeVariable, string>(enumValue, attr.Value));
+				}
+			}
+		}
+	}
+	enumIndex++;
+}
+
+#>
+
+/* 
+* =====================================================
+*		   	THIS CODE IS GENERATED, 
+*	ANY CHANGES ARE SUBJECT TO BEING OVERWRITTEN
+* =====================================================
+*/
+using System;
+using System.Linq;
+using CssUI.Internal;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+namespace CssUI
+{
+	internal static class EnumTables
+	{
+		static Dictionary<RuntimeTypeHandle, int> TypeHandleMap = CreateTypeMap();
+		
+		static Dictionary<RuntimeTypeHandle, int> CreateTypeMap()
+		{	
+			var typeMap = new Dictionary<RuntimeTypeHandle, int>();
+			<#
+			int typeIndex = 0;
+			foreach(EnvDTE.CodeEnum E in allEnums)
+			{
+			#>
+typeMap[typeof(<#= E.FullName #>).TypeHandle] = <#= typeIndex++ #>;
+			<#
+			}
+			#>
+
+			return typeMap;
+		}
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int Get_Enum_Index<Ty>()
+        {
+			if (TypeHandleMap.TryGetValue(typeof(Ty).TypeHandle, out int outIndex))
+			{
+				return outIndex;
+			}
+
+			return -1;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int Get_Enum_Index(RuntimeTypeHandle Handle)
+        {
+			if (TypeHandleMap.TryGetValue(Handle, out int outIndex))
+			{
+				return outIndex;
+			}
+
+			return -1;
+        }
+		
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool Lookup_Index<Ty>(out int outIndex) where Ty : struct
+		{
+			if (TypeHandleMap.TryGetValue(typeof(Ty).TypeHandle, out int outMapValue))
+			{
+				outIndex = outMapValue;
+				return true;
+			}
+
+			outIndex = -1;
+			return false;
+		}
+
+
+		#region Static Tables
+		internal static readonly EnumData[][] TABLE;
+		internal static readonly List<Dictionary<AtomicString, object>> KEYWORD;
+
+
+		static EnumTables()
+		{
+			TABLE = new EnumData[<#=allEnums.Count+1#>][];
+			KEYWORD = new List<Dictionary<AtomicString, object>>(<#=allEnums.Count+1#>);
+
+			int maxIndex = 0;
+
+			#region Table Data 
+<#
+			for(int idx=0; idx<allEnums.Count; idx++)
+			{
+				EnvDTE.CodeEnum E = allEnums[idx];
+#>
+			/* <#= E.FullName #> */
+			#region <#= E.FullName #>
+<#
+
+				var vMap = EnumMap[idx];
+#>
+			maxIndex = (int)Enum.GetValues(typeof(<#=E.FullName#>)).Cast<<#=E.FullName#>>().Max();
+			TABLE[<#=idx#>] = new EnumData[maxIndex+1];
+<#
+				for(int i=0; i<vMap.Count; i++)
+				{
+					WriteLine($"\t\t\tTABLE[{idx}][(int){vMap[i].Item1.FullName}] = new EnumData({vMap[i].Item2});");
+				}
+			#>
+			#endregion
+			<#
+				WriteLine("");
+				WriteLine("");
+			}
+		#>
+		#endregion
+		/* Generate Reverse lookup maps */
+		#region Reverse Lookup
+<#
+			for(int idx=0; idx<allEnums.Count; idx++)
+			{
+				EnvDTE.CodeEnum E = allEnums[idx];
+#>
+			/* <#= E.FullName #> */
+			#region <#= E.FullName #>
+<#
+
+				var vMap = EnumMap[idx];
+#>
+			KEYWORD.Add(new Dictionary<AtomicString, object>());
+
+<#
+				for(int i=0; i<vMap.Count; i++)
+				{
+					string key = vMap[i].Item2.Split(',')[0];
+#>
+			KEYWORD[<#=idx#>].Add(new AtomicString(<#=key#>), <#=vMap[i].Item1.FullName#>);
+<#
+				}
+				#>
+			#endregion
+				<#
+				WriteLine("");
+				WriteLine("");
+			}
+#>
+		#endregion
+		}
+		#endregion
+	}
+}
+
+<#+	
+
+public List<EnvDTE.ProjectItem> GetProjectItemsRecursively(EnvDTE.ProjectItems items)
+{
+    var ret = new List<EnvDTE.ProjectItem>();
+    if (items is null) return ret;
+    foreach(EnvDTE.ProjectItem item in items)
+    {
+		ret.Add(item);
+		ret.AddRange(GetProjectItemsRecursively(item.ProjectItems));
+    }
+    return ret;
+}
+
+
+#>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -10,6 +11,7 @@ namespace CssUI
         #region Constants
 
         #region /* Specials */
+        public const int CHAR_UNICODE_MAX = 0x10FFFF;
         public const char CHAR_MAX = char.MaxValue;
         public const char EOF = '\u0000';
         public const char CHAR_NULL = '\u0000';
@@ -145,10 +147,12 @@ namespace CssUI
         public const char CHAR_DIGIT_7 = '\u0037';
         public const char CHAR_DIGIT_8 = '\u0038';
         public const char CHAR_DIGIT_9 = '\u0039';
+
+        public static ReadOnlySpan<char> ASCII_DIGITS => new char[] { CHAR_DIGIT_0, CHAR_DIGIT_1, CHAR_DIGIT_2, CHAR_DIGIT_3, CHAR_DIGIT_4, CHAR_DIGIT_5, CHAR_DIGIT_6, CHAR_DIGIT_7, CHAR_DIGIT_8, CHAR_DIGIT_9 };
         #endregion
 
 
-        #region /* Ascii Upper Alpha */
+        #region Ascii Upper Alpha
         /* Docs: https://infra.spec.whatwg.org/#ascii-upper-alpha */
         public const char CHAR_A_UPPER = '\u0041';
         public const char CHAR_B_UPPER = '\u0042';
@@ -156,11 +160,14 @@ namespace CssUI
         public const char CHAR_D_UPPER = '\u0044';
         public const char CHAR_E_UPPER = '\u0045';
         public const char CHAR_F_UPPER = '\u0046';
+        public const char CHAR_G_UPPER = '\u0047';
         public const char CHAR_H_UPPER = '\u0048';
         public const char CHAR_M_UPPER = '\u004D';
         public const char CHAR_P_UPPER = '\u0050';
         public const char CHAR_S_UPPER = '\u0053';
         public const char CHAR_T_UPPER = '\u0054';
+        public const char CHAR_U_UPPER = '\u0055';
+        public const char CHAR_V_UPPER = '\u0056';
         public const char CHAR_W_UPPER = '\u0057';
         public const char CHAR_X_UPPER = '\u0058';
         public const char CHAR_Y_UPPER = '\u0059';
@@ -168,7 +175,7 @@ namespace CssUI
         #endregion
 
 
-        #region /* Ascii Lower Alpha */
+        #region Ascii Lower Alpha
         /* Docs: https://infra.spec.whatwg.org/#ascii-lower-alpha */
         public const char CHAR_A_LOWER = '\u0061';
         public const char CHAR_B_LOWER = '\u0062';
@@ -176,9 +183,13 @@ namespace CssUI
         public const char CHAR_D_LOWER = '\u0064';
         public const char CHAR_E_LOWER = '\u0065';
         public const char CHAR_F_LOWER = '\u0066';
+        public const char CHAR_G_LOWER = '\u0067';
         public const char CHAR_H_LOWER = '\u0068';
         public const char CHAR_M_LOWER = '\u006D';
         public const char CHAR_S_LOWER = '\u0073';
+        public const char CHAR_T_LOWER = '\u0074';
+        public const char CHAR_U_LOWER = '\u0075';
+        public const char CHAR_V_LOWER = '\u0076';
         public const char CHAR_W_LOWER = '\u0077';
         public const char CHAR_X_LOWER = '\u0078';
         public const char CHAR_Y_LOWER = '\u0079';
@@ -281,28 +292,47 @@ namespace CssUI
 
 
         #region Character Checks
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_NonPrintable(char codePoint)
+        {
+            switch (codePoint)
+            {
+                case CHAR_TAB:
+                case CHAR_C0_DELETE:
+                case char _ when (codePoint >= '\0' && codePoint <= '\u0008'):
+                case char _ when (codePoint >= '\u000E' && codePoint <= CHAR_C0_INFO_SEPERATOR):
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         /// <summary>
         /// A surrogate is a code point that is in the range U+D800 to U+DFFF, inclusive.
         /// </summary>
-        /// <param name="c">Code point to check</param>
+        /// <param name="codePoint">Code point to check</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Surrogate_Code_Point(char c)
+        public static bool Is_Surrogate_Code_Point(char codePoint)
         {/* Docs: https://infra.spec.whatwg.org/#surrogate */
-            return (c >= '\uD800' && c <= '\uDFFF');
+            switch (codePoint)
+            {
+                case var _ when (codePoint >= '\uD800' && codePoint <= '\uDFFF'):
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         /// <summary>
         /// True if char is an non-character code point
         /// </summary>
-        /// <param name="c">Code point to check</param>
+        /// <param name="codePoint">Code point to check</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_NonCharacter_Code_Point(char c)
+        public static bool Is_NonCharacter_Code_Point(char codePoint)
         {/* Docs: https://infra.spec.whatwg.org/#noncharacter */
-
-            if (c >= '\uFDD0' && c <= '\uFDEF') return true;
-
-            switch ((int)c)
+            switch ((int)codePoint)
             {
+                case var _ when (codePoint >= '\uFDD0' && codePoint <= '\uFDEF'):
                 case 0xFFFE:
                 case 0xFFFF:
                 case 0x1FFFE:
@@ -367,21 +397,45 @@ namespace CssUI
         /// <summary>
         /// True if code point is in the range U+0000 NULL to U+007F DELETE, inclusive.
         /// </summary>
-        /// <param name="c">Code point to check</param>
+        /// <param name="codePoint">Code point to check</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Ascii_Code_Point(char c)
+        public static bool Is_Ascii_Code_Point(char codePoint)
         {/* Docs: https://infra.spec.whatwg.org/#ascii-code-point */
-            return (c >= 0x0000 && c <= 0x007F);
+            switch (codePoint)
+            {
+                case var _ when (codePoint >= 0x0000 && codePoint <= 0x007F):
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+
+        /// <summary>
+        /// True if code point is an ASCII plus or minus character
+        /// </summary>
+        /// <param name="codePoint">Code point to check</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Ascii_Plus_Or_Minus(char codePoint)
+        {
+            switch (codePoint)
+            {
+                case CHAR_PLUS_SIGN:
+                case CHAR_HYPHEN_MINUS:
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         /// <summary>
         /// True if code point is an ASCII tab or newline character
         /// </summary>
-        /// <param name="c">Code point to check</param>
+        /// <param name="codePoint">Code point to check</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Ascii_Tab_Or_Newline(char c)
+        public static bool Is_Ascii_Tab_Or_Newline(char codePoint)
         {/* Docs: https://infra.spec.whatwg.org/#ascii-tab-or-newline */
-            switch (c)
+            switch (codePoint)
             {
                 case CHAR_TAB:
                 case CHAR_LINE_FEED:
@@ -395,21 +449,34 @@ namespace CssUI
         /// <summary>
         /// True if code point is an ASCII control character
         /// </summary>
-        /// <param name="c">Code point to check</param>
+        /// <param name="codePoint">Code point to check</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Ascii_Control(char c)
+        public static bool Is_Ascii_Control(char codePoint)
         {/* Docs: https://infra.spec.whatwg.org/#c0-control */
-            return (c >= CHAR_C0_DELETE && c <= CHAR_C0_APPLICATION_PROGRAM_COMMAND);
+            switch (codePoint)
+            {
+                case var _ when (codePoint >= CHAR_C0_DELETE && codePoint <= CHAR_C0_APPLICATION_PROGRAM_COMMAND):
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         /// <summary>
         /// True if code point is an ASCII control or space character
         /// </summary>
-        /// <param name="c">Code point to check</param>
+        /// <param name="codePoint">Code point to check</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Ascii_Control_Or_Space(char c)
+        public static bool Is_Ascii_Control_Or_Space(char codePoint)
         {/* Docs: https://infra.spec.whatwg.org/#c0-control-or-space */
-            return (c >= CHAR_C0_DELETE && c <= CHAR_C0_APPLICATION_PROGRAM_COMMAND) || c == CHAR_SPACE;
+            switch (codePoint)
+            {
+                case CHAR_SPACE:
+                case var _ when (codePoint >= CHAR_C0_DELETE && codePoint <= CHAR_C0_APPLICATION_PROGRAM_COMMAND):
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         /// <summary>
@@ -425,11 +492,17 @@ namespace CssUI
         /// <summary>
         /// True if code point is an ASCII digit character
         /// </summary>
-        /// <param name="c">Code point to check</param>
+        /// <param name="codePoint">Code point to check</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Ascii_Digit(char c)
+        public static bool Is_Ascii_Digit(char codePoint)
         {/* Docs: https://infra.spec.whatwg.org/#ascii-digit */
-            return c >= CHAR_DIGIT_0 && c <= CHAR_DIGIT_9;
+            switch (codePoint)
+            {
+                case var _ when (codePoint >= CHAR_DIGIT_0 && codePoint <= CHAR_DIGIT_9):
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         /// <summary>
@@ -445,52 +518,88 @@ namespace CssUI
         /// <summary>
         /// True if code point is ASCII alpha lowercase character
         /// </summary>
-        /// <param name="c">Code point to check</param>
+        /// <param name="codePoint">Code point to check</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_ASCII_Lower_Alpha(char c)
+        public static bool Is_ASCII_Lower_Alpha(char codePoint)
         {
-            return c >= CHAR_A_LOWER && c <= CHAR_Z_LOWER;
+            switch (codePoint)
+            {
+                case var _ when (codePoint >= CHAR_A_LOWER && codePoint <= CHAR_Z_LOWER):
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         /// <summary>
         /// True if code point is ASCII alpha uppercase character
         /// </summary>
-        /// <param name="c">Code point to check</param>
+        /// <param name="codePoint">Code point to check</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_ASCII_Upper_Alpha(char c)
+        public static bool Is_ASCII_Upper_Alpha(char codePoint)
         {
-            return c >= CHAR_A_UPPER && c <= CHAR_Z_UPPER;
+            switch (codePoint)
+            {
+                case var _ when (codePoint >= CHAR_A_UPPER && codePoint <= CHAR_Z_UPPER):
+                    return true;
+                default:
+                    return false;
+            }
         }
 
 
         /// <summary>
         /// True if code point is an ASCII hex-digit character (0-9 | a-f | A-F)
         /// </summary>
-        /// <param name="c">Code point to check</param>
+        /// <param name="codePoint">Code point to check</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Ascii_Hex_Digit(char c)
-        {/* Docs: https://infra.spec.whatwg.org/#ascii-digit */
-            return (c >= CHAR_DIGIT_0 && c <= CHAR_DIGIT_9) || (c >= CHAR_A_LOWER && c <= CHAR_F_LOWER) || (c >= CHAR_A_UPPER && c <= CHAR_F_UPPER);
+        public static bool Is_Ascii_Hex_Digit(char codePoint)
+        {/* Docs: https://infra.spec.whatwg.org/#ascii-digit
+            Docs:  https://www.w3.org/TR/css-syntax-3/#hex-digit
+            */
+            switch (codePoint)
+            {
+                case var _ when (codePoint >= CHAR_DIGIT_0 && codePoint <= CHAR_DIGIT_9):
+                case var _ when (codePoint >= CHAR_A_LOWER && codePoint <= CHAR_F_LOWER):
+                case var _ when (codePoint >= CHAR_A_UPPER && codePoint <= CHAR_F_UPPER):
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         /// <summary>
         /// True if code point is an ASCII hex-digit character excluding uppercase alpha characters
         /// </summary>
-        /// <param name="c">Code point to check</param>
+        /// <param name="codePoint">Code point to check</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Ascii_Hex_Digit_Lower(char c)
+        public static bool Is_Ascii_Hex_Digit_Lower(char codePoint)
         {/* Docs: https://infra.spec.whatwg.org/#ascii-digit */
-            return (c >= CHAR_DIGIT_0 && c <= CHAR_DIGIT_9) || (c >= CHAR_A_LOWER && c <= CHAR_F_LOWER);
+            switch (codePoint)
+            {
+                case var _ when (codePoint >= CHAR_DIGIT_0 && codePoint <= CHAR_DIGIT_9):
+                case var _ when (codePoint >= CHAR_A_LOWER && codePoint <= CHAR_F_LOWER):
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         /// <summary>
         /// True if code point is an ASCII hex-digit character excluding lowercase alpha characters
         /// </summary>
-        /// <param name="c">Code point to check</param>
+        /// <param name="codePoint">Code point to check</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Ascii_Hex_Digit_Upper(char c)
+        public static bool Is_Ascii_Hex_Digit_Upper(char codePoint)
         {/* Docs: https://infra.spec.whatwg.org/#ascii-digit */
-            return (c >= CHAR_DIGIT_0 && c <= CHAR_DIGIT_9) || (c >= CHAR_A_UPPER && c <= CHAR_F_UPPER);
+            switch (codePoint)
+            {
+                case var _ when (codePoint >= CHAR_DIGIT_0 && codePoint <= CHAR_DIGIT_9):
+                case var _ when (codePoint >= CHAR_A_UPPER && codePoint <= CHAR_F_UPPER):
+                    return true;
+                default:
+                    return false;
+            }
         }
 
 
@@ -509,28 +618,35 @@ namespace CssUI
         /// <summary>
         /// Converts an ASCII uppercase character to its lowecase form
         /// </summary>
-        /// <param name="c">Code point to transform</param>
+        /// <param name="codePoint">Code point to transform</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char To_ASCII_Lower_Alpha(char c)
+        public static char To_ASCII_Lower_Alpha(char codePoint)
         {
-            if (!Is_ASCII_Upper_Alpha(c))
-                return c;
-
-            // Add to lowercase 'a' the distance that c is from uppercase 'A'
-            return (char)(CHAR_A_LOWER + (c - CHAR_A_UPPER));
+            switch (codePoint)
+            {
+                case var c when (codePoint >= CHAR_A_UPPER && codePoint <= CHAR_Z_UPPER):
+                    // Add to lowercase 'a' the distance that c is from uppercase 'A'
+                    return (char)(CHAR_A_LOWER + (c - CHAR_A_UPPER));
+                default:
+                    return codePoint;
+            }
         }
 
         /// <summary>
         /// Converts an ASCII lowercase character to its uppercase form
         /// </summary>
-        /// <param name="c">Code point to transform</param>
+        /// <param name="codePoint">Code point to transform</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char To_ASCII_Upper_Alpha(char c)
+        public static char To_ASCII_Upper_Alpha(char codePoint)
         {
-            if (!Is_ASCII_Lower_Alpha(c))
-                return c;
-            // Add to uppercase 'A' the distance that c is from lowercase 'a'
-            return (char)(CHAR_A_UPPER + (c - CHAR_A_LOWER));
+            switch (codePoint)
+            {
+                case var c when (codePoint >= CHAR_A_LOWER && codePoint <= CHAR_Z_LOWER):
+                    // Add to uppercase 'A' the distance that c is from lowercase 'a'
+                    return (char)(CHAR_A_UPPER + (c - CHAR_A_LOWER));
+                default:
+                    return codePoint;
+            }
         }
 
         /// <summary>
@@ -540,10 +656,31 @@ namespace CssUI
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Ascii_Digit_To_Value(char c)
         {
-            if (c < CHAR_DIGIT_0 || c > CHAR_DIGIT_9)
-                throw new IndexOutOfRangeException();
-
-            return (int)c - CHAR_DIGIT_0;
+            switch (c)
+            {
+                case CHAR_DIGIT_0:
+                    return 0;
+                case CHAR_DIGIT_1:
+                    return 1;
+                case CHAR_DIGIT_2:
+                    return 2;
+                case CHAR_DIGIT_3:
+                    return 3;
+                case CHAR_DIGIT_4:
+                    return 4;
+                case CHAR_DIGIT_5:
+                    return 5;
+                case CHAR_DIGIT_6:
+                    return 6;
+                case CHAR_DIGIT_7:
+                    return 7;
+                case CHAR_DIGIT_8:
+                    return 8;
+                case CHAR_DIGIT_9:
+                    return 9;
+                default:
+                    throw new IndexOutOfRangeException();
+            }
         }
 
         #endregion
@@ -551,17 +688,55 @@ namespace CssUI
 
         #region Hexadecimal
         /// <summary>
+        /// Map of ASCII code points to their hex value.
+        /// 0xFF is a placeholder.
+        /// </summary>
+        private static ReadOnlySpan<byte> HexLookupTable => new byte[]
+        {
+            0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+            0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+            0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+            0x0,  0x1,  0x2,  0x3,  0x4,  0x5,  0x6,  0x7,  0x8,  0x9,  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+            0xFF, 0xA,  0xB,  0xC,  0xD,  0xE,  0xF,  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+            0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+            0xFF, 0xa,  0xb,  0xc,  0xd,  0xe,  0xf
+        };
+
+        /// <summary>
         /// Converts an ASCII hexadecimal character to its numeric value
         /// </summary>
         /// <param name="c">Code point to convert</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Ascii_Hex_To_Value(char c)
         {
-            if (c >= CHAR_DIGIT_0 && c <= CHAR_DIGIT_9)
-                return (int)c - CHAR_DIGIT_0;
+            if (c > HexLookupTable.Length)
+                throw new IndexOutOfRangeException();
 
-            switch (c)
+            Contract.EndContractBlock();
+
+            return HexLookupTable[c];
+            /*switch (c)
             {
+                case CHAR_DIGIT_0:
+                    return 0;
+                case CHAR_DIGIT_1:
+                    return 1;
+                case CHAR_DIGIT_2:
+                    return 2;
+                case CHAR_DIGIT_3:
+                    return 3;
+                case CHAR_DIGIT_4:
+                    return 4;
+                case CHAR_DIGIT_5:
+                    return 5;
+                case CHAR_DIGIT_6:
+                    return 6;
+                case CHAR_DIGIT_7:
+                    return 7;
+                case CHAR_DIGIT_8:
+                    return 8;
+                case CHAR_DIGIT_9:
+                    return 9;
                 case CHAR_A_LOWER:
                 case CHAR_A_UPPER:
                     return 10;
@@ -582,7 +757,7 @@ namespace CssUI
                     return 15;
                 default:
                     throw new IndexOutOfRangeException();
-            }
+            }*/
         }
 
         /// <summary>
@@ -592,7 +767,7 @@ namespace CssUI
         /// <param name="Digits">Minimum number of digits to include</param>
         /// <returns>Characters representing the hexadecimal form of the given value</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char[] Ascii_Value_To_Hex(char codePoint, UInt32 Digits = 0)
+        public static string Ascii_Value_To_Hex(char codePoint, UInt32 Digits = 0)
         {
             return Ascii_Value_To_Hex((UInt64)codePoint, Digits);
         }
@@ -604,7 +779,7 @@ namespace CssUI
         /// <param name="Digits">Minimum number of digits to include</param>
         /// <returns>Characters representing the hexadecimal form of the given value</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char[] Ascii_Value_To_Hex(Int32 value, UInt32 Digits = 0)
+        public static string Ascii_Value_To_Hex(Int32 value, UInt32 Digits = 0)
         {
             return Ascii_Value_To_Hex((UInt64)value, Digits);
         }
@@ -616,7 +791,7 @@ namespace CssUI
         /// <param name="Digits">Minimum number of digits to include</param>
         /// <returns>Characters representing the hexadecimal form of the given value</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char[] Ascii_Value_To_Hex(UInt32 value, UInt32 Digits = 0)
+        public static string Ascii_Value_To_Hex(UInt32 value, UInt32 Digits = 0)
         {
             return Ascii_Value_To_Hex((UInt64)value, Digits);
         }
@@ -628,7 +803,7 @@ namespace CssUI
         /// <param name="Digits">Minimum number of digits to include</param>
         /// <returns>Characters representing the hexadecimal form of the given value</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char[] Ascii_Value_To_Hex(Int64 value, UInt32 Digits = 0)
+        public static string Ascii_Value_To_Hex(Int64 value, UInt32 Digits = 0)
         {
             return Ascii_Value_To_Hex((UInt64)value, Digits);
         }
@@ -640,13 +815,14 @@ namespace CssUI
         /// <param name="Digits">Minimum number of digits to include</param>
         /// <returns>Characters representing the hexadecimal form of the given value</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char[] Ascii_Value_To_Hex(UInt64 value, UInt32 Digits = 0)
-        {
-            /* To determine how many hexidecimal chars we will need to represent this value:
-             * Find the index of the values most significant bit and divide it by 4and then round it up */
-            int msb = (int)Math.Ceiling(BitScanner.BitScanForward(value) / 4.0d);
+        public static string Ascii_Value_To_Hex(UInt64 value, UInt32 Digits = 0)
+        {// Ascii hex numbers are written in big-endian format
+            return value.ToString($"X{Digits}");
+            /* To determine how many hexadecimal chars we will need to represent this value:
+             * Find the index of the values most significant bit and divide it by 4 and then round it up */
+            int msb = (int)Math.Ceiling(BitOperations.CountTrailingZeros(value) / 4.0d);
             int charCount = MathExt.Max(1, msb);
-            char[] result = new char[MathExt.Max(charCount, Digits)];
+            var result = new char[MathExt.Max(charCount, Digits)];
             int padding = (int)((charCount > Digits) ? 0 : (Digits - charCount));
 
             for (int i=0; i<charCount; i++)
@@ -661,7 +837,7 @@ namespace CssUI
                 result[i] = CHAR_DIGIT_0;
             }
 
-            return result;
+            return new string(result);
         }
         #endregion
 
@@ -829,13 +1005,13 @@ namespace CssUI
         #region Percent Encoding
         public static char[] Percent_Encode(byte b)
         {/* Docs: https://url.spec.whatwg.org/#percent-encode */
-            char[] hex = Ascii_Value_To_Hex((ulong)b, 2);
+            var hex = Ascii_Value_To_Hex((ulong)b, 2);
             return new char[3] { CHAR_PERCENT, hex[0], hex[1] };
         }
 
         public static byte[] Percent_Decode(ReadOnlyMemory<byte> input)
         {/* Docs: https://url.spec.whatwg.org/#percent-decode */
-            DataStream<byte> Stream = new DataStream<byte>(input, byte.MinValue);
+            DataConsumer<byte> Stream = new DataConsumer<byte>(input, byte.MinValue);
             /* Create a list of memory chunks that make up the final string */
             ulong newLength = 0;
             ulong? chunkStart = null;
@@ -866,7 +1042,7 @@ namespace CssUI
                 {
                     case EFilterResult.FILTER_ACCEPT:// Char should be included in the chunk
                         {
-                            if (!chunkStart.HasValue) chunkStart = Stream.Position;/* Start new chunk (if one isnt started yet) */
+                            if (!chunkStart.HasValue) chunkStart = Stream.LongPosition;/* Start new chunk (if one isnt started yet) */
                         }
                         break;
                     case EFilterResult.FILTER_REJECT:// Char should not be included in chunk, current chunk ends
@@ -878,7 +1054,7 @@ namespace CssUI
                         {
                             if (!chunkStart.HasValue)
                             {
-                                chunkStart = Stream.Position + 1;/* At chunk-start */
+                                chunkStart = Stream.LongPosition + 1;/* At chunk-start */
                             }
                             else
                             {
@@ -890,10 +1066,10 @@ namespace CssUI
 
                 if (end_chunk || Stream.Remaining <= 1)
                 {
-                    if (!chunkStart.HasValue) chunkStart = Stream.Position;
+                    if (!chunkStart.HasValue) chunkStart = Stream.LongPosition;
 
                     /* Push new chunk to our list */
-                    var chunkSize = Stream.Position - chunkStart.Value;
+                    var chunkSize = Stream.LongPosition - chunkStart.Value;
                     var Mem = Stream.AsMemory().Slice((int)chunkStart.Value, (int)chunkSize);
                     var chunk = new Tuple<ReadOnlyMemory<byte>, byte?>(Mem, bytePoint);
                     chunks.AddLast(chunk);

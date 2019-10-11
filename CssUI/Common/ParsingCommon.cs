@@ -1,4 +1,8 @@
-﻿using System;
+﻿using CssUI.Common.Exceptions;
+using CssUI.DOM.Exceptions;
+using System;
+using System.Diagnostics.Contracts;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using static CssUI.UnicodeCommon;
 
@@ -8,25 +12,32 @@ namespace CssUI
     {
 
         #region Utility
-        public static string Get_Location(DataStream<char> Stream)
+        public static string Get_Location(DataConsumer<char> Stream)
         {
-            return Stream.AsMemory().Slice((int)Stream.Position, 32).ToString();
+            return Stream.AsMemory().Slice((int)Stream.LongPosition, 32).ToString();
         }
 
+        /// <summary>
+        /// Converts a series of digits into a base10 number
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long Digits_To_Base10(ReadOnlyMemory<char> digits) => Digits_To_Base10(digits.Span);
+        /// <summary>
+        /// Converts a series of digits into a base10 number
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long Digits_To_Base10(ReadOnlySpan<char> digits)
         {
-            if (digits == null)
-            {
+            if (digits == null || digits.IsEmpty)
                 return 0;
-            }
+            if (!StringCommon.ContainsOnly(digits, ASCII_DIGITS))
+                throw new ArgumentOutOfRangeException(ParserErrors.INVALID_CONTAINS_NON_DIGIT_CHARS);
+            Contract.EndContractBlock();
 
             long Integer = 0;
             var span = digits;
             long power = 1;
-            for (int i = 0; i < digits.Length; i++)
+            for (int i = digits.Length-1; i >= 0 ; i--)
             {
                 Integer += power * Ascii_Digit_To_Value(span[i]);
                 power *= 10;
@@ -35,22 +46,29 @@ namespace CssUI
             return Integer;
         }
 
+        /// <summary>
+        /// Converts a series of digits into an unsigned base10 number
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ulong Digits_To_Base10_Unsigned(ReadOnlyMemory<char> digits) => Digits_To_Base10_Unsigned(digits.Span);
+        /// <summary>
+        /// Converts a series of digits into an unsigned base10 number
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ulong Digits_To_Base10_Unsigned(ReadOnlySpan<char> digits)
         {
-            if (digits == null)
-            {
+            if (digits == null || digits.IsEmpty)
                 return 0;
-            }
+            if (!StringCommon.ContainsOnly(digits, ASCII_DIGITS))
+                throw new ArgumentOutOfRangeException(ParserErrors.INVALID_CONTAINS_NON_DIGIT_CHARS);
+            Contract.EndContractBlock();
 
             ulong Integer = 0;
             var span = digits;
             ulong power = 1;
-            for (int i = 0; i < digits.Length; i++)
+            for (int i = digits.Length-1; i >= 0; i--)
             {
-                Integer += power * Ascii_Digit_To_Value(span[i]);
+                Integer += power * (ulong)Ascii_Digit_To_Value(span[i]);
                 power *= 10;
             }
 
@@ -60,30 +78,64 @@ namespace CssUI
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long ToInteger(int sign, ReadOnlySpan<char> integerDigits, int exponent_sign, ReadOnlySpan<char> exponentDigits)
-        {
-            long I = Digits_To_Base10(integerDigits);
-            long E = Digits_To_Base10(exponentDigits);
+        {/* s·(i + f·10-d)·10te. */
+            var I = Digits_To_Base10(integerDigits);
+            if (sign != 1) I = -I;
 
-            /* s·(i + f·10-d)·10te. */
-            return (long)(sign * I * Math.Pow(10, exponent_sign * E));
+            if (exponentDigits.Length > 0)
+            {
+                var E = Digits_To_Base10_Unsigned(exponentDigits);
+                long Exp = MathExt.Pow(10L, E);
+                if (exponent_sign != 1) Exp = -Exp;
+
+                I *= Exp;
+            }
+
+            return I; 
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double ToDecimal(double sign, ReadOnlySpan<char> integerDigits, ReadOnlySpan<char> fractionDigits, double exponent_sign, ReadOnlySpan<char> exponentDigits)
-        {
+        public static double ToDecimal(int sign, ReadOnlySpan<char> integerDigits, ReadOnlySpan<char> fractionDigits, int exponent_sign, ReadOnlySpan<char> exponentDigits)
+        {/* s·(i + f·10-d)·10te. */
             long I = Digits_To_Base10(integerDigits);
-            long F = Digits_To_Base10(fractionDigits);
-            long E = Digits_To_Base10(exponentDigits);
+            double RetVal = I;
 
-            /* s·(i + f·10-d)·10te. */
-            return (sign * (I + (F * Math.Pow(10, -fractionDigits.Length))) * Math.Pow(10, exponent_sign * E));
+            if (fractionDigits.Length > 0)
+            {
+                var F = Digits_To_Base10_Unsigned(fractionDigits);
+                var Frac = MathExt.NPow(10, (uint)fractionDigits.Length);
+                Frac *= F;
+                RetVal += Frac;
+            }
+
+            if (exponentDigits.Length > 0)
+            {
+                var E = Digits_To_Base10_Unsigned(exponentDigits);
+                var Exp = MathExt.Pow(10L, E);
+                if (exponent_sign != 1) Exp = -Exp;
+
+                RetVal *= Exp;
+            }
+
+            return (sign == 1) ? RetVal : -RetVal;
+            //return (sign * (I + (F * Math.Pow(10, -fractionDigits.Length))) * Math.Pow(10, exponent_sign * E));
         }
         #endregion
 
         #region Hexadecimal
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ulong Parse_Hex(ReadOnlyMemory<char> input)
         {
-            ulong result = 0, multiple = 1;
+            if (!Parse_Hex(input, out ulong outValue))
+            {
+                throw new Exception(ParserErrors.PARSING_FAILED);
+            }
+
+            return outValue;
+        }
+        public static bool Parse_Hex(ReadOnlyMemory<char> input, out ulong outValue)
+        {
+            ulong result = 0;
             var span = input.Span;
 
             for(int i=0; i<span.Length; i++)
@@ -96,30 +148,34 @@ namespace CssUI
                         continue;
                     }
 
-                    throw new ArgumentOutOfRangeException($"Input string \"{input.ToString()}\" contains non-hexadecimal characters");
+                    outValue = 0;
+                    return false;
                 }
 
-                var v = (uint)Ascii_Hex_To_Value(span[i]);
-                result += (v * multiple);
-                multiple *= 10;
+                var v = (ulong)Ascii_Hex_To_Value(span[i]);
+                result = (16 * result) + v;
             }
 
-            return result;
+            outValue = result;
+            return true;
         }
         #endregion
 
         #region Integer
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Parse_Integer(ReadOnlyMemory<char> input, out long outValue)
         {
-            DataStream<char> Stream = new DataStream<char>(input, EOF);
+            DataConsumer<char> Stream = new DataConsumer<char>(input, EOF);
             bool result = Parse_Integer(Stream, out long outParsed);
             outValue = outParsed;
             return result;
         }
-        public static bool Parse_Integer(DataStream<char> Stream, out long outValue)
+        public static bool Parse_Integer(DataConsumer<char> Stream, out long outValue)
         {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#signed-integers */
-            bool sign = true;//Sign
+            if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+            Contract.EndContractBlock();
 
+            bool sign = true;//Sign
             /* SKip ASCII whitespace */
             Stream.Consume_While(Is_Ascii_Whitespace);
 
@@ -158,29 +214,33 @@ namespace CssUI
         #endregion
 
         #region Decimal
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Parse_FloatingPoint(ReadOnlyMemory<char> input, out float outValue)
         {
-            DataStream<char> Stream = new DataStream<char>(input, EOF);
+            DataConsumer<char> Stream = new DataConsumer<char>(input, EOF);
             bool result = Parse_FloatingPoint(Stream, out double outParsed);
             outValue = (float)outParsed;
             return result;
         }
-        public static bool Parse_FloatingPoint(DataStream<char> Stream, out float outValue)
+        public static bool Parse_FloatingPoint(DataConsumer<char> Stream, out float outValue)
         {
             bool result = Parse_FloatingPoint(Stream, out double outParsed);
             outValue = (float)outParsed;
             return result;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Parse_FloatingPoint(ReadOnlyMemory<char> input, out double outValue)
         {
-            DataStream<char> Stream = new DataStream<char>(input, EOF);
+            DataConsumer<char> Stream = new DataConsumer<char>(input, EOF);
             bool result = Parse_FloatingPoint(Stream, out double outParsed);
             outValue = outParsed;
             return result;
         }
-        public static bool Parse_FloatingPoint(DataStream<char> Stream, out double outValue)
+        public static bool Parse_FloatingPoint(DataConsumer<char> Stream, out double outValue)
         {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#rules-for-parsing-floating-point-number-values */
+            if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+            Contract.EndContractBlock();
 
             double value = 1;
             double divisor = 1;
@@ -228,7 +288,7 @@ namespace CssUI
             {
                 /* 11) Collect a sequence of code points that are ASCII digits from input given position, and interpret the resulting sequence as a base-ten integer. Multiply value by that integer. */
                 Stream.Consume_While(Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
-                value *= double.Parse(outDigits.ToString());
+                value *= Digits_To_Base10(outDigits);//double.Parse(outDigits.ToString(), CultureInfo.InvariantCulture);
             }
 
             /* 12) If position is past the end of input, jump to the step labeled conversion. */
@@ -283,26 +343,27 @@ namespace CssUI
                     {
                         /* 5) Collect a sequence of code points that are ASCII digits from input given position, and interpret the resulting sequence as a base-ten integer. Multiply exponent by that integer. */
                         Stream.Consume_While(Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
-                        exponent *= double.Parse(outDigits.ToString());
+                        exponent *= Digits_To_Base10(outDigits);//double.Parse(outDigits.ToString(), CultureInfo.InvariantCulture);
                         /* 6) Multiply value by ten raised to the exponentth power. */
                         value *= Math.Pow(10, exponent);
                     }
                 }
             }
 
-            /* 15) Conversion: Let S be the set of finite IEEE 754 double-precision floating-point values except −0, but with two special values added: 21024 and −21024. */
+            /* 15) Conversion: Let S be the set of finite IEEE 754 double-precision floating-point values except −0, but with two special values added: 2^1024 and −2^1024. */
             /* 16) Let rounded-value be the number in S that is closest to value, 
              * selecting the number with an even significand if there are two equally close values. 
-             * (The two special values 21024 and −21024 are considered to have even significands for this purpose.) */
-            var roundedValue = Math.Round(value, MidpointRounding.ToEven);
+             * (The two special values 2^1024 and −2^1024 are considered to have even significands for this purpose.) */
+            var roundedValue = value;
+            if (roundedValue == -0D) roundedValue = -roundedValue;
 
-            /* 17) If rounded-value is 21024 or −21024, return an error. */
-            if (MathExt.Feq(roundedValue, double.MinValue) || MathExt.Feq(roundedValue, double.MaxValue))
+            /* 17) If rounded-value is 2^1024 or −2^1024, return an error. */
+            if (roundedValue == double.MinValue || roundedValue == double.MaxValue)
             {
                 outValue = double.NaN;
                 return false;
             }
-
+            /* 18) Return rounded-value. */
             outValue = roundedValue;
             return true;
         }

@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+
+#if ENABLE_HEADLESS == false
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Advanced;
 using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.PixelFormats;
-using System.Threading.Tasks;
+#endif
 
 namespace CssUI.Rendering
 {
@@ -15,6 +18,7 @@ namespace CssUI.Rendering
     /// </summary>
     public class GpuTexture : IDisposable
     {
+        public static bool PERSIST_IMAGE_DATA = false;
         #region Properties
         public bool IsAnimated { get; private set; } = false;
         /// <summary>
@@ -28,7 +32,7 @@ namespace CssUI.Rendering
         /// <summary>
         /// Stores the number of seconds each frame starts at.
         /// </summary>
-        private float[] Timeline = new float[0];
+        private float[] Timeline = Array.Empty<float>();
         /// <summary>
         /// Total sum duration of all frames for this texture
         /// </summary>
@@ -47,27 +51,42 @@ namespace CssUI.Rendering
         /// <summary>
         /// Size of the current texture
         /// </summary>
-        public readonly Size2D Size = Size2D.Zero;
+        public readonly Rect2i Size;
         #endregion
 
         #region Constructors
-        public GpuTexture(ReadOnlySpan<byte> imgData) : this(Image.Load<Rgba32>(imgData.ToArray()))
+        private GpuTexture(ReadOnlyRect2i Size)
         {
+            this.Size = new Rect2i(Size);
         }
 
-        public GpuTexture(MemoryStream imgData) : this(Image.Load<Rgba32>(imgData.ToArray()))
+        public GpuTexture(ReadOnlySpan<byte> Data, ReadOnlyRect2i Size, EPixelFormat Format)
         {
-        }
-
-        public GpuTexture(ReadOnlySpan<byte> Data, Size2D Size, EPixelFormat Format)
-        {
-            this.Size = Size;
+            this.Size = new Rect2i(Size);
+#if ENABLE_HEADLESS == false
             Push_Frame(Data, Size, Format);
+#endif
         }
 
-        internal GpuTexture(Image<Rgba32> image)
+#endregion
+
+#region Image Loading
+
+        public static async Task<GpuTexture> fromStream(MemoryStream Stream)
         {
-            Size = new Size2D(image.Width, image.Height);
+            return await fromData(Stream.ToArray());
+        }
+        /// <summary>
+        /// Creates a new GPU texture by decoding the given image data
+        /// </summary>
+        public static async Task<GpuTexture> fromData(ReadOnlyMemory<byte> imgData)
+        {
+#if ENABLE_HEADLESS
+            return new GpuTexture(Rect2i.Zero);
+#else
+            var image = Image.Load<Rgba32>(imgData.ToArray());
+            var Size = new Rect2i(image.Width, image.Height);
+            var Texture = new GpuTexture(Size);
 
             if (image.Frames.Count > 1)
             {
@@ -87,33 +106,37 @@ namespace CssUI.Rendering
                     finally
                     {
                         Span<byte> rgbaBytes = MemoryMarshal.AsBytes(frame.GetPixelSpan()).ToArray();
-                        var size = new Size2D(frame.Width, frame.Height);
+                        var size = new Rect2i(frame.Width, frame.Height);
                         var duration = delay / 1000.0f;
-                        Push_Frame(rgbaBytes, size, EPixelFormat.RGBA, duration);
+                        Texture.Push_Frame(rgbaBytes, size, EPixelFormat.RGBA, duration);
                     }
                 }
             }
             else
             {
                 Span<byte> rgbaBytes = MemoryMarshal.AsBytes(image.GetPixelSpan()).ToArray();
-                var size = new Size2D(image.Width, image.Height);
-                Push_Frame(rgbaBytes, size, EPixelFormat.RGBA);
+                var size = new Rect2i(image.Width, image.Height);
+                Texture.Push_Frame(rgbaBytes, size, EPixelFormat.RGBA);
             }
+            return Texture;
+#endif
         }
-        #endregion
 
-        #region Image Loading
         public static async Task<GpuTexture> fromFile(string path)
         {
+#if ENABLE_HEADLESS
+            return new GpuTexture(Rect2i.Zero);
+#else
             return await Task.Factory.StartNew(() =>
             {
                 var img = Image.Load<Rgba32>(path);
                 return new GpuTexture(img);
             });
+#endif
         }
-        #endregion
+#endregion
 
-        #region Destructor
+#region Destructor
         public void Dispose()
         {
             foreach (var frame in FrameAtlas)
@@ -121,24 +144,24 @@ namespace CssUI.Rendering
                 frame.Dispose();
             }
         }
-        #endregion
+#endregion
 
-        #region Frame Pushing
-        public void Push_Frame(ReadOnlySpan<byte> Data, Size2D Size, EPixelFormat Format, float Time = 0f)
+#region Frame Pushing
+        public void Push_Frame(ReadOnlySpan<byte> Data, ReadOnlyRect2i Size, EPixelFormat Format, float Time = 0f)
         {
-            FrameAtlas.Add(new GpuTextureFrame(Data, Size, Format, Time));
+            FrameAtlas.Add(new GpuTextureFrame(Data, new Rect2i(Size), Format, Time));
             Build_Timeline();
         }
-        #endregion
+#endregion
 
-        #region Uploading
+#region Uploading
         public void Upload(IRenderEngine Engine)
         {
             Frame.Upload(this, Engine);
         }
-        #endregion
+#endregion
 
-        #region Frame Progression
+#region Frame Progression
         /// <summary>
         /// Progresses the current frame number based on the number of seconds which have passed since it was last updated, given by deltaTime
         /// </summary>
@@ -166,9 +189,9 @@ namespace CssUI.Rendering
                 CurrentFrame = fnum;
             }
         }
-        #endregion
+#endregion
 
-        #region Timeline
+#region Timeline
         /// <summary>
         /// Rebuilds the timeline of all our frames.
         /// </summary>
@@ -186,6 +209,6 @@ namespace CssUI.Rendering
 
             Timeline = timeline.ToArray();
         }
-        #endregion
+#endregion
     }
 }
