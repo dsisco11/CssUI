@@ -8,7 +8,7 @@ namespace CssUI
     /// This is used for things like DOM element attributes, and CSS property names.
     /// <para>AtomicNames can effectively be thought of as self indexing strings, Maps and lists of AtomicNames cease being indexed by strings and instead are effectively indexed by their self assigned integer values</para>
     /// </summary>
-    public class AtomicName<Ty> : IConvertible, IComparable<Int32>, IEquatable<Int32> where Ty : struct
+    public class AtomicName<T> : IConvertible, IComparable<Int32>, IEquatable<Int32> where T : struct
     {
         #region Static
         private static int CUSTOM_VALUE = -1;
@@ -31,7 +31,7 @@ namespace CssUI
                     if (IsCustom) throw new Exception("Name backing-value for custom event type is not set!");
 
                     string name = Value_To_Name( Value );
-                    if (ReferenceEquals(null, name)) throw new Exception($"Unable to convert \"{typeof(Ty).Name}\" value to string");
+                    if (ReferenceEquals(null, name)) throw new Exception($"Unable to convert \"{typeof(T).Name}\" value to string");
 
                     _name = name;
                     _name_lower = name.ToLowerInvariant();
@@ -67,7 +67,7 @@ namespace CssUI
         /// The value of this name for comparison purposes
         /// </summary>
         internal readonly int Value;
-        public readonly Ty? EnumValue = null;
+        public readonly T? EnumValue = null;
         public readonly bool IsCustom;
         #endregion
 
@@ -76,12 +76,12 @@ namespace CssUI
         /// Creates an event specifier from the given <see cref="EEventName"/> value.
         /// </summary>
         /// <param name="name"></param>
-        public AtomicName(Ty enumValue)
+        public AtomicName(T enumValue)
         {
             var eV = Enum_To_Value(enumValue);
             if (!eV.HasValue)
             {
-                throw new Exception($"Unable to convert \"{typeof(Ty).Name}\" value to integer");
+                throw new Exception($"Unable to convert \"{typeof(T).Name}\" value to integer");
             }
 
             Value = eV.Value;
@@ -112,8 +112,8 @@ namespace CssUI
             Name = Value_To_Name(ValueID);
             Value = ValueID;
 
-            Ty enumValue = CastTo<Ty>.From<int>(Value);
-            if (Lookup.TryKeyword<Ty>(enumValue, out string LUT) && !(LUT is null))
+            T enumValue = CastTo<T>.From<int>(Value);
+            if (Lookup.TryKeyword<T>(enumValue, out string LUT) && !(LUT is null))
             {
                 EnumValue = enumValue;
                 IsCustom = false;
@@ -127,8 +127,8 @@ namespace CssUI
 
         protected bool Check_If_Value_Is_Custom(int value)
         {
-            Ty enumValue = CastTo<Ty>.From<int>(value);
-            if (Lookup.TryKeyword<Ty>(enumValue, out string LUT) && !(LUT is null))
+            T enumValue = CastTo<T>.From<int>(value);
+            if (Lookup.TryKeyword<T>(enumValue, out string LUT) && !(LUT is null))
             {
                 return false;
             }
@@ -144,9 +144,9 @@ namespace CssUI
             if (!IsCustom)
             {
                 /* /!\ These conversions will fucking EXPLODE if the given generic type does not have an integer backing type /!\ */
-                Ty enumValue = CastTo<Ty>.From<int>(value);
+                T enumValue = CastTo<T>.From<int>(value);
 
-                if (Lookup.TryKeyword<Ty>(enumValue, out string LUT) && !(LUT is null))
+                if (Lookup.TryKeyword<T>(enumValue, out string LUT) && !(LUT is null))
                 {
                     return LUT;
                 }
@@ -160,10 +160,10 @@ namespace CssUI
             return null;
         }
 
-        protected Ty Value_To_Enum(int value)
+        protected T Value_To_Enum(int value)
         {
-            Ty enumValue = CastTo<Ty>.From<int>(value);
-            if (Lookup.TryKeyword<Ty>(enumValue, out string LUT) && !(LUT is null))
+            T enumValue = CastTo<T>.From<int>(value);
+            if (Lookup.TryKeyword<T>(enumValue, out string LUT) && !(LUT is null))
             {
                 return enumValue;
             }
@@ -178,9 +178,9 @@ namespace CssUI
         /// <param name="Name"></param>
         protected virtual int? Name_To_Value(string Name)
         {
-            if (Lookup.TryEnum<Ty>(Name, out Ty outEnum))
+            if (Lookup.TryEnum<T>(Name, out T outEnum))
             {
-                return CastTo<Int32>.From<Ty>(outEnum);
+                return CastTo<Int32>.From<T>(outEnum);
             }
             return null;// name.GetHashCode();
         }
@@ -189,19 +189,19 @@ namespace CssUI
         /// Converts an enum value into a positive integer value, preferrably via LUT lookup or else this class wont be performant.
         /// </summary>
         /// <param name="enumValue"></param>
-        protected virtual int? Enum_To_Value(Ty enumValue)
+        protected virtual int? Enum_To_Value(T enumValue)
         {
             //return Convert.ToInt32(enumValue);
-            return CastTo<Int32>.From<Ty>(enumValue);
+            return CastTo<Int32>.From<T>(enumValue);
         }
 
         /// <summary>
         /// Converts a string name into an enum value, preferrably via LUT lookup or else this class wont be performant.
         /// </summary>
         /// <param name="Name"></param>
-        protected virtual Ty? Name_To_Enum(string Name)
+        protected virtual T? Name_To_Enum(string Name)
         {
-            if (Lookup.TryEnum<Ty>(Name, out Ty outEnum))
+            if (Lookup.TryEnum<T>(Name, out T outEnum))
             {
                 return outEnum;
             }
@@ -232,43 +232,43 @@ namespace CssUI
         #endregion
 
         #region Implicit
-        public static implicit operator AtomicName<Ty>(Ty Name) => new AtomicName<Ty>(Name);
-        public static implicit operator AtomicName<Ty>(string Name) => new AtomicName<Ty>(Name);
+        public static implicit operator AtomicName<T>(T Name) => new AtomicName<T>(Name);
+        public static implicit operator AtomicName<T>(string Name) => new AtomicName<T>(Name);
         #endregion
 
         #region Equality
-        public static bool operator ==(AtomicName<Ty> A, AtomicName<Ty> B)
+        public static bool operator ==(AtomicName<T> A, AtomicName<T> B)
         {
             return (A.Value == B.Value);
         }
 
-        public static bool operator !=(AtomicName<Ty> A, AtomicName<Ty> B)
+        public static bool operator !=(AtomicName<T> A, AtomicName<T> B)
         {
             return (A.Value != B.Value);
         }
 
-        public static bool operator ==(AtomicName<Ty> A, Ty B)
+        public static bool operator ==(AtomicName<T> A, T B)
         {
             return (A.Value == Convert.ToInt32(B));
         }
 
-        public static bool operator !=(AtomicName<Ty> A, Ty B)
+        public static bool operator !=(AtomicName<T> A, T B)
         {
             return (A.Value != Convert.ToInt32(B));
         }
 
         public override bool Equals(object obj)
         {
-            if (obj is AtomicName<Ty> name && Value.Equals(name.Value))
+            if (obj is AtomicName<T> name && Value.Equals(name.Value))
                 return true;
 
-            if (obj is Ty enumValue && Value.Equals(Convert.ToInt32(enumValue)))
+            if (obj is T enumValue && Value.Equals(Convert.ToInt32(enumValue)))
                 return true;
 
             return false;
         }
 
-        public bool Equals(AtomicName<Ty> Name)
+        public bool Equals(AtomicName<T> Name)
         {
             if (Name == null)
                 return false;
@@ -295,7 +295,7 @@ namespace CssUI
             if (obj == null)
                 return 1;
 
-            if (obj is AtomicName<Ty> objName)
+            if (obj is AtomicName<T> objName)
             {
                 return Value.CompareTo(objName.Value);
             }
@@ -309,11 +309,11 @@ namespace CssUI
             }
             else
             {
-                throw new ArgumentException($"Object is not an {nameof(AtomicName<Ty>)} or Integer");
+                throw new ArgumentException($"Object is not an {nameof(AtomicName<T>)} or Integer");
             }
         }
 
-        public int CompareTo(AtomicName<Ty> Name)
+        public int CompareTo(AtomicName<T> Name)
         {
             if (Name == null)
                 return 1;

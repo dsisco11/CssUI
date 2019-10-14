@@ -247,7 +247,13 @@ namespace CssUI
                 return false;
             }
 
-            outEnum = (T)EnumMetaTable.KEYWORD[enumIndex][Keyword];
+            if (!EnumMetaTable.KEYWORD[enumIndex].TryGetValue(Keyword, out object outValue))
+            {
+                outEnum = default;
+                return false;
+            }
+
+            outEnum = CastTo<T>.From(outValue);
             return true;
         }
 
@@ -272,7 +278,14 @@ namespace CssUI
                 return false;
             }
 
-            outEnum = EnumMetaTable.KEYWORD[enumIndex][Keyword];
+
+            if (!EnumMetaTable.KEYWORD[enumIndex].TryGetValue(Keyword, out object outValue))
+            {
+                outEnum = default;
+                return false;
+            }
+
+            outEnum = outValue;
             return true;
         }
 

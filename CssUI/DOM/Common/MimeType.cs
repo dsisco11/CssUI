@@ -329,11 +329,13 @@ namespace CssUI.DOM
                 /* 4) If value does not solely contain HTTP token code points or value is the empty string, then: */
                 if (StringCommon.Contains(kv.Value.AsSpan(), c => !HTTPCommon.Is_HTTP_Token(c)))
                 {
-                    var escapedQuote = new ReadOnlyMemory<char>(new char[2] { CHAR_REVERSE_SOLIDUS, CHAR_QUOTATION_MARK });
-                    var escapedSlash = new ReadOnlyMemory<char>(new char[2] { CHAR_REVERSE_SOLIDUS, CHAR_REVERSE_SOLIDUS });
-                    string escapedStr = StringCommon.Replace(kv.Value.AsMemory(), false, 
-                        (CHAR_QUOTATION_MARK, escapedQuote), 
-                        (CHAR_REVERSE_SOLIDUS, escapedSlash));
+                    //var escapedQuote = new ReadOnlyMemory<char>(new char[2] { CHAR_REVERSE_SOLIDUS, CHAR_QUOTATION_MARK });
+                    //var escapedSlash = new ReadOnlyMemory<char>(new char[2] { CHAR_REVERSE_SOLIDUS, CHAR_REVERSE_SOLIDUS });
+                    const string escapedQuote = @"\?";
+                    const string escapedSlash = @"\\";
+
+                    string escapedStr = StringCommon.Replace(kv.Value, false, false, 
+                        (CHAR_QUOTATION_MARK, escapedQuote), (CHAR_REVERSE_SOLIDUS, escapedSlash));
 
                     valueStr = string.Concat(CHAR_QUOTATION_MARK, escapedStr, CHAR_QUOTATION_MARK);
                 }

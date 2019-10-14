@@ -20,7 +20,7 @@ namespace CssUI.DOM
             {
                 if (!AttrDict.ContainsKey(def.Name))
                 {
-                    AttrDict.Add(def.Name, new List<AttributeDefinition>(3));
+                    AttrDict.Add(def.Name, new List<AttributeDefinition>());
                 }
 
                 AttrDict[def.Name].Add(def);

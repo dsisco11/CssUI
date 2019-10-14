@@ -62,42 +62,42 @@ namespace CssUI.DOM
         /// <summary>
         /// Creates a new <see cref="EAttributeType.Integer"/> type attribute value
         /// </summary>
-        public static AttributeValue From(int Integer) => new AttributeValue(EAttributeType.Integer, Integer, Integer.ToString(CultureInfo.InvariantCulture));
+        public static AttributeValue From(Int32 Integer) => new AttributeValue(EAttributeType.Integer, Integer, Integer.ToString(CultureInfo.InvariantCulture));
 
         /// <summary>
         /// Creates a new <see cref="EAttributeType.Integer"/> type attribute value
         /// </summary>
-        public static AttributeValue From(uint Integer) => new AttributeValue(EAttributeType.NonNegative_Integer, Integer, Integer.ToString(CultureInfo.InvariantCulture));
+        public static AttributeValue From(UInt32 Integer) => new AttributeValue(EAttributeType.NonNegative_Integer, Integer, Integer.ToString(CultureInfo.InvariantCulture));
 
         /// <summary>
         /// Creates a new <see cref="EAttributeType.Integer"/> type attribute value
         /// </summary>
-        public static AttributeValue From(ulong Integer) => new AttributeValue(EAttributeType.NonNegative_Integer, Integer, Integer.ToString(CultureInfo.InvariantCulture));
+        public static AttributeValue From(Int64 Integer) => new AttributeValue(EAttributeType.Integer, Integer, Integer.ToString(CultureInfo.InvariantCulture));
 
         /// <summary>
         /// Creates a new <see cref="EAttributeType.Integer"/> type attribute value
         /// </summary>
-        public static AttributeValue From(long Integer) => new AttributeValue(EAttributeType.Integer, Integer, Integer.ToString(CultureInfo.InvariantCulture));
+        public static AttributeValue From(UInt64 Integer) => new AttributeValue(EAttributeType.NonNegative_Integer, Integer, Integer.ToString(CultureInfo.InvariantCulture));
 
         /// <summary>
         /// Creates a new <see cref="EAttributeType.FloatingPoint"/> type attribute value
         /// </summary>
-        public static AttributeValue From(double Single) => new AttributeValue(EAttributeType.FloatingPoint, Single, Single.ToString(CultureInfo.InvariantCulture));
+        public static AttributeValue From(Double Single) => new AttributeValue(EAttributeType.FloatingPoint, Single, Single.ToString(CultureInfo.InvariantCulture));
 
         /// <summary>
         /// Creates a new <see cref="EAttributeType.Boolean"/> type attribute value
         /// </summary>
-        public static AttributeValue From(bool boolVal) => new AttributeValue(EAttributeType.Boolean, boolVal, boolVal ? string.Empty : null);
+        public static AttributeValue From(Boolean boolVal) => new AttributeValue(EAttributeType.Boolean, boolVal, boolVal ? string.Empty : null);
 
         /// <summary>
         /// Creates a new <see cref="EAttributeType.Length"/> type attribute value
         /// </summary>
-        public static AttributeValue From_Length(double Length) => new AttributeValue(EAttributeType.Length, Length, Length.ToString(CultureInfo.InvariantCulture));
+        public static AttributeValue From_Length(Double Length) => new AttributeValue(EAttributeType.Length, Length, Length.ToString(CultureInfo.InvariantCulture));
         
         /// <summary>
         /// Creates a new <see cref="EAttributeType.Percentage"/> type attribute value
         /// </summary>
-        public static AttributeValue From_Percent(double Percentage) => new AttributeValue(EAttributeType.Percentage, Percentage, Percentage.ToString(CultureInfo.InvariantCulture));
+        public static AttributeValue From_Percent(Double Percentage) => new AttributeValue(EAttributeType.Percentage, Percentage, Percentage.ToString(CultureInfo.InvariantCulture));
         
         /// <summary>
         /// Creates a new <see cref="EAttributeType.String"/> type attribute value
@@ -202,7 +202,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Retreives this value as the requested type if possible
         /// </summary>
-        public double AsFloatingPoint()
+        public Double AsFloatingPoint()
         {
             if (Type != EAttributeType.FloatingPoint)
             {
@@ -228,7 +228,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Retreives this value as the requested type if possible
         /// </summary>
-        public double AsLength()
+        public Double AsLength()
         {
             if (Type != EAttributeType.Length && Type != EAttributeType.NonZero_Length)
             {
@@ -241,7 +241,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Retreives this value as the requested type if possible
         /// </summary>
-        public double AsPercentage()
+        public Double AsPercentage()
         {
             if (Type != EAttributeType.Percentage && Type != EAttributeType.NonZero_Percentage)
             {

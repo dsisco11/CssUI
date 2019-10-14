@@ -6,9 +6,9 @@ namespace CssUI.Filters
     /// <summary>
     /// Rejects any non-selectable unicode code points
     /// </summary>
-    public class FilterCharSelectable : DataFilter<char>
+    public class FilterCharNonSelectable : DataFilter<char>
     {
-        public static DataFilter<char> Instance = new FilterCharSelectable();
+        public static DataFilter<char> Instance = new FilterCharNonSelectable();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override EFilterResult acceptData(char data)

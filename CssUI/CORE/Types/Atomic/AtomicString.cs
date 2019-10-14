@@ -75,10 +75,10 @@ namespace CssUI
         public ReadOnlyMemory<char> AsMemory() => Data;
         public override string ToString() => Data.ToString();
 
-        public static implicit operator string(AtomicString atom) => atom.Data.ToString();
+        public static implicit operator String(AtomicString atom) => atom.Data.ToString();
         public static implicit operator ReadOnlyMemory<char>(AtomicString atom) => atom.Data;
 
-        public static implicit operator AtomicString(string str) => new AtomicString(str.AsMemory());
+        public static implicit operator AtomicString(String str) => new AtomicString(str.AsMemory());
         public static implicit operator AtomicString(ReadOnlyMemory<char> memory) => new AtomicString(memory);
         #endregion
 

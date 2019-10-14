@@ -570,6 +570,14 @@ namespace CssUI.Serialization
 
             double secondsParsed = ParsingCommon.Digits_To_Base10_Unsigned(secondsDigits);
 
+            if (secondsParsed < 0 || secondsParsed > 59)
+            {
+                outHours = 0;
+                outMinutes = 0;
+                outSeconds = 0;
+                return false;
+            }
+
             if (Stream.Next == CHAR_FULL_STOP)
             {
                 Stream.Consume();
@@ -590,14 +598,6 @@ namespace CssUI.Serialization
                 outMinutes = 0;
                 outSeconds = 0;
                 return true;
-            }
-
-            if (secondsParsed < 0 || secondsParsed > 59)
-            {
-                outHours = 0;
-                outMinutes = 0;
-                outSeconds = 0;
-                return false;
             }
 
             outHours = hourParsed;
@@ -1152,7 +1152,7 @@ namespace CssUI.Serialization
                     }
                 }
 
-                if (!(TimeInSeconds ==  totalTime))
+                if (!(TimeInSeconds == totalTime))
                 {
                     return false;
                 }
@@ -1166,7 +1166,7 @@ namespace CssUI.Serialization
                     totalTime += outSeconds;
                 }
 
-                if (!(TimeInSeconds ==  totalTime))
+                if (!(TimeInSeconds == totalTime))
                 {
                     return false;
                 }
@@ -1274,6 +1274,7 @@ namespace CssUI.Serialization
                         return false;
                     }
 
+                    Stream.Consume();
                     units = EDurationUnit.Seconds;
                 }
                 else
@@ -1330,51 +1331,51 @@ namespace CssUI.Serialization
                                 return false;
                             }
                     }
-
-                    componentCount++;
-                    double multiplier = 1;
-
-                    if (units == EDurationUnit.Years)
-                    {
-                        multiplier *= 12;
-                        units = EDurationUnit.Months;
-                    }
-
-                    if (units == EDurationUnit.Months)
-                    {
-                        months += N * multiplier;
-                    }
-                    else
-                    {
-                        if (units == EDurationUnit.Weeks)
-                        {
-                            multiplier *= 7;
-                            units = EDurationUnit.Days;
-                        }
-
-                        if (units == EDurationUnit.Days)
-                        {
-                            multiplier *= 24;
-                            units = EDurationUnit.Hours;
-                        }
-
-                        if (units == EDurationUnit.Hours)
-                        {
-                            multiplier *= 60;
-                            units = EDurationUnit.Minutes;
-                        }
-
-                        if (units == EDurationUnit.Minutes)
-                        {
-                            multiplier *= 60;
-                            units = EDurationUnit.Seconds;
-                        }
-
-                        seconds += N * multiplier;
-                    }
-
-                    Stream.Consume_While(Is_Ascii_Whitespace);
                 }
+
+                componentCount++;
+                double multiplier = 1;
+
+                if (units == EDurationUnit.Years)
+                {
+                    multiplier *= 12;
+                    units = EDurationUnit.Months;
+                }
+
+                if (units == EDurationUnit.Months)
+                {
+                    months += N * multiplier;
+                }
+                else
+                {
+                    if (units == EDurationUnit.Weeks)
+                    {
+                        multiplier *= 7;
+                        units = EDurationUnit.Days;
+                    }
+
+                    if (units == EDurationUnit.Days)
+                    {
+                        multiplier *= 24;
+                        units = EDurationUnit.Hours;
+                    }
+
+                    if (units == EDurationUnit.Hours)
+                    {
+                        multiplier *= 60;
+                        units = EDurationUnit.Minutes;
+                    }
+
+                    if (units == EDurationUnit.Minutes)
+                    {
+                        multiplier *= 60;
+                        units = EDurationUnit.Seconds;
+                    }
+
+                    seconds += N * multiplier;
+                }
+
+                Stream.Consume_While(Is_Ascii_Whitespace);
             }
 
             if (componentCount == 0)
@@ -1770,7 +1771,7 @@ namespace CssUI.Serialization
                 return true;
             }
 
-            string input = StringCommon.Replace(mem, FilterUnicodeOOB.Instance, "00".AsSpan(), true);
+            string input = StringCommon.Replace(mem.Span, true, false, (FilterUnicodeOOB.Instance, "00"));
 
             int startOffset = input[0] == CHAR_HASH ? 1 : 0;
             input = input.Substring(startOffset, Math.Min(input.Length, 128));

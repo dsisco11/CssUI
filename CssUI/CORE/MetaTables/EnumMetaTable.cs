@@ -74,13 +74,14 @@ namespace CssUI
         }
 
         #region Helpers
-        /*public static int IntCast<T>(object o)
+        public static int IntCast<T>(object o) where T : struct
         {
             int retVal;
-            dynamic obj = (T)o;
-            retVal = obj;
+            T obj = (T)o;
+            retVal = Unsafe.As<T, int>(ref obj);
+            //retVal = Unsafe.Unbox<int>(obj);
             return retVal;
-        }*/
+        }
         public static object EnumMaxValue<T>() where T : struct
         {
             return Enum.GetValues(typeof(T)).Cast<T>().Max();
@@ -90,21 +91,21 @@ namespace CssUI
         {
             if (metaEnum is null) throw new ArgumentNullException(nameof(metaEnum));
             Contract.EndContractBlock();
-
             
             Type underlyingType = metaEnum.GetEnumUnderlyingType();
-            //var castMethod = typeof(EnumMetaTable).GetMethod("IntCast").MakeGenericMethod(underlyingType);
+            var castMethod = typeof(EnumMetaTable).GetMethod("IntCast").MakeGenericMethod(underlyingType);
             var enumMaxMethod = typeof(EnumMetaTable).GetMethod("EnumMaxValue").MakeGenericMethod(metaEnum);
             object bigValue = enumMaxMethod.Invoke(null, null);
-            int maxValue = (int)bigValue;// (int)castMethod.Invoke(null, new object[] { bigValue });
-            
+            //int maxValue = Unsafe.Unbox<int>(bigValue);
+            int maxValue = (int)castMethod.Invoke(null, new object[] { bigValue });
+
             int TotalValues = 1 + maxValue;
             var RetVal = new (int, MetaKeywordAttribute)[TotalValues];
             Array metaValues = Enum.GetValues(metaEnum);
             foreach (object o in metaValues)
             {
                 var u = Enum.ToObject(metaEnum, o);
-                int i = (int)u;// (int)castMethod.Invoke(null, new object[] { u });
+                int i = (int)castMethod.Invoke(null, new object[] { u });
 
                 if (i < 0) continue;
 

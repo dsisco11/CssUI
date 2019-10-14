@@ -2,6 +2,9 @@
 using CssUI.Filters;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using static CssUI.UnicodeCommon;
 
@@ -50,11 +53,11 @@ namespace CssUI
             if (Str.Length == 0)
                 return false;
 
-            var Span = Str;//.Data.Span;
+            var Span = Str;
             for (int i = 0; i < Span.Length; i++)
             {
                 var result = Filter.acceptData(Span[i]);
-                if (result == EFilterResult.FILTER_ACCEPT)
+                if (result != EFilterResult.FILTER_ACCEPT)
                 {
                     return true;
                 }
@@ -245,7 +248,8 @@ namespace CssUI
             var Span = Str;//.Data.Span;
             for (int i = 0; i < Span.Length; i++)
             {
-                if (Span[i] == Search)
+                char c = Span[i];
+                if (c.Equals(Search))
                 {
                     RetVal++;
                 }
@@ -257,15 +261,23 @@ namespace CssUI
 
 
         #region Transformations
-        const string SPACE = " ";
+        static ValueTuple<char, StringPtr>[] WhitespaceReplacements = new ValueTuple<char, StringPtr>[]
+        {
+            (CHAR_TAB, " "),
+            (CHAR_LINE_FEED, " "),
+            (CHAR_FORM_FEED, " "),
+            (CHAR_CARRIAGE_RETURN, " "),
+            (CHAR_SPACE, " "),
+        };
+
         /// <summary>
         /// Strips leading and trailing whitespace from a string and also collapses groups of whitespace characters with a single space
         /// </summary>
         /// <param name="buffMem">String memory</param>
         /// <returns>Altered string</returns>
-        public static String Strip_And_Collapse_Whitespace(ReadOnlyMemory<char> buffMem)
+        public static String Strip_And_Collapse_Whitespace(ReadOnlySpan<char> buffMem)
         {/* Docs: https://infra.spec.whatwg.org/#strip-and-collapse-ascii-whitespace */
-            return Replace(buffMem, FilterWhitespace.Instance, SPACE.AsSpan(), true);
+            return Replace(buffMem, true, true, WhitespaceReplacements);
         }
 
 
@@ -287,156 +299,182 @@ namespace CssUI
         /// Concatenates an array of strings into a single string with each original string seperated from the next by a given delimiter
         /// </summary>
         /// <param name="Delim">The delimiter(s) that should seperate each token</param>
-        /// <param name="Inputs">The strings to join</param>
+        /// <param name="Args">The strings to join</param>
         /// <returns></returns>
-        public static String Concat(char Delim, IEnumerable<ReadOnlyMemory<char>> Inputs)
+        public static String Concat(char Delim, IEnumerable<ReadOnlyMemory<char>> Args)
         {
-            ulong chunkCount = 0;
-            ulong newLength = 0;
-            foreach (var chunk in Inputs)
+            if (Args is null) throw new ArgumentNullException(nameof(Args));
+            Contract.EndContractBlock();
+
+            int chunkCount = 0;
+            int newLength = 0;
+            foreach (var chunk in Args)
             {
                 chunkCount++;
-                newLength += (ulong)chunk.Length;
+                newLength += chunk.Length;
             }
 
-            /* Compile the new string */
-            ulong insertCount = (chunkCount - 1);/* Number of delimiters we will insert into new string */
-            newLength += insertCount;
+            // Compile the new string
+            if (Delim != '\0')
+            {
+                var insertCount = (chunkCount - 1);// Number of delimiters we will insert into new string
+                newLength += insertCount;
+            }
 
             char[] dataPtr = new char[newLength];
             Memory<char> data = new Memory<char>(dataPtr);
-            string newStr = new string(dataPtr);
 
-            ulong index = 0;
-            foreach (var chunk in Inputs)
+            int index = 0;
+            foreach (var chunk in Args)
             {
-                /* Copy substring */
-                chunk.CopyTo(data.Slice((int)index));
-                index += (ulong)chunk.Length;
+                // Insert delimiter
+                if (Delim != '\0' && index > 0)
+                {
+                    data.Span[index] = Delim;
+                    index += 1;
+                }
 
-                /* Insert delimiter */
-                data.Span[(int)index] = Delim;
-                index += 1;
+                // Copy substring 
+                chunk.CopyTo(data.Slice(index));
+                index += chunk.Length;
             }
 
-            return newStr;
+            return new string(dataPtr);
         }
 
         /// <summary>
         /// Concatenates an array of strings into a single string with each original string seperated from the next by a given delimiter
         /// </summary>
         /// <param name="Delim">The delimiter(s) that should seperate each token</param>
-        /// <param name="Inputs">The strings to join</param>
+        /// <param name="Args">The strings to join</param>
         /// <returns></returns>
-        public static String Concat(char Delim, params StringPtr[] Inputs)
+        public static String Concat(char Delim, params StringPtr[] Args)
         {
-            ulong chunkCount = (ulong)Inputs.Length;
-            ulong newLength = 0;
-            for (ulong i = 0; i < chunkCount; i++)
+            if (Args is null) throw new ArgumentNullException(nameof(Args));
+            Contract.EndContractBlock();
+
+            var chunkCount = Args.Length;
+            int newLength = 0;
+            for (int i = 0; i < chunkCount; i++)
             {
-                newLength += (ulong)Inputs[i].Length;
+                newLength += Args[i].Length;
             }
 
-            /* Compile the new string */
-            ulong insertCount = (chunkCount - 1);/* Number of delimiters we will insert into new string */
-            newLength += insertCount;
+            // Compile the new string
+            if (Delim != '\0')
+            {
+                var insertCount = (chunkCount - 1);// Number of delimiters we will insert into new string
+                newLength += insertCount;
+            }
 
             char[] dataPtr = new char[newLength];
             Memory<char> data = new Memory<char>(dataPtr);
-            string newStr = new string(dataPtr);
 
-            ulong index = 0;
-            foreach (var chunk in Inputs)
+            int index = 0;
+            foreach (var chunk in Args)
             {
-                /* Copy substring */
-                chunk.Data.CopyTo(data.Slice((int)index));
-                index += (ulong)chunk.Length;
+                // Insert delimiter
+                if (Delim != '\0' && index > 0)
+                {
+                    data.Span[index] = Delim;
+                    index += 1;
+                }
 
-                /* Insert delimiter */
-                data.Span[(int)index] = Delim;
-                index += 1;
+                // Copy substring 
+                chunk.Data.CopyTo(data.Slice(index));
+                index += chunk.Length;
             }
 
-            return newStr;
+            return new string(dataPtr);
         }
 
         /// <summary>
         /// Concatenates an array of strings into a single string with each original string seperated from the next by a given delimiter
         /// </summary>
         /// <param name="Delim">The delimiter(s) that should seperate each token</param>
-        /// <param name="Inputs">The strings to join</param>
+        /// <param name="Args">The strings to join</param>
         /// <returns></returns>
-        public static String Concat(ReadOnlySpan<char> Delim, IEnumerable<ReadOnlyMemory<char>> Inputs)
+        public static String Concat(ReadOnlySpan<char> Delim, IEnumerable<ReadOnlyMemory<char>> Args)
         {
-            ulong chunkCount = 0;
-            ulong newLength = 0;
-            foreach (var chunk in Inputs)
+            if (Args is null) throw new ArgumentNullException(nameof(Args));
+            Contract.EndContractBlock();
+
+            int chunkCount = 0;
+            int newLength = 0;
+            foreach (var chunk in Args)
             {
                 chunkCount++;
-                newLength += (ulong)chunk.Length;
+                newLength += chunk.Length;
             }
 
-            /* Compile the new string */
-            ulong substituteLength = (ulong)Delim.Length;
-            ulong insertCount = (chunkCount - 1);/* Number of delimiters we will insert into new string */
+            // Compile the new string
+            var substituteLength = Delim.Length;
+            var insertCount = (chunkCount - 1);// Number of delimiters we will insert into new string
             newLength += insertCount * substituteLength;
 
             char[] dataPtr = new char[newLength];
             Memory<char> data = new Memory<char>(dataPtr);
-            string newStr = new string(dataPtr);
 
-            ulong index = 0;
-            foreach (var chunk in Inputs)
+            int index = 0;
+            foreach (var chunk in Args)
             {
-                /* Copy substring */
-                chunk.CopyTo(data.Slice((int)index));
-                index += (ulong)chunk.Length;
+                // Insert delimiter
+                if (index > 0)
+                {
+                    Delim.CopyTo(data.Span.Slice(index));
+                    index += substituteLength;
+                }
 
-                /* Insert delimiter */
-                Delim.CopyTo(data.Span.Slice((int)index));
-                index += substituteLength;
+                // Copy substring 
+                chunk.CopyTo(data.Slice(index));
+                index += chunk.Length;
             }
 
-            return newStr;
+            return new string(dataPtr);
         }
 
         /// <summary>
         /// Concatenates an array of strings into a single string with each original string seperated from the next by a given delimiter
         /// </summary>
         /// <param name="Delim">The delimiter(s) that should seperate each token</param>
-        /// <param name="Inputs">The strings to join</param>
+        /// <param name="Args">The strings to join</param>
         /// <returns></returns>
-        public static String Concat(ReadOnlySpan<char> Delim, params StringPtr[] Inputs)
+        public static String Concat(ReadOnlySpan<char> Delim, params StringPtr[] Args)
         {
-            ulong chunkCount = (ulong)Inputs.Length;
-            ulong newLength = 0;
-            for (ulong i = 0; i < chunkCount; i++)
+            if (Args is null) throw new ArgumentNullException(nameof(Args));
+            Contract.EndContractBlock();
+
+            int chunkCount = Args.Length;
+            int newLength = 0;
+            for (int i = 0; i < chunkCount; i++)
             {
-                newLength += (ulong)Inputs[i].Length;
+                newLength += Args[i].Length;
             }
 
-            /* Compile the new string */
-            ulong substituteLength = (ulong)Delim.Length;
-            ulong insertCount = (chunkCount - 1);/* Number of delimiters we will insert into new string */
+            // Compile the new string
+            var substituteLength = Delim.Length;
+            var insertCount = (chunkCount - 1);// Number of delimiters we will insert into new string
             newLength += insertCount * substituteLength;
 
             char[] dataPtr = new char[newLength];
             Memory<char> data = new Memory<char>(dataPtr);
-            string newStr = new string(dataPtr);
 
-            ulong index = 0;
-            foreach (var chunk in Inputs)
+            int index = 0;
+            foreach (var chunk in Args)
             {
-                /* Copy substring */
-                chunk.Data.CopyTo(data.Slice((int)index));
-                index += (ulong)chunk.Length;
+                // Insert delimiter
+                if (index > 0)
+                {
+                    Delim.CopyTo(data.Span.Slice(index));
+                    index += substituteLength;
+                }
 
-                /* Insert delimiter */
-                Delim.CopyTo(data.Span.Slice((int)index));
-                index += substituteLength;
+                // Copy substring 
+                chunk.Data.CopyTo(data.Slice(index));
+                index += chunk.Length;
             }
 
-            return newStr;
+            return new string(dataPtr);
         }
 
         /* Delimitless concats */
@@ -444,68 +482,67 @@ namespace CssUI
         /// <summary>
         /// Concatenates an array of strings into a single string
         /// </summary>
-        /// <param name="Inputs">The strings to join</param>
+        /// <param name="Args">The strings to join</param>
         /// <returns></returns>
-        public static String Concat(IEnumerable<ReadOnlyMemory<char>> Inputs)
+        public static String Concat(IEnumerable<ReadOnlyMemory<char>> Args)
         {
-            ulong chunkCount = 0;
-            ulong newLength = 0;
-            foreach (var chunk in Inputs)
+            if (Args is null) throw new ArgumentNullException(nameof(Args));
+            Contract.EndContractBlock();
+
+            int chunkCount = 0;
+            int newLength = 0;
+            foreach (var chunk in Args)
             {
                 chunkCount++;
-                newLength += (ulong)chunk.Length;
+                newLength += chunk.Length;
             }
 
-            /* Compile the new string */
-            ulong insertCount = (chunkCount - 1);/* Number of delimiters we will insert into new string */
-            newLength += insertCount;
-
+            // Compile the new string
             char[] dataPtr = new char[newLength];
             Memory<char> data = new Memory<char>(dataPtr);
-            string newStr = new string(dataPtr);
 
-            ulong index = 0;
-            foreach (var chunk in Inputs)
+            int index = 0;
+            foreach (var chunk in Args)
             {
-                /* Copy substring */
-                chunk.CopyTo(data.Slice((int)index));
-                index += (ulong)chunk.Length;
+                // Copy substring
+                chunk.CopyTo(data.Slice(index));
+                index += chunk.Length;
             }
 
-            return newStr;
+            return new string(dataPtr);
         }
 
         /// <summary>
         /// Concatenates an array of strings into a single string
         /// </summary>
-        /// <param name="Inputs">The strings to join</param>
+        /// <param name="Args">The strings to join</param>
         /// <returns></returns>
-        public static String Concat(params ReadOnlyMemory<char>[] Inputs)
+        public static String Concat(params StringPtr[] Args)
         {
-            ulong chunkCount = (ulong)Inputs.Length;
-            ulong newLength = 0;
-            for (ulong i = 0; i < chunkCount; i++)
+            if (Args is null) throw new ArgumentNullException(nameof(Args));
+            Contract.EndContractBlock();
+            if (Args.Length <= 0) return String.Empty;
+
+            int chunkCount = Args.Length;
+            int newLength = 0;
+            for (int i = 0; i < chunkCount; i++)
             {
-                newLength += (ulong)Inputs[i].Length;
+                newLength += Args[i].Length;
             }
 
-            /* Compile the new string */
-            ulong insertCount = (chunkCount - 1);/* Number of delimiters we will insert into new string */
-            newLength += insertCount;
-
+            // Compile the new string
             char[] dataPtr = new char[newLength];
             Memory<char> data = new Memory<char>(dataPtr);
-            string newStr = new string(dataPtr);
 
-            ulong index = 0;
-            foreach (var chunk in Inputs)
+            int index = 0;
+            foreach (var chunk in Args)
             {
-                /* Copy substring */
-                chunk.CopyTo(data.Slice((int)index));
-                index += (ulong)chunk.Length;
+                // Copy substring 
+                chunk.AsMemory().CopyTo(data.Slice(index));
+                index += chunk.Length;
             }
 
-            return newStr;
+            return new string(dataPtr);
         }
         #endregion
 
@@ -872,543 +909,148 @@ namespace CssUI
 
         #region Tokenization
         /// <summary>
-        /// Splits a string <paramref name="Input"/> into tokens based on a given delimiter(s)
+        /// Splits a string <paramref name="Source"/> into tokens based on a given delimiter(s)
         /// </summary>
-        /// <param name="Input">The string to tokenize</param>
+        /// <param name="Source">The string to tokenize</param>
         /// <param name="Delim">The delimiter(s) that should seperate each token</param>
         /// <returns></returns>
-        public static IReadOnlyList<ReadOnlyMemory<char>> Strtok(StringPtr Input, char Delim)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlyMemory<char>[] Strtok(StringPtr Source, char Delim)
         {
-            return Strtok(Input, new char[1] { Delim });
+            return Strtok(Source, new char[1] { Delim });
         }
 
         /// <summary>
-        /// Splits a string <paramref name="Input"/> into tokens based on a given delimiter(s)
+        /// Splits a string <paramref name="Source"/> into tokens based on a given delimiter(s)
         /// </summary>
-        /// <param name="Input">The string to tokenize</param>
+        /// <param name="Source">The string to tokenize</param>
         /// <param name="Delims">The delimiter(s) that should seperate each token</param>
         /// <returns></returns>
-        public static IReadOnlyList<ReadOnlyMemory<char>> Strtok(StringPtr Input, params char[] Delims)
+        /// DO NOT INLINE THIS FUNCTION
+        public static ReadOnlyMemory<char>[] Strtok(StringPtr Source, params char[] Delims)
         {
-            if (Delims == null || Delims.Length == 0)
-            {
-                throw new ArgumentException("Delimeters must be non-null and contain one or more characters");
-            }
+            if (Source is null) throw new ArgumentNullException(nameof(Source));
+            if (Delims is null) throw new ArgumentNullException(nameof(Delims));
+            if (Delims.Length == 0) throw new ArgumentException("Delimeters must be non-null and contain one or more characters");
+            Contract.EndContractBlock();
 
-            DataConsumer<char> Stream = new DataConsumer<char>(Input, UnicodeCommon.EOF);
-            /* Create a list of memory chunks that make up the final string */
-            int? chunkStart = null;
-            int chunkCount = 0;
-            var chunks = new List<ReadOnlyMemory<char>>(16);
+            // Split the source string into chunks using the given delimiters
+            IEnumerable<StringChunk> AllChunks = _chunkify(Source.AsSpan(), true, Delims);
+            // We only want to return chunks that arent delimiters
+            IEnumerable<StringChunk> Chunks = AllChunks.Where(x => !x.IsDelimiter);
+            // Compile the return list of memory segments
+            var Src = Source.AsMemory();
+            ReadOnlyMemory<char>[] RetVal = Chunks.Select(Chunk => Src.Slice(Chunk.Start, Chunk.Size)).ToArray();
 
-            while (!Stream.atEnd)
-            {
-                EFilterResult filterResult = EFilterResult.FILTER_ACCEPT;
-                if (Delims.Length == 1)
-                {
-                    if (Stream.Next == Delims[0])
-                        filterResult = EFilterResult.FILTER_SKIP;
-                }
-                else
-                {
-                    foreach (char delim in Delims)
-                    {
-                        if (Stream.Next == delim)
-                        {
-                            filterResult = EFilterResult.FILTER_SKIP;
-                        }
-                    }
-                }
-
-
-                /* When filter result:
-                 * ACCEPT: Char should be included in chunk
-                 * SKIP: Char should not be included in chunk, if at chunk-start shift chunk-start past char, otherwise end chunk
-                 * REJECT: Char should not be included in chunk, current chunk ends
-                 */
-                bool end_chunk = false;
-                switch (filterResult)
-                {
-                    case EFilterResult.FILTER_ACCEPT:// Char should be included in the chunk
-                        {
-                            if (!chunkStart.HasValue) chunkStart = (int)Stream.LongPosition;/* Start new chunk (if one isnt started yet) */
-                        }
-                        break;
-                    case EFilterResult.FILTER_REJECT:// Char should not be included in chunk, current chunk ends
-                        {
-                            end_chunk = true;
-                        }
-                        break;
-                    case EFilterResult.FILTER_SKIP:// Char should not be included in chunk, if at chunk-start shift chunk-start past char, otherwise end chunk
-                        {
-                            if (!chunkStart.HasValue)
-                            {
-                                chunkStart = (int)Stream.LongPosition + 1;/* At chunk-start */
-                            }
-                            else
-                            {
-                                end_chunk = true;
-                            }
-                        }
-                        break;
-                }
-
-
-                Stream.Consume();
-                if (end_chunk || Stream.atEnd)
-                {
-                    if (!chunkStart.HasValue) chunkStart = (int)Stream.LongPosition - 1;
-
-                    /* Push new chunk to our list */
-                    var chunkSize = (int)(Stream.LongPosition - 1) - chunkStart.Value;
-                    chunks.Add(Input.Data.Slice((int)chunkStart.Value, (int)chunkSize));
-
-                    chunkCount++;
-                    chunkStart = null;
-                }
-            }
-
-            return chunks;
+            return RetVal;
         }
 
         /// <summary>
-        /// Splits a string <paramref name="Input"/> into tokens based on a given delimeter(s)
+        /// Splits a string <paramref name="Source"/> into tokens based on a given delimeter(s)
         /// </summary>
-        /// <param name="Input">The string to tokenize</param>
+        /// <param name="Source">The string to tokenize</param>
         /// <param name="Filter">The delimiter(s) that should seperate each token</param>
         /// <returns></returns>
-        public static IReadOnlyList<ReadOnlyMemory<char>> Strtok(StringPtr Input, DataFilter<char> Filter)
+        /// /// DO NOT INLINE THIS FUNCTION
+        public static ReadOnlyMemory<char>[] Strtok(StringPtr Source, DataFilter<char> Filter = null)
         {
-            if (Filter == null)
-            {
-                throw new ArgumentNullException("Filter cannot be null");
-            }
+            if (Source is null) throw new ArgumentNullException(nameof(Source));
+            if (Filter is null) throw new ArgumentNullException(nameof(Filter));
+            Contract.EndContractBlock();
 
-            DataConsumer<char> Stream = new DataConsumer<char>(Input, UnicodeCommon.EOF);
-            /* Create a list of memory chunks that make up the final string */
-            int? chunkStart = null;
-            int chunkCount = 0;
-            var chunks = new List<ReadOnlyMemory<char>>(16);
+            // Split the source string into chunks using the given delimiters
+            IEnumerable<StringChunk> AllChunks = _chunkify(Source.AsSpan(), true, Filter);
+            // We only want to return chunks that arent delimiters
+            IEnumerable<StringChunk> Chunks = AllChunks.Where(x => !x.IsDelimiter);
+            // Compile the return list of memory segments
+            var Src = Source.AsMemory();
+            ReadOnlyMemory<char>[] RetVal = Chunks.Select(Chunk => Src.Slice(Chunk.Start, Chunk.Size)).ToArray();
 
-            while (!Stream.atEnd)
-            {
-                EFilterResult filterResult = Filter.acceptData(Stream.Next);
-
-                /* When filter result:
-                 * ACCEPT: Char should be included in chunk
-                 * SKIP: Char should not be included in chunk, if at chunk-start shift chunk-start past char, otherwise end chunk
-                 * REJECT: Char should not be included in chunk, current chunk ends
-                 */
-                bool end_chunk = false;
-                switch (filterResult)
-                {
-                    case EFilterResult.FILTER_ACCEPT:// Char should be included in the chunk
-                        {
-                            if (!chunkStart.HasValue) chunkStart = (int)Stream.LongPosition;/* Start new chunk (if one isnt started yet) */
-                        }
-                        break;
-                    case EFilterResult.FILTER_REJECT:// Char should not be included in chunk, current chunk ends
-                        {
-                            end_chunk = true;
-                        }
-                        break;
-                    case EFilterResult.FILTER_SKIP:// Char should not be included in chunk, if at chunk-start shift chunk-start past char, otherwise end chunk
-                        {
-                            if (!chunkStart.HasValue)
-                            {
-                                chunkStart = (int)Stream.LongPosition + 1;/* At chunk-start */
-                            }
-                            else
-                            {
-                                end_chunk = true;
-                            }
-                        }
-                        break;
-                }
-
-                Stream.Consume();
-                if (end_chunk || Stream.atEnd)
-                {
-                    if (!chunkStart.HasValue) chunkStart = (int)Stream.LongPosition - 1;
-
-                    /* Push new chunk to our list */
-                    var chunkSize = (int)(Stream.LongPosition - 1) - chunkStart.Value;
-                    chunks.Add(Input.Data.Slice((int)chunkStart.Value, (int)chunkSize));
-
-                    chunkCount++;
-                    chunkStart = null;
-                }
-
-            }
-
-            return chunks;
+            return RetVal;
         }
         #endregion
 
 
         #region Mutation
 
+
         /// <summary>
         /// Replaces all characters indicated by the first value for each of the <paramref name="Replacements"/>, with the characters provided by their second value
         /// </summary>
-        /// <param name="buffMem">String memory</param>
-        /// <param name="trim">If <c>True</c> then leading and trailing ends of the returned string will have the <paramref name="substituteData"/> stripped from them</param>
+        /// <param name="Source">Target string</param>
+        /// <param name="Trim">If <c>True</c> then leading and trailing ends of the returned string will have the <paramref name="substituteData"/> stripped from them</param>
         /// <param name="Replacements">A series of tuples containing characters to be replaced and the characters which will replace each of them</param>
         /// <returns>Altered string</returns>
-        public static string Replace(ReadOnlyMemory<char> buffMem, bool trim = false, params ValueTuple<char, StringPtr>[] Replacements)
+        public static string Replace(ReadOnlySpan<char> Source, bool Trim = false, bool Collapse = false, params ValueTuple<char, StringPtr>[] Replacements)
         {
-            DataConsumer<char> Stream = new DataConsumer<char>(buffMem, UnicodeCommon.EOF);
-            /* Create a list of memory chunks that make up the final string */
-            int newLength = 0;
-            int? chunkStart = null;
-            int chunkCount = 0;
-            var chunks = new LinkedList<ValueTuple<ReadOnlyMemory<char>, int>>();
-            int substituteLength = 0;
+            if (Source.IsEmpty) return string.Empty;
+            if (Replacements.Length <= 0) return Source.ToString();
+            Contract.EndContractBlock();
 
-            /* Scan for replacement characters, when encountered create a new chunk (non inclusive). */
-            while (!Stream.atEnd)
-            {
-                EFilterResult filterResult = EFilterResult.FILTER_ACCEPT;
-                int replacementIndex = -1;
+            // Prepare the arrays needed for the generic chunking functions
+            char[] Delimiters = Replacements.Select(o => o.Item1).ToArray();
+            StringPtr[] Substitutions = Replacements.Select(o => o.Item2).ToArray();
 
-                for (int i = 0; i < Replacements.Length; i++)
-                {
-                    var replace = Replacements[i];
-                    if (Stream.Next == replace.Item1)
-                    {
-                        filterResult = EFilterResult.FILTER_SKIP;
-                        replacementIndex = i;
-                        substituteLength += replace.Item2.Length;
-                        break;
-                    }
-                }
-                /* When filter result:
-                 * ACCEPT: Char should be included in chunk
-                 * SKIP: Char should not be included in chunk, if at chunk-start shift chunk-start past char, otherwise end chunk
-                 * REJECT: Char should not be included in chunk, current chunk ends
-                 */
-                bool end_chunk = false;
-                switch (filterResult)
-                {
-                    case EFilterResult.FILTER_ACCEPT:// Char should be included in the chunk
-                        {
-                            if (!chunkStart.HasValue) chunkStart = (int)Stream.LongPosition;/* Start new chunk (if one isnt started yet) */
-                        }
-                        break;
-                    case EFilterResult.FILTER_REJECT:// Char should not be included in chunk, current chunk ends
-                        {
-                            end_chunk = true;
-                        }
-                        break;
-                    case EFilterResult.FILTER_SKIP:// Char should not be included in chunk, if at chunk-start shift chunk-start past char, otherwise end chunk
-                        {
-                            if (!chunkStart.HasValue)
-                            {
-                                chunkStart = (int)Stream.LongPosition + 1;/* At chunk-start */
-                            }
-                            else
-                            {
-                                end_chunk = true;
-                            }
-                        }
-                        break;
-                }
-
-                Stream.Consume();
-                if (end_chunk || Stream.Next == Stream.EOF_ITEM)
-                {
-                    if (!chunkStart.HasValue) chunkStart = (int)Stream.LongPosition;
-                    if (replacementIndex < 0) Stream.Consume();// if we arent actually trying to replace something in this chunk then we go ahead and include the last char also
-
-                    /* Push new chunk to our list */
-                    var chunkSize = (int)Stream.LongPosition - chunkStart.Value;
-                    var Mem = buffMem.Slice((int)chunkStart.Value, (int)chunkSize);
-                    chunks.AddLast((Mem, replacementIndex));
-
-                    if (replacementIndex >= 0) chunkCount++;
-                    chunkStart = null;
-                    newLength += chunkSize;
-                }
-            }
-
-            /* Compile the new string */
-
-            if (trim)
-            {/* To trim we just need to skip any empty chunks at the beginning and end */
-                while (chunks.First.Value.Item1.Length <= 0)
-                {
-                    chunks.RemoveFirst();
-                    chunkCount--;
-                }
-
-                while (chunks.Last.Value.Item1.Length <= 0)
-                {
-                    chunks.RemoveLast();
-                    chunkCount--;
-                }
-            }
-
-            int insertCount = chunkCount;/* Number of substitutes we will insert into new string */
-            newLength += insertCount * substituteLength;
-
-            char[] dataPtr = new char[newLength];
-            Memory<char> data = new Memory<char>(dataPtr);
-
-            int index = 0;
-            foreach (var tpl in chunks)
-            {
-                var chunk = tpl.Item1;
-                /* Copy substring */
-                chunk.CopyTo(data.Slice((int)index));
-                index += chunk.Length;
-                if (tpl.Item2 < 0) continue;
-
-                /* Insert substitute */
-                var replaceIndex = tpl.Item2;
-                var replaceTarget = data.Slice((int)index);
-                var replaceSource = Replacements[replaceIndex].Item2.AsMemory();
-                replaceSource.CopyTo(replaceTarget);
-                index += replaceSource.Length;
-            }
-
-            return new string(dataPtr);
+            // Seperate the source memory into chunks using the given predicates
+            var Chunks = _chunkify(Source, Collapse, Delimiters);
+            // Calculate size of the new string
+            int newLength = _tally_chunks(ref Chunks, Trim, Substitutions);
+            // Allocate final string
+            char[] pBuffer = _compile_chunks(Source, Chunks, newLength, Substitutions);
+            return new string(pBuffer);
         }
 
         /// <summary>
-        /// Replaces all characters, for which <paramref name="dataFilter"/> does not return <see cref="EFilterResult.FILTER_ACCEPT"/>, with the characters provided by <paramref name="substituteData"/>
+        /// Replaces all characters indicated by the first value for each of the <paramref name="Replacements"/>, with the characters provided by their second value
         /// </summary>
-        /// <param name="buffMem">String memory</param>
-        /// <param name="dataFilter"></param>
-        /// <param name="substituteData"></param>
-        /// <param name="trim">If <c>True</c> then leading and trailing ends of the returned string will have the <paramref name="substituteData"/> stripped from them</param>
+        /// <param name="Source">Target string</param>
+        /// <param name="Trim">If <c>True</c> then leading and trailing ends of the returned string will have the <paramref name="substituteData"/> stripped from them</param>
+        /// <param name="Replacements">A series of tuples containing characters to be replaced and the characters which will replace each of them</param>
         /// <returns>Altered string</returns>
-        public static string Replace(ReadOnlyMemory<char> buffMem, DataFilter<char> dataFilter, ReadOnlySpan<char> substituteData, bool trim = false)
+        public static string Replace(ReadOnlySpan<char> Source, bool Trim = false, bool Collapse = false, params ValueTuple<Predicate<char>, StringPtr>[] Replacements)
         {
-            DataConsumer<char> Stream = new DataConsumer<char>(buffMem, UnicodeCommon.EOF);
-            /* Create a list of memory chunks that make up the final string */
-            int newLength = 0;
-            int? chunkStart = null;
-            int chunkCount = 0;
-            var chunks = new LinkedList<ValueTuple<ReadOnlyMemory<char>, bool>>();
+            if (Source.IsEmpty) return string.Empty;
+            if (Replacements.Length <= 0) return Source.ToString();
+            Contract.EndContractBlock();
 
-            /* Scan for replacement characters, when encountered create a new chunk (non inclusive). */
-            while (!Stream.atEnd)
-            {
-                EFilterResult filterResult = dataFilter.acceptData(Stream.Next);
-                /* When filter result:
-                 * ACCEPT: Char should be included in chunk
-                 * SKIP: Char should not be included in chunk, if at chunk-start shift chunk-start past char, otherwise end chunk
-                 * REJECT: Char should not be included in chunk, current chunk ends
-                 */
-                bool end_chunk = false;
-                switch (filterResult)
-                {
-                    case EFilterResult.FILTER_ACCEPT:// Char should be included in the chunk
-                        {
-                            if (!chunkStart.HasValue) chunkStart = (int)Stream.LongPosition;/* Start new chunk (if one isnt started yet) */
-                        }
-                        break;
-                    case EFilterResult.FILTER_REJECT:// Char should not be included in chunk, current chunk ends
-                        {
-                            end_chunk = true;
-                        }
-                        break;
-                    case EFilterResult.FILTER_SKIP:// Char should not be included in chunk, if at chunk-start shift chunk-start past char, otherwise end chunk
-                        {
-                            if (!chunkStart.HasValue)
-                            {
-                                chunkStart = (int)Stream.LongPosition + 1;/* At chunk-start */
-                            }
-                            else
-                            {
-                                end_chunk = true;
-                            }
-                        }
-                        break;
-                }
+            // Prepare the arrays needed for the generic chunking functions
+            Predicate<char>[] Predicates = Replacements.Select(o => o.Item1).ToArray();
+            StringPtr[] Substitutions = Replacements.Select(o => o.Item2).ToArray();
 
-                Stream.Consume();
-                if (end_chunk || Stream.atEnd)
-                {
-                    if (!chunkStart.HasValue) chunkStart = (int)Stream.LongPosition - 1;
-                    if (Stream.atEnd) chunkStart++;// if we arent actually trying to replace something in this chunk then we go ahead and include the last char also
-
-                    /* Push new chunk to our list */
-                    var chunkSize = (int)(Stream.LongPosition - 1) - chunkStart.Value;
-                    chunks.AddLast((buffMem.Slice((int)chunkStart.Value, (int)chunkSize), !Stream.atEnd));
-
-                    chunkCount++;
-                    chunkStart = null;
-                    newLength += chunkSize;
-                }
-
-            }
-
-            /* Compile the new string */
-
-            if (trim)
-            {/* To trim we just need to skip any empty chunks at the beginning and end */
-                while (chunks.First.Value.Item1.Length <= 0)
-                {
-                    chunks.RemoveFirst();
-                    chunkCount--;
-                }
-
-                while (chunks.Last.Value.Item1.Length <= 0)
-                {
-                    chunks.RemoveLast();
-                    chunkCount--;
-                }
-            }
-
-            int substituteLength = substituteData.Length;
-            int insertCount = (chunkCount - 1);/* Number of substitutes we will insert into new string */
-            newLength += insertCount * substituteLength;
-
-            char[] dataPtr = new char[newLength];
-            Memory<char> data = new Memory<char>(dataPtr);
-
-            int index = 0;
-            foreach (var chunk in chunks)
-            {
-                /* Copy substring */
-                chunk.Item1.CopyTo(data.Slice((int)index));
-                index += chunk.Item1.Length;
-                if (!chunk.Item2) continue;
-                /* Insert substitute */
-                substituteData.CopyTo(data.Slice((int)index).Span);
-                index += substituteLength;
-            }
-
-            return new string(dataPtr);
+            // Seperate the source memory into chunks using the given predicates
+            var Chunks = _chunkify(Source, Collapse, Predicates);
+            // Calculate size of the new string
+            int newLength = _tally_chunks(ref Chunks, Trim, Substitutions);
+            // Allocate final string
+            char[] pBuffer = _compile_chunks(Source, Chunks, newLength, Substitutions);
+            return new string(pBuffer);
         }
 
         /// <summary>
-        /// Replaces all characters indicated by each of the data-filters in <paramref name="Replacements"/> does not return <see cref="EFilterResult.FILTER_ACCEPT"/>, with the characters provided by their second value
+        /// Replaces all characters indicated by the first value for each of the <paramref name="Replacements"/>, with the characters provided by their second value
         /// </summary>
-        /// <param name="buffMem">String memory</param>
-        /// <param name="trim">If <c>True</c> then leading and trailing ends of the returned string will have the <paramref name="substituteData"/> stripped from them</param>
-        /// <param name="Replacements">A series of tuples containing data filters and the characters to replace them.</param>
+        /// <param name="Source">Target string</param>
+        /// <param name="Trim">If <c>True</c> then leading and trailing ends of the returned string will have the <paramref name="substituteData"/> stripped from them</param>
+        /// <param name="Replacements">A series of tuples containing characters to be replaced and the characters which will replace each of them</param>
         /// <returns>Altered string</returns>
-        public static string Replace(ReadOnlyMemory<char> buffMem, bool trim = false, params ValueTuple<DataFilter<char>, StringPtr>[] Replacements)
+        public static string Replace(ReadOnlySpan<char> Source, bool Trim = false, bool Collapse = false, params ValueTuple<DataFilter<char>, StringPtr>[] Replacements)
         {
-            DataConsumer<char> Stream = new DataConsumer<char>(buffMem, UnicodeCommon.EOF);
-            /* Create a list of memory chunks that make up the final string */
-            int newLength = 0;
-            int? chunkStart = null;
-            int chunkCount = 0;
-            var chunks = new LinkedList<ValueTuple<ReadOnlyMemory<char>, int>>();
-            int substituteLength = 0;
+            if (Source.IsEmpty) return string.Empty;
+            if (Replacements.Length <= 0) return Source.ToString();
+            Contract.EndContractBlock();
+            // Prepare the arrays needed for the generic chunking functions
+            DataFilter<char>[] Filters = Replacements.Select(o => o.Item1).ToArray();
+            StringPtr[] Substitutions = Replacements.Select(o => o.Item2).ToArray();
 
-            /* Scan for replacement characters, when encountered create a new chunk (non inclusive). */
-            while (!Stream.atEnd)
-            {
-                EFilterResult filterResult = EFilterResult.FILTER_ACCEPT;
-                int replacementIndex = -1;
-
-                for (int i = 0; i < Replacements.Length; i++)
-                {
-                    var replace = Replacements[i];
-                    filterResult = replace.Item1.acceptData(Stream.Next);
-                    if (filterResult != EFilterResult.FILTER_ACCEPT)
-                    {
-                        replacementIndex = i;
-                        substituteLength += replace.Item2.Length;
-                        break;
-                    }
-                }
-                /* When filter result:
-                 * ACCEPT: Char should be included in chunk
-                 * SKIP: Char should not be included in chunk, if at chunk-start shift chunk-start past char, otherwise end chunk
-                 * REJECT: Char should not be included in chunk, current chunk ends
-                 */
-                bool end_chunk = false;
-                switch (filterResult)
-                {
-                    case EFilterResult.FILTER_ACCEPT:// Char should be included in the chunk
-                        {
-                            if (!chunkStart.HasValue) chunkStart = (int)Stream.LongPosition;/* Start new chunk (if one isnt started yet) */
-                        }
-                        break;
-                    case EFilterResult.FILTER_REJECT:// Char should not be included in chunk, current chunk ends
-                        {
-                            end_chunk = true;
-                        }
-                        break;
-                    case EFilterResult.FILTER_SKIP:// Char should not be included in chunk, if at chunk-start shift chunk-start past char, otherwise end chunk
-                        {
-                            if (!chunkStart.HasValue)
-                            {
-                                chunkStart = (int)Stream.LongPosition + 1;/* At chunk-start */
-                            }
-                            else
-                            {
-                                end_chunk = true;
-                            }
-                        }
-                        break;
-                }
-
-                if (end_chunk || Stream.NextNext == Stream.EOF_ITEM)
-                {
-                    if (!chunkStart.HasValue) chunkStart = (int)Stream.LongPosition;
-                    if (replacementIndex < 0) Stream.Consume();// if we arent actually trying to replace something in this chunk then we go ahead and include the last char also
-
-                    /* Push new chunk to our list */
-                    var chunkSize = (int)Stream.LongPosition - chunkStart.Value;
-                    var Mem = buffMem.Slice((int)chunkStart.Value, (int)chunkSize);
-                    chunks.AddLast((Mem, replacementIndex));
-
-                    chunkCount++;
-                    chunkStart = null;
-                    newLength += chunkSize;
-                }
-
-                Stream.Consume();
-            }
-
-            /* Compile the new string */
-
-            if (trim)
-            {/* To trim we just need to skip any empty chunks at the beginning and end */
-                while (chunks.First.Value.Item1.Length <= 0)
-                {
-                    chunks.RemoveFirst();
-                    chunkCount--;
-                }
-
-                while (chunks.Last.Value.Item1.Length <= 0)
-                {
-                    chunks.RemoveLast();
-                    chunkCount--;
-                }
-            }
-
-            int insertCount = (chunkCount - 1);/* Number of substitutes we will insert into new string */
-            newLength += insertCount * substituteLength;
-
-            char[] dataPtr = new char[newLength];
-            Memory<char> data = new Memory<char>(dataPtr);
-
-            ulong index = 0;
-            foreach (var tpl in chunks)
-            {
-                var chunk = tpl.Item1;
-                /* Copy substring */
-                chunk.CopyTo(data.Slice((int)index));
-                index += (ulong)chunk.Length;
-                if (tpl.Item2 < 0) continue;
-
-                /* Insert substitute */
-                var replaceIndex = tpl.Item2;
-                var replaceTarget = data.Slice((int)index);
-                var replaceSource = Replacements[replaceIndex].Item2.AsMemory();
-                replaceSource.CopyTo(replaceTarget);
-                index += (ulong)replaceSource.Length;
-            }
-
-            return new string(dataPtr);
+            // Seperate the source memory into chunks using the given predicates
+            var Chunks = _chunkify(Source, Collapse, Filters);
+            // Calculate size of the new string
+            int newLength = _tally_chunks(ref Chunks, Trim, Substitutions);
+            // Allocate final string
+            char[] pBuffer = _compile_chunks(Source, Chunks, newLength, Substitutions);
+            return new string(pBuffer);
         }
+
 
         /// <summary>
         /// Runs a transform function on every character in a string and returns a new string containing the transformed characters
@@ -1433,7 +1075,7 @@ namespace CssUI
             char[] data = new char[Length];
             int idx = 0;
 
-            for (int i=0; i<Length; i++)
+            for (int i = 0; i < Length; i++)
             {
                 char ch = Transform(buffMem[i]);
                 if (ch != CHAR_NULL)
@@ -1443,6 +1085,781 @@ namespace CssUI
             }
 
             return new string(data, 0, idx);
+        }
+        #endregion
+
+
+        #region Scan
+        /// <summary>
+        /// Searches the given string and returns the next location where its value matches the search value
+        /// </summary>
+        /// <param name="Offset">Offset to begin searching from</param>
+        /// <returns>-1 on failure</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int Scan_Match(ReadOnlySpan<char> Source, char[] Match, int Offset, out int MatchedIndex)
+        {
+            if (Offset > 0) Source = Source.Slice(Offset);
+            var idx = Source.IndexOfAny(Match);
+            if (idx > -1)
+            {
+                if (Match.Length <= 1)
+                    MatchedIndex = 0;
+                else
+                    MatchedIndex = new Span<char>(Match).IndexOf(Source[idx]);
+
+                idx += Offset;
+            }
+            else
+            {
+                MatchedIndex = -1;
+            }
+
+            return idx;
+        }
+
+        /// <summary>
+        /// Searches the given string and returns the next location where its value doesn't match the search value
+        /// </summary>
+        /// <param name="Offset">Offset to begin searching from</param>
+        /// <returns>-1 on failure</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int Scan_Mismatch(ReadOnlySpan<char> Source, char[] Match, int Offset)
+        {
+            if (Offset > 0) Source = Source.Slice(Offset);
+            if (Source.IndexOfAny(Match) == 0)
+            {// Scan forwards to the end of the block of matching chars at the start
+                ReadOnlySpan<char> ptr = Source.Slice(1);
+                // XXX: Optimize
+                // This method is probably pretty slow comparatively
+                int i = 1;
+                for (; ptr.Length > 0 && ptr.IndexOfAny(Match) == 0; i++)
+                {
+                    ptr = ptr.Slice(1);
+                }
+                // This is the end of the matching block at the start of this string, and therefore is the index of the next mismatch
+                if (i > -1) i += Offset;
+                return i;
+            }
+
+            var idx = Source.IndexOfAny(Match);
+            if (idx > -1) idx += Offset;
+            return idx;
+        }
+
+
+        /// <summary>
+        /// Searches the given string and returns the next location where its value matches the search value
+        /// </summary>
+        /// <param name="Offset">Offset to begin searching from</param>
+        /// <returns>-1 on failure</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int Scan_Match(ReadOnlySpan<char> Source, ReadOnlySpan<char> Match, int Offset)
+        {
+            if (Offset > 0) Source = Source.Slice(Offset);
+            var idx = Source.IndexOf(Match, StringComparison.Ordinal);
+            if (idx > -1) idx += Offset;
+
+            return idx;
+        }
+
+        /// <summary>
+        /// Searches the given string and returns the next location where its value doesn't match the search value
+        /// </summary>
+        /// <param name="Offset">Offset to begin searching from</param>
+        /// <returns>-1 on failure</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int Scan_Mismatch(ReadOnlySpan<char> Source, ReadOnlySpan<char> Match, int Offset)
+        {
+            if (Offset > 0) Source = Source.Slice(Offset);
+            if (Source.StartsWith(Match))
+            {// Scan forwards to the end of the block of matching chars at the start
+                ReadOnlySpan<char> ptr = Source.Slice(Match.Length);
+                int i = 1;
+                for (; ptr.Length > Match.Length && ptr.StartsWith(Match); i += Match.Length)
+                {
+                    ptr = ptr.Slice(Match.Length);
+                }
+                // This is the end of the matching block at the start of this string, and therefore is the index of the next mismatch
+                if (i > -1) i += Offset;
+                return i;
+            }
+
+            var idx = Source.IndexOf(Match, StringComparison.Ordinal);
+            if (idx > -1) idx += Offset;
+            return idx;
+        }
+
+
+        /// <summary>
+        /// Searches the given string and returns the next location where its value matches the search value
+        /// </summary>
+        /// <param name="Offset">Offset to begin searching from</param>
+        /// <returns>-1 on failure</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int Scan_Match(ReadOnlySpan<char> Source, Predicate<char> Predicate, int Offset)
+        {
+            for (int Pos = Offset; Pos < Source.Length; Pos++)
+            {
+                if (true == Predicate(Source[Pos]))
+                {
+                    return Pos;
+                }
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        /// Searches the given string and returns the next location where its value doesn't match the search value
+        /// </summary>
+        /// <param name="Offset">Offset to begin searching from</param>
+        /// <returns>-1 on failure</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int Scan_Mismatch(ReadOnlySpan<char> Source, Predicate<char> Predicate, int Offset)
+        {
+            for (int Pos = Offset; Pos < Source.Length; Pos++)
+            {
+                if (false == Predicate(Source[Pos]))
+                {
+                    return Pos;
+                }
+            }
+
+            return -1;
+        }
+
+
+        /// <summary>
+        /// Searches the given string and returns the next location where its value matches the search value
+        /// </summary>
+        /// <param name="Offset">Offset to begin searching from</param>
+        /// <returns>-1 on failure</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int Scan_Match(ReadOnlySpan<char> Source, Predicate<char>[] Predicates, int Offset, out int MatchedIndex)
+        {
+            for (int Pos = Offset; Pos < Source.Length; Pos++)
+            {
+                for (int i = 0; i < Predicates.Length; i++)
+                {
+                    if (true == Predicates[i](Source[Pos]))
+                    {
+                        MatchedIndex = i;
+                        return Pos;
+                    }
+                }
+            }
+
+            MatchedIndex = -1;
+            return -1;
+        }
+
+        /// <summary>
+        /// Searches the given string and returns the next location where its value doesn't match the search value
+        /// </summary>
+        /// <param name="Offset">Offset to begin searching from</param>
+        /// <returns>-1 on failure</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int Scan_Mismatch(ReadOnlySpan<char> Source, Predicate<char>[] Predicates, int Offset)
+        {
+            for (int Pos = Offset; Pos < Source.Length; Pos++)
+            {
+                bool Matched = false;
+                for (int i = 0; i < Predicates.Length; i++)
+                {
+                    if (false == Predicates[i](Source[Pos]))
+                    {
+                        Matched = true;
+                        break;
+                    }
+                }
+
+                if (!Matched)
+                    continue;
+
+                return Pos;
+            }
+
+            return -1;
+        }
+
+
+
+        /// <summary>
+        /// Searches the given string and returns the next location where its value matches the search value
+        /// </summary>
+        /// <param name="Offset">Offset to begin searching from</param>
+        /// <returns>-1 on failure</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int Scan_Match(ReadOnlySpan<char> Source, DataFilter<char> Filter, int Offset)
+        {
+            for (int Pos = Offset; Pos < Source.Length; Pos++)
+            {
+                if (Filter.acceptData(Source[Pos]) != EFilterResult.FILTER_ACCEPT)
+                {
+                    return Pos;
+                }
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        /// Searches the given string and returns the next location where its value doesn't match the search value
+        /// </summary>
+        /// <param name="Offset">Offset to begin searching from</param>
+        /// <returns>-1 on failure</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int Scan_Mismatch(ReadOnlySpan<char> Source, DataFilter<char> Filter, int Offset)
+        {
+            for (int Pos = Offset; Pos < Source.Length; Pos++)
+            {
+                if (Filter.acceptData(Source[Pos]) == EFilterResult.FILTER_ACCEPT)
+                {
+                    return Pos;
+                }
+            }
+
+            return -1;
+        }
+
+
+        /// <summary>
+        /// Searches the given string and returns the next location where its value matches the search value
+        /// </summary>
+        /// <param name="Offset">Offset to begin searching from</param>
+        /// <returns>-1 on failure</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int Scan_Match(ReadOnlySpan<char> Source, DataFilter<char>[] Filters, int Offset, out int MatchedIndex)
+        {
+            for (int Pos = Offset; Pos < Source.Length; Pos++)
+            {
+                for (int i = 0; i < Filters.Length; i++)
+                {
+                    if (Filters[i].acceptData(Source[Pos]) != EFilterResult.FILTER_ACCEPT)// DataFilters accept anything that ISNT their subject
+                    {
+                        MatchedIndex = i;
+                        return Pos;
+                    }
+                }
+            }
+
+            MatchedIndex = -1;
+            return -1;
+        }
+
+        /// <summary>
+        /// Searches the given string and returns the next location where its value doesn't match the search value
+        /// </summary>
+        /// <param name="Offset">Offset to begin searching from</param>
+        /// <returns>-1 on failure</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int Scan_Mismatch(ReadOnlySpan<char> Source, DataFilter<char>[] Filters, int Offset)
+        {
+            for (int Pos = Offset; Pos < Source.Length; Pos++)
+            {
+                bool Matched = false;
+                for (int i = 0; i < Filters.Length; i++)
+                {
+                    if (Filters[i].acceptData(Source[Pos]) == EFilterResult.FILTER_ACCEPT)// DataFilters accept anything that ISNT their subject
+                    {
+                        Matched = true;
+                        break;
+                    }
+                }
+
+                if (!Matched)
+                    continue;
+
+                return Pos;
+            }
+
+            return -1;
+        }
+        #endregion
+
+        #region Internal Chunking
+        private struct StringChunk
+        {
+            public readonly int Start;
+            public readonly int Size;
+            public readonly int DelimiterIndex;
+            public bool IsDelimiter => (DelimiterIndex > -1);
+
+            public StringChunk(int start_offset, int size)
+            {
+                Start = start_offset;
+                Size = size;
+                DelimiterIndex = -1;
+            }
+
+            public StringChunk(int start_offset, int size, int delimiter_index)
+            {
+                Start = start_offset;
+                Size = size;
+                DelimiterIndex = delimiter_index;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static LinkedList<StringChunk> _chunkify(ReadOnlySpan<char> Source, bool Collapse, params char[] Delimiters)
+        {
+            var Chunks = new LinkedList<StringChunk>();
+
+            // Scan for replacement characters, when encountered create a new chunk(non inclusive).
+            for (int chunkStart = 0; chunkStart < Source.Length;)
+            {
+                var lastChunkEnd = Math.Max(0, chunkStart);
+                // Find the chunk starting pos by finding the next occurance of any of the replacement targets
+                chunkStart = Scan_Match(Source, Delimiters, chunkStart, out int DelimiterIndex);
+
+                // If no more replacements can be found then abort
+                if (chunkStart < 0)
+                {
+                    int tailLen = Source.Length - lastChunkEnd;
+                    if (tailLen > 0)
+                    {
+                        Chunks.AddLast(new StringChunk(lastChunkEnd, tailLen));
+                    }
+                    break;
+                }
+                else
+                {
+                    // Add room for the non-replaced contents inbetween this chunk and the last
+                    var interChunkLen = chunkStart - lastChunkEnd;
+                    if (interChunkLen > 0)
+                    {
+                        Chunks.AddLast(new StringChunk(lastChunkEnd, interChunkLen));
+                    }
+                }
+
+                Debug.Assert(DelimiterIndex > -1);
+                // Find the length of the chunk by locating the next spot which doesn't match any replacements
+                int chunkEnd = chunkStart + 1;
+                if (Collapse)
+                {// In order to collapse we have to consume all consecutive replacements
+                    chunkEnd = Scan_Mismatch(Source, Delimiters, chunkStart);
+                    if (chunkEnd < 0)
+                    {// If no character mismatch could be found then the rest of the string consists of amtches
+                        chunkEnd = Source.Length;
+                    }
+                }
+
+                var chunkSize = chunkEnd - chunkStart;
+                // Push new chunk
+                Chunks.AddLast(new StringChunk(chunkStart, chunkSize, DelimiterIndex));
+                // Move our read position forward for the next pass
+                chunkStart = chunkEnd;
+            }
+
+            return Chunks;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static LinkedList<StringChunk> _chunkify(ReadOnlySpan<char> Source, bool Collapse, Predicate<char> Predicate)
+        {
+            var Chunks = new LinkedList<StringChunk>();
+            const int DelimiterIndex = 0;// We just use this here to keep this generic code the same
+
+            // Scan for replacement characters, when encountered create a new chunk(non inclusive).
+            for (int chunkStart = 0; chunkStart < Source.Length;)
+            {
+                var lastChunkEnd = Math.Max(0, chunkStart);
+                // Find the chunk starting pos by finding the next occurance of any of the replacement targets
+                chunkStart = Scan_Match(Source, Predicate, chunkStart);
+
+                // If no more replacements can be found then abort
+                if (chunkStart < 0)
+                {
+                    int tailLen = Source.Length - lastChunkEnd;
+                    if (tailLen > 0)
+                    {
+                        Chunks.AddLast(new StringChunk(lastChunkEnd, tailLen));
+                    }
+                    break;
+                }
+                else
+                {
+                    // Add room for the non-replaced contents inbetween this chunk and the last
+                    var interChunkLen = chunkStart - lastChunkEnd;
+                    if (interChunkLen > 0)
+                    {
+                        Chunks.AddLast(new StringChunk(lastChunkEnd, interChunkLen));
+                    }
+                }
+
+                Debug.Assert(DelimiterIndex > -1);
+                // Find the length of the chunk by locating the next spot which doesn't match any replacements
+                int chunkEnd = chunkStart + 1;
+                if (Collapse)
+                {// In order to collapse we have to consume all consecutive replacements
+                    chunkEnd = Scan_Mismatch(Source, Predicate, chunkStart);
+                    if (chunkEnd < 0)
+                    {// If no character mismatch could be found then the rest of the string consists of amtches
+                        chunkEnd = Source.Length;
+                    }
+                }
+
+                var chunkSize = chunkEnd - chunkStart;
+                // Push new chunk
+                Chunks.AddLast(new StringChunk(chunkStart, chunkSize, DelimiterIndex));
+                // Move our read position forward for the next pass
+                chunkStart = chunkEnd;
+            }
+
+            return Chunks;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static LinkedList<StringChunk> _chunkify(ReadOnlySpan<char> Source, bool Collapse, params Predicate<char>[] Predicates)
+        {
+            var Chunks = new LinkedList<StringChunk>();
+
+            // Scan for replacement characters, when encountered create a new chunk(non inclusive).
+            for (int chunkStart = 0; chunkStart < Source.Length;)
+            {
+                var lastChunkEnd = Math.Max(0, chunkStart);
+                // Find the chunk starting pos by finding the next occurance of any of the replacement targets
+                chunkStart = Scan_Match(Source, Predicates, chunkStart, out int DelimiterIndex);
+
+                // If no more replacements can be found then abort
+                if (chunkStart < 0)
+                {
+                    int tailLen = Source.Length - lastChunkEnd;
+                    if (tailLen > 0)
+                    {
+                        Chunks.AddLast(new StringChunk(lastChunkEnd, tailLen));
+                    }
+                    break;
+                }
+                else
+                {
+                    // Add room for the non-replaced contents inbetween this chunk and the last
+                    var interChunkLen = chunkStart - lastChunkEnd;
+                    if (interChunkLen > 0)
+                    {
+                        Chunks.AddLast(new StringChunk(lastChunkEnd, interChunkLen));
+                    }
+                }
+
+                Debug.Assert(DelimiterIndex > -1);
+                // Find the length of the chunk by locating the next spot which doesn't match any replacements
+                int chunkEnd = chunkStart + 1;
+                if (Collapse)
+                {// In order to collapse we have to consume all consecutive replacements
+                    chunkEnd = Scan_Mismatch(Source, Predicates, chunkStart);
+                    if (chunkEnd < 0)
+                    {// If no character mismatch could be found then the rest of the string consists of amtches
+                        chunkEnd = Source.Length;
+                    }
+                }
+
+                var chunkSize = chunkEnd - chunkStart;
+                // Push new chunk
+                Chunks.AddLast(new StringChunk(chunkStart, chunkSize, DelimiterIndex));
+                // Move our read position forward for the next pass
+                chunkStart = chunkEnd;
+            }
+
+            return Chunks;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static LinkedList<StringChunk> _chunkify(ReadOnlySpan<char> Source, bool Collapse, DataFilter<char> Filter)
+        {
+            var Chunks = new LinkedList<StringChunk>();
+            const int DelimiterIndex = 0;// We just use this here to keep this generic code the same
+
+            // Scan for replacement characters, when encountered create a new chunk(non inclusive).
+            for (int chunkStart = 0; chunkStart < Source.Length;)
+            {
+                var lastChunkEnd = Math.Max(0, chunkStart);
+                // Find the chunk starting pos by finding the next occurance of any of the replacement targets
+                chunkStart = Scan_Match(Source, Filter, chunkStart);
+
+                // If no more replacements can be found then abort
+                if (chunkStart < 0)
+                {
+                    int tailLen = Source.Length - lastChunkEnd;
+                    if (tailLen > 0)
+                    {
+                        Chunks.AddLast(new StringChunk(lastChunkEnd, tailLen));
+                    }
+                    break;
+                }
+                else
+                {
+                    // Add room for the non-replaced contents inbetween this chunk and the last
+                    var interChunkLen = chunkStart - lastChunkEnd;
+                    if (interChunkLen > 0)
+                    {
+                        Chunks.AddLast(new StringChunk(lastChunkEnd, interChunkLen));
+                    }
+                }
+
+                Debug.Assert(DelimiterIndex > -1);
+                // Find the length of the chunk by locating the next spot which doesn't match any replacements
+                int chunkEnd = chunkStart + 1;
+                if (Collapse)
+                {// In order to collapse we have to consume all consecutive replacements
+                    chunkEnd = Scan_Mismatch(Source, Filter, chunkStart);
+                    if (chunkEnd < 0)
+                    {// If no character mismatch could be found then the rest of the string consists of amtches
+                        chunkEnd = Source.Length;
+                    }
+                }
+
+                var chunkSize = chunkEnd - chunkStart;
+                // Push new chunk
+                Chunks.AddLast(new StringChunk(chunkStart, chunkSize, DelimiterIndex));
+                // Move our read position forward for the next pass
+                chunkStart = chunkEnd;
+            }
+
+            return Chunks;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static LinkedList<StringChunk> _chunkify(ReadOnlySpan<char> Source, bool Collapse, params DataFilter<char>[] Delimiters)
+        {
+            var Chunks = new LinkedList<StringChunk>();
+
+            // Scan for replacement characters, when encountered create a new chunk(non inclusive).
+            for (int chunkStart = 0; chunkStart < Source.Length;)
+            {
+                var lastChunkEnd = Math.Max(0, chunkStart);
+                // Find the chunk starting pos by finding the next occurance of any of the replacement targets
+                chunkStart = Scan_Match(Source, Delimiters, chunkStart, out int DelimiterIndex);
+
+                // If no more replacements can be found then abort
+                if (chunkStart < 0)
+                {
+                    int tailLen = Source.Length - lastChunkEnd;
+                    if (tailLen > 0)
+                    {
+                        Chunks.AddLast(new StringChunk(lastChunkEnd, tailLen));
+                    }
+                    break;
+                }
+                else
+                {
+                    // Add room for the non-replaced contents inbetween this chunk and the last
+                    var interChunkLen = chunkStart - lastChunkEnd;
+                    if (interChunkLen > 0)
+                    {
+                        Chunks.AddLast(new StringChunk(lastChunkEnd, interChunkLen));
+                    }
+                }
+
+                Debug.Assert(DelimiterIndex > -1);
+                // Find the length of the chunk by locating the next spot which doesn't match any replacements
+                int chunkEnd = chunkStart + 1;
+                if (Collapse)
+                {// In order to collapse we have to consume all consecutive replacements
+                    chunkEnd = Scan_Mismatch(Source, Delimiters, chunkStart);
+                    if (chunkEnd < 0)
+                    {// If no character mismatch could be found then the rest of the string consists of amtches
+                        chunkEnd = Source.Length;
+                    }
+                }
+
+                var chunkSize = chunkEnd - chunkStart;
+                // Push new chunk
+                Chunks.AddLast(new StringChunk(chunkStart, chunkSize, DelimiterIndex));
+                // Move our read position forward for the next pass
+                chunkStart = chunkEnd;
+            }
+
+            return Chunks;
+        }
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int _tally_chunks(ref LinkedList<StringChunk> Chunks, bool Trim, int[] SubstitutionLengths)
+        {
+            int Length = 0;
+            LinkedListNode<StringChunk> node = Chunks.First;
+            while (node is object)
+            {
+                StringChunk chunk = node.Value;
+                if (chunk.IsDelimiter)
+                {
+                    // Check if this chunk qualifies to be trimmed
+                    if (Trim && node.Previous is null)
+                    {
+                        node = node.Next;
+                        Chunks.RemoveFirst();
+                        continue;
+                    }
+                    else if (Trim && node.Next is null)
+                    {
+                        node = node.Next;
+                        Chunks.RemoveLast();
+                        continue;
+                    }
+
+                    Length += SubstitutionLengths[chunk.DelimiterIndex];
+                }
+                else
+                {
+                    Length += chunk.Size;
+                }
+
+                node = node.Next;
+            }
+
+            if (Trim && Chunks.Last.Value.IsDelimiter)
+            {
+                // Make sure theres no trailing delimiter chunks
+                while (Chunks.Last.Value.IsDelimiter)
+                {
+                    Length -= SubstitutionLengths[Chunks.Last.Value.DelimiterIndex];
+                    Chunks.RemoveLast();
+                }
+            }
+
+            return Length;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int _tally_chunks(ref LinkedList<StringChunk> Chunks, bool Trim, StringPtr[] Substitutions)
+        {
+            int Length = 0;
+            LinkedListNode<StringChunk> node = Chunks.First;
+            while (node is object)
+            {
+                StringChunk chunk = node.Value;
+                if (chunk.IsDelimiter)
+                {
+                    // Check if this chunk qualifies to be trimmed
+                    if (Trim && node.Previous is null)
+                    {
+                        node = node.Next;
+                        Chunks.RemoveFirst();
+                        continue;
+                    }
+                    else if (Trim && node.Next is null)
+                    {
+                        node = node.Next;
+                        Chunks.RemoveLast();
+                        continue;
+                    }
+
+                    Length += Substitutions[chunk.DelimiterIndex].Length;
+                }
+                else
+                {
+                    Length += chunk.Size;
+                }
+
+                node = node.Next;
+            }
+
+            if (Trim && Chunks.Last.Value.IsDelimiter)
+            {
+                // Make sure theres no trailing delimiter chunks
+                while (Chunks.Last.Value.IsDelimiter)
+                {
+                    Length -= Substitutions[Chunks.Last.Value.DelimiterIndex].Length;
+                    Chunks.RemoveLast();
+                }
+            }
+
+            return Length;
+        }
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static char[] _compile_chunks(ReadOnlySpan<char> Source, LinkedList<StringChunk> Chunks, int Length, char[] Substitutions)
+        {
+            // Allocate final string
+            char[] pBuffer = new char[Length];
+            Memory<char> Buffer = new Memory<char>(pBuffer);
+            int writePos = 0;
+
+            var node = Chunks.First;
+            while (node is object)
+            {
+                StringChunk Chunk = node.Value;
+                node = node.Next;
+                int chunkEnd = Chunk.Start + Chunk.Size;
+
+                if (Chunk.IsDelimiter)
+                {
+                    if (Chunk.DelimiterIndex >= 0)
+                    {
+                        var Substitution = Substitutions[Chunk.DelimiterIndex];
+                        if (Substitution != '\0')
+                        {
+                            // Insert substitute
+                            pBuffer[writePos] = Substitution;
+                            // Increase writePos
+                            writePos += 1;
+                        }
+                    }
+                }
+                else
+                {
+                    // Insert this chunks data directly into new string unmodified
+                    Debug.Assert(chunkEnd <= Source.Length);
+
+                    if (Chunk.Start < Source.Length && Chunk.Size > 0)
+                    {
+                        Source.Slice(Chunk.Start, Chunk.Size).CopyTo(Buffer.Span.Slice(writePos));
+                        // Increase writePos
+                        writePos += Chunk.Size;
+                    }
+                }
+            }
+
+            return pBuffer;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static char[] _compile_chunks(ReadOnlySpan<char> Source, LinkedList<StringChunk> Chunks, int Length, StringPtr[] Substitutions)
+        {
+            // Allocate final string
+            char[] pBuffer = new char[Length];
+            Memory<char> Buffer = new Memory<char>(pBuffer);
+            int writePos = 0;
+
+            var node = Chunks.First;
+            while (node is object)
+            {
+                StringChunk Chunk = node.Value;
+                node = node.Next;
+                int chunkEnd = Chunk.Start + Chunk.Size;
+
+                if (Chunk.IsDelimiter)
+                {
+                    if (Chunk.DelimiterIndex >= 0)
+                    {
+                        var Substitution = Substitutions[Chunk.DelimiterIndex];
+                        if (Substitution.Length > 0)
+                        {
+                            // Insert substitute
+                            var replaceTarget = Buffer.Slice(writePos);
+                            var replaceSource = Substitution.AsMemory();
+                            replaceSource.CopyTo(replaceTarget);
+                            // Increase writePos
+                            writePos += replaceSource.Length;
+                        }
+                    }
+                }
+                else
+                {
+                    // Insert this chunks data directly into new string unmodified
+                    Debug.Assert(chunkEnd <= Source.Length);
+
+                    if (Chunk.Start < Source.Length && Chunk.Size > 0)
+                    {
+                        Source.Slice(Chunk.Start, Chunk.Size).CopyTo(Buffer.Span.Slice(writePos));
+                        // Increase writePos
+                        writePos += Chunk.Size;
+                    }
+                }
+            }
+
+            return pBuffer;
         }
         #endregion
     }

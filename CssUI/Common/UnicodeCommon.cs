@@ -23,7 +23,7 @@ namespace CssUI
         /* Docs: https://infra.spec.whatwg.org/#ascii-whitespace */
         public const char CHAR_TAB = '\u0009';
         /// <summary>
-        /// Line Feed (Newline)
+        /// Newline (\n)
         /// </summary>
         public const char CHAR_LINE_FEED = '\u000A';
         /// <summary>
@@ -31,7 +31,7 @@ namespace CssUI
         /// </summary>
         public const char CHAR_FORM_FEED = '\u000C';
         /// <summary>
-        /// CR
+        /// Carriage Return (\r)
         /// </summary>
         public const char CHAR_CARRIAGE_RETURN = '\u000D';
         /// <summary>

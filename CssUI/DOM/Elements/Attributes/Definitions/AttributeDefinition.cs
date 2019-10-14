@@ -5,6 +5,7 @@ using CssUI.DOM.Exceptions;
 using System.Runtime.CompilerServices;
 using System.Linq;
 using CssUI.Serialization;
+using System.Diagnostics.Contracts;
 
 namespace CssUI.DOM
 {
@@ -71,7 +72,7 @@ namespace CssUI.DOM
             }
             else
             {
-                var set = Keywords.Select(word => word.ToLowerInvariant()).Cast<AtomicString>();
+                var set = Keywords.Select(word => new AtomicString(word.ToLowerInvariant())).ToArray();
                 this.Keywords = new HashSet<AtomicString>(set);
             }
 
@@ -143,6 +144,9 @@ namespace CssUI.DOM
         /// <exception cref="DomSyntaxError">On invalid value</exception>
         public void Parse(string Input, out object outValue)
         {
+            if (Input is null) throw new ArgumentNullException(nameof(Input));
+            Contract.EndContractBlock();
+
             switch (Type)
             {
                 case EAttributeType.String:// strings accept any value
@@ -155,23 +159,63 @@ namespace CssUI.DOM
                         outValue = Input is object;
                     }
                     break;
+                case EAttributeType.Color:
+                    {
+                        if (!HTMLParserCommon.Parse_Simple_Color_String(Input.AsMemory(), out SimpleColor outVal))
+                        {
+                            throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an valid color string");
+                        }
+
+                        outValue = outVal;
+                    }
+                    break;
+                case EAttributeType.Date:
+                    {
+                        if (!HTMLParserCommon.Parse_Date_String(Input.AsMemory(), out DateTime outVal))
+                        {
+                            throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an valid date string");
+                        }
+
+                        outValue = outVal;
+                    }
+                    break;
+                case EAttributeType.Time:
+                    {
+                        if (!HTMLParserCommon.Parse_Time_String(Input.AsMemory(), out TimeSpan outVal))
+                        {
+                            throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an valid time string");
+                        }
+
+                        outValue = outVal;
+                    }
+                    break;
+                case EAttributeType.Duration:
+                    {
+                        if (!HTMLParserCommon.Parse_Duration_String(Input.AsMemory(), out double outVal))
+                        {
+                            throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an valid duration string");
+                        }
+
+                        outValue = outVal;
+                    }
+                    break;
                 case EAttributeType.Enumerated:
                     {
-                        if (Keywords != null && Keywords.Count > 0)
+                        string strLower = Input.ToLowerInvariant();
+                        if (Keywords is object && Keywords.Count > 0)
                         {
-                            string strLower = Input.ToLowerInvariant();
                             if (!Keywords.Contains(strLower))
                             {
-                                throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an acceptable value, Acceptable values are: {StringCommon.Concat(@", ".AsSpan(), Keywords.Select(o => o.AsMemory()))}");
+                                throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an acceptable value, Acceptable values are: {StringCommon.Concat(", ".AsSpan(), Keywords.Select(o => o.AsMemory()))}");
                             }
-
-                            if (!CssUI.Lookup.TryEnum(enumType, strLower, out var outEnum))
+                            else if (enumType is object && CssUI.Lookup.TryEnum(enumType, strLower, out var outEnum))
                             {
-                                outValue = strLower;
-                                throw new DomSyntaxError($"Unable to find keyword value for \"{strLower}\" in enum: {enumType.Name}");
+                                outValue = outEnum;
+                                break;
+                                //throw new DomSyntaxError($"Unable to find keyword value for \"{strLower}\" in enum: {enumType.Name}");
                             }
 
-                            outValue = outEnum;
+                            outValue = strLower;
                         }
                         else
                         {
@@ -257,7 +301,7 @@ namespace CssUI.DOM
                     break;
                 default:
                     {
-                        throw new NotImplementedException();
+                        throw new NotImplementedException($"Unrecognized attribute type: {Type}");
                     }
                     break;
             }

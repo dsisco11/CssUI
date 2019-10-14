@@ -1,6 +1,7 @@
 ﻿using CssUI.DOM.Enums;
 using CssUI.DOM.Exceptions;
 using System;
+using System.Diagnostics.Contracts;
 using static CssUI.UnicodeCommon;
 
 namespace CssUI.Serialization
@@ -29,14 +30,14 @@ namespace CssUI.Serialization
                 Stream.Consume();
             }
 
+            if (!Stream.atEnd && !Is_Ascii_Digit(Stream.Next))
+            {
+                return false;
+            }
 
             /* Collect sequence of ASCII digit codepoints */
             Stream.Consume_While(Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
 
-            if (!Stream.atEnd && Is_Ascii_Alpha(Stream.Next))
-            {
-                return false;
-            }
 
             return true;
         }
@@ -118,9 +119,11 @@ namespace CssUI.Serialization
             outValue = outParsed;
             return result;
         }
-
         public static bool Try_Parse_Integer(DataConsumer<char> Stream, out long outValue)
         {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#signed-integers */
+            if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+            Contract.EndContractBlock();
+
             bool sign = true;
 
             /* SKip ASCII whitespace */
@@ -142,15 +145,14 @@ namespace CssUI.Serialization
                 Stream.Consume();
             }
 
-
-            /* Collect sequence of ASCII digit codepoints */
-            Stream.Consume_While(Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
-
-            if (!Stream.atEnd && Is_Ascii_Alpha(Stream.Next))
+            if (!Stream.atEnd && !Is_Ascii_Digit(Stream.Next))
             {
                 outValue = long.MaxValue;
                 return false;
             }
+
+            /* Collect sequence of ASCII digit codepoints */
+            Stream.Consume_While(Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
 
             var parsed = ParsingCommon.Digits_To_Base10(outDigits);
 
@@ -168,6 +170,9 @@ namespace CssUI.Serialization
         }
         public static bool Is_Valid_FloatingPoint(DataConsumer<char> Stream)
         {
+            if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+            Contract.EndContractBlock();
+
             return Try_Parse_FloatingPoint(Stream, out double _);
         }
 
@@ -180,6 +185,9 @@ namespace CssUI.Serialization
         }
         public static void Parse_FloatingPoint(DataConsumer<char> Stream, out float outValue)
         {
+            if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+            Contract.EndContractBlock();
+
             if (Try_Parse_FloatingPoint(Stream, out double outParsed))
             {
                 outValue = (float)outParsed;
@@ -201,6 +209,9 @@ namespace CssUI.Serialization
         }
         public static bool Try_Parse_FloatingPoint(DataConsumer<char> Stream, out float outValue)
         {
+            if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+            Contract.EndContractBlock();
+
             bool result = Try_Parse_FloatingPoint(Stream, out double outParsed);
             outValue = (float)outParsed;
             return result;
@@ -215,6 +226,9 @@ namespace CssUI.Serialization
         }
         public static void Parse_FloatingPoint(DataConsumer<char> Stream, out double outValue)
         {
+            if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+            Contract.EndContractBlock();
+
             if (Try_Parse_FloatingPoint(Stream, out double outParsed))
             {
                 outValue = outParsed;
@@ -225,7 +239,7 @@ namespace CssUI.Serialization
                 throw new DomSyntaxError($"Unable to parse \"{Stream.AsSpan().ToString()}\" as floating-point number");
             }
         }
-
+        
 
         public static bool Try_Parse_FloatingPoint(ReadOnlyMemory<char> input, out double outValue)
         {
@@ -236,6 +250,9 @@ namespace CssUI.Serialization
         }
         public static bool Try_Parse_FloatingPoint(DataConsumer<char> Stream, out double outValue)
         {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#rules-for-parsing-floating-point-number-values */
+
+            if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+            Contract.EndContractBlock();
 
             double value = 1;
             double divisor = 1;
@@ -378,6 +395,9 @@ namespace CssUI.Serialization
         }
         public static bool Is_Valid_Length(DataConsumer<char> Stream)
         {
+            if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+            Contract.EndContractBlock();
+
             return Try_Parse_Length(Stream, out _, out _);
         }
 
@@ -391,6 +411,9 @@ namespace CssUI.Serialization
         }
         public static void Parse_Length(DataConsumer<char> Stream, out float outValue, out EAttributeType outType)
         {
+            if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+            Contract.EndContractBlock();
+
             if (Try_Parse_Length(Stream, out double outParsedValue, out EAttributeType outParsedType))
             {
                 outValue = (float)outParsedValue;
@@ -414,6 +437,9 @@ namespace CssUI.Serialization
         }
         public static void Parse_Length(DataConsumer<char> Stream, out double outValue, out EAttributeType outType)
         {
+            if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+            Contract.EndContractBlock();
+
             if (Try_Parse_Length(Stream, out double outParsedValue, out EAttributeType outParsedType))
             {
                 outValue = outParsedValue;
@@ -435,10 +461,13 @@ namespace CssUI.Serialization
             return res;
         }
         public static bool Try_Parse_Length(DataConsumer<char> Stream, out double outValue, out EAttributeType outType)
-        {
+        {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#percentages-and-dimensions */
+            if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+            Contract.EndContractBlock();
+
             /* 3) Skip ASCII whitespace within input given position. */
             Stream.Consume_While(Is_Ascii_Whitespace);
-            if (Stream.atEnd)
+            if (Stream.atEnd || !Is_Ascii_Digit(Stream.Next))
             {
                 outValue = double.NaN;
                 outType = EAttributeType.Length;
@@ -489,7 +518,16 @@ namespace CssUI.Serialization
             }
 
             /* 8) Return the current dimension value with value, input, and position. */
-            outType = Stream.Next == CHAR_PERCENT ? EAttributeType.Percentage : EAttributeType.Length;
+            if (Stream.Next == CHAR_PERCENT)
+            {
+                outType = EAttributeType.Percentage;
+                Stream.Consume();
+            }
+            else
+            {
+                outType = EAttributeType.Length;
+            }
+
             outValue = value;
             return true;
         }

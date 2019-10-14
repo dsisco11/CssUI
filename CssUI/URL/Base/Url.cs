@@ -1327,7 +1327,7 @@ namespace CssUI.HTTP
         {/* Docs: https://url.spec.whatwg.org/#concept-ipv4-parser */
             var Stream = new DataConsumer<char>(input, EOF);
             bool bValidationErrorFlag = false;
-            IReadOnlyList<ReadOnlyMemory<char>> Parts = StringCommon.Strtok(Stream.AsMemory(), CHAR_FULL_STOP);
+            IReadOnlyList<ReadOnlyMemory<char>> Parts = StringCommon.Strtok(Stream.AsMemory(), UnicodeCommon.CHAR_FULL_STOP);
 
             if (Parts[Parts.Count - 1].Length <= 0)
             {

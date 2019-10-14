@@ -152,9 +152,9 @@ namespace CssUI.DOM
         public static IReadOnlyList<ReadOnlyMemory<char>> Parse_Comma_Seperated_List(StringPtr Input)
         {/* Docs: https://infra.spec.whatwg.org/#split-on-commas */
             var Tokens = StringCommon.Strtok(Input, UnicodeCommon.CHAR_COMMA);
-            var newList = new ReadOnlyMemory<char>[Tokens.Count];
+            var newList = new ReadOnlyMemory<char>[Tokens.Length];
 
-            for (int i = 0; i < Tokens.Count; i++)
+            for (int i = 0; i < Tokens.Length; i++)
             {
                 newList[i] = StringCommon.Trim(Tokens[i], UnicodeCommon.CHAR_SPACE);
             }

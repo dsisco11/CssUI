@@ -804,7 +804,7 @@ namespace CssUI.DOM
                 /* 1) If qualifiedName does not match the Name production in XML, then throw an "InvalidCharacterError" DOMException. */
                 if (!XMLCommon.Is_Valid(Name.Name))
                 {
-                    throw new InvalidCharacterError($"The givne name is not a valid XML name: \"{Name.Name}\"");
+                    throw new InvalidCharacterError($"The given name is not a valid XML name: \"{Name.Name}\"");
                 }
 
                 /* 2) If the context object is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase. */

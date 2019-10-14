@@ -44,16 +44,15 @@ namespace CssUI.DOM
                         string s = element.data;
                         if (options.endings == EBlobEnding.Native)
                         {
-                            string native_line_ending = "";
-                            if (Environment.NewLine.Equals("\r\n"))
+                            string CorrectEnding = FilterCRLF.CRLF;
+                            if (!Environment.NewLine.Equals(FilterCRLF.CRLF, StringComparison.Ordinal))
                             {
-                                native_line_ending = StringCommon.Replace(s.AsMemory(), FilterCRLF.Instance, FilterCRLF.CRLF.AsSpan());
-                            }
-                            else
-                            {
-                                native_line_ending = StringCommon.Replace(s.AsMemory(), FilterCRLF.Instance, FilterCRLF.LF.AsSpan());
+                                CorrectEnding = FilterCRLF.LF;
                             }
 
+                            string native_line_ending = StringCommon.Replace(s, false, false,
+                                                                             (UnicodeCommon.CHAR_CARRIAGE_RETURN, CorrectEnding),
+                                                                             (UnicodeCommon.CHAR_LINE_FEED, CorrectEnding));
                             var encodedBytes = System.Text.Encoding.UTF8.GetBytes(native_line_ending);
                             Stream.Write(encodedBytes, (int)Stream.Position, encodedBytes.Length);
                         }
