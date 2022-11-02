@@ -622,14 +622,13 @@ namespace CssUI
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char To_ASCII_Lower_Alpha(char codePoint)
         {
-            switch (codePoint)
+            return codePoint switch
             {
-                case var c when (codePoint >= CHAR_A_UPPER && codePoint <= CHAR_Z_UPPER):
-                    // Add to lowercase 'a' the distance that c is from uppercase 'A'
-                    return (char)(CHAR_A_LOWER + (c - CHAR_A_UPPER));
-                default:
-                    return codePoint;
-            }
+                var c when (codePoint >= CHAR_A_UPPER && codePoint <= CHAR_Z_UPPER) => (char)(codePoint - 32),
+                // Add to lowercase 'a' the distance that c is from uppercase 'A'
+                //return (char)(CHAR_A_LOWER + (c - CHAR_A_UPPER));
+                _ => codePoint,
+            };
         }
 
         /// <summary>
@@ -639,14 +638,13 @@ namespace CssUI
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char To_ASCII_Upper_Alpha(char codePoint)
         {
-            switch (codePoint)
+            return codePoint switch
             {
-                case var c when (codePoint >= CHAR_A_LOWER && codePoint <= CHAR_Z_LOWER):
-                    // Add to uppercase 'A' the distance that c is from lowercase 'a'
-                    return (char)(CHAR_A_UPPER + (c - CHAR_A_LOWER));
-                default:
-                    return codePoint;
-            }
+                var c when (codePoint >= CHAR_A_LOWER && codePoint <= CHAR_Z_LOWER) => (char)(codePoint + 32),
+                // Add to uppercase 'A' the distance that c is from lowercase 'a'
+                //return (char)(CHAR_A_UPPER + (c - CHAR_A_LOWER));
+                _ => codePoint,
+            };
         }
 
         /// <summary>
@@ -656,31 +654,20 @@ namespace CssUI
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Ascii_Digit_To_Value(char c)
         {
-            switch (c)
+            return c switch
             {
-                case CHAR_DIGIT_0:
-                    return 0;
-                case CHAR_DIGIT_1:
-                    return 1;
-                case CHAR_DIGIT_2:
-                    return 2;
-                case CHAR_DIGIT_3:
-                    return 3;
-                case CHAR_DIGIT_4:
-                    return 4;
-                case CHAR_DIGIT_5:
-                    return 5;
-                case CHAR_DIGIT_6:
-                    return 6;
-                case CHAR_DIGIT_7:
-                    return 7;
-                case CHAR_DIGIT_8:
-                    return 8;
-                case CHAR_DIGIT_9:
-                    return 9;
-                default:
-                    throw new IndexOutOfRangeException();
-            }
+                CHAR_DIGIT_0 => 0,
+                CHAR_DIGIT_1 => 1,
+                CHAR_DIGIT_2 => 2,
+                CHAR_DIGIT_3 => 3,
+                CHAR_DIGIT_4 => 4,
+                CHAR_DIGIT_5 => 5,
+                CHAR_DIGIT_6 => 6,
+                CHAR_DIGIT_7 => 7,
+                CHAR_DIGIT_8 => 8,
+                CHAR_DIGIT_9 => 9,
+                _ => throw new IndexOutOfRangeException(),
+            };
         }
 
         #endregion
