@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace CssUI
 {
-    public class ReversableDictionary<KeyTy, ValueTy> : Dictionary<KeyTy, ValueTy>
+    public class ReversableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IReversableDictionary<TKey, TValue>
     {
         #region Properties
-        Dictionary<ValueTy, KeyTy> MapInverse = new Dictionary<ValueTy, KeyTy>();
+        Dictionary<TValue, TKey> MapInverse = new Dictionary<TValue, TKey>();
         #endregion
 
         #region Constructors
@@ -15,17 +15,17 @@ namespace CssUI
         }
         #endregion
 
-        public new void Add(KeyTy key, ValueTy value)
+        public new void Add(TKey key, TValue value)
         {
             base.Add(key, value);
             MapInverse.Add(value, key);
         }
 
-        public new void Remove(KeyTy key, out ValueTy outValue)
+        public new void Remove(TKey key, out TValue outValue)
         {
-            if (base.TryGetValue(key, out ValueTy value))
+            if (base.TryGetValue(key, out TValue value))
             {
-                throw new Exception($"Unable to find key-value entry from dictionary! ValueType: {typeof(ValueTy).FullName}");
+                throw new Exception($"Unable to find key-value entry from dictionary! ValueType: {typeof(TValue).FullName}");
             }
 
             base.Remove(key);
@@ -34,11 +34,11 @@ namespace CssUI
         }
 
 
-        public bool RemoveInverse(ValueTy value)
+        public bool RemoveInverse(TValue value)
         {
-            if (MapInverse.TryGetValue(value, out KeyTy key))
+            if (MapInverse.TryGetValue(value, out TKey key))
             {
-                throw new Exception($"Unable to find value-key entry from inverse dictionary! ValueType: {typeof(ValueTy).FullName}");
+                throw new Exception($"Unable to find value-key entry from inverse dictionary! ValueType: {typeof(TValue).FullName}");
             }
 
             if (!MapInverse.Remove(value))
@@ -49,11 +49,11 @@ namespace CssUI
             return true;
         }
 
-        public bool RemoveInverse(ValueTy value, out KeyTy outKey)
+        public bool RemoveInverse(TValue value, out TKey outKey)
         {
-            if (MapInverse.TryGetValue(value, out KeyTy key))
+            if (MapInverse.TryGetValue(value, out TKey key))
             {
-                throw new Exception($"Unable to find value-key entry from inverse dictionary! ValueType: {typeof(ValueTy).FullName}");
+                throw new Exception($"Unable to find value-key entry from inverse dictionary! ValueType: {typeof(TValue).FullName}");
             }
             outKey = key;
 
@@ -72,7 +72,7 @@ namespace CssUI
         /// <param name="newValue"></param>
         /// <param name="comparisonValue"></param>
         /// <returns></returns>
-        public new bool Update(KeyTy key, ValueTy newValue, ValueTy comparisonValue)
+        public new bool Update(TKey key, TValue newValue, TValue comparisonValue)
         {
             var oldValue = base[key];
             if (!ReferenceEquals(oldValue, comparisonValue) && !oldValue.Equals(comparisonValue))
@@ -85,7 +85,7 @@ namespace CssUI
             return true;
         }
 
-        public bool TryGetKey(ValueTy value, out KeyTy key) => MapInverse.TryGetValue(value, out key);
+        public bool TryGetKey(TValue value, out TKey key) => MapInverse.TryGetValue(value, out key);
 
     }
 }
