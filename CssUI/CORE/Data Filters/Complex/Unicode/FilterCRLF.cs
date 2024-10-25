@@ -5,9 +5,9 @@ namespace CssUI.Filters
     /// <summary>
     /// Skips CR LF chars
     /// </summary>
-    public class FilterCRLF : DataFilter<char>
+    public class FilterCRLF : Filter<char>
     {
-        public static DataFilter<char> Instance = new FilterCRLF();
+        public static Filter<char> Instance = new FilterCRLF();
         public static string LF = new string(new char[] { UnicodeCommon.CHAR_LINE_FEED });
         public static string CRLF = new string(new char[] { UnicodeCommon.CHAR_CARRIAGE_RETURN, UnicodeCommon.CHAR_LINE_FEED });
 

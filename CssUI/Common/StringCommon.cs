@@ -45,7 +45,7 @@ namespace CssUI
         /// Returns whether <paramref name="Str"/> contains any characters matching the given filter
         /// </summary>
         /// <returns>True if string contains a character which the given filter matches</returns>
-        public static bool Contains(ReadOnlySpan<char> Str, DataFilter<char> Filter)
+        public static bool Contains(ReadOnlySpan<char> Str, Filter<char> Filter)
         {
             if (Filter is null)
                 return false;
@@ -186,7 +186,7 @@ namespace CssUI
         /// Returns the number of characters within <paramref name="Str"/> matching the given <paramref name="Filter"/>
         /// </summary>
         /// <returns>Number of matching characters</returns>
-        public static int Count(ReadOnlySpan<char> Str, DataFilter<char> Filter)
+        public static int Count(ReadOnlySpan<char> Str, Filter<char> Filter)
         {
             if (Filter == null)
                 return 0;
@@ -642,7 +642,7 @@ namespace CssUI
         /// <param name="Input">The string memory to trim</param>
         /// <param name="Filter">The filter used to trim characters out of the input</param>
         /// <returns></returns>
-        public static ReadOnlyMemory<char> Trim(StringPtr Input, DataFilter<char> Filter)
+        public static ReadOnlyMemory<char> Trim(StringPtr Input, Filter<char> Filter)
         {
             var Ptr = Input;
             /* Trim start */
@@ -765,7 +765,7 @@ namespace CssUI
         /// <param name="Input">The string memory to trim</param>
         /// <param name="Filter">The filter used to trim characters out of the input</param>
         /// <returns></returns>
-        public static ReadOnlyMemory<char> TrimStart(StringPtr Input, DataFilter<char> Filter)
+        public static ReadOnlyMemory<char> TrimStart(StringPtr Input, Filter<char> Filter)
         {
             var Ptr = Input;
             /* Trim start */
@@ -867,7 +867,7 @@ namespace CssUI
         /// <param name="Input">The string memory to trim</param>
         /// <param name="Filter">The filter used to trim characters out of the input</param>
         /// <returns></returns>
-        public static ReadOnlyMemory<char> TrimEnd(StringPtr Input, DataFilter<char> Filter)
+        public static ReadOnlyMemory<char> TrimEnd(StringPtr Input, Filter<char> Filter)
         {
             var Ptr = Input;
             /* Trim end */
@@ -952,7 +952,7 @@ namespace CssUI
         /// <param name="Filter">The delimiter(s) that should seperate each token</param>
         /// <returns></returns>
         /// /// DO NOT INLINE THIS FUNCTION
-        public static ReadOnlyMemory<char>[] Strtok(StringPtr Source, DataFilter<char> Filter = null)
+        public static ReadOnlyMemory<char>[] Strtok(StringPtr Source, Filter<char> Filter = null)
         {
             if (Source is null) throw new ArgumentNullException(nameof(Source));
             if (Filter is null) throw new ArgumentNullException(nameof(Filter));
@@ -1033,13 +1033,13 @@ namespace CssUI
         /// <param name="Trim">If <c>True</c> then leading and trailing ends of the returned string will have the <paramref name="substituteData"/> stripped from them</param>
         /// <param name="Replacements">A series of tuples containing characters to be replaced and the characters which will replace each of them</param>
         /// <returns>Altered string</returns>
-        public static string Replace(ReadOnlySpan<char> Source, bool Trim = false, bool Collapse = false, params ValueTuple<DataFilter<char>, StringPtr>[] Replacements)
+        public static string Replace(ReadOnlySpan<char> Source, bool Trim = false, bool Collapse = false, params ValueTuple<Filter<char>, StringPtr>[] Replacements)
         {
             if (Source.IsEmpty) return string.Empty;
             if (Replacements.Length <= 0) return Source.ToString();
             Contract.EndContractBlock();
             // Prepare the arrays needed for the generic chunking functions
-            DataFilter<char>[] Filters = Replacements.Select(o => o.Item1).ToArray();
+            Filter<char>[] Filters = Replacements.Select(o => o.Item1).ToArray();
             StringPtr[] Substitutions = Replacements.Select(o => o.Item2).ToArray();
 
             // Seperate the source memory into chunks using the given predicates
@@ -1290,7 +1290,7 @@ namespace CssUI
         /// <param name="Offset">Offset to begin searching from</param>
         /// <returns>-1 on failure</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Scan_Match(ReadOnlySpan<char> Source, DataFilter<char> Filter, int Offset)
+        private static int Scan_Match(ReadOnlySpan<char> Source, Filter<char> Filter, int Offset)
         {
             for (int Pos = Offset; Pos < Source.Length; Pos++)
             {
@@ -1309,7 +1309,7 @@ namespace CssUI
         /// <param name="Offset">Offset to begin searching from</param>
         /// <returns>-1 on failure</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Scan_Mismatch(ReadOnlySpan<char> Source, DataFilter<char> Filter, int Offset)
+        private static int Scan_Mismatch(ReadOnlySpan<char> Source, Filter<char> Filter, int Offset)
         {
             for (int Pos = Offset; Pos < Source.Length; Pos++)
             {
@@ -1329,7 +1329,7 @@ namespace CssUI
         /// <param name="Offset">Offset to begin searching from</param>
         /// <returns>-1 on failure</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Scan_Match(ReadOnlySpan<char> Source, DataFilter<char>[] Filters, int Offset, out int MatchedIndex)
+        private static int Scan_Match(ReadOnlySpan<char> Source, Filter<char>[] Filters, int Offset, out int MatchedIndex)
         {
             for (int Pos = Offset; Pos < Source.Length; Pos++)
             {
@@ -1353,7 +1353,7 @@ namespace CssUI
         /// <param name="Offset">Offset to begin searching from</param>
         /// <returns>-1 on failure</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Scan_Mismatch(ReadOnlySpan<char> Source, DataFilter<char>[] Filters, int Offset)
+        private static int Scan_Mismatch(ReadOnlySpan<char> Source, Filter<char>[] Filters, int Offset)
         {
             for (int Pos = Offset; Pos < Source.Length; Pos++)
             {
@@ -1564,7 +1564,7 @@ namespace CssUI
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static LinkedList<StringChunk> _chunkify(ReadOnlySpan<char> Source, bool Collapse, DataFilter<char> Filter)
+        private static LinkedList<StringChunk> _chunkify(ReadOnlySpan<char> Source, bool Collapse, Filter<char> Filter)
         {
             var Chunks = new LinkedList<StringChunk>();
             const int DelimiterIndex = 0;// We just use this here to keep this generic code the same
@@ -1619,7 +1619,7 @@ namespace CssUI
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static LinkedList<StringChunk> _chunkify(ReadOnlySpan<char> Source, bool Collapse, params DataFilter<char>[] Delimiters)
+        private static LinkedList<StringChunk> _chunkify(ReadOnlySpan<char> Source, bool Collapse, params Filter<char>[] Delimiters)
         {
             var Chunks = new LinkedList<StringChunk>();
 

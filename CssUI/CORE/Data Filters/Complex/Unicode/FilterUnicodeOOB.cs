@@ -5,9 +5,9 @@ namespace CssUI.Filters
     /// <summary>
     /// Filters any unicode characters which exceed 0xFFFF
     /// </summary>
-    public class FilterUnicodeOOB : DataFilter<char>
+    public class FilterUnicodeOOB : Filter<char>
     {
-        public static DataFilter<char> Instance = new FilterUnicodeOOB();
+        public static Filter<char> Instance = new FilterUnicodeOOB();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override EFilterResult acceptData(char data)

@@ -6,9 +6,9 @@ namespace CssUI.Filters
     /// <summary>
     /// Skips HTTP whitespace chars
     /// </summary>
-    public class FilterHTTPWhitespace : DataFilter<char>
+    public class FilterHTTPWhitespace : Filter<char>
     {
-        public static DataFilter<char> Instance = new FilterHTTPWhitespace();
+        public static Filter<char> Instance = new FilterHTTPWhitespace();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override EFilterResult acceptData(char data)

@@ -2,7 +2,7 @@
 
 namespace CssUI.Filters
 {
-    public abstract class DataFilter<Ty>
+    public abstract class Filter<Ty>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public abstract EFilterResult acceptData(Ty data);
