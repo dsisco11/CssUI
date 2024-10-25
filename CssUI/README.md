@@ -1,0 +1,1 @@
+﻿TODO: Implement console interface capabilities (Docs: https://console.spec.whatwg.org/)
