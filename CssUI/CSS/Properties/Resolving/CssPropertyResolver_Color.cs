@@ -14,10 +14,10 @@ namespace CssUI.CSS.Internal
             Contract.EndContractBlock();
 
             var prop = (Property as CssProperty);
-            if (prop.Specified.Type != ECssValueTypes.KEYWORD)
-                return prop.Specified;
+            if (prop.Assigned.Type != ECssValueTypes.KEYWORD)
+                return prop.Assigned;
 
-            CssValue Value = prop.Specified;
+            CssValue Value = prop.Assigned;
             var keyword = Value.AsEnum<EColor>();
             switch (keyword)
             {
@@ -41,7 +41,7 @@ namespace CssUI.CSS.Internal
             Contract.EndContractBlock();
 
             var prop = (Property as CssProperty);
-            CssValue Value = prop.Computed;
+            CssValue Value = prop.Specified;
 
             if (Value.Type == ECssValueTypes.KEYWORD)
             {
@@ -63,7 +63,7 @@ namespace CssUI.CSS.Internal
                                 throw new CssPropertyException($"No meta-enum data found for keyword '{keyword}'");
                             }
 
-                            return CssValue.From(new Color((int)outData.Data[1], (int)outData.Data[2], (int)outData.Data[3], (int)outData.Data[4]));
+                            return CssValue.From(new Color((int)outData.Data[0], (int)outData.Data[1], (int)outData.Data[2], (int)outData.Data[3]));
                         }
                 }
             }

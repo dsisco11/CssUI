@@ -76,19 +76,19 @@ namespace CssUI.DOM
 
         public AttributeValue Value {
             get => _value_used;
-            set
-            {
-                /* 1) If attribute’s element is null, then set attribute’s value to value. */
-                if (ownerElement == null)
-                {
-                    _set_value(value);
-                }
-                else
-                {
-                    /* 2) Otherwise, change attribute from attribute’s element to value. */
-                    ownerElement.setAttribute(localName, value);
-                }
-            }
+            set => _set_value(value);
+            //{
+            //    /* 1) If attribute’s element is null, then set attribute’s value to value. */
+            //    if (ownerElement is null)
+            //    {
+            //        _set_value(value);
+            //    }
+            //    else
+            //    {
+            //        /* 2) Otherwise, change attribute from attribute’s element to value. */
+            //        ownerElement.setAttribute(localName, value);
+            //    }
+            //}
         }
         #endregion
 
@@ -109,18 +109,18 @@ namespace CssUI.DOM
                     IsInvalidValue = false;
                     if (def is object)
                     {
-                    def.CheckAndThrow(newValue);
+                        def.CheckAndThrow(newValue);
 
-                    if (!(def.LowerRange is null) && newValue.AsRAW() < def.LowerRange)
-                    {
-                        newValue = def.MissingValueDefault;
-                    }
+                        if (!(def.LowerRange is null) && newValue.AsRAW() < def.LowerRange)
+                        {
+                            newValue = def.MissingValueDefault;
+                        }
 
-                    if (!(def.UpperRange is null) && newValue.AsRAW() > def.UpperRange)
-                    {
-                        newValue = def.MissingValueDefault;
+                        if (!(def.UpperRange is null) && newValue.AsRAW() > def.UpperRange)
+                        {
+                            newValue = def.MissingValueDefault;
+                        }
                     }
-                }
                 }
                 catch (Exception ex)
                 {

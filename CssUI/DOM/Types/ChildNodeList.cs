@@ -14,7 +14,7 @@ namespace CssUI.DOM
     public class ChildNodeList : IList<Node>
     {
         #region Properties
-        //private readonly Node Owner;
+        private readonly WeakReference<Node> Owner;
         private readonly bool IsParentNode = false;
         private List<Node> Items = new List<Node>();
 
@@ -27,7 +27,7 @@ namespace CssUI.DOM
         #region Constructor
         public ChildNodeList(in Node owner)
         {
-            //Owner = owner;
+            Owner = new WeakReference<Node>(owner);
             IsParentNode = (owner is ParentNode);
             if (IsParentNode)
             {
@@ -114,6 +114,7 @@ namespace CssUI.DOM
         {
             if (index > Count) throw new IndexOutOfRangeException();
             Contract.EndContractBlock();
+            if (Count <= 0) return;
 
             var previousNode = (Count > (index - 1)) ? Items[index - 1] : null;
             var node = Items[index];
@@ -149,6 +150,8 @@ namespace CssUI.DOM
         public void Add(Node item)
         {
             Items.Add(item);
+            item.parentNode = this.Owner.TryGetTarget(out Node outParent) ? outParent : null;
+
             int index = Items.Count - 1;
             Update_Node_Links(index);
             // Update our linked elements list (if needed)
@@ -160,6 +163,8 @@ namespace CssUI.DOM
         public void Insert(int index, Node item)
         {
             Items.Insert(index, item);
+            item.parentNode = this.Owner.TryGetTarget(out Node outParent) ? outParent : null;
+
             Update_Node_Links(index);
             // Update our linked elements list (if needed)
             if (item is Element element)
@@ -172,10 +177,16 @@ namespace CssUI.DOM
         {
             int index = Items.IndexOf(item);
             var result = Items.Remove(item);
-            Update_Node_Links(index);
-            if (item is Element element)
+            if (result)
             {
-                _element_child_removed(index, element);
+                item.parentNode = null;
+                item.nextSibling = item.previousSibling = null;
+
+                Update_Node_Links(index);
+                if (item is Element element)
+                {
+                    _element_child_removed(index, element);
+                }
             }
             return result;
         }
@@ -184,6 +195,9 @@ namespace CssUI.DOM
         {
             Node item = Items[index];
             Items.RemoveAt(index);
+            item.parentNode = null;
+            item.nextSibling = item.previousSibling = null;
+
             Update_Node_Links(index);
             if (item is Element element)
             {
@@ -196,6 +210,7 @@ namespace CssUI.DOM
             /* Clear the sibling/index values for all nodes */
             foreach (Node item in Items)
             {
+                item.parentNode = null;
                 item.previousSibling = item.nextSibling = null;
                 item.index = 0;
                 if (item is Element element)

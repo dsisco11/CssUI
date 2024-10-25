@@ -9,7 +9,7 @@ namespace CssUI.CSS.Internal
 
         public static CssValue Border_Width_Used(ICssProperty Property)
         {// Docs: https://www.w3.org/TR/css-backgrounds-3/#the-border-width
-            if (Property == null) throw new ArgumentNullException(nameof(Property));
+            if (Property is null) throw new ArgumentNullException(nameof(Property));
             Contract.EndContractBlock();
 
             var prop = (Property as CssProperty);
@@ -17,7 +17,7 @@ namespace CssUI.CSS.Internal
                 return prop.Computed;
 
 
-            var keyword = prop.Specified.AsEnum<EBorderSize>();
+            var keyword = prop.Computed.AsEnum<EBorderSize>();
             int Width = 0;
 
 
@@ -74,7 +74,7 @@ namespace CssUI.CSS.Internal
 
         public static CssValue Min_Width_Used(ICssProperty Property)
         {// Docs: https://www.w3.org/TR/css-sizing-3/#min-size-properties
-            if (Property == null) throw new ArgumentNullException(nameof(Property));
+            if (Property is null) throw new ArgumentNullException(nameof(Property));
             Contract.EndContractBlock();
 
             var prop = (Property as CssProperty);
@@ -116,16 +116,17 @@ namespace CssUI.CSS.Internal
                  * It also resolves to zero when no box is generated.
                  */
 
-                switch (prop.Owner.Box.DisplayGroup)
-                {
-                    case EBoxDisplayGroup.BLOCK:
-                    case EBoxDisplayGroup.INLINE:
-                    case EBoxDisplayGroup.INLINE_BLOCK:
-                    default:
-                        {
-                            return CssValue.Zero;
-                        }
-                }
+                //switch (prop.Owner.Box.DisplayGroup)
+                //{
+                //    case EBoxDisplayGroup.BLOCK:
+                //    case EBoxDisplayGroup.INLINE:
+                //    case EBoxDisplayGroup.INLINE_BLOCK:
+                //    default:
+                //        {
+                //            return CssValue.Zero;
+                //        }
+                //}
+                return CssValue.Zero;
             }
 
             return Value;
@@ -133,7 +134,7 @@ namespace CssUI.CSS.Internal
 
         public static CssValue Min_Height_Used(ICssProperty Property)
         {// Docs: https://www.w3.org/TR/css-sizing-3/#min-size-properties
-            if (Property == null) throw new ArgumentNullException(nameof(Property));
+            if (Property is null) throw new ArgumentNullException(nameof(Property));
             Contract.EndContractBlock();
 
             var prop = (Property as CssProperty);
@@ -175,16 +176,17 @@ namespace CssUI.CSS.Internal
                  * It also resolves to zero when no box is generated.
                  */
 
-                switch (prop.Owner.Box.DisplayGroup)
-                {
-                    case EBoxDisplayGroup.BLOCK:
-                    case EBoxDisplayGroup.INLINE:
-                    case EBoxDisplayGroup.INLINE_BLOCK:
-                    default:
-                        {
-                            return CssValue.Zero;
-                        }
-                }
+                //switch (prop.Owner.Box.DisplayGroup)
+                //{
+                //    case EBoxDisplayGroup.BLOCK:
+                //    case EBoxDisplayGroup.INLINE:
+                //    case EBoxDisplayGroup.INLINE_BLOCK:
+                //    default:
+                //        {
+                //            return CssValue.Zero;
+                //        }
+                //}
+                return CssValue.Zero;
             }
 
             return Value;
@@ -192,7 +194,7 @@ namespace CssUI.CSS.Internal
 
         public static CssValue Max_Width_Used(ICssProperty Property)
         {// Docs: https://www.w3.org/TR/css-sizing-3/#min-size-properties
-            if (Property == null) throw new ArgumentNullException(nameof(Property));
+            if (Property is null) throw new ArgumentNullException(nameof(Property));
             Contract.EndContractBlock();
 
             var prop = (Property as CssProperty);
@@ -231,7 +233,7 @@ namespace CssUI.CSS.Internal
 
         public static CssValue Max_Height_Used(ICssProperty Property)
         {// Docs: https://www.w3.org/TR/css-sizing-3/#min-size-properties
-            if (Property == null) throw new ArgumentNullException(nameof(Property));
+            if (Property is null) throw new ArgumentNullException(nameof(Property));
             Contract.EndContractBlock();
 
             var prop = (Property as CssProperty);
@@ -272,7 +274,7 @@ namespace CssUI.CSS.Internal
 
         public static CssValue Definite_Or_Zero_Used(ICssProperty Property)
         {
-            if (Property == null) throw new ArgumentNullException(nameof(Property));
+            if (Property is null) throw new ArgumentNullException(nameof(Property));
             Contract.EndContractBlock();
 
             var prop = (Property as CssProperty);
@@ -287,7 +289,7 @@ namespace CssUI.CSS.Internal
 
         public static CssValue Box_Top_Used(ICssProperty Property)
         {
-            if (Property == null) throw new ArgumentNullException(nameof(Property));
+            if (Property is null) throw new ArgumentNullException(nameof(Property));
             Contract.EndContractBlock();
 
             var prop = (Property as CssProperty);
@@ -301,7 +303,7 @@ namespace CssUI.CSS.Internal
 
         public static CssValue Box_Right_Used(ICssProperty Property)
         {
-            if (Property == null) throw new ArgumentNullException(nameof(Property));
+            if (Property is null) throw new ArgumentNullException(nameof(Property));
             Contract.EndContractBlock();
 
             var prop = (Property as CssProperty);
@@ -315,7 +317,7 @@ namespace CssUI.CSS.Internal
 
         public static CssValue Box_Bottom_Used(ICssProperty Property)
         {
-            if (Property == null) throw new ArgumentNullException(nameof(Property));
+            if (Property is null) throw new ArgumentNullException(nameof(Property));
             Contract.EndContractBlock();
 
             var prop = (Property as CssProperty);
@@ -329,7 +331,7 @@ namespace CssUI.CSS.Internal
 
         public static CssValue Box_Left_Used(ICssProperty Property)
         {
-            if (Property == null) throw new ArgumentNullException(nameof(Property));
+            if (Property is null) throw new ArgumentNullException(nameof(Property));
             Contract.EndContractBlock();
 
             var prop = (Property as CssProperty);
@@ -345,7 +347,7 @@ namespace CssUI.CSS.Internal
 
         public static CssValue Position_Computed(ICssProperty Property)
         {/* Docs: https://www.w3.org/TR/css-backgrounds-3/#propdef-background-position */
-            if (Property == null) throw new ArgumentNullException(nameof(Property));
+            if (Property is null) throw new ArgumentNullException(nameof(Property));
             Contract.EndContractBlock();
 
             var prop = (Property as CssProperty);
@@ -362,7 +364,7 @@ namespace CssUI.CSS.Internal
 
         public static CssValue Position_Used(ICssProperty Property)
         {
-            if (Property == null) throw new ArgumentNullException(nameof(Property));
+            if (Property is null) throw new ArgumentNullException(nameof(Property));
             Contract.EndContractBlock();
 
             var prop = (Property as CssProperty);

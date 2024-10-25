@@ -170,16 +170,56 @@ namespace CssUI.CSS
             Contract.EndContractBlock();
 
             /* A contain constraint is resolved by setting the concrete object size to the largest rectangle that has the object's intrinsic aspect ratio and additionally has neither width nor height larger than the constraint rectangle's width and height, respectively. */
-            var Ratio = (Box.Intrinsic_Ratio ?? 1f);
-            /* Formula: Height = Width / Min(ratio, (Width/minHeight)) */
-            if (Width > Height)
-            {
-                Height = (Width / MathExt.Min(Ratio, Width / Height));
+
+            /*
+             * Essentially whats going on is that we are setting the largest axis of the box to match the same axis of the container 
+             * And then we are calculating the opposite axis of the box using the aspect ratio while respecting its minimum bounds
+             * 
+             * Essentially whats happening is that we want to match the axis on which the container and box are closest.
+             * This relationship is a bit obtuse at first glance so i'll simplify it down into a single point.
+             * Heres 2 examples to drive that point home.
+             * IF box W>H AND container W>H   then you match one axis, BUT
+             * IF box W>H AND container W<H   then you match the opposite axis
+             * SO the box wants to match its longest axis and the container wants to match it's own smallest.
+             * 
+             * The logical competition between the two indicates we need to ask a different question!
+             * The question here is: "Which of these rectangles edges are going to touch first?"
+             * 
+             * So we want to know which axis is the longest for the inner rectangle and which is the shortest for the outer rectangle
+             * For both rectangles the relationship between their sides is describes by their aspect ratio!
+             * 
+             * So by subtracting their ratios we can determine which axis is closest between them.
+             * If (outter - inner) < 0 then their X axis is the closer point of collision
+             * Otherwise its the Y axis!
+             * 
+             * Note: There's absolutely a way to do this without divisions which would be fewer cycles on the processor,
+             * But any situation wherein this is making a difference, you probably shouldnt be using C# (an JIT intermediate language)
+             * In the aforementioned case you should be using something closer to machine language like C++ or, heck, go for Assembly if your a masochist!
+             */
+
+
+            var innerRatio = (Box.Intrinsic_Ratio ?? 1.0);
+            var outterRatio = Width / Height;
+
+            if (outterRatio < innerRatio)// this is equivalent to (outter - inner) < 0
+            {// Lock width, scale height
+                Height = (int)(Width / innerRatio);
             }
             else
-            {
-                Width = (Height * MathExt.Min(1f/Ratio, Height / Width));
+            {// Lock height, scale width
+                Width = (int)(Height * innerRatio);
             }
+
+            //var Ratio = (Box.Intrinsic_Ratio ?? 1f);
+            ///* Formula: Height = Width / Min(ratio, (Width/minHeight)) */
+            //if (Width > Height)
+            //{
+            //    Height = (Width / MathExt.Min(Ratio, Width / Height));
+            //}
+            //else
+            //{
+            //    Width = (Height * MathExt.Min(1f/Ratio, Height / Width));
+            //}
 
             return new Rect2f(Width, Height);
         }
@@ -191,18 +231,63 @@ namespace CssUI.CSS
             Contract.EndContractBlock();
 
             /* A cover constraint is resolved by setting the concrete object size to the smallest rectangle that has the object's intrinsic aspect ratio and additionally has neither width nor height smaller than the constraint rectangle's width and height, respectively. */
-            var Ratio = (Box.Intrinsic_Ratio ?? 1f);
+            /*
+             * THIS IS THE EXPLINATION OF THE PROCESS FOR THE "Contain" CONSTRAINT METHOD
+             * THE "Cover" CONSTRAINT METHOD IS MERELY THE INVERSE OF THE OTHER ONE!
+             * 
+             * Essentially whats going on is that we are setting the largest axis of the box to match the same axis of the container 
+             * And then we are calculating the opposite axis of the box using the aspect ratio while respecting its minimum bounds
+             * 
+             * Essentially whats happening is that we want to match the axis on which the container and box are closest.
+             * This relationship is a bit obtuse at first glance so i'll simplify it down into a single point.
+             * Heres 2 examples to drive that point home.
+             * IF box W>H AND container W>H   then you match one axis, BUT
+             * IF box W>H AND container W<H   then you match the opposite axis
+             * SO the box wants to match its longest axis and the container wants to match it's own smallest.
+             * 
+             * The logical competition between the two indicates we need to ask a different question!
+             * The question here is: "Which of these rectangles edges are going to touch FIRST?"
+             * 
+             * So we want to know which axis is the longest for the inner rectangle and which is the shortest for the outer rectangle
+             * For both rectangles the relationship between their sides is describes by their aspect ratio!
+             * 
+             * So by subtracting their ratios we can determine which axis is closest between them.
+             * If (outter - inner) < 0 then their X axis is the closer point of collision
+             * Otherwise its the Y axis!
+             * 
+             * Note: There's absolutely a way to do this without divisions which would be fewer cycles on the processor,
+             * But any situation wherein this is making a difference, you probably shouldnt be using C# (an JIT intermediate language)
+             * In the aforementioned case you should be using something closer to machine language like C++ or, heck, go for Assembly if your a masochist!
+             */
 
-            if (Width > Height)
-            {/* Formula: Height = Width / Max(ratio, (Width/minHeight)) */
-                Height = (Width / MathExt.Max(Ratio, Width / Height));
-                return new Rect2f(Width, Height);
+            var innerRatio = (Box.Intrinsic_Ratio ?? 1.0);
+            var outterRatio = Width / Height;
+
+            // HERES THE DIFFERENCE BETWEEN "Contain" AND "Cover"
+            //             V
+            if (innerRatio < outterRatio)
+            {// Lock width, scale height
+                Height = (int)(Width / innerRatio);
             }
             else
-            {/* Formula: Width = Height * Max(1/ratio, (minHeight/Width)) */
-                Width = (Height * MathExt.Max(1f/Ratio, Height / Width));
-                return new Rect2f(Width, Height);
+            {// Lock height, scale width
+                Width = (int)(Height * innerRatio);
             }
+
+            //var Ratio = (Box.Intrinsic_Ratio ?? 1f);
+
+            //if (Width > Height)
+            //{/* Formula: Height = Width / Max(ratio, (Width/minHeight)) */
+            //    Height = (Width / MathExt.Max(Ratio, Width / Height));
+            //    return new Rect2f(Width, Height);
+            //}
+            //else
+            //{/* Formula: Width = Height * Max(1/ratio, (minHeight/Width)) */
+            //    Width = (Height * MathExt.Max(1f/Ratio, Height / Width));
+            //    return new Rect2f(Width, Height);
+            //}
+
+            return new Rect2f(Width, Height);
         }
     }
 }

@@ -4,6 +4,20 @@ using CssUI.CSS;
 namespace CssUI.Rendering
 {
 
+    /*
+     * XXX: TODO: Move away from this outdated state machine dependent model and instead create a new system where 
+     * UI items can just tell the engine how they need to look, like what geometry and colors they have,
+     * and then the engine gives the UI element some sort of RenderID handle
+     * Then the RenderID can be used to tell the engine to render that thing or reference it in general!
+     * 
+     * This acheives true seperation of concerns.
+     * UI elements shouldnt be involved PERIOD with their rasterization, all they need to be able to do is tell the engine
+     * HEY, RENDER ME NOW K?
+     * 
+     * Further this allows a huge variety of engine implementations to be created.
+     * Everything from OpenGL 2.1 state machines all the way to OpenGL 4 or Vulkan stateless rendering!
+     */
+
     /// <summary>
     /// Provides an implementation of a basic render engine with a stack.
     /// </summary>

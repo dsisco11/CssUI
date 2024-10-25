@@ -139,7 +139,6 @@
     <Folder Include="CORE\Debug\" />
     <Folder Include="CORE\Units\Interface\" />
     <Folder Include="DOM\Base\" />
-    <Folder Include="DOM\Events\Interfaces\" />
     <Folder Include="CORE\Structs\" />
   </ItemGroup>
 

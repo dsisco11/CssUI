@@ -51,25 +51,15 @@ namespace CssUI.CSS.Parser
         #endregion
 
         /// <summary>
-        /// Encodes the token back to it's CSS representation
+        /// Encodes the token back to it's representation as a text string
         /// </summary>
-        /// <returns>Css string</returns>
+        /// <returns>Text form of the token</returns>
         public abstract string Encode();
 
         #region ToString
         public override string ToString()
         {
             return Encode();
-            /*if (this is ValuedTokenBase)
-            {
-                return Encode();
-            }
-            else
-            {
-                var mem = Encode().AsMemory();
-                string encoded = StringCommon.Replace(mem, false, ('\n', "\\n"), ('\t', "\\t"));
-                return string.Concat(GetType().Name, "(", encoded, ")");
-            }*/
         }
         #endregion
     }

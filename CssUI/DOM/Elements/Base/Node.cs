@@ -25,7 +25,8 @@ namespace CssUI.DOM.Nodes
         #region Properties
         private ENodeFlags nodeFlags = ENodeFlags.Clear;
         internal List<RegisteredObserver> RegisteredObservers = new List<RegisteredObserver>();
-        public Document nodeDocument { get; internal set; }
+        public virtual Document nodeDocument { get; internal set; }
+        private WeakReference<Node> _parentNode = null;
 
         #region Abstracts
         public abstract ENodeType nodeType { get; }
@@ -62,7 +63,13 @@ namespace CssUI.DOM.Nodes
                 return (this is Document) ? null : nodeDocument;
             }
         }
-        public Node parentNode { get; private set; }
+
+
+        public Node parentNode
+        {
+            get => _parentNode.TryGetTarget(out var outParentNode) ? outParentNode : null;
+            internal set => _parentNode.SetTarget(value);
+        }
         public Element parentElement { get; private set; }
         public ChildNodeList childNodes { get; private set; }
 
@@ -110,6 +117,7 @@ namespace CssUI.DOM.Nodes
         #endregion
 
         #region CSS
+        // XXX: SPECIFICATIONS DICTATE THAT ONLY 'ELEMENTS' AND 'TEXT NODES' ACTUALLY OWN BOXES, REFACTOR THIS!!! [Source: https://www.w3.org/TR/css-display-3/#intro]
         /// <summary>
         /// The layout box for this element
         /// </summary>
@@ -122,6 +130,7 @@ namespace CssUI.DOM.Nodes
         #region Constructors
         public Node()
         {
+            _parentNode = new WeakReference<Node>(null);
             childNodes = new ChildNodeList(this);
         }
         #endregion
@@ -495,6 +504,15 @@ namespace CssUI.DOM.Nodes
         #endregion
 
         #region Customizable Overload Steps
+
+        /// <summary>
+        /// Runs the W3C specification defined steps on a given parent node for when a child node changes
+        /// </summary>
+        internal virtual void Run_children_changed_steps()
+        {/* Docs: https://dom.spec.whatwg.org/#concept-node-children-changed-ext */
+            /* Currently none of our specifications define this, so it's a placeholder. */
+        }
+
         /// <summary>
         /// Runs the W3C specification defined steps on a given parent node for when a child <see cref="Text"/> node changes
         /// </summary>
@@ -855,39 +873,41 @@ namespace CssUI.DOM.Nodes
             /* 7) For each node in nodes, in tree order: */
             foreach (Node newNode in nodes)
             {
-                /* 1) If child is null, then append node to parent’s children. */
+                /* 1) Adopt node into parent’s node document. */
+                parent.nodeDocument.adoptNode(newNode);
+                /* 2) If child is null, then append node to parent’s children. */
                 if (child is null)
                 {
                     parent.childNodes.Add(newNode);
                 }
-                /* 2) Otherwise, insert node into parent’s children before child’s index. */
+                /* 3) Otherwise, insert node into parent’s children before child’s index. */
                 else
                 {
                     parent.childNodes.Insert(childIndex, newNode);
                     // Increment childIndex so its position is correct
                     childIndex++;
                 }
-                /* 3) If parent is a shadow host and node is a slotable, then assign a slot for node. */
+                /* 4) If parent is a shadow host and node is a slotable, then assign a slot for node. */
                 if (parent.Is_ShadowHost && node is ISlottable)
                 {
                     DOMCommon.Assign_A_Slot(node as ISlottable);
                 }
 
-                /* 4) If node is a Text node, run the child text content change steps for parent. */
+                /* 5) If node is a Text node, run the child text content change steps for parent. */
                 if (node is Text nodeAsText)
                 {
                     parent.Run_child_text_node_change_steps(nodeAsText);
                 }
-                /* 5) If parent’s root is a shadow root, and parent is a slot whose assigned nodes is the empty list, then run signal a slot change for parent. */
+                /* 6) If parent’s root is a shadow root, and parent is a slot whose assigned nodes is the empty list, then run signal a slot change for parent. */
                 if (parent.getRootNode().Is_ShadowHost && parent is ISlot parentSlot && !parentSlot.assignedNodes().Any())
                 {
                     parentSlot.Signal_Slot_Change();
                 }
 
-                /* 6) Run assign slotables for a tree with node’s root. */
+                /* 7) Run assign slotables for a tree with node’s root. */
                 DOMCommon.Assign_Slottables_For_Tree(node.getRootNode());
 
-                /* 7) For each shadow-including inclusive descendant inclusiveDescendant of node, in shadow-including tree order: */
+                /* 8) For each shadow-including inclusive descendant inclusiveDescendant of node, in shadow-including tree order: */
                 var newNodeDescendents = DOMCommon.Get_Shadow_Including_Inclusive_Descendents(newNode);
                 foreach (Node inclusiveDescendant in newNodeDescendents)
                 {
@@ -911,6 +931,9 @@ namespace CssUI.DOM.Nodes
             {
                 MutationRecord.Queue_Tree_Mutation_Record(parent, nodes, Array.Empty<Node>(), previousSibling, child);
             }
+
+            /* 9) Run the children changed steps for parent. */
+            parent.Run_children_changed_steps();
         }
 
         /// <summary>
@@ -1144,7 +1167,7 @@ namespace CssUI.DOM.Nodes
             if (ReferenceEquals(referenceChild, node))
                 referenceChild = node.nextSibling;
 
-            parent.ownerDocument.adoptNode(node);
+            parent.nodeDocument.adoptNode(node);
             Dom_insert_node_into_parent_before(node, parent, referenceChild);
             return node;
         }

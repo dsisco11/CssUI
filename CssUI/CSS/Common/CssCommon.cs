@@ -203,19 +203,19 @@ namespace CssUI.CSS.Internal
 
         #region Boxes
         /// <summary>
-        /// Returns <c>True</c> if the owner of the containing block for the <paramref name="A"/> element is an ancestor of <paramref name="B"/>
+        /// Returns <c>True</c> if the owner of the containing block for the <paramref name="Left"/> element is an ancestor of <paramref name="Right"/>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_Containing_Block_Ancestor_Of(Element A, Element B)
+        public static bool Is_Containing_Block_Ancestor_Of(Element Left, Element Right)
         {/* Docs: https://www.w3.org/TR/CSS22/visudet.html#containing-block-details */
             /* Root elements */
-            if (A.parentElement is null)
+            if (Left.parentElement is null)
             {
                 return true;
             }
 
             /* Other elements */
-            switch (A.Style.Positioning)
+            switch (Left.Style.Positioning)
             {
                 case EBoxPositioning.Static:
                 case EBoxPositioning.Relative:
@@ -225,7 +225,7 @@ namespace CssUI.CSS.Internal
                          * the containing block is formed by the content edge of the nearest ancestor box that is a block container or which establishes a formatting context. 
                          */
 
-                        var Tree = new DOM.TreeWalker(A, DOM.Enums.ENodeFilterMask.SHOW_ELEMENT);
+                        var Tree = new DOM.TreeWalker(Left, DOM.Enums.ENodeFilterMask.SHOW_ELEMENT);
                         var Current = Tree.parentNode();
                         while (Current is object)
                         {
@@ -233,14 +233,14 @@ namespace CssUI.CSS.Internal
                             {
                                 if (element.Box.DisplayType.Outer == EOuterDisplayType.Block || element.Box.FormattingContext is object)
                                 {
-                                    return DOMCommon.Is_Ancestor(element, B);
+                                    return DOMCommon.Is_Ancestor(element, Right);
                                 }
                             }
 
                             Current = Tree.parentNode();
                         }
 
-                        throw new CssException($"Cant find containing-block for element: {A.ToString()}");
+                        throw new CssException($"Cant find containing-block for element: {Left.ToString()}");
                     }
                 case EBoxPositioning.Fixed:
                     {/* If the element has 'position: fixed', the containing block is established by the viewport in the case of continuous media or the page area in the case of paged media. */
@@ -256,7 +256,7 @@ namespace CssUI.CSS.Internal
                          * 
                          */
 
-                        var Tree = new DOM.TreeWalker(A, DOM.Enums.ENodeFilterMask.SHOW_ELEMENT);
+                        var Tree = new DOM.TreeWalker(Left, DOM.Enums.ENodeFilterMask.SHOW_ELEMENT);
                         var Current = Tree.parentNode();
                         while (Current is object)
                         {
@@ -264,7 +264,7 @@ namespace CssUI.CSS.Internal
                             {
                                 if (ancestor.Style.Positioning == EBoxPositioning.Absolute || ancestor.Style.Positioning == EBoxPositioning.Relative || ancestor.Style.Positioning == EBoxPositioning.Fixed)
                                 {
-                                    return DOMCommon.Is_Ancestor(ancestor, B);
+                                    return DOMCommon.Is_Ancestor(ancestor, Right);
                                 }
                             }
 
@@ -272,11 +272,11 @@ namespace CssUI.CSS.Internal
                         }
 
                         /* If there is no such ancestor, the containing block is the initial containing block. */
-                        return DOMCommon.Is_Ancestor(A.getRootNode(), B);
+                        return DOMCommon.Is_Ancestor(Left.getRootNode(), Right);
                     }
                 default:
                     {
-                        return DOMCommon.Is_Ancestor(A.parentElement, B);
+                        return DOMCommon.Is_Ancestor(Left.parentElement, Right);
                     }
             }
 

@@ -279,7 +279,7 @@ namespace CssUI.DOM
         #endregion
 
         #region Constructors
-        internal Element(Document document, string localName, string prefix = "", string Namespace = "") : base()
+        public Element(Document document, string localName, string prefix = "", string Namespace = "") : base()
         {/* Docs: https://dom.spec.whatwg.org/#interface-element */
             nodeDocument = document;
             this.localName = localName;

@@ -1,4 +1,5 @@
-using CssUI.Enums;
+﻿using CssUI.Enums;
+
 using System;
 
 namespace CssUI.DOM
@@ -11,7 +12,7 @@ namespace CssUI.DOM
         {
         }
 
-        public DOMTokenList(Element ownerElement, AtomicName<EAttributeName> localName, string[] supportedTokens) : base(ownerElement, localName, null)
+        public DOMTokenList(Element ownerElement, AtomicName<EAttributeName> localName, AtomicString[] supportedTokens) : base(ownerElement, localName, supportedTokens)
         {
         }
         #endregion

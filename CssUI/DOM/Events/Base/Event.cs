@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CssUI.DOM.Events
 {
-    public class Event
+    public class Event : IEvent
     {
         #region Properties
         public EEventFlags Flags { get; internal set; } = 0x0;

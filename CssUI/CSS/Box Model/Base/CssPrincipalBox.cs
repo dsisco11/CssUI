@@ -561,11 +561,11 @@ namespace CssUI.CSS.BoxTree
             bool eqMargin = oldMargin != Margin.GetHashCode();
 
             HasChanged = oldPos != newPos || oldSize != newSize;
-            HasChanged = HasChanged | eqReplaced;
-            HasChanged = HasChanged | eqContent;
-            HasChanged = HasChanged | eqPadding;
-            HasChanged = HasChanged | eqBorder;
-            HasChanged = HasChanged | eqMargin;
+            HasChanged |= eqReplaced;
+            HasChanged |= eqContent;
+            HasChanged |= eqPadding;
+            HasChanged |= eqBorder;
+            HasChanged |= eqMargin;
 
             if (HasChanged)
             {

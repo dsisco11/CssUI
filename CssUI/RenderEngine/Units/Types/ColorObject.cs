@@ -134,16 +134,22 @@ namespace CssUI.Rendering
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return unchecked((int)AsInteger());
         }
 
         public static bool operator ==(ColorObject<T> left, IColorObject right)
         {
+            if ((left is null) ^ (right is null))// One is null but not both
+                return false;
+
             return left?.Equals(right) ?? false;
         }
 
         public static bool operator !=(ColorObject<T> left, IColorObject right)
         {
+            if ((left is null) ^ (right is null))// One is null but not both
+                return true;
+
             return !(left == right);
         }
         #endregion

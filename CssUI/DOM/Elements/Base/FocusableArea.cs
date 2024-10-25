@@ -97,7 +97,7 @@ namespace CssUI.DOM
 
 
             /* The user-agent provided subwidgets of elements that are being rendered and are not actually disabled or expressly inert. */
-            /* XXX: dont forget these */
+            /* XXX: dont forget to check "The user-agent provided subwidgets of elements that are being rendered and are not actually disabled or expressly inert" */
 
 
             /* Any other element or part of an element, especially to aid with accessibility or to better match platform conventions. */

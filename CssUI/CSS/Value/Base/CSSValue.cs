@@ -151,9 +151,9 @@ namespace CssUI.CSS
             if (type == ECssValueTypes.KEYWORD)// Try and catch some common IMPORTANT keywords
             {
                 /* If our keyword can be resolved to another ECssValueType then its an global keyword */
-                if (!Lookup.TryEnum(value as string, out ECssValueTypes outType))
+                if (Lookup.TryEnum(value as string, out ECssValueTypes outKeyword))
                 {
-                    type = outType;
+                    type = outKeyword;
                 }
             }
             else if (type == ECssValueTypes.DIMENSION || type == ECssValueTypes.RESOLUTION)

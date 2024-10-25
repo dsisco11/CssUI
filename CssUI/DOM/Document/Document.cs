@@ -28,6 +28,7 @@ namespace CssUI.DOM
         #region Backing Values
         private EDesignMode _designMode = EDesignMode.OFF;
         internal Selection _selection = null;
+        private Element _documentElement = null;
         #endregion
 
         #region Rendering
@@ -133,8 +134,21 @@ namespace CssUI.DOM
 
         /// <summary>
         /// Returns the Element that is the root element of the document (for example, the <html> element for HTML documents).
+        /// "The document element of a document is the element whose parent is that document, if it exists; otherwise null."
+        /// Docs: https://dom.spec.whatwg.org/#document-element
         /// </summary>
-        public Element documentElement { get; private set; }
+        public Element documentElement 
+        {
+            get
+            {
+                if (_documentElement is null)
+                {
+                    _documentElement = this?.childNodes?.ChildElements?.First?.Value ?? null;
+                }
+
+                return _documentElement;
+            }
+        }
 
 #if ENABLE_HTML
         /* XXX: */
@@ -159,7 +173,7 @@ namespace CssUI.DOM
 
         public override int nodeLength => childNodes.Count;
 
-        public readonly new Document ownerDocument;
+        public override Document nodeDocument { get => this; }
         #endregion
 
         #region Internal States
@@ -211,7 +225,7 @@ namespace CssUI.DOM
                     {
                         if (current.GetFlag(ENodeFlags.NeedsStyleUpdate))
                         {
-                            BoxModel.Resolve(currentAsElement.Box, current.Style.Cascaded);
+                            //BoxModel.Resolve(currentAsElement.Box, current.Style.Cascaded);
                             current.Unpropagate_Flag(ENodeFlags.ChildNeedsStyleUpdate | ENodeFlags.DirectChildNeedsStyleUpdate, ENodeFlags.NeedsStyleUpdate, false);
                         }
 
@@ -223,6 +237,7 @@ namespace CssUI.DOM
                         }
                     }
 
+                    current = Tree.nextNode();
                 }
             }
         }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CssUI.DOM.Events
@@ -34,11 +35,11 @@ namespace CssUI.DOM.Events
         #endregion
 
         #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
+        private int _disposedValue = 0; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (Interlocked.Exchange(ref this._disposedValue, 1) == 0)
             {
                 if (disposing)
                 {
@@ -50,7 +51,6 @@ namespace CssUI.DOM.Events
                     }
                     Listeners.Clear();
                 }
-                disposedValue = true;
             }
         }
 

@@ -201,7 +201,8 @@ namespace CssUI.CSS.Internal
         static IEnumerable<StyleDefinition> Create_Block_Property_Definitions()
         {
             return new StyleDefinition[] {
-
+                
+                /// XXX: Update 'Display' property to modern specifications (Docs: https://www.w3.org/TR/css-display-3/#the-display-properties)
                 new StyleDefinition(ECssPropertyID.Display, false, EPropertyDirtFlags.Box, CssValue.From(EDisplayMode.INLINE_BLOCK), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EDisplayMode>()),
                 new StyleDefinition(ECssPropertyID.BoxSizing, false, EPropertyDirtFlags.Content_Area | EPropertyDirtFlags.Border_Area, CssValue.From(EBoxSizingMode.BorderBox), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EBoxSizingMode>()),
 
@@ -215,6 +216,38 @@ namespace CssUI.CSS.Internal
                 new StyleDefinition(ECssPropertyID.Right, false, EPropertyDirtFlags.Margin_Area, CssValue.Auto, ECssValueTypes.AUTO | ECssValueTypes.DIMENSION | ECssValueTypes.PERCENT, null, false, CssPercentageResolvers.Containing_Block_Logical_Width, new Tuple<EPropertyStage, PropertyResolverFunc>(EPropertyStage.Used, CssPropertyResolver.Definite_Or_Zero_Used)),
                 new StyleDefinition(ECssPropertyID.Bottom, false, EPropertyDirtFlags.Margin_Area, CssValue.Auto, ECssValueTypes.AUTO | ECssValueTypes.DIMENSION | ECssValueTypes.PERCENT, null, false, CssPercentageResolvers.Containing_Block_Logical_Height, new Tuple<EPropertyStage, PropertyResolverFunc>(EPropertyStage.Used, CssPropertyResolver.Definite_Or_Zero_Used)),
                 new StyleDefinition(ECssPropertyID.Left, false, EPropertyDirtFlags.Margin_Area, CssValue.Auto, ECssValueTypes.AUTO | ECssValueTypes.DIMENSION | ECssValueTypes.PERCENT, null, false, CssPercentageResolvers.Containing_Block_Logical_Width, new Tuple<EPropertyStage, PropertyResolverFunc>(EPropertyStage.Used, CssPropertyResolver.Definite_Or_Zero_Used)),
+
+                
+                /// XXX: Implement the latest standards for min/max & preffered sizing
+                //// WIDTH (NEW Docs: https://www.w3.org/TR/css-sizing-3/#specifying-sizes )
+                //new PropertyDefinition(EPropertyName.Width, false, EPropertyDependencies.Content_Area, StyleValue.Auto, EValueType.LENGTH | EValueType.PERCENT | EValueType.AUTO | EValueType.INHERIT | EValueType.KEYWORD | EValueType.FUNCTION, Meta.Get_Keywords<EBoxSize>(), false,
+                //Percentage_Resolver: PercentageResolvers.Containing_Block_Logical_Width,
+                ////new KeyValuePair<EPropertyStage, PropertyResolutionMethod>(EPropertyStage.Used, BoxAlgorithms.Width_Used),
+                //new KeyValuePair<EPropertyStage, PropertyResolutionMethod>(EPropertyStage.Actual, BoxAlgorithms.Definite_Or_Zero_NonNegative_Actual)
+                //),
+                //// HEIGHT
+                //new PropertyDefinition(EPropertyName.Height, false, EPropertyDependencies.Content_Area, StyleValue.Auto, EValueType.LENGTH | EValueType.PERCENT | EValueType.AUTO | EValueType.INHERIT | EValueType.KEYWORD | EValueType.FUNCTION, Meta.Get_Keywords<EBoxSize>(), false,
+                //Percentage_Resolver: PercentageResolvers.Containing_Block_Logical_Height,
+                ////new KeyValuePair<EPropertyStage, PropertyResolutionMethod>(EPropertyStage.Used, BoxAlgorithms.Height_Used),
+                //new KeyValuePair<EPropertyStage, PropertyResolutionMethod>(EPropertyStage.Actual, BoxAlgorithms.Definite_Or_Zero_NonNegative_Actual)
+                //),
+
+                //// MIN-WIDTH
+                //new PropertyDefinition(EPropertyName.MinWidth, false, EPropertyDependencies.Content_Area, StyleValue.Auto, EValueType.LENGTH | EValueType.PERCENT | EValueType.AUTO | EValueType.KEYWORD | EValueType.FUNCTION, Meta.Get_Keywords<EBoxSize>(), false,
+                //PercentageResolvers.Containing_Block_Logical_Width,
+                //new KeyValuePair<EPropertyStage, PropertyResolutionMethod>(EPropertyStage.Used, BoxAlgorithms.Min_Width_Used) ),
+                //// MIN-HEIGHT
+                //new PropertyDefinition(EPropertyName.MinHeight, false, EPropertyDependencies.Content_Area, StyleValue.Auto, EValueType.LENGTH | EValueType.PERCENT | EValueType.AUTO | EValueType.KEYWORD | EValueType.FUNCTION, Meta.Get_Keywords<EBoxSize>(), false,
+                //PercentageResolvers.Containing_Block_Logical_Height,
+                //new KeyValuePair<EPropertyStage, PropertyResolutionMethod>(EPropertyStage.Used, BoxAlgorithms.Min_Height_Used)),
+                //// MAX-WIDTH
+                //new PropertyDefinition(EPropertyName.MaxWidth, false, EPropertyDependencies.Content_Area, StyleValue.None, EValueType.LENGTH | EValueType.PERCENT | EValueType.NONE | EValueType.KEYWORD | EValueType.FUNCTION, Meta.Get_Keywords<EBoxSize>(), false,
+                //PercentageResolvers.Containing_Block_Logical_Width,
+                //new KeyValuePair<EPropertyStage, PropertyResolutionMethod>(EPropertyStage.Used, BoxAlgorithms.Max_Width_Used)),
+                //// MAX-HEIGHT
+                //new PropertyDefinition(EPropertyName.MaxHeight, false, EPropertyDependencies.Content_Area, StyleValue.None, EValueType.LENGTH | EValueType.PERCENT | EValueType.NONE | EValueType.KEYWORD | EValueType.FUNCTION, Meta.Get_Keywords<EBoxSize>(), false,
+                //PercentageResolvers.Containing_Block_Logical_Height,
+                //new KeyValuePair<EPropertyStage, PropertyResolutionMethod>(EPropertyStage.Used, BoxAlgorithms.Max_Height_Used)),
 
 
                 new StyleDefinition(ECssPropertyID.Width, false, EPropertyDirtFlags.Content_Area, CssValue.Auto, ECssValueTypes.DIMENSION | ECssValueTypes.PERCENT | ECssValueTypes.AUTO | ECssValueTypes.INHERIT, null, false, CssPercentageResolvers.Containing_Block_Logical_Width),

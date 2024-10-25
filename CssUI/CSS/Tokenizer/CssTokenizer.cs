@@ -15,7 +15,7 @@ namespace CssUI.CSS.Parser
     public class CssTokenizer
     {
         #region Properties
-        private readonly DataConsumer<char> Stream;
+        private readonly DataConsumer<char> Stream; 
         private readonly CssToken[] tokens = null;
 
         public ReadOnlyMemory<CssToken> Tokens => tokens;

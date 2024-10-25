@@ -4,7 +4,7 @@ using System;
 
 namespace CssUI.DOM.Events
 {
-    public class MouseEvent : UIEvent
+    public class MouseEvent : UIEvent, IEvent
     {
         public static Type initType = typeof(MouseEventInit);
 

@@ -138,17 +138,18 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
         static void Consume_All_Whitespace(DataConsumer<CssToken> Stream)
         {
-            if (Stream is null)
-            {
-                throw new CssParserException(CssErrors.STREAM_IS_NULL);
-            }
+            if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
+            Contract.EndContractBlock();
+
             while (Stream.Next.Type == ECssTokenType.Whitespace) { Stream.Consume(); }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static IEnumerable<CssComponent> Consume_Rule_List(DataConsumer<CssToken> Stream, bool TopLevel = false)
         {
             if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
+            Contract.EndContractBlock();
+
             LinkedList<CssComponent> Rules = new LinkedList<CssComponent>();
 
             CssToken Token;
