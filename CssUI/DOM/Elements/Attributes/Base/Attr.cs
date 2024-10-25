@@ -50,7 +50,7 @@ namespace CssUI.DOM
         {
             get
             {
-                if (_definition == null)
+                if (_definition is null)
                 {
                     _definition = new WeakReference<AttributeDefinition>(AttributeDefinition.Lookup(localName, ownerElement.GetType()));
                 }
@@ -72,7 +72,7 @@ namespace CssUI.DOM
         /// Qualified Name
         /// </summary>
         /// Docs: https://dom.spec.whatwg.org/#concept-attribute-qualified-name
-        public string Name { get => prefix==null ? localName.ToString() : string.Concat(prefix, ":", localName); }
+        public string Name { get => prefix is null ? localName.ToString() : string.Concat(prefix, ":", localName); }
 
         public AttributeValue Value {
             get => _value_used;
@@ -107,6 +107,8 @@ namespace CssUI.DOM
                 {
                     var def = Definition;
                     IsInvalidValue = false;
+                    if (def is object)
+                    {
                     def.CheckAndThrow(newValue);
 
                     if (!(def.LowerRange is null) && newValue.AsRAW() < def.LowerRange)
@@ -118,6 +120,7 @@ namespace CssUI.DOM
                     {
                         newValue = def.MissingValueDefault;
                     }
+                }
                 }
                 catch (Exception ex)
                 {

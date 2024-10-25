@@ -164,7 +164,7 @@ namespace CssUI.DOM.Internal
                     if (parent is Window || (parent is Node && DOMCommon.Is_Shadow_Including_Inclusive_Ancestor((target as Node).getRootNode(), parent as Node)))
                     {
                         /* 1) If isActivationEvent is true, event’s bubbles attribute is true, activationTarget is null, and parent has activation behavior, then set activationTarget to parent. */
-                        if (isActivationEvent && @event.bubbles && activationTarget == null && parent.has_activation_behaviour)
+                        if (isActivationEvent && @event.bubbles && activationTarget is null && parent.has_activation_behaviour)
                         {
                             activationTarget = parent;
                         }
@@ -179,7 +179,7 @@ namespace CssUI.DOM.Internal
                     {
                         target = parent;
                         /* 1) If isActivationEvent is true, activationTarget is null, and target has activation behavior, then set activationTarget to target. */
-                        if (isActivationEvent && activationTarget == null && target.has_activation_behaviour)
+                        if (isActivationEvent && activationTarget is null && target.has_activation_behaviour)
                         {
                             activationTarget = target;
                         }

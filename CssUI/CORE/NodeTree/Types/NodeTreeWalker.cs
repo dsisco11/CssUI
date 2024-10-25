@@ -377,7 +377,7 @@ namespace CssUI.NodeTree
                 /* 3) Let temporary be node. */
                 var temporary = node;
                 /* 4) While temporary is non-null: */
-                while (temporary != null)
+                while (temporary is object)
                 {
                     /* 1) If temporary is the context object’s root, then return null. */
                     if (ReferenceEquals(temporary, root))
@@ -385,7 +385,7 @@ namespace CssUI.NodeTree
                     /* 2) Set sibling to temporary’s next sibling. */
                     sibling = temporary.nextSibling;
                     /* 3) If sibling is non-null, then break. */
-                    if (sibling != null) break;
+                    if (sibling is object) break;
                     /* 4) Set temporary to temporary’s parent. */
                     temporary = temporary.parentNode;
                 }

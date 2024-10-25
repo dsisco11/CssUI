@@ -52,7 +52,7 @@ namespace CssUI
         /// </returns>
         public static implicit operator ulong(UniqueID uid)
         {
-            if (uid == null)
+            if (uid is null)
             {
                 throw new ArgumentNullException(nameof(uid));
             }
@@ -90,7 +90,7 @@ namespace CssUI
             }
 
             UniqueID uid = obj as UniqueID;
-            if ((object)uid == null)
+            if ((object)uid is null)
             {
                 return false;
             }

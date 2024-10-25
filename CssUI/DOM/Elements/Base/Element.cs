@@ -101,7 +101,7 @@ namespace CssUI.DOM
                 var tree = new TreeWalker(this, ENodeFilterMask.SHOW_TEXT);
                 StringBuilder sb = new StringBuilder();
                 Node n;
-                while ((n = tree.firstChild()) != null)
+                while ((n = tree.firstChild()) is object)
                     sb.Append(n.textContent);
 
                 return sb.ToString();

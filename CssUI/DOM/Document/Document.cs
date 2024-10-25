@@ -130,6 +130,7 @@ namespace CssUI.DOM
                 }
             }
         }
+
         /// <summary>
         /// Returns the Element that is the root element of the document (for example, the <html> element for HTML documents).
         /// </summary>
@@ -474,7 +475,7 @@ namespace CssUI.DOM
         #region Selection
         public Selection getSelection()
         {/* Docs: https://www.w3.org/TR/selection-api/#extensions-to-document-interface */
-            if (BrowsingContext == null) return null;
+            if (BrowsingContext is null) return null;
             return _selection;
         }
 
@@ -585,7 +586,7 @@ namespace CssUI.DOM
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-document-elementfrompoint */
 
             /* 1) If either argument is negative, x is greater than the viewport width excluding the size of a rendered scroll bar (if any), or y is greater than the viewport height excluding the size of a rendered scroll bar (if any), or there is no viewport associated with the document, return null and terminate these steps. */
-            if (Viewport == null) return null;
+            if (Viewport is null) return null;
 
             var vWidth = Viewport.Width - Viewport.ScrollBox?.VScrollBar.Width ?? 0;
             var vHeight = Viewport.Height - Viewport.ScrollBox?.HScrollBar.Height ?? 0;
@@ -597,7 +598,7 @@ namespace CssUI.DOM
             /* 2) If there is a layout box in the viewport that would be a target for hit testing at coordinates x,y, when applying the transforms that apply to the descendants of the viewport, return the associated element and terminate these steps. */
             var filter = new FilterLayoutBoxHitTest(x, y);
             var hit = DOMCommon.Get_Nth_Descendant<Element>(this, 1, filter, ENodeFilterMask.SHOW_ELEMENT);
-            if (hit != null)
+            if (hit is object)
             {
                 return hit;
             }
@@ -609,7 +610,7 @@ namespace CssUI.DOM
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-document-elementsfrompoint */
 
             /* 1) If either argument is negative, x is greater than the viewport width excluding the size of a rendered scroll bar (if any), or y is greater than the viewport height excluding the size of a rendered scroll bar (if any), or there is no viewport associated with the document, return null and terminate these steps. */
-            /*if (Viewport == null) return null;
+            /*if (Viewport is null) return null;
 
             var vWidth = Viewport.Width - Viewport.ScrollBox?.VScrollBar.width ?? 0;
             var vHeight = Viewport.Height - Viewport.ScrollBox?.HScrollBar.height ?? 0;
@@ -628,7 +629,7 @@ namespace CssUI.DOM
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-document-caretpositionfrompoint */
 
             /* 1) If there is no viewport associated with the document, return null. */
-            /*if (Viewport == null) return null;
+            /*if (Viewport is null) return null;
             *//* 2) If either argument is negative, x is greater than the viewport width excluding the size of a rendered scroll bar (if any), y is greater than the viewport height excluding the size of a rendered scroll bar (if any) return null. *//*
             var vWidth = Viewport.Width - Viewport.ScrollBox?.VScrollBar.width ?? 0;
             var vHeight = Viewport.Height - Viewport.ScrollBox?.HScrollBar.height ?? 0;
@@ -649,7 +650,7 @@ namespace CssUI.DOM
                 if (Mode == EQuirksMode.Quirks)
                 {
                     /* 1) If the HTML body element exists, and it is not potentially scrollable, return the HTML body element and abort these steps. */
-                    if (body != null && !body.is_potentially_scrollable) return body;
+                    if (body is object && !body.is_potentially_scrollable) return body;
                     /* 2) Return null and abort these steps. */
                     return null;
                 }
@@ -688,7 +689,7 @@ namespace CssUI.DOM
                 Element_ID_Map.Remove(oldKey);
             }
 
-            if (weakRef == null)
+            if (weakRef is null)
             {
                 weakRef = new WeakReference<Element>(element);
             }

@@ -73,8 +73,9 @@ namespace CssUI.DOM.Events
             get => 0 != (Flags & EEventFlags.Canceled);
         }
 
-        public bool cancelBubble {
-            get => 0!=(this.Flags & EEventFlags.StopPropogation);
+        public bool cancelBubble
+        {
+            get => 0 != (this.Flags & EEventFlags.StopPropogation);
             set
             {
                 if (value) this.Flags |= EEventFlags.StopPropogation;
@@ -83,7 +84,7 @@ namespace CssUI.DOM.Events
 
         public bool canceled
         {
-            get => 0!=(Flags & EEventFlags.Canceled);
+            get => 0 != (Flags & EEventFlags.Canceled);
             set
             {/* To set the canceled flag, given an event event, if event’s cancelable attribute value is true and event’s in passive listener flag is unset, then set event’s canceled flag, and do nothing otherwise. */
                 if (value && this.cancelable && 0 == (Flags & EEventFlags.InPassiveListener)) Flags |= EEventFlags.Canceled;
@@ -158,7 +159,7 @@ namespace CssUI.DOM.Events
 
             /* 9) While index is greater than or equal to 0: */
             int index = Path.Count - 1;
-            while(index >= 0)
+            while (index >= 0)
             {
                 EventPathItem pathItem = Path[index];
                 if (pathItem.root_of_closed_tree) currentTargetHiddenSubtreeLevel++;
@@ -206,7 +207,7 @@ namespace CssUI.DOM.Events
             /* 14) Set index to currentTargetIndex + 1. */
             index = currentTargetIndex + 1;
             /* 15) While index is less than path’s size: */
-            while(index < this.Path.Count)
+            while (index < this.Path.Count)
             {
                 /* 1) If path[index]'s slot-in-closed-tree is true, then increase currentHiddenLevel by 1. */
                 if (Path[index].slot_in_closed_tree) currentHiddenLevel++;

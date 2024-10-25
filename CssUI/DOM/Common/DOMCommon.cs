@@ -1870,7 +1870,7 @@ namespace CssUI.DOM
             /* 3) If namespace is the HTML namespace, and either localName is a valid custom element name or is is non-null, then set result’s custom element state to "undefined". */
 
             var ctor = Lookup_Element_Interface(localName, Namespace);
-            if (ctor == null)
+            if (ctor is null)
                 throw new Exception($"Cannot find interface constructor for element type: \"{localName}\"");
             /* XXX: Just need to make sure that every tag type has an interface type correctly specified for it */
             result = (Element)ctor.Invoke(new object[] { document, localName, prefix, Namespace });
@@ -1936,16 +1936,19 @@ namespace CssUI.DOM
 
         internal static void Run_Focusing_Steps(FocusableArea new_focus_target)
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#focusing-steps */
+            //XXX:
             throw new NotImplementedException();
         }
 
         internal static void Run_Unfocusing_Steps(FocusableArea new_focus_target)
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#unfocusing-steps */
+            //XXX:
             throw new NotImplementedException();
         }
 
         internal static void Run_Focus_Update_Steps(IReadOnlyCollection<FocusableArea> oldChain, IReadOnlyCollection<FocusableArea> newChain, FocusableArea newFocusTarget)
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#focus-update-steps */
+            //XXX:
             throw new NotImplementedException();
         }
         #endregion

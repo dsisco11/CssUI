@@ -21,7 +21,7 @@ namespace CssUI.DOM
         {
             if (node.nodeType == ENodeType.ELEMENT_NODE && node is Element element)
             {
-                if (element.Box == null) return ENodeFilterResult.FILTER_REJECT;
+                if (element.Box is null) return ENodeFilterResult.FILTER_REJECT;
                 if (!element.Box.HitTest(x, y)) return ENodeFilterResult.FILTER_REJECT;
 
                 return ENodeFilterResult.FILTER_ACCEPT;

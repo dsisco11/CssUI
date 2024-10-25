@@ -151,10 +151,10 @@ namespace CssUI.CSS.Internal
             {
                 case ECssValueTypes.KEYWORD:
                     {// check this value against our keyword whitelist
-                        if (KeywordWhitelist != null && KeywordWhitelist.Count > 0)
+                        if (KeywordWhitelist is object && KeywordWhitelist.Count > 0)
                         {
-                            if (!KeywordWhitelist.Contains(Value.AsString()))
-                                throw new CssException($"Property({Name}) does not accept '{Value.AsString()}' as a value!");
+                            if (!KeywordWhitelist.Contains(Value.ToString()))
+                                throw new CssException($"Property({Name}) does not accept '{Value.ToString()}' as a value!");
                         }
                     }
                     break;

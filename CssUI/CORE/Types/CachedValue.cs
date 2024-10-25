@@ -66,9 +66,9 @@ namespace CssUI
         public static bool operator ==(CachedValue<Ty> A, CachedValue<Ty> B)
         {
             // If both objects are NULL they match
-            if (ReferenceEquals(null, A) && ReferenceEquals(null, B)) return true;
+            if (A is null && B is null) return true;
             // If one object is null and not the other they do not match
-            if (ReferenceEquals(null, A) ^ ReferenceEquals(null, B)) return false;
+            if (A is null ^ B is null) return false;
             // Check if values match
             return A.Get().Equals(B.Get());
         }
@@ -76,28 +76,21 @@ namespace CssUI
         public static bool operator !=(CachedValue<Ty> A, CachedValue<Ty> B)
         {
             // If both objects are null they do not match
-            if (ReferenceEquals(null, A) && ReferenceEquals(null, B)) return false;
+            if (A is null && B is null) return false;
             // If one object is null and not the other they do match
-            if (ReferenceEquals(null, A) ^ ReferenceEquals(null, B)) return true;
+            if (A is null ^ B is null) return true;
             // Check if values match
             return !A.Get().Equals(B.Get());
         }
 
         public bool Equals(CachedValue<Ty> other)
         {
-            if (other == null) return false;
-
-            return Get().Equals(other.Get());
+            return other != null && Get().Equals(other.Get());
         }
 
         public override bool Equals(object other)
         {
-            if (other == null) return false;
-            if (other is CachedValue<Ty> cache)
-            {
-                return Get().Equals(cache.Get());
-            }
-            return false;
+            return other != null && other is CachedValue<Ty> cache && Get().Equals(cache.Get());
         }
 
         public override int GetHashCode()

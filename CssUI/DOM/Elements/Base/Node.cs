@@ -430,7 +430,7 @@ namespace CssUI.DOM.Nodes
 
         public override bool Equals(object obj)
         {/* https://dom.spec.whatwg.org/#concept-node-equals */
-            if (obj == null)
+            if (obj is null)
                 return false;
 
             if (ReferenceEquals(this, obj))

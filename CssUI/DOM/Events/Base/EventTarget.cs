@@ -113,7 +113,7 @@ namespace CssUI.DOM.Events
             bool once = false;
             bool passive = false;
 
-            if (!ReferenceEquals(options, null))
+            if (options is object)
             {
                 capture = options.capture;
                 once = options.once;
@@ -123,12 +123,12 @@ namespace CssUI.DOM.Events
             /* To add an event listener given an EventTarget object eventTarget and an event listener listener, run these steps: */
             /* 1) ... */
             /* 2) If listener’s callback is null, then return. */
-            if (ReferenceEquals(callback, null))
+            if (callback is null)
                 return;
 
             /* 3) If eventTarget’s event listener list does not contain an event listener whose type is listener’s type, callback is listener’s callback, and capture is listener’s capture, then append listener to eventTarget’s event listener list. */
             var srch = Find_Listener(eventName, callback, capture);
-            if (ReferenceEquals(srch, null))
+            if (srch is null)
             {
                 var newListener = new EventListener(eventName, callback, capture, once, passive);
                 Listeners.AddLast(newListener);
@@ -144,14 +144,14 @@ namespace CssUI.DOM.Events
         public void removeEventListener(EventName eventName, EventCallback callback, EventListenerOptions options = null)
         {
             bool capture = false;
-            if (!ReferenceEquals(options, null))
+            if (options is object)
             {
                 capture = options.capture;
             }
 
             /* 3) If the context object’s event listener list contains an event listener whose type is type, callback is callback, and capture is capture, then remove an event listener with the context object and that event listener. */
             var found = Find_Listener(eventName, callback, capture);
-            if (!ReferenceEquals(found, null))
+            if (found is object)
             {
                 found.removed = true;
                 Listeners.Remove(found);

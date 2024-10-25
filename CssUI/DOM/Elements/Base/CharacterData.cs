@@ -76,10 +76,12 @@ namespace CssUI.DOM
                     Log.Error("Found expired reference to Range object in Live Ranges.");
                 }
             }
-            /* 12) If node is a Text node and its parent is not null, run the child text content change steps for node’s parent. */
-            if (this is Text txtNode && parentNode != null)
+
+            /* 12) If node’s parent is non-null, then run the children changed steps for node’s parent. */
+            if (parentNode is object)
             {
-                parentNode.Run_child_text_node_change_steps(txtNode);
+                parentNode.Run_children_changed_steps();
+                //parentNode.Run_child_text_node_change_steps(txtNode);
             }
         }
         #endregion
