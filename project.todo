@@ -45,7 +45,7 @@
 - [x] 0.6 Implement block container intrinsic sizing
 - [x] 0.7 Implement replaced element intrinsic sizing
 - [x] 0.8 Update CssPrincipalBox with GetIntrinsicSize() and caching
-- [ ] 0.9 Add unit tests for intrinsic sizing
+- [x] 0.9 Add unit tests for intrinsic sizing (45 tests passing)
 - [ ] 0.10 Wire fit-content/shrink-to-fit to layout system
 
 ## Phase 1: Flexbox Layout
