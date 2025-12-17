@@ -97,9 +97,8 @@ namespace CssUI.CSS.BoxTree
             {
                 EDisplayMode.FLEX => new Formatting.FlexFormattingContext(),
                 EDisplayMode.INLINE_FLEX => new Formatting.FlexFormattingContext(),
-                // Grid support will be added in Phase 2
-                // EDisplayMode.GRID => new Formatting.GridFormattingContext(),
-                // EDisplayMode.INLINE_GRID => new Formatting.GridFormattingContext(),
+                EDisplayMode.GRID => new Formatting.GridFormattingContext(),
+                EDisplayMode.INLINE_GRID => new Formatting.GridFormattingContext(),
                 _ => new Formatting.BlockFormattingContext()
             };
         }

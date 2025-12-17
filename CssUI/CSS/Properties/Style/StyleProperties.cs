@@ -145,6 +145,13 @@ namespace CssUI.CSS
         public EJustifyContent JustifyContent => Cascaded.JustifyContent.Actual;
         public EAlignItems AlignItems => Cascaded.AlignItems.Actual;
         public EAlignItems AlignSelf => Cascaded.AlignSelf.Actual;
+
+        // Grid properties
+        public EGridAutoFlow GridAutoFlow => Cascaded.GridAutoFlow.Actual;
+        public int GridColumnStart => Cascaded.GridColumnStart.Actual;
+        public int GridColumnEnd => Cascaded.GridColumnEnd.Actual;
+        public int GridRowStart => Cascaded.GridRowStart.Actual;
+        public int GridRowEnd => Cascaded.GridRowEnd.Actual;
         #endregion
 
         #region Block Values

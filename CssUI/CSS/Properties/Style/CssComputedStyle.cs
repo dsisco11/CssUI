@@ -315,6 +315,36 @@ namespace CssUI.CSS
         /// </summary>
         public EnumProperty<EAlignItems> AlignSelf => (EnumProperty<EAlignItems>)Get(ECssPropertyID.AlignSelf);
         #endregion
+
+        #region Grid
+        /// <summary>
+        /// Controls the auto-placement algorithm (row, column, dense).
+        /// </summary>
+        public EnumProperty<EGridAutoFlow> GridAutoFlow => (EnumProperty<EGridAutoFlow>)Get(ECssPropertyID.GridAutoFlow);
+        
+        /// <summary>
+        /// Specifies a grid item's start position in the column direction.
+        /// </summary>
+        public IntProperty GridColumnStart => (IntProperty)Get(ECssPropertyID.GridColumnStart);
+        
+        /// <summary>
+        /// Specifies a grid item's end position in the column direction.
+        /// </summary>
+        public IntProperty GridColumnEnd => (IntProperty)Get(ECssPropertyID.GridColumnEnd);
+        
+        /// <summary>
+        /// Specifies a grid item's start position in the row direction.
+        /// </summary>
+        public IntProperty GridRowStart => (IntProperty)Get(ECssPropertyID.GridRowStart);
+        
+        /// <summary>
+        /// Specifies a grid item's end position in the row direction.
+        /// </summary>
+        public IntProperty GridRowEnd => (IntProperty)Get(ECssPropertyID.GridRowEnd);
+        
+        // Note: GridTemplateColumns, GridTemplateRows, GridAutoColumns, GridAutoRows
+        // require a GridTrackList value type (not yet implemented)
+        #endregion
         #endregion
 
         #region Constructors
