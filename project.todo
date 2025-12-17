@@ -109,7 +109,7 @@
 - [x] Add gap unit tests (20 formatting tests passing)
 
 ## Phase 4: Advanced Features ✅ PARTIAL
-### 4.1 CSS Functions ✅ COMPLETE
+### 4.1 CSS Functions ✅ PARTIAL
 - [x] Implement calc() evaluator (CssCalcEvaluator.cs)
   - [x] Basic arithmetic (+, -, *, /)
   - [x] Operator precedence
@@ -126,7 +126,31 @@
 - [x] Add CssValue.AsFunction() accessor
 - [x] Unit tests (15 tests passing)
 
-### 4.2 Remaining Features
+### 4.2 CSS calc() Standards Compliance (CSS Values Level 4)
+- [ ] IEEE-754 semantics
+  - [ ] Division by zero returns ±∞ instead of throwing
+  - [ ] NaN propagation
+  - [ ] Infinity handling (+∞, -∞)
+  - [ ] Signed zero handling (0⁺, 0⁻)
+- [ ] Numeric constants support
+  - [ ] e (≈2.718)
+  - [ ] pi (≈3.14159)
+  - [ ] infinity keyword
+  - [ ] -infinity keyword
+  - [ ] NaN keyword
+- [ ] Additional math functions
+  - [ ] Trigonometric: sin(), cos(), tan(), asin(), acos(), atan(), atan2()
+  - [ ] Exponential: pow(), sqrt(), hypot(), log(), exp()
+  - [ ] Sign-related: abs(), sign()
+  - [ ] Stepped value: round(), mod(), rem()
+- [ ] clamp() enhancements
+  - [ ] Support 'none' keyword (clamp(none, VAL, MAX) = min(VAL, MAX))
+- [ ] Formal calculation tree representation
+  - [ ] Sum/Product/Negate/Invert nodes (per spec)
+  - [ ] Simplification algorithm
+  - [ ] Proper serialization
+
+### 4.3 Remaining Features
 - [ ] Flex fragmentation support
 - [ ] Grid fragmentation support
 - [ ] Performance optimization / caching
