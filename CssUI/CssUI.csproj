@@ -9,6 +9,11 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <!-- Make internals visible to test project -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="CssUITests" />
+  </ItemGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Core - Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE;WINDOWS;ENABLE_HEADLESS;DISABLE_FONT_SYSTEM</DefineConstants>
     <DocumentationFile></DocumentationFile>

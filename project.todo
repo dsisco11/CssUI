@@ -126,26 +126,26 @@
 - [x] Add CssValue.AsFunction() accessor
 - [x] Unit tests (15 tests passing)
 
-### 4.2 CSS calc() Standards Compliance (CSS Values Level 4)
-- [ ] IEEE-754 semantics
-  - [ ] Division by zero returns ±∞ instead of throwing
-  - [ ] NaN propagation
-  - [ ] Infinity handling (+∞, -∞)
-  - [ ] Signed zero handling (0⁺, 0⁻)
-- [ ] Numeric constants support
-  - [ ] e (≈2.718)
-  - [ ] pi (≈3.14159)
-  - [ ] infinity keyword
-  - [ ] -infinity keyword
-  - [ ] NaN keyword
-- [ ] Additional math functions
-  - [ ] Trigonometric: sin(), cos(), tan(), asin(), acos(), atan(), atan2()
-  - [ ] Exponential: pow(), sqrt(), hypot(), log(), exp()
-  - [ ] Sign-related: abs(), sign()
-  - [ ] Stepped value: round(), mod(), rem()
-- [ ] clamp() enhancements
-  - [ ] Support 'none' keyword (clamp(none, VAL, MAX) = min(VAL, MAX))
-- [ ] Formal calculation tree representation
+### 4.2 CSS calc() Standards Compliance (CSS Values Level 4) ✅ COMPLETE
+- [x] IEEE-754 semantics
+  - [x] Division by zero returns ±∞ instead of throwing
+  - [x] NaN propagation
+  - [x] Infinity handling (+∞, -∞)
+  - [x] Signed zero handling (0⁺, 0⁻)
+- [x] Numeric constants support
+  - [x] e (≈2.718)
+  - [x] pi (≈3.14159)
+  - [x] infinity keyword
+  - [x] -infinity keyword
+  - [x] NaN keyword
+- [x] Additional math functions
+  - [x] Trigonometric: sin(), cos(), tan(), asin(), acos(), atan(), atan2()
+  - [x] Exponential: pow(), sqrt(), hypot(), log(), exp()
+  - [x] Sign-related: abs(), sign()
+  - [x] Stepped value: round(), mod(), rem()
+- [x] clamp() enhancements
+  - [x] Support 'none' keyword (clamp(none, VAL, MAX) = min(VAL, MAX))
+- [ ] Formal calculation tree representation (future enhancement)
   - [ ] Sum/Product/Negate/Invert nodes (per spec)
   - [ ] Simplification algorithm
   - [ ] Proper serialization
