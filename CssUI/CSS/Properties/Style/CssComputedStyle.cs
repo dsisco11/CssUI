@@ -261,6 +261,60 @@ namespace CssUI.CSS
         #region Transforms
         public TransformListProperty Transform => (TransformListProperty)Get(ECssPropertyID.Transform);
         #endregion
+
+        #region Flexbox
+        /// <summary>
+        /// Specifies how flex items are placed in the flex container (row, column, etc.).
+        /// </summary>
+        public EnumProperty<EFlexDirection> FlexDirection => (EnumProperty<EFlexDirection>)Get(ECssPropertyID.FlexDirection);
+        
+        /// <summary>
+        /// Controls whether the flex container is single-line or multi-line.
+        /// </summary>
+        public EnumProperty<EFlexWrap> FlexWrap => (EnumProperty<EFlexWrap>)Get(ECssPropertyID.FlexWrap);
+        
+        /// <summary>
+        /// Specifies the flex grow factor (how much the item grows relative to other items).
+        /// </summary>
+        public NumberProperty FlexGrow => (NumberProperty)Get(ECssPropertyID.FlexGrow);
+        
+        /// <summary>
+        /// Specifies the flex shrink factor (how much the item shrinks relative to other items).
+        /// </summary>
+        public NumberProperty FlexShrink => (NumberProperty)Get(ECssPropertyID.FlexShrink);
+        
+        /// <summary>
+        /// Specifies the initial main size of a flex item before free space is distributed.
+        /// </summary>
+        public IntProperty FlexBasis => (IntProperty)Get(ECssPropertyID.FlexBasis);
+        
+        /// <summary>
+        /// Controls the order of flex/grid items within the container.
+        /// </summary>
+        public IntProperty Order => (IntProperty)Get(ECssPropertyID.Order);
+        #endregion
+
+        #region Alignment
+        /// <summary>
+        /// Aligns flex lines or grid tracks within the container along the cross axis.
+        /// </summary>
+        public EnumProperty<EAlignContent> AlignContent => (EnumProperty<EAlignContent>)Get(ECssPropertyID.AlignContent);
+        
+        /// <summary>
+        /// Justifies content along the main axis (flex) or inline axis (grid).
+        /// </summary>
+        public EnumProperty<EJustifyContent> JustifyContent => (EnumProperty<EJustifyContent>)Get(ECssPropertyID.JustifyContent);
+        
+        /// <summary>
+        /// Sets the default alignment for all items along the cross axis.
+        /// </summary>
+        public EnumProperty<EAlignItems> AlignItems => (EnumProperty<EAlignItems>)Get(ECssPropertyID.AlignItems);
+        
+        /// <summary>
+        /// Overrides align-items for a specific item.
+        /// </summary>
+        public EnumProperty<EAlignItems> AlignSelf => (EnumProperty<EAlignItems>)Get(ECssPropertyID.AlignSelf);
+        #endregion
         #endregion
 
         #region Constructors

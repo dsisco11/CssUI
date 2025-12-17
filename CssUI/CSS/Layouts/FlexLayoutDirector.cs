@@ -103,6 +103,7 @@ namespace CssUI.CSS.Layouts
 
         #region Fields
 
+        private cssElement _owner;
         private List<FlexItem> _flexItems;
         private List<FlexLine> _flexLines;
 
@@ -125,16 +126,15 @@ namespace CssUI.CSS.Layouts
         public override CssBoxArea Handle(IParentElement Owner, cssElement[] controls)
         {
             Reset();
-            var owner = Owner as cssElement;
-            if (owner == null || controls == null || controls.Length == 0)
+            _owner = Owner as cssElement;
+            if (_owner == null || controls == null || controls.Length == 0)
             {
                 return layoutBlock;
             }
 
-            // Cache container properties
-            // TODO: Read from owner.Style once flex properties are implemented
-            _flexDirection = EFlexDirection.Row; // Default
-            _flexWrap = EFlexWrap.NoWrap; // Default
+            // Cache container properties from style
+            _flexDirection = _owner.Style.FlexDirection?.Actual ?? EFlexDirection.Row;
+            _flexWrap = _owner.Style.FlexWrap?.Actual ?? EFlexWrap.NoWrap;
 
             // Determine available space
             Rect2i layoutArea = Owner.Get_Layout_Area();
@@ -222,9 +222,8 @@ namespace CssUI.CSS.Layouts
                 var item = new FlexItem
                 {
                     Element = element,
-                    // TODO: Read actual flex properties once implemented
-                    FlexGrow = 0f,   // Default
-                    FlexShrink = 1f, // Default
+                    FlexGrow = (float)(element.Style.FlexGrow?.Actual ?? 0),
+                    FlexShrink = (float)(element.Style.FlexShrink?.Actual ?? 1),
                     Frozen = false
                 };
 
@@ -269,10 +268,18 @@ namespace CssUI.CSS.Layouts
         /// </summary>
         private float CalculateFlexBaseSize(FlexItem item)
         {
-            // TODO: Implement full flex-basis resolution
-            // For now, use the item's content size
-            var box = item.Element.Box.Content;
-            return IsMainAxisHorizontal ? box.Width : box.Height;
+            var style = item.Element.Style;
+            var flexBasis = style.FlexBasis;
+            
+            // If flex-basis is auto or not specified, use the item's content size
+            if (flexBasis == null || flexBasis.Computed.IsAuto)
+            {
+                var box = item.Element.Box.Content;
+                return IsMainAxisHorizontal ? box.Width : box.Height;
+            }
+            
+            // Use specified flex-basis value
+            return (float)flexBasis.Actual;
         }
 
         /// <summary>
@@ -280,9 +287,20 @@ namespace CssUI.CSS.Layouts
         /// </summary>
         private float ClampToMinMax(FlexItem item, float size)
         {
-            // TODO: Get actual min/max from style
-            float minMain = 0;
-            float maxMain = float.MaxValue;
+            var style = item.Element.Style;
+            float minMain, maxMain;
+            
+            if (IsMainAxisHorizontal)
+            {
+                minMain = (float)(style.Min_Width?.Actual ?? 0);
+                maxMain = style.Max_Width?.Computed?.IsNone == true ? float.MaxValue : (float)(style.Max_Width?.Actual ?? float.MaxValue);
+            }
+            else
+            {
+                minMain = (float)(style.Min_Height?.Actual ?? 0);
+                maxMain = style.Max_Height?.Computed?.IsNone == true ? float.MaxValue : (float)(style.Max_Height?.Actual ?? float.MaxValue);
+            }
+            
             return Math.Max(minMain, Math.Min(maxMain, size));
         }
 
@@ -538,9 +556,8 @@ namespace CssUI.CSS.Layouts
 
                 float remainingSpace = _availableMainSpace - totalItemsMainSize;
 
-                // TODO: Get justify-content from style
-                // For now, use flex-start (items packed to start)
-                float position = IsMainAxisReversed ? _availableMainSpace : 0;
+                var justifyContent = _owner?.Style.JustifyContent?.Actual ?? EJustifyContent.FlexStart;
+                float position = CalculateMainAxisStartPosition(justifyContent, remainingSpace, line.Items.Count);
 
                 foreach (var item in line.Items)
                 {
@@ -585,11 +602,12 @@ namespace CssUI.CSS.Layouts
                 }
 
                 // Align items within the line
+                var containerAlignItems = _owner?.Style.AlignItems?.Actual ?? EAlignItems.Stretch;
                 foreach (var item in line.Items)
                 {
-                    // TODO: Get align-items/align-self from style
-                    // For now, use stretch (fill the line's cross size)
-                    item.CrossAxisPosition = line.CrossAxisPosition;
+                    // align-self overrides align-items
+                    var alignSelf = item.Element.Style.AlignSelf?.Actual ?? containerAlignItems;
+                    item.CrossAxisPosition = CalculateCrossAxisPosition(alignSelf, line, item);
                 }
             }
         }
@@ -632,11 +650,67 @@ namespace CssUI.CSS.Layouts
 
         #endregion
 
+        #region Alignment Helpers
+
+        /// <summary>
+        /// Calculate the starting position on the main axis based on justify-content.
+        /// </summary>
+        private float CalculateMainAxisStartPosition(EJustifyContent justifyContent, float remainingSpace, int itemCount)
+        {
+            if (IsMainAxisReversed)
+            {
+                // For reversed axes, we start from the end
+                return justifyContent switch
+                {
+                    EJustifyContent.FlexStart => _availableMainSpace,
+                    EJustifyContent.FlexEnd => _availableMainSpace - remainingSpace,
+                    EJustifyContent.Center => _availableMainSpace - (remainingSpace / 2),
+                    _ => _availableMainSpace
+                };
+            }
+            else
+            {
+                return justifyContent switch
+                {
+                    EJustifyContent.FlexStart => 0,
+                    EJustifyContent.FlexEnd => remainingSpace,
+                    EJustifyContent.Center => remainingSpace / 2,
+                    EJustifyContent.SpaceBetween => 0, // First item at start, spacing handled in loop
+                    EJustifyContent.SpaceAround => remainingSpace / (itemCount * 2), // Half gap at start
+                    EJustifyContent.SpaceEvenly => remainingSpace / (itemCount + 1),
+                    _ => 0
+                };
+            }
+        }
+
+        /// <summary>
+        /// Calculate the cross-axis position for an item based on alignment.
+        /// </summary>
+        private float CalculateCrossAxisPosition(EAlignItems alignment, FlexLine line, FlexItem item)
+        {
+            float lineStart = line.CrossAxisPosition;
+            float lineSize = line.CrossSize;
+            float itemSize = item.UsedCrossSize;
+
+            return alignment switch
+            {
+                EAlignItems.FlexStart => lineStart,
+                EAlignItems.FlexEnd => lineStart + lineSize - itemSize,
+                EAlignItems.Center => lineStart + (lineSize - itemSize) / 2,
+                EAlignItems.Baseline => lineStart, // TODO: Implement proper baseline alignment
+                EAlignItems.Stretch => lineStart, // Item already stretched to fill line
+                _ => lineStart
+            };
+        }
+
+        #endregion
+
         #region Reset
 
         protected override void Reset()
         {
             base.Reset();
+            _owner = null;
             _flexItems = null;
             _flexLines = null;
         }

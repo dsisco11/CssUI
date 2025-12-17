@@ -131,6 +131,20 @@ namespace CssUI.CSS
         public double LineHeight => Cascaded.LineHeight.Actual;
         public double Opacity => Cascaded.Opacity.Actual;
         public Color Blend_Color { get; private set; } = null;
+
+        // Flexbox properties
+        public EFlexDirection FlexDirection => Cascaded.FlexDirection.Actual;
+        public EFlexWrap FlexWrap => Cascaded.FlexWrap.Actual;
+        public double FlexGrow => Cascaded.FlexGrow.Actual;
+        public double FlexShrink => Cascaded.FlexShrink.Actual;
+        public int FlexBasis => Cascaded.FlexBasis.Actual;
+        public int Order => Cascaded.Order.Actual;
+
+        // Alignment properties
+        public EAlignContent AlignContent => Cascaded.AlignContent.Actual;
+        public EJustifyContent JustifyContent => Cascaded.JustifyContent.Actual;
+        public EAlignItems AlignItems => Cascaded.AlignItems.Actual;
+        public EAlignItems AlignSelf => Cascaded.AlignSelf.Actual;
         #endregion
 
         #region Block Values

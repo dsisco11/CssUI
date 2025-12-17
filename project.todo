@@ -50,22 +50,24 @@
 - [x] Add FlexDirection, FlexWrap, FlexGrow, FlexShrink, FlexBasis, Order to ECssPropertyID
 - [x] Add EFlexDirection, EFlexWrap enums
 - [x] Add property definitions to CssDefinitions.cs
-- [ ] Add style accessors to CssComputedStyle (e.g., Style.FlexDirection)
+- [x] Add style accessors to CssComputedStyle (FlexDirection, FlexWrap, FlexGrow, etc.)
+- [x] Add style accessors to StyleProperties (convenience properties)
 
-### 1.2 Layout Director Integration
-- [x] Create FlexLayoutDirector.cs scaffold
-- [ ] Wire FlexLayoutDirector to element layout system for display:flex
-- [ ] Read actual flex properties from element styles (replace TODOs)
+### 1.2 Layout Integration (Updated Approach)
+- [x] Create FlexFormattingContext.cs (replaces legacy FlexLayoutDirector)
+- [x] Implement flex algorithm in FlexFormattingContext (uses CssBoxTreeNode)
+- [x] Read flex properties from element styles
 
-### 1.3 Algorithm Implementation
-- [ ] §9.1 Initial Setup — Generate anonymous flex items
-- [ ] §9.2 Line Length Determination — Calculate flex base size
-- [ ] §9.3 Resolve Flexible Lengths — Grow/shrink distribution
-- [ ] §9.4 Cross Size Determination
-- [ ] §9.5 Main-Axis Alignment (justify-content)
-- [ ] §9.6 Cross-Axis Alignment (align-items, align-self, align-content)
+### 1.3 Algorithm Implementation ✅ COMPLETE
+- [x] §9.1 Initial Setup — Generate flex items from box tree
+- [x] §9.2 Line Length Determination — Calculate flex base size, collect into lines
+- [x] §9.3 Resolve Flexible Lengths — Grow/shrink distribution with freeze loop
+- [x] §9.4 Cross Size Determination — Calculate line cross sizes
+- [x] §9.5 Main-Axis Alignment (justify-content) — FlexStart/End/Center/Space*
+- [x] §9.6 Cross-Axis Alignment (align-items, align-self) — FlexStart/End/Center/Stretch
 
-### 1.4 Testing
+### 1.4 Remaining Work
+- [ ] Wire FlexFormattingContext to box tree generation (for display:flex elements)
 - [ ] Unit tests for flex item generation
 - [ ] Unit tests for flexible length resolution
 - [ ] Integration tests for common flex patterns
