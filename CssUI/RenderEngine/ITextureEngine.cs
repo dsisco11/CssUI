@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
+using CssUI.Rendering;
 
 namespace CssUI
 {
@@ -85,6 +87,24 @@ namespace CssUI
         /// Destroy a texture and free associated resources.
         /// </summary>
         void DestroyTexture(TextureHandle handle);
+
+        #endregion
+
+        #region Async GpuTexture Loading
+
+        /// <summary>
+        /// Load image data into a GpuTexture asynchronously.
+        /// </summary>
+        /// <param name="imageData">Encoded image data.</param>
+        /// <returns>A GpuTexture, or an empty texture on failure.</returns>
+        Task<GpuTexture> LoadTextureAsync(ReadOnlyMemory<byte> imageData);
+
+        /// <summary>
+        /// Load an image file into a GpuTexture asynchronously.
+        /// </summary>
+        /// <param name="path">Path to the image file.</param>
+        /// <returns>A GpuTexture, or an empty texture on failure.</returns>
+        Task<GpuTexture> LoadTextureFromFileAsync(string path);
 
         #endregion
     }

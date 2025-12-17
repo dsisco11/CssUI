@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Numerics;
+using System.Threading.Tasks;
 using CssUI.CSS;
 using CssUI.Rendering;
 
@@ -104,6 +105,12 @@ public sealed class NullTextureEngine : ITextureEngine
         => !handle.IsNull;
     
     public void DestroyTexture(TextureHandle handle) { }
+
+    public Task<GpuTexture> LoadTextureAsync(ReadOnlyMemory<byte> imageData)
+        => Task.FromResult(new GpuTexture(ReadOnlySpan<byte>.Empty, Rect2i.Zero, EPixelFormat.RGBA));
+
+    public Task<GpuTexture> LoadTextureFromFileAsync(string path)
+        => Task.FromResult(new GpuTexture(ReadOnlySpan<byte>.Empty, Rect2i.Zero, EPixelFormat.RGBA));
 }
 
 /// <summary>

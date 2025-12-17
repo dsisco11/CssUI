@@ -90,20 +90,14 @@ namespace CssUI
 
         private static IFontEngine CreateDefaultFontEngine()
         {
-#if DISABLE_FONT_SYSTEM || ENABLE_HEADLESS
+            // Default to null engine - concrete implementations should be injected
             return new NullFontEngine();
-#else
-            return new CssUI.Fonts.SixLaborsFontEngine();
-#endif
         }
 
         private static ITextureEngine CreateDefaultTextureEngine()
         {
-#if ENABLE_HEADLESS
+            // Default to null engine - concrete implementations should be injected
             return new NullTextureEngine();
-#else
-            return new CssUI.Rendering.SixLaborsTextureEngine();
-#endif
         }
 
         /// <summary>

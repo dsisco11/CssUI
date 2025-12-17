@@ -16,19 +16,16 @@
 - [x] Create EngineProvider.cs (initialization and global access)
 
 ### Implementations
-- [x] Create SixLaborsFontEngine (wraps FontManager/FontFactory)
-- [x] Create SixLaborsTextureEngine (wraps GpuTexture)
 - [x] Create NullFontEngine, NullTextureEngine, NullRenderEngine (headless stubs)
 - [x] Update EngineProvider with auto-initialization and defaults
+- [x] Remove SixLabors implementations from core library (moved to separate project scope)
 
 ### CSS/DOM Decoupling (Completed)
 - [x] Create GenericFontFamilies.cs (works in headless mode)
 - [x] Refactor CssPropertyResolver_Font to use GenericFontFamilies
 - [x] Refactor StyleProperties.Font to use FontHandle + EngineProvider.FontEngine
 - [x] Remove direct SixLabors references from CSS/DOM code
-
-### Future (Optional)
-- [ ] Move SixLabors implementations to separate CssUI.SixLabors project
+- [x] Remove SixLabors package references from CssUI.csproj
 
 ## Pre-existing HTML Module Issues (CssUI - Debug config)
 - [ ] Fix missing DOMCommon methods (Is_Form_Associated_Custom_Element, etc.)

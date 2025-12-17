@@ -4,17 +4,11 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-#if ENABLE_HEADLESS == false
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Advanced;
-using SixLabors.ImageSharp.Formats.Gif;
-using SixLabors.ImageSharp.PixelFormats;
-#endif
-
 namespace CssUI.Rendering
 {
     /// <summary>
     /// Abstracted representation of a multi-frame animated texture used by UI elements.
+    /// Concrete image loading implementations should be provided via ITextureEngine.
     /// </summary>
     public class GpuTexture : IDisposable
     {
@@ -63,112 +57,50 @@ namespace CssUI.Rendering
         public GpuTexture(ReadOnlySpan<byte> Data, ReadOnlyRect2i Size, EPixelFormat Format)
         {
             this.Size = new Rect2i(Size);
-#if ENABLE_HEADLESS == false
             Push_Frame(Data, Size, Format);
-#endif
         }
 
-#endregion
+        #endregion
 
-#region Image Loading
+        #region Image Loading
 
         public static async Task<GpuTexture> fromStream(MemoryStream Stream)
         {
             return await fromData(Stream.ToArray());
         }
+
         /// <summary>
-        /// Creates a new GPU texture by decoding the given image data
+        /// Creates a new GPU texture by decoding the given image data.
+        /// Note: Requires ITextureEngine implementation for actual image decoding.
         /// </summary>
         public static async Task<GpuTexture> fromData(ReadOnlyMemory<byte> imgData)
         {
-#if ENABLE_HEADLESS
+            // Use the texture engine if available for actual image loading
+            var textureEngine = EngineProvider.TextureEngine;
+            if (textureEngine != null && !(textureEngine is NullTextureEngine))
+            {
+                return await textureEngine.LoadTextureAsync(imgData);
+            }
+
+            // Fallback: return empty texture
             return new GpuTexture(Rect2i.Zero);
-#else
-            var image = Image.Load<Rgba32>(imgData.ToArray());
-            var Size = new Rect2i(image.Width, image.Height);
-            var Texture = new GpuTexture(Size);
-
-            if (image.Frames.Count > 1)
-            {
-                var frames = image.Frames;
-                int frameCount = frames.Count;
-
-                for (int f = 0; f < frameCount; f++)
-                {
-                    var frame = frames[f];
-                    // Get the delay for this frame from the gif
-                    int delay = 0;
-                    try
-                    {
-                        GifFrameMetaData meta = frame.MetaData.GetFormatMetaData(GifFormat.Instance);
-                        delay = meta.FrameDelay;// Time is in 1/100th of a second
-                    }
-                    finally
-                    {
-                        byte[] rgbaBytes = MemoryMarshal.AsBytes(frame.GetPixelSpan()).ToArray();
-                        var size = new Rect2i(frame.Width, frame.Height);
-                        var duration = delay / 1000.0f;
-                        Texture.Push_Frame(rgbaBytes, size, EPixelFormat.RGBA, duration);
-                    }
-                }
-            }
-            else
-            {
-                byte[] rgbaBytes = MemoryMarshal.AsBytes(image.GetPixelSpan()).ToArray();
-                var size = new Rect2i(image.Width, image.Height);
-                Texture.Push_Frame(rgbaBytes, size, EPixelFormat.RGBA);
-            }
-            return Texture;
-#endif
         }
 
         public static async Task<GpuTexture> fromFile(string path)
         {
-#if ENABLE_HEADLESS
-            return new GpuTexture(Rect2i.Zero);
-#else
-            return await Task.Factory.StartNew(() =>
+            // Use the texture engine if available for actual image loading
+            var textureEngine = EngineProvider.TextureEngine;
+            if (textureEngine != null && !(textureEngine is NullTextureEngine))
             {
-                var image = Image.Load<Rgba32>(path);
-                var Size = new Rect2i(image.Width, image.Height);
-                var Texture = new GpuTexture(Size);
+                return await textureEngine.LoadTextureFromFileAsync(path);
+            }
 
-                if (image.Frames.Count > 1)
-                {
-                    var frames = image.Frames;
-                    int frameCount = frames.Count;
-
-                    for (int f = 0; f < frameCount; f++)
-                    {
-                        var frame = frames[f];
-                        int delay = 0;
-                        try
-                        {
-                            GifFrameMetaData meta = frame.MetaData.GetFormatMetaData(GifFormat.Instance);
-                            delay = meta.FrameDelay;
-                        }
-                        finally
-                        {
-                            byte[] rgbaBytes = MemoryMarshal.AsBytes(frame.GetPixelSpan()).ToArray();
-                            var size = new Rect2i(frame.Width, frame.Height);
-                            var duration = delay / 1000.0f;
-                            Texture.Push_Frame(rgbaBytes, size, EPixelFormat.RGBA, duration);
-                        }
-                    }
-                }
-                else
-                {
-                    byte[] rgbaBytes = MemoryMarshal.AsBytes(image.GetPixelSpan()).ToArray();
-                    var size = new Rect2i(image.Width, image.Height);
-                    Texture.Push_Frame(rgbaBytes, size, EPixelFormat.RGBA);
-                }
-                return Texture;
-            });
-#endif
+            // Fallback: return empty texture
+            return new GpuTexture(Rect2i.Zero);
         }
-#endregion
+        #endregion
 
-#region Destructor
+        #region Destructor
         public void Dispose()
         {
             foreach (var frame in FrameAtlas)
@@ -176,24 +108,24 @@ namespace CssUI.Rendering
                 frame.Dispose();
             }
         }
-#endregion
+        #endregion
 
-#region Frame Pushing
+        #region Frame Pushing
         public void Push_Frame(ReadOnlySpan<byte> Data, ReadOnlyRect2i Size, EPixelFormat Format, float Time = 0f)
         {
             FrameAtlas.Add(new GpuTextureFrame(Data, new Rect2i(Size), Format, Time));
             Build_Timeline();
         }
-#endregion
+        #endregion
 
-#region Uploading
+        #region Uploading
         public void Upload(IRenderEngine Engine)
         {
             Frame.Upload(this, Engine);
         }
-#endregion
+        #endregion
 
-#region Frame Progression
+        #region Frame Progression
         /// <summary>
         /// Progresses the current frame number based on the number of seconds which have passed since it was last updated, given by deltaTime
         /// </summary>
@@ -221,9 +153,9 @@ namespace CssUI.Rendering
                 CurrentFrame = fnum;
             }
         }
-#endregion
+        #endregion
 
-#region Timeline
+        #region Timeline
         /// <summary>
         /// Rebuilds the timeline of all our frames.
         /// </summary>
@@ -241,6 +173,6 @@ namespace CssUI.Rendering
 
             Timeline = timeline.ToArray();
         }
-#endregion
+        #endregion
     }
 }
