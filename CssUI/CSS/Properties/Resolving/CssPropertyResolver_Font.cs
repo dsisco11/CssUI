@@ -1,15 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using CssUI.Internal;
-#if DISABLE_FONT_SYSTEM
-#else
-using System.Collections.Generic;
-using System.Text;
-using CssUI.CSS;
-using CssUI.Enums;
 using CssUI.Fonts;
-using SixLabors.Fonts;
-#endif
 
 namespace CssUI.CSS.Internal
 {
@@ -181,9 +174,6 @@ namespace CssUI.CSS.Internal
             if (Property == null) throw new ArgumentNullException(nameof(Property));
             Contract.EndContractBlock();
 
-#if DISABLE_FONT_SYSTEM
-            return null;
-#else
             CssValueList curValues = (Property as CssMultiValueProperty).Computed;
             List<CssValue> retValues = new List<CssValue>();
 
@@ -191,7 +181,7 @@ namespace CssUI.CSS.Internal
             {
                 switch (val.Type)
                 {
-                    case ECssValueType.KEYWORD:
+                    case ECssValueTypes.KEYWORD:
                         {// Replace generic font-family keywords with a list of our fallback font-familys for that family
                             var familyKeyword = val.AsEnum<EGenericFontFamily>();
 
@@ -203,26 +193,20 @@ namespace CssUI.CSS.Internal
                                 case EGenericFontFamily.Cursive:
                                 case EGenericFontFamily.Fantasy:
                                     {
-                                        if (FontManager.GenericFamilyMap.TryGetValue(outFamily, out List<CssValue> GenericFontFamilys))
+                                        if (GenericFontFamilies.TryGetFamilies(familyKeyword, out List<CssValue> GenericFontFamilys))
                                             retValues.AddRange(GenericFontFamilys);
                                     }
                                     break;
                                 default:
-                                    throw new NotImplementedException($"Unknown font-family keyword '{val.Value.ToString()}'");
+                                    throw new NotImplementedException($"Unknown font-family keyword '{val}'");
                             }
 
                         }
                         break;
-                    case ECssValueType.STRING:
-                        {// Remove any invalid font-familys
-                            foreach (FontFamily family in SystemFonts.Families)
-                            {
-                                if (0 == Unicode.CaselessCompare(val.AsString, family.Name))
-                                {// Found it!
-                                    retValues.Add(val);
-                                    break;
-                                }
-                            }
+                    case ECssValueTypes.STRING:
+                        {// Add valid font family names
+                            // Font validation is now handled by the font engine
+                            retValues.Add(val);
                         }
                         break;
                     default:
@@ -234,7 +218,6 @@ namespace CssUI.CSS.Internal
             }
 
             return (retValues.Count > 0) ? new CssValueList(retValues) : null;
-#endif
         }
     }
 }

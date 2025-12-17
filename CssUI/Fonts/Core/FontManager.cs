@@ -98,6 +98,15 @@ namespace CssUI.Fonts
 
         #region Font Family Setup
 
+        private static void SyncToGenericFontFamilies()
+        {
+            // Sync our populated maps to the shared GenericFontFamilies class
+            foreach (var kvp in GenericFamilyMap)
+            {
+                GenericFontFamilies.Map[kvp.Key] = kvp.Value;
+            }
+        }
+
         public static void Setup_Latin_Script_FontFamilys()
         {
             GenericFamilyMap.TryAdd(EGenericFontFamily.Serif, new List<CssValue>() { CssValue.From_String("Times New Roman"), CssValue.From_String("Bodoni"), CssValue.From_String("Garamond"), CssValue.From_String("Minion Web"), CssValue.From_String("ITC Stone Serif"), CssValue.From_String("MS Georgia"), CssValue.From_String("Bitstream Cyberbit") });
@@ -105,6 +114,7 @@ namespace CssUI.Fonts
             GenericFamilyMap.TryAdd(EGenericFontFamily.Monospace, new List<CssValue>() { CssValue.From_String("Courier"), CssValue.From_String("MS Courier New"), CssValue.From_String("Prestige"), CssValue.From_String("Everson Mono") });
             GenericFamilyMap.TryAdd(EGenericFontFamily.Cursive, new List<CssValue>() { CssValue.From_String("Caflisch Script"), CssValue.From_String("Adobe Poetica"), CssValue.From_String("Sanvito"), CssValue.From_String("Ex Ponto"), CssValue.From_String("Snell Roundhand"), CssValue.From_String("Zapf-Chancery") });
             GenericFamilyMap.TryAdd(EGenericFontFamily.Fantasy, new List<CssValue>() { CssValue.From_String("Alpha Geometrique"), CssValue.From_String("Critter"), CssValue.From_String("Cottonwood"), CssValue.From_String("FB Reactor"), CssValue.From_String("Studz") });
+            SyncToGenericFontFamilies();
         }
 
         public static void Setup_Greek_Script_FontFamilys()
@@ -114,6 +124,7 @@ namespace CssUI.Fonts
             GenericFamilyMap.TryAdd(EGenericFontFamily.Monospace, new List<CssValue>() { CssValue.From_String("MS Courier New"), CssValue.From_String("Everson Mono") });
             GenericFamilyMap.TryAdd(EGenericFontFamily.Cursive, new List<CssValue>() {  });
             GenericFamilyMap.TryAdd(EGenericFontFamily.Fantasy, new List<CssValue>() {  });
+            SyncToGenericFontFamilies();
         }
 
         public static void Setup_Cyrillic_Script_FontFamilys()
@@ -123,6 +134,7 @@ namespace CssUI.Fonts
             GenericFamilyMap.TryAdd(EGenericFontFamily.Monospace, new List<CssValue>() { CssValue.From_String("ER Kurier"), CssValue.From_String("Everson Mono") });
             GenericFamilyMap.TryAdd(EGenericFontFamily.Cursive, new List<CssValue>() { CssValue.From_String("ER Architekt") });
             GenericFamilyMap.TryAdd(EGenericFontFamily.Fantasy, new List<CssValue>() {  });
+            SyncToGenericFontFamilies();
         }
 
         public static void Setup_Japanese_Script_FontFamilys()
@@ -132,6 +144,7 @@ namespace CssUI.Fonts
             GenericFamilyMap.TryAdd(EGenericFontFamily.Monospace, new List<CssValue>() { CssValue.From_String("Osaka Monospaced") });
             GenericFamilyMap.TryAdd(EGenericFontFamily.Cursive, new List<CssValue>() {  });
             GenericFamilyMap.TryAdd(EGenericFontFamily.Fantasy, new List<CssValue>() {  });
+            SyncToGenericFontFamilies();
         }
 
         public static void Setup_Hebrew_Script_FontFamilys()
@@ -141,6 +154,7 @@ namespace CssUI.Fonts
             GenericFamilyMap.TryAdd(EGenericFontFamily.Monospace, new List<CssValue>() {  });
             GenericFamilyMap.TryAdd(EGenericFontFamily.Cursive, new List<CssValue>() { CssValue.From_String("Corsiva") });
             GenericFamilyMap.TryAdd(EGenericFontFamily.Fantasy, new List<CssValue>() { });
+            SyncToGenericFontFamilies();
         }
 
         public static void Setup_Cheroke_Script_FontFamilys()
@@ -150,6 +164,7 @@ namespace CssUI.Fonts
             GenericFamilyMap.TryAdd(EGenericFontFamily.Monospace, new List<CssValue>() { CssValue.From_String("Everson Mono") });
             GenericFamilyMap.TryAdd(EGenericFontFamily.Cursive, new List<CssValue>() {  });
             GenericFamilyMap.TryAdd(EGenericFontFamily.Fantasy, new List<CssValue>() { });
+            SyncToGenericFontFamilies();
         }
 
         public static void Setup_Arabic_Script_FontFamilys()
@@ -159,6 +174,7 @@ namespace CssUI.Fonts
             GenericFamilyMap.TryAdd(EGenericFontFamily.Monospace, new List<CssValue>() { });
             GenericFamilyMap.TryAdd(EGenericFontFamily.Cursive, new List<CssValue>() { CssValue.From_String("DecoType Naskh"), CssValue.From_String("Monotype Urdu 507") });
             GenericFamilyMap.TryAdd(EGenericFontFamily.Fantasy, new List<CssValue>() { });
+            SyncToGenericFontFamilies();
         }
         #endregion
 

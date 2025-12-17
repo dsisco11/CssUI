@@ -11,11 +11,6 @@ using CssUI.CSS.Internal;
 using CssUI.DOM;
 using CssUI.DOM.Nodes;
 using CssUI.Rendering;
-#if DISABLE_FONT_SYSTEM
-#else
-using CssUI.Fonts;
-using SixLabors.Fonts;
-#endif
 
 namespace CssUI.CSS
 {
@@ -127,10 +122,11 @@ namespace CssUI.CSS
         public double FontSize => Cascaded.FontSize.Actual;
         public IEnumerable<string> FontFamily => Cascaded.FontFamily.Actual;
 
-#if DISABLE_FONT_SYSTEM
-#else
-        public Font Font { get; private set; }
-#endif
+        /// <summary>
+        /// Handle to the resolved font for this element's style.
+        /// Use with EngineProvider.FontEngine for text measurement and rendering.
+        /// </summary>
+        public FontHandle Font { get; private set; } = FontHandle.Null;
 
         public double LineHeight => Cascaded.LineHeight.Actual;
         public double Opacity => Cascaded.Opacity.Actual;
@@ -663,16 +659,13 @@ namespace CssUI.CSS
                 Notify_Unit_Scale_Change(ECssUnit.CH);
             }
 
-#if DISABLE_FONT_SYSTEM
-#else
-            // Get font from font factory, which will help cache identical fonts
-            FontOptions fontOptions = new FontOptions(FontFamily, FontSize, FontWeight, FontStyle);
-            Font = FontFactory.Get(fontOptions);
-
-            // XXX: Find the new equivalent of the below code once the new rendering system is finished
-            // Flag our elements font dirty flag so it updates whatever is using it
-            //this.Flag(EElementDirtyFlags.Font);
-#endif
+            // Resolve font using the engine provider
+            var families = FontFamily.ToArray();
+            Font = EngineProvider.FontEngine.ResolveFont(
+                families,
+                (float)FontSize,
+                (EFontWeight)FontWeight,
+                FontStyle);
 
             // Remove font dirt flag
             ClearFlag(EPropertySystemDirtFlags.NeedsToResolveFont);

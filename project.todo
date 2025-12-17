@@ -21,10 +21,13 @@
 - [x] Create NullFontEngine, NullTextureEngine, NullRenderEngine (headless stubs)
 - [x] Update EngineProvider with auto-initialization and defaults
 
-### Refactoring (Optional - for full decoupling)
-- [ ] Refactor CssPropertyResolver_Font to use EngineProvider.FontEngine
-- [ ] Refactor StyleProperties font handling to use EngineProvider.FontEngine
-- [ ] Remove direct SixLabors references from CSS/DOM code
+### CSS/DOM Decoupling (Completed)
+- [x] Create GenericFontFamilies.cs (works in headless mode)
+- [x] Refactor CssPropertyResolver_Font to use GenericFontFamilies
+- [x] Refactor StyleProperties.Font to use FontHandle + EngineProvider.FontEngine
+- [x] Remove direct SixLabors references from CSS/DOM code
+
+### Future (Optional)
 - [ ] Move SixLabors implementations to separate CssUI.SixLabors project
 
 ## Pre-existing HTML Module Issues (CssUI - Debug config)
