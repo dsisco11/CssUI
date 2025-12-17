@@ -36,7 +36,7 @@
 - [ ] Fix API signature changes (ReadOnlyMemory vs ReadOnlySpan)
 - [ ] Fix MathExt missing methods (Feq, Fgteq, Flteq)
 
-## Phase 0: Intrinsic Sizing Infrastructure
+## Phase 0: Intrinsic Sizing Infrastructure ✅ COMPLETE
 - [x] 0.1 Audit existing intrinsic sizing code in CssAlgorithms.cs
 - [x] 0.2 Implement IIntrinsicSizable interface (CSS/Sizing/IIntrinsicSizable.cs)
 - [x] 0.3 Implement IntrinsicTypes (IntrinsicAxisSize, IntrinsicSize, EIntrinsicSizeType)
@@ -46,7 +46,7 @@
 - [x] 0.7 Implement replaced element intrinsic sizing
 - [x] 0.8 Update CssPrincipalBox with GetIntrinsicSize() and caching
 - [x] 0.9 Add unit tests for intrinsic sizing (45 tests passing)
-- [ ] 0.10 Wire fit-content/shrink-to-fit to layout system
+- [x] 0.10 Wire fit-content/shrink-to-fit to layout system (BoxModel.cs updated)
 
 ## Phase 1: Flexbox Layout
 ### 1.1 Property Integration

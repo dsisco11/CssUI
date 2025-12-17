@@ -19,6 +19,26 @@ namespace CssUI.CSS
 
     public static class BoxModel
     {
+        #region Shrink-to-Fit Helper
+
+        /// <summary>
+        /// Calculates shrink-to-fit width using intrinsic size calculations.
+        /// </summary>
+        /// <remarks>
+        /// Shrink-to-fit width is: min(max(min-content, available), max-content)
+        /// See: https://www.w3.org/TR/CSS2/visudet.html#shrink-to-fit-float
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static double CalculateShrinkToFitWidth(CssPrincipalBox box, double availableWidth)
+        {
+            // Get intrinsic size (cached)
+            var intrinsic = box.GetIntrinsicSize();
+            
+            // Use fit-content algorithm: clamp(min-content, max-content, available)
+            return IntrinsicSizeCalculator.FitContent(intrinsic.Inline, availableWidth);
+        }
+
+        #endregion
 
         public static void Resolve(CssPrincipalBox Box, CssComputedStyle Cascaded)
         {
@@ -588,7 +608,7 @@ namespace CssUI.CSS
                                 var total = (marginLeft + BorderLeft + PaddingLeft + 0 + PaddingRight + BorderRight + marginRight + sbWidth);
                                 var available_width = (CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - total);
 
-                                Width = CssValue.From(MathExt.Clamp(Box.Preferred_Width, Box.Min_Content.Width, available_width));
+                                Width = CssValue.From(CalculateShrinkToFitWidth(Box, available_width));
                             }
                         }
 
@@ -659,7 +679,7 @@ namespace CssUI.CSS
                                     /* the width is shrink-to-fit . Then solve for 'right' */
                                     var eqRes = (Left.AsDecimal() + marginLeft + BorderLeft + PaddingLeft + 0 + PaddingRight + BorderRight + marginRight + 0);
                                     var avail = (CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes);
-                                    Width =  CssValue.From(MathExt.Clamp(Box.Preferred_Width, Box.Min_Content.Width, avail));
+                                    Width = CssValue.From(CalculateShrinkToFitWidth(Box, avail));
 
                                     /* Solve for 'right' */
                                     eqRes = (Left.AsDecimal() + marginLeft + BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight + marginRight + 0);
@@ -672,7 +692,7 @@ namespace CssUI.CSS
                                     /* the width is shrink-to-fit . Then solve for 'left' */
                                     var eqRes = (0 + marginLeft + BorderLeft + PaddingLeft + 0 + PaddingRight + BorderRight + marginRight + Right.AsDecimal());
                                     var avail = (CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes);
-                                    Width = CssValue.From(MathExt.Clamp(Box.Preferred_Width, Box.Min_Content.Width, avail));
+                                    Width = CssValue.From(CalculateShrinkToFitWidth(Box, avail));
 
                                     /* Solve for 'left' */
                                     eqRes = (0 + marginLeft + BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight + marginRight + Right.AsDecimal());
@@ -747,7 +767,7 @@ namespace CssUI.CSS
                                     /* the width is shrink-to-fit . Then solve for 'left' */
                                     var eqRes = (0 + MarginLeft.AsDecimal() + BorderLeft + PaddingLeft + 0 + PaddingRight + BorderRight + MarginRight.AsDecimal() + Right.AsDecimal());
                                     var avail = (CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes);
-                                    Width = CssValue.From(MathExt.Clamp(Box.Preferred_Width, Box.Min_Content.Width, avail));
+                                    Width = CssValue.From(CalculateShrinkToFitWidth(Box, avail));
 
                                     /* Solve for 'left' */
                                     eqRes = (0 + MarginLeft.AsDecimal() + BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight + MarginRight.AsDecimal() + Right.AsDecimal());
@@ -779,7 +799,7 @@ namespace CssUI.CSS
                                     /* Width is shrink-to-fit */
                                     var eqRes = (Left.AsDecimal() + MarginLeft.AsDecimal() + BorderLeft + PaddingLeft + 0 + PaddingRight + BorderRight + MarginRight.AsDecimal() + 0);
                                     var avail = (CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes);
-                                    Width = CssValue.From(MathExt.Clamp(Box.Preferred_Width, Box.Min_Content.Width, avail));
+                                    Width = CssValue.From(CalculateShrinkToFitWidth(Box, avail));
                                     /* Solve for 'right' */
                                     eqRes = (Left.AsDecimal() + MarginLeft.AsDecimal() + BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight + MarginRight.AsDecimal() + 0);
                                     Right = CssValue.From(CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes);
@@ -951,13 +971,12 @@ namespace CssUI.CSS
                                 var sbWidth = CssCommon.SnapToPixel(Box.Owner?.ScrollBox?.VScrollBar?.Width ?? 0);
                                 var eqRes = (marginLeft + BorderLeft + PaddingLeft + 0 + PaddingRight + BorderRight + marginRight + sbWidth);
                                 var avail = (CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes);
-                                Width = CssValue.From(MathExt.Clamp(Box.Preferred_Width, Box.Min_Content.Width, avail));
+                                Width = CssValue.From(CalculateShrinkToFitWidth(Box, avail));
                             }
 
                             if (MarginLeft.IsAuto) MarginLeft = CssValue.Zero;
                             if (MarginRight.IsAuto) MarginRight = CssValue.Zero;
                         }
-
                         /* 10.3.10 'Inline-block', replaced elements in normal flow */
                         if (Box.IsReplacedElement)
                         {/* Exactly as inline replaced elements. */
