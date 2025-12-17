@@ -57,6 +57,8 @@ namespace CssUI.CSS.Formatting
         private EFlexWrap _flexWrap;
         private float _availableMainSpace;
         private float _availableCrossSpace;
+        private float _mainAxisGap;
+        private float _crossAxisGap;
 
         #endregion
 
@@ -95,6 +97,20 @@ namespace CssUI.CSS.Formatting
             var style = _container.Style;
             _flexDirection = style?.FlexDirection ?? EFlexDirection.Row;
             _flexWrap = style?.FlexWrap ?? EFlexWrap.NoWrap;
+
+            // Read gap properties
+            // Main axis gap is column-gap for row direction, row-gap for column direction
+            // Cross axis gap is row-gap for row direction, column-gap for column direction
+            if (IsMainAxisHorizontal)
+            {
+                _mainAxisGap = (float)(style?.ColumnGap ?? 0);
+                _crossAxisGap = (float)(style?.RowGap ?? 0);
+            }
+            else
+            {
+                _mainAxisGap = (float)(style?.RowGap ?? 0);
+                _crossAxisGap = (float)(style?.ColumnGap ?? 0);
+            }
 
             // Determine available space from container size
             var containerSize = _container.Size;
@@ -230,17 +246,20 @@ namespace CssUI.CSS.Formatting
             foreach (var item in _flexItems)
             {
                 float itemMainSize = item.HypotheticalMainSize;
+                // Account for gap when adding items after the first
+                float gapForThisItem = currentLine.Items.Count > 0 ? _mainAxisGap : 0;
 
                 if (IsMultiLine && currentLine.Items.Count > 0 &&
-                    currentLineMainSize + itemMainSize > _availableMainSpace)
+                    currentLineMainSize + gapForThisItem + itemMainSize > _availableMainSpace)
                 {
                     _flexLines.Add(currentLine);
                     currentLine = new FlexLine();
                     currentLineMainSize = 0;
+                    gapForThisItem = 0;
                 }
 
                 currentLine.Items.Add(item);
-                currentLineMainSize += itemMainSize;
+                currentLineMainSize += gapForThisItem + itemMainSize;
             }
 
             if (currentLine.Items.Count > 0)
@@ -390,15 +409,20 @@ namespace CssUI.CSS.Formatting
                     totalItemsMainSize += item.TargetMainSize;
                 }
 
-                float remainingSpace = _availableMainSpace - totalItemsMainSize;
+                // Account for gaps between items
+                int gapCount = Math.Max(0, line.Items.Count - 1);
+                float totalGapSpace = gapCount * _mainAxisGap;
+                float remainingSpace = _availableMainSpace - totalItemsMainSize - totalGapSpace;
+                
                 float position = CalculateMainAxisStartPosition(justifyContent, remainingSpace, line.Items.Count);
-                float gap = CalculateMainAxisGap(justifyContent, remainingSpace, line.Items.Count);
+                float extraGap = CalculateMainAxisGap(justifyContent, remainingSpace, line.Items.Count);
 
                 for (int i = 0; i < line.Items.Count; i++)
                 {
                     var item = line.Items[IsMainAxisReversed ? line.Items.Count - 1 - i : i];
                     item.MainAxisPosition = position;
-                    position += item.TargetMainSize + gap;
+                    // Add both the configured gap and any extra gap from justify-content
+                    position += item.TargetMainSize + _mainAxisGap + extraGap;
                 }
             }
         }
@@ -439,15 +463,22 @@ namespace CssUI.CSS.Formatting
             float linePosition = IsWrapReversed ? _availableCrossSpace : 0;
             var containerAlignItems = _container?.Style?.AlignItems ?? EAlignItems.Stretch;
 
-            foreach (var line in _flexLines)
+            for (int lineIndex = 0; lineIndex < _flexLines.Count; lineIndex++)
             {
+                var line = _flexLines[lineIndex];
+                
+                // Add gap between lines (not before first line)
+                float gapBefore = lineIndex > 0 ? _crossAxisGap : 0;
+                
                 if (IsWrapReversed)
                 {
                     linePosition -= line.CrossSize;
+                    if (lineIndex > 0) linePosition -= _crossAxisGap;
                     line.CrossAxisPosition = linePosition;
                 }
                 else
                 {
+                    linePosition += gapBefore;
                     line.CrossAxisPosition = linePosition;
                     linePosition += line.CrossSize;
                 }

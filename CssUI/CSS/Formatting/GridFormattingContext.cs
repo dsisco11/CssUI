@@ -95,6 +95,8 @@ namespace CssUI.CSS.Formatting
         private EGridAutoFlow _autoFlow;
         private float _availableWidth;
         private float _availableHeight;
+        private float _columnGap;
+        private float _rowGap;
 
         // Auto-placement cursor
         private int _autoCursorColumn;
@@ -136,6 +138,10 @@ namespace CssUI.CSS.Formatting
             // Read container grid properties from style
             var style = _container.Style;
             _autoFlow = style?.GridAutoFlow ?? EGridAutoFlow.Row;
+
+            // Read gap properties
+            _columnGap = (float)(style?.ColumnGap ?? 0);
+            _rowGap = (float)(style?.RowGap ?? 0);
 
             // Determine available space from container size
             var containerSize = _container.Size;
@@ -472,18 +478,24 @@ namespace CssUI.CSS.Formatting
 
         private void StretchAutoTracks()
         {
-            // Calculate total used space
+            // Calculate total used space including gaps
             float totalColumnSpace = 0;
             foreach (var track in _columnTracks)
             {
                 totalColumnSpace += track.ResolvedSize;
             }
+            // Add column gaps (one less than number of tracks)
+            float totalColumnGaps = Math.Max(0, _columnTracks.Count - 1) * _columnGap;
+            totalColumnSpace += totalColumnGaps;
 
             float totalRowSpace = 0;
             foreach (var track in _rowTracks)
             {
                 totalRowSpace += track.ResolvedSize;
             }
+            // Add row gaps (one less than number of tracks)
+            float totalRowGaps = Math.Max(0, _rowTracks.Count - 1) * _rowGap;
+            totalRowSpace += totalRowGaps;
 
             // Distribute remaining space equally among auto tracks
             if (_columnTracks.Count > 0 && totalColumnSpace < _availableWidth)
@@ -511,19 +523,29 @@ namespace CssUI.CSS.Formatting
 
         private void CalculateFinalPositions()
         {
-            // Calculate track start positions
+            // Calculate track start positions including gaps
             float columnPosition = 0;
-            foreach (var track in _columnTracks)
+            for (int i = 0; i < _columnTracks.Count; i++)
             {
-                track.StartPosition = columnPosition;
-                columnPosition += track.ResolvedSize;
+                _columnTracks[i].StartPosition = columnPosition;
+                columnPosition += _columnTracks[i].ResolvedSize;
+                // Add gap after each track except the last
+                if (i < _columnTracks.Count - 1)
+                {
+                    columnPosition += _columnGap;
+                }
             }
 
             float rowPosition = 0;
-            foreach (var track in _rowTracks)
+            for (int i = 0; i < _rowTracks.Count; i++)
             {
-                track.StartPosition = rowPosition;
-                rowPosition += track.ResolvedSize;
+                _rowTracks[i].StartPosition = rowPosition;
+                rowPosition += _rowTracks[i].ResolvedSize;
+                // Add gap after each track except the last
+                if (i < _rowTracks.Count - 1)
+                {
+                    rowPosition += _rowGap;
+                }
             }
 
             // Calculate item positions
@@ -539,18 +561,28 @@ namespace CssUI.CSS.Formatting
                     item.X = _columnTracks[colStart].StartPosition;
                     item.Y = _rowTracks[rowStart].StartPosition;
 
-                    // Calculate width (sum of spanned column tracks)
+                    // Calculate width (sum of spanned column tracks + gaps between them)
                     item.Width = 0;
                     for (int i = colStart; i < colEnd && i < _columnTracks.Count; i++)
                     {
                         item.Width += _columnTracks[i].ResolvedSize;
+                        // Add gap between tracks (not after last track in span)
+                        if (i < colEnd - 1 && i < _columnTracks.Count - 1)
+                        {
+                            item.Width += _columnGap;
+                        }
                     }
 
-                    // Calculate height (sum of spanned row tracks)
+                    // Calculate height (sum of spanned row tracks + gaps between them)
                     item.Height = 0;
                     for (int i = rowStart; i < rowEnd && i < _rowTracks.Count; i++)
                     {
                         item.Height += _rowTracks[i].ResolvedSize;
+                        // Add gap between tracks (not after last track in span)
+                        if (i < rowEnd - 1 && i < _rowTracks.Count - 1)
+                        {
+                            item.Height += _rowGap;
+                        }
                     }
                 }
             }

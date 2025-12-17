@@ -146,6 +146,10 @@ namespace CssUI.CSS
         public EAlignItems AlignItems => Cascaded.AlignItems.Actual;
         public EAlignItems AlignSelf => Cascaded.AlignSelf.Actual;
 
+        // Gap properties
+        public int RowGap => Cascaded.RowGap.Actual;
+        public int ColumnGap => Cascaded.ColumnGap.Actual;
+
         // Grid properties
         public EGridAutoFlow GridAutoFlow => Cascaded.GridAutoFlow.Actual;
         public int GridColumnStart => Cascaded.GridColumnStart.Actual;

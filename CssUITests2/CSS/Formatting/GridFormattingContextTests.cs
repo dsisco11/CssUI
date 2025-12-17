@@ -109,5 +109,18 @@ namespace CssUITests.CSS.Formatting
         }
 
         #endregion
+
+        #region Gap Property Tests
+
+        [TestMethod]
+        [TestCategory("Grid")]
+        [TestCategory("Gap")]
+        public void ECssPropertyID_HasGapProperties()
+        {
+            Assert.IsTrue(System.Enum.IsDefined(typeof(ECssPropertyID), "RowGap"));
+            Assert.IsTrue(System.Enum.IsDefined(typeof(ECssPropertyID), "ColumnGap"));
+        }
+
+        #endregion
     }
 }

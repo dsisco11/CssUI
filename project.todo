@@ -98,16 +98,15 @@
 ### 2.4 Testing ✅ COMPLETE
 - [x] Unit tests for GridFormattingContext (9 tests passing)
 
-## Phase 3: Alignment Properties
+## Phase 3: Gap & Alignment Properties ✅ COMPLETE
 - [x] Add alignment properties to ECssPropertyID
 - [x] Add EAlignContent, EJustifyContent, EAlignItems enums
 - [x] Add property definitions to CssDefinitions.cs
-- [x] Add style accessors to CssComputedStyle ✅ (done in Phase 1)
-- [ ] Implement alignment calculation helpers
-- [ ] Add gap calculations to flex layout
-- [ ] Add gap calculations to grid layout
-- [ ] Add gap calculations to flex layout
-- [ ] Add gap calculations to grid layout
+- [x] Add style accessors to CssComputedStyle (RowGap, ColumnGap)
+- [x] Add style accessors to StyleProperties (RowGap, ColumnGap)
+- [x] Add gap calculations to FlexFormattingContext (main-axis & cross-axis gaps)
+- [x] Add gap calculations to GridFormattingContext (column & row gaps)
+- [x] Add gap unit tests (20 formatting tests passing)
 
 ## Phase 4: Advanced Features
 - [ ] Implement calc() evaluation

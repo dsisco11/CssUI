@@ -314,6 +314,16 @@ namespace CssUI.CSS
         /// Overrides align-items for a specific item.
         /// </summary>
         public EnumProperty<EAlignItems> AlignSelf => (EnumProperty<EAlignItems>)Get(ECssPropertyID.AlignSelf);
+        
+        /// <summary>
+        /// Sets the gap between rows in flex/grid containers.
+        /// </summary>
+        public IntProperty RowGap => (IntProperty)Get(ECssPropertyID.RowGap);
+        
+        /// <summary>
+        /// Sets the gap between columns in flex/grid containers.
+        /// </summary>
+        public IntProperty ColumnGap => (IntProperty)Get(ECssPropertyID.ColumnGap);
         #endregion
 
         #region Grid
