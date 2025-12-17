@@ -1,0 +1,89 @@
+# CssUI Revival - Project TODO
+
+## Pre-existing Issues
+- [ ] Fix SixLabors package dependencies (fonts, image processing)
+- [ ] Resolve RootBox.cs override errors
+
+## Phase 0: Intrinsic Sizing Infrastructure
+- [ ] 0.1 Audit existing intrinsic sizing code in CssAlgorithms.cs
+- [ ] 0.2 Implement IIntrinsicSizable interface
+- [ ] 0.3 Implement intrinsic size calculation for text content
+- [ ] 0.4 Implement intrinsic size calculation for replaced elements
+- [ ] 0.5 Implement intrinsic size calculation for block containers
+- [ ] 0.6 Add unit tests for intrinsic sizing
+
+## Phase 1: Flexbox Layout
+### 1.1 Property Integration
+- [x] Add FlexDirection, FlexWrap, FlexGrow, FlexShrink, FlexBasis, Order to ECssPropertyID
+- [x] Add EFlexDirection, EFlexWrap enums
+- [x] Add property definitions to CssDefinitions.cs
+- [ ] Add style accessors to CssComputedStyle (e.g., Style.FlexDirection)
+
+### 1.2 Layout Director Integration
+- [x] Create FlexLayoutDirector.cs scaffold
+- [ ] Wire FlexLayoutDirector to element layout system for display:flex
+- [ ] Read actual flex properties from element styles (replace TODOs)
+
+### 1.3 Algorithm Implementation
+- [ ] §9.1 Initial Setup — Generate anonymous flex items
+- [ ] §9.2 Line Length Determination — Calculate flex base size
+- [ ] §9.3 Resolve Flexible Lengths — Grow/shrink distribution
+- [ ] §9.4 Cross Size Determination
+- [ ] §9.5 Main-Axis Alignment (justify-content)
+- [ ] §9.6 Cross-Axis Alignment (align-items, align-self, align-content)
+
+### 1.4 Testing
+- [ ] Unit tests for flex item generation
+- [ ] Unit tests for flexible length resolution
+- [ ] Integration tests for common flex patterns
+
+## Phase 2: Grid Layout
+### 2.1 Property Integration
+- [x] Add grid properties to ECssPropertyID
+- [x] Add EGridAutoFlow enum
+- [x] Add property definitions to CssDefinitions.cs
+- [ ] Add style accessors to CssComputedStyle
+- [ ] Implement GridTrackList value type for grid-template-*
+
+### 2.2 Layout Director Integration
+- [x] Create GridLayoutDirector.cs scaffold
+- [ ] Wire GridLayoutDirector to element layout system for display:grid
+- [ ] Read actual grid properties from element styles (replace TODOs)
+
+### 2.3 Algorithm Implementation
+- [ ] §7 Define explicit/implicit grid from grid-template-*
+- [ ] §8.5 Auto-placement algorithm
+- [ ] §11.4 Initialize Track Sizes
+- [ ] §11.5 Resolve Intrinsic Track Sizes
+- [ ] §11.6 Maximize Tracks
+- [ ] §11.7 Expand Flexible Tracks (fr units)
+- [ ] §11.8 Stretch auto Tracks
+
+### 2.4 Testing
+- [ ] Unit tests for track sizing
+- [ ] Unit tests for item placement
+- [ ] Integration tests for common grid patterns
+
+## Phase 3: Alignment Properties
+- [x] Add alignment properties to ECssPropertyID
+- [x] Add EAlignContent, EJustifyContent, EAlignItems enums
+- [x] Add property definitions to CssDefinitions.cs
+- [ ] Add style accessors to CssComputedStyle
+- [ ] Implement alignment calculation helpers
+- [ ] Add gap calculations to flex layout
+- [ ] Add gap calculations to grid layout
+
+## Phase 4: Advanced Features
+- [ ] Implement calc() evaluation
+- [ ] Implement var() custom properties
+- [ ] Flex fragmentation support
+- [ ] Grid fragmentation support
+- [ ] Performance optimization / caching
+
+## Documentation
+- [x] Create STATUS.md
+- [x] Create SPECIFICATIONS.md
+- [x] Create ROADMAP.md
+- [ ] Update README.md with current project state
+- [ ] Add API documentation
+- [ ] Add usage examples
