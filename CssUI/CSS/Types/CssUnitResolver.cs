@@ -141,10 +141,8 @@ namespace CssUI
 #if DISABLE_FONT_SYSTEM
                         return 1;
 #else 
-                        if (Owner.Style.Font != null)
-                            return Owner.Style.Font.EmSize;
-                        else
-                            return Owner.Style.FontSize;
+                        // Em size is based on the computed font size
+                        return Owner.Style.FontSize;
 #endif
                     }
                 case ECssUnit.EX:

@@ -105,7 +105,7 @@ namespace CssUI.Rendering
                     }
                     finally
                     {
-                        Span<byte> rgbaBytes = MemoryMarshal.AsBytes(frame.GetPixelSpan()).ToArray();
+                        byte[] rgbaBytes = MemoryMarshal.AsBytes(frame.GetPixelSpan()).ToArray();
                         var size = new Rect2i(frame.Width, frame.Height);
                         var duration = delay / 1000.0f;
                         Texture.Push_Frame(rgbaBytes, size, EPixelFormat.RGBA, duration);
@@ -114,7 +114,7 @@ namespace CssUI.Rendering
             }
             else
             {
-                Span<byte> rgbaBytes = MemoryMarshal.AsBytes(image.GetPixelSpan()).ToArray();
+                byte[] rgbaBytes = MemoryMarshal.AsBytes(image.GetPixelSpan()).ToArray();
                 var size = new Rect2i(image.Width, image.Height);
                 Texture.Push_Frame(rgbaBytes, size, EPixelFormat.RGBA);
             }
@@ -129,8 +129,40 @@ namespace CssUI.Rendering
 #else
             return await Task.Factory.StartNew(() =>
             {
-                var img = Image.Load<Rgba32>(path);
-                return new GpuTexture(img);
+                var image = Image.Load<Rgba32>(path);
+                var Size = new Rect2i(image.Width, image.Height);
+                var Texture = new GpuTexture(Size);
+
+                if (image.Frames.Count > 1)
+                {
+                    var frames = image.Frames;
+                    int frameCount = frames.Count;
+
+                    for (int f = 0; f < frameCount; f++)
+                    {
+                        var frame = frames[f];
+                        int delay = 0;
+                        try
+                        {
+                            GifFrameMetaData meta = frame.MetaData.GetFormatMetaData(GifFormat.Instance);
+                            delay = meta.FrameDelay;
+                        }
+                        finally
+                        {
+                            byte[] rgbaBytes = MemoryMarshal.AsBytes(frame.GetPixelSpan()).ToArray();
+                            var size = new Rect2i(frame.Width, frame.Height);
+                            var duration = delay / 1000.0f;
+                            Texture.Push_Frame(rgbaBytes, size, EPixelFormat.RGBA, duration);
+                        }
+                    }
+                }
+                else
+                {
+                    byte[] rgbaBytes = MemoryMarshal.AsBytes(image.GetPixelSpan()).ToArray();
+                    var size = new Rect2i(image.Width, image.Height);
+                    Texture.Push_Frame(rgbaBytes, size, EPixelFormat.RGBA);
+                }
+                return Texture;
             });
 #endif
         }
