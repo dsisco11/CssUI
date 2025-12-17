@@ -344,7 +344,13 @@ namespace CssUI.CSS.Internal
                 new StyleDefinition(ECssPropertyID.GridRowStart, false, EPropertyDirtFlags.Flow, CssValue.Auto, ECssValueTypes.AUTO | ECssValueTypes.INTEGER | ECssValueTypes.KEYWORD),
                 
                 // grid-row-end: <grid-line> (default auto)
-                new StyleDefinition(ECssPropertyID.GridRowEnd, false, EPropertyDirtFlags.Flow, CssValue.Auto, ECssValueTypes.AUTO | ECssValueTypes.INTEGER | ECssValueTypes.KEYWORD)
+                new StyleDefinition(ECssPropertyID.GridRowEnd, false, EPropertyDirtFlags.Flow, CssValue.Auto, ECssValueTypes.AUTO | ECssValueTypes.INTEGER | ECssValueTypes.KEYWORD),
+                
+                // grid-template-columns: none | <track-list> (default none)
+                new StyleDefinition(ECssPropertyID.GridTemplateColumns, false, EPropertyDirtFlags.Flow, CssValue.From_String("none"), ECssValueTypes.KEYWORD | ECssValueTypes.STRING),
+                
+                // grid-template-rows: none | <track-list> (default none)
+                new StyleDefinition(ECssPropertyID.GridTemplateRows, false, EPropertyDirtFlags.Flow, CssValue.From_String("none"), ECssValueTypes.KEYWORD | ECssValueTypes.STRING)
             };
         }
 

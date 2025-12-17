@@ -156,6 +156,8 @@ namespace CssUI.CSS
         public int GridColumnEnd => Cascaded.GridColumnEnd.Actual;
         public int GridRowStart => Cascaded.GridRowStart.Actual;
         public int GridRowEnd => Cascaded.GridRowEnd.Actual;
+        public string GridTemplateColumns => Cascaded.GridTemplateColumns?.Actual;
+        public string GridTemplateRows => Cascaded.GridTemplateRows?.Actual;
         #endregion
 
         #region Block Values

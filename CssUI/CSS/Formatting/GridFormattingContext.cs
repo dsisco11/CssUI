@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using CssUI.CSS.BoxTree;
+using CssUI.CSS.Types;
 
 namespace CssUI.CSS.Formatting
 {
@@ -74,6 +75,11 @@ namespace CssUI.CSS.Formatting
             public float FlexFactor { get; set; }
 
             /// <summary>
+            /// The original track size definition (if from explicit grid).
+            /// </summary>
+            public GridTrackSize? SizeDefinition { get; set; }
+
+            /// <summary>
             /// The final resolved size.
             /// </summary>
             public float ResolvedSize { get; set; }
@@ -97,6 +103,10 @@ namespace CssUI.CSS.Formatting
         private float _availableHeight;
         private float _columnGap;
         private float _rowGap;
+
+        // Explicit track lists from grid-template-columns/rows
+        private GridTrackList _explicitColumnTracks;
+        private GridTrackList _explicitRowTracks;
 
         // Auto-placement cursor
         private int _autoCursorColumn;
@@ -218,12 +228,21 @@ namespace CssUI.CSS.Formatting
 
         private void DefineExplicitGrid()
         {
-            // For now, create a simple implicit grid based on items
-            // TODO: Parse grid-template-columns and grid-template-rows when GridTrackList is implemented
+            // Parse explicit track definitions from style
+            var style = _container.Style;
+            string columnTemplate = style?.GridTemplateColumns;
+            string rowTemplate = style?.GridTemplateRows;
 
-            // Find the maximum column and row needed
-            int maxColumn = 1;
-            int maxRow = 1;
+            _explicitColumnTracks = !string.IsNullOrEmpty(columnTemplate) 
+                ? GridTrackList.Parse(columnTemplate) 
+                : new GridTrackList();
+            _explicitRowTracks = !string.IsNullOrEmpty(rowTemplate) 
+                ? GridTrackList.Parse(rowTemplate) 
+                : new GridTrackList();
+
+            // Find the maximum column and row needed from items
+            int maxColumn = _explicitColumnTracks.Count;
+            int maxRow = _explicitRowTracks.Count;
 
             foreach (var item in _gridItems)
             {
@@ -233,25 +252,66 @@ namespace CssUI.CSS.Formatting
                     maxRow = Math.Max(maxRow, item.RowEnd);
             }
 
-            // Create implicit tracks with auto sizing
+            // Ensure we have at least 1 track
+            maxColumn = Math.Max(1, maxColumn);
+            maxRow = Math.Max(1, maxRow);
+
+            // Create column tracks from explicit definitions + implicit auto tracks
             for (int i = 0; i < maxColumn; i++)
             {
-                _columnTracks.Add(new GridTrack
+                GridTrack track;
+                if (i < _explicitColumnTracks.Count)
                 {
-                    BaseSize = 0,
-                    GrowthLimit = float.MaxValue,
-                    IsFlexible = false
-                });
+                    var trackSize = _explicitColumnTracks[i];
+                    track = new GridTrack
+                    {
+                        BaseSize = 0,
+                        GrowthLimit = float.MaxValue,
+                        IsFlexible = trackSize.IsFlexible,
+                        FlexFactor = (float)trackSize.FlexFactor,
+                        SizeDefinition = trackSize
+                    };
+                }
+                else
+                {
+                    // Implicit track with auto sizing
+                    track = new GridTrack
+                    {
+                        BaseSize = 0,
+                        GrowthLimit = float.MaxValue,
+                        IsFlexible = false
+                    };
+                }
+                _columnTracks.Add(track);
             }
 
+            // Create row tracks from explicit definitions + implicit auto tracks
             for (int i = 0; i < maxRow; i++)
             {
-                _rowTracks.Add(new GridTrack
+                GridTrack track;
+                if (i < _explicitRowTracks.Count)
                 {
-                    BaseSize = 0,
-                    GrowthLimit = float.MaxValue,
-                    IsFlexible = false
-                });
+                    var trackSize = _explicitRowTracks[i];
+                    track = new GridTrack
+                    {
+                        BaseSize = 0,
+                        GrowthLimit = float.MaxValue,
+                        IsFlexible = trackSize.IsFlexible,
+                        FlexFactor = (float)trackSize.FlexFactor,
+                        SizeDefinition = trackSize
+                    };
+                }
+                else
+                {
+                    // Implicit track with auto sizing
+                    track = new GridTrack
+                    {
+                        BaseSize = 0,
+                        GrowthLimit = float.MaxValue,
+                        IsFlexible = false
+                    };
+                }
+                _rowTracks.Add(track);
             }
         }
 
@@ -472,8 +532,80 @@ namespace CssUI.CSS.Formatting
 
         private void ExpandFlexibleTracks()
         {
-            // TODO: Implement fr unit distribution when GridTrackList is available
-            // For now, all tracks are non-flexible
+            // §11.7 Expand Flexible Tracks
+            // Distribute remaining space to fr tracks proportionally
+
+            // Calculate free space for columns
+            float usedColumnSpace = 0;
+            float totalColumnFlexFactor = 0;
+            foreach (var track in _columnTracks)
+            {
+                if (!track.IsFlexible)
+                {
+                    usedColumnSpace += track.ResolvedSize;
+                }
+                else
+                {
+                    totalColumnFlexFactor += track.FlexFactor;
+                }
+            }
+            // Add gaps
+            usedColumnSpace += Math.Max(0, _columnTracks.Count - 1) * _columnGap;
+
+            float freeColumnSpace = Math.Max(0, _availableWidth - usedColumnSpace);
+
+            // Distribute free space to flexible column tracks
+            if (totalColumnFlexFactor > 0 && freeColumnSpace > 0)
+            {
+                // Calculate hypothetical fr size
+                float frSize = freeColumnSpace / totalColumnFlexFactor;
+
+                foreach (var track in _columnTracks)
+                {
+                    if (track.IsFlexible)
+                    {
+                        // The track size is max(base size, fr * flex factor)
+                        float flexSize = frSize * track.FlexFactor;
+                        track.ResolvedSize = Math.Max(track.BaseSize, flexSize);
+                    }
+                }
+            }
+
+            // Calculate free space for rows
+            float usedRowSpace = 0;
+            float totalRowFlexFactor = 0;
+            foreach (var track in _rowTracks)
+            {
+                if (!track.IsFlexible)
+                {
+                    usedRowSpace += track.ResolvedSize;
+                }
+                else
+                {
+                    totalRowFlexFactor += track.FlexFactor;
+                }
+            }
+            // Add gaps
+            usedRowSpace += Math.Max(0, _rowTracks.Count - 1) * _rowGap;
+
+            float freeRowSpace = Math.Max(0, _availableHeight - usedRowSpace);
+
+            // Distribute free space to flexible row tracks
+            if (totalRowFlexFactor > 0 && freeRowSpace > 0)
+            {
+                // Calculate hypothetical fr size
+                float frSize = freeRowSpace / totalRowFlexFactor;
+
+                foreach (var track in _rowTracks)
+                {
+                    if (track.IsFlexible)
+                    {
+                        // The track size is max(base size, fr * flex factor)
+                        float flexSize = frSize * track.FlexFactor;
+                        track.ResolvedSize = Math.Max(track.BaseSize, flexSize);
+                    }
+                }
+            }
         }
 
         private void StretchAutoTracks()

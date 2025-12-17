@@ -156,6 +156,12 @@ namespace CssUI.CSS
         [MetaKeyword("turn")]
         TURN,
 
+        /* Grid Units */
+        /// <summary>
+        /// Flexible length unit for CSS Grid (fraction of remaining space)
+        /// </summary>
+        [MetaKeyword("fr")]
+        FR,
 
     }
 }

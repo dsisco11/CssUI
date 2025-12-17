@@ -78,25 +78,26 @@
 - [x] Add property definitions to CssDefinitions.cs
 - [x] Add style accessors to CssComputedStyle (GridAutoFlow, GridColumn/RowStart/End)
 - [x] Add style accessors to StyleProperties (convenience properties)
-- [ ] Implement GridTrackList value type for grid-template-* (future enhancement)
+- [x] Implement GridTrackList value type for grid-template-*
 
 ### 2.2 Layout Integration ✅ COMPLETE
 - [x] Create GridFormattingContext.cs
 - [x] Wire to CssPrincipalBox.InitializeFormattingContext
 - [x] Read grid properties from element styles
 
-### 2.3 Algorithm Implementation ✅ COMPLETE (Basic)
+### 2.3 Algorithm Implementation ✅ COMPLETE
 - [x] §7.1 Grid item generation
 - [x] §7.2 Define explicit/implicit grid (auto-sizing)
 - [x] §8.5 Auto-placement algorithm (row/column flow)
 - [x] §11.4 Initialize Track Sizes
 - [x] §11.5 Resolve Intrinsic Track Sizes
 - [x] §11.6 Maximize Tracks
+- [x] §11.7 Expand Flexible Tracks (fr units)
 - [x] §11.8 Stretch auto Tracks
-- [ ] §11.7 Expand Flexible Tracks (fr units) — requires GridTrackList
 
 ### 2.4 Testing ✅ COMPLETE
 - [x] Unit tests for GridFormattingContext (9 tests passing)
+- [x] Unit tests for GridTrackList (27 tests passing)
 
 ## Phase 3: Gap & Alignment Properties ✅ COMPLETE
 - [x] Add alignment properties to ECssPropertyID

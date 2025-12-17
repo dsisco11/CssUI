@@ -352,8 +352,15 @@ namespace CssUI.CSS
         /// </summary>
         public IntProperty GridRowEnd => (IntProperty)Get(ECssPropertyID.GridRowEnd);
         
-        // Note: GridTemplateColumns, GridTemplateRows, GridAutoColumns, GridAutoRows
-        // require a GridTrackList value type (not yet implemented)
+        /// <summary>
+        /// Defines the columns of a grid container (e.g., "1fr 2fr 100px").
+        /// </summary>
+        public StringProperty GridTemplateColumns => (StringProperty)Get(ECssPropertyID.GridTemplateColumns);
+        
+        /// <summary>
+        /// Defines the rows of a grid container (e.g., "auto 1fr 200px").
+        /// </summary>
+        public StringProperty GridTemplateRows => (StringProperty)Get(ECssPropertyID.GridTemplateRows);
         #endregion
         #endregion
 
