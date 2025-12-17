@@ -848,6 +848,12 @@ namespace CssUI.CSS
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string AsString() => (string)value;
+
+        /// <summary>
+        /// Returns the value as a CssFunction (for FUNCTION type values).
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal CssFunction AsFunction() => value as CssFunction;
         #endregion
 
         #region Operators

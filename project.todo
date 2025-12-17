@@ -108,9 +108,25 @@
 - [x] Add gap calculations to GridFormattingContext (column & row gaps)
 - [x] Add gap unit tests (20 formatting tests passing)
 
-## Phase 4: Advanced Features
-- [ ] Implement calc() evaluation
-- [ ] Implement var() custom properties
+## Phase 4: Advanced Features ✅ PARTIAL
+### 4.1 CSS Functions ✅ COMPLETE
+- [x] Implement calc() evaluator (CssCalcEvaluator.cs)
+  - [x] Basic arithmetic (+, -, *, /)
+  - [x] Operator precedence
+  - [x] Percentage resolution
+  - [x] Dimension handling
+  - [x] min(), max(), clamp() support
+  - Note: Parser has bugs with function parsing - evaluator ready once parser fixed
+- [x] Implement var() custom properties
+  - [x] CssCustomPropertyRegistry for storing custom properties
+  - [x] CssVarResolver for resolving var() references
+  - [x] Inheritance support (parent/child registries)
+  - [x] Fallback value support
+  - [x] Cycle detection (max depth)
+- [x] Add CssValue.AsFunction() accessor
+- [x] Unit tests (15 tests passing)
+
+### 4.2 Remaining Features
 - [ ] Flex fragmentation support
 - [ ] Grid fragmentation support
 - [ ] Performance optimization / caching
