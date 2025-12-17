@@ -4,6 +4,23 @@
 - [ ] Fix SixLabors package dependencies (fonts, image processing)
 - [ ] Resolve RootBox.cs override errors
 
+## Engine Plugin Architecture
+### Interface Definitions
+- [x] Create EngineTypes.cs (FontHandle, TextureHandle, FontMetrics, etc.)
+- [x] Create IFontEngine interface
+- [x] Create ITextureEngine interface
+- [x] Create IRenderEngine interface
+- [x] Create EngineProvider.cs (initialization and global access)
+
+### Refactoring
+- [ ] Update FontManager to implement IFontEngine (or create wrapper)
+- [ ] Update GpuTexture to use ITextureEngine
+- [ ] Update RenderEngineBase to implement new IRenderEngine
+- [ ] Refactor CssPropertyResolver_Font to use EngineProvider.FontEngine
+- [ ] Refactor StyleProperties font handling to use EngineProvider.FontEngine
+- [ ] Remove direct SixLabors references from CSS/DOM code
+- [ ] Move SixLabors implementations to separate CssUI.SixLabors project
+
 ## Phase 0: Intrinsic Sizing Infrastructure
 - [ ] 0.1 Audit existing intrinsic sizing code in CssAlgorithms.cs
 - [ ] 0.2 Implement IIntrinsicSizable interface
