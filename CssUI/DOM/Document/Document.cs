@@ -11,7 +11,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
-using xLog;
+using Microsoft.Extensions.Logging;
 using CssUI.DOM.CustomElements;
 using System.Diagnostics.Contracts;
 using CssUI.CSS;
@@ -40,7 +40,7 @@ namespace CssUI.DOM
         #endregion
 
         #region Internal Properties
-        internal ILogger Log = LogFactory.GetLogger(nameof(Document));
+        internal ILogger Logger = CssUI.Log.GetLogger<Document>();
 
         /* XXX: This never fires because we dont have a system to notify the document its not active yet */
         internal readonly ManualResetEvent Active_State_Change_Signal = new ManualResetEvent(false);

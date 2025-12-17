@@ -11,7 +11,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using xLog;
+using Microsoft.Extensions.Logging;
 
 namespace CssUI.DOM.Nodes
 {

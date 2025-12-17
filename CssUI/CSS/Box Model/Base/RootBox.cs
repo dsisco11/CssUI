@@ -1,6 +1,7 @@
 ﻿using CssUI.CSS.Enums;
 using CssUI.CSS.Formatting;
 using CssUI.DOM;
+using CssUI.DOM.Geometry;
 
 namespace CssUI.CSS.BoxTree
 {
@@ -17,16 +18,20 @@ namespace CssUI.CSS.BoxTree
         private readonly IFormattingContext _formattingContext;
         #endregion
 
-        #region Overrides
-        public override IFormattingContext FormattingContext
-        {
-            get
-            {
-                return _formattingContext;
-            }
-        }
+        #region Accessors
+        /// <summary>
+        /// Gets the formatting context for this root box.
+        /// </summary>
+        public IFormattingContext RootFormattingContext => _formattingContext;
 
-        public override EDisplayMode Display => EDisplayMode.BLOCK;
+        /// <summary>
+        /// Gets the display mode for the root box.
+        /// </summary>
+        public EDisplayMode RootDisplay => EDisplayMode.BLOCK;
+
+        /// <summary>
+        /// Gets the display type for this root box.
+        /// </summary>
         public override DisplayType DisplayType => _displayType;
         #endregion
 
@@ -42,15 +47,18 @@ namespace CssUI.CSS.BoxTree
         #endregion
 
         #region Geometry
-        public override Rect4d getBoundingClientRect()
+        /// <summary>
+        /// Gets the bounding client rectangle for this root box.
+        /// </summary>
+        public DOMRect GetBoundingClientRect()
         {
-            var viewport = this.ownerElement.nodeDocument.Viewport;
-            return new Rect4d(
-                Top: (int)viewport.Top,
-                Right: (int)(viewport.Left + viewport.Width),
-                Bottom: (int)(viewport.Top + viewport.Height),
-                Left: (int)viewport.Left
-                );
+            var viewport = this.Owner.nodeDocument.Viewport;
+            return new DOMRect(
+                x: viewport.Left,
+                y: viewport.Top,
+                width: viewport.Width,
+                height: viewport.Height
+            );
         }
         #endregion
     }

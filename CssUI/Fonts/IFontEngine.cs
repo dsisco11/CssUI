@@ -36,7 +36,7 @@ namespace CssUI
         /// </summary>
         /// <param name="font">The font handle.</param>
         /// <returns>Font metrics, or default values if handle is invalid.</returns>
-        FontMetrics GetMetrics(FontHandle font);
+        FontMetricsData GetMetrics(FontHandle font);
 
         /// <summary>
         /// Measure text dimensions for layout and intrinsic sizing.

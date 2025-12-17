@@ -124,7 +124,7 @@ namespace CssUI.DOM
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(ex);
+                    CssUI.Log.Error(ex);
                     IsInvalidValue = true;
                 }
 

@@ -76,7 +76,7 @@ namespace CssUI.Fonts
             foreach (FontFamily family in SystemFonts.Families)
             {
                 Fallbacks.Add(family.Name);
-                xLog.Log.Info($"[FontFactory] Found font family: {family.Name}");
+                Log.Info($"[FontFactory] Found font family: {family.Name}");
             }
 
             // Cleanup the list ahead of time
@@ -217,7 +217,7 @@ namespace CssUI.Fonts
             }
             catch (FontException ex)
             {
-                xLog.Log.Error(ex);
+                Log.Error(ex);
             }
 
             // SECOND, we  prioritize the style, and try to find a font that supports this style
@@ -237,7 +237,7 @@ namespace CssUI.Fonts
             }
             catch (FontException ex)
             {
-                xLog.Log.Error(ex);
+                Log.Error(ex);
             }
 
 
@@ -256,7 +256,7 @@ namespace CssUI.Fonts
             }
             catch (FontException ex)
             {
-                xLog.Log.Error(ex);
+                Log.Error(ex);
             }
 
             return null;

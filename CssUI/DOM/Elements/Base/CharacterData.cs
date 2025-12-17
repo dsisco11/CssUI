@@ -73,7 +73,7 @@ namespace CssUI.DOM
                 }
                 else
                 {
-                    Log.Error("Found expired reference to Range object in Live Ranges.");
+                    CssUI.Log.Error("Found expired reference to Range object in Live Ranges.");
                 }
             }
 

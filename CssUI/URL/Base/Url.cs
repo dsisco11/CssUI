@@ -1,10 +1,10 @@
-﻿using xLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Net;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Logging;
 using static CssUI.UnicodeCommon;
 
 namespace CssUI.HTTP
@@ -13,7 +13,7 @@ namespace CssUI.HTTP
     public class Url
     {
         #region Static
-        static ILogger Log = LogFactory.GetLogger(typeof(Url));
+        static ILogger Logger = CssUI.Log.GetLogger<Url>();
         #endregion
 
         #region Backing Values

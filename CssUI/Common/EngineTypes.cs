@@ -5,12 +5,8 @@ namespace CssUI
     /// <summary>
     /// Opaque handle to a font instance managed by an <see cref="IFontEngine"/>.
     /// </summary>
-    public readonly struct FontHandle : IEquatable<FontHandle>
+    public readonly record struct FontHandle(int Id)
     {
-        internal readonly int Id;
-
-        internal FontHandle(int id) => Id = id;
-
         /// <summary>
         /// Returns true if this handle is null/invalid.
         /// </summary>
@@ -21,23 +17,14 @@ namespace CssUI
         /// </summary>
         public static FontHandle Null => default;
 
-        public bool Equals(FontHandle other) => Id == other.Id;
-        public override bool Equals(object obj) => obj is FontHandle other && Equals(other);
-        public override int GetHashCode() => Id;
-        public static bool operator ==(FontHandle left, FontHandle right) => left.Equals(right);
-        public static bool operator !=(FontHandle left, FontHandle right) => !left.Equals(right);
         public override string ToString() => $"FontHandle({Id})";
     }
 
     /// <summary>
     /// Opaque handle to a texture managed by an <see cref="ITextureEngine"/>.
     /// </summary>
-    public readonly struct TextureHandle : IEquatable<TextureHandle>
+    public readonly record struct TextureHandle(int Id)
     {
-        internal readonly int Id;
-
-        internal TextureHandle(int id) => Id = id;
-
         /// <summary>
         /// Returns true if this handle is null/invalid.
         /// </summary>
@@ -48,70 +35,43 @@ namespace CssUI
         /// </summary>
         public static TextureHandle Null => default;
 
-        public bool Equals(TextureHandle other) => Id == other.Id;
-        public override bool Equals(object obj) => obj is TextureHandle other && Equals(other);
-        public override int GetHashCode() => Id;
-        public static bool operator ==(TextureHandle left, TextureHandle right) => left.Equals(right);
-        public static bool operator !=(TextureHandle left, TextureHandle right) => !left.Equals(right);
         public override string ToString() => $"TextureHandle({Id})";
     }
 
     /// <summary>
     /// A rectangle with position and size for rendering operations.
     /// </summary>
-    public readonly struct RenderRect
+    public readonly record struct RenderRect(float X, float Y, float Width, float Height)
     {
-        public float X { get; init; }
-        public float Y { get; init; }
-        public float Width { get; init; }
-        public float Height { get; init; }
-
-        public RenderRect(float x, float y, float width, float height)
-        {
-            X = x;
-            Y = y;
-            Width = width;
-            Height = height;
-        }
-
         public float Left => X;
         public float Top => Y;
         public float Right => X + Width;
         public float Bottom => Y + Height;
 
         public static RenderRect FromLTRB(float left, float top, float right, float bottom)
-            => new RenderRect(left, top, right - left, bottom - top);
+            => new(left, top, right - left, bottom - top);
     }
 
     /// <summary>
     /// A 2D point for rendering operations.
     /// </summary>
-    public readonly struct RenderPoint
-    {
-        public float X { get; init; }
-        public float Y { get; init; }
-
-        public RenderPoint(float x, float y)
-        {
-            X = x;
-            Y = y;
-        }
-    }
+    public readonly record struct RenderPoint(float X, float Y);
 
     /// <summary>
-    /// Font metrics for CSS unit resolution and text layout.
+    /// Font metrics data for CSS unit resolution and text layout.
+    /// Used by <see cref="IFontEngine"/>.
     /// </summary>
-    public readonly struct FontMetrics
+    public readonly record struct FontMetricsData
     {
         /// <summary>
         /// The font size in pixels (for 'em' unit).
         /// </summary>
-        public float EmSize { get; init; }
+        public required float EmSize { get; init; }
 
         /// <summary>
         /// The height of lowercase 'x' (for 'ex' unit).
         /// </summary>
-        public float XHeight { get; init; }
+        public required float XHeight { get; init; }
 
         /// <summary>
         /// The height of capital letters.
@@ -121,12 +81,12 @@ namespace CssUI
         /// <summary>
         /// The distance from baseline to top of tallest glyph.
         /// </summary>
-        public float Ascender { get; init; }
+        public required float Ascender { get; init; }
 
         /// <summary>
         /// The distance from baseline to bottom of lowest glyph (typically negative).
         /// </summary>
-        public float Descender { get; init; }
+        public required float Descender { get; init; }
 
         /// <summary>
         /// Additional spacing between lines.
@@ -142,43 +102,27 @@ namespace CssUI
     /// <summary>
     /// Result of measuring text dimensions.
     /// </summary>
-    public readonly struct TextMeasurement
-    {
-        /// <summary>
-        /// The total width of the measured text.
-        /// </summary>
-        public float Width { get; init; }
-
-        /// <summary>
-        /// The total height of the measured text.
-        /// </summary>
-        public float Height { get; init; }
-
-        /// <summary>
-        /// The Y offset from top to the text baseline.
-        /// </summary>
-        public float Baseline { get; init; }
-    }
+    public readonly record struct TextMeasurement(float Width, float Height, float Baseline);
 
     /// <summary>
     /// Decoded image data from an <see cref="ITextureEngine"/>.
     /// </summary>
-    public readonly struct ImageData
+    public readonly record struct ImageData
     {
         /// <summary>
         /// Image width in pixels.
         /// </summary>
-        public int Width { get; init; }
+        public required int Width { get; init; }
 
         /// <summary>
         /// Image height in pixels.
         /// </summary>
-        public int Height { get; init; }
+        public required int Height { get; init; }
 
         /// <summary>
         /// Raw pixel data in RGBA format (4 bytes per pixel).
         /// </summary>
-        public byte[] Pixels { get; init; }
+        public required byte[] Pixels { get; init; }
 
         /// <summary>
         /// Number of frames (1 for static images, >1 for animations).
@@ -189,7 +133,7 @@ namespace CssUI
         /// Per-frame delay in milliseconds for animated images.
         /// Null or empty for static images.
         /// </summary>
-        public int[] FrameDelaysMs { get; init; }
+        public int[]? FrameDelaysMs { get; init; }
 
         /// <summary>
         /// Returns true if this is an animated image.

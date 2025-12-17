@@ -1,8 +1,11 @@
 # CssUI Revival - Project TODO
 
 ## Pre-existing Issues
-- [ ] Fix SixLabors package dependencies (fonts, image processing)
-- [ ] Resolve RootBox.cs override errors
+- [x] Upgrade to .NET 8.0
+- [x] Replace xLog with Microsoft.Extensions.Logging
+- [x] Remove xLog project dependency from solution
+- [x] Fix RootBox.cs override errors
+- [ ] Fix nullable reference warnings (many throughout codebase)
 
 ## Engine Plugin Architecture
 ### Interface Definitions

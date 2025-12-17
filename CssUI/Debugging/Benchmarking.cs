@@ -142,7 +142,7 @@ namespace CssUI
             var info = Get(name);
             if (info.HasValue)
             {
-                xLog.Log.Success(info.Value.ToString());
+                Log.Success(info.Value.ToString());
             }
         }
 
@@ -150,7 +150,7 @@ namespace CssUI
         {
             foreach (var kv in History)
             {
-                xLog.Log.Success(Get(kv.Key).Value.ToString());
+                Log.Success(Get(kv.Key).Value.ToString());
             }
         }
     }

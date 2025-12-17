@@ -3,7 +3,6 @@ using SixLabors.Fonts;
 using SixLabors.Fonts.Exceptions;
 using System;
 using System.Collections.Concurrent;
-using xLog;
 
 namespace CssUI.Fonts
 {

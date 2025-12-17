@@ -1,14 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29009.5
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CssUI", "CssUI\CssUI.csproj", "{0C66602D-0FD6-4D70-826F-07EAFFE6AAC3}"
-	ProjectSection(ProjectDependencies) = postProject
-		{686BB281-DFA0-4FF4-9007-A8DDB8BFFAE1} = {686BB281-DFA0-4FF4-9007-A8DDB8BFFAE1}
-	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xLog", "..\xLog\xLog\xLog.csproj", "{686BB281-DFA0-4FF4-9007-A8DDB8BFFAE1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CssUITests", "CssUITests2\CssUITests.csproj", "{33AEADA8-A70B-4A46-BEB2-5AD41BBEE64C}"
 EndProject
@@ -28,12 +23,6 @@ Global
 		{0C66602D-0FD6-4D70-826F-07EAFFE6AAC3}.Debug|Any CPU.Build.0 = CssUI - Debug|Any CPU
 		{0C66602D-0FD6-4D70-826F-07EAFFE6AAC3}.Release|Any CPU.ActiveCfg = CssUI - Release|Any CPU
 		{0C66602D-0FD6-4D70-826F-07EAFFE6AAC3}.Release|Any CPU.Build.0 = CssUI - Release|Any CPU
-		{686BB281-DFA0-4FF4-9007-A8DDB8BFFAE1}.Core - Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{686BB281-DFA0-4FF4-9007-A8DDB8BFFAE1}.Core - Release|Any CPU.ActiveCfg = Release|Any CPU
-		{686BB281-DFA0-4FF4-9007-A8DDB8BFFAE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{686BB281-DFA0-4FF4-9007-A8DDB8BFFAE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{686BB281-DFA0-4FF4-9007-A8DDB8BFFAE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{686BB281-DFA0-4FF4-9007-A8DDB8BFFAE1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{33AEADA8-A70B-4A46-BEB2-5AD41BBEE64C}.Core - Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{33AEADA8-A70B-4A46-BEB2-5AD41BBEE64C}.Core - Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33AEADA8-A70B-4A46-BEB2-5AD41BBEE64C}.Core - Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -3,11 +3,11 @@ using CssUI.DOM;
 using CssUI.DOM.Enums;
 using CssUI.DOM.Nodes;
 using CssUI.DOM.Traversal;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using xLog;
 
 namespace CssUI.CSS
 {
@@ -18,7 +18,7 @@ namespace CssUI.CSS
     public class CssSelector : List<ComplexSelector>
     {/* Docs: https://www.w3.org/TR/selectors-4 */
         #region Properties
-        private static ILogger Log = LogFactory.GetLogger(nameof(CssSelector));
+        private static ILogger Logger = Log.GetLogger<CssSelector>();
         /// <summary>
         /// Whether this selector is coming from a stylesheet we loaded or from some internal styling rule defined directly in code.
         /// </summary>

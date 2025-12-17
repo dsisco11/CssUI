@@ -17,7 +17,6 @@ using CssUI.DOM.Internal;
 using CssUI.DOM.Media;
 using CssUI.DOM.Mutation;
 using CssUI.DOM.Nodes;
-using xLog;
 using static CssUI.UIWindowBridge;
 
 #if ENABLE_HTML
