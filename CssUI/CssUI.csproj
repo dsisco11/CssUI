@@ -52,13 +52,8 @@
 
   <!-- SixLabors packages removed - implementations moved to separate project -->
   
-  <!-- Old CSS Layouts folder excluded - uses legacy types (cssElement, IParentElement) -->
-  <!-- Flex/Grid layout algorithms are implemented in Formatting contexts instead -->
-  <ItemGroup>
-    <Compile Remove="CSS\Layouts\**" />
-    <EmbeddedResource Remove="CSS\Layouts\**" />
-    <None Remove="CSS\Layouts\**" />
-  </ItemGroup>
+  <!-- Legacy CSS/Layouts folder deleted - used defunct types (cssElement, IParentElement) -->
+  <!-- Flex/Grid layout algorithms are now in CSS/Formatting/ using the box tree system -->
 
   <ItemGroup>
     <Compile Remove="Common\EElementTag.cs" />

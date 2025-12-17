@@ -67,6 +67,7 @@
 - [x] §9.6 Cross-Axis Alignment (align-items, align-self) — FlexStart/End/Center/Stretch
 
 ### 1.4 Remaining Work
+- [x] Delete legacy CSS/Layouts folder (used defunct cssElement/IParentElement types)
 - [ ] Wire FlexFormattingContext to box tree generation (for display:flex elements)
 - [ ] Unit tests for flex item generation
 - [ ] Unit tests for flexible length resolution
@@ -80,9 +81,8 @@
 - [ ] Add style accessors to CssComputedStyle
 - [ ] Implement GridTrackList value type for grid-template-*
 
-### 2.2 Layout Director Integration
-- [x] Create GridLayoutDirector.cs scaffold
-- [ ] Wire GridLayoutDirector to element layout system for display:grid
+### 2.2 Layout Integration (Updated Approach)
+- [ ] Create GridFormattingContext.cs (replaces legacy GridLayoutDirector)
 - [ ] Read actual grid properties from element styles (replace TODOs)
 
 ### 2.3 Algorithm Implementation
