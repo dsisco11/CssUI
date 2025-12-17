@@ -666,6 +666,58 @@ namespace CssUI.CSS.BoxTree
         #endregion
 
         #region Intrinsic Sizing
+
+        /// <summary>
+        /// Cached intrinsic size, invalidated when content changes.
+        /// </summary>
+        private IntrinsicSize? _cachedIntrinsicSize = null;
+
+        /// <summary>
+        /// Calculate and return the intrinsic size for this box.
+        /// Uses caching to avoid repeated calculations.
+        /// </summary>
+        public IntrinsicSize GetIntrinsicSize(IntrinsicSizeContext context = default)
+        {
+            // Check cache first
+            if (_cachedIntrinsicSize.HasValue)
+                return _cachedIntrinsicSize.Value;
+
+            // Calculate intrinsic size
+            var size = IntrinsicSizeCalculator.Calculate(this, context);
+
+            // Update legacy fields for compatibility
+            Min_Content = new Rect2f(size.Inline.MinContent, size.Block.MinContent);
+            Max_Content = new Rect2f(size.Inline.MaxContent, size.Block.MaxContent);
+
+            // Cache the result
+            _cachedIntrinsicSize = size;
+
+            return size;
+        }
+
+        /// <summary>
+        /// Invalidate cached intrinsic size (call when content changes).
+        /// </summary>
+        public void InvalidateIntrinsicSize()
+        {
+            _cachedIntrinsicSize = null;
+        }
+
+        /// <summary>
+        /// Returns true if this box has a definite intrinsic width.
+        /// </summary>
+        public bool HasIntrinsicWidth => Intrinsic_Width.HasValue;
+
+        /// <summary>
+        /// Returns true if this box has a definite intrinsic height.
+        /// </summary>
+        public bool HasIntrinsicHeight => Intrinsic_Height.HasValue;
+
+        /// <summary>
+        /// Returns true if this box has an intrinsic aspect ratio.
+        /// </summary>
+        public bool HasIntrinsicRatio => Intrinsic_Ratio.HasValue;
+
         public void Set_Intrinsic_Size(int? Width, int? Height)
         {
             bool changed = Width != Intrinsic_Width || Height != Intrinsic_Height;
@@ -679,6 +731,7 @@ namespace CssUI.CSS.BoxTree
             else
                 Intrinsic_Ratio = null;
 
+            InvalidateIntrinsicSize();
             Flag(EBoxInvalidationReason.Content_Changed);
         }
 
@@ -688,6 +741,7 @@ namespace CssUI.CSS.BoxTree
             if (!changed) return;
 
             Intrinsic_Width = Width;
+            InvalidateIntrinsicSize();
             Flag(EBoxInvalidationReason.Content_Changed);
         }
 
@@ -697,6 +751,7 @@ namespace CssUI.CSS.BoxTree
             if (!changed) return;
 
             Intrinsic_Height = Height;
+            InvalidateIntrinsicSize();
             Flag(EBoxInvalidationReason.Content_Changed);
         }
 
@@ -706,6 +761,7 @@ namespace CssUI.CSS.BoxTree
             if (!changed) return;
 
             Intrinsic_Ratio = Ratio;
+            InvalidateIntrinsicSize();
             Flag(EBoxInvalidationReason.Content_Changed);
         }
 

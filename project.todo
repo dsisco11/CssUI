@@ -37,12 +37,16 @@
 - [ ] Fix MathExt missing methods (Feq, Fgteq, Flteq)
 
 ## Phase 0: Intrinsic Sizing Infrastructure
-- [ ] 0.1 Audit existing intrinsic sizing code in CssAlgorithms.cs
-- [ ] 0.2 Implement IIntrinsicSizable interface
-- [ ] 0.3 Implement intrinsic size calculation for text content
-- [ ] 0.4 Implement intrinsic size calculation for replaced elements
-- [ ] 0.5 Implement intrinsic size calculation for block containers
-- [ ] 0.6 Add unit tests for intrinsic sizing
+- [x] 0.1 Audit existing intrinsic sizing code in CssAlgorithms.cs
+- [x] 0.2 Implement IIntrinsicSizable interface (CSS/Sizing/IIntrinsicSizable.cs)
+- [x] 0.3 Implement IntrinsicTypes (IntrinsicAxisSize, IntrinsicSize, EIntrinsicSizeType)
+- [x] 0.4 Implement IntrinsicSizeCalculator (dispatches to appropriate algorithm)
+- [x] 0.5 Implement text intrinsic sizing (TextIntrinsicSizer.cs)
+- [x] 0.6 Implement block container intrinsic sizing
+- [x] 0.7 Implement replaced element intrinsic sizing
+- [x] 0.8 Update CssPrincipalBox with GetIntrinsicSize() and caching
+- [ ] 0.9 Add unit tests for intrinsic sizing
+- [ ] 0.10 Wire fit-content/shrink-to-fit to layout system
 
 ## Phase 1: Flexbox Layout
 ### 1.1 Property Integration
