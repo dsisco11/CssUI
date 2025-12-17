@@ -15,14 +15,23 @@
 - [x] Create IRenderEngine interface
 - [x] Create EngineProvider.cs (initialization and global access)
 
-### Refactoring
-- [ ] Update FontManager to implement IFontEngine (or create wrapper)
-- [ ] Update GpuTexture to use ITextureEngine
-- [ ] Update RenderEngineBase to implement new IRenderEngine
+### Implementations
+- [x] Create SixLaborsFontEngine (wraps FontManager/FontFactory)
+- [x] Create SixLaborsTextureEngine (wraps GpuTexture)
+- [x] Create NullFontEngine, NullTextureEngine, NullRenderEngine (headless stubs)
+- [x] Update EngineProvider with auto-initialization and defaults
+
+### Refactoring (Optional - for full decoupling)
 - [ ] Refactor CssPropertyResolver_Font to use EngineProvider.FontEngine
 - [ ] Refactor StyleProperties font handling to use EngineProvider.FontEngine
 - [ ] Remove direct SixLabors references from CSS/DOM code
 - [ ] Move SixLabors implementations to separate CssUI.SixLabors project
+
+## Pre-existing HTML Module Issues (CssUI - Debug config)
+- [ ] Fix missing DOMCommon methods (Is_Form_Associated_Custom_Element, etc.)
+- [ ] Fix missing HTML element types (HTMLFieldSetElement, HTMLAreaElement, etc.)
+- [ ] Fix API signature changes (ReadOnlyMemory vs ReadOnlySpan)
+- [ ] Fix MathExt missing methods (Feq, Fgteq, Flteq)
 
 ## Phase 0: Intrinsic Sizing Infrastructure
 - [ ] 0.1 Audit existing intrinsic sizing code in CssAlgorithms.cs

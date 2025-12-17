@@ -9,18 +9,21 @@ namespace CssUI
     {
         /// <summary>
         /// Engine for font resolution, metrics, and text measurement.
+        /// If null, a default engine will be selected based on build configuration.
         /// </summary>
-        public required IFontEngine FontEngine { get; init; }
+        public IFontEngine? FontEngine { get; init; }
 
         /// <summary>
         /// Engine for image decoding and texture management.
+        /// If null, a default engine will be selected based on build configuration.
         /// </summary>
-        public required ITextureEngine TextureEngine { get; init; }
+        public ITextureEngine? TextureEngine { get; init; }
 
         /// <summary>
         /// Engine for rendering primitives, textures, and text.
+        /// If null, a NullRenderEngine will be used.
         /// </summary>
-        public required IRenderEngine RenderEngine { get; init; }
+        public IRenderEngine? RenderEngine { get; init; }
     }
 
     /// <summary>
@@ -28,27 +31,47 @@ namespace CssUI
     /// </summary>
     public static class EngineProvider
     {
-        private static IFontEngine _fontEngine;
-        private static ITextureEngine _textureEngine;
-        private static IRenderEngine _renderEngine;
+        private static IFontEngine? _fontEngine;
+        private static ITextureEngine? _textureEngine;
+        private static IRenderEngine? _renderEngine;
         private static bool _initialized;
+        private static readonly object _lock = new();
 
         /// <summary>
         /// Initialize CssUI with the provided engine implementations.
         /// Must be called before using any CssUI functionality.
         /// </summary>
-        /// <param name="config">Configuration with engine implementations.</param>
-        /// <exception cref="ArgumentNullException">If any engine is null.</exception>
+        /// <param name="config">Configuration with engine implementations. Pass null for all defaults.</param>
         /// <exception cref="InvalidOperationException">If already initialized.</exception>
-        public static void Initialize(CssUIConfig config)
+        public static void Initialize(CssUIConfig? config = null)
         {
-            if (_initialized)
-                throw new InvalidOperationException("CssUI has already been initialized.");
+            lock (_lock)
+            {
+                if (_initialized)
+                    throw new InvalidOperationException("CssUI has already been initialized.");
 
-            _fontEngine = config.FontEngine ?? throw new ArgumentNullException(nameof(config.FontEngine));
-            _textureEngine = config.TextureEngine ?? throw new ArgumentNullException(nameof(config.TextureEngine));
-            _renderEngine = config.RenderEngine ?? throw new ArgumentNullException(nameof(config.RenderEngine));
-            _initialized = true;
+                config ??= new CssUIConfig();
+                
+                _fontEngine = config.FontEngine ?? CreateDefaultFontEngine();
+                _textureEngine = config.TextureEngine ?? CreateDefaultTextureEngine();
+                _renderEngine = config.RenderEngine ?? new NullRenderEngine();
+                _initialized = true;
+            }
+        }
+
+        /// <summary>
+        /// Ensure CssUI is initialized, using defaults if not already initialized.
+        /// Safe to call multiple times.
+        /// </summary>
+        public static void EnsureInitialized()
+        {
+            if (_initialized) return;
+            
+            lock (_lock)
+            {
+                if (_initialized) return;
+                Initialize();
+            }
         }
 
         /// <summary>
@@ -56,32 +79,71 @@ namespace CssUI
         /// </summary>
         internal static void Reset()
         {
-            _fontEngine = null;
-            _textureEngine = null;
-            _renderEngine = null;
-            _initialized = false;
+            lock (_lock)
+            {
+                _fontEngine = null;
+                _textureEngine = null;
+                _renderEngine = null;
+                _initialized = false;
+            }
+        }
+
+        private static IFontEngine CreateDefaultFontEngine()
+        {
+#if DISABLE_FONT_SYSTEM || ENABLE_HEADLESS
+            return new NullFontEngine();
+#else
+            return new CssUI.Fonts.SixLaborsFontEngine();
+#endif
+        }
+
+        private static ITextureEngine CreateDefaultTextureEngine()
+        {
+#if ENABLE_HEADLESS
+            return new NullTextureEngine();
+#else
+            return new CssUI.Rendering.SixLaborsTextureEngine();
+#endif
         }
 
         /// <summary>
         /// Get the font engine instance.
         /// </summary>
         /// <exception cref="InvalidOperationException">If not initialized.</exception>
-        public static IFontEngine FontEngine => 
-            _fontEngine ?? throw new InvalidOperationException("CssUI has not been initialized. Call EngineProvider.Initialize() first.");
+        public static IFontEngine FontEngine
+        {
+            get
+            {
+                EnsureInitialized();
+                return _fontEngine!;
+            }
+        }
 
         /// <summary>
         /// Get the texture engine instance.
         /// </summary>
         /// <exception cref="InvalidOperationException">If not initialized.</exception>
-        public static ITextureEngine TextureEngine => 
-            _textureEngine ?? throw new InvalidOperationException("CssUI has not been initialized. Call EngineProvider.Initialize() first.");
+        public static ITextureEngine TextureEngine
+        {
+            get
+            {
+                EnsureInitialized();
+                return _textureEngine!;
+            }
+        }
 
         /// <summary>
         /// Get the render engine instance.
         /// </summary>
         /// <exception cref="InvalidOperationException">If not initialized.</exception>
-        public static IRenderEngine RenderEngine => 
-            _renderEngine ?? throw new InvalidOperationException("CssUI has not been initialized. Call EngineProvider.Initialize() first.");
+        public static IRenderEngine RenderEngine
+        {
+            get
+            {
+                EnsureInitialized();
+                return _renderEngine!;
+            }
+        }
 
         /// <summary>
         /// Returns true if CssUI has been initialized.
