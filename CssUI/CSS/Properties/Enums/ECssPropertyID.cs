@@ -118,6 +118,153 @@ namespace CssUI.CSS
         [MetaKeyword("margin-left")]
         MarginLeft,
 
+        #region Flexbox Properties
+        /// <summary>
+        /// Specifies how flex items are placed in the flex container.
+        /// Docs: https://www.w3.org/TR/css-flexbox-1/#propdef-flex-direction
+        /// </summary>
+        [MetaKeyword("flex-direction")]
+        FlexDirection,
+        /// <summary>
+        /// Controls whether the flex container is single-line or multi-line.
+        /// Docs: https://www.w3.org/TR/css-flexbox-1/#propdef-flex-wrap
+        /// </summary>
+        [MetaKeyword("flex-wrap")]
+        FlexWrap,
+        /// <summary>
+        /// Specifies the flex grow factor.
+        /// Docs: https://www.w3.org/TR/css-flexbox-1/#propdef-flex-grow
+        /// </summary>
+        [MetaKeyword("flex-grow")]
+        FlexGrow,
+        /// <summary>
+        /// Specifies the flex shrink factor.
+        /// Docs: https://www.w3.org/TR/css-flexbox-1/#propdef-flex-shrink
+        /// </summary>
+        [MetaKeyword("flex-shrink")]
+        FlexShrink,
+        /// <summary>
+        /// Specifies the initial main size of a flex item.
+        /// Docs: https://www.w3.org/TR/css-flexbox-1/#propdef-flex-basis
+        /// </summary>
+        [MetaKeyword("flex-basis")]
+        FlexBasis,
+        /// <summary>
+        /// Controls the order of flex/grid items.
+        /// Docs: https://www.w3.org/TR/css-display-3/#propdef-order
+        /// </summary>
+        [MetaKeyword("order")]
+        Order,
+        #endregion
+
+        #region Grid Properties
+        /// <summary>
+        /// Specifies the sizing of grid columns.
+        /// Docs: https://www.w3.org/TR/css-grid-1/#propdef-grid-template-columns
+        /// </summary>
+        [MetaKeyword("grid-template-columns")]
+        GridTemplateColumns,
+        /// <summary>
+        /// Specifies the sizing of grid rows.
+        /// Docs: https://www.w3.org/TR/css-grid-1/#propdef-grid-template-rows
+        /// </summary>
+        [MetaKeyword("grid-template-rows")]
+        GridTemplateRows,
+        /// <summary>
+        /// Specifies the sizing of implicitly-created columns.
+        /// Docs: https://www.w3.org/TR/css-grid-1/#propdef-grid-auto-columns
+        /// </summary>
+        [MetaKeyword("grid-auto-columns")]
+        GridAutoColumns,
+        /// <summary>
+        /// Specifies the sizing of implicitly-created rows.
+        /// Docs: https://www.w3.org/TR/css-grid-1/#propdef-grid-auto-rows
+        /// </summary>
+        [MetaKeyword("grid-auto-rows")]
+        GridAutoRows,
+        /// <summary>
+        /// Controls the auto-placement algorithm.
+        /// Docs: https://www.w3.org/TR/css-grid-1/#propdef-grid-auto-flow
+        /// </summary>
+        [MetaKeyword("grid-auto-flow")]
+        GridAutoFlow,
+        /// <summary>
+        /// Specifies a grid item's start position in the column direction.
+        /// Docs: https://www.w3.org/TR/css-grid-1/#propdef-grid-column-start
+        /// </summary>
+        [MetaKeyword("grid-column-start")]
+        GridColumnStart,
+        /// <summary>
+        /// Specifies a grid item's end position in the column direction.
+        /// Docs: https://www.w3.org/TR/css-grid-1/#propdef-grid-column-end
+        /// </summary>
+        [MetaKeyword("grid-column-end")]
+        GridColumnEnd,
+        /// <summary>
+        /// Specifies a grid item's start position in the row direction.
+        /// Docs: https://www.w3.org/TR/css-grid-1/#propdef-grid-row-start
+        /// </summary>
+        [MetaKeyword("grid-row-start")]
+        GridRowStart,
+        /// <summary>
+        /// Specifies a grid item's end position in the row direction.
+        /// Docs: https://www.w3.org/TR/css-grid-1/#propdef-grid-row-end
+        /// </summary>
+        [MetaKeyword("grid-row-end")]
+        GridRowEnd,
+        #endregion
+
+        #region Alignment Properties
+        /// <summary>
+        /// Aligns flex lines or grid tracks within the container.
+        /// Docs: https://www.w3.org/TR/css-align-3/#propdef-align-content
+        /// </summary>
+        [MetaKeyword("align-content")]
+        AlignContent,
+        /// <summary>
+        /// Justifies content along the main/inline axis.
+        /// Docs: https://www.w3.org/TR/css-align-3/#propdef-justify-content
+        /// </summary>
+        [MetaKeyword("justify-content")]
+        JustifyContent,
+        /// <summary>
+        /// Sets the default align-self for all items.
+        /// Docs: https://www.w3.org/TR/css-align-3/#propdef-align-items
+        /// </summary>
+        [MetaKeyword("align-items")]
+        AlignItems,
+        /// <summary>
+        /// Overrides align-items for a specific item.
+        /// Docs: https://www.w3.org/TR/css-align-3/#propdef-align-self
+        /// </summary>
+        [MetaKeyword("align-self")]
+        AlignSelf,
+        /// <summary>
+        /// Sets the default justify-self for all items.
+        /// Docs: https://www.w3.org/TR/css-align-3/#propdef-justify-items
+        /// </summary>
+        [MetaKeyword("justify-items")]
+        JustifyItems,
+        /// <summary>
+        /// Overrides justify-items for a specific item.
+        /// Docs: https://www.w3.org/TR/css-align-3/#propdef-justify-self
+        /// </summary>
+        [MetaKeyword("justify-self")]
+        JustifySelf,
+        /// <summary>
+        /// Sets the gap between rows.
+        /// Docs: https://www.w3.org/TR/css-align-3/#propdef-row-gap
+        /// </summary>
+        [MetaKeyword("row-gap")]
+        RowGap,
+        /// <summary>
+        /// Sets the gap between columns.
+        /// Docs: https://www.w3.org/TR/css-align-3/#propdef-column-gap
+        /// </summary>
+        [MetaKeyword("column-gap")]
+        ColumnGap,
+        #endregion
+
 
         MAX_VALUE,
     }

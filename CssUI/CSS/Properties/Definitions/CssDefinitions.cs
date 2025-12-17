@@ -84,6 +84,9 @@ namespace CssUI.CSS.Internal
             foreach (var def in Create_Layout_Property_Definitions()) { Definitions.AddLast(def); }
             foreach (var def in Create_Sizing_Property_Definitions()) { Definitions.AddLast(def); }
             foreach (var def in Create_Block_Property_Definitions()) { Definitions.AddLast(def); }
+            foreach (var def in Create_Flexbox_Property_Definitions()) { Definitions.AddLast(def); }
+            foreach (var def in Create_Grid_Property_Definitions()) { Definitions.AddLast(def); }
+            foreach (var def in Create_Alignment_Property_Definitions()) { Definitions.AddLast(def); }
 
             // Add all of our definitions to a backing dictionary
             var Dict = new Dictionary<AtomicName<ECssPropertyID>, StyleDefinition>();
@@ -277,6 +280,104 @@ namespace CssUI.CSS.Internal
                 new StyleDefinition(ECssPropertyID.MarginRight, false, EPropertyDirtFlags.Margin_Area, CssValue.Zero, AllowedTypes: ECssValueTypes.AUTO | ECssValueTypes.PERCENT | ECssValueTypes.DIMENSION, Keywords: null, IsPrivate: false, Percentage_Resolver: CssPercentageResolvers.Containing_Block_Logical_Width),
                 new StyleDefinition(ECssPropertyID.MarginBottom, false, EPropertyDirtFlags.Margin_Area, CssValue.Zero, AllowedTypes: ECssValueTypes.AUTO | ECssValueTypes.PERCENT | ECssValueTypes.DIMENSION, Keywords: null, IsPrivate: false, Percentage_Resolver: CssPercentageResolvers.Containing_Block_Logical_Width),
                 new StyleDefinition(ECssPropertyID.MarginLeft, false, EPropertyDirtFlags.Margin_Area, CssValue.Zero, AllowedTypes: ECssValueTypes.AUTO | ECssValueTypes.PERCENT | ECssValueTypes.DIMENSION, Keywords: null, IsPrivate: false, Percentage_Resolver: CssPercentageResolvers.Containing_Block_Logical_Width)
+            };
+        }
+
+        /// <summary>
+        /// Properties for CSS Flexbox layout.
+        /// Docs: https://www.w3.org/TR/css-flexbox-1/
+        /// </summary>
+        static IEnumerable<StyleDefinition> Create_Flexbox_Property_Definitions()
+        {
+            return new StyleDefinition[] {
+                // flex-direction: row | row-reverse | column | column-reverse
+                new StyleDefinition(ECssPropertyID.FlexDirection, false, EPropertyDirtFlags.Flow, CssValue.From(EFlexDirection.Row), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EFlexDirection>()),
+                
+                // flex-wrap: nowrap | wrap | wrap-reverse
+                new StyleDefinition(ECssPropertyID.FlexWrap, false, EPropertyDirtFlags.Flow, CssValue.From(EFlexWrap.NoWrap), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EFlexWrap>()),
+                
+                // flex-grow: <number> (default 0)
+                new StyleDefinition(ECssPropertyID.FlexGrow, false, EPropertyDirtFlags.Flow, CssValue.From(0.0), ECssValueTypes.NUMBER),
+                
+                // flex-shrink: <number> (default 1)
+                new StyleDefinition(ECssPropertyID.FlexShrink, false, EPropertyDirtFlags.Flow, CssValue.From(1.0), ECssValueTypes.NUMBER),
+                
+                // flex-basis: content | auto | <width> (default auto)
+                new StyleDefinition(ECssPropertyID.FlexBasis, false, EPropertyDirtFlags.Flow, CssValue.Auto, ECssValueTypes.AUTO | ECssValueTypes.DIMENSION | ECssValueTypes.PERCENT | ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EBoxSize>(), false, CssPercentageResolvers.Containing_Block_Logical_Width),
+                
+                // order: <integer> (default 0)
+                new StyleDefinition(ECssPropertyID.Order, false, EPropertyDirtFlags.Flow, CssValue.From(0), ECssValueTypes.INTEGER)
+            };
+        }
+
+        /// <summary>
+        /// Properties for CSS Grid layout.
+        /// Docs: https://www.w3.org/TR/css-grid-1/
+        /// </summary>
+        static IEnumerable<StyleDefinition> Create_Grid_Property_Definitions()
+        {
+            return new StyleDefinition[] {
+                // grid-template-columns: none | <track-list> (default none)
+                // TODO: Implement proper track-list parsing
+                new StyleDefinition(ECssPropertyID.GridTemplateColumns, false, EPropertyDirtFlags.Flow, CssValue.None, ECssValueTypes.NONE | ECssValueTypes.STRING),
+                
+                // grid-template-rows: none | <track-list> (default none)
+                // TODO: Implement proper track-list parsing
+                new StyleDefinition(ECssPropertyID.GridTemplateRows, false, EPropertyDirtFlags.Flow, CssValue.None, ECssValueTypes.NONE | ECssValueTypes.STRING),
+                
+                // grid-auto-columns: <track-size>+ (default auto)
+                new StyleDefinition(ECssPropertyID.GridAutoColumns, false, EPropertyDirtFlags.Flow, CssValue.Auto, ECssValueTypes.AUTO | ECssValueTypes.DIMENSION | ECssValueTypes.PERCENT | ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EBoxSize>()),
+                
+                // grid-auto-rows: <track-size>+ (default auto)
+                new StyleDefinition(ECssPropertyID.GridAutoRows, false, EPropertyDirtFlags.Flow, CssValue.Auto, ECssValueTypes.AUTO | ECssValueTypes.DIMENSION | ECssValueTypes.PERCENT | ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EBoxSize>()),
+                
+                // grid-auto-flow: [ row | column ] || dense (default row)
+                new StyleDefinition(ECssPropertyID.GridAutoFlow, false, EPropertyDirtFlags.Flow, CssValue.From(EGridAutoFlow.Row), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EGridAutoFlow>()),
+                
+                // grid-column-start: <grid-line> (default auto)
+                new StyleDefinition(ECssPropertyID.GridColumnStart, false, EPropertyDirtFlags.Flow, CssValue.Auto, ECssValueTypes.AUTO | ECssValueTypes.INTEGER | ECssValueTypes.KEYWORD),
+                
+                // grid-column-end: <grid-line> (default auto)
+                new StyleDefinition(ECssPropertyID.GridColumnEnd, false, EPropertyDirtFlags.Flow, CssValue.Auto, ECssValueTypes.AUTO | ECssValueTypes.INTEGER | ECssValueTypes.KEYWORD),
+                
+                // grid-row-start: <grid-line> (default auto)
+                new StyleDefinition(ECssPropertyID.GridRowStart, false, EPropertyDirtFlags.Flow, CssValue.Auto, ECssValueTypes.AUTO | ECssValueTypes.INTEGER | ECssValueTypes.KEYWORD),
+                
+                // grid-row-end: <grid-line> (default auto)
+                new StyleDefinition(ECssPropertyID.GridRowEnd, false, EPropertyDirtFlags.Flow, CssValue.Auto, ECssValueTypes.AUTO | ECssValueTypes.INTEGER | ECssValueTypes.KEYWORD)
+            };
+        }
+
+        /// <summary>
+        /// Properties for CSS Box Alignment.
+        /// Docs: https://www.w3.org/TR/css-align-3/
+        /// </summary>
+        static IEnumerable<StyleDefinition> Create_Alignment_Property_Definitions()
+        {
+            return new StyleDefinition[] {
+                // align-content: normal | <baseline-position> | <content-distribution> | <content-position> (default normal)
+                new StyleDefinition(ECssPropertyID.AlignContent, false, EPropertyDirtFlags.Flow, CssValue.From(EAlignContent.Normal), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EAlignContent>()),
+                
+                // justify-content: normal | <content-distribution> | <content-position> (default normal)
+                new StyleDefinition(ECssPropertyID.JustifyContent, false, EPropertyDirtFlags.Flow, CssValue.From(EJustifyContent.Normal), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EJustifyContent>()),
+                
+                // align-items: normal | stretch | <baseline-position> | <self-position> (default normal)
+                new StyleDefinition(ECssPropertyID.AlignItems, false, EPropertyDirtFlags.Flow, CssValue.From(EAlignItems.Normal), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EAlignItems>()),
+                
+                // align-self: auto | normal | stretch | <baseline-position> | <self-position> (default auto)
+                new StyleDefinition(ECssPropertyID.AlignSelf, false, EPropertyDirtFlags.Flow, CssValue.From(EAlignItems.Auto), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EAlignItems>()),
+                
+                // justify-items: normal | stretch | <baseline-position> | <self-position> (default normal)
+                new StyleDefinition(ECssPropertyID.JustifyItems, false, EPropertyDirtFlags.Flow, CssValue.From(EAlignItems.Normal), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EAlignItems>()),
+                
+                // justify-self: auto | normal | stretch | <baseline-position> | <self-position> (default auto)
+                new StyleDefinition(ECssPropertyID.JustifySelf, false, EPropertyDirtFlags.Flow, CssValue.From(EAlignItems.Auto), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EAlignItems>()),
+                
+                // row-gap: normal | <length-percentage> (default normal)
+                new StyleDefinition(ECssPropertyID.RowGap, false, EPropertyDirtFlags.Flow, CssValue.From(0.0), ECssValueTypes.DIMENSION | ECssValueTypes.PERCENT, null, false, CssPercentageResolvers.Containing_Block_Logical_Height),
+                
+                // column-gap: normal | <length-percentage> (default normal)
+                new StyleDefinition(ECssPropertyID.ColumnGap, false, EPropertyDirtFlags.Flow, CssValue.From(0.0), ECssValueTypes.DIMENSION | ECssValueTypes.PERCENT, null, false, CssPercentageResolvers.Containing_Block_Logical_Width)
             };
         }
 #endregion

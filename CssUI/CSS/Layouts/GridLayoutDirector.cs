@@ -666,10 +666,8 @@ namespace CssUI.CSS.Layouts
         #endregion
     }
 
-    #region Grid Enums (Temporary - Move to CSS/Enums/)
-
     /// <summary>
-    /// Track sizing function types.
+    /// Track sizing function types for grid layout.
     /// </summary>
     public enum ETrackSizingFunction
     {
@@ -684,18 +682,4 @@ namespace CssUI.CSS.Layouts
         /// <summary>Flexible fr unit.</summary>
         Flex
     }
-
-    /// <summary>
-    /// Values for the grid-auto-flow property.
-    /// Spec: https://www.w3.org/TR/css-grid-1/#propdef-grid-auto-flow
-    /// </summary>
-    [Flags]
-    public enum EGridAutoFlow
-    {
-        Row = 0,
-        Column = 1,
-        Dense = 2
-    }
-
-    #endregion
 }

@@ -643,31 +643,4 @@ namespace CssUI.CSS.Layouts
 
         #endregion
     }
-
-    #region Flex Enums (Temporary - Move to CSS/Enums/)
-
-    /// <summary>
-    /// Values for the flex-direction property.
-    /// Spec: https://www.w3.org/TR/css-flexbox-1/#propdef-flex-direction
-    /// </summary>
-    public enum EFlexDirection
-    {
-        Row,
-        RowReverse,
-        Column,
-        ColumnReverse
-    }
-
-    /// <summary>
-    /// Values for the flex-wrap property.
-    /// Spec: https://www.w3.org/TR/css-flexbox-1/#propdef-flex-wrap
-    /// </summary>
-    public enum EFlexWrap
-    {
-        NoWrap,
-        Wrap,
-        WrapReverse
-    }
-
-    #endregion
 }
