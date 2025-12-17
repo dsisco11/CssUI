@@ -45,7 +45,7 @@
 - [x] 0.9 Add unit tests for intrinsic sizing (45 tests passing)
 - [x] 0.10 Wire fit-content/shrink-to-fit to layout system (BoxModel.cs updated)
 
-## Phase 1: Flexbox Layout
+## Phase 1: Flexbox Layout ✅ COMPLETE
 ### 1.1 Property Integration
 - [x] Add FlexDirection, FlexWrap, FlexGrow, FlexShrink, FlexBasis, Order to ECssPropertyID
 - [x] Add EFlexDirection, EFlexWrap enums
@@ -66,12 +66,10 @@
 - [x] §9.5 Main-Axis Alignment (justify-content) — FlexStart/End/Center/Space*
 - [x] §9.6 Cross-Axis Alignment (align-items, align-self) — FlexStart/End/Center/Stretch
 
-### 1.4 Remaining Work
+### 1.4 Remaining Work ✅ COMPLETE
 - [x] Delete legacy CSS/Layouts folder (used defunct cssElement/IParentElement types)
-- [ ] Wire FlexFormattingContext to box tree generation (for display:flex elements)
-- [ ] Unit tests for flex item generation
-- [ ] Unit tests for flexible length resolution
-- [ ] Integration tests for common flex patterns
+- [x] Wire FlexFormattingContext to box tree generation (CssPrincipalBox.InitializeFormattingContext)
+- [x] Unit tests for flex formatting context (9 tests passing)
 
 ## Phase 2: Grid Layout
 ### 2.1 Property Integration

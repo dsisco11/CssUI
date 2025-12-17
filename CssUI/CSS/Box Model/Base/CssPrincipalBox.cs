@@ -78,6 +78,31 @@ namespace CssUI.CSS.BoxTree
         #region Formatting Context
         internal IFormattingContext FormattingContext { get; private set; } = null;
         public bool IsParticipatingInFlow => !(FormattingContext is null);
+
+        /// <summary>
+        /// Creates and assigns the appropriate formatting context based on the element's display mode.
+        /// </summary>
+        internal void InitializeFormattingContext()
+        {
+            var display = Style?.Display ?? EDisplayMode.BLOCK;
+            FormattingContext = CreateFormattingContext(display);
+        }
+
+        /// <summary>
+        /// Creates the appropriate formatting context for the given display mode.
+        /// </summary>
+        private static IFormattingContext CreateFormattingContext(EDisplayMode display)
+        {
+            return display switch
+            {
+                EDisplayMode.FLEX => new Formatting.FlexFormattingContext(),
+                EDisplayMode.INLINE_FLEX => new Formatting.FlexFormattingContext(),
+                // Grid support will be added in Phase 2
+                // EDisplayMode.GRID => new Formatting.GridFormattingContext(),
+                // EDisplayMode.INLINE_GRID => new Formatting.GridFormattingContext(),
+                _ => new Formatting.BlockFormattingContext()
+            };
+        }
         #endregion
 
         #region Box Areas
@@ -310,6 +335,9 @@ namespace CssUI.CSS.BoxTree
         public CssPrincipalBox(in Element owner, in CssBoxTreeNode parent) : base(parent)
         {
             _owner = new WeakReference<Element>(owner);
+            // Initialize formatting context based on display mode
+            // This enables flex/grid containers to use their respective layout algorithms
+            InitializeFormattingContext();
         }
 
         ~CssPrincipalBox()
