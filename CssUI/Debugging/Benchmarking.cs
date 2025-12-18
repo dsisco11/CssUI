@@ -132,7 +132,7 @@ namespace CssUI
                 }
                 double avg = (sum / (double)hist.Count);
 
-                return new Benchmark_Info() { Name = Name, Average = avg, Count = hist.Count, High = high.Value, Low = low.Value, Total = sum };
+                return new Benchmark_Info() { Name = Name, Average = avg, Count = hist.Count, High = high.GetValueOrDefault(), Low = low.GetValueOrDefault(), Total = sum };
             }
             return null;
         }
@@ -150,7 +150,11 @@ namespace CssUI
         {
             foreach (var kv in History)
             {
-                Log.Success(Get(kv.Key).Value.ToString());
+                var info = Get(kv.Key);
+                if (info.HasValue)
+                {
+                    Log.Success(info.Value.ToString());
+                }
             }
         }
     }

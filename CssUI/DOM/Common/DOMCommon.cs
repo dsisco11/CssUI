@@ -186,7 +186,7 @@ namespace CssUI.DOM
                 left = !left.HasValue ? rect.Left : Math.Min(left.Value, rect.Left);
             }
 
-            return new DOMRect(left.Value, top.Value, (right.Value - left.Value), (bottom.Value - top.Value));
+            return new DOMRect(left.GetValueOrDefault(), top.GetValueOrDefault(), (right.GetValueOrDefault() - left.GetValueOrDefault()), (bottom.GetValueOrDefault() - top.GetValueOrDefault()));
         }
         #endregion
 

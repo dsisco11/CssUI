@@ -108,6 +108,7 @@ namespace CssUI.DOM
             if (_range == null) throw new InvalidStateError($"Selection has no set range");
             if (!ReferenceEquals(document, node.getRootNode())) return;
 
+            if (!Anchor.HasValue || !Focus.HasValue) throw new InvalidStateError($"Selection has no anchor or focus");
             var oldAnchor = Anchor.Value;
             var oldFocus = Focus.Value;
             var newFocus = new BoundaryPoint(node, offset);

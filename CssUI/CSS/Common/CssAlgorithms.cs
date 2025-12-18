@@ -134,11 +134,11 @@ namespace CssUI.CSS
                 {/* 1) If the object has an intrinsic aspect ratio, the missing dimension of the concrete object size is calculated using the intrinsic aspect ratio and the present dimension. */
                     if (Box.Intrinsic_Width.HasValue)
                     {
-                        return new Rect2f(Box.Intrinsic_Width.Value, (Box.Intrinsic_Width.Value / Box.Intrinsic_Ratio.Value));
+                        return new Rect2f(Box.Intrinsic_Width.Value, (Box.Intrinsic_Width.Value / Box.Intrinsic_Ratio!.Value));
                     }
                     else
                     {
-                        return new Rect2f((Box.Intrinsic_Height.Value * Box.Intrinsic_Ratio.Value), Box.Intrinsic_Height.Value);
+                        return new Rect2f((Box.Intrinsic_Height!.Value * Box.Intrinsic_Ratio!.Value), Box.Intrinsic_Height.Value);
                     }
                 }
 
@@ -149,7 +149,7 @@ namespace CssUI.CSS
                 }
                 else
                 {
-                    return new Rect2f(Default_Width, Box.Intrinsic_Height.Value);
+                    return new Rect2f(Default_Width, Box.Intrinsic_Height!.Value);
                 }
             }
 

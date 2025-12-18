@@ -210,7 +210,7 @@ Note: The HTML module requires significant work and is excluded from Core config
 - [x] Fix CS8605 (4→0) - unboxing possibly null value
 - [x] Fix CS8619 (6→0) - nullability mismatch in assignment
 - [x] Fix CS8601 (62→0) - null assignment to non-nullable ✅
-- [ ] Fix CS8629 (34) - nullable value type may be null (requires logic review)
+- [x] Fix CS8629 (30→0) - nullable value type may be null ✅
 - [ ] Fix CS8618 (146) - non-nullable member not initialized
 - [ ] Fix CS8604 (222) - possible null reference argument
 - [ ] Fix CS8600 (340) - converting null to non-nullable type

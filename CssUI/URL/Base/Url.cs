@@ -1523,7 +1523,7 @@ namespace CssUI.HTTP
                             Stream.Consume();
                         }
                         /* 5) Set address[pieceIndex] to address[pieceIndex] × 0x100 + ipv4Piece. */
-                        address[pieceIndex] = (ushort)(address[pieceIndex] * 0x100 + ipv4Piece.Value);
+                        address[pieceIndex] = (ushort)(address[pieceIndex] * 0x100 + ipv4Piece.GetValueOrDefault());
                         numbersSeen++;
                         /* 7) If numbersSeen is 2 or 4, then increase pieceIndex by 1. */
                         if (numbersSeen == 2 || numbersSeen == 4)

@@ -388,7 +388,7 @@ namespace CssUI.CSS
                                 }
                             }
 
-                            if (Width.IsAuto && !autoHeight)
+                            if (Width.IsAuto && !autoHeight && Box.Intrinsic_Ratio.HasValue)
                             {/* or if 'width' has a computed value of 'auto', 'height' has some other computed value, and the element does have an intrinsic ratio; then the used value of 'width' is: (used height) * (intrinsic ratio) */
                                 Width = CssValue.From((Height.AsDecimal() * Box.Intrinsic_Ratio.Value));
                             }
@@ -509,7 +509,7 @@ namespace CssUI.CSS
                                 }
                             }
 
-                            if (Width.IsAuto && !autoHeight)
+                            if (Width.IsAuto && !autoHeight && Box.Intrinsic_Ratio.HasValue)
                             {/* or if 'width' has a computed value of 'auto', 'height' has some other computed value, and the element does have an intrinsic ratio; then the used value of 'width' is: (used height) * (intrinsic ratio) */
                                 Width = CssValue.From((Height.AsDecimal() * Box.Intrinsic_Ratio.Value));
                             }
@@ -633,7 +633,7 @@ namespace CssUI.CSS
                                 }
                             }
 
-                            if (Width.IsAuto && !autoHeight)
+                            if (Width.IsAuto && !autoHeight && Box.Intrinsic_Ratio.HasValue)
                             {/* or if 'width' has a computed value of 'auto', 'height' has some other computed value, and the element does have an intrinsic ratio; then the used value of 'width' is: (used height) * (intrinsic ratio) */
                                 Width = CssValue.From((Height.AsDecimal() * Box.Intrinsic_Ratio.Value));
                             }
@@ -842,7 +842,7 @@ namespace CssUI.CSS
                                 }
                             }
 
-                            if (Width.IsAuto && !autoHeight)
+                            if (Width.IsAuto && !autoHeight && Box.Intrinsic_Ratio.HasValue)
                             {/* or if 'width' has a computed value of 'auto', 'height' has some other computed value, and the element does have an intrinsic ratio; then the used value of 'width' is: (used height) * (intrinsic ratio) */
                                 Width = CssValue.From((Height.AsDecimal() * Box.Intrinsic_Ratio.Value));
                             }
@@ -997,7 +997,7 @@ namespace CssUI.CSS
                                 }
                             }
 
-                            if (Width.IsAuto && !autoHeight)
+                            if (Width.IsAuto && !autoHeight && Box.Intrinsic_Ratio.HasValue)
                             {/* or if 'width' has a computed value of 'auto', 'height' has some other computed value, and the element does have an intrinsic ratio; then the used value of 'width' is: (used height) * (intrinsic ratio) */
                                 Width = CssValue.From((Height.AsDecimal() * Box.Intrinsic_Ratio.Value));
                             }
