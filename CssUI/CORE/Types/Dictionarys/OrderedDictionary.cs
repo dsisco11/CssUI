@@ -179,7 +179,7 @@ namespace CssUI
             int index = Items.IndexOf(value);
             if (!KeyIndex.TryGetKey(index, out KeyTy key))
             {
-                outKey = default(KeyTy);
+                outKey = default!;
                 return false;
             }
 
@@ -191,7 +191,7 @@ namespace CssUI
         {
             if (!KeyIndex.TryGetValue(key, out int index))
             {
-                outValue = default(ValueTy);
+                outValue = default!;
                 return false;
             }
 

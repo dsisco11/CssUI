@@ -17,7 +17,7 @@ namespace CssUI.CSS.Selectors
         /// <para>'*' if it matches ANY namespace</para>
         /// <para></para>
         /// </summary>
-        readonly string Namespace;
+        readonly string? Namespace;
         readonly string TypeName;
         #endregion
 
@@ -35,7 +35,7 @@ namespace CssUI.CSS.Selectors
             this.TypeName = TypeName;
         }
 
-        public TypeSelector(NamespacePrefixToken Namespace, string TypeName) : base(ESimpleSelectorType.TypeSelector)
+        public TypeSelector(NamespacePrefixToken? Namespace, string TypeName) : base(ESimpleSelectorType.TypeSelector)
         {
             this.Namespace = Namespace?.Value;
             this.TypeName = TypeName;

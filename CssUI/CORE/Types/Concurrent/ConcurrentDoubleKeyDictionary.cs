@@ -182,7 +182,7 @@ namespace CssUI
                 }
             }
 
-            Value = default(Vty);
+            Value = default!;
             return false;
         }
         public bool LookupInverse(Key2 key2, Key1 key1, out Vty Value)
@@ -196,7 +196,7 @@ namespace CssUI
                 }
             }
 
-            Value = default(Vty);
+            Value = default!;
             return false;
         }
         #endregion

@@ -94,10 +94,10 @@ namespace CssUI.CSS.Formatting
 
         #region Fields
 
-        private CssPrincipalBox _container;
-        private List<GridItem> _gridItems;
-        private List<GridTrack> _columnTracks;
-        private List<GridTrack> _rowTracks;
+        private CssPrincipalBox? _container;
+        private List<GridItem>? _gridItems;
+        private List<GridTrack>? _columnTracks;
+        private List<GridTrack>? _rowTracks;
         private EGridAutoFlow _autoFlow;
         private float _availableWidth;
         private float _availableHeight;
@@ -105,8 +105,8 @@ namespace CssUI.CSS.Formatting
         private float _rowGap;
 
         // Explicit track lists from grid-template-columns/rows
-        private GridTrackList _explicitColumnTracks;
-        private GridTrackList _explicitRowTracks;
+        private GridTrackList? _explicitColumnTracks;
+        private GridTrackList? _explicitRowTracks;
 
         // Auto-placement cursor
         private int _autoCursorColumn;

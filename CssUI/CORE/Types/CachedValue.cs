@@ -9,8 +9,8 @@ namespace CssUI
     {
         #region Properties
         public bool IsCached { get; private set; } = false;
-        private Ty value = default(Ty);
-        private readonly Func<Ty> Resolver = null;
+        private Ty? value = default;
+        private readonly Func<Ty>? Resolver = null;
         #endregion
 
         #region Constructors
@@ -26,7 +26,7 @@ namespace CssUI
         public void Clear()
         {
             IsCached = false;
-            value = default(Ty);
+            value = default;
         }
 
         /// <summary>
@@ -38,11 +38,11 @@ namespace CssUI
         {
             if (!IsCached)
             {
-                value = Resolver();
+                value = Resolver!();
                 IsCached = true;
             }
 
-            return value;
+            return value!;
         }
 
         /// <summary>

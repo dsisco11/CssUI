@@ -24,7 +24,7 @@ namespace CssUI
         /// </summary>
         public ulong LongPosition { get => (ulong)Position; set => Position = (int)value; }
 
-        public readonly T EOF_ITEM = default;
+        public readonly T EOF_ITEM = default!;
         #endregion
 
         #region Constructors

@@ -20,7 +20,7 @@ namespace CssUI
         #region Properties
         public readonly string LocalName;
         public readonly Type ElementType;
-        public readonly ConstructorInfo ctor;
+        public readonly ConstructorInfo? ctor;
         #endregion
 
         #region Constructors

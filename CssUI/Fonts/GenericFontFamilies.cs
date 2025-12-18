@@ -317,7 +317,7 @@ public static class GenericFontFamilies
     /// <summary>
     /// Get font family names for a generic family keyword.
     /// </summary>
-    public static bool TryGetFamilies(EGenericFontFamily genericFamily, out List<CssValue> families)
+    public static bool TryGetFamilies(EGenericFontFamily genericFamily, out List<CssValue>? families)
     {
         return Map.TryGetValue(genericFamily, out families);
     }

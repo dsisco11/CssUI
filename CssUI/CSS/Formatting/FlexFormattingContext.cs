@@ -50,9 +50,9 @@ namespace CssUI.CSS.Formatting
 
         #region Fields
 
-        private CssPrincipalBox _container;
-        private List<FlexItem> _flexItems;
-        private List<FlexLine> _flexLines;
+        private CssPrincipalBox? _container;
+        private List<FlexItem>? _flexItems;
+        private List<FlexLine>? _flexLines;
         private EFlexDirection _flexDirection;
         private EFlexWrap _flexWrap;
         private float _availableMainSpace;
