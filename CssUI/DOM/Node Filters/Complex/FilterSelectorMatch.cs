@@ -1,4 +1,4 @@
-﻿using CssUI.CSS;
+using CssUI.CSS;
 using CssUI.DOM.Enums;
 using CssUI.DOM.Nodes;
 
@@ -29,3 +29,4 @@ namespace CssUI.DOM.Traversal
         }
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 
 namespace CssUI
@@ -62,3 +62,4 @@ namespace CssUI
     }
 
 }
+

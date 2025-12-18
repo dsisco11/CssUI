@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CssUI.DOM.Geometry;
 using CssUI.DOM.Nodes;
 
@@ -26,3 +26,4 @@ namespace CssUI.Fonts
 
     }
 }
+

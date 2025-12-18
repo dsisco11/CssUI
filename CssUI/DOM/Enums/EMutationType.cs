@@ -1,4 +1,4 @@
-﻿
+
 namespace CssUI.DOM.Enums
 {
     public enum EMutationType : ushort
@@ -17,3 +17,4 @@ namespace CssUI.DOM.Enums
         ChildList
     }
 }
+

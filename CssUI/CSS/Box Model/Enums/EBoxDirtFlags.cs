@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CssUI.CSS
 {
@@ -9,3 +9,4 @@ namespace CssUI.CSS
         Dirty = 0x1 << 2,
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using CssUI.CSS;
+using CssUI.CSS;
 using CssUI.CSS.BoxTree;
 
 namespace CssUI.DOM.Nodes
@@ -9,3 +9,4 @@ namespace CssUI.DOM.Nodes
         StyleProperties Style { get; }
     }
 }
+

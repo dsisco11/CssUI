@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM
+namespace CssUI.DOM
 {
     public class AssignedNodesOptions
     {
@@ -10,3 +10,4 @@
         }
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using CssUI.Internal;
+using CssUI.Internal;
 
 namespace CssUI.CSS.Internal
 {
@@ -44,3 +44,4 @@ namespace CssUI.CSS.Internal
         Sibling_Subsequent,
     }
 }
+

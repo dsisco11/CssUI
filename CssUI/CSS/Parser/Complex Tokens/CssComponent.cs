@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.Parser;
+using CssUI.CSS.Parser;
 
 namespace CssUI.CSS
 {
@@ -17,3 +17,4 @@ namespace CssUI.CSS
         #endregion
     }
 }
+

@@ -1,4 +1,4 @@
-﻿
+
 namespace CssUI.DOM.Events
 {
     public class CompositionEventInit : UIEventInit
@@ -11,3 +11,4 @@ namespace CssUI.DOM.Events
         }
     }
 }
+

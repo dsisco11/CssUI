@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using CssUI.DOM;
 
@@ -35,3 +35,4 @@ namespace CssUI
 
     }
 }
+

@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM.Events
+namespace CssUI.DOM.Events
 {
     public class CustomEvent : Event
     {/* Docs: https://dom.spec.whatwg.org/#interface-customevent */
@@ -12,3 +12,4 @@
 
     }
 }
+

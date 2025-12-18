@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Exceptions;
+using CssUI.DOM.Exceptions;
 
 namespace CssUI.DOM
 {
@@ -71,3 +71,4 @@ namespace CssUI.DOM
         /*boolean hasFeature(); // useless; always returns true*/
     }
 }
+

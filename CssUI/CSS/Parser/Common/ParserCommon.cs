@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.Media;
+using CssUI.CSS.Media;
 using CssUI.CSS.Parser;
 using System;
 using System.Diagnostics.Contracts;
@@ -281,3 +281,4 @@ namespace CssUI.CSS.Serialization
         #endregion
     }
 }
+

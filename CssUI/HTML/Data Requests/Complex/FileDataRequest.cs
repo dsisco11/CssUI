@@ -1,4 +1,4 @@
-﻿
+
 namespace CssUI.HTML
 {
     public class FileDataRequest : DataRequest
@@ -38,3 +38,4 @@ namespace CssUI.HTML
         }
     }
 }
+

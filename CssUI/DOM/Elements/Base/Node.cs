@@ -1,4 +1,4 @@
-﻿using CssUI.CSS;
+using CssUI.CSS;
 using CssUI.CSS.BoxTree;
 using CssUI.DOM.CustomElements;
 using CssUI.DOM.Enums;
@@ -1237,3 +1237,4 @@ namespace CssUI.DOM.Nodes
 
     }
 }
+

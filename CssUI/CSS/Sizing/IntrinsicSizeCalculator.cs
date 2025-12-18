@@ -332,3 +332,4 @@ public static class IntrinsicSizeCalculator
 
     #endregion
 }
+

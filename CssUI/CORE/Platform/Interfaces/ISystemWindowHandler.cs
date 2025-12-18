@@ -1,4 +1,4 @@
-﻿
+
 using System;
 
 namespace CssUI.Platform
@@ -12,3 +12,4 @@ namespace CssUI.Platform
         IntPtr Get_Window();
     }
 }
+

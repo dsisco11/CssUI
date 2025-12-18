@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Exceptions;
+using CssUI.DOM.Exceptions;
 
 namespace CssUI.DOM.Geometry
 {
@@ -446,3 +446,4 @@ namespace CssUI.DOM.Geometry
         #endregion
     }
 }
+

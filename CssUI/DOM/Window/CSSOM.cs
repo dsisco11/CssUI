@@ -1,4 +1,4 @@
-﻿using CssUI.CSS;
+using CssUI.CSS;
 using CssUI.CSS.Internal;
 using CssUI.DOM.Geometry;
 using CssUI.DOM.Media;
@@ -17,9 +17,9 @@ namespace CssUI.DOM
         }
 
         // browsing context
-        public void moveTo(long x, long y) => Set_Window_Location(new ReadOnlyPoint2i(x, y));
+        public void moveTo(long x, long y) => Set_Window_Location(new Point2i(x, y));
         public void moveBy(long x, long y) => Set_Window_Location(new Point2i(x, y) + Get_Window_Location());
-        public void resizeTo(long x, long y) => Set_Window_Size(new ReadOnlyRect2i(x, y));
+        public void resizeTo(long x, long y) => Set_Window_Size(new Rect2i(x, y));
         public void resizeBy(long x, long y) => Set_Window_Size(new Rect2i(x, y) + Get_Window_Size());
 
         // Viewport
@@ -163,3 +163,4 @@ namespace CssUI.DOM
         #endregion
     }
 }
+

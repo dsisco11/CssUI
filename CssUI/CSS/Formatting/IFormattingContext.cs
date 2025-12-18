@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.BoxTree;
+using CssUI.CSS.BoxTree;
 
 namespace CssUI.CSS.Formatting
 {
@@ -11,3 +11,4 @@ namespace CssUI.CSS.Formatting
         void Flow(CssBoxTreeNode node);
     }
 }
+

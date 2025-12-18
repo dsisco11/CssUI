@@ -1,4 +1,4 @@
-﻿namespace CssUI.CSS.Parser
+namespace CssUI.CSS.Parser
 {
     public class BadUrlToken : UrlToken
     {
@@ -9,3 +9,4 @@
         public override string Encode() { return string.Empty; }
     }
 }
+

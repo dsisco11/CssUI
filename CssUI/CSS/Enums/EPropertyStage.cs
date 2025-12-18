@@ -1,4 +1,4 @@
-﻿namespace CssUI.CSS.Enums
+namespace CssUI.CSS.Enums
 {
     /// <summary>
     /// Describes all of the different value stages for a Css property
@@ -32,3 +32,4 @@
         Actual
     }
 }
+

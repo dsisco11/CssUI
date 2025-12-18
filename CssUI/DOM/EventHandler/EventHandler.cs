@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM.Events
+namespace CssUI.DOM.Events
 {
     /// <summary>
     /// Acts as a non-capturing event listener
@@ -21,3 +21,4 @@
         #endregion
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using CssUI.DOM;
+using CssUI.DOM;
 using CssUI.DOM.CustomElements;
 using System;
 using System.Collections.Generic;
@@ -66,3 +66,4 @@ namespace CssUI.HTML.CustomElements
         #endregion
     }
 }
+

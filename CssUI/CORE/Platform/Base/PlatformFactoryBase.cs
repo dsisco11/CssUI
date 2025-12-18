@@ -1,4 +1,4 @@
-﻿
+
 
 namespace CssUI.Platform
 {
@@ -24,3 +24,4 @@ namespace CssUI.Platform
         public ISystemWindowHandler SystemWindows { get; protected set; }
     }
 }
+

@@ -1,4 +1,4 @@
-﻿
+
 using CssUI.CSS.Parser;
 
 namespace CssUI.CSS
@@ -16,3 +16,4 @@ namespace CssUI.CSS
         public override string Encode() => "}";
     }
 }
+

@@ -1,4 +1,4 @@
-﻿
+
 namespace CssUI.Enums
 {
     //
@@ -596,3 +596,4 @@ namespace CssUI.Enums
         LastKey = 131
     }
 }
+

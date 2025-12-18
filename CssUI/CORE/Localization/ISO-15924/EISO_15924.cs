@@ -1,4 +1,4 @@
-﻿ 
+ 
 
 // Generated code
 namespace CssUI.Enums

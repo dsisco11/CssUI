@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM
+namespace CssUI.DOM
 {
     public enum ESelectionMode : int
     {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#dom-selectionmode-select-dev */
@@ -23,3 +23,4 @@
         Preserve,
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Collections.Generic;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Internal;
@@ -163,3 +163,4 @@ namespace CssUI.HTML
         }
     }
 }
+

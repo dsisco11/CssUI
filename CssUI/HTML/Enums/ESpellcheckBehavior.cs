@@ -1,4 +1,4 @@
-﻿namespace CssUI.HTML
+namespace CssUI.HTML
 {
     /// <summary>
     /// Determines the default behavior for an elements spellchecking
@@ -22,3 +22,4 @@
         Inherit_By_Default = -1,
     }
 }
+

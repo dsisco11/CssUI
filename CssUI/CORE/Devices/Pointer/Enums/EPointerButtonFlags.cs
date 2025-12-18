@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CssUI.Devices
 {
@@ -14,3 +14,4 @@ namespace CssUI.Devices
         Eraser = (1 << 6), // 32
     }
 }
+

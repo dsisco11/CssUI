@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM
+namespace CssUI.DOM
 {
     public enum EFormDataValueType : int
     {
@@ -7,3 +7,4 @@
         File,
     }
 }
+

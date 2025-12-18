@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using CssUI.Enums;
@@ -1086,3 +1086,4 @@ namespace CssUI.NodeTree
 
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CssUI.DOM.Events;
 using CssUI.DOM.Geometry;
 
@@ -96,3 +96,4 @@ namespace CssUI.DOM
         }
     }
 }
+

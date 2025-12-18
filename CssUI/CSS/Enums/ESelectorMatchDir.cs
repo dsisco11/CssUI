@@ -1,4 +1,4 @@
-﻿
+
 namespace CssUI.CSS.Internal
 {
     public enum ESelectorMatchingOrder
@@ -7,3 +7,4 @@ namespace CssUI.CSS.Internal
         RTL
     }
 }
+

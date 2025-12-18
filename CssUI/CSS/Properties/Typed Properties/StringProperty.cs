@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Nodes;
+using CssUI.DOM.Nodes;
 using System;
 
 namespace CssUI.CSS
@@ -36,3 +36,4 @@ namespace CssUI.CSS
         
     }
 }
+

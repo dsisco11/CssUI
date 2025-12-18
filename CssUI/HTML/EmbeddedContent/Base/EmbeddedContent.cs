@@ -1,4 +1,4 @@
-﻿
+
 namespace CssUI.HTML
 {
     public abstract class EmbeddedContent
@@ -10,3 +10,4 @@ namespace CssUI.HTML
         #endregion
     }
 }
+

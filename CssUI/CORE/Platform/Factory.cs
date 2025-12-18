@@ -1,4 +1,4 @@
-﻿
+
 namespace CssUI.Platform
 {
     public static class Factory
@@ -26,3 +26,4 @@ namespace CssUI.Platform
         #endregion
     }
 }
+

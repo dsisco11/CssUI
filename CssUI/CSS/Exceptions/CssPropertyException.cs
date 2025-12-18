@@ -1,4 +1,4 @@
-﻿namespace CssUI
+namespace CssUI
 {
     public class CssPropertyException : CssException
     {
@@ -11,3 +11,4 @@
         }
     }
 }
+

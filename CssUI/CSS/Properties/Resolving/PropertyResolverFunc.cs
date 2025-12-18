@@ -1,4 +1,4 @@
-﻿using CssUI.CSS;
+using CssUI.CSS;
 
 namespace CssUI.Internal
 {
@@ -12,3 +12,4 @@ namespace CssUI.Internal
 
 
 }
+

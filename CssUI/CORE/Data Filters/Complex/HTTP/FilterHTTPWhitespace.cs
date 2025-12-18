@@ -1,4 +1,4 @@
-﻿using CssUI.HTTP;
+using CssUI.HTTP;
 using System.Runtime.CompilerServices;
 
 namespace CssUI.Filters
@@ -22,3 +22,4 @@ namespace CssUI.Filters
         }
     }
 }
+

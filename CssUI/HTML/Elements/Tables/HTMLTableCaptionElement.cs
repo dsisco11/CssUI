@@ -1,4 +1,4 @@
-﻿using CssUI.DOM;
+using CssUI.DOM;
 
 namespace CssUI.HTML
 {
@@ -23,3 +23,4 @@ namespace CssUI.HTML
         #endregion
     }
 }
+

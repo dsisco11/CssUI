@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using CssUI.CSS.Enums;
 using CssUI.CSS.Internal;
@@ -147,3 +147,4 @@ namespace CssUI.CSS
 
 
 }
+

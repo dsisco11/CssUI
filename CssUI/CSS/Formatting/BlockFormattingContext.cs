@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.Contracts;
+using System.Diagnostics.Contracts;
 using CssUI.CSS.BoxTree;
 
 namespace CssUI.CSS.Formatting
@@ -33,3 +33,4 @@ namespace CssUI.CSS.Formatting
         }
     }
 }
+

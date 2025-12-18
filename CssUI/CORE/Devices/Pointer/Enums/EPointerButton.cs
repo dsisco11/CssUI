@@ -1,4 +1,4 @@
-﻿namespace CssUI.Devices
+namespace CssUI.Devices
 {
     public enum EPointerButton : short
     {
@@ -10,3 +10,4 @@
         Eraser = 5,
     }
 }
+

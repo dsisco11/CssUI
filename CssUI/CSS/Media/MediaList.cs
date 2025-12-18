@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace CssUI.DOM
 {
@@ -35,3 +35,4 @@ namespace CssUI.DOM
 
     }
 }
+

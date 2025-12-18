@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 
 namespace CssUI.HTTP
@@ -118,3 +118,4 @@ namespace CssUI.HTTP
         #endregion
     }
 }
+

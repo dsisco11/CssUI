@@ -1,4 +1,4 @@
-﻿namespace CssUI.CSS.Selectors
+namespace CssUI.CSS.Selectors
 {
     /// <summary>
     /// Defines all the simple selector types 
@@ -21,3 +21,4 @@
         PseudoElementSelector
     }
 }
+

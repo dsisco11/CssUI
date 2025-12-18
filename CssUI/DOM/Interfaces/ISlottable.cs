@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM.Nodes
+namespace CssUI.DOM.Nodes
 {
     public interface ISlottable : INode
     {
@@ -8,3 +8,4 @@
 #endif
     }
 }
+

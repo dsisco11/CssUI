@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CssUI.DOM.Enums
 {
@@ -31,3 +31,4 @@ namespace CssUI.DOM.Enums
         IMPLEMENTATION_SPECIFIC = 0x20,
     }
 }
+

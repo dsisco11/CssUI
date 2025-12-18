@@ -1,4 +1,4 @@
-﻿using CssUI.DOM;
+using CssUI.DOM;
 using CssUI.DOM.Enums;
 using CssUI.DOM.Events;
 using CssUI.DOM.Exceptions;
@@ -2926,3 +2926,4 @@ namespace CssUI.HTML
         #endregion
     }
 }
+

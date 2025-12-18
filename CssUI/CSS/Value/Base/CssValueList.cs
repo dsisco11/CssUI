@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using CssUI.CSS;
 using System.Collections;
 using System.Collections.Generic;
@@ -138,3 +138,4 @@ namespace CssUI.Internal
 
     }
 }
+

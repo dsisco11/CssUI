@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CssUI
 {
@@ -51,3 +51,4 @@ namespace CssUI
         }
     }
 }
+

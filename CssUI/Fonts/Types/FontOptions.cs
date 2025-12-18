@@ -1,4 +1,4 @@
-﻿using CssUI.CSS;
+using CssUI.CSS;
 using System.Collections.Generic;
 
 namespace CssUI.Fonts
@@ -45,3 +45,4 @@ namespace CssUI.Fonts
         #endregion
     }
 }
+

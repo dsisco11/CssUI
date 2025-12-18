@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.Exceptions;
+using CssUI.CSS.Exceptions;
 using CssUI.CSS.Media;
 using CssUI.CSS.Parser;
 using CssUI.DOM;
@@ -899,3 +899,4 @@ namespace CssUI.CSS.Serialization
         #endregion
     }
 }
+

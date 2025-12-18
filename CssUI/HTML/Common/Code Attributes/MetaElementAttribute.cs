@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CssUI.HTML
 {
@@ -16,3 +16,4 @@ namespace CssUI.HTML
         #endregion
     }
 }
+

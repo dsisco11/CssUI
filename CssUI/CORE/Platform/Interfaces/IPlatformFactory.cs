@@ -1,4 +1,4 @@
-﻿
+
 namespace CssUI.Platform
 {
     interface IPlatformFactoryMethods
@@ -8,3 +8,4 @@ namespace CssUI.Platform
         ISystemWindowHandler  SystemWindows { get; }
     }
 }
+

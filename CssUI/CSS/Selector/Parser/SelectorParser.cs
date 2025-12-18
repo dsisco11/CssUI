@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.Parser;
+using CssUI.CSS.Parser;
 using CssUI.CSS.Serialization;
 using System.Collections.Generic;
 using System.Linq;
@@ -576,3 +576,4 @@ namespace CssUI.CSS.Selectors
         #endregion
     }
 }
+

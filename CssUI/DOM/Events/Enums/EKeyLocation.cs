@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM.Events
+namespace CssUI.DOM.Events
 {
     public enum EKeyLocation : ulong
     {/* Docs: https://w3c.github.io/uievents/#events-keyboard-key-location */
@@ -25,3 +25,4 @@
         NUMPAD = 0x03
     }
 }
+

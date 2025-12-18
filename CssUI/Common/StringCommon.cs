@@ -1,4 +1,4 @@
-﻿using CssUI.DOM;
+using CssUI.DOM;
 using CssUI.Filters;
 using System;
 using System.Collections.Generic;
@@ -1864,3 +1864,4 @@ namespace CssUI
         #endregion
     }
 }
+

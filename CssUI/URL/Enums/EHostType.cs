@@ -1,4 +1,4 @@
-﻿namespace CssUI.HTTP
+namespace CssUI.HTTP
 {
     public enum EHostType : int
     {
@@ -9,3 +9,4 @@
         Empty,
     }
 }
+

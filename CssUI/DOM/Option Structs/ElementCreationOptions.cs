@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM
+namespace CssUI.DOM
 {
     public class ElementCreationOptions
     {
@@ -14,3 +14,4 @@
         }
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Events;
+using CssUI.DOM.Events;
 using System.Collections.Generic;
 
 namespace CssUI.DOM.Nodes
@@ -29,3 +29,4 @@ namespace CssUI.DOM.Nodes
         void Signal_Slot_Change();
     }
 }
+

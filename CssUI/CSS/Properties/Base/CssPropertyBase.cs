@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CssUI.CSS.Enums;
@@ -225,3 +225,4 @@ namespace CssUI.CSS.Internal
 
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using CssUI.CSS.Enums;
@@ -184,7 +184,7 @@ namespace CssUI.CSS.BoxTree
         public double Left => Margin.Left;
 
         /// <inheritdoc/>
-        public override ReadOnlyRect2f Size { get => new ReadOnlyRect2f(Margin.Width, Margin.Height); set => throw new NotSupportedException($"The layout size of a {nameof(CssPrincipalBox)} cannot be set directly, it is determined by the box-model!"); }
+        public override Rect2f Size { get => new Rect2f(Margin.Width, Margin.Height); set => throw new NotSupportedException($"The layout size of a {nameof(CssPrincipalBox)} cannot be set directly, it is determined by the box-model!"); }
 
         /// <summary>
         /// Backing value for <see cref="Containing_Box"/>
@@ -352,7 +352,7 @@ namespace CssUI.CSS.BoxTree
         /// <param name="Right"></param>
         /// <param name="Left"></param>
         /// <param name="Left_Offsets"></param>
-        private void Fit_Rect_Around(Rect4f Left, Rect4f Right, in ReadOnlyRect4f Left_Offsets)
+        private void Fit_Rect_Around(Rect4f Left, Rect4f Right, in Rect4f Left_Offsets)
         {
             if (Left is null)
             {
@@ -378,7 +378,7 @@ namespace CssUI.CSS.BoxTree
         /// <param name="Left"></param>
         /// <param name="Right"></param>
         /// <param name="Right_Offsets"></param>
-        private void Fit_Rect_Within(Rect4f Left, Rect4f Right, in ReadOnlyRect4f Right_Offsets)
+        private void Fit_Rect_Within(Rect4f Left, Rect4f Right, in Rect4f Right_Offsets)
         {
             if (Left is null)
             {
@@ -840,3 +840,4 @@ namespace CssUI.CSS.BoxTree
         #endregion
     }
 }
+

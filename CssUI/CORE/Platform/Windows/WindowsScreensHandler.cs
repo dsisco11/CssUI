@@ -1,4 +1,4 @@
-﻿#if WINDOWS
+#if WINDOWS
 using System;
 
 namespace CssUI.Platform.Windows

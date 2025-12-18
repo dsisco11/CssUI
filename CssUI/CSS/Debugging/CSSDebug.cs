@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.Enums;
+using CssUI.CSS.Enums;
 
 namespace CssUI.CSS
 {
@@ -14,3 +14,4 @@ namespace CssUI.CSS
         }
     }
 }
+

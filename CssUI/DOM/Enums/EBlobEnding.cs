@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM.Enums
+namespace CssUI.DOM.Enums
 {
 
     public enum EBlobEnding : int
@@ -7,3 +7,4 @@
         Native,
     }
 }
+

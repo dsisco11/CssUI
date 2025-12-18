@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM.Enums
+namespace CssUI.DOM.Enums
 {
     public enum ENodeType : ushort
     {
@@ -16,3 +16,4 @@
         NOTATION_NODE = 12, // historical
     }
 }
+

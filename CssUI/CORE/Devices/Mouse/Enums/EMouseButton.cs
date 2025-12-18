@@ -1,4 +1,4 @@
-﻿namespace CssUI.Devices
+namespace CssUI.Devices
 {
     public enum EMouseButton : short
     {
@@ -14,3 +14,4 @@
         X2 = 4,
     }
 }
+

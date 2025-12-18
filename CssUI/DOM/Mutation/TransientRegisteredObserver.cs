@@ -1,4 +1,4 @@
-﻿
+
 namespace CssUI.DOM.Mutation
 {
     public class TransientRegisteredObserver : RegisteredObserver
@@ -11,3 +11,4 @@ namespace CssUI.DOM.Mutation
         }
     }
 }
+

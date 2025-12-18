@@ -1,4 +1,4 @@
-﻿
+
 namespace CssUI.CSS
 {
     public abstract class Stylesheet
@@ -13,3 +13,4 @@ namespace CssUI.CSS
         #endregion
     }
 }
+

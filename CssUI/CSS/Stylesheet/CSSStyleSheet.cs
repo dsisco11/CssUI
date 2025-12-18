@@ -1,4 +1,4 @@
-﻿
+
 namespace CssUI.CSS
 {
     public class CSSStyleSheet : Stylesheet
@@ -22,3 +22,4 @@ namespace CssUI.CSS
         }
     }
 }
+

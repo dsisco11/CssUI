@@ -1,4 +1,4 @@
-﻿using CssUI.Common.Exceptions;
+using CssUI.Common.Exceptions;
 using CssUI.DOM.Exceptions;
 using System;
 using System.Diagnostics.Contracts;
@@ -370,3 +370,4 @@ namespace CssUI
         #endregion
     }
 }
+

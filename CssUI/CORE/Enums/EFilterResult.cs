@@ -1,4 +1,4 @@
-﻿namespace CssUI
+namespace CssUI
 {
     public enum EFilterResult
     {
@@ -7,3 +7,4 @@
         FILTER_SKIP = 3
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using CssUI.CSS;
+using CssUI.CSS;
 using CssUI.Filters;
 using System;
 using System.Globalization;
@@ -1831,3 +1831,4 @@ namespace CssUI.Serialization
     }
 
 }
+

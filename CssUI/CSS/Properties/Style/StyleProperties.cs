@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -189,9 +189,9 @@ namespace CssUI.CSS
         public int Padding_Bottom => Cascaded.Padding_Bottom.Actual;
         public int Padding_Left => Cascaded.Padding_Left.Actual;
 
-        public ReadOnlyRect4f Get_Padding_Size()
+        public Rect4f Get_Padding_Size()
         {
-            return new ReadOnlyRect4f(Cascaded.Padding_Top.Actual,
+            return new Rect4f(Cascaded.Padding_Top.Actual,
                                       Cascaded.Padding_Right.Actual,
                                       Cascaded.Padding_Bottom.Actual,
                                       Cascaded.Padding_Left.Actual);
@@ -207,9 +207,9 @@ namespace CssUI.CSS
         public int Border_Bottom_Width => Cascaded.Border_Bottom_Width.Actual;
         public int Border_Left_Width => Cascaded.Border_Left_Width.Actual;
 
-        public ReadOnlyRect4f Get_Border_Size()
+        public Rect4f Get_Border_Size()
         {
-            return new ReadOnlyRect4f(Cascaded.Border_Top_Width.Actual,
+            return new Rect4f(Cascaded.Border_Top_Width.Actual,
                                       Cascaded.Border_Right_Width.Actual,
                                       Cascaded.Border_Bottom_Width.Actual,
                                       Cascaded.Border_Left_Width.Actual);
@@ -223,9 +223,9 @@ namespace CssUI.CSS
         public int Margin_Bottom => Cascaded.Margin_Bottom.Actual;
         public int Margin_Left => Cascaded.Margin_Bottom.Actual;
 
-        public ReadOnlyRect4f Get_Margin_Size()
+        public Rect4f Get_Margin_Size()
         {
-            return new ReadOnlyRect4f(Cascaded.Margin_Top.Actual,
+            return new Rect4f(Cascaded.Margin_Top.Actual,
                                       Cascaded.Margin_Right.Actual,
                                       Cascaded.Margin_Bottom.Actual,
                                       Cascaded.Margin_Left.Actual);
@@ -729,3 +729,4 @@ namespace CssUI.CSS
 
     }
 }
+

@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM
+namespace CssUI.DOM
 {
     public enum EAutofillCategory : int
     {
@@ -8,3 +8,4 @@
         Contact,
     }
 }
+

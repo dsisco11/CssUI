@@ -1,4 +1,4 @@
-﻿namespace CssUI.HTTP
+namespace CssUI.HTTP
 {
     public enum EOriginType : int
     {
@@ -6,3 +6,4 @@
         Tuple,
     }
 }
+

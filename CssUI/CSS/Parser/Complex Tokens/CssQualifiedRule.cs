@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.Parser;
+using CssUI.CSS.Parser;
 using System.Collections.Generic;
 using System.Text;
 
@@ -26,3 +26,4 @@ namespace CssUI.CSS
         }
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.Enums;
+using CssUI.CSS.Enums;
 using CssUI.CSS.Media;
 using CssUI.Internal;
 using System;
@@ -389,3 +389,4 @@ namespace CssUI.CSS.Internal
 #endregion
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.Serialization;
+using CssUI.CSS.Serialization;
 using CssUI.DOM;
 using System.Collections.Generic;
 using System.Text;
@@ -93,3 +93,4 @@ namespace CssUI.CSS.Media
         }
     }
 }
+

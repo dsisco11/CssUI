@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Geometry;
+using CssUI.DOM.Geometry;
 using CssUI.DOM.Nodes;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,3 +48,4 @@ namespace CssUI.DOM
         }
     }
 }
+

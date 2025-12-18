@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Events;
+using CssUI.DOM.Events;
 
 namespace CssUI.DOM
 {
@@ -7,3 +7,4 @@ namespace CssUI.DOM
         Document document { get; }
     }
 }
+

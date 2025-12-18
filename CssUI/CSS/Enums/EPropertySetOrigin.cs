@@ -1,4 +1,4 @@
-﻿
+
 namespace CssUI.CSS.Internal
 {
     public enum EPropertySetOrigin : int
@@ -15,3 +15,4 @@ namespace CssUI.CSS.Internal
         Author = 2
     }
 }
+

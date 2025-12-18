@@ -1,4 +1,4 @@
-﻿using CssUI.DOM;
+using CssUI.DOM;
 using CssUI.DOM.Nodes;
 using System;
 using System.Collections.Generic;
@@ -53,3 +53,4 @@ namespace CssUI.HTML
 
     }
 }
+

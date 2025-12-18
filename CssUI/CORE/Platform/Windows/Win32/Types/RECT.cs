@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 
 namespace CssUI.Platform.Windows.Win32
 {
@@ -11,3 +11,4 @@ namespace CssUI.Platform.Windows.Win32
         public int bottom;
     }
 }
+

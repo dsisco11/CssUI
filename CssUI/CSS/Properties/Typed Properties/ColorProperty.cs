@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CssUI.DOM.Nodes;
 using CssUI.Rendering;
 
@@ -33,3 +33,4 @@ namespace CssUI.CSS
         #endregion
     }
 }
+

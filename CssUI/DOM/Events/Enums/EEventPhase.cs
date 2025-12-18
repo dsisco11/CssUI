@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM.Events
+namespace CssUI.DOM.Events
 {
     public enum EEventPhase : ushort
     {
@@ -20,3 +20,4 @@
         BUBBLING_PHASE = 3
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Collections.Generic;
 using System.Diagnostics;
 using CssUI.DOM;
@@ -58,3 +58,4 @@ namespace CssUI.HTTP
         #endregion
     }
 }
+

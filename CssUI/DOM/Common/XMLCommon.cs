@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Exceptions;
+using CssUI.DOM.Exceptions;
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -149,3 +149,4 @@ namespace CssUI.DOM
         #endregion
     }
 }
+

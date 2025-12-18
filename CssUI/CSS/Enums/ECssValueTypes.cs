@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CssUI.Internal;
 
 namespace CssUI.CSS
@@ -107,3 +107,4 @@ namespace CssUI.CSS
         RESOLUTION = (1 << 31),
     }
 }
+

@@ -103,3 +103,4 @@ public static class Log
     /// </summary>
     public static void Success(string message) => _defaultLogger.LogInformation("[SUCCESS] {Message}", message);
 }
+

@@ -1,4 +1,4 @@
-﻿namespace CssUI.CSS.Enums
+namespace CssUI.CSS.Enums
 {
     /// <summary>
     /// Defines the *-level of a box, whether it is block-level, inline-level, or other.
@@ -27,3 +27,4 @@
         Run_In,
     }
 }
+

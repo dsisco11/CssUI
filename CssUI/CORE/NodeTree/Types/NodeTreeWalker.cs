@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Exceptions;
+using CssUI.DOM.Exceptions;
 
 namespace CssUI.NodeTree
 {
@@ -401,4 +401,5 @@ namespace CssUI.NodeTree
         }
     }
 }
+
 

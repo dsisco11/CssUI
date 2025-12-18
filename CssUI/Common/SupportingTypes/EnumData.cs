@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 
 namespace CssUI
 {
@@ -29,3 +29,4 @@ namespace CssUI
         public int Length => Data.Length;
     }
 }
+

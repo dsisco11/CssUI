@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CssUI.Devices
 {
@@ -13,3 +13,4 @@ namespace CssUI.Devices
         X2 = 1 << 5,
     }
 }
+

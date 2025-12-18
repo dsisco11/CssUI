@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.Serialization;
+using CssUI.CSS.Serialization;
 using CssUI.DOM;
 
 namespace CssUI.CSS.Media
@@ -8,3 +8,4 @@ namespace CssUI.CSS.Media
         bool Matches(Document document);
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using CssUI.DOM;
+using CssUI.DOM;
 using CssUI.CSS.Enums;
 using CssUI.CSS.Internal;
 using System.Runtime.CompilerServices;
@@ -1501,3 +1501,4 @@ namespace CssUI.CSS
 
     }
 }
+

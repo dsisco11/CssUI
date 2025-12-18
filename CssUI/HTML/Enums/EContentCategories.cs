@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CssUI.HTML
 {
@@ -71,3 +71,4 @@ namespace CssUI.HTML
         ScriptSupporting = (1 << 10),
     }
 }
+

@@ -1,4 +1,4 @@
-﻿namespace CssUI.CSS.Internal
+namespace CssUI.CSS.Internal
 {
     /// <summary>
     /// 
@@ -9,3 +9,4 @@
     /// <param name="hadValue"><c>True</c> if the tracker previously had a value set</param>
     public delegate void ValueTrackerEventHandler(int oldHash, int newHash, int changes, bool hadValue);
 }
+

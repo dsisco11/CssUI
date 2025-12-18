@@ -1,4 +1,4 @@
-﻿using CssUI.Internal;
+using CssUI.Internal;
 
 namespace CssUI.HTML
 {
@@ -52,3 +52,4 @@ namespace CssUI.HTML
         Characters,
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.CompilerServices;
 
 namespace CssUI
@@ -163,3 +163,4 @@ namespace CssUI
         #endregion
     }
 }
+

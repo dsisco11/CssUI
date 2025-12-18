@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Events;
+using CssUI.DOM.Events;
 using CssUI.DOM.Internal;
 
 namespace CssUI.DOM
@@ -8,3 +8,4 @@ namespace CssUI.DOM
         BrowsingContext Nested_Browsing_Context { get; }
     }
 }
+

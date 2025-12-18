@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM.Exceptions
+namespace CssUI.DOM.Exceptions
 {
     public class EncodingError : DOMException
     {
@@ -8,3 +8,4 @@
         }
     }
 }
+

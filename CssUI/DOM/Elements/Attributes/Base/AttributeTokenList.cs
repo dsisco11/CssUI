@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Exceptions;
+using CssUI.DOM.Exceptions;
 using CssUI.Enums;
 using System;
 using System.Collections;
@@ -309,3 +309,4 @@ namespace CssUI.DOM
         #endregion
     }
 }
+

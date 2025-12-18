@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.Media;
+using CssUI.CSS.Media;
 using CssUI.DOM.Events;
 
 namespace CssUI.DOM
@@ -79,3 +79,4 @@ namespace CssUI.DOM
         #endregion
     }
 }
+

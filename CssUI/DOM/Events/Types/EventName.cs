@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 
 namespace CssUI.DOM.Events
 {
@@ -128,3 +128,4 @@ namespace CssUI.DOM.Events
         #endregion
     }
 }
+

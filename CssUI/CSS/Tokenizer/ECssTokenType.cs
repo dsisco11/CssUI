@@ -1,4 +1,4 @@
-﻿namespace CssUI.CSS.Parser
+namespace CssUI.CSS.Parser
 {
     /// <summary>
     /// Defines all of the different possible CSS token types
@@ -87,3 +87,4 @@
         Combinator,
     }
 }
+

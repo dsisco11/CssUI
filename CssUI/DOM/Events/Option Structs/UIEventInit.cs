@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM.Events
+namespace CssUI.DOM.Events
 {
     public class UIEventInit : EventInit
     {
@@ -6,3 +6,4 @@
         public long detail = 0;
     }
 }
+

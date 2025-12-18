@@ -1,4 +1,4 @@
-﻿using CssUI.CSS;
+using CssUI.CSS;
 using CssUI.CSS.BoxTree;
 using CssUI.CSS.Enums;
 using CssUI.CSS.Internal;
@@ -2020,3 +2020,4 @@ namespace CssUI.DOM
         #endregion
     }
 }
+

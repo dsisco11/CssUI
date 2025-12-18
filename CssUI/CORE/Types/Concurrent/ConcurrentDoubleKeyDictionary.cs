@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace CssUI
@@ -204,3 +204,4 @@ namespace CssUI
         public IEnumerable<Key2> SecondaryKeys => MapInverse.Keys;
     }
 }
+

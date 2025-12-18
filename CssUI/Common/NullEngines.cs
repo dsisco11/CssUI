@@ -150,3 +150,4 @@ public sealed class NullRenderEngine : IRenderEngine
         Color topColor, Color rightColor, Color bottomColor, Color leftColor,
         EBorderStyle topStyle, EBorderStyle rightStyle, EBorderStyle bottomStyle, EBorderStyle leftStyle) { }
 }
+

@@ -1,4 +1,4 @@
-﻿using CssUI.Enums;
+using CssUI.Enums;
 using System.Runtime.CompilerServices;
 
 namespace CssUI.NodeTree
@@ -76,3 +76,4 @@ namespace CssUI.NodeTree
         #endregion
     }
 }
+

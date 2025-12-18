@@ -1,4 +1,4 @@
-﻿namespace CssUI.CSS.BoxTree
+namespace CssUI.CSS.BoxTree
 {
     /* Docs: https://www.w3.org/TR/css-display-3/#anonymous */
     /// <summary>
@@ -19,3 +19,4 @@
         public static CssAnonymousBox Create_Inline(in CssBoxTreeNode parent) => new CssAnonymousBox(parent, new DisplayType(Enums.EOuterDisplayType.Inline, Enums.EInnerDisplayType.Flow));
     }
 }
+

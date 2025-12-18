@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CssUI.DOM.Enums
 {
@@ -97,3 +97,4 @@ namespace CssUI.DOM.Enums
         KeyCombo,
     }
 }
+

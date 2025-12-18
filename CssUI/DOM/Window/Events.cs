@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CssUI.DOM.Events;
 
 namespace CssUI.DOM
@@ -793,3 +793,4 @@ namespace CssUI.DOM
         #endregion
     }
 }
+

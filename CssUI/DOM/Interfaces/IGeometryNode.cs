@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Events;
+using CssUI.DOM.Events;
 using CssUI.DOM.Geometry;
 using CssUI.DOM.Internal;
 using System.Collections.Generic;
@@ -13,3 +13,4 @@ namespace CssUI.DOM.Interfaces
         DOMPoint convertPointFromNode(DOMPointInit point, IGeometryNode from, ConvertCoordinateOptions options); // XXX z,w turns into 0
     }
 }
+

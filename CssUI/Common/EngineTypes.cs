@@ -141,3 +141,4 @@ namespace CssUI
         public bool IsAnimated => FrameCount > 1;
     }
 }
+

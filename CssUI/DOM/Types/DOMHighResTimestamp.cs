@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM
+namespace CssUI.DOM
 {
     /// <summary>
     /// The DOMHighResTimeStamp type is used to store a time value in milliseconds, measured relative from the time origin, 
@@ -9,3 +9,4 @@
         public double Timestmap;
     }
 }
+

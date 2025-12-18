@@ -1,4 +1,4 @@
-﻿namespace CssUI
+namespace CssUI
 {
     public interface IReversableDictionary<TKey, TValue>
     {

@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.CustomElements;
+using CssUI.DOM.CustomElements;
 using CssUI.DOM.Exceptions;
 using CssUI.Enums;
 using System;
@@ -36,3 +36,4 @@ namespace CssUI.DOM
 
     }
 }
+

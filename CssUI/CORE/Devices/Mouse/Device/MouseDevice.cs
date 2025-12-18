@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Geometry;
+using CssUI.DOM.Geometry;
 using System;
 
 namespace CssUI.Devices
@@ -21,3 +21,4 @@ namespace CssUI.Devices
         #endregion
     }
 }
+

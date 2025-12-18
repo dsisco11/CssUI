@@ -1,4 +1,4 @@
-﻿
+
 namespace CssUI.DOM
 {
     public enum EBoundaryPosition : short
@@ -8,3 +8,4 @@ namespace CssUI.DOM
         After = 1
     }
 }
+

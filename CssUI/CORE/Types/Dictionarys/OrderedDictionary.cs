@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -259,3 +259,4 @@ public struct Enumerator : IEnumerator<KeyValuePair<KeyTy, ValueTy>>, IEnumerato
 
     }
 }
+

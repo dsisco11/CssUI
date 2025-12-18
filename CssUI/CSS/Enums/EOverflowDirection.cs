@@ -1,4 +1,4 @@
-﻿namespace CssUI.CSS.Enums
+namespace CssUI.CSS.Enums
 {
     /// <summary>
     /// Used by <see cref="DOM.ScrollBox"/>
@@ -11,3 +11,4 @@
         Leftward,
     }
 }
+

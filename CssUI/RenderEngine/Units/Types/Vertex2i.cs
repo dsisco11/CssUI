@@ -1,4 +1,4 @@
-﻿using CssUI.Rendering;
+using CssUI.Rendering;
 using System.Runtime.InteropServices;
 
 namespace CssUI.CSS
@@ -29,3 +29,4 @@ namespace CssUI.CSS
         }
     }
 }
+

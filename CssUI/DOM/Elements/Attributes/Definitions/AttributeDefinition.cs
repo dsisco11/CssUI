@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using CssUI.DOM.Enums;
 using CssUI.DOM.Exceptions;
@@ -404,3 +404,4 @@ namespace CssUI.DOM
         }
     }
 }
+

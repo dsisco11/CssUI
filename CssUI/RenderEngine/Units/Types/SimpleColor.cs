@@ -1,4 +1,4 @@
-﻿using CssUI.Rendering;
+using CssUI.Rendering;
 using System;
 using System.Globalization;
 using System.Numerics;
@@ -170,3 +170,4 @@ namespace CssUI
         #endregion
     }
 }
+

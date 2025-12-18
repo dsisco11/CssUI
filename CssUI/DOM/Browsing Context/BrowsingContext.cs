@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using CssUI.DOM.Events;
 using CssUI.HTTP;
@@ -80,3 +80,4 @@ namespace CssUI.DOM.Internal
         }
     }
 }
+

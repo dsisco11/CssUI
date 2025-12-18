@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics.Contracts;
 using CssUI.CSS.Enums;
 
@@ -377,3 +377,4 @@ namespace CssUI.CSS.Internal
         }
     }
 }
+

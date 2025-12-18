@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CssUI.DOM.Enums
 {
@@ -20,3 +20,4 @@ namespace CssUI.DOM.Enums
         SHOW_NOTATION = 0x800 // historical
     }
 }
+

@@ -1,4 +1,4 @@
-﻿namespace CssUI.CSS.Enums
+namespace CssUI.CSS.Enums
 {
     /// <summary>
     /// the inner display type, which defines (if it is a non-replaced element) the kind of formatting context it generates, 
@@ -39,3 +39,4 @@
         Ruby
     }
 }
+

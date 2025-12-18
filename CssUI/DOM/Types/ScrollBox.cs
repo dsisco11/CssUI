@@ -1,4 +1,4 @@
-﻿using CssUI.CSS;
+using CssUI.CSS;
 using CssUI.CSS.Enums;
 using CssUI.CSS.Internal;
 using CssUI.DOM.Enums;
@@ -404,3 +404,4 @@ namespace CssUI.DOM
 
     }
 }
+

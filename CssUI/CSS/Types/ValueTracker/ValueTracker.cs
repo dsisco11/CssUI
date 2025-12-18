@@ -1,4 +1,4 @@
-﻿
+
 namespace CssUI.CSS.Internal
 {
 
@@ -104,3 +104,4 @@ namespace CssUI.CSS.Internal
         #endregion
     }
 }
+

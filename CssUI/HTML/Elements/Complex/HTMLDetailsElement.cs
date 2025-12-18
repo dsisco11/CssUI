@@ -1,4 +1,4 @@
-﻿using CssUI.DOM;
+using CssUI.DOM;
 using CssUI.DOM.Events;
 using System;
 using System.Threading.Tasks;
@@ -54,3 +54,4 @@ namespace CssUI.HTML
 
     }
 }
+

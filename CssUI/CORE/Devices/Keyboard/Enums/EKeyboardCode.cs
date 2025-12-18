@@ -1,4 +1,4 @@
-﻿using CssUI.Internal;
+using CssUI.Internal;
 
 namespace CssUI.Devices
 {
@@ -960,3 +960,4 @@ namespace CssUI.Devices
     }
 
 }
+

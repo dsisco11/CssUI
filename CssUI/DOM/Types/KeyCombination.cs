@@ -1,4 +1,4 @@
-﻿using CssUI.Devices;
+using CssUI.Devices;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -100,3 +100,4 @@ namespace CssUI.DOM
         #endregion
     }
 }
+

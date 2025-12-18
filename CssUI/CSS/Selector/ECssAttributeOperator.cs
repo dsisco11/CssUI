@@ -1,4 +1,4 @@
-﻿
+
 namespace CssUI.CSS.Selectors
 {
     public enum ECssAttributeOperator
@@ -21,3 +21,4 @@ namespace CssUI.CSS.Selectors
         Contains,
     }
 }
+

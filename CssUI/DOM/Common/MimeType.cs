@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Runtime.CompilerServices;
@@ -1101,3 +1101,4 @@ namespace CssUI.DOM
         #endregion
     }
 }
+

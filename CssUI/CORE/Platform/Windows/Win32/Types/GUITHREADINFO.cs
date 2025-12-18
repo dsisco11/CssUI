@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
 namespace CssUI.Platform.Windows.Win32
@@ -41,3 +41,4 @@ namespace CssUI.Platform.Windows.Win32
         public RECT rcCaret;
     }
 }
+

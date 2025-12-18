@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 
 namespace CssUI
@@ -177,3 +177,4 @@ namespace CssUI
 
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using CssUI.DOM;
+using CssUI.DOM;
 using CssUI.DOM.Nodes;
 using CssUI.CSS.Internal;
 using System.Collections.Generic;
@@ -133,3 +133,4 @@ namespace CssUI.CSS.Selectors
 
     }
 }
+

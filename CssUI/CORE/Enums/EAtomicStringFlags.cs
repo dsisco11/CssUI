@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CssUI.Enums
 {
@@ -16,3 +16,4 @@ namespace CssUI.Enums
         HasUppercase = (1 << 2),
     }
 }
+

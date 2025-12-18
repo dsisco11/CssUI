@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Nodes;
+using CssUI.DOM.Nodes;
 using System.Collections.Generic;
 
 namespace CssUI.DOM.Events
@@ -258,3 +258,4 @@ namespace CssUI.DOM.Events
         #endregion
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Exceptions;
+using CssUI.DOM.Exceptions;
 using CssUI.DOM.Nodes;
 using System.Collections.Generic;
 
@@ -106,3 +106,4 @@ namespace CssUI.DOM.Mutation
         }
     }
 }
+

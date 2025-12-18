@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Events;
+using CssUI.DOM.Events;
 using CssUI.DOM.Internal;
 using CssUI.Internal;
 using System;
@@ -163,3 +163,4 @@ namespace CssUI.DOM.Events
 
     }
 }
+

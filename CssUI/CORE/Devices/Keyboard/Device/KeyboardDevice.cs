@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 
 namespace CssUI.Devices
@@ -77,3 +77,4 @@ namespace CssUI.Devices
         public abstract EKeyboardCode TranslateKey(char key);
     }
 }
+

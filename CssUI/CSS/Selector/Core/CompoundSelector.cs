@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.Internal;
+using CssUI.CSS.Internal;
 using CssUI.DOM;
 using CssUI.DOM.Nodes;
 using System.Collections.Generic;
@@ -96,3 +96,4 @@ namespace CssUI.CSS.Selectors
         #endregion
     }
 }
+

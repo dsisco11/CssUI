@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CssUI.DOM.Enums
 {
@@ -16,3 +16,4 @@ namespace CssUI.DOM.Enums
         Inherited = (1 << 1),
     }
 }
+

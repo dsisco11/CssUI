@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CssUI.DOM;
 
 namespace CssUI.CSS.BoxTree
@@ -30,3 +30,4 @@ namespace CssUI.CSS.BoxTree
         #endregion
     }
 }
+

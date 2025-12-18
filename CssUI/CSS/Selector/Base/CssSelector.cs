@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.Selectors;
+using CssUI.CSS.Selectors;
 using CssUI.DOM;
 using CssUI.DOM.Enums;
 using CssUI.DOM.Nodes;
@@ -191,3 +191,4 @@ namespace CssUI.CSS
     }
     
 }
+

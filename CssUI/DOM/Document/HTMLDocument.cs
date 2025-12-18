@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM
+namespace CssUI.DOM
 {
     public sealed class HTMLDocument : Document
     {
@@ -7,3 +7,4 @@
         }
     }
 }
+

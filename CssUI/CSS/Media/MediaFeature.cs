@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.Internal;
+using CssUI.CSS.Internal;
 using CssUI.CSS.Serialization;
 using CssUI.DOM;
 using System;
@@ -443,3 +443,4 @@ namespace CssUI.CSS.Media
 
     }
 }
+

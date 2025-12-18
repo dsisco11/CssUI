@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CssUI.CSS;
 
 namespace CssUI.Rendering
@@ -164,7 +164,7 @@ namespace CssUI.Rendering
         /// <param name="Data">Pixel data for the texture</param>
         /// <param name="Size">Pixel dimensions of the texture</param>
         /// <param name="Format">Format for the pixels in Data</param>
-        public abstract object Create_Texture(ReadOnlySpan<byte> Data, ReadOnlyRect2i Size, EPixelFormat Format);
+        public abstract object Create_Texture(ReadOnlySpan<byte> Data, Rect2i Size, EPixelFormat Format);
         /// <summary>
         /// Destroy a texture, ensuring it cannot be used again unless recreated.
         /// </summary>
@@ -200,7 +200,7 @@ namespace CssUI.Rendering
         /// <param name="LineThickness">Thickness of the line in pixels</param>
         /// <param name="pos">Origin location of the area</param>
         /// <param name="size">Size of the area</param>
-        public abstract void Draw_Rect(int LineThickness, ReadOnlyPoint2i Pos, ReadOnlyRect2i Size);
+        public abstract void Draw_Rect(int LineThickness, Point2i Pos, Rect2i Size);
         /// <summary>
         /// Outlines a rectangular area with the currently set color
         /// </summary>
@@ -255,7 +255,7 @@ namespace CssUI.Rendering
         /// </summary>
         /// <param name="pos">Origin location of the area</param>
         /// <param name="size">Size of the area</param>
-        public abstract void Fill_Rect(ReadOnlyPoint2i Pos, ReadOnlyRect2i Size);
+        public abstract void Fill_Rect(Point2i Pos, Rect2i Size);
         /// <summary>
         /// Fills a rectangular area with the currently set color
         /// </summary>
@@ -295,3 +295,4 @@ namespace CssUI.Rendering
         #endregion
     }
 }
+

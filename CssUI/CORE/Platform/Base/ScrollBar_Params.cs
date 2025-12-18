@@ -1,4 +1,4 @@
-﻿
+
 namespace CssUI.Platform
 {
     /// <summary>
@@ -20,3 +20,4 @@ namespace CssUI.Platform
         public int BtnArrowSize;
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CssUI.CSS.Enums
 {
@@ -49,3 +49,4 @@ namespace CssUI.CSS.Enums
         Replaced_Area = 1 << 14,
     }
 }
+

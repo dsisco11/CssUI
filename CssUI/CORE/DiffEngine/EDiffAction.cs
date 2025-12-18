@@ -1,4 +1,4 @@
-﻿namespace CssUI.Difference
+namespace CssUI.Difference
 {
     public enum EDiffAction
     {
@@ -20,3 +20,4 @@
         Modify
     };
 }
+

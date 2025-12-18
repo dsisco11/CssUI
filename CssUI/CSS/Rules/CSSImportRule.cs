@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.Internal;
+using CssUI.CSS.Internal;
 using System;
 
 namespace CssUI.CSS
@@ -23,3 +23,4 @@ namespace CssUI.CSS
         }
     }
 }
+

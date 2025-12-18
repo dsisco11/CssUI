@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.Serialization;
+using CssUI.CSS.Serialization;
 using System.Linq;
 
 namespace CssUI
@@ -17,3 +17,4 @@ namespace CssUI
         }
     }
 }
+

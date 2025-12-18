@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace CssUI.HTTP
 {
@@ -110,3 +110,4 @@ namespace CssUI.HTTP
         }
     }
 }
+

@@ -1,4 +1,4 @@
-﻿namespace CssUI.CSS.Enums
+namespace CssUI.CSS.Enums
 {
     /// <summary>
     /// Used by the scrolling system
@@ -11,3 +11,4 @@
         BTT,
     }
 }
+

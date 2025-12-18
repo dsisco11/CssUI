@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics.Contracts;
 using CssUI.DOM;
 using CssUI.Devices;
@@ -148,3 +148,4 @@ namespace CssUI
 
     }
 }
+

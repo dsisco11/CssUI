@@ -1,4 +1,4 @@
-﻿using CssUI.Enums;
+using CssUI.Enums;
 
 using System;
 
@@ -30,3 +30,4 @@ namespace CssUI.DOM
 
     }
 }
+

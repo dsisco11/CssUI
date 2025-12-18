@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -49,12 +49,12 @@ namespace CssUI.Rendering
         #endregion
 
         #region Constructors
-        private GpuTexture(ReadOnlyRect2i Size)
+        private GpuTexture(Rect2i Size)
         {
             this.Size = new Rect2i(Size);
         }
 
-        public GpuTexture(ReadOnlySpan<byte> Data, ReadOnlyRect2i Size, EPixelFormat Format)
+        public GpuTexture(ReadOnlySpan<byte> Data, Rect2i Size, EPixelFormat Format)
         {
             this.Size = new Rect2i(Size);
             Push_Frame(Data, Size, Format);
@@ -111,7 +111,7 @@ namespace CssUI.Rendering
         #endregion
 
         #region Frame Pushing
-        public void Push_Frame(ReadOnlySpan<byte> Data, ReadOnlyRect2i Size, EPixelFormat Format, float Time = 0f)
+        public void Push_Frame(ReadOnlySpan<byte> Data, Rect2i Size, EPixelFormat Format, float Time = 0f)
         {
             FrameAtlas.Add(new GpuTextureFrame(Data, new Rect2i(Size), Format, Time));
             Build_Timeline();
@@ -176,3 +176,4 @@ namespace CssUI.Rendering
         #endregion
     }
 }
+

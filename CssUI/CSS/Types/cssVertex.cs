@@ -1,4 +1,4 @@
-﻿using CssUI.Rendering;
+using CssUI.Rendering;
 
 namespace CssUI.CSS
 {
@@ -27,3 +27,4 @@ namespace CssUI.CSS
         }
     }
 }
+

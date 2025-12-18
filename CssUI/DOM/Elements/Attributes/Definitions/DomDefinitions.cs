@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Enums;
+using CssUI.DOM.Enums;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 #if ENABLE_HTML
@@ -182,3 +182,4 @@ namespace CssUI.DOM
         }
     }
 }
+

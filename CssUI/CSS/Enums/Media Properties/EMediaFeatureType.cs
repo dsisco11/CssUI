@@ -1,4 +1,4 @@
-﻿namespace CssUI.CSS.Media
+namespace CssUI.CSS.Media
 {
     public enum EMediaFeatureType : int
     {
@@ -12,3 +12,4 @@
         Range
     }
 }
+

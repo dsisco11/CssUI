@@ -1,4 +1,4 @@
-﻿namespace CssUI.CSS.Enums
+namespace CssUI.CSS.Enums
 {
     /// <summary>
     /// Describes how to calculate the boundaries of a CSS box
@@ -27,3 +27,4 @@
 
     }
 }
+

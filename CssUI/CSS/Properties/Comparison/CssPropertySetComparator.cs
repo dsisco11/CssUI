@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace CssUI.CSS
 {
@@ -37,3 +37,4 @@ namespace CssUI.CSS
         }
     }
 }
+

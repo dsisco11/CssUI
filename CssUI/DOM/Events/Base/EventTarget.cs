@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Exceptions;
+using CssUI.DOM.Exceptions;
 using CssUI.DOM.Internal;
 using CssUI.Internal;
 using System;
@@ -183,3 +183,4 @@ namespace CssUI.DOM.Events
         }
     }
 }
+

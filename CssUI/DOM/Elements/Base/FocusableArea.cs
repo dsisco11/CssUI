@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Events;
+using CssUI.DOM.Events;
 using CssUI.DOM.Internal;
 using CssUI.DOM.Nodes;
 
@@ -121,3 +121,4 @@ namespace CssUI.DOM
         #endregion
     }
 }
+

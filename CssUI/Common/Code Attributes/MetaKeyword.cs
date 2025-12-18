@@ -1,4 +1,4 @@
-﻿namespace CssUI.Internal
+namespace CssUI.Internal
 {
     [System.AttributeUsage(System.AttributeTargets.Field)]
     public class MetaKeywordAttribute : System.Attribute
@@ -17,3 +17,4 @@
         #endregion
     }
 }
+

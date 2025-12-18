@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace CssUI.Internal
 {
@@ -32,3 +32,4 @@ namespace CssUI.Internal
         #endregion
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 
 namespace CssUI.Filters
 {
@@ -29,3 +29,4 @@ namespace CssUI.Filters
         }
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.Parser;
+using CssUI.CSS.Parser;
 
 namespace CssUI.CSS.Selectors
 {
@@ -22,3 +22,4 @@ namespace CssUI.CSS.Selectors
         }
     }
 }
+

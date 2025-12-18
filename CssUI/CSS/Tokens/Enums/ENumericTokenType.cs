@@ -1,4 +1,4 @@
-﻿
+
 namespace CssUI.CSS
 {
     public enum ENumericTokenType
@@ -13,3 +13,4 @@ namespace CssUI.CSS
         Integer,
     }
 }
+

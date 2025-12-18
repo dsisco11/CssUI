@@ -1,4 +1,4 @@
-﻿using CssUI.HTTP;
+using CssUI.HTTP;
 using System;
 using System.Collections.Generic;
 
@@ -47,3 +47,4 @@ namespace CssUI.HTML
         }
     }
 }
+

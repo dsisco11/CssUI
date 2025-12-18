@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Mutation;
+using CssUI.DOM.Mutation;
 
 namespace CssUI.DOM
 {
@@ -14,3 +14,4 @@ namespace CssUI.DOM
         }
     }
 }
+

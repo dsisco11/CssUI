@@ -1,4 +1,4 @@
-﻿namespace CssUI.CSS.Enums
+namespace CssUI.CSS.Enums
 {
     public enum EPropertySystemDirtFlags : byte
     {
@@ -20,3 +20,4 @@
         NeedsToResolveFont = 1 << 2
     }
 }
+

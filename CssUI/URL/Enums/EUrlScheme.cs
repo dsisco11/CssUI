@@ -1,4 +1,4 @@
-﻿using CssUI.Internal;
+using CssUI.Internal;
 
 namespace CssUI.HTTP
 {
@@ -31,3 +31,4 @@ namespace CssUI.HTTP
         Wss,
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.Parser;
+using CssUI.CSS.Parser;
 using CssUI.CSS.Serialization;
 using CssUI.DOM;
 using CssUI.DOM.Nodes;
@@ -129,3 +129,4 @@ namespace CssUI.CSS.Selectors
         }
     }
 }
+

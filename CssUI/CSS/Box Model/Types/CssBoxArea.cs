@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.BoxTree;
+using CssUI.CSS.BoxTree;
 using CssUI.DOM.Geometry;
 
 namespace CssUI.CSS
@@ -14,11 +14,11 @@ namespace CssUI.CSS
         /// <summary>
         /// Holds the origin location for the bounds
         /// </summary>
-        private readonly Point2i Pos = new Point2i();
+        private Point2i Pos = new Point2i(0, 0);
         /// <summary>
         /// Holds the size of the bounds
         /// </summary>
-        private readonly Rect2i Dimensions = new Rect2i();
+        private Rect2i Dimensions = new Rect2i(0, 0);
 
         /// <summary>
         /// The edges of this area
@@ -90,21 +90,21 @@ namespace CssUI.CSS
         /// <summary>
         /// Returns the box's current APPROXIMATE center position
         /// </summary>
-        public ReadOnlyPoint2i Get_Center_Pos() => new ReadOnlyPoint2i(CenterX, CenterY);
+        public Point2i Get_Center_Pos() => new Point2i(CenterX, CenterY);
 
         /// <summary>
         /// Returns the box's Position
         /// </summary>
         /// <returns></returns>
         /// We return a new object because destructive calculations will likely be done on this
-        public ReadOnlyPoint2i Get_Pos() => Pos;
+        public Point2i Get_Pos() => Pos;
 
         /// <summary>
         /// Returns the box's Dimensions
         /// </summary>
         /// <returns></returns>
         /// We return a new object because destructive calculations will likely be done on this
-        public ReadOnlyRect2i Get_Dimensions() => Dimensions;
+        public Rect2i Get_Dimensions() => Dimensions;
         #endregion
 
         #region Accessors
@@ -421,3 +421,4 @@ namespace CssUI.CSS
         #endregion
     }
 }
+

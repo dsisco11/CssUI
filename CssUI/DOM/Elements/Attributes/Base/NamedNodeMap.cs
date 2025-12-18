@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Exceptions;
+using CssUI.DOM.Exceptions;
 using CssUI.DOM.Nodes;
 using System;
 using System.Linq;
@@ -105,3 +105,4 @@ namespace CssUI.DOM
         }
     }
 }
+

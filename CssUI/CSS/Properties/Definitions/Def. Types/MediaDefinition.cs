@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CssUI.Internal;
 using CssUI.CSS.Media;
 using System.Diagnostics.Contracts;
@@ -133,3 +133,4 @@ namespace CssUI.CSS.Internal
         #endregion
     }
 }
+

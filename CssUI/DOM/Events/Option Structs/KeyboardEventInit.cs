@@ -1,4 +1,4 @@
-﻿using CssUI.Devices;
+using CssUI.Devices;
 
 namespace CssUI.DOM.Events
 {
@@ -11,3 +11,4 @@ namespace CssUI.DOM.Events
         public bool isComposing = false;
     }
 }
+

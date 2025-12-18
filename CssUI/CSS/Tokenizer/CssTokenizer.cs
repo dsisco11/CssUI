@@ -1,4 +1,4 @@
-﻿using CssUI.Common.Exceptions;
+using CssUI.Common.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -873,3 +873,4 @@ namespace CssUI.CSS.Parser
         }
     }
 }
+

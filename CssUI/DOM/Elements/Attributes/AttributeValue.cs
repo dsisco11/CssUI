@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Enums;
+using CssUI.DOM.Enums;
 using System;
 using System.Diagnostics.Contracts;
 using System.Globalization;
@@ -313,3 +313,4 @@ namespace CssUI.DOM
 
     }
 }
+

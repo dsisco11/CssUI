@@ -1,4 +1,4 @@
-﻿using CssUI.Enums;
+using CssUI.Enums;
 using System;
 using System.Globalization;
 
@@ -155,3 +155,4 @@ namespace CssUI
         #endregion
     }
 }
+

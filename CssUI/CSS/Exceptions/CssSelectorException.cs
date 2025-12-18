@@ -1,4 +1,4 @@
-﻿
+
 namespace CssUI
 {
     public class CssSelectorException : CssException
@@ -12,3 +12,4 @@ namespace CssUI
         }
     }
 }
+

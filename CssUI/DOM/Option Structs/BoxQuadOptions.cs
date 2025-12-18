@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.Enums;
+using CssUI.CSS.Enums;
 using CssUI.DOM.Interfaces;
 
 namespace CssUI.DOM.Internal
@@ -19,3 +19,4 @@ namespace CssUI.DOM.Internal
         #endregion
     }
 }
+

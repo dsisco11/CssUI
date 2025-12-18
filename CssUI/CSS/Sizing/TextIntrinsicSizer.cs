@@ -197,3 +197,4 @@ public static class TextIntrinsicSizer
             IntrinsicAxisSize.Definite(blockSize));
     }
 }
+

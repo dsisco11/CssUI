@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CssUI.CSS.Parser
 {
@@ -19,3 +19,4 @@ namespace CssUI.CSS.Parser
         }
     }
 }
+

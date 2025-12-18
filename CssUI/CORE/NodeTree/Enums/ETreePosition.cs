@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CssUI.Enums
 {
@@ -30,3 +30,4 @@ namespace CssUI.Enums
         CONTAINED_BY = (0x01 << 4),
     }
 }
+

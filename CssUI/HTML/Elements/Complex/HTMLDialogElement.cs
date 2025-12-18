@@ -1,4 +1,4 @@
-﻿using CssUI.DOM;
+using CssUI.DOM;
 using CssUI.DOM.Events;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Nodes;
@@ -119,3 +119,4 @@ namespace CssUI.HTML
         }
     }
 }
+

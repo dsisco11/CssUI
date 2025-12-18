@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CssUI.DOM.Nodes
 {
@@ -48,3 +48,4 @@ namespace CssUI.DOM.Nodes
         DescendentHasFocus = 1 << 18,
     }
 }
+

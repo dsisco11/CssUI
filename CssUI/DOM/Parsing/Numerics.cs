@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Enums;
+using CssUI.DOM.Enums;
 using CssUI.DOM.Exceptions;
 using System;
 using System.Diagnostics.Contracts;
@@ -534,3 +534,4 @@ namespace CssUI.Serialization
         #endregion
     }
 }
+

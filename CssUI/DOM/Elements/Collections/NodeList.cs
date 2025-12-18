@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Enums;
+using CssUI.DOM.Enums;
 using CssUI.DOM.Nodes;
 using System;
 using System.Collections;
@@ -66,3 +66,4 @@ namespace CssUI.DOM
         #endregion
     }
 }
+

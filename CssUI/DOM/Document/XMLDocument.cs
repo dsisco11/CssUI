@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM
+namespace CssUI.DOM
 {
     public class XMLDocument : Document
     {/* Docs: https://dom.spec.whatwg.org/#xmldocument */
@@ -9,3 +9,4 @@
         }
     }
 }
+

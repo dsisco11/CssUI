@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 
 namespace CssUI
@@ -69,3 +69,4 @@ namespace CssUI
 
     }
 }
+

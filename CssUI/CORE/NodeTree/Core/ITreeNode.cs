@@ -1,4 +1,4 @@
-﻿using CssUI.Enums;
+using CssUI.Enums;
 
 namespace CssUI.NodeTree
 {
@@ -41,3 +41,4 @@ namespace CssUI.NodeTree
         ITreeNode GetRootNode();
     }
 }
+

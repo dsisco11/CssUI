@@ -1,4 +1,4 @@
-﻿using CssUI.DOM;
+using CssUI.DOM;
 using CssUI.DOM.Enums;
 
 namespace CssUI.HTML
@@ -68,3 +68,4 @@ namespace CssUI.HTML
 
     }
 }
+

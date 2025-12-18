@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.Parser;
+using CssUI.CSS.Parser;
 using CssUI.CSS.Serialization;
 using System;
 using System.Collections.Generic;
@@ -83,3 +83,4 @@ namespace CssUI.CSS
         }
     }
 }
+

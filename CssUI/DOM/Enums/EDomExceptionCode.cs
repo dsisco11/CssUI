@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM.Enums
+namespace CssUI.DOM.Enums
 {
     public enum EDomExceptionCode : ushort
     {
@@ -29,3 +29,4 @@
         DATA_CLONE_ERR = 25,
     }
 }
+

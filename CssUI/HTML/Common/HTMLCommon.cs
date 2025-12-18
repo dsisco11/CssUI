@@ -1,4 +1,4 @@
-﻿using CssUI.DOM;
+using CssUI.DOM;
 using CssUI.DOM.Enums;
 using CssUI.DOM.Nodes;
 using CssUI.DOM.Traversal;
@@ -614,3 +614,4 @@ namespace CssUI.HTML
 
     }
 }
+

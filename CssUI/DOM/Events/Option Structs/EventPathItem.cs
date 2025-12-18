@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace CssUI.DOM.Events
 {
@@ -13,3 +13,4 @@ namespace CssUI.DOM.Events
         public bool slot_in_closed_tree;
     }
 }
+

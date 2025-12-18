@@ -1,4 +1,4 @@
-﻿namespace CssUI.CSS.Internal
+namespace CssUI.CSS.Internal
 {
     public enum ECssRuleType : ushort
     {
@@ -12,3 +12,4 @@
         NAMESPACE_RULE = 10
     }
 }
+

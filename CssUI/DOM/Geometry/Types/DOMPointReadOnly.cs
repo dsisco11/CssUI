@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM.Geometry
+namespace CssUI.DOM.Geometry
 {
     public class DOMPointReadOnly : IDOMPointReadOnly
     {/* Docs: https://www.w3.org/TR/geometry-1/#DOMPoint */
@@ -89,3 +89,4 @@
 
     }
 }
+

@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM.Geometry
+namespace CssUI.DOM.Geometry
 {
     public class DOMRectInit
     {
@@ -18,3 +18,4 @@
         }
     }
 }
+

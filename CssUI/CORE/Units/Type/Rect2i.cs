@@ -1,239 +1,90 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
 
 namespace CssUI
 {
     /// <summary>
-    /// Represents a 2D rectangle with a width and height but no position
+    /// Represents a 2D size with integer Width and Height (no position).
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class Rect2i
+    public record struct Rect2i(int Width, int Height)
     {
         #region Static Definitions
-        public static readonly Rect2i Zero = new Rect2i(0, 0);
-        #endregion
-
-        #region Properties
-        public int Width;
-        public int Height;
-        #endregion
-
-        #region Constructors
-        public Rect2i()
-        {
-            Width = Height = 0;
-        }
-        public Rect2i(int n)
-        {
-            Width = Height = n;
-        }
-        public Rect2i(int width, int height)
-        {
-            Width = width;
-            Height = height;
-        }
-        public Rect2i(double width, double height)
-        {
-            Width = (int)width;
-            Height = (int)height;
-        }
-        public Rect2i(in ReadOnlyRect2i Other)
-        {
-            Width = Other.Width;
-            Height = Other.Height;
-        }
+        public static readonly Rect2i Zero = new(0, 0);
         #endregion
 
         #region Operators
-        #region Math
         // ADDITION
-        public static Rect2i operator +(Rect2i A, int Value)
-        {
-            return new Rect2i(A.Width + Value,
-                              A.Height + Value);
-        }
-        public static Rect2i operator +(Rect2i A, double Value)
-        {
-            return new Rect2i(A.Width + (int)Value,
-                              A.Height + (int)Value);
-        }
-        public static Rect2i operator +(Rect2i A, in ReadOnlyRect2i B)
-        {
-            return new Rect2i(A.Width + B.Width,
-                              A.Height + B.Height);
-        }
+        public static Rect2i operator +(Rect2i A, int Value) => new(A.Width + Value, A.Height + Value);
+        public static Rect2i operator +(Rect2i A, Rect2i B) => new(A.Width + B.Width, A.Height + B.Height);
 
         // SUBTRACTION
-        public static Rect2i operator -(Rect2i A, int Value)
-        {
-            return new Rect2i(A.Width - Value,
-                              A.Height - Value);
-        }
-        public static Rect2i operator -(Rect2i A, double Value)
-        {
-            return new Rect2i(A.Width - (int)Value,
-                              A.Height - (int)Value);
-        }
-        public static Rect2i operator -(Rect2i A, in ReadOnlyRect2i B)
-        {
-            return new Rect2i(A.Width - B.Width,
-                              A.Height - B.Height);
-        }
+        public static Rect2i operator -(Rect2i A, int Value) => new(A.Width - Value, A.Height - Value);
+        public static Rect2i operator -(Rect2i A, Rect2i B) => new(A.Width - B.Width, A.Height - B.Height);
 
         // MULTIPLICATION
-        public static Rect2i operator *(Rect2i A, int Value)
-        {
-            return new Rect2i(A.Width * Value,
-                              A.Height * Value);
-        }
-        public static Rect2i operator *(Rect2i A, double Value)
-        {
-            return new Rect2i(A.Width * (int)Value,
-                              A.Height * (int)Value);
-        }
-        public static Rect2i operator *(Rect2i A, in ReadOnlyRect2i B)
-        {
-            return new Rect2i(A.Width * B.Width,
-                              A.Height * B.Height);
-        }
+        public static Rect2i operator *(Rect2i A, int Value) => new(A.Width * Value, A.Height * Value);
+        public static Rect2i operator *(Rect2i A, Rect2i B) => new(A.Width * B.Width, A.Height * B.Height);
 
         // DIVISION
-        public static Rect2i operator /(Rect2i A, int Value)
-        {
-            return new Rect2i(A.Width / Value,
-                              A.Height / Value);
-        }
-        public static Rect2i operator /(Rect2i A, double Value)
-        {
-            return new Rect2i(A.Width / (int)Value,
-                              A.Height / (int)Value);
-        }
-        public static Rect2i operator /(Rect2i A, in ReadOnlyRect2i B)
-        {
-            return new Rect2i(A.Width / B.Width,
-                              A.Height / B.Height);
-        }
+        public static Rect2i operator /(Rect2i A, int Value) => new(A.Width / Value, A.Height / Value);
+        public static Rect2i operator /(Rect2i A, Rect2i B) => new(A.Width / B.Width, A.Height / B.Height);
         #endregion
-
-        #region Equality
-        public static bool operator ==(Rect2i A, Rect2i B)
-        {
-            if ((A is null) || (B is null))
-                return (A is null) ^ (B is null);
-
-            if (ReferenceEquals(A, B)) return true;
-
-            return (A.Width == B.Width) && (A.Height == B.Height);
-        }
-
-        public static bool operator !=(Rect2i A, Rect2i B)
-        {
-            if ((A is null) || (B is null))
-                return !((A is null) ^ (B is null));
-
-            if (ReferenceEquals(A, B)) return false;
-
-            return (A.Width != B.Width) || (A.Height != B.Height);
-        }
-
-        public override bool Equals(object o)
-        {
-            return (o is Rect2i val && this == val);
-        }
-
-        public override int GetHashCode()
-        {
-            int hash = 17;
-            hash = (hash * 31 + Width.GetHashCode());
-            hash = (hash * 31 + Height.GetHashCode());
-            return hash;
-        }
-
-        public override string ToString()
-        {
-            return $"{GetType().Name}<{Width}, {Height}>";
-        }
-        #endregion
-        #endregion
-
 
         #region Bounds Limiting
-
         /// <summary>
-        /// Returns the smallest dimensions of this size and the one given
+        /// Returns the smallest dimensions of this size and the one given.
         /// </summary>
-        /// <param name="mn"></param>
-        /// <returns></returns>
-        public Rect2i Min(Rect2i mn)
+        public readonly Rect2i Min(Rect2i? mn)
         {
             if (mn is null) return this;
-            return new Rect2i()
-            {
-                Width = Math.Min(Width, mn.Width),
-                Height = Math.Min(Height, mn.Height),
-            };
+            return new Rect2i(
+                Math.Min(Width, mn.Value.Width),
+                Math.Min(Height, mn.Value.Height));
         }
 
         /// <summary>
-        /// Returns the largest dimensions of this size and the one given
+        /// Returns the largest dimensions of this size and the one given.
         /// </summary>
-        /// <param name="mx"></param>
-        /// <returns></returns>
-        public Rect2i Max(Rect2i mx)
+        public readonly Rect2i Max(Rect2i? mx)
         {
             if (mx is null) return this;
-            return new Rect2i()
-            {
-                Width = Math.Max(Width, mx.Width),
-                Height = Math.Max(Height, mx.Height),
-            };
+            return new Rect2i(
+                Math.Max(Width, mx.Value.Width),
+                Math.Max(Height, mx.Value.Height));
         }
 
         /// <summary>
-        /// Clamps this sizes dimensions to the min and max given
+        /// Clamps this size's dimensions to the min and max given.
         /// </summary>
-        /// <param name="mn"></param>
-        /// <param name="mx"></param>
-        /// <returns></returns>
-        public Rect2i Clamp(Rect2i mn, Rect2i mx)
+        public readonly Rect2i Clamp(Rect2i? mn, Rect2i? mx)
         {
             if (mn is null && mx is null)
-            {// We have been given no minimum or maximum values, so just return the size
+            {
                 return this;
             }
             else if (mn is null)
-            {// We have been given no minimum value, so function like Min() instead
-                return new Rect2i()
-                {
-                    Width = Math.Min(Width, mx.Width),
-                    Height = Math.Min(Height, mx.Height),
-                };
+            {
+                return new Rect2i(
+                    Math.Min(Width, mx!.Value.Width),
+                    Math.Min(Height, mx.Value.Height));
             }
             else if (mx is null)
-            {// We have been given no maximum value, so function like Max() instead
-                return new Rect2i()
-                {
-                    Width = Math.Max(Width, mn.Width),
-                    Height = Math.Max(Height, mn.Height),
-                };
+            {
+                return new Rect2i(
+                    Math.Max(Width, mn.Value.Width),
+                    Math.Max(Height, mn.Value.Height));
             }
             else
             {
-                return new Rect2i()
-                {
-                    Width = Math.Clamp(Width, mn.Width, mx.Width),
-                    Height = Math.Clamp(Height, mn.Height, mx.Height),
-                };
+                return new Rect2i(
+                    Math.Clamp(Width, mn.Value.Width, mx.Value.Width),
+                    Math.Clamp(Height, mn.Value.Height, mx.Value.Height));
             }
         }
         #endregion
 
-
-        #region Casts
-        public static implicit operator ReadOnlyRect2i(Rect2i size)
-        {
-            return (ReadOnlyRect2i)size;
-        }
+        #region Formatting
+        public override readonly string ToString() => $"Rect2i({Width}, {Height})";
         #endregion
     }
 }
+

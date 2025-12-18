@@ -1,4 +1,4 @@
-﻿using CssUI.Devices;
+using CssUI.Devices;
 using CssUI.DOM.Events;
 using CssUI.DOM.Nodes;
 using System;
@@ -440,3 +440,4 @@ namespace CssUI.DOM.Internal
         #endregion
     }
 }
+

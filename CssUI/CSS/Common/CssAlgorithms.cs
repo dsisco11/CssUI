@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.BoxTree;
+using CssUI.CSS.BoxTree;
 using System;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
@@ -291,3 +291,4 @@ namespace CssUI.CSS
         }
     }
 }
+

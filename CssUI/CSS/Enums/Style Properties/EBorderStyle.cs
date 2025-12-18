@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CssUI.Internal;
 
 namespace CssUI.CSS
@@ -37,3 +37,4 @@ namespace CssUI.CSS
         Outset = (1 << 9),
     };
 }
+

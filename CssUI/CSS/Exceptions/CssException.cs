@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 
 namespace CssUI
@@ -18,3 +18,4 @@ namespace CssUI
         }
     }
 }
+

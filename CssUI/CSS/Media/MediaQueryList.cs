@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.Media;
+using CssUI.CSS.Media;
 using CssUI.CSS.Serialization;
 using CssUI.DOM.Events;
 using System;
@@ -113,3 +113,4 @@ namespace CssUI.DOM.Media
         }
     }
 }
+

@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM.Events
+namespace CssUI.DOM.Events
 {
     public class ProgressEvent : Event
     {/* Docs: https://xhr.spec.whatwg.org/#progressevent */
@@ -19,3 +19,4 @@
 
     }
 }
+

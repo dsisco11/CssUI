@@ -1,4 +1,4 @@
-﻿using CssUI.DOM;
+using CssUI.DOM;
 using System.Linq;
 
 namespace CssUI.HTML
@@ -76,3 +76,4 @@ namespace CssUI.HTML
         #endregion
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using CssUI.NodeTree;
+using CssUI.NodeTree;
 
 namespace CssUI.CSS.BoxTree
 {
@@ -25,7 +25,7 @@ namespace CssUI.CSS.BoxTree
         /// <summary>
         /// Layout dimensions
         /// </summary>
-        public virtual ReadOnlyRect2f Size { get; set; }
+        public virtual Rect2f Size { get; set; }
 
         #region TreeNode Overrides
         /// <inheritdoc/>
@@ -74,3 +74,4 @@ namespace CssUI.CSS.BoxTree
         }
     }
 }
+

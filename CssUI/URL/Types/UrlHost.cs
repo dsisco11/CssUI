@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CssUI.HTTP
 {
@@ -67,3 +67,4 @@ namespace CssUI.HTTP
         }
     }
 }
+

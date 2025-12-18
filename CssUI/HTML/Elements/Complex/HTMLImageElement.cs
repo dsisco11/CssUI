@@ -1,4 +1,4 @@
-﻿using CssUI.DOM;
+using CssUI.DOM;
 using CssUI.DOM.Enums;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Internal;
@@ -300,3 +300,4 @@ namespace CssUI.HTML
         }
     }
 }
+

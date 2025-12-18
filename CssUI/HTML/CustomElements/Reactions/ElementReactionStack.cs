@@ -1,4 +1,4 @@
-﻿using CssUI.DOM;
+using CssUI.DOM;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -99,3 +99,4 @@ namespace CssUI.HTML.CustomElements
         #endregion
     }
 }
+

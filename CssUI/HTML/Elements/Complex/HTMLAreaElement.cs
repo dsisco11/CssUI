@@ -1,4 +1,4 @@
-﻿using CssUI.DOM;
+using CssUI.DOM;
 using CssUI.DOM.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -105,3 +105,4 @@ namespace CssUI.HTML
         #endregion
     }
 }
+

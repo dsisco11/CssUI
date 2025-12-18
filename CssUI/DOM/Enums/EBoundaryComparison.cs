@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM
+namespace CssUI.DOM
 {
     public enum EBoundaryComparison : ushort
     {
@@ -8,3 +8,4 @@
         END_TO_START = 3
     }
 }
+

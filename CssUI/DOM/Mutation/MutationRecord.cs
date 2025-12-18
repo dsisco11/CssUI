@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Enums;
+using CssUI.DOM.Enums;
 using CssUI.DOM.Nodes;
 using System.Collections.Generic;
 
@@ -132,3 +132,4 @@ namespace CssUI.DOM.Mutation
         #endregion
     }
 }
+

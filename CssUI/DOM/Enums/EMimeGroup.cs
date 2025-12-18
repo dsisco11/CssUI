@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CssUI.DOM
 {
@@ -106,3 +106,4 @@ namespace CssUI.DOM
         JSON = (1 << 11),
     }
 }
+

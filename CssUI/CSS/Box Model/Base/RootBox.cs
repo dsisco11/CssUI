@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.Enums;
+using CssUI.CSS.Enums;
 using CssUI.CSS.Formatting;
 using CssUI.DOM;
 using CssUI.DOM.Geometry;
@@ -63,3 +63,4 @@ namespace CssUI.CSS.BoxTree
         #endregion
     }
 }
+

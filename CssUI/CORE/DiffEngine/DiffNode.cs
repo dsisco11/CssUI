@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics.Contracts;
 using System.Text;
 
@@ -82,3 +82,4 @@ namespace CssUI.Difference
         #endregion
     }
 }
+

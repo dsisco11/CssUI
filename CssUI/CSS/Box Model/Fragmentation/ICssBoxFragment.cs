@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.BoxTree;
+using CssUI.CSS.BoxTree;
 
 namespace CssUI.CSS
 {

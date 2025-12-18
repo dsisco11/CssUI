@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Events;
+using CssUI.DOM.Events;
 using System.Collections.Generic;
 
 namespace CssUI.HTML
@@ -16,3 +16,4 @@ namespace CssUI.HTML
         IReadOnlyCollection<HTMLLabelElement> labels { get; }
     }
 }
+

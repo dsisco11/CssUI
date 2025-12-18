@@ -1,4 +1,4 @@
-﻿namespace CssUI
+namespace CssUI
 {
     public static class CssIcons
     {
@@ -45,3 +45,4 @@
 ";
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 
 namespace CssUI.Difference
@@ -72,3 +72,4 @@ namespace CssUI.Difference
         #endregion
     }
 }
+

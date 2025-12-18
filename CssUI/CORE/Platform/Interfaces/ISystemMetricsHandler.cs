@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Numerics;
 
 namespace CssUI.Platform
@@ -43,3 +43,4 @@ namespace CssUI.Platform
         Vector2 Get_DPI(IntPtr window);
     }
 }
+

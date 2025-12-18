@@ -1,4 +1,4 @@
-﻿using CssUI.Internal;
+using CssUI.Internal;
 
 namespace CssUI.CSS.Media
 {
@@ -21,3 +21,4 @@ namespace CssUI.CSS.Media
         Scroll,
     }
 }
+

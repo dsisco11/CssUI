@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using CssUI.DOM;
 
 namespace CssUI.CSS
@@ -44,3 +44,4 @@ namespace CssUI.CSS
         }
     }
 }
+

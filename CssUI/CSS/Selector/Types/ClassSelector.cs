@@ -1,4 +1,4 @@
-﻿using CssUI.DOM;
+using CssUI.DOM;
 using CssUI.DOM.Nodes;
 using System.Runtime.CompilerServices;
 
@@ -24,3 +24,4 @@ namespace CssUI.CSS.Selectors
         }
     }
 }
+

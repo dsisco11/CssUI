@@ -1,4 +1,4 @@
-﻿namespace CssUI.CSS.Internal
+namespace CssUI.CSS.Internal
 {
     public sealed class CSSPageRule : CSSGroupingRule
     {
@@ -13,3 +13,4 @@
         }
     }
 }
+

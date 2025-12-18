@@ -1,4 +1,4 @@
-﻿using CssUI.DOM;
+using CssUI.DOM;
 using CssUI.DOM.Exceptions;
 
 namespace CssUI.HTML
@@ -176,3 +176,4 @@ namespace CssUI.HTML
         }
     }
 }
+

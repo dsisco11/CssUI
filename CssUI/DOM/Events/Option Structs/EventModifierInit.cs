@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM.Events
+namespace CssUI.DOM.Events
 {
     public class EventModifierInit : UIEventInit
     {
@@ -19,3 +19,4 @@
         public bool modifierSymbolLock = false;
     }
 }
+

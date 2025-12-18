@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace CssUI.DOM
@@ -23,3 +23,4 @@ namespace CssUI.DOM
         #endregion
     }
 }
+

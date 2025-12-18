@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CssUI.CSS.Internal
 {
@@ -24,3 +24,4 @@ namespace CssUI.CSS.Internal
 
     }
 }
+

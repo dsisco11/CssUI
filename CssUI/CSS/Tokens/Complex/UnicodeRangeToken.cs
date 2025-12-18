@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 
 namespace CssUI.CSS.Parser
@@ -46,3 +46,4 @@ namespace CssUI.CSS.Parser
         #endregion
     }
 }
+

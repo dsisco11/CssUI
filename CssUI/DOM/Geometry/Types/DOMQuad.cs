@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CssUI.DOM.Geometry
 {
@@ -72,3 +72,4 @@ namespace CssUI.DOM.Geometry
         }
     }
 }
+

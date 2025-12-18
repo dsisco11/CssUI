@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM.Geometry
+namespace CssUI.DOM.Geometry
 {
     public class DOMMatrix2DInit
     {
@@ -30,3 +30,4 @@
         #endregion
     }
 }
+

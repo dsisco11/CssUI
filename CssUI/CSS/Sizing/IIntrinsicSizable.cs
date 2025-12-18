@@ -119,3 +119,4 @@ public readonly struct IntrinsicSizeContext
     /// </summary>
     public bool IsMaxContent => SizeType == EIntrinsicSizeType.MaxContent;
 }
+

@@ -1,4 +1,4 @@
-﻿using CssUI.Internal;
+using CssUI.Internal;
 
 namespace CssUI.DOM.Enums
 {
@@ -27,3 +27,4 @@ namespace CssUI.DOM.Enums
         LimitedQuirks
     }
 }
+

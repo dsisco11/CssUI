@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using CssUI.DOM;
 using CssUI.CSS;
@@ -369,3 +369,4 @@ namespace CssUI
 
     }
 }
+

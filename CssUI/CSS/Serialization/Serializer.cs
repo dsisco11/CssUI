@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Text;
 using CssUI.CSS.Media;
@@ -108,3 +108,4 @@ namespace CssUI.CSS.Serialization
 
     }
 }
+

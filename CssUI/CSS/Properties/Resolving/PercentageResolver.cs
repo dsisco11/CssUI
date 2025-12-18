@@ -1,4 +1,4 @@
-﻿namespace CssUI.CSS.Internal
+namespace CssUI.CSS.Internal
 {
     /// <summary>
     /// A function that transforms a percentage into an absolute value
@@ -37,3 +37,4 @@
         }
     }
 }
+

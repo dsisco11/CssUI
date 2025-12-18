@@ -1,4 +1,4 @@
-﻿using CssUI.Devices;
+using CssUI.Devices;
 using System;
 
 namespace CssUI.DOM.Events
@@ -96,3 +96,4 @@ namespace CssUI.DOM.Events
         public bool getModifierState(string keyArg) => false;
     }
 }
+

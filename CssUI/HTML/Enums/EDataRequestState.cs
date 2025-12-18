@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM.Enums
+namespace CssUI.DOM.Enums
 {
     public enum EDataRequestState : int
     {
@@ -23,3 +23,4 @@
         Broken,
     }
 }
+

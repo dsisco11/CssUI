@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Enums;
+using CssUI.DOM.Enums;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Mutation;
 using CssUI.DOM.Nodes;
@@ -144,3 +144,4 @@ namespace CssUI.DOM
         }
     }
 }
+

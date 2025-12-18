@@ -1,4 +1,4 @@
-﻿//#define USE_PARALLEL
+//#define USE_PARALLEL
 
 using System;
 using System.Collections.Generic;
@@ -616,3 +616,4 @@ text.diff-type-modify { color: #F0F0F0; background-color: #3967FF; }
         #endregion
     }
 }
+

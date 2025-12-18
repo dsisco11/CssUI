@@ -1,4 +1,4 @@
-﻿namespace CssUI.DOM.Geometry
+namespace CssUI.DOM.Geometry
 {
     public interface IDOMPointReadOnly
     {
@@ -8,3 +8,4 @@
         double w { get; }
     }
 }
+

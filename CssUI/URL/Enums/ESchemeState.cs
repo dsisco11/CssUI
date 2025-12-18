@@ -1,4 +1,4 @@
-﻿namespace CssUI.HTTP
+namespace CssUI.HTTP
 {
     public enum ESchemeState : int
     {/* Docs: https://url.spec.whatwg.org/#scheme-start-state */
@@ -27,3 +27,4 @@
 
     }
 }
+

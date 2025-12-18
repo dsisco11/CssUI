@@ -1,4 +1,4 @@
-﻿using CssUI.DOM;
+using CssUI.DOM;
 using CssUI.DOM.Exceptions;
 using System;
 using System.Collections;
@@ -135,3 +135,4 @@ namespace CssUI.HTML
         }
     }
 }
+

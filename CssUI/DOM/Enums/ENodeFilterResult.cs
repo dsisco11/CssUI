@@ -1,4 +1,4 @@
-﻿
+
 namespace CssUI.DOM.Enums
 {
     public enum ENodeFilterResult
@@ -17,3 +17,4 @@ namespace CssUI.DOM.Enums
         FILTER_SKIP = 3
     }
 }
+

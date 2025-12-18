@@ -1,4 +1,4 @@
-﻿using CssUI.CSS.Internal;
+using CssUI.CSS.Internal;
 using CssUI.CSS.Parser;
 using CssUI.CSS.Serialization;
 using CssUI.Rendering;
@@ -1016,3 +1016,4 @@ namespace CssUI.CSS
     }
 
 }
+

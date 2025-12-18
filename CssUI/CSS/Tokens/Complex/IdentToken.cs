@@ -1,4 +1,4 @@
-﻿namespace CssUI.CSS.Parser
+namespace CssUI.CSS.Parser
 {
     public sealed class IdentToken : ValuedTokenBase
     {
@@ -12,3 +12,4 @@
         }
     }
 }
+

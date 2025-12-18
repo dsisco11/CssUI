@@ -1,4 +1,4 @@
-﻿namespace CssUI.CSS.Parser
+namespace CssUI.CSS.Parser
 {
     public sealed class DelimToken : CssToken
     {
@@ -31,3 +31,4 @@
         #endregion
     }
 }
+

@@ -1,4 +1,4 @@
-﻿namespace CssUI
+namespace CssUI
 {
     /// <summary>
     /// Provides stuff related to our "user agent"
@@ -10,3 +10,4 @@
         #endregion
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CssUI.CSS.Enums
 {
@@ -15,3 +15,4 @@ namespace CssUI.CSS.Enums
         IsReplaced = (1 << 1),
     }
 }
+

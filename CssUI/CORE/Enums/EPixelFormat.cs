@@ -1,4 +1,4 @@
-﻿namespace CssUI
+namespace CssUI
 {
     /// <summary>
     /// Specifys the format of pixel data
@@ -11,3 +11,4 @@
         RGBA,
     }
 }
+

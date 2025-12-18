@@ -1,4 +1,4 @@
-﻿using CssUI.DOM;
+using CssUI.DOM;
 using CssUI.DOM.Internal;
 using System;
 
@@ -160,3 +160,4 @@ namespace CssUI.HTML
 
     }
 }
+

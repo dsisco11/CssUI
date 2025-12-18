@@ -1,4 +1,4 @@
-﻿using CssUI.DOM.Enums;
+using CssUI.DOM.Enums;
 using System.IO;
 using System.Threading;
 
@@ -48,3 +48,4 @@ namespace CssUI.HTML
         public abstract void Fetch();
     }
 }
+

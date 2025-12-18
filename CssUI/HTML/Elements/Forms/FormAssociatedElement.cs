@@ -1,4 +1,4 @@
-﻿using CssUI.DOM;
+using CssUI.DOM;
 using CssUI.DOM.Events;
 using System.Text;
 
@@ -282,3 +282,4 @@ namespace CssUI.HTML
 
     }
 }
+

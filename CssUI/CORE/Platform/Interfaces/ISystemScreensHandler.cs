@@ -1,4 +1,4 @@
-﻿
+
 using System;
 
 namespace CssUI.Platform
@@ -13,3 +13,4 @@ namespace CssUI.Platform
         ISystemScreen Get_Screen_From_window(IntPtr window);
     }
 }
+

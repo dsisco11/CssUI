@@ -1,4 +1,4 @@
-﻿using CssUI.DOM;
+using CssUI.DOM;
 using CssUI.HTML;
 using CssUI.HTML.CustomElements;
 
@@ -25,3 +25,4 @@ namespace CssUI.HTML.Internal
         }
     }
 }
+

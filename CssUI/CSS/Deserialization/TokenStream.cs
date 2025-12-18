@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CssUI.CSS.Parser;
 
 namespace CssUI.CSS.Serialization
@@ -16,3 +16,4 @@ namespace CssUI.CSS.Serialization
         #endregion
     }
 }
+
