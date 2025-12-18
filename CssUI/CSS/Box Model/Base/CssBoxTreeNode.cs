@@ -29,15 +29,15 @@ namespace CssUI.CSS.BoxTree
 
         #region TreeNode Overrides
         /// <inheritdoc/>
-        public new CssBoxTreeNode parentNode { get => (CssBoxTreeNode)base.parentNode; set => base.parentNode = value; }
+        public new CssBoxTreeNode? parentNode { get => (CssBoxTreeNode?)base.parentNode; set => base.parentNode = value; }
         /// <inheritdoc/>
-        public new CssBoxTreeNode firstChild => (CssBoxTreeNode)base.firstChild;
+        public new CssBoxTreeNode? firstChild => (CssBoxTreeNode?)base.firstChild;
         /// <inheritdoc/>
-        public new CssBoxTreeNode lastChild => (CssBoxTreeNode)base.lastChild;
+        public new CssBoxTreeNode? lastChild => (CssBoxTreeNode?)base.lastChild;
         /// <inheritdoc/>
-        public new CssBoxTreeNode nextSibling => (CssBoxTreeNode)base.nextSibling;
+        public new CssBoxTreeNode? nextSibling => (CssBoxTreeNode?)base.nextSibling;
         /// <inheritdoc/>
-        public new CssBoxTreeNode previousSibling => (CssBoxTreeNode)base.previousSibling;
+        public new CssBoxTreeNode? previousSibling => (CssBoxTreeNode?)base.previousSibling;
         #endregion
         #endregion
 

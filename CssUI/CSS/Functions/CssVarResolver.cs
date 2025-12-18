@@ -22,7 +22,7 @@ namespace CssUI.CSS.Functions
         /// <param name="registry">The custom property registry to look up values</param>
         /// <param name="depth">Current resolution depth (for cycle detection)</param>
         /// <returns>The resolved CssValue, or null if resolution fails</returns>
-        internal static CssValue Resolve(CssFunction function, CssCustomPropertyRegistry registry, int depth = 0)
+        internal static CssValue? Resolve(CssFunction? function, CssCustomPropertyRegistry? registry, int depth = 0)
         {
             if (function == null)
                 return null;

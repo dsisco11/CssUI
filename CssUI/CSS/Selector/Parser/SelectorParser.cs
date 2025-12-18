@@ -151,7 +151,7 @@ namespace CssUI.CSS.Selectors
             return Consume_Selector_List(Stream);
         }
 
-        public ComplexSelector Parse_Single_Selector()
+        public ComplexSelector? Parse_Single_Selector()
         {
             return Consume_Single_Selector(Stream);
         }
@@ -321,10 +321,10 @@ namespace CssUI.CSS.Selectors
         /// Consumes a single <see cref="CompoundSelector"/> and it's <see cref="ESelectorCombinator"/> (if available)
         /// </summary>
         /// <returns></returns>
-        private static RelativeSelector Consume_Relative_Selector(DataConsumer<CssToken> Stream)
+        private static RelativeSelector? Consume_Relative_Selector(DataConsumer<CssToken> Stream)
         {
             Stream.Consume_While(tok => tok.Type == ECssTokenType.Whitespace);// Consume all of the prefixing whitespace
-            CompoundSelector Compound = Consume_Compound_Selector(Stream);
+            CompoundSelector? Compound = Consume_Compound_Selector(Stream);
 
             if (Compound == null)
                 return null;
@@ -367,9 +367,9 @@ namespace CssUI.CSS.Selectors
         /// Consumes a single <see cref="CompoundSelector"/>, which is a comprised of multiple <see cref="SimpleSelector"/>s
         /// </summary>
         /// <returns></returns>
-        private static CompoundSelector Consume_Compound_Selector(DataConsumer<CssToken> Stream)
+        private static CompoundSelector? Consume_Compound_Selector(DataConsumer<CssToken> Stream)
         {
-            SimpleSelector Simple;
+            SimpleSelector? Simple;
             var selectorList = new LinkedList<SimpleSelector>();
             do
             {
@@ -386,10 +386,10 @@ namespace CssUI.CSS.Selectors
             }
             while (Simple != null);
 
-            return new CompoundSelector(selectorList);
+            return selectorList.Count > 0 ? new CompoundSelector(selectorList) : null;
         }
 
-        private static SimpleSelector Consume_Simple_Selector(DataConsumer<CssToken> Stream)
+        private static SimpleSelector? Consume_Simple_Selector(DataConsumer<CssToken> Stream)
         {
             if (Starts_ID_Selector(Stream.Next))
             {
@@ -481,7 +481,7 @@ namespace CssUI.CSS.Selectors
         /// </summary>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static AttributeSelector Consume_Attribute_Selector(DataConsumer<CssToken> Stream)
+        static AttributeSelector? Consume_Attribute_Selector(DataConsumer<CssToken> Stream)
         {
             Stream.Consume();// Consume the '[' prefix
 
@@ -521,7 +521,7 @@ namespace CssUI.CSS.Selectors
         /// <para>':' <function-token> <any-value> ')'</para>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static PseudoClassSelector Consume_Pseudo_Class_Selector(DataConsumer<CssToken> Stream)
+        static PseudoClassSelector? Consume_Pseudo_Class_Selector(DataConsumer<CssToken> Stream)
         {
             Stream.Consume();// Consume the ':' prefix
             switch (Stream.Next.Type)
@@ -551,7 +551,7 @@ namespace CssUI.CSS.Selectors
         /// <para>'::' <function-token> <any-value> ')'</para>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static PseudoElementSelector Consume_Pseudo_Element_Selector(DataConsumer<CssToken> Stream)
+        static PseudoElementSelector? Consume_Pseudo_Element_Selector(DataConsumer<CssToken> Stream)
         {
             Stream.Consume(2);// Consume the '::' prefix
             switch (Stream.Next.Type)

@@ -36,7 +36,7 @@ namespace CssUI.DOM
         /// <summary>
         /// This is the window itsself
         /// </summary>
-        internal BrowsingContext BrowsingContext => document?.BrowsingContext;
+        internal BrowsingContext? BrowsingContext => document?.BrowsingContext;
         internal override Window WindowProxy { get => this; }
 
 #if ENABLE_HTML
@@ -156,7 +156,7 @@ namespace CssUI.DOM
 
 
         #region Selection
-        public Selection getSelection()
+        public Selection? getSelection()
         {/* Docs: https://www.w3.org/TR/selection-api/#extensions-to-window-interface */
             return document?.getSelection();
         }
@@ -254,12 +254,12 @@ namespace CssUI.DOM
 
 
         #region Node Management
-        public Node importNode(Node node, bool deep = false)
+        public Node? importNode(Node node, bool deep = false)
         {
             return this.document?.importNode(node, deep);
         }
 
-        public Node adoptNode(Node node)
+        public Node? adoptNode(Node node)
         {
             return this.document?.adoptNode(node);
         }

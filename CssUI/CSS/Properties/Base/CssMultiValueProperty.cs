@@ -95,7 +95,7 @@ namespace CssUI
         /// <summary>
         /// The value we interpreted from <see cref="Assigned"/>
         /// </summary>
-        public CssValueList Specified
+        public CssValueList? Specified
         {
             get
             {
@@ -112,7 +112,7 @@ namespace CssUI
         /// The value as used for inheritence.
         /// The Specified value after being resolved to an absolute value, if possible
         /// </summary>
-        public CssValueList Computed
+        public CssValueList? Computed
         {
             get
             {
@@ -128,7 +128,7 @@ namespace CssUI
         /// <summary>
         /// The final calculated value after applying a property specific resolution method to it
         /// </summary>
-        public CssValueList Used
+        public CssValueList? Used
         {
             get
             {
@@ -145,7 +145,7 @@ namespace CssUI
         /// The value that will be used by the element
         /// <para>This is the <see cref="Used"/> value with system restrictions placed on it</para>
         /// </summary>
-        public virtual CssValueList Actual
+        public virtual CssValueList? Actual
         {
             get
             {
@@ -245,7 +245,7 @@ namespace CssUI
         #region Interpreting
 
         #region Deriving
-        private CssValue Derive_SpecifiedValue(CssValue AssignedValue, out bool Inherited)
+        private CssValue? Derive_SpecifiedValue(CssValue AssignedValue, out bool Inherited)
         {
             StyleDefinition Def = Definition;
             Inherited = false;

@@ -92,7 +92,7 @@ namespace CssUI.CSS
         /// <summary>
         /// The value we interpreted from <see cref="Assigned"/>
         /// </summary>
-        public CssValue Specified
+        public CssValue? Specified
         {
             get
             {
@@ -109,7 +109,7 @@ namespace CssUI.CSS
         /// The value as used for inheritence.
         /// The Specified value after being resolved to an absolute value, if possible
         /// </summary>
-        public CssValue Computed
+        public CssValue? Computed
         {
             get
             {
@@ -125,7 +125,7 @@ namespace CssUI.CSS
         /// <summary>
         /// The final calculated value after applying a property specific resolution method to it
         /// </summary>
-        public CssValue Used
+        public CssValue? Used
         {
             get
             {
@@ -142,7 +142,7 @@ namespace CssUI.CSS
         /// The value that will be used by the element
         /// <para>This is the <see cref="Used"/> value with user-agent/system(platform) restrictions placed on it</para>
         /// </summary>
-        public CssValue Actual
+        public CssValue? Actual
         {
             get
             {

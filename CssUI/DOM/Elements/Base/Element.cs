@@ -746,11 +746,11 @@ namespace CssUI.DOM
             });
         }
         [CEReactions]
-        public Attr setAttributeNode(Attr attr)
+        public Attr? setAttributeNode(Attr attr)
         {
             return CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
-                find_attribute(attr.Name, out Attr oldAttr);
+                find_attribute(attr.Name, out Attr? oldAttr);
                 if (ReferenceEquals(attr, oldAttr))
                     return attr;
 

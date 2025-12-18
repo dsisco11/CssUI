@@ -19,7 +19,7 @@ namespace CssUI.DOM
         }
         #endregion
 
-        public Attr this[int index]
+        public Attr? this[int index]
         {
             get
             {
@@ -31,18 +31,18 @@ namespace CssUI.DOM
                 if (index >= ownerElement.AttributeList.Count) return;
                 Attr oldAttr = ownerElement.AttributeList[index];
                 if (ReferenceEquals(oldAttr, value)) return;
-                ownerElement.AttributeList[index] = value;
+                ownerElement.AttributeList[index] = value!;
             }
         }
 
-        public Attr item(int index)
+        public Attr? item(int index)
         {
             if (index >= ownerElement.AttributeList.Count) return null;
 
             return ownerElement.AttributeList[index];
         }
 
-        public Attr getNamedItem(ReadOnlyMemory<char> qualifiedName)
+        public Attr? getNamedItem(ReadOnlyMemory<char> qualifiedName)
         {
             /* To get an attribute by name given a qualifiedName and element element, run these steps: */
             /* 1) If element is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase. */
