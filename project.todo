@@ -205,15 +205,15 @@ Note: The HTML module requires significant work and is excluded from Core config
   - Currently: <Nullable>enable</Nullable> but many warnings
 - [x] Fix CS8765/CS8767 (64→0) - override/interface nullability mismatches
 - [x] Fix CS8714 (40→0) - generic notnull constraints
-- [ ] Fix CS8073 (2) - expression always false
-- [ ] Fix CS8622 (4) - parameter nullability mismatch
-- [ ] Fix CS8605 (4) - unboxing possibly null value
-- [ ] Fix CS8619 (6) - nullability mismatch in assignment
-- [ ] Fix CS8629 (34) - nullable value type may be null
-- [ ] Fix CS8601 (64) - null assignment to non-nullable
-- [ ] Fix CS8604 (156) - possible null reference argument
+- [x] Fix CS8073 (2→0) - expression always false
+- [x] Fix CS8622 (4→0) - parameter nullability mismatch
+- [x] Fix CS8605 (4→0) - unboxing possibly null value
+- [x] Fix CS8619 (6→0) - nullability mismatch in assignment
+- [ ] Fix CS8629 (34) - nullable value type may be null (requires logic review)
+- [ ] Fix CS8601 (62) - null assignment to non-nullable
+- [ ] Fix CS8604 (158) - possible null reference argument
 - [ ] Fix CS8618 (174) - non-nullable member not initialized
-- [ ] Fix CS8600 (250) - converting null to non-nullable type
-- [ ] Fix CS8602 (334) - dereference of possibly null reference
+- [ ] Fix CS8600 (246) - converting null to non-nullable type
+- [ ] Fix CS8602 (328) - dereference of possibly null reference
 - [ ] Fix CS8603 (386) - possible null reference return
 - [ ] Fix CS8625 (1036) - null literal to non-nullable type
