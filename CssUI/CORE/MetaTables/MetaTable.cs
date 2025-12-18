@@ -52,7 +52,7 @@ namespace CssUI.CORE
             {
                 if (ty.IsEnum)
                 {
-                    var metaAttr = (TAttribute)ty.GetCustomAttribute(MetaAttributeType, false);
+                    var metaAttr = (TAttribute?)ty.GetCustomAttribute(MetaAttributeType, false);
                     if (metaAttr != null)
                     {
                         RetVal.Add((ty, metaAttr));

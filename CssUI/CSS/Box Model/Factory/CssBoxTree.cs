@@ -54,8 +54,8 @@ namespace CssUI.CSS
 
                 if (node.GetFlag(ENodeFlags.NeedsBoxUpdate))
                 {
-                    CssBoxTreeNode Box = node.Box;
-                    Element nearestAncestor = Get_Closest_Box_Generating_Ancestor(node);
+                    CssBoxTreeNode? Box = node.Box;
+                    Element? nearestAncestor = Get_Closest_Box_Generating_Ancestor(node);
 
                     // 3) Delete the nodes current box
                     // 3) Unlink all box-nodes in the chain leading to the nodes real principal-box parent
@@ -63,11 +63,11 @@ namespace CssUI.CSS
                     int index = -1;
                     if (Box is object)
                     {
-                        var ChainRoot = Box.Unlink(nearestAncestor.Box);
+                        var ChainRoot = Box.Unlink(nearestAncestor!.Box);
                         index = ChainRoot.index;
                     }
 
-                    CssBoxTreeNode nextBox = null;
+                    CssBoxTreeNode? nextBox = null;
                     // 4) Generate a new principal-box or text-run
                     switch (node.nodeType)
                     {
@@ -188,7 +188,7 @@ namespace CssUI.CSS
 
         public static bool HasBlockLevelChildren(in Element Node)
         {
-            Element current = Node.firstElementChild;
+            Element? current = Node.firstElementChild;
             while (current != null)
             {
                 if (DisplayType.Get_Outer(current.Style.Display) == EOuterDisplayType.Block)
@@ -204,7 +204,7 @@ namespace CssUI.CSS
 
         public static bool HasInlineLevelChildren(in Element Node)
         {
-            Element current = Node.firstElementChild;
+            Element? current = Node.firstElementChild;
             while (current != null)
             {
                 if (DisplayType.From(current.Style.Display).IsInlineLevel)

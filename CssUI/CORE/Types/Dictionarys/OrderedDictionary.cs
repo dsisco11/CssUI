@@ -145,11 +145,11 @@ namespace CssUI
             }
 
             /* 2) Check if the oldKey and newKey are the same */
-            KeyIndex.TryGetKey(index, out KeyTy oldKey);
-            if (!oldKey.Equals(newKey))
+            KeyIndex.TryGetKey(index, out KeyTy? oldKey);
+            if (oldKey is null || !oldKey.Equals(newKey))
             {
                 /* Update our key map */
-                KeyIndex.Remove(oldKey);
+                if (oldKey != null) KeyIndex.Remove(oldKey);
                 KeyIndex.Add(newKey, index);
             }
         }

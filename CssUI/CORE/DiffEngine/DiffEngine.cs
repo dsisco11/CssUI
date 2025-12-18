@@ -40,7 +40,7 @@ namespace CssUI.Difference
             /* We want a series of commands that ONLY replace text which has changed BUT which does not skip CSI commands that may apply to those differences AND which do not include redundant CSI commands */
             int Balance = 0;// Tracks the total balance of data added vs removed
             var RetList = new LinkedList<DiffData<T>>();
-            LinkedListNode<DiffNode<T>> node = Diffs.First;
+            LinkedListNode<DiffNode<T>>? node = Diffs.First;
 
             while (node != null)
             {
@@ -115,7 +115,7 @@ namespace CssUI.Difference
 
             /* We want a series of commands that ONLY replace text which has changed BUT which does not skip CSI commands that may apply to those differences AND which do not include redundant CSI commands */
             var RetList = new LinkedList<DiffData<T>>();
-            LinkedListNode<DiffNode<T>> node = Diffs.First;
+            LinkedListNode<DiffNode<T>>? node = Diffs.First;
 
             while (node is object)
             {
@@ -230,13 +230,13 @@ namespace CssUI.Difference
         /// <param name="Old"></param>
         /// <param name="New"></param>
         /// <returns></returns>
-        private DiffNode<T> Consume(DataConsumer<T> Old, DataConsumer<T> New)
+        private DiffNode<T>? Consume(DataConsumer<T> Old, DataConsumer<T> New)
         {
             /* Scan both streams until we either find a spot ahead in one that matches the current spot in the other OR we hit the end of the stream */
-            T nOld = Old.Next;
-            T nNew = New.Next;
-            DiffNode<T> addDiff = null;
-            DiffNode<T> rmvDiff = null;
+            T? nOld = Old.Next;
+            T? nNew = New.Next;
+            DiffNode<T>? addDiff = null;
+            DiffNode<T>? rmvDiff = null;
 
             /* To start off we need to ensure both streams are positioned at the next mismatch */
             if (Scan_Lockstep_Mismatch(Old, New, out int outOldPos, out int outNewPos))

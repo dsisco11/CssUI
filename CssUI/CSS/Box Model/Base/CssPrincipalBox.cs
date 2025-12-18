@@ -133,17 +133,17 @@ namespace CssUI.CSS.BoxTree
 
 
         #region Accessors
-        public Element Owner
+        public Element? Owner
         {
             get
             {
-                if (_owner.TryGetTarget(out Element outValue))
+                if (_owner.TryGetTarget(out Element? outValue))
                     return outValue;
 
                 return null;
             }
         }
-        public virtual StyleProperties Style => Owner.Style;
+        public virtual StyleProperties Style => Owner!.Style;
 
         public override DisplayType DisplayType => new DisplayType(Style.Display);
 
@@ -513,7 +513,7 @@ namespace CssUI.CSS.BoxTree
 
             // Figure out if we have any block-level children
             HasBlockLevelChildren = false;
-            Element node = Owner.firstElementChild;
+            Element? node = Owner?.firstElementChild;
             while (node is object)
             {
                 if (node.Box.DisplayType.Outer == EOuterDisplayType.Block)

@@ -467,9 +467,9 @@ namespace CssUI
         /// <returns>Success</returns>
         public override bool Cascade(ICssProperty prop)
         {
-            CssMultiValueProperty Property = prop as CssMultiValueProperty;
+            CssMultiValueProperty? Property = prop as CssMultiValueProperty;
             bool changes = false;
-            if (Property.Assigned.FirstOrDefault().HasValue)
+            if (Property?.Assigned.FirstOrDefault().HasValue == true)
             {
                 changes = true;
                 _assigned = new CssValueList(Property.Assigned);
@@ -500,9 +500,9 @@ namespace CssUI
         /// <returns>Success</returns>
         public override bool Overwrite(ICssProperty prop)
         {// Circumvents locking
-            CssMultiValueProperty Property = prop as CssMultiValueProperty;
+            CssMultiValueProperty? Property = prop as CssMultiValueProperty;
             bool changes = false;
-            if (Property.Assigned != Assigned)
+            if (Property is not null && Property.Assigned != Assigned)
             {
                 changes = true;
                 _assigned = new CssValueList(Property.Assigned);

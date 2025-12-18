@@ -45,8 +45,8 @@ namespace CssUI.CSS
             }
             else if (Stream.Next.Type == ECssTokenType.Dimension)
             {
-                DimensionToken dim = Stream.Consume() as DimensionToken;
-                if (dim.DataType == ENumericTokenType.Integer && dim.Unit.Equals("n", StringComparison.OrdinalIgnoreCase))
+                DimensionToken? dim = Stream.Consume() as DimensionToken;
+                if (dim!.DataType == ENumericTokenType.Integer && dim.Unit.Equals("n", StringComparison.OrdinalIgnoreCase))
                 {// <n-dimension>
                     throw new NotImplementedException($"{nameof(CssAnBMatcher)} Has not implemented parsing support for {nameof(ECssTokenType.Dimension)}");
 

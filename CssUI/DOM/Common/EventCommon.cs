@@ -103,8 +103,8 @@ namespace CssUI.DOM.Internal
             /* 1) Set event’s dispatch flag. */
             @event.Flags |= EEventFlags.Dispatch;
             /* 2) Let targetOverride be target, if legacy target override flag is not given, and target’s associated Document otherwise. [HTML] */
-            EventTarget targetOverride = legacyTargetOverrideFlag && target is Node ? (target as Node).ownerDocument : target;
-            EventTarget activationTarget = null;
+            EventTarget? targetOverride = legacyTargetOverrideFlag && target is Node ? (target as Node)!.ownerDocument : target;
+            EventTarget? activationTarget = null;
             bool clearTargets = false;
             /* 4) Let relatedTarget be the result of retargeting event’s relatedTarget against target. */
             EventTarget relatedTarget = EventCommon.retarget_event(@event.relatedTarget, target);

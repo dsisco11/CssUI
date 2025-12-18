@@ -22,7 +22,7 @@ namespace CssUI.CSS.Selectors
 
         public CompoundSelector(IEnumerable<SimpleSelector> Collection) : base(Collection)
         {
-            SimpleSelector ts = this.FirstOrDefault(o => o is TypeSelector);
+            SimpleSelector? ts = this.FirstOrDefault(o => o is TypeSelector);
             if (ts != null && ts != this[0] || this.Count(o => o is TypeSelector) > 1)
                 throw new CssSyntaxErrorException("Compound selectors can only contain a single type-selector and it MUST be the first selector in the list!");
         }

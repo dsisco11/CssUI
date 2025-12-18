@@ -1677,7 +1677,7 @@ namespace CssUI
         private static int _tally_chunks(ref LinkedList<StringChunk> Chunks, bool Trim, int[] SubstitutionLengths)
         {
             int Length = 0;
-            LinkedListNode<StringChunk> node = Chunks.First;
+            LinkedListNode<StringChunk>? node = Chunks.First;
             while (node is object)
             {
                 StringChunk chunk = node.Value;
@@ -1707,10 +1707,10 @@ namespace CssUI
                 node = node.Next;
             }
 
-            if (Trim && Chunks.Last.Value.IsDelimiter)
+            if (Trim && Chunks.Last!.Value.IsDelimiter)
             {
                 // Make sure theres no trailing delimiter chunks
-                while (Chunks.Last.Value.IsDelimiter)
+                while (Chunks.Last!.Value.IsDelimiter)
                 {
                     Length -= SubstitutionLengths[Chunks.Last.Value.DelimiterIndex];
                     Chunks.RemoveLast();
@@ -1724,7 +1724,7 @@ namespace CssUI
         private static int _tally_chunks(ref LinkedList<StringChunk> Chunks, bool Trim, StringPtr[] Substitutions)
         {
             int Length = 0;
-            LinkedListNode<StringChunk> node = Chunks.First;
+            LinkedListNode<StringChunk>? node = Chunks.First;
             while (node is object)
             {
                 StringChunk chunk = node.Value;
@@ -1754,10 +1754,10 @@ namespace CssUI
                 node = node.Next;
             }
 
-            if (Trim && Chunks.Last.Value.IsDelimiter)
+            if (Trim && Chunks.Last!.Value.IsDelimiter)
             {
                 // Make sure theres no trailing delimiter chunks
-                while (Chunks.Last.Value.IsDelimiter)
+                while (Chunks.Last!.Value.IsDelimiter)
                 {
                     Length -= Substitutions[Chunks.Last.Value.DelimiterIndex].Length;
                     Chunks.RemoveLast();

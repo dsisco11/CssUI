@@ -302,9 +302,9 @@ namespace CssUI.CSS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Cascade(ICssProperty prop)
         {// Circumvents locking
-            CssProperty o = prop as CssProperty;
+            CssProperty? o = prop as CssProperty;
             bool changes = false;
-            if (o.Assigned.HasValue)
+            if (o?.Assigned.HasValue == true)
             {
                 changes = true;
                 // Don't make a copy of the value, they are readonly anyhow
@@ -338,9 +338,9 @@ namespace CssUI.CSS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Overwrite(ICssProperty prop)
         {
-            CssProperty o = prop as CssProperty;
+            CssProperty? o = prop as CssProperty;
             bool changes = false;
-            if (o.Assigned != Assigned)
+            if (o is not null && o.Assigned != Assigned)
             {
                 changes = true;
                 //_value = new CssValue(o.Assigned);

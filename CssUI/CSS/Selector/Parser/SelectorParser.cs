@@ -67,19 +67,19 @@ namespace CssUI.CSS.Selectors
 
         static NamespacePrefixToken Consume_NamespacePrefix(DataConsumer<CssToken> Stream)
         {
-            string Name = null;
+            string? Name = null;
 
             CssToken Tok;
             Tok = Stream.Consume();
 
             if (Tok.Type == ECssTokenType.Ident)
             {
-                Name = (Tok as IdentToken).Value;
+                Name = (Tok as IdentToken)?.Value;
                 if (Stream.Next.Type != ECssTokenType.Column) throw new CssParserException("Namespace prefixes must be followed by a '|' token!");
 
                 Stream.Consume();// Consume the next '|' token
             }
-            else if (Tok.Type == ECssTokenType.Delim && (Tok as DelimToken).Value == '*')
+            else if (Tok.Type == ECssTokenType.Delim && (Tok as DelimToken)?.Value == '*')
             {
                 Name = "*";// Any namespace
                 if (Stream.Next.Type != ECssTokenType.Column) throw new CssParserException("Namespace prefixes must be followed by a '|' token!");
@@ -287,7 +287,7 @@ namespace CssUI.CSS.Selectors
                         break;
                     case ECssTokenType.EOF:
                     default:
-                        Selector = null;
+                        Selector = null!;
                         break;
                 }
             }
@@ -430,8 +430,8 @@ namespace CssUI.CSS.Selectors
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static IDSelector Consume_ID_Selector(DataConsumer<CssToken> Stream)
         {
-            HashToken Hash = (Stream.Consume() as HashToken);
-            if (Hash.HashType != EHashTokenType.ID) throw new CssParserException("Invalid Hash token, hash-type is not ID!");
+            HashToken? Hash = (Stream.Consume() as HashToken);
+            if (Hash?.HashType != EHashTokenType.ID) throw new CssParserException("Invalid Hash token, hash-type is not ID!");
             return new IDSelector(Hash.Value);
         }
 

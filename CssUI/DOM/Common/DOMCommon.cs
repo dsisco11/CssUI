@@ -535,7 +535,7 @@ namespace CssUI.DOM
                 return false;
 
             /* Proove it true */
-            Node node = A.nextSibling;
+            Node? node = A.nextSibling;
             while (!ReferenceEquals(node, null))
             {
                 if (ReferenceEquals(node, B))
@@ -557,7 +557,7 @@ namespace CssUI.DOM
                 return false;
 
             /* Proove it true */
-            Node node = A.previousSibling;
+            Node? node = A.previousSibling;
             while (!ReferenceEquals(node, null))
             {
                 if (ReferenceEquals(node, B))
@@ -904,11 +904,11 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static LinkedList<Node> Get_Previous(Node node, NodeFilter Filter = null)
+        public static LinkedList<Node> Get_Previous(Node node, NodeFilter? Filter = null)
         {
             var list = new LinkedList<Node>();
 
-            Node current = node.previousSibling;
+            Node? current = node.previousSibling;
             while (current is object)
             {
                 var fres = Filter?.acceptNode(current) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
@@ -935,7 +935,7 @@ namespace CssUI.DOM
         {
             var list = new LinkedList<NodeType>();
 
-            Node current = node.previousSibling;
+            Node? current = node.previousSibling;
             while (current is object)
             {
                 if (current is NodeType nodeAsType)
@@ -962,14 +962,14 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Node Get_Nth_Previous(Node node, uint Nth, NodeFilter Filter = null)
+        public static Node? Get_Nth_Previous(Node node, uint Nth, NodeFilter? Filter = null)
         {
             if (Nth == 0)
             {
                 throw new IndexOutOfRangeException("N must be greater than 0");
             }
 
-            Node current = node.previousSibling;
+            Node? current = node.previousSibling;
             while (current is object)
             {
                 var fres = Filter?.acceptNode(current) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
@@ -999,12 +999,12 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static LinkedList<Node> Get_Preceeding(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static LinkedList<Node> Get_Preceeding(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             var list = new LinkedList<Node>();
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
 
-            Node current = tree.previousSibling();
+            Node? current = tree.previousSibling();
             while (current is object)
             {
                 var fres = Filter?.acceptNode(current) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
@@ -1176,10 +1176,10 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static LinkedList<Node> Get_Next(Node node, NodeFilter Filter = null)
+        public static LinkedList<Node> Get_Next(Node node, NodeFilter? Filter = null)
         {
             var list = new LinkedList<Node>();
-            Node current = node.nextSibling;
+            Node? current = node.nextSibling;
             while (current is object)
             {
                 var fres = Filter?.acceptNode(current) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
@@ -1202,10 +1202,10 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static LinkedList<NodeType> Get_Next<NodeType>(Node node, NodeFilter Filter = null) where NodeType : INode
+        public static LinkedList<NodeType> Get_Next<NodeType>(Node node, NodeFilter? Filter = null) where NodeType : INode
         {
             var list = new LinkedList<NodeType>();
-            Node current = node.nextSibling;
+            Node? current = node.nextSibling;
             while (current is object)
             {
                 if (current is NodeType nodeAsType)
@@ -1232,14 +1232,14 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Node Get_Nth_Next(Node node, uint Nth, NodeFilter Filter = null)
+        public static Node? Get_Nth_Next(Node node, uint Nth, NodeFilter? Filter = null)
         {
             if (Nth == 0)
             {
                 throw new IndexOutOfRangeException("N must be greater than 0");
             }
 
-            Node current = node.nextSibling;
+            Node? current = node.nextSibling;
             while (current is object)
             {
                 var fres = Filter?.acceptNode(current) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;

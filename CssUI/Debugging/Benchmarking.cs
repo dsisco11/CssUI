@@ -117,7 +117,7 @@ namespace CssUI
 
         public static Benchmark_Info? Get(string Name)
         {
-            if (History.TryGetValue(Name, out List<double> hist))
+            if (History.TryGetValue(Name, out List<double>? hist))
             {
                 double sum = 0;
                 double? low = null, high = null;

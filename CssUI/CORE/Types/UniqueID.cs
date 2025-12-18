@@ -89,8 +89,8 @@ namespace CssUI
                 return false;
             }
 
-            UniqueID uid = obj as UniqueID;
-            if ((object)uid is null)
+            UniqueID? uid = obj as UniqueID;
+            if (uid is null)
             {
                 return false;
             }

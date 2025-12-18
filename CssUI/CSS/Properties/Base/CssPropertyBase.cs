@@ -45,12 +45,12 @@ namespace CssUI.CSS.Internal
         /// </summary>
         public virtual bool IsInheritable { get => Definition.Inherited; }
 
-        public CssComputedStyle Source
+        public CssComputedStyle? Source
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                SourcePtr.TryGetTarget(out CssComputedStyle src);
+                SourcePtr.TryGetTarget(out CssComputedStyle? src);
                 return src;
             }
         }

@@ -230,8 +230,8 @@ namespace CssUI.CSS.Formatting
         {
             // Parse explicit track definitions from style
             var style = _container.Style;
-            string columnTemplate = style?.GridTemplateColumns;
-            string rowTemplate = style?.GridTemplateRows;
+            string? columnTemplate = style?.GridTemplateColumns;
+            string? rowTemplate = style?.GridTemplateRows;
 
             _explicitColumnTracks = !string.IsNullOrEmpty(columnTemplate) 
                 ? GridTrackList.Parse(columnTemplate) 

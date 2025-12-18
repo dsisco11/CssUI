@@ -85,7 +85,7 @@ namespace CssUI
         /// </summary>
         protected void Handle_Keyboard_Input(KeyboardDevice Device, EKeyboardInputType InputType, EKeyboardCode KeyCode, char Key)
         {
-            Event RetEvent = null;
+            Event? RetEvent = null;
             switch (InputType)
             {
                 case EKeyboardInputType.KeyDown:

@@ -60,7 +60,7 @@ namespace CssUI
                 foreach ((int, MetaKeywordAttribute?) metaValue in metaValues)
                 {
                     int enumValue = metaValue.Item1;
-                    MetaKeywordAttribute metadata = metaValue.Item2;
+                    MetaKeywordAttribute? metadata = metaValue.Item2;
                     if (metadata is null) continue;
 
                     int valueIndex = Get_Value_Index(enumIndex, enumValue);

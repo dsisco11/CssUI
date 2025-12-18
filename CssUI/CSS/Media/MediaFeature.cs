@@ -31,7 +31,7 @@ namespace CssUI.CSS.Media
         {
             Context = EMediaFeatureContext.Boolean;
 
-            MediaDefinition def = MediaDefinition.Lookup(Name);
+            MediaDefinition? def = MediaDefinition.Lookup(Name);
             if (def != null)
             {
                 IsValid = true;

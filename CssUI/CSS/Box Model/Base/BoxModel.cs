@@ -1432,10 +1432,10 @@ namespace CssUI.CSS
             {
                 var topEdge = 0d;
                 var bottomEdge = 0d;
-                Element node;
+                Element? node;
 
                 // find our first inline-level element and its top-margin-edge
-                node = Box.Owner.firstElementChild;
+                node = Box.Owner?.firstElementChild;
                 while (node is object)
                 {
                     if (node.Box.DisplayType.Outer == EOuterDisplayType.Inline)
@@ -1448,7 +1448,7 @@ namespace CssUI.CSS
                 }
 
                 // find our last inline-level element and its bottom-margin-edge
-                node = Box.Owner.lastElementChild;
+                node = Box.Owner?.lastElementChild;
                 while (node is object)
                 {
                     if (node.Box.DisplayType.Outer == EOuterDisplayType.Inline)
@@ -1466,10 +1466,10 @@ namespace CssUI.CSS
             {
                 var topEdge = 0d;
                 var bottomEdge = 0d;
-                Element node;
+                Element? node;
 
                 // find our first block-level element and its top-margin-edge
-                node = Box.Owner.firstElementChild;
+                node = Box.Owner?.firstElementChild;
                 while (node is object)
                 {
                     if (node.Box.DisplayType.Outer == EOuterDisplayType.Block)
@@ -1482,7 +1482,7 @@ namespace CssUI.CSS
                 }
 
                 // find our last block-level element and its bottom-margin-edge
-                node = Box.Owner.lastElementChild;
+                node = Box.Owner?.lastElementChild;
                 while (node is object)
                 {
                     if (node.Box.DisplayType.Outer == EOuterDisplayType.Block)

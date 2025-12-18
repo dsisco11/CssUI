@@ -118,7 +118,7 @@ namespace CssUI.DOM
                  * and then run the focusing steps for the document element of the Document, if non-null. */
                 if (value == EDesignMode.ON && oldValue == EDesignMode.OFF)
                 {
-                    Range activeRange = getSelection()?.GetRangeAt(0);
+                    Range? activeRange = getSelection()?.GetRangeAt(0);
                     if (activeRange != null)
                     {
                         activeRange.collapse(true);

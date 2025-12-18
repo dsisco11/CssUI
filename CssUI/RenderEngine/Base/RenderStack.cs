@@ -70,7 +70,7 @@ namespace CssUI
             // Remove the current matrix value from the stack so we can replace it
             if (MatrixStack.Count > 0) MatrixStack.Pop();
             // Find the value we need to stack the incoming one ontop of (so we can combine them)
-            Matrix4 mtx = MatrixStack.FirstOrDefault();
+            Matrix4? mtx = MatrixStack.FirstOrDefault();
             // Combine the incoming value with the one before it(if any) in the stack
             if (mtx != null) mtx *= value;
             else mtx = value;

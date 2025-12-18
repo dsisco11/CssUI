@@ -53,7 +53,7 @@ namespace CssUI.CSS.Parser
         public static string PreProcess(Stream stream)
         {// SEE:  https://encoding.spec.whatwg.org/#decode
             bool BOM_Seen = false;
-            Encoding enc = null;
+            Encoding? enc = null;
             List<byte> buf = new List<byte>();
             
             for (int i=0; i<3; i++)

@@ -54,11 +54,11 @@ namespace CssUI.DOM.Internal
         /* A browsing context has a corresponding WindowProxy object. */
         internal abstract Window WindowProxy { get; }
 
-        public BrowsingContext Opener
+        public BrowsingContext? Opener
         {/* A browsing context has an opener browsing context, which is null or a browsing context. It is initially null. */
             get
             {
-                if (_opener.TryGetTarget(out BrowsingContext outOpener))
+                if (_opener.TryGetTarget(out BrowsingContext? outOpener))
                     return outOpener;
 
                 return null;

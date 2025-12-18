@@ -338,7 +338,7 @@ namespace CssUI.CSS.Internal
                                     if (ancestor.Box.DisplayType.Outer == EOuterDisplayType.Inline)
                                     {
                                         double top = 0, right = 0, bottom = 0, left = 0;
-                                        Element child;
+                                        Element? child;
 
                                         // find our first inline-level element and its padding-edges
                                         child = ancestor.firstElementChild;

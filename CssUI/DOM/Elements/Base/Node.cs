@@ -312,9 +312,9 @@ namespace CssUI.DOM.Nodes
             if (ReferenceEquals(this, other))
                 return 0x0;
 
-            Node node1 = other;
-            Node node2 = this;
-            Attr attr1 = null, attr2 = null;
+            Node? node1 = other;
+            Node? node2 = this;
+            Attr? attr1 = null, attr2 = null;
             if (node1 is Attr)
             {
                 attr1 = (Attr)node1;

@@ -247,13 +247,13 @@ namespace CssUI
                 return false;
             }
 
-            if (!EnumMetaTable.KEYWORD[enumIndex].TryGetValue(Keyword, out object outValue))
+            if (!EnumMetaTable.KEYWORD[enumIndex].TryGetValue(Keyword, out object? outValue))
             {
                 outEnum = default;
                 return false;
             }
 
-            outEnum = CastTo<T>.From(outValue);
+            outEnum = CastTo<T>.From(outValue!);
             return true;
         }
 
@@ -265,7 +265,7 @@ namespace CssUI
         /// <param name="outEnum">Returned enum value</param>
         /// <returns>Success</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
-        public static bool TryEnum(Type enumType, AtomicString Keyword, out object outEnum)
+        public static bool TryEnum(Type enumType, AtomicString Keyword, out object? outEnum)
         {
             if (enumType is null) throw new ArgumentNullException(nameof(enumType));
             Contract.EndContractBlock();
@@ -279,7 +279,7 @@ namespace CssUI
             }
 
 
-            if (!EnumMetaTable.KEYWORD[enumIndex].TryGetValue(Keyword, out object outValue))
+            if (!EnumMetaTable.KEYWORD[enumIndex].TryGetValue(Keyword, out object? outValue))
             {
                 outEnum = default;
                 return false;

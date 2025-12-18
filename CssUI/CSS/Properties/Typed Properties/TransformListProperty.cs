@@ -59,17 +59,17 @@ namespace CssUI.CSS
         /// </summary>
         public virtual bool IsInheritable { get => Definition.Inherited; }
 
-        public CssComputedStyle Source
+        public CssComputedStyle? Source
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                SourcePtr.TryGetTarget(out CssComputedStyle src);
+                SourcePtr.TryGetTarget(out CssComputedStyle? src);
                 return src;
             }
         }
 
-        public StyleDefinition Definition
+        public StyleDefinition? Definition
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
@@ -88,9 +88,9 @@ namespace CssUI.CSS
         /// <returns>Success</returns>
         public bool Cascade(ICssProperty prop)
         {// Circumvents locking
-            TransformListProperty o = prop as TransformListProperty;
+            TransformListProperty? o = prop as TransformListProperty;
             bool changes = false;
-            if (o.HasValue)
+            if (o?.HasValue == true)
             {
                 changes = true;
                 Transforms = new Dictionary<AtomicString, StyleFunction>(o.Transforms);
@@ -131,7 +131,7 @@ namespace CssUI.CSS
         public async Task<bool> OverwriteAsync(ICssProperty prop)
         {// Circumvents locking
 
-            TransformListProperty o = prop as TransformListProperty;
+            TransformListProperty? o = prop as TransformListProperty;
             bool changes = false;
 
             // XXX: Finish the overwrite logic for TransformsList properties

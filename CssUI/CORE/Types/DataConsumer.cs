@@ -457,13 +457,13 @@ namespace CssUI
         {
             if (LongPosition >= (ulong)Data.Span.Length)
             {
-                return default;
+                return default!;
             }
 
             T retVal = Data.Span[(int)LongPosition];
             Position += 1;
 
-            return (CastType)retVal;
+            return (CastType)(object)retVal!;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

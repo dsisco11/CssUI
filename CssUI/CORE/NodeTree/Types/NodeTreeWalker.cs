@@ -373,7 +373,7 @@ namespace CssUI.NodeTree
                     }
                 }
                 /* 2) Let sibling be null. */
-                ITreeNode sibling = null;
+                ITreeNode? sibling = null;
                 /* 3) Let temporary be node. */
                 var temporary = node;
                 /* 4) While temporary is non-null: */
