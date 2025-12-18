@@ -453,8 +453,9 @@ namespace CssUI.CSS
         /// Sets the <see cref="Assigned"/> value for this property
         /// </summary>
         /// <param name="value"></param>
-        public void Set(CssValue DeclaredValue)
+        public void Set(CssValue? DeclaredValue)
         {
+            if (DeclaredValue is null) return;
             if (Assigned != DeclaredValue)
             {
                 Assigned = DeclaredValue;

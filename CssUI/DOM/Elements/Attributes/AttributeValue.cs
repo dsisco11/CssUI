@@ -113,9 +113,9 @@ namespace CssUI.DOM
         public static AttributeValue From<T>(T enumValue) where T: struct
         {
             /* Not all enumeration values will have a DOM keyword, some defined by the specification explicitly say certain values should NOT have a keyword */
-            string keyword = null;
+            string? keyword = null;
 
-            if (Lookup.TryKeyword(enumValue, out string outKey))
+            if (Lookup.TryKeyword(enumValue, out string? outKey))
                 keyword = outKey;
 
             return new AttributeValue(EAttributeType.Enumerated, enumValue, keyword);
@@ -290,7 +290,7 @@ namespace CssUI.DOM
                         {
                             if (other.Type == EAttributeType.String)
                             {
-                                return ((AtomicString)Value).Equals((AtomicString)other.Value);
+                                return ((AtomicString?)Value)?.Equals((AtomicString?)other.Value) ?? false;
                             }
                             else
                             {

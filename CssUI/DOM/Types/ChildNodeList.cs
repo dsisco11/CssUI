@@ -64,7 +64,7 @@ namespace CssUI.DOM
                     current = current.Next;
                 }
 
-                item.ptrSelfRef = ChildElements.AddBefore(current, item);
+                item.ptrSelfRef = ChildElements!.AddBefore(current, item);
             }
         }
 
@@ -75,12 +75,12 @@ namespace CssUI.DOM
 
             if (item.ptrSelfRef is null)
             {
-                bool exists = ChildElements.Contains(item);
+                bool exists = ChildElements!.Contains(item);
                 Debug.Assert(exists, "The removal handler for an already removed child element was called!");
                 if (exists)
                 {
                     // Remove the item from the list
-                    ChildElements.Remove(item.ptrSelfRef);
+                    ChildElements.Remove(item.ptrSelfRef!);
                 }
                 // Update our first/last indices
                 firstElementIndex = ChildElements.First?.Value.index ?? -1;
@@ -89,7 +89,7 @@ namespace CssUI.DOM
             else
             {
                 // Remove the item from the list
-                ChildElements.Remove(item.ptrSelfRef);
+                ChildElements!.Remove(item.ptrSelfRef);
                 // Update our first/last indices
                 firstElementIndex = ChildElements.First?.Value.index ?? -1;
                 lastElementIndex = ChildElements.Last?.Value.index ?? firstElementIndex;

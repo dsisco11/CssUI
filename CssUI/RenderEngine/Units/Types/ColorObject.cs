@@ -137,7 +137,7 @@ namespace CssUI.Rendering
             return unchecked((int)AsInteger());
         }
 
-        public static bool operator ==(ColorObject<T> left, IColorObject right)
+        public static bool operator ==(ColorObject<T>? left, IColorObject? right)
         {
             if ((left is null) ^ (right is null))// One is null but not both
                 return false;
@@ -145,7 +145,7 @@ namespace CssUI.Rendering
             return left?.Equals(right) ?? false;
         }
 
-        public static bool operator !=(ColorObject<T> left, IColorObject right)
+        public static bool operator !=(ColorObject<T>? left, IColorObject? right)
         {
             if ((left is null) ^ (right is null))// One is null but not both
                 return true;

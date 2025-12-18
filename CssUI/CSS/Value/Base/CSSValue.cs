@@ -131,19 +131,19 @@ namespace CssUI.CSS
             flags |= Get_Inherent_Value_Type_Flags(type, unit, value);
         }
 
-        internal CssValue(ECssValueTypes type, object value = null) : this(type)
+        internal CssValue(ECssValueTypes type, object? value = null) : this(type)
         {
             this.value = value;
         }
 
-        internal CssValue(ECssValueTypes type, object value, ECssValueFlags flags) : this(type)
+        internal CssValue(ECssValueTypes type, object? value, ECssValueFlags flags) : this(type)
         {
             this.value = value;
             this.flags |= flags;
             this.value = value;
         }
 
-        internal CssValue(ECssValueTypes type, object value, ECssUnit unit) : this(type)
+        internal CssValue(ECssValueTypes type, object? value, ECssUnit unit) : this(type)
         {
             this.unit = unit;
             this.value = value;

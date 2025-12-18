@@ -15,7 +15,7 @@ namespace CssUI.CSS
             if (y is null) return 1;
 
             // XXX: We do not take into account the '!important' flag atm
-            if (x.Source.Origin != y.Source.Origin)
+            if (x.Source!.Origin != y.Source!.Origin)
             {
                 if (x.Source.Origin > y.Source.Origin)
                     return 1;// this set is of lesser origin, it belongs behind us
@@ -23,8 +23,8 @@ namespace CssUI.CSS
                     return -1;// this set is of greater origin, so we go behind it
             }
 
-            long xSpec = x.Selector.Get_Specificity(x.Owner as Element);
-            long ySpec = y.Selector.Get_Specificity(y.Owner as Element);
+            long xSpec = x.Selector?.Get_Specificity(x.Owner as Element) ?? 0;
+            long ySpec = y.Selector?.Get_Specificity(y.Owner as Element) ?? 0;
             if (xSpec != ySpec)
             {
                 if (xSpec > ySpec)

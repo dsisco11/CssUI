@@ -53,7 +53,7 @@ namespace CssUI
             // Remove old value from the top of the stack
             if (BlendingStack.Count > 0) BlendingStack.Pop();
             // Find the value we need to stack the incoming one ontop of (so we can combine them)
-            Color clr = BlendingStack.FirstOrDefault();
+            Color? clr = BlendingStack.FirstOrDefault();
             // Combine the incoming value with the one before it(if any) in the stack
             if (clr != null) clr *= value;
             else clr = new Color(value);

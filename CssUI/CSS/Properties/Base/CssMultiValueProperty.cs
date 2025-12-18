@@ -184,16 +184,16 @@ namespace CssUI
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if the assigned value has the <see cref="ECssValueFlags.Depends"/> flag
         /// </summary>
-        public override bool IsDependentOrAuto { get => (Assigned.FirstOrDefault().Type == ECssValueTypes.AUTO || Assigned.FirstOrDefault(o => o.Has_Flags(ECssValueFlags.Depends)) != null); }
+        public override bool IsDependentOrAuto { get => (Assigned.FirstOrDefault()?.Type == ECssValueTypes.AUTO || Assigned.FirstOrDefault(o => o.Has_Flags(ECssValueFlags.Depends)) != null); }
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if the assigned value type is a percentage
         /// </summary>
-        public override bool IsPercentageOrAuto { get => (Assigned.FirstOrDefault().Type == ECssValueTypes.AUTO || Assigned.FirstOrDefault(o => o.Type == ECssValueTypes.PERCENT) != null); }
+        public override bool IsPercentageOrAuto { get => (Assigned.FirstOrDefault()?.Type == ECssValueTypes.AUTO || Assigned.FirstOrDefault(o => o.Type == ECssValueTypes.PERCENT) != null); }
         /// <summary>
         /// Returns whether or not the property has a set value that should take affect during cascading.
         /// </summary>
-        public override bool HasValue { get { return Assigned.FirstOrDefault().HasValue; } }
+        public override bool HasValue { get { return Assigned.FirstOrDefault()?.HasValue ?? false; } }
         #endregion
 
         #region Constructor
@@ -602,7 +602,7 @@ namespace CssUI
         /// </summary>
         public override void Handle_Unit_Change(ECssUnit Unit)
         {
-            if (Specified.FirstOrDefault(o => o.Unit == Unit) != null)
+            if (Specified.FirstOrDefault(o => o?.Unit == Unit) != null)
             {
                 // This unit change will affect our computed value
                 FireValueChangeEvent(EPropertyStage.Computed);

@@ -111,8 +111,8 @@ namespace CssUI
 
                 if (i < 0) continue;
 
-                string valueName = Enum.GetName(metaEnum, u);
-                MemberInfo[] memberInfos = metaEnum.GetMember(valueName);
+                string? valueName = Enum.GetName(metaEnum, u);
+                MemberInfo[] memberInfos = metaEnum.GetMember(valueName!);
                 var enumValueMemberInfo = memberInfos.First(m => m.DeclaringType == metaEnum);
                 var valueAttribute = enumValueMemberInfo.GetCustomAttribute<MetaKeywordAttribute>(false);
 

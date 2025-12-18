@@ -30,12 +30,12 @@ namespace CssUI.DOM
             {
                 /* To string replace all with a string string within a node parent, run these steps: */
                 /* 1) Let node be null. */
-                Node node = null;
-                /* 2) If string is not the empty string, then set node to a new Text node whose data is string and node document is parent’s node document. */
+                Node? node = null;
+                /* 2) If string is not the empty string, then set node to a new Text node whose data is string and node document is parent's node document. */
                 if (!string.IsNullOrEmpty(value))
-                    node = new Text(parentNode.ownerDocument, value);
+                    node = new Text(parentNode!.ownerDocument!, value);
                 /* 3) Replace all with node within parent. */
-                Dom_replace_all_within_node(node, parentNode);
+                Dom_replace_all_within_node(node, parentNode!);
                 node = null;
             }
         }

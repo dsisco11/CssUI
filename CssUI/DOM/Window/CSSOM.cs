@@ -81,14 +81,14 @@ namespace CssUI.DOM
             }
 
             /* Let position be the scroll position the viewport would have by aligning the x-coordinate x of the viewport scrolling area with the left of the viewport and aligning the y-coordinate y of the viewport scrolling area with the top of the viewport. */
-            double deltaX = x - document.Viewport.Left;
+            double deltaX = x - document.Viewport!.Left;
             double deltaY = y - document.Viewport.Top;
 
             DOMPoint position = new DOMPoint(scrollBox.ScrollX + deltaX, scrollBox.ScrollY + deltaY);
             if (position.Equals(scrollBox.ScrollX, scrollBox.ScrollY) && !scrollBox.IsScrolling)
                 return;
 
-            scrollBox.Perform_Scroll(position, document.documentElement, behavior);
+            scrollBox.Perform_Scroll(position, document.documentElement!, behavior);
         }
 
         public void Scroll(ScrollToOptions options) => ScrollTo(options);

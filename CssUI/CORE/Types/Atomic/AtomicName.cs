@@ -146,14 +146,14 @@ namespace CssUI
                 /* /!\ These conversions will fucking EXPLODE if the given generic type does not have an integer backing type /!\ */
                 T enumValue = CastTo<T>.From<int>(value);
 
-                if (Lookup.TryKeyword<T>(enumValue, out string LUT) && !(LUT is null))
+                if (Lookup.TryKeyword<T>(enumValue, out string? LUT) && !(LUT is null))
                 {
                     return LUT;
                 }
             }
 
             /* Alright buster, we gotta do things the slow way */
-            if (NameRegistry.TryGetKey(value, out AtomicString name))
+            if (NameRegistry.TryGetKey(value, out AtomicString? name))
                 return name;
 
             /* Well we tried */
@@ -163,7 +163,7 @@ namespace CssUI
         protected T Value_To_Enum(int value)
         {
             T enumValue = CastTo<T>.From<int>(value);
-            if (Lookup.TryKeyword<T>(enumValue, out string LUT) && !(LUT is null))
+            if (Lookup.TryKeyword<T>(enumValue, out string? LUT) && !(LUT is null))
             {
                 return enumValue;
             }

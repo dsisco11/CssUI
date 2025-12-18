@@ -142,16 +142,16 @@ namespace CssUI.CSS
                 return null;
             }
 
-            if (Node.isRoot || Node.parentElement is null)
+            if (Node!.isRoot || Node.parentElement is null)
             {// Root-nodes always generate block-level boxes
-                Node.Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
-                CssPrincipalBox box = new CssPrincipalBox(Node.parentElement, null);
+                Node.Style!.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
+                CssPrincipalBox box = new CssPrincipalBox(Node, null!);
                 return box;
             }
             else
             {
-                CssBox parentBox = Node.parentElement.Box;
-                CssBox box = new CssPrincipalBox(Node, parentBox);
+                CssBox? parentBox = Node.parentElement.Box;
+                CssBox box = new CssPrincipalBox(Node, parentBox!);
 
                 if (!Is_Compatable_Parent_Box(Node, Node.parentElement))
                 {

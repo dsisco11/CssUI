@@ -94,9 +94,9 @@ namespace CssUI.CSS.Selectors
             return new NamespacePrefixToken(Name);
         }
 
-        static QualifiedNameToken Consume_QualifiedName(DataConsumer<CssToken> Stream)
+        static QualifiedNameToken? Consume_QualifiedName(DataConsumer<CssToken> Stream)
         {
-            NamespacePrefixToken NS = null;
+            NamespacePrefixToken? NS = null;
             if (Starts_NamespacePrefix(Stream.Next, Stream.NextNext))
             {
                 NS = Consume_NamespacePrefix(Stream);
@@ -104,9 +104,9 @@ namespace CssUI.CSS.Selectors
 
             CssToken Tok = Stream.Consume();
             if (Tok.Type != ECssTokenType.Ident) return null;
-            string Name = (Tok as IdentToken).Value;
+            string? Name = (Tok as IdentToken)?.Value;
 
-            return new QualifiedNameToken(Name, NS);
+            return new QualifiedNameToken(Name!, NS);
         }
 
         static CombinatorToken Consume_Combinator(DataConsumer<CssToken> Stream)
@@ -485,7 +485,7 @@ namespace CssUI.CSS.Selectors
         {
             Stream.Consume();// Consume the '[' prefix
 
-            NamespacePrefixToken NS = null;
+            NamespacePrefixToken? NS = null;
             if (Starts_NamespacePrefix(Stream.Next, Stream.NextNext)) NS = Consume_NamespacePrefix(Stream);
 
             //QualifiedNameToken attrName = Stream.Consume<QualifiedNameToken>();
@@ -504,11 +504,11 @@ namespace CssUI.CSS.Selectors
 
             if (value.Type == ECssTokenType.String)
             {
-                return new AttributeSelector(NS, attrName.Value, OperatorToken, (value as StringToken).Value);
+                return new AttributeSelector(NS, attrName.Value, OperatorToken, (value as StringToken)!.Value);
             }
             else if (value.Type == ECssTokenType.Ident)
             {
-                return new AttributeSelector(NS, attrName.Value, OperatorToken, (value as IdentToken).Value);
+                return new AttributeSelector(NS, attrName.Value, OperatorToken, (value as IdentToken)!.Value);
             }
 
             return null;// Parse error

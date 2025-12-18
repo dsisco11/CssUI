@@ -18,12 +18,12 @@ namespace CssUI.DOM
             var AttrDict = new Dictionary<AtomicName<EAttributeName>, List<AttributeDefinition>>();
             foreach (var def in AttrDefs)
             {
-                if (!AttrDict.ContainsKey(def.Name))
+                if (!AttrDict.ContainsKey(def.Name!))
                 {
-                    AttrDict.Add(def.Name, new List<AttributeDefinition>());
+                    AttrDict.Add(def.Name!, new List<AttributeDefinition>());
                 }
 
-                AttrDict[def.Name].Add(def);
+                AttrDict[def.Name!].Add(def);
             }
             // Finally all of our definitions go into this global readonly map of attribute definitions!
             AttributeDefinitions = new ReadOnlyDictionary<AtomicName<EAttributeName>, List<AttributeDefinition>>(AttrDict);

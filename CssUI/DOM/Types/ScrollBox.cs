@@ -178,8 +178,8 @@ namespace CssUI.DOM
                     bottom = icb.Bottom;
                     left = icb.Left;
 
-                    var tree = new TreeWalker(View.document.documentElement, Enums.ENodeFilterMask.SHOW_ELEMENT);
-                    Node node = tree.nextNode();
+                    var tree = new TreeWalker(View.document.documentElement!, Enums.ENodeFilterMask.SHOW_ELEMENT);
+                    Node? node = tree.nextNode();
                     while (node is object)
                     {
                         if (node is Element E)

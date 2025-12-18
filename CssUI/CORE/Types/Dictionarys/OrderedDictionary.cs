@@ -59,13 +59,13 @@ namespace CssUI
             Items.Insert(index, item);
 
             /* Find the key of the item we are displacing by looking for it by its value */
-            if (!KeyIndex.TryGetKey(index, out KeyTy movedKey))
+            if (!KeyIndex.TryGetKey(index, out KeyTy? movedKey))
             {
                 throw new System.Exception($"Unable to reverse lookup key by value!");
             }
 
             KeyIndex.Add(key, index);
-            KeyIndex.Update(movedKey, index + 1, index);
+            KeyIndex.Update(movedKey!, index + 1, index);
         }
         #endregion
 

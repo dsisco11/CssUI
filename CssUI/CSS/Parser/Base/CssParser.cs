@@ -322,11 +322,11 @@ namespace CssUI.CSS.Serialization
                 Token = Stream.Consume();
                 if (Token.Type == ECssTokenType.EOF) break;
                 //Decleration.Value.Add(new CssPreservedToken(Token));
-                Decleration.Values.Add(Token as CssComponent);// upcast to Component (Preserve the token)
+                Decleration.Values.Add((Token as CssComponent)!);// upcast to Component (Preserve the token)
             }
             while (Token.Type != ECssTokenType.EOF);
 
-            CssToken A = null, B = null;
+            CssToken? A = null, B = null;
             // Find the last two non-whitespace tokens out of the declerations values
             for (int i = Decleration.Values.Count - 1; i >= 0; i--)
             {
@@ -345,9 +345,9 @@ namespace CssUI.CSS.Serialization
                 }
             }
             // Check if those last two values indicate this declerations 'important' flag is set
-            if (A.Type == ECssTokenType.Delim && (A as DelimToken).Value == UnicodeCommon.CHAR_EXCLAMATION_POINT)
+            if (A?.Type == ECssTokenType.Delim && (A as DelimToken)?.Value == UnicodeCommon.CHAR_EXCLAMATION_POINT)
             {
-                if (B.Type == ECssTokenType.Ident && (B as IdentToken).Value.Equals("important", StringComparison.OrdinalIgnoreCase))
+                if (B?.Type == ECssTokenType.Ident && (B as IdentToken)?.Value.Equals("important", StringComparison.OrdinalIgnoreCase) == true)
                 {
                     Decleration.Important = true;
                 }
@@ -518,12 +518,12 @@ namespace CssUI.CSS.Serialization
                 case ECssTokenType.String:
                     {
                         var tok = Stream.Consume() as StringToken;
-                        return new CssValue(ECssValueTypes.STRING, tok.Value);
+                        return new CssValue(ECssValueTypes.STRING, tok!.Value);
                     }
                 case ECssTokenType.Ident:// Keyword
                     {
                         var tok = Stream.Consume() as IdentToken;
-                        return new CssValue(ECssValueTypes.KEYWORD, tok.Value);
+                        return new CssValue(ECssValueTypes.KEYWORD, tok!.Value);
                     }
                 case ECssTokenType.FunctionName:
                     {
@@ -533,7 +533,7 @@ namespace CssUI.CSS.Serialization
                 case ECssTokenType.Function:
                     {
                         var func = Stream.Consume() as CssFunction;
-                        return new CssValue(func);
+                        return new CssValue(func!);
                     }
                 case ECssTokenType.Url:
                     {/* XXX: Finish this */

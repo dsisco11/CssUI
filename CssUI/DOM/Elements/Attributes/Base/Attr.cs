@@ -55,7 +55,7 @@ namespace CssUI.DOM
                     _definition = new WeakReference<AttributeDefinition>(AttributeDefinition.Lookup(localName, ownerElement.GetType()));
                 }
 
-                if (_definition.TryGetTarget(out AttributeDefinition outDef))
+                if (_definition.TryGetTarget(out AttributeDefinition? outDef))
                 {
                     return outDef;
                 }
@@ -64,8 +64,8 @@ namespace CssUI.DOM
             }
         }
 
-        public override string? nodeValue { get => Value.Data; set => _set_value(AttributeValue.Parse(localName, value)); }
-        public override string? textContent { get => Value.Data; set => _set_value(AttributeValue.Parse(localName, value)); }
+        public override string? nodeValue { get => Value.Data; set => _set_value(AttributeValue.Parse(localName, value!)); }
+        public override string? textContent { get => Value.Data; set => _set_value(AttributeValue.Parse(localName, value!)); }
         public override int nodeLength => childNodes.Count;
 
         /// <summary>

@@ -317,7 +317,7 @@ namespace CssUI.CSS
         #endregion
 
         #region Cloning
-        public static CssBoxArea ShallowCopy(CssBoxArea Area)
+        public static CssBoxArea? ShallowCopy(CssBoxArea? Area)
         {
             if (ReferenceEquals(Area, null))
                 return null;

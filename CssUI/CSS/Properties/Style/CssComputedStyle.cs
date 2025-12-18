@@ -62,12 +62,12 @@ namespace CssUI.CSS
         /// </summary>
         public string Name { get { return _name ?? defaultName; } set { _name = value; } }
 
-        private string _name = null;
+        private string? _name = null;
         private string defaultName
         {
             get
             {
-                return (string)$"{nameof(CssComputedStyle)} - {ID}".Concat(string.IsNullOrEmpty(Selector.ToString()) ? "" : Selector.ToString());
+                return (string)$"{nameof(CssComputedStyle)} - {ID}".Concat(string.IsNullOrEmpty(Selector?.ToString()) ? "" : Selector!.ToString());
             }
         }
         /// <summary>
@@ -512,11 +512,11 @@ namespace CssUI.CSS
             if (def is null) throw new Exception($"Cannot find a definition for Css property: \"{Property.CssName}\"");
 
             EPropertyDirtFlags Flags = def.Flags;
-            StackTrace Stack = null;
+            StackTrace? Stack = null;
 #if DEBUG
             //stack = new StackTrace(STACK_FRAME_OFFSET, true);
 #endif
-            Property_Changed?.Invoke(Stage, Property, Flags, Stack);
+            Property_Changed?.Invoke(Stage, Property, Flags, Stack!);
         }
 
         #endregion

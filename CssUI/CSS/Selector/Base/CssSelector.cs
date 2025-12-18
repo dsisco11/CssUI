@@ -163,7 +163,7 @@ namespace CssUI.CSS
              * If the result of match a selector against an element for element and selector is success, add element to the selector match list.
              * For each possible pseudo-element associated with element that is one of the pseudo-elements allowed to show up in the match list, if the result of match a selector against a pseudo-element for the pseudo-element and selector is success, add the pseudo-element to the selector match list.
             */
-            NodeFilter Filter = null;
+            NodeFilter? Filter = null;
             if (scopingRoot != null)
                 Filter = new FilterDescendantOf(scopingRoot);
 
@@ -171,8 +171,9 @@ namespace CssUI.CSS
             foreach (Node root in rootElements)
             {
                 var rootList = DOMCommon.Get_Shadow_Including_Inclusive_Descendents(root, Filter, ENodeFilterMask.SHOW_ELEMENT);
-                LinkedListNode<Node> firstNode = ((LinkedList<Node>)rootList).First;
-                candidateElements.AddLast(firstNode);
+                LinkedListNode<Node>? firstNode = ((LinkedList<Node>)rootList).First;
+                if (firstNode != null)
+                    candidateElements.AddLast(firstNode);
             }
 
             LinkedList<Element> matchList = new LinkedList<Element>();

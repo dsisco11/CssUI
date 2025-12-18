@@ -193,8 +193,8 @@ namespace CssUI.CSS.Internal
                                 case EGenericFontFamily.Cursive:
                                 case EGenericFontFamily.Fantasy:
                                     {
-                                        if (GenericFontFamilies.TryGetFamilies(familyKeyword, out List<CssValue> GenericFontFamilys))
-                                            retValues.AddRange(GenericFontFamilys);
+                                        if (GenericFontFamilies.TryGetFamilies(familyKeyword, out List<CssValue>? GenericFontFamilys))
+                                            retValues.AddRange(GenericFontFamilys!);
                                     }
                                     break;
                                 default:

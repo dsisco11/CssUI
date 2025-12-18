@@ -25,7 +25,7 @@ namespace CssUI
 
         public new void Remove(TKey key, out TValue outValue)
         {
-            if (base.TryGetValue(key, out TValue value))
+            if (!base.TryGetValue(key, out TValue? value))
             {
                 throw new Exception($"Unable to find key-value entry from dictionary! ValueType: {typeof(TValue).FullName}");
             }
@@ -38,7 +38,7 @@ namespace CssUI
 
         public bool RemoveInverse(TValue value)
         {
-            if (MapInverse.TryGetValue(value, out TKey key))
+            if (!MapInverse.TryGetValue(value, out TKey? key))
             {
                 throw new Exception($"Unable to find value-key entry from inverse dictionary! ValueType: {typeof(TValue).FullName}");
             }
@@ -53,7 +53,7 @@ namespace CssUI
 
         public bool RemoveInverse(TValue value, out TKey? outKey)
         {
-            if (MapInverse.TryGetValue(value, out TKey? key))
+            if (!MapInverse.TryGetValue(value, out TKey? key))
             {
                 throw new Exception($"Unable to find value-key entry from inverse dictionary! ValueType: {typeof(TValue).FullName}");
             }

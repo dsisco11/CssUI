@@ -121,7 +121,7 @@ namespace CssUI
         /// </summary>
         protected void Handle_Pointer_Input(PointerDevice Device, EPointerInputType InputType)
         {
-            Event RetEvent = null;
+            Event? RetEvent = null;
             switch (InputType)
             {
                 case EPointerInputType.Moved:
@@ -142,7 +142,8 @@ namespace CssUI
                     }
             }
 
-            dispatchEvent(RetEvent);
+            if (RetEvent != null)
+                dispatchEvent(RetEvent);
         }
         #endregion
 

@@ -167,7 +167,7 @@ namespace CssUI.CSS.Functions
         /// <summary>
         /// Resolves any nested var() references within a value.
         /// </summary>
-        private static CssValue ResolveNestedVars(CssValue value, CssCustomPropertyRegistry registry, int depth)
+        private static CssValue? ResolveNestedVars(CssValue? value, CssCustomPropertyRegistry registry, int depth)
         {
             if (value == null || value.IsNull)
                 return value;
@@ -190,7 +190,7 @@ namespace CssUI.CSS.Functions
         /// <summary>
         /// Checks if a value contains var() references that need resolution.
         /// </summary>
-        public static bool ContainsVarReference(CssValue value)
+        public static bool ContainsVarReference(CssValue? value)
         {
             if (value == null || value.IsNull)
                 return false;
