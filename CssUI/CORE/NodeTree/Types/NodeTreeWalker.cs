@@ -96,11 +96,11 @@ namespace CssUI.NodeTree
         /// <summary>
         /// Returns the next node in a sequence containing all first-child descendant nodes and the siblings of the bottom-most node(in tree order)
         /// </summary>
-        public ITreeNode FirstChild()
+        public ITreeNode? FirstChild()
         {
             /* To traverse children, given a walker and type, run these steps: */
-            /* 1) Let node be walker’s current. */
-            ITreeNode node = currentNode;
+            /* 1) Let node be walker's current. */
+            ITreeNode? node = currentNode;
             /* 2) Set node to node’s first child if type is first, and node’s last child if type is last. */
             node = node.firstChild;
             /* 3) While node is non-null: */
@@ -149,11 +149,11 @@ namespace CssUI.NodeTree
         /// <summary>
         /// Returns the next node in a sequence containing all descendant nodes (in reverse tree order)
         /// </summary>
-        public ITreeNode LastChild()
+        public ITreeNode? LastChild()
         {
             /* To traverse children, given a walker and type, run these steps: */
-            /* 1) Let node be walker’s current. */
-            ITreeNode node = currentNode;
+            /* 1) Let node be walker's current. */
+            ITreeNode? node = currentNode;
             /* 2) Set node to node’s first child if type is first, and node’s last child if type is last. */
             node = node.lastChild;
             /* 3) While node is non-null: */
@@ -203,11 +203,11 @@ namespace CssUI.NodeTree
         /// Returns the next node in a sequence containing all sibling nodes of the root and their children (in tree order)
         /// </summary>
         /// <returns></returns>
-        public ITreeNode NextSibling()
+        public ITreeNode? NextSibling()
         {
             /* To traverse siblings, given a walker and type, run these steps: */
-            /* 1) Let node be walker’s current. */
-            ITreeNode node = currentNode;
+            /* 1) Let node be walker's current. */
+            ITreeNode? node = currentNode;
             /* 2) If node is root, then return null. */
             if (ReferenceEquals(node, root)) return null;
             /* 3) While true: */
@@ -249,11 +249,11 @@ namespace CssUI.NodeTree
         /// Returns the next node in a sequence containing all sibling nodes of the root and their children (in reverse tree order)
         /// </summary>
         /// <returns></returns>
-        public ITreeNode PreviousSibling()
+        public ITreeNode? PreviousSibling()
         {
             /* To traverse siblings, given a walker and type, run these steps: */
-            /* 1) Let node be walker’s current. */
-            ITreeNode node = currentNode;
+            /* 1) Let node be walker's current. */
+            ITreeNode? node = currentNode;
             /* 2) If node is root, then return null. */
             if (ReferenceEquals(node, root)) return null;
             /* 3) While true: */
@@ -294,16 +294,16 @@ namespace CssUI.NodeTree
         /// <summary>
         /// Returns the next node in a sequence containing all ancestor nodes of the root (in reverse tree order)
         /// </summary>
-        public ITreeNode PreviousNode()
+        public ITreeNode? PreviousNode()
         {
             /* The previousNode() method, when invoked, must run these steps: */
-            /* 1) Let node be the context object’s current. */
-            ITreeNode node = currentNode;
-            /* 2) While node is not the context object’s root: */
+            /* 1) Let node be the context object's current. */
+            ITreeNode? node = currentNode;
+            /* 2) While node is not the context object's root: */
             while (!ReferenceEquals(node, root))
             {
-                /* 1) Let sibling be node’s previous sibling. */
-                var sibling = node.previousSibling;
+                /* 1) Let sibling be node's previous sibling. */
+                var sibling = node!.previousSibling;
                 /* 2) While sibling is non-null: */
                 while (sibling != null)
                 {
@@ -348,11 +348,11 @@ namespace CssUI.NodeTree
         /// Returns the next node in a sequence containing the complete tree of all descendant nodes from the root (in tree order)
         /// <para>Basically itterates through the first child of every descendent node until it hits one it doesnt accept, then starts returning the rest of the nodes within the roots tree in order from left-right and from bottom-top</para>
         /// </summary>
-        public ITreeNode NextNode()
+        public ITreeNode? NextNode()
         {
             /* The nextNode() method, when invoked, must run these steps: */
-            /* 1) Let node be the context object’s current. */
-            ITreeNode node = currentNode;
+            /* 1) Let node be the context object's current. */
+            ITreeNode? node = currentNode;
             /* 2) Let result be FILTER_ACCEPT. */
             var result = EFilterResult.FILTER_ACCEPT;
             /* 3) While true: */

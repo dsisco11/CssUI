@@ -214,6 +214,7 @@ Note: The HTML module requires significant work and is excluded from Core config
 - [x] Fix CS8618 (146→0) - non-nullable member not initialized ✅
 - [x] Fix CS8604 (232→0) - possible null reference argument ✅
 - [x] Fix CS8600 (324→0) - converting null to non-nullable type ✅
-- [ ] Fix CS8603 (382→360) - possible null reference return
-- [ ] Fix CS8602 (610→730) - dereference of possibly null reference
+- [ ] Fix CS8603 (360→312) - possible null reference return (13% reduced)
+- [ ] Fix CS8602 (610→732) - dereference of possibly null reference
 - [ ] Fix CS8625 (960→190) - null literal to non-nullable type
+  Note: Some warning counts increase temporarily as nullable changes propagate

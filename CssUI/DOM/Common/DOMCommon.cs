@@ -646,7 +646,7 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Node Get_Nth_Ancestor(Node node, uint Nth, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static Node? Get_Nth_Ancestor(Node node, uint Nth, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             if (Nth == 0)
             {
@@ -673,7 +673,7 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static NodeType Get_Nth_Ancestor<NodeType>(Node node, uint Nth, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL) where NodeType : INode
+        public static NodeType? Get_Nth_Ancestor<NodeType>(Node node, uint Nth, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL) where NodeType : INode
         {
             if (Nth == 0)
             {
@@ -774,7 +774,7 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Node Get_Nth_Descendant(Node node, uint Nth, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static Node? Get_Nth_Descendant(Node node, uint Nth, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             if (Nth == 0)
             {
@@ -801,7 +801,7 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static NodeType Get_Nth_Descendant<NodeType>(Node node, uint Nth, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL) where NodeType : INode
+        public static NodeType? Get_Nth_Descendant<NodeType>(Node node, uint Nth, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL) where NodeType : INode
         {
             if (Nth == 0)
             {
@@ -1061,7 +1061,7 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Node Get_Nth_Preceeding(Node node, uint Nth, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static Node? Get_Nth_Preceeding(Node node, uint Nth, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             if (Nth == 0)
             {
@@ -1150,7 +1150,7 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Node Get_Nth_Following(Node node, uint Nth, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static Node? Get_Nth_Following(Node node, uint Nth, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             if (Nth == 0)
             {
@@ -1492,7 +1492,7 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Node Get_Nth_Child(Node node, uint Nth, NodeFilter? Filter = null)
+        public static Node? Get_Nth_Child(Node node, uint Nth, NodeFilter? Filter = null)
         {
             if (Nth == 0)
             {
@@ -1579,7 +1579,7 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static NodeType Get_Nth_Child<NodeType>(Node node, uint Nth, NodeFilter? Filter = null) where NodeType : INode
+        public static NodeType? Get_Nth_Child<NodeType>(Node node, uint Nth, NodeFilter? Filter = null) where NodeType : INode
         {
             if (Nth == 0)
             {
@@ -1631,7 +1631,7 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static NodeType Get_First_Child<NodeType>(Node node, NodeFilter? Filter = null) where NodeType : INode
+        public static NodeType? Get_First_Child<NodeType>(Node node, NodeFilter? Filter = null) where NodeType : INode
         {
             return Get_Nth_Child<NodeType>(node, 1, Filter);
         }
@@ -1642,7 +1642,7 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static NodeType Get_Last_Child<NodeType>(Node node, NodeFilter? Filter = null) where NodeType : INode
+        public static NodeType? Get_Last_Child<NodeType>(Node node, NodeFilter? Filter = null) where NodeType : INode
         {
             Node? current = node.lastChild;
             while (current is object)
@@ -1823,7 +1823,7 @@ namespace CssUI.DOM
         /// <param name="ancestor">Target stopping point for the search</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Node Get_Junction(Node node, Node ancestor)
+        public static Node? Get_Junction(Node node, Node ancestor)
         {
             if (node is null) throw new ArgumentNullException(nameof(node));
             if (ancestor is null) throw new ArgumentNullException(nameof(ancestor));
@@ -1833,7 +1833,7 @@ namespace CssUI.DOM
                 return node;
             }
 
-            var current = node;
+            Node? current = node;
             while (current is object && !ReferenceEquals(current.parentNode, ancestor))
             {
                 current = current.parentNode;

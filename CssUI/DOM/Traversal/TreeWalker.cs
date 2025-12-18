@@ -70,7 +70,7 @@ namespace CssUI.DOM
         /// Returns the next node in a sequence containing all nodes in the parent chain(in reverse tree order)
         /// </summary>
         /// <returns></returns>
-        public Node parentNode()
+        public Node? parentNode()
         {
             /* The parentNode() method, when invoked, must run these steps: */
             /* 1) Let node be the context object’s current. */
@@ -94,7 +94,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Returns the next node in a sequence containing all first-child descendant nodes and the siblings of the bottom-most node(in tree order)
         /// </summary>
-        public Node firstChild()
+        public Node? firstChild()
         {
             /* To traverse children, given a walker and type, run these steps: */
             /* 1) Let node be walker’s current. */
@@ -147,7 +147,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Returns the next node in a sequence containing all descendant nodes (in reverse tree order)
         /// </summary>
-        public Node lastChild()
+        public Node? lastChild()
         {
             /* To traverse children, given a walker and type, run these steps: */
             /* 1) Let node be walker’s current. */
@@ -201,7 +201,7 @@ namespace CssUI.DOM
         /// Returns the next node in a sequence containing all sibling nodes of the root and their children (in tree order)
         /// </summary>
         /// <returns></returns>
-        public Node nextSibling()
+        public Node? nextSibling()
         {
             /* To traverse siblings, given a walker and type, run these steps: */
             /* 1) Let node be walker’s current. */
@@ -247,7 +247,7 @@ namespace CssUI.DOM
         /// Returns the next node in a sequence containing all sibling nodes of the root and their children (in reverse tree order)
         /// </summary>
         /// <returns></returns>
-        public Node previousSibling()
+        public Node? previousSibling()
         {
             /* To traverse siblings, given a walker and type, run these steps: */
             /* 1) Let node be walker’s current. */
@@ -292,7 +292,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Returns the next node in a sequence containing all ancestor nodes of the root (in reverse tree order)
         /// </summary>
-        public Node previousNode()
+        public Node? previousNode()
         {
             /* The previousNode() method, when invoked, must run these steps: */
             /* 1) Let node be the context object’s current. */
@@ -346,7 +346,7 @@ namespace CssUI.DOM
         /// Returns the next node in a sequence containing the complete tree of all descendant nodes from the root (in tree order)
         /// <para>Basically itterates through the first child of every descendent node until it hits one it doesnt accept, then starts returning the rest of the nodes within the roots tree in order from left-right and from bottom-top</para>
         /// </summary>
-        public Node nextNode()
+        public Node? nextNode()
         {
             /* The nextNode() method, when invoked, must run these steps: */
             /* 1) Let node be the context object’s current. */

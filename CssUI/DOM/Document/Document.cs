@@ -48,7 +48,7 @@ namespace CssUI.DOM
         internal BrowsingContext? BrowsingContext = null;
 
         [Obsolete("Use defaultView instead", true)]
-        internal Window window
+        internal Window? window
         {/* https://html.spec.whatwg.org/multipage/window-object.html#dom-document-defaultview */
             get
             {
@@ -72,7 +72,7 @@ namespace CssUI.DOM
         #endregion
 
         #region Properties
-        public Window defaultView
+        public Window? defaultView
         {/* https://html.spec.whatwg.org/multipage/window-object.html#dom-document-defaultview */
             get
             {
@@ -96,7 +96,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Returns the doctype or null if there is none.
         /// </summary>
-        public DocumentType doctype => DOMCommon.Get_First_Child<DocumentType>(this);
+        public DocumentType? doctype => DOMCommon.Get_First_Child<DocumentType>(this);
         /// <summary>
         /// Returns document’s content type.
         /// </summary>
@@ -261,12 +261,12 @@ namespace CssUI.DOM
         /// </summary>
         /* The body element of a document is the first of the html element's children that is either a body element or a frameset element, or null if there is no such element. */
 #if ENABLE_HTML
-        public HTMLElement body
+        public HTMLElement? body
         {
             get => DOMCommon.Get_Nth_Child<HTMLBodyElement>(documentElement!, 1);
         }
 #else
-        public Element body
+        public Element? body
         {
             get => DOMCommon.Get_Nth_Child<Element>(documentElement!, 1);
         }
@@ -488,7 +488,7 @@ namespace CssUI.DOM
         #endregion
 
         #region Selection
-        public Selection getSelection()
+        public Selection? getSelection()
         {/* Docs: https://www.w3.org/TR/selection-api/#extensions-to-document-interface */
             if (BrowsingContext is null) return null;
             return _selection;
@@ -597,7 +597,7 @@ namespace CssUI.DOM
         #endregion
 
         #region CSSOM Extensions
-        public Element elementFromPoint(double x, double y)
+        public Element? elementFromPoint(double x, double y)
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-document-elementfrompoint */
 
             /* 1) If either argument is negative, x is greater than the viewport width excluding the size of a rendered scroll bar (if any), or y is greater than the viewport height excluding the size of a rendered scroll bar (if any), or there is no viewport associated with the document, return null and terminate these steps. */
@@ -658,7 +658,7 @@ namespace CssUI.DOM
             throw new NotImplementedException();
         }
 
-        public Element scrollingElement
+        public Element? scrollingElement
         {
             get
             {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-document-scrollingelement */
@@ -678,7 +678,7 @@ namespace CssUI.DOM
         #region ID Map
         Dictionary<AtomicString, WeakReference<Element>> Element_ID_Map = new Dictionary<AtomicString, WeakReference<Element>>();
 
-        public Element getElementByID(AtomicString id)
+        public Element? getElementByID(AtomicString id)
         {
             if (Element_ID_Map.TryGetValue(id, out var weakRef))
             {

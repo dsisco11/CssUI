@@ -20,15 +20,15 @@ namespace CssUI.NodeTree
 
 
         /// <summary> The node immediately containing this one </summary>
-        public ITreeNode parentNode { get; set; }
+        public ITreeNode? parentNode { get; set; }
         /// <summary> The first child in this nodes list of children </summary>
-        public ITreeNode firstChild => (childNodes.Count <= 0 ? null : childNodes[0]);
+        public ITreeNode? firstChild => (childNodes.Count <= 0 ? null : childNodes[0]);
         /// <summary> The last child in this nodes list of children </summary>
-        public ITreeNode lastChild => (childNodes.Count <= 0 ? null : childNodes[childNodes.Count - 1]);
+        public ITreeNode? lastChild => (childNodes.Count <= 0 ? null : childNodes[childNodes.Count - 1]);
         /// <summary> The node which is directly adjacent to this one within the parent </summary>
-        public ITreeNode nextSibling => Tree.Get_Next_Sibling(this);
+        public ITreeNode? nextSibling => Tree.Get_Next_Sibling(this);
         /// <summary> The node which is directly adjacent to this one within the parent </summary>
-        public ITreeNode previousSibling => Tree.Get_Previous_Sibling(this);
+        public ITreeNode? previousSibling => Tree.Get_Previous_Sibling(this);
         #endregion
 
         #region Constructors

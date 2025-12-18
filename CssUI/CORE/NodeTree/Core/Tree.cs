@@ -199,7 +199,7 @@ namespace CssUI.NodeTree
         /// <param name="FilterMask">Mask for which IWalkableTreeNode types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ITreeNode Get_Nth_Ancestor(ITreeNode node, uint Nth, in NodeTreeFilter? Filter = null, ulong FilterMask = FILTER_SHOW_ALL)
+        public static ITreeNode? Get_Nth_Ancestor(ITreeNode node, uint Nth, in NodeTreeFilter? Filter = null, ulong FilterMask = FILTER_SHOW_ALL)
         {
             if (Nth == 0)
             {
@@ -208,7 +208,7 @@ namespace CssUI.NodeTree
 
             uint N = Nth;
             NodeTreeWalker tree = new NodeTreeWalker(node, FilterMask, Filter);
-            ITreeNode current = tree.ParentNode();
+            ITreeNode? current = tree.ParentNode();
             while (current != null)
             {
                 if (--N <= 0) { return current; }
@@ -227,7 +227,7 @@ namespace CssUI.NodeTree
         /// <param name="FilterMask">Mask for which IWalkableTreeNode types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static NodeType Get_Nth_Ancestor_OfType<NodeType>(ITreeNode node, uint Nth, in NodeTreeFilter? Filter = null, ulong FilterMask = FILTER_SHOW_ALL) where NodeType : ITreeNode
+        public static NodeType? Get_Nth_Ancestor_OfType<NodeType>(ITreeNode node, uint Nth, in NodeTreeFilter? Filter = null, ulong FilterMask = FILTER_SHOW_ALL) where NodeType : ITreeNode
         {
             if (Nth == 0)
             {
@@ -236,7 +236,7 @@ namespace CssUI.NodeTree
 
             uint N = Nth;
             NodeTreeWalker tree = new NodeTreeWalker(node, FilterMask, Filter);
-            ITreeNode current = tree.ParentNode();
+            ITreeNode? current = tree.ParentNode();
             while (current != null)
             {
                 if (current is NodeType nodeAsType)
@@ -329,7 +329,7 @@ namespace CssUI.NodeTree
         /// <param name="FilterMask">Mask for which IWalkableTreeNode types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ITreeNode Get_Nth_Descendant(ITreeNode node, uint Nth, in NodeTreeFilter? Filter = null, ulong FilterMask = FILTER_SHOW_ALL)
+        public static ITreeNode? Get_Nth_Descendant(ITreeNode node, uint Nth, in NodeTreeFilter? Filter = null, ulong FilterMask = FILTER_SHOW_ALL)
         {
             if (Nth == 0)
             {
@@ -338,7 +338,7 @@ namespace CssUI.NodeTree
 
             uint N = Nth;
             NodeTreeWalker tree = new NodeTreeWalker(node, FilterMask, Filter);
-            ITreeNode current = tree.NextNode();
+            ITreeNode? current = tree.NextNode();
             while (current != null)
             {
                 if (--N <= 0) { return current; }
@@ -357,7 +357,7 @@ namespace CssUI.NodeTree
         /// <param name="FilterMask">Mask for which IWalkableTreeNode types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static NodeType Get_Nth_Descendant_OfType<NodeType>(ITreeNode node, uint Nth, in NodeTreeFilter? Filter = null, ulong FilterMask = FILTER_SHOW_ALL) where NodeType : ITreeNode
+        public static NodeType? Get_Nth_Descendant_OfType<NodeType>(ITreeNode node, uint Nth, in NodeTreeFilter? Filter = null, ulong FilterMask = FILTER_SHOW_ALL) where NodeType : ITreeNode
         {
             if (Nth == 0)
             {
@@ -440,7 +440,7 @@ namespace CssUI.NodeTree
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ITreeNode Get_Nth_Previous(ITreeNode node, uint Nth, in NodeTreeFilter? Filter = null)
+        public static ITreeNode? Get_Nth_Previous(ITreeNode node, uint Nth, in NodeTreeFilter? Filter = null)
         {
             if (Nth == 0)
             {
@@ -448,7 +448,7 @@ namespace CssUI.NodeTree
             }
 
             uint N = Nth;
-            ITreeNode sibling = node.previousSibling;
+            ITreeNode? sibling = node.previousSibling;
             while (sibling != null)
             {
                 var fres = Filter?.acceptNode(sibling) ?? EFilterResult.FILTER_ACCEPT;
@@ -540,7 +540,7 @@ namespace CssUI.NodeTree
         /// <param name="FilterMask">Mask for which IWalkableTreeNode types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ITreeNode Get_Nth_Preceeding(ITreeNode node, uint Nth, in NodeTreeFilter? Filter = null, ulong FilterMask = FILTER_SHOW_ALL)
+        public static ITreeNode? Get_Nth_Preceeding(ITreeNode node, uint Nth, in NodeTreeFilter? Filter = null, ulong FilterMask = FILTER_SHOW_ALL)
         {
             if (Nth == 0)
             {
@@ -549,7 +549,7 @@ namespace CssUI.NodeTree
 
             uint N = Nth;
             NodeTreeWalker tree = new NodeTreeWalker(node, FilterMask, Filter);
-            ITreeNode current = tree.PreviousSibling();
+            ITreeNode? current = tree.PreviousSibling();
             while (current != null)
             {
                 if (--N <= 0) { return current; }
@@ -630,7 +630,7 @@ namespace CssUI.NodeTree
         /// <param name="FilterMask">Mask for which IWalkableTreeNode types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ITreeNode Get_Nth_Following(ITreeNode node, uint Nth, in NodeTreeFilter? Filter = null, ulong FilterMask = FILTER_SHOW_ALL)
+        public static ITreeNode? Get_Nth_Following(ITreeNode node, uint Nth, in NodeTreeFilter? Filter = null, ulong FilterMask = FILTER_SHOW_ALL)
         {
             if (Nth == 0)
             {
@@ -639,7 +639,7 @@ namespace CssUI.NodeTree
 
             uint N = Nth;
             NodeTreeWalker tree = new NodeTreeWalker(node, FilterMask, Filter);
-            ITreeNode current = tree.NextSibling();
+            ITreeNode? current = tree.NextSibling();
             while (current != null)
             {
                 if (--N <= 0) { return current; }
@@ -684,7 +684,7 @@ namespace CssUI.NodeTree
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ITreeNode Get_Nth_Next(ITreeNode node, uint Nth, in NodeTreeFilter? Filter = null)
+        public static ITreeNode? Get_Nth_Next(ITreeNode node, uint Nth, in NodeTreeFilter? Filter = null)
         {
             if (Nth == 0)
             {
@@ -692,7 +692,7 @@ namespace CssUI.NodeTree
             }
 
             var N = Nth;
-            ITreeNode sibling = node.nextSibling;
+            ITreeNode? sibling = node.nextSibling;
             while (sibling != null)
             {
                 var fres = Filter?.acceptNode(sibling) ?? EFilterResult.FILTER_ACCEPT;
@@ -722,7 +722,7 @@ namespace CssUI.NodeTree
         /// <param name="ancestor">Target stopping point for the search</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ITreeNode Get_Junction(ITreeNode node, ITreeNode ancestor)
+        public static ITreeNode? Get_Junction(ITreeNode node, ITreeNode ancestor)
         {
             if (node is null) throw new ArgumentNullException(nameof(node));
             if (ancestor is null) throw new ArgumentNullException(nameof(ancestor));
@@ -786,7 +786,7 @@ namespace CssUI.NodeTree
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ITreeNode Get_Nth_Child(ITreeNode node, uint Nth, in NodeTreeFilter? Filter = null)
+        public static ITreeNode? Get_Nth_Child(ITreeNode node, uint Nth, in NodeTreeFilter? Filter = null)
         {
             if (Nth == 0)
             {
@@ -794,7 +794,7 @@ namespace CssUI.NodeTree
             }
 
             uint N = Nth;
-            ITreeNode child = node.firstChild;
+            ITreeNode? child = node.firstChild;
             if (Filter is object)
             {
                 while (child is object)
@@ -975,10 +975,10 @@ namespace CssUI.NodeTree
         /// </summary>
         /// <param name="node">The node to start searching from</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ITreeNode Get_Root(ITreeNode node)
+        public static ITreeNode? Get_Root(ITreeNode node)
         {
             /* The root of an object is itself, if its parent is null, or else it is the root of its parent. The root of a tree is any object participating in that tree whose parent is null. */
-            ITreeNode current = node;
+            ITreeNode? current = node;
             while (current is object)
             {
                 if (current.parentNode is null)
@@ -995,7 +995,7 @@ namespace CssUI.NodeTree
         /// </summary>
         /// <param name="node">The node to start searching from</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ITreeNode Get_Previous_Sibling(ITreeNode node)
+        public static ITreeNode? Get_Previous_Sibling(ITreeNode node)
         {
             if (node is null || node.parentNode is null)
             {
@@ -1015,7 +1015,7 @@ namespace CssUI.NodeTree
         /// </summary>
         /// <param name="node">The node to start searching from</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ITreeNode Get_Next_Sibling(ITreeNode node)
+        public static ITreeNode? Get_Next_Sibling(ITreeNode node)
         {
             if (node is null || node.parentNode is null)
             {
