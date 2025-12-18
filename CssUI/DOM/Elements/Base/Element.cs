@@ -121,11 +121,11 @@ namespace CssUI.DOM
         #endregion
 
         #region CSS
-        public new CssPrincipalBox Box
+        public new CssPrincipalBox? Box
         {
             get
             {
-                return (CssPrincipalBox)base.Box;
+                return base.Box as CssPrincipalBox;
             }
             set
             {

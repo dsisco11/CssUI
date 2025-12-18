@@ -56,11 +56,11 @@ namespace CssUI.DOM
         #endregion
 
         #region CSS
-        public new CssTextRun Box
+        public new CssTextRun? Box
         {
             get
             {
-                return (CssTextRun)base.Box;
+                return base.Box as CssTextRun;
             }
             set
             {

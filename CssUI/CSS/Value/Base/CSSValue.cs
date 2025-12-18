@@ -814,7 +814,7 @@ namespace CssUI.CSS
             if (!IsCollection) throw new CssException($"{nameof(CssValue)} is not a collection! {this}");
             Contract.EndContractBlock();
 
-            return new ReadOnlyCollection<CssValue>((CssValue[])value);
+            return new ReadOnlyCollection<CssValue>((CssValue[])value!);
         }
 
         /// <summary>
@@ -847,13 +847,13 @@ namespace CssUI.CSS
         /// Returns the value as a string
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string AsString() => (string)value;
+        public string AsString() => (string)value!;
 
         /// <summary>
         /// Returns the value as a CssFunction (for FUNCTION type values).
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal CssFunction AsFunction() => value as CssFunction;
+        internal CssFunction? AsFunction() => value as CssFunction;
         #endregion
 
         #region Operators
@@ -878,15 +878,15 @@ namespace CssUI.CSS
                 case ECssValueTypes.COLOR:
                     return EqualityComparer<int>.Default.Equals((int)A.value, (int)B.value);
                 case ECssValueTypes.INTEGER:
-                    return EqualityComparer<long>.Default.Equals((long)A.value, (long)B.value);
+                    return EqualityComparer<long>.Default.Equals((long)A.value!, (long)B.value!);
                 case ECssValueTypes.NUMBER:
                 case ECssValueTypes.DIMENSION:
                 case ECssValueTypes.PERCENT:
-                    return EqualityComparer<double>.Default.Equals((double)A.value, (double)B.value);
+                    return EqualityComparer<double>.Default.Equals((double)A.value!, (double)B.value!);
                 case ECssValueTypes.STRING:
-                    return EqualityComparer<string>.Default.Equals((string)A.value, (string)B.value);
+                    return EqualityComparer<string>.Default.Equals((string)A.value!, (string)B.value!);
                 case ECssValueTypes.KEYWORD:
-                    return A.value.Equals(B.value);
+                    return A.value!.Equals(B.value);
                 //return EqualityComparer<int>.Default.Equals((int)A.Value, (int)B.Value);
                 default:
                     throw new NotImplementedException($"Equality comparison logic not implemented for type: {Enum.GetName(typeof(ECssValueTypes), A.Type)}");
@@ -939,9 +939,9 @@ namespace CssUI.CSS
                 case ECssValueTypes.PERCENT:
                     return string.Concat(AsDecimal().ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture), "%");
                 case ECssValueTypes.STRING:
-                    return string.Concat(UnicodeCommon.CHAR_QUOTATION_MARK, (string)value, UnicodeCommon.CHAR_QUOTATION_MARK);
+                    return string.Concat(UnicodeCommon.CHAR_QUOTATION_MARK, (string)value!, UnicodeCommon.CHAR_QUOTATION_MARK);
                 case ECssValueTypes.KEYWORD:
-                    return Lookup.Keyword(value.GetType(), value);// Enum.GetName(value.GetType(), value);
+                    return Lookup.Keyword(value!.GetType(), value);// Enum.GetName(value.GetType(), value)
                 default:
                     return string.Concat("[", Enum.GetName(typeof(ECssValueTypes), Type), "]");
             }
@@ -968,11 +968,11 @@ namespace CssUI.CSS
                     }
                 case ECssValueTypes.KEYWORD:
                     {
-                        return (string)value;
+                        return (string)value!;
                     }
                 case ECssValueTypes.STRING:
                     {
-                        return string.Concat(UnicodeCommon.CHAR_QUOTATION_MARK, (string)value, UnicodeCommon.CHAR_QUOTATION_MARK);
+                        return string.Concat(UnicodeCommon.CHAR_QUOTATION_MARK, (string)value!, UnicodeCommon.CHAR_QUOTATION_MARK);
                     }
                 case ECssValueTypes.COLOR:
                     {

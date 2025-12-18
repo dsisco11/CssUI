@@ -55,7 +55,7 @@ namespace CssUI.DOM.Internal
                 if (B is Node nB && DOMCommon.Is_Shadow_Including_Inclusive_Ancestor(((Node)A).getRootNode(), (Node)B))
                     return (EventTarget)A;
 
-                A = (((Node)A).getRootNode() as DocumentFragment).Host;
+                A = (((Node)A!).getRootNode() as DocumentFragment)?.Host!;
             }
 
             return null;
