@@ -857,7 +857,7 @@ namespace CssUI.CSS
         #endregion
 
         #region Operators
-        public static bool operator ==(CssValue A, CssValue B)
+        public static bool operator ==(CssValue? A, CssValue? B)
         {
             // If either object is null return whether they are BOTH null
             if (A is null || B is null)
@@ -893,7 +893,7 @@ namespace CssUI.CSS
             }
         }
 
-        public static bool operator !=(CssValue A, CssValue B)
+        public static bool operator !=(CssValue? A, CssValue? B)
         {
             return !(A == B);
         }

@@ -10,10 +10,10 @@ namespace CssUI.CSS.Selectors
     /* XXX: Finish this, we need to add the rest of the attribute operators */
     public class AttributeSelector : SimpleSelector
     {
-        readonly NamespacePrefixToken Namespace;
+        readonly NamespacePrefixToken? Namespace;
         readonly AtomicName<EAttributeName> AttributeName;
         readonly ECssAttributeOperator Operator = ECssAttributeOperator.None;
-        readonly string Value = null;
+        readonly string? Value = null;
 
         #region Constructor
         /// <summary>
@@ -21,21 +21,21 @@ namespace CssUI.CSS.Selectors
         /// <param name="Attrib">The attribute name for this selector</param>
         /// <param name="Operator">String token that defines the method of comparison</param>
         /// <param name="Value"></param>
-        public AttributeSelector(NamespacePrefixToken Namespace, string Attrib) : base(ESimpleSelectorType.AttributeSelector)
+        public AttributeSelector(NamespacePrefixToken? Namespace, string Attrib) : base(ESimpleSelectorType.AttributeSelector)
         {
             this.Namespace = Namespace;
             this.AttributeName = Attrib;
             this.Operator = ECssAttributeOperator.Isset;
         }
 
-        public AttributeSelector(NamespacePrefixToken Namespace, string Attrib, CssToken OperatorToken, string Value) : base(ESimpleSelectorType.AttributeSelector)
+        public AttributeSelector(NamespacePrefixToken? Namespace, string Attrib, CssToken OperatorToken, string Value) : base(ESimpleSelectorType.AttributeSelector)
         {
             this.Namespace = Namespace;
             this.AttributeName = Attrib;
             if (Value == null) Value = string.Empty;
             this.Value = Value;
 
-            if (OperatorToken == null || OperatorToken.Type == ECssTokenType.Delim && (OperatorToken as DelimToken).Value == '>')
+            if (OperatorToken == null || OperatorToken.Type == ECssTokenType.Delim && (OperatorToken as DelimToken)!.Value == '>')
             {
                 this.Operator = ECssAttributeOperator.Isset;
             }
@@ -45,7 +45,7 @@ namespace CssUI.CSS.Selectors
                 {
                     case ECssTokenType.Delim:
                         {
-                            if ((OperatorToken as DelimToken).Value == '=')
+                            if ((OperatorToken as DelimToken)!.Value == '=')
                                 this.Operator = ECssAttributeOperator.Equals;
                         }
                         break;

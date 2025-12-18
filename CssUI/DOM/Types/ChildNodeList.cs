@@ -64,7 +64,7 @@ namespace CssUI.DOM
                     current = current.Next;
                 }
 
-                item.ptrSelfRef = ChildElements!.AddBefore(current, item);
+                item.ptrSelfRef = ChildElements!.AddBefore(current!, item);
             }
         }
 

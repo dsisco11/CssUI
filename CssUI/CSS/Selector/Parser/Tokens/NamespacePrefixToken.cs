@@ -4,15 +4,15 @@ namespace CssUI.CSS.Selectors
 {
     public class NamespacePrefixToken : CssToken
     {
-        public readonly string Value;
-        public NamespacePrefixToken(string Value) : base(ECssTokenType.NamespacePrefix)
+        public readonly string? Value;
+        public NamespacePrefixToken(string? Value) : base(ECssTokenType.NamespacePrefix)
         {
             this.Value = Value;
         }
 
         public override string Encode()
         {
-            return Value;
+            return Value ?? string.Empty;
         }
     }
 }

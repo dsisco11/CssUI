@@ -594,11 +594,11 @@ namespace CssUI.DOM.Nodes
                             {
                                 if (node is HTMLDocument)
                                 {
-                                    copy = new HTMLDocument((node as Document)!.contentType);
+                                    copy = new HTMLDocument((node as Document)!.contentType!);
                                 }
                                 else
                                 {
-                                    copy = new XMLDocument((node as Document)!.contentType);
+                                    copy = new XMLDocument((node as Document)!.contentType!);
                                 }
                             }
                             break;
@@ -835,7 +835,7 @@ namespace CssUI.DOM.Nodes
         /// <param name="child"></param>
         /// <param name="suppress_observers"></param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void Dom_insert_node_into_parent_before(Node node, Node parent, Node child, bool suppress_observers = false)
+        private static void Dom_insert_node_into_parent_before(Node node, Node parent, Node? child, bool suppress_observers = false)
         {/* Docs: https://dom.spec.whatwg.org/#concept-node-insert */
             /* 1) Let count be the number of children of node if it is a DocumentFragment node, and one otherwise. */
             int count = (node is DocumentFragment doc) ? doc.childNodes.Count : 1;
@@ -888,9 +888,9 @@ namespace CssUI.DOM.Nodes
                     childIndex++;
                 }
                 /* 4) If parent is a shadow host and node is a slotable, then assign a slot for node. */
-                if (parent.Is_ShadowHost && node is ISlottable)
+                if (parent.Is_ShadowHost && node is ISlottable slottable)
                 {
-                    DOMCommon.Assign_A_Slot(node as ISlottable);
+                    DOMCommon.Assign_A_Slot(slottable);
                 }
 
                 /* 5) If node is a Text node, run the child text content change steps for parent. */
@@ -1055,7 +1055,7 @@ namespace CssUI.DOM.Nodes
         /// <param name="node">The node which will replace all others</param>
         /// <param name="parent">The parent node whose children are being replaced</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static void Dom_replace_all_within_node(Node node, Node parent)
+        internal static void Dom_replace_all_within_node(Node? node, Node parent)
         {/* Docs: https://dom.spec.whatwg.org/#concept-node-replace-all */
             /* 1) If node is not null, adopt node into parent’s node document. */
             if (node is object)

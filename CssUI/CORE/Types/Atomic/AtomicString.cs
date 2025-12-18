@@ -119,14 +119,14 @@ namespace CssUI
             return false;
         }
 
-        public static bool operator ==(AtomicString A, AtomicString B)
+        public static bool operator ==(AtomicString? A, AtomicString? B)
         {
             // If both object are NULL they match
             if (ReferenceEquals(null, A) && ReferenceEquals(null, B)) return true;
             // If one object is null and not the other they do not match
             if (ReferenceEquals(null, A) ^ ReferenceEquals(null, B)) return false;
             // Check if hashes match
-            if (0 != ((A.Flags ^ B.Flags) & EAtomicStringFlags.CaseInsensitive))
+            if (0 != ((A!.Flags ^ B!.Flags) & EAtomicStringFlags.CaseInsensitive))
             {/* Flag mismatch: the XOR of both flags still returned CaseInsensitive, meaning only one of these atomic-strings is trying to be case-insensitive */
                 return A.Hash_Lower == B.Hash_Lower;
             }
@@ -136,14 +136,14 @@ namespace CssUI
             }
         }
 
-        public static bool operator !=(AtomicString A, AtomicString B)
+        public static bool operator !=(AtomicString? A, AtomicString? B)
         {
             // If both object are null they do not match
             if (ReferenceEquals(null, A) && ReferenceEquals(null, B)) return false;
             // If one object is null and not the other they do match
             if (ReferenceEquals(null, A) ^ ReferenceEquals(null, B)) return true;
             // Check if hashes match
-            if (0 != ((A.Flags ^ B.Flags) & EAtomicStringFlags.CaseInsensitive))
+            if (0 != ((A!.Flags ^ B!.Flags) & EAtomicStringFlags.CaseInsensitive))
             {/* Flag mismatch: the XOR of both flags still returned CaseInsensitive, meaning only one of these atomic-strings is trying to be case-insensitive */
                 return A.Hash_Lower != B.Hash_Lower;
             }

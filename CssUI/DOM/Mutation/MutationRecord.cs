@@ -72,7 +72,7 @@ namespace CssUI.DOM.Mutation
             MutationRecord.QueueRecord(record);
         }
 
-        internal static void Queue_Tree_Mutation_Record(Node target, IEnumerable<Node> addedNodes, IEnumerable<Node> removedNodes, Node previousSibling, Node nextSibling)
+        internal static void Queue_Tree_Mutation_Record(Node target, IEnumerable<Node> addedNodes, IEnumerable<Node> removedNodes, Node? previousSibling, Node? nextSibling)
         {
             MutationRecord record = new MutationRecord(EMutationType.ChildList, target, null, null, null, addedNodes, removedNodes, previousSibling, nextSibling);
             MutationRecord.QueueRecord(record);

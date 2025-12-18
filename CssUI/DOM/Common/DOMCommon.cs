@@ -98,7 +98,7 @@ namespace CssUI.DOM
         /// <param name="node"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Is_CommonTextNode(Node node)
+        public static bool Is_CommonTextNode(Node? node)
         {
             return node is Text || node is ProcessingInstruction || node is Comment;
         }

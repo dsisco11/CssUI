@@ -468,7 +468,7 @@ namespace CssUI.DOM
                     /* 2) While reference node’s parent is not null and is not an inclusive ancestor of original end node, set reference node to its parent. */
                     while (referenceNode.parentNode != null && !DOMCommon.Is_Inclusive_Ancestor(referenceNode.parentNode, endContainer))
                     {
-                        referenceNode = referenceNode.parentNode;
+                        referenceNode = referenceNode.parentNode!;
                     }
                     /* 3) Set new node to the parent of reference node, and new offset to one plus reference node’s index. */
                     newNode = referenceNode.parentNode!;

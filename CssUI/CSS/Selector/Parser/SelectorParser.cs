@@ -118,10 +118,10 @@ namespace CssUI.CSS.Selectors
                 Value = string.Concat((Stream.Consume() as DelimToken)!.Value);
                 if (Stream.Next.Type == ECssTokenType.Delim)
                 {
-                    char dv = (Stream.Next as DelimToken).Value;
+                    char dv = (Stream.Next as DelimToken)!.Value;
                     if (dv == CHAR_RIGHT_CHEVRON)
                     {
-                        Value = string.Concat(Value, (Stream.Consume() as DelimToken).Value);
+                        Value = string.Concat(Value, (Stream.Consume() as DelimToken)!.Value);
                     }
                 }
 

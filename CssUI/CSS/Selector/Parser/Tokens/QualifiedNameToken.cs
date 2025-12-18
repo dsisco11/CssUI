@@ -7,9 +7,9 @@ namespace CssUI.CSS.Selectors
     /// </summary>
     public class QualifiedNameToken : CssToken
     {
-        public readonly NamespacePrefixToken Namespace;
+        public readonly NamespacePrefixToken? Namespace;
         public readonly string Value;
-        public QualifiedNameToken(string Value, NamespacePrefixToken Namespace) : base(ECssTokenType.QualifiedName)
+        public QualifiedNameToken(string Value, NamespacePrefixToken? Namespace) : base(ECssTokenType.QualifiedName)
         {
             this.Value = Value;
             this.Namespace = Namespace;

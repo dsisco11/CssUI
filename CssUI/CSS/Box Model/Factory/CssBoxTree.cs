@@ -91,19 +91,19 @@ namespace CssUI.CSS
                     }
 
                     // Transfer child nodes from old box to the new box (they will remove themselves if needed)
-                    ITreeNode current = Box.firstChild;
+                    ITreeNode? current = Box.firstChild;
                     while (current is object)
                     {
                         current.parentNode = null;
-                        nextBox.childNodes.Add(current);
+                        nextBox!.childNodes.Add(current);
                         current = current.nextSibling;
                     }
 
                     // 5) Insert the new box-node into tree
                     if (index > -1)
-                        nearestAncestor!.Box.Insert(index, nextBox);
+                        nearestAncestor!.Box.Insert(index, nextBox!);
                     else
-                        nearestAncestor!.Box.Add(nextBox);
+                        nearestAncestor!.Box.Add(nextBox!);
 
                     // Notify the tree that we need to be reflowed
                     node.Propagate_Flag(ENodeFlags.ChildNeedsReflow, exclude_self: true);

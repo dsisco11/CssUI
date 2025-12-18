@@ -83,7 +83,7 @@ namespace CssUI.DOM
             var count = Length - offset;
             var newData = substringData(offset, count);
             /* 5) Let new node be a new Text node, with the same node document as node. Set new node’s data to new data. */
-            var newNode = new Text(ownerDocument!, newData);
+            var newNode = new Text(ownerDocument ?? nodeDocument!, newData);
             var parent = parentNode;
             if (parent != null)
             {

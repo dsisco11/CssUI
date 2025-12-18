@@ -87,7 +87,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Creates a new <see cref="EAttributeType.Boolean"/> type attribute value
         /// </summary>
-        public static AttributeValue From(Boolean boolVal) => new AttributeValue(EAttributeType.Boolean, boolVal, boolVal ? string.Empty : null);
+        public static AttributeValue From(Boolean boolVal) => new AttributeValue(EAttributeType.Boolean, boolVal, boolVal ? string.Empty : string.Empty);
 
         /// <summary>
         /// Creates a new <see cref="EAttributeType.Length"/> type attribute value
@@ -113,12 +113,12 @@ namespace CssUI.DOM
         public static AttributeValue From<T>(T enumValue) where T: struct
         {
             /* Not all enumeration values will have a DOM keyword, some defined by the specification explicitly say certain values should NOT have a keyword */
-            string? keyword = null;
+            string keyword = string.Empty;
 
-            if (Lookup.TryKeyword(enumValue, out string? outKey))
+            if (Lookup.TryKeyword(enumValue, out string? outKey) && outKey != null)
                 keyword = outKey;
 
-            return new AttributeValue(EAttributeType.Enumerated, enumValue, keyword);
+            return new AttributeValue(EAttributeType.Enumerated, enumValue!, keyword);
         }
         #endregion
 
@@ -290,7 +290,7 @@ namespace CssUI.DOM
                         {
                             if (other.Type == EAttributeType.String)
                             {
-                                return ((AtomicString?)Value)?.Equals((AtomicString?)other.Value) ?? false;
+                                return ((AtomicString?)Value)?.Equals((AtomicString?)other.Value!) ?? false;
                             }
                             else
                             {

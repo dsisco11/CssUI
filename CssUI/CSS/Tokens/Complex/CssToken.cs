@@ -24,12 +24,14 @@ namespace CssUI.CSS.Parser
         #endregion
 
         #region Equality Operators
-        public static bool operator ==(CssToken left, CssToken right)
+        public static bool operator ==(CssToken? left, CssToken? right)
         {
+            if (left is null && right is null) return true;
+            if (left is null || right is null) return false;
             return left.Equals(right);
         }
 
-        public static bool operator !=(CssToken left, CssToken right)
+        public static bool operator !=(CssToken? left, CssToken? right)
         {
             return !(left == right);
         }
