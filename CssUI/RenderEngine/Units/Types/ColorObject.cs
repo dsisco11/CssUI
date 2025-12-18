@@ -123,7 +123,7 @@ namespace CssUI.Rendering
         #endregion
 
         #region Equality
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is IColorObject C)
             {

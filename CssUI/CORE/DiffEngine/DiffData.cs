@@ -27,7 +27,7 @@ namespace CssUI.Difference
         #endregion
 
         #region Overrides
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is DiffData<T> other)
             {

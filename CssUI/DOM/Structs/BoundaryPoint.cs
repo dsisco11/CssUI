@@ -17,7 +17,7 @@ namespace CssUI.DOM
         }
         #endregion
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is BoundaryPoint other)
             {

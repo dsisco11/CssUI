@@ -255,7 +255,7 @@ namespace CssUI.DOM
         #endregion
 
         #region Equality
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (!(obj is AttributeValue other))
                 return false;

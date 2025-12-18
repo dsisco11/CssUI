@@ -165,7 +165,7 @@ namespace CssUI.DOM
         }
         #endregion
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {/* Docs: https://dom.spec.whatwg.org/#concept-node-equals */
             if (!base.Equals(obj))
                 return false;

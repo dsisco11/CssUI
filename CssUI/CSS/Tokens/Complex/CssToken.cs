@@ -34,7 +34,7 @@ namespace CssUI.CSS.Parser
             return !(left == right);
         }
 
-        public override bool Equals(object o)
+        public override bool Equals(object? o)
         {
             if (o is CssToken other)
             {

@@ -257,7 +257,7 @@ namespace CssUI
             return (A.Value != Convert.ToInt32(B));
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is AtomicName<T> name && Value.Equals(name.Value))
                 return true;
@@ -328,39 +328,39 @@ namespace CssUI
         #endregion
 
         #region Convertable
-        bool IConvertible.ToBoolean(IFormatProvider provider) => Convert.ToBoolean(Value, provider);
+        bool IConvertible.ToBoolean(IFormatProvider? provider) => Convert.ToBoolean(Value, provider);
 
-        byte IConvertible.ToByte(IFormatProvider provider) => Convert.ToByte(Value, provider);
+        byte IConvertible.ToByte(IFormatProvider? provider) => Convert.ToByte(Value, provider);
 
-        UInt16 IConvertible.ToUInt16(IFormatProvider provider) => Convert.ToUInt16(Value, provider);
+        UInt16 IConvertible.ToUInt16(IFormatProvider? provider) => Convert.ToUInt16(Value, provider);
 
-        Int16 IConvertible.ToInt16(IFormatProvider provider) => Convert.ToInt16(Value, provider);
+        Int16 IConvertible.ToInt16(IFormatProvider? provider) => Convert.ToInt16(Value, provider);
 
-        UInt32 IConvertible.ToUInt32(IFormatProvider provider) => Convert.ToUInt32(Value, provider);
+        UInt32 IConvertible.ToUInt32(IFormatProvider? provider) => Convert.ToUInt32(Value, provider);
 
-        Int32 IConvertible.ToInt32(IFormatProvider provider) => Convert.ToInt32(Value, provider);
+        Int32 IConvertible.ToInt32(IFormatProvider? provider) => Convert.ToInt32(Value, provider);
 
-        UInt64 IConvertible.ToUInt64(IFormatProvider provider) => Convert.ToUInt64(Value, provider);
+        UInt64 IConvertible.ToUInt64(IFormatProvider? provider) => Convert.ToUInt64(Value, provider);
 
-        Int64 IConvertible.ToInt64(IFormatProvider provider) => Convert.ToInt64(Value, provider);
+        Int64 IConvertible.ToInt64(IFormatProvider? provider) => Convert.ToInt64(Value, provider);
 
         public TypeCode GetTypeCode() => Value.GetTypeCode();
 
-        public char ToChar(IFormatProvider provider) => ((IConvertible)Value).ToChar(provider);
+        public char ToChar(IFormatProvider? provider) => ((IConvertible)Value).ToChar(provider);
 
-        public DateTime ToDateTime(IFormatProvider provider) => ((IConvertible)Value).ToDateTime(provider);
+        public DateTime ToDateTime(IFormatProvider? provider) => ((IConvertible)Value).ToDateTime(provider);
 
-        public decimal ToDecimal(IFormatProvider provider) => ((IConvertible)Value).ToDecimal(provider);
+        public decimal ToDecimal(IFormatProvider? provider) => ((IConvertible)Value).ToDecimal(provider);
 
-        public double ToDouble(IFormatProvider provider) => ((IConvertible)Value).ToDouble(provider);
+        public double ToDouble(IFormatProvider? provider) => ((IConvertible)Value).ToDouble(provider);
 
-        public sbyte ToSByte(IFormatProvider provider) => ((IConvertible)Value).ToSByte(provider);
+        public sbyte ToSByte(IFormatProvider? provider) => ((IConvertible)Value).ToSByte(provider);
 
-        public float ToSingle(IFormatProvider provider) => ((IConvertible)Value).ToSingle(provider);
+        public float ToSingle(IFormatProvider? provider) => ((IConvertible)Value).ToSingle(provider);
 
-        public string ToString(IFormatProvider provider) => Value.ToString(provider);
+        public string ToString(IFormatProvider? provider) => Value.ToString(provider);
 
-        public object ToType(Type conversionType, IFormatProvider provider) => ((IConvertible)Value).ToType(conversionType, provider);
+        public object ToType(Type conversionType, IFormatProvider? provider) => ((IConvertible)Value).ToType(conversionType, provider);
         #endregion
 
     }

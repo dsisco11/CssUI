@@ -437,7 +437,7 @@ namespace CssUI.DOM.Nodes
             return true;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {/* https://dom.spec.whatwg.org/#concept-node-equals */
             if (obj is null)
                 return false;

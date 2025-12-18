@@ -20,7 +20,7 @@ namespace CssUI.CSS.Parser
         }
 
 
-        public override bool Equals(object o)
+        public override bool Equals(object? o)
         {
             if (o is NumberToken Other)
             {

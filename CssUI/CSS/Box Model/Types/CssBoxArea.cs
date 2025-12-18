@@ -395,7 +395,7 @@ namespace CssUI.CSS
             return A.GetHashCode() != B.GetHashCode();
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is CssBoxArea area && GetHashCode() == area.GetHashCode();
         }

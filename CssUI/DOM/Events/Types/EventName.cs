@@ -109,7 +109,7 @@ namespace CssUI.DOM.Events
             return (A.Value != (int)B);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is EventName name && name.Value == this.Value)
                 return true;

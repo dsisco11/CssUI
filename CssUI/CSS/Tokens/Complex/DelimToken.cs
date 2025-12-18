@@ -15,7 +15,7 @@ namespace CssUI.CSS.Parser
         }
 
         #region Equality Operators
-        public override bool Equals(object o)
+        public override bool Equals(object? o)
         {
             if (o is DelimToken Other)
             {

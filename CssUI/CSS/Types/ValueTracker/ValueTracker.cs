@@ -94,7 +94,7 @@ namespace CssUI.CSS.Internal
             return Hash;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is ValueTracker<Ty> hash && this.Hash == hash.Hash)
                 return true;

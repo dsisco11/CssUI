@@ -899,7 +899,7 @@ namespace CssUI.CSS
         }
 
 
-        public override bool Equals(object o)
+        public override bool Equals(object? o)
         {
             if (o is null)
                 return false;

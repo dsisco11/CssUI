@@ -25,7 +25,7 @@ namespace CssUI.CSS.Parser
         }
         #endregion
 
-        public override bool Equals(object o)
+        public override bool Equals(object? o)
         {
             if (o is ValuedTokenBase other)
             {

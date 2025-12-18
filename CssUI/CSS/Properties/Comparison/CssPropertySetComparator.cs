@@ -5,8 +5,11 @@ namespace CssUI.CSS
     public class CssPropertySetComparator : IComparer<CssComputedStyle>
     {
         // DOCS: https://www.w3.org/TR/CSS22/cascade.html#cascading-order
-        public int Compare(CssComputedStyle x, CssComputedStyle y)
+        public int Compare(CssComputedStyle? x, CssComputedStyle? y)
         {
+            if (x is null && y is null) return 0;
+            if (x is null) return -1;
+            if (y is null) return 1;
 
             // When sorting we need to to take into account the "order" in which these rules would have been declared in a stylesheet, this is indicated by the PropertySets ID number with lower ids being older.
             // We also have to take into account:

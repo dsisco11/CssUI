@@ -8,8 +8,12 @@ namespace CssUI.CSS
         public readonly static CssPropertyComparator Instance = new CssPropertyComparator();
 
         // DOCS: https://www.w3.org/TR/CSS22/cascade.html#cascading-order
-        public int Compare(ICssProperty x, ICssProperty y)
+        public int Compare(ICssProperty? x, ICssProperty? y)
         {
+            if (x is null && y is null) return 0;
+            if (x is null) return -1;
+            if (y is null) return 1;
+
             // XXX: We do not take into account the '!important' flag atm
             if (x.Source.Origin != y.Source.Origin)
             {

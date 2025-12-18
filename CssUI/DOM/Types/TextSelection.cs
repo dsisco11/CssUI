@@ -59,7 +59,7 @@ namespace CssUI.DOM
             start = end = 0;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if ((obj is TextSelection other))
             {
