@@ -74,7 +74,7 @@ namespace CssUI.DOM
         {
             /* The parentNode() method, when invoked, must run these steps: */
             /* 1) Let node be the context object’s current. */
-            Node node = currentNode;
+            Node? node = currentNode;
             /* 2) While node is non-null and is not the context object’s root: */
             while (node is object && !ReferenceEquals(node, root))
             {
@@ -98,7 +98,7 @@ namespace CssUI.DOM
         {
             /* To traverse children, given a walker and type, run these steps: */
             /* 1) Let node be walker’s current. */
-            Node node = currentNode;
+            Node? node = currentNode;
             /* 2) Set node to node’s first child if type is first, and node’s last child if type is last. */
             node = node.firstChild;
             /* 3) While node is non-null: */
@@ -151,7 +151,7 @@ namespace CssUI.DOM
         {
             /* To traverse children, given a walker and type, run these steps: */
             /* 1) Let node be walker’s current. */
-            Node node = currentNode;
+            Node? node = currentNode;
             /* 2) Set node to node’s first child if type is first, and node’s last child if type is last. */
             node = node.lastChild;
             /* 3) While node is non-null: */
@@ -205,7 +205,7 @@ namespace CssUI.DOM
         {
             /* To traverse siblings, given a walker and type, run these steps: */
             /* 1) Let node be walker’s current. */
-            Node node = currentNode;
+            Node? node = currentNode;
             /* 2) If node is root, then return null. */
             if (ReferenceEquals(node, root)) return null;
             /* 3) While true: */
@@ -251,7 +251,7 @@ namespace CssUI.DOM
         {
             /* To traverse siblings, given a walker and type, run these steps: */
             /* 1) Let node be walker’s current. */
-            Node node = currentNode;
+            Node? node = currentNode;
             /* 2) If node is root, then return null. */
             if (ReferenceEquals(node, root)) return null;
             /* 3) While true: */
@@ -296,7 +296,7 @@ namespace CssUI.DOM
         {
             /* The previousNode() method, when invoked, must run these steps: */
             /* 1) Let node be the context object’s current. */
-            Node node = currentNode;
+            Node? node = currentNode;
             /* 2) While node is not the context object’s root: */
             while (!ReferenceEquals(node, root))
             {
@@ -350,7 +350,7 @@ namespace CssUI.DOM
         {
             /* The nextNode() method, when invoked, must run these steps: */
             /* 1) Let node be the context object’s current. */
-            Node node = currentNode;
+            Node? node = currentNode;
             /* 2) Let result be FILTER_ACCEPT. */
             var result = ENodeFilterResult.FILTER_ACCEPT;
             /* 3) While true: */

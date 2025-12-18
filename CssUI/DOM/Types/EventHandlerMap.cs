@@ -76,7 +76,7 @@ namespace CssUI.DOM.Events
                 if (eventTarget == null)
                     return null;/* This event is not valid for the owning element */
 
-                if (!Map.TryGetValue(Name, out LinkedList<EventHandler> handlerList))
+                if (!Map.TryGetValue(Name, out var handlerList))
                     return Array.Empty<EventHandler>();
 
                 return handlerList;
@@ -90,7 +90,7 @@ namespace CssUI.DOM.Events
             if (eventTarget == null)
                 return false;/* This event is not valid for the owning element */
 
-            if (!Map.TryGetValue(Name, out LinkedList<EventHandler> handlerList))
+            if (!Map.TryGetValue(Name, out var handlerList))
             {/* We have no handlers for this event yet */
                 handlerList = new LinkedList<EventHandler>();
                 Map.Add(Name, handlerList);
@@ -110,7 +110,7 @@ namespace CssUI.DOM.Events
             if (eventTarget == null)
                 return false;/* This event is not valid for the owning element */
 
-            if (!Map.TryGetValue(Name, out LinkedList<EventHandler> handlerList))
+            if (!Map.TryGetValue(Name, out var handlerList))
             {/* We have no handlers for this event yet */
                 return false;
             }

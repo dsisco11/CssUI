@@ -1027,7 +1027,7 @@ namespace CssUI.DOM
                     return;
                 }
 
-                Node viablePreviousSibling = DOMCommon.Get_Nth_Preceeding(this, 1, new FilterNotOneOf(nodes.AsMemory()));
+                Node? viablePreviousSibling = DOMCommon.Get_Nth_Preceeding(this, 1, new FilterNotOneOf(nodes.AsMemory()));
                 var node = Dom_convert_nodes_into_node(nodeDocument, nodes);
                 if (viablePreviousSibling == null)
                 {
@@ -1087,7 +1087,7 @@ namespace CssUI.DOM
                     return;
                 }
 
-                Node viableNextSibling = DOMCommon.Get_Nth_Following(this, 1, new FilterNotOneOf(nodes.AsMemory()));
+                Node? viableNextSibling = DOMCommon.Get_Nth_Following(this, 1, new FilterNotOneOf(nodes.AsMemory()));
                 var node = Dom_convert_nodes_into_node(nodeDocument, nodes);
                 if (viableNextSibling == null)
                 {
@@ -1147,7 +1147,7 @@ namespace CssUI.DOM
                     return;
                 }
 
-                Node viableNextSibling = DOMCommon.Get_Nth_Following(this, 1, new FilterNotOneOf(nodes.AsMemory()));
+                Node? viableNextSibling = DOMCommon.Get_Nth_Following(this, 1, new FilterNotOneOf(nodes.AsMemory()));
                 var node = Dom_convert_nodes_into_node(nodeDocument, nodes);
 
                 /* 5) If context object’s parent is parent, replace the context object with node within parent. */
@@ -1240,7 +1240,7 @@ namespace CssUI.DOM
                     {
                         hasAnon = false;
                         // Search all items in our current list
-                        LinkedListNode<CssBox> node = subBoxes.First;
+                        LinkedListNode<CssBox>? node = subBoxes.First;
                         while (node is object)
                         {
                             CssBox child = node.Value;

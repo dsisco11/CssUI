@@ -315,7 +315,7 @@ namespace CssUI.CSS.Internal
                     }
                 case EBoxPositioning.Fixed:
                     {/* If the element has 'position: fixed', the containing block is established by the viewport in the case of continuous media or the page area in the case of paged media. */
-                        Viewport view = Target.ownerDocument.Viewport;
+                        Viewport view = Target.ownerDocument.Viewport!;
                         return view.getBoundingClientRect();
                     }
                 case EBoxPositioning.Absolute:

@@ -366,7 +366,7 @@ namespace CssUI.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static AttributeDefinition Lookup(AtomicName<EAttributeName> Name)
         {
-            if (DomDefinitions.AttributeDefinitions.TryGetValue(Name, out List<AttributeDefinition> definitionList))
+            if (DomDefinitions.AttributeDefinitions.TryGetValue(Name, out var definitionList))
             {
                 if (definitionList.Count > 1)
                 {
@@ -387,7 +387,7 @@ namespace CssUI.DOM
                 throw new ArgumentNullException(nameof(elementType));
             }
 
-            if (DomDefinitions.AttributeDefinitions.TryGetValue(Name, out List<AttributeDefinition> definitionList))
+            if (DomDefinitions.AttributeDefinitions.TryGetValue(Name, out var definitionList))
             {
                 foreach (var def in definitionList)
                 {

@@ -370,7 +370,7 @@ namespace CssUI.CSS.Parser
             if (Stream is null) throw new ArgumentNullException(nameof(Stream));
             Contract.EndContractBlock();
 
-            string Result = "";
+            string Result = string.Empty;
             Stream.Consume_While(Is_Ascii_Whitespace);
             if (Stream.Next == EOF)
             {
@@ -386,7 +386,7 @@ namespace CssUI.CSS.Parser
                     return new BadUrlToken();
                 }
 
-                Result = ((StringToken)stok).Value;
+                Result = ((StringToken)stok).Value ?? string.Empty;
                 Stream.Consume_While(Is_Ascii_Whitespace);
                 if (Stream.Next == CHAR_RIGHT_PARENTHESES || Stream.Next == EOF)
                 {

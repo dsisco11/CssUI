@@ -253,8 +253,7 @@ namespace CssUI.CSS
         {
             get
             {
-                StyleFunction func;
-                if (Transforms.TryGetValue(Name, out func)) return func;
+                if (Transforms.TryGetValue(Name, out var func)) return func;
 
                 return null;
             }

@@ -157,7 +157,7 @@ namespace CssUI.DOM.Nodes
                 SetFlag(Flags);
             }
 
-            Node current = parentNode;
+            Node? current = parentNode;
             while (current is object)
             {
                 if (current.GetFlag(Flags))
@@ -181,7 +181,7 @@ namespace CssUI.DOM.Nodes
                 ClearFlag(Flags);
             }
 
-            Node current = parentNode;
+            Node? current = parentNode;
             while (current is object)
             {
                 if (current.GetFlag(StopFlags))
@@ -248,7 +248,7 @@ namespace CssUI.DOM.Nodes
 
                         foreach (WeakReference<Range> weakRef in nodeDocument.LIVE_RANGES)
                         {
-                            if (weakRef.TryGetTarget(out Range liveRange))
+                            if (weakRef.TryGetTarget(out Range? liveRange))
                             {
                                 /* 1) For each live range whose start node is currentNode, add length to its start offset and set its start node to node. */
                                 if (ReferenceEquals(currentNode, liveRange.startContainer))
@@ -564,7 +564,7 @@ namespace CssUI.DOM.Nodes
             }
 
             /* 2) If node is an element, then: */
-            Node copy = targetNode;
+            Node? copy = targetNode;
             if (node is Element element)
             {
                 if (copy is null)
@@ -711,7 +711,7 @@ namespace CssUI.DOM.Nodes
             int index = node.index;
             foreach (WeakReference<Range> weakRef in node.nodeDocument.LIVE_RANGES)
             {
-                if (weakRef.TryGetTarget(out Range liveRange))
+                if (weakRef.TryGetTarget(out Range? liveRange))
                 {
                     /* 2) For each live range whose start node is an inclusive descendant of node, set its start to (parent, index). */
                     if (DOMCommon.Is_Inclusive_Descendant(liveRange.startContainer, node))
@@ -740,7 +740,7 @@ namespace CssUI.DOM.Nodes
             /* 6) For each NodeIterator object iterator whose root’s node document is node’s node document, run the NodeIterator pre-removing steps given node and iterator. */
             foreach (var weakRef in NodeIterator.ALL)
             {
-                if (weakRef.TryGetTarget(out NodeIterator iter))
+                if (weakRef.TryGetTarget(out NodeIterator? iter))
                 {
                     if (ReferenceEquals(node.ownerDocument, iter.root.ownerDocument))
                     {
@@ -844,7 +844,7 @@ namespace CssUI.DOM.Nodes
             {
                 foreach (WeakReference<Range> weakRef in parent.nodeDocument.LIVE_RANGES)
                 {
-                    if (weakRef.TryGetTarget(out Range liveRange))
+                    if (weakRef.TryGetTarget(out Range? liveRange))
                     {
                         /* 1) For each live range whose start node is parent and start offset is greater than child’s index, increase its start offset by count. */
                         if (ReferenceEquals(parent, liveRange.startContainer) && liveRange.startOffset > child.index)

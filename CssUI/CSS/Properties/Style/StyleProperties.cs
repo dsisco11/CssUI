@@ -531,8 +531,7 @@ namespace CssUI.CSS
         {
             get
             {
-                CssComputedStyle prop;
-                if (!CssRules.TryGetValue(State, out prop))
+                if (!CssRules.TryGetValue(State, out var prop))
                 {
                     throw new Exception(string.Format("The styling state \"{0}\" is invalid!", State));
                 }

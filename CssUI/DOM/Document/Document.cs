@@ -680,9 +680,9 @@ namespace CssUI.DOM
 
         public Element getElementByID(AtomicString id)
         {
-            if (Element_ID_Map.TryGetValue(id, out WeakReference<Element> weakRef))
+            if (Element_ID_Map.TryGetValue(id, out var weakRef))
             {
-                if (weakRef.TryGetTarget(out Element element))
+                if (weakRef.TryGetTarget(out Element? element))
                 {
                     return element;
                 }
@@ -695,11 +695,10 @@ namespace CssUI.DOM
         {
             AtomicString oldKey = oldValue.AsAtomic();
             AtomicString newKey = newValue.AsAtomic();
-            WeakReference<Element> weakRef;
 
             if (oldKey.Equals(newKey)) return;
 
-            if (Element_ID_Map.TryGetValue(oldKey, out weakRef))
+            if (Element_ID_Map.TryGetValue(oldKey, out var weakRef))
             {
                 Element_ID_Map.Remove(oldKey);
             }

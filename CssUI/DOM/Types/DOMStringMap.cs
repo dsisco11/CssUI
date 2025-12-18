@@ -24,7 +24,7 @@ namespace CssUI.DOM
             get
             {
                 string safeName = To_XML_Safe_Name(Name);
-                string Value = Owner.Attributes.getNamedItem(safeName.AsMemory())?.Value?.AsString();
+                string? Value = Owner.Attributes.getNamedItem(safeName.AsMemory())?.Value?.AsString();
                 return ReferenceEquals(null, Value) ? string.Empty : Value;
             }
             set

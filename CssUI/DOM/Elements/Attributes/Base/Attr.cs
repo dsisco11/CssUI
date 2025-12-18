@@ -93,7 +93,7 @@ namespace CssUI.DOM
         #endregion
 
         #region Internal Utilities
-        private void _set_value(AttributeValue newValue)
+        private void _set_value(AttributeValue? newValue)
         {
             _value_assigned = newValue;
 

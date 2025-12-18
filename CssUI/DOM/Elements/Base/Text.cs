@@ -85,13 +85,13 @@ namespace CssUI.DOM
             /* 5) Let new node be a new Text node, with the same node document as node. Set new node’s data to new data. */
             var newNode = new Text(ownerDocument ?? nodeDocument!, newData);
             var parent = parentNode;
-            if (parent != null)
+            if (parent is not null)
             {
                 /* 1) Insert new node into parent before node’s next sibling. */
                 parent.insertBefore(newNode, nextSibling!);
                 foreach (WeakReference<Range> weakRef in nodeDocument!.LIVE_RANGES)
                 {
-                    if (weakRef.TryGetTarget(out Range liveRange))
+                    if (weakRef.TryGetTarget(out Range? liveRange))
                     {
                         /* 2) For each live range whose start node is node and start offset is greater than offset, set its start node to new node and decrease its start offset by offset. */
                         if (ReferenceEquals(this, liveRange.startContainer) && liveRange.startOffset > offset)
@@ -165,7 +165,7 @@ namespace CssUI.DOM
         {
             /* The contiguous Text nodes of a node node are node, node’s previous sibling Text node, if any, and its contiguous Text nodes, and node’s next sibling Text node, if any, and its contiguous Text nodes, avoiding any duplicates. */
             var RetList = new LinkedList<Text>();
-            Node currentNode = node;
+            Node? currentNode = node;
             // 1) Add all previous text-node siblings to the list
             do
             {

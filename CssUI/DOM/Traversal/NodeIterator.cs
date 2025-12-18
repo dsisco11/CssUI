@@ -45,7 +45,7 @@ namespace CssUI.DOM
             /* Remove us from the list */
             foreach (WeakReference<NodeIterator> weakRef in ALL)
             {
-                if (weakRef.TryGetTarget(out NodeIterator target))
+                if (weakRef.TryGetTarget(out NodeIterator? target))
                 {
                     if (ReferenceEquals(this, target))
                     {
@@ -154,7 +154,7 @@ namespace CssUI.DOM
 
         public Node nextNode()
         {/* Docs: https://dom.spec.whatwg.org/#concept-traversal-active */
-            Node node = referenceNode;
+            Node? node = referenceNode;
             bool beforeNode = pointerBeforeReferenceNode;
 
             while (true)
@@ -188,7 +188,7 @@ namespace CssUI.DOM
         public Node previousNode()
         {/* Docs: https://dom.spec.whatwg.org/#concept-traversal-active */
 
-            Node node = referenceNode;
+            Node? node = referenceNode;
             bool beforeNode = pointerBeforeReferenceNode;
 
             while (true)

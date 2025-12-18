@@ -150,7 +150,7 @@ namespace CssUI.DOM
         public void Add(Node item)
         {
             Items.Add(item);
-            item.parentNode = this.Owner.TryGetTarget(out Node outParent) ? outParent : null;
+            item.parentNode = this.Owner.TryGetTarget(out var outParent) ? outParent : null;
 
             int index = Items.Count - 1;
             Update_Node_Links(index);
@@ -163,7 +163,7 @@ namespace CssUI.DOM
         public void Insert(int index, Node item)
         {
             Items.Insert(index, item);
-            item.parentNode = this.Owner.TryGetTarget(out Node outParent) ? outParent : null;
+            item.parentNode = this.Owner.TryGetTarget(out var outParent) ? outParent : null;
 
             Update_Node_Links(index);
             // Update our linked elements list (if needed)

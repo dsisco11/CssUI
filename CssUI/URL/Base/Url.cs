@@ -227,8 +227,8 @@ namespace CssUI.HTTP
         internal static bool Parse_Basic(ReadOnlyMemory<char> InputStr, in Url Base, out Url outUrl, in Encoding? encodingOverride = null, Url? TargetUrl = null, in ESchemeState? stateOverride = null)
         {/* Docs: https://url.spec.whatwg.org/#concept-basic-url-parser */
             ReadOnlyMemory<char> input = InputStr;
-            Url url = TargetUrl;
-            if (url == null)
+            Url? url = TargetUrl;
+            if (url is null)
             {
                 url = new Url();
                 if (Is_Ascii_Control_Or_Space(input.Span[0]) || Is_Ascii_Control_Or_Space(input.Span[input.Length - 1]))

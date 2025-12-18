@@ -48,7 +48,7 @@ namespace CssUI.DOM
             this.data = newData.Remove(delete, count);
             foreach (var weakRef in nodeDocument.LIVE_RANGES)
             {
-                if (weakRef.TryGetTarget(out Range liveRange))
+                if (weakRef.TryGetTarget(out Range? liveRange))
                 {
                     /* 8) For each live range whose start node is node and start offset is greater than offset but less than or equal to offset plus count, set its start offset to offset. */
                     if (ReferenceEquals(this, liveRange.startContainer) && liveRange.startOffset > offset && liveRange.startOffset < (offset + count))
@@ -91,9 +91,9 @@ namespace CssUI.DOM
         {
             get
             {
-                Node n = previousSibling;
-                while((n != null) && !(n is Element)) { n = n.previousSibling; }
-                return n as Element;
+                Node? n = previousSibling;
+                while((n is not null) && !(n is Element)) { n = n.previousSibling; }
+                return (Element)n!;
             }
         }
 
@@ -101,9 +101,9 @@ namespace CssUI.DOM
         {
             get
             {
-                Node n = nextSibling;
-                while ((n != null) && !(n is Element)) { n = n.nextSibling; }
-                return n as Element;
+                Node? n = nextSibling;
+                while ((n is not null) && !(n is Element)) { n = n.nextSibling; }
+                return (Element)n!;
             }
         }
         #endregion
