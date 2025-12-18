@@ -17,10 +17,10 @@ namespace CssUI.DOM
         }
 
         // browsing context
-        public void moveTo(long x, long y) => Set_Window_Location(new Point2i(x, y));
-        public void moveBy(long x, long y) => Set_Window_Location(new Point2i(x, y) + Get_Window_Location());
-        public void resizeTo(long x, long y) => Set_Window_Size(new Rect2i(x, y));
-        public void resizeBy(long x, long y) => Set_Window_Size(new Rect2i(x, y) + Get_Window_Size());
+        public void moveTo(long x, long y) => Set_Window_Location(new Point2i((int)x, (int)y));
+        public void moveBy(long x, long y) => Set_Window_Location(new Point2i((int)x, (int)y) + Get_Window_Location());
+        public void resizeTo(long x, long y) => Set_Window_Size(new Rect2i((int)x, (int)y));
+        public void resizeBy(long x, long y) => Set_Window_Size(new Rect2i((int)x, (int)y) + Get_Window_Size());
 
         // Viewport
         public long innerWidth => (document.Viewport is null) ? 0 : document.Viewport.Width;

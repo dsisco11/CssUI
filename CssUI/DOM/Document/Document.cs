@@ -64,7 +64,7 @@ namespace CssUI.DOM
         {/* Docs: https://www.w3.org/TR/css-display-3/#initial-containing-block */
             get
             {
-                return documentElement?.Box.Content;
+                return documentElement?.Box.Content ?? default;
             }
         }
 

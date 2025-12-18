@@ -49,14 +49,14 @@ namespace CssUI.Rendering
         #endregion
 
         #region Constructors
-        private GpuTexture(Rect2i Size)
+        private GpuTexture(in Rect2i Size)
         {
-            this.Size = new Rect2i(Size);
+            this.Size = Size;
         }
 
-        public GpuTexture(ReadOnlySpan<byte> Data, Rect2i Size, EPixelFormat Format)
+        public GpuTexture(ReadOnlySpan<byte> Data, in Rect2i Size, EPixelFormat Format)
         {
-            this.Size = new Rect2i(Size);
+            this.Size = Size;
             Push_Frame(Data, Size, Format);
         }
 
@@ -111,9 +111,9 @@ namespace CssUI.Rendering
         #endregion
 
         #region Frame Pushing
-        public void Push_Frame(ReadOnlySpan<byte> Data, Rect2i Size, EPixelFormat Format, float Time = 0f)
+        public void Push_Frame(ReadOnlySpan<byte> Data, in Rect2i Size, EPixelFormat Format, float Time = 0f)
         {
-            FrameAtlas.Add(new GpuTextureFrame(Data, new Rect2i(Size), Format, Time));
+            FrameAtlas.Add(new GpuTextureFrame(Data, Size, Format, Time));
             Build_Timeline();
         }
         #endregion

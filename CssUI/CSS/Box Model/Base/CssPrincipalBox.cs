@@ -108,23 +108,23 @@ namespace CssUI.CSS.BoxTree
         /// <summary>
         /// The edge positions of the Replaced-Content-Area 
         /// </summary>
-        public Rect4f Replaced { get; protected set; } = null;
+        public Rect4f? Replaced { get; protected set; }
         /// <summary>
         /// The edge positions of the Content-Area 
         /// </summary>
-        public Rect4f Content { get; protected set; } = null;
+        public Rect4f Content { get; protected set; }
         /// <summary>
         /// The edge positions of the Padding-Area 
         /// </summary>
-        public Rect4f Padding { get; protected set; } = null;
+        public Rect4f Padding { get; protected set; }
         /// <summary>
         /// The edge positions of the Border-Area 
         /// </summary>
-        public Rect4f Border { get; protected set; } = null;
+        public Rect4f Border { get; protected set; }
         /// <summary>
         /// The edge positions of the Margin-Area 
         /// </summary>
-        public Rect4f Margin { get; protected set; } = null;
+        public Rect4f Margin { get; protected set; }
         /// <summary>
         /// The block which represents the hitbox for mouse related input events
         /// </summary>
@@ -189,7 +189,7 @@ namespace CssUI.CSS.BoxTree
         /// <summary>
         /// Backing value for <see cref="Containing_Box"/>
         /// </summary>
-        private Rect4f _containing_box = null;
+        private Rect4f? _containing_box;
         /// <summary>
         /// The containing block of this element
         /// <para>If the control has an ancestor this will be said ancestors content-area block</para>
@@ -203,7 +203,7 @@ namespace CssUI.CSS.BoxTree
                 {
                     _containing_box = CssCommon.Find_Containing_Block(Owner);
                 }
-                return _containing_box;
+                return _containing_box.Value;
             }
         }
 
@@ -347,55 +347,35 @@ namespace CssUI.CSS.BoxTree
 
         #region Bounds Updating
         /// <summary>
-        /// Alters the TRBL values of the <paramref name="Left"/> rect such that it fits AROUND the <paramref name="Right"/> rect with the given <paramref name="Left_Offsets"/>.
+        /// Creates a new Rect4f that fits AROUND the <paramref name="Inner"/> rect with the given <paramref name="Offsets"/>.
         /// </summary>
-        /// <param name="Right"></param>
-        /// <param name="Left"></param>
-        /// <param name="Left_Offsets"></param>
-        private void Fit_Rect_Around(Rect4f Left, Rect4f Right, in Rect4f Left_Offsets)
+        /// <param name="Inner">The inner rectangle to wrap around</param>
+        /// <param name="Offsets">The offsets to apply outward from the inner rect</param>
+        /// <returns>A new Rect4f that surrounds the inner rect</returns>
+        private static Rect4f Create_Rect_Around(in Rect4f Inner, in Rect4f Offsets)
         {
-            if (Left is null)
-            {
-                throw new ArgumentNullException(nameof(Left));
-            }
-
-            if (Right is null)
-            {
-                throw new ArgumentNullException(nameof(Right));
-            }
-
-            Contract.EndContractBlock();
-
-            Left.Top = Right.Top - Left_Offsets.Top;
-            Left.Right = Right.Right + Left_Offsets.Right;
-            Left.Bottom = Right.Bottom + Left_Offsets.Bottom;
-            Left.Left = Right.Left - Left_Offsets.Left;
+            return new Rect4f(
+                Inner.Top - Offsets.Top,
+                Inner.Right + Offsets.Right,
+                Inner.Bottom + Offsets.Bottom,
+                Inner.Left - Offsets.Left
+            );
         }
 
         /// <summary>
-        /// Alters the TRBL values of the <paramref name="Left"/> rect such that it fits WITHIN the <paramref name="Right"/> rect with the given <paramref name="Right_Offsets"/>.
+        /// Creates a new Rect4f that fits WITHIN the <paramref name="Outer"/> rect with the given <paramref name="Offsets"/>.
         /// </summary>
-        /// <param name="Left"></param>
-        /// <param name="Right"></param>
-        /// <param name="Right_Offsets"></param>
-        private void Fit_Rect_Within(Rect4f Left, Rect4f Right, in Rect4f Right_Offsets)
+        /// <param name="Outer">The outer rectangle to fit within</param>
+        /// <param name="Offsets">The offsets to apply inward from the outer rect</param>
+        /// <returns>A new Rect4f that is inside the outer rect</returns>
+        private static Rect4f Create_Rect_Within(in Rect4f Outer, in Rect4f Offsets)
         {
-            if (Left is null)
-            {
-                throw new ArgumentNullException(nameof(Left));
-            }
-
-            if (Right is null)
-            {
-                throw new ArgumentNullException(nameof(Right));
-            }
-
-            Contract.EndContractBlock();
-
-            Left.Top = Right.Top + Right_Offsets.Top;
-            Left.Right = Right.Right - Right_Offsets.Right;
-            Left.Bottom = Right.Bottom - Right_Offsets.Bottom;
-            Left.Left = Right.Left + Right_Offsets.Left;
+            return new Rect4f(
+                Outer.Top + Offsets.Top,
+                Outer.Right - Offsets.Right,
+                Outer.Bottom - Offsets.Bottom,
+                Outer.Left + Offsets.Left
+            );
         }
 
         /// <summary>
@@ -430,17 +410,17 @@ namespace CssUI.CSS.BoxTree
                 case EBoxPositioning.Absolute:
                     {/* For an absolute element all of the TRBL values will have a resolved value */
                         Margin = new Rect4f(Style.Top, Style.Right, Style.Bottom, Style.Left);
-                        Fit_Rect_Within(Border, Margin, Margin_Size);
-                        Fit_Rect_Within(Padding, Border, Border_Size);
-                        Fit_Rect_Within(Content, Padding, Padding_Size);
+                        Border = Create_Rect_Within(Margin, Margin_Size);
+                        Padding = Create_Rect_Within(Border, Border_Size);
+                        Content = Create_Rect_Within(Padding, Padding_Size);
                     }
                     break;
                 case EBoxPositioning.Fixed:
                     {/* For a fixed element all of the TRBL values will have a resolved value */
                         Margin = new Rect4f(Style.Top, Style.Right, Style.Bottom, Style.Left);
-                        Fit_Rect_Within(Border, Margin, Margin_Size);
-                        Fit_Rect_Within(Padding, Border, Border_Size);
-                        Fit_Rect_Within(Content, Padding, Padding_Size);
+                        Border = Create_Rect_Within(Margin, Margin_Size);
+                        Padding = Create_Rect_Within(Border, Border_Size);
+                        Content = Create_Rect_Within(Padding, Padding_Size);
                     }
                     break;
                 default:
@@ -470,9 +450,9 @@ namespace CssUI.CSS.BoxTree
             var cBottom = cTop + Style.Height;// - (Margin.Size_Bottom + Border.Size_Bottom + Padding.Size_Bottom);
 
             Content = new Rect4f(cTop, cRight, cBottom, cLeft);
-            Fit_Rect_Around(Padding, Content, Style.Get_Padding_Size());
-            Fit_Rect_Around(Border, Padding, Style.Get_Border_Size());
-            Fit_Rect_Around(Margin, Border, Style.Get_Margin_Size());
+            Padding = Create_Rect_Around(Content, Style.Get_Padding_Size());
+            Border = Create_Rect_Around(Padding, Style.Get_Border_Size());
+            Margin = Create_Rect_Around(Border, Style.Get_Margin_Size());
 
             Debug.Assert((Content.Width ==  Style.Width));
             Debug.Assert((Content.Height ==  Style.Height));
@@ -505,17 +485,7 @@ namespace CssUI.CSS.BoxTree
             var rBottom = Content.Top + Y + cSize.Height;
             var rLeft = Content.Left + X;
 
-            if (Replaced is null)
-            {
-                Replaced = new Rect4f(rTop, rRight, rBottom, rLeft);
-            }
-            else
-            {
-                Replaced.Top = rTop;
-                Replaced.Right = rRight;
-                Replaced.Bottom = rBottom;
-                Replaced.Left = rLeft;
-            }
+            Replaced = new Rect4f(rTop, rRight, rBottom, rLeft);
         }
         #endregion
 
@@ -562,10 +532,10 @@ namespace CssUI.CSS.BoxTree
                     {
                         Replaced = null;
 
-                        Content = null;
-                        Padding = null;
-                        Border = null;
-                        Margin = null;
+                        Content = default;
+                        Padding = default;
+                        Border = default;
+                        Margin = default;
                     }
                     break;
                 default:

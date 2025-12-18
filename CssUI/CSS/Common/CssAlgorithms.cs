@@ -49,15 +49,10 @@ namespace CssUI.CSS
         /// <param name="ObjectSize">Size of the object itsself</param>
         public static Point2f Solve_Object_Position(CssValue xPos, CssValue yPos, Rect2f ObjectArea, Rect2f ObjectSize)
         {/* https://www.w3.org/TR/css-backgrounds-3/#the-background-position */
-            if (ObjectArea is null) throw new ArgumentNullException(nameof(ObjectArea));
-            if (ObjectSize is null) throw new ArgumentNullException(nameof(ObjectSize));
-            Contract.EndContractBlock();
-
-            var retPos = new Point2f
-            {
-                X = Solve_Object_Axis_Position(xPos, ObjectArea.Width, ObjectSize.Width),
-                Y = Solve_Object_Axis_Position(yPos, ObjectArea.Height, ObjectSize.Height)
-            };
+            var retPos = new Point2f(
+                Solve_Object_Axis_Position(xPos, ObjectArea.Width, ObjectSize.Width),
+                Solve_Object_Axis_Position(yPos, ObjectArea.Height, ObjectSize.Height)
+            );
             return retPos;
         }
         /// <summary>

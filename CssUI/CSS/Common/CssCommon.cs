@@ -205,7 +205,6 @@ namespace CssUI.CSS.Internal
         /// <summary>
         /// Returns <c>True</c> if the owner of the containing block for the <paramref name="Left"/> element is an ancestor of <paramref name="Right"/>
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_Containing_Block_Ancestor_Of(Element Left, Element Right)
         {/* Docs: https://www.w3.org/TR/CSS22/visudet.html#containing-block-details */
             /* Root elements */
@@ -282,13 +281,12 @@ namespace CssUI.CSS.Internal
 
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Rect4f Find_Containing_Block(Element Target)
         {/* Docs: https://www.w3.org/TR/CSS22/visudet.html#containing-block-details */
             /* Root elements */
             if (Target.parentElement is null)
             {
-                return Target.ownerDocument.Viewport?.getBoundingClientRect();
+                return Target.ownerDocument.Viewport?.getBoundingClientRect() ?? default;
             }
             /* Other elements */
             switch (Target.Style.Positioning)
@@ -387,7 +385,7 @@ namespace CssUI.CSS.Internal
                     }
                 default:
                     {
-                        return Target.parentElement?.Box.Content;
+                        return Target.parentElement?.Box.Content ?? default;
                     }
             }
 
@@ -398,7 +396,6 @@ namespace CssUI.CSS.Internal
         /// </summary>
         /// <param name="Target"></param>
         /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Element Find_Formatting_Container(Element Target)
         {
             // Root Elements
