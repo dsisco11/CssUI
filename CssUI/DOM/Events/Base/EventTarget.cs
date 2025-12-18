@@ -71,7 +71,7 @@ namespace CssUI.DOM.Events
         /// <param name="capture"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal EventListener Find_Listener(EventName type, EventCallback callback, bool capture)
+        internal EventListener? Find_Listener(EventName type, EventCallback callback, bool capture)
         {
             foreach (var listener in Listeners)
             {
@@ -96,7 +96,7 @@ namespace CssUI.DOM.Events
 
         #endregion
 
-        public virtual EventTarget get_the_parent(Event @event)
+        public virtual EventTarget? get_the_parent(Event @event)
         {/* Docs: https://dom.spec.whatwg.org/#get-the-parent */
             return null;
         }

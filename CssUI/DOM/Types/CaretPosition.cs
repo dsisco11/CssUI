@@ -27,7 +27,7 @@ namespace CssUI.DOM
 
 
 
-        public DOMRect getClientRect()
+        public DOMRect? getClientRect()
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-caretposition-getclientrect */
             if (caretRange != null)
             {

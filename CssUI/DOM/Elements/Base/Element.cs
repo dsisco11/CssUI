@@ -148,20 +148,20 @@ namespace CssUI.DOM
         /// A completely unique identifier for this element 
         /// </summary>
         [CEReactions]
-        public string id
+        public string? id
         {/* The id attribute must reflect the "id" content attribute. */
-            get => getAttribute(EAttributeName.ID).AsString();
-            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.ID, AttributeValue.Parse(EAttributeName.ID, value)));
+            get => getAttribute(EAttributeName.ID)?.AsString();
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.ID, AttributeValue.Parse(EAttributeName.ID, value ?? string.Empty)));
         }
 
         /// <summary>
         /// List of classes that apply to this element
         /// </summary>
         [CEReactions]
-        public string className
+        public string? className
         {/* The className attribute must reflect the "class" content attribute. */
-            get => getAttribute(EAttributeName.Class).AsString();
-            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Class, AttributeValue.Parse(EAttributeName.Class, value)));
+            get => getAttribute(EAttributeName.Class)?.AsString();
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Class, AttributeValue.Parse(EAttributeName.Class, value ?? string.Empty)));
         }
 
         /// <summary>

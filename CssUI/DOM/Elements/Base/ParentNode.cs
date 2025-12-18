@@ -15,13 +15,13 @@ namespace CssUI.DOM
 #if USE_FUNCTIONS_FOR_NODE_RELATIONSHIP_LINKS
         public IEnumerable<Element> children => childNodes.Where(c => c is Element).Cast<Element>();
         public int childElementCount => childNodes.Count(c => c is Element);
-        public Element firstElementChild => (Element)childNodes.FirstOrDefault(c => c is Element);
-        public Element lastElementChild => (Element)childNodes.LastOrDefault(c => c is Element);
+        public Element? firstElementChild => (Element?)childNodes.FirstOrDefault(c => c is Element);
+        public Element? lastElementChild => (Element?)childNodes.LastOrDefault(c => c is Element);
 #else
-        public LinkedList<Element> children => childNodes.ChildElements;
+        public LinkedList<Element>? children => childNodes.ChildElements;
         public int childElementCount => childNodes.ChildElements?.Count ?? 0;
-        public Element firstElementChild => childNodes.ChildElements?.First?.Value;
-        public Element lastElementChild => childNodes.ChildElements?.Last?.Value;
+        public Element? firstElementChild => childNodes.ChildElements?.First?.Value;
+        public Element? lastElementChild => childNodes.ChildElements?.Last?.Value;
 #endif
         #endregion
 
@@ -65,7 +65,7 @@ namespace CssUI.DOM
         /// </summary>
         /// <param name="selectors"></param>
         /// <returns></returns>
-        public Element querySelector(string selector)
+        public Element? querySelector(string selector)
         {
             var results = DOMCommon.Scope_Match_Selector_String(this, selector);
             if (results.Any())

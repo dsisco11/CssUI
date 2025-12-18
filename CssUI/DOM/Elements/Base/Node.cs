@@ -56,7 +56,7 @@ namespace CssUI.DOM.Nodes
         #endregion
 
         #region DOM
-        public Document ownerDocument
+        public Document? ownerDocument
         {/* Docs: https://dom.spec.whatwg.org/#dom-node-ownerdocument */
             get
             {
@@ -73,11 +73,11 @@ namespace CssUI.DOM.Nodes
         public Element? parentElement { get; private set; }
         public ChildNodeList childNodes { get; private set; } = null!;
 
-        public Node firstChild { get => childNodes.Count > 0 ? childNodes[0] : null; }
-        public Node lastChild { get => childNodes.Count > 0 ? childNodes[childNodes.Count - 1] : null; }
+        public Node? firstChild { get => childNodes.Count > 0 ? childNodes[0] : null; }
+        public Node? lastChild { get => childNodes.Count > 0 ? childNodes[childNodes.Count - 1] : null; }
 
 #if USE_FUNCTIONS_FOR_NODE_RELATIONSHIP_LINKS
-        public Node previousSibling
+        public Node? previousSibling
         {
             get
             {
@@ -87,7 +87,7 @@ namespace CssUI.DOM.Nodes
             }
             internal set { }
         }
-        public Node nextSibling
+        public Node? nextSibling
         {
             get
             {

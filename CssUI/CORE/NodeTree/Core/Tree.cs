@@ -155,7 +155,7 @@ namespace CssUI.NodeTree
         {
             LinkedList<ITreeNode> list = new LinkedList<ITreeNode>();
             NodeTreeWalker tree = new NodeTreeWalker(node, FilterMask, Filter);
-            ITreeNode current = tree.ParentNode();
+            ITreeNode? current = tree.ParentNode();
             while (current != null)
             {
                 list.AddLast(current);
@@ -874,7 +874,7 @@ namespace CssUI.NodeTree
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static NodeType Get_Nth_Child_OfType<NodeType>(ITreeNode node, uint Nth, in NodeTreeFilter? Filter = null) where NodeType : ITreeNode
+        public static NodeType? Get_Nth_Child_OfType<NodeType>(ITreeNode node, uint Nth, in NodeTreeFilter? Filter = null) where NodeType : ITreeNode
         {
             if (Nth == 0)
             {
@@ -882,7 +882,7 @@ namespace CssUI.NodeTree
             }
 
             uint N = Nth;
-            ITreeNode child = node.firstChild;
+            ITreeNode? child = node.firstChild;
             if (Filter is object)
             {
                 while (child is object)
@@ -927,7 +927,7 @@ namespace CssUI.NodeTree
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static NodeType Get_First_Child_OfType<NodeType>(ITreeNode node, in NodeTreeFilter? Filter = null) where NodeType : ITreeNode
+        public static NodeType? Get_First_Child_OfType<NodeType>(ITreeNode node, in NodeTreeFilter? Filter = null) where NodeType : ITreeNode
         {
             return Get_Nth_Child_OfType<NodeType>(node, 1, Filter);
         }
@@ -938,9 +938,9 @@ namespace CssUI.NodeTree
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static NodeType Get_Last_Child_OfType<NodeType>(ITreeNode node, in NodeTreeFilter? Filter = null) where NodeType : ITreeNode
+        public static NodeType? Get_Last_Child_OfType<NodeType>(ITreeNode node, in NodeTreeFilter? Filter = null) where NodeType : ITreeNode
         {
-            ITreeNode child = node.lastChild;
+            ITreeNode? child = node.lastChild;
             while (child is object)
             {
                 if (child is NodeType childAsType)

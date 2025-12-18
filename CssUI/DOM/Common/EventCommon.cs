@@ -358,12 +358,12 @@ namespace CssUI.DOM.Internal
                 return eventTarget;
 
             /* 3) If eventTarget's node document is not an active document, then return null. */
-            if (!DOMCommon.Is_Active_Document((eventTarget as Node).ownerDocument))
+            if (!DOMCommon.Is_Active_Document((eventTarget as Node)!.ownerDocument!))
                 return null;
 
             /* 4) Return eventTarget's node document's relevant global object. */
             /* For us this just means the actual document */
-            return (eventTarget as Node).ownerDocument;
+            return (eventTarget as Node)!.ownerDocument;
         }
 
         public static Ty create_event<Ty>(EventName eventName, EventInit eventInit) where Ty : Event

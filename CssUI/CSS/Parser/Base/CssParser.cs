@@ -74,12 +74,12 @@ namespace CssUI.CSS.Serialization
                 throw new CssSyntaxErrorException(CssErrors.EOF_EXPECTED, Stream);
         }
 
-        public CssDecleration Parse_Decleration()
+        public CssDecleration? Parse_Decleration()
         {
             Consume_All_Whitespace(Stream);
             if (Stream.Next.Type != ECssTokenType.Ident) throw new CssSyntaxErrorException(CssErrors.EXPECTING_IDENT, Stream);
 
-            CssDecleration Dec = Consume_Decleration(Stream);
+            CssDecleration? Dec = Consume_Decleration(Stream);
             if (Dec is object) throw new CssSyntaxErrorException(CssErrors.CANT_CONSUME_DECLERATION, Stream);
 
             return Dec;
@@ -246,7 +246,6 @@ namespace CssUI.CSS.Serialization
             while (Token.Type != ECssTokenType.EOF);
             return Rule;
         }
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
         static IEnumerable<CssComponent> Consume_Decleration_List(DataConsumer<CssToken> Stream)
         {// SEE:  https://www.w3.org/TR/css-syntax-3/#consume-a-list-of-declarations0
@@ -303,10 +302,10 @@ namespace CssUI.CSS.Serialization
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
-        static CssDecleration Consume_Decleration(DataConsumer<CssToken> Stream)
+        static CssDecleration? Consume_Decleration(DataConsumer<CssToken> Stream)
         {
             if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
-            var name = (Stream.Consume() as ValuedTokenBase).Value;
+            var name = (Stream.Consume() as ValuedTokenBase)?.Value;
 
             CssDecleration Decleration = new CssDecleration(name);
             // Consume all whitespace

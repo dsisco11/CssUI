@@ -23,9 +23,9 @@ namespace CssUI.DOM
 
         BoundaryPoint? Anchor => (direction == ESelectionDirection.Forward) ? _range?.start : _range?.end;
         BoundaryPoint? Focus => (direction == ESelectionDirection.Forward) ? _range?.end : _range?.start;
-        public Node AnchorNode => Anchor?.node;
+        public Node? AnchorNode => Anchor?.node;
         public int AnchorOffset => Anchor?.offset ?? 0;
-        public Node FocusNode => Focus?.node;
+        public Node? FocusNode => Focus?.node;
         public int FocusOffset => Focus?.offset ?? 0;
         public bool IsCollapsed => (Anchor == Focus);
         public int RangeCount => (_range == null) ? 0 : 1;
@@ -40,7 +40,7 @@ namespace CssUI.DOM
         #endregion
 
 
-        public Range GetRangeAt(int index)
+        public Range? GetRangeAt(int index)
         {
             if (index != 0) throw new IndexSizeError();
             return _range;
@@ -198,7 +198,7 @@ namespace CssUI.DOM
             }
         }
 
-        public override string ToString()
+        public override string? ToString()
         {
             return _range?.ToString();
         }

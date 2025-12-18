@@ -135,7 +135,7 @@ namespace CssUI.CSS
         /// </summary>
         /// <param name="Node"></param>
         /// <returns></returns>
-        private static CssBoxTreeNode Generate_Box(in Element Node)
+        private static CssBoxTreeNode? Generate_Box(in Element Node)
         {
             if (Node is null || Node?.Box?.DisplayType.Outer == EOuterDisplayType.None)
             {
@@ -225,7 +225,7 @@ namespace CssUI.CSS
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
-        private static Element Get_Closest_Box_Generating_Ancestor(in Node node)
+        private static Element? Get_Closest_Box_Generating_Ancestor(in Node node)
         {
             var current = node.parentNode;
             while (current is object)

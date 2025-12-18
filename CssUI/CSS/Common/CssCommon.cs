@@ -396,7 +396,7 @@ namespace CssUI.CSS.Internal
         /// </summary>
         /// <param name="Target"></param>
         /// <returns></returns>
-        public static Element Find_Formatting_Container(Element Target)
+        public static Element? Find_Formatting_Container(Element Target)
         {
             // Root Elements
             if (Target.parentElement is null)

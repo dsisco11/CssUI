@@ -1718,7 +1718,7 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ElementType Get_Nth_Element_Child<ElementType>(Element element, uint Nth, NodeFilter? Filter = null) where ElementType : Element
+        public static ElementType? Get_Nth_Element_Child<ElementType>(Element element, uint Nth, NodeFilter? Filter = null) where ElementType : Element
         {
             if (Nth == 0)
             {
@@ -1769,7 +1769,7 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ElementType Get_First_Element_Child<ElementType>(Element element, NodeFilter? Filter = null) where ElementType : Element
+        public static ElementType? Get_First_Element_Child<ElementType>(Element element, NodeFilter? Filter = null) where ElementType : Element
         {
             return Get_Nth_Element_Child<ElementType>(element, 1, Filter);
         }
@@ -1780,7 +1780,7 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ElementType Get_Last_Element_Child<ElementType>(Element element, NodeFilter? Filter = null) where ElementType : Node
+        public static ElementType? Get_Last_Element_Child<ElementType>(Element element, NodeFilter? Filter = null) where ElementType : Node
         {
             Element? child = element.lastElementChild;
             if (Filter is object)

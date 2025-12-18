@@ -135,17 +135,17 @@ namespace CssUI.DOM
         /// <summary>
         /// Retreives this value as an <see cref="AtomicString"/> if possible
         /// </summary>
-        public AtomicString AsAtomic() => Value as AtomicString;
+        public AtomicString? AsAtomic() => Value as AtomicString;
 
         /// <summary>
         /// Retreives this value as a string if possible
         /// </summary>
-        public string AsString() => Value as string;
+        public string? AsString() => Value as string;
 
         /// <summary>
         /// Retreives the RAW backing value
         /// </summary>
-        public object AsRAW() => Value;
+        public object? AsRAW() => Value;
 
         /// <summary>
         /// Retreives this value as the requested type if possible
