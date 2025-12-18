@@ -10,21 +10,21 @@ namespace Foo
     public class ISO_639_3
     {
         // The three-letter 639-3 identifier
-        public string Id { get; set; }
+        public string? Id { get; set; }
         // Equivalent 639-2 identifier of the bibliographic applications code set, if there is one
-        public string Part2B { get; set; }
+        public string? Part2B { get; set; }
         // Equivalent 639-2 identifier of the terminology applications code set, if there is one
-        public string Part2T { get; set; }
+        public string? Part2T { get; set; }
         // Equivalent 639-1 identifier, if there is one
-        public string Part1 { get; set; }
+        public string? Part1 { get; set; }
         // I(ndividual), M(acrolanguage), S(pecial)
-        public string Scope { get; set; }
+        public string? Scope { get; set; }
         // A(ncient), C(onstructed), E(xtinct), H(istorical), L(iving), S(pecial)
-        public string Language_Type { get; set; }
+        public string? Language_Type { get; set; }
         // Reference language name
-        public string Ref_Name { get; set; }
+        public string? Ref_Name { get; set; }
         // Comment relating to one or more of the columns
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
 
         // Create a list of all known codes
         public static List<ISO_639_3> Create()

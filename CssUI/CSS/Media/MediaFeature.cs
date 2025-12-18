@@ -16,8 +16,8 @@ namespace CssUI.CSS.Media
         private readonly EMediaCombinator Combinator = EMediaCombinator.None;
         private readonly EMediaFeatureContext Context;
 
-        private readonly CssValue[] Values;
-        private readonly EMediaOperator[] Operators;
+        private readonly CssValue[]? Values;
+        private readonly EMediaOperator[]? Operators;
         private bool IsValid = false;
         // private bool IsNegated = false;
         #endregion

@@ -242,7 +242,7 @@ namespace CssUI.CSS
         /// <summary>
         /// The assigned value of a property has changed
         /// </summary>
-        public event Action<ICssProperty, EPropertyDirtFlags, StackTrace> onProperty_Change;
+        public event Action<ICssProperty, EPropertyDirtFlags, StackTrace>? onProperty_Change;
         #endregion
 
         #region Constructors

@@ -3,7 +3,7 @@ namespace CssUI.Platform
 {
     public static class Factory
     {
-        static IPlatformFactoryMethods self;
+        static IPlatformFactoryMethods self = null!;
         /// <summary>
         /// Creates the applicable IPlatformMethods implementation for the current operating system
         /// </summary>

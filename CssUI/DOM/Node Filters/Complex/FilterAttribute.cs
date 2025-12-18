@@ -16,7 +16,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Value to check the attribute for
         /// </summary>
-        public readonly AttributeValue Value;
+        public readonly AttributeValue? Value;
         /// <summary>
         /// Whether the attribute should be checked for a boolean status
         /// </summary>

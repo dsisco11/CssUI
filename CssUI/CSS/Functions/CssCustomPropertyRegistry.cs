@@ -13,7 +13,7 @@ namespace CssUI.CSS.Functions
         #region Fields
 
         private readonly Dictionary<string, CssValue> _properties = new Dictionary<string, CssValue>(StringComparer.OrdinalIgnoreCase);
-        private readonly CssCustomPropertyRegistry _parent;
+        private readonly CssCustomPropertyRegistry? _parent;
 
         #endregion
 

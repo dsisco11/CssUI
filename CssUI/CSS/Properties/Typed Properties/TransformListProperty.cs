@@ -23,23 +23,23 @@ namespace CssUI.CSS
         /// <summary>
         /// The UI element which contains this property
         /// </summary>
-        public ICssElement Owner { get; protected set; } = null;
+        public ICssElement Owner { get; protected set; } = null!;
         /// <summary>
         /// The propertys identifier token in stylesheets.
         /// </summary>
-        public AtomicName<ECssPropertyID> CssName { get; protected set; } = null;
+        public AtomicName<ECssPropertyID> CssName { get; protected set; } = null!;
         /// <summary>
         /// Callback for when any value stage of this property changes
         /// </summary>
-        public event Action<EPropertyStage, ICssProperty> onValueChange;
+        public event Action<EPropertyStage, ICssProperty>? onValueChange;
         /// <summary>
         /// Tracks which styling rule block this property came from
         /// </summary>
-        public WeakReference<CssComputedStyle> SourcePtr { get; set; } = null;
+        public WeakReference<CssComputedStyle>? SourcePtr { get; set; } = null;
         /// <summary>
         /// Tracks which styling rule block this property came from
         /// </summary>
-        public CssSelector Selector { get; set; } = null;
+        public CssSelector? Selector { get; set; } = null;
 
         /// <summary>
         /// If true then this propertys values cannot be set externally
@@ -272,7 +272,7 @@ namespace CssUI.CSS
         public TransformListProperty(AtomicName<ECssPropertyID> CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
         {
             this.CssName = CssName;
-            this.Owner = Owner;
+            this.Owner = Owner!;
             SourcePtr = Source;
             this.Locked = Locked;
         }

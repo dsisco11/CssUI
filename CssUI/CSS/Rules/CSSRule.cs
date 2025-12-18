@@ -11,8 +11,8 @@ namespace CssUI.CSS
     {
         public readonly ECssRuleType type;
         public string cssText { get { return this.Serialize(); } }
-        public readonly CSSRule parentRule;
-        public readonly CSSStyleSheet parentStyleSheet;
+        public readonly CSSRule? parentRule;
+        public readonly CSSStyleSheet? parentStyleSheet;
 
         protected abstract string Serialize();
 

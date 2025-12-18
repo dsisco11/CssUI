@@ -31,11 +31,11 @@ namespace CssUI.NodeTree
         public delegate void TreeNode_Value_Change_Handler(ITreeNode OldValue, ITreeNode NewValue);
 
         /// <summary> An item was added to the list </summary>
-        public event TreeNode_Item_Handler onAdded;
+        public event TreeNode_Item_Handler? onAdded;
         /// <summary> An item was removed from the list </summary>
-        public event TreeNode_Item_Handler onRemoved;
+        public event TreeNode_Item_Handler? onRemoved;
         /// <summary> a node changed value </summary>
-        public event TreeNode_Value_Change_Handler onChanged;
+        public event TreeNode_Value_Change_Handler? onChanged;
         #endregion
 
         #region Constructor

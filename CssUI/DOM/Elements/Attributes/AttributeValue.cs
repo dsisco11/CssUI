@@ -32,7 +32,7 @@ namespace CssUI.DOM
         /// <summary>
         /// The typed form of this value
         /// </summary>
-        private readonly object Value;
+        private readonly object? Value;
         #endregion
 
         #region Accessors

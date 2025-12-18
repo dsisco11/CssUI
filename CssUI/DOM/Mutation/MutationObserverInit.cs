@@ -9,7 +9,7 @@ namespace CssUI.DOM.Mutation
         public bool subtree = false;
         public bool attributeOldValue;
         public bool characterDataOldValue;
-        public IList<string> attributeFilter;
+        public IList<string>? attributeFilter;
 
         public MutationObserverInit()
         {

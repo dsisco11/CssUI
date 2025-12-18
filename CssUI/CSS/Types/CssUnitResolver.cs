@@ -41,8 +41,8 @@ namespace CssUI
         /// If <c>True</c> the physical units will be anchored to the device DPI
         /// </summary>
         private bool anchor_to_dpi = true;
-        private double[] SCALING_TABLE;
-        Document document;
+        private double[] SCALING_TABLE = null!;
+        Document document = null!;
         #endregion
 
         #region Constructors

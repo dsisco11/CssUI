@@ -19,7 +19,7 @@ namespace CssUI.DOM
         private List<Node> Items = new List<Node>();
 
         // Element type children link management
-        public LinkedList<Element> ChildElements;
+        public LinkedList<Element>? ChildElements;
         private int firstElementIndex = -1;
         private int lastElementIndex = -1;
         #endregion

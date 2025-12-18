@@ -50,15 +50,15 @@ namespace CssUI.DOM
         /// 
         /// </summary>
         public string Name { get; private set; } = CSSUI_VERSION_STRING;
-        public Document document { get; private set; }
+        public Document document { get; private set; } = null!;
 
         /// <summary>
         /// Determines the area of the document being rendered
         /// </summary>
-        public readonly VisualViewport visualViewport;
-        public readonly Screen screen;
+        public readonly VisualViewport visualViewport = null!;
+        public readonly Screen screen = null!;
 #if ENABLE_HTML
-        public readonly CustomElementRegistry customElements;
+        public readonly CustomElementRegistry customElements = null!;
 #endif
         #endregion
 

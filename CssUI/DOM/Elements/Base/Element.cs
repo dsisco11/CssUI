@@ -67,9 +67,9 @@ namespace CssUI.DOM
             }
         }
 
-        public DOMTokenList classList { get; private set; }
+        public DOMTokenList classList { get; private set; } = null!;
 
-        public NamedNodeMap Attributes { get; private set; }
+        public NamedNodeMap Attributes { get; private set; } = null!;
         #endregion
 
         #region Custom Element
@@ -271,9 +271,9 @@ namespace CssUI.DOM
         /// <summary>
         /// Holds a pointer to this element within it's parent's linked-list of child elements
         /// </summary>
-        internal LinkedListNode<Element> ptrSelfRef = null;
-        public Element previousElementSibling => ptrSelfRef?.Previous?.Value;
-        public Element nextElementSibling => ptrSelfRef?.Next?.Value;
+        internal LinkedListNode<Element>? ptrSelfRef = null;
+        public Element? previousElementSibling => ptrSelfRef?.Previous?.Value;
+        public Element? nextElementSibling => ptrSelfRef?.Next?.Value;
 #endif
 
         #endregion

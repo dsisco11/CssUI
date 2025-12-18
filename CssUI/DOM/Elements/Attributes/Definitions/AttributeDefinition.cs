@@ -18,18 +18,18 @@ namespace CssUI.DOM
         /// <summary>
         /// Name of the attribute
         /// </summary>
-        public readonly AtomicName<EAttributeName> Name;
+        public readonly AtomicName<EAttributeName>? Name;
 
         public readonly EAttributeFlags Flags = 0x0;
         /// <summary>
         /// When the attribute is not specified, if there is a missing value default state defined, then that is the state represented by the (missing) attribute. Otherwise, the absence of the attribute means that there is no state represented.
         /// </summary>
         /// Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#missing-value-default
-        public readonly AttributeValue MissingValueDefault = null;
+        public readonly AttributeValue? MissingValueDefault = null;
         /// <summary>
         /// 
         /// </summary>
-        public readonly AttributeValue InvalidValueDefault = null;
+        public readonly AttributeValue? InvalidValueDefault = null;
         /// <summary>
         /// Allowed datatypes
         /// </summary>
@@ -37,14 +37,14 @@ namespace CssUI.DOM
         /// <summary>
         /// A list of all keywords that can be assigned to this property
         /// </summary>
-        public readonly HashSet<AtomicString> Keywords = null;
+        public readonly HashSet<AtomicString>? Keywords = null;
         /// <summary>
         /// A list of all tokens that can be assigned to this property
         /// </summary>
-        public readonly HashSet<AtomicString> SupportedTokens = null;
+        public readonly HashSet<AtomicString>? SupportedTokens = null;
 
-        public readonly Type enumType = null;
-        public readonly Type ElementType = null;
+        public readonly Type? enumType = null;
+        public readonly Type? ElementType = null;
 
         /// <summary>
         /// The minimum value (if any) that can be assigned to this attribute

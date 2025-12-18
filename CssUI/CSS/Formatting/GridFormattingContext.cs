@@ -19,8 +19,8 @@ namespace CssUI.CSS.Formatting
         /// </summary>
         private class GridItem
         {
-            public CssBoxTreeNode Box { get; set; }
-            public CssPrincipalBox PrincipalBox => Box as CssPrincipalBox;
+            public CssBoxTreeNode Box { get; set; } = null!;
+            public CssPrincipalBox? PrincipalBox => Box as CssPrincipalBox;
 
             /// <summary>
             /// The grid area this item occupies (column start, column end, row start, row end).

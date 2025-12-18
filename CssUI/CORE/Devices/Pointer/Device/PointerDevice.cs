@@ -11,7 +11,7 @@ namespace CssUI.Devices
 
         #region Static
         internal static HashSet<PointerDevice> DEVICE_LIST = new HashSet<PointerDevice>();
-        public static PointerDevice[] PrimaryDevice { get; private set; }
+        public static PointerDevice[] PrimaryDevice { get; private set; } = null!;
 
         public static IReadOnlyCollection<PointerDevice> Get_All()
         {
@@ -59,7 +59,7 @@ namespace CssUI.Devices
         /// All of the currently pressed buttons for this pointer device
         /// </summary>
         public EPointerButtonFlags Buttons { get; protected set; }
-        public DOMPoint Position { get; protected set; }
+        public DOMPoint Position { get; protected set; } = null!;
 
         /// <summary>
         /// The width (magnitude on the X axis), in CSS pixels (see [CSS21]), of the contact geometry of the pointer.

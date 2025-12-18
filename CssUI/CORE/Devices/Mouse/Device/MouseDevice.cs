@@ -10,7 +10,7 @@ namespace CssUI.Devices
     public abstract class MouseDevice
     {
         #region Properties
-        public DOMPoint Position { get; protected set; }
+        public DOMPoint Position { get; protected set; } = null!;
         public EMouseButtonFlags Buttons { get; protected set; }
         #endregion
 

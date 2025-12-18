@@ -73,7 +73,7 @@ namespace CssUI.CSS
         /// <summary>
         /// The CSS selector for this rule block
         /// </summary>
-        public readonly CssSelector Selector = null;
+        public readonly CssSelector? Selector = null;
 
         public readonly EPropertySetOrigin Origin;
         #endregion
@@ -490,7 +490,7 @@ namespace CssUI.CSS
         /// <summary>
         /// A property which affects the elements block changed
         /// </summary>
-        public event Action<EPropertyStage, ICssProperty, EPropertyDirtFlags, StackTrace> Property_Changed;
+        public event Action<EPropertyStage, ICssProperty, EPropertyDirtFlags, StackTrace>? Property_Changed;
         #endregion
 
         #region Change Handlers

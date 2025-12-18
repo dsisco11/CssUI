@@ -23,7 +23,7 @@ namespace CssUI
         #endregion
 
         #region Events
-        public event Action Stack_Changed;
+        public event Action? Stack_Changed;
         #endregion
 
 

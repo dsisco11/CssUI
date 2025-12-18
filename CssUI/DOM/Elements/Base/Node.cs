@@ -21,12 +21,12 @@ namespace CssUI.DOM.Nodes
     public abstract class Node : EventTarget, INode
     {/* Docs: https://dom.spec.whatwg.org/#interface-node */
 
-        internal ILogger Log { get => nodeDocument.Log; }
+        internal ILogger Log { get => nodeDocument!.Log; }
         #region Properties
         private ENodeFlags nodeFlags = ENodeFlags.Clear;
         internal List<RegisteredObserver> RegisteredObservers = new List<RegisteredObserver>();
-        public virtual Document nodeDocument { get; internal set; }
-        private WeakReference<Node> _parentNode = null;
+        public virtual Document? nodeDocument { get; internal set; }
+        private WeakReference<Node>? _parentNode = null;
 
         #region Abstracts
         public abstract ENodeType nodeType { get; }
@@ -121,8 +121,8 @@ namespace CssUI.DOM.Nodes
         /// <summary>
         /// The layout box for this element
         /// </summary>
-        public CssBoxTreeNode Box { get; internal set; } = null;
-        public StyleProperties Style { get; internal set; } = null;
+        public CssBoxTreeNode? Box { get; internal set; } = null;
+        public StyleProperties? Style { get; internal set; } = null;
         #endregion
 
         #endregion

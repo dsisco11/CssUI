@@ -11,17 +11,17 @@ namespace CssUI.Platform
         /// <summary>
         /// Provides access to important system dependant configuration information such as double click time, drag drop distance, and screen DPI
         /// </summary>
-        public ISystemMetricsHandler SystemMetrics { get; protected set; }
+        public ISystemMetricsHandler SystemMetrics { get; protected set; } = null!;
 
         /// <summary>
         /// Provides access to handling screens/monitors
         /// </summary>
-        public ISystemScreensHandler SystemScreens { get; protected set; }
+        public ISystemScreensHandler SystemScreens { get; protected set; } = null!;
 
         /// <summary>
         /// Provides access to handling application windows
         /// </summary>
-        public ISystemWindowHandler SystemWindows { get; protected set; }
+        public ISystemWindowHandler SystemWindows { get; protected set; } = null!;
     }
 }
 

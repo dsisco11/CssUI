@@ -36,7 +36,7 @@ namespace CssUI.CSS.Selectors
     public class PseudoClassSelectorAnBFunction : PseudoClassSelector
     {
         protected readonly CssAnBMatcher AnB;
-        protected readonly IEnumerable<ComplexSelector> Selectors;
+        protected readonly IEnumerable<ComplexSelector>? Selectors;
 
         public PseudoClassSelectorAnBFunction(string Name, DataConsumer<CssToken> Stream) : base(Name)
         {

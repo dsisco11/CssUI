@@ -6,8 +6,8 @@ namespace CssUI.CSS
 {
     public class CSSStyleDeclaration : List<CssDecleration>
     {
-        public readonly CSSRule parentRule;
-        public string cssFloat;
+        public readonly CSSRule? parentRule;
+        public string? cssFloat;
 
         public string cssText {
             get {

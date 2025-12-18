@@ -778,18 +778,18 @@ namespace CssUI.DOM
         #endregion
 
         #region Window Events
-        public event EventCallback onHashChange;
-        public event EventCallback onLanguageChange;
-        public event EventCallback onMessage;
-        public event EventCallback onMessagEerror;
-        public event EventCallback onOffline;
-        public event EventCallback onOnline;
-        public event EventCallback onPageHide;
-        public event EventCallback onPageShow;
-        public event EventCallback onPopState;
-        public event EventCallback onRejectionHandled;
-        public event EventCallback onStorage;
-        public event EventCallback onUnhandledRejection;
+        public event EventCallback? onHashChange;
+        public event EventCallback? onLanguageChange;
+        public event EventCallback? onMessage;
+        public event EventCallback? onMessagEerror;
+        public event EventCallback? onOffline;
+        public event EventCallback? onOnline;
+        public event EventCallback? onPageHide;
+        public event EventCallback? onPageShow;
+        public event EventCallback? onPopState;
+        public event EventCallback? onRejectionHandled;
+        public event EventCallback? onStorage;
+        public event EventCallback? onUnhandledRejection;
         #endregion
     }
 }

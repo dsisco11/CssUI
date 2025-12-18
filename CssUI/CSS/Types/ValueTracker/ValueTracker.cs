@@ -25,7 +25,7 @@ namespace CssUI.CSS.Internal
         /// <summary>
         /// Fired whenever the value hash changes
         /// </summary>
-        public event ValueTrackerEventHandler onChange;
+        public event ValueTrackerEventHandler? onChange;
         #endregion
 
         #region Constructors

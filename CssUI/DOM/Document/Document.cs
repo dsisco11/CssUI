@@ -45,7 +45,7 @@ namespace CssUI.DOM
         /* XXX: This never fires because we dont have a system to notify the document its not active yet */
         internal readonly ManualResetEvent Active_State_Change_Signal = new ManualResetEvent(false);
         internal LinkedList<MediaQueryList> _mediaQueryLists = new LinkedList<MediaQueryList>();
-        internal BrowsingContext BrowsingContext = null;
+        internal BrowsingContext? BrowsingContext = null;
 
         [Obsolete("Use defaultView instead", true)]
         internal Window window
@@ -84,7 +84,7 @@ namespace CssUI.DOM
         /// The area within which element layout is performed
         /// (The viewport used for layout)
         /// </summary>
-        public readonly Viewport Viewport;
+        public readonly Viewport? Viewport;
 
         public readonly EQuirksMode Mode = EQuirksMode.NoQuirks;
         /// <summary>
@@ -100,7 +100,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Returns document’s content type.
         /// </summary>
-        public readonly string contentType = "application/xml";
+        public readonly string? contentType = "application/xml";
 
         public Url document_url = Url.Parse("about:blank".AsMemory());
         public UrlOrigin document_origin => document_url.Origin;// UrlOrigin.Default;
@@ -191,7 +191,7 @@ namespace CssUI.DOM
             cssUnitResolver = new CssUnitResolver(this, true);
         }
 
-        protected Document(DocumentType doctype, string contentType = null) : this()
+        protected Document(DocumentType doctype, string? contentType = null) : this()
         {
             this.contentType = contentType;
             appendChild(doctype);
@@ -453,7 +453,7 @@ namespace CssUI.DOM
         /// <summary>
         /// Returns the deepest element in the document through which or to which key events are being routed. This is, roughly speaking, the focused element in the document.
         /// </summary>
-        public Element activeElement { get; private set; }
+        public Element? activeElement { get; private set; }
 
         /// <summary>
         /// Returns true if key events are being routed through or to the document; otherwise, returns false. Roughly speaking, this corresponds to the document, or a document nested inside this one, being focused.

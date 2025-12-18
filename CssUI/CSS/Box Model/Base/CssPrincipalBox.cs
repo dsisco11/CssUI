@@ -262,7 +262,7 @@ namespace CssUI.CSS.BoxTree
         /// <summary>
         /// One of the areas from this box has changed
         /// </summary>
-        public event Action<ECssBoxType> onChange;
+        public event Action<ECssBoxType>? onChange;
 
         #endregion
 

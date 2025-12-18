@@ -9,7 +9,7 @@ namespace CssUI.CSS
     public class CssBoxArea
     {
         #region Properties
-        private readonly ICssBoxFragment Fragment;
+        private readonly ICssBoxFragment? Fragment;
 
         /// <summary>
         /// Holds the origin location for the bounds
