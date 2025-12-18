@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>CssUI.Benchmarks.MathExtBenchmarks-20251218-023122</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.15.8, Windows 11 (10.0.26100.7171/24H2/2024Update/HudsonValley)
+12th Gen Intel Core i9-12900K 3.20GHz, 1 CPU, 24 logical and 16 physical cores
+.NET SDK 9.0.308
+  [Host]   : .NET 8.0.22 (8.0.22, 8.0.2225.52707), X64 RyuJIT x86-64-v3
+  .NET 8.0 : .NET 8.0.22 (8.0.22, 8.0.2225.52707), X64 RyuJIT x86-64-v3
+</code></pre>
+<pre><code>Job=.NET 8.0  Runtime=.NET 8.0  
+</code></pre>
+
+<table>
+<thead><tr><th>Method              </th><th>Mean</th><th>Error</th><th>StdDev</th><th>Median</th><th>Allocated</th>
+</tr>
+</thead><tbody><tr><td>MathExt_Min_Int</td><td>0.0000 ns</td><td>0.0000 ns</td><td>0.0000 ns</td><td>0.0000 ns</td><td>-</td>
+</tr><tr><td>SystemMath_Min_Int</td><td>0.0014 ns</td><td>0.0042 ns</td><td>0.0035 ns</td><td>0.0000 ns</td><td>-</td>
+</tr><tr><td>MathExt_Min_Double</td><td>0.2761 ns</td><td>0.0378 ns</td><td>0.0316 ns</td><td>0.2712 ns</td><td>-</td>
+</tr><tr><td>SystemMath_Min_Double</td><td>0.2967 ns</td><td>0.0382 ns</td><td>0.0572 ns</td><td>0.2871 ns</td><td>-</td>
+</tr><tr><td>MathExt_Max_Int</td><td>0.0531 ns</td><td>0.0337 ns</td><td>0.0388 ns</td><td>0.0477 ns</td><td>-</td>
+</tr><tr><td>SystemMath_Max_Int</td><td>0.0053 ns</td><td>0.0099 ns</td><td>0.0111 ns</td><td>0.0000 ns</td><td>-</td>
+</tr><tr><td>MathExt_Max_Double</td><td>0.2657 ns</td><td>0.0384 ns</td><td>0.0526 ns</td><td>0.2614 ns</td><td>-</td>
+</tr><tr><td>SystemMath_Max_Double</td><td>0.3251 ns</td><td>0.0397 ns</td><td>0.0819 ns</td><td>0.3101 ns</td><td>-</td>
+</tr><tr><td>MathExt_Clamp_Int</td><td>0.3377 ns</td><td>0.0414 ns</td><td>0.0668 ns</td><td>0.3409 ns</td><td>-</td>
+</tr><tr><td>SystemMath_Clamp_Int</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td>
+</tr><tr><td>MathExt_Clamp_Double</td><td>0.3848 ns</td><td>0.0399 ns</td><td>0.0730 ns</td><td>0.3924 ns</td><td>-</td>
+</tr><tr><td>SystemMath_Clamp_Double</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td>
+</tr><tr><td>MathExt_Min_Bulk</td><td>10.3679 ns</td><td>0.2392 ns</td><td>0.2349 ns</td><td>10.4192 ns</td><td>-</td>
+</tr><tr><td>SystemMath_Min_Bulk</td><td>9.7467 ns</td><td>0.2345 ns</td><td>0.2606 ns</td><td>9.8522 ns</td><td>-</td>
+</tr><tr><td>MathExt_Min_Bulk_Double</td><td>10.4703 ns</td><td>0.2358 ns</td><td>0.3529 ns</td><td>10.5397 ns</td><td>-</td>
+</tr><tr><td>SystemMath_Min_Bulk_Double</td><td>12.6223 ns</td><td>0.1659 ns</td><td>0.1552 ns</td><td>12.6317 ns</td><td>-</td>
+</tr></tbody></table>
+</body>
+</html>

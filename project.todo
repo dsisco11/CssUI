@@ -174,10 +174,13 @@ Note: The HTML module requires significant work and is excluded from Core config
 - [x] Add usage examples (in README.md)
 
 ## Code Quality & Modernization
-### Performance Analysis
-- [ ] Create BenchmarkDotNet benchmark tests for MathExt methods
-  - Evaluate if "optimized" Min/Max/Clamp methods provide benefit over System.Math
-  - Decision: remove or keep based on benchmark results
+### MathExt Refactoring
+- [ ] Remove duplicate Min/Max/Clamp methods from MathExt
+  - Replace all MathExt.Min calls with Math.Min
+  - Replace all MathExt.Max calls with Math.Max
+  - Replace all MathExt.Clamp calls with Math.Clamp
+  - Keep only CssUI-specific math utilities (e.g., Feq, Fgteq, Flteq, DegreesToRadians)
+  - Update any call sites that depend on MathExt's non-throwing Clamp behavior
 
 ### Type System Modernization
 - [ ] Analyze unit type structures in codebase
