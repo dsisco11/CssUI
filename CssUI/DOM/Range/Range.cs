@@ -399,7 +399,7 @@ namespace CssUI.DOM
                     endCD.replaceData(0, endOffset, string.Empty);
                 }
                 /* 10) Set start and end to (new node, new offset). */
-                startContainer = endContainer = newNode;
+                startContainer = endContainer = newNode!;
                 startOffset = endOffset = newOffset;
             });
         }
@@ -517,7 +517,7 @@ namespace CssUI.DOM
                     clone.appendChild(subfragment);
                 }
                 /* 20) Set range’s start and end to (new node, new offset). */
-                startContainer = endContainer = newNode;
+                startContainer = endContainer = newNode!;
                 startOffset = endOffset = newOffset;
 
                 return fragment;

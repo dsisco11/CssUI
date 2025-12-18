@@ -6,21 +6,21 @@ namespace CssUI.DOM.Nodes
     public interface INode : IEventTarget
     {
         ChildNodeList childNodes { get; }
-        Node firstChild { get; }
+        Node? firstChild { get; }
         int index { get; }
         bool isAssigned { get; }
         bool isConnected { get; }
-        Node lastChild { get; }
-        Node nextSibling { get; }
+        Node? lastChild { get; }
+        Node? nextSibling { get; }
         int nodeLength { get; }
         string nodeName { get; }
         ENodeType nodeType { get; }
-        string nodeValue { get; set; }
-        Document ownerDocument { get; }
-        Element parentElement { get; }
-        Node parentNode { get; }
-        Node previousSibling { get; }
-        string textContent { get; set; }
+        string? nodeValue { get; set; }
+        Document? ownerDocument { get; }
+        Element? parentElement { get; }
+        Node? parentNode { get; }
+        Node? previousSibling { get; }
+        string? textContent { get; set; }
 
         #region Flags
         bool GetFlag(ENodeFlags Flags);

@@ -51,9 +51,9 @@ namespace CssUI
             return true;
         }
 
-        public bool RemoveInverse(TValue value, out TKey outKey)
+        public bool RemoveInverse(TValue value, out TKey? outKey)
         {
-            if (MapInverse.TryGetValue(value, out TKey key))
+            if (MapInverse.TryGetValue(value, out TKey? key))
             {
                 throw new Exception($"Unable to find value-key entry from inverse dictionary! ValueType: {typeof(TValue).FullName}");
             }
@@ -87,7 +87,7 @@ namespace CssUI
             return true;
         }
 
-        public bool TryGetKey(TValue value, out TKey key) => MapInverse.TryGetValue(value, out key);
+        public bool TryGetKey(TValue value, out TKey? key) => MapInverse.TryGetValue(value, out key!);
 
     }
 }

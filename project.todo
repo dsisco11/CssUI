@@ -209,11 +209,11 @@ Note: The HTML module requires significant work and is excluded from Core config
 - [x] Fix CS8622 (4→0) - parameter nullability mismatch
 - [x] Fix CS8605 (4→0) - unboxing possibly null value
 - [x] Fix CS8619 (6→0) - nullability mismatch in assignment
-- [x] Fix CS8601 (62→36) - null assignment to non-nullable
+- [x] Fix CS8601 (62→0) - null assignment to non-nullable ✅
 - [ ] Fix CS8629 (34) - nullable value type may be null (requires logic review)
-- [ ] Fix CS8618 (152) - non-nullable member not initialized
-- [ ] Fix CS8604 (160) - possible null reference argument
-- [ ] Fix CS8600 (248) - converting null to non-nullable type
-- [ ] Fix CS8603 (390) - possible null reference return
-- [ ] Fix CS8602 (402) - dereference of possibly null reference
-- [ ] Fix CS8625 (1032) - null literal to non-nullable type
+- [ ] Fix CS8618 (146) - non-nullable member not initialized
+- [ ] Fix CS8604 (222) - possible null reference argument
+- [ ] Fix CS8600 (340) - converting null to non-nullable type
+- [ ] Fix CS8603 (382) - possible null reference return
+- [ ] Fix CS8602 (428) - dereference of possibly null reference
+- [ ] Fix CS8625 (1008) - null literal to non-nullable type

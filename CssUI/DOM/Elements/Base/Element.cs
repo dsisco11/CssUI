@@ -90,9 +90,9 @@ namespace CssUI.DOM
         #region Node Overrides
         public override ENodeType nodeType => Enums.ENodeType.ELEMENT_NODE;
         public override string nodeName => localName.ToUpperInvariant();
-        public override string nodeValue { get => null; set { /* specs say do nothing */ } }
+        public override string? nodeValue { get => null; set { /* specs say do nothing */ } }
         public override int nodeLength => childNodes.Count;
-        public override string textContent
+        public override string? textContent
         {
             get
             {

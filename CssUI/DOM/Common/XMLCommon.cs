@@ -109,16 +109,16 @@ namespace CssUI.DOM
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Validate_And_Extract(string Namespace, string qualifiedName, out string outPrefix, out string outLocalName)
+        public static void Validate_And_Extract(string? Namespace, string qualifiedName, out string? outPrefix, out string outLocalName)
         {/* Docs: https://dom.spec.whatwg.org/#validate-and-extract */
             /* 1) If namespace is the empty string, set it to null. */
-            if (Namespace.Length <= 0)
+            if (Namespace?.Length <= 0)
                 Namespace = null;
 
             /* 2) Validate qualifiedName. */
             Validate(qualifiedName);
 
-            string prefix = null;
+            string? prefix = null;
             string localName = qualifiedName;
             /* 5) If qualifiedName contains a ":" (U+003E), then split the string on it and set prefix to the part before and localName to the part after. */
             if (qualifiedName.Contains(':'))
@@ -144,7 +144,7 @@ namespace CssUI.DOM
                 throw new NamespaceError($"The qualified names' prefix \"{qualifiedName}\" does not match the namespace specified \"{Namespace}\"");
 
             outPrefix = prefix;
-            outLocalName = localName;
+            outLocalName = localName!;
         }
         #endregion
     }

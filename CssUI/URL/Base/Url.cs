@@ -1240,15 +1240,15 @@ namespace CssUI.HTTP
             if (StringCommon.Contains(asciiDomain.AsSpan(), Is_Forbidden_Host_Code_Point))
             {
                 Log.Warn($"Validation error @ \"{ParsingCommon.Get_Location(Stream)}\"");
-                outHost = null;
+                outHost = null!;
                 return false;
             }
 
             /* 8) Let ipv4Host be the result of IPv4 parsing asciiDomain. */
             /* 9) If ipv4Host is an IPv4 address or failure, return ipv4Host. */
-            if (!Parse_IPV4(asciiDomain.AsMemory(), out IPAddress ipv4Host) || ipv4Host != null)
+            if (!Parse_IPV4(asciiDomain.AsMemory(), out IPAddress? ipv4Host) || ipv4Host != null)
             {
-                outHost = ipv4Host?.ToString();
+                outHost = ipv4Host?.ToString() ?? string.Empty;
                 return true;
             }
 

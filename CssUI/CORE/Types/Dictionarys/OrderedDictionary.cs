@@ -174,12 +174,12 @@ namespace CssUI
             return ((IList<ValueTy>)Items).Contains(item);
         }
 
-        public bool TryGetKey(ValueTy value, out KeyTy outKey)
+        public bool TryGetKey(ValueTy value, out KeyTy? outKey)
         {
             int index = Items.IndexOf(value);
-            if (!KeyIndex.TryGetKey(index, out KeyTy key))
+            if (!KeyIndex.TryGetKey(index, out KeyTy? key))
             {
-                outKey = default!;
+                outKey = default;
                 return false;
             }
 

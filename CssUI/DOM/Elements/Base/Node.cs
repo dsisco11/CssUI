@@ -35,10 +35,10 @@ namespace CssUI.DOM.Nodes
         public abstract string nodeName { get; }
 
         /* Docs: https://dom.spec.whatwg.org/#dom-node-nodevalue */
-        [CEReactions] public abstract string nodeValue { get; set; }
+        [CEReactions] public abstract string? nodeValue { get; set; }
 
         /* Docs: https://dom.spec.whatwg.org/#dom-node-textcontent */
-        [CEReactions] public abstract string textContent { get; set; }
+        [CEReactions] public abstract string? textContent { get; set; }
 
         /* Docs: https://dom.spec.whatwg.org/#concept-node-length */
         public abstract int nodeLength { get; }
@@ -65,13 +65,13 @@ namespace CssUI.DOM.Nodes
         }
 
 
-        public Node parentNode
+        public Node? parentNode
         {
             get => _parentNode.TryGetTarget(out var outParentNode) ? outParentNode : null;
-            internal set => _parentNode.SetTarget(value);
+            internal set => _parentNode.SetTarget(value!);
         }
-        public Element parentElement { get; private set; }
-        public ChildNodeList childNodes { get; private set; }
+        public Element? parentElement { get; private set; }
+        public ChildNodeList childNodes { get; private set; } = null!;
 
         public Node firstChild { get => childNodes.Count > 0 ? childNodes[0] : null; }
         public Node lastChild { get => childNodes.Count > 0 ? childNodes[childNodes.Count - 1] : null; }
@@ -98,8 +98,8 @@ namespace CssUI.DOM.Nodes
             internal set { }
         }
 #else
-        public Node previousSibling { get; internal set; }
-        public Node nextSibling { get; internal set; }
+        public Node? previousSibling { get; internal set; }
+        public Node? nextSibling { get; internal set; }
 #endif
 
         /// <summary>

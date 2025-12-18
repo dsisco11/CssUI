@@ -24,7 +24,7 @@ namespace CssUI.Devices
         {
             if (DEVICE_LIST.Count <= 0)
             {
-                PrimaryDevice[(int)PointerType] = null;
+                PrimaryDevice[(int)PointerType] = null!;
             }
             else
             {
@@ -36,7 +36,7 @@ namespace CssUI.Devices
                 }
                 else
                 {
-                    PrimaryDevice[(int)PointerType] = DEVICE_LIST.FirstOrDefault(x => x.Type == PointerType);
+                    PrimaryDevice[(int)PointerType] = DEVICE_LIST.FirstOrDefault(x => x.Type == PointerType)!;
                 }
             }
         }

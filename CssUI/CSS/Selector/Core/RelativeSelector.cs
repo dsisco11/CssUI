@@ -84,7 +84,7 @@ namespace CssUI.CSS.Selectors
                             case ESelectorMatchingOrder.LTR:
                                 return new LinkedList<Element>(element.children);
                             default:
-                                return new Element[] { element.parentElement };
+                                return element.parentElement is null ? Array.Empty<Element>() : new Element[] { element.parentElement };
                         }
                     }
                 case ESelectorCombinator.Sibling_Adjacent:
@@ -92,9 +92,9 @@ namespace CssUI.CSS.Selectors
                         switch (Dir)
                         {
                             case ESelectorMatchingOrder.LTR:
-                                return new Element[] { element.nextElementSibling };
+                                return element.nextElementSibling is null ? Array.Empty<Element>() : new Element[] { element.nextElementSibling };
                             default:
-                                return new Element[] { element.previousElementSibling };
+                                return element.previousElementSibling is null ? Array.Empty<Element>() : new Element[] { element.previousElementSibling };
                         }
 
                     }

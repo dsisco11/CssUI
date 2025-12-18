@@ -19,8 +19,8 @@ namespace CssUI.DOM
         #region Node Implementation
         public override ENodeType nodeType =>  ENodeType.DOCUMENT_TYPE_NODE;
         public override string nodeName => this.name;
-        public override string nodeValue { get => null; set { /* Specifications say do nothing */ } }
-        public override string textContent { get => null; set { /* Specifications say do nothing */ } }
+        public override string? nodeValue { get => null; set { /* Specifications say do nothing */ } }
+        public override string? textContent { get => null; set { /* Specifications say do nothing */ } }
         public override int nodeLength => 0;
         #endregion
 

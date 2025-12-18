@@ -31,11 +31,11 @@ namespace CssUI
             return false;
         }
 
-        new public bool TryRemove(Key key, out Value value)
+        new public bool TryRemove(Key key, out Value? value)
         {
-            if (base.TryRemove(key, out value))
+            if (base.TryRemove(key, out value!))
             {
-                if ( !MapInverse.TryRemove(value, out var _) )
+                if ( !MapInverse.TryRemove(value!, out var _) )
                 {
                     throw new Exception($"Unable to remove value-key entry from inverse dictionary! ValueType: {typeof(Value).FullName}");
                 }
@@ -45,9 +45,9 @@ namespace CssUI
         }
 
 
-        public bool TryRemoveInverse(Value value, out Key key)
+        public bool TryRemoveInverse(Value value, out Key? key)
         {
-            if ( !MapInverse.TryRemove(value, out key) )
+            if ( !MapInverse.TryRemove(value, out key!) )
             {
                 //throw new Exception($"Unable to remove value-key entry from inverse dictionary! ValueType: {typeof(Value).FullName}");
                 return false;
@@ -67,7 +67,7 @@ namespace CssUI
             throw new NotImplementedException();
         }
 
-        public bool TryGetKey(Value value, out Key key) => MapInverse.TryGetValue(value, out key);
+        public bool TryGetKey(Value value, out Key? key) => MapInverse.TryGetValue(value, out key!);
 
     }
 }

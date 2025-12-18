@@ -27,8 +27,8 @@ namespace CssUI.DOM
 
         #region Backing Values
         private EDesignMode _designMode = EDesignMode.OFF;
-        internal Selection _selection = null;
-        private Element _documentElement = null;
+        internal Selection? _selection = null;
+        private Element? _documentElement = null;
         #endregion
 
         #region Rendering
@@ -137,13 +137,13 @@ namespace CssUI.DOM
         /// "The document element of a document is the element whose parent is that document, if it exists; otherwise null."
         /// Docs: https://dom.spec.whatwg.org/#document-element
         /// </summary>
-        public Element documentElement 
+        public Element? documentElement 
         {
             get
             {
                 if (_documentElement is null)
                 {
-                    _documentElement = this?.childNodes?.ChildElements?.First?.Value ?? null;
+                    _documentElement = this?.childNodes?.ChildElements?.First?.Value;
                 }
 
                 return _documentElement;
@@ -168,8 +168,8 @@ namespace CssUI.DOM
         #region Node Implementation
         public override ENodeType nodeType => ENodeType.DOCUMENT_NODE;
         public override string nodeName => "#document";
-        public override string nodeValue { get => null; set { /* specs say do nothing */ } }
-        public override string textContent { get => null; set { /* specs say do nothing */ } }
+        public override string? nodeValue { get => null; set { /* specs say do nothing */ } }
+        public override string? textContent { get => null; set { /* specs say do nothing */ } }
 
         public override int nodeLength => childNodes.Count;
 

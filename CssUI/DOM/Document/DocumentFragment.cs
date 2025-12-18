@@ -11,8 +11,8 @@ namespace CssUI.DOM
         #region Node Implementation
         public override ENodeType nodeType => ENodeType.DOCUMENT_FRAGMENT_NODE;
         public override string nodeName => "#document-fragment";
-        public override string nodeValue { get => null; set { /* specs say do nothing */ } }
-        public override string textContent
+        public override string? nodeValue { get => null; set { /* specs say do nothing */ } }
+        public override string? textContent
         {
             get
             {
