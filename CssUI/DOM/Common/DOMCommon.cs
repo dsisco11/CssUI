@@ -598,11 +598,11 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static LinkedList<Node> Get_Ancestors(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static LinkedList<Node> Get_Ancestors(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             var list = new LinkedList<Node>();
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
-            Node current = tree.parentNode();
+            Node? current = tree.parentNode();
             while (current is object)
             {
                 list.AddLast(current);
@@ -620,11 +620,11 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static LinkedList<NodeType> Get_Ancestors<NodeType>(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL) where NodeType : INode
+        public static LinkedList<NodeType> Get_Ancestors<NodeType>(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL) where NodeType : INode
         {
             LinkedList<NodeType> list = new LinkedList<NodeType>();
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
-            Node current = tree.parentNode();
+            Node? current = tree.parentNode();
             while (current is object)
             {
                 if (current is NodeType currentAsType)
@@ -646,7 +646,7 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Node Get_Nth_Ancestor(Node node, uint Nth, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static Node Get_Nth_Ancestor(Node node, uint Nth, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             if (Nth == 0)
             {
@@ -654,7 +654,7 @@ namespace CssUI.DOM
             }
 
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
-            Node current = tree.parentNode();
+            Node? current = tree.parentNode();
             while (current is object)
             {
                 if (--Nth <= 0) { return current; }
@@ -673,7 +673,7 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static NodeType Get_Nth_Ancestor<NodeType>(Node node, uint Nth, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL) where NodeType : INode
+        public static NodeType Get_Nth_Ancestor<NodeType>(Node node, uint Nth, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL) where NodeType : INode
         {
             if (Nth == 0)
             {
@@ -681,7 +681,7 @@ namespace CssUI.DOM
             }
 
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
-            Node current = tree.parentNode();
+            Node? current = tree.parentNode();
             while (current is object)
             {
                 if (current is NodeType nodeAsType)
@@ -703,12 +703,12 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static LinkedList<Node> Get_Inclusive_Ancestors(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static LinkedList<Node> Get_Inclusive_Ancestors(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             var list = new LinkedList<Node>();
             list.AddLast(node);
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
-            Node current = tree.parentNode();
+            Node? current = tree.parentNode();
             while (current is object)
             {
                 list.AddLast(current);
@@ -726,11 +726,11 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static LinkedList<Node> Get_Descendents(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static LinkedList<Node> Get_Descendents(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             var list = new LinkedList<Node>();
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
-            Node current = tree.nextNode();
+            Node? current = tree.nextNode();
             while (current is object)
             {
                 list.AddLast(current);
@@ -748,11 +748,11 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static LinkedList<NodeType> Get_Descendents<NodeType>(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL) where NodeType : INode
+        public static LinkedList<NodeType> Get_Descendents<NodeType>(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL) where NodeType : INode
         {
             LinkedList<NodeType> list = new LinkedList<NodeType>();
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
-            Node current = tree.nextNode();
+            Node? current = tree.nextNode();
             while (current is object)
             {
                 if (current is NodeType currentAsType)
@@ -774,7 +774,7 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Node Get_Nth_Descendant(Node node, uint Nth, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static Node Get_Nth_Descendant(Node node, uint Nth, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             if (Nth == 0)
             {
@@ -782,7 +782,7 @@ namespace CssUI.DOM
             }
 
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
-            Node current = tree.nextNode();
+            Node? current = tree.nextNode();
             while (current is object)
             {
                 if (--Nth <= 0) { return current; }
@@ -801,7 +801,7 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static NodeType Get_Nth_Descendant<NodeType>(Node node, uint Nth, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL) where NodeType : INode
+        public static NodeType Get_Nth_Descendant<NodeType>(Node node, uint Nth, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL) where NodeType : INode
         {
             if (Nth == 0)
             {
@@ -809,7 +809,7 @@ namespace CssUI.DOM
             }
 
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
-            Node current = tree.nextNode();
+            Node? current = tree.nextNode();
             while (current is object)
             {
                 if (current is NodeType nodeAsType)
@@ -831,12 +831,12 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static LinkedList<Node> Get_Shadow_Including_Descendents(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static LinkedList<Node> Get_Shadow_Including_Descendents(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
 #if ENABLE_HTML
             var list = new LinkedList<Node>();
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
-            Node current = tree.nextNode();
+            Node? current = tree.nextNode();
             while (current is object)
             {
                 if (Is_Shadow_Including_Descendant(current, node))
@@ -866,12 +866,12 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static LinkedList<Node> Get_Inclusive_Descendents(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static LinkedList<Node> Get_Inclusive_Descendents(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             var list = new LinkedList<Node>();
             list.AddLast(node);
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
-            Node current = tree.nextNode();
+            Node? current = tree.nextNode();
             while (current is object)
             {
                 list.AddLast(current);
@@ -889,7 +889,7 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static LinkedList<Node> Get_Shadow_Including_Inclusive_Descendents(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static LinkedList<Node> Get_Shadow_Including_Inclusive_Descendents(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             var list = (LinkedList<Node>)Get_Shadow_Including_Descendents(node, Filter, FilterMask);
             list.AddFirst(node);// Add the node (inclusive)
@@ -931,7 +931,7 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static LinkedList<NodeType> Get_Previous<NodeType>(Node node, NodeFilter Filter = null) where NodeType : INode
+        public static LinkedList<NodeType> Get_Previous<NodeType>(Node node, NodeFilter? Filter = null) where NodeType : INode
         {
             var list = new LinkedList<NodeType>();
 
@@ -1028,12 +1028,12 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static LinkedList<NodeType> Get_Preceeding<NodeType>(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static LinkedList<NodeType> Get_Preceeding<NodeType>(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             LinkedList<NodeType> list = new LinkedList<NodeType>();
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
 
-            Node current = tree.previousSibling();
+            Node? current = tree.previousSibling();
             while (current is object)
             {
                 if (current is NodeType nodeAsType)
@@ -1061,7 +1061,7 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Node Get_Nth_Preceeding(Node node, uint Nth, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static Node Get_Nth_Preceeding(Node node, uint Nth, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             if (Nth == 0)
             {
@@ -1069,7 +1069,7 @@ namespace CssUI.DOM
             }
 
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
-            Node current = tree.previousSibling();
+            Node? current = tree.previousSibling();
             while (current is object)
             {
                 if (--Nth <= 0) { return current; }
@@ -1088,12 +1088,12 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static LinkedList<Node> Get_Following(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static LinkedList<Node> Get_Following(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             var list = new LinkedList<Node>();
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
 
-            Node current = tree.nextSibling();
+            Node? current = tree.nextSibling();
             while (current is object)
             {
                 var fres = Filter?.acceptNode(current) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
@@ -1117,12 +1117,12 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static LinkedList<NodeType> Get_Following<NodeType>(Node node, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL) where NodeType : INode
+        public static LinkedList<NodeType> Get_Following<NodeType>(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL) where NodeType : INode
         {
             var list = new LinkedList<NodeType>();
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
 
-            Node current = tree.nextSibling();
+            Node? current = tree.nextSibling();
             while (current is object)
             {
                 if (current is NodeType nodeAsType)
@@ -1150,7 +1150,7 @@ namespace CssUI.DOM
         /// <param name="FilterMask">Mask for which Node types to allow</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Node Get_Nth_Following(Node node, uint Nth, NodeFilter Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
+        public static Node Get_Nth_Following(Node node, uint Nth, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             if (Nth == 0)
             {
@@ -1158,7 +1158,7 @@ namespace CssUI.DOM
             }
 
             TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
-            Node current = tree.nextSibling();
+            Node? current = tree.nextSibling();
             while (current is object)
             {
                 if (--Nth <= 0) { return current; }
@@ -1275,7 +1275,7 @@ namespace CssUI.DOM
             {
                 LinkedList<Element> descendents = new LinkedList<Element>();
                 var tree = new TreeWalker(root, ENodeFilterMask.SHOW_ELEMENT);
-                Node current = tree.nextNode();
+                Node? current = tree.nextNode();
                 while (current is object)
                 {
                     descendents.AddLast((Element)current);
@@ -1292,7 +1292,7 @@ namespace CssUI.DOM
 
                 LinkedList<Element> descendents = new LinkedList<Element>();
                 var tree = new TreeWalker(root, ENodeFilterMask.SHOW_ELEMENT);
-                Node current = tree.nextNode();
+                Node? current = tree.nextNode();
                 while (current is object)
                 {
                     var element = (Element)current;
@@ -1350,23 +1350,23 @@ namespace CssUI.DOM
         /// <param name="localName"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static LinkedList<Element> Get_Elements_By_Namespace_And_Local_Name(Node root, string Namespace, string localName)
+        public static LinkedList<Element> Get_Elements_By_Namespace_And_Local_Name(Node root, string? Namespace, string localName)
         {/* Docs: https://dom.spec.whatwg.org/#concept-getelementsbytagnamens */
-            if (Namespace.Length <= 0)
+            if (Namespace?.Length <= 0)
                 Namespace = null;
 
             /* 2) If both namespace and localName are "*" (U+002A), return a HTMLCollection rooted at root, whose filter matches descendant elements. */
-            if (Namespace.Equals("\u002A") && localName.Equals("\u002A"))
+            if (string.Equals(Namespace, "\u002A") && localName.Equals("\u002A"))
                 return Get_Descendents<Element>(root, null, ENodeFilterMask.SHOW_ELEMENT);
 
             /* 3) Otherwise, if namespace is "*" (U+002A), return a HTMLCollection rooted at root, whose filter matches descendant elements whose local name is localName. */
             var localNameFilter = new FilterLocalName(localName);
-            if (Namespace.Equals("\u002A"))
+            if (string.Equals(Namespace, "\u002A"))
                 return Get_Descendents<Element>(root, localNameFilter, ENodeFilterMask.SHOW_ELEMENT);
 
             /* 4) Otherwise, if localName is "*" (U+002A), return a HTMLCollection rooted at root, whose filter matches descendant elements whose namespace is namespace. */
             var NamespaceFilter = new FilterNamespace(Namespace);
-            if (localName.Equals("\u002A"))
+            if (string.Equals(localName, "\u002A"))
                 return Get_Descendents<Element>(root, NamespaceFilter, ENodeFilterMask.SHOW_ELEMENT);
 
             /* 5) Otherwise, return a HTMLCollection rooted at root, whose filter matches descendant elements whose namespace is namespace and local name is localName. */
@@ -1394,10 +1394,10 @@ namespace CssUI.DOM
             /* 3) Return a HTMLCollection rooted at root, whose filter matches descendant elements that have all their classes in classes. */
             var descendents = new LinkedList<Element>();
             var tree = new TreeWalker(root, ENodeFilterMask.SHOW_ELEMENT);
-            Node current = tree.nextNode();
+            Node? current = tree.nextNode();
             while (current is object)
             {
-                Element E = current as Element;
+                Element? E = current as Element;
 
                 if (E.classList.ContainsAll(classes))
                     descendents.AddLast(E);
@@ -1456,10 +1456,10 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static LinkedList<Node> Get_Children(Node node, NodeFilter Filter = null)
+        public static LinkedList<Node> Get_Children(Node node, NodeFilter? Filter = null)
         {
             var list = new LinkedList<Node>();
-            Node current = node.firstChild;
+            Node? current = node.firstChild;
             if (Filter is object)
             {
                 while (current is object)
@@ -1492,14 +1492,14 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Node Get_Nth_Child(Node node, uint Nth, NodeFilter Filter = null)
+        public static Node Get_Nth_Child(Node node, uint Nth, NodeFilter? Filter = null)
         {
             if (Nth == 0)
             {
                 throw new IndexOutOfRangeException("N must be greater than 0");
             }
 
-            Node current = node.firstChild;
+            Node? current = node.firstChild;
             if (Filter is object)
             {
                 while (current is object)
@@ -1537,10 +1537,10 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static LinkedList<NodeType> Get_Children<NodeType>(Node node, NodeFilter Filter = null) where NodeType : INode
+        public static LinkedList<NodeType> Get_Children<NodeType>(Node node, NodeFilter? Filter = null) where NodeType : INode
         {
             LinkedList<NodeType> list = new LinkedList<NodeType>();
-            Node current = node.firstChild;
+            Node? current = node.firstChild;
             if (Filter is object)
             {
                 while (current is object)
@@ -1579,14 +1579,14 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static NodeType Get_Nth_Child<NodeType>(Node node, uint Nth, NodeFilter Filter = null) where NodeType : INode
+        public static NodeType Get_Nth_Child<NodeType>(Node node, uint Nth, NodeFilter? Filter = null) where NodeType : INode
         {
             if (Nth == 0)
             {
                 throw new IndexOutOfRangeException("N must be greater than 0");
             }
 
-            Node current = node.firstChild;
+            Node? current = node.firstChild;
             if (Filter is object)
             {
                 while (current is object)
@@ -1631,7 +1631,7 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static NodeType Get_First_Child<NodeType>(Node node, NodeFilter Filter = null) where NodeType : INode
+        public static NodeType Get_First_Child<NodeType>(Node node, NodeFilter? Filter = null) where NodeType : INode
         {
             return Get_Nth_Child<NodeType>(node, 1, Filter);
         }
@@ -1642,9 +1642,9 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static NodeType Get_Last_Child<NodeType>(Node node, NodeFilter Filter = null) where NodeType : INode
+        public static NodeType Get_Last_Child<NodeType>(Node node, NodeFilter? Filter = null) where NodeType : INode
         {
-            Node current = node.lastChild;
+            Node? current = node.lastChild;
             while (current is object)
             {
                 if (current is NodeType childAsType)
@@ -1677,10 +1677,10 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static LinkedList<ElementType> Get_Element_Children<ElementType>(Element element, NodeFilter Filter = null) where ElementType : Element
+        public static LinkedList<ElementType> Get_Element_Children<ElementType>(Element element, NodeFilter? Filter = null) where ElementType : Element
         {
             LinkedList<ElementType> list = new LinkedList<ElementType>();
-            Element child = element.firstElementChild;
+            Element? child = element.firstElementChild;
             if (Filter is object)
             {
                 while (child is object)
@@ -1718,14 +1718,14 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ElementType Get_Nth_Element_Child<ElementType>(Element element, uint Nth, NodeFilter Filter = null) where ElementType : Element
+        public static ElementType Get_Nth_Element_Child<ElementType>(Element element, uint Nth, NodeFilter? Filter = null) where ElementType : Element
         {
             if (Nth == 0)
             {
                 throw new IndexOutOfRangeException("N must be greater than 0");
             }
 
-            Element child = element.firstElementChild;
+            Element? child = element.firstElementChild;
             if (Filter is object)
             {
                 while (child is object)
@@ -1769,7 +1769,7 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ElementType Get_First_Element_Child<ElementType>(Element element, NodeFilter Filter = null) where ElementType : Element
+        public static ElementType Get_First_Element_Child<ElementType>(Element element, NodeFilter? Filter = null) where ElementType : Element
         {
             return Get_Nth_Element_Child<ElementType>(element, 1, Filter);
         }
@@ -1780,9 +1780,9 @@ namespace CssUI.DOM
         /// <param name="Filter">Filter used for determining which nodes to allow</param>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ElementType Get_Last_Element_Child<ElementType>(Element element, NodeFilter Filter = null) where ElementType : Node
+        public static ElementType Get_Last_Element_Child<ElementType>(Element element, NodeFilter? Filter = null) where ElementType : Node
         {
-            Element child = element.lastElementChild;
+            Element? child = element.lastElementChild;
             if (Filter is object)
             {
                 while (child is object)
@@ -1860,7 +1860,7 @@ namespace CssUI.DOM
 
             /* 4) Let definition be the result of looking up a custom element definition given document, namespace, localName, and is. */
             /* XXX: Implement custom elements */
-            object definition = null;
+            object? definition = null;
             /* 5) If definition is non-null, and definition’s name is not equal to its local name (i.e., definition represents a customized built-in element), then: */
             /* 6) Otherwise, if definition is non-null, then: */
 

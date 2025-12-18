@@ -22,7 +22,7 @@ namespace CssUI.CSS
         /// </summary>
         /// <param name="E"></param>
         /// <returns></returns>
-        public static void Generate_Tree(Node StartNode, Node EndNode = null)
+        public static void Generate_Tree(Node StartNode, Node? EndNode = null)
         {
             if (StartNode is null)
             {

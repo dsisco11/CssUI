@@ -9,7 +9,7 @@ namespace CssUI.DOM.Events
         #endregion
 
         #region Constructors
-        public ProgressEvent(EventName type, ProgressEventInit initDict = null) : base(type, initDict)
+        public ProgressEvent(EventName type, ProgressEventInit? initDict = null) : base(type, initDict)
         {
             lengthComputable = initDict.lengthComputable;
             loaded = initDict.loaded;

@@ -16,8 +16,8 @@ namespace CssUI
         #endregion
 
         #region Backing Values
-        private string _name = null;
-        private string _name_lower = null;
+        private string? _name = null;
+        private string? _name_lower = null;
         #endregion
 
         #region Properties

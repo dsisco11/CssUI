@@ -25,14 +25,14 @@ namespace CssUI.DOM.Events
         /// <summary>
         /// Returns the object to which event is dispatched (its target).
         /// </summary>
-        public EventTarget target { get; internal set; } = null;
+        public EventTarget? target { get; internal set; } = null;
 
         /// <summary>
         /// Returns the object whose event listener’s callback is currently being invoked.
         /// </summary>
-        public EventTarget relatedTarget { get; internal set; } = null;
+        public EventTarget? relatedTarget { get; internal set; } = null;
 
-        public EventTarget currentTarget { get; internal set; } = null;
+        public EventTarget? currentTarget { get; internal set; } = null;
 
         /// <summary>
         /// Returns the event’s phase, which is one of NONE, CAPTURING_PHASE, AT_TARGET, and BUBBLING_PHASE.
@@ -109,7 +109,7 @@ namespace CssUI.DOM.Events
         /// </summary>
         /// <param name="type"></param>
         /// <param name="eventInitDict">allows for setting the bubbles and cancelable attributes via object members of the same name</param>
-        public Event(EventName type, EventInit eventInitDict = null)
+        public Event(EventName type, EventInit? eventInitDict = null)
         {
             /* To initialize an event, with type, bubbles, and cancelable, run these steps:*/
             /* 1) Set event’s initialized flag. */

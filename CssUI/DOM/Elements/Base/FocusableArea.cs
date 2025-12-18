@@ -14,13 +14,13 @@ namespace CssUI.DOM
     internal class FocusableArea
     {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#focusable-area */
         #region Properties
-        public readonly EventTarget FocusTarget = null;
+        public readonly EventTarget? FocusTarget = null;
         /// <summary>
         /// Each focusable area has a DOM anchor, which is a Node object that represents the position of the focusable area in the DOM. 
         /// (When the focusable area is itself a Node, it is its own DOM anchor.) 
         /// The DOM anchor is used in some APIs as a substitute for the focusable area when there is no other DOM object to represent the focusable area.
         /// </summary>
-        public readonly Node DOMAnchor = null;
+        public readonly Node? DOMAnchor = null;
 
         #endregion
 

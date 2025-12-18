@@ -14,11 +14,11 @@ namespace CssUI
         /// <summary>
         /// Stores the case sensitive hash
         /// </summary>
-        private CachedValue<int> Hash = null;
+        private CachedValue<int>? Hash = null;
         /// <summary>
         /// Stores the case-insensitive hash
         /// </summary>
-        private CachedValue<int> Hash_Lower = null;
+        private CachedValue<int>? Hash_Lower = null;
 
         private readonly string String = string.Empty;
         private readonly ReadOnlyMemory<char> Data = null;

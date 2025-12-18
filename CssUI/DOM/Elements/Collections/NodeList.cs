@@ -12,7 +12,7 @@ namespace CssUI.DOM
     {
         #region Properties
         public readonly Node Root;
-        private readonly NodeFilter CollectionFilter = null;
+        private readonly NodeFilter? CollectionFilter = null;
         #endregion
 
         #region Constructors

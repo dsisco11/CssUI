@@ -15,7 +15,7 @@ namespace CssUI.Rendering
         /// <summary>
         /// Instance object given to us by the <see cref="IRenderEngine"/> implementation, which it uses to actually handle the texture.
         /// </summary>
-        public object Handle { get; private set; } = null;
+        public object? Handle { get; private set; } = null;
         /// <summary>
         /// Time (in seconds) this frame should be onscreen for
         /// </summary>

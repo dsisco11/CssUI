@@ -16,7 +16,7 @@ namespace CssUI.CSS.Parser
     {
         #region Properties
         private readonly DataConsumer<char> Stream; 
-        private readonly CssToken[] tokens = null;
+        private readonly CssToken[]? tokens = null;
 
         public ReadOnlyMemory<CssToken> Tokens => tokens;
         #endregion

@@ -9,7 +9,7 @@ namespace CssUI.Devices
     public abstract class KeyboardDevice : IDisposable
     {
         #region Static
-        public static KeyboardDevice PrimaryDevice { get; private set; } = null;
+        public static KeyboardDevice? PrimaryDevice { get; private set; } = null;
         #endregion
 
         #region Constructors

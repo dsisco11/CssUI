@@ -7,7 +7,7 @@ namespace CssUI.CSS.Parser
         /// <summary>
         /// Holds the numeric representation of this token value
         /// </summary>
-        public readonly object Number = null;
+        public readonly object? Number = null;
         /// <summary>
         /// Specifies the type of value stored in the <see cref="Number"/> field. (int or float)
         /// </summary>

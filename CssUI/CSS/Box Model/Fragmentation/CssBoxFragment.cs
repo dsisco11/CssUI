@@ -28,7 +28,7 @@ namespace CssUI.CSS
         /// <summary>
         /// The edge positions of the Repalced-Content-Area 
         /// </summary>
-        public CssBoxArea Replaced { get; private set; } = null;
+        public CssBoxArea? Replaced { get; private set; } = null;
         /// <summary>
         /// The edge positions of the Content-Area 
         /// </summary>

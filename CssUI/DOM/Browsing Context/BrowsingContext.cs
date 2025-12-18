@@ -17,9 +17,9 @@ namespace CssUI.DOM.Internal
         public readonly WeakReference<BrowsingContext> _opener = new WeakReference<BrowsingContext>(null);
         public bool Disowned { get; protected set; } = false;
         public bool IsClosing { get; protected set; } = false;
-        public readonly Url CreatorURL = null;
-        public readonly Url CreatorBaseURL = null;
-        public readonly UrlOrigin CreatorOrigin = null;
+        public readonly Url? CreatorURL = null;
+        public readonly Url? CreatorBaseURL = null;
+        public readonly UrlOrigin? CreatorOrigin = null;
 
         /* 
          * A browsing context has a session history, which lists the Document objects that the browsing context has presented, is presenting, or will present. 
@@ -31,7 +31,7 @@ namespace CssUI.DOM.Internal
         #endregion
 
         #region Constructors
-        protected BrowsingContext(BrowsingContext opener = null)
+        protected BrowsingContext(BrowsingContext? opener = null)
         {/* Docs: https://html.spec.whatwg.org/multipage/browsers.html#creating-a-new-browsing-context */
             _opener.SetTarget(opener);
         }
@@ -69,7 +69,7 @@ namespace CssUI.DOM.Internal
 
         public BrowsingContext Get_Top_Level_Browsing_Context()
         {
-            BrowsingContext context = this;
+            BrowsingContext? context = this;
 
             while (!context.IsTopLevel)
             {

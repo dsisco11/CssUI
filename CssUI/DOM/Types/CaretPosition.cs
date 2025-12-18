@@ -13,7 +13,7 @@ namespace CssUI.DOM
         #region Properties
         public Node offsetNode { get; private set; }
         public ulong offset { get; private set; }
-        private Range caretRange = null;
+        private Range? caretRange = null;
         #endregion
 
         #region Constructor

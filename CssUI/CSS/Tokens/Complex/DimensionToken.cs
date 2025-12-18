@@ -7,7 +7,7 @@ namespace CssUI.CSS.Parser
         /// <summary>
         /// Holds the numeric representation of this token value
         /// </summary>
-        public readonly object Number = null;
+        public readonly object? Number = null;
         /// <summary>
         /// Specifies the type of value stored in the <see cref="Number"/> field. (int or float)
         /// </summary>
@@ -15,7 +15,7 @@ namespace CssUI.CSS.Parser
         /// <summary>
         /// Holds the dimension's unit type string
         /// </summary>
-        public readonly string Unit = null;
+        public readonly string? Unit = null;
 
         public DimensionToken(ENumericTokenType DataType, ReadOnlySpan<char> Value, object Number, ReadOnlySpan<char> Unit) : base(ECssTokenType.Dimension, Value)
         {

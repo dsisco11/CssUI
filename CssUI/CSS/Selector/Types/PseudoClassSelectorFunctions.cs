@@ -12,7 +12,7 @@ namespace CssUI.CSS.Selectors
     {
         protected readonly List<CssToken> Args;
 
-        public PseudoClassSelectorFunction(string Name, List<CssToken> Args = null) : base(Name)
+        public PseudoClassSelectorFunction(string Name, List<CssToken>? Args = null) : base(Name)
         {
             this.Args = Args;
         }

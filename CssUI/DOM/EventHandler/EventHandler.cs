@@ -8,8 +8,8 @@ namespace CssUI.DOM.Events
     public class EventHandler
     {
         #region Properties
-        public EventListener listener = null;
-        public EventCallback callback = null;
+        public EventListener? listener = null;
+        public EventCallback? callback = null;
         #endregion
 
         #region Constructor

@@ -21,7 +21,7 @@ namespace CssUI.CSS.Selectors
             Name = PseudoClass;
         }
 
-        public static PseudoClassSelector Create_Function(string Name, CssToken[] Args = null)
+        public static PseudoClassSelector Create_Function(string Name, CssToken[]? Args = null)
         {
             if (Name.Equals("not"))
             {

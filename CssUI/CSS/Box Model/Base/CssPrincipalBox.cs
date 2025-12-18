@@ -76,7 +76,7 @@ namespace CssUI.CSS.BoxTree
         #endregion
 
         #region Formatting Context
-        internal IFormattingContext FormattingContext { get; private set; } = null;
+        internal IFormattingContext? FormattingContext { get; private set; } = null;
         public bool IsParticipatingInFlow => !(FormattingContext is null);
 
         /// <summary>

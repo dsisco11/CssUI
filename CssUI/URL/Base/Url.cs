@@ -27,14 +27,14 @@ namespace CssUI.HTTP
         /// </summary>
         public AtomicName<EUrlScheme> Scheme = string.Empty;
 
-        public UrlHost Host = null;
+        public UrlHost? Host = null;
         public ushort? Port = null;
 
         public List<string> Path = new List<string>();
-        public string Query = null;
-        public string Fragment = null;
+        public string? Query = null;
+        public string? Fragment = null;
         public bool bCannotBeBaseURLFlag = false;
-        public BlobURLEntry blobURLEntry = null;
+        public BlobURLEntry? blobURLEntry = null;
         #endregion
 
         #region Constructors
@@ -191,7 +191,7 @@ namespace CssUI.HTTP
         #endregion
 
         #region Parsing
-        public static Url Parse(ReadOnlyMemory<char> input, in Url urlBase = null, in Encoding encodingOverride = null)
+        public static Url Parse(ReadOnlyMemory<char> input, in Url? urlBase = null, in Encoding? encodingOverride = null)
         {
             if (TryParse(input, out Url outUrl, urlBase, encodingOverride))
             {
@@ -200,7 +200,7 @@ namespace CssUI.HTTP
 
             return null;
         }
-        public static bool TryParse(ReadOnlyMemory<char> input, out Url outUrl, in Url urlBase = null, in Encoding encodingOverride = null, in Url TargetUrl = null)
+        public static bool TryParse(ReadOnlyMemory<char> input, out Url outUrl, in Url? urlBase = null, in Encoding? encodingOverride = null, in Url? TargetUrl = null)
         {/* Docs: https://url.spec.whatwg.org/#concept-url-parser */
             if (Parse_Basic(input, urlBase, out Url parsedUrl, encodingOverride, TargetUrl))
             {
@@ -224,7 +224,7 @@ namespace CssUI.HTTP
             outUrl = parsedUrl;
             return true;
         }
-        internal static bool Parse_Basic(ReadOnlyMemory<char> InputStr, in Url Base, out Url outUrl, in Encoding encodingOverride = null, Url TargetUrl = null, in ESchemeState? stateOverride = null)
+        internal static bool Parse_Basic(ReadOnlyMemory<char> InputStr, in Url Base, out Url outUrl, in Encoding? encodingOverride = null, Url? TargetUrl = null, in ESchemeState? stateOverride = null)
         {/* Docs: https://url.spec.whatwg.org/#concept-basic-url-parser */
             ReadOnlyMemory<char> input = InputStr;
             Url url = TargetUrl;

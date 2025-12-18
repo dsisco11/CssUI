@@ -21,7 +21,7 @@ namespace CssUI.CSS
         /// Sets the <see cref="Assigned"/> value for this property to the given color
         /// </summary>
         /// <param name="value"></param>
-        public void Set(CssValue Horizontal, CssValue Vertical = null)
+        public void Set(CssValue Horizontal, CssValue? Vertical = null)
         {
             var newValue = CssValue.From(Horizontal, Vertical ?? CssValue.Null);
             if (Assigned != newValue)

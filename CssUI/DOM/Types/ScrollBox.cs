@@ -14,8 +14,8 @@ namespace CssUI.DOM
         #region Property
         public EFlowDirection Block;
         public EFlowDirection Inline;
-        public readonly Element Owner = null;
-        public readonly IViewport View = null;
+        public readonly Element? Owner = null;
+        public readonly IViewport? View = null;
 
         /// <summary>
         /// Current x-coordinate offset position of this scrollbox
@@ -35,11 +35,11 @@ namespace CssUI.DOM
         /// <summary>
         /// The vertical scroll bar bounds
         /// </summary>
-        public DOMRectReadOnly VScrollBar { get; private set; } = null;
+        public DOMRectReadOnly? VScrollBar { get; private set; } = null;
         /// <summary>
         /// The horizontal scroll bar bounds
         /// </summary>
-        public DOMRectReadOnly HScrollBar { get; private set; } = null;
+        public DOMRectReadOnly? HScrollBar { get; private set; } = null;
 /*
         /// <summary>
         /// Determines along which edge of this box the (horizontal) scrollbar will be rendered on.
@@ -298,16 +298,16 @@ namespace CssUI.DOM
         /// Animation time for smooth scrolling
         /// </summary>
         private static TimeSpan Smooth_Scroll_Anim_Time = TimeSpan.FromMilliseconds(350);
-        private ScheduledFunction smooth_scroller = null;
+        private ScheduledFunction? smooth_scroller = null;
         private double Smooth_Scroll_End_Time = -1;
         /// <summary>
         /// The distance from our smooth scroll start position to the end position
         /// </summary>
-        private DOMPoint Smooth_Scroll_Distance = null;
+        private DOMPoint? Smooth_Scroll_Distance = null;
         /// <summary>
         /// The position this scrollbox should be at when the smooth scroll ends
         /// </summary>
-        private DOMPoint Smooth_Scroll_Target = null;
+        private DOMPoint? Smooth_Scroll_Target = null;
 
         /// <summary>
         /// Called by the smooth scroller everytime it ticks

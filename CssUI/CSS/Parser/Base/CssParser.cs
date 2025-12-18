@@ -575,7 +575,7 @@ namespace CssUI.CSS.Serialization
             return new MediaQueryList(document, queryList);
         }
 
-        static MediaQuery Consume_MediaQuery(DataConsumer<CssToken> Stream = null)
+        static MediaQuery Consume_MediaQuery(DataConsumer<CssToken>? Stream = null)
         {/* Docs: https://drafts.csswg.org/mediaqueries-4/#mq-syntax */
             if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
 
@@ -710,7 +710,7 @@ namespace CssUI.CSS.Serialization
                     if (ParserCommon.Is_Combinator(Stream.Next))
                     {
                         /* Consume combinator */
-                        IdentToken combinatorToken = Stream.Consume() as IdentToken;
+                        IdentToken? combinatorToken = Stream.Consume() as IdentToken;
                         if (!Lookup.TryEnum(combinatorToken.Value, out EMediaCombinator combLookup))
                         {
                             throw new CssSyntaxErrorException(String.Format(CultureInfo.InvariantCulture, CssErrors.INVALID_COMBINATOR, combinatorToken.Value), Stream);
@@ -758,7 +758,7 @@ namespace CssUI.CSS.Serialization
             if (ParserCommon.Starts_Boolean_Feature(Stream.AsSpan()))
             {
                 /* Consume feature name */
-                IdentToken nameTok = Stream.Consume() as IdentToken;
+                IdentToken? nameTok = Stream.Consume() as IdentToken;
 
                 /* Resolve the name */
                 if (!Lookup.TryEnum(nameTok.Value, out EMediaFeatureName Name))
@@ -771,7 +771,7 @@ namespace CssUI.CSS.Serialization
             else if (ParserCommon.Starts_Discreet_Feature(Stream.AsSpan()))
             {
                 /* Consume feature name */
-                IdentToken nameTok = Stream.Consume() as IdentToken;
+                IdentToken? nameTok = Stream.Consume() as IdentToken;
 
                 /* Resolve the name */
                 if (!Lookup.TryEnum(nameTok.Value, out EMediaFeatureName Name))
@@ -874,9 +874,9 @@ namespace CssUI.CSS.Serialization
                         if (ParserCommon.Starts_Ratio_Value(Stream.AsSpan()))
                         {
                             Consume_All_Whitespace(Stream);
-                            DelimToken dtok = Stream.Consume() as DelimToken;
+                            DelimToken? dtok = Stream.Consume() as DelimToken;
                             Consume_All_Whitespace(Stream);
-                            NumberToken numTok2 = Stream.Consume() as NumberToken;
+                            NumberToken? numTok2 = Stream.Consume() as NumberToken;
 
                             double ratioValue = ((double)numTok.Number / (double)numTok2.Number);
                             return new CssValue(ECssValueTypes.RATIO, ratioValue);

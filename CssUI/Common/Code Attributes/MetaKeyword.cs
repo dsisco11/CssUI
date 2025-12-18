@@ -5,7 +5,7 @@ namespace CssUI.Internal
     {
         #region Properties
         public readonly string Keyword;
-        public readonly object[] Values = null;
+        public readonly object[]? Values = null;
         #endregion
 
         #region Constructor

@@ -7,8 +7,8 @@ namespace CssUI.DOM
     public class Selection
     {/* Docs: https://www.w3.org/TR/selection-api/#selection-interface */
         #region Properties
-        Range _range = null;
-        Document document = null;
+        Range? _range = null;
+        Document? document = null;
         ESelectionDirection direction = ESelectionDirection.None;
         #endregion
 

@@ -7,7 +7,7 @@ namespace CssUI
     public class AsyncManualResetEvent
     {
         private volatile TaskCompletionSource<bool> m_tcs = new TaskCompletionSource<bool>();
-        private Timer timer_timeout = null;
+        private Timer? timer_timeout = null;
 
         public Task WaitAsync()
         {

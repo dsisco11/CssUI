@@ -198,7 +198,7 @@ namespace CssUI.DOM.Nodes
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
-        public Node getRootNode(GetRootNodeOptions options = null)
+        public Node getRootNode(GetRootNodeOptions? options = null)
         {/* Docs: https://dom.spec.whatwg.org/#dom-node-getrootnode */
             /* The getRootNode(options) method, when invoked, must return context object’s shadow-including root if options’s composed is true, and context object’s root otherwise. */
             if (options != null && options.composed)
@@ -555,7 +555,7 @@ namespace CssUI.DOM.Nodes
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static Node Dom_clone_node(Node node, Document document = null, bool clone_children = false, Node targetNode = null)
+        private static Node Dom_clone_node(Node node, Document? document = null, bool clone_children = false, Node? targetNode = null)
         {/* Docs: https://dom.spec.whatwg.org/#concept-node-clone */
             /* 1) If document is not given, let document be node’s node document. */
             if (document is null)

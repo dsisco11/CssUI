@@ -11,7 +11,7 @@ namespace CssUI.CSS.Selectors
     {
         protected readonly List<CssToken> Args;
 
-        public CssPseudoElementSelectorFunction(string Name, List<CssToken> Args = null) : base(Name)
+        public CssPseudoElementSelectorFunction(string Name, List<CssToken>? Args = null) : base(Name)
         {
             this.Args = Args;
         }

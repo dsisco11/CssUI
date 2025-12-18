@@ -13,24 +13,24 @@ namespace CssUI.DOM
         /// <summary>
         /// Namespace name
         /// </summary>
-        public string namespaceURI { get; private set; } = null;
+        public string? namespaceURI { get; private set; } = null;
         /// <summary>
         /// Namespace prefix
         /// </summary>
-        public string prefix { get; private set; } = null;
-        public AtomicName<EAttributeName> localName { get; private set; } = null;
+        public string? prefix { get; private set; } = null;
+        public AtomicName<EAttributeName>? localName { get; private set; } = null;
 
         /// <summary>
         /// The actual value assigned to this attribute by the user
         /// </summary>
-        private AttributeValue _value_assigned = null;
+        private AttributeValue? _value_assigned = null;
         /// <summary>
         /// The value being used for this attribute (an invalid/missing assigned value can cause this value to be assigned a default)
         /// </summary>
-        private AttributeValue _value_used = null;
+        private AttributeValue? _value_used = null;
 
-        public Element ownerElement { get; internal set; } = null;
-        private WeakReference<AttributeDefinition> _definition = null;
+        public Element? ownerElement { get; internal set; } = null;
+        private WeakReference<AttributeDefinition>? _definition = null;
 
         /// <summary>
         /// True if this attribute doesnt have an assigned value
@@ -141,7 +141,7 @@ namespace CssUI.DOM
         #endregion
 
         #region Constructors
-        public Attr(AtomicName<EAttributeName> localName, Element Owner, string Namespace = null)
+        public Attr(AtomicName<EAttributeName> localName, Element Owner, string? Namespace = null)
         {
             this.localName = localName;
             this.ownerElement = Owner;
@@ -149,7 +149,7 @@ namespace CssUI.DOM
             this.namespaceURI = Namespace;
         }
 
-        public Attr(AtomicName<EAttributeName> localName, Element Owner, Document document, string Namespace = null)
+        public Attr(AtomicName<EAttributeName> localName, Element Owner, Document document, string? Namespace = null)
         {
             this.localName = localName;
             this.ownerElement = Owner;
@@ -157,7 +157,7 @@ namespace CssUI.DOM
             this.namespaceURI = Namespace;
         }
 
-        public Attr(AtomicName<EAttributeName> localName, Document document, string Namespace = null)
+        public Attr(AtomicName<EAttributeName> localName, Document document, string? Namespace = null)
         {
             this.localName = localName;
             this.nodeDocument = document;

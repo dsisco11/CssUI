@@ -10,7 +10,7 @@ namespace CssUI.DOM.Events
         #endregion
 
         #region Constructor
-        public CompositionEvent(EEventName type, CompositionEventInit eventInit = null) : base(type, eventInit)
+        public CompositionEvent(EEventName type, CompositionEventInit? eventInit = null) : base(type, eventInit)
         {
             this.data = eventInit?.data ?? string.Empty;
         }

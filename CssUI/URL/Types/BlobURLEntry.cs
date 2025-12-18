@@ -15,7 +15,7 @@ namespace CssUI.HTTP
             Debug.Assert(url.Scheme == "blob");
             string urlString = url.Serialize(true);
 
-            if (BlobURLStore.TryGetValue(urlString, out BlobURLEntry blob))
+            if (BlobURLStore.TryGetValue(urlString, out BlobURLEntry? blob))
             {
                 outBlob = blob;
                 return true;

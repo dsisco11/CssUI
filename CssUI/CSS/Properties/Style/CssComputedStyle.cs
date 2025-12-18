@@ -45,7 +45,7 @@ namespace CssUI.CSS
         //public HashSet<AtomicName<ECssPropertyID>> SetProperties { get; private set; } = new HashSet<AtomicName<ECssPropertyID>>();
         public readonly FlagCollection<ECssPropertyID> SetProperties = new FlagCollection<ECssPropertyID>(MAX_PROPERTY_ID_INDEX+1);
 
-        private List<ICssProperty> CssProperties = null;
+        private List<ICssProperty>? CssProperties = null;
         //private ConcurrentDictionary<AtomicName<ECssPropertyID>, ICssProperty> CssPropertyMap = null;
 
         /// <summary>

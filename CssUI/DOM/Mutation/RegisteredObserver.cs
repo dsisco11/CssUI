@@ -4,8 +4,8 @@ namespace CssUI.DOM
 {
     public class RegisteredObserver
     {
-        public MutationObserver observer = null;
-        public MutationObserverInit options = null;
+        public MutationObserver? observer = null;
+        public MutationObserverInit? options = null;
 
         public RegisteredObserver(MutationObserver observer, MutationObserverInit options)
         {

@@ -23,7 +23,7 @@ namespace CssUI.DOM
         /// Name of the attribute this token list represents
         /// </summary>
         public readonly AtomicName<EAttributeName> localName;
-        private readonly HashSet<T> SupportedTokens = null;
+        private readonly HashSet<T>? SupportedTokens = null;
         #endregion
 
         #region Constructor

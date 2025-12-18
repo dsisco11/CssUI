@@ -65,7 +65,7 @@ namespace CssUI.DOM
             /* Remove self from list of live ranges */
             foreach (WeakReference<Range> weakRef in root.nodeDocument.LIVE_RANGES)
             {
-                if (weakRef.TryGetTarget(out Range r))
+                if (weakRef.TryGetTarget(out Range? r))
                 {
                     if (ReferenceEquals(this, r))
                     {
@@ -361,7 +361,7 @@ namespace CssUI.DOM
                     node = tree.nextSibling();
                 }
                 /* 5) If original start node is an inclusive ancestor of original end node, set new node to original start node and new offset to original start offset. */
-                Node newNode = null;
+                Node? newNode = null;
                 int newOffset = 0;
                 if (DOMCommon.Is_Inclusive_Ancestor(startContainer, endContainer))
                 {
@@ -454,7 +454,7 @@ namespace CssUI.DOM
                 if (containedChildren.Any(c => c is DocumentType))
                     throw new HierarchyRequestError();
                 /* 13) If original start node is an inclusive ancestor of original end node, set new node to original start node and new offset to original start offset. */
-                Node newNode = null;
+                Node? newNode = null;
                 int newOffset = 0;
                 if (DOMCommon.Is_Inclusive_Ancestor(startContainer, endContainer))
                 {
@@ -627,7 +627,7 @@ namespace CssUI.DOM
                 if (startContainer is ProcessingInstruction || startContainer is Comment || (startContainer is Text startTxt && startTxt.parentNode == null))
                     throw new HierarchyRequestError();
 
-                Node referenceNode = null;
+                Node? referenceNode = null;
                 /* 3) If range’s start node is a Text node, set referenceNode to that Text node. */
                 if (startContainer is Text)
                 {

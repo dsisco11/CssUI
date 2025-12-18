@@ -21,7 +21,7 @@ namespace CssUI.DOM
 
         private double _scale;
 
-        ScrollBox scrollBox = null;
+        ScrollBox? scrollBox = null;
         #endregion
 
         #region Events

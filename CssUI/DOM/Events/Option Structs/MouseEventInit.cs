@@ -11,7 +11,7 @@ namespace CssUI.DOM.Events
 
         public EMouseButton button = 0;
         public EMouseButtonFlags buttons = 0;
-        public EventTarget relatedTarget = null;
+        public EventTarget? relatedTarget = null;
 
         /// <summary>
         ///

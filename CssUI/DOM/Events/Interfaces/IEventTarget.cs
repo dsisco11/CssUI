@@ -11,9 +11,9 @@ namespace CssUI.DOM.Events
         EventHandlerMap handlerMap { get; }
         LinkedList<EventListener> Listeners { get; }
 
-        void addEventListener(EventName eventName, EventCallback callback, AddEventListenerOptions options = null);
+        void addEventListener(EventName eventName, EventCallback callback, AddEventListenerOptions? options = null);
         ValueTask<bool> dispatchEvent(Event @event);
         EventTarget get_the_parent(Event @event);
-        void removeEventListener(EventName eventName, EventCallback callback, EventListenerOptions options = null);
+        void removeEventListener(EventName eventName, EventCallback callback, EventListenerOptions? options = null);
     }
 }

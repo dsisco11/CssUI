@@ -5,7 +5,7 @@ namespace CssUI.DOM.Events
 
         public dynamic? detail { get; protected set; } = null;
 
-        public CustomEvent(EEventName type, CustomEventInit eventInit = null) : base(type, eventInit)
+        public CustomEvent(EEventName type, CustomEventInit? eventInit = null) : base(type, eventInit)
         {
             this.detail = eventInit?.detail;
         }

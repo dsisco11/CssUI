@@ -36,7 +36,7 @@ namespace CssUI.DOM.Nodes
         Node cloneNode(bool deep = false);
         EDocumentPosition compareDocumentPosition(Node other);
         bool contains(Node other);
-        Node getRootNode(GetRootNodeOptions options = null);
+        Node getRootNode(GetRootNodeOptions? options = null);
         bool hasChildNodes();
         Node insertBefore(Node node, Node child);
         bool isEqualNode(Node otherNode);

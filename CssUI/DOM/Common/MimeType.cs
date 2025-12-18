@@ -31,7 +31,7 @@ namespace CssUI.DOM
             return record;
         }
 
-        public static MimeTypeRecord CreateRecord(string Type, string SubType, Dictionary<string, string> Parameters = null)
+        public static MimeTypeRecord CreateRecord(string Type, string SubType, Dictionary<string, string>? Parameters = null)
         {
             return new MimeTypeRecord(Type, SubType, Parameters);
         }
@@ -262,7 +262,7 @@ namespace CssUI.DOM
                 Stream.Consume_While(c => c != CHAR_SEMICOLON && c != CHAR_EQUALS, out ReadOnlyMemory<char> paramName);
 
                 string parameterName = StringCommon.Transform(paramName, To_ASCII_Lower_Alpha);
-                string parameterValue = null;
+                string? parameterValue = null;
 
                 if (!Stream.atEnd)
                 {

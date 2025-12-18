@@ -11,28 +11,28 @@ namespace CssUI.DOM.Mutation
         /// Returns "attributes" if it was an attribute mutation. "characterData" if it was a mutation to a CharacterData node. And "childList" if it was a mutation to the tree of nodes.
         /// </summary>
         public EMutationType type { get; private set; }
-        public readonly Node target = null;
-        public readonly IEnumerable<Node> addedNodes = null;
-        public readonly IEnumerable<Node> removedNodes = null;
+        public readonly Node? target = null;
+        public readonly IEnumerable<Node>? addedNodes = null;
+        public readonly IEnumerable<Node>? removedNodes = null;
 
         /// <summary>
         /// Return the previous sibling of the added or removed nodes, and null otherwise.
         /// </summary>
-        public readonly Node previousSibling = null;
+        public readonly Node? previousSibling = null;
         /// <summary>
         /// Return the next sibling of the added or removed nodes, and null otherwise.
         /// </summary>
-        public readonly Node nextSibling = null;
+        public readonly Node? nextSibling = null;
 
         /// <summary>
         /// Returns the local name of the changed attribute, and null otherwise.
         /// </summary>
-        public readonly string attributeName = null;
-        public readonly string attributeNamespace = null;
+        public readonly string? attributeName = null;
+        public readonly string? attributeNamespace = null;
         /// <summary>
         /// The return value depends on type. For "attributes", it is the value of the changed attribute before the change. For "characterData", it is the data of the changed node before the change. For "childList", it is null.
         /// </summary>
-        public readonly dynamic oldValue = null;
+        public readonly dynamic? oldValue = null;
         #endregion
 
         #region Constructor

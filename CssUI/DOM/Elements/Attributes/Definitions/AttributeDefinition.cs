@@ -49,11 +49,11 @@ namespace CssUI.DOM
         /// <summary>
         /// The minimum value (if any) that can be assigned to this attribute
         /// </summary>
-        public readonly dynamic LowerRange = null;
+        public readonly dynamic? LowerRange = null;
         /// <summary>
         /// The maximum value (if any) that can be assigned to this attribute
         /// </summary>
-        public readonly dynamic UpperRange = null;
+        public readonly dynamic? UpperRange = null;
         #endregion
 
         #region Accessors
@@ -94,7 +94,7 @@ namespace CssUI.DOM
         /// <param name="Flags">Indicates what aspects of an element this property affects</param>
         /// <param name="MissingValueDefault">Default value for the attribute</param>
         /// <param name="Keywords">List of keywords which can be assigned to this attribute</param>
-        public AttributeDefinition(AtomicName<EAttributeName> Name, EAttributeType Type = 0x0, AttributeValue MissingValueDefault = null, AttributeValue InvalidValueDefault = null, EAttributeFlags Flags = 0x0, string[] Keywords = null, Type enumType = null, dynamic lowerRange = null, dynamic upperRange = null, string[] SupportedTokens = null)
+        public AttributeDefinition(AtomicName<EAttributeName> Name, EAttributeType Type = 0x0, AttributeValue? MissingValueDefault = null, AttributeValue? InvalidValueDefault = null, EAttributeFlags Flags = 0x0, string[]? Keywords = null, Type? enumType = null, dynamic? lowerRange = null, dynamic? upperRange = null, string[]? SupportedTokens = null)
             : this(Keywords, SupportedTokens)
         {
             this.ElementType = typeof(Element);
@@ -117,7 +117,7 @@ namespace CssUI.DOM
         /// <param name="Flags">Indicates what aspects of an element this property affects</param>
         /// <param name="MissingValueDefault">Default value for the attribute</param>
         /// <param name="Keywords">List of keywords which can be assigned to this attribute</param>
-        public AttributeDefinition(Type ElementType, AtomicName<EAttributeName> Name, EAttributeType Type = 0x0, AttributeValue MissingValueDefault = null, AttributeValue InvalidValueDefault = null, EAttributeFlags Flags = 0x0, string[] Keywords = null, Type enumType = null, dynamic lowerRange = null, dynamic upperRange = null, string[] SupportedTokens = null)
+        public AttributeDefinition(Type ElementType, AtomicName<EAttributeName> Name, EAttributeType Type = 0x0, AttributeValue? MissingValueDefault = null, AttributeValue? InvalidValueDefault = null, EAttributeFlags Flags = 0x0, string[]? Keywords = null, Type? enumType = null, dynamic? lowerRange = null, dynamic? upperRange = null, string[]? SupportedTokens = null)
             : this(Keywords, SupportedTokens)
         {
             this.ElementType = ElementType;

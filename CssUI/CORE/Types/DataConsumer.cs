@@ -332,7 +332,7 @@ namespace CssUI
         /// Returns the index of the first item matching the given <paramref name="Subject"/>  or -1 if none was found
         /// </summary>
         /// <returns>Index of first item matching the given one or -1 if none was found</returns>
-        public bool Scan(T Subject, out int OutOffset, int StartOffset = 0, IEqualityComparer<T> Comparer = null)
+        public bool Scan(T Subject, out int OutOffset, int StartOffset = 0, IEqualityComparer<T>? Comparer = null)
         {
             bool RetVal = _scan(Subject, out UInt32 outOffset, StartOffset, Comparer);
             OutOffset = (int)outOffset;
@@ -342,7 +342,7 @@ namespace CssUI
         /// Returns the index of the first item matching the given <paramref name="Subject"/>  or -1 if none was found
         /// </summary>
         /// <returns>Index of first item matching the given one or -1 if none was found</returns>
-        public bool Scan(T Subject, out uint OutOffset, uint StartOffset = 0, IEqualityComparer<T> Comparer = null)
+        public bool Scan(T Subject, out uint OutOffset, uint StartOffset = 0, IEqualityComparer<T>? Comparer = null)
         {
             bool RetVal = _scan(Subject, out UInt32 outOffset, (int)StartOffset, Comparer);
             OutOffset = outOffset;
@@ -352,7 +352,7 @@ namespace CssUI
         /// Returns the index of the first item matching the given <paramref name="Subject"/>  or -1 if none was found
         /// </summary>
         /// <returns>Index of first item matching the given one or -1 if none was found</returns>
-        public bool Scan(T Subject, out long OutOffset, long StartOffset = 0, IEqualityComparer<T> Comparer = null)
+        public bool Scan(T Subject, out long OutOffset, long StartOffset = 0, IEqualityComparer<T>? Comparer = null)
         {
             bool RetVal = _scan(Subject, out UInt32 outOffset, (int)StartOffset, Comparer);
             OutOffset = outOffset;
@@ -362,7 +362,7 @@ namespace CssUI
         /// Returns the index of the first item matching the given <paramref name="Subject"/>  or -1 if none was found
         /// </summary>
         /// <returns>Index of first item matching the given one or -1 if none was found</returns>
-        public bool Scan(T Subject, out ulong OutOffset, ulong StartOffset = 0, IEqualityComparer<T> Comparer = null)
+        public bool Scan(T Subject, out ulong OutOffset, ulong StartOffset = 0, IEqualityComparer<T>? Comparer = null)
         {
             bool RetVal = _scan(Subject, out UInt32 outOffset, (int)StartOffset, Comparer);
             OutOffset = outOffset;

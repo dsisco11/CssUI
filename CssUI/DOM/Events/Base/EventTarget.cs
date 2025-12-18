@@ -107,7 +107,7 @@ namespace CssUI.DOM.Events
         /// <param name="eventName">Name of the event to listen for</param>
         /// <param name="callback">Callback that fires when the event is triggered.</param>
         /// <param name="options"></param>
-        public void addEventListener(EventName eventName, EventCallback callback, AddEventListenerOptions options = null)
+        public void addEventListener(EventName eventName, EventCallback callback, AddEventListenerOptions? options = null)
         {/* Docs: https://dom.spec.whatwg.org/#dom-eventtarget-addeventlistener */
             bool capture = false;
             bool once = false;
@@ -141,7 +141,7 @@ namespace CssUI.DOM.Events
         /// <param name="eventName">Name of the event</param>
         /// <param name="callback">Callback that fires when the event is triggered.</param>
         /// <param name="options"></param>
-        public void removeEventListener(EventName eventName, EventCallback callback, EventListenerOptions options = null)
+        public void removeEventListener(EventName eventName, EventCallback callback, EventListenerOptions? options = null)
         {
             bool capture = false;
             if (options is object)

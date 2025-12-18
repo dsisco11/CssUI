@@ -11,7 +11,7 @@ namespace CssUI.CSS.Internal
     /// </summary>
     public class MediaDefinition
     {
-        private readonly string[] keywordWhitelist = null;
+        private readonly string[]? keywordWhitelist = null;
 
         #region Properties
         /// <summary>
@@ -46,7 +46,7 @@ namespace CssUI.CSS.Internal
         /// <param name="DisallowedTypes">Bitmask of all value data types which cannot be assigned to this property</param>
         /// <param name="Keywords">List of keywords which can be assigned to this property</param>
         /// <param name="IsPrivate">If TRUE then this property cannot be set from style-sheets</param>
-        public MediaDefinition(AtomicName<EMediaFeatureName> Name, EMediaFeatureType Type, ECssValueTypes AllowedTypes, string[] Keywords = null)
+        public MediaDefinition(AtomicName<EMediaFeatureName> Name, EMediaFeatureType Type, ECssValueTypes AllowedTypes, string[]? Keywords = null)
         {
             this.Name = Name;
             this.Type = Type;

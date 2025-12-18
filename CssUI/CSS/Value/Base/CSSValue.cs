@@ -71,7 +71,7 @@ namespace CssUI.CSS
 #if ALLOW_DYNAMIC
         private readonly dynamic value = null;
 #else
-        private readonly object value = null;
+        private readonly object? value = null;
 #endif
         #endregion
 

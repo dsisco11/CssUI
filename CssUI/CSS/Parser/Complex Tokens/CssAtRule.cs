@@ -10,7 +10,7 @@ namespace CssUI.CSS
         public readonly string Name;
         //public List<CssComponent> Prelude = new List<CssComponent>();
         public List<CssToken> Prelude = new List<CssToken>();
-        public CssSimpleBlock Block = null;
+        public CssSimpleBlock? Block = null;
 
         //public CssAtRule(string Name) : base(ECssComponent.AtRule)
         public CssAtRule(ReadOnlySpan<char> Name) : base(ECssTokenType.AtRule)

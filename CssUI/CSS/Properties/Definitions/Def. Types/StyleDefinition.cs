@@ -32,7 +32,7 @@ namespace CssUI.CSS.Internal
         /// <summary>
         /// Method used to resolve percentage values to computed values for this property, or NULL if percentages are not accepted.
         /// </summary>
-        public CssPercentageResolver Percentage_Resolver { get; } = null;
+        public CssPercentageResolver? Percentage_Resolver { get; } = null;
         /// <summary>
         /// If TRUE then this property cannot be set from style-sheets
         /// </summary>
@@ -41,7 +41,7 @@ namespace CssUI.CSS.Internal
         /// <summary>
         /// A list of all keywords that can be assigned to this property
         /// </summary>
-        private readonly string[] keywordWhitelist = null;
+        private readonly string[]? keywordWhitelist = null;
         /// <summary>
         /// A map of resolution delegates to <see cref="EPropertyStage"/> which the defined property uses to resolve property values
         /// </summary>
@@ -78,7 +78,7 @@ namespace CssUI.CSS.Internal
         /// <param name="Initial">Default value for the property</param>
         /// <param name="Keywords">List of keywords which can be assigned to this property</param>
         /// <param name="IsPrivate">If TRUE then this property cannot be set from style-sheets</param>
-        public StyleDefinition(AtomicName<ECssPropertyID> Name, bool Inherited, EPropertyDirtFlags Flags, CssValue Initial, ECssValueTypes AllowedTypes = 0x0, string[] Keywords = null, bool IsPrivate = false, CssPercentageResolver Percentage_Resolver = null, params Tuple<EPropertyStage, PropertyResolverFunc>[] Resolvers)
+        public StyleDefinition(AtomicName<ECssPropertyID> Name, bool Inherited, EPropertyDirtFlags Flags, CssValue Initial, ECssValueTypes AllowedTypes = 0x0, string[]? Keywords = null, bool IsPrivate = false, CssPercentageResolver? Percentage_Resolver = null, params Tuple<EPropertyStage, PropertyResolverFunc>[] Resolvers)
         {
             this.Name = Name;
             this.Flags = Flags;

@@ -16,7 +16,7 @@ namespace CssUI.Tests
             metaEnumList = new List<Type>();
 
             var allTypes = System.Reflection.Assembly.GetExecutingAssembly().DefinedTypes;
-            Attribute attr = null;
+            Attribute? attr = null;
 
             foreach (Type type in allTypes)
             {
@@ -40,7 +40,7 @@ namespace CssUI.Tests
                 var allValues = Enum.GetValues(enumType);
                 foreach (var value in allValues)
                 {
-                    string keyword = Enum.GetName(enumType, value);
+                    var keyword = Enum.GetName(enumType, value);
                     Assert.True(Lookup.Is_Declared(enumType, keyword));
                 }
             }
@@ -115,8 +115,8 @@ namespace CssUI.Tests
                 var allValues = Enum.GetValues(enumType);
                 foreach (var value in allValues)
                 {
-                    string keyword = Enum.GetName(enumType, value);
-                    Assert.True(Lookup.TryEnum(enumType, keyword, out object outValue));
+                    var keyword = Enum.GetName(enumType, value);
+                    Assert.True(Lookup.TryEnum(enumType, keyword, out var outValue));
                     Assert.Equal(value, outValue);
                 }
             }
@@ -131,7 +131,7 @@ namespace CssUI.Tests
                 var allValues = Enum.GetValues(enumType);
                 foreach (var value in allValues)
                 {
-                    string keyword = Enum.GetName(enumType, value);
+                    var keyword = Enum.GetName(enumType, value);
                     var actual = Lookup.Enum(enumType, keyword);
                     Assert.Equal(value, actual);
                 }
@@ -147,7 +147,7 @@ namespace CssUI.Tests
                 var allValues = Enum.GetValues(enumType);
                 foreach (var value in allValues)
                 {
-                    string keyword = Enum.GetName(enumType, value);
+                    var keyword = Enum.GetName(enumType, value);
                     Assert.True(Lookup.Is_Declared(enumType, keyword));
                 }
             }
@@ -163,7 +163,7 @@ namespace CssUI.Tests
                 var allValues = Enum.GetValues(enumType);
                 foreach (var value in allValues)
                 {
-                    string keyword = Enum.GetName(enumType, value);
+                    var keyword = Enum.GetName(enumType, value);
                     Lookup.Get_Keywords(enumType);
                 }
             }

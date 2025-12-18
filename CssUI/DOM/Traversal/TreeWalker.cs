@@ -7,9 +7,9 @@ namespace CssUI.DOM
     public class TreeWalker
     {/* Docs: https://dom.spec.whatwg.org/#treewalker */
         #region Properties
-        public readonly Node root = null;
+        public readonly Node? root = null;
         public readonly ENodeFilterMask whatToShow = 0x0;
-        public readonly NodeFilter Filter = null;
+        public readonly NodeFilter? Filter = null;
         private Node currentNode;
         private bool isActive = false;
         #endregion
@@ -371,7 +371,7 @@ namespace CssUI.DOM
                     }
                 }
                 /* 2) Let sibling be null. */
-                Node sibling = null;
+                Node? sibling = null;
                 /* 3) Let temporary be node. */
                 var temporary = node;
                 /* 4) While temporary is non-null: */

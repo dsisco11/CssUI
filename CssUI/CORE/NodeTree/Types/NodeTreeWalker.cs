@@ -8,9 +8,9 @@ namespace CssUI.NodeTree
     public class NodeTreeWalker
     {
         #region Properties
-        public readonly ITreeNode root = null;
+        public readonly ITreeNode? root = null;
         public readonly ulong whatToShow = 0x0;
-        public readonly NodeTreeFilter Filter = null;
+        public readonly NodeTreeFilter? Filter = null;
         private ITreeNode currentNode;
         private bool isActive = false;
         #endregion

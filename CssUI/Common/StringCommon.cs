@@ -952,7 +952,7 @@ namespace CssUI
         /// <param name="Filter">The delimiter(s) that should seperate each token</param>
         /// <returns></returns>
         /// /// DO NOT INLINE THIS FUNCTION
-        public static ReadOnlyMemory<char>[] Strtok(StringPtr Source, Filter<char> Filter = null)
+        public static ReadOnlyMemory<char>[] Strtok(StringPtr Source, Filter<char>? Filter = null)
         {
             if (Source is null) throw new ArgumentNullException(nameof(Source));
             if (Filter is null) throw new ArgumentNullException(nameof(Filter));

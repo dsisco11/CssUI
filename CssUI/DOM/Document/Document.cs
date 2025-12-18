@@ -448,7 +448,7 @@ namespace CssUI.DOM
         /// The term focusable area is used to refer to regions of the interface that can become the target of keyboard input. Focusable areas can be elements, parts of elements, or other regions managed by the user agent.
         /// </summary>
         /// Docs: https://html.spec.whatwg.org/multipage/interaction.html#focused-area-of-the-document
-        internal FocusableArea focusedArea = null;
+        internal FocusableArea? focusedArea = null;
 
         /// <summary>
         /// Returns the deepest element in the document through which or to which key events are being routed. This is, roughly speaking, the focused element in the document.

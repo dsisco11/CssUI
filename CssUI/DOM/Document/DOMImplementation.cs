@@ -19,10 +19,10 @@ namespace CssUI.DOM
             return new DocumentType(qualifiedName, publicId, systemId);
         }
 
-        public XMLDocument createDocument(string Namespace, string qualifiedName, DocumentType doctype = null)
+        public XMLDocument createDocument(string Namespace, string qualifiedName, DocumentType? doctype = null)
         {/* Docs: https://dom.spec.whatwg.org/#dom-domimplementation-createdocument */
             var document = new XMLDocument(Namespace);
-            Element element = null;
+            Element? element = null;
 
             if (!string.IsNullOrEmpty(qualifiedName))
             {

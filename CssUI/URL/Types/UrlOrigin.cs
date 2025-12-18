@@ -13,10 +13,10 @@ namespace CssUI.HTTP
 
         #region Properties
         public readonly EOriginType Type;
-        public readonly AtomicName<EUrlScheme> Scheme = null;
-        public readonly UrlHost Host = null;
+        public readonly AtomicName<EUrlScheme>? Scheme = null;
+        public readonly UrlHost? Host = null;
         public readonly ushort? Port = null;
-        public readonly string Domain = null;
+        public readonly string? Domain = null;
         #endregion
 
         #region Constructors

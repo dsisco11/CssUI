@@ -6,7 +6,7 @@ namespace CssUI.DOM
 {
     public class DocumentFragment : ParentNode
     {
-        public Element Host { get; private set; } = null;
+        public Element? Host { get; private set; } = null;
 
         #region Node Implementation
         public override ENodeType nodeType => ENodeType.DOCUMENT_FRAGMENT_NODE;
@@ -43,7 +43,7 @@ namespace CssUI.DOM
 
         public override int nodeLength => childNodes.Count;
 
-        public DocumentFragment(Element Host, Document ownerDocument = null)
+        public DocumentFragment(Element Host, Document? ownerDocument = null)
         {
             this.Host = Host;
             nodeDocument = ownerDocument;

@@ -28,25 +28,25 @@ namespace CssUI
         /// Backing value for <see cref="Specified"/>
         /// <para> Docs: https://www.w3.org/TR/css-cascade-3/#specified </para>
         /// </summary>
-        CssValueList _specified = null;
+        CssValueList? _specified = null;
 
         /// <summary>
         /// Backing value for <see cref="Computed"/>
         /// <para> Docs: https://www.w3.org/TR/css-cascade-3/#computed </para>
         /// </summary>
-        CssValueList _computed = null;
+        CssValueList? _computed = null;
 
         /// <summary>
         /// Backing value for <see cref="Used"/>
         /// <para> Docs: https://www.w3.org/TR/css-cascade-3/#used </para>
         /// </summary>
-        CssValueList _used = null;
+        CssValueList? _used = null;
 
         /// <summary>
         /// Backing value for <see cref="Actual"/>
         /// <para> Docs: https://www.w3.org/TR/css-cascade-3/#actual </para>
         /// </summary>
-        CssValueList _actual = null;
+        CssValueList? _actual = null;
         #endregion
 
         #region Trackers

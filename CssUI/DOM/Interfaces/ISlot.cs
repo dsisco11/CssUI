@@ -16,14 +16,14 @@ namespace CssUI.DOM.Nodes
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
-        IReadOnlyCollection<ISlottable> assignedNodes(AssignedNodesOptions options = null);
+        IReadOnlyCollection<ISlottable> assignedNodes(AssignedNodesOptions? options = null);
 
         /// <summary>
         /// Returns slot's assigned nodes, limited to elements.
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
-        IReadOnlyCollection<Element> assignedElements(AssignedNodesOptions options = null);
+        IReadOnlyCollection<Element> assignedElements(AssignedNodesOptions? options = null);
 
 
         void Signal_Slot_Change();

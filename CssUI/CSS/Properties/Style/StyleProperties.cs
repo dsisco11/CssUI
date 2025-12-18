@@ -112,7 +112,7 @@ namespace CssUI.CSS
 
         public EObjectFit ObjectFit => Cascaded.ObjectFit.Actual;
 
-        public Matrix4 TransformMatrix { get; private set; } = null;
+        public Matrix4? TransformMatrix { get; private set; } = null;
 
         public double DpiX => Cascaded.DpiX.Actual;
         public double DpiY => Cascaded.DpiY.Actual;
@@ -130,7 +130,7 @@ namespace CssUI.CSS
 
         public double LineHeight => Cascaded.LineHeight.Actual;
         public double Opacity => Cascaded.Opacity.Actual;
-        public Color Blend_Color { get; private set; } = null;
+        public Color? Blend_Color { get; private set; } = null;
 
         // Flexbox properties
         public EFlexDirection FlexDirection => Cascaded.FlexDirection.Actual;
@@ -377,7 +377,7 @@ namespace CssUI.CSS
             var benchmark_id = Benchmark.Start("style-cascade");
 
             // Get a list of only the properties with an Assigned value
-            AsyncCountdownEvent ctdn = null;
+            AsyncCountdownEvent? ctdn = null;
             /*
             HashSet<AtomicName<ECssPropertyID>> targetFields = new HashSet<AtomicName<ECssPropertyID>>();
             List<HashSet<AtomicName<ECssPropertyID>>> allFields = CssRules.Values.Select(x => { return x.SetProperties; }).ToList();

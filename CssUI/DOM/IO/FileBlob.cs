@@ -15,7 +15,7 @@ namespace CssUI.DOM
         #endregion
 
         #region Constructors
-        public FileBlob(ReadOnlyMemory<byte> data, string name, FilePropertyBag options = null) : base(new BlobPart[] { data }, options)
+        public FileBlob(ReadOnlyMemory<byte> data, string name, FilePropertyBag? options = null) : base(new BlobPart[] { data }, options)
         {
             this.name = name;
             if (ReferenceEquals(null, data) || data.IsEmpty)

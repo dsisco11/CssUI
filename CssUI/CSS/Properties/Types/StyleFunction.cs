@@ -13,11 +13,11 @@ namespace CssUI
         /// <summary>
         /// Function name
         /// </summary>
-        public readonly AtomicString Name = null;
+        public readonly AtomicString? Name = null;
         /// <summary>
         /// Arguments
         /// </summary>
-        public readonly CssValue[] Args = null;
+        public readonly CssValue[]? Args = null;
         #endregion
 
         public StyleFunction(AtomicString Name, params CssValue[] Args)

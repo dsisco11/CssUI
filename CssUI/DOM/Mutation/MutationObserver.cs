@@ -12,7 +12,7 @@ namespace CssUI.DOM.Mutation
         #region Properties
         internal List<Node> Nodes = new List<Node>();
         private Queue<MutationRecord> RecordQueue = new Queue<MutationRecord>();
-        public MutationCallback callback { get; private set; } = null;
+        public MutationCallback? callback { get; private set; } = null;
         #endregion
 
 
@@ -28,7 +28,7 @@ namespace CssUI.DOM.Mutation
         }
         #endregion
 
-        public void Observe(Node target, MutationObserverInit options = null)
+        public void Observe(Node target, MutationObserverInit? options = null)
         {
             if (options != null)
             {

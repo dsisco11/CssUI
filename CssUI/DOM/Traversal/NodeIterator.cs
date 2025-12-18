@@ -11,13 +11,13 @@ namespace CssUI.DOM
         public static LinkedList<WeakReference<NodeIterator>> ALL = new LinkedList<WeakReference<NodeIterator>>();
 
         #region Properties
-        public readonly Node root = null;
+        public readonly Node? root = null;
         public readonly ENodeFilterMask whatToShow = 0x0;
-        public readonly NodeFilter Filter = null;
+        public readonly NodeFilter? Filter = null;
 
         // XXX: Still dont know where this collection comes from
         private IList<Node> iterCollection;// = new ICollection<Node>();
-        private Node referenceNode = null;
+        private Node? referenceNode = null;
         private bool pointerBeforeReferenceNode = false;
         private bool isActive = false;
         #endregion
@@ -31,7 +31,7 @@ namespace CssUI.DOM
             this.iterCollection = Array.Empty<Node>();
         }
 
-        public NodeIterator(Node root, IList<Node> Collection, ENodeFilterMask whatToShow, NodeFilter Filter = null)
+        public NodeIterator(Node root, IList<Node> Collection, ENodeFilterMask whatToShow, NodeFilter? Filter = null)
         {
             this.root = root;
             this.referenceNode = root;
@@ -67,7 +67,7 @@ namespace CssUI.DOM
             if (nodeIterator.pointerBeforeReferenceNode)
             {
                 /* 1) Let next be toBeRemovedNode’s first following node that is an inclusive descendant of nodeIterator’s root and is not an inclusive descendant of toBeRemovedNode, and null if there is no such node. */
-                Node next = null;
+                Node? next = null;
                 var tree = new TreeWalker(toBeRemovedNode, ENodeFilterMask.SHOW_ALL);
                 Node n = tree.nextSibling();
                 while(!ReferenceEquals(n, null))

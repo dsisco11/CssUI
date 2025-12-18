@@ -52,7 +52,7 @@ namespace CssUI.DOM.Events
         /// <summary>
         /// Used to identify a secondary EventTarget related to a UI event, depending on the type of event.
         /// </summary>
-        public EventTarget relatedTarget { get; private set; } = null;
+        public EventTarget? relatedTarget { get; private set; } = null;
         #endregion
 
         #region ModifierState

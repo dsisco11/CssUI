@@ -11,7 +11,7 @@ namespace CssUI.CSS.Parser
         /// <summary>
         /// Holds the string representation of this tokens value
         /// </summary>
-        public readonly string Value = null;
+        public readonly string? Value = null;
         #endregion
 
         #region Constructors

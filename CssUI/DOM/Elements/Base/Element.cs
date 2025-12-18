@@ -35,11 +35,11 @@ namespace CssUI.DOM
         /// <summary>
         /// This elements official namespace name string
         /// </summary>
-        public readonly string NamespaceURI = null;
+        public readonly string? NamespaceURI = null;
         /// <summary>
         /// This elements namespace prefix eg: "html" or "xml"
         /// </summary>
-        public readonly string prefix = null;
+        public readonly string? prefix = null;
         /// <summary>
         /// Local part of the qualified name of an element.
         /// </summary>
@@ -47,7 +47,7 @@ namespace CssUI.DOM
 
         private string qualifiedName => (prefix is null) ? localName : string.Concat(prefix, ":", localName);
 
-        private string _tagname = null;
+        private string? _tagname = null;
         /// <summary>
         /// For example, if the element is an <img>, its tagName property is "IMG"
         /// </summary>
@@ -110,7 +110,7 @@ namespace CssUI.DOM
             {
                 /* To string replace all with a string string within a node parent, run these steps: */
                 /* 1) Let node be null. */
-                Node node = null;
+                Node? node = null;
                 /* 2) If string is not the empty string, then set node to a new Text node whose data is string and node document is parent’s node document. */
                 if (!string.IsNullOrEmpty(value))
                     node = new Text(parentNode!.ownerDocument!, value);
@@ -1117,7 +1117,7 @@ namespace CssUI.DOM
                     return;
                 }
 
-                Node viableNextSibling = null;// DOMCommon.Get_Nth_Following(this, 1, new FilterNotOneOf(nodes.AsMemory()));
+                Node? viableNextSibling = null;// DOMCommon.Get_Nth_Following(this, 1, new FilterNotOneOf(nodes.AsMemory()));
                 var node = Dom_convert_nodes_into_node(nodeDocument, nodes);
                 if (viableNextSibling == null)
                 {
@@ -1178,7 +1178,7 @@ namespace CssUI.DOM
                     return;
                 }
 
-                Node viableNextSibling = null;// DOMCommon.Get_Nth_Following(this, 1, new FilterNotOneOf(nodes.AsMemory()));
+                Node? viableNextSibling = null;// DOMCommon.Get_Nth_Following(this, 1, new FilterNotOneOf(nodes.AsMemory()));
                 var node = Dom_convert_nodes_into_node(nodeDocument, nodes);
 
                 /* 5) If context object’s parent is parent, replace the context object with node within parent. */
@@ -1498,7 +1498,7 @@ namespace CssUI.DOM
             if ((position.x ==  scrollBox.ScrollX) && (position.y ==  scrollBox.ScrollY) && !scrollBox.IsScrolling)
                 return false;
 
-            Element associatedElement = null;
+            Element? associatedElement = null;
             if (scrollBox.Owner == null)
             {/* Viewport */
                 associatedElement = scrollBox.View.document.activeElement;
@@ -1582,7 +1582,7 @@ namespace CssUI.DOM
         #endregion
 
         #region Scrolling
-        internal ScrollBox ScrollBox = null;
+        internal ScrollBox? ScrollBox = null;
 
         public double scrollTop
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-element-scrolltop */

@@ -24,7 +24,7 @@ namespace CssUI.DOM
             type = string.Empty;
         }
 
-        public Blob(IReadOnlyCollection<BlobPart> blobParts, BlobPropertyBag options = null)
+        public Blob(IReadOnlyCollection<BlobPart> blobParts, BlobPropertyBag? options = null)
         {
             data = process_blob_parts(blobParts, options);
             size = (uint)data.Length;
@@ -80,7 +80,7 @@ namespace CssUI.DOM
         #endregion
 
         // slice Blob into byte-ranged chunks
-        public Blob slice(long? start, long? end, string contentType = null)
+        public Blob slice(long? start, long? end, string? contentType = null)
         {/* Docs: https://w3c.github.io/FileAPI/#dfn-slice */
             ulong relativeStart = 0;
             if (start.HasValue)

@@ -13,7 +13,7 @@ namespace CssUI.CSS.BoxTree
         /// <summary>
         /// Represents the object responsible for rendering this boxs' objects/contents.
         /// </summary>
-        internal object RenderObject = null;
+        internal object? RenderObject = null;
         /// <summary>
         /// The parent object from which this one descends
         /// </summary>

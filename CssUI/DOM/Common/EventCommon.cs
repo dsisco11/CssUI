@@ -128,7 +128,7 @@ namespace CssUI.DOM.Internal
                 /* 6) Let slotable be target, if target is a slotable and is assigned, and null otherwise. */
                 var slotable = (target is Node targetNode && targetNode is ISlottable) ? target : null;
                 bool slotInClosedTree = false;
-                EventTarget parent = target.get_the_parent(@event);
+                EventTarget? parent = target.get_the_parent(@event);
                 while (parent is object)
                 {
                     /* 1) If slotable is non-null: */
