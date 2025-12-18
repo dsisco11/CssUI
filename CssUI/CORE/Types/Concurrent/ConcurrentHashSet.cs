@@ -10,6 +10,7 @@ namespace CssUI
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public sealed class ConcurrentHashSet<T> : IReadOnlyCollection<T>, ISet<T>
+        where T : notnull
     {
         public int Count => BackingCollection.Count;
         public bool IsReadOnly => false;

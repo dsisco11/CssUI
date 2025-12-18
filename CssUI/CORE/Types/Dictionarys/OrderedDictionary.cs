@@ -10,6 +10,7 @@ namespace CssUI
     /// <typeparam name="KeyTy"></typeparam>
     /// <typeparam name="ValueTy"></typeparam>
     public class OrderedDictionary<KeyTy, ValueTy> : IEnumerable<ValueTy>
+        where KeyTy : notnull
     {
         #region Properties
         private ReversableDictionary<KeyTy, int> KeyIndex = new ReversableDictionary<KeyTy, int>();

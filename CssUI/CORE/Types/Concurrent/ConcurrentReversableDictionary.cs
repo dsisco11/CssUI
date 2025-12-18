@@ -4,6 +4,8 @@ using System.Collections.Concurrent;
 namespace CssUI
 {
     public class ConcurrentReversableDictionary<Key, Value> : ConcurrentDictionary<Key, Value>
+        where Key : notnull
+        where Value : notnull
     {
         #region Properties
         ConcurrentDictionary<Value, Key> MapInverse = new ConcurrentDictionary<Value, Key>();

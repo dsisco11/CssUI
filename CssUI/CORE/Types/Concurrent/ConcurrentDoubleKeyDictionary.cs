@@ -4,6 +4,8 @@ using System.Collections.Generic;
 namespace CssUI
 {
     public class ConcurrentDoubleKeyDictionary<Key1, Key2, Vty>
+        where Key1 : notnull
+        where Key2 : notnull
     {
         #region Properties
         private ConcurrentDictionary<Key1, ConcurrentDictionary<Key2, Vty>> Map = new ConcurrentDictionary<Key1, ConcurrentDictionary<Key2, Vty>>();

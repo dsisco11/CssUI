@@ -4,6 +4,8 @@ using System.Collections.Generic;
 namespace CssUI
 {
     public class ReversableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IReversableDictionary<TKey, TValue>
+        where TKey : notnull
+        where TValue : notnull
     {
         #region Properties
         Dictionary<TValue, TKey> MapInverse = new Dictionary<TValue, TKey>();
