@@ -172,3 +172,35 @@ Note: The HTML module requires significant work and is excluded from Core config
 - [x] Update README.md with current project state
 - [x] Add API documentation (in README.md)
 - [x] Add usage examples (in README.md)
+
+## Code Quality & Modernization
+### Performance Analysis
+- [ ] Create BenchmarkDotNet benchmark tests for MathExt methods
+  - Evaluate if "optimized" Min/Max/Clamp methods provide benefit over System.Math
+  - Decision: remove or keep based on benchmark results
+
+### Type System Modernization
+- [ ] Analyze unit type structures in codebase
+  - Audit: Point2f, Point2i, Point3f, Rect2f, Rect2i, Rect4f, Rect4i, Size2f, etc.
+  - Evaluate replacement with System.Numerics types (Vector2, Vector3, etc.)
+  - Consider System.Drawing types where appropriate
+  - Document migration plan if beneficial
+
+### Standard Library Alignment
+- [ ] Analyze integer/numeric parsing implementations
+  - Compare custom parsing with .NET int.Parse/double.Parse/etc.
+  - Verify W3C CSS/HTML spec compliance of .NET implementations
+  - Plan migration to .NET if compliant (remove custom code)
+- [ ] Analyze string parsing implementations
+  - Identify custom string parsing code in codebase
+  - Compare with .NET equivalents (StringComparison, Span<char>, etc.)
+  - Verify W3C spec compliance
+  - Plan migration if .NET implementations are compliant
+
+### Nullable Reference Types
+- [ ] Enable nullable context across codebase
+  - Currently: <Nullable>enable</Nullable> but many warnings
+  - Phase 1: Fix CORE/ folder nullable warnings
+  - Phase 2: Fix CSS/ folder nullable warnings
+  - Phase 3: Fix DOM/ folder nullable warnings
+  - Phase 4: Fix HTML/ folder nullable warnings (if pursuing HTML module)
