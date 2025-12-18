@@ -153,7 +153,7 @@ namespace CssUI
             }
 
             /* Alright buster, we gotta do things the slow way */
-            if (NameRegistry.TryGetKey(value, out AtomicString? name))
+            if (NameRegistry.TryGetKey(value, out AtomicString? name) && name != null)
                 return name;
 
             /* Well we tried */

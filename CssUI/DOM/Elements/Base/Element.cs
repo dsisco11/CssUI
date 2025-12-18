@@ -454,7 +454,7 @@ namespace CssUI.DOM
                     return true;
                 }
 
-                var focusChain = DOMCommon.Get_Focus_Chain(focusedElement);
+                var focusChain = DOMCommon.Get_Focus_Chain(focusedElement!);
                 foreach (FocusableArea area in focusChain)
                 {
                     if (ReferenceEquals(this, area.DOMAnchor))
@@ -1035,10 +1035,10 @@ namespace CssUI.DOM
                 }
                 else
                 {
-                    viablePreviousSibling = viablePreviousSibling.nextSibling;
+                    viablePreviousSibling = viablePreviousSibling!.nextSibling;
                 }
 
-                Dom_pre_insert_node(node, parent, viablePreviousSibling);
+                Dom_pre_insert_node(node, parent!, viablePreviousSibling);
             });
         }
 
@@ -1049,7 +1049,7 @@ namespace CssUI.DOM
         [CEReactions]
         public void before(params string[] nodes)
         {/* Docs: https://dom.spec.whatwg.org/#dom-childnode-before */
-            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument!.defaultView, () =>
             {
                 var parent = parentNode;
                 if (parent == null)
@@ -1057,18 +1057,18 @@ namespace CssUI.DOM
                     return;
                 }
 
-                Node viablePreviousSibling = null;// DOMCommon.Get_Nth_Preceeding(this, 1, new FilterNotOneOf(nodes.AsMemory()));
-                var node = Dom_convert_nodes_into_node(nodeDocument, nodes);
+                Node? viablePreviousSibling = null;// DOMCommon.Get_Nth_Preceeding(this, 1, new FilterNotOneOf(nodes.AsMemory()));
+                var node = Dom_convert_nodes_into_node(nodeDocument!, nodes);
                 if (viablePreviousSibling == null)
                 {
-                    viablePreviousSibling = parent.firstChild;
+                    viablePreviousSibling = parent!.firstChild;
                 }
                 else
                 {
                     viablePreviousSibling = viablePreviousSibling.nextSibling;
                 }
 
-                Dom_pre_insert_node(node, parent, viablePreviousSibling);
+                Dom_pre_insert_node(node, parent!, viablePreviousSibling);
             });
         }
 
@@ -1095,10 +1095,10 @@ namespace CssUI.DOM
                 }
                 else
                 {
-                    viableNextSibling = viableNextSibling.nextSibling;
+                    viableNextSibling = viableNextSibling!.nextSibling;
                 }
 
-                Dom_pre_insert_node(node, parent, viableNextSibling);
+                Dom_pre_insert_node(node, parent!, viableNextSibling);
             });
         }
 
@@ -1109,7 +1109,7 @@ namespace CssUI.DOM
         [CEReactions]
         public void after(params string[] nodes)
         {/* Docs: https://dom.spec.whatwg.org/#dom-childnode-after */
-            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument!.defaultView, () =>
             {
                 var parent = parentNode;
                 if (parent == null)
@@ -1125,10 +1125,10 @@ namespace CssUI.DOM
                 }
                 else
                 {
-                    viableNextSibling = viableNextSibling.nextSibling;
+                    viableNextSibling = viableNextSibling!.nextSibling;
                 }
 
-                Dom_pre_insert_node(node, parent, viableNextSibling);
+                Dom_pre_insert_node(node, parent!, viableNextSibling);
             });
         }
 
@@ -1139,7 +1139,7 @@ namespace CssUI.DOM
         [CEReactions]
         public void replaceWith(params Node[] nodes)
         {/* Docs: https://dom.spec.whatwg.org/#dom-childnode-replacewith */
-            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument!.defaultView, () =>
             {
                 var parent = parentNode;
                 if (parent == null)
@@ -1185,11 +1185,11 @@ namespace CssUI.DOM
                 /* (We check this because context object could have been inserted into node.) */
                 if (ReferenceEquals(parentNode, parent))
                 {
-                    parent.replaceChild(this, node);
+                    parent!.replaceChild(this, node);
                 }
                 else
                 {
-                    Dom_pre_insert_node(node, parent, viableNextSibling);
+                    Dom_pre_insert_node(node, parent!, viableNextSibling);
                 }
             });
         }
@@ -1200,7 +1200,7 @@ namespace CssUI.DOM
         [CEReactions]
         public void remove()
         {/* Docs: https://dom.spec.whatwg.org/#dom-childnode-remove */
-            CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
+            CEReactions.Wrap_CEReaction(nodeDocument!.defaultView, () =>
             {
                 if (parentNode == null)
                 {

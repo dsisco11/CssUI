@@ -594,11 +594,11 @@ namespace CssUI.DOM.Nodes
                             {
                                 if (node is HTMLDocument)
                                 {
-                                    copy = new HTMLDocument((node as Document).contentType);
+                                    copy = new HTMLDocument((node as Document)!.contentType);
                                 }
                                 else
                                 {
-                                    copy = new XMLDocument((node as Document).contentType);
+                                    copy = new XMLDocument((node as Document)!.contentType);
                                 }
                             }
                             break;
@@ -817,7 +817,7 @@ namespace CssUI.DOM.Nodes
             /* 17) If suppress observers flag is unset, then queue a tree mutation record for parent with « », « node », oldPreviousSibling, and oldNextSibling. */
             if (!suppress_observers)
             {
-                MutationRecord.Queue_Tree_Mutation_Record(parent, Array.Empty<Node>(), new Node[] { node }, previousSibling, nextSibling);
+                MutationRecord.Queue_Tree_Mutation_Record(parent, Array.Empty<Node>(), new Node[] { node }, previousSibling!, nextSibling!);
             }
             /* 18) If node is a Text node, then run the child text content change steps for parent. */
             if (node is Text nodeAsText)
@@ -929,7 +929,7 @@ namespace CssUI.DOM.Nodes
             /* 8) If suppress observers flag is unset, then queue a tree mutation record for parent with nodes, « », previousSibling, and child. */
             if (!suppress_observers)
             {
-                MutationRecord.Queue_Tree_Mutation_Record(parent, nodes, Array.Empty<Node>(), previousSibling, child);
+                MutationRecord.Queue_Tree_Mutation_Record(parent, nodes, Array.Empty<Node>(), previousSibling!, child!);
             }
 
             /* 9) Run the children changed steps for parent. */
@@ -1160,15 +1160,15 @@ namespace CssUI.DOM.Nodes
         /// <param name="parent">Parent node which is being inserted into</param>
         /// <param name="child">Child node being used as a reference point for insertion</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static Node Dom_pre_insert_node(Node node, Node parent, Node child)
+        internal static Node Dom_pre_insert_node(Node node, Node parent, Node? child)
         {/* Docs: https://dom.spec.whatwg.org/#concept-node-pre-insert */
-            Dom_ensure_pre_insertion_validity(node, parent, child);
+            Dom_ensure_pre_insertion_validity(node, parent, child!);
             var referenceChild = child;
             if (ReferenceEquals(referenceChild, node))
                 referenceChild = node.nextSibling;
 
-            parent.nodeDocument.adoptNode(node);
-            Dom_insert_node_into_parent_before(node, parent, referenceChild);
+            parent.nodeDocument!.adoptNode(node);
+            Dom_insert_node_into_parent_before(node, parent, referenceChild!);
             return node;
         }
 

@@ -295,7 +295,7 @@ namespace CssUI.DOM
                 /* 10) If all of the following are true */
                 if (!ReferenceEquals(null, parameterName) && parameterName.Length > 0 && !StringCommon.Contains(parameterName.AsSpan(), c => !HTTPCommon.Is_HTTP_Token(c)))
                 {
-                    if (!StringCommon.Contains(parameterValue.AsSpan(), c => !HTTPCommon.Is_HTTP_Quoted_String_Token(c)))
+                    if (!StringCommon.Contains(parameterValue!.AsSpan(), c => !HTTPCommon.Is_HTTP_Quoted_String_Token(c)))
                     {
                         if (!Parameters.ContainsKey(parameterName))
                         {

@@ -112,9 +112,9 @@ namespace CssUI.DOM
         {
             if (target is Element element) return new FocusableArea(element);
             else if (target is Viewport viewport) return new FocusableArea(viewport, viewport.document);
-            else if (target is ScrollBox scrollbox) return new FocusableArea(scrollbox, scrollbox.Owner);
-            else if (target is Document document) return new FocusableArea(document, document.documentElement);
-            else if (target is BrowsingContext context) return new FocusableArea(context, context.activeDocument);
+            else if (target is ScrollBox scrollbox) return new FocusableArea(scrollbox, scrollbox.Owner!);
+            else if (target is Document document) return new FocusableArea(document, document.documentElement!);
+            else if (target is BrowsingContext context) return new FocusableArea(context, context.activeDocument!);
 
             return new FocusableArea(target);
         }

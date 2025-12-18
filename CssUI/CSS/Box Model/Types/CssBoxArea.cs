@@ -322,7 +322,7 @@ namespace CssUI.CSS
             if (ReferenceEquals(Area, null))
                 return null;
 
-            return new CssBoxArea(Area.Fragment)
+            return new CssBoxArea(Area.Fragment!)
             {
                 Edge = new CssRect() { Top = Area.Edge.Top, Right = Area.Edge.Right, Bottom = Area.Edge.Bottom, Left = Area.Edge.Left },
                 Size = new CssRect() { Top = Area.Size.Top, Right = Area.Size.Right, Bottom = Area.Size.Bottom, Left = Area.Size.Left }

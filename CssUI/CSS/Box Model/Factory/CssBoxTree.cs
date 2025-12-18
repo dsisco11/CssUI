@@ -101,9 +101,9 @@ namespace CssUI.CSS
 
                     // 5) Insert the new box-node into tree
                     if (index > -1)
-                        nearestAncestor.Box.Insert(index, nextBox);
+                        nearestAncestor!.Box.Insert(index, nextBox);
                     else
-                        nearestAncestor.Box.Add(nextBox);
+                        nearestAncestor!.Box.Add(nextBox);
 
                     // Notify the tree that we need to be reflowed
                     node.Propagate_Flag(ENodeFlags.ChildNeedsReflow, exclude_self: true);

@@ -583,7 +583,7 @@ namespace CssUI.DOM
             var commonAncestor = range.startContainer;
             while (!Is_Inclusive_Ancestor(commonAncestor, range.endContainer))
             {
-                commonAncestor = commonAncestor.parentNode;
+                commonAncestor = commonAncestor.parentNode!;
             }
 
             var containedChildren = Get_Descendents(commonAncestor, new FilterRangeContains(range));
@@ -1847,16 +1847,16 @@ namespace CssUI.DOM
 
 
         #region Element Creation
-        internal static Element createElementNS(Document document, string qualifiedName, string Namespace, ElementCreationOptions options = null)
+        internal static Element createElementNS(Document document, string qualifiedName, string Namespace, ElementCreationOptions? options = null)
         {
-            XMLCommon.Validate_And_Extract(Namespace, qualifiedName, out string Prefix, out string LocalName);
-            return Create_Element(document, LocalName, Prefix);
+            XMLCommon.Validate_And_Extract(Namespace, qualifiedName, out string? Prefix, out string LocalName);
+            return Create_Element(document, LocalName, Prefix!);
         }
 
-        internal static Element Create_Element(Document document, AtomicString localName, string Namespace, string prefix = null, string customClassName = null, bool synchronousCustomElementsFlag = false)
+        internal static Element Create_Element(Document document, AtomicString localName, string? Namespace, string? prefix = null, string? customClassName = null, bool synchronousCustomElementsFlag = false)
         {/* Docs: https://dom.spec.whatwg.org/#concept-create-element */
             /* 3) Let result be null. */
-            Element result = null;
+            Element? result = null;
 
             /* 4) Let definition be the result of looking up a custom element definition given document, namespace, localName, and is. */
             /* XXX: Implement custom elements */

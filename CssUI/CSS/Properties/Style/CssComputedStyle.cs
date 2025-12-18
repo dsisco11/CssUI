@@ -67,7 +67,10 @@ namespace CssUI.CSS
         {
             get
             {
-                return (string)$"{nameof(CssComputedStyle)} - {ID}".Concat(string.IsNullOrEmpty(Selector?.ToString()) ? "" : Selector!.ToString());
+                var selectorStr = Selector?.ToString() ?? "";
+                return string.IsNullOrEmpty(selectorStr) 
+                    ? $"{nameof(CssComputedStyle)} - {ID}" 
+                    : $"{nameof(CssComputedStyle)} - {ID}{selectorStr}";
             }
         }
         /// <summary>

@@ -179,17 +179,17 @@ namespace CssUI
         /// <summary>
         /// Returns TRUE if the assigned value has the <see cref="ECssValueFlags.Depends"/> flag
         /// </summary>
-        public override bool IsDependent { get => Assigned.FirstOrDefault(o => o.Has_Flags(ECssValueFlags.Depends)) != null; }
+        public override bool IsDependent { get => Assigned.FirstOrDefault(o => o?.Has_Flags(ECssValueFlags.Depends) == true) != null; }
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if the assigned value has the <see cref="ECssValueFlags.Depends"/> flag
         /// </summary>
-        public override bool IsDependentOrAuto { get => (Assigned.FirstOrDefault()?.Type == ECssValueTypes.AUTO || Assigned.FirstOrDefault(o => o.Has_Flags(ECssValueFlags.Depends)) != null); }
+        public override bool IsDependentOrAuto { get => (Assigned.FirstOrDefault()?.Type == ECssValueTypes.AUTO || Assigned.FirstOrDefault(o => o?.Has_Flags(ECssValueFlags.Depends) == true) != null); }
         /// <summary>
         /// Return TRUE if the assigned value is set to <see cref="CssValue.Auto"/>
         /// Returns TRUE if the assigned value type is a percentage
         /// </summary>
-        public override bool IsPercentageOrAuto { get => (Assigned.FirstOrDefault()?.Type == ECssValueTypes.AUTO || Assigned.FirstOrDefault(o => o.Type == ECssValueTypes.PERCENT) != null); }
+        public override bool IsPercentageOrAuto { get => (Assigned.FirstOrDefault()?.Type == ECssValueTypes.AUTO || Assigned.FirstOrDefault(o => o?.Type == ECssValueTypes.PERCENT) != null); }
         /// <summary>
         /// Returns whether or not the property has a set value that should take affect during cascading.
         /// </summary>

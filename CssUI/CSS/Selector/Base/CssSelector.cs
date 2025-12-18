@@ -170,7 +170,7 @@ namespace CssUI.CSS
             LinkedList<Node> candidateElements = new LinkedList<Node>();
             foreach (Node root in rootElements)
             {
-                var rootList = DOMCommon.Get_Shadow_Including_Inclusive_Descendents(root, Filter, ENodeFilterMask.SHOW_ELEMENT);
+                var rootList = DOMCommon.Get_Shadow_Including_Inclusive_Descendents(root, Filter!, ENodeFilterMask.SHOW_ELEMENT);
                 LinkedListNode<Node>? firstNode = ((LinkedList<Node>)rootList).First;
                 if (firstNode != null)
                     candidateElements.AddLast(firstNode);

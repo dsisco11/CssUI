@@ -151,7 +151,7 @@ namespace CssUI.CSS
             if (type == ECssValueTypes.KEYWORD)// Try and catch some common IMPORTANT keywords
             {
                 /* If our keyword can be resolved to another ECssValueType then its an global keyword */
-                if (Lookup.TryEnum(value as string, out ECssValueTypes outKeyword))
+                if (value is string strValue && Lookup.TryEnum(strValue, out ECssValueTypes outKeyword))
                 {
                     type = outKeyword;
                 }
@@ -185,7 +185,7 @@ namespace CssUI.CSS
         }
         #endregion
 
-        private static ECssValueFlags Get_Inherent_Value_Type_Flags(ECssValueTypes Type, ECssUnit Unit, object Value)
+        private static ECssValueFlags Get_Inherent_Value_Type_Flags(ECssValueTypes Type, ECssUnit Unit, object? Value)
         {
             ECssValueFlags Flags = ECssValueFlags.None;
 

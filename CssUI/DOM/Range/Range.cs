@@ -419,20 +419,20 @@ namespace CssUI.DOM
                 {
                     CharacterData clone = (CharacterData)startContainer.cloneNode();
                     /* 2) Set the data of clone to the result of substringing data with node original start node, offset original start offset, and count original end offset minus original start offset. */
-                    clone.data = (startContainer as CharacterData).substringData(startOffset, endOffset - startOffset);
+                    clone.data = (startContainer as CharacterData)!.substringData(startOffset, endOffset - startOffset);
                     fragment.appendChild(clone);
                     /* 4) Replace data with node original start node, offset original start offset, count original end offset minus original start offset, and data the empty string. */
-                    (startContainer as CharacterData).replaceData(startOffset, endOffset - startOffset, string.Empty);
+                    (startContainer as CharacterData)!.replaceData(startOffset, endOffset - startOffset, string.Empty);
                     return fragment;
                 }
                 /* 5) Let common ancestor be original start node. */
                 var commonAncestor = startContainer;
                 while (!DOMCommon.Is_Inclusive_Ancestor(commonAncestor, endContainer))
                 {
-                    commonAncestor = commonAncestor.parentNode;
+                    commonAncestor = commonAncestor.parentNode!;
                 }
                 /* 7) Let first partially contained child be null. */
-                Node firstPartiallyContainedChild = null;
+                Node? firstPartiallyContainedChild = null;
                 var partialFilter = new FilterRangePartiallyContains(this);
                 /* 8) If original start node is not an inclusive ancestor of original end node, set first partially contained child to the first child of common ancestor that is partially contained in range. */
                 if (!DOMCommon.Is_Inclusive_Ancestor(startContainer, endContainer))
@@ -441,7 +441,7 @@ namespace CssUI.DOM
                     firstPartiallyContainedChild = tree.firstChild();
                 }
                 /* 9) Let last partially contained child be null. */
-                Node lastPartiallyContainedChild = null;
+                Node? lastPartiallyContainedChild = null;
                 /* 10) If original end node is not an inclusive ancestor of original start node, set last partially contained child to the last child of common ancestor that is partially contained in range. */
                 if (!DOMCommon.Is_Inclusive_Ancestor(endContainer, startContainer))
                 {
@@ -471,7 +471,7 @@ namespace CssUI.DOM
                         referenceNode = referenceNode.parentNode;
                     }
                     /* 3) Set new node to the parent of reference node, and new offset to one plus reference node’s index. */
-                    newNode = referenceNode.parentNode;
+                    newNode = referenceNode.parentNode!;
                     newOffset = 1 + referenceNode.index;
                 }
                 /* 15) If first partially contained child is a Text, ProcessingInstruction, or Comment node: */
@@ -545,9 +545,9 @@ namespace CssUI.DOM
                 /* 6) While common ancestor is not an inclusive ancestor of original end node, set common ancestor to its own parent. */
                 while (DOMCommon.Is_Inclusive_Ancestor(commonAncestor, endContainer))
                 {
-                    commonAncestor = commonAncestor.parentNode;
+                    commonAncestor = commonAncestor.parentNode!;
                 }
-                Node firstPartiallyContainedChild = null;
+                Node? firstPartiallyContainedChild = null;
                 var partialFilter = new FilterRangePartiallyContains(this);
                 /* 8) If original start node is not an inclusive ancestor of original end node, set first partially contained child to the first child of common ancestor that is partially contained in range. */
                 if (!DOMCommon.Is_Inclusive_Ancestor(startContainer, endContainer))
@@ -556,7 +556,7 @@ namespace CssUI.DOM
                     firstPartiallyContainedChild = tree.firstChild();
                 }
                 /* 9) Let last partially contained child be null. */
-                Node lastPartiallyContainedChild = null;
+                Node? lastPartiallyContainedChild = null;
                 /* 10) If original end node is not an inclusive ancestor of original start node, set last partially contained child to the last child of common ancestor that is partially contained in range. */
                 if (!DOMCommon.Is_Inclusive_Ancestor(endContainer, startContainer))
                 {
@@ -640,10 +640,10 @@ namespace CssUI.DOM
                 }
 
                 /* 5) Let parent be range’s start node if referenceNode is null, and referenceNode’s parent otherwise. */
-                Node parent = referenceNode == null ? startContainer : referenceNode.parentNode;
+                Node parent = referenceNode == null ? startContainer : referenceNode.parentNode!;
 
                 /* 6) Ensure pre-insertion validity of node into parent before referenceNode. */
-                Node.Dom_ensure_pre_insertion_validity(node, parent, referenceNode);
+                Node.Dom_ensure_pre_insertion_validity(node, parent, referenceNode!);
 
                 /* 7) If range’s start node is a Text node, set referenceNode to the result of splitting it with offset range’s start offset. */
                 if (startContainer is Text)
@@ -682,13 +682,13 @@ namespace CssUI.DOM
         {/* Docs: https://dom.spec.whatwg.org/#dom-range-surroundcontents */
 
             /* XXX: FINISH THIS */
-            CEReactions.Wrap_CEReaction(root.nodeDocument.defaultView, () =>
+            CEReactions.Wrap_CEReaction(root.nodeDocument!.defaultView, () =>
             {
                 /* 1) If a non-Text node is partially contained in the context object, then throw an "InvalidStateError" DOMException. */
                 bool bPartial = false;
                 if (startContainer is Text)
                 {
-                    if (PartiallyContains(startContainer.parentNode))
+                    if (PartiallyContains(startContainer.parentNode!))
                     {
                         bPartial = true;
                     }
@@ -700,7 +700,7 @@ namespace CssUI.DOM
 
                 if (endContainer is Text)
                 {
-                    if (PartiallyContains(endContainer.parentNode))
+                    if (PartiallyContains(endContainer.parentNode!))
                     {
                         bPartial = true;
                     }
@@ -798,7 +798,7 @@ namespace CssUI.DOM
             LinkedList<DOMRect> rectList = new LinkedList<DOMRect>();
             var common = commonAncestorContainer;
             var tree = new TreeWalker(common, ENodeFilterMask.SHOW_ALL);
-            Node node = tree.nextNode();
+            Node? node = tree.nextNode();
             while (node != null)
             {
                 /* For each element selected by the range, whose parent is not selected by the range, include the border areas returned by invoking getClientRects() on the element. */
@@ -806,9 +806,9 @@ namespace CssUI.DOM
                 {
                     if (Contains(node))
                     {
-                        if (!Contains(node.parentNode))
+                        if (!Contains(node.parentNode!))
                         {
-                            var rects = (node as Element).getClientRects();
+                            var rects = (node as Element)!.getClientRects();
                             foreach (var rect in rects)
                             {
                                 rectList.AddLast(rect);

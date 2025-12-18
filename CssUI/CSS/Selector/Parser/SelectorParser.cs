@@ -49,13 +49,13 @@ namespace CssUI.CSS.Selectors
                 if (o == null) throw new CssParserException("Unable to consume combinator!");
                 return o;
             }
-            else if (Starts_QualifiedName(Stream.Peek(0), Stream.Peek(1), Stream.Peek(2)))
+            else if (Starts_QualifiedName(Stream.Peek(0), Stream.Peek(1)!, Stream.Peek(2)!))
             {
                 var o = Consume_QualifiedName(Stream);
                 if (o == null) throw new CssParserException("Unable to consume qualified name!");
                 return o;
             }
-            else if (Starts_NamespacePrefix(Stream.Peek(0), Stream.Peek(1)))
+            else if (Starts_NamespacePrefix(Stream.Peek(0), Stream.Peek(1)!))
             {
                 var o = Consume_NamespacePrefix(Stream);
                 if (o == null) throw new CssParserException("Unable to consume namespace prefix!");
@@ -115,7 +115,7 @@ namespace CssUI.CSS.Selectors
             string Value = string.Empty;
             if (Stream.Next.Type == ECssTokenType.Delim)
             {
-                Value = string.Concat((Stream.Consume() as DelimToken).Value);
+                Value = string.Concat((Stream.Consume() as DelimToken)!.Value);
                 if (Stream.Next.Type == ECssTokenType.Delim)
                 {
                     char dv = (Stream.Next as DelimToken).Value;

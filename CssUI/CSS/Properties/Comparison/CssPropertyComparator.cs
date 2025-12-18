@@ -23,8 +23,8 @@ namespace CssUI.CSS
                     return -1;// this set is of greater origin, so we go behind it
             }
 
-            long xSpec = x.Selector?.Get_Specificity(x.Owner as Element) ?? 0;
-            long ySpec = y.Selector?.Get_Specificity(y.Owner as Element) ?? 0;
+            long xSpec = x.Selector?.Get_Specificity((x.Owner as Element)!) ?? 0;
+            long ySpec = y.Selector?.Get_Specificity((y.Owner as Element)!) ?? 0;
             if (xSpec != ySpec)
             {
                 if (xSpec > ySpec)

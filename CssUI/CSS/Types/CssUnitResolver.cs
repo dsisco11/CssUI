@@ -118,7 +118,7 @@ namespace CssUI
 
                             if (Property.Owner.parentElement is object)
                             {// Basically just try and inherit our parents unit scale
-                                return Get_Font_Unit_Scale(Owner.parentElement, Property, Unit);
+                                return Get_Font_Unit_Scale(Owner.parentElement!, Property, Unit);
                             }
                             else// No parent
                             {
