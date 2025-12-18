@@ -88,8 +88,8 @@ namespace CssUI.DOM
             if (parent != null)
             {
                 /* 1) Insert new node into parent before node’s next sibling. */
-                parent.insertBefore(newNode, nextSibling);
-                foreach (WeakReference<Range> weakRef in nodeDocument.LIVE_RANGES)
+                parent.insertBefore(newNode, nextSibling!);
+                foreach (WeakReference<Range> weakRef in nodeDocument!.LIVE_RANGES)
                 {
                     if (weakRef.TryGetTarget(out Range liveRange))
                     {

@@ -161,7 +161,7 @@ namespace CssUI.DOM.Internal
                         touchTargets.AddLast(EventCommon.retarget_event(touchTarget, parent));
                     }
                     /* 6) If parent is a Window object, or parent is a node and target’s root is a shadow-including inclusive ancestor of parent, then: */
-                    if (parent is Window || (parent is Node && DOMCommon.Is_Shadow_Including_Inclusive_Ancestor((target as Node)!.getRootNode(), parent as Node)))
+                    if (parent is Window || (parent is Node parentNode && DOMCommon.Is_Shadow_Including_Inclusive_Ancestor((target as Node)!.getRootNode(), parentNode)))
                     {
                         /* 1) If isActivationEvent is true, event’s bubbles attribute is true, activationTarget is null, and parent has activation behavior, then set activationTarget to parent. */
                         if (isActivationEvent && @event.bubbles && activationTarget is null && parent.has_activation_behaviour)

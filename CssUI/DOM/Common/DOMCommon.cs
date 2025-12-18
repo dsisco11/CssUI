@@ -1869,11 +1869,11 @@ namespace CssUI.DOM
             /* 2) Set result to a new element that implements interface, with no attributes, namespace set to namespace, namespace prefix set to prefix, local name set to localName, custom element state set to "uncustomized", custom element definition set to null, is value set to is, and node document set to document. */
             /* 3) If namespace is the HTML namespace, and either localName is a valid custom element name or is is non-null, then set result’s custom element state to "undefined". */
 
-            var ctor = Lookup_Element_Interface(localName, Namespace);
+            var ctor = Lookup_Element_Interface(localName, Namespace ?? string.Empty);
             if (ctor is null)
                 throw new Exception($"Cannot find interface constructor for element type: \"{localName}\"");
             /* XXX: Just need to make sure that every tag type has an interface type correctly specified for it */
-            result = (Element)ctor.Invoke(new object[] { document, localName, prefix, Namespace });
+            result = (Element)ctor.Invoke(new object?[] { document, localName, prefix, Namespace });
 
             return result;
         }

@@ -42,14 +42,14 @@ namespace CssUI.DOM.Mutation
             this.target = target;
         }
 
-        private MutationRecord(EMutationType type, Node target, string attributeName, string attributeNamespace, dynamic oldValue) : this(type, target)
+        private MutationRecord(EMutationType type, Node target, string? attributeName, string? attributeNamespace, dynamic? oldValue) : this(type, target)
         {
             this.attributeName = attributeName;
             this.attributeNamespace = attributeNamespace;
             this.oldValue = oldValue;
         }
 
-        private MutationRecord(EMutationType type, Node target, string attributeName, string attributeNamespace, string oldValue, IEnumerable<Node> addedNodes, IEnumerable<Node> removedNodes, Node previousSibling, Node nextSibling)
+        private MutationRecord(EMutationType type, Node target, string? attributeName, string? attributeNamespace, string? oldValue, IEnumerable<Node>? addedNodes, IEnumerable<Node>? removedNodes, Node? previousSibling, Node? nextSibling)
             : this(type, target, attributeName, attributeNamespace, oldValue)
         {
             this.addedNodes = addedNodes;
