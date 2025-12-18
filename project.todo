@@ -160,6 +160,6 @@
 - [x] Create STATUS.md
 - [x] Create SPECIFICATIONS.md
 - [x] Create ROADMAP.md
-- [ ] Update README.md with current project state
-- [ ] Add API documentation
-- [ ] Add usage examples
+- [x] Update README.md with current project state
+- [x] Add API documentation (in README.md)
+- [x] Add usage examples (in README.md)
