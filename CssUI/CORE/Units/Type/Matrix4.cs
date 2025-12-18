@@ -596,7 +596,7 @@ namespace CssUI
             for (int i = 0; i < 16; i++)
             {
                 arr[i] = mat.Data[i].ToString("0.##");
-                longest = MathExt.Max(longest, arr[i].Length);
+                longest = Math.Max(longest, arr[i].Length);
             }
 
             for (int i = 0; i < 16; i++)

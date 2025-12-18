@@ -2430,14 +2430,14 @@ namespace CssUI.HTML
             var maxIndex = value.Length - 1;
             if (end <= start)
             {/* If end is less than or equal to start then the start of the selection and the end of the selection must both be placed immediately before the character with offset end. */
-                var pos = MathExt.Clamp(end.Value - 1, 0, maxIndex);
+                var pos = Math.Clamp(end.Value - 1, 0, maxIndex);
                 selection.start = pos;
                 selection.end = pos;
             }
             else
             {
-                selection.start = MathExt.Clamp(start.Value, 0, maxIndex);
-                selection.end = MathExt.Clamp(end.Value, 0, maxIndex);
+                selection.start = Math.Clamp(start.Value, 0, maxIndex);
+                selection.end = Math.Clamp(end.Value, 0, maxIndex);
             }
 
             /* 4) If direction is not a case-sensitive match for either the string "backward" or "forward", or if the direction argument was omitted, set direction to "none". */

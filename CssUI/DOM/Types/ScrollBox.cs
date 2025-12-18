@@ -188,26 +188,26 @@ namespace CssUI.DOM
                             {
                                 case 0:/* Rightward & Downward */
                                     {
-                                        right = MathExt.Max(right, E.Box.Margin.Right);
-                                        bottom = MathExt.Max(bottom, E.Box.Margin.Bottom);
+                                        right = Math.Max(right, E.Box.Margin.Right);
+                                        bottom = Math.Max(bottom, E.Box.Margin.Bottom);
                                     }
                                     break;
                                 case 1:/* Leftward & Downward */
                                     {
-                                        left = MathExt.Max(right, E.Box.Margin.Left);
-                                        bottom = MathExt.Max(bottom, E.Box.Margin.Bottom);
+                                        left = Math.Max(right, E.Box.Margin.Left);
+                                        bottom = Math.Max(bottom, E.Box.Margin.Bottom);
                                     }
                                     break;
                                 case 2:/* Leftward & Upward */
                                     {
-                                        left = MathExt.Max(right, E.Box.Margin.Left);
-                                        top = MathExt.Max(bottom, E.Box.Margin.Top);
+                                        left = Math.Max(right, E.Box.Margin.Left);
+                                        top = Math.Max(bottom, E.Box.Margin.Top);
                                     }
                                     break;
                                 case 3:/* Rightward & Upward */
                                     {
-                                        right = MathExt.Max(right, E.Box.Margin.Right);
-                                        top = MathExt.Max(bottom, E.Box.Margin.Top);
+                                        right = Math.Max(right, E.Box.Margin.Right);
+                                        top = Math.Max(bottom, E.Box.Margin.Top);
                                     }
                                     break;
                             }
@@ -241,26 +241,26 @@ namespace CssUI.DOM
                             {
                                 case 0:/* Rightward & Downward */
                                     {
-                                        right = MathExt.Max(right, E.Box.Padding.Right);
-                                        bottom = MathExt.Max(bottom, E.Box.Padding.Bottom);
+                                        right = Math.Max(right, E.Box.Padding.Right);
+                                        bottom = Math.Max(bottom, E.Box.Padding.Bottom);
                                     }
                                     break;
                                 case 1:/* Leftward & Downward */
                                     {
-                                        left = MathExt.Max(right, E.Box.Padding.Left);
-                                        bottom = MathExt.Max(bottom, E.Box.Padding.Bottom);
+                                        left = Math.Max(right, E.Box.Padding.Left);
+                                        bottom = Math.Max(bottom, E.Box.Padding.Bottom);
                                     }
                                     break;
                                 case 2:/* Leftward & Upward */
                                     {
-                                        left = MathExt.Max(right, E.Box.Padding.Left);
-                                        top = MathExt.Max(bottom, E.Box.Padding.Top);
+                                        left = Math.Max(right, E.Box.Padding.Left);
+                                        top = Math.Max(bottom, E.Box.Padding.Top);
                                     }
                                     break;
                                 case 3:/* Rightward & Upward */
                                     {
-                                        right = MathExt.Max(right, E.Box.Padding.Right);
-                                        top = MathExt.Max(bottom, E.Box.Padding.Top);
+                                        right = Math.Max(right, E.Box.Padding.Right);
+                                        top = Math.Max(bottom, E.Box.Padding.Top);
                                     }
                                     break;
                             }

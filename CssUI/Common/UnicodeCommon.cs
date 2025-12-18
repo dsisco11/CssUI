@@ -808,8 +808,8 @@ namespace CssUI
             /* To determine how many hexadecimal chars we will need to represent this value:
              * Find the index of the values most significant bit and divide it by 4 and then round it up */
             int msb = (int)Math.Ceiling(BitOperations.CountTrailingZeros(value) / 4.0d);
-            int charCount = MathExt.Max(1, msb);
-            var result = new char[MathExt.Max(charCount, Digits)];
+            int charCount = Math.Max(1, msb);
+            var result = new char[Math.Max(charCount, Digits)];
             int padding = (int)((charCount > Digits) ? 0 : (Digits - charCount));
 
             for (int i=0; i<charCount; i++)

@@ -38,98 +38,31 @@ namespace CssUI
         }
         #endregion
 
-        #region Min
-        /* We use these instead of the normal Math class because these are aggressively inlined and avoid a jmp call and an eq comparison (usually negligable but its an effortless improvement nonetheless) */
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Byte Min(Byte x, Byte y) => (x < y ? x : y);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static SByte Min(SByte x, SByte y) => (x < y ? x : y);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Int16 Min(Int16 x, Int16 y) => (x < y ? x : y);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static UInt16 Min(UInt16 x, UInt16 y) => (x < y ? x : y);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Int32 Min(Int32 x, Int32 y) => (x < y ? x : y);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static UInt32 Min(UInt32 x, UInt32 y) => (x < y ? x : y);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Int64 Min(Int64 x, Int64 y) => (x < y ? x : y);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static UInt64 Min(UInt64 x, UInt64 y) => (x < y ? x : y);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Single Min(Single x, Single y) => (x < y ? x : y);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Double Min(Double x, Double y) => (x < y ? x : y);
-        #endregion
-
-        #region Max
-        /* We use these instead of the normal Math class because these are aggressively inlined and avoid a jmp call and an eq comparison (usually negligable but its an effortless improvement nonetheless) */
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Byte Max(Byte x, Byte y) => (x > y ? x : y);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static SByte Max(SByte x, SByte y) => (x > y ? x : y);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Int16 Max(Int16 x, Int16 y) => (x > y ? x : y);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static UInt16 Max(UInt16 x, UInt16 y) => (x > y ? x : y);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Int32 Max(Int32 x, Int32 y) => (x > y ? x : y);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static UInt32 Max(UInt32 x, UInt32 y) => (x > y ? x : y);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Int64 Max(Int64 x, Int64 y) => (x > y ? x : y);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static UInt64 Max(UInt64 x, UInt64 y) => (x > y ? x : y);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Single Max(Single x, Single y) => (x > y ? x : y);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Double Max(Double x, Double y) => (x > y ? x : y);
-        #endregion
-
-        #region Clamp
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Byte Clamp(Byte value, Byte min, Byte max) => Max(min, Min(max, value));
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static SByte Clamp(SByte value, SByte min, SByte max) => Max(min, Min(max, value));
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Int16 Clamp(Int16 value, Int16 min, Int16 max) => Max(min, Min(max, value));
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static UInt16 Clamp(UInt16 value, UInt16 min, UInt16 max) => Max(min, Min(max, value));
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Int32 Clamp(Int32 value, Int32 min, Int32 max) => Max(min, Min(max, value));
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static UInt32 Clamp(UInt32 value, UInt32 min, UInt32 max) => Max(min, Min(max, value));
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Int64 Clamp(Int64 value, Int64 min, Int64 max) => Max(min, Min(max, value));
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static UInt64 Clamp(UInt64 value, UInt64 min, UInt64 max) => Max(min, Min(max, value));
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Single Clamp(Single value, Single min, Single max) => Max(min, Min(max, value));
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Double Clamp(Double value, Double min, Double max) => Max(min, Min(max, value));
-        #endregion
-
         #region RangeClamp
+        /// <summary>
+        /// Clamps a value to a range, automatically determining min/max from a and b.
+        /// Unlike Math.Clamp, this handles the case where a > b.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Byte RangeClamp(Byte value, Byte a, Byte b) => Max(Min(a, b), Min(Max(a, b), value));
+        public static Byte RangeClamp(Byte value, Byte a, Byte b) => Math.Max(Math.Min(a, b), Math.Min(Math.Max(a, b), value));
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static SByte RangeClamp(SByte value, SByte a, SByte b) => Max(Min(a, b), Min(Max(a, b), value));
+        public static SByte RangeClamp(SByte value, SByte a, SByte b) => Math.Max(Math.Min(a, b), Math.Min(Math.Max(a, b), value));
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Int16 RangeClamp(Int16 value, Int16 a, Int16 b) => Max(Min(a, b), Min(Max(a, b), value));
+        public static Int16 RangeClamp(Int16 value, Int16 a, Int16 b) => Math.Max(Math.Min(a, b), Math.Min(Math.Max(a, b), value));
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static UInt16 RangeClamp(UInt16 value, UInt16 a, UInt16 b) => Max(Min(a, b), Min(Max(a, b), value));
+        public static UInt16 RangeClamp(UInt16 value, UInt16 a, UInt16 b) => Math.Max(Math.Min(a, b), Math.Min(Math.Max(a, b), value));
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Int32 RangeClamp(Int32 value, Int32 a, Int32 b) => Max(Min(a, b), Min(Max(a, b), value));
+        public static Int32 RangeClamp(Int32 value, Int32 a, Int32 b) => Math.Max(Math.Min(a, b), Math.Min(Math.Max(a, b), value));
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static UInt32 RangeClamp(UInt32 value, UInt32 a, UInt32 b) => Max(Min(a, b), Min(Max(a, b), value));
+        public static UInt32 RangeClamp(UInt32 value, UInt32 a, UInt32 b) => Math.Max(Math.Min(a, b), Math.Min(Math.Max(a, b), value));
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Int64 RangeClamp(Int64 value, Int64 a, Int64 b) => Max(Min(a, b), Min(Max(a, b), value));
+        public static Int64 RangeClamp(Int64 value, Int64 a, Int64 b) => Math.Max(Math.Min(a, b), Math.Min(Math.Max(a, b), value));
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static UInt64 RangeClamp(UInt64 value, UInt64 a, UInt64 b) => Max(Min(a, b), Min(Max(a, b), value));
+        public static UInt64 RangeClamp(UInt64 value, UInt64 a, UInt64 b) => Math.Max(Math.Min(a, b), Math.Min(Math.Max(a, b), value));
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Single RangeClamp(Single value, Single a, Single b) => Max(Min(a, b), Min(Max(a, b), value));
+        public static Single RangeClamp(Single value, Single a, Single b) => Math.Max(Math.Min(a, b), Math.Min(Math.Max(a, b), value));
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Double RangeClamp(Double value, Double a, Double b) => Max(Min(a, b), Min(Max(a, b), value));
+        public static Double RangeClamp(Double value, Double a, Double b) => Math.Max(Math.Min(a, b), Math.Min(Math.Max(a, b), value));
         #endregion
         
         #region Radians / Degrees

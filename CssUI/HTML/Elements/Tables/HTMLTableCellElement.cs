@@ -31,8 +31,8 @@ namespace CssUI.HTML
         [CEReactions]
         public uint colSpan
         {/* The td and th elements may have a colspan content attribute specified, whose value must be a valid non-negative integer greater than zero and less than or equal to 1000. */
-            get => MathExt.Clamp(getAttribute(EAttributeName.ColSpan)?.AsUInt() ?? 0, 0, 1000);
-            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.ColSpan, AttributeValue.From(MathExt.Clamp(value, 0, 1000))));
+            get => Math.Clamp(getAttribute(EAttributeName.ColSpan)?.AsUInt() ?? 0, 0u, 1000u);
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.ColSpan, AttributeValue.From(Math.Clamp(value, 0u, 1000u))));
         }
         /// <summary>
         /// Number of rows that the cell is to span
@@ -42,8 +42,8 @@ namespace CssUI.HTML
         {
             /* The td and th elements may also have a rowspan content attribute specified, whose value must be a valid non-negative integer less than or equal to 65534. 
              * For this attribute, the value zero means that the cell is to span all the remaining rows in the row group. */
-            get => MathExt.Clamp(getAttribute(EAttributeName.RowSpan)?.AsUInt() ?? 0, 0, ushort.MaxValue);
-            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.RowSpan, AttributeValue.From(MathExt.Clamp(value, 0, ushort.MaxValue))));
+            get => Math.Clamp(getAttribute(EAttributeName.RowSpan)?.AsUInt() ?? 0, 0u, (uint)ushort.MaxValue);
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.RowSpan, AttributeValue.From(Math.Clamp(value, 0u, (uint)ushort.MaxValue))));
         }
         /// <summary>
         /// The header cells for this cell

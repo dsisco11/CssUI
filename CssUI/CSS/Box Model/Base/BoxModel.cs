@@ -230,10 +230,10 @@ namespace CssUI.CSS
             */
 
             var Min_Width = Cascaded.Min_Width.Actual;
-            var Max_Width = MathExt.Max(Min_Width, Cascaded.Max_Width.Actual ?? 0);
+            var Max_Width = Math.Max(Min_Width, Cascaded.Max_Width.Actual ?? 0);
 
             var Min_Height = Cascaded.Min_Height.Actual;
-            var Max_Height = MathExt.Max(Min_Height, Cascaded.Max_Height.Actual ?? 0);
+            var Max_Height = Math.Max(Min_Height, Cascaded.Max_Height.Actual ?? 0);
 
             var width = Width.AsDecimal();
             var height = Height.AsDecimal();
@@ -250,42 +250,42 @@ namespace CssUI.CSS
             if (width > Max_Width) // W > max-width
             {
                 Width = CssValue.From(Max_Width);
-                Height = CssValue.From(MathExt.Max(Max_Width * (fheight / fwidth), Min_Height));
+                Height = CssValue.From(Math.Max(Max_Width * (fheight / fwidth), Min_Height));
             }
             else if (width < Min_Width) // W < min-width
             {
                 Width = CssValue.From(Min_Width);
-                Height = CssValue.From(MathExt.Min(Min_Width * (fheight / fwidth), Max_Height));
+                Height = CssValue.From(Math.Min(Min_Width * (fheight / fwidth), Max_Height));
             }
             else if (height > Max_Height) // H > max-height
             {
-                Width = CssValue.From(MathExt.Max(Max_Height * fwidth / fheight, Min_Width));
+                Width = CssValue.From(Math.Max(Max_Height * fwidth / fheight, Min_Width));
                 Height = CssValue.From(Max_Height);
             }
             else if (height < Min_Height)// H < min-height
             {
-                Width = CssValue.From(MathExt.Min(Min_Height * fwidth / fheight, Max_Width));
+                Width = CssValue.From(Math.Min(Min_Height * fwidth / fheight, Max_Width));
                 Height = CssValue.From(Min_Height);
             }
             else if (width > Max_Width && height > Max_Height && wMaxRatio <= hMaxRatio)
             {
                 Width = CssValue.From(Max_Width);
-                Height = CssValue.From(MathExt.Max(Min_Height, Max_Width * (fheight / fwidth)));
+                Height = CssValue.From(Math.Max(Min_Height, Max_Width * (fheight / fwidth)));
             }
             else if (width > Max_Width && height > Max_Height && wMaxRatio > hMaxRatio)
             {
-                Width = CssValue.From(MathExt.Max(Min_Width, Max_Height * fwidth / fheight));
+                Width = CssValue.From(Math.Max(Min_Width, Max_Height * fwidth / fheight));
                 Height = CssValue.From(Max_Height);
             }
             else if (width < Min_Width && height < Min_Height && wMinRatio <= hMinRatio)
             {
-                Width = CssValue.From(MathExt.Min(Max_Width, Min_Height * fwidth / fheight));
+                Width = CssValue.From(Math.Min(Max_Width, Min_Height * fwidth / fheight));
                 Height = CssValue.From(Min_Height);
             }
             else if (width < Min_Width && height < Min_Height && wMinRatio > hMinRatio)
             {
                 Width = CssValue.From(Min_Width);
-                Height = CssValue.From(MathExt.Min(Max_Height, Min_Width * (fheight / fwidth)));
+                Height = CssValue.From(Math.Min(Max_Height, Min_Width * (fheight / fwidth)));
             }
             else if (width < Min_Width && height > Max_Height)
             {
@@ -683,7 +683,7 @@ namespace CssUI.CSS
 
                                     /* Solve for 'right' */
                                     eqRes = (Left.AsDecimal() + marginLeft + BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight + marginRight + 0);
-                                    Right = CssValue.From(MathExt.Max(0, CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes));
+                                    Right = CssValue.From(Math.Max(0, CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes));
                                 }
                                 else if(Direction == EDirection.RTL)
                                 {
@@ -696,7 +696,7 @@ namespace CssUI.CSS
 
                                     /* Solve for 'left' */
                                     eqRes = (0 + marginLeft + BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight + marginRight + Right.AsDecimal());
-                                    Left = CssValue.From(MathExt.Max(0, CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes));
+                                    Left = CssValue.From(Math.Max(0, CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes));
 
                                 }
                             }
@@ -1123,7 +1123,7 @@ namespace CssUI.CSS
                                  * has a height not greater than 150px, and has a width not greater than the device width.
                                  */
                                 /* Formula:  h = w * Min(2 (150/w)) */
-                                var eq = (Width.AsDecimal() * MathExt.Min(2, (150 / Width.AsDecimal())));
+                                var eq = (Width.AsDecimal() * Math.Min(2, (150 / Width.AsDecimal())));
                                 Height = CssValue.From(eq);
                             }
                         }
@@ -1335,7 +1335,7 @@ namespace CssUI.CSS
                                  * has a height not greater than 150px, and has a width not greater than the device width.
                                  */
                                 /* Formula:  h = w * Min(2 (150/w)) */
-                                var eq = (Width.AsDecimal() * MathExt.Min(2, (150 / Width.AsDecimal())));
+                                var eq = (Width.AsDecimal() * Math.Min(2, (150 / Width.AsDecimal())));
                                 Height = CssValue.From(eq);
                             }
 

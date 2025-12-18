@@ -1,4 +1,5 @@
 ﻿using CssUI.Rendering;
+using System;
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -47,9 +48,9 @@ namespace CssUI
         /// </summary>
         public SimpleColor(int Red, int Green, int Blue)
         {
-            red = MathExt.Clamp((byte)Red, byte.MinValue, byte.MaxValue);
-            green = MathExt.Clamp((byte)Green, byte.MinValue, byte.MaxValue);
-            blue = MathExt.Clamp((byte)Blue, byte.MinValue, byte.MaxValue);
+            red = Math.Clamp((byte)Red, byte.MinValue, byte.MaxValue);
+            green = Math.Clamp((byte)Green, byte.MinValue, byte.MaxValue);
+            blue = Math.Clamp((byte)Blue, byte.MinValue, byte.MaxValue);
         }
 
         /// <summary>
@@ -69,9 +70,9 @@ namespace CssUI
         public SimpleColor(Vector4 RGBA)
         {
             var scaled = RGBA * fbyteMax;
-            red = MathExt.Clamp((byte)scaled.X, byte.MinValue, byte.MaxValue);
-            green = MathExt.Clamp((byte)scaled.Y, byte.MinValue, byte.MaxValue);
-            blue = MathExt.Clamp((byte)scaled.Z, byte.MinValue, byte.MaxValue);
+            red = Math.Clamp((byte)scaled.X, byte.MinValue, byte.MaxValue);
+            green = Math.Clamp((byte)scaled.Y, byte.MinValue, byte.MaxValue);
+            blue = Math.Clamp((byte)scaled.Z, byte.MinValue, byte.MaxValue);
         }
 
         /// <summary>
@@ -80,9 +81,9 @@ namespace CssUI
         public SimpleColor(float Red, float Green, float Blue)
         {
             var scaled = new Vector3(Red, Green, Blue) * fbyteMax;
-            red = MathExt.Clamp((byte)scaled.X, byte.MinValue, byte.MaxValue);
-            green = MathExt.Clamp((byte)scaled.Y, byte.MinValue, byte.MaxValue);
-            blue = MathExt.Clamp((byte)scaled.Z, byte.MinValue, byte.MaxValue);
+            red = Math.Clamp((byte)scaled.X, byte.MinValue, byte.MaxValue);
+            green = Math.Clamp((byte)scaled.Y, byte.MinValue, byte.MaxValue);
+            blue = Math.Clamp((byte)scaled.Z, byte.MinValue, byte.MaxValue);
         }
         #endregion
 
@@ -104,9 +105,9 @@ namespace CssUI
         public override void SetVector(Vector4 RGBA)
         {
             var scaled = RGBA * fbyteMax;
-            red = MathExt.Clamp((byte)scaled.X, byte.MinValue, byte.MaxValue);
-            green = MathExt.Clamp((byte)scaled.Y, byte.MinValue, byte.MaxValue);
-            blue = MathExt.Clamp((byte)scaled.Z, byte.MinValue, byte.MaxValue);
+            red = Math.Clamp((byte)scaled.X, byte.MinValue, byte.MaxValue);
+            green = Math.Clamp((byte)scaled.Y, byte.MinValue, byte.MaxValue);
+            blue = Math.Clamp((byte)scaled.Z, byte.MinValue, byte.MaxValue);
         }
         #endregion
 

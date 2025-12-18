@@ -1,4 +1,6 @@
-﻿namespace CssUI.DOM.Geometry
+﻿using System;
+
+namespace CssUI.DOM.Geometry
 {
     [System.Diagnostics.DebuggerDisplay("[{Top}, {Right}, {Bottom}, {Left}]")]
     public class DOMRectReadOnly
@@ -14,19 +16,19 @@
         #region Accessors
         public double Top
         {/* Docs: https://www.w3.org/TR/geometry-1/#dom-domrectreadonly-domrect-top */
-            get => MathExt.Min(Y, Y + Height);
+            get => Math.Min(Y, Y + Height);
         }
         public double Right
         {/* Docs: https://www.w3.org/TR/geometry-1/#dom-domrectreadonly-domrect-right */
-            get => MathExt.Max(X, X + Width);
+            get => Math.Max(X, X + Width);
         }
         public double Bottom
         {/* Docs: https://www.w3.org/TR/geometry-1/#dom-domrectreadonly-domrect-bottom */
-            get => MathExt.Max(Y, Y + Height);
+            get => Math.Max(Y, Y + Height);
         }
         public double Left
         {/* Docs: https://www.w3.org/TR/geometry-1/#dom-domrectreadonly-domrect-left */
-            get => MathExt.Min(X, X + Width);
+            get => Math.Min(X, X + Width);
         }
         #endregion
 

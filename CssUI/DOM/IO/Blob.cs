@@ -85,15 +85,15 @@ namespace CssUI.DOM
             ulong relativeStart = 0;
             if (start.HasValue)
             {
-                if (start < 0) relativeStart = MathExt.Max(0, (ulong)((long)size + start.Value));
-                else relativeStart = MathExt.Min((ulong)start.Value, size);
+                if (start < 0) relativeStart = Math.Max(0, (ulong)((long)size + start.Value));
+                else relativeStart = Math.Min((ulong)start.Value, size);
             }
 
             ulong relativeEnd = size;
             if (end.HasValue)
             {
-                if (end < 0) relativeEnd = MathExt.Max(0, (ulong)((long)size + end.Value));
-                else relativeEnd = MathExt.Min((ulong)end.Value, size);
+                if (end < 0) relativeEnd = Math.Max(0, (ulong)((long)size + end.Value));
+                else relativeEnd = Math.Min((ulong)end.Value, size);
             }
 
             string relativeContentType = string.Empty;
@@ -102,7 +102,7 @@ namespace CssUI.DOM
                 relativeContentType = StringCommon.Transform(contentType.AsMemory(), UnicodeCommon.To_ASCII_Lower_Alpha);
             }
 
-            ulong span = MathExt.Max(0, relativeEnd - relativeStart);
+            ulong span = Math.Max(0, relativeEnd - relativeStart);
             return new Blob(new BlobPart[] { AsMemory().Slice((int)relativeStart, (int)span) }, new BlobPropertyBag(relativeContentType));
         }
 

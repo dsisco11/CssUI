@@ -64,20 +64,20 @@ namespace CssUI.DOM
 
             if (document.Viewport.ScrollBox.Overflow_Block == CSS.Enums.EOverflowDirection.Rightward)
             {
-                x = MathExt.Max(0, MathExt.Min(x, scrollArea.Width - viewportWidth));
+                x = Math.Max(0, Math.Min(x, scrollArea.Width - viewportWidth));
             }
             else
             {
-                x = MathExt.Min(0, MathExt.Max(x, viewportWidth - scrollArea.Width));
+                x = Math.Min(0, Math.Max(x, viewportWidth - scrollArea.Width));
             }
 
             if (document.Viewport.ScrollBox.Overflow_Inline == CSS.Enums.EOverflowDirection.Downward)
             {
-                y = MathExt.Max(0, MathExt.Min(y, scrollArea.Height - viewportHeight));
+                y = Math.Max(0, Math.Min(y, scrollArea.Height - viewportHeight));
             }
             else
             {
-                y = MathExt.Min(0, MathExt.Max(y, viewportHeight - scrollArea.Height));
+                y = Math.Min(0, Math.Max(y, viewportHeight - scrollArea.Height));
             }
 
             /* Let position be the scroll position the viewport would have by aligning the x-coordinate x of the viewport scrolling area with the left of the viewport and aligning the y-coordinate y of the viewport scrolling area with the top of the viewport. */

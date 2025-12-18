@@ -174,13 +174,13 @@ Note: The HTML module requires significant work and is excluded from Core config
 - [x] Add usage examples (in README.md)
 
 ## Code Quality & Modernization
-### MathExt Refactoring
-- [ ] Remove duplicate Min/Max/Clamp methods from MathExt
-  - Replace all MathExt.Min calls with Math.Min
-  - Replace all MathExt.Max calls with Math.Max
-  - Replace all MathExt.Clamp calls with Math.Clamp
-  - Keep only CssUI-specific math utilities (e.g., Feq, Fgteq, Flteq, DegreesToRadians)
-  - Update any call sites that depend on MathExt's non-throwing Clamp behavior
+### MathExt Refactoring ✅ COMPLETE
+- [x] Remove duplicate Min/Max/Clamp methods from MathExt
+  - Replaced all MathExt.Min calls with Math.Min (~30 files)
+  - Replaced all MathExt.Max calls with Math.Max
+  - Replaced all MathExt.Clamp calls with Math.Clamp
+  - Kept CssUI-specific utilities: Feq, Fgteq, Flteq, DegreesToRadians, RangeClamp
+  - RangeClamp preserved (handles min>max case unlike Math.Clamp)
 
 ### Type System Modernization
 - [ ] Analyze unit type structures in codebase

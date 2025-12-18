@@ -180,10 +180,10 @@ namespace CssUI.DOM
             Rects.GetEnumerator().Reset();
             foreach (var rect in Rects)
             {
-                top = !top.HasValue ? rect.Top : MathExt.Min(top.Value, rect.Top);
-                right = !right.HasValue ? rect.Right : MathExt.Max(right.Value, rect.Right);
-                bottom = !bottom.HasValue ? rect.Bottom : MathExt.Max(bottom.Value, rect.Bottom);
-                left = !left.HasValue ? rect.Left : MathExt.Min(left.Value, rect.Left);
+                top = !top.HasValue ? rect.Top : Math.Min(top.Value, rect.Top);
+                right = !right.HasValue ? rect.Right : Math.Max(right.Value, rect.Right);
+                bottom = !bottom.HasValue ? rect.Bottom : Math.Max(bottom.Value, rect.Bottom);
+                left = !left.HasValue ? rect.Left : Math.Min(left.Value, rect.Left);
             }
 
             return new DOMRect(left.Value, top.Value, (right.Value - left.Value), (bottom.Value - top.Value));

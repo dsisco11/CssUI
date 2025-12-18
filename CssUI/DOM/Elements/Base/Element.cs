@@ -1549,21 +1549,21 @@ namespace CssUI.DOM
             /* 2) If box has rightward overflow direction */
             if (ScrollBox.Overflow_Block == CSS.Enums.EOverflowDirection.Rightward)
             {
-                x = MathExt.Max(0, MathExt.Min(x, scrollArea.Width - Box.Padding.Width));
+                x = Math.Max(0, Math.Min(x, scrollArea.Width - Box.Padding.Width));
             }
             else
             {
-                x = MathExt.Min(0, MathExt.Max(x, Box.Padding.Width - scrollArea.Width));
+                x = Math.Min(0, Math.Max(x, Box.Padding.Width - scrollArea.Width));
             }
 
             /* 3) If box has downward overflow direction */
             if (ScrollBox.Overflow_Inline == CSS.Enums.EOverflowDirection.Downward)
             {
-                y = MathExt.Max(0, MathExt.Min(y, scrollArea.Height - Box.Padding.Height));
+                y = Math.Max(0, Math.Min(y, scrollArea.Height - Box.Padding.Height));
             }
             else
             {
-                y = MathExt.Min(0, MathExt.Max(y, Box.Padding.Height - scrollArea.Height));
+                y = Math.Min(0, Math.Max(y, Box.Padding.Height - scrollArea.Height));
             }
 
             /* 4) Let position be the scroll position box would have by aligning scrolling area x-coordinate x with the left of box and aligning scrolling area y-coordinate y with the top of box. */
@@ -1722,10 +1722,10 @@ namespace CssUI.DOM
                 }
 
                 if (isRoot && document.Mode != EQuirksMode.Quirks)
-                    return (long)MathExt.Max(viewportWidth, document.Viewport.ScrollBox.ScrollArea.Width);
+                    return (long)Math.Max(viewportWidth, document.Viewport.ScrollBox.ScrollArea.Width);
 
                 if (ReferenceEquals(this, document.body) && document.Mode == EQuirksMode.Quirks && !is_potentially_scrollable)
-                    return (long)MathExt.Max(viewportWidth, document.Viewport.ScrollBox.ScrollArea.Width);
+                    return (long)Math.Max(viewportWidth, document.Viewport.ScrollBox.ScrollArea.Width);
 
                 if (Box == null)
                     return 0;
@@ -1748,10 +1748,10 @@ namespace CssUI.DOM
                 }
 
                 if (isRoot && document.Mode != EQuirksMode.Quirks)
-                    return (long)MathExt.Max(viewportHeight, document.Viewport.ScrollBox.ScrollArea.Height);
+                    return (long)Math.Max(viewportHeight, document.Viewport.ScrollBox.ScrollArea.Height);
 
                 if (ReferenceEquals(this, document.body) && document.Mode == EQuirksMode.Quirks && !is_potentially_scrollable)
-                    return (long)MathExt.Max(viewportHeight, document.Viewport.ScrollBox.ScrollArea.Height);
+                    return (long)Math.Max(viewportHeight, document.Viewport.ScrollBox.ScrollArea.Height);
 
                 if (Box == null)
                     return 0;

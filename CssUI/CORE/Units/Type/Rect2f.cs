@@ -175,8 +175,8 @@ namespace CssUI
             if (mn is null) return this;
             return new Rect2f()
             {
-                Width = MathExt.Min(Width, mn.Width),
-                Height = MathExt.Min(Height, mn.Height),
+                Width = Math.Min(Width, mn.Width),
+                Height = Math.Min(Height, mn.Height),
             };
         }
 
@@ -190,8 +190,8 @@ namespace CssUI
             if (mx is null) return this;
             return new Rect2f()
             {
-                Width = MathExt.Max(Width, mx.Width),
-                Height = MathExt.Max(Height, mx.Height),
+                Width = Math.Max(Width, mx.Width),
+                Height = Math.Max(Height, mx.Height),
             };
         }
 
@@ -211,24 +211,24 @@ namespace CssUI
             {// We have been given no minimum value, so function like Min() instead
                 return new Rect2f()
                 {
-                    Width = MathExt.Min(Width, mx.Width),
-                    Height = MathExt.Min(Height, mx.Height),
+                    Width = Math.Min(Width, mx.Width),
+                    Height = Math.Min(Height, mx.Height),
                 };
             }
             else if (mx is null)
             {// We have been given no maximum value, so function like Max() instead
                 return new Rect2f()
                 {
-                    Width = MathExt.Max(Width, mn.Width),
-                    Height = MathExt.Max(Height, mn.Height),
+                    Width = Math.Max(Width, mn.Width),
+                    Height = Math.Max(Height, mn.Height),
                 };
             }
             else
             {
                 return new Rect2f()
                 {
-                    Width = MathExt.Clamp(Width, mn.Width, mx.Width),
-                    Height = MathExt.Clamp(Height, mn.Height, mx.Height),
+                    Width = Math.Clamp(Width, mn.Width, mx.Width),
+                    Height = Math.Clamp(Height, mn.Height, mx.Height),
                 };
             }
         }

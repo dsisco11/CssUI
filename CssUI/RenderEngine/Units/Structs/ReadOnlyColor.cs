@@ -53,10 +53,10 @@ namespace CssUI.Rendering
         /// </summary>
         public ReadOnlyColor(int Red, int Green, int Blue, int? Alpha)
         {
-            red = MathExt.Clamp((byte)Red, byte.MinValue, byte.MaxValue);
-            green = MathExt.Clamp((byte)Green, byte.MinValue, byte.MaxValue);
-            blue = MathExt.Clamp((byte)Blue, byte.MinValue, byte.MaxValue);
-            alpha = MathExt.Clamp((byte?)Alpha ?? byte.MaxValue, byte.MinValue, byte.MaxValue);
+            red = Math.Clamp((byte)Red, byte.MinValue, byte.MaxValue);
+            green = Math.Clamp((byte)Green, byte.MinValue, byte.MaxValue);
+            blue = Math.Clamp((byte)Blue, byte.MinValue, byte.MaxValue);
+            alpha = Math.Clamp((byte?)Alpha ?? byte.MaxValue, byte.MinValue, byte.MaxValue);
         }
 
         /// <summary>
@@ -77,10 +77,10 @@ namespace CssUI.Rendering
         public ReadOnlyColor(Vector4 RGBA)
         {
             var scaled = RGBA * fbyteMax;
-            red = MathExt.Clamp((byte)scaled.X, byte.MinValue, byte.MaxValue);
-            green = MathExt.Clamp((byte)scaled.Y, byte.MinValue, byte.MaxValue);
-            blue = MathExt.Clamp((byte)scaled.Z, byte.MinValue, byte.MaxValue);
-            alpha = MathExt.Clamp((byte)scaled.W, byte.MinValue, byte.MaxValue);
+            red = Math.Clamp((byte)scaled.X, byte.MinValue, byte.MaxValue);
+            green = Math.Clamp((byte)scaled.Y, byte.MinValue, byte.MaxValue);
+            blue = Math.Clamp((byte)scaled.Z, byte.MinValue, byte.MaxValue);
+            alpha = Math.Clamp((byte)scaled.W, byte.MinValue, byte.MaxValue);
         }
 
         /// <summary>
@@ -89,10 +89,10 @@ namespace CssUI.Rendering
         public ReadOnlyColor(float Red, float Green, float Blue, float? Alpha = null)
         {
             var scaled = new Vector3(Red, Green, Blue) * fbyteMax;
-            red = MathExt.Clamp((byte)scaled.X, byte.MinValue, byte.MaxValue);
-            green = MathExt.Clamp((byte)scaled.Y, byte.MinValue, byte.MaxValue);
-            blue = MathExt.Clamp((byte)scaled.Z, byte.MinValue, byte.MaxValue);
-            alpha = MathExt.Clamp((byte?)(Alpha * fbyteMax) ?? byte.MaxValue, byte.MinValue, byte.MaxValue);
+            red = Math.Clamp((byte)scaled.X, byte.MinValue, byte.MaxValue);
+            green = Math.Clamp((byte)scaled.Y, byte.MinValue, byte.MaxValue);
+            blue = Math.Clamp((byte)scaled.Z, byte.MinValue, byte.MaxValue);
+            alpha = Math.Clamp((byte?)(Alpha * fbyteMax) ?? byte.MaxValue, byte.MinValue, byte.MaxValue);
         }
         #endregion
 

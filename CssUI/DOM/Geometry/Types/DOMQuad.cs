@@ -1,4 +1,6 @@
-﻿namespace CssUI.DOM.Geometry
+﻿using System;
+
+namespace CssUI.DOM.Geometry
 {
     /// <summary>
     /// Represents a quadrilateral.
@@ -56,10 +58,10 @@
         public DOMRect getBounds()
         {/* Docs: https://www.w3.org/TR/geometry-1/#dom-domquad-getbounds */
             var bounds = new DOMRect();
-            var left = MathExt.Min(p1.x, MathExt.Min(p2.x, MathExt.Min(p3.x, p4.x)));
-            var top = MathExt.Min(p1.y, MathExt.Min(p2.y, MathExt.Min(p3.y, p4.y)));
-            var right = MathExt.Max(p1.x, MathExt.Max(p2.x, MathExt.Max(p3.x, p4.x)));
-            var bottom = MathExt.Max(p1.y, MathExt.Max(p2.y, MathExt.Max(p3.y, p4.y)));
+            var left = Math.Min(p1.x, Math.Min(p2.x, Math.Min(p3.x, p4.x)));
+            var top = Math.Min(p1.y, Math.Min(p2.y, Math.Min(p3.y, p4.y)));
+            var right = Math.Max(p1.x, Math.Max(p2.x, Math.Max(p3.x, p4.x)));
+            var bottom = Math.Max(p1.y, Math.Max(p2.y, Math.Max(p3.y, p4.y)));
 
             bounds.X = left;
             bounds.Y = top;

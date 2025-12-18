@@ -11,39 +11,39 @@ namespace CssUI.Tests
         [Fact()]
         public void MinTest()
         {
-            Assert.Equal(0, MathExt.Min(0, 0));
-            Assert.Equal(0, MathExt.Min(0, 1));
-            Assert.Equal(1, MathExt.Min(1, 2));
-            Assert.Equal(2, MathExt.Min(2, 4));
-            Assert.Equal(4, MathExt.Min(4, 8));
-            Assert.Equal(8, MathExt.Min(8, 16));
-            Assert.Equal(16, MathExt.Min(16, 32));
-            Assert.Equal(32, MathExt.Min(32, 64));
-            Assert.Equal(Int32.MinValue, MathExt.Min(Int32.MinValue, Int32.MaxValue));
+            Assert.Equal(0, Math.Min(0, 0));
+            Assert.Equal(0, Math.Min(0, 1));
+            Assert.Equal(1, Math.Min(1, 2));
+            Assert.Equal(2, Math.Min(2, 4));
+            Assert.Equal(4, Math.Min(4, 8));
+            Assert.Equal(8, Math.Min(8, 16));
+            Assert.Equal(16, Math.Min(16, 32));
+            Assert.Equal(32, Math.Min(32, 64));
+            Assert.Equal(Int32.MinValue, Math.Min(Int32.MinValue, Int32.MaxValue));
         }
 
         [Fact()]
         public void MaxTest()
         {
-            Assert.Equal(0, MathExt.Max(0, 0));
-            Assert.Equal(1, MathExt.Max(0, 1));
-            Assert.Equal(2, MathExt.Max(1, 2));
-            Assert.Equal(4, MathExt.Max(2, 4));
-            Assert.Equal(8, MathExt.Max(4, 8));
-            Assert.Equal(16, MathExt.Max(8, 16));
-            Assert.Equal(32, MathExt.Max(16, 32));
-            Assert.Equal(64, MathExt.Max(32, 64));
-            Assert.Equal(Int32.MaxValue, MathExt.Max(Int32.MinValue, Int32.MaxValue));
+            Assert.Equal(0, Math.Max(0, 0));
+            Assert.Equal(1, Math.Max(0, 1));
+            Assert.Equal(2, Math.Max(1, 2));
+            Assert.Equal(4, Math.Max(2, 4));
+            Assert.Equal(8, Math.Max(4, 8));
+            Assert.Equal(16, Math.Max(8, 16));
+            Assert.Equal(32, Math.Max(16, 32));
+            Assert.Equal(64, Math.Max(32, 64));
+            Assert.Equal(Int32.MaxValue, Math.Max(Int32.MinValue, Int32.MaxValue));
         }
 
         [Fact()]
         public void ClampTest()
         {
-            Assert.Equal(0, MathExt.Clamp(-1, 0, 1));
-            Assert.Equal(8, MathExt.Clamp(0x00, 8, 16));
-            Assert.Equal(16, MathExt.Clamp(0xFF, 8, 16));
-            Assert.Equal(Int32.MinValue, MathExt.Clamp(-0xFFFFFFFF, Int32.MinValue, Int32.MaxValue));
-            Assert.Equal(Int32.MaxValue, MathExt.Clamp(0xFFFFFFFF, Int32.MinValue, Int32.MaxValue));
+            Assert.Equal(0, Math.Clamp(-1, 0, 1));
+            Assert.Equal(8, Math.Clamp(0x00, 8, 16));
+            Assert.Equal(16, Math.Clamp(0xFF, 8, 16));
+            Assert.Equal(Int32.MinValue, Math.Clamp(-0xFFFFFFFF, Int32.MinValue, Int32.MaxValue));
+            Assert.Equal(Int32.MaxValue, Math.Clamp(0xFFFFFFFF, Int32.MinValue, Int32.MaxValue));
         }
 
         [Fact()]
