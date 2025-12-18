@@ -278,7 +278,7 @@ namespace CssUI.HTML
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-htmlelement-offsetparent */
             get
             {
-                if (Box == null || is_root || ReferenceEquals(this, ownerDocument.body) || Style.Positioning == CSS.EPositioning.Fixed)
+                if (Box == null || isRoot || ReferenceEquals(this, ownerDocument.body) || Style.Positioning == CSS.EBoxPositioning.Fixed)
                     return null;
 
                 /* 2) Return the nearest ancestor element of the element for which at least one of the following is true and terminate this algorithm if such an ancestor is found: */
@@ -286,7 +286,7 @@ namespace CssUI.HTML
                 Element ancestor = tree.parentNode() as Element;
                 while (ancestor != null)
                 {
-                    if (ancestor.Style.Positioning != CSS.EPositioning.Static)
+                    if (ancestor.Style.Positioning != CSS.EBoxPositioning.Static)
                     {
                         return ancestor;
                     }
@@ -294,7 +294,7 @@ namespace CssUI.HTML
                     {
                         return ancestor;
                     }
-                    else if (ancestor.Style.Positioning == CSS.EPositioning.Static && (ancestor is HTMLTableRowElement || ancestor is HTMLTableHeadElement || ancestor is HTMLTableElement))
+                    else if (ancestor.Style.Positioning == CSS.EBoxPositioning.Static && (ancestor is HTMLTableRowElement || ancestor is HTMLTableHeadElement || ancestor is HTMLTableElement))
                     {
                         return ancestor;
                     }
@@ -319,12 +319,12 @@ namespace CssUI.HTML
                 var offsetParent = this.offsetParent;
                 if (offsetParent == null)
                 {
-                    return (long)(Box.Border.Top - ownerDocument.Initial_Containing_Block.top);
+                    return (long)(Box.Border.Top - ownerDocument.Initial_Containing_Block.Top);
                 }
                 /* 3) Return the result of subtracting the y-coordinate of the top padding edge of the first CSS layout box associated with the offsetParent 
                  * of the element from the y-coordinate of the top border edge of the first CSS layout box associated with the element, 
                  * relative to the initial containing block origin, ignoring any transforms that apply to the element and its ancestors. */
-                return (long)(Box.Border.Top - offsetParent.Box.Padding.Top - ownerDocument.Initial_Containing_Block.top);
+                return (long)(Box.Border.Top - offsetParent.Box.Padding.Top - ownerDocument.Initial_Containing_Block.Top);
             }
         }
         /// <summary>
@@ -340,12 +340,12 @@ namespace CssUI.HTML
                 var offsetParent = this.offsetParent;
                 if (offsetParent == null)
                 {
-                    return (long)(Box.Border.Left - ownerDocument.Initial_Containing_Block.left);
+                    return (long)(Box.Border.Left - ownerDocument.Initial_Containing_Block.Left);
                 }
                 /* 3) Return the result of subtracting the x-coordinate of the left padding edge of the first CSS layout box associated with the offsetParent 
                  * of the element from the x-coordinate of the left border edge of the first CSS layout box associated with the element, 
                  * relative to the initial containing block origin, ignoring any transforms that apply to the element and its ancestors. */
-                return (long)(Box.Border.Left - offsetParent.Box.Padding.Left - ownerDocument.Initial_Containing_Block.left);
+                return (long)(Box.Border.Left - offsetParent.Box.Padding.Left - ownerDocument.Initial_Containing_Block.Left);
             }
         }
         /// <summary>

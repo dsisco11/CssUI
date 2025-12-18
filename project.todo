@@ -27,11 +27,20 @@
 - [x] Remove direct SixLabors references from CSS/DOM code
 - [x] Remove SixLabors package references from CssUI.csproj
 
-## Pre-existing HTML Module Issues (CssUI - Debug config)
-- [ ] Fix missing DOMCommon methods (Is_Form_Associated_Custom_Element, etc.)
-- [ ] Fix missing HTML element types (HTMLFieldSetElement, HTMLAreaElement, etc.)
-- [ ] Fix API signature changes (ReadOnlyMemory vs ReadOnlySpan)
-- [ ] Fix MathExt missing methods (Feq, Fgteq, Flteq)
+## Pre-existing HTML Module Issues (CssUI - Debug config) — 132 errors remain
+Note: The HTML module requires significant work and is excluded from Core config.
+- [x] Fix MathExt missing methods (Feq, Fgteq, Flteq) — enabled #if false block
+- [x] Fix EPositioning reference (renamed to EBoxPositioning)
+- [x] Fix Rect4f property casing (top→Top, left→Left)
+- [ ] Fix missing DOMCommon methods (~10 methods need implementation)
+  - Is_Form_Associated_Custom_Element, Is_Editing_Host, Is_Listed_Element
+  - Is_Submittable_Element, Is_Lableable_Element, Is_Submit_Button
+  - Run_Dialog_Focusing_Steps, Modal_Dialog_Block_Document, Modal_Dialog_Unblock_Document
+  - Is_Autocapitalize_Inheriting_Element
+- [ ] Fix missing HTML element types (HTMLFieldSetElement, HTMLAElement, HTMLLinkElement, HTMLAreaElement)
+- [ ] Fix API signature changes (ReadOnlyMemory vs ReadOnlySpan) — ~20 call sites
+- [ ] Fix Filter/FilterCharSelectable API changes
+- [ ] Fix ValueTask<bool> to bool async issues
 
 ## Phase 0: Intrinsic Sizing Infrastructure ✅ COMPLETE
 - [x] 0.1 Audit existing intrinsic sizing code in CssAlgorithms.cs

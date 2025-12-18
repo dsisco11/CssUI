@@ -152,7 +152,6 @@ namespace CssUI
         }
         #endregion
 
-#if false
         #region Floating-Point equality with epsilon tolerance
         /// <summary>
         /// Returns <c>True</c> if <paramref name="x"/> is equal to <paramref name="y"/> within a range of error <paramref name="epsilon"/>
@@ -343,7 +342,7 @@ namespace CssUI
             }
         }
         #endregion
-#endif
+
         #region Integer Exponents
         /// <summary>
         /// A cached power function which fetches low values from a cache before defaulting to the frameworks implementation

@@ -121,7 +121,7 @@ namespace CssUI.HTML
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#extensions-to-the-htmlimageelement-interface */
             get
             {
-                return (long)(Box.Border.Left - ownerDocument.Initial_Containing_Block.left);
+                return (long)(Box.Border.Left - ownerDocument.Initial_Containing_Block.Left);
             }
         }
         /// <summary>
@@ -131,7 +131,7 @@ namespace CssUI.HTML
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#extensions-to-the-htmlimageelement-interface */
             get
             {
-                return (long)(Box.Border.Top - ownerDocument.Initial_Containing_Block.top);
+                return (long)(Box.Border.Top - ownerDocument.Initial_Containing_Block.Top);
             }
         }
         #endregion
