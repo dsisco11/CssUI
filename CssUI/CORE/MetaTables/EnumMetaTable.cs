@@ -51,13 +51,13 @@ namespace CssUI
                 bool hasFlagsAttribute = (metaInfo.Item1.GetCustomAttribute<FlagsAttribute>() is object);
                 IS_FLAGS[enumIndex] = hasFlagsAttribute;
 
-                (int, MetaKeywordAttribute)[] metaValues = Get_Meta_Enum_Values(metaInfo.Item1);
+                (int, MetaKeywordAttribute?)[] metaValues = Get_Meta_Enum_Values(metaInfo.Item1);
                 // Initialize the tables for this enum
                 int maxValue = metaValues.Max(x => x.Item1);
                 TABLE[enumIndex] = new EnumData[maxValue + 1];
                 KEYWORD[enumIndex] = new Dictionary<AtomicString, object>(maxValue + 1);
                 // Populate the tables
-                foreach ((int, MetaKeywordAttribute) metaValue in metaValues)
+                foreach ((int, MetaKeywordAttribute?) metaValue in metaValues)
                 {
                     int enumValue = metaValue.Item1;
                     MetaKeywordAttribute metadata = metaValue.Item2;
@@ -87,25 +87,27 @@ namespace CssUI
             return Enum.GetValues(typeof(T)).Cast<T>().Max();
         }
 
-        public static unsafe (int, MetaKeywordAttribute)[] Get_Meta_Enum_Values(Type metaEnum)
+        public static unsafe (int, MetaKeywordAttribute?)[] Get_Meta_Enum_Values(Type metaEnum)
         {
             if (metaEnum is null) throw new ArgumentNullException(nameof(metaEnum));
             Contract.EndContractBlock();
             
             Type underlyingType = metaEnum.GetEnumUnderlyingType();
-            var castMethod = typeof(EnumMetaTable).GetMethod("IntCast").MakeGenericMethod(underlyingType);
-            var enumMaxMethod = typeof(EnumMetaTable).GetMethod("EnumMaxValue").MakeGenericMethod(metaEnum);
-            object bigValue = enumMaxMethod.Invoke(null, null);
+            var castMethod = typeof(EnumMetaTable).GetMethod("IntCast")?.MakeGenericMethod(underlyingType) 
+                ?? throw new InvalidOperationException("IntCast method not found");
+            var enumMaxMethod = typeof(EnumMetaTable).GetMethod("EnumMaxValue")?.MakeGenericMethod(metaEnum)
+                ?? throw new InvalidOperationException("EnumMaxValue method not found");
+            object? bigValue = enumMaxMethod.Invoke(null, null);
             //int maxValue = Unsafe.Unbox<int>(bigValue);
-            int maxValue = (int)castMethod.Invoke(null, new object[] { bigValue });
+            int maxValue = (int)(castMethod.Invoke(null, new object?[] { bigValue }) ?? 0);
 
             int TotalValues = 1 + maxValue;
-            var RetVal = new (int, MetaKeywordAttribute)[TotalValues];
+            var RetVal = new (int, MetaKeywordAttribute?)[TotalValues];
             Array metaValues = Enum.GetValues(metaEnum);
             foreach (object o in metaValues)
             {
                 var u = Enum.ToObject(metaEnum, o);
-                int i = (int)castMethod.Invoke(null, new object[] { u });
+                int i = (int)(castMethod.Invoke(null, new object?[] { u }) ?? 0);
 
                 if (i < 0) continue;
 

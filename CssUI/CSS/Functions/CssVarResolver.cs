@@ -67,13 +67,13 @@ namespace CssUI.CSS.Functions
         /// <summary>
         /// Parses var() function arguments to extract property name and optional fallback.
         /// </summary>
-        private static (string propertyName, CssValue fallback) ParseVarArguments(List<CssToken> arguments)
+        private static (string? propertyName, CssValue? fallback) ParseVarArguments(List<CssToken> arguments)
         {
             if (arguments == null || arguments.Count == 0)
                 return (null, null);
 
-            string propertyName = null;
-            CssValue fallback = null;
+            string? propertyName = null;
+            CssValue? fallback = null;
             bool foundComma = false;
             var fallbackTokens = new List<CssToken>();
 

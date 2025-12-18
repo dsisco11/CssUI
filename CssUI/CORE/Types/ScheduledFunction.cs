@@ -55,7 +55,7 @@ namespace CssUI
         }
 
 
-        void Tick(object state)
+        void Tick(object? state)
         {
             func?.Invoke();
         }

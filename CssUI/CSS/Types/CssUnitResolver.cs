@@ -180,7 +180,7 @@ namespace CssUI
 
 #if DISABLE_FONT_SYSTEM
 #else
-                        if (Owner.Style.Font != null)
+                        if (!Owner.Style.Font.IsNull)
                         {
                             // XXX: implement logic to measure the 'x' height for our font. SEE: https://www.w3.org/TR/css-values-3/#font-relative-lengths
                             throw new NotImplementedException();

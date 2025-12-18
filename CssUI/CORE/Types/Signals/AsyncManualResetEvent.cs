@@ -16,10 +16,10 @@ namespace CssUI
 
         public Task WaitAsync(TimeSpan timeout)
         {
-            timer_timeout = new Timer((object state) =>
+            timer_timeout = new Timer((object? state) =>
             {
                 var task = state as TaskCompletionSource<bool>;
-                task.TrySetCanceled();
+                task?.TrySetCanceled();
             }, m_tcs, timeout, TimeSpan.FromMilliseconds(-1));
 
             return m_tcs.Task;
