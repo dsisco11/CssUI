@@ -218,3 +218,12 @@ Note: The HTML module requires significant work and is excluded from Core config
 - [ ] Fix CS8602 (610→732) - dereference of possibly null reference
 - [ ] Fix CS8625 (960→190) - null literal to non-nullable type
   Note: Some warning counts increase temporarily as nullable changes propagate
+
+## Linting & Static Analysis
+
+### Update linting rules
+- [ ] Enable "file scoped namespaces" rule
+- [ ] Enable "nullable reference types" rule
+- [ ] Enable "null-coalescing assignment" rule
+- [ ] Enable "pattern matching" rule
+- [ ] Enable "prefer is null" rule
