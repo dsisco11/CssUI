@@ -194,16 +194,19 @@ Note: The HTML module requires significant work and is excluded from Core config
   - Consider System.Drawing types where appropriate
   - Document migration plan if beneficial
 
-### Standard Library Alignment
-- [ ] Analyze integer/numeric parsing implementations
-  - Compare custom parsing with .NET int.Parse/double.Parse/etc.
-  - Verify W3C CSS/HTML spec compliance of .NET implementations
-  - Plan migration to .NET if compliant (remove custom code)
-- [ ] Analyze string parsing implementations
-  - Identify custom string parsing code in codebase
-  - Compare with .NET equivalents (StringComparison, Span<char>, etc.)
-  - Verify W3C spec compliance
-  - Plan migration if .NET implementations are compliant
+### Standard Library Alignment ✅ ANALYZED
+See [PARSING_ANALYSIS.md](CssUI/docs/PARSING_ANALYSIS.md) for detailed analysis.
+
+- [x] Analyze integer/numeric parsing implementations
+  - Custom parsing in ParsingCommon.cs, Numerics.cs, CssTokenizer.cs
+  - HTML spec allows trailing non-digits (parsing stops); .NET throws
+  - CSS tokenizer needs stream-based parsing with token type output
+  - **Conclusion: Custom implementations required for spec compliance**
+- [x] Analyze string parsing implementations
+  - StringCommon.cs: StrEq/StriEq already use .NET StringComparison
+  - ASCII whitespace (5 chars) differs from .NET Unicode whitespace
+  - Memory-efficient Span<char>/ReadOnlyMemory<char> operations needed
+  - **Conclusion: Custom implementations required for spec compliance**
 
 ## Linting & Static Analysis
 

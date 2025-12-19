@@ -10,8 +10,30 @@ using static CssUI.UnicodeCommon;
 namespace CssUI.CSS.Parser
 {
     /// <summary>
-    /// Handles parsing CSS text
+    /// Tokenizes CSS text per the CSS Syntax Level 3 specification.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Implements the tokenization algorithms from
+    /// <see href="https://www.w3.org/TR/css-syntax-3/#tokenization">CSS Syntax Level 3 §4</see>.
+    /// </para>
+    /// <para>
+    /// <b>Why custom number parsing instead of .NET?</b>
+    /// </para>
+    /// <para>
+    /// CSS tokenization requires capabilities not available in .NET's parsing:
+    /// </para>
+    /// <list type="bullet">
+    /// <item><description><b>Token type discrimination:</b> Must distinguish between <c>&lt;integer&gt;</c> and
+    /// <c>&lt;number&gt;</c> token types based on presence of decimal point or exponent.</description></item>
+    /// <item><description><b>Original representation:</b> Must preserve the original string representation
+    /// for serialization (e.g., "1.0" vs "1" vs "1e0" are semantically different).</description></item>
+    /// <item><description><b>Stream integration:</b> Parsing operates on <see cref="DataConsumer{T}"/>
+    /// character stream with lookahead, not on complete strings.</description></item>
+    /// <item><description><b>Continuation:</b> After parsing a number, tokenization continues to check
+    /// for dimension units or percentage signs.</description></item>
+    /// </list>
+    /// </remarks>
     public class CssTokenizer
     {
         #region Properties

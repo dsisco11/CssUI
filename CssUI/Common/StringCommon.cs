@@ -10,6 +10,29 @@ using static CssUI.UnicodeCommon;
 
 namespace CssUI
 {
+    /// <summary>
+    /// Provides string manipulation utilities compliant with WHATWG Infra and HTML specifications.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Why custom implementations instead of .NET string methods?</b>
+    /// </para>
+    /// <para>
+    /// The WHATWG and HTML specifications define specific string operations that differ from .NET:
+    /// </para>
+    /// <list type="bullet">
+    /// <item><description><b>ASCII Whitespace:</b> Specs define exactly 5 characters (TAB U+0009, LF U+000A,
+    /// FF U+000C, CR U+000D, SPACE U+0020). .NET's <c>char.IsWhiteSpace()</c> includes many more
+    /// Unicode whitespace characters.</description></item>
+    /// <item><description><b>Memory efficiency:</b> Operations work directly on <see cref="ReadOnlySpan{T}"/>
+    /// and <see cref="ReadOnlyMemory{T}"/> without allocating intermediate strings.</description></item>
+    /// <item><description><b>Filter/Predicate patterns:</b> Custom filter system for character matching
+    /// used throughout the DOM/CSS parsing infrastructure.</description></item>
+    /// </list>
+    /// <para>
+    /// See <see href="https://infra.spec.whatwg.org/#strings">WHATWG Infra §4</see> for specification details.
+    /// </para>
+    /// </remarks>
     public static class StringCommon
     {
 
@@ -271,10 +294,29 @@ namespace CssUI
         };
 
         /// <summary>
-        /// Strips leading and trailing whitespace from a string and also collapses groups of whitespace characters with a single space
+        /// Strips leading/trailing ASCII whitespace and collapses runs of whitespace to single spaces.
         /// </summary>
-        /// <param name="buffMem">String memory</param>
-        /// <returns>Altered string</returns>
+        /// <param name="buffMem">The string memory to process.</param>
+        /// <returns>A new string with normalized whitespace.</returns>
+        /// <remarks>
+        /// <para>
+        /// Implements <see href="https://infra.spec.whatwg.org/#strip-and-collapse-ascii-whitespace">WHATWG Infra §4.6</see>.
+        /// </para>
+        /// <para>
+        /// <b>Why not use .NET string methods?</b>
+        /// </para>
+        /// <para>
+        /// .NET's <c>string.Trim()</c> and regex-based whitespace collapsing use Unicode whitespace
+        /// definitions. The WHATWG spec explicitly requires only these 5 ASCII characters:
+        /// </para>
+        /// <list type="bullet">
+        /// <item><description>U+0009 TAB</description></item>
+        /// <item><description>U+000A LINE FEED (LF)</description></item>
+        /// <item><description>U+000C FORM FEED (FF)</description></item>
+        /// <item><description>U+000D CARRIAGE RETURN (CR)</description></item>
+        /// <item><description>U+0020 SPACE</description></item>
+        /// </list>
+        /// </remarks>
         public static String Strip_And_Collapse_Whitespace(ReadOnlySpan<char> buffMem)
         {/* Docs: https://infra.spec.whatwg.org/#strip-and-collapse-ascii-whitespace */
             return Replace(buffMem, true, true, WhitespaceReplacements);

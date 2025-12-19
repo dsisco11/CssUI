@@ -8,6 +8,32 @@ using static CssUI.UnicodeCommon;
 
 namespace CssUI
 {
+    /// <summary>
+    /// Provides parsing utilities for HTML and CSS number formats per W3C specifications.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Why custom implementations instead of .NET standard library?</b>
+    /// </para>
+    /// <para>
+    /// The HTML and CSS specifications define specific parsing behaviors that differ from .NET's
+    /// <c>int.Parse()</c>, <c>double.Parse()</c>, etc.:
+    /// </para>
+    /// <list type="bullet">
+    /// <item><description><b>Trailing characters:</b> HTML/CSS parsers stop at non-matching characters and return
+    /// the parsed portion. .NET throws <see cref="FormatException"/> for any trailing content.</description></item>
+    /// <item><description><b>Error semantics:</b> Specs return specific failure values (e.g., <c>long.MaxValue</c>)
+    /// rather than throwing exceptions.</description></item>
+    /// <item><description><b>Whitespace handling:</b> Specs define ASCII whitespace (5 chars: TAB, LF, FF, CR, SPACE)
+    /// while .NET uses broader Unicode whitespace definitions.</description></item>
+    /// <item><description><b>Stream-based parsing:</b> CSS tokenization requires character-by-character consumption
+    /// with lookahead, not available in .NET parsing methods.</description></item>
+    /// </list>
+    /// <para>
+    /// See <see href="https://html.spec.whatwg.org/multipage/common-microsyntaxes.html">HTML Common Microsyntaxes</see>
+    /// and <see href="https://www.w3.org/TR/css-syntax-3/">CSS Syntax Level 3</see> for specification details.
+    /// </para>
+    /// </remarks>
     public static class ParsingCommon
     {
 
@@ -18,13 +44,20 @@ namespace CssUI
         }
 
         /// <summary>
-        /// Converts a series of digits into a base10 number
+        /// Converts a series of ASCII digit characters into a base-10 integer.
         /// </summary>
+        /// <param name="digits">A span containing only ASCII digit characters ('0'-'9').</param>
+        /// <returns>The parsed integer value.</returns>
+        /// <remarks>
+        /// This is an internal utility used by HTML/CSS number parsing. It operates on pre-validated
+        /// digit sequences extracted by the spec-compliant parsers, avoiding the overhead of
+        /// <c>long.Parse()</c> validation for already-validated input.
+        /// </remarks>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if input contains non-digit characters.</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long Digits_To_Base10(ReadOnlyMemory<char> digits) => Digits_To_Base10(digits.Span);
-        /// <summary>
-        /// Converts a series of digits into a base10 number
-        /// </summary>
+
+        /// <inheritdoc cref="Digits_To_Base10(ReadOnlyMemory{char})"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long Digits_To_Base10(ReadOnlySpan<char> digits)
         {
@@ -162,6 +195,30 @@ namespace CssUI
         #endregion
 
         #region Integer
+        /// <summary>
+        /// Parses a signed integer per the HTML specification's "rules for parsing integers".
+        /// </summary>
+        /// <param name="input">The input string to parse.</param>
+        /// <param name="outValue">When successful, contains the parsed integer; otherwise <c>long.MaxValue</c>.</param>
+        /// <returns><c>true</c> if parsing succeeded; otherwise <c>false</c>.</returns>
+        /// <remarks>
+        /// <para>
+        /// <b>Why not use <c>int.Parse()</c>?</b>
+        /// </para>
+        /// <para>
+        /// Per <see href="https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#signed-integers">HTML §2.4.4.2</see>,
+        /// the algorithm:
+        /// </para>
+        /// <list type="bullet">
+        /// <item><description>Strips leading ASCII whitespace (TAB, LF, FF, CR, SPACE only)</description></item>
+        /// <item><description>Stops parsing at the first non-digit character without failing</description></item>
+        /// <item><description>Returns an error for alphabetic characters immediately after digits</description></item>
+        /// </list>
+        /// <para>
+        /// .NET's <c>int.Parse()</c> throws <see cref="FormatException"/> for any trailing characters,
+        /// making it non-compliant with HTML parsing requirements.
+        /// </para>
+        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Parse_Integer(ReadOnlyMemory<char> input, out long outValue)
         {
@@ -170,6 +227,8 @@ namespace CssUI
             outValue = outParsed;
             return result;
         }
+
+        /// <inheritdoc cref="Parse_Integer(ReadOnlyMemory{char}, out long)"/>
         public static bool Parse_Integer(DataConsumer<char> Stream, out long outValue)
         {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#signed-integers */
             if (Stream is null) throw new ArgumentNullException(nameof(Stream));
@@ -214,6 +273,32 @@ namespace CssUI
         #endregion
 
         #region Decimal
+        /// <summary>
+        /// Parses a floating-point number per the HTML specification's "rules for parsing floating-point number values".
+        /// </summary>
+        /// <param name="input">The input string to parse.</param>
+        /// <param name="outValue">When successful, contains the parsed value; otherwise <c>NaN</c>.</param>
+        /// <returns><c>true</c> if parsing succeeded; otherwise <c>false</c>.</returns>
+        /// <remarks>
+        /// <para>
+        /// <b>Why not use <c>double.Parse()</c>?</b>
+        /// </para>
+        /// <para>
+        /// Per <see href="https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#rules-for-parsing-floating-point-number-values">HTML §2.4.4.3</see>,
+        /// the algorithm has specific behaviors:
+        /// </para>
+        /// <list type="bullet">
+        /// <item><description>Stops at trailing non-numeric characters without failing</description></item>
+        /// <item><description>Rejects negative zero (returns +0 instead)</description></item>
+        /// <item><description>Returns error for overflow (not ±∞ like .NET)</description></item>
+        /// <item><description>Does not accept "NaN" or "Infinity" keywords</description></item>
+        /// <item><description>Allows leading decimal point (e.g., ".5")</description></item>
+        /// </list>
+        /// <para>
+        /// .NET's <c>double.Parse()</c> throws exceptions for trailing characters and accepts
+        /// special values like "NaN" and "Infinity", making it non-compliant.
+        /// </para>
+        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Parse_FloatingPoint(ReadOnlyMemory<char> input, out float outValue)
         {
@@ -222,6 +307,8 @@ namespace CssUI
             outValue = (float)outParsed;
             return result;
         }
+
+        /// <inheritdoc cref="Parse_FloatingPoint(ReadOnlyMemory{char}, out float)"/>
         public static bool Parse_FloatingPoint(DataConsumer<char> Stream, out float outValue)
         {
             bool result = Parse_FloatingPoint(Stream, out double outParsed);
@@ -229,6 +316,7 @@ namespace CssUI
             return result;
         }
 
+        /// <inheritdoc cref="Parse_FloatingPoint(ReadOnlyMemory{char}, out float)"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Parse_FloatingPoint(ReadOnlyMemory<char> input, out double outValue)
         {
@@ -237,6 +325,8 @@ namespace CssUI
             outValue = outParsed;
             return result;
         }
+
+        /// <inheritdoc cref="Parse_FloatingPoint(ReadOnlyMemory{char}, out float)"/>
         public static bool Parse_FloatingPoint(DataConsumer<char> Stream, out double outValue)
         {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#rules-for-parsing-floating-point-number-values */
             if (Stream is null) throw new ArgumentNullException(nameof(Stream));

@@ -6,6 +6,27 @@ using static CssUI.UnicodeCommon;
 
 namespace CssUI.Serialization
 {
+    /// <summary>
+    /// Provides HTML-compliant numeric parsing per the WHATWG HTML specification.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This class implements the "common microsyntaxes" parsing algorithms from
+    /// <see href="https://html.spec.whatwg.org/multipage/common-microsyntaxes.html">HTML §2.4</see>.
+    /// </para>
+    /// <para>
+    /// <b>Why custom implementations instead of .NET parsing?</b>
+    /// </para>
+    /// <para>
+    /// HTML attribute parsing has unique requirements that .NET's standard parsing doesn't support:
+    /// </para>
+    /// <list type="bullet">
+    /// <item><description>Lenient parsing that stops at invalid characters rather than failing entirely</description></item>
+    /// <item><description>Specific ASCII whitespace handling (only TAB, LF, FF, CR, SPACE)</description></item>
+    /// <item><description>Stream-based parsing with <see cref="DataConsumer{T}"/> for integration with tokenizers</description></item>
+    /// <item><description>Specific error return values rather than exceptions</description></item>
+    /// </list>
+    /// </remarks>
     public static partial class HTMLParserCommon
     {
         #region Integer
