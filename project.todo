@@ -200,25 +200,6 @@ Note: The HTML module requires significant work and is excluded from Core config
   - Verify W3C spec compliance
   - Plan migration if .NET implementations are compliant
 
-### Nullable Reference Types
-- [x] Enable nullable context across codebase
-  - Currently: <Nullable>enable</Nullable> but many warnings
-- [x] Fix CS8765/CS8767 (64→0) - override/interface nullability mismatches
-- [x] Fix CS8714 (40→0) - generic notnull constraints
-- [x] Fix CS8073 (2→0) - expression always false
-- [x] Fix CS8622 (4→0) - parameter nullability mismatch
-- [x] Fix CS8605 (4→0) - unboxing possibly null value
-- [x] Fix CS8619 (6→0) - nullability mismatch in assignment
-- [x] Fix CS8601 (62→0) - null assignment to non-nullable ✅
-- [x] Fix CS8629 (30→0) - nullable value type may be null ✅
-- [x] Fix CS8618 (146→0) - non-nullable member not initialized ✅
-- [x] Fix CS8604 (232→0) - possible null reference argument ✅
-- [x] Fix CS8600 (324→0) - converting null to non-nullable type ✅
-- [x] Fix CS8603 (360→0) - possible null reference return ✅
-- [ ] Fix CS8602 (610→732) - dereference of possibly null reference
-- [x] Fix CS8625 (960→0) - null literal to non-nullable type ✅
-  Note: Some warning counts increase temporarily as nullable changes propagate
-
 ## Linting & Static Analysis
 
 ### Update linting rules
