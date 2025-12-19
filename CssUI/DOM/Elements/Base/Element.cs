@@ -709,7 +709,7 @@ namespace CssUI.DOM
 
 
         #region Attribute Management
-        public AttributeValue getAttribute(AtomicName<EAttributeName> Name)
+        public AttributeValue? getAttribute(AtomicName<EAttributeName> Name)
         {
             if (!AttributeList.TryGetValue(Name, out Attr outAttr))
                 return null;
@@ -718,7 +718,7 @@ namespace CssUI.DOM
             /* 3) Return attr’s value. */
             return outAttr.Value;
         }
-        public Attr getAttributeNode(AtomicName<EAttributeName> Name)
+        public Attr? getAttributeNode(AtomicName<EAttributeName> Name)
         {
             if (!AttributeList.TryGetValue(Name, out Attr outAttr))
                 return null;
@@ -863,7 +863,7 @@ namespace CssUI.DOM
         /// </summary>
         /// <param name="selectors"></param>
         /// <returns></returns>
-        public Element closest(string selectors)
+        public Element? closest(string selectors)
         {/* Docs: https://dom.spec.whatwg.org/#dom-element-closest */
             /* The closest(selectors) method, when invoked, must run these steps: */
             /* 1) Let s be the result of parse a selector from selectors. [SELECTORS4] */

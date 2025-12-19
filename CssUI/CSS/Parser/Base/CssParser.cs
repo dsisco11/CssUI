@@ -223,7 +223,7 @@ namespace CssUI.CSS.Serialization
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
-        static CssQualifiedRule Consume_QualifiedRule(DataConsumer<CssToken> Stream)
+        static CssQualifiedRule? Consume_QualifiedRule(DataConsumer<CssToken> Stream)
         {
             if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
             CssQualifiedRule Rule = new CssQualifiedRule();
@@ -748,7 +748,7 @@ namespace CssUI.CSS.Serialization
             throw new CssSyntaxErrorException(CssErrors.EXPECTING_MEDIA_CONDITION_START, Stream);
         }
 
-        static IMediaCondition Consume_Media_Feature(DataConsumer<CssToken> Stream)
+        static IMediaCondition? Consume_Media_Feature(DataConsumer<CssToken> Stream)
         {/* Docs: https://drafts.csswg.org/mediaqueries-4/#mq-syntax */
             if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
 

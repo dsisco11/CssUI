@@ -46,7 +46,7 @@ namespace CssUI.DOM
 
         #region Accessors
 
-        public AttributeDefinition Definition
+        public AttributeDefinition? Definition
         {
             get
             {

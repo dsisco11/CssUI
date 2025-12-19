@@ -207,7 +207,7 @@ namespace CssUI.DOM
         #endregion
 
         #region Slottables
-        internal static ISlot Find_Slot(ISlottable slottable, bool open_flag = false)
+        internal static ISlot? Find_Slot(ISlottable slottable, bool open_flag = false)
         {/* Docs: https://dom.spec.whatwg.org/#find-a-slot */
 #if ENABLE_HTML
             if (slottable.parentNode == null)

@@ -50,7 +50,7 @@ namespace CssUI
         /// </summary>
         /// <param name="Resolver"></param>
         /// <returns></returns>
-        public Ty Get(Func<Ty> Resolver)
+        public Ty? Get(Func<Ty> Resolver)
         {
             if (!IsCached)
             {
@@ -97,7 +97,7 @@ namespace CssUI
         {
             return Get().GetHashCode();
         }
-        public override string ToString()
+        public override string? ToString()
         {
             return Get().ToString();
         }

@@ -81,7 +81,7 @@ namespace CssUI.CSS
         public readonly EPropertySetOrigin Origin;
         #endregion
 
-        public override string ToString()
+        public override string? ToString()
         {
             if (!string.IsNullOrEmpty(Name)) return Name;
             return base.ToString();
@@ -89,72 +89,72 @@ namespace CssUI.CSS
 
         #region CSS Properties
         #region Display
-        public EnumProperty<EDisplayMode> Display => (EnumProperty<EDisplayMode>)Get(ECssPropertyID.Display);
+        public EnumProperty<EDisplayMode> Display => (EnumProperty<EDisplayMode>)Get(ECssPropertyID.Display)!;
 
         /// <summary>
         /// Current BoxSizing mode for this element.
         /// (Defaults to <see cref="EBoxSizingMode.BorderBox"/>)
         /// </summary>
-        public EnumProperty<EBoxSizingMode> BoxSizing => (EnumProperty<EBoxSizingMode>)Get(ECssPropertyID.BoxSizing);
+        public EnumProperty<EBoxSizingMode> BoxSizing => (EnumProperty<EBoxSizingMode>)Get(ECssPropertyID.BoxSizing)!;
 
-        public EnumProperty<EBoxPositioning> Positioning => (EnumProperty<EBoxPositioning>)Get(ECssPropertyID.Positioning);
+        public EnumProperty<EBoxPositioning> Positioning => (EnumProperty<EBoxPositioning>)Get(ECssPropertyID.Positioning)!;
         #endregion
 
         #region Flow
-        public EnumProperty<EDirection> Direction => (EnumProperty<EDirection>)Get(ECssPropertyID.Direction);
-        public EnumProperty<EWritingMode> WritingMode => (EnumProperty<EWritingMode>)Get(ECssPropertyID.WritingMode);
+        public EnumProperty<EDirection> Direction => (EnumProperty<EDirection>)Get(ECssPropertyID.Direction)!;
+        public EnumProperty<EWritingMode> WritingMode => (EnumProperty<EWritingMode>)Get(ECssPropertyID.WritingMode)!;
         #endregion
 
         #region Replaced Element Properties
-        public EnumProperty<EObjectFit> ObjectFit => (EnumProperty<EObjectFit>)Get(ECssPropertyID.ObjectFit);
-        public PositionProperty ObjectPosition => (PositionProperty)Get(ECssPropertyID.ObjectPosition);
+        public EnumProperty<EObjectFit> ObjectFit => (EnumProperty<EObjectFit>)Get(ECssPropertyID.ObjectFit)!;
+        public PositionProperty ObjectPosition => (PositionProperty)Get(ECssPropertyID.ObjectPosition)!;
         // public IntProperty ObjectPosition_X => (IntProperty)Get(ECssPropertyID.ObjectPositionX);
         // public IntProperty ObjectPosition_Y => (IntProperty)Get(ECssPropertyID.ObjectPositionY);
         #endregion
 
         #region Scroll Behavior
-        public EnumProperty<EScrollBehavior> ScrollBehavior => (EnumProperty<EScrollBehavior>)Get(ECssPropertyID.ScrollBehavior);
-        public EnumProperty<EOverflowMode> Overflow_X => (EnumProperty<EOverflowMode>)Get(ECssPropertyID.OverflowX);
-        public EnumProperty<EOverflowMode> Overflow_Y => (EnumProperty<EOverflowMode>)Get(ECssPropertyID.OverflowY);
+        public EnumProperty<EScrollBehavior> ScrollBehavior => (EnumProperty<EScrollBehavior>)Get(ECssPropertyID.ScrollBehavior)!;
+        public EnumProperty<EOverflowMode> Overflow_X => (EnumProperty<EOverflowMode>)Get(ECssPropertyID.OverflowX)!;
+        public EnumProperty<EOverflowMode> Overflow_Y => (EnumProperty<EOverflowMode>)Get(ECssPropertyID.OverflowY)!;
         #endregion
 
         #region Size
-        public IntProperty Width => (IntProperty)Get(ECssPropertyID.Width);
-        public IntProperty Height => (IntProperty)Get(ECssPropertyID.Height);
+        public IntProperty Width => (IntProperty)Get(ECssPropertyID.Width)!;
+        public IntProperty Height => (IntProperty)Get(ECssPropertyID.Height)!;
         #endregion
 
         #region Borders
-        public EnumProperty<EBorderStyle> Border_Top_Style => (EnumProperty<EBorderStyle>)Get(ECssPropertyID.BorderTopStyle);
-        public EnumProperty<EBorderStyle> Border_Right_Style => (EnumProperty<EBorderStyle>)Get(ECssPropertyID.BorderRightStyle);
-        public EnumProperty<EBorderStyle> Border_Bottom_Style => (EnumProperty<EBorderStyle>)Get(ECssPropertyID.BorderBottomStyle);
-        public EnumProperty<EBorderStyle> Border_Left_Style => (EnumProperty<EBorderStyle>)Get(ECssPropertyID.BorderLeftStyle);
+        public EnumProperty<EBorderStyle> Border_Top_Style => (EnumProperty<EBorderStyle>)Get(ECssPropertyID.BorderTopStyle)!;
+        public EnumProperty<EBorderStyle> Border_Right_Style => (EnumProperty<EBorderStyle>)Get(ECssPropertyID.BorderRightStyle)!;
+        public EnumProperty<EBorderStyle> Border_Bottom_Style => (EnumProperty<EBorderStyle>)Get(ECssPropertyID.BorderBottomStyle)!;
+        public EnumProperty<EBorderStyle> Border_Left_Style => (EnumProperty<EBorderStyle>)Get(ECssPropertyID.BorderLeftStyle)!;
 
-        public IntProperty Border_Top_Width => (IntProperty)Get(ECssPropertyID.BorderTopWidth);
-        public IntProperty Border_Right_Width => (IntProperty)Get(ECssPropertyID.BorderRightWidth);
-        public IntProperty Border_Bottom_Width => (IntProperty)Get(ECssPropertyID.BorderBottomWidth);
-        public IntProperty Border_Left_Width => (IntProperty)Get(ECssPropertyID.BorderLeftWidth);
+        public IntProperty Border_Top_Width => (IntProperty)Get(ECssPropertyID.BorderTopWidth)!;
+        public IntProperty Border_Right_Width => (IntProperty)Get(ECssPropertyID.BorderRightWidth)!;
+        public IntProperty Border_Bottom_Width => (IntProperty)Get(ECssPropertyID.BorderBottomWidth)!;
+        public IntProperty Border_Left_Width => (IntProperty)Get(ECssPropertyID.BorderLeftWidth)!;
         #endregion
 
         #region Min Size
         /// <summary>
         /// The minimum Width of an elements content-area
         /// </summary>
-        public IntProperty Min_Width => (IntProperty)Get(ECssPropertyID.MinWidth);
+        public IntProperty Min_Width => (IntProperty)Get(ECssPropertyID.MinWidth)!;
         /// <summary>
         /// The minimum Height of an elements content-area
         /// </summary>
-        public IntProperty Min_Height => (IntProperty)Get(ECssPropertyID.MinHeight);
+        public IntProperty Min_Height => (IntProperty)Get(ECssPropertyID.MinHeight)!;
         #endregion
 
         #region Max Size
         /// <summary>
         /// The maximum Width of an elements content-area
         /// </summary>
-        public NullableIntProperty Max_Width => (NullableIntProperty)Get(ECssPropertyID.MaxWidth);
+        public NullableIntProperty Max_Width => (NullableIntProperty)Get(ECssPropertyID.MaxWidth)!;
         /// <summary>
         /// The maximum Height of an elements content-area
         /// </summary>
-        public NullableIntProperty Max_Height => (NullableIntProperty)Get(ECssPropertyID.MaxHeight);
+        public NullableIntProperty Max_Height => (NullableIntProperty)Get(ECssPropertyID.MaxHeight)!;
         #endregion
 
         #region Position
@@ -162,30 +162,30 @@ namespace CssUI.CSS
         /// Points to <see cref="Left"/>
         /// Distance between the elements Left outter edge and the matching edge of its containing block.
         /// </summary>
-        public IntProperty X => (IntProperty)Get(ECssPropertyID.Left);
+        public IntProperty X => (IntProperty)Get(ECssPropertyID.Left)!;
         /// <summary>
         /// Points to <see cref="Top"/>
         /// Distance between the elements Top outter edge and the matching edge of its containing block.
         /// </summary>
-        public IntProperty Y => (IntProperty)Get(ECssPropertyID.Top);
+        public IntProperty Y => (IntProperty)Get(ECssPropertyID.Top)!;
 
 
         /// <summary>
         /// Distance between the elements Top outter edge and the matching edge of its containing block.
         /// </summary>
-        public IntProperty Top => (IntProperty)Get(ECssPropertyID.Top);
+        public IntProperty Top => (IntProperty)Get(ECssPropertyID.Top)!;
         /// <summary>
         /// Distance between the elements Right outter edge and the matching edge of its containing block.
         /// </summary>
-        public IntProperty Right => (IntProperty)Get(ECssPropertyID.Right);
+        public IntProperty Right => (IntProperty)Get(ECssPropertyID.Right)!;
         /// <summary>
         /// Distance between the elements Bottom outter edge and the matching edge of its containing block.
         /// </summary>
-        public IntProperty Bottom => (IntProperty)Get(ECssPropertyID.Bottom);
+        public IntProperty Bottom => (IntProperty)Get(ECssPropertyID.Bottom)!;
         /// <summary>
         /// Distance between the elements Left outter edge and the matching edge of its containing block.
         /// </summary>
-        public IntProperty Left => (IntProperty)Get(ECssPropertyID.Left);
+        public IntProperty Left => (IntProperty)Get(ECssPropertyID.Left)!;
         #endregion
 
         #region Padding
@@ -193,22 +193,22 @@ namespace CssUI.CSS
         /// Distance between this elements Top border and its content (in pixels)
         /// <para>Clears an area around the content. The padding can be thought of as extending the content area in that the controls background occupys it</para>
         /// </summary>
-        public IntProperty Padding_Top => (IntProperty)Get(ECssPropertyID.PaddingTop);
+        public IntProperty Padding_Top => (IntProperty)Get(ECssPropertyID.PaddingTop)!;
         /// <summary>
         /// Distance between this elements Right border and its content (in pixels)
         /// <para>Clears an area around the content. The padding can be thought of as extending the content area in that the controls background occupys it</para>
         /// </summary>
-        public IntProperty Padding_Right => (IntProperty)Get(ECssPropertyID.PaddingRight);
+        public IntProperty Padding_Right => (IntProperty)Get(ECssPropertyID.PaddingRight)!;
         /// <summary>
         /// Distance between this elements Bottom border and its content (in pixels)
         /// <para>Clears an area around the content. The padding can be thought of as extending the content area in that the controls background occupys it</para>
         /// </summary>
-        public IntProperty Padding_Bottom => (IntProperty)Get(ECssPropertyID.PaddingBottom);
+        public IntProperty Padding_Bottom => (IntProperty)Get(ECssPropertyID.PaddingBottom)!;
         /// <summary>
         /// Distance between this elements Left border and its content (in pixels)
         /// <para>Clears an area around the content. The padding can be thought of as extending the content area in that the controls background occupys it</para>
         /// </summary>
-        public IntProperty Padding_Left => (IntProperty)Get(ECssPropertyID.PaddingLeft);
+        public IntProperty Padding_Left => (IntProperty)Get(ECssPropertyID.PaddingLeft)!;
         #endregion
 
         #region Margins
@@ -216,154 +216,154 @@ namespace CssUI.CSS
         /// Distance between the elements Top edge and Top border (in pixels)
         /// <para>Clears an area outside the border. The margin is transparent</para>
         /// </summary>
-        public IntProperty Margin_Top => (IntProperty)Get(ECssPropertyID.MarginTop);
+        public IntProperty Margin_Top => (IntProperty)Get(ECssPropertyID.MarginTop)!;
         /// <summary>
         /// Distance between the elements Right edge and Right border (in pixels)
         /// <para>Clears an area outside the border. The margin is transparent</para>
         /// </summary>
-        public IntProperty Margin_Right => (IntProperty)Get(ECssPropertyID.MarginRight);
+        public IntProperty Margin_Right => (IntProperty)Get(ECssPropertyID.MarginRight)!;
         /// <summary>
         /// Distance between the elements Bottom edge and Bottom border (in pixels)
         /// <para>Clears an area outside the border. The margin is transparent</para>
         /// </summary>
-        public IntProperty Margin_Bottom => (IntProperty)Get(ECssPropertyID.MarginBottom);
+        public IntProperty Margin_Bottom => (IntProperty)Get(ECssPropertyID.MarginBottom)!;
         /// <summary>
         /// Distance between the elements Left edge and Left border (in pixels)
         /// <para>Clears an area outside the border. The margin is transparent</para>
         /// </summary>
-        public IntProperty Margin_Left => (IntProperty)Get(ECssPropertyID.MarginLeft);
+        public IntProperty Margin_Left => (IntProperty)Get(ECssPropertyID.MarginLeft)!;
         #endregion
 
         #region Text
-        public EnumProperty<ETextAlign> TextAlign => (EnumProperty<ETextAlign>)Get(ECssPropertyID.TextAlign);
+        public EnumProperty<ETextAlign> TextAlign => (EnumProperty<ETextAlign>)Get(ECssPropertyID.TextAlign)!;
         #endregion
 
         #region Font
-        public NumberProperty DpiX => (NumberProperty)Get(ECssPropertyID.DpiX);
-        public NumberProperty DpiY => (NumberProperty)Get(ECssPropertyID.DpiY);
+        public NumberProperty DpiX => (NumberProperty)Get(ECssPropertyID.DpiX)!;
+        public NumberProperty DpiY => (NumberProperty)Get(ECssPropertyID.DpiY)!;
 
-        public IntProperty FontWeight => (IntProperty)Get(ECssPropertyID.FontWeight);
-        public EnumProperty<EFontStyle> FontStyle => (EnumProperty<EFontStyle>)Get(ECssPropertyID.FontStyle);
-        public NumberProperty FontSize => (NumberProperty)Get(ECssPropertyID.FontSize);
-        public MultiStringProperty FontFamily => (MultiStringProperty)Get(ECssPropertyID.FontFamily);
+        public IntProperty FontWeight => (IntProperty)Get(ECssPropertyID.FontWeight)!;
+        public EnumProperty<EFontStyle> FontStyle => (EnumProperty<EFontStyle>)Get(ECssPropertyID.FontStyle)!;
+        public NumberProperty FontSize => (NumberProperty)Get(ECssPropertyID.FontSize)!;
+        public MultiStringProperty FontFamily => (MultiStringProperty)Get(ECssPropertyID.FontFamily)!;
 
-        public ColorProperty Color => (ColorProperty)Get(ECssPropertyID.Color);
+        public ColorProperty Color => (ColorProperty)Get(ECssPropertyID.Color)!;
         #endregion
 
         #region Lines
         /// <summary>
         /// 'line-height' specifies the minimal height of line boxes within the element.
         /// </summary>
-        public IntProperty LineHeight => (IntProperty)Get(ECssPropertyID.LineHeight);
+        public IntProperty LineHeight => (IntProperty)Get(ECssPropertyID.LineHeight)!;
         #endregion
 
         #region Opacity
-        public NumberProperty Opacity => (NumberProperty)Get(ECssPropertyID.Opacity);
+        public NumberProperty Opacity => (NumberProperty)Get(ECssPropertyID.Opacity)!;
         #endregion
 
         #region Transforms
-        public TransformListProperty Transform => (TransformListProperty)Get(ECssPropertyID.Transform);
+        public TransformListProperty Transform => (TransformListProperty)Get(ECssPropertyID.Transform)!;
         #endregion
 
         #region Flexbox
         /// <summary>
         /// Specifies how flex items are placed in the flex container (row, column, etc.).
         /// </summary>
-        public EnumProperty<EFlexDirection> FlexDirection => (EnumProperty<EFlexDirection>)Get(ECssPropertyID.FlexDirection);
+        public EnumProperty<EFlexDirection> FlexDirection => (EnumProperty<EFlexDirection>)Get(ECssPropertyID.FlexDirection)!;
         
         /// <summary>
         /// Controls whether the flex container is single-line or multi-line.
         /// </summary>
-        public EnumProperty<EFlexWrap> FlexWrap => (EnumProperty<EFlexWrap>)Get(ECssPropertyID.FlexWrap);
+        public EnumProperty<EFlexWrap> FlexWrap => (EnumProperty<EFlexWrap>)Get(ECssPropertyID.FlexWrap)!;
         
         /// <summary>
         /// Specifies the flex grow factor (how much the item grows relative to other items).
         /// </summary>
-        public NumberProperty FlexGrow => (NumberProperty)Get(ECssPropertyID.FlexGrow);
+        public NumberProperty FlexGrow => (NumberProperty)Get(ECssPropertyID.FlexGrow)!;
         
         /// <summary>
         /// Specifies the flex shrink factor (how much the item shrinks relative to other items).
         /// </summary>
-        public NumberProperty FlexShrink => (NumberProperty)Get(ECssPropertyID.FlexShrink);
+        public NumberProperty FlexShrink => (NumberProperty)Get(ECssPropertyID.FlexShrink)!;
         
         /// <summary>
         /// Specifies the initial main size of a flex item before free space is distributed.
         /// </summary>
-        public IntProperty FlexBasis => (IntProperty)Get(ECssPropertyID.FlexBasis);
+        public IntProperty FlexBasis => (IntProperty)Get(ECssPropertyID.FlexBasis)!;
         
         /// <summary>
         /// Controls the order of flex/grid items within the container.
         /// </summary>
-        public IntProperty Order => (IntProperty)Get(ECssPropertyID.Order);
+        public IntProperty Order => (IntProperty)Get(ECssPropertyID.Order)!;
         #endregion
 
         #region Alignment
         /// <summary>
         /// Aligns flex lines or grid tracks within the container along the cross axis.
         /// </summary>
-        public EnumProperty<EAlignContent> AlignContent => (EnumProperty<EAlignContent>)Get(ECssPropertyID.AlignContent);
+        public EnumProperty<EAlignContent> AlignContent => (EnumProperty<EAlignContent>)Get(ECssPropertyID.AlignContent)!;
         
         /// <summary>
         /// Justifies content along the main axis (flex) or inline axis (grid).
         /// </summary>
-        public EnumProperty<EJustifyContent> JustifyContent => (EnumProperty<EJustifyContent>)Get(ECssPropertyID.JustifyContent);
+        public EnumProperty<EJustifyContent> JustifyContent => (EnumProperty<EJustifyContent>)Get(ECssPropertyID.JustifyContent)!;
         
         /// <summary>
         /// Sets the default alignment for all items along the cross axis.
         /// </summary>
-        public EnumProperty<EAlignItems> AlignItems => (EnumProperty<EAlignItems>)Get(ECssPropertyID.AlignItems);
+        public EnumProperty<EAlignItems> AlignItems => (EnumProperty<EAlignItems>)Get(ECssPropertyID.AlignItems)!;
         
         /// <summary>
         /// Overrides align-items for a specific item.
         /// </summary>
-        public EnumProperty<EAlignItems> AlignSelf => (EnumProperty<EAlignItems>)Get(ECssPropertyID.AlignSelf);
+        public EnumProperty<EAlignItems> AlignSelf => (EnumProperty<EAlignItems>)Get(ECssPropertyID.AlignSelf)!;
         
         /// <summary>
         /// Sets the gap between rows in flex/grid containers.
         /// </summary>
-        public IntProperty RowGap => (IntProperty)Get(ECssPropertyID.RowGap);
+        public IntProperty RowGap => (IntProperty)Get(ECssPropertyID.RowGap)!;
         
         /// <summary>
         /// Sets the gap between columns in flex/grid containers.
         /// </summary>
-        public IntProperty ColumnGap => (IntProperty)Get(ECssPropertyID.ColumnGap);
+        public IntProperty ColumnGap => (IntProperty)Get(ECssPropertyID.ColumnGap)!;
         #endregion
 
         #region Grid
         /// <summary>
         /// Controls the auto-placement algorithm (row, column, dense).
         /// </summary>
-        public EnumProperty<EGridAutoFlow> GridAutoFlow => (EnumProperty<EGridAutoFlow>)Get(ECssPropertyID.GridAutoFlow);
+        public EnumProperty<EGridAutoFlow> GridAutoFlow => (EnumProperty<EGridAutoFlow>)Get(ECssPropertyID.GridAutoFlow)!;
         
         /// <summary>
         /// Specifies a grid item's start position in the column direction.
         /// </summary>
-        public IntProperty GridColumnStart => (IntProperty)Get(ECssPropertyID.GridColumnStart);
+        public IntProperty GridColumnStart => (IntProperty)Get(ECssPropertyID.GridColumnStart)!;
         
         /// <summary>
         /// Specifies a grid item's end position in the column direction.
         /// </summary>
-        public IntProperty GridColumnEnd => (IntProperty)Get(ECssPropertyID.GridColumnEnd);
+        public IntProperty GridColumnEnd => (IntProperty)Get(ECssPropertyID.GridColumnEnd)!;
         
         /// <summary>
         /// Specifies a grid item's start position in the row direction.
         /// </summary>
-        public IntProperty GridRowStart => (IntProperty)Get(ECssPropertyID.GridRowStart);
+        public IntProperty GridRowStart => (IntProperty)Get(ECssPropertyID.GridRowStart)!;
         
         /// <summary>
         /// Specifies a grid item's end position in the row direction.
         /// </summary>
-        public IntProperty GridRowEnd => (IntProperty)Get(ECssPropertyID.GridRowEnd);
+        public IntProperty GridRowEnd => (IntProperty)Get(ECssPropertyID.GridRowEnd)!;
         
         /// <summary>
         /// Defines the columns of a grid container (e.g., "1fr 2fr 100px").
         /// </summary>
-        public StringProperty GridTemplateColumns => (StringProperty)Get(ECssPropertyID.GridTemplateColumns);
+        public StringProperty GridTemplateColumns => (StringProperty)Get(ECssPropertyID.GridTemplateColumns)!;
         
         /// <summary>
         /// Defines the rows of a grid container (e.g., "auto 1fr 200px").
         /// </summary>
-        public StringProperty GridTemplateRows => (StringProperty)Get(ECssPropertyID.GridTemplateRows);
+        public StringProperty GridTemplateRows => (StringProperty)Get(ECssPropertyID.GridTemplateRows)!;
         #endregion
         #endregion
 
@@ -543,7 +543,7 @@ namespace CssUI.CSS
             return Get(Property.CssName);
         }
 
-        internal ICssProperty Get(AtomicName<ECssPropertyID> CssName)
+        internal ICssProperty? Get(AtomicName<ECssPropertyID> CssName)
         {
             if (CssName is null) throw new ArgumentNullException(nameof(CssName));
             if (CssName.Value < 0) throw new ArgumentOutOfRangeException($"Invalid CSS property ID (negative value): {CssName}");

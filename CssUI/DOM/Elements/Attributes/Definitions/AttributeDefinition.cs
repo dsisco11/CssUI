@@ -364,7 +364,7 @@ namespace CssUI.DOM
         #endregion
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static AttributeDefinition Lookup(AtomicName<EAttributeName> Name)
+        public static AttributeDefinition? Lookup(AtomicName<EAttributeName> Name)
         {
             if (DomDefinitions.AttributeDefinitions.TryGetValue(Name, out var definitionList))
             {
@@ -380,7 +380,7 @@ namespace CssUI.DOM
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static AttributeDefinition Lookup(AtomicName<EAttributeName> Name, Type elementType)
+        public static AttributeDefinition? Lookup(AtomicName<EAttributeName> Name, Type elementType)
         {
             if (elementType == null)
             {

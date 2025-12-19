@@ -152,7 +152,7 @@ namespace CssUI.DOM
             return result;
         }
 
-        public Node nextNode()
+        public Node? nextNode()
         {/* Docs: https://dom.spec.whatwg.org/#concept-traversal-active */
             Node? node = referenceNode;
             bool beforeNode = pointerBeforeReferenceNode;
@@ -185,7 +185,7 @@ namespace CssUI.DOM
             return node;
 
         }
-        public Node previousNode()
+        public Node? previousNode()
         {/* Docs: https://dom.spec.whatwg.org/#concept-traversal-active */
 
             Node? node = referenceNode;

@@ -44,7 +44,7 @@ namespace CssUI.DOM.Internal
         /// <param name="A"></param>
         /// <param name="B"></param>
         /// <returns></returns>
-        internal static EventTarget retarget_event(IEventTarget A, IEventTarget B)
+        internal static EventTarget? retarget_event(IEventTarget A, IEventTarget B)
         {/* Docs: https://dom.spec.whatwg.org/#retarget */
             while (A is object)
             {
@@ -347,7 +347,7 @@ namespace CssUI.DOM.Internal
             return found;
         }
         
-        public static EventTarget determine_target(EventTarget eventTarget, EventName Name)
+        public static EventTarget? determine_target(EventTarget eventTarget, EventName Name)
         {/* Docs: https://html.spec.whatwg.org/multipage/webappapis.html#determining-the-target-of-an-event-handler */
          /* 1) If eventTarget is not a body element or a frameset element, then return eventTarget. */
             if ((eventTarget is Element element) && !element.tagName.Equals("body") && element.tagName.Equals("frameset"))
