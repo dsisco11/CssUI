@@ -351,10 +351,10 @@ dotnet_diagnostic.IDE0048.severity = silent
 dotnet_diagnostic.IDE0049.severity = silent
 
 # IDE0051: Remove unused private members
-dotnet_diagnostic.IDE0051.severity = warning
+dotnet_diagnostic.IDE0051.severity = suggestion
 
 # IDE0052: Remove unread private members
-dotnet_diagnostic.IDE0052.severity = warning
+dotnet_diagnostic.IDE0052.severity = suggestion
 
 # IDE0053: Use expression body for lambda
 dotnet_diagnostic.IDE0053.severity = silent
