@@ -5,7 +5,7 @@ using CssUI.HTML;
 namespace CssUI.DOM
 {
     /// <summary>
-    /// Rejects any node that isnt lableable
+    /// Rejects any node that isnt labelable
     /// </summary>
     public class FilterIsLableable : NodeFilter
     {
@@ -16,7 +16,7 @@ namespace CssUI.DOM
             if (node.nodeType != ENodeType.ELEMENT_NODE || !(node is HTMLElement nodeElement))
                 return ENodeFilterResult.FILTER_REJECT;
 
-            if (DOMCommon.Is_Lableable_Element(nodeElement))
+            if (DOMCommon.Is_Labelable_Element(nodeElement))
                 return ENodeFilterResult.FILTER_ACCEPT;
 
             return ENodeFilterResult.FILTER_SKIP;

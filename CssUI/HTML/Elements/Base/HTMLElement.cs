@@ -358,7 +358,7 @@ namespace CssUI.HTML
                 if (Box == null || ReferenceEquals(this, ownerDocument.body))
                     return 0;
 
-                return Box.Border.Width;
+                return (long)Box.Border.Width;
             }
         }
         /// <summary>
@@ -371,7 +371,7 @@ namespace CssUI.HTML
                 if (Box == null || ReferenceEquals(this, ownerDocument.body))
                     return 0;
 
-                return Box.Border.Height;
+                return (long)Box.Border.Height;
             }
         }
         #endregion

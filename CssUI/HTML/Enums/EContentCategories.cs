@@ -69,6 +69,23 @@ namespace CssUI.HTML
         /// </summary>
         /// Docs: https://html.spec.whatwg.org/multipage/dom.html#script-supporting-elements-2
         ScriptSupporting = (1 << 10),
+
+        /// <summary>
+        /// Alias for MetaData for consistency with HTML spec naming
+        /// </summary>
+        Metadata = MetaData,
+
+        /// <summary>
+        /// Listed form-associated elements are listed in form.elements and fieldset.elements collections.
+        /// </summary>
+        /// Docs: https://html.spec.whatwg.org/multipage/forms.html#category-listed
+        Listed = (1 << 11),
+
+        /// <summary>
+        /// Form-associated elements can have a form owner.
+        /// </summary>
+        /// Docs: https://html.spec.whatwg.org/multipage/forms.html#form-associated-element
+        FormAssociated = (1 << 12),
     }
 }
 

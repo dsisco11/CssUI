@@ -240,6 +240,10 @@ namespace CssUI.DOM
         Ping,
         [MetaKeyword("download")]
         Download,
+
+        /* SCRIPT/LINK INTEGRITY */
+        [MetaKeyword("integrity")]
+        Integrity,
     }
 }
 

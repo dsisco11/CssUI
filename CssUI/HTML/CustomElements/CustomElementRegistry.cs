@@ -111,7 +111,8 @@ namespace CssUI.HTML.CustomElements
                     throw new NotSupportedError($"Custom element cannot extend \"{extends}\"");
                 }
                 /* 2) If the element interface for extends and the HTML namespace is HTMLUnknownElement (e.g., if extends does not indicate an element definition in this specification), then throw a "NotSupportedError" DOMException. */
-                Type interfaceType = DOMCommon.Lookup_Element_Interface(extends, DOMCommon.HTMLNamespace);
+                var ctor = DOMCommon.Lookup_Element_Interface(extends, DOMCommon.HTMLNamespace);
+                Type? interfaceType = ctor?.DeclaringType;
                 if (interfaceType == typeof(HTMLUnknownElement))
                 {
                     throw new NotSupportedError($"Cannot extend non existant element type \"{extends}\"");
@@ -201,7 +202,7 @@ namespace CssUI.HTML.CustomElements
 
             Document document = window.activeDocument;
             FilterLocalName_Namespace Filter = new FilterLocalName_Namespace(localName, DOMCommon.HTMLNamespace);
-            IReadOnlyCollection<Node> upgradeCandidates = DOMCommon.Get_Shadow_Including_Descendents(document.documentElement, Filter, Enums.ENodeFilterMask.SHOW_ELEMENT);
+            IReadOnlyCollection<Node> upgradeCandidates = DOMCommon.Get_Shadow_Including_Descendents(document.documentElement, Filter, DOM.Enums.ENodeFilterMask.SHOW_ELEMENT);
 
             /* 19) For each element element in upgrade candidates, enqueue a custom element upgrade reaction given element and definition. */
             foreach (Node candidate in upgradeCandidates)

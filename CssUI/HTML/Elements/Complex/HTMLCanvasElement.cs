@@ -12,6 +12,11 @@ namespace CssUI.HTML
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Returns true if the canvas has an active rendering context.
+        /// When false, child elements are used as fallback content.
+        /// </summary>
+        public bool HasRenderingContext { get; private set; } = false;
         #endregion
 
         #region Constructors

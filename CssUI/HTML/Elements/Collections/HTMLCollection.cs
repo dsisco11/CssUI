@@ -19,6 +19,11 @@ namespace CssUI.HTML
             this.root = root;
         }
 
+        public HTMLCollection(HTMLElement root, NodeFilter CollectionFilter, ENodeFilterMask filterMask) : this(root)
+        {
+            this.CollectionFilter = CollectionFilter;
+        }
+
         protected HTMLCollection(HTMLElement root, NodeFilter CollectionFilter) : this(root)
         {
             this.CollectionFilter = CollectionFilter;

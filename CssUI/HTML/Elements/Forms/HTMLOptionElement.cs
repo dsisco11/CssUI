@@ -229,7 +229,7 @@ namespace CssUI.HTML
                 }
 
                 string textStr = sb.ToString();
-                return StringCommon.Strip_And_Collapse_Whitespace(textStr.AsMemory());
+                return StringCommon.Strip_And_Collapse_Whitespace(textStr.AsSpan());
             }
 
             set

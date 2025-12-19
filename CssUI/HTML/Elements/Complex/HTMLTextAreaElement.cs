@@ -162,7 +162,7 @@ namespace CssUI.HTML
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal string get_api_value()
         {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#the-textarea-element:concept-fe-api-value-2 */
-            return StringCommon.Replace(raw_value.AsMemory(), Filters.FilterCRLF.Instance, Filters.FilterCRLF.LF.AsSpan());
+            return StringCommon.Replace(raw_value.AsMemory(), Filters.FilterCRLF.Instance, Filters.FilterCRLF.LF);
         }
 
         #region Overrides

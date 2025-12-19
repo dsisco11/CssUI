@@ -18,7 +18,7 @@ namespace CssUI.HTML
         public static void Append_Entry_To_List(ref List<Tuple<string, FormDataEntryValue>> entryList, string name, dynamic value, bool prevent_line_break_normalization_flag = false)
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#append-an-entry */
             /* 1) For name, replace every occurrence of U+000D (CR) not followed by U+000A (LF), and every occurrence of U+000A (LF) not preceded by U+000D (CR), by a string consisting of a U+000D (CR) and U+000A (LF). */
-            var normalizedName = StringCommon.Replace(name.AsMemory(), FilterCRLF.Instance, strNewline.AsSpan());
+            var normalizedName = StringCommon.Replace(name.AsMemory(), FilterCRLF.Instance, strNewline);
 
             /* 2) Replace name with the result of converting to a sequence of Unicode scalar values. */
             name = UnicodeCommon.Convert_To_Scalar_Values(normalizedName.AsMemory());
@@ -33,7 +33,7 @@ namespace CssUI.HTML
 
                 if (!prevent_line_break_normalization_flag)
                 {
-                    string normalizedValue = StringCommon.Replace(((string)value).AsMemory(), FilterCRLF.Instance, strNewline.AsSpan());
+                    string normalizedValue = StringCommon.Replace(((string)value).AsMemory(), FilterCRLF.Instance, strNewline);
                     value = UnicodeCommon.Convert_To_Scalar_Values(normalizedValue.AsMemory());
                 }
 
@@ -337,7 +337,7 @@ namespace CssUI.HTML
 
             foreach (var field in invalidElements)
             {
-                var notCanceled = field.dispatchEvent(new Event(EEventName.Invalid, new EventInit() { cancelable = true }));
+                var notCanceled = field.dispatchEvent(new Event(EEventName.Invalid, new EventInit() { cancelable = true })).AsTask().GetAwaiter().GetResult();
                 if (notCanceled)
                 {
                     unhandledInvalidElements.AddLast(field);
@@ -438,13 +438,17 @@ namespace CssUI.HTML
 
         public static void Reset_Form(HTMLFormElement form)
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#concept-form-reset */
-            var reset = form.dispatchEvent(new Event(EEventName.Reset, new EventInit() { bubbles = true, cancelable = true }));
+            var reset = form.dispatchEvent(new Event(EEventName.Reset, new EventInit() { bubbles = true, cancelable = true })).AsTask().GetAwaiter().GetResult();
             if (reset)
             {
-                var resettableList = DOMCommon.Get_Descendents<IResettableElement>(form, new FilterFormOwner(form), ENodeFilterMask.SHOW_ELEMENT);
-                foreach (IResettableElement resettable in resettableList)
+                // Get all descendant elements and filter for resettable ones
+                var descendentsList = DOMCommon.Get_Descendents(form, new FilterFormOwner(form), ENodeFilterMask.SHOW_ELEMENT);
+                foreach (var node in descendentsList)
                 {
-                    resettable.Reset();
+                    if (node is IResettableElement resettable)
+                    {
+                        resettable.Reset();
+                    }
                 }
             }
         }

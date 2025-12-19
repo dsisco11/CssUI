@@ -10,6 +10,9 @@ using CssUI.DOM.Enums;
 using CssUI.DOM.Events;
 using CssUI.DOM.Geometry;
 using System.Reflection;
+#if ENABLE_HTML
+using CssUI.HTML;
+#endif
 
 namespace CssUI.DOM
 {
@@ -1951,6 +1954,460 @@ namespace CssUI.DOM
             //XXX:
             throw new NotImplementedException();
         }
+        #endregion
+
+        #region Form-Associated Elements
+#if ENABLE_HTML
+        /// <summary>
+        /// Checks if an element is a form-associated custom element.
+        /// A form-associated custom element is an autonomous custom element whose definition has form-associated set to true.
+        /// </summary>
+        /// <param name="element">The element to check</param>
+        /// <returns>True if the element is a form-associated custom element; otherwise, false</returns>
+        /// <remarks>
+        /// Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-element
+        /// Form-associated custom elements have:
+        /// - Static formAssociated property set to true
+        /// - Are listed, labelable, submittable, and resettable form-associated elements
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Form_Associated_Custom_Element(Element? element)
+        {
+            // Form-associated custom elements are autonomous custom elements with formAssociated = true
+            // Currently not implementing custom element registry, so return false
+            // TODO: Implement custom element definition lookup when custom elements are supported
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if an element is a listed element.
+        /// Listed elements are form-associated elements that are listed in form.elements and fieldset.elements APIs.
+        /// </summary>
+        /// <param name="element">The element to check</param>
+        /// <returns>True if the element is a listed element; otherwise, false</returns>
+        /// <remarks>
+        /// Docs: https://html.spec.whatwg.org/multipage/forms.html#category-listed
+        /// Listed elements: button, fieldset, input, object, output, select, textarea, form-associated custom elements
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Listed_Element(Element? element)
+        {
+            if (element == null)
+                return false;
+
+            // Check for standard listed HTML elements
+            if (element is HTML.HTMLButtonElement ||
+                element is HTML.HTMLFieldSetElement ||
+                element is HTML.HTMLInputElement ||
+                element is HTML.HTMLObjectElement ||
+                element is HTML.HTMLOutputElement ||
+                element is HTML.HTMLSelectElement ||
+                element is HTML.HTMLTextAreaElement)
+            {
+                return true;
+            }
+
+            // Also check for form-associated custom elements
+            return Is_Form_Associated_Custom_Element(element);
+        }
+
+        /// <summary>
+        /// Checks if an element is a submittable element.
+        /// Submittable elements can be used for constructing the entry list when a form is submitted.
+        /// </summary>
+        /// <param name="element">The element to check</param>
+        /// <returns>True if the element is a submittable element; otherwise, false</returns>
+        /// <remarks>
+        /// Docs: https://html.spec.whatwg.org/multipage/forms.html#category-submit
+        /// Submittable elements: button, input, select, textarea, form-associated custom elements
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Submittable_Element(Element? element)
+        {
+            if (element == null)
+                return false;
+
+            // Check for standard submittable HTML elements
+            if (element is HTML.HTMLButtonElement ||
+                element is HTML.HTMLInputElement ||
+                element is HTML.HTMLSelectElement ||
+                element is HTML.HTMLTextAreaElement)
+            {
+                return true;
+            }
+
+            // Also check for form-associated custom elements
+            return Is_Form_Associated_Custom_Element(element);
+        }
+
+        /// <summary>
+        /// Checks if an element is a labelable element.
+        /// Labelable elements can be associated with a label element.
+        /// </summary>
+        /// <param name="element">The element to check</param>
+        /// <returns>True if the element is a labelable element; otherwise, false</returns>
+        /// <remarks>
+        /// Docs: https://html.spec.whatwg.org/multipage/forms.html#category-label
+        /// Labelable elements: button, input (not type=hidden), meter, output, progress, select, textarea, form-associated custom elements
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Labelable_Element(Element? element)
+        {
+            if (element == null)
+                return false;
+
+            // Check for standard labelable HTML elements
+            if (element is HTML.HTMLButtonElement ||
+                element is HTML.HTMLMeterElement ||
+                element is HTML.HTMLOutputElement ||
+                element is HTML.HTMLProgressElement ||
+                element is HTML.HTMLSelectElement ||
+                element is HTML.HTMLTextAreaElement)
+            {
+                return true;
+            }
+
+            // Input elements are labelable unless type=hidden
+            if (element is HTML.HTMLInputElement inputElement)
+            {
+                // Input is labelable unless its type is "hidden"
+                return inputElement.type != HTML.EInputType.Hidden;
+            }
+
+            // Also check for form-associated custom elements
+            return Is_Form_Associated_Custom_Element(element);
+        }
+
+        /// <summary>
+        /// Checks if an element is a submit button.
+        /// A submit button submits the form when activated.
+        /// </summary>
+        /// <param name="element">The element to check</param>
+        /// <returns>True if the element is a submit button; otherwise, false</returns>
+        /// <remarks>
+        /// Docs: https://html.spec.whatwg.org/multipage/forms.html#concept-submit-button
+        /// Submit buttons:
+        /// - button element where type=submit (or type is in Auto state with no command/commandfor attributes)
+        /// - input element where type=submit or type=image
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Submit_Button(Element? element)
+        {
+            if (element == null)
+                return false;
+
+            // Button element is a submit button if type="submit"
+            if (element is HTML.HTMLButtonElement buttonElement)
+            {
+                return buttonElement.type == HTML.EButtonType.Submit;
+            }
+
+            // Input element is a submit button if type=submit or type=image
+            if (element is HTML.HTMLInputElement inputElement)
+            {
+                return inputElement.type == HTML.EInputType.Submit || inputElement.type == HTML.EInputType.Image;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if an element is an autocapitalize-inheriting element.
+        /// These elements inherit the autocapitalize attribute from their form owner.
+        /// </summary>
+        /// <param name="element">The element to check</param>
+        /// <returns>True if the element inherits autocapitalize; otherwise, false</returns>
+        /// <remarks>
+        /// Docs: https://html.spec.whatwg.org/multipage/forms.html#category-autocapitalize
+        /// Autocapitalize-and-autocorrect-inheriting elements: button, fieldset, input, output, select, textarea
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Autocapitalize_Inheriting_Element(Element? element)
+        {
+            if (element == null)
+                return false;
+
+            // Check for autocapitalize-and-autocorrect inheriting elements
+            return element is HTML.HTMLButtonElement ||
+                   element is HTML.HTMLFieldSetElement ||
+                   element is HTML.HTMLInputElement ||
+                   element is HTML.HTMLOutputElement ||
+                   element is HTML.HTMLSelectElement ||
+                   element is HTML.HTMLTextAreaElement;
+        }
+#endif
+        #endregion
+
+        #region Editing
+#if ENABLE_HTML
+        /// <summary>
+        /// Checks if an element is an editing host.
+        /// An editing host is an HTML element with contenteditable="true" or "plaintext-only", 
+        /// or a child HTML element of a Document with designMode enabled.
+        /// </summary>
+        /// <param name="element">The element to check</param>
+        /// <returns>True if the element is an editing host; otherwise, false</returns>
+        /// <remarks>
+        /// Docs: https://html.spec.whatwg.org/multipage/interaction.html#editing-host
+        /// An editing host is either:
+        /// - An HTML element with its contenteditable attribute in the true state or plaintext-only state
+        /// - A child HTML element of a Document whose design mode enabled is true
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Editing_Host(Element? element)
+        {
+            if (element == null)
+                return false;
+
+            // Check if element has contenteditable set to true or plaintext-only
+            var contentEditableAttr = element.getAttribute("contenteditable");
+            if (contentEditableAttr != null)
+            {
+                var value = contentEditableAttr.AsString()?.ToLowerInvariant() ?? "";
+                if (value == "true" || value == "" || value == "plaintext-only")
+                {
+                    return true;
+                }
+            }
+
+            // Check if the document's designMode is enabled
+            // When designMode is "on", all HTML elements that are children of the document become editing hosts
+            var ownerDocument = element.ownerDocument;
+            if (ownerDocument != null)
+            {
+                // Check document's designMode
+                // TODO: Implement designMode property on Document
+                // if (ownerDocument.designMode == "on") return true;
+            }
+
+            return false;
+        }
+#endif
+        #endregion
+
+        #region Canvas
+#if ENABLE_HTML
+        /// <summary>
+        /// Checks if an element is being used as relevant canvas fallback content.
+        /// An element is being used as canvas fallback content if its nearest canvas element ancestor 
+        /// is being rendered and represents embedded content.
+        /// </summary>
+        /// <param name="element">The element to check</param>
+        /// <returns>True if the element is being used as canvas fallback content; otherwise, false</returns>
+        /// <remarks>
+        /// Docs: https://html.spec.whatwg.org/multipage/canvas.html#being-used-as-relevant-canvas-fallback-content
+        /// An element whose nearest canvas element ancestor is being rendered and represents 
+        /// embedded content is an element that is being used as relevant canvas fallback content.
+        /// This affects focusability - such elements can still be focused even though the canvas shows graphics.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Is_Being_Used_As_Canvas_Fallback_Content(Element? element)
+        {
+            if (element == null)
+                return false;
+
+            // Find the nearest canvas element ancestor
+            Node? current = element.parentNode;
+            while (current != null)
+            {
+                if (current is HTML.HTMLCanvasElement canvasElement)
+                {
+                    // Check if the canvas is being rendered and represents embedded content
+                    // A canvas represents embedded content when it has a rendering context bound to it
+                    // TODO: Implement proper check for canvas rendering context
+                    // For now, return true if we found an ancestor canvas element
+                    return true;
+                }
+                current = current.parentNode;
+            }
+
+            return false;
+        }
+#endif
+        #endregion
+
+        #region Dialog
+#if ENABLE_HTML
+        /// <summary>
+        /// Runs the dialog focusing steps for a dialog element.
+        /// This focuses the appropriate element within the dialog when it is shown.
+        /// </summary>
+        /// <param name="subject">The dialog element</param>
+        /// <remarks>
+        /// Docs: https://html.spec.whatwg.org/multipage/interactive-elements.html#dialog-focusing-steps
+        /// The dialog focusing steps are:
+        /// 1. If allow focus steps return false, return
+        /// 2. If subject has autofocus, set control to subject
+        /// 3. Otherwise, set control to the focus delegate of subject
+        /// 4. If control is null, set control to subject
+        /// 5. Run the focusing steps for control
+        /// 6. Clear autofocus candidates and set autofocus processed flag
+        /// </remarks>
+        internal static void Run_Dialog_Focusing_Steps(Element subject)
+        {
+            if (subject == null)
+                return;
+
+            // 1. If allow focus steps return false, return
+            // TODO: Implement allow focus steps check
+
+            Element? control = null;
+
+            // 2. If subject has autofocus attribute, set control to subject
+            if (subject.hasAttribute("autofocus"))
+            {
+                control = subject;
+            }
+
+            // 3. If control is null, set control to the focus delegate of subject
+            if (control == null)
+            {
+                // TODO: Implement focus delegate lookup
+                // The focus delegate is the first focusable area in tree order
+                // that has the autofocus attribute set, or is otherwise focusable
+                control = Find_Focus_Delegate(subject);
+            }
+
+            // 4. If control is null, set control to subject
+            if (control == null)
+            {
+                control = subject;
+            }
+
+            // 5. Run the focusing steps for control
+            // TODO: Call the proper focusing steps
+            // Run_Focusing_Steps(control);
+
+            // 6-10. Clear autofocus candidates and set processed flag
+            // TODO: Implement autofocus candidates clearing
+        }
+
+        /// <summary>
+        /// Finds the focus delegate for an element.
+        /// </summary>
+        /// <param name="element">The element to find the focus delegate for</param>
+        /// <returns>The focus delegate element, or null if none found</returns>
+        private static Element? Find_Focus_Delegate(Element element)
+        {
+            // The focus delegate is the first element in tree order that:
+            // 1. Has the autofocus attribute, OR
+            // 2. Is a focusable area (like a form control)
+            
+            // First, look for an element with autofocus
+            var tree = new TreeWalker(element, ENodeFilterMask.SHOW_ELEMENT);
+            var current = tree.nextNode();
+            while (current != null)
+            {
+                if (current is Element el)
+                {
+                    if (el.hasAttribute("autofocus"))
+                    {
+                        return el;
+                    }
+                }
+                current = tree.nextNode();
+            }
+
+            // Then, look for the first focusable element
+            tree = new TreeWalker(element, ENodeFilterMask.SHOW_ELEMENT);
+            current = tree.nextNode();
+            while (current != null)
+            {
+                if (current is Element el)
+                {
+                    // Check if element is focusable (simplified check)
+                    if (Is_Focusable_Element(el))
+                    {
+                        return el;
+                    }
+                }
+                current = tree.nextNode();
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Simplified check if an element is focusable.
+        /// </summary>
+        private static bool Is_Focusable_Element(Element element)
+        {
+            // Simplified focusability check
+            // A proper implementation would check many more conditions
+            
+            if (element is HTML.HTMLInputElement inputEl)
+            {
+                return inputEl.type != HTML.EInputType.Hidden && !inputEl.disabled;
+            }
+            if (element is HTML.HTMLButtonElement buttonEl)
+            {
+                return !buttonEl.disabled;
+            }
+            if (element is HTML.HTMLSelectElement selectEl)
+            {
+                return !selectEl.disabled;
+            }
+            if (element is HTML.HTMLTextAreaElement textareaEl)
+            {
+                return !textareaEl.disabled;
+            }
+            if (element is HTML.HTMLAElement anchorEl)
+            {
+                return anchorEl.hasAttribute("href");
+            }
+            if (element.hasAttribute("tabindex"))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Sets the document to be blocked by the modal dialog.
+        /// When blocked, the document's focused area becomes inert except for shadow-including descendants of the dialog.
+        /// </summary>
+        /// <param name="document">The document to block</param>
+        /// <param name="dialog">The modal dialog blocking the document</param>
+        /// <remarks>
+        /// Docs: https://html.spec.whatwg.org/multipage/interaction.html#blocked-by-a-modal-dialog
+        /// A Document is blocked by a modal dialog subject when the subject element is in the 
+        /// document's top layer. This causes elements outside the dialog to become inert.
+        /// </remarks>
+        internal static void Modal_Dialog_Block_Document(Document document, Element dialog)
+        {
+            if (document == null || dialog == null)
+                return;
+
+            // Mark the document as blocked by the modal dialog
+            // This makes all elements outside the dialog inert
+            // TODO: Implement proper blocking logic
+            // - Add dialog to document's top layer
+            // - Mark non-dialog elements as inert
+            // - Update accessibility tree
+        }
+
+        /// <summary>
+        /// Removes the modal dialog blocking from the document.
+        /// </summary>
+        /// <param name="document">The document to unblock</param>
+        /// <param name="dialog">The modal dialog that was blocking the document</param>
+        /// <remarks>
+        /// Docs: https://html.spec.whatwg.org/multipage/interactive-elements.html#the-dialog-element
+        /// When a modal dialog is closed, the document is unblocked and elements are no longer inert.
+        /// </remarks>
+        internal static void Modal_Dialog_Unblock_Document(Document document, Element dialog)
+        {
+            if (document == null || dialog == null)
+                return;
+
+            // Remove the blocking state from the document
+            // TODO: Implement proper unblocking logic
+            // - Remove dialog from document's top layer
+            // - Restore interactivity to previously inert elements
+            // - Update accessibility tree
+        }
+#endif
         #endregion
     }
 }

@@ -10,6 +10,10 @@ namespace CssUI.DOM.Nodes
         IsShadowRoot = 1 << 1,
         IsCustomElement = 1 << 2,
         IsReplaced = 1 << 3,
+        /// <summary>
+        /// This node is an HTML element (in the HTML namespace)
+        /// </summary>
+        IsHTML = 1 << 4,
 
         /// <summary>
         /// This node needs to have it's layout-box reflowed

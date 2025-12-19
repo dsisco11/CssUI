@@ -100,7 +100,7 @@ namespace CssUI.DOM
             if (element is FormAssociatedElement formElement)
             {
                 /* 1) Reset the form owner of element. If element is associated with a form element, then enqueue a custom element callback reaction with element, callback name "formAssociatedCallback", and « the associated form ». */
-                FormCommon.Reset_Form_Owner(element);
+                FormCommon.Reset_Form_Owner(formElement);
                 if (formElement.form != null)
                 {
                     Enqueue_Reaction(element, EReactionName.FormAssociated, formElement.form);

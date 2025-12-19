@@ -973,6 +973,30 @@ namespace CssUI
 
         #region Mutation
 
+        /// <summary>
+        /// Replaces all characters matching the filter with the replacement string.
+        /// This is a convenience overload for the more complex Replace methods.
+        /// </summary>
+        /// <param name="Source">Target string as ReadOnlyMemory</param>
+        /// <param name="Filter">Filter to match characters that should be replaced</param>
+        /// <param name="Replacement">String to replace matched characters with</param>
+        /// <returns>Altered string</returns>
+        public static string Replace(ReadOnlyMemory<char> Source, Filter<char> Filter, string Replacement)
+        {
+            return Replace(Source.Span, false, false, (Filter, (StringPtr)Replacement));
+        }
+
+        /// <summary>
+        /// Replaces all characters matching the filter with the replacement string.
+        /// </summary>
+        /// <param name="Source">Target string as ReadOnlySpan</param>
+        /// <param name="Filter">Filter to match characters that should be replaced</param>
+        /// <param name="Replacement">String to replace matched characters with</param>
+        /// <returns>Altered string</returns>
+        public static string Replace(ReadOnlySpan<char> Source, Filter<char> Filter, string Replacement)
+        {
+            return Replace(Source, false, false, (Filter, (StringPtr)Replacement));
+        }
 
         /// <summary>
         /// Replaces all characters indicated by the first value for each of the <paramref name="Replacements"/>, with the characters provided by their second value

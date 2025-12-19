@@ -198,7 +198,7 @@ namespace CssUI.HTML
             {
                 /* 1) Let report be the result of firing an event named invalid at element, with the cancelable attribute initialized to true. */
 
-                var report = dispatchEvent(new Event(EEventName.Invalid, new EventInit() { cancelable = true }));
+                var report = dispatchEvent(new Event(EEventName.Invalid, new EventInit() { cancelable = true })).AsTask().GetAwaiter().GetResult();
                 /* 2) If report is true, then report the problems with the constraints of this element to the user. 
                  * When reporting the problem with the constraints to the user, the user agent may run the focusing steps for element, 
                  * and may change the scrolling position of the document, or perform some other action that brings element to the user's attention. 
