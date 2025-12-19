@@ -180,14 +180,14 @@ namespace CssUI.DOM
 #if ENABLE_HTML
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void Wrap_CEReaction(Window window, Action wrappedMethod)
+        public static void Wrap_CEReaction(Window? window, Action wrappedMethod)
         {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#cereactions */
 #if ENABLE_HTML
             /* 1) Push a new element queue onto this object's relevant agent's custom element reactions stack. */
-            window.Reactions.Stack.Push(new Queue<Element>());
+            window?.Reactions.Stack.Push(new Queue<Element>());
 
             /* 2) Run the originally-specified steps for this construct, catching any exceptions. If the steps return a value, let value be the returned value. If they throw an exception, let exception be the thrown exception. */
-            Exception exception = null;
+            Exception? exception = null;
             try
             {
                 wrappedMethod.Invoke();
@@ -198,9 +198,9 @@ namespace CssUI.DOM
             }
 
             /* 3) Let queue be the result of popping from this object's relevant agent's custom element reactions stack. */
-            var queue = window.Reactions.Stack.Pop();
+            var queue = window?.Reactions.Stack.Pop();
             /* 4) Invoke custom element reactions in queue. */
-            window.Reactions.Invoke_Reactions(queue);
+            if (queue is not null) window?.Reactions.Invoke_Reactions(queue);
             /* 5) If an exception exception was thrown by the original steps, rethrow exception. */
             if (exception != null)
             {
@@ -220,15 +220,15 @@ namespace CssUI.DOM
 #if ENABLE_HTML
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        public static ReturnType Wrap_CEReaction<ReturnType>(Window window, Func<ReturnType> wrappedMethod)
+        public static ReturnType? Wrap_CEReaction<ReturnType>(Window? window, Func<ReturnType> wrappedMethod)
         {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#cereactions */
 #if ENABLE_HTML
             /* 1) Push a new element queue onto this object's relevant agent's custom element reactions stack. */
-            window.Reactions.Stack.Push(new Queue<Element>());
+            window?.Reactions.Stack.Push(new Queue<Element>());
 
             /* 2) Run the originally-specified steps for this construct, catching any exceptions. If the steps return a value, let value be the returned value. If they throw an exception, let exception be the thrown exception. */
-            Exception exception = null;
-            ReturnType retValue = default;
+            Exception? exception = null;
+            ReturnType? retValue = default;
             try
             {
                 retValue = wrappedMethod.Invoke();
@@ -239,9 +239,9 @@ namespace CssUI.DOM
             }
 
             /* 3) Let queue be the result of popping from this object's relevant agent's custom element reactions stack. */
-            var queue = window.Reactions.Stack.Pop();
+            var queue = window?.Reactions.Stack.Pop();
             /* 4) Invoke custom element reactions in queue. */
-            window.Reactions.Invoke_Reactions(queue);
+            if (queue is not null) window?.Reactions.Invoke_Reactions(queue);
             /* 5) If an exception exception was thrown by the original steps, rethrow exception. */
             if (exception != null)
             {

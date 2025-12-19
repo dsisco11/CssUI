@@ -374,7 +374,7 @@ namespace CssUI.DOM
                 {
                     if (0 != (pointer.Buttons & EPointerButtonFlags.Left)) continue;/* Skip any pointing device that isnt in the "down" state */
 
-                    if (CssUI.Geometry.Intersects(Box.ClickArea, pointer.GetBoundingClientRect()))
+                    if (Box is not null && CssUI.Geometry.Intersects(Box.ClickArea, pointer.GetBoundingClientRect()))
                         return true;
                 }
 
@@ -397,7 +397,7 @@ namespace CssUI.DOM
 
                 foreach (PointerDevice pointer in PointerDevice.Get_All())
                 {
-                    if (CssUI.Geometry.Intersects(Box.ClickArea, pointer.GetBoundingClientRect()))
+                    if (Box is not null && CssUI.Geometry.Intersects(Box.ClickArea, pointer.GetBoundingClientRect()))
                         return true;
                 }
 
@@ -424,7 +424,7 @@ namespace CssUI.DOM
                     {
                         foreach (PointerDevice pointer in PointerDevice.Get_All())
                         {
-                            if (CssUI.Geometry.Intersects(descendantElement.Box.ClickArea, pointer.GetBoundingClientRect()))
+                            if (descendantElement.Box is not null && CssUI.Geometry.Intersects(descendantElement.Box.ClickArea, pointer.GetBoundingClientRect()))
                                 return true;
                         }
                     }
@@ -510,7 +510,7 @@ namespace CssUI.DOM
                 if (Box != null)
                 {/* The element is not the HTML body element, or it is and the root element’s used value of the overflow-x or overflow-y properties is not visible. */
                     var root = getRootNode() as Element;
-                    if (!ReferenceEquals(this, ownerDocument.body) || (ReferenceEquals(this, ownerDocument.body) && (root.Style.Overflow_X != EOverflowMode.Visible || root.Style.Overflow_Y != EOverflowMode.Visible)))
+                    if (!ReferenceEquals(this, ownerDocument.body) || (ReferenceEquals(this, ownerDocument.body) && (root?.Style.Overflow_X != EOverflowMode.Visible || root?.Style.Overflow_Y != EOverflowMode.Visible)))
                     {
                         return true;
                     }
@@ -531,6 +531,8 @@ namespace CssUI.DOM
                     return false;
 
                 var bounds = getBoundingClientRect();
+                if (Box is null)
+                    return false;
                 if (bounds.Left < Box.Padding.Left || bounds.Right > Box.Padding.Right)
                     return true;
                 if (bounds.Top < Box.Padding.Top || bounds.Bottom > Box.Padding.Bottom)
