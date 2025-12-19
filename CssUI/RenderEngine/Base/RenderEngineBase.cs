@@ -96,7 +96,7 @@ namespace CssUI.Rendering
 
         private void Finalize_Matrix()
         {
-            Upload_Matrix(Matrix);
+            Upload_Matrix(Matrix ?? Matrix4.Identity_Matrix);
         }
 
         /// <summary>

@@ -52,7 +52,7 @@ namespace CssUI.HTML
                 throw new IndexSizeError();
             }
 
-            var tableRow = new HTMLTableRowElement(nodeDocument);
+            var tableRow = new HTMLTableRowElement(nodeDocument!);
 
             if (index == -1 || index == rowCount)
             {

@@ -31,7 +31,7 @@ namespace CssUI.CSS.Internal
         /// <summary>
         /// A list of all keywords that can be assigned to this property
         /// </summary>
-        public ReadOnlyCollection<string> KeywordWhitelist => new ReadOnlyCollection<string>(keywordWhitelist);
+        public ReadOnlyCollection<string> KeywordWhitelist => new ReadOnlyCollection<string>(keywordWhitelist ?? Array.Empty<string>());
         public ECssUnit DefaultUnit { get; } = ECssUnit.PX;
         #endregion
 

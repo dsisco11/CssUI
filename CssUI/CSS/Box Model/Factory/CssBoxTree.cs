@@ -63,7 +63,7 @@ namespace CssUI.CSS
                     int index = -1;
                     if (Box is object)
                     {
-                        var ChainRoot = Box.Unlink(nearestAncestor!.Box);
+                        var ChainRoot = Box.Unlink(nearestAncestor!.Box!);
                         index = ChainRoot.index;
                     }
 
@@ -101,9 +101,9 @@ namespace CssUI.CSS
 
                     // 5) Insert the new box-node into tree
                     if (index > -1)
-                        nearestAncestor!.Box.Insert(index, nextBox!);
+                        nearestAncestor!.Box!.Insert(index, nextBox!);
                     else
-                        nearestAncestor!.Box.Add(nextBox!);
+                        nearestAncestor!.Box!.Add(nextBox!);
 
                     // Notify the tree that we need to be reflowed
                     node.Propagate_Flag(ENodeFlags.ChildNeedsReflow, exclude_self: true);
@@ -158,13 +158,13 @@ namespace CssUI.CSS
                     // If a block container box has a block-level box inside it, then force it to ONLY have block-level boxes inside it
                     if (HasBlockLevelChildren(Node.parentElement))
                     {
-                        CssAnonymousBox wrapper = CssAnonymousBox.Create_Block(parentBox);
+                        CssAnonymousBox wrapper = CssAnonymousBox.Create_Block(parentBox!);
                         wrapper.Add(box);
                         box = wrapper;
                     }
                     else if (HasInlineLevelChildren(Node.parentElement))
                     {
-                        CssAnonymousBox wrapper = CssAnonymousBox.Create_Inline(parentBox);
+                        CssAnonymousBox wrapper = CssAnonymousBox.Create_Inline(parentBox!);
                         wrapper.Add(box);
                         box = wrapper;
                     }

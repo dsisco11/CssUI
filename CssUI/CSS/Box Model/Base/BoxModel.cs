@@ -1039,7 +1039,7 @@ namespace CssUI.CSS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void Calculate_Vertical(CssPrincipalBox Box, CssComputedStyle Cascaded, ref CssValue Top, ref CssValue MarginTop, ref CssValue Height, ref CssValue MarginBottom, ref CssValue Bottom, CssValue? WidthOverride = null)
         {
-            Calculate_Vertical(Box, Cascaded, Top, MarginTop, Height, MarginBottom, Bottom, WidthOverride, out CssValue outTop, out CssValue outMarginTop, out CssValue outHeight, out CssValue outMarginBottom, out CssValue outBottom);
+            Calculate_Vertical(Box, Cascaded, Top, MarginTop, Height, MarginBottom, Bottom, WidthOverride!, out CssValue outTop, out CssValue outMarginTop, out CssValue outHeight, out CssValue outMarginBottom, out CssValue outBottom);
 
             Top = outTop;
             MarginTop = outMarginTop;

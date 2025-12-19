@@ -2,6 +2,7 @@ using CssUI.DOM;
 using CssUI.DOM.Enums;
 using CssUI.DOM.Events;
 using CssUI.DOM.Nodes;
+using System;
 using System.Collections.Generic;
 
 namespace CssUI.HTML
@@ -33,7 +34,7 @@ namespace CssUI.HTML
         #endregion
 
         #region Accessors
-        public IReadOnlyCollection<HTMLLabelElement> labels => DOMCommon.Get_Descendents<HTMLLabelElement>(form, labelFilter, ENodeFilterMask.SHOW_ELEMENT);
+        public IReadOnlyCollection<HTMLLabelElement> labels => form is not null ? DOMCommon.Get_Descendents<HTMLLabelElement>(form, labelFilter, ENodeFilterMask.SHOW_ELEMENT) : Array.Empty<HTMLLabelElement>();
         #endregion
 
         #region Content Attributes

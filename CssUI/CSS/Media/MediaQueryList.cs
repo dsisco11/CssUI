@@ -87,7 +87,7 @@ namespace CssUI.DOM.Media
 
         public void addEventListener(EventListener listener)
         {
-            if (listener == null)
+            if (listener == null || listener.callback == null)
             {
                 return;
             }
@@ -97,6 +97,11 @@ namespace CssUI.DOM.Media
 
         public void removeEventListener(EventListener listener)
         {
+            if (listener?.callback == null)
+            {
+                return;
+            }
+
             base.removeEventListener(EEventName.Change, listener.callback, new EventListenerOptions(false));
         }
 

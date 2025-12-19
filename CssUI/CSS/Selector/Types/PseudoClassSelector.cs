@@ -25,14 +25,14 @@ namespace CssUI.CSS.Selectors
         {
             if (Name.Equals("not"))
             {
-                return new PseudoClassSelectorNegationFunction(Name, new DataConsumer<CssToken>(Args, CssToken.EOF));
+                return new PseudoClassSelectorNegationFunction(Name, new DataConsumer<CssToken>(Args ?? Array.Empty<CssToken>(), CssToken.EOF));
             }
             else if (Name.StartsWith("nth-"))
             {
-                return new PseudoClassSelectorAnBFunction(Name, new DataConsumer<CssToken>(Args, CssToken.EOF));
+                return new PseudoClassSelectorAnBFunction(Name, new DataConsumer<CssToken>(Args ?? Array.Empty<CssToken>(), CssToken.EOF));
             }
 
-            return new PseudoClassSelectorFunction(Name, new List<CssToken>(Args));
+            return new PseudoClassSelectorFunction(Name, new List<CssToken>(Args ?? Array.Empty<CssToken>()));
         }
 
         /// <summary>

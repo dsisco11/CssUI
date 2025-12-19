@@ -280,7 +280,7 @@ namespace CssUI.CSS.Serialization
                             }
                             while (Stream.Next.Type != ECssTokenType.EOF);
 
-                            List.AddLast(Consume_Decleration(new DataConsumer<CssToken>(tmp.ToArray())));
+                            List.AddLast(Consume_Decleration(new DataConsumer<CssToken>(tmp.ToArray()))!);
                         }
                         break;
                     default:
@@ -636,7 +636,7 @@ namespace CssUI.CSS.Serialization
                 }
 
                 var condition = Consume_Media_Condition(Stream);
-                conditionList.AddLast(condition);
+                conditionList.AddLast(condition!);
             }
             while (Stream.Next.Type != ECssTokenType.EOF);
 
@@ -732,7 +732,7 @@ namespace CssUI.CSS.Serialization
 
                     /* Oh look a yummy little sub-condition for us to gobble up! */
                     var feature = Consume_Media_Condition(Stream);
-                    conditionList.AddLast(feature);
+                    conditionList.AddLast(feature!);
                 }
                 while (Stream.Next.Type != ECssTokenType.EOF);
 

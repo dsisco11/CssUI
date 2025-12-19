@@ -125,14 +125,14 @@ namespace CssUI.HTML
                     throw new HierarchyRequestError("Cannot add ancestor of Select element to its descendants");
                 }
 
-                Node reference = null;
+                Node? reference = null;
                 var items = Collection;
                 if (before < items.Count)
                 {
                     reference = items[(int)before];
                 }
 
-                Node parent = null;
+                Node? parent = null;
                 if (reference != null)
                 {
                     parent = reference.parentNode;
@@ -142,7 +142,7 @@ namespace CssUI.HTML
                     parent = root;
                 }
 
-                Node.Dom_pre_insert_node(element, parent, reference);
+                Node.Dom_pre_insert_node(element, parent!, reference);
             });
         }
 
@@ -174,8 +174,8 @@ namespace CssUI.HTML
                     return;
                 }
 
-                Node reference = before;
-                Node parent = null;
+                Node? reference = before;
+                Node? parent = null;
                 if (reference != null)
                 {
                     parent = reference.parentNode;
@@ -185,7 +185,7 @@ namespace CssUI.HTML
                     parent = root;
                 }
 
-                Node.Dom_pre_insert_node(element, parent, reference);
+                Node.Dom_pre_insert_node(element, parent!, reference);
             });
         }
 

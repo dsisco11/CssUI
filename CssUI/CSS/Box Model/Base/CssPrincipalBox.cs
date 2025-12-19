@@ -201,7 +201,7 @@ namespace CssUI.CSS.BoxTree
             {
                 if (_containing_box is null)
                 {
-                    _containing_box = CssCommon.Find_Containing_Block(Owner);
+                    _containing_box = CssCommon.Find_Containing_Block(Owner!);
                 }
                 return _containing_box.Value;
             }

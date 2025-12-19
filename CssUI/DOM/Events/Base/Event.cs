@@ -153,7 +153,7 @@ namespace CssUI.DOM.Events
                 return composedPath;
             }
 
-            composedPath.Add(currentTarget);
+            composedPath.Add(currentTarget!);
             int currentTargetIndex = 0;
             int currentTargetHiddenSubtreeLevel = 0;
 

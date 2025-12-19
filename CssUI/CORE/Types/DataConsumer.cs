@@ -307,7 +307,7 @@ namespace CssUI
 
         #region Scanning
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool _scan(T subject, out uint outOffset, int startOffset, IEqualityComparer<T> comparer)
+        private bool _scan(T subject, out uint outOffset, int startOffset, IEqualityComparer<T>? comparer)
         {
             IEqualityComparer<T> Comparator = comparer ?? EqualityComparer<T>.Default;
             Int32 offset = startOffset;

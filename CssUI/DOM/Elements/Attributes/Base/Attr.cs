@@ -52,7 +52,7 @@ namespace CssUI.DOM
             {
                 if (_definition is null)
                 {
-                    _definition = new WeakReference<AttributeDefinition>(AttributeDefinition.Lookup(localName, ownerElement.GetType()));
+                    _definition = new WeakReference<AttributeDefinition>(AttributeDefinition.Lookup(localName!, ownerElement!.GetType())!);
                 }
 
                 if (_definition.TryGetTarget(out AttributeDefinition? outDef))
@@ -64,8 +64,8 @@ namespace CssUI.DOM
             }
         }
 
-        public override string? nodeValue { get => Value.Data; set => _set_value(AttributeValue.Parse(localName, value!)); }
-        public override string? textContent { get => Value.Data; set => _set_value(AttributeValue.Parse(localName, value!)); }
+        public override string? nodeValue { get => Value?.Data; set => _set_value(AttributeValue.Parse(localName!, value ?? string.Empty)); }
+        public override string? textContent { get => Value?.Data; set => _set_value(AttributeValue.Parse(localName!, value ?? string.Empty)); }
         public override int nodeLength => childNodes.Count;
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace CssUI.DOM
 
             if (IsMissingValue)
             {
-                _value_used = Definition.MissingValueDefault;
+                _value_used = Definition?.MissingValueDefault;
             }
             else
             {
@@ -110,7 +110,7 @@ namespace CssUI.DOM
                     IsInvalidValue = false;
                     if (def is object)
                     {
-                        def.CheckAndThrow(newValue);
+                        def.CheckAndThrow(newValue!);
 
                         if (!(def.LowerRange is null) && newValue.AsRAW() < def.LowerRange)
                         {

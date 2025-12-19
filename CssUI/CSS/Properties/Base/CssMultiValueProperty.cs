@@ -235,7 +235,7 @@ namespace CssUI
             {// Take our parents computed value
                 ICssProperty prop = Owner.parentElement.Style.Cascaded.Get(CssName);
                 if (prop is object)
-                    return new CssValueList((prop as CssProperty).Computed);
+                    return new CssValueList((prop as CssProperty)!.Computed!);
                 else
                     throw new CssPropertyException($"Cannot read parent element property: {CssName}");
             }
@@ -336,7 +336,7 @@ namespace CssUI
                 }
                 else
                 {
-                    _specified = new CssValueList(newValue);
+                    _specified = new CssValueList(newValue!);
                 }
             }
             else
@@ -345,7 +345,7 @@ namespace CssUI
                 CssValue[] newValues = new CssValue[Total];
                 for (int i = 0; i < Total; i++)
                 {
-                    newValues[i] = Assigned[i].Derive_SpecifiedValue(this);
+                    newValues[i] = Assigned[i].Derive_SpecifiedValue(this)!;
                 }
                 _specified = new CssValueList(newValues);
             }
@@ -377,7 +377,7 @@ namespace CssUI
                         var parentProperty = Owner.parentElement?.Style.Cascaded.Get(CssName);
                         if (parentProperty != null)
                         {
-                            _computed = new CssValueList((parentProperty as CssMultiValueProperty).Specified);
+                            _computed = new CssValueList((parentProperty as CssMultiValueProperty)!.Specified!);
                         }
                         else
                         {
@@ -396,7 +396,7 @@ namespace CssUI
                 CssValue[] newValues = new CssValue[Total];
                 for (int i = 0; i < Total; i++)
                 {
-                    newValues[i] = Specified[i].Derive_ComputedValue(this);
+                    newValues[i] = Specified[i].Derive_ComputedValue(this)!;
                 }
                 _computed = new CssValueList(newValues);
             }
@@ -423,7 +423,7 @@ namespace CssUI
             }
             else
             {
-                _used = new CssValueList(Computed);
+                _used = new CssValueList(Computed!);
             }
 
             // detect changes, fire events
@@ -448,7 +448,7 @@ namespace CssUI
             }
             else
             {
-                _actual = new CssValueList(Used);
+                _actual = new CssValueList(Used!);
             }
 
             // detect changes, fire events
@@ -602,7 +602,7 @@ namespace CssUI
         /// </summary>
         public override void Handle_Unit_Change(ECssUnit Unit)
         {
-            if (Specified.FirstOrDefault(o => o?.Unit == Unit) != null)
+            if (Specified?.FirstOrDefault(o => o?.Unit == Unit) != null)
             {
                 // This unit change will affect our computed value
                 FireValueChangeEvent(EPropertyStage.Computed);

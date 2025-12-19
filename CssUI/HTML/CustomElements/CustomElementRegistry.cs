@@ -206,7 +206,7 @@ namespace CssUI.HTML.CustomElements
             /* 19) For each element element in upgrade candidates, enqueue a custom element upgrade reaction given element and definition. */
             foreach (Node candidate in upgradeCandidates)
             {
-                CEReactions.Enqueue_Upgrade(candidate as Element, definition);
+                CEReactions.Enqueue_Upgrade((candidate as Element)!, definition);
             }
 
             /* 20) If this CustomElementRegistry's when-defined promise map contains an entry with key name: */

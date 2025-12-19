@@ -64,7 +64,7 @@ namespace CssUI.DOM
         #endregion
 
         #region Constructors
-        private AttributeDefinition(string[] Keywords, string[] SupportedTokens)
+        private AttributeDefinition(string[]? Keywords, string[]? SupportedTokens)
         {
             if (Keywords is null)
             {

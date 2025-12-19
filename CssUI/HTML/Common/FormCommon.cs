@@ -80,7 +80,7 @@ namespace CssUI.HTML
             /* 3) If the element's submission value is not null, append an entry to entry list with the name attribute value and the submission value. */
             if (!(formElement.submission_value is null))
             {
-                Append_Entry_To_List(ref entryList, nameAttr.AsString(), formElement.submission_value);
+                Append_Entry_To_List(ref entryList, nameAttr.AsString()!, formElement.submission_value);
             }
         }
 
@@ -116,7 +116,7 @@ namespace CssUI.HTML
             {
                 /* 1) If the first element in element's tree, in tree order, to have an ID that is case-sensitively equal to element's form content attribute's value, is a form element, then associate the element with that form element. */
                 var idValue = element.getAttribute(EAttributeName.Form).AsString();
-                Element searchResult = (Element)DOMCommon.Get_Nth_Ancestor(element, 1, new FilterAttribute(EAttributeName.ID, AttributeValue.From(idValue)), ENodeFilterMask.SHOW_ELEMENT);
+                Element searchResult = (Element)DOMCommon.Get_Nth_Ancestor(element, 1, new FilterAttribute(EAttributeName.ID, AttributeValue.From(idValue!)), ENodeFilterMask.SHOW_ELEMENT)!;
                 if (searchResult != null && searchResult is HTMLFormElement form)
                 {
                     element.form = form;
@@ -228,7 +228,7 @@ namespace CssUI.HTML
                 {
                     continue;
                 }
-                string name = nameValue.AsString();
+                string name = nameValue.AsString()!;
 
                 /* 6) If the field element is a select element, then for each option element in the select element's list of options whose selectedness is true and that is not disabled, append an entry to entry list with name and the value of the option element. */
                 if (field is HTMLSelectElement selectElement)
@@ -256,7 +256,7 @@ namespace CssUI.HTML
                 {
                     var inputElement = (HTMLInputElement)field;
                     /* 1) If there are no selected files, then append an entry to entry list with name and a new File object with an empty name, application/octet-stream as type, and an empty body. */
-                    if (!inputElement.files.Any())
+                    if (inputElement.files is null || !inputElement.files.Any())
                     {
                         FileBlob file = new FileBlob(null, string.Empty, new FilePropertyBag() { type = "application/octet-stream" });
                         Append_Entry_To_List(ref entryList, name, file);
@@ -296,7 +296,7 @@ namespace CssUI.HTML
                 /* 13) If the element has a dirname attribute, and that attribute's value is not the empty string, then: */
                 if (field.hasAttribute(EAttributeName.Dirname, out Attr outDirname) && !string.IsNullOrEmpty(outDirname.Value.AsString()))
                 {
-                    string dirname = outDirname.Value.AsString();
+                    string dirname = outDirname.Value.AsString()!;
                     string dir = (field as HTMLElement).directionality == CSS.EDirection.LTR ? "ltr" : "rtl";
                     Append_Entry_To_List(ref entryList, dirname, dir);
                 }

@@ -223,7 +223,7 @@ namespace CssUI.CSS.Functions
                             double numericValue = Convert.ToDouble(dimToken.Number);
 
                             // Try to resolve the unit
-                            if (unitResolver != null && Lookup.TryEnum(dimToken.Unit, out ECssUnit unit))
+                            if (unitResolver != null && Lookup.TryEnum(dimToken.Unit!, out ECssUnit unit))
                             {
                                 double multiplier = unitResolver(unit);
                                 return numericValue * multiplier;
@@ -247,7 +247,7 @@ namespace CssUI.CSS.Functions
                         // Handle numeric constants (§10.7)
                         if (token is IdentToken identToken)
                         {
-                            return ResolveNumericConstant(identToken.Value);
+                            return ResolveNumericConstant(identToken.Value!);
                         }
                         return 0;
                     }

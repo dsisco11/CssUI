@@ -65,7 +65,7 @@ namespace CssUI.DOM
             /* 1) If attr’s element is neither null nor element, throw an "InUseAttributeError" DOMException. */
             if (ReferenceEquals(ownerElement, null)) throw new InUseAttributeError("Element is null!");
             /* 2) Let oldAttr be the result of getting an attribute given attr’s namespace, attr’s local name, and element. */
-            ownerElement.find_attribute(attr.localName, attr.namespaceURI, out Attr oldAttr);
+            ownerElement.find_attribute(attr.localName!, attr.namespaceURI ?? string.Empty, out Attr? oldAttr);
             /* 3) If oldAttr is attr, return attr. */
             if (ReferenceEquals(oldAttr, attr)) return attr;
             /* 4) If oldAttr is non-null, replace it by attr in element. */

@@ -432,7 +432,7 @@ namespace CssUI.CSS.Selectors
         {
             HashToken? Hash = (Stream.Consume() as HashToken);
             if (Hash?.HashType != EHashTokenType.ID) throw new CssParserException("Invalid Hash token, hash-type is not ID!");
-            return new IDSelector(Hash.Value);
+            return new IDSelector(Hash.Value!);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -458,10 +458,10 @@ namespace CssUI.CSS.Selectors
             if (Starts_NamespacePrefix(Stream.Next, Stream.NextNext))
             {
                 NamespacePrefixToken Namespace = Consume_NamespacePrefix(Stream);
-                return new TypeSelector(Namespace, Stream.Consume<IdentToken>().Value);
+                return new TypeSelector(Namespace, Stream.Consume<IdentToken>().Value!);
             }
 
-            return new TypeSelector(Stream.Consume<IdentToken>().Value);
+            return new TypeSelector(Stream.Consume<IdentToken>().Value!);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -470,7 +470,7 @@ namespace CssUI.CSS.Selectors
             Stream.Consume();// Consume the '.' prefixing the classname
             IdentToken Ident = Stream.Consume<IdentToken>();
 
-            return new ClassSelector(Ident.Value);
+            return new ClassSelector(Ident.Value!);
         }
 
         /// <summary>
@@ -493,7 +493,7 @@ namespace CssUI.CSS.Selectors
             CssToken Tok = Stream.Consume();
             if (Tok.Type == ECssTokenType.SqBracket_Close)
             {
-                return new AttributeSelector(NS, attrName.Value);
+                return new AttributeSelector(NS, attrName.Value!);
             }
 
             CssToken OperatorToken = Tok;
@@ -504,11 +504,11 @@ namespace CssUI.CSS.Selectors
 
             if (value.Type == ECssTokenType.String)
             {
-                return new AttributeSelector(NS, attrName.Value, OperatorToken, (value as StringToken)!.Value);
+                return new AttributeSelector(NS, attrName.Value!, OperatorToken, (value as StringToken)!.Value!);
             }
             else if (value.Type == ECssTokenType.Ident)
             {
-                return new AttributeSelector(NS, attrName.Value, OperatorToken, (value as IdentToken)!.Value);
+                return new AttributeSelector(NS, attrName.Value!, OperatorToken, (value as IdentToken)!.Value!);
             }
 
             return null;// Parse error
@@ -528,7 +528,7 @@ namespace CssUI.CSS.Selectors
             {
                 case ECssTokenType.Ident:
                     {
-                        return new PseudoClassSelector(Stream.Consume<IdentToken>().Value);
+                        return new PseudoClassSelector(Stream.Consume<IdentToken>().Value!);
                     }
                 case ECssTokenType.FunctionName:
                     {
@@ -537,7 +537,7 @@ namespace CssUI.CSS.Selectors
                 case ECssTokenType.Function:
                     {
                         CssFunction func = Stream.Consume<CssFunction>();
-                        return PseudoClassSelector.Create_Function(func.Name, func.Arguments.ToArray());
+                        return PseudoClassSelector.Create_Function(func.Name!, func.Arguments.ToArray());
                     }
             }
 
@@ -558,7 +558,7 @@ namespace CssUI.CSS.Selectors
             {
                 case ECssTokenType.Ident:
                     {
-                        return new PseudoElementSelector(Stream.Consume<IdentToken>().Value);
+                        return new PseudoElementSelector(Stream.Consume<IdentToken>().Value!);
                     }
                 case ECssTokenType.FunctionName:
                     {
@@ -567,7 +567,7 @@ namespace CssUI.CSS.Selectors
                 case ECssTokenType.Function:
                     {
                         CssFunction func = Stream.Consume<CssFunction>();
-                        return new CssPseudoElementSelectorFunction(func.Name, func.Arguments);
+                        return new CssPseudoElementSelectorFunction(func.Name!, func.Arguments);
                     }
             }
 

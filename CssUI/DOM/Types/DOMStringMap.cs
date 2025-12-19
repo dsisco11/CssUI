@@ -68,8 +68,8 @@ namespace CssUI.DOM
             sb.Insert(0, "data-");
             Name = sb.ToString();
             /* 3) Remove an attribute by name given name and the DOMStringMap's associated element. */
-            if (Owner.find_attribute(Name, out Attr attr))
-                Owner.remove_attribute(attr);
+            if (Owner.find_attribute(Name, out Attr? attr))
+                Owner.remove_attribute(attr!);
         }
 
         public IEnumerable<KeyValuePair<string, string>> GetKeyValuePairs()
@@ -82,7 +82,7 @@ namespace CssUI.DOM
                 string unsafeName = From_XML_Safe_Name(attr.Name);
                 if (!ReferenceEquals(null, unsafeName))
                 {
-                    list.AddLast(new KeyValuePair<string, string>(unsafeName, attr.Value.AsString()));
+                    list.AddLast(new KeyValuePair<string, string>(unsafeName, attr.Value!.AsString()));
                 }
             }
 

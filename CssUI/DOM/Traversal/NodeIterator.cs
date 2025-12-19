@@ -69,7 +69,7 @@ namespace CssUI.DOM
                 /* 1) Let next be toBeRemovedNode’s first following node that is an inclusive descendant of nodeIterator’s root and is not an inclusive descendant of toBeRemovedNode, and null if there is no such node. */
                 Node? next = null;
                 var tree = new TreeWalker(toBeRemovedNode, ENodeFilterMask.SHOW_ALL);
-                Node n = tree.nextSibling();
+                Node? n = tree.nextSibling();
                 while (!ReferenceEquals(n, null))
                 {
                     if (DOMCommon.Is_Inclusive_Descendant(n, nodeIterator.root) && !DOMCommon.Is_Inclusive_Descendant(n, toBeRemovedNode))
@@ -77,7 +77,7 @@ namespace CssUI.DOM
                         next = n;
                         break;
                     }
-                    n = tree.nextSibling();
+                    n = tree.nextSibling()!;
                 }
                 /* 2) If next is non-null, then set nodeIterator’s reference to next and return. */
                 if (!ReferenceEquals(next, null))
@@ -172,13 +172,13 @@ namespace CssUI.DOM
                     beforeNode = false;
 
                 /* 2) Let result be the result of filtering node within iterator. */
-                ENodeFilterResult result = filterNode(node);
+                ENodeFilterResult result = filterNode(node!);
                 /* 3) If result is FILTER_ACCEPT, then break. */
                 if (result == ENodeFilterResult.FILTER_ACCEPT) break;
             }
 
-            /* 4) Set iterator’s reference to node. */
-            referenceNode = node;
+            /* 4) Set iterator's reference to node. */
+            referenceNode = node!;
             /* 5) Set iterator’s pointer before reference to beforeNode. */
             pointerBeforeReferenceNode = beforeNode;
             /* 6) Return node. */
@@ -196,7 +196,7 @@ namespace CssUI.DOM
                 /* 1) If beforeNode is true, then set node to the first node preceding node in iterator’s iterator collection. If there is no such node, then return null. */
                 if (beforeNode)
                 {
-                    int i = iterCollection.IndexOf(node);
+                    int i = iterCollection.IndexOf(node!);
                     if (i <= 0)
                         return null;
 
@@ -206,13 +206,13 @@ namespace CssUI.DOM
                     beforeNode = true;
 
                 /* 2) Let result be the result of filtering node within iterator. */
-                ENodeFilterResult result = filterNode(node);
+                ENodeFilterResult result = filterNode(node!);
                 /* 3) If result is FILTER_ACCEPT, then break. */
                 if (result == ENodeFilterResult.FILTER_ACCEPT) break;
             }
 
-            /* 4) Set iterator’s reference to node. */
-            referenceNode = node;
+            /* 4) Set iterator's reference to node. */
+            referenceNode = node!;
             /* 5) Set iterator’s pointer before reference to beforeNode. */
             pointerBeforeReferenceNode = beforeNode;
             /* 6) Return node. */

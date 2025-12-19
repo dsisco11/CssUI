@@ -566,12 +566,12 @@ namespace CssUI.CSS
         /// <summary>
         /// Returns all of the properties
         /// </summary>
-        internal IEnumerable<ICssProperty> GetAll() => CssProperties.AsEnumerable();
+        internal IEnumerable<ICssProperty> GetAll() => CssProperties!.AsEnumerable()!;
 
         /// <summary>
         /// Returns all of the properties matching a given predicate
         /// </summary>
-        internal IEnumerable<ICssProperty> GetAll(Func<ICssProperty, bool> Predicate) => CssProperties.Where(Predicate).AsEnumerable();
+        internal IEnumerable<ICssProperty> GetAll(Func<ICssProperty, bool> Predicate) => CssProperties!.Where(Predicate!).AsEnumerable()!;
 
         /// <summary>
         /// Returns all of the Css properties that have a value assigned to them
@@ -584,7 +584,7 @@ namespace CssUI.CSS
             /* XXX: NEED AN ENUMERATOR FOR FlagCollection */
             foreach (var name in SetProperties)
             {
-                List.Add(Get(name));
+                List.Add(Get(name)!);
             }
 
             return List;

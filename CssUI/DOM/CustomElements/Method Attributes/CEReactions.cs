@@ -119,7 +119,7 @@ namespace CssUI.DOM
 
         public static void Try_Upgrade_Element(Element element)
         {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#concept-try-upgrade */
-            var definition = element.nodeDocument.defaultView.customElements.Lookup(element.nodeDocument, element.NamespaceURI, element.localName, element.is_value);
+            var definition = element.nodeDocument.defaultView.customElements.Lookup(element.nodeDocument, element.NamespaceURI!, element.localName!, element.is_value!);
             if (definition != null)
             {
                 Enqueue_Upgrade(element, definition);
@@ -142,7 +142,7 @@ namespace CssUI.DOM
             if (!element.isCustom)
                 return;
             /* 1) Let definition be element's custom element definition. */
-            CustomElementDefinition def = element.ownerDocument.defaultView.customElements.Lookup(element.ownerDocument, element.NamespaceURI, element.tagName, element.is_value);
+            CustomElementDefinition def = element.ownerDocument.defaultView.customElements.Lookup(element.ownerDocument, element.NamespaceURI!, element.tagName!, element.is_value!);
             if (def == null)
                 return;
 
@@ -156,9 +156,9 @@ namespace CssUI.DOM
             if (Reaction == EReactionName.AttributeChanged)
             {
                 /* 1) Let attributeName be the first element of args. */
-                AtomicName<EAttributeName> attributeName = Args[0] as AtomicName<EAttributeName>;
+                AtomicName<EAttributeName>? attributeName = Args[0] as AtomicName<EAttributeName>;
                 /* 2) If definition's observed attributes does not contain attributeName, then return. */
-                if (!def.observedAttributes.Contains(attributeName))
+                if (!def.observedAttributes.Contains(attributeName!))
                     return;
             }
 

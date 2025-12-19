@@ -348,8 +348,8 @@ namespace CssUI.HTML
                 return;
             }
 
-            string href = outAttr.Value?.AsString();
-            if (HTTPCommon.Parse_URL(href.AsMemory(), nodeDocument, out Url outUrl, out _))
+            string? href = outAttr.Value?.AsString();
+            if (href is not null && HTTPCommon.Parse_URL(href.AsMemory(), nodeDocument, out Url outUrl, out _))
             {
                 url = outUrl;
             }

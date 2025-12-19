@@ -693,14 +693,18 @@ namespace CssUI.DOM
 
         internal void Update_Element_ID(Element element, AttributeValue oldValue, AttributeValue newValue)
         {
-            AtomicString oldKey = oldValue.AsAtomic();
-            AtomicString newKey = newValue.AsAtomic();
+            AtomicString? oldKey = oldValue.AsAtomic();
+            AtomicString? newKey = newValue.AsAtomic();
 
-            if (oldKey.Equals(newKey)) return;
+            if (oldKey is not null && (newKey is null ? false : oldKey.Equals(newKey))) return;
 
-            if (Element_ID_Map.TryGetValue(oldKey, out var weakRef))
+            if (oldKey is not null && Element_ID_Map.TryGetValue(oldKey, out var weakRef))
             {
                 Element_ID_Map.Remove(oldKey);
+            }
+            else
+            {
+                weakRef = null;
             }
 
             if (weakRef is null)
@@ -708,18 +712,21 @@ namespace CssUI.DOM
                 weakRef = new WeakReference<Element>(element);
             }
 
-            if (!Element_ID_Map.ContainsKey(newKey))
+            if (newKey is not null && !Element_ID_Map.ContainsKey(newKey))
             {
-                Element_ID_Map.Add(newValue.AsAtomic(), weakRef);
+                Element_ID_Map.Add(newKey, weakRef);
             }
             else
             {
                 /* It appears there is already an element that has this ID, so we need to traverse the tree and get the first tree-order element with this ID, thats the true owner */
                 NodeFilter idFilter = new FilterAttribute(EAttributeName.ID, newValue);
-                var owner = (Element)DOMCommon.Get_Nth_Ancestor(documentElement!, 1, idFilter, ENodeFilterMask.SHOW_ELEMENT);
+                var owner = (Element?)DOMCommon.Get_Nth_Ancestor(documentElement!, 1, idFilter, ENodeFilterMask.SHOW_ELEMENT);
                 /* This is the canonical owner of this ID */
-                weakRef.SetTarget(owner);
-                Element_ID_Map[newKey] = weakRef;
+                if (owner is not null && newKey is not null)
+                {
+                    weakRef.SetTarget(owner);
+                    Element_ID_Map[newKey] = weakRef;
+                }
             }
         }
         #endregion

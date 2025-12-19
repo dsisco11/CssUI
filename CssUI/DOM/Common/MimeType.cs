@@ -33,7 +33,7 @@ namespace CssUI.DOM
 
         public static MimeTypeRecord CreateRecord(string Type, string SubType, Dictionary<string, string>? Parameters = null)
         {
-            return new MimeTypeRecord(Type, SubType, Parameters);
+            return new MimeTypeRecord(Type, SubType, Parameters ?? new Dictionary<string, string>());
         }
         #endregion
 

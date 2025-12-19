@@ -29,7 +29,7 @@ namespace CssUI.DOM
         #region Constructor
         public AttributeTokenList(Element ownerElement, AtomicName<EAttributeName> localName, T[]? supportedTokens)
         {
-            SupportedTokens = new HashSet<T>(supportedTokens);
+            SupportedTokens = new HashSet<T>(supportedTokens ?? Array.Empty<T>());
             /* 1) Let element be associated element. */
             this.ownerElement = ownerElement;
             /* 2) Let localName be associated attribute’s local name. */

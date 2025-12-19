@@ -85,12 +85,12 @@ namespace CssUI.DOM.Mutation
             Dictionary<MutationObserver, string?> interestedObservers = new Dictionary<MutationObserver, string?>();
             /* 2) Let nodes be the inclusive ancestors of target. */
             List<Node> Nodes = new List<Node>();
-            TreeWalker tree = new TreeWalker(Record.target, ENodeFilterMask.SHOW_ALL);
-            Node ancestor = Record.target;
+            TreeWalker tree = new TreeWalker(Record.target!, ENodeFilterMask.SHOW_ALL);
+            Node ancestor = Record.target!;
             while (ancestor != null)
             {
-                ancestor = tree.parentNode();
-                Nodes.Add(ancestor);
+                ancestor = tree.parentNode()!;
+                Nodes.Add(ancestor!);
             }
             /* 3) For each node in nodes, and then for each registered of node’s registered observer list: */
             foreach (Node node in Nodes)
@@ -109,8 +109,8 @@ namespace CssUI.DOM.Mutation
                         /* 1) Let mo be registered’s observer. */
                         var mo = registered.observer;
                         /* 2) If interestedObservers[mo] does not exist, then set interestedObservers[mo] to null. */
-                        if (!interestedObservers.ContainsKey(mo))
-                            interestedObservers.Add(mo, null);
+                        if (!interestedObservers.ContainsKey(mo!))
+                            interestedObservers.Add(mo!, null);
                         /* 3) If either type is "attributes" and options’s attributeOldValue is true, or type is "characterData" and options’s characterDataOldValue is true, then set interestedObservers[mo] to oldValue. */
                         if ((Record.type == EMutationType.Attributes && options.attributeOldValue) || (Record.type == EMutationType.CharacterData && options.characterDataOldValue))
                             interestedObservers[mo] = Record.oldValue;

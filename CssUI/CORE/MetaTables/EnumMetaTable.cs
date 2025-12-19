@@ -65,7 +65,7 @@ namespace CssUI
 
                     int valueIndex = Get_Value_Index(enumIndex, enumValue);
 
-                    var data = new EnumData(metadata.Keyword, metadata.Values);
+                    var data = new EnumData(metadata.Keyword, metadata.Values!);
                     TABLE[enumIndex][valueIndex] = data;
                     KEYWORD[enumIndex].Add(new AtomicString(metadata.Keyword), valueIndex);
                 }

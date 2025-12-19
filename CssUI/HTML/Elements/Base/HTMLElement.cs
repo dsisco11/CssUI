@@ -165,7 +165,7 @@ namespace CssUI.HTML
                 throw new NotSupportedError("Cannot attach internals to element that still has it's 'is' value");
             }
 
-            var definition = nodeDocument.defaultView.customElements.Lookup(nodeDocument, NamespaceURI, localName, null);
+            var definition = nodeDocument.defaultView.customElements.Lookup(nodeDocument, NamespaceURI!, localName, null);
             if (definition == null)
             {
                 throw new NotSupportedError("Element internals may only be attached to custom elements");
@@ -539,7 +539,7 @@ namespace CssUI.HTML
         public string? AccessKey
         {
             get => getAttribute(EAttributeName.AccessKey)?.AsString();
-            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.AccessKey, AttributeValue.Parse(EAttributeName.AccessKey, value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.AccessKey, AttributeValue.Parse(EAttributeName.AccessKey, value ?? string.Empty)));
         }
 
         /* This has been removed from HTML5.1 because it's not a good solution to the problem of user discovery */

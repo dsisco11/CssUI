@@ -253,7 +253,7 @@ namespace CssUI.DOM
             {
                 if (node is ISlottable)
                 {
-                    ISlottable slotable = node as ISlottable;
+                    ISlottable slotable = (node as ISlottable)!;
                     var foundSlot = Find_Slot(slotable);
                     if (ReferenceEquals(foundSlot, slot))
                         result.Add(slotable);
@@ -281,7 +281,7 @@ namespace CssUI.DOM
                 {
                     if (child is ISlottable)
                     {
-                        slotables.Add(child as ISlottable);
+                        slotables.Add((child as ISlottable)!);
                     }
                 }
             }
@@ -291,7 +291,7 @@ namespace CssUI.DOM
             {
                 if (node is ISlot && node.getRootNode() is ShadowRoot)
                 {
-                    var temporaryResult = DOMCommon.Find_Flattened_Slotables(node as ISlot);
+                    var temporaryResult = DOMCommon.Find_Flattened_Slotables((node as ISlot)!);
                     result.AddRange(temporaryResult);
                 }
                 else
@@ -414,7 +414,7 @@ namespace CssUI.DOM
             if (Is_Descendant(A, B))
                 return true;
 #if ENABLE_HTML
-            if (A.getRootNode() is ShadowRoot aRootShadow && Is_Shadow_Including_Inclusive_Descendant(aRootShadow.Host, B))
+            if (A.getRootNode() is ShadowRoot aRootShadow && Is_Shadow_Including_Inclusive_Descendant(aRootShadow.Host!, B))
                 return true;
 #endif
 
@@ -601,7 +601,7 @@ namespace CssUI.DOM
         public static LinkedList<Node> Get_Ancestors(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
         {
             var list = new LinkedList<Node>();
-            TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
+            TreeWalker tree = new TreeWalker(node!, FilterMask, Filter);
             Node? current = tree.parentNode();
             while (current is object)
             {
@@ -623,7 +623,7 @@ namespace CssUI.DOM
         public static LinkedList<NodeType> Get_Ancestors<NodeType>(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL) where NodeType : INode
         {
             LinkedList<NodeType> list = new LinkedList<NodeType>();
-            TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
+            TreeWalker tree = new TreeWalker(node!, FilterMask, Filter);
             Node? current = tree.parentNode();
             while (current is object)
             {
@@ -847,7 +847,7 @@ namespace CssUI.DOM
                 if (current.Is_ShadowHost)
                 {
                     var element = current as Element;
-                    Get_Shadow_Including_Descendents(element.shadowRoot);
+                    Get_Shadow_Including_Descendents(element!.shadowRoot!);
                 }
                 current = tree.nextNode();
             }
@@ -1360,17 +1360,17 @@ namespace CssUI.DOM
                 return Get_Descendents<Element>(root, null, ENodeFilterMask.SHOW_ELEMENT);
 
             /* 3) Otherwise, if namespace is "*" (U+002A), return a HTMLCollection rooted at root, whose filter matches descendant elements whose local name is localName. */
-            var localNameFilter = new FilterLocalName(localName);
+            var localNameFilter = new FilterLocalName(localName!);
             if (string.Equals(Namespace, "\u002A"))
                 return Get_Descendents<Element>(root, localNameFilter, ENodeFilterMask.SHOW_ELEMENT);
 
             /* 4) Otherwise, if localName is "*" (U+002A), return a HTMLCollection rooted at root, whose filter matches descendant elements whose namespace is namespace. */
-            var NamespaceFilter = new FilterNamespace(Namespace);
+            var NamespaceFilter = new FilterNamespace(Namespace!);
             if (string.Equals(localName, "\u002A"))
                 return Get_Descendents<Element>(root, NamespaceFilter, ENodeFilterMask.SHOW_ELEMENT);
 
             /* 5) Otherwise, return a HTMLCollection rooted at root, whose filter matches descendant elements whose namespace is namespace and local name is localName. */
-            var localName_Namespace_Filter = new FilterLocalName_Namespace(localName, Namespace);
+            var localName_Namespace_Filter = new FilterLocalName_Namespace(localName!, Namespace!);
             return Get_Descendents<Element>(root, localName_Namespace_Filter, ENodeFilterMask.SHOW_ELEMENT);
         }
 
@@ -1438,7 +1438,7 @@ namespace CssUI.DOM
             Node rootNode = Get_Root(node);
             while (rootNode is ShadowRoot)
             {
-                Node next = Get_Root(((ShadowRoot)rootNode).Host);
+                Node next = Get_Root(((ShadowRoot)rootNode).Host!);
                 if (!(next is ShadowRoot))
                 {
                     return rootNode;

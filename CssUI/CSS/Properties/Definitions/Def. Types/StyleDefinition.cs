@@ -50,7 +50,7 @@ namespace CssUI.CSS.Internal
         /// <summary>
         /// A list of all keywords that can be assigned to this property
         /// </summary>
-        public ReadOnlyCollection<string> KeywordWhitelist => new ReadOnlyCollection<string>(keywordWhitelist);
+        public ReadOnlyCollection<string> KeywordWhitelist => new ReadOnlyCollection<string>(keywordWhitelist ?? Array.Empty<string>());
 
         /// <summary>
         /// A map of resolution delegates to <see cref="EPropertyStage"/> which the defined property uses to resolve property values

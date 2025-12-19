@@ -42,7 +42,7 @@ namespace CssUI.DOM
                 if (nodes.Any(c => !(c is Node) && !(c is string)))
                     throw new TypeError("Only Node and string types are accepted types.");
 
-                var node = Dom_convert_nodes_into_node(ownerDocument, nodes);
+                var node = Dom_convert_nodes_into_node(ownerDocument!, nodes);
                 Dom_pre_insert_node(node, this, firstChild);
             });
         }
@@ -55,7 +55,7 @@ namespace CssUI.DOM
                 if (nodes.Any(c => !(c is Node) && !(c is string)))
                     throw new TypeError("Only Node and string types are accepted types.");
 
-                var node = Dom_convert_nodes_into_node(ownerDocument, nodes);
+                var node = Dom_convert_nodes_into_node(ownerDocument!, nodes);
                 appendChild(node);
             });
         }

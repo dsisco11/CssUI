@@ -625,13 +625,13 @@ namespace CssUI.HTTP
                                 /* 2) Let host be the result of host parsing buffer with url is not special. */
                                 /* 3) If host is failure, then return failure. */
                                 var buffStr = buffer.ToString();
-                                if (!Parse_Host(buffStr.AsMemory(), out string parsedHost, !url.IsSpecial))
+                                if (!Parse_Host(buffStr.AsMemory(), out string? parsedHost, !url.IsSpecial))
                                 {
                                     outUrl = null;
                                     return false;
                                 }
 
-                                url.Host = new UrlHost(parsedHost);
+                                url.Host = new UrlHost(parsedHost!);
                                 buffer.Clear();
                                 state = ESchemeState.Port;
                                 /* 5) If state override is given and state override is hostname state, then return. */
@@ -658,13 +658,13 @@ namespace CssUI.HTTP
                                     return false;
                                 }
 
-                                if (!Parse_Host(buffer.ToString().AsMemory(), out string parsedHost, !url.IsSpecial))
+                                if (!Parse_Host(buffer.ToString().AsMemory(), out string? parsedHost, !url.IsSpecial))
                                 {
                                     outUrl = null;
                                     return false;
                                 }
 
-                                url.Host = new UrlHost(parsedHost);
+                                url.Host = new UrlHost(parsedHost!);
                                 buffer.Clear();
                                 state = ESchemeState.PathStart;
                                 if (stateOverride.HasValue)
@@ -843,13 +843,13 @@ namespace CssUI.HTTP
                                 }
                                 else
                                 {
-                                    if (!Parse_Host(buffer.ToString().AsMemory(), out string parsedHost, !url.IsSpecial))
+                                    if (!Parse_Host(buffer.ToString().AsMemory(), out string? parsedHost, !url.IsSpecial))
                                     {
                                         outUrl = null;
                                         return false;
                                     }
 
-                                    if (parsedHost.AsSpan().Equals("localhost".AsSpan(), StringComparison.Ordinal))
+                                    if (parsedHost!.AsSpan().Equals("localhost".AsSpan(), StringComparison.Ordinal))
                                     {
                                         parsedHost = string.Empty;
                                     }

@@ -569,7 +569,7 @@ namespace CssUI.DOM.Nodes
             {
                 if (copy is null)
                 {
-                    copy = DOMCommon.Create_Element(document, element.localName, element.NamespaceURI, element.prefix, element.is_value, false);
+                    copy = DOMCommon.Create_Element(document!, element.localName, element.NamespaceURI, element.prefix, element.is_value, false);
                 }
                 else
                 {
@@ -611,22 +611,22 @@ namespace CssUI.DOM.Nodes
                         case ENodeType.ATTRIBUTE_NODE:
                             {
                                 var natr = (Attr)node;
-                                copy = new Attr(natr.Name, document, natr.namespaceURI) { Value = natr.Value };
+                                copy = new Attr(natr.Name, document!, natr.namespaceURI) { Value = natr.Value };
                             }
                             break;
                         default:
                             {
                                 if (node is Text)
                                 {
-                                    copy = new Text(document, ((Text)node).data);
+                                    copy = new Text(document!, ((Text)node).data);
                                 }
                                 else if (node is Comment comment)
                                 {
-                                    copy = new Comment(document, comment.data);
+                                    copy = new Comment(document!, comment.data);
                                 }
                                 else if (node is ProcessingInstruction processingInstruction)
                                 {
-                                    copy = new ProcessingInstruction(document, processingInstruction.target, processingInstruction.data);
+                                    copy = new ProcessingInstruction(document!, processingInstruction.target, processingInstruction.data);
                                 }
                                 else
                                 {
@@ -687,7 +687,7 @@ namespace CssUI.DOM.Nodes
             }
 
             /* 5) Run any cloning steps defined for node in other applicable specifications and pass copy, node, document and the clone children flag if set, as parameters. */
-            node.Run_cloning_steps(ref copy, document, clone_children);
+            node.Run_cloning_steps(ref copy, document!, clone_children);
             /* 5.1) Also lets run CssUIs CopyTo function */
             node.CopyTo(ref copy, true);
 
@@ -809,7 +809,7 @@ namespace CssUI.DOM.Nodes
                 {
                     if (registered.options.subtree)
                     {
-                        var tro = new TransientRegisteredObserver(registered, registered.observer, registered.options);
+                        var tro = new TransientRegisteredObserver(registered, registered.observer!, registered.options);
                         node.RegisteredObservers.Add(tro);
                     }
                 }
@@ -918,9 +918,12 @@ namespace CssUI.DOM.Nodes
                     {
 #if ENABLE_HTML
                         /* 1) If inclusiveDescendant is custom, then enqueue a custom element callback reaction with inclusiveDescendant, callback name "connectedCallback", and an empty argument list. */
-                        CEReactions.Enqueue_Reaction(inclusiveDescendant as Element, EReactionName.Connected, Array.Empty<object>());
-                        /* 2) Otherwise, try to upgrade inclusiveDescendant. */
-                        CEReactions.Try_Upgrade_Element(inclusiveDescendant as Element);
+                        if (inclusiveDescendant is Element elem)
+                        {
+                            CEReactions.Enqueue_Reaction(elem, EReactionName.Connected, Array.Empty<object>());
+                            /* 2) Otherwise, try to upgrade inclusiveDescendant. */
+                            CEReactions.Try_Upgrade_Element(elem);
+                        }
 #endif
                     }
                 }

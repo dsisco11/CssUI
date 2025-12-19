@@ -52,7 +52,7 @@ namespace CssUI.HTML
         public string? headers
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#attr-tdth-headers */
             get => getAttribute(EAttributeName.Headers)?.AsString();
-            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Headers, AttributeValue.From(value)));
+            set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Headers, AttributeValue.From(value ?? string.Empty)));
         }
 
         /// <summary>

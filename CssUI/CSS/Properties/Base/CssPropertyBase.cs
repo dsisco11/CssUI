@@ -129,7 +129,7 @@ namespace CssUI.CSS.Internal
             {// Take our parents computed value
                 ICssProperty prop = Owner.parentElement.Style.Cascaded.Get(CssName);
                 if (prop is object)
-                    return new CssValue((prop as CssProperty).Computed);
+                    return new CssValue((prop as CssProperty)!.Computed!);
                 else
                     throw new CssPropertyException($"Cannot read parent element property: {CssName}");
             }

@@ -26,9 +26,9 @@ namespace CssUI.DOM
 
         public Blob(IReadOnlyCollection<BlobPart> blobParts, BlobPropertyBag? options = null)
         {
-            data = process_blob_parts(blobParts, options);
+            data = process_blob_parts(blobParts, options!);
             size = (uint)data.Length;
-            type = StringCommon.Transform(options.type.AsMemory(), UnicodeCommon.To_ASCII_Lower_Alpha);
+            type = StringCommon.Transform(options!.type.AsMemory(), UnicodeCommon.To_ASCII_Lower_Alpha);
         }
         #endregion
 

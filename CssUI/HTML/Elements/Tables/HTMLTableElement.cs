@@ -51,11 +51,11 @@ namespace CssUI.HTML
                     Node first = firstChild;
                     if (first == null)
                     {
-                        appendChild(value);
+                        appendChild(value!);
                     }
                     else
                     {
-                        insertBefore(firstChild, value);
+                        insertBefore(value!, firstChild!);
                     }
                 });
             }
@@ -132,7 +132,10 @@ namespace CssUI.HTML
                         throw new HierarchyRequestError();
                     }
 
-                    appendChild(value);
+                    if (value != null)
+                    {
+                        appendChild(value);
+                    }
                 });
             }
         }
@@ -168,7 +171,7 @@ namespace CssUI.HTML
                 return firstOfType;
             }
 
-            var newChild = new HTMLTableCaptionElement(nodeDocument);
+            var newChild = new HTMLTableCaptionElement(nodeDocument!);
             insertFirst(newChild);
 
             return newChild;
@@ -188,7 +191,7 @@ namespace CssUI.HTML
                 return firstOfType;
             }
 
-            var newChild = new HTMLTableHeadElement(nodeDocument);
+            var newChild = new HTMLTableHeadElement(nodeDocument!);
 
             Element before = firstElementChild;
             while (before != null)
@@ -219,7 +222,7 @@ namespace CssUI.HTML
             }
 
 
-            var newChild = new HTMLTableFootElement(nodeDocument);
+            var newChild = new HTMLTableFootElement(nodeDocument!);
             appendChild(newChild);
             return newChild;
         }
@@ -235,7 +238,7 @@ namespace CssUI.HTML
              * if any, or at the end of the table element if the table element has no tbody element children, 
              * and then must return the new tbody element. */
             var lastOfType = DOMCommon.Get_Last_Element_Child<HTMLTableBodyElement>(this);
-            var newChild = new HTMLTableBodyElement(nodeDocument);
+            var newChild = new HTMLTableBodyElement(nodeDocument!);
 
             if (lastOfType != null)
             {
@@ -269,8 +272,8 @@ namespace CssUI.HTML
 
             if (rowCount <= 0 && tBodies.Count <= 0)
             {
-                var body = new HTMLTableBodyElement(nodeDocument);
-                var row = new HTMLTableRowElement(nodeDocument);
+                var body = new HTMLTableBodyElement(nodeDocument!);
+                var row = new HTMLTableRowElement(nodeDocument!);
 
                 body.appendChild(row);
                 appendChild(body);
@@ -280,22 +283,22 @@ namespace CssUI.HTML
 
             if (rowCount <= 0)
             {
-                var row = new HTMLTableRowElement(nodeDocument);
+                var row = new HTMLTableRowElement(nodeDocument!);
                 tBodies.Last().appendChild(row);
                 return row;
             }
 
             if (index == -1 || index == rowCount)
             {
-                var row = new HTMLTableRowElement(nodeDocument);
+                var row = new HTMLTableRowElement(nodeDocument!);
                 var parent = rows.Last().parentNode;
-                parent.appendChild(row);
+                parent!.appendChild(row);
                 return row;
             }
 
-            var newRow = new HTMLTableRowElement(nodeDocument);
+            var newRow = new HTMLTableRowElement(nodeDocument!);
             var indexRow = rows.ElementAt(index);
-            indexRow.parentNode.insertBefore(newRow, indexRow);
+            indexRow.parentNode!.insertBefore(newRow, indexRow);
             return newRow;
         }
 

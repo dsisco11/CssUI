@@ -419,7 +419,7 @@ namespace CssUI.CSS
                         foreach (ICssProperty o in propertyList)
                         {
                             //bool b = await Value.CascadeAsync(o);
-                            bool b = Value.Cascade(o);
+                            bool b = Value.Cascade(o!);
                             if (b) break;// stop cascading the instant we find a set value
                         }
 
@@ -480,7 +480,7 @@ namespace CssUI.CSS
             var propertyList = new List<ICssProperty>(4);
             foreach (var propSet in CssRules.Values)
             {
-                propertyList.Add(propSet[Property.CssName]);
+                propertyList.Add(propSet[Property.CssName]!);
             }
 
             // Order these properties according to CSS 3.0 specifications

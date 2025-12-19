@@ -23,7 +23,7 @@ namespace CssUI.NodeTree
             currentNode = root;
             Filter = null;
         }
-        public NodeTreeWalker(ITreeNode root, ulong whatToShow, NodeTreeFilter Filter)
+        public NodeTreeWalker(ITreeNode root, ulong whatToShow, NodeTreeFilter? Filter)
         {
             this.root = root;
             this.whatToShow = whatToShow;
@@ -315,7 +315,7 @@ namespace CssUI.NodeTree
                     while (result != EFilterResult.FILTER_REJECT && node.hasChildNodes)
                     {
                         /* 1) Set node to node’s last child. */
-                        node = node.lastChild;
+                        node = node.lastChild!;
                         /* 2) Set result to the result of filtering node within the context object. */
                         result = FilterNode(node);
                     }
@@ -362,7 +362,7 @@ namespace CssUI.NodeTree
                 while (result != EFilterResult.FILTER_REJECT && node.hasChildNodes)
                 {
                     /* 1) Set node to its first child. */
-                    node = node.firstChild;
+                    node = node.firstChild!;
                     /* 2) Set result to the result of filtering node within the context object. */
                     result = FilterNode(node);
                     /* 3) If result is FILTER_ACCEPT, then set the context object’s current to node and return node. */

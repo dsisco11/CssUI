@@ -22,7 +22,7 @@ namespace CssUI.DOM
             currentNode = root;
             Filter = null;
         }
-        public TreeWalker(Node root, ENodeFilterMask whatToShow, NodeFilter Filter)
+        public TreeWalker(Node root, ENodeFilterMask whatToShow, NodeFilter? Filter)
         {
             this.root = root;
             this.whatToShow = whatToShow;

@@ -283,7 +283,7 @@ namespace CssUI.CSS
             Transforms.Clear();
             foreach (StyleFunction func in Args)
             {
-                Transforms[func.Name] = func;
+                Transforms[func.Name!] = func;
             }
         }
 

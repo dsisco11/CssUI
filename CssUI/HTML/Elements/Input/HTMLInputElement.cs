@@ -206,7 +206,7 @@ namespace CssUI.HTML
                 if (type == EInputType.Hidden)
                     return null;
 
-                return DOMCommon.Get_Descendents<HTMLLabelElement>(form, labelFilter, ENodeFilterMask.SHOW_ELEMENT);
+                return DOMCommon.Get_Descendents<HTMLLabelElement>(form!, labelFilter, ENodeFilterMask.SHOW_ELEMENT);
             }
         }
         #endregion
@@ -428,7 +428,10 @@ namespace CssUI.HTML
                         }
                 }
 
-                setAttribute(EAttributeName.FormEncType, !value.HasValue ? null : AttributeValue.From(value.Value));
+                if (!value.HasValue)
+                    removeAttribute(EAttributeName.FormEncType);
+                else
+                    setAttribute(EAttributeName.FormEncType, AttributeValue.From(value.Value));
             });
         }
 
@@ -450,7 +453,10 @@ namespace CssUI.HTML
                         }
                 }
 
-                setAttribute(EAttributeName.FormMethod, !value.HasValue ? null : AttributeValue.From(value.Value));
+                if (!value.HasValue)
+                    removeAttribute(EAttributeName.FormMethod);
+                else
+                    setAttribute(EAttributeName.FormMethod, AttributeValue.From(value.Value));
             });
         }
 
@@ -590,7 +596,10 @@ namespace CssUI.HTML
                         }
                 }
 
-                setAttribute(EAttributeName.List, value == null ? null : AttributeValue.From(value?.id));
+                if (value == null)
+                    removeAttribute(EAttributeName.List);
+                else
+                    setAttribute(EAttributeName.List, AttributeValue.From(value.id!));
             }
         }
 

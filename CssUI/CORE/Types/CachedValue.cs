@@ -63,24 +63,24 @@ namespace CssUI
 
         #region Operators
 
-        public static bool operator ==(CachedValue<Ty> A, CachedValue<Ty> B)
+        public static bool operator ==(CachedValue<Ty>? A, CachedValue<Ty>? B)
         {
             // If both objects are NULL they match
             if (A is null && B is null) return true;
             // If one object is null and not the other they do not match
             if (A is null ^ B is null) return false;
             // Check if values match
-            return A.Get().Equals(B.Get());
+            return A!.Get()!.Equals(B!.Get());
         }
 
-        public static bool operator !=(CachedValue<Ty> A, CachedValue<Ty> B)
+        public static bool operator !=(CachedValue<Ty>? A, CachedValue<Ty>? B)
         {
             // If both objects are null they do not match
             if (A is null && B is null) return false;
             // If one object is null and not the other they do match
             if (A is null ^ B is null) return true;
             // Check if values match
-            return !A.Get().Equals(B.Get());
+            return !A!.Get()!.Equals(B!.Get());
         }
 
         public bool Equals(CachedValue<Ty>? other)

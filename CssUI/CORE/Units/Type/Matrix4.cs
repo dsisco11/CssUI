@@ -20,6 +20,8 @@ namespace CssUI
                 }
             }
         }
+
+        public static readonly Matrix4 Identity_Matrix = new();
         #endregion
 
         #region Properties

@@ -118,7 +118,7 @@ namespace CssUI.HTML
                 throw new IndexSizeError();
             }
 
-            var tableCell = new HTMLTableCellElement(nodeDocument);
+            var tableCell = new HTMLTableCellElement(nodeDocument!);
 
             if (index == -1 || index == cellCount)
             {

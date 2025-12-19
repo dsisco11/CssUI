@@ -107,17 +107,17 @@ namespace CssUI.DOM.Internal
             EventTarget? activationTarget = null;
             bool clearTargets = false;
             /* 4) Let relatedTarget be the result of retargeting event’s relatedTarget against target. */
-            EventTarget relatedTarget = EventCommon.retarget_event(@event.relatedTarget, target);
+            EventTarget? relatedTarget = EventCommon.retarget_event(@event.relatedTarget!, target);
             /* 5) If target is not relatedTarget or target is event’s relatedTarget, then: */
             if (!ReferenceEquals(target, relatedTarget) || ReferenceEquals(target, @event.relatedTarget))
             {
                 var touchTargets = new LinkedList<IEventTarget>();
                 foreach (var touchTarget in @event.TouchTargetList)
                 {
-                    touchTargets.AddLast(EventCommon.retarget_event(touchTarget, target));
+                    touchTargets.AddLast(EventCommon.retarget_event(touchTarget, target)!);
                 }
                 /* 3) Append to an event path with event, target, targetOverride, relatedTarget, touchTargets, and false. */
-                append_to_event_path(@event, target, targetOverride, relatedTarget, touchTargets, false);
+                append_to_event_path(@event, target, targetOverride, relatedTarget!, touchTargets, false);
                 /* 4) Let isActivationEvent be true, if event is a MouseEvent object and event’s type attribute is "click", and false otherwise. */
                 bool isActivationEvent = (@event is MouseEvent mouseEvent && mouseEvent.type == EEventName.Click);
                 /* 5) If isActivationEvent is true and target has activation behavior, then set activationTarget to target. */
@@ -152,13 +152,13 @@ namespace CssUI.DOM.Internal
                         slotable = parent;
                     }
                     /* 3) Let relatedTarget be the result of retargeting event’s relatedTarget against parent. */
-                    relatedTarget = EventCommon.retarget_event(@event.relatedTarget, parent);
+                    relatedTarget = EventCommon.retarget_event(@event.relatedTarget!, parent);
                     /* 4) Let touchTargets be a new list. */
                     touchTargets = new LinkedList<IEventTarget>();
                     /* 5) For each touchTarget of event’s touch target list, append the result of retargeting touchTarget against parent to touchTargets. */
                     foreach (var touchTarget in @event.TouchTargetList)
                     {
-                        touchTargets.AddLast(EventCommon.retarget_event(touchTarget, parent));
+                        touchTargets.AddLast(EventCommon.retarget_event(touchTarget, parent)!);
                     }
                     /* 6) If parent is a Window object, or parent is a node and target’s root is a shadow-including inclusive ancestor of parent, then: */
                     if (parent is Window || (parent is Node parentNode && DOMCommon.Is_Shadow_Including_Inclusive_Ancestor((target as Node)!.getRootNode(), parentNode)))
@@ -169,7 +169,7 @@ namespace CssUI.DOM.Internal
                             activationTarget = parent;
                         }
                         /* 2) Append to an event path with event, parent, null, relatedTarget, touchTargets, and slot-in-closed-tree. */
-                        EventCommon.append_to_event_path(@event, parent, null, relatedTarget, touchTargets, slotInClosedTree);
+                        EventCommon.append_to_event_path(@event, parent, null, relatedTarget!, touchTargets, slotInClosedTree);
                     }
                     /* 7) Otherwise, if parent is relatedTarget, then set parent to null. */
                     else if (ReferenceEquals(parent, relatedTarget))
@@ -184,7 +184,7 @@ namespace CssUI.DOM.Internal
                             activationTarget = target;
                         }
                         /* 2) Append to an event path with event, parent, target, relatedTarget, touchTargets, and slot-in-closed-tree. */
-                        EventCommon.append_to_event_path(@event, parent, target, relatedTarget, touchTargets, slotInClosedTree);
+                        EventCommon.append_to_event_path(@event, parent, target, relatedTarget!, touchTargets, slotInClosedTree);
                     }
                     /* 9) If parent is non-null, then set parent to the result of invoking parent’s get the parent with event. */
                     if (parent is object)
@@ -315,7 +315,7 @@ namespace CssUI.DOM.Internal
                 if (!listener.removed)
                     continue;
 
-                if (@event.type != listener.type)
+                if (@event.type != listener.type!)
                     continue;
 
                 found = true;

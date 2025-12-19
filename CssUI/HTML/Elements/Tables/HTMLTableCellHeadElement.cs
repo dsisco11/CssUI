@@ -28,13 +28,13 @@ namespace CssUI.HTML
         public string? scope
         {
             get => getAttribute(EAttributeName.Scope)?.AsString();
-            set => setAttribute(EAttributeName.Scope, AttributeValue.From(value));
+            set => setAttribute(EAttributeName.Scope, AttributeValue.From(value ?? string.Empty));
         }
         [CEReactions]
         public string? abbr
         {
             get => getAttribute(EAttributeName.Abbr)?.AsString();
-            set => setAttribute(EAttributeName.Abbr, AttributeValue.From(value));
+            set => setAttribute(EAttributeName.Abbr, AttributeValue.From(value ?? string.Empty));
         }
         #endregion
     }

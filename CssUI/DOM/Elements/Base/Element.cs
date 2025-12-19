@@ -319,7 +319,7 @@ namespace CssUI.DOM
             /* If A is an element, each attribute in its attribute list has an attribute that equals an attribute in B’s attribute list. */
             foreach (Attr attr in AttributeList)
             {
-                Attr bAttr = B.getAttributeNode(attr.localName);
+                Attr? bAttr = B.getAttributeNode(attr.localName!);
                 if (bAttr == null)
                     return false;
 
@@ -634,13 +634,13 @@ namespace CssUI.DOM
         {
             /* To change an attribute attribute from an element element to value, run these steps: */
             /* 1) Queue an attribute mutation record for element with attribute’s local name, attribute’s namespace, and attribute’s value. */
-            MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.namespaceURI, oldValue);
+            MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.namespaceURI ?? string.Empty, oldValue!);
 
             /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute’s local name, attribute’s value, value, and attribute’s namespace. */
             CEReactions.Enqueue_Reaction(this, EReactionName.AttributeChanged, attr.localName, attr.Value, attr.namespaceURI);
 
             /* 3) Run the attribute change steps with element, attribute’s local name, attribute’s value, value, and attribute’s namespace. */
-            run_attribute_change_steps(this, attr.localName, attr.Value, newValue, attr.namespaceURI.AsMemory());
+            run_attribute_change_steps(this, attr.localName, attr.Value!, newValue!, (attr.namespaceURI ?? string.Empty).AsMemory());
             /* 4) Set attribute’s value to value. */
             attr.Value = newValue;
         }
@@ -650,7 +650,7 @@ namespace CssUI.DOM
         {
             /* To append an attribute attribute to an element element, run these steps: */
             /* 1) Queue an attribute mutation record for element with attribute’s local name, attribute’s namespace, and null. */
-            MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.namespaceURI, attr.Value);
+            MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.namespaceURI ?? string.Empty, attr.Value);
 
             /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute’s local name, null, attribute’s value, and attribute’s namespace. */
             CEReactions.Enqueue_Reaction(this, EReactionName.AttributeChanged, attr.localName, null, attr.Value, attr.namespaceURI);
@@ -690,7 +690,7 @@ namespace CssUI.DOM
         {
             /* To replace an attribute oldAttr by an attribute newAttr in an element element, run these steps: */
             /* 1) Queue an attribute mutation record for element with oldAttr’s local name, oldAttr’s namespace, and oldAttr’s value. */
-            MutationRecord.Queue_Attribute_Mutation_Record(this, oldAttr.Name, oldAttr.namespaceURI, oldAttr.Value); // REDUNDANT
+            MutationRecord.Queue_Attribute_Mutation_Record(this, oldAttr.Name, oldAttr.namespaceURI ?? string.Empty, oldAttr.Value); // REDUNDANT
 
             /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing oldAttr’s local name, oldAttr’s value, newAttr’s value, and oldAttr’s namespace. */
             CEReactions.Enqueue_Reaction(this, EReactionName.AttributeChanged, oldAttr.localName, oldAttr.Value, newAttr.Value, oldAttr.namespaceURI);
@@ -993,7 +993,7 @@ namespace CssUI.DOM
             */
             if (isValidCustomName || !ReferenceEquals(null, is_value))
             {
-                var definition = nodeDocument.defaultView.customElements.Lookup(nodeDocument, NamespaceURI, localName, is_value);
+                var definition = nodeDocument.defaultView.customElements.Lookup(nodeDocument, NamespaceURI!, localName, is_value!);
                 if (definition != null && definition.bDisableShadow)
                 {
                     throw new NotSupportedError($"Cannot attach ShadowDOM to custom element whose definition has ShadowDOM disabled");
@@ -1006,7 +1006,7 @@ namespace CssUI.DOM
                 throw new NotSupportedError("Cannot attach a ShadowDOM to an element which already has one");
             }
 
-            var shadow = new ShadowRoot(this, nodeDocument, init.Mode);
+            var shadow = new ShadowRoot(this, nodeDocument!, init.Mode);
             /* 6) Set context object’s shadow root to shadow. */
             shadowRoot = shadow;
             return shadow;

@@ -82,7 +82,7 @@ namespace CssUI.CSS.Selectors
                         switch (Dir)
                         {
                             case ESelectorMatchingOrder.LTR:
-                                return new LinkedList<Element>(element.children);
+                                return new LinkedList<Element>(element.children!);
                             default:
                                 return element.parentElement is null ? Array.Empty<Element>() : new Element[] { element.parentElement };
                         }

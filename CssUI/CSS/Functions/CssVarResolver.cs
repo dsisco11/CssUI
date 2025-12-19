@@ -145,7 +145,7 @@ namespace CssUI.CSS.Functions
                         case ECssTokenType.Ident:
                             if (token is IdentToken ident)
                             {
-                                fallback = CssValue.From_CSS(ident.Value);
+                                fallback = CssValue.From_CSS(ident.Value!);
                             }
                             break;
                         case ECssTokenType.String:
