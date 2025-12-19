@@ -200,7 +200,7 @@ namespace CssUI.HTTP
 
             return null;
         }
-        public static bool TryParse(ReadOnlyMemory<char> input, out Url outUrl, in Url? urlBase = null, in Encoding? encodingOverride = null, in Url? TargetUrl = null)
+        public static bool TryParse(ReadOnlyMemory<char> input, out Url? outUrl, in Url? urlBase = null, in Encoding? encodingOverride = null, in Url? TargetUrl = null)
         {/* Docs: https://url.spec.whatwg.org/#concept-url-parser */
             if (Parse_Basic(input, urlBase, out Url parsedUrl, encodingOverride, TargetUrl))
             {
@@ -224,7 +224,7 @@ namespace CssUI.HTTP
             outUrl = parsedUrl;
             return true;
         }
-        internal static bool Parse_Basic(ReadOnlyMemory<char> InputStr, in Url Base, out Url outUrl, in Encoding? encodingOverride = null, Url? TargetUrl = null, in ESchemeState? stateOverride = null)
+        internal static bool Parse_Basic(ReadOnlyMemory<char> InputStr, in Url? Base, out Url? outUrl, in Encoding? encodingOverride = null, Url? TargetUrl = null, in ESchemeState? stateOverride = null)
         {/* Docs: https://url.spec.whatwg.org/#concept-basic-url-parser */
             ReadOnlyMemory<char> input = InputStr;
             Url? url = TargetUrl;
@@ -1198,7 +1198,7 @@ namespace CssUI.HTTP
             }
         }
 
-        public static bool Parse_Host(ReadOnlyMemory<char> input, out string outHost, bool bIsNotSpecial = false)
+        public static bool Parse_Host(ReadOnlyMemory<char> input, out string? outHost, bool bIsNotSpecial = false)
         {/* Docs: https://url.spec.whatwg.org/#concept-host-parser */
             DataConsumer<char> Stream = new DataConsumer<char>(input, EOF);
             if (Stream.Next == CHAR_LEFT_SQUARE_BRACKET)
@@ -1255,7 +1255,7 @@ namespace CssUI.HTTP
             outHost = asciiDomain;
             return true;
         }
-        public static bool Parse_Opaque_Host(ReadOnlyMemory<char> input, out string outHost)
+        public static bool Parse_Opaque_Host(ReadOnlyMemory<char> input, out string? outHost)
         {/* Docs: https://url.spec.whatwg.org/#concept-opaque-host-parser */
             DataConsumer<char> Stream = new DataConsumer<char>(input, EOF);
             if (StringCommon.Contains(input.Span, c => { return c != CHAR_PERCENT && Is_Forbidden_Host_Code_Point(c); }))
@@ -1323,7 +1323,7 @@ namespace CssUI.HTTP
             return true;
         }
         static long[] IPV4_POW_LUT = new long[4] { 256, MathExt.Pow(256, 2), MathExt.Pow(256, 3), MathExt.Pow(256, 4) };
-        public static bool Parse_IPV4(ReadOnlyMemory<char> input, out IPAddress outAddress)
+        public static bool Parse_IPV4(ReadOnlyMemory<char> input, out IPAddress? outAddress)
         {/* Docs: https://url.spec.whatwg.org/#concept-ipv4-parser */
             var Stream = new DataConsumer<char>(input, EOF);
             bool bValidationErrorFlag = false;
@@ -1402,7 +1402,7 @@ namespace CssUI.HTTP
             outAddress = new IPAddress(ipv4);
             return true;
         }
-        public static bool Parse_IPV6(ReadOnlyMemory<char> input, out IPAddress outAddress)
+        public static bool Parse_IPV6(ReadOnlyMemory<char> input, out IPAddress? outAddress)
         {/* Docs: https://url.spec.whatwg.org/#concept-ipv6-parser */
             var Stream = new DataConsumer<char>(input, EOF);
             var address = new ushort[8];

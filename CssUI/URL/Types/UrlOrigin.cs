@@ -25,7 +25,7 @@ namespace CssUI.HTTP
             Type = EOriginType.Opaque;
         }
 
-        public UrlOrigin(AtomicName<EUrlScheme> scheme, UrlHost host, ushort? port, string domain)
+        public UrlOrigin(AtomicName<EUrlScheme>? scheme, UrlHost? host, ushort? port, string? domain)
         {
             Type = EOriginType.Tuple;
             Scheme = scheme;

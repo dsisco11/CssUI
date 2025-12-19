@@ -268,9 +268,9 @@ namespace CssUI
             return false;
         }
 
-        public bool Equals(AtomicName<T> Name)
+        public bool Equals(AtomicName<T>? Name)
         {
-            if (Name == null)
+            if (Name is null)
                 return false;
 
             return Value.Equals(Name.Value);
@@ -313,7 +313,7 @@ namespace CssUI
             }
         }
 
-        public int CompareTo(AtomicName<T> Name)
+        public int CompareTo(AtomicName<T>? Name)
         {
             if (Name == null)
                 return 1;

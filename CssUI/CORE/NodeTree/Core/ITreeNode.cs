@@ -12,15 +12,15 @@ namespace CssUI.NodeTree
         bool hasChildNodes { get; }
 
         /// <summary> The node immediately containing this one </summary>
-        ITreeNode parentNode { get; set; }
+        ITreeNode? parentNode { get; set; }
         /// <summary> The first child in this nodes list of children </summary>
-        ITreeNode firstChild { get; }
+        ITreeNode? firstChild { get; }
         /// <summary> The last child in this nodes list of children </summary>
-        ITreeNode lastChild { get; }
+        ITreeNode? lastChild { get; }
         /// <summary> The node which is directly adjacent to this one within the parent </summary>
-        ITreeNode nextSibling { get; }
+        ITreeNode? nextSibling { get; }
         /// <summary> The node which is directly adjacent to this one within the parent </summary>
-        ITreeNode previousSibling { get; }
+        ITreeNode? previousSibling { get; }
         #endregion
 
 

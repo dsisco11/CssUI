@@ -16,6 +16,8 @@ using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Diagnostics.CodeAnalysis;
+
 #if ENABLE_HTML
 using CssUI.HTML;
 using CssUI.HTML.CustomElements;
@@ -574,7 +576,7 @@ namespace CssUI.DOM
 
         #region Internal Utility
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal bool find_attribute(AtomicName<EAttributeName> Name, out Attr outAttrib)
+        internal bool find_attribute(AtomicName<EAttributeName> Name, [MaybeNullWhen(false)] out Attr? outAttrib)
         {/* Docs: https://dom.spec.whatwg.org/#concept-element-attributes-get-by-namespace */
             if (!AttributeList.TryGetValue(Name, out Attr attr))
             {
@@ -587,7 +589,7 @@ namespace CssUI.DOM
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal bool find_attribute(AtomicName<EAttributeName> Name, string Namespace, out Attr outAttrib)
+        internal bool find_attribute(AtomicName<EAttributeName> Name, string Namespace, [MaybeNullWhen(false)] out Attr? outAttrib)
         {/* Docs: https://dom.spec.whatwg.org/#concept-element-attributes-get-by-namespace */
             if (!AttributeList.TryGetValue(Name, out Attr attr))
             {
@@ -600,7 +602,7 @@ namespace CssUI.DOM
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal bool find_attribute(string qualifiedName, out Attr outAttrib)
+        internal bool find_attribute(string qualifiedName, [MaybeNullWhen(false)] out Attr? outAttrib)
         {/* Docs: https://dom.spec.whatwg.org/#concept-element-attributes-get-by-namespace */
             qualifiedName = qualifiedName.ToLowerInvariant();
             if (!AttributeList.TryGetValue(qualifiedName, out Attr attr))
@@ -614,7 +616,7 @@ namespace CssUI.DOM
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal bool find_attribute(string localName, string Namespace, out Attr outAttrib)
+        internal bool find_attribute(string localName, string Namespace, out Attr? outAttrib)
         {/* Docs: https://dom.spec.whatwg.org/#concept-element-attributes-get-by-namespace */
             localName = string.Concat(Namespace, ":", localName.ToLowerInvariant());
             if (!AttributeList.TryGetValue(localName, out Attr attr))
@@ -628,7 +630,7 @@ namespace CssUI.DOM
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void change_attribute(Attr attr, AttributeValue oldValue, AttributeValue newValue)
+        internal void change_attribute(Attr attr, AttributeValue? oldValue, AttributeValue? newValue)
         {
             /* To change an attribute attribute from an element element to value, run these steps: */
             /* 1) Queue an attribute mutation record for element with attribute’s local name, attribute’s namespace, and attribute’s value. */
@@ -846,7 +848,7 @@ namespace CssUI.DOM
 
             return false;
         }
-        public bool hasAttribute(AtomicName<EAttributeName> Name, out Attr outAttr)
+        public bool hasAttribute(AtomicName<EAttributeName> Name, out Attr? outAttr)
         {
             if (AttributeList.TryGetValue(Name, out Attr attr))
             {
@@ -1319,7 +1321,7 @@ namespace CssUI.DOM
 
         #region Scrolling Internal Utility
 
-        internal bool scroll_bounds_into_view(Element ancestor, DOMRect elementBoundingBorderBox, ScrollBox ancestorScrollBox, EScrollLogicalPosition block, EScrollLogicalPosition inline, EScrollBehavior behavior)
+        internal bool scroll_bounds_into_view(Element? ancestor, DOMRect elementBoundingBorderBox, ScrollBox ancestorScrollBox, EScrollLogicalPosition block, EScrollLogicalPosition inline, EScrollBehavior behavior)
         {
             /* Edge definitions: https://www.w3.org/TR/cssom-view-1/#beginning-edges */
             double scrollingBoxEdgeA = 0; double elementEdgeA = 0;/* X */

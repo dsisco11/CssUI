@@ -105,7 +105,7 @@ namespace CssUI.DOM
         protected abstract string Token_To_String(T token);
         #endregion
 
-        public void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue newValue, ReadOnlyMemory<char> Namespace)
+        public void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue? oldValue, AttributeValue? newValue, ReadOnlyMemory<char>? Namespace)
         {
             if (localName != this.localName) return;
             if (Namespace is object) return;

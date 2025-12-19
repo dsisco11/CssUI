@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace CssUI
         /// <param name="outKeyword">Returned value</param>
         /// <returns>Success</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
-        public static bool TryKeyword<T>(T Value, out string outKeyword) where T : struct
+        public static bool TryKeyword<T>(T Value, [MaybeNullWhen(false)] out string? outKeyword) where T : struct
         {
             int enumIndex = EnumMetaTable.Meta.Lookup<T>();
             if (enumIndex < 0)
@@ -44,7 +45,7 @@ namespace CssUI
         /// <param name="outKeyword">Returned value</param>
         /// <returns>Success</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
-        public static bool TryKeyword(Type enumType, object Value, out string outKeyword)
+        public static bool TryKeyword(Type enumType, object Value, [MaybeNullWhen(false)] out string? outKeyword)
         {
             if (enumType is null) throw new ArgumentNullException(nameof(enumType));
             if (Value is null) throw new ArgumentNullException(nameof(Value));

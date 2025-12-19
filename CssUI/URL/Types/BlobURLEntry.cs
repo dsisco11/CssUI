@@ -2,6 +2,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.Diagnostics;
 using CssUI.DOM;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CssUI.HTTP
 {
@@ -10,7 +11,7 @@ namespace CssUI.HTTP
         #region Static
         public static readonly Dictionary<string, BlobURLEntry> BlobURLStore = new Dictionary<string, BlobURLEntry>();
 
-        public static bool Resolve(Url url, out BlobURLEntry outBlob)
+        public static bool Resolve(Url url, [MaybeNullWhen(false)] out BlobURLEntry? outBlob)
         {/* Docs: https://w3c.github.io/FileAPI/#blob-url-resolve */
             Debug.Assert(url.Scheme == "blob");
             string urlString = url.Serialize(true);

@@ -148,7 +148,7 @@ namespace CssUI
         #endregion
 
         #region Lookup
-        public bool Lookup(Key1 key1, out ConcurrentDictionary<Key2, Vty> Value)
+        public bool Lookup(Key1 key1, out ConcurrentDictionary<Key2, Vty>? Value)
         {
             if (Map.TryGetValue(key1, out var v))
             {
@@ -159,7 +159,7 @@ namespace CssUI
             Value = null;
             return false;
         }
-        public bool LookupInverse(Key2 key2, out ConcurrentDictionary<Key1, Vty> Value)
+        public bool LookupInverse(Key2 key2, out ConcurrentDictionary<Key1, Vty>? Value)
         {
             if (MapInverse.TryGetValue(key2, out var v))
             {

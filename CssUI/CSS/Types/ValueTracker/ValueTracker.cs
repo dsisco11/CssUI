@@ -44,7 +44,7 @@ namespace CssUI.CSS.Internal
         /// </summary>
         /// <param name="newValue">New Value</param>
         /// <param name="suppress">If <c>True</c> the change event will not be fired</param>
-        public void Update(Ty newValue, bool suppress = false)
+        public void Update(Ty? newValue, bool suppress = false)
         {
             if (ReferenceEquals(newValue, null))
             {
