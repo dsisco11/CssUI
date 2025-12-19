@@ -96,7 +96,7 @@ namespace CssUI.Internal
         #endregion
 
         #region Operators
-        public static bool operator ==(CssValueList A, CssValueList B)
+        public static bool operator ==(CssValueList? A, CssValueList? B)
         {
             // If either object is null return whether they are BOTH null
             if (object.ReferenceEquals(A, null) || object.ReferenceEquals(B, null))
@@ -104,7 +104,7 @@ namespace CssUI.Internal
 
             return A.GetHashCode() == B.GetHashCode();
         }
-        public static bool operator !=(CssValueList A, CssValueList B)
+        public static bool operator !=(CssValueList? A, CssValueList? B)
         {
             // If either object is null return whether they are BOTH null
             if (object.ReferenceEquals(A, null) || object.ReferenceEquals(B, null))

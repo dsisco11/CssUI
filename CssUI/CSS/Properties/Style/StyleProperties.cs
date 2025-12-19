@@ -275,7 +275,7 @@ namespace CssUI.CSS
         /// <param name="Owner"></param>
         /// <param name="Unset"></param>
         /// <returns></returns>
-        private CssComputedStyle NewPropertySet(string Name, string Selector, ICssElement Owner, bool Unset, EPropertySetOrigin Origin)
+        private CssComputedStyle NewPropertySet(string Name, string? Selector, ICssElement Owner, bool Unset, EPropertySetOrigin Origin)
         {
             var retVal = new CssComputedStyle(Name, new CssSelector(false, Selector), Owner, false, Unset, Origin);
             // Capture all update events.

@@ -237,13 +237,17 @@ namespace CssUI
         #endregion
 
         #region Equality
-        public static bool operator ==(AtomicName<T> A, AtomicName<T> B)
+        public static bool operator ==(AtomicName<T>? A, AtomicName<T>? B)
         {
+            if (A is null && B is null) return true;
+            if (A is null || B is null) return false;
             return (A.Value == B.Value);
         }
 
-        public static bool operator !=(AtomicName<T> A, AtomicName<T> B)
+        public static bool operator !=(AtomicName<T>? A, AtomicName<T>? B)
         {
+            if (A is null && B is null) return false;
+            if (A is null || B is null) return true;
             return (A.Value != B.Value);
         }
 

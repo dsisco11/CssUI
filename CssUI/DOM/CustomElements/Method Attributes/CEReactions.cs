@@ -136,7 +136,7 @@ namespace CssUI.DOM
 #endif
 
 
-        public static void Enqueue_Reaction(Element element, AtomicName<EReactionName> Reaction, params object[] Args)
+        public static void Enqueue_Reaction(Element element, AtomicName<EReactionName> Reaction, params object?[] Args)
         {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#enqueue-a-custom-element-callback-reaction */
 #if ENABLE_HTML
             if (!element.isCustom)

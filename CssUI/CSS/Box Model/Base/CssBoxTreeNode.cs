@@ -43,7 +43,7 @@ namespace CssUI.CSS.BoxTree
 
         /* XXX: Create a class which holds a value for each CSS property but which links them by reference to a parent objects values unless overriden */
 
-        public CssBoxTreeNode(CssBoxTreeNode parent) : base(parent)
+        public CssBoxTreeNode(CssBoxTreeNode? parent) : base(parent)
         {
             Position = Point2f.Zero;
             Size = Rect2f.Zero;

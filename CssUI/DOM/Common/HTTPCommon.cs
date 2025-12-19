@@ -1,5 +1,6 @@
 using CssUI.DOM;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text;
 using static CssUI.UnicodeCommon;
@@ -178,12 +179,12 @@ namespace CssUI.HTTP
         #endregion
 
         #region URL
-        public static bool Parse_URL(ReadOnlyMemory<char> href, Document document, out Url outUrl, out string outUrlString)
+        public static bool Parse_URL(ReadOnlyMemory<char> href, Document document, [MaybeNullWhen(false)] out Url? outUrl, [MaybeNullWhen(false)] out string? outUrlString)
         {/* Docs: https://html.spec.whatwg.org/multipage/urls-and-fetching.html#parse-a-url */
 
             var encoding = document.characterEncoding;
             var baseURL = document.document_url;
-            if (!Url.TryParse(href, out Url urlRecord, baseURL, encoding))
+            if (!Url.TryParse(href, out Url? urlRecord, baseURL, encoding))
             {
                 outUrl = null;
                 outUrlString = null;

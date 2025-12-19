@@ -8,7 +8,7 @@ namespace CssUI.Fonts
     /// </summary>
     public class FontOptions
     {
-        public readonly IEnumerable<string> Families = null;
+        public readonly IEnumerable<string>? Families = null;
         public readonly double Size = 0;
         public readonly int Weight = 400;
         public readonly EFontStyle Style = EFontStyle.Normal;

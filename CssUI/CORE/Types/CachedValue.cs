@@ -83,9 +83,13 @@ namespace CssUI
             return !A.Get().Equals(B.Get());
         }
 
-        public bool Equals(CachedValue<Ty> other)
+        public bool Equals(CachedValue<Ty>? other)
         {
-            return other != null && Get().Equals(other.Get());
+            if (other is null) return false;
+            var thisVal = Get();
+            var otherVal = other.Get();
+            if (thisVal is null || otherVal is null) return false;
+            return thisVal.Equals(otherVal);
         }
 
         public override bool Equals(object? other)

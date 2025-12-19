@@ -14,7 +14,7 @@ namespace CssUI.DOM.Internal
     {
         #region Properties
         //public Document document { get; protected set; }
-        public readonly WeakReference<BrowsingContext> _opener = new WeakReference<BrowsingContext>(null);
+        public readonly WeakReference<BrowsingContext?> _opener = new WeakReference<BrowsingContext?>(null);
         public bool Disowned { get; protected set; } = false;
         public bool IsClosing { get; protected set; } = false;
         public readonly Url? CreatorURL = null;

@@ -70,7 +70,7 @@ namespace CssUI.DOM.Internal
         /// <param name="relatedTarget"></param>
         /// <param name="touchTargets"></param>
         /// <param name="slotInClosedTree"></param>
-        public static void append_to_event_path(Event @event, EventTarget invocationTarget, EventTarget shadowAdjustedTarget, EventTarget relatedTarget, LinkedList<IEventTarget> touchTargets, bool slotInClosedTree)
+        public static void append_to_event_path(Event @event, EventTarget invocationTarget, EventTarget? shadowAdjustedTarget, EventTarget relatedTarget, LinkedList<IEventTarget> touchTargets, bool slotInClosedTree)
         {/* Docs: https://dom.spec.whatwg.org/#concept-event-path-append */
             bool invocationTargetInShadowTree = false;
             bool rootOfClosedTree = false;

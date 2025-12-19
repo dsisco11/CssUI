@@ -70,7 +70,7 @@ namespace CssUI.CSS.BoxTree
         #endregion
 
         #region Constructors
-        public CssBox(in CssBoxTreeNode parent) : base(parent)
+        public CssBox(in CssBoxTreeNode? parent) : base(parent)
         {
             childNodes.onAdded += ChildNodes_onAdded;
             childNodes.onRemoved += ChildNodes_onRemoved;

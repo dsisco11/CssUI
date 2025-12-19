@@ -26,7 +26,7 @@ namespace CssUI.DOM.Nodes
         private ENodeFlags nodeFlags = ENodeFlags.Clear;
         internal List<RegisteredObserver> RegisteredObservers = new List<RegisteredObserver>();
         public virtual Document? nodeDocument { get; internal set; }
-        private WeakReference<Node>? _parentNode = null;
+        private WeakReference<Node?>? _parentNode = null;
 
         #region Abstracts
         public abstract ENodeType nodeType { get; }
@@ -130,7 +130,7 @@ namespace CssUI.DOM.Nodes
         #region Constructors
         public Node()
         {
-            _parentNode = new WeakReference<Node>(null);
+            _parentNode = new WeakReference<Node?>(null);
             childNodes = new ChildNodeList(this);
         }
         #endregion

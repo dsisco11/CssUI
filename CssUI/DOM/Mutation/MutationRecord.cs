@@ -82,7 +82,7 @@ namespace CssUI.DOM.Mutation
         {/* Docs: https://dom.spec.whatwg.org/#queueing-a-mutation-record */
 
             /* 1) Let interestedObservers be an empty map. */
-            Dictionary<MutationObserver, string> interestedObservers = new Dictionary<MutationObserver, string>();
+            Dictionary<MutationObserver, string?> interestedObservers = new Dictionary<MutationObserver, string?>();
             /* 2) Let nodes be the inclusive ancestors of target. */
             List<Node> Nodes = new List<Node>();
             TreeWalker tree = new TreeWalker(Record.target, ENodeFilterMask.SHOW_ALL);
@@ -118,7 +118,7 @@ namespace CssUI.DOM.Mutation
                 }
             }
             /* 4) For each observer → mappedOldValue of interestedObservers: */
-            foreach (KeyValuePair<MutationObserver, string> kv in interestedObservers)
+            foreach (KeyValuePair<MutationObserver, string?> kv in interestedObservers)
             {
                 /* 1) Let record be a new MutationRecord object with its type set to type, target set to target, attributeName set to name, attributeNamespace set to namespace, oldValue set to mappedOldValue, addedNodes set to addedNodes, removedNodes set to removedNodes, previousSibling set to previousSibling, and nextSibling set to nextSibling. */
                 var record = new MutationRecord(Record.type, Record.target, Record.attributeName, Record.attributeNamespace, kv.Value, Record.addedNodes, Record.removedNodes, Record.previousSibling, Record.nextSibling);

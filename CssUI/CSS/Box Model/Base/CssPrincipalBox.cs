@@ -28,7 +28,7 @@ namespace CssUI.CSS.BoxTree
         #region Properties
 
         #region Backing
-        private WeakReference<Element> _owner;
+        private WeakReference<Element>? _owner;
         #endregion
 
         #region Display Types
@@ -331,7 +331,7 @@ namespace CssUI.CSS.BoxTree
 
 
         #region Constructors
-        public CssPrincipalBox(in Element owner, in CssBoxTreeNode parent) : base(parent)
+        public CssPrincipalBox(in Element owner, in CssBoxTreeNode? parent) : base(parent)
         {
             _owner = new WeakReference<Element>(owner);
             // Initialize formatting context based on display mode

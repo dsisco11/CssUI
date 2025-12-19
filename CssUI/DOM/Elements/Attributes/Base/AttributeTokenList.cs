@@ -27,7 +27,7 @@ namespace CssUI.DOM
         #endregion
 
         #region Constructor
-        public AttributeTokenList(Element ownerElement, AtomicName<EAttributeName> localName, T[] supportedTokens)
+        public AttributeTokenList(Element ownerElement, AtomicName<EAttributeName> localName, T[]? supportedTokens)
         {
             SupportedTokens = new HashSet<T>(supportedTokens);
             /* 1) Let element be associated element. */

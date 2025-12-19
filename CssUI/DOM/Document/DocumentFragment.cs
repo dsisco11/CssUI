@@ -43,7 +43,7 @@ namespace CssUI.DOM
 
         public override int nodeLength => childNodes.Count;
 
-        public DocumentFragment(Element Host, Document? ownerDocument = null)
+        public DocumentFragment(Element? Host, Document? ownerDocument = null)
         {
             this.Host = Host;
             nodeDocument = ownerDocument;
