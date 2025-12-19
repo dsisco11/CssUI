@@ -35,7 +35,7 @@ namespace CssUI.CSS.Parser
             return false;
         }
 
-        public override String Encode()
+        public override String? Encode()
         {
             return Value;
         }

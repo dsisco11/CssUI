@@ -36,7 +36,7 @@ namespace CssUI.CSS
         #endregion
 
         #region ToString
-        public override string ToString()
+        public override string? ToString()
         {
             if (Computed.Type == ECssValueTypes.INTEGER)
             {

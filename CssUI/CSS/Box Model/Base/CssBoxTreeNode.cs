@@ -17,7 +17,7 @@ namespace CssUI.CSS.BoxTree
         /// <summary>
         /// The parent object from which this one descends
         /// </summary>
-        public CssBoxTreeNode parentBox => parentNode as CssBoxTreeNode;
+        public CssBoxTreeNode? parentBox => parentNode as CssBoxTreeNode;
         /// <summary>
         /// Layout position
         /// </summary>

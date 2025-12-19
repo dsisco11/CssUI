@@ -109,7 +109,7 @@ namespace CssUI.CSS.Selectors
             return new QualifiedNameToken(Name!, NS);
         }
 
-        static CombinatorToken Consume_Combinator(DataConsumer<CssToken> Stream)
+        static CombinatorToken? Consume_Combinator(DataConsumer<CssToken> Stream)
         {
             var bHasWhitespace = Stream.Consume_While(o => o.Type == ECssTokenType.Whitespace);
             string Value = string.Empty;

@@ -51,11 +51,11 @@ namespace CssUI.NodeTree
         public bool Contains(ITreeNode other) => Tree.Is_Inclusive_Descendant(this, other);
 
         /// <summary> Returns the nodes root </summary>
-        public ITreeNode GetRootNode() => Tree.Get_Root(this);
+        public ITreeNode? GetRootNode() => Tree.Get_Root(this);
 
 
         #region List Implementation
-        public TreeNode this[int index] { get => (TreeNode)childNodes[index]; }
+        public TreeNode? this[int index] { get => (TreeNode?)childNodes[index]; }
 
         public bool IsReadOnly => false;
 

@@ -525,16 +525,16 @@ namespace CssUI.CSS
         #endregion
 
         #region Getters
-        public ICssProperty this[AtomicName<ECssPropertyID> CssName] => Get(CssName);
+        public ICssProperty? this[AtomicName<ECssPropertyID> CssName] => Get(CssName);
 
-        internal ICssProperty Get_ByIndex(int index) => CssProperties[index];
+        internal ICssProperty? Get_ByIndex(int index) => CssProperties[index];
 
         /// <summary>
         /// Finds the property within this style set that matches the given property
         /// </summary>
         /// <param name="Property"></param>
         /// <returns></returns>
-        internal ICssProperty Get(ICssProperty Property)
+        internal ICssProperty? Get(ICssProperty Property)
         {
             if (Property is null) throw new ArgumentNullException(nameof(Property));
 

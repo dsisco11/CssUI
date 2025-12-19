@@ -59,7 +59,7 @@ namespace CssUI.DOM
             return null;
         }
 
-        public Attr setNamedItem(Attr attr)
+        public Attr? setNamedItem(Attr attr)
         {
             /* To set an attribute given an attr and element, run these steps: */
             /* 1) If attr’s element is neither null nor element, throw an "InUseAttributeError" DOMException. */
@@ -82,7 +82,7 @@ namespace CssUI.DOM
             return oldAttr;
         }
 
-        public Attr removeNamedItem(AtomicString qualifiedName)
+        public Attr? removeNamedItem(AtomicString qualifiedName)
         {
             /* The removeNamedItem(qualifiedName) method, when invoked, must run these steps: */
             /* 1) Let attr be the result of removing an attribute given qualifiedName and element. */

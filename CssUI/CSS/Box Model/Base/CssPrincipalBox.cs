@@ -143,7 +143,7 @@ namespace CssUI.CSS.BoxTree
                 return null;
             }
         }
-        public virtual StyleProperties Style => Owner!.Style;
+        public virtual StyleProperties? Style => Owner!.Style;
 
         public override DisplayType DisplayType => new DisplayType(Style.Display);
 

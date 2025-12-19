@@ -53,13 +53,13 @@ namespace CssUI.CSS.Serialization
         #endregion
 
         #region Identifiers
-        public static string Identifier<Ty>(Ty ident) where Ty : struct
+        public static string? Identifier<Ty>(Ty ident) where Ty : struct
         {
             string keyword = Lookup.Keyword<Ty>(ident);
             return Identifier(keyword);
         }
 
-        public static string Identifier(string ident)
+        public static string? Identifier(string ident)
         {/* Docs: https://drafts.csswg.org/cssom/#serialize-an-identifier */
             if (ident == null)
             {

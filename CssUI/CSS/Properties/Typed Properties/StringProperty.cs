@@ -9,7 +9,7 @@ namespace CssUI.CSS
     public class StringProperty : CssProperty
     {
         #region Accessors
-        public string Value => Specified?.AsString();
+        public string? Value => Specified?.AsString();
         #endregion
 
         #region Value Overrides

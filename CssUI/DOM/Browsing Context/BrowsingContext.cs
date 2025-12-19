@@ -43,7 +43,7 @@ namespace CssUI.DOM.Internal
             get => (Opener == null);
         }
 
-        public Document activeDocument
+        public Document? activeDocument
         {/* A browsing context's active document is its WindowProxy object's [[Window]] internal slot value's associated Document. */
             get
             {

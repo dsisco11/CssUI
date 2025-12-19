@@ -12,7 +12,7 @@ namespace CssUI
         private readonly IEnumerator<T> Enumerator;
         private readonly SemaphoreSlim SemaphoreSlim;
 
-        object IEnumerator.Current => Current;
+        object? IEnumerator.Current => Current;
 
         internal ConcurrentEnumerator(ICollection<T> collection, SemaphoreSlim semaphoreSlim)
         {

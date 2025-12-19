@@ -11,7 +11,7 @@ namespace CssUI.DOM
     {/* Docs: https://wicg.github.io/visual-viewport/#the-visualviewport-interface */
         #region Properties
         public readonly Window window;
-        public Document document => window?.document;
+        public Document? document => window?.document;
 
         private long Left;
         private long Top;

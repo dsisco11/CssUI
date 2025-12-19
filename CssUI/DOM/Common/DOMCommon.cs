@@ -61,7 +61,7 @@ namespace CssUI.DOM
             }
         }
 
-        internal static ConstructorInfo Lookup_Element_Interface(AtomicString localName, AtomicString Namespace)
+        internal static ConstructorInfo? Lookup_Element_Interface(AtomicString localName, AtomicString Namespace)
         {
 #if ENABLE_HTML
             if (Namespace.Equals(HTMLNamespace))

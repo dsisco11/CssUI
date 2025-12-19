@@ -492,7 +492,7 @@ namespace CssUI.DOM.Nodes
         #endregion
 
         #region Event Stuff
-        public override EventTarget get_the_parent(Event @event)
+        public override EventTarget? get_the_parent(Event @event)
         {
 #if ENABLE_HTML
             /* A node’s get the parent algorithm, given an event, returns the node’s assigned slot, if node is assigned, and node’s parent otherwise. */

@@ -67,7 +67,7 @@ namespace CssUI.DOM.Events
         #endregion
 
         #region Manipulation
-        public IEnumerable<EventHandler> this[EventName Name]
+        public IEnumerable<EventHandler>? this[EventName Name]
         {
             get
             {

@@ -19,7 +19,7 @@ namespace CssUI.DOM
         #endregion
 
         #region Manipulation
-        public string this[string Name]
+        public string? this[string Name]
         {
             get
             {
@@ -135,7 +135,7 @@ namespace CssUI.DOM
             return safeName;
         }
 
-        private string From_XML_Safe_Name(string Name)
+        private string? From_XML_Safe_Name(string Name)
         {
             if (0 == Name.IndexOf("data-") && !UnicodeCommon.Has_ASCII_Upper_Alpha(Name.AsSpan()))
             {

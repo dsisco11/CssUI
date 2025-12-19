@@ -118,7 +118,7 @@ namespace CssUI.CSS
         }
 
         /* XXX: Have to restructure the CSS box system because this current system does NOT actually describe the CSS break system for fragmentation */
-        private StyleProperties Style => null;
+        private StyleProperties? Style => null;
 
         /// <summary>
         /// The logical-width for this area

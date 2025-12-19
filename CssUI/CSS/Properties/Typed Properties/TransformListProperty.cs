@@ -249,7 +249,7 @@ namespace CssUI.CSS
             return Transforms.Values.ToArray();
         }
 
-        public StyleFunction this[AtomicString Name]
+        public StyleFunction? this[AtomicString Name]
         {
             get
             {

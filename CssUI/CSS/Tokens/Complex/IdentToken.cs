@@ -6,7 +6,7 @@ namespace CssUI.CSS.Parser
         {
         }
 
-        public override string Encode()
+        public override string? Encode()
         {
             return Value;
         }

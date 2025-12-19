@@ -505,7 +505,7 @@ namespace CssUI.DOM
         #endregion
 
         #region EventTarget Overrides
-        public override EventTarget get_the_parent(Event @event)
+        public override EventTarget? get_the_parent(Event @event)
         {
             /* A document’s get the parent algorithm, given an event, returns null if event’s type attribute value is "load" or document does not have a browsing context, and the document’s relevant global object otherwise. */
             /* Note: We arent a browser implementation so we will never have a browsing context, knowing this I think we should direguard the check and allow Document to return itsself except for when event is "load" */

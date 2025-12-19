@@ -72,7 +72,7 @@ namespace CssUI.NodeTree
         /// Returns the next node in a sequence containing all nodes in the parent chain(in reverse tree order)
         /// </summary>
         /// <returns></returns>
-        public ITreeNode ParentNode()
+        public ITreeNode? ParentNode()
         {
             /* The parentNode() method, when invoked, must run these steps: */
             /* 1) Let node be the context object’s current. */

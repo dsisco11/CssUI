@@ -648,7 +648,7 @@ namespace CssUI.CSS.Serialization
         /// </summary>
         /// <param name="Stream"></param>
         /// <returns></returns>
-        static IMediaCondition Consume_Media_Condition(DataConsumer<CssToken> Stream)
+        static IMediaCondition? Consume_Media_Condition(DataConsumer<CssToken> Stream)
         {/* Docs: https://www.w3.org/TR/mediaqueries-4/#media-condition */
             if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
 

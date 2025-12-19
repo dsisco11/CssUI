@@ -781,7 +781,7 @@ namespace CssUI.DOM
             });
         }
         [CEReactions]
-        public Attr removeAttributeNode(Attr attr)
+        public Attr? removeAttributeNode(Attr attr)
         {
             return CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {

@@ -66,11 +66,11 @@ namespace CssUI.DOM
         /// <summary>
         /// The primary pointing device
         /// </summary>
-        public PointerDevice Mouse => PointerDevice.PrimaryDevice[(int)EPointerType.Mouse];
+        public PointerDevice? Mouse => PointerDevice.PrimaryDevice[(int)EPointerType.Mouse];
         /// <summary>
         /// The keyboard device of which there can be only one (the system sees ALL active keyboards as a single device).
         /// </summary>
-        public KeyboardDevice Keyboard => KeyboardDevice.PrimaryDevice;
+        public KeyboardDevice? Keyboard => KeyboardDevice.PrimaryDevice;
 
         private ConcurrentDictionary<KeyCombination, Action> KeyCommands = new ConcurrentDictionary<KeyCombination, Action>();
         private ConcurrentHashSet<KeyCombination> ProtectedKeyCommands = new ConcurrentHashSet<KeyCombination>();

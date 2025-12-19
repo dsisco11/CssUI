@@ -82,7 +82,7 @@ namespace CssUI.Rendering
 
         #region Matrix
 
-        public Matrix4 Matrix => Stack.Matrix;
+        public Matrix4? Matrix => Stack.Matrix;
 
         /// <summary>
         /// Sets the latest matrix value in the stack.

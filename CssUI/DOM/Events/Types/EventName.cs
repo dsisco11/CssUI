@@ -124,7 +124,7 @@ namespace CssUI.DOM.Events
         #region Overrides
         public override int GetHashCode() => Value;
 
-        public override string ToString() => Name;
+        public override string? ToString() => Name;
         #endregion
     }
 }

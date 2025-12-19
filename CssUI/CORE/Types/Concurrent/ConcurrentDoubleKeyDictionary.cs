@@ -18,7 +18,7 @@ namespace CssUI
         }
         #endregion
 
-        public Vty this[Key1 key1, Key2 key2]
+        public Vty? this[Key1 key1, Key2 key2]
         {
             get
             {

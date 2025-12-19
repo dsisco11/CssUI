@@ -87,7 +87,7 @@ namespace CssUI.DOM
             set => CEReactions.Wrap_CEReaction(ownerElement.nodeDocument.defaultView, () => ownerElement.setAttribute(localName, AttributeValue.From(value)));
         }
 
-        public T item(int index)
+        public T? item(int index)
         {
             /* The item(index) method, when invoked, must run these steps: */
             /* 1) If index is equal to or greater than context object’s token set’s size, then return null. */

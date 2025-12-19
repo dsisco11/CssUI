@@ -19,7 +19,7 @@ namespace CssUI
         #region Properties
         public Color Color => ColorStack.Peek() ?? Color.White;
         public Color Blend_Color => BlendingStack.Peek() ?? Color.White;
-        public Matrix4 Matrix => MatrixStack.FirstOrDefault();
+        public Matrix4? Matrix => MatrixStack.FirstOrDefault();
         #endregion
 
         #region Events

@@ -191,7 +191,7 @@ namespace CssUI.HTTP
         #endregion
 
         #region Parsing
-        public static Url Parse(ReadOnlyMemory<char> input, in Url? urlBase = null, in Encoding? encodingOverride = null)
+        public static Url? Parse(ReadOnlyMemory<char> input, in Url? urlBase = null, in Encoding? encodingOverride = null)
         {
             if (TryParse(input, out Url outUrl, urlBase, encodingOverride))
             {

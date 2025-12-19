@@ -55,7 +55,7 @@ namespace CssUI.CSS.Internal
             }
         }
 
-        public StyleDefinition Definition
+        public StyleDefinition? Definition
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get

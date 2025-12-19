@@ -61,7 +61,7 @@ namespace CssUI.CSS.Functions
         /// </summary>
         /// <param name="name">Property name (e.g., "--my-color")</param>
         /// <returns>The value, or null if not found</returns>
-        public CssValue Get(string name)
+        public CssValue? Get(string name)
         {
             if (_properties.TryGetValue(name, out var value))
             {

@@ -139,7 +139,7 @@ namespace CssUI
         /// Converts our integer value into its string name, supposedly through an enum lookup table
         /// </summary>
         /// <param name="value"></param>
-        protected virtual string Value_To_Name(int value)
+        protected virtual string? Value_To_Name(int value)
         {
             if (!IsCustom)
             {

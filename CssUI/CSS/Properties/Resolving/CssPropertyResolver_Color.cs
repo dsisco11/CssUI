@@ -71,7 +71,7 @@ namespace CssUI.CSS.Internal
             return Value;
         }
 
-        public static CssValue Color_Used(ICssProperty Property)
+        public static CssValue? Color_Used(ICssProperty Property)
         {
             if (Property is null) throw new ArgumentNullException(nameof(Property));
             Contract.EndContractBlock();
