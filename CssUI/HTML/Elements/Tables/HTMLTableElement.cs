@@ -34,7 +34,7 @@ namespace CssUI.HTML
         /// Can be set, to replace the caption element.
         /// /// </summary>
         [CEReactions]
-        public HTMLTableCaptionElement caption
+        public HTMLTableCaptionElement? caption
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-caption */
 
             get => DOMCommon.Get_First_Element_Child<HTMLTableCaptionElement>(this);
@@ -66,7 +66,7 @@ namespace CssUI.HTML
         /// Can be set, to replace the thead element.If the new value is not a thead element, throws a "HierarchyRequestError" DOMException.
         /// </summary>
         [CEReactions]
-        public HTMLTableHeadElement tHead
+        public HTMLTableHeadElement? tHead
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-thead */
 
             get => DOMCommon.Get_First_Element_Child<HTMLTableHeadElement>(this);
@@ -111,7 +111,7 @@ namespace CssUI.HTML
         /// Can be set, to replace the tfoot element.If the new value is not a tfoot element, throws a "HierarchyRequestError" DOMException.
         /// </summary>
         [CEReactions]
-        public HTMLTableFootElement tFoot
+        public HTMLTableFootElement? tFoot
         {/* Docs: https://html.spec.whatwg.org/multipage/tables.html#dom-table-tfoot */
             get => DOMCommon.Get_First_Element_Child<HTMLTableFootElement>(this);
             set

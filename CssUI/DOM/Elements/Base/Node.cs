@@ -304,7 +304,7 @@ namespace CssUI.DOM.Nodes
                 /* 2) Return a clone of the context object, with the clone children flag set if deep is true. */
                 /* Docs: https://dom.spec.whatwg.org/#concept-node-clone */
                 return Dom_clone_node(this, null, deep);
-            });
+            })!;
         }
 
         public EDocumentPosition compareDocumentPosition(Node other)
@@ -382,7 +382,7 @@ namespace CssUI.DOM.Nodes
             return CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 return Dom_pre_insert_node(newNode, this, null);
-            });
+            })!;
         }
 
         /// <summary>
@@ -397,7 +397,7 @@ namespace CssUI.DOM.Nodes
             return CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 return Dom_pre_insert_node(newNode, this, before);
-            });
+            })!;
         }
 
         [CEReactions]
@@ -406,7 +406,7 @@ namespace CssUI.DOM.Nodes
             return CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 return Dom_pre_insert_node(node, this, null);
-            });
+            })!;
         }
 
         [CEReactions]
@@ -415,7 +415,7 @@ namespace CssUI.DOM.Nodes
             return CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 return Dom_replace_node_within_parent(node, this, child);
-            });
+            })!;
         }
 
         [CEReactions]
@@ -424,7 +424,7 @@ namespace CssUI.DOM.Nodes
             return CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 return Dom_pre_remove_node(child, this);
-            });
+            })!;
         }
 
 

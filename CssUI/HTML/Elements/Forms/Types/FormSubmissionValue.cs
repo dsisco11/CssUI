@@ -34,9 +34,9 @@ namespace CssUI.HTML
         #endregion
 
         #region Implicit
-        public static implicit operator FormSubmissionValue(string value) => ReferenceEquals(null, value) ? null : new FormSubmissionValue(value);
-        public static implicit operator FormSubmissionValue(FileBlob value) => ReferenceEquals(null, value) ? null : new FormSubmissionValue(value);
-        public static implicit operator FormSubmissionValue(FormData value) => ReferenceEquals(null, value) ? null : new FormSubmissionValue(value);
+        public static implicit operator FormSubmissionValue?(string value) => ReferenceEquals(null, value) ? null : new FormSubmissionValue(value);
+        public static implicit operator FormSubmissionValue?(FileBlob value) => ReferenceEquals(null, value) ? null : new FormSubmissionValue(value);
+        public static implicit operator FormSubmissionValue?(FormData value) => ReferenceEquals(null, value) ? null : new FormSubmissionValue(value);
         #endregion
     }
 

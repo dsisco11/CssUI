@@ -139,31 +139,31 @@ namespace CssUI.HTML
         #region Content Attributes
 
         [CEReactions]
-        public string alt
+        public string? alt
         {
             get => getAttribute(EAttributeName.Alt)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Alt, AttributeValue.From(value)));
         }
         [CEReactions]
-        public string src
+        public string? src
         {
             get => getAttribute(EAttributeName.Src)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Src, AttributeValue.From(value)));
         }
         [CEReactions]
-        public string srcset
+        public string? srcset
         {
             get => getAttribute(EAttributeName.SrcSet)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.SrcSet, AttributeValue.From(value)));
         }
         [CEReactions]
-        public string sizes
+        public string? sizes
         {
             get => getAttribute(EAttributeName.Sizes)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Sizes, AttributeValue.From(value)));
         }
         [CEReactions]
-        public string crossOrigin
+        public string? crossOrigin
         {
             get => getAttribute(EAttributeName.CrossOrigin)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.CrossOrigin, AttributeValue.From(value)));
@@ -173,7 +173,7 @@ namespace CssUI.HTML
         /// The usemap attribute, if present, can indicate that the image has an associated image map.
         /// </summary>
         [CEReactions]
-        public string useMap
+        public string? useMap
         {
             get => getAttribute(EAttributeName.UseMap)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.UseMap, AttributeValue.From(value)));
@@ -208,15 +208,15 @@ namespace CssUI.HTML
         }
 
         [CEReactions]
-        public string referrerPolicy
+        public string? referrerPolicy
         {
-            get => getAttribute(EAttributeName.ReferrerPolicy).AsString();
+            get => getAttribute(EAttributeName.ReferrerPolicy)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.ReferrerPolicy, AttributeValue.From(value)));
         }
         [CEReactions]
-        public string decoding
+        public string? decoding
         {
-            get => getAttribute(EAttributeName.Decoding).AsString();
+            get => getAttribute(EAttributeName.Decoding)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Decoding, AttributeValue.From(value)));
         }
 
@@ -226,7 +226,7 @@ namespace CssUI.HTML
         /// This function returns an appropriate <see cref="DataRequest"/> object that can properly retrieve the data format of the requested object.
         /// </summary>
         /// <returns></returns>
-        protected virtual DataRequest get_data_request(string location)
+        protected virtual DataRequest? get_data_request(string location)
         {
             return DataRequestFactory.Create(location);
         }

@@ -134,7 +134,7 @@ namespace CssUI.HTML
         }
 
 
-        public static List<Tuple<string, FormDataEntryValue>> Construct_Form_Entry_List(HTMLFormElement form, Element submitter = null, string encoding = null)
+        public static List<Tuple<string, FormDataEntryValue>>? Construct_Form_Entry_List(HTMLFormElement form, Element submitter = null, string encoding = null)
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#constructing-the-form-data-set */
             if (form.bConstructingEntryList)
                 return null;

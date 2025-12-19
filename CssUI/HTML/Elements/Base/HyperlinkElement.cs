@@ -35,7 +35,7 @@ namespace CssUI.HTML
             {
                 reinitialize_url();
                 if (!hasAttribute(EAttributeName.Href, out Attr outAttr) && url == null) return string.Empty;
-                if (url == null) return outAttr.Value?.AsString();
+                if (url == null) return outAttr.Value?.AsString() ?? string.Empty;
                 return url.Serialize();
             }
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Href, AttributeValue.From(value)));

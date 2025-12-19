@@ -37,7 +37,7 @@ namespace CssUI.HTML.CustomElements
             get => Definitions[index];
         }
 
-        public CustomElementDefinition Lookup(Document document, string NamespaceURI, string localName, string isValue)
+        public CustomElementDefinition? Lookup(Document document, string NamespaceURI, string localName, string isValue)
         {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#look-up-a-custom-element-definition */
             if (!StringCommon.StrEq(NamespaceURI.AsSpan(), DOMCommon.HTMLNamespace.AsSpan()))
             {
@@ -222,7 +222,7 @@ namespace CssUI.HTML.CustomElements
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public CustomElementConstructor get(string name)
+        public CustomElementConstructor? get(string name)
         {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#dom-customelementregistry-get */
             var definition = Definitions.FirstOrDefault(def => def.name.Equals(name));
             return definition?.constructor;

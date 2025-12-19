@@ -59,7 +59,7 @@ namespace CssUI.HTML
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public virtual ElementType this[string name]
+        public virtual ElementType? this[string name]
         {
             get
             {

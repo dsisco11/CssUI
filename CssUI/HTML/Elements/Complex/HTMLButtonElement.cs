@@ -52,7 +52,7 @@ namespace CssUI.HTML
                     return nodeDocument.URL;
                 }
                 
-                return attr.Value.AsString();
+                return attr.Value.AsString() ?? nodeDocument.URL;
             }
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.FormAction, AttributeValue.From(value)));
         }
@@ -75,15 +75,15 @@ namespace CssUI.HTML
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => toggleAttribute(EAttributeName.FormNoValidate, value));
         }
 
-        [CEReactions] public string formTarget
+        [CEReactions] public string? formTarget
         {
-            get => getAttribute(EAttributeName.FormTarget).AsString();
+            get => getAttribute(EAttributeName.FormTarget)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.FormTarget, AttributeValue.From(value)));
         }
 
-        [CEReactions] public string name
+        [CEReactions] public string? name
         {
-            get => getAttribute(EAttributeName.Name).AsString();
+            get => getAttribute(EAttributeName.Name)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Name, AttributeValue.From(value)));
         }
 

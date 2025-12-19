@@ -37,9 +37,9 @@ namespace CssUI.HTML
         /// <summary>
         /// The name attribute is used to assign slots to other elements: a slot element with a name attribute creates a named slot to which any element is assigned if that element has a slot attribute whose value matches that name attribute's value, and the slot element is a child of the shadow tree whose root's host has that corresponding slot attribute value.
         /// </summary>
-        [CEReactions] public string Name
+        [CEReactions] public string? Name
         {
-            get => getAttribute(EAttributeName.Name).AsString();
+            get => getAttribute(EAttributeName.Name)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Name, AttributeValue.From(value)));
         }
         #endregion

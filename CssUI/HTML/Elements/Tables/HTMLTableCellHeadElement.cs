@@ -25,15 +25,15 @@ namespace CssUI.HTML
 
         #region Content Attribute
         [CEReactions]
-        public string scope
+        public string? scope
         {
             get => getAttribute(EAttributeName.Scope)?.AsString();
             set => setAttribute(EAttributeName.Scope, AttributeValue.From(value));
         }
         [CEReactions]
-        public string abbr
+        public string? abbr
         {
-            get => getAttribute(EAttributeName.Abbr).AsString();
+            get => getAttribute(EAttributeName.Abbr)?.AsString();
             set => setAttribute(EAttributeName.Abbr, AttributeValue.From(value));
         }
         #endregion

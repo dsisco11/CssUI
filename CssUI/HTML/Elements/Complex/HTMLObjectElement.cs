@@ -51,15 +51,15 @@ namespace CssUI.HTML
         #endregion
 
         #region Accessors
-        public Window contentWindow => Nested_Browsing_Context?.WindowProxy;
+        public Window? contentWindow => Nested_Browsing_Context?.WindowProxy;
 
-        public Document contentDocument
+        public Document? contentDocument
         {/* Docs: https://html.spec.whatwg.org/multipage/browsers.html#concept-bcc-content-document */
             get
             {
                 if (Nested_Browsing_Context == null) return null;
                 var document = Nested_Browsing_Context.activeDocument;
-                if (!document.document_origin.IsSameOriginDomain(nodeDocument.document_origin)) return null;
+                if (document == null || !document.document_origin.IsSameOriginDomain(nodeDocument.document_origin)) return null;
                 return document;
             }
         }
@@ -86,7 +86,7 @@ namespace CssUI.HTML
 
         #region Content Attributes
         [CEReactions]
-        public string data
+        public string? data
         {
             get => getAttribute(EAttributeName.Data)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Data, AttributeValue.From(value)));
@@ -96,21 +96,21 @@ namespace CssUI.HTML
         /// A valid MIME-type
         /// </summary>
         [CEReactions]
-        public override string type
+        public override string? type
         {
             get => getAttribute(EAttributeName.Type)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Type, AttributeValue.From(value)));
         }
 
         [CEReactions]
-        public string name
+        public string? name
         {
             get => getAttribute(EAttributeName.Name)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Name, AttributeValue.From(value)));
         }
 
         [CEReactions]
-        public string useMap
+        public string? useMap
         {
             get => getAttribute(EAttributeName.UseMap)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.UseMap, AttributeValue.From(value)));
@@ -146,12 +146,12 @@ namespace CssUI.HTML
         #endregion
 
 
-        public Document getSVGDocument()
+        public Document? getSVGDocument()
         {/* Docs: https://html.spec.whatwg.org/multipage/embedded-content-other.html#dom-media-getsvgdocument */
             if (Nested_Browsing_Context == null)
                 return null;
 
-            if (!nodeDocument.document_origin.IsSameOriginDomain(Nested_Browsing_Context.activeDocument.document_origin))
+            if (Nested_Browsing_Context.activeDocument == null || !nodeDocument.document_origin.IsSameOriginDomain(Nested_Browsing_Context.activeDocument.document_origin))
                 return null;
 
             /* XXX: Finish the SVG document stuff */

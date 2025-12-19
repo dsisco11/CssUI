@@ -182,10 +182,10 @@ namespace CssUI.DOM
         /// <summary>
         /// an elements 'is' attribute specifies its custom element class
         /// </summary>
-        public string is_value
+        public string? is_value
         {/* Docs: https://dom.spec.whatwg.org/#concept-element-is-value */
 #if ENABLE_HTML
-            get => getAttribute(EAttributeName.IS).AsString();
+            get => getAttribute(EAttributeName.IS)?.AsString();
             set => setAttribute(EAttributeName.IS, AttributeValue.From(value));
 #else
             get => string.Empty;
@@ -195,9 +195,9 @@ namespace CssUI.DOM
 
 #if ENABLE_HTML
         [CEReactions]
-        public string slot
+        public string? slot
         {/* The slot attribute must reflect the "slot" content attribute. */
-            get => getAttribute(EAttributeName.Slot).AsString();
+            get => getAttribute(EAttributeName.Slot)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Slot, AttributeValue.From(value)));
         }
 #endif
@@ -952,8 +952,8 @@ namespace CssUI.DOM
         #region Shadow DOM
 
 #if ENABLE_HTML
-        private ShadowRoot _shadow_root = null;
-        public ShadowRoot shadowRoot
+        private ShadowRoot? _shadow_root = null;
+        public ShadowRoot? shadowRoot
         {
             get
             {

@@ -42,9 +42,9 @@ namespace CssUI.HTML
 
         #region Content Attributes
         [CEReactions]
-        public string acceptCharset
+        public string? acceptCharset
         {
-            get => getAttribute(EAttributeName.AcceptCharset).AsString();
+            get => getAttribute(EAttributeName.AcceptCharset)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.AcceptCharset, AttributeValue.From(value)));
         }
 
@@ -58,35 +58,35 @@ namespace CssUI.HTML
         [CEReactions]
         public EAutoComplete autocomplete
         {
-            get => getAttribute(EAttributeName.Autocomplete).AsEnum<EAutoComplete>();
+            get => getAttribute(EAttributeName.Autocomplete)?.AsEnum<EAutoComplete>() ?? default;
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Autocomplete, AttributeValue.From(value)));
         }
 
         [CEReactions]
         public EEncType enctype
         {
-            get => getAttribute(EAttributeName.EncType).AsEnum<EEncType>();
+            get => getAttribute(EAttributeName.EncType)?.AsEnum<EEncType>() ?? default;
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.EncType, AttributeValue.From(value)));
         }
 
         [CEReactions]
         public EEncType encoding
         {
-            get => getAttribute(EAttributeName.EncType).AsEnum<EEncType>();
+            get => getAttribute(EAttributeName.EncType)?.AsEnum<EEncType>() ?? default;
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.EncType, AttributeValue.From(value)));
         }
 
         [CEReactions]
         public EFormMethod method
         {
-            get => getAttribute(EAttributeName.Method).AsEnum<EFormMethod>();
+            get => getAttribute(EAttributeName.Method)?.AsEnum<EFormMethod>() ?? default;
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Method, AttributeValue.From(value)));
         }
 
         [CEReactions]
-        public string name
+        public string? name
         {
-            get => getAttribute(EAttributeName.Name).AsString();
+            get => getAttribute(EAttributeName.Name)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Name, AttributeValue.From(value)));
         }
 
@@ -98,16 +98,16 @@ namespace CssUI.HTML
         }
 
         [CEReactions]
-        public string target
+        public string? target
         {
-            get => getAttribute(EAttributeName.Target).AsString();
+            get => getAttribute(EAttributeName.Target)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Target, AttributeValue.From(value)));
         }
 
         [CEReactions]
-        public string rel
+        public string? rel
         {
-            get => getAttribute(EAttributeName.Rel).AsString();
+            get => getAttribute(EAttributeName.Rel)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Rel, AttributeValue.From(value)));
         }
         #endregion
@@ -115,13 +115,13 @@ namespace CssUI.HTML
         #region Accessors
         public int length => elements.length;
 
-        public Element this[int index] => elements[index];
+        public Element? this[int index] => elements[index];
 
         /// <summary>
         /// Returns the item with ID or name name from the collection.
         /// If there are multiple matching items, then a RadioNodeList object containing all those elements is returned.
         /// </summary>
-        public dynamic this[string name] => elements[name];
+        public dynamic? this[string name] => elements[name];
         #endregion
 
 

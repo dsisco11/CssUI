@@ -28,9 +28,9 @@ namespace CssUI.HTML
         /// Link to the source of the quotation or more information about the edit
         /// </summary>
         [CEReactions]
-        public string cite
+        public string? cite
         {
-            get => getAttribute(EAttributeName.Cite).AsString();
+            get => getAttribute(EAttributeName.Cite)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Cite, AttributeValue.From(value)));
         }
         #endregion

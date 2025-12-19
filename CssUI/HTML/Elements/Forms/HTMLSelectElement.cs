@@ -60,9 +60,9 @@ namespace CssUI.HTML
         }
 
         [CEReactions]
-        public string name
+        public string? name
         {
-            get => getAttribute(EAttributeName.Name).AsString();
+            get => getAttribute(EAttributeName.Name)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Name, AttributeValue.From(value)));
         }
 
@@ -76,7 +76,7 @@ namespace CssUI.HTML
         [CEReactions]
         public int size
         {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#dom-select-size */
-            get => getAttribute(EAttributeName.Size).AsInt();
+            get => getAttribute(EAttributeName.Size)?.AsInt() ?? 0;
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Size, AttributeValue.From(value)));
         }
         #endregion
@@ -94,7 +94,7 @@ namespace CssUI.HTML
                     return string.Empty;
                 }
 
-                return selected.First()?.value;
+                return selected.First()?.value ?? string.Empty;
             }
 
             set
@@ -211,13 +211,13 @@ namespace CssUI.HTML
 
         #region Indexers
         [CEReactions]
-        public HTMLOptionElement this[int index]
+        public HTMLOptionElement? this[int index]
         {
             get => options[index];
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => options[index] = value);
         }
 
-        public HTMLOptionElement this[string name] => options[name];
+        public HTMLOptionElement? this[string name] => options[name];
         #endregion
 
         #region Utility
@@ -240,7 +240,7 @@ namespace CssUI.HTML
             }
         }
 
-        private HTMLOptionElement get_placeholder_label_option()
+        private HTMLOptionElement? get_placeholder_label_option()
         {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#placeholder-label-option */
             if (!required)
             {

@@ -21,16 +21,16 @@ namespace CssUI.HTML
         /// Its value must be a valid BCP 47 language tag, or the empty string. Setting the attribute to the empty string indicates that the primary language is unknown.
         /// </summary>
         [CEReactions]
-        public string Title
+        public string? Title
         {
-            get => getAttribute(EAttributeName.Title).AsString();
+            get => getAttribute(EAttributeName.Title)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Title, AttributeValue.From(value)));
         }
 
         [CEReactions]
-        public string Lang
+        public string? Lang
         {
-            get => getAttribute(EAttributeName.Lang).AsString();
+            get => getAttribute(EAttributeName.Lang)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Lang, AttributeValue.From(value)));
         }
 
@@ -125,9 +125,9 @@ namespace CssUI.HTML
         /// Returns the value of the element's [[CryptographicNonce]] internal slot.
         /// Can be set, to update that slot's value.
         /// </summary>
-        public string nonce// Intentionally no [CEReactions]
+        public string? nonce// Intentionally no [CEReactions]
         {/* Docs: https://html.spec.whatwg.org/multipage/urls-and-fetching.html#dom-noncedelement-nonce */
-            get => getAttribute(EAttributeName.Nonce).AsString();
+            get => getAttribute(EAttributeName.Nonce)?.AsString();
             set => setAttribute(EAttributeName.Nonce, AttributeValue.From(value));
         }
 
@@ -274,7 +274,7 @@ namespace CssUI.HTML
         #endregion
 
         #region CSS Object Model
-        public Element offsetParent
+        public Element? offsetParent
         {/* Docs: https://www.w3.org/TR/cssom-view-1/#dom-htmlelement-offsetparent */
             get
             {
@@ -283,7 +283,7 @@ namespace CssUI.HTML
 
                 /* 2) Return the nearest ancestor element of the element for which at least one of the following is true and terminate this algorithm if such an ancestor is found: */
                 var tree = new TreeWalker(this, ENodeFilterMask.SHOW_ELEMENT);
-                Element ancestor = tree.parentNode() as Element;
+                Element? ancestor = tree.parentNode() as Element;
                 while (ancestor != null)
                 {
                     if (ancestor.Style.Positioning != CSS.EBoxPositioning.Static)
@@ -536,9 +536,9 @@ namespace CssUI.HTML
 
 
         [CEReactions]
-        public string AccessKey
+        public string? AccessKey
         {
-            get => getAttribute(EAttributeName.AccessKey).AsString();
+            get => getAttribute(EAttributeName.AccessKey)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.AccessKey, AttributeValue.Parse(EAttributeName.AccessKey, value)));
         }
 

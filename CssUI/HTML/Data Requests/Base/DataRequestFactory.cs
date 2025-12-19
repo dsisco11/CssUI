@@ -18,7 +18,7 @@ namespace CssUI.HTML
         /// </summary>
         public static ConcurrentHashSet<DataRequestResolver> Resolvers = new ConcurrentHashSet<DataRequestResolver>();
 
-        public static DataRequest Create(string requestURI)
+        public static DataRequest? Create(string requestURI)
         {
             /*
             Url url = new Url(requestURI);

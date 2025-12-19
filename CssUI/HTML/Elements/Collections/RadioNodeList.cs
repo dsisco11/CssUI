@@ -29,7 +29,7 @@ namespace CssUI.HTML
                     return "on";
                 }
 
-                return attr.Value.AsString();
+                return attr.Value.AsString() ?? string.Empty;
             }
 
             set

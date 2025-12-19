@@ -17,7 +17,7 @@ namespace CssUI.HTML
         /// Returns the item with ID or name name from the collection.
         /// If there are multiple matching items, then a RadioNodeList object containing all those elements is returned.
         /// </summary>
-        public new dynamic this[string name]
+        public new dynamic? this[string name]
         {
             get
             {

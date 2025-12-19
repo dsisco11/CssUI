@@ -71,23 +71,23 @@ namespace CssUI.HTML
         }
 
         [CEReactions]
-        public string dirName
+        public string? dirName
         {
-            get => getAttribute(EAttributeName.Dirname).AsString();
+            get => getAttribute(EAttributeName.Dirname)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Dirname, AttributeValue.From(value)));
         }
 
         [CEReactions]
-        public string name
+        public string? name
         {
-            get => getAttribute(EAttributeName.Name).AsString();
+            get => getAttribute(EAttributeName.Name)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Name, AttributeValue.From(value)));
         }
 
         [CEReactions]
-        public string placeholder
+        public string? placeholder
         {
-            get => getAttribute(EAttributeName.Placeholder).AsString();
+            get => getAttribute(EAttributeName.Placeholder)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Placeholder, AttributeValue.From(value)));
         }
 
@@ -108,28 +108,28 @@ namespace CssUI.HTML
         [CEReactions]
         public uint rows
         {
-            get => getAttribute(EAttributeName.Rows).AsUInt();
+            get => getAttribute(EAttributeName.Rows)?.AsUInt() ?? 0;
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Rows, AttributeValue.From(value)));
         }
 
         [CEReactions]
-        public string wrap
+        public string? wrap
         {
-            get => getAttribute(EAttributeName.Wrap).AsString();
+            get => getAttribute(EAttributeName.Wrap)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Wrap, AttributeValue.From(value)));
         }
 
         [CEReactions]
         public int maxLength
         {
-            get => getAttribute(EAttributeName.MaxLength).AsInt();
+            get => getAttribute(EAttributeName.MaxLength)?.AsInt() ?? -1;
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.MaxLength, AttributeValue.From(value)));
         }
 
         [CEReactions]
         public int minLength
         {
-            get => getAttribute(EAttributeName.MinLength).AsInt();
+            get => getAttribute(EAttributeName.MinLength)?.AsInt() ?? -1;
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.MinLength, AttributeValue.From(value)));
         }
         #endregion

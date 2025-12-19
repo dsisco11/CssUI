@@ -33,7 +33,7 @@ namespace CssUI.HTML
         #endregion
 
         #region Content Attributes  
-        [CEReactions] public string alt
+        [CEReactions] public string? alt
         {
             get => getAttribute(EAttributeName.Alt)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Alt, AttributeValue.From(value)));
@@ -73,25 +73,25 @@ namespace CssUI.HTML
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Shape, AttributeValue.From(value)));
         }
 
-        [CEReactions] public string target
+        [CEReactions] public string? target
         {
             get => getAttribute(EAttributeName.Target)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Target, AttributeValue.From(value)));
         }
 
-        [CEReactions] public string download
+        [CEReactions] public string? download
         {
             get => getAttribute(EAttributeName.Download)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Download, AttributeValue.From(value)));
         }
 
-        [CEReactions] public string ping
+        [CEReactions] public string? ping
         {
             get => getAttribute(EAttributeName.Ping)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Ping, AttributeValue.From(value)));
         }
 
-        [CEReactions] public string rel
+        [CEReactions] public string? rel
         {
             get => getAttribute(EAttributeName.Rel)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Rel, AttributeValue.From(value)));

@@ -28,7 +28,7 @@ namespace CssUI.HTML
         /// The label attribute must be specified. Its value gives the name of the group, for the purposes of the user interface.
         /// </summary>
         [CEReactions]
-        public string label
+        public string? label
         {
             get => getAttribute(EAttributeName.Label)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Label, AttributeValue.From(value)));

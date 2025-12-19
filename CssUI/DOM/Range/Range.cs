@@ -405,12 +405,12 @@ namespace CssUI.DOM
         }
 
         [CEReactions]
-        public DocumentFragment extractContents()
+        public DocumentFragment? extractContents()
         {/* Docs: https://dom.spec.whatwg.org/#dom-range-extractcontents */
 
             return CEReactions.Wrap_CEReaction(root.nodeDocument.defaultView, () =>
             {
-                var fragment = new DocumentFragment(null, startContainer.ownerDocument);
+                var fragment = new DocumentFragment(null, startContainer.ownerDocument!);
                 if (collapsed)
                     return fragment;
 
@@ -525,12 +525,12 @@ namespace CssUI.DOM
         }
 
         [CEReactions]
-        public DocumentFragment cloneContents()
+        public DocumentFragment? cloneContents()
         {/* Docs: https://dom.spec.whatwg.org/#concept-range-clone */
 
             return CEReactions.Wrap_CEReaction(root.nodeDocument.defaultView, () =>
             {
-                var fragment = new DocumentFragment(null, startContainer.ownerDocument);
+                var fragment = new DocumentFragment(null, startContainer.ownerDocument!);
                 if (collapsed) return fragment;
 
                 /* 4) If original start node is original end node, and they are a Text, ProcessingInstruction, or Comment node: */

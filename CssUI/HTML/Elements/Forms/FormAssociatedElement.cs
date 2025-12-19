@@ -44,7 +44,7 @@ namespace CssUI.HTML
         #endregion
 
         #region Properties
-        public virtual HTMLFormElement form
+        public virtual HTMLFormElement? form
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#form-owner */
             get
             {
@@ -55,10 +55,10 @@ namespace CssUI.HTML
                 }
 
                 /* if the 'form' content attribute has been specified then find the form by the id given by the attribute */
-                AttributeValue attr = getAttribute(EAttributeName.Form);
+                AttributeValue? attr = getAttribute(EAttributeName.Form);
                 if (attr != null)
                 {
-                    Element formElement = ownerDocument?.getElementByID(attr.AsAtomic());
+                    Element? formElement = ownerDocument?.getElementByID(attr.AsAtomic());
                     if (!(formElement is HTMLFormElement))
                         return null;
 

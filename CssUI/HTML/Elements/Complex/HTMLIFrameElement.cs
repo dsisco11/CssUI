@@ -36,7 +36,7 @@ namespace CssUI.HTML
         #endregion
 
         #region Accessors
-        public Document contentDocument
+        public Document? contentDocument
         {
             get
             {/* Docs: https://html.spec.whatwg.org/multipage/browsers.html#concept-bcc-content-document */
@@ -50,30 +50,30 @@ namespace CssUI.HTML
             }
         }
 
-        public Window contentWindow
+        public Window? contentWindow
         {/* Docs: https://html.spec.whatwg.org/multipage/iframe-embed-object.html#dom-iframe-contentwindow */
             get => Nested_Browsing_Context?.WindowProxy;
         }
         #endregion
 
         #region Content publics
-        [CEReactions] public string src
+        [CEReactions] public string? src
         {
-            get => getAttribute(EAttributeName.Src).AsString();
+            get => getAttribute(EAttributeName.Src)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Src, AttributeValue.From(value)));
         }
 
         [CEReactions] public string srcdoc;
 
-        [CEReactions] public string name
+        [CEReactions] public string? name
         {
-            get => getAttribute(EAttributeName.Name).AsString();
+            get => getAttribute(EAttributeName.Name)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Name, AttributeValue.From(value)));
         }
 
-        [CEReactions] public string allow
+        [CEReactions] public string? allow
         {
-            get => getAttribute(EAttributeName.Allow).AsString();
+            get => getAttribute(EAttributeName.Allow)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Allow, AttributeValue.From(value)));
         }
 

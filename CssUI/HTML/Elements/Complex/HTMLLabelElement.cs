@@ -29,7 +29,7 @@ namespace CssUI.HTML
         /// Returns the form owner of the form control that is associated with this element.
         /// Returns null if there isn't one.
         /// </summary>
-        public HTMLFormElement form
+        public HTMLFormElement? form
         {/* Docs: https://html.spec.whatwg.org/multipage/forms.html#dom-label-form */
             get
             {
@@ -43,23 +43,23 @@ namespace CssUI.HTML
         /// <summary>
         /// Returns the form control that is associated with this element.
         /// </summary>
-        public HTMLElement control
+        public HTMLElement? control
         {/* Docs: https://html.spec.whatwg.org/multipage/forms.html#attr-label-for */
             get
             {
                 if (hasAttribute(EAttributeName.For, out Attr forAttr) && !ReferenceEquals(null, forAttr.Value))
                 {
-                    return (HTMLElement)ownerDocument.getElementByID(forAttr?.Value?.AsAtomic());
+                    return (HTMLElement?)ownerDocument?.getElementByID(forAttr?.Value?.AsAtomic());
                 }
 
-                return (HTMLElement)DOMCommon.Get_Nth_Descendant(this, 1, FilterIsLableable.Instance, ENodeFilterMask.SHOW_ELEMENT);
+                return (HTMLElement?)DOMCommon.Get_Nth_Descendant(this, 1, FilterIsLableable.Instance, ENodeFilterMask.SHOW_ELEMENT);
             }
         }
         #endregion
 
         #region Content Attributes
         [CEReactions]
-        public string htmlFor
+        public string? htmlFor
         {/* Docs: https://html.spec.whatwg.org/multipage/forms.html#dom-label-htmlfor */
             get => getAttribute(EAttributeName.For)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.For, AttributeValue.From(value)));

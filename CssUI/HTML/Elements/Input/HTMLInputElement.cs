@@ -199,7 +199,7 @@ namespace CssUI.HTML
             }
         }
 
-        public IReadOnlyCollection<HTMLLabelElement> labels
+        public IReadOnlyCollection<HTMLLabelElement>? labels
         {
             get
             {
@@ -218,9 +218,9 @@ namespace CssUI.HTML
         /// <para>The accept attribute may be specified to provide user agents with a hint of what file types will be accepted.</para>
         /// </summary>
         [CEReactions]
-        public string accept
+        public string? accept
         {
-            get => getAttribute(EAttributeName.Accept).AsString();
+            get => getAttribute(EAttributeName.Accept)?.AsString();
             set
             {
                 CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
@@ -273,9 +273,9 @@ namespace CssUI.HTML
         /// Hint for form autofill feature
         /// </summary>
         [CEReactions]
-        public string autocomplete
+        public string? autocomplete
         {
-            get => getAttribute(EAttributeName.Autocomplete).AsString();
+            get => getAttribute(EAttributeName.Autocomplete)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
             {
                 switch (type)
@@ -338,7 +338,7 @@ namespace CssUI.HTML
         }
 
         [CEReactions]
-        public string dirName
+        public string? dirName
         {
             get => getAttribute(EAttributeName.Dirname)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
@@ -363,7 +363,7 @@ namespace CssUI.HTML
         /// <summary>
         /// Returns the list of selected files
         /// </summary>
-        public IReadOnlyList<FileBlob> files
+        public IReadOnlyList<FileBlob>? files
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#dom-input-files */
             get
             {
@@ -476,9 +476,9 @@ namespace CssUI.HTML
         }
 
         [CEReactions]
-        public string formTarget
+        public string? formTarget
         {
-            get => getAttribute(EAttributeName.FormTarget).AsString();
+            get => getAttribute(EAttributeName.FormTarget)?.AsString();
             set
             {
                 CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
@@ -544,7 +544,7 @@ namespace CssUI.HTML
             }
         }
 
-        public HTMLDataListElement list
+        public HTMLDataListElement? list
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#concept-input-list */
             get
             {
@@ -552,7 +552,7 @@ namespace CssUI.HTML
                  * If there is no list attribute, or if there is no element with that ID, or if the first element with that ID is not a datalist element, then there is no suggestions source element. */
                 if (hasAttribute(EAttributeName.List, out Attr outList))
                 {
-                    string idValue = outList?.Value?.AsString();
+                    string? idValue = outList?.Value?.AsString();
                     if (!string.IsNullOrEmpty(idValue))
                     {
                         var found = nodeDocument.getElementByID(idValue);
@@ -595,7 +595,7 @@ namespace CssUI.HTML
         }
 
         [CEReactions]
-        public string max
+        public string? max
         {
             get => getAttribute(EAttributeName.Max)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
@@ -646,7 +646,7 @@ namespace CssUI.HTML
         }
 
         [CEReactions]
-        public string min
+        public string? min
         {
             get => getAttribute(EAttributeName.Min)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
@@ -718,14 +718,14 @@ namespace CssUI.HTML
         }
 
         [CEReactions]
-        public string name
+        public string? name
         {
-            get => getAttribute(EAttributeName.Name).AsString();
+            get => getAttribute(EAttributeName.Name)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Name, AttributeValue.From(value)));
         }
 
         [CEReactions]
-        public string pattern
+        public string? pattern
         {
             get => getAttribute(EAttributeName.Pattern)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
@@ -760,7 +760,7 @@ namespace CssUI.HTML
         }
 
         [CEReactions]
-        public string placeholder
+        public string? placeholder
         {
             get => getAttribute(EAttributeName.Placeholder)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
@@ -881,7 +881,7 @@ namespace CssUI.HTML
         }
 
         [CEReactions]
-        public string src
+        public string? src
         {
             get => getAttribute(EAttributeName.Src)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
@@ -903,12 +903,12 @@ namespace CssUI.HTML
         [CEReactions]
         public new EInputType type
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#dom-input-type */
-            get => getAttribute(EAttributeName.Type).AsEnum<EInputType>();
+            get => getAttribute(EAttributeName.Type)?.AsEnum<EInputType>() ?? EInputType.Text;
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Type, AttributeValue.From(value)));
         }
 
         [CEReactions]
-        public string defaultValue
+        public string? defaultValue
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#dom-input-defaultvalue */
             get => getAttribute(EAttributeName.Value)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Value, AttributeValue.From(value)));
@@ -953,7 +953,7 @@ namespace CssUI.HTML
             }
         }
 
-        public override HTMLFormElement form
+        public override HTMLFormElement? form
         {
             get => base.form;
             set
@@ -967,7 +967,7 @@ namespace CssUI.HTML
 
         #region Input Step
         [CEReactions]
-        public string step
+        public string? step
         {
             get => getAttribute(EAttributeName.Step)?.AsString();
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>

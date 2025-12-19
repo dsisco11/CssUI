@@ -70,7 +70,7 @@ namespace CssUI.HTML
         #endregion
 
         #region Utility
-        private HTMLSelectElement get_select()
+        private HTMLSelectElement? get_select()
         {
             if (parentElement is HTMLSelectElement parentSelect)
             {
@@ -87,11 +87,11 @@ namespace CssUI.HTML
         #endregion
 
         #region Accessors
-        public override HTMLFormElement form
+        public override HTMLFormElement? form
         {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#dom-option-form */
             get
             {
-                HTMLSelectElement select = get_select();
+                HTMLSelectElement? select = get_select();
                 if (select != null)
                 {
                     return select.form;
