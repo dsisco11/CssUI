@@ -1,26 +1,25 @@
-using CssUI.CSS.Internal;
 using System;
+using CssUI.CSS.Internal;
 
-namespace CssUI.CSS
+namespace CssUI.CSS;
+
+public sealed class CSSImportRule : CSSRule
 {
-    public sealed class CSSImportRule : CSSRule
+    public new readonly ECssRuleType type = ECssRuleType.IMPORT_RULE;
+    public readonly string href;
+    public readonly CSSStyleSheet stylesheet;
+    // public MediaList media { get { return stylesheet.media; } }
+
+
+    public CSSImportRule(string href, CSSStyleSheet stylesheet)
     {
-        public new readonly ECssRuleType type = ECssRuleType.IMPORT_RULE;
-        public readonly string href;
-        public readonly CSSStyleSheet stylesheet;
-        // public MediaList media { get { return stylesheet.media; } }
+        this.href = href;
+        this.stylesheet = stylesheet;
+    }
 
-
-        public CSSImportRule(string href, CSSStyleSheet stylesheet)
-        {
-            this.href = href;
-            this.stylesheet = stylesheet;
-        }
-
-        protected override string Serialize()
-        {
-            throw new NotImplementedException();
-        }
+    protected override string Serialize()
+    {
+        throw new NotImplementedException();
     }
 }
 

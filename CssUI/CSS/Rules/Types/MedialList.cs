@@ -1,6 +1,5 @@
-namespace CssUI.CSS
+namespace CssUI.CSS;
+
+public class MedialList
 {
-    public class MedialList
-    {
-    }
 }

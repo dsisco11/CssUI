@@ -1,11 +1,10 @@
 
-namespace CssUI.Platform
+namespace CssUI.Platform;
+
+interface IPlatformFactoryMethods
 {
-    interface IPlatformFactoryMethods
-    {
-        ISystemMetricsHandler SystemMetrics { get; }
-        ISystemScreensHandler SystemScreens { get; }
-        ISystemWindowHandler SystemWindows { get; }
-    }
+    ISystemMetricsHandler SystemMetrics { get; }
+    ISystemScreensHandler SystemScreens { get; }
+    ISystemWindowHandler SystemWindows { get; }
 }
 

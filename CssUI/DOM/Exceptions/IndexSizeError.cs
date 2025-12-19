@@ -1,11 +1,10 @@
-namespace CssUI.DOM.Exceptions
+namespace CssUI.DOM.Exceptions;
+
+public class IndexSizeError : DOMException
 {
-    public class IndexSizeError : DOMException
+    public IndexSizeError(string message = "")
+        : base(message, "IndexSizeError")
     {
-        public IndexSizeError(string message = "")
-            : base(message, "IndexSizeError")
-        {
-        }
     }
 }
 

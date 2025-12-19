@@ -1,10 +1,9 @@
-namespace CssUI.DOM.Enums
-{
+namespace CssUI.DOM.Enums;
 
-    public enum EBlobEnding : int
-    {
-        Transparent,
-        Native,
-    }
+
+public enum EBlobEnding : int
+{
+    Transparent,
+    Native,
 }
 

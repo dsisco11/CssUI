@@ -1,12 +1,11 @@
 using System;
 
-namespace CssUI.CSS
+namespace CssUI.CSS;
+
+[Flags]
+public enum EBoxDirtFlags : byte
 {
-    [Flags]
-    public enum EBoxDirtFlags : byte
-    {
-        Clean = 0x0,
-        Dirty = 0x1 << 2,
-    }
+    Clean = 0x0,
+    Dirty = 0x1 << 2,
 }
 

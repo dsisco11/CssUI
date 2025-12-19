@@ -1,16 +1,15 @@
 using System;
 
-namespace CssUI.DOM
-{
-    public class ReadableStream : DataConsumer<byte>
-    {
-        public ReadableStream(ReadOnlyMemory<byte> Data, byte EOF_ITEM) : base(Data, EOF_ITEM)
-        {
-        }
+namespace CssUI.DOM;
 
-        public ReadableStream(byte[] Items, byte EOF_ITEM) : base(Items, EOF_ITEM)
-        {
-        }
+public class ReadableStream : DataConsumer<byte>
+{
+    public ReadableStream(ReadOnlyMemory<byte> Data, byte EOF_ITEM) : base(Data, EOF_ITEM)
+    {
+    }
+
+    public ReadableStream(byte[] Items, byte EOF_ITEM) : base(Items, EOF_ITEM)
+    {
     }
 }
 

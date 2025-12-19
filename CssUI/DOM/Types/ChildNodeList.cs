@@ -1,200 +1,184 @@
-using CssUI.DOM.Nodes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
+using CssUI.DOM.Nodes;
 
-namespace CssUI.DOM
+namespace CssUI.DOM;
+
+/// <summary>
+/// Manages and allows indexing of a list of child-nodes, updating their previous/next siblings to the correct values
+/// </summary>
+public class ChildNodeList : IList<Node>
 {
-    /// <summary>
-    /// Manages and allows indexing of a list of child-nodes, updating their previous/next siblings to the correct values
-    /// </summary>
-    public class ChildNodeList : IList<Node>
+    #region Properties
+    private readonly WeakReference<Node> Owner;
+    private readonly bool IsParentNode = false;
+    private List<Node> Items = new List<Node>();
+
+    // Element type children link management
+    public LinkedList<Element>? ChildElements;
+    private int firstElementIndex = -1;
+    private int lastElementIndex = -1;
+    #endregion
+
+    #region Constructor
+    public ChildNodeList(in Node owner)
     {
-        #region Properties
-        private readonly WeakReference<Node> Owner;
-        private readonly bool IsParentNode = false;
-        private List<Node> Items = new List<Node>();
-
-        // Element type children link management
-        public LinkedList<Element>? ChildElements;
-        private int firstElementIndex = -1;
-        private int lastElementIndex = -1;
-        #endregion
-
-        #region Constructor
-        public ChildNodeList(in Node owner)
+        Owner = new WeakReference<Node>(owner);
+        IsParentNode = (owner is ParentNode);
+        if (IsParentNode)
         {
-            Owner = new WeakReference<Node>(owner);
-            IsParentNode = (owner is ParentNode);
-            if (IsParentNode)
-            {
-                ChildElements = new LinkedList<Element>();
-            }
+            ChildElements = new LinkedList<Element>();
         }
-        #endregion
+    }
+    #endregion
 
-        #region Child Element Handling
+    #region Child Element Handling
 
-        private void _element_child_added(int index, in Element item)
+    private void _element_child_added(int index, in Element item)
+    {
+        if (item is null) throw new ArgumentNullException(nameof(item));
+        Contract.EndContractBlock();
+
+        // Figure out where to add this item in our list of child elements
+        if (index <= firstElementIndex)
         {
-            if (item is null) throw new ArgumentNullException(nameof(item));
-            Contract.EndContractBlock();
-
-            // Figure out where to add this item in our list of child elements
-            if (index <= firstElementIndex)
-            {
-                item.ptrSelfRef = ChildElements.AddFirst(item);
-            }
-            else if (index >= lastElementIndex)
-            {
-                item.ptrSelfRef = ChildElements.AddLast(item);
-            }
-            else
-            {// Scan through the list and 
-                var current = ChildElements.First;
-                while (current is object)
-                {
-                    if (current.Value.index <= index)
-                    {
-                        break;
-                    }
-                    current = current.Next;
-                }
-
-                item.ptrSelfRef = ChildElements!.AddBefore(current!, item);
-            }
+            item.ptrSelfRef = ChildElements.AddFirst(item);
         }
-
-        private void _element_child_removed(int index, in Element item)
+        else if (index >= lastElementIndex)
         {
-            if (item is null) throw new ArgumentNullException(nameof(item));
-            Contract.EndContractBlock();
-
-            if (item.ptrSelfRef is null)
+            item.ptrSelfRef = ChildElements.AddLast(item);
+        }
+        else
+        {// Scan through the list and 
+            var current = ChildElements.First;
+            while (current is object)
             {
-                bool exists = ChildElements!.Contains(item);
-                Debug.Assert(exists, "The removal handler for an already removed child element was called!");
-                if (exists)
+                if (current.Value.index <= index)
                 {
-                    // Remove the item from the list
-                    ChildElements.Remove(item.ptrSelfRef!);
+                    break;
                 }
-                // Update our first/last indices
-                firstElementIndex = ChildElements.First?.Value.index ?? -1;
-                lastElementIndex = ChildElements.Last?.Value.index ?? firstElementIndex;
+                current = current.Next;
             }
-            else
+
+            item.ptrSelfRef = ChildElements!.AddBefore(current!, item);
+        }
+    }
+
+    private void _element_child_removed(int index, in Element item)
+    {
+        if (item is null) throw new ArgumentNullException(nameof(item));
+        Contract.EndContractBlock();
+
+        if (item.ptrSelfRef is null)
+        {
+            bool exists = ChildElements!.Contains(item);
+            Debug.Assert(exists, "The removal handler for an already removed child element was called!");
+            if (exists)
             {
                 // Remove the item from the list
-                ChildElements!.Remove(item.ptrSelfRef);
-                // Update our first/last indices
-                firstElementIndex = ChildElements.First?.Value.index ?? -1;
-                lastElementIndex = ChildElements.Last?.Value.index ?? firstElementIndex;
-                // Remove the elements list node pointer
-                item.ptrSelfRef = null;
+                ChildElements.Remove(item.ptrSelfRef!);
             }
+            // Update our first/last indices
+            firstElementIndex = ChildElements.First?.Value.index ?? -1;
+            lastElementIndex = ChildElements.Last?.Value.index ?? firstElementIndex;
         }
-        #endregion
-
-        #region List Implementation
-        public Node this[int index] { get => Items[index]; set => Items[index] = value; }
-
-        public int Count => Items.Count;
-
-        public bool IsReadOnly => false;
-        /// <summary>
-        /// Updates the previous and next siblings of the node at <paramref name="index"/> as well as its neighbors
-        /// </summary>
-        /// <param name="index"></param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void Update_Node_Links(int index)
+        else
         {
-            if (index > Count) throw new IndexOutOfRangeException();
-            Contract.EndContractBlock();
-            if (Count <= 0) return;
+            // Remove the item from the list
+            ChildElements!.Remove(item.ptrSelfRef);
+            // Update our first/last indices
+            firstElementIndex = ChildElements.First?.Value.index ?? -1;
+            lastElementIndex = ChildElements.Last?.Value.index ?? firstElementIndex;
+            // Remove the elements list node pointer
+            item.ptrSelfRef = null;
+        }
+    }
+    #endregion
 
-            var previousNode = (Count > (index - 1)) ? Items[index - 1] : null;
-            var node = Items[index];
-            var nextNode = (Count > (index + 1)) ? Items[index + 1] : null;
+    #region List Implementation
+    public Node this[int index] { get => Items[index]; set => Items[index] = value; }
 
-            node.index = index;
+    public int Count => Items.Count;
 
-            if (previousNode is null)
-            {
-                node.previousSibling = null;
-            }
-            else
-            {
-                node.previousSibling = previousNode;
-                previousNode.nextSibling = node;
-                previousNode.index = index - 1;
-            }
+    public bool IsReadOnly => false;
+    /// <summary>
+    /// Updates the previous and next siblings of the node at <paramref name="index"/> as well as its neighbors
+    /// </summary>
+    /// <param name="index"></param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void Update_Node_Links(int index)
+    {
+        if (index > Count) throw new IndexOutOfRangeException();
+        Contract.EndContractBlock();
+        if (Count <= 0) return;
 
-            if (nextNode is null)
-            {
-                node.nextSibling = null;
-            }
-            else
-            {
-                node.nextSibling = nextNode;
-                nextNode.previousSibling = node;
-                nextNode.index = index + 1;
-            }
+        var previousNode = (Count > (index - 1)) ? Items[index - 1] : null;
+        var node = Items[index];
+        var nextNode = (Count > (index + 1)) ? Items[index + 1] : null;
 
+        node.index = index;
+
+        if (previousNode is null)
+        {
+            node.previousSibling = null;
+        }
+        else
+        {
+            node.previousSibling = previousNode;
+            previousNode.nextSibling = node;
+            previousNode.index = index - 1;
         }
 
-        #region List Manipulation
-        public void Add(Node item)
+        if (nextNode is null)
         {
-            Items.Add(item);
-            item.parentNode = this.Owner.TryGetTarget(out var outParent) ? outParent : null;
-
-            int index = Items.Count - 1;
-            Update_Node_Links(index);
-            // Update our linked elements list (if needed)
-            if (item is Element element)
-            {
-                _element_child_added(index, element);
-            }
+            node.nextSibling = null;
         }
-        public void Insert(int index, Node item)
+        else
         {
-            Items.Insert(index, item);
-            item.parentNode = this.Owner.TryGetTarget(out var outParent) ? outParent : null;
-
-            Update_Node_Links(index);
-            // Update our linked elements list (if needed)
-            if (item is Element element)
-            {
-                _element_child_added(index, element);
-            }
+            node.nextSibling = nextNode;
+            nextNode.previousSibling = node;
+            nextNode.index = index + 1;
         }
 
-        public bool Remove(Node item)
-        {
-            int index = Items.IndexOf(item);
-            var result = Items.Remove(item);
-            if (result)
-            {
-                item.parentNode = null;
-                item.nextSibling = item.previousSibling = null;
+    }
 
-                Update_Node_Links(index);
-                if (item is Element element)
-                {
-                    _element_child_removed(index, element);
-                }
-            }
-            return result;
+    #region List Manipulation
+    public void Add(Node item)
+    {
+        Items.Add(item);
+        item.parentNode = this.Owner.TryGetTarget(out var outParent) ? outParent : null;
+
+        int index = Items.Count - 1;
+        Update_Node_Links(index);
+        // Update our linked elements list (if needed)
+        if (item is Element element)
+        {
+            _element_child_added(index, element);
         }
+    }
+    public void Insert(int index, Node item)
+    {
+        Items.Insert(index, item);
+        item.parentNode = this.Owner.TryGetTarget(out var outParent) ? outParent : null;
 
-        public void RemoveAt(int index)
+        Update_Node_Links(index);
+        // Update our linked elements list (if needed)
+        if (item is Element element)
         {
-            Node item = Items[index];
-            Items.RemoveAt(index);
+            _element_child_added(index, element);
+        }
+    }
+
+    public bool Remove(Node item)
+    {
+        int index = Items.IndexOf(item);
+        var result = Items.Remove(item);
+        if (result)
+        {
             item.parentNode = null;
             item.nextSibling = item.previousSibling = null;
 
@@ -204,60 +188,75 @@ namespace CssUI.DOM
                 _element_child_removed(index, element);
             }
         }
+        return result;
+    }
 
-        public void Clear()
+    public void RemoveAt(int index)
+    {
+        Node item = Items[index];
+        Items.RemoveAt(index);
+        item.parentNode = null;
+        item.nextSibling = item.previousSibling = null;
+
+        Update_Node_Links(index);
+        if (item is Element element)
         {
-            /* Clear the sibling/index values for all nodes */
-            foreach (Node item in Items)
-            {
-                item.parentNode = null;
-                item.previousSibling = item.nextSibling = null;
-                item.index = 0;
-                if (item is Element element)
-                {
-                    element.ptrSelfRef = null;
-                }
-            }
-
-            firstElementIndex = lastElementIndex = -1;
-            /* Now erase the list */
-            Items.Clear();
-            ChildElements.Clear();
+            _element_child_removed(index, element);
         }
-        #endregion
+    }
 
-
-        public bool Contains(Node item)
+    public void Clear()
+    {
+        /* Clear the sibling/index values for all nodes */
+        foreach (Node item in Items)
         {
-            // A minor search improvement here is to, if the item is an Element-type, search our (likely smaller) list of elements
+            item.parentNode = null;
+            item.previousSibling = item.nextSibling = null;
+            item.index = 0;
             if (item is Element element)
             {
-                return ChildElements.Contains(element);
+                element.ptrSelfRef = null;
             }
-
-            return Items.Contains(item);
         }
 
-        public void CopyTo(Node[] array, int arrayIndex)
-        {
-            Items.CopyTo(array, arrayIndex);
-        }
-
-        public IEnumerator<Node> GetEnumerator()
-        {
-            return Items.GetEnumerator();
-        }
-
-        public int IndexOf(Node item)
-        {
-            return Items.IndexOf(item);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return Items.GetEnumerator();
-        }
-        #endregion
+        firstElementIndex = lastElementIndex = -1;
+        /* Now erase the list */
+        Items.Clear();
+        ChildElements.Clear();
     }
+    #endregion
+
+
+    public bool Contains(Node item)
+    {
+        // A minor search improvement here is to, if the item is an Element-type, search our (likely smaller) list of elements
+        if (item is Element element)
+        {
+            return ChildElements.Contains(element);
+        }
+
+        return Items.Contains(item);
+    }
+
+    public void CopyTo(Node[] array, int arrayIndex)
+    {
+        Items.CopyTo(array, arrayIndex);
+    }
+
+    public IEnumerator<Node> GetEnumerator()
+    {
+        return Items.GetEnumerator();
+    }
+
+    public int IndexOf(Node item)
+    {
+        return Items.IndexOf(item);
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return Items.GetEnumerator();
+    }
+    #endregion
 }
 

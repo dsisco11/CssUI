@@ -1,11 +1,10 @@
 
-namespace CssUI.DOM
+namespace CssUI.DOM;
+
+public enum EBoundaryPosition : short
 {
-    public enum EBoundaryPosition : short
-    {
-        Before = -1,
-        Equal = 0,
-        After = 1
-    }
+    Before = -1,
+    Equal = 0,
+    After = 1
 }
 

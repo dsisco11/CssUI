@@ -1,14 +1,13 @@
 using CssUI.Internal;
 
-namespace CssUI.DOM.Enums
+namespace CssUI.DOM.Enums;
+
+[MetaEnum]
+public enum EShadowRootMode : int
 {
-    [MetaEnum]
-    public enum EShadowRootMode : int
-    {
-        [MetaKeyword("open")]
-        Open,
-        [MetaKeyword("closed")]
-        Closed,
-    }
+    [MetaKeyword("open")]
+    Open,
+    [MetaKeyword("closed")]
+    Closed,
 }
 

@@ -1,15 +1,14 @@
 
-namespace CssUI
-{
-    public class CssSelectorException : CssException
-    {
-        public CssSelectorException(string Message) : base("Selector", Message)
-        {
-        }
+namespace CssUI;
 
-        public CssSelectorException(params object[] Args) : base("Selector", Args)
-        {
-        }
+public class CssSelectorException : CssException
+{
+    public CssSelectorException(string Message) : base("Selector", Message)
+    {
+    }
+
+    public CssSelectorException(params object[] Args) : base("Selector", Args)
+    {
     }
 }
 

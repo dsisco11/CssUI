@@ -1,18 +1,17 @@
 using CssUI.DOM.Enums;
 
-namespace CssUI.DOM
+namespace CssUI.DOM;
+
+public class CDATASection : CharacterData
 {
-    public class CDATASection : CharacterData
+
+    #region Node Overrides
+    public override ENodeType nodeType => ENodeType.CDATA_SECTION_NODE;
+    public override string nodeName => "#cdata-section";
+    #endregion
+
+    public CDATASection(Document ownerDocument, string data) : base(ownerDocument, data)
     {
-
-        #region Node Overrides
-        public override ENodeType nodeType => ENodeType.CDATA_SECTION_NODE;
-        public override string nodeName => "#cdata-section";
-        #endregion
-
-        public CDATASection(Document ownerDocument, string data) : base(ownerDocument, data)
-        {
-        }
     }
 }
 

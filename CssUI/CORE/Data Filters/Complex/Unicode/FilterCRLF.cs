@@ -1,31 +1,30 @@
 using System.Runtime.CompilerServices;
 
-namespace CssUI.Filters
-{
-    /// <summary>
-    /// Skips CR LF chars
-    /// </summary>
-    public class FilterCRLF : Filter<char>
-    {
-        public static Filter<char> Instance = new FilterCRLF();
-        public static string LF = new string(new char[] { UnicodeCommon.CHAR_LINE_FEED });
-        public static string CRLF = new string(new char[] { UnicodeCommon.CHAR_CARRIAGE_RETURN, UnicodeCommon.CHAR_LINE_FEED });
+namespace CssUI.Filters;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override EFilterResult acceptData(char data)
+/// <summary>
+/// Skips CR LF chars
+/// </summary>
+public class FilterCRLF : Filter<char>
+{
+    public static Filter<char> Instance = new FilterCRLF();
+    public static string LF = new string(new char[] { UnicodeCommon.CHAR_LINE_FEED });
+    public static string CRLF = new string(new char[] { UnicodeCommon.CHAR_CARRIAGE_RETURN, UnicodeCommon.CHAR_LINE_FEED });
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public override EFilterResult acceptData(char data)
+    {
+        switch (data)
         {
-            switch (data)
-            {
-                case UnicodeCommon.CHAR_CARRIAGE_RETURN:
-                case UnicodeCommon.CHAR_LINE_FEED:
-                    {
-                        return EFilterResult.FILTER_SKIP;
-                    }
-                default:
-                    {
-                        return EFilterResult.FILTER_ACCEPT;
-                    }
-            }
+            case UnicodeCommon.CHAR_CARRIAGE_RETURN:
+            case UnicodeCommon.CHAR_LINE_FEED:
+                {
+                    return EFilterResult.FILTER_SKIP;
+                }
+            default:
+                {
+                    return EFilterResult.FILTER_ACCEPT;
+                }
         }
     }
 }

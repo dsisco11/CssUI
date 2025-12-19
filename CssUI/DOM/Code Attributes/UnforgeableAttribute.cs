@@ -1,9 +1,8 @@
 using System;
 
-namespace CssUI.DOM
+namespace CssUI.DOM;
+
+public class UnforgeableAttribute : Attribute
 {
-    public class UnforgeableAttribute : Attribute
-    {
-    }
 }
 

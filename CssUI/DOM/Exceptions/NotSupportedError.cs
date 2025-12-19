@@ -1,11 +1,10 @@
-namespace CssUI.DOM.Exceptions
+namespace CssUI.DOM.Exceptions;
+
+public class NotSupportedError : DOMException
 {
-    public class NotSupportedError : DOMException
+    public NotSupportedError(string message = "")
+        : base(message, "NotSupportedError")
     {
-        public NotSupportedError(string message = "")
-            : base(message, "NotSupportedError")
-        {
-        }
     }
 }
 

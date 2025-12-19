@@ -33,7 +33,7 @@ public class LayoutCache
         public float[] RowTrackSizes { get; set; } = Array.Empty<float>();
         public float[] ColumnTrackPositions { get; set; } = Array.Empty<float>();
         public float[] RowTrackPositions { get; set; } = Array.Empty<float>();
-        public (float X, float Y, float Width, float Height)[] ItemBounds { get; set; } = 
+        public (float X, float Y, float Width, float Height)[] ItemBounds { get; set; } =
             Array.Empty<(float, float, float, float)>();
     }
 
@@ -99,8 +99,8 @@ public class LayoutCache
     /// </summary>
     private long GetElementVersion(int elementId)
     {
-        return _styleVersions.TryGetValue(elementId, out var version) 
-            ? version + _globalVersion 
+        return _styleVersions.TryGetValue(elementId, out var version)
+            ? version + _globalVersion
             : _globalVersion;
     }
 
@@ -112,15 +112,15 @@ public class LayoutCache
     /// Tries to get a cached flex layout result.
     /// </summary>
     public bool TryGetFlexLayout(
-        int containerId, 
-        float containerWidth, 
-        float containerHeight, 
+        int containerId,
+        float containerWidth,
+        float containerHeight,
         out FlexLayoutResult? result)
     {
         if (_flexCache.TryGetValue(containerId, out var entry))
         {
             var currentVersion = GetElementVersion(containerId);
-            
+
             // Check if cache is still valid (same version and container size)
             if (entry.Version == currentVersion &&
                 Math.Abs(entry.ContainerWidth - containerWidth) < 0.001f &&
@@ -139,9 +139,9 @@ public class LayoutCache
     /// Caches a flex layout result.
     /// </summary>
     public void SetFlexLayout(
-        int containerId, 
-        float containerWidth, 
-        float containerHeight, 
+        int containerId,
+        float containerWidth,
+        float containerHeight,
         FlexLayoutResult result)
     {
         var version = GetElementVersion(containerId);
@@ -157,15 +157,15 @@ public class LayoutCache
     /// Tries to get a cached grid layout result.
     /// </summary>
     public bool TryGetGridLayout(
-        int containerId, 
-        float containerWidth, 
-        float containerHeight, 
+        int containerId,
+        float containerWidth,
+        float containerHeight,
         out GridLayoutResult? result)
     {
         if (_gridCache.TryGetValue(containerId, out var entry))
         {
             var currentVersion = GetElementVersion(containerId);
-            
+
             // Check if cache is still valid (same version and container size)
             if (entry.Version == currentVersion &&
                 Math.Abs(entry.ContainerWidth - containerWidth) < 0.001f &&
@@ -184,9 +184,9 @@ public class LayoutCache
     /// Caches a grid layout result.
     /// </summary>
     public void SetGridLayout(
-        int containerId, 
-        float containerWidth, 
-        float containerHeight, 
+        int containerId,
+        float containerWidth,
+        float containerHeight,
         GridLayoutResult result)
     {
         var version = GetElementVersion(containerId);

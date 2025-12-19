@@ -1,9 +1,8 @@
-namespace CssUI.HTTP
+namespace CssUI.HTTP;
+
+public enum EOriginType : int
 {
-    public enum EOriginType : int
-    {
-        Opaque,
-        Tuple,
-    }
+    Opaque,
+    Tuple,
 }
 

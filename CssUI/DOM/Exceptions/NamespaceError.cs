@@ -1,11 +1,10 @@
-namespace CssUI.DOM.Exceptions
+namespace CssUI.DOM.Exceptions;
+
+public class NamespaceError : DOMException
 {
-    public class NamespaceError : DOMException
+    public NamespaceError(string message = "")
+        : base(message, "NamespaceError")
     {
-        public NamespaceError(string message = "")
-            : base(message, "NamespaceError")
-        {
-        }
     }
 }
 

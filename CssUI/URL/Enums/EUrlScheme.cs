@@ -1,34 +1,33 @@
 using CssUI.Internal;
 
-namespace CssUI.HTTP
-{
-    [MetaEnum]
-    public enum EUrlScheme : int
-    {/* Docs: https://url.spec.whatwg.org/#special-scheme */
+namespace CssUI.HTTP;
 
-        [MetaKeyword("ftp", 21)]
-        Ftp,
+[MetaEnum]
+public enum EUrlScheme : int
+{/* Docs: https://url.spec.whatwg.org/#special-scheme */
 
-        [MetaKeyword("file")]
-        File,
+    [MetaKeyword("ftp", 21)]
+    Ftp,
 
-        [MetaKeyword("blob")]
-        Blob,
+    [MetaKeyword("file")]
+    File,
 
-        [MetaKeyword("gopher", 70)]
-        Gopher,
+    [MetaKeyword("blob")]
+    Blob,
 
-        [MetaKeyword("http", 80)]
-        Http,
+    [MetaKeyword("gopher", 70)]
+    Gopher,
 
-        [MetaKeyword("https", 443)]
-        Https,
+    [MetaKeyword("http", 80)]
+    Http,
 
-        [MetaKeyword("ws", 80)]
-        Ws,
+    [MetaKeyword("https", 443)]
+    Https,
 
-        [MetaKeyword("wss", 443)]
-        Wss,
-    }
+    [MetaKeyword("ws", 80)]
+    Ws,
+
+    [MetaKeyword("wss", 443)]
+    Wss,
 }
 

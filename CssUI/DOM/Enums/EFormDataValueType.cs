@@ -1,10 +1,9 @@
-namespace CssUI.DOM
+namespace CssUI.DOM;
+
+public enum EFormDataValueType : int
 {
-    public enum EFormDataValueType : int
-    {
-        String,
-        Blob,
-        File,
-    }
+    String,
+    Blob,
+    File,
 }
 

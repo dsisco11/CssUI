@@ -1,15 +1,14 @@
-namespace CssUI.DOM.Events
-{
-    public class CustomEvent : Event
-    {/* Docs: https://dom.spec.whatwg.org/#interface-customevent */
+namespace CssUI.DOM.Events;
 
-        public dynamic? detail { get; protected set; } = null;
+public class CustomEvent : Event
+{/* Docs: https://dom.spec.whatwg.org/#interface-customevent */
 
-        public CustomEvent(EEventName type, CustomEventInit? eventInit = null) : base(type, eventInit)
-        {
-            this.detail = eventInit?.detail;
-        }
+    public dynamic? detail { get; protected set; } = null;
 
+    public CustomEvent(EEventName type, CustomEventInit? eventInit = null) : base(type, eventInit)
+    {
+        this.detail = eventInit?.detail;
     }
+
 }
 

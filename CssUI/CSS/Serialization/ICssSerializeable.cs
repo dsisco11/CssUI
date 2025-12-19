@@ -1,8 +1,7 @@
-namespace CssUI.CSS.Serialization
+namespace CssUI.CSS.Serialization;
+
+public interface ICssSerializeable
 {
-    public interface ICssSerializeable
-    {
-        string Serialize();
-    }
+    string Serialize();
 }
 

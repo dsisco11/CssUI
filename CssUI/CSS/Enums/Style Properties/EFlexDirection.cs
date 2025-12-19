@@ -1,37 +1,36 @@
 using CssUI.Internal;
 
-namespace CssUI.CSS
+namespace CssUI.CSS;
+
+/// <summary>
+/// Values for the flex-direction property.
+/// Spec: https://www.w3.org/TR/css-flexbox-1/#propdef-flex-direction
+/// </summary>
+[MetaEnum]
+public enum EFlexDirection
 {
     /// <summary>
-    /// Values for the flex-direction property.
-    /// Spec: https://www.w3.org/TR/css-flexbox-1/#propdef-flex-direction
+    /// The flex container's main axis has the same orientation as the inline axis of the current writing mode.
     /// </summary>
-    [MetaEnum]
-    public enum EFlexDirection
-    {
-        /// <summary>
-        /// The flex container's main axis has the same orientation as the inline axis of the current writing mode.
-        /// </summary>
-        [MetaKeyword("row")]
-        Row,
+    [MetaKeyword("row")]
+    Row,
 
-        /// <summary>
-        /// Same as row, but the main-start and main-end directions are swapped.
-        /// </summary>
-        [MetaKeyword("row-reverse")]
-        RowReverse,
+    /// <summary>
+    /// Same as row, but the main-start and main-end directions are swapped.
+    /// </summary>
+    [MetaKeyword("row-reverse")]
+    RowReverse,
 
-        /// <summary>
-        /// The flex container's main axis has the same orientation as the block axis of the current writing mode.
-        /// </summary>
-        [MetaKeyword("column")]
-        Column,
+    /// <summary>
+    /// The flex container's main axis has the same orientation as the block axis of the current writing mode.
+    /// </summary>
+    [MetaKeyword("column")]
+    Column,
 
-        /// <summary>
-        /// Same as column, but the main-start and main-end directions are swapped.
-        /// </summary>
-        [MetaKeyword("column-reverse")]
-        ColumnReverse
-    }
+    /// <summary>
+    /// Same as column, but the main-start and main-end directions are swapped.
+    /// </summary>
+    [MetaKeyword("column-reverse")]
+    ColumnReverse
 }
 

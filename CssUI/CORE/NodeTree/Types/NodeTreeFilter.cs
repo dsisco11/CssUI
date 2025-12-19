@@ -1,8 +1,7 @@
-namespace CssUI.NodeTree
+namespace CssUI.NodeTree;
+
+public abstract class NodeTreeFilter
 {
-    public abstract class NodeTreeFilter
-    {
-        public abstract EFilterResult acceptNode(ITreeNode node);
-    }
+    public abstract EFilterResult acceptNode(ITreeNode node);
 }
 

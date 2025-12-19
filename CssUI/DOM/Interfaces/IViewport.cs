@@ -1,10 +1,9 @@
 using CssUI.DOM.Events;
 
-namespace CssUI.DOM
+namespace CssUI.DOM;
+
+public interface IViewport : IEventTarget
 {
-    public interface IViewport : IEventTarget
-    {
-        Document document { get; }
-    }
+    Document document { get; }
 }
 

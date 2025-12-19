@@ -1,14 +1,13 @@
 
-namespace CssUI.DOM.Events
-{
-    public class CompositionEventInit : UIEventInit
-    {
-        public string data;
+namespace CssUI.DOM.Events;
 
-        public CompositionEventInit(string data = "")
-        {
-            this.data = data;
-        }
+public class CompositionEventInit : UIEventInit
+{
+    public string data;
+
+    public CompositionEventInit(string data = "")
+    {
+        this.data = data;
     }
 }
 

@@ -1,8 +1,8 @@
-namespace CssUI
+namespace CssUI;
+
+public static class CssIcons
 {
-    public static class CssIcons
-    {
-        public static string close = @"<?xml version=""1.0"" encoding=""utf-8""?>
+    public static string close = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE svg PUBLIC "" -//W3C//DTD SVG 1.1//EN"" ""http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"" >
 <svg version = ""1.1"" id=""Layer_1"" xmlns=""http://www.w3.org/2000/svg"" xmlns:xlink=""http://www.w3.org/1999/xlink"" x=""0px"" y=""0px""
 
@@ -12,7 +12,7 @@ namespace CssUI
 </svg>
 ";
 
-        public static string arrow_up = @"<?xml version=""1.0"" encoding=""utf-8""?>
+    public static string arrow_up = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE svg PUBLIC ""-//W3C//DTD SVG 1.1//EN"" ""http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"">
 <svg version=""1.1"" id=""Layer_1"" xmlns=""http://www.w3.org/2000/svg"" xmlns:xlink=""http://www.w3.org/1999/xlink"" x=""0px"" y=""0px""
 	 width=""128px"" height=""96px"" viewBox=""0 0 128 96"" enable-background=""new 0 0 128 96"" xml:space=""preserve"">
@@ -20,7 +20,7 @@ namespace CssUI
 </svg>
 ";
 
-        public static string arrow_down = @"<?xml version=""1.0"" encoding=""utf-8""?>
+    public static string arrow_down = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE svg PUBLIC ""-//W3C//DTD SVG 1.1//EN"" ""http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"">
 <svg version=""1.1"" id=""Layer_1"" xmlns=""http://www.w3.org/2000/svg"" xmlns:xlink=""http://www.w3.org/1999/xlink"" x=""0px"" y=""0px""
 	 width=""128px"" height=""96px"" viewBox=""0 0 128 96"" enable-background=""new 0 0 128 96"" xml:space=""preserve"">
@@ -28,7 +28,7 @@ namespace CssUI
 </svg>
 ";
 
-        public static string arrow_left = @"<?xml version=""1.0"" encoding=""utf-8""?>
+    public static string arrow_left = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE svg PUBLIC ""-//W3C//DTD SVG 1.1//EN"" ""http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"">
 <svg version=""1.1"" id=""Layer_1"" xmlns=""http://www.w3.org/2000/svg"" xmlns:xlink=""http://www.w3.org/1999/xlink"" x=""0px"" y=""0px""
 	 width=""98px"" height=""128px"" viewBox=""0 0 98 128"" enable-background=""new 0 0 98 128"" xml:space=""preserve"">
@@ -36,13 +36,12 @@ namespace CssUI
 </svg>
 ";
 
-        public static string arrow_right = @"<?xml version=""1.0"" encoding=""utf-8""?>
+    public static string arrow_right = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE svg PUBLIC ""-//W3C//DTD SVG 1.1//EN"" ""http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"">
 <svg version=""1.1"" id=""Layer_1"" xmlns=""http://www.w3.org/2000/svg"" xmlns:xlink=""http://www.w3.org/1999/xlink"" x=""0px"" y=""0px""
 	 width=""98px"" height=""128px"" viewBox=""0 0 98 128"" enable-background=""new 0 0 98 128"" xml:space=""preserve"">
 <polygon fill=""#F2F2F2"" points=""0,64.366 0,0.432 49.139,32.398 98,64.366 49.001,96.334 0,128.302 ""/>
 </svg>
 ";
-    }
 }
 

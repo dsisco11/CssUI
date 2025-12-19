@@ -195,8 +195,7 @@ public class FlexFormattingContext : IFormattingContext
         var current = _container!.firstChild;
         while (current != null)
         {
-            var principalBox = current as CssPrincipalBox;
-            if (principalBox != null)
+            if (current is CssPrincipalBox principalBox)
             {
                 var style = principalBox.Style;
 
@@ -625,7 +624,7 @@ public class FlexFormattingContext : IFormattingContext
             if (!_fragmentationContext.CanFit(line.CrossSize))
             {
                 // Check if breaks should be avoided
-                bool avoidBreak = line.Items.Exists(item => 
+                bool avoidBreak = line.Items.Exists(item =>
                     _fragmentationContext.ShouldAvoidBreakInside(item.PrincipalBox));
 
                 if (!avoidBreak)

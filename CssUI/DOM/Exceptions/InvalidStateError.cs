@@ -1,11 +1,10 @@
-namespace CssUI.DOM.Exceptions
+namespace CssUI.DOM.Exceptions;
+
+public class InvalidStateError : DOMException
 {
-    public class InvalidStateError : DOMException
+    public InvalidStateError(string message = "")
+        : base(message, "InvalidStateError")
     {
-        public InvalidStateError(string message = "")
-            : base(message, "InvalidStateError")
-        {
-        }
     }
 }
 

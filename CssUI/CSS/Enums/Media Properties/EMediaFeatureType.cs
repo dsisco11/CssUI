@@ -1,15 +1,14 @@
-namespace CssUI.CSS.Media
+namespace CssUI.CSS.Media;
+
+public enum EMediaFeatureType : int
 {
-    public enum EMediaFeatureType : int
-    {
-        /// <summary>
-        /// Feature is a single value
-        /// </summary>
-        Discreet,
-        /// <summary>
-        /// Feature is a value range
-        /// </summary>
-        Range
-    }
+    /// <summary>
+    /// Feature is a single value
+    /// </summary>
+    Discreet,
+    /// <summary>
+    /// Feature is a value range
+    /// </summary>
+    Range
 }
 

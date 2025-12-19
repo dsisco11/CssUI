@@ -1,34 +1,33 @@
-using CssUI.CSS.Parser;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using CssUI.CSS.Parser;
 
-namespace CssUI.CSS
+namespace CssUI.CSS;
+
+internal class CssFunction : CssComponent
 {
-    internal class CssFunction : CssComponent
+    public readonly string Name;
+    //public List<CssComponent> Value = new List<CssComponent>();
+    public List<CssToken> Arguments = new List<CssToken>();
+
+    #region Constructors
+    //public CssFunction(string Name) : base(ECssComponent.Function)
+    public CssFunction(ReadOnlySpan<char> Name) : base(ECssTokenType.Function)
     {
-        public readonly string Name;
-        //public List<CssComponent> Value = new List<CssComponent>();
-        public List<CssToken> Arguments = new List<CssToken>();
+        this.Name = Name.ToString();
+    }
+    #endregion
 
-        #region Constructors
-        //public CssFunction(string Name) : base(ECssComponent.Function)
-        public CssFunction(ReadOnlySpan<char> Name) : base(ECssTokenType.Function)
-        {
-            this.Name = Name.ToString();
-        }
-        #endregion
+    public override string Encode()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.Append(Name);
+        sb.Append("(");
+        foreach (CssToken t in Arguments) { sb.Append(t.Encode()); }
+        sb.Append(")");
 
-        public override string Encode()
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append(Name);
-            sb.Append("(");
-            foreach (CssToken t in Arguments) { sb.Append(t.Encode()); }
-            sb.Append(")");
-
-            return sb.ToString();
-        }
+        return sb.ToString();
     }
 }
 

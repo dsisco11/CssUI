@@ -1,463 +1,461 @@
-using CssUI.Common.Exceptions;
-using CssUI.DOM.Exceptions;
 using System;
 using System.Diagnostics.Contracts;
-using System.Globalization;
 using System.Runtime.CompilerServices;
+using CssUI.Common.Exceptions;
+using CssUI.DOM.Exceptions;
 using static CssUI.UnicodeCommon;
 
-namespace CssUI
+namespace CssUI;
+
+/// <summary>
+/// Provides parsing utilities for HTML and CSS number formats per W3C specifications.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>Why custom implementations instead of .NET standard library?</b>
+/// </para>
+/// <para>
+/// The HTML and CSS specifications define specific parsing behaviors that differ from .NET's
+/// <c>int.Parse()</c>, <c>double.Parse()</c>, etc.:
+/// </para>
+/// <list type="bullet">
+/// <item><description><b>Trailing characters:</b> HTML/CSS parsers stop at non-matching characters and return
+/// the parsed portion. .NET throws <see cref="FormatException"/> for any trailing content.</description></item>
+/// <item><description><b>Error semantics:</b> Specs return specific failure values (e.g., <c>long.MaxValue</c>)
+/// rather than throwing exceptions.</description></item>
+/// <item><description><b>Whitespace handling:</b> Specs define ASCII whitespace (5 chars: TAB, LF, FF, CR, SPACE)
+/// while .NET uses broader Unicode whitespace definitions.</description></item>
+/// <item><description><b>Stream-based parsing:</b> CSS tokenization requires character-by-character consumption
+/// with lookahead, not available in .NET parsing methods.</description></item>
+/// </list>
+/// <para>
+/// See <see href="https://html.spec.whatwg.org/multipage/common-microsyntaxes.html">HTML Common Microsyntaxes</see>
+/// and <see href="https://www.w3.org/TR/css-syntax-3/">CSS Syntax Level 3</see> for specification details.
+/// </para>
+/// </remarks>
+public static class ParsingCommon
 {
-    /// <summary>
-    /// Provides parsing utilities for HTML and CSS number formats per W3C specifications.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>Why custom implementations instead of .NET standard library?</b>
-    /// </para>
-    /// <para>
-    /// The HTML and CSS specifications define specific parsing behaviors that differ from .NET's
-    /// <c>int.Parse()</c>, <c>double.Parse()</c>, etc.:
-    /// </para>
-    /// <list type="bullet">
-    /// <item><description><b>Trailing characters:</b> HTML/CSS parsers stop at non-matching characters and return
-    /// the parsed portion. .NET throws <see cref="FormatException"/> for any trailing content.</description></item>
-    /// <item><description><b>Error semantics:</b> Specs return specific failure values (e.g., <c>long.MaxValue</c>)
-    /// rather than throwing exceptions.</description></item>
-    /// <item><description><b>Whitespace handling:</b> Specs define ASCII whitespace (5 chars: TAB, LF, FF, CR, SPACE)
-    /// while .NET uses broader Unicode whitespace definitions.</description></item>
-    /// <item><description><b>Stream-based parsing:</b> CSS tokenization requires character-by-character consumption
-    /// with lookahead, not available in .NET parsing methods.</description></item>
-    /// </list>
-    /// <para>
-    /// See <see href="https://html.spec.whatwg.org/multipage/common-microsyntaxes.html">HTML Common Microsyntaxes</see>
-    /// and <see href="https://www.w3.org/TR/css-syntax-3/">CSS Syntax Level 3</see> for specification details.
-    /// </para>
-    /// </remarks>
-    public static class ParsingCommon
+
+    #region Utility
+    public static string Get_Location(DataConsumer<char> Stream)
     {
+        return Stream.AsMemory().Slice((int)Stream.LongPosition, 32).ToString();
+    }
 
-        #region Utility
-        public static string Get_Location(DataConsumer<char> Stream)
+    /// <summary>
+    /// Converts a series of ASCII digit characters into a base-10 integer.
+    /// </summary>
+    /// <param name="digits">A span containing only ASCII digit characters ('0'-'9').</param>
+    /// <returns>The parsed integer value.</returns>
+    /// <remarks>
+    /// This is an internal utility used by HTML/CSS number parsing. It operates on pre-validated
+    /// digit sequences extracted by the spec-compliant parsers, avoiding the overhead of
+    /// <c>long.Parse()</c> validation for already-validated input.
+    /// </remarks>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if input contains non-digit characters.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static long Digits_To_Base10(ReadOnlyMemory<char> digits) => Digits_To_Base10(digits.Span);
+
+    /// <inheritdoc cref="Digits_To_Base10(ReadOnlyMemory{char})"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static long Digits_To_Base10(ReadOnlySpan<char> digits)
+    {
+        if (digits == null || digits.IsEmpty)
+            return 0;
+        if (!StringCommon.ContainsOnly(digits, ASCII_DIGITS))
+            throw new ArgumentOutOfRangeException(ParserErrors.INVALID_CONTAINS_NON_DIGIT_CHARS);
+        Contract.EndContractBlock();
+
+        long Integer = 0;
+        var span = digits;
+        long power = 1;
+        for (int i = digits.Length - 1; i >= 0; i--)
         {
-            return Stream.AsMemory().Slice((int)Stream.LongPosition, 32).ToString();
+            Integer += power * Ascii_Digit_To_Value(span[i]);
+            power *= 10;
         }
 
-        /// <summary>
-        /// Converts a series of ASCII digit characters into a base-10 integer.
-        /// </summary>
-        /// <param name="digits">A span containing only ASCII digit characters ('0'-'9').</param>
-        /// <returns>The parsed integer value.</returns>
-        /// <remarks>
-        /// This is an internal utility used by HTML/CSS number parsing. It operates on pre-validated
-        /// digit sequences extracted by the spec-compliant parsers, avoiding the overhead of
-        /// <c>long.Parse()</c> validation for already-validated input.
-        /// </remarks>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if input contains non-digit characters.</exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static long Digits_To_Base10(ReadOnlyMemory<char> digits) => Digits_To_Base10(digits.Span);
+        return Integer;
+    }
 
-        /// <inheritdoc cref="Digits_To_Base10(ReadOnlyMemory{char})"/>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static long Digits_To_Base10(ReadOnlySpan<char> digits)
+    /// <summary>
+    /// Converts a series of digits into an unsigned base10 number
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ulong Digits_To_Base10_Unsigned(ReadOnlyMemory<char> digits) => Digits_To_Base10_Unsigned(digits.Span);
+    /// <summary>
+    /// Converts a series of digits into an unsigned base10 number
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ulong Digits_To_Base10_Unsigned(ReadOnlySpan<char> digits)
+    {
+        if (digits == null || digits.IsEmpty)
+            return 0;
+        if (!StringCommon.ContainsOnly(digits, ASCII_DIGITS))
+            throw new ArgumentOutOfRangeException(ParserErrors.INVALID_CONTAINS_NON_DIGIT_CHARS);
+        Contract.EndContractBlock();
+
+        ulong Integer = 0;
+        var span = digits;
+        ulong power = 1;
+        for (int i = digits.Length - 1; i >= 0; i--)
         {
-            if (digits == null || digits.IsEmpty)
-                return 0;
-            if (!StringCommon.ContainsOnly(digits, ASCII_DIGITS))
-                throw new ArgumentOutOfRangeException(ParserErrors.INVALID_CONTAINS_NON_DIGIT_CHARS);
-            Contract.EndContractBlock();
-
-            long Integer = 0;
-            var span = digits;
-            long power = 1;
-            for (int i = digits.Length - 1; i >= 0; i--)
-            {
-                Integer += power * Ascii_Digit_To_Value(span[i]);
-                power *= 10;
-            }
-
-            return Integer;
+            Integer += power * (ulong)Ascii_Digit_To_Value(span[i]);
+            power *= 10;
         }
 
-        /// <summary>
-        /// Converts a series of digits into an unsigned base10 number
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong Digits_To_Base10_Unsigned(ReadOnlyMemory<char> digits) => Digits_To_Base10_Unsigned(digits.Span);
-        /// <summary>
-        /// Converts a series of digits into an unsigned base10 number
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong Digits_To_Base10_Unsigned(ReadOnlySpan<char> digits)
+        return Integer;
+    }
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static long ToInteger(int sign, ReadOnlySpan<char> integerDigits, int exponent_sign, ReadOnlySpan<char> exponentDigits)
+    {/* s·(i + f·10-d)·10te. */
+        var I = Digits_To_Base10(integerDigits);
+        if (sign != 1) I = -I;
+
+        if (exponentDigits.Length > 0)
         {
-            if (digits == null || digits.IsEmpty)
-                return 0;
-            if (!StringCommon.ContainsOnly(digits, ASCII_DIGITS))
-                throw new ArgumentOutOfRangeException(ParserErrors.INVALID_CONTAINS_NON_DIGIT_CHARS);
-            Contract.EndContractBlock();
+            var E = Digits_To_Base10_Unsigned(exponentDigits);
+            long Exp = MathExt.Pow(10L, E);
+            if (exponent_sign != 1) Exp = -Exp;
 
-            ulong Integer = 0;
-            var span = digits;
-            ulong power = 1;
-            for (int i = digits.Length - 1; i >= 0; i--)
-            {
-                Integer += power * (ulong)Ascii_Digit_To_Value(span[i]);
-                power *= 10;
-            }
-
-            return Integer;
+            I *= Exp;
         }
 
+        return I;
+    }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static long ToInteger(int sign, ReadOnlySpan<char> integerDigits, int exponent_sign, ReadOnlySpan<char> exponentDigits)
-        {/* s·(i + f·10-d)·10te. */
-            var I = Digits_To_Base10(integerDigits);
-            if (sign != 1) I = -I;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double ToDecimal(int sign, ReadOnlySpan<char> integerDigits, ReadOnlySpan<char> fractionDigits, int exponent_sign, ReadOnlySpan<char> exponentDigits)
+    {/* s·(i + f·10-d)·10te. */
+        long I = Digits_To_Base10(integerDigits);
+        double RetVal = I;
 
-            if (exponentDigits.Length > 0)
-            {
-                var E = Digits_To_Base10_Unsigned(exponentDigits);
-                long Exp = MathExt.Pow(10L, E);
-                if (exponent_sign != 1) Exp = -Exp;
-
-                I *= Exp;
-            }
-
-            return I;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double ToDecimal(int sign, ReadOnlySpan<char> integerDigits, ReadOnlySpan<char> fractionDigits, int exponent_sign, ReadOnlySpan<char> exponentDigits)
-        {/* s·(i + f·10-d)·10te. */
-            long I = Digits_To_Base10(integerDigits);
-            double RetVal = I;
-
-            if (fractionDigits.Length > 0)
-            {
-                var F = Digits_To_Base10_Unsigned(fractionDigits);
-                var Frac = MathExt.NPow(10, (uint)fractionDigits.Length);
-                Frac *= F;
-                RetVal += Frac;
-            }
-
-            if (exponentDigits.Length > 0)
-            {
-                var E = Digits_To_Base10_Unsigned(exponentDigits);
-                var Exp = MathExt.Pow(10L, E);
-                if (exponent_sign != 1) Exp = -Exp;
-
-                RetVal *= Exp;
-            }
-
-            return (sign == 1) ? RetVal : -RetVal;
-            //return (sign * (I + (F * Math.Pow(10, -fractionDigits.Length))) * Math.Pow(10, exponent_sign * E));
-        }
-        #endregion
-
-        #region Hexadecimal
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong Parse_Hex(ReadOnlyMemory<char> input)
+        if (fractionDigits.Length > 0)
         {
-            if (!Parse_Hex(input, out ulong outValue))
-            {
-                throw new Exception(ParserErrors.PARSING_FAILED);
-            }
-
-            return outValue;
+            var F = Digits_To_Base10_Unsigned(fractionDigits);
+            var Frac = MathExt.NPow(10, (uint)fractionDigits.Length);
+            Frac *= F;
+            RetVal += Frac;
         }
-        public static bool Parse_Hex(ReadOnlyMemory<char> input, out ulong outValue)
-        {
-            ulong result = 0;
-            var span = input.Span;
 
-            for (int i = 0; i < span.Length; i++)
+        if (exponentDigits.Length > 0)
+        {
+            var E = Digits_To_Base10_Unsigned(exponentDigits);
+            var Exp = MathExt.Pow(10L, E);
+            if (exponent_sign != 1) Exp = -Exp;
+
+            RetVal *= Exp;
+        }
+
+        return (sign == 1) ? RetVal : -RetVal;
+        //return (sign * (I + (F * Math.Pow(10, -fractionDigits.Length))) * Math.Pow(10, exponent_sign * E));
+    }
+    #endregion
+
+    #region Hexadecimal
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ulong Parse_Hex(ReadOnlyMemory<char> input)
+    {
+        if (!Parse_Hex(input, out ulong outValue))
+        {
+            throw new Exception(ParserErrors.PARSING_FAILED);
+        }
+
+        return outValue;
+    }
+    public static bool Parse_Hex(ReadOnlyMemory<char> input, out ulong outValue)
+    {
+        ulong result = 0;
+        var span = input.Span;
+
+        for (int i = 0; i < span.Length; i++)
+        {
+            if (!Is_Ascii_Hex_Digit(span[i]))
             {
-                if (!Is_Ascii_Hex_Digit(span[i]))
+                if (span[i] == CHAR_HASH && i == 0)
                 {
-                    if (span[i] == CHAR_HASH && i == 0)
-                    {
-                        /* it's fine just ignore it */
-                        continue;
-                    }
-
-                    outValue = 0;
-                    return false;
+                    /* it's fine just ignore it */
+                    continue;
                 }
 
-                var v = (ulong)Ascii_Hex_To_Value(span[i]);
-                result = (16 * result) + v;
-            }
-
-            outValue = result;
-            return true;
-        }
-        #endregion
-
-        #region Integer
-        /// <summary>
-        /// Parses a signed integer per the HTML specification's "rules for parsing integers".
-        /// </summary>
-        /// <param name="input">The input string to parse.</param>
-        /// <param name="outValue">When successful, contains the parsed integer; otherwise <c>long.MaxValue</c>.</param>
-        /// <returns><c>true</c> if parsing succeeded; otherwise <c>false</c>.</returns>
-        /// <remarks>
-        /// <para>
-        /// <b>Why not use <c>int.Parse()</c>?</b>
-        /// </para>
-        /// <para>
-        /// Per <see href="https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#signed-integers">HTML §2.4.4.2</see>,
-        /// the algorithm:
-        /// </para>
-        /// <list type="bullet">
-        /// <item><description>Strips leading ASCII whitespace (TAB, LF, FF, CR, SPACE only)</description></item>
-        /// <item><description>Stops parsing at the first non-digit character without failing</description></item>
-        /// <item><description>Returns an error for alphabetic characters immediately after digits</description></item>
-        /// </list>
-        /// <para>
-        /// .NET's <c>int.Parse()</c> throws <see cref="FormatException"/> for any trailing characters,
-        /// making it non-compliant with HTML parsing requirements.
-        /// </para>
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Parse_Integer(ReadOnlyMemory<char> input, out long outValue)
-        {
-            DataConsumer<char> Stream = new DataConsumer<char>(input, EOF);
-            bool result = Parse_Integer(Stream, out long outParsed);
-            outValue = outParsed;
-            return result;
-        }
-
-        /// <inheritdoc cref="Parse_Integer(ReadOnlyMemory{char}, out long)"/>
-        public static bool Parse_Integer(DataConsumer<char> Stream, out long outValue)
-        {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#signed-integers */
-            if (Stream is null) throw new ArgumentNullException(nameof(Stream));
-            Contract.EndContractBlock();
-
-            bool sign = true;//Sign
-            /* SKip ASCII whitespace */
-            Stream.Consume_While(Is_Ascii_Whitespace);
-
-            if (Stream.Next == EOF)
-            {
-                outValue = long.MaxValue;
+                outValue = 0;
                 return false;
             }
 
-            if (Stream.Next == CHAR_HYPHEN_MINUS)
-            {
-                sign = false;
-                Stream.Consume();
-            }
-            else if (Stream.Next == CHAR_PLUS_SIGN)
-            {
-                sign = true;
-                Stream.Consume();
-            }
-
-
-            /* Collect sequence of ASCII digit codepoints */
-            Stream.Consume_While(Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
-
-            if (Stream.Next != EOF && Is_Ascii_Alpha(Stream.Next))
-            {
-                outValue = long.MaxValue;
-                return false;
-            }
-
-            var parsed = Digits_To_Base10(outDigits);
-
-            outValue = sign ? parsed : -parsed;
-            return true;
+            var v = (ulong)Ascii_Hex_To_Value(span[i]);
+            result = (16 * result) + v;
         }
-        #endregion
 
-        #region Decimal
-        /// <summary>
-        /// Parses a floating-point number per the HTML specification's "rules for parsing floating-point number values".
-        /// </summary>
-        /// <param name="input">The input string to parse.</param>
-        /// <param name="outValue">When successful, contains the parsed value; otherwise <c>NaN</c>.</param>
-        /// <returns><c>true</c> if parsing succeeded; otherwise <c>false</c>.</returns>
-        /// <remarks>
-        /// <para>
-        /// <b>Why not use <c>double.Parse()</c>?</b>
-        /// </para>
-        /// <para>
-        /// Per <see href="https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#rules-for-parsing-floating-point-number-values">HTML §2.4.4.3</see>,
-        /// the algorithm has specific behaviors:
-        /// </para>
-        /// <list type="bullet">
-        /// <item><description>Stops at trailing non-numeric characters without failing</description></item>
-        /// <item><description>Rejects negative zero (returns +0 instead)</description></item>
-        /// <item><description>Returns error for overflow (not ±∞ like .NET)</description></item>
-        /// <item><description>Does not accept "NaN" or "Infinity" keywords</description></item>
-        /// <item><description>Allows leading decimal point (e.g., ".5")</description></item>
-        /// </list>
-        /// <para>
-        /// .NET's <c>double.Parse()</c> throws exceptions for trailing characters and accepts
-        /// special values like "NaN" and "Infinity", making it non-compliant.
-        /// </para>
-        /// </remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Parse_FloatingPoint(ReadOnlyMemory<char> input, out float outValue)
+        outValue = result;
+        return true;
+    }
+    #endregion
+
+    #region Integer
+    /// <summary>
+    /// Parses a signed integer per the HTML specification's "rules for parsing integers".
+    /// </summary>
+    /// <param name="input">The input string to parse.</param>
+    /// <param name="outValue">When successful, contains the parsed integer; otherwise <c>long.MaxValue</c>.</param>
+    /// <returns><c>true</c> if parsing succeeded; otherwise <c>false</c>.</returns>
+    /// <remarks>
+    /// <para>
+    /// <b>Why not use <c>int.Parse()</c>?</b>
+    /// </para>
+    /// <para>
+    /// Per <see href="https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#signed-integers">HTML §2.4.4.2</see>,
+    /// the algorithm:
+    /// </para>
+    /// <list type="bullet">
+    /// <item><description>Strips leading ASCII whitespace (TAB, LF, FF, CR, SPACE only)</description></item>
+    /// <item><description>Stops parsing at the first non-digit character without failing</description></item>
+    /// <item><description>Returns an error for alphabetic characters immediately after digits</description></item>
+    /// </list>
+    /// <para>
+    /// .NET's <c>int.Parse()</c> throws <see cref="FormatException"/> for any trailing characters,
+    /// making it non-compliant with HTML parsing requirements.
+    /// </para>
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool Parse_Integer(ReadOnlyMemory<char> input, out long outValue)
+    {
+        DataConsumer<char> Stream = new DataConsumer<char>(input, EOF);
+        bool result = Parse_Integer(Stream, out long outParsed);
+        outValue = outParsed;
+        return result;
+    }
+
+    /// <inheritdoc cref="Parse_Integer(ReadOnlyMemory{char}, out long)"/>
+    public static bool Parse_Integer(DataConsumer<char> Stream, out long outValue)
+    {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#signed-integers */
+        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        Contract.EndContractBlock();
+
+        bool sign = true;//Sign
+        /* SKip ASCII whitespace */
+        Stream.Consume_While(Is_Ascii_Whitespace);
+
+        if (Stream.Next == EOF)
         {
-            DataConsumer<char> Stream = new DataConsumer<char>(input, EOF);
-            bool result = Parse_FloatingPoint(Stream, out double outParsed);
-            outValue = (float)outParsed;
-            return result;
+            outValue = long.MaxValue;
+            return false;
         }
 
-        /// <inheritdoc cref="Parse_FloatingPoint(ReadOnlyMemory{char}, out float)"/>
-        public static bool Parse_FloatingPoint(DataConsumer<char> Stream, out float outValue)
+        if (Stream.Next == CHAR_HYPHEN_MINUS)
         {
-            bool result = Parse_FloatingPoint(Stream, out double outParsed);
-            outValue = (float)outParsed;
-            return result;
+            sign = false;
+            Stream.Consume();
         }
-
-        /// <inheritdoc cref="Parse_FloatingPoint(ReadOnlyMemory{char}, out float)"/>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Parse_FloatingPoint(ReadOnlyMemory<char> input, out double outValue)
+        else if (Stream.Next == CHAR_PLUS_SIGN)
         {
-            DataConsumer<char> Stream = new DataConsumer<char>(input, EOF);
-            bool result = Parse_FloatingPoint(Stream, out double outParsed);
-            outValue = outParsed;
-            return result;
+            sign = true;
+            Stream.Consume();
         }
 
-        /// <inheritdoc cref="Parse_FloatingPoint(ReadOnlyMemory{char}, out float)"/>
-        public static bool Parse_FloatingPoint(DataConsumer<char> Stream, out double outValue)
-        {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#rules-for-parsing-floating-point-number-values */
-            if (Stream is null) throw new ArgumentNullException(nameof(Stream));
-            Contract.EndContractBlock();
 
-            double value = 1;
-            double divisor = 1;
-            double exponent = 1;
+        /* Collect sequence of ASCII digit codepoints */
+        Stream.Consume_While(Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
 
-            /* Skip ASCII whitespace */
-            Stream.Consume_While(Is_Ascii_Whitespace);
+        if (Stream.Next != EOF && Is_Ascii_Alpha(Stream.Next))
+        {
+            outValue = long.MaxValue;
+            return false;
+        }
 
-            if (Stream.Next == EOF)
-                throw new DomSyntaxError();
+        var parsed = Digits_To_Base10(outDigits);
 
-            switch (Stream.Next)
-            {
-                case CHAR_HYPHEN_MINUS:
-                    {
-                        value = divisor = -1;
-                        Stream.Consume();
-                    }
-                    break;
+        outValue = sign ? parsed : -parsed;
+        return true;
+    }
+    #endregion
 
-                case CHAR_PLUS_SIGN:
-                    {
-                        Stream.Consume();
-                    }
-                    break;
-            }
+    #region Decimal
+    /// <summary>
+    /// Parses a floating-point number per the HTML specification's "rules for parsing floating-point number values".
+    /// </summary>
+    /// <param name="input">The input string to parse.</param>
+    /// <param name="outValue">When successful, contains the parsed value; otherwise <c>NaN</c>.</param>
+    /// <returns><c>true</c> if parsing succeeded; otherwise <c>false</c>.</returns>
+    /// <remarks>
+    /// <para>
+    /// <b>Why not use <c>double.Parse()</c>?</b>
+    /// </para>
+    /// <para>
+    /// Per <see href="https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#rules-for-parsing-floating-point-number-values">HTML §2.4.4.3</see>,
+    /// the algorithm has specific behaviors:
+    /// </para>
+    /// <list type="bullet">
+    /// <item><description>Stops at trailing non-numeric characters without failing</description></item>
+    /// <item><description>Rejects negative zero (returns +0 instead)</description></item>
+    /// <item><description>Returns error for overflow (not ±∞ like .NET)</description></item>
+    /// <item><description>Does not accept "NaN" or "Infinity" keywords</description></item>
+    /// <item><description>Allows leading decimal point (e.g., ".5")</description></item>
+    /// </list>
+    /// <para>
+    /// .NET's <c>double.Parse()</c> throws exceptions for trailing characters and accepts
+    /// special values like "NaN" and "Infinity", making it non-compliant.
+    /// </para>
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool Parse_FloatingPoint(ReadOnlyMemory<char> input, out float outValue)
+    {
+        DataConsumer<char> Stream = new DataConsumer<char>(input, EOF);
+        bool result = Parse_FloatingPoint(Stream, out double outParsed);
+        outValue = (float)outParsed;
+        return result;
+    }
 
-            if (Stream.Next == EOF)
-                throw new DomSyntaxError();
+    /// <inheritdoc cref="Parse_FloatingPoint(ReadOnlyMemory{char}, out float)"/>
+    public static bool Parse_FloatingPoint(DataConsumer<char> Stream, out float outValue)
+    {
+        bool result = Parse_FloatingPoint(Stream, out double outParsed);
+        outValue = (float)outParsed;
+        return result;
+    }
 
-            /* 9) If the character indicated by position is a U+002E FULL STOP (.), 
-             * and that is not the last character in input, 
-             * and the character after the character indicated by position is an ASCII digit, 
-             * then set value to zero and jump to the step labeled fraction. */
-            if (Stream.Next == CHAR_FULL_STOP && Stream.NextNext != EOF && Is_Ascii_Digit(Stream.NextNext))
-            {
-                value = 0;
-            }
-            else if (!Is_Ascii_Digit(Stream.Next))
-            {
-                outValue = double.NaN;
-                return false;
-            }
-            else
-            {
-                /* 11) Collect a sequence of code points that are ASCII digits from input given position, and interpret the resulting sequence as a base-ten integer. Multiply value by that integer. */
-                Stream.Consume_While(Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
-                value *= Digits_To_Base10(outDigits);//double.Parse(outDigits.ToString(), CultureInfo.InvariantCulture);
-            }
+    /// <inheritdoc cref="Parse_FloatingPoint(ReadOnlyMemory{char}, out float)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool Parse_FloatingPoint(ReadOnlyMemory<char> input, out double outValue)
+    {
+        DataConsumer<char> Stream = new DataConsumer<char>(input, EOF);
+        bool result = Parse_FloatingPoint(Stream, out double outParsed);
+        outValue = outParsed;
+        return result;
+    }
 
-            /* 12) If position is past the end of input, jump to the step labeled conversion. */
-            if (Stream.Next != EOF)
-            {
-                /* 13) Fraction: If the character indicated by position is a U+002E FULL STOP (.), run these substeps: */
-                if (Stream.Next == CHAR_FULL_STOP)
+    /// <inheritdoc cref="Parse_FloatingPoint(ReadOnlyMemory{char}, out float)"/>
+    public static bool Parse_FloatingPoint(DataConsumer<char> Stream, out double outValue)
+    {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#rules-for-parsing-floating-point-number-values */
+        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        Contract.EndContractBlock();
+
+        double value = 1;
+        double divisor = 1;
+        double exponent = 1;
+
+        /* Skip ASCII whitespace */
+        Stream.Consume_While(Is_Ascii_Whitespace);
+
+        if (Stream.Next == EOF)
+            throw new DomSyntaxError();
+
+        switch (Stream.Next)
+        {
+            case CHAR_HYPHEN_MINUS:
+                {
+                    value = divisor = -1;
+                    Stream.Consume();
+                }
+                break;
+
+            case CHAR_PLUS_SIGN:
                 {
                     Stream.Consume();
-                    /* 2) If position is past the end of input, or if the character indicated by position is not an ASCII digit, U+0065 LATIN SMALL LETTER E (e), or U+0045 LATIN CAPITAL LETTER E (E), then jump to the step labeled conversion. */
-                    if (Stream.Next != EOF && (Is_Ascii_Digit(Stream.Next) || Stream.Next == CHAR_E_LOWER || Stream.Next == CHAR_E_UPPER))
-                    {
-                        /* 3) If the character indicated by position is a U+0065 LATIN SMALL LETTER E character (e) or a U+0045 LATIN CAPITAL LETTER E character (E), skip the remainder of these substeps. */
-                        if (Is_Ascii_Digit(Stream.Next))
-                        {
-                            while (Is_Ascii_Digit(Stream.Next))
-                            {
-                                /* 4) Fraction loop: Multiply divisor by ten. */
-                                divisor *= 10;
-                                /* 5) Add the value of the character indicated by position, interpreted as a base-ten digit (0..9) and divided by divisor, to value. */
-                                double n = Ascii_Digit_To_Value(Stream.Next) / divisor;
-                                value += n;
-                                /* 6) Advance position to the next character. */
-                                Stream.Consume();
-                                /* 7) If position is past the end of input, then jump to the step labeled conversion. */
+                }
+                break;
+        }
 
-                                if (Stream.Next == EOF)
-                                    break;
-                            }
+        if (Stream.Next == EOF)
+            throw new DomSyntaxError();
+
+        /* 9) If the character indicated by position is a U+002E FULL STOP (.), 
+         * and that is not the last character in input, 
+         * and the character after the character indicated by position is an ASCII digit, 
+         * then set value to zero and jump to the step labeled fraction. */
+        if (Stream.Next == CHAR_FULL_STOP && Stream.NextNext != EOF && Is_Ascii_Digit(Stream.NextNext))
+        {
+            value = 0;
+        }
+        else if (!Is_Ascii_Digit(Stream.Next))
+        {
+            outValue = double.NaN;
+            return false;
+        }
+        else
+        {
+            /* 11) Collect a sequence of code points that are ASCII digits from input given position, and interpret the resulting sequence as a base-ten integer. Multiply value by that integer. */
+            Stream.Consume_While(Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
+            value *= Digits_To_Base10(outDigits);//double.Parse(outDigits.ToString(), CultureInfo.InvariantCulture);
+        }
+
+        /* 12) If position is past the end of input, jump to the step labeled conversion. */
+        if (Stream.Next != EOF)
+        {
+            /* 13) Fraction: If the character indicated by position is a U+002E FULL STOP (.), run these substeps: */
+            if (Stream.Next == CHAR_FULL_STOP)
+            {
+                Stream.Consume();
+                /* 2) If position is past the end of input, or if the character indicated by position is not an ASCII digit, U+0065 LATIN SMALL LETTER E (e), or U+0045 LATIN CAPITAL LETTER E (E), then jump to the step labeled conversion. */
+                if (Stream.Next != EOF && (Is_Ascii_Digit(Stream.Next) || Stream.Next == CHAR_E_LOWER || Stream.Next == CHAR_E_UPPER))
+                {
+                    /* 3) If the character indicated by position is a U+0065 LATIN SMALL LETTER E character (e) or a U+0045 LATIN CAPITAL LETTER E character (E), skip the remainder of these substeps. */
+                    if (Is_Ascii_Digit(Stream.Next))
+                    {
+                        while (Is_Ascii_Digit(Stream.Next))
+                        {
+                            /* 4) Fraction loop: Multiply divisor by ten. */
+                            divisor *= 10;
+                            /* 5) Add the value of the character indicated by position, interpreted as a base-ten digit (0..9) and divided by divisor, to value. */
+                            double n = Ascii_Digit_To_Value(Stream.Next) / divisor;
+                            value += n;
+                            /* 6) Advance position to the next character. */
+                            Stream.Consume();
+                            /* 7) If position is past the end of input, then jump to the step labeled conversion. */
+
+                            if (Stream.Next == EOF)
+                                break;
                         }
                     }
                 }
+            }
 
-                /* 14) If the character indicated by position is U+0065 (e) or a U+0045 (E), then: */
-                if (Stream.Next == CHAR_E_LOWER || Stream.Next == CHAR_E_UPPER)
+            /* 14) If the character indicated by position is U+0065 (e) or a U+0045 (E), then: */
+            if (Stream.Next == CHAR_E_LOWER || Stream.Next == CHAR_E_UPPER)
+            {
+                Stream.Consume();
+                /* 2) If position is past the end of input, then jump to the step labeled conversion. */
+                /* 3) If the character indicated by position is a U+002D HYPHEN-MINUS character (-): */
+                if (Stream.Next == CHAR_HYPHEN_MINUS)
+                {
+                    exponent = -1;
+                    Stream.Consume();
+                }
+                else if (Stream.Next == CHAR_PLUS_SIGN)
                 {
                     Stream.Consume();
-                    /* 2) If position is past the end of input, then jump to the step labeled conversion. */
-                    /* 3) If the character indicated by position is a U+002D HYPHEN-MINUS character (-): */
-                    if (Stream.Next == CHAR_HYPHEN_MINUS)
-                    {
-                        exponent = -1;
-                        Stream.Consume();
-                    }
-                    else if (Stream.Next == CHAR_PLUS_SIGN)
-                    {
-                        Stream.Consume();
-                    }
+                }
 
-                    /* 4) If the character indicated by position is not an ASCII digit, then jump to the step labeled conversion. */
-                    if (Is_Ascii_Digit(Stream.Next))
-                    {
-                        /* 5) Collect a sequence of code points that are ASCII digits from input given position, and interpret the resulting sequence as a base-ten integer. Multiply exponent by that integer. */
-                        Stream.Consume_While(Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
-                        exponent *= Digits_To_Base10(outDigits);//double.Parse(outDigits.ToString(), CultureInfo.InvariantCulture);
-                        /* 6) Multiply value by ten raised to the exponentth power. */
-                        value *= Math.Pow(10, exponent);
-                    }
+                /* 4) If the character indicated by position is not an ASCII digit, then jump to the step labeled conversion. */
+                if (Is_Ascii_Digit(Stream.Next))
+                {
+                    /* 5) Collect a sequence of code points that are ASCII digits from input given position, and interpret the resulting sequence as a base-ten integer. Multiply exponent by that integer. */
+                    Stream.Consume_While(Is_Ascii_Digit, out ReadOnlySpan<char> outDigits);
+                    exponent *= Digits_To_Base10(outDigits);//double.Parse(outDigits.ToString(), CultureInfo.InvariantCulture);
+                    /* 6) Multiply value by ten raised to the exponentth power. */
+                    value *= Math.Pow(10, exponent);
                 }
             }
-
-            /* 15) Conversion: Let S be the set of finite IEEE 754 double-precision floating-point values except −0, but with two special values added: 2^1024 and −2^1024. */
-            /* 16) Let rounded-value be the number in S that is closest to value, 
-             * selecting the number with an even significand if there are two equally close values. 
-             * (The two special values 2^1024 and −2^1024 are considered to have even significands for this purpose.) */
-            var roundedValue = value;
-            if (roundedValue == -0D) roundedValue = -roundedValue;
-
-            /* 17) If rounded-value is 2^1024 or −2^1024, return an error. */
-            if (roundedValue == double.MinValue || roundedValue == double.MaxValue)
-            {
-                outValue = double.NaN;
-                return false;
-            }
-            /* 18) Return rounded-value. */
-            outValue = roundedValue;
-            return true;
         }
-        #endregion
+
+        /* 15) Conversion: Let S be the set of finite IEEE 754 double-precision floating-point values except −0, but with two special values added: 2^1024 and −2^1024. */
+        /* 16) Let rounded-value be the number in S that is closest to value, 
+         * selecting the number with an even significand if there are two equally close values. 
+         * (The two special values 2^1024 and −2^1024 are considered to have even significands for this purpose.) */
+        var roundedValue = value;
+        if (roundedValue == -0D) roundedValue = -roundedValue;
+
+        /* 17) If rounded-value is 2^1024 or −2^1024, return an error. */
+        if (roundedValue == double.MinValue || roundedValue == double.MaxValue)
+        {
+            outValue = double.NaN;
+            return false;
+        }
+        /* 18) Return rounded-value. */
+        outValue = roundedValue;
+        return true;
     }
+    #endregion
 }
 

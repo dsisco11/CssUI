@@ -1,12 +1,11 @@
 using CssUI.CSS;
 using CssUI.CSS.BoxTree;
 
-namespace CssUI.DOM.Nodes
+namespace CssUI.DOM.Nodes;
+
+public interface ICssElement : INode
 {
-    public interface ICssElement : INode
-    {
-        CssPrincipalBox Box { get; }
-        StyleProperties Style { get; }
-    }
+    CssPrincipalBox Box { get; }
+    StyleProperties Style { get; }
 }
 

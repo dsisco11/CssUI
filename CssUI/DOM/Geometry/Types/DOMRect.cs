@@ -1,51 +1,50 @@
 using System;
 
-namespace CssUI.DOM.Geometry
-{
-    [System.Diagnostics.DebuggerDisplay("[{Top}, {Right}, {Bottom}, {Left}]")]
-    public class DOMRect : DOMRectReadOnly
-    {/* Docs: https://www.w3.org/TR/geometry-1/#DOMRect */
+namespace CssUI.DOM.Geometry;
 
-        #region Properties
-        public new double X { get; set; }
-        public new double Y { get; set; }
-        public new double Width { get; set; }
-        public new double Height { get; set; }
-        #endregion
+[System.Diagnostics.DebuggerDisplay("[{Top}, {Right}, {Bottom}, {Left}]")]
+public class DOMRect : DOMRectReadOnly
+{/* Docs: https://www.w3.org/TR/geometry-1/#DOMRect */
 
-        #region Accessors
-        public double Top
-        {/* Docs: https://www.w3.org/TR/geometry-1/#dom-domrectreadonly-domrect-top */
-            get => Math.Min(Y, Y + Height);
-        }
-        public double Right
-        {/* Docs: https://www.w3.org/TR/geometry-1/#dom-domrectreadonly-domrect-right */
-            get => Math.Max(X, X + Width);
-        }
-        public double Bottom
-        {/* Docs: https://www.w3.org/TR/geometry-1/#dom-domrectreadonly-domrect-bottom */
-            get => Math.Max(Y, Y + Height);
-        }
-        public double Left
-        {/* Docs: https://www.w3.org/TR/geometry-1/#dom-domrectreadonly-domrect-left */
-            get => Math.Min(X, X + Width);
-        }
-        #endregion
+    #region Properties
+    public new double X { get; set; }
+    public new double Y { get; set; }
+    public new double Width { get; set; }
+    public new double Height { get; set; }
+    #endregion
 
-        #region Constructor
-        public DOMRect(double x = 0, double y = 0, double width = 0, double height = 0) : base(x, y, width, height)
-        {
-            /*this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;*/
-        }
-        #endregion
+    #region Accessors
+    public double Top
+    {/* Docs: https://www.w3.org/TR/geometry-1/#dom-domrectreadonly-domrect-top */
+        get => Math.Min(Y, Y + Height);
+    }
+    public double Right
+    {/* Docs: https://www.w3.org/TR/geometry-1/#dom-domrectreadonly-domrect-right */
+        get => Math.Max(X, X + Width);
+    }
+    public double Bottom
+    {/* Docs: https://www.w3.org/TR/geometry-1/#dom-domrectreadonly-domrect-bottom */
+        get => Math.Max(Y, Y + Height);
+    }
+    public double Left
+    {/* Docs: https://www.w3.org/TR/geometry-1/#dom-domrectreadonly-domrect-left */
+        get => Math.Min(X, X + Width);
+    }
+    #endregion
 
-        public new static DOMRect fromRect(DOMRectInit other)
-        {
-            return new DOMRect(other.X, other.Y, other.Width, other.Height);
-        }
+    #region Constructor
+    public DOMRect(double x = 0, double y = 0, double width = 0, double height = 0) : base(x, y, width, height)
+    {
+        /*this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;*/
+    }
+    #endregion
+
+    public new static DOMRect fromRect(DOMRectInit other)
+    {
+        return new DOMRect(other.X, other.Y, other.Width, other.Height);
     }
 }
 

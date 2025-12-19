@@ -1,31 +1,30 @@
 using System;
 using CssUI.DOM.Nodes;
 
-namespace CssUI.CSS
+namespace CssUI.CSS;
+
+/// <summary>
+/// Represents a styling property which always resolves to an integer
+/// </summary>
+public class IntProperty : LengthProperty
 {
-    /// <summary>
-    /// Represents a styling property which always resolves to an integer
-    /// </summary>
-    public class IntProperty : LengthProperty
+    #region Value Overrides
+    public new int Actual
     {
-        #region Value Overrides
-        public new int Actual
+        get
         {
-            get
-            {
-                return base.Actual.AsInteger();
-            }
+            return base.Actual.AsInteger();
         }
-        #endregion
-
-        #region Constructors
-        public IntProperty(AtomicName<ECssPropertyID> CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
-            : base(CssName, Owner, Source, Locked)
-        {
-        }
-        #endregion
-
     }
+    #endregion
+
+    #region Constructors
+    public IntProperty(AtomicName<ECssPropertyID> CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
+        : base(CssName, Owner, Source, Locked)
+    {
+    }
+    #endregion
+
 }
 
 

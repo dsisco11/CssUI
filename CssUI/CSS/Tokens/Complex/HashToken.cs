@@ -1,36 +1,40 @@
 using System;
 
-namespace CssUI.CSS.Parser
+namespace CssUI.CSS.Parser;
+
+public enum EHashTokenType
 {
-    public enum EHashTokenType
+    Unrestricted,
+    ID,
+}
+
+public sealed class HashToken : ValuedTokenBase
+{
+    #region Properties
+    public readonly EHashTokenType HashType = EHashTokenType.Unrestricted;
+    #endregion
+
+    public HashToken(EHashTokenType HashType, ReadOnlySpan<char> Value) : base(ECssTokenType.Hash, Value)
     {
-        Unrestricted,
-        ID,
+        this.HashType = HashType;
     }
 
-    public sealed class HashToken : ValuedTokenBase
+
+    #region Equality Operators
+    public override bool Equals(object? o)
     {
-        #region Properties
-        public readonly EHashTokenType HashType = EHashTokenType.Unrestricted;
-        #endregion
-
-        public HashToken(EHashTokenType HashType, ReadOnlySpan<char> Value) : base(ECssTokenType.Hash, Value)
+        if (o is HashToken Other)
         {
-            this.HashType = HashType;
+            return Type == Other.Type && HashType == Other.HashType && Value.Equals(Other.Value, StringComparison.OrdinalIgnoreCase);
         }
 
-
-        #region Equality Operators
-        public override bool Equals(object? o)
-        {
-            if (o is HashToken Other)
-            {
-                return Type == Other.Type && HashType == Other.HashType && Value.Equals(Other.Value, StringComparison.OrdinalIgnoreCase);
-            }
-
-            return false;
-        }
-        #endregion
+        return false;
     }
+
+    public override int GetHashCode()
+    {
+        throw new NotImplementedException();
+    }
+    #endregion
 }
 

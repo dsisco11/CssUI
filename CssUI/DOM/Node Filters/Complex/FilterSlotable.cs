@@ -1,22 +1,21 @@
 using CssUI.DOM.Enums;
 using CssUI.DOM.Nodes;
 
-namespace CssUI.DOM
+namespace CssUI.DOM;
+
+/// <summary>
+/// Accepts only nodes that implement <see cref="ISlottable"/>
+/// </summary>
+public class FilterSlotable : NodeFilter
 {
-    /// <summary>
-    /// Accepts only nodes that implement <see cref="ISlottable"/>
-    /// </summary>
-    public class FilterSlotable : NodeFilter
+    public static NodeFilter Instance = new FilterSlotable();
+
+    public override ENodeFilterResult acceptNode(Node node)
     {
-        public static NodeFilter Instance = new FilterSlotable();
+        if (node is ISlottable)
+            return ENodeFilterResult.FILTER_ACCEPT;
 
-        public override ENodeFilterResult acceptNode(Node node)
-        {
-            if (node is ISlottable)
-                return ENodeFilterResult.FILTER_ACCEPT;
-
-            return ENodeFilterResult.FILTER_SKIP;
-        }
+        return ENodeFilterResult.FILTER_SKIP;
     }
 }
 

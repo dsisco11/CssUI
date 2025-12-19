@@ -1,11 +1,10 @@
 using System.Runtime.CompilerServices;
 
-namespace CssUI.Filters
+namespace CssUI.Filters;
+
+public abstract class Filter<Ty>
 {
-    public abstract class Filter<Ty>
-    {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public abstract EFilterResult acceptData(Ty data);
-    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public abstract EFilterResult acceptData(Ty data);
 }
 

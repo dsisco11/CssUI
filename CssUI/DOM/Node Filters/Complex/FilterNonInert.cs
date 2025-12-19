@@ -1,25 +1,24 @@
 using CssUI.DOM.Enums;
 using CssUI.DOM.Nodes;
 
-namespace CssUI.DOM
+namespace CssUI.DOM;
+
+/// <summary>
+/// Accepts any node that is non-inert
+/// </summary>
+public class FilterNonInert : NodeFilter
 {
-    /// <summary>
-    /// Accepts any node that is non-inert
-    /// </summary>
-    public class FilterNonInert : NodeFilter
+    public static NodeFilter Instance = new FilterNonInert();
+
+    public override ENodeFilterResult acceptNode(Node node)
     {
-        public static NodeFilter Instance = new FilterNonInert();
+        if (node.nodeType != ENodeType.ELEMENT_NODE)
+            return ENodeFilterResult.FILTER_REJECT;
 
-        public override ENodeFilterResult acceptNode(Node node)
-        {
-            if (node.nodeType != ENodeType.ELEMENT_NODE)
-                return ENodeFilterResult.FILTER_REJECT;
+        if (!(node as Element).isInert)
+            return ENodeFilterResult.FILTER_ACCEPT;
 
-            if (!(node as Element).isInert)
-                return ENodeFilterResult.FILTER_ACCEPT;
-
-            return ENodeFilterResult.FILTER_SKIP;
-        }
+        return ENodeFilterResult.FILTER_SKIP;
     }
 }
 

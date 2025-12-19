@@ -1,16 +1,15 @@
 
 using CssUI.CSS.Parser;
 
-namespace CssUI.CSS
-{
-    public sealed class ColumnToken : CssToken
-    {
-        public static ColumnToken Instance = new ColumnToken();
-        public ColumnToken() : base(ECssTokenType.Column)
-        {
-        }
+namespace CssUI.CSS;
 
-        public override string Encode() => "||";
+public sealed class ColumnToken : CssToken
+{
+    public static ColumnToken Instance = new ColumnToken();
+    public ColumnToken() : base(ECssTokenType.Column)
+    {
     }
+
+    public override string Encode() => "||";
 }
 

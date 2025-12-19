@@ -1,35 +1,34 @@
 using System;
 
-namespace CssUI
+namespace CssUI;
+
+public class BitVector32
 {
-    public class BitVector32
+    private UInt32 data;
+
+    public BitVector32()
     {
-        private UInt32 data;
+    }
+    public BitVector32(UInt32 value)
+    {
+        data = value;
+    }
 
-        public BitVector32()
-        {
-        }
-        public BitVector32(UInt32 value)
-        {
-            data = value;
-        }
+    public UInt32 Data
+    {
+        get { return data; }
+        set { data = value; }
+    }
 
-        public UInt32 Data
+    public UInt32 this[uint bitoffset, UInt32 valuemask]
+    {
+        get
         {
-            get { return data; }
-            set { data = value; }
+            return (data >> (ushort)bitoffset) & valuemask;
         }
-
-        public UInt32 this[uint bitoffset, UInt32 valuemask]
+        set
         {
-            get
-            {
-                return (data >> (ushort)bitoffset) & valuemask;
-            }
-            set
-            {
-                data = (data & ~(valuemask << (ushort)bitoffset)) | ((value & valuemask) << (ushort)bitoffset);
-            }
+            data = (data & ~(valuemask << (ushort)bitoffset)) | ((value & valuemask) << (ushort)bitoffset);
         }
     }
 }

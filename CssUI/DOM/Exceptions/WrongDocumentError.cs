@@ -1,11 +1,10 @@
-namespace CssUI.DOM.Exceptions
+namespace CssUI.DOM.Exceptions;
+
+public class WrongDocumentError : DOMException
 {
-    public class WrongDocumentError : DOMException
+    public WrongDocumentError(string message = "")
+        : base(message, "WrongDocumentError")
     {
-        public WrongDocumentError(string message = "")
-            : base(message, "WrongDocumentError")
-        {
-        }
     }
 }
 

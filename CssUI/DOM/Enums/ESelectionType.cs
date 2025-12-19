@@ -1,16 +1,15 @@
 using CssUI.Internal;
 
-namespace CssUI.DOM
+namespace CssUI.DOM;
+
+[MetaEnum]
+public enum ESelectionType : int
 {
-    [MetaEnum]
-    public enum ESelectionType : int
-    {
-        [MetaKeyword("None")]
-        None,
-        [MetaKeyword("Caret")]
-        Caret,
-        [MetaKeyword("Range")]
-        Range,
-    }
+    [MetaKeyword("None")]
+    None,
+    [MetaKeyword("Caret")]
+    Caret,
+    [MetaKeyword("Range")]
+    Range,
 }
 

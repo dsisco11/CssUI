@@ -1,10 +1,9 @@
 
-namespace CssUI.CSS.Internal
+namespace CssUI.CSS.Internal;
+
+public enum ESelectorMatchingOrder
 {
-    public enum ESelectorMatchingOrder
-    {
-        LTR,
-        RTL
-    }
+    LTR,
+    RTL
 }
 

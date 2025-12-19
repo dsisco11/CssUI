@@ -1,11 +1,10 @@
-namespace CssUI.DOM.Exceptions
+namespace CssUI.DOM.Exceptions;
+
+public class InvalidNodeTypeError : DOMException
 {
-    public class InvalidNodeTypeError : DOMException
+    public InvalidNodeTypeError(string message = "")
+        : base(message, "InvalidNodeTypeError")
     {
-        public InvalidNodeTypeError(string message = "")
-            : base(message, "InvalidNodeTypeError")
-        {
-        }
     }
 }
 

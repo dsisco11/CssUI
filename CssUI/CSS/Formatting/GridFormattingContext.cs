@@ -134,11 +134,6 @@ public class GridFormattingContext : IFormattingContext
     private bool IsRowFlow => (_autoFlow & EGridAutoFlow.Column) == 0;
 
     /// <summary>
-    /// Whether dense packing is enabled.
-    /// </summary>
-    private bool IsDense => (_autoFlow & EGridAutoFlow.Dense) != 0;
-
-    /// <summary>
     /// Whether fragmentation is active for this layout.
     /// </summary>
     private bool IsFragmenting => _fragmentationContext?.IsFragmenting == true;
@@ -226,8 +221,7 @@ public class GridFormattingContext : IFormattingContext
         var current = _container!.firstChild;
         while (current != null)
         {
-            var principalBox = current as CssPrincipalBox;
-            if (principalBox != null)
+            if (current is CssPrincipalBox principalBox)
             {
                 var style = principalBox.Style;
 

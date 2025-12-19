@@ -1,11 +1,10 @@
-namespace CssUI.DOM.Exceptions
+namespace CssUI.DOM.Exceptions;
+
+public class InvalidCharacterError : DOMException
 {
-    public class InvalidCharacterError : DOMException
+    public InvalidCharacterError(string message = "")
+        : base(message, "InvalidCharacterError")
     {
-        public InvalidCharacterError(string message = "")
-            : base(message, "InvalidCharacterError")
-        {
-        }
     }
 }
 

@@ -1,30 +1,29 @@
-using CssUI.DOM;
-using CssUI.DOM.Nodes;
 using System;
 using System.Runtime.CompilerServices;
+using CssUI.DOM;
+using CssUI.DOM.Nodes;
 
-namespace CssUI.CSS.Selectors
+namespace CssUI.CSS.Selectors;
+
+public class PseudoElementSelector : SimpleSelector
 {
-    public class PseudoElementSelector : SimpleSelector
+    protected readonly string Name;
+
+    public PseudoElementSelector(string Name) : base(ESimpleSelectorType.PseudoElementSelector)
     {
-        protected readonly string Name;
+        this.Name = Name;
+    }
 
-        public PseudoElementSelector(string Name) : base(ESimpleSelectorType.PseudoElementSelector)
+    /// <summary>
+    /// Returns whether the selector matches a specified element or index
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    override public bool Matches(Element E, params Node[] scopeElements)
+    {
+        switch (Name)
         {
-            this.Name = Name;
-        }
-
-        /// <summary>
-        /// Returns whether the selector matches a specified element or index
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        override public bool Matches(Element E, params Node[] scopeElements)
-        {
-            switch (Name)
-            {
-                default:
-                    throw new NotImplementedException($"Selector pseudo-element ({Name}) logic not implemented!");
-            }
+            default:
+                throw new NotImplementedException($"Selector pseudo-element ({Name}) logic not implemented!");
         }
     }
 }

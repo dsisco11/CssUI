@@ -1,34 +1,33 @@
-using CssUI.CSS.Parser;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using CssUI.CSS.Parser;
 
-namespace CssUI.CSS
+namespace CssUI.CSS;
+
+public class CssDecleration : CssComponent
 {
-    public class CssDecleration : CssComponent
+    public readonly string Name;
+    //public List<CssComponent> Values = new List<CssComponent>();
+    public List<CssToken> Values = new List<CssToken>();
+    public bool Important = false;
+
+    //public CssDecleration(string Name) : base(ECssComponent.Decleration)
+    public CssDecleration(ReadOnlySpan<char> Name) : base(ECssTokenType.Decleration)
     {
-        public readonly string Name;
-        //public List<CssComponent> Values = new List<CssComponent>();
-        public List<CssToken> Values = new List<CssToken>();
-        public bool Important = false;
+        this.Name = Name.ToString();
+    }
 
-        //public CssDecleration(string Name) : base(ECssComponent.Decleration)
-        public CssDecleration(ReadOnlySpan<char> Name) : base(ECssTokenType.Decleration)
-        {
-            this.Name = Name.ToString();
-        }
+    public override string Encode()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.Append(Name);
+        sb.Append(": ");
+        foreach (CssToken t in Values) { sb.Append(t.Encode()); }
+        if (Important) sb.Append(" !important");
+        sb.Append(";");
 
-        public override string Encode()
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append(Name);
-            sb.Append(": ");
-            foreach (CssToken t in Values) { sb.Append(t.Encode()); }
-            if (Important) sb.Append(" !important");
-            sb.Append(";");
-
-            return sb.ToString();
-        }
+        return sb.ToString();
     }
 }
 

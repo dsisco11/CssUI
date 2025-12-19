@@ -1,7 +1,6 @@
-namespace CssUI.DOM
+namespace CssUI.DOM;
+
+public class StaticRange : AbstractRange
 {
-    public class StaticRange : AbstractRange
-    {
-    }
 }
 

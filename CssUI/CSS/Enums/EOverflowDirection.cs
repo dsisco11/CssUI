@@ -1,14 +1,13 @@
-namespace CssUI.CSS.Enums
+namespace CssUI.CSS.Enums;
+
+/// <summary>
+/// Used by <see cref="DOM.ScrollBox"/>
+/// </summary>
+public enum EOverflowDirection : int
 {
-    /// <summary>
-    /// Used by <see cref="DOM.ScrollBox"/>
-    /// </summary>
-    public enum EOverflowDirection : int
-    {
-        Upward,
-        Rightward,
-        Downward,
-        Leftward,
-    }
+    Upward,
+    Rightward,
+    Downward,
+    Leftward,
 }
 

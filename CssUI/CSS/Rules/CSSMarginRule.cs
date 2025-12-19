@@ -1,24 +1,23 @@
-using CssUI.CSS.Internal;
 using System;
+using CssUI.CSS.Internal;
 
-namespace CssUI.CSS
+namespace CssUI.CSS;
+
+public sealed class CSSMarginRule : CSSRule
 {
-    public sealed class CSSMarginRule : CSSRule
+    public new readonly ECssRuleType type = ECssRuleType.MARGIN_RULE;
+    public readonly string name;
+    public readonly CSSStyleDeclaration style;
+
+    public CSSMarginRule(string name, CSSStyleDeclaration style)
     {
-        public new readonly ECssRuleType type = ECssRuleType.MARGIN_RULE;
-        public readonly string name;
-        public readonly CSSStyleDeclaration style;
+        this.name = name;
+        this.style = style;
+    }
 
-        public CSSMarginRule(string name, CSSStyleDeclaration style)
-        {
-            this.name = name;
-            this.style = style;
-        }
-
-        protected override string Serialize()
-        {
-            throw new NotImplementedException();
-        }
+    protected override string Serialize()
+    {
+        throw new NotImplementedException();
     }
 }
 

@@ -1,11 +1,10 @@
-namespace CssUI.DOM.Exceptions
+namespace CssUI.DOM.Exceptions;
+
+public class DomSyntaxError : DOMException
 {
-    public class DomSyntaxError : DOMException
+    public DomSyntaxError(string message = "")
+        : base(message, "SyntaxError")
     {
-        public DomSyntaxError(string message = "")
-            : base(message, "SyntaxError")
-        {
-        }
     }
 }
 

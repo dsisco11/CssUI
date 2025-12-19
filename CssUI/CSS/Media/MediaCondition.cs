@@ -3,88 +3,87 @@ using System.Text;
 using CssUI.CSS.Serialization;
 using CssUI.DOM;
 
-namespace CssUI.CSS.Media
-{
-    public class MediaCondition : IMediaCondition, ICssSerializeable
-    {/* https://www.w3.org/TR/mediaqueries-4/#media-condition */
+namespace CssUI.CSS.Media;
 
-        #region Properites
-        private readonly LinkedList<IMediaCondition> Conditions;
-        private readonly EMediaCombinator Op;
-        #endregion
+public class MediaCondition : IMediaCondition, ICssSerializeable
+{/* https://www.w3.org/TR/mediaqueries-4/#media-condition */
 
-        #region Constructor
-        public MediaCondition(EMediaCombinator op, IEnumerable<IMediaCondition> conditions)
-        {
-            Conditions = new LinkedList<IMediaCondition>(conditions);
-            Op = op;
-        }
-        #endregion
+    #region Properites
+    private readonly LinkedList<IMediaCondition> Conditions;
+    private readonly EMediaCombinator Op;
+    #endregion
 
-
-        public bool Matches(Document document)
-        {
-            bool matches = true;
-            if (Op == EMediaCombinator.OR) matches = false;
-
-            foreach (IMediaCondition condition in Conditions)
-            {
-                if (condition.Matches(document))
-                {
-                    if (Op == EMediaCombinator.NOT)
-                    {
-                        return false;
-                    }
-                    else if (Op == EMediaCombinator.OR)
-                    {
-                        matches = true;
-                        return true;
-                    }
-                }
-                else
-                {
-                    if (Op == EMediaCombinator.AND)
-                    {
-                        matches = false;
-                    }
-                }
-            }
-
-            return matches;
-        }
-
-
-
-        public string Serialize()
-        {
-            if (Conditions.Count <= 0)
-            {
-                return string.Empty;
-            }
-
-            StringBuilder sb = new StringBuilder();
-
-            sb.Append(UnicodeCommon.CHAR_LEFT_PARENTHESES);
-
-            bool first = true;
-            foreach (IMediaCondition Condition in Conditions)
-            {
-                if (!first)
-                {
-                    sb.Append(UnicodeCommon.CHAR_SPACE);
-                    sb.Append(Lookup.Keyword(Op));
-                    sb.Append(UnicodeCommon.CHAR_SPACE);
-                }
-
-                sb.Append(Condition.Serialize());
-                first = false;
-            }
-
-            sb.Append(UnicodeCommon.CHAR_RIGHT_PARENTHESES);
-            return sb.ToString();
-        }
-
-
+    #region Constructor
+    public MediaCondition(EMediaCombinator op, IEnumerable<IMediaCondition> conditions)
+    {
+        Conditions = new LinkedList<IMediaCondition>(conditions);
+        Op = op;
     }
+    #endregion
+
+
+    public bool Matches(Document document)
+    {
+        bool matches = true;
+        if (Op == EMediaCombinator.OR) matches = false;
+
+        foreach (IMediaCondition condition in Conditions)
+        {
+            if (condition.Matches(document))
+            {
+                if (Op == EMediaCombinator.NOT)
+                {
+                    return false;
+                }
+                else if (Op == EMediaCombinator.OR)
+                {
+                    matches = true;
+                    return true;
+                }
+            }
+            else
+            {
+                if (Op == EMediaCombinator.AND)
+                {
+                    matches = false;
+                }
+            }
+        }
+
+        return matches;
+    }
+
+
+
+    public string Serialize()
+    {
+        if (Conditions.Count <= 0)
+        {
+            return string.Empty;
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.Append(UnicodeCommon.CHAR_LEFT_PARENTHESES);
+
+        bool first = true;
+        foreach (IMediaCondition Condition in Conditions)
+        {
+            if (!first)
+            {
+                sb.Append(UnicodeCommon.CHAR_SPACE);
+                sb.Append(Lookup.Keyword(Op));
+                sb.Append(UnicodeCommon.CHAR_SPACE);
+            }
+
+            sb.Append(Condition.Serialize());
+            first = false;
+        }
+
+        sb.Append(UnicodeCommon.CHAR_RIGHT_PARENTHESES);
+        return sb.ToString();
+    }
+
+
 }
 

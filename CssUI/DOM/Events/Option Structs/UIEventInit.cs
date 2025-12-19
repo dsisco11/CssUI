@@ -1,9 +1,8 @@
-namespace CssUI.DOM.Events
+namespace CssUI.DOM.Events;
+
+public class UIEventInit : EventInit
 {
-    public class UIEventInit : EventInit
-    {
-        public Window? view = null;
-        public long detail = 0;
-    }
+    public Window? view = null;
+    public long detail = 0;
 }
 
