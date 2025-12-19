@@ -210,18 +210,47 @@ See [PARSING_ANALYSIS.md](CssUI/docs/PARSING_ANALYSIS.md) for detailed analysis.
 
 ## Architecture & Design
 
-### Dependency Injection Pattern
-- [ ] Explore DI pattern for engine subsystems
-  - [ ] Evaluate Microsoft.Extensions.DependencyInjection integration
-  - [ ] Design service interfaces for pluggable components:
-    - [ ] IRenderEngine (rendering backend)
-    - [ ] IFontEngine (font loading, metrics, glyph rendering)
-    - [ ] ITextureEngine (texture/image handling)
-    - [ ] IWindowingSystem (window creation, input events)
-  - [ ] Design IServiceProvider-based initialization
-  - [ ] Consider lifetime management (singleton vs scoped vs transient)
-  - [ ] Evaluate impact on existing EngineProvider pattern
-  - [ ] Create migration plan from static EngineProvider to DI
+### Dependency Injection Pattern ✅ IMPLEMENTED
+- [x] Explore DI pattern for engine subsystems
+  - [x] Evaluate Microsoft.Extensions.DependencyInjection integration
+  - [x] Design service interfaces for pluggable components:
+    - [x] IRenderEngine (rendering backend)
+    - [x] IFontEngine (font loading, metrics, glyph rendering)
+    - [x] ITextureEngine (texture/image handling)
+    - [ ] IWindowingSystem (window creation, input events) - pending
+  - [x] Design IServiceProvider-based initialization
+  - [x] Consider lifetime management (singleton vs scoped vs transient)
+    - Engines are registered as singletons
+  - [x] Evaluate impact on existing EngineProvider pattern
+    - Bridge pattern: DI resolves engines → initializes static EngineProvider
+  - [x] Create migration plan from static EngineProvider to DI
+    - Added UseCssUI() extension to bridge DI to static provider
+
+#### Implementation Details
+- Added Microsoft.Extensions.DependencyInjection (8.0.1) package
+- Created CORE/DependencyInjection/ folder with:
+  - ICssUIEngineProvider.cs - Interface for engine access
+  - CssUIEngineProvider.cs - Implementation that holds engine instances
+  - CssUIServiceCollectionExtensions.cs - IServiceCollection extensions
+  - CssUIOptions.cs - Configuration options for engines
+- Updated EngineProvider.cs with Reset() method for testing
+- Added 15 passing unit tests
+
+#### Usage Pattern
+```csharp
+// Configure DI container
+services.AddCssUI(options => {
+    options.FontEngine = new MyFontEngine();
+    options.RenderEngine = new MyRenderEngine();
+});
+
+// Or register individual engines
+services.AddFontEngine<MyFontEngine>();
+services.AddRenderEngine(sp => new MyRenderEngine(sp.GetRequiredService<ILogger>()));
+
+// Bridge to static provider (for backwards compatibility)
+serviceProvider.UseCssUI();
+```
 
 ## Test Coverage
 

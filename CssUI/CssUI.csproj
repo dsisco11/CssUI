@@ -37,6 +37,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
   </ItemGroup>
 
   <ItemGroup Condition="!$(DefineConstants.Contains('ENABLE_HTML'))">
@@ -56,7 +57,7 @@
   </ItemGroup>
 
   <!-- SixLabors packages removed - implementations moved to separate project -->
-  
+
   <!-- Legacy CSS/Layouts folder deleted - used defunct types (cssElement, IParentElement) -->
   <!-- Flex/Grid layout algorithms are now in CSS/Formatting/ using the box tree system -->
 

@@ -1,4 +1,5 @@
 using System;
+using CssUI.DependencyInjection;
 
 namespace CssUI;
 
@@ -29,6 +30,17 @@ public sealed class CssUIConfig
 /// <summary>
 /// Global access to engine instances after initialization.
 /// </summary>
+/// <remarks>
+/// <para>
+/// For new projects using dependency injection, prefer injecting <see cref="ICssUIEngineProvider"/>
+/// or individual engine interfaces directly. This static class is provided for backward compatibility
+/// and simpler initialization scenarios.
+/// </para>
+/// <para>
+/// When using DI, call <see cref="CssUIServiceCollectionExtensions.UseCssUI"/> after building
+/// the service provider to bridge DI-registered engines to this static provider.
+/// </para>
+/// </remarks>
 public static class EngineProvider
 {
     private static IFontEngine? _fontEngine;
@@ -55,6 +67,29 @@ public static class EngineProvider
             _fontEngine = config.FontEngine ?? CreateDefaultFontEngine();
             _textureEngine = config.TextureEngine ?? CreateDefaultTextureEngine();
             _renderEngine = config.RenderEngine ?? new NullRenderEngine();
+            _initialized = true;
+        }
+    }
+
+    /// <summary>
+    /// Initialize the static EngineProvider from a DI-provided <see cref="ICssUIEngineProvider"/>.
+    /// This bridges the dependency injection system to the static API for backward compatibility.
+    /// </summary>
+    /// <param name="provider">The DI-provided engine provider.</param>
+    /// <exception cref="ArgumentNullException">If provider is null.</exception>
+    /// <exception cref="InvalidOperationException">If already initialized.</exception>
+    public static void InitializeFromDI(ICssUIEngineProvider provider)
+    {
+        ArgumentNullException.ThrowIfNull(provider);
+
+        lock (_lock)
+        {
+            if (_initialized)
+                throw new InvalidOperationException("CssUI has already been initialized.");
+
+            _fontEngine = provider.FontEngine;
+            _textureEngine = provider.TextureEngine;
+            _renderEngine = provider.RenderEngine;
             _initialized = true;
         }
     }

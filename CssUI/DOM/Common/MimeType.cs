@@ -932,7 +932,7 @@ public static class MimeType
 
     static bool match_padded_sequence(ReadOnlyMemory<byte> pattern, ReadOnlyMemory<byte> sequence)
     {/* Docs: https://mimesniff.spec.whatwg.org/#matching-a-padded-sequence */
-        /* Matching a padded sequence pattern on a sequence sequence at starting at byte offset and ending at by end means returning true if sequence has a length greater than end, 
+        /* Matching a padded sequence pattern on a sequence sequence at starting at byte offset and ending at by end means returning true if sequence has a length greater than end,
          * and contains exactly, in the range [offset, end], the bytes in pattern, in the same order, eventually preceded by bytes with a value of 0x00, false otherwise. */
         if (!sequence.Span.SequenceEqual(pattern.Span)) return false;
         /*for (int i=end; i<sequence.Length; i++)
@@ -1066,7 +1066,7 @@ public static class MimeType
         var maskSpan = mask.Span;
 
         var s = 0;
-        if (ignore is not null)
+        if (!ignore.IsEmpty)
         {
             var ignoreSpan = ignore.Span;
             while (s < input.Length)
