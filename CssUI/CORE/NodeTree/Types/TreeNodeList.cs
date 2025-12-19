@@ -9,7 +9,7 @@ namespace CssUI.NodeTree
     /// <summary>
     /// Manages and allows indexing of a list of child-nodes, updating their previous/next siblings to the correct values
     /// </summary>
-    public class TreeNodeList : ICollection<ITreeNode>, IEnumerable<ITreeNode>,  IList<ITreeNode>
+    public class TreeNodeList : ICollection<ITreeNode>, IEnumerable<ITreeNode>, IList<ITreeNode>
     {
         #region Properties
         private List<ITreeNode> Items = new List<ITreeNode>();
@@ -80,7 +80,7 @@ namespace CssUI.NodeTree
             // Update the target nodes index
             node.index = index;
             // Update the index of all nodes following the target one
-            for (int i=index; i<Count-1; i++)
+            for (int i = index; i < Count - 1; i++)
             {
                 Items[i].index = i;
             }

@@ -54,26 +54,26 @@ namespace CssUI.DOM.Geometry
         {
             if (obj is DOMPoint pt)
             {
-                return (this.x ==  pt.x)
-                    && (this.y ==  pt.y)
-                    && (this.z ==  pt.z)
-                    && (this.w ==  pt.w);
+                return (this.x == pt.x)
+                    && (this.y == pt.y)
+                    && (this.z == pt.z)
+                    && (this.w == pt.w);
             }
 
             if (obj is DOMPointReadOnly ro)
             {
-                return (this.x ==  ro.x)
-                    && (this.y ==  ro.y)
-                    && (this.z ==  ro.z)
-                    && (this.w ==  ro.w);
+                return (this.x == ro.x)
+                    && (this.y == ro.y)
+                    && (this.z == ro.z)
+                    && (this.w == ro.w);
             }
 
             if (obj is DOMPointInit op)
             {
-                return (this.x ==  op.x)
-                    && (this.y ==  op.y)
-                    && (this.z ==  op.z)
-                    && (this.w ==  op.w);
+                return (this.x == op.x)
+                    && (this.y == op.y)
+                    && (this.z == op.z)
+                    && (this.w == op.w);
             }
 
             return base.Equals(obj);

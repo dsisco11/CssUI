@@ -9,10 +9,12 @@ namespace CssUI.CSS
         public readonly CSSRule? parentRule;
         public string? cssFloat;
 
-        public string cssText {
-            get {
+        public string cssText
+        {
+            get
+            {
                 StringBuilder sb = new StringBuilder();
-                foreach(CssDecleration dec in this)
+                foreach (CssDecleration dec in this)
                 {
                     sb.AppendLine(dec.ToString());
                 }

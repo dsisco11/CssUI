@@ -18,7 +18,7 @@ namespace CssUI
         {
         }
 
-        public ScheduledFunction(Action func, TimeSpan delay) 
+        public ScheduledFunction(Action func, TimeSpan delay)
             : this(delay, func)
         {
         }

@@ -37,7 +37,7 @@ namespace CssUI
             long Integer = 0;
             var span = digits;
             long power = 1;
-            for (int i = digits.Length-1; i >= 0 ; i--)
+            for (int i = digits.Length - 1; i >= 0; i--)
             {
                 Integer += power * Ascii_Digit_To_Value(span[i]);
                 power *= 10;
@@ -66,7 +66,7 @@ namespace CssUI
             ulong Integer = 0;
             var span = digits;
             ulong power = 1;
-            for (int i = digits.Length-1; i >= 0; i--)
+            for (int i = digits.Length - 1; i >= 0; i--)
             {
                 Integer += power * (ulong)Ascii_Digit_To_Value(span[i]);
                 power *= 10;
@@ -91,7 +91,7 @@ namespace CssUI
                 I *= Exp;
             }
 
-            return I; 
+            return I;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -138,7 +138,7 @@ namespace CssUI
             ulong result = 0;
             var span = input.Span;
 
-            for(int i=0; i<span.Length; i++)
+            for (int i = 0; i < span.Length; i++)
             {
                 if (!Is_Ascii_Hex_Digit(span[i]))
                 {
@@ -208,7 +208,7 @@ namespace CssUI
 
             var parsed = Digits_To_Base10(outDigits);
 
-            outValue = sign ? parsed :  -parsed;
+            outValue = sign ? parsed : -parsed;
             return true;
         }
         #endregion

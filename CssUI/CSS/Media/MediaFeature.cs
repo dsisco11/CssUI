@@ -65,7 +65,7 @@ namespace CssUI.CSS.Media
                 IsValid = false;
             }
         }
-        
+
         /// <summary>
         /// Creates a new 'range' type media feature
         /// </summary>
@@ -139,14 +139,14 @@ namespace CssUI.CSS.Media
                                 {
                                     double A = (double)Resolve_Media_Name_Value(document, nameLookup);
                                     double B = valueB.AsDecimal();
-                                    return !(A ==  B);
+                                    return !(A == B);
                                 }
                             case ECssValueTypes.DIMENSION:
                             case ECssValueTypes.RESOLUTION:
                                 {
                                     double A = (double)Resolve_Media_Name_Value(document, nameLookup);
                                     double B = valueB.Resolve(document.cssUnitResolver);
-                                    return !(A ==  B);
+                                    return !(A == B);
                                 }
                         }
                     }
@@ -154,7 +154,7 @@ namespace CssUI.CSS.Media
                 case EMediaFeatureContext.Range:
                     {
                         /* Compare all value/operator pairs  */
-                        for (int i=1; i<Operators.Length; i++)
+                        for (int i = 1; i < Operators.Length; i++)
                         {
                             CssValue A = Values[i - 1];
                             CssValue B = Values[i];
@@ -185,7 +185,7 @@ namespace CssUI.CSS.Media
                             double width = (double)Resolve_Media_Name_Value(document, EMediaFeatureName.Width);
                             double height = (double)Resolve_Media_Name_Value(document, EMediaFeatureName.Height);
 
-                            return (outOrientation == EMediaOrientation.Landscape) ? width >= height: height >= width;
+                            return (outOrientation == EMediaOrientation.Landscape) ? width >= height : height >= width;
                         }
                     }
                     break;
@@ -198,7 +198,7 @@ namespace CssUI.CSS.Media
                             {
                                 case EMediaUpdate.None:
                                     {
-                                        return (0 ==  refreshRate);
+                                        return (0 == refreshRate);
                                     }
                                 case EMediaUpdate.Slow:
                                     {
@@ -301,7 +301,7 @@ namespace CssUI.CSS.Media
             {
                 case EMediaOperator.EqualTo:
                     {
-                        return (A ==  B);
+                        return (A == B);
                     }
                 case EMediaOperator.LessThan:
                     {
@@ -313,11 +313,11 @@ namespace CssUI.CSS.Media
                     }
                 case EMediaOperator.LessThanEq:
                     {
-                        return (A < B || (A ==  B));
+                        return (A < B || (A == B));
                     }
                 case EMediaOperator.GreaterThanEq:
                     {
-                        return (A > B || (A ==  B));
+                        return (A > B || (A == B));
                     }
             }
 

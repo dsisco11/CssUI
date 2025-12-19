@@ -812,11 +812,11 @@ namespace CssUI
             var result = new char[Math.Max(charCount, Digits)];
             int padding = (int)((charCount > Digits) ? 0 : (Digits - charCount));
 
-            for (int i=0; i<charCount; i++)
+            for (int i = 0; i < charCount; i++)
             {
                 var halfByte = (value & 0xF);
                 value = value >> 4;
-                result[padding+i] = (char)((halfByte < 10) ? (halfByte + CHAR_DIGIT_0) : (halfByte + CHAR_A_UPPER));
+                result[padding + i] = (char)((halfByte < 10) ? (halfByte + CHAR_DIGIT_0) : (halfByte + CHAR_A_UPPER));
             }
 
             for (int i = 0; i < padding; i++)
@@ -940,7 +940,7 @@ namespace CssUI
             int i = 0;
             StringBuilder U = new StringBuilder();
 
-            for(;i<n; i++)
+            for (; i < n; i++)
             {
                 char c = S[i];
                 if (c < 0xD800 || c > 0xDFFF)
@@ -954,7 +954,7 @@ namespace CssUI
                 else if (0xD800 <= c && c <= 0xDBFF)
                 {
                     /* 1) If i = n−1, then append to U a U+FFFD REPLACEMENT CHARACTER. */
-                    if (i == n-1)
+                    if (i == n - 1)
                     {
                         U.Append(CHAR_REPLACEMENT);
                     }
@@ -1100,7 +1100,7 @@ namespace CssUI
             var bytes = Encoding.UTF8.GetBytes(new char[1] { codePoint });
             char[] data = new char[bytes.Length * 3];
 
-            for (int i=0; i<bytes.Length; i++)
+            for (int i = 0; i < bytes.Length; i++)
             {
                 var enc = Percent_Encode(bytes[i]);
                 int j = i * 3;

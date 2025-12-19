@@ -64,7 +64,7 @@ namespace CssUI.DOM.Events
         public readonly bool modifierSymbol = false;
         public readonly bool modifierSymbolLock = false;
         #endregion
-        
+
         #region Constructors
         public KeyboardEvent(EEventName type, KeyboardEventInit eventInit) : base(type, eventInit)
         {

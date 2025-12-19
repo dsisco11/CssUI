@@ -14,7 +14,7 @@ namespace CssUI.CSS
     public class FlagCollection<FlagType> : IDisposable, IEnumerable<FlagType> where FlagType : struct
     {
         private struct FlagOffset { public int Chunk, Bit; public uint Mask; }
-        const int CHUNK_SIZE = sizeof(int)*8;
+        const int CHUNK_SIZE = sizeof(int) * 8;
 
         #region Properties
         /// <summary>
@@ -69,7 +69,7 @@ namespace CssUI.CSS
         public void Dispose()
         {
             Dispose(true);
-             GC.SuppressFinalize(this);
+            GC.SuppressFinalize(this);
         }
         #endregion
         #endregion
@@ -167,7 +167,7 @@ namespace CssUI.CSS
         private int Tally_Active()
         {
             int RetVal = 0;
-            for (int i = 0; i<Length; i++)
+            for (int i = 0; i < Length; i++)
             {
                 if (GetFlag(i))
                 {
@@ -205,7 +205,7 @@ namespace CssUI.CSS
                 {
                     unsafe
                     {
-                        for (int i=0; i<Size; i++)
+                        for (int i = 0; i < Size; i++)
                         {
                             if (ChunkData[i] != other.ChunkData[i])
                                 return false;
@@ -274,7 +274,7 @@ namespace CssUI.CSS
             var RetVal = new FlagCollection<FlagType>(Left.Length);
             unsafe
             {
-                for (int i=0; i<Left.Size; i++)
+                for (int i = 0; i < Left.Size; i++)
                 {
                     RetVal.ChunkData[i] = Left.ChunkData[i] & Right.ChunkData[i];
                 }
@@ -306,7 +306,7 @@ namespace CssUI.CSS
             var RetVal = new FlagCollection<FlagType>(Left.Length);
             unsafe
             {
-                for (int i=0; i<Left.Size; i++)
+                for (int i = 0; i < Left.Size; i++)
                 {
                     RetVal.ChunkData[i] = Left.ChunkData[i] ^ Right.ChunkData[i];
                 }
@@ -359,11 +359,11 @@ namespace CssUI.CSS
             int FlagNum = 0;
             for (int i = 0; i < Size; i++)
             {
-                uint mask = unchecked( (uint)-1 );
-                for (int j = 0; j<CHUNK_SIZE; j++)
+                uint mask = unchecked((uint)-1);
+                for (int j = 0; j < CHUNK_SIZE; j++)
                 {
                     mask <<= 1;
-                    if((Get_Chunk_Data(i) & mask) != 0)
+                    if ((Get_Chunk_Data(i) & mask) != 0)
                     {
                         yield return CastTo<FlagType>.From(FlagNum);
                     }

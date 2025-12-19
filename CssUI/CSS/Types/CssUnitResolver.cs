@@ -95,7 +95,7 @@ namespace CssUI
             return canonical / SCALING_TABLE[(int)unitTo];
         }
 
-        
+
         public static double Get_Font_Unit_Scale(Element Owner, ICssProperty Property, ECssUnit Unit)
         {
             switch (Unit)

@@ -16,17 +16,17 @@ namespace CssUI.DOM.Geometry
         internal const int _m12 = 4;
         internal const int _m13 = 8;
         internal const int _m14 = 12;
-        
+
         internal const int _m21 = 1;
         internal const int _m22 = 5;
         internal const int _m23 = 9;
         internal const int _m24 = 13;
-        
+
         internal const int _m31 = 2;
         internal const int _m32 = 6;
         internal const int _m33 = 10;
         internal const int _m34 = 14;
-        
+
         internal const int _m41 = 3;
         internal const int _m42 = 7;
         internal const int _m43 = 11;
@@ -42,7 +42,7 @@ namespace CssUI.DOM.Geometry
             protected set
             {
                 Data[_m13] = value;
-                if (!(value ==  0.0))
+                if (!(value == 0.0))
                     is2D = false;
             }
         }
@@ -52,7 +52,7 @@ namespace CssUI.DOM.Geometry
             protected set
             {
                 Data[3] = value;
-                if (!(value ==  0.0))
+                if (!(value == 0.0))
                     is2D = false;
             }
         }
@@ -64,7 +64,7 @@ namespace CssUI.DOM.Geometry
             protected set
             {
                 Data[_m23] = value;
-                if (!(value ==  0.0))
+                if (!(value == 0.0))
                     is2D = false;
             }
         }
@@ -74,7 +74,7 @@ namespace CssUI.DOM.Geometry
             protected set
             {
                 Data[_m24] = value;
-                if (!(value ==  0.0))
+                if (!(value == 0.0))
                     is2D = false;
             }
         }
@@ -84,7 +84,7 @@ namespace CssUI.DOM.Geometry
             protected set
             {
                 Data[_m31] = value;
-                if (!(value ==  1.0))
+                if (!(value == 1.0))
                     is2D = false;
             }
         }
@@ -94,7 +94,7 @@ namespace CssUI.DOM.Geometry
             protected set
             {
                 Data[_m32] = value;
-                if (!(value ==  0.0))
+                if (!(value == 0.0))
                     is2D = false;
             }
         }
@@ -104,7 +104,7 @@ namespace CssUI.DOM.Geometry
             protected set
             {
                 Data[_m33] = value;
-                if (!(value ==  1.0))
+                if (!(value == 1.0))
                     is2D = false;
             }
         }
@@ -114,7 +114,7 @@ namespace CssUI.DOM.Geometry
             protected set
             {
                 Data[_m34] = value;
-                if (!(value ==  0.0))
+                if (!(value == 0.0))
                     is2D = false;
             }
         }
@@ -126,7 +126,7 @@ namespace CssUI.DOM.Geometry
             protected set
             {
                 Data[_m43] = value;
-                if (!(value ==  0.0))
+                if (!(value == 0.0))
                     is2D = false;
             }
         }
@@ -136,7 +136,7 @@ namespace CssUI.DOM.Geometry
             protected set
             {
                 Data[_m44] = value;
-                if (!(value ==  1.0))
+                if (!(value == 1.0))
                     is2D = false;
             }
         }
@@ -156,23 +156,23 @@ namespace CssUI.DOM.Geometry
         {/* Docs: https://www.w3.org/TR/geometry-1/#dom-dommatrixreadonly-isidentity */
             get
             {
-                if (!(1.0 ==  m11)) return false;
-                if (!(1.0 ==  m22)) return false;
-                if (!(1.0 ==  m33)) return false;
-                if (!(1.0 ==  m44)) return false;
+                if (!(1.0 == m11)) return false;
+                if (!(1.0 == m22)) return false;
+                if (!(1.0 == m33)) return false;
+                if (!(1.0 == m44)) return false;
 
-                if (!(0.0 ==  m12)) return false;
-                if (!(0.0 ==  m13)) return false;
-                if (!(0.0 ==  m14)) return false;
-                if (!(0.0 ==  m21)) return false;
-                if (!(0.0 ==  m23)) return false;
-                if (!(0.0 ==  m24)) return false;
-                if (!(0.0 ==  m31)) return false;
-                if (!(0.0 ==  m32)) return false;
-                if (!(0.0 ==  m34)) return false;
-                if (!(0.0 ==  m41)) return false;
-                if (!(0.0 ==  m42)) return false;
-                if (!(0.0 ==  m43)) return false;
+                if (!(0.0 == m12)) return false;
+                if (!(0.0 == m13)) return false;
+                if (!(0.0 == m14)) return false;
+                if (!(0.0 == m21)) return false;
+                if (!(0.0 == m23)) return false;
+                if (!(0.0 == m24)) return false;
+                if (!(0.0 == m31)) return false;
+                if (!(0.0 == m32)) return false;
+                if (!(0.0 == m34)) return false;
+                if (!(0.0 == m41)) return false;
+                if (!(0.0 == m42)) return false;
+                if (!(0.0 == m43)) return false;
 
                 return true;
             }
@@ -228,16 +228,16 @@ namespace CssUI.DOM.Geometry
             this.m41 = init.m41;
             this.m42 = init.m42;
 
-            this.m13  = init.m13;
-            this.m14  = init.m14;
-            this.m23  = init.m23;
-            this.m24  = init.m24;
-            this.m31  = init.m31;
-            this.m32  = init.m32;
-            this.m33  = init.m33;
-            this.m34  = init.m34;
-            this.m43  = init.m43;
-            this.m44  = init.m44;
+            this.m13 = init.m13;
+            this.m14 = init.m14;
+            this.m23 = init.m23;
+            this.m24 = init.m24;
+            this.m31 = init.m31;
+            this.m32 = init.m32;
+            this.m33 = init.m33;
+            this.m34 = init.m34;
+            this.m43 = init.m43;
+            this.m44 = init.m44;
         }
 
         public DOMMatrixReadOnly(DOMMatrix2DInit init)

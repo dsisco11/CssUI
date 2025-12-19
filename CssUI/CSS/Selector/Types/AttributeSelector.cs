@@ -93,7 +93,7 @@ namespace CssUI.CSS.Selectors
                     {
                         if (!E.hasAttribute(AttributeName)) return false;
                         string val = E.getAttribute(AttributeName).AsString();
-                        if (StringCommon.StrEq(Value,val)) return true;
+                        if (StringCommon.StrEq(Value, val)) return true;
                         if (val.StartsWith(string.Concat(Value, '-'))) return true;
                         return false;
                     }

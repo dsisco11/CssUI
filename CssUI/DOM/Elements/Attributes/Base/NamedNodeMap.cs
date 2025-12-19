@@ -48,7 +48,7 @@ namespace CssUI.DOM
             /* 1) If element is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase. */
             //qualifiedName = qualifiedName.ToLowerInvariant();
             /* 2) Return the first attribute in element’s attribute list whose qualified name is qualifiedName, and null otherwise. */
-            for (int i=0; i<ownerElement.AttributeList.Count; i++)
+            for (int i = 0; i < ownerElement.AttributeList.Count; i++)
             {
                 var a = ownerElement.AttributeList[i];
                 if (qualifiedName.Span.Equals(a.Name.AsSpan(), StringComparison.OrdinalIgnoreCase))
@@ -90,11 +90,11 @@ namespace CssUI.DOM
             /* To remove an attribute by name given a qualifiedName and element element, run these steps: */
             /* 1) Let attr be the result of getting an attribute given qualifiedName and element. */
             ownerElement.find_attribute(qualifiedName, out Attr attr);
-                /* 2) If attr is non-null, remove it from element. */
-                if (attr != null)
-                {
-                    ownerElement.AttributeList.Remove(attr.Name.ToLowerInvariant());
-                }
+            /* 2) If attr is non-null, remove it from element. */
+            if (attr != null)
+            {
+                ownerElement.AttributeList.Remove(attr.Name.ToLowerInvariant());
+            }
             /* 2) If attr is null, then throw a "NotFoundError" DOMException. */
             if (attr == null)
             {

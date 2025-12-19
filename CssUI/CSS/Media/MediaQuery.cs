@@ -75,7 +75,7 @@ namespace CssUI.CSS.Media
             //List<MediaFeature> features = query.Conditions.Where(cond => cond is MediaFeature feature && feature.IsValid).OrderBy(feature => CssLookup.Keyword_From_Enum(feature.Name)).ToList();
 
             bool first = true;
-            foreach(IMediaCondition Condition in Conditions)
+            foreach (IMediaCondition Condition in Conditions)
             {
                 /* 4) If this is not the last media feature append a single SPACE (U+0020), followed by "and", followed by a single SPACE (U+0020), to s. */
                 if (!first)

@@ -5,7 +5,7 @@ namespace CssUI.Platform
     {
         ISystemMetricsHandler SystemMetrics { get; }
         ISystemScreensHandler SystemScreens { get; }
-        ISystemWindowHandler  SystemWindows { get; }
+        ISystemWindowHandler SystemWindows { get; }
     }
 }
 

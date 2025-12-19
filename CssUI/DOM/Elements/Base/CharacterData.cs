@@ -92,7 +92,7 @@ namespace CssUI.DOM
             get
             {
                 Node? n = previousSibling;
-                while((n is not null) && !(n is Element)) { n = n.previousSibling; }
+                while ((n is not null) && !(n is Element)) { n = n.previousSibling; }
                 return (Element)n!;
             }
         }

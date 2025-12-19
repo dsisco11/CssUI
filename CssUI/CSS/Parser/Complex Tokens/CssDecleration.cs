@@ -17,7 +17,7 @@ namespace CssUI.CSS
         {
             this.Name = Name.ToString();
         }
-        
+
         public override string Encode()
         {
             StringBuilder sb = new StringBuilder();

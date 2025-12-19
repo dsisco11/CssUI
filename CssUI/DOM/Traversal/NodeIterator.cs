@@ -70,7 +70,7 @@ namespace CssUI.DOM
                 Node? next = null;
                 var tree = new TreeWalker(toBeRemovedNode, ENodeFilterMask.SHOW_ALL);
                 Node n = tree.nextSibling();
-                while(!ReferenceEquals(n, null))
+                while (!ReferenceEquals(n, null))
                 {
                     if (DOMCommon.Is_Inclusive_Descendant(n, nodeIterator.root) && !DOMCommon.Is_Inclusive_Descendant(n, toBeRemovedNode))
                     {
@@ -141,7 +141,7 @@ namespace CssUI.DOM
             {
                 result = this.Filter.acceptNode(node);
             }
-            catch(DOMException)
+            catch (DOMException)
             {
                 /* Unset traverser’s active flag. */
                 isActive = false;

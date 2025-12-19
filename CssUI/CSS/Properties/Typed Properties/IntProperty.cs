@@ -19,7 +19,7 @@ namespace CssUI.CSS
         #endregion
 
         #region Constructors
-        public IntProperty(AtomicName<ECssPropertyID> CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked) 
+        public IntProperty(AtomicName<ECssPropertyID> CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
             : base(CssName, Owner, Source, Locked)
         {
         }

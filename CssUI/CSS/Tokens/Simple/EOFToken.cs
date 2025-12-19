@@ -5,7 +5,7 @@ namespace CssUI.CSS
     public class EOFToken : CssToken
     {
         public static EOFToken Instance = new EOFToken();
-        public EOFToken() : base (ECssTokenType.EOF)
+        public EOFToken() : base(ECssTokenType.EOF)
         {
         }
 

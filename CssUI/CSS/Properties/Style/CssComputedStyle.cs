@@ -43,7 +43,7 @@ namespace CssUI.CSS
         /// List of Field-Names for all our properties which have a set value
         /// </summary>
         //public HashSet<AtomicName<ECssPropertyID>> SetProperties { get; private set; } = new HashSet<AtomicName<ECssPropertyID>>();
-        public readonly FlagCollection<ECssPropertyID> SetProperties = new FlagCollection<ECssPropertyID>(MAX_PROPERTY_ID_INDEX+1);
+        public readonly FlagCollection<ECssPropertyID> SetProperties = new FlagCollection<ECssPropertyID>(MAX_PROPERTY_ID_INDEX + 1);
 
         private List<ICssProperty>? CssProperties = null;
         //private ConcurrentDictionary<AtomicName<ECssPropertyID>, ICssProperty> CssPropertyMap = null;
@@ -68,8 +68,8 @@ namespace CssUI.CSS
             get
             {
                 var selectorStr = Selector?.ToString() ?? "";
-                return string.IsNullOrEmpty(selectorStr) 
-                    ? $"{nameof(CssComputedStyle)} - {ID}" 
+                return string.IsNullOrEmpty(selectorStr)
+                    ? $"{nameof(CssComputedStyle)} - {ID}"
                     : $"{nameof(CssComputedStyle)} - {ID}{selectorStr}";
             }
         }
@@ -270,27 +270,27 @@ namespace CssUI.CSS
         /// Specifies how flex items are placed in the flex container (row, column, etc.).
         /// </summary>
         public EnumProperty<EFlexDirection> FlexDirection => (EnumProperty<EFlexDirection>)Get(ECssPropertyID.FlexDirection)!;
-        
+
         /// <summary>
         /// Controls whether the flex container is single-line or multi-line.
         /// </summary>
         public EnumProperty<EFlexWrap> FlexWrap => (EnumProperty<EFlexWrap>)Get(ECssPropertyID.FlexWrap)!;
-        
+
         /// <summary>
         /// Specifies the flex grow factor (how much the item grows relative to other items).
         /// </summary>
         public NumberProperty FlexGrow => (NumberProperty)Get(ECssPropertyID.FlexGrow)!;
-        
+
         /// <summary>
         /// Specifies the flex shrink factor (how much the item shrinks relative to other items).
         /// </summary>
         public NumberProperty FlexShrink => (NumberProperty)Get(ECssPropertyID.FlexShrink)!;
-        
+
         /// <summary>
         /// Specifies the initial main size of a flex item before free space is distributed.
         /// </summary>
         public IntProperty FlexBasis => (IntProperty)Get(ECssPropertyID.FlexBasis)!;
-        
+
         /// <summary>
         /// Controls the order of flex/grid items within the container.
         /// </summary>
@@ -302,27 +302,27 @@ namespace CssUI.CSS
         /// Aligns flex lines or grid tracks within the container along the cross axis.
         /// </summary>
         public EnumProperty<EAlignContent> AlignContent => (EnumProperty<EAlignContent>)Get(ECssPropertyID.AlignContent)!;
-        
+
         /// <summary>
         /// Justifies content along the main axis (flex) or inline axis (grid).
         /// </summary>
         public EnumProperty<EJustifyContent> JustifyContent => (EnumProperty<EJustifyContent>)Get(ECssPropertyID.JustifyContent)!;
-        
+
         /// <summary>
         /// Sets the default alignment for all items along the cross axis.
         /// </summary>
         public EnumProperty<EAlignItems> AlignItems => (EnumProperty<EAlignItems>)Get(ECssPropertyID.AlignItems)!;
-        
+
         /// <summary>
         /// Overrides align-items for a specific item.
         /// </summary>
         public EnumProperty<EAlignItems> AlignSelf => (EnumProperty<EAlignItems>)Get(ECssPropertyID.AlignSelf)!;
-        
+
         /// <summary>
         /// Sets the gap between rows in flex/grid containers.
         /// </summary>
         public IntProperty RowGap => (IntProperty)Get(ECssPropertyID.RowGap)!;
-        
+
         /// <summary>
         /// Sets the gap between columns in flex/grid containers.
         /// </summary>
@@ -334,32 +334,32 @@ namespace CssUI.CSS
         /// Controls the auto-placement algorithm (row, column, dense).
         /// </summary>
         public EnumProperty<EGridAutoFlow> GridAutoFlow => (EnumProperty<EGridAutoFlow>)Get(ECssPropertyID.GridAutoFlow)!;
-        
+
         /// <summary>
         /// Specifies a grid item's start position in the column direction.
         /// </summary>
         public IntProperty GridColumnStart => (IntProperty)Get(ECssPropertyID.GridColumnStart)!;
-        
+
         /// <summary>
         /// Specifies a grid item's end position in the column direction.
         /// </summary>
         public IntProperty GridColumnEnd => (IntProperty)Get(ECssPropertyID.GridColumnEnd)!;
-        
+
         /// <summary>
         /// Specifies a grid item's start position in the row direction.
         /// </summary>
         public IntProperty GridRowStart => (IntProperty)Get(ECssPropertyID.GridRowStart)!;
-        
+
         /// <summary>
         /// Specifies a grid item's end position in the row direction.
         /// </summary>
         public IntProperty GridRowEnd => (IntProperty)Get(ECssPropertyID.GridRowEnd)!;
-        
+
         /// <summary>
         /// Defines the columns of a grid container (e.g., "1fr 2fr 100px").
         /// </summary>
         public StringProperty GridTemplateColumns => (StringProperty)Get(ECssPropertyID.GridTemplateColumns)!;
-        
+
         /// <summary>
         /// Defines the rows of a grid container (e.g., "auto 1fr 200px").
         /// </summary>
@@ -407,7 +407,7 @@ namespace CssUI.CSS
             this.ReadOnly = ReadOnly;
             var selfRef = new WeakReference<CssComputedStyle>(this);
 
-            CssProperties = new List<ICssProperty>(MAX_PROPERTY_ID_INDEX+1);
+            CssProperties = new List<ICssProperty>(MAX_PROPERTY_ID_INDEX + 1);
 
             CssProperties[(int)ECssPropertyID.Top] = new IntProperty(ECssPropertyID.Top, Owner, selfRef, this.ReadOnly);
             CssProperties[(int)ECssPropertyID.Right] = new IntProperty(ECssPropertyID.Right, Owner, selfRef, this.ReadOnly);
@@ -419,7 +419,7 @@ namespace CssUI.CSS
             CssProperties[(int)ECssPropertyID.Display] = new EnumProperty<EDisplayMode>(ECssPropertyID.Display, Owner, selfRef, this.ReadOnly);
             CssProperties[(int)ECssPropertyID.BoxSizing] = new EnumProperty<EBoxSizingMode>(ECssPropertyID.BoxSizing, Owner, selfRef, this.ReadOnly);
             CssProperties[(int)ECssPropertyID.Positioning] = new EnumProperty<EBoxPositioning>(ECssPropertyID.Positioning, Owner, selfRef, this.ReadOnly);
-            
+
             CssProperties[(int)ECssPropertyID.ScrollBehavior] = new EnumProperty<EScrollBehavior>(ECssPropertyID.ScrollBehavior, Owner, selfRef, this.ReadOnly);
             CssProperties[(int)ECssPropertyID.OverflowX] = new EnumProperty<EOverflowMode>(ECssPropertyID.OverflowX, Owner, selfRef, this.ReadOnly);
             CssProperties[(int)ECssPropertyID.OverflowY] = new EnumProperty<EOverflowMode>(ECssPropertyID.OverflowY, Owner, selfRef, this.ReadOnly);
@@ -448,7 +448,7 @@ namespace CssUI.CSS
             CssProperties[(int)ECssPropertyID.PaddingRight] = new IntProperty(ECssPropertyID.PaddingRight, Owner, selfRef, this.ReadOnly);
             CssProperties[(int)ECssPropertyID.PaddingBottom] = new IntProperty(ECssPropertyID.PaddingBottom, Owner, selfRef, this.ReadOnly);
             CssProperties[(int)ECssPropertyID.PaddingLeft] = new IntProperty(ECssPropertyID.PaddingLeft, Owner, selfRef, this.ReadOnly);
-            
+
             CssProperties[(int)ECssPropertyID.BorderTopStyle] = new EnumProperty<EBorderStyle>(ECssPropertyID.BorderTopStyle, Owner, selfRef, this.ReadOnly);
             CssProperties[(int)ECssPropertyID.BorderRightStyle] = new EnumProperty<EBorderStyle>(ECssPropertyID.BorderRightStyle, Owner, selfRef, this.ReadOnly);
             CssProperties[(int)ECssPropertyID.BorderBottomStyle] = new EnumProperty<EBorderStyle>(ECssPropertyID.BorderBottomStyle, Owner, selfRef, this.ReadOnly);
@@ -458,7 +458,7 @@ namespace CssUI.CSS
             CssProperties[(int)ECssPropertyID.BorderRightWidth] = new IntProperty(ECssPropertyID.BorderRightWidth, Owner, selfRef, this.ReadOnly);
             CssProperties[(int)ECssPropertyID.BorderBottomWidth] = new IntProperty(ECssPropertyID.BorderBottomWidth, Owner, selfRef, this.ReadOnly);
             CssProperties[(int)ECssPropertyID.BorderLeftWidth] = new IntProperty(ECssPropertyID.BorderLeftWidth, Owner, selfRef, this.ReadOnly);
-            
+
             CssProperties[(int)ECssPropertyID.TextAlign] = new EnumProperty<ETextAlign>(ECssPropertyID.TextAlign, Owner, selfRef, this.ReadOnly);
 
             CssProperties[(int)ECssPropertyID.DpiX] = new NumberProperty(ECssPropertyID.DpiX, Owner, selfRef, this.ReadOnly);
@@ -473,7 +473,7 @@ namespace CssUI.CSS
 
             CssProperties[(int)ECssPropertyID.LineHeight] = new IntProperty(ECssPropertyID.LineHeight, Owner, selfRef, this.ReadOnly);
             CssProperties[(int)ECssPropertyID.Transform] = new TransformListProperty(ECssPropertyID.Transform, Owner, selfRef, this.ReadOnly);
-            
+
             /*CssPropertyMap = new ConcurrentDictionary<AtomicName<ECssPropertyID>, ICssProperty>(3, CssProperties.Count);
             for (int i = 0; i < CssProperties.Count; i++)
             {
@@ -631,7 +631,7 @@ namespace CssUI.CSS
             */
         }
         #endregion
-        
+
         #region Padding Helpers
         public void Set_Padding(int? horizontal, int? vertical)
         {

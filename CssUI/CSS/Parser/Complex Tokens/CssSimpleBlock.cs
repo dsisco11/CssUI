@@ -24,7 +24,7 @@ namespace CssUI.CSS
             sb.AppendLine();
             foreach (CssToken t in Values) { sb.Append(t.Encode()); }
             sb.AppendLine();
-            switch(StartToken.Type)
+            switch (StartToken.Type)
             {
                 case ECssTokenType.Parenth_Open:
                     sb.Append(")");

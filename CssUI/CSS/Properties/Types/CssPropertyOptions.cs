@@ -85,7 +85,7 @@ namespace CssUI.CSS
             switch (Value.Type)
             {
                 case ECssValueTypes.AUTO:
-                    if (!AllowAuto) throw new Exception(string.Concat("The property(", Owner.CssName,") cannot be set to AUTO!"));
+                    if (!AllowAuto) throw new Exception(string.Concat("The property(", Owner.CssName, ") cannot be set to AUTO!"));
                     break;
                 case ECssValueTypes.INHERIT:
                     if (!AllowInherited) throw new Exception(string.Concat("The property(", Owner.CssName, ") cannot be set to INHERITED!"));

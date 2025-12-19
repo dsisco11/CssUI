@@ -36,7 +36,7 @@ namespace CssUI.DOM.Events
         [MetaKeyword("dblclick")]
         DoubleClick,
 
-    /* Drag drop */
+        /* Drag drop */
         [MetaKeyword("drag")]
         Drag,
         [MetaKeyword("dragend")]
@@ -89,7 +89,7 @@ namespace CssUI.DOM.Events
         [MetaKeyword("loadstart")]
         LoadStart,
 
-/* Mouse input */
+        /* Mouse input */
         [MetaKeyword("mousedown")]
         MouseDown,
         [MetaKeyword("mouseenter")]
@@ -107,8 +107,8 @@ namespace CssUI.DOM.Events
         [MetaKeyword("wheel")]
         Wheel,
 
-/* Pointer input */
-/* Docs: https://w3c.github.io/pointerevents/#intro */
+        /* Pointer input */
+        /* Docs: https://w3c.github.io/pointerevents/#intro */
         [MetaKeyword("pointerover")]
         PointerOver,
         [MetaKeyword("pointerdown")]
@@ -184,7 +184,7 @@ namespace CssUI.DOM.Events
         SelectStart,
         [MetaKeyword("selectionchange")]
         SelectionChange,
-        
+
         [MetaKeyword("copy")]
         Copy,
         [MetaKeyword("cut")]
@@ -192,7 +192,7 @@ namespace CssUI.DOM.Events
         [MetaKeyword("paste")]
         Paste,
 
-/* Window events */
+        /* Window events */
         [MetaKeyword("afterprint")]
         AfterPrint,
         [MetaKeyword("beforeprint")]

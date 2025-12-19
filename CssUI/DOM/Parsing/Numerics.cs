@@ -239,7 +239,7 @@ namespace CssUI.Serialization
                 throw new DomSyntaxError($"Unable to parse \"{Stream.AsSpan().ToString()}\" as floating-point number");
             }
         }
-        
+
 
         public static bool Try_Parse_FloatingPoint(ReadOnlyMemory<char> input, out double outValue)
         {
@@ -375,7 +375,7 @@ namespace CssUI.Serialization
             var roundedValue = Math.Round(value, MidpointRounding.ToEven);
 
             /* 17) If rounded-value is 21024 or −21024, return an error. */
-            if ((roundedValue ==  double.MinValue) || (roundedValue ==  double.MaxValue))
+            if ((roundedValue == double.MinValue) || (roundedValue == double.MaxValue))
             {
                 outValue = double.NaN;
                 return false;

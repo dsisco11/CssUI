@@ -20,7 +20,7 @@ namespace CssUI.CSS.Internal
         internal static readonly ReadOnlyDictionary<AtomicName<ECssPropertyID>, StyleDefinition> StyleDefinitions = new ReadOnlyDictionary<AtomicName<ECssPropertyID>, StyleDefinition>(Create_Style_Definitions());
         internal static readonly ReadOnlyDictionary<AtomicName<EMediaFeatureName>, MediaDefinition> MediaDefinitions = new ReadOnlyDictionary<AtomicName<EMediaFeatureName>, MediaDefinition>(Create_Media_Definitions());
 
-        
+
         #region Media Definitions
         static Dictionary<AtomicName<EMediaFeatureName>, MediaDefinition> Create_Media_Definitions()
         {
@@ -386,7 +386,7 @@ namespace CssUI.CSS.Internal
                 new StyleDefinition(ECssPropertyID.ColumnGap, false, EPropertyDirtFlags.Flow, CssValue.From(0.0), ECssValueTypes.DIMENSION | ECssValueTypes.PERCENT, null, false, CssPercentageResolvers.Containing_Block_Logical_Width)
             };
         }
-#endregion
+        #endregion
     }
 }
 

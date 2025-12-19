@@ -14,7 +14,7 @@ namespace CssUI.Rendering
 
         public abstract T From(uint n);
         public abstract T From(Vector4 vector);
-               
+
 
         #region Scalars
         public abstract Vector4 GetVector();

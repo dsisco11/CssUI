@@ -233,11 +233,11 @@ namespace CssUI.CSS.Formatting
             string? columnTemplate = style?.GridTemplateColumns;
             string? rowTemplate = style?.GridTemplateRows;
 
-            _explicitColumnTracks = !string.IsNullOrEmpty(columnTemplate) 
-                ? GridTrackList.Parse(columnTemplate) 
+            _explicitColumnTracks = !string.IsNullOrEmpty(columnTemplate)
+                ? GridTrackList.Parse(columnTemplate)
                 : new GridTrackList();
-            _explicitRowTracks = !string.IsNullOrEmpty(rowTemplate) 
-                ? GridTrackList.Parse(rowTemplate) 
+            _explicitRowTracks = !string.IsNullOrEmpty(rowTemplate)
+                ? GridTrackList.Parse(rowTemplate)
                 : new GridTrackList();
 
             // Find the maximum column and row needed from items

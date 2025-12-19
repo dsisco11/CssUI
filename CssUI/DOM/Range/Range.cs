@@ -18,10 +18,10 @@ namespace CssUI.DOM
     public class Range : AbstractRange
     {/* Docs: https://dom.spec.whatwg.org/#interface-range */
 
-#region Properties
-#endregion
+        #region Properties
+        #endregion
 
-#region Accessors
+        #region Accessors
         internal BoundaryPoint start { get => new BoundaryPoint() { node = startContainer, offset = startOffset }; }
         internal BoundaryPoint end { get => new BoundaryPoint() { node = endContainer, offset = endOffset }; }
         public Node? root { get => startContainer?.getRootNode(); }
@@ -37,9 +37,9 @@ namespace CssUI.DOM
                 return container;
             }
         }
-#endregion
+        #endregion
 
-#region Constructors
+        #region Constructors
         private Range()
         {
             /* Add self to list of live ranges */
@@ -75,9 +75,9 @@ namespace CssUI.DOM
                 }
             }
         }
-#endregion
-        
-#region Utility
+        #endregion
+
+        #region Utility
         /// <summary>
         /// A node is partially contained in a live range if it’s an inclusive ancestor of the live range’s start node but not its end node, or vice versa.
         /// </summary>
@@ -157,7 +157,7 @@ namespace CssUI.DOM
 
             return EBoundaryPosition.Before;
         }
-#endregion
+        #endregion
 
         public void setStart(Node node, int offset)
         {
@@ -785,7 +785,7 @@ namespace CssUI.DOM
 
             int offset = node.index;
             var point1 = new BoundaryPoint() { node = parent, offset = offset };
-            var point2 = new BoundaryPoint() { node = parent, offset = offset+1 };
+            var point2 = new BoundaryPoint() { node = parent, offset = offset + 1 };
             /* 5) If (parent, offset) is before end and (parent, offset plus 1) is after start, return true. */
             if (Get_Boundary_Position(point1, end) == EBoundaryPosition.Before && Get_Boundary_Position(point2, start) == EBoundaryPosition.After)
                 return true;
@@ -858,7 +858,7 @@ namespace CssUI.DOM
             return DOMCommon.getBoundingClientRect(getClientRects());
         }
 
-#region ToString
+        #region ToString
         public override string ToString()
         {/* Docs: https://dom.spec.whatwg.org/#dom-range-stringifier */
             /* 2) If the context object’s start node is the context object’s end node and it is a Text node, then return the substring of that Text node’s data beginning at the context object’s start offset and ending at the context object’s end offset. */
@@ -872,7 +872,7 @@ namespace CssUI.DOM
 
             /* 4) Append the concatenation of the data of all Text nodes that are contained in the context object, in tree order, to s. */
             var allNodes = DOMCommon.Get_Range_Nodes(this);
-            foreach(Node node in allNodes)
+            foreach (Node node in allNodes)
             {
                 if (node is Text textNode)
                 {
@@ -887,7 +887,7 @@ namespace CssUI.DOM
 
             return sb.ToString();
         }
-#endregion
+        #endregion
     }
 }
 

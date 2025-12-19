@@ -91,9 +91,9 @@ namespace CssUI
         {
             if (metaEnum is null) throw new ArgumentNullException(nameof(metaEnum));
             Contract.EndContractBlock();
-            
+
             Type underlyingType = metaEnum.GetEnumUnderlyingType();
-            var castMethod = typeof(EnumMetaTable).GetMethod("IntCast")?.MakeGenericMethod(underlyingType) 
+            var castMethod = typeof(EnumMetaTable).GetMethod("IntCast")?.MakeGenericMethod(underlyingType)
                 ?? throw new InvalidOperationException("IntCast method not found");
             var enumMaxMethod = typeof(EnumMetaTable).GetMethod("EnumMaxValue")?.MakeGenericMethod(metaEnum)
                 ?? throw new InvalidOperationException("EnumMaxValue method not found");

@@ -26,7 +26,7 @@ namespace CssUI.Rendering
         public readonly static Color MinValue = new Color(byte.MinValue, byte.MinValue, byte.MinValue);
         public readonly static Color MaxValue = new Color(byte.MaxValue, byte.MaxValue, byte.MaxValue);
         #endregion
-        
+
         #region Properties
         /// <summary>Red channel value in the range [0-255]</summary>
         private byte red;

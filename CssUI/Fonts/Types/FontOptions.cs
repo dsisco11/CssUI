@@ -16,7 +16,7 @@ namespace CssUI.Fonts
         #region Constructors
         public FontOptions(string Family, double Size, int Weight = 400, EFontStyle Style = EFontStyle.Normal)
         {
-            this.Families = new string[1]{ Family };
+            this.Families = new string[1] { Family };
             this.Size = Size;
             this.Weight = Weight;
             this.Style = Style;

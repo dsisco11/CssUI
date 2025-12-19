@@ -127,7 +127,7 @@ namespace CssUI.CSS
                     return new Rect2f(Box.Intrinsic_Width.Value, Box.Intrinsic_Height.Value);
                 }
             }
-            else if(Box.Intrinsic_Width.HasValue ^ Box.Intrinsic_Height.HasValue)
+            else if (Box.Intrinsic_Width.HasValue ^ Box.Intrinsic_Height.HasValue)
             {
                 /* Step 1 */
                 if (Box.Intrinsic_Ratio.HasValue)

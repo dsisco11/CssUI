@@ -27,7 +27,7 @@ namespace CssUI.CSS.Parser
         {
             if (buf.Count < BOM_BUFFER.Length) return false;
 
-            for (int i=0; i< BOM_BUFFER.Length; i++)
+            for (int i = 0; i < BOM_BUFFER.Length; i++)
             {
                 if (buf[i] != BOM_BUFFER[i]) return false;
             }
@@ -55,8 +55,8 @@ namespace CssUI.CSS.Parser
             bool BOM_Seen = false;
             Encoding? enc = null;
             List<byte> buf = new List<byte>();
-            
-            for (int i=0; i<3; i++)
+
+            for (int i = 0; i < 3; i++)
             {
                 int b = stream.ReadByte();
                 if (b == -1) break;// EOF

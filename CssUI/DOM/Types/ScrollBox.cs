@@ -40,21 +40,21 @@ namespace CssUI.DOM
         /// The horizontal scroll bar bounds
         /// </summary>
         public DOMRectReadOnly? HScrollBar { get; private set; } = null;
-/*
-        /// <summary>
-        /// Determines along which edge of this box the (horizontal) scrollbar will be rendered on.
-        /// <para><see cref="EDirection.LTR"/> = Bottom</para>
-        /// <para><see cref="EDirection.RTL"/> = Top</para>
-        /// </summary>
-        public EDirection HScrollbarSide = EDirection.LTR;
+        /*
+                /// <summary>
+                /// Determines along which edge of this box the (horizontal) scrollbar will be rendered on.
+                /// <para><see cref="EDirection.LTR"/> = Bottom</para>
+                /// <para><see cref="EDirection.RTL"/> = Top</para>
+                /// </summary>
+                public EDirection HScrollbarSide = EDirection.LTR;
 
-        /// <summary>
-        /// Determines along which edge of this box the (vertical) scrollbar will be rendered on.
-        /// <para><see cref="EDirection.LTR"/> = Right</para>
-        /// <para><see cref="EDirection.RTL"/> = Left</para>
-        /// </summary>
-        public EDirection VScrollbarSide = EDirection.LTR;
-*/
+                /// <summary>
+                /// Determines along which edge of this box the (vertical) scrollbar will be rendered on.
+                /// <para><see cref="EDirection.LTR"/> = Right</para>
+                /// <para><see cref="EDirection.RTL"/> = Left</para>
+                /// </summary>
+                public EDirection VScrollbarSide = EDirection.LTR;
+        */
         #endregion
 
         #region Accessors

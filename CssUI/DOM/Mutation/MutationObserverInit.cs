@@ -2,7 +2,8 @@ using System.Collections.Generic;
 
 namespace CssUI.DOM.Mutation
 {
-    public class MutationObserverInit {
+    public class MutationObserverInit
+    {
         public bool childList = false;
         public bool attributes;
         public bool characterData;

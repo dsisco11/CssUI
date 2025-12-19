@@ -79,7 +79,7 @@ namespace CssUI.CSS
         /// <param name="index">The index to check</param>
         public bool Match(int index)
         {
-            return (A % (index+B)) == 0;
+            return (A % (index + B)) == 0;
         }
     }
 }

@@ -138,7 +138,7 @@ namespace CssUI.DOM.Events
         #endregion
 
         #region Constructors
-        public MouseEvent(EEventName type, MouseEventInit eventInit)  : base(type, eventInit)
+        public MouseEvent(EEventName type, MouseEventInit eventInit) : base(type, eventInit)
         {
             screenX = eventInit.screenX;
             screenY = eventInit.screenY;

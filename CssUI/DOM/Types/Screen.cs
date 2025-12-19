@@ -35,7 +35,7 @@ namespace CssUI.DOM
         /// <summary>
         /// The height of the output device, in CSS pixels.
         /// </summary>
-        public abstract long height { get;  }
+        public abstract long height { get; }
 
         /// <summary>
         /// The color depth of the current output devices screen

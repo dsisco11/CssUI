@@ -37,19 +37,19 @@ namespace CssUI
         #region TryAdd
         public bool TryAdd(Key1 key1, Key2 key2, Vty value)
         {
-            if ( !Map.ContainsKey(key1) )
+            if (!Map.ContainsKey(key1))
             {
                 Map.TryAdd(key1, new ConcurrentDictionary<Key2, Vty>());
             }
 
-            if ( !MapInverse.ContainsKey(key2) )
+            if (!MapInverse.ContainsKey(key2))
             {
                 MapInverse.TryAdd(key2, new ConcurrentDictionary<Key1, Vty>());
             }
 
-            if ( Map[key1].TryAdd(key2, value) )
+            if (Map[key1].TryAdd(key2, value))
             {
-                if ( !MapInverse[key2].TryAdd(key1, value) )
+                if (!MapInverse[key2].TryAdd(key1, value))
                 {
                     Log.Error(nameof(ConcurrentDoubleKeyDictionary<Key1, Key2, Vty>), $"Failed to add entry to inverse map!");
                 }
@@ -64,11 +64,11 @@ namespace CssUI
         #region TryRemove
         public bool TryRemove(Key1 key1, Key2 key2)
         {
-            if ( Map.ContainsKey(key1) )
+            if (Map.ContainsKey(key1))
             {
-                if ( Map[key1].TryRemove(key2, out var subList) )
+                if (Map[key1].TryRemove(key2, out var subList))
                 {
-                    if ( MapInverse.ContainsKey(key2) )
+                    if (MapInverse.ContainsKey(key2))
                     {
                         MapInverse[key2].TryRemove(key1, out var _);
                         if (MapInverse.Keys.Count <= 0)
@@ -125,9 +125,9 @@ namespace CssUI
         #region Contains
         public bool Contains(Key1 key1, Key2 key2)
         {
-            if ( Map.ContainsKey( key1 ) )
+            if (Map.ContainsKey(key1))
             {
-                if ( Map[key1].ContainsKey( key2 ) )
+                if (Map[key1].ContainsKey(key2))
                 {
                     return true;
                 }
@@ -173,9 +173,9 @@ namespace CssUI
 
         public bool Lookup(Key1 key1, Key2 key2, out Vty Value)
         {
-            if ( Map.TryGetValue(key1, out var subMap) )
+            if (Map.TryGetValue(key1, out var subMap))
             {
-                if ( subMap.TryGetValue(key2, out var v) )
+                if (subMap.TryGetValue(key2, out var v))
                 {
                     Value = v;
                     return true;

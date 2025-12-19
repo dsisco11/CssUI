@@ -33,7 +33,7 @@ namespace CssUI.CSS
         {
             // Get intrinsic size (cached)
             var intrinsic = box.GetIntrinsicSize();
-            
+
             // Use fit-content algorithm: clamp(min-content, max-content, available)
             return IntrinsicSizeCalculator.FitContent(intrinsic.Inline, availableWidth);
         }
@@ -314,11 +314,11 @@ namespace CssUI.CSS
         {
             Calculate_Horizontal(Box, Cascaded, Left, MarginLeft, Width, MarginRight, Right, out CssValue outLeft, out CssValue outMarginLeft, out CssValue outWidth, out CssValue outMarginRight, out CssValue outRight);
 
-            Left        = outLeft;
-            MarginLeft  = outMarginLeft;
-            Width       = outWidth;
+            Left = outLeft;
+            MarginLeft = outMarginLeft;
+            Width = outWidth;
             MarginRight = outMarginRight;
-            Right       = outRight;
+            Right = outRight;
         }
 
         /// <summary>
@@ -326,20 +326,20 @@ namespace CssUI.CSS
         /// </summary>
         private static void Calculate_Horizontal(CssPrincipalBox Box, CssComputedStyle Cascaded, CssValue Left, CssValue MarginLeft, CssValue Width, CssValue MarginRight, CssValue Right, out CssValue outLeft, out CssValue outMarginLeft, out CssValue outWidth, out CssValue outMarginRight, out CssValue outRight)
         {// Docs: https://www.w3.org/TR/CSS22/visudet.html#Computing_widths_and_margins
-         /*
-          * The values of an element's 'width', 'margin-left', 'margin-right', 'left' and 'right' properties as used for layout depend on the type of box generated and on each other. (The value used for layout is sometimes referred to as the used value.) In principle, the values used are the same as the computed values, with 'auto' replaced by some suitable value, and percentages calculated based on the containing block, but there are exceptions. The following situations need to be distinguished:
-          * 
-          * inline, non-replaced elements
-          * inline, replaced elements
-          * block-level, non-replaced elements in normal flow
-          * block-level, replaced elements in normal flow
-          * floating, non-replaced elements
-          * floating, replaced elements
-          * absolutely positioned, non-replaced elements
-          * absolutely positioned, replaced elements
-          * 'inline-block', non-replaced elements in normal flow
-          * 'inline-block', replaced elements in normal flow
-          */
+            /*
+             * The values of an element's 'width', 'margin-left', 'margin-right', 'left' and 'right' properties as used for layout depend on the type of box generated and on each other. (The value used for layout is sometimes referred to as the used value.) In principle, the values used are the same as the computed values, with 'auto' replaced by some suitable value, and percentages calculated based on the containing block, but there are exceptions. The following situations need to be distinguished:
+             * 
+             * inline, non-replaced elements
+             * inline, replaced elements
+             * block-level, non-replaced elements in normal flow
+             * block-level, replaced elements in normal flow
+             * floating, non-replaced elements
+             * floating, replaced elements
+             * absolutely positioned, non-replaced elements
+             * absolutely positioned, replaced elements
+             * 'inline-block', non-replaced elements in normal flow
+             * 'inline-block', replaced elements in normal flow
+             */
 
             /* Setup some commonly used variables*/
             bool autoHeight = Cascaded.Height.Computed.IsAuto;
@@ -398,10 +398,10 @@ namespace CssUI.CSS
                                 if (!Box.Containing_Box_Dependent)
                                 {/* 'margin-left' + 'border-left-width' + 'padding-left' + 'width' + 'padding-right' + 'border-right-width' + 'margin-right' = width of containing block */
                                     var eqRes = (marginLeft + BorderLeft + PaddingLeft + PaddingRight + BorderRight + marginRight);
-                                    Width = CssValue.From( CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes);
+                                    Width = CssValue.From(CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes);
                                 }
                             }
-                            else if(Width.IsAuto && Box.Intrinsic_Width.HasValue) /* Otherwise, if 'width' has a computed value of 'auto', and the element has an intrinsic width, then that intrinsic width is the used value of 'width'. */
+                            else if (Width.IsAuto && Box.Intrinsic_Width.HasValue) /* Otherwise, if 'width' has a computed value of 'auto', and the element has an intrinsic width, then that intrinsic width is the used value of 'width'. */
                             {
                                 Width = CssValue.From(Box.Intrinsic_Width.Value);
                             }
@@ -434,7 +434,7 @@ namespace CssUI.CSS
                             /* If all of the above have a computed value other than 'auto', the values are said to be "over-constrained" and one of the used values will have to be different from its computed value. If the 'direction' property of the containing block has the value 'ltr', the specified value of 'margin-right' is ignored and the value is calculated so as to make the equality true. If the value of 'direction' is 'rtl', this happens to 'margin-left' instead. */
                             if (OverConstrained)
                             {
-                                switch(Direction)
+                                switch (Direction)
                                 {
                                     case EDirection.LTR:
                                         {
@@ -542,7 +542,7 @@ namespace CssUI.CSS
                                 if (MarginRight.IsAuto)
                                     MarginRight = CssValue.Zero;
                             }
-                            
+
                             bool singleAuto = (MarginLeft.IsAuto ^ Width.IsAuto ^ MarginRight.IsAuto);
                             bool OverConstrained = !(MarginLeft.IsAuto && Width.IsAuto && MarginRight.IsAuto);
 
@@ -602,7 +602,7 @@ namespace CssUI.CSS
                              * If 'width' is computed as 'auto', the used value is the "shrink-to-fit" width.
                              * Calculation of the shrink-to-fit width is similar to calculating the width of a table cell using the automatic table layout algorithm. Roughly: calculate the preferred width by formatting the content without breaking lines other than where explicit line breaks occur, and also calculate the preferred minimum width, e.g., by trying all possible line breaks. CSS 2.1 does not define the exact algorithm. Thirdly, find the available width: in this case, this is the width of the containing block minus the used values of 'margin-left', 'border-left-width', 'padding-left', 'padding-right', 'border-right-width', 'margin-right', and the widths of any relevant scroll bars. 
                              */
-                             if (Width.IsAuto)
+                            if (Width.IsAuto)
                             {
                                 var sbWidth = CssCommon.SnapToPixel(Box.Owner?.ScrollBox?.VScrollBar?.Width ?? 0);
                                 var total = (marginLeft + BorderLeft + PaddingLeft + 0 + PaddingRight + BorderRight + marginRight + sbWidth);
@@ -685,7 +685,7 @@ namespace CssUI.CSS
                                     eqRes = (Left.AsDecimal() + marginLeft + BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight + marginRight + 0);
                                     Right = CssValue.From(Math.Max(0, CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes));
                                 }
-                                else if(Direction == EDirection.RTL)
+                                else if (Direction == EDirection.RTL)
                                 {
                                     Right = CssValue.From(Box.Layout_Pos_X);
                                     /* Apply Rule #1 */
@@ -804,7 +804,7 @@ namespace CssUI.CSS
                                     eqRes = (Left.AsDecimal() + MarginLeft.AsDecimal() + BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight + MarginRight.AsDecimal() + 0);
                                     Right = CssValue.From(CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes);
                                 }
-                                else if(Left.IsAuto && !Width.IsAuto && !Right.IsAuto)
+                                else if (Left.IsAuto && !Width.IsAuto && !Right.IsAuto)
                                 {/* Apply Rule #4 */
                                     /* Solve for 'left' */
                                     var eqRes = (0 + MarginLeft.AsDecimal() + BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight + MarginRight.AsDecimal() + Right.AsDecimal());
@@ -1054,20 +1054,20 @@ namespace CssUI.CSS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void Calculate_Vertical(CssPrincipalBox Box, CssComputedStyle Cascaded, CssValue Top, CssValue MarginTop, CssValue Height, CssValue MarginBottom, CssValue Bottom, CssValue Width, out CssValue outTop, out CssValue outMarginTop, out CssValue outHeight, out CssValue outMarginBottom, out CssValue outBottom)
         {// Docs: https://www.w3.org/TR/CSS22/visudet.html#Computing_heights_and_margins
-         /*
-          * The values of an element's 'width', 'margin-left', 'margin-right', 'left' and 'right' properties as used for layout depend on the type of box generated and on each other. (The value used for layout is sometimes referred to as the used value.) In principle, the values used are the same as the computed values, with 'auto' replaced by some suitable value, and percentages calculated based on the containing block, but there are exceptions. The following situations need to be distinguished:
-          * 
-          * inline, non-replaced elements
-          * inline, replaced elements
-          * block-level, non-replaced elements in normal flow
-          * block-level, replaced elements in normal flow
-          * floating, non-replaced elements
-          * floating, replaced elements
-          * absolutely positioned, non-replaced elements
-          * absolutely positioned, replaced elements
-          * 'inline-block', non-replaced elements in normal flow
-          * 'inline-block', replaced elements in normal flow
-          */
+            /*
+             * The values of an element's 'width', 'margin-left', 'margin-right', 'left' and 'right' properties as used for layout depend on the type of box generated and on each other. (The value used for layout is sometimes referred to as the used value.) In principle, the values used are the same as the computed values, with 'auto' replaced by some suitable value, and percentages calculated based on the containing block, but there are exceptions. The following situations need to be distinguished:
+             * 
+             * inline, non-replaced elements
+             * inline, replaced elements
+             * block-level, non-replaced elements in normal flow
+             * block-level, replaced elements in normal flow
+             * floating, non-replaced elements
+             * floating, replaced elements
+             * absolutely positioned, non-replaced elements
+             * absolutely positioned, replaced elements
+             * 'inline-block', non-replaced elements in normal flow
+             * 'inline-block', replaced elements in normal flow
+             */
 
             /* Setup some commonly used variables*/
             bool autoWidth;
@@ -1093,7 +1093,7 @@ namespace CssUI.CSS
 
             if (Box.IsReplacedElement)
             {
-                switch(Box.DisplayGroup)
+                switch (Box.DisplayGroup)
                 {
                     case EBoxDisplayGroup.INLINE:
                     case EBoxDisplayGroup.BLOCK:
@@ -1147,7 +1147,7 @@ namespace CssUI.CSS
                         /* 10.6.3 Block-level non-replaced elements in normal flow when 'overflow' computes to 'visible' */
                         if (!Box.IsReplacedElement)
                         {/* This section also applies to block-level non-replaced elements in normal flow when 'overflow' does not compute to 'visible' but has been propagated to the viewport. */
-                         /* If 'margin-top', or 'margin-bottom' are 'auto', their used value is 0. If 'height' is 'auto', the height depends on whether the element has any block-level children and whether it has padding or borders: */
+                            /* If 'margin-top', or 'margin-bottom' are 'auto', their used value is 0. If 'height' is 'auto', the height depends on whether the element has any block-level children and whether it has padding or borders: */
 
                             if (Box.Style.Overflow_X == EOverflowMode.Visible)
                             {
@@ -1216,7 +1216,7 @@ namespace CssUI.CSS
                                 {
                                     var eqRes = (Top.AsDecimal() + 0 + BorderTop + PaddingTop + heightVal + PaddingBottom + BorderBottom + 0 + Bottom.AsDecimal());
                                     var avail = (CssCommon.Get_Logical_Height(WritingMode, Box.Containing_Box) - eqRes);
-                                    MarginTop = MarginBottom = CssValue.From(avail/2);
+                                    MarginTop = MarginBottom = CssValue.From(avail / 2);
                                 }
                                 else if (MarginTop.IsAuto ^ MarginBottom.IsAuto)
                                 {/* Only a single margin is 'auto' */
@@ -1290,7 +1290,7 @@ namespace CssUI.CSS
                                 var eqRes = (0 + MarginTop.AsDecimal() + BorderTop + PaddingTop + Height.AsDecimal() + PaddingBottom + BorderBottom + MarginBottom.AsDecimal() + Bottom.AsDecimal());
                                 Top = CssValue.From(CssCommon.Get_Logical_Height(WritingMode, Box.Containing_Box) - eqRes);
                             }
-                            else if(Height.IsAuto && !Top.IsAuto && !Bottom.IsAuto)
+                            else if (Height.IsAuto && !Top.IsAuto && !Bottom.IsAuto)
                             {
                                 if (MarginTop.IsAuto) MarginTop = CssValue.Zero;
                                 if (MarginBottom.IsAuto) MarginBottom = CssValue.Zero;
@@ -1493,7 +1493,7 @@ namespace CssUI.CSS
 
                     node = node.previousElementSibling;
                 }
-                
+
                 return (bottomEdge - topEdge);
             }
         }

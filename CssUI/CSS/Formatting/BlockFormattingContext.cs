@@ -18,7 +18,7 @@ namespace CssUI.CSS.Formatting
             {
                 if (Current.previousSibling is null)
                 {
-                    Current.Position = Point2f.Zero; 
+                    Current.Position = Point2f.Zero;
                 }
                 else
                 {

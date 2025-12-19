@@ -7,7 +7,7 @@ namespace CssUI.CSS.Internal
     {/* Docs: https://www.w3.org/TR/2018/REC-selectors-3-20181106/#combinators */
 
         None = 0,
-        
+
         /// <summary>
         /// '>>' or ' '
         /// Descendant combinators express such a relationship. 

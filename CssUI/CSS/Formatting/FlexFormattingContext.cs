@@ -223,14 +223,14 @@ namespace CssUI.CSS.Formatting
             if (IsMainAxisHorizontal)
             {
                 minMain = (float)(style?.Min_Width ?? 0);
-                maxMain = style?.Max_Width.HasValue == true 
+                maxMain = style?.Max_Width.HasValue == true
                     ? (float)style.Max_Width.Value
                     : float.MaxValue;
             }
             else
             {
                 minMain = (float)(style?.Min_Height ?? 0);
-                maxMain = style?.Max_Height.HasValue == true 
+                maxMain = style?.Max_Height.HasValue == true
                     ? (float)style.Max_Height.Value
                     : float.MaxValue;
             }
@@ -413,7 +413,7 @@ namespace CssUI.CSS.Formatting
                 int gapCount = Math.Max(0, line.Items.Count - 1);
                 float totalGapSpace = gapCount * _mainAxisGap;
                 float remainingSpace = _availableMainSpace - totalItemsMainSize - totalGapSpace;
-                
+
                 float position = CalculateMainAxisStartPosition(justifyContent, remainingSpace, line.Items.Count);
                 float extraGap = CalculateMainAxisGap(justifyContent, remainingSpace, line.Items.Count);
 
@@ -466,10 +466,10 @@ namespace CssUI.CSS.Formatting
             for (int lineIndex = 0; lineIndex < _flexLines.Count; lineIndex++)
             {
                 var line = _flexLines[lineIndex];
-                
+
                 // Add gap between lines (not before first line)
                 float gapBefore = lineIndex > 0 ? _crossAxisGap : 0;
-                
+
                 if (IsWrapReversed)
                 {
                     linePosition -= line.CrossSize;

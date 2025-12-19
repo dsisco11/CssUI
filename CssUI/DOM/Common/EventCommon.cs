@@ -346,13 +346,13 @@ namespace CssUI.DOM.Internal
             /* 3) Return found. */
             return found;
         }
-        
+
         public static EventTarget? determine_target(EventTarget eventTarget, EventName Name)
         {/* Docs: https://html.spec.whatwg.org/multipage/webappapis.html#determining-the-target-of-an-event-handler */
-         /* 1) If eventTarget is not a body element or a frameset element, then return eventTarget. */
+            /* 1) If eventTarget is not a body element or a frameset element, then return eventTarget. */
             if ((eventTarget is Element element) && !element.tagName.Equals("body") && element.tagName.Equals("frameset"))
                 return eventTarget;
-            
+
             /* 2) If name is not the name of an attribute member of the WindowEventHandlers interface mixin and the Window-reflecting body element event handler set does not contain name, then return eventTarget. */
             if (!EventCommon.Is_Window_Event(Name.EnumValue) && !EventCommon.Is_Window_Reflecting_Body_Element_Event(Name.EnumValue))
                 return eventTarget;

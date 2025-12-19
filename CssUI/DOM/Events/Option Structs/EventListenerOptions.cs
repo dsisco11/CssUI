@@ -4,7 +4,7 @@ namespace CssUI.DOM.Events
     {
         public readonly bool capture = false;
 
-        public EventListenerOptions(bool capture=false)
+        public EventListenerOptions(bool capture = false)
         {
             this.capture = capture;
         }

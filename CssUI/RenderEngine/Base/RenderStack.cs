@@ -49,7 +49,7 @@ namespace CssUI
         /// </summary>
         /// <param name="value"></param>
         public void Set_Blend(ReadOnlyColor value, bool FireChangedEvent = true)
-        {            
+        {
             // Remove old value from the top of the stack
             if (BlendingStack.Count > 0) BlendingStack.Pop();
             // Find the value we need to stack the incoming one ontop of (so we can combine them)
@@ -97,7 +97,7 @@ namespace CssUI
 
             if (MatrixStack.Count > 0) MatrixStack.Push(MatrixStack.First());
             else MatrixStack.Push(null);
-            
+
             Stack_Changed?.Invoke();
         }
         #endregion
@@ -114,7 +114,7 @@ namespace CssUI
             Stack_Changed?.Invoke();
         }
         #endregion
-        
+
     }
 }
 

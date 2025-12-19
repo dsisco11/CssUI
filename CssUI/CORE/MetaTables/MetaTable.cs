@@ -27,7 +27,8 @@ namespace CssUI.CORE
         #region Accessors
         public int Length => Items.Length;
 
-        public (TypeInfo, TAttribute) this[int index] {
+        public (TypeInfo, TAttribute) this[int index]
+        {
             get => Items[index];
             set => Items[index] = value;
         }

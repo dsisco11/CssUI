@@ -22,7 +22,7 @@ namespace CssUI.DOM.Geometry
             this.p3 = new DOMPoint(p3.x, p3.y, p3.z, p3.w);
             this.p4 = new DOMPoint(p4.x, p4.y, p4.z, p4.w);
         }
-        
+
         public DOMQuad(DOMPoint p1, DOMPoint p2, DOMPoint p3, DOMPoint p4)
         {
             this.p1 = new DOMPoint(p1);
@@ -30,7 +30,7 @@ namespace CssUI.DOM.Geometry
             this.p3 = new DOMPoint(p3);
             this.p4 = new DOMPoint(p4);
         }
-        
+
         public DOMQuad(DOMPointReadOnly p1, DOMPointReadOnly p2, DOMPointReadOnly p3, DOMPointReadOnly p4)
         {
             this.p1 = new DOMPoint(p1);
@@ -43,9 +43,9 @@ namespace CssUI.DOM.Geometry
         public static DOMQuad fromRect(DOMRectInit R)
         {/* Docs: https://www.w3.org/TR/geometry-1/#create-a-domquad-from-the-domrectinit-dictionary */
             var p1 = new DOMPoint(R.X, R.Y);
-            var p2 = new DOMPoint(R.X+R.Width, R.Y);
-            var p3 = new DOMPoint(R.X+R.Width, R.Y+R.Height);
-            var p4 = new DOMPoint(R.X, R.Y+R.Height);
+            var p2 = new DOMPoint(R.X + R.Width, R.Y);
+            var p3 = new DOMPoint(R.X + R.Width, R.Y + R.Height);
+            var p4 = new DOMPoint(R.X, R.Y + R.Height);
 
             return new DOMQuad(p1, p2, p3, p4);
         }

@@ -48,13 +48,13 @@ namespace CssUI.CSS.Internal
             /* Calculate the average distance inbetween these font scale values */
             double avg = 0;
             int entries = 0;
-            for (int i=0; i<FONT_TABLE_MAX_INDEX-1; i++)
+            for (int i = 0; i < FONT_TABLE_MAX_INDEX - 1; i++)
             {
                 entries++;
-                avg += (FONT_SCALE[i+1] - FONT_SCALE[i]);
+                avg += (FONT_SCALE[i + 1] - FONT_SCALE[i]);
             }
 
-            FONT_SCALE_STEP_AVG = (avg / (double)entries);            
+            FONT_SCALE_STEP_AVG = (avg / (double)entries);
         }
         #endregion
 

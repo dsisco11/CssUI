@@ -8,7 +8,7 @@ namespace CssUI.Serialization
 {
     public static partial class HTMLParserCommon
     {/* Docs: https://www.w3.org/TR/DOM-Parsing/ */
-     /* https://html.spec.whatwg.org/multipage/parsing.html#overview-of-the-parsing-model */
+        /* https://html.spec.whatwg.org/multipage/parsing.html#overview-of-the-parsing-model */
 
         #region Thank the gods for stackoverflow
 

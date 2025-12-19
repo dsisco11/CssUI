@@ -66,11 +66,11 @@ namespace CssUI.Difference
                     break;
             }
 
-            for (int i=0; i<data.Length; i++)
+            for (int i = 0; i < data.Length; i++)
             {
                 T item = data.Span[i];
-                buf.Append( item.ToString() );
-                if (i < (data.Length-1) )
+                buf.Append(item.ToString());
+                if (i < (data.Length - 1))
                     buf.Append(", ");
             }
 

@@ -36,7 +36,7 @@ namespace CssUI.Rendering
             this.Data = new ReadOnlyMemory<byte>(Data.ToArray());
 #endif
         }
-#endregion
+        #endregion
 
         public void Upload(GpuTexture Owner, IRenderEngine Engine)
         {
@@ -48,7 +48,7 @@ namespace CssUI.Rendering
             }
         }
 
-#region Destructor
+        #region Destructor
         public bool IsDisposed => (0 != Disposed);
         private int Disposed;
 
@@ -73,6 +73,6 @@ namespace CssUI.Rendering
                 }
             }
         }
-#endregion
+        #endregion
     }
 }

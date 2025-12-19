@@ -11,7 +11,7 @@ namespace CssUI.CSS
         #region Value Overrides
         public new int? Actual => base.Actual.AsIntegerN();
         #endregion
-        
+
         #region Constructors
         public NullableLengthProperty(AtomicName<ECssPropertyID> CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
             : base(CssName, Owner, Source, Locked)

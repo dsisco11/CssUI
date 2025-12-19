@@ -173,7 +173,7 @@ namespace CssUI.CSS.Selectors
             if (Starts_Universal_Selector(A, B)) return true;
             if (Starts_Attribute_Selector(A, B)) return true;
             if (Starts_Pseudo_Class_Selector(A, B)) return true;
-            
+
             return false;
         }
 
@@ -339,7 +339,7 @@ namespace CssUI.CSS.Selectors
                 ESelectorCombinator Combinator = ESelectorCombinator.None;
                 if (Stream.Next.Type == ECssTokenType.Combinator)
                 {
-                    switch(Comb.Value)
+                    switch (Comb.Value)
                     {
                         case " ":
                         case ">>":
@@ -460,7 +460,7 @@ namespace CssUI.CSS.Selectors
                 NamespacePrefixToken Namespace = Consume_NamespacePrefix(Stream);
                 return new TypeSelector(Namespace, Stream.Consume<IdentToken>().Value);
             }
-            
+
             return new TypeSelector(Stream.Consume<IdentToken>().Value);
         }
 

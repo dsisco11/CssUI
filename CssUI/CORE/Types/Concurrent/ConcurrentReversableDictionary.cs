@@ -19,9 +19,9 @@ namespace CssUI
 
         new public bool TryAdd(Key key, Value value)
         {
-            if ( base.TryAdd(key, value) )
+            if (base.TryAdd(key, value))
             {
-                if ( !MapInverse.TryAdd(value, key) )
+                if (!MapInverse.TryAdd(value, key))
                 {
                     throw new Exception($"Unable to add value-key entry from inverse dictionary! ValueType: {typeof(Value).FullName}");
                 }
@@ -35,7 +35,7 @@ namespace CssUI
         {
             if (base.TryRemove(key, out value!))
             {
-                if ( !MapInverse.TryRemove(value!, out var _) )
+                if (!MapInverse.TryRemove(value!, out var _))
                 {
                     throw new Exception($"Unable to remove value-key entry from inverse dictionary! ValueType: {typeof(Value).FullName}");
                 }
@@ -47,13 +47,13 @@ namespace CssUI
 
         public bool TryRemoveInverse(Value value, out Key? key)
         {
-            if ( !MapInverse.TryRemove(value, out key!) )
+            if (!MapInverse.TryRemove(value, out key!))
             {
                 //throw new Exception($"Unable to remove value-key entry from inverse dictionary! ValueType: {typeof(Value).FullName}");
                 return false;
             }
 
-            if ( !base.TryRemove(key, out _) )
+            if (!base.TryRemove(key, out _))
             {
                 //throw new Exception($"Unable to remove key-value entry from dictionary! KeyType: {typeof(Key).FullName}");
                 return false;

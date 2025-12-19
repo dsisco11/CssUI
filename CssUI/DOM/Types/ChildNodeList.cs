@@ -118,7 +118,7 @@ namespace CssUI.DOM
 
             var previousNode = (Count > (index - 1)) ? Items[index - 1] : null;
             var node = Items[index];
-            var nextNode = (Count > (index+1)) ? Items[index + 1] : null;
+            var nextNode = (Count > (index + 1)) ? Items[index + 1] : null;
 
             node.index = index;
 

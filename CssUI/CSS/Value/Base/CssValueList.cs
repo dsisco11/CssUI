@@ -88,7 +88,7 @@ namespace CssUI.Internal
         #region LINQ Implementation
         public IEnumerable<T> Select<T>(Func<CssValue, T> predicate)
         {
-            foreach(CssValue cssValue in this)
+            foreach (CssValue cssValue in this)
             {
                 yield return predicate(cssValue);
             }
@@ -126,7 +126,7 @@ namespace CssUI.Internal
                 return hash_cache.Value;
 
             int hash = 17;//magic number
-            foreach(CssValue obj in Items)
+            foreach (CssValue obj in Items)
             {
                 hash = hash * 31 + obj.GetHashCode();
             }

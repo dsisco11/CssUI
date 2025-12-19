@@ -5,7 +5,7 @@ namespace CssUI.CSS.Media
     [MetaEnum]
     public enum EMediaFeatureName : int
     {/* Docs: https://drafts.csswg.org/mediaqueries-4/#mf-dimensions */
-        
+
         Unknown = 0x0,
 
         /// <summary>
@@ -20,7 +20,7 @@ namespace CssUI.CSS.Media
         [MetaKeyword("max-width")]
         Max_Width,
 
-                /// <summary>
+        /// <summary>
         /// The ‘height’ media feature describes the height of the targeted display area of the output device. 
         /// For continuous media, this is the height of the viewport including the size of a rendered scroll bar (if any). 
         /// For paged media, this is the height of the page box.
@@ -31,7 +31,7 @@ namespace CssUI.CSS.Media
         Min_Height,
         [MetaKeyword("max-height")]
         Max_Height,
-        
+
         /// <summary>
         /// The aspect-ratio media feature is defined as the ratio of the value of the width media feature to the value of the height media feature.
         /// </summary>
@@ -131,16 +131,16 @@ namespace CssUI.CSS.Media
         [MetaKeyword("color-gamut")]
         ColorGamut,
 
-/*
-        [MetaKeyword("pointer")]
-        Pointer,
-        [MetaKeyword("hover")]
-        Hover,
-        [MetaKeyword("any-pointer")]
-        AnyPointer,
-        [MetaKeyword("any-hover")]
-        AnyHover,
-*/
+        /*
+                [MetaKeyword("pointer")]
+                Pointer,
+                [MetaKeyword("hover")]
+                Hover,
+                [MetaKeyword("any-pointer")]
+                AnyPointer,
+                [MetaKeyword("any-hover")]
+                AnyHover,
+        */
     }
 }
 

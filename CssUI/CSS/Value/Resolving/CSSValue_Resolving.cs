@@ -147,7 +147,7 @@ namespace CssUI.CSS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal CssValue Derive_ActualValue(ICssProperty Property)
         {/* Docs:  https://www.w3.org/TR/css-cascade-3/#actual */
-         // the Actual value does not get 'resolved' it gets restricted.
+            // the Actual value does not get 'resolved' it gets restricted.
 
             var ResolutionDelegate = Property.Definition.PropertyStageResolver[(int)EPropertyStage.Actual];
             if (ResolutionDelegate is object)

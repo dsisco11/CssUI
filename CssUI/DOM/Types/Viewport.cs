@@ -33,7 +33,7 @@ namespace CssUI.DOM
             remove => handlerMap.Remove(EEventName.Scroll, value);
         }
         #endregion
-        
+
         #region Constructor
         public Viewport(Document document)
         {
@@ -49,7 +49,7 @@ namespace CssUI.DOM
         public Rect4f getBoundingClientRect()
         {
             //return new DOMRect(Left, Top, Width, Height);
-            return new Rect4f(Top, Left+Width, Top+Height, Left);
+            return new Rect4f(Top, Left + Width, Top + Height, Left);
         }
 
     }

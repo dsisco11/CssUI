@@ -72,7 +72,7 @@ namespace CssUI
             return new UniqueID(uid);
         }
         #endregion
-        
+
 
         #region Equality
         /// <summary>
@@ -151,7 +151,7 @@ namespace CssUI
             return !(a == b);
         }
         #endregion
-        
+
 
         /// <summary>
         /// Returns a hash code for this instance.

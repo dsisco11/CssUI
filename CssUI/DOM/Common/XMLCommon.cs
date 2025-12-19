@@ -17,9 +17,9 @@ namespace CssUI.DOM
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Is_Valid_Name(string name)
         {
-            for(int i=0; i<name.Length; i++)
+            for (int i = 0; i < name.Length; i++)
             {
-                if ( !Is_NameChar(name[i]) )
+                if (!Is_NameChar(name[i]))
                     return false;
             }
             return true;

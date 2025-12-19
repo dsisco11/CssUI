@@ -358,8 +358,8 @@ namespace CssUI.CSS
         /// </summary>
         public bool Intersects(CssBoxArea box)
         {
-            bool intersectsX = (Left <=  box.Right) && (Right >=  box.Left);
-            bool intersectsY = (Bottom <=  box.Top) && (Top >=  box.Bottom);
+            bool intersectsX = (Left <= box.Right) && (Right >= box.Left);
+            bool intersectsY = (Bottom <= box.Top) && (Top >= box.Bottom);
             return intersectsX && intersectsY;
             /*return Math.Abs(CenterX - box.CenterX) <= Half_Width + box.Half_Width &&
                    Math.Abs(CenterY - box.CenterY) <= Half_Height + box.Half_Height;*/
@@ -370,8 +370,8 @@ namespace CssUI.CSS
         /// </summary>
         public bool Intersects(DOMRectReadOnly rect)
         {
-            bool intersectsX = (Left <=  rect.Right) && (Right >=  rect.Left);
-            bool intersectsY = (Bottom <=  rect.Top) && (Top >=  rect.Bottom);
+            bool intersectsX = (Left <= rect.Right) && (Right >= rect.Left);
+            bool intersectsY = (Bottom <= rect.Top) && (Top >= rect.Bottom);
             return intersectsX && intersectsY;
         }
 

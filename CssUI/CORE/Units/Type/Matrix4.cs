@@ -12,7 +12,7 @@ namespace CssUI
         static Matrix4()
         {
             POW_LUT = new double[POW_LUT_SIZE, POW_LUT_SIZE];
-            for(int i=0; i<POW_LUT_SIZE; i++)
+            for (int i = 0; i < POW_LUT_SIZE; i++)
             {
                 for (int j = 0; j < POW_LUT_SIZE; j++)
                 {
@@ -257,13 +257,13 @@ namespace CssUI
             double Sum = 0;
 
             /* For each item in the row multiply it by its wrapped diagonal values (count = size) and add this to Sum */
-            for (int j=0; j<size; j++)
+            for (int j = 0; j < size; j++)
             {/* j = the offset into our horizontal row */
                 double value = 1;
-                for (int c=0; c<size; c++)
+                for (int c = 0; c < size; c++)
                 {/* c = our diagonal index */
                     //value *= data[rowIndex + j + ((c * size) + j)];
-                    value *= data[get_index(size, c, j+c)];
+                    value *= data[get_index(size, c, j + c)];
                 }
                 Sum += value;
             }
@@ -319,7 +319,7 @@ namespace CssUI
             {
                 //for (int j = 0; j < size; j++)
                 //{
-                    Result += data[get_index(size, i, 0)] * calc_cofactor(data, size, i, 0);
+                Result += data[get_index(size, i, 0)] * calc_cofactor(data, size, i, 0);
                 //}
             }
 
@@ -336,7 +336,7 @@ namespace CssUI
             /* The adjugant matrix of a given matrix consists of the cofactor of each value in said matrix */
             /* A[i,j] = -1^(i+j)|M[j,i]| */
             double[] matrix = new double[size * size];
-            for (int i=0; i<size; i++)
+            for (int i = 0; i < size; i++)
             {
                 for (int j = 0; j < size; j++)
                 {
@@ -362,7 +362,7 @@ namespace CssUI
             double[] adjunct = calc_adjugant_matrix(data, size);
 
             double[] matrix = new double[size * size];
-            for (int i=0; i<size; i++)
+            for (int i = 0; i < size; i++)
             {
                 for (int j = 0; j < size; j++)
                 {
@@ -601,7 +601,7 @@ namespace CssUI
 
             for (int i = 0; i < 16; i++)
             {
-                sb.Append( arr[i].PadLeft(longest) );
+                sb.Append(arr[i].PadLeft(longest));
                 if ((i % 4) < 3) sb.Append(',');
                 if ((i % 4) == 3)
                 {

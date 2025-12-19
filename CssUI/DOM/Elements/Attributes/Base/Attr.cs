@@ -74,7 +74,8 @@ namespace CssUI.DOM
         /// Docs: https://dom.spec.whatwg.org/#concept-attribute-qualified-name
         public string Name { get => prefix is null ? localName.ToString()! : string.Concat(prefix, ":", localName)!; }
 
-        public AttributeValue? Value {
+        public AttributeValue? Value
+        {
             get => _value_used;
             set => _set_value(value);
             //{

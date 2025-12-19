@@ -18,7 +18,7 @@ namespace CssUI.DOM
 
         public override ENodeFilterResult acceptNode(Node node)
         {
-            for (int i=0; i<nodeList.Length; i++)
+            for (int i = 0; i < nodeList.Length; i++)
             {
                 if (ReferenceEquals(node, nodeList.Span[i]))
                     return ENodeFilterResult.FILTER_REJECT;

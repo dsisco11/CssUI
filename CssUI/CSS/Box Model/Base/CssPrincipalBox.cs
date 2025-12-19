@@ -454,8 +454,8 @@ namespace CssUI.CSS.BoxTree
             Border = Create_Rect_Around(Padding, Style.Get_Border_Size());
             Margin = Create_Rect_Around(Border, Style.Get_Margin_Size());
 
-            Debug.Assert((Content.Width ==  Style.Width));
-            Debug.Assert((Content.Height ==  Style.Height));
+            Debug.Assert((Content.Width == Style.Width));
+            Debug.Assert((Content.Height == Style.Height));
         }
 
         /// <summary>

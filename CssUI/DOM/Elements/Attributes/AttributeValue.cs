@@ -93,12 +93,12 @@ namespace CssUI.DOM
         /// Creates a new <see cref="EAttributeType.Length"/> type attribute value
         /// </summary>
         public static AttributeValue From_Length(Double Length) => new AttributeValue(EAttributeType.Length, Length, Length.ToString(CultureInfo.InvariantCulture));
-        
+
         /// <summary>
         /// Creates a new <see cref="EAttributeType.Percentage"/> type attribute value
         /// </summary>
         public static AttributeValue From_Percent(Double Percentage) => new AttributeValue(EAttributeType.Percentage, Percentage, Percentage.ToString(CultureInfo.InvariantCulture));
-        
+
         /// <summary>
         /// Creates a new <see cref="EAttributeType.String"/> type attribute value
         /// </summary>
@@ -110,7 +110,7 @@ namespace CssUI.DOM
         /// <typeparam name="T"></typeparam>
         /// <param name="enumValue"></param>
         /// <returns></returns>
-        public static AttributeValue From<T>(T enumValue) where T: struct
+        public static AttributeValue From<T>(T enumValue) where T : struct
         {
             /* Not all enumeration values will have a DOM keyword, some defined by the specification explicitly say certain values should NOT have a keyword */
             string keyword = string.Empty;
@@ -123,7 +123,7 @@ namespace CssUI.DOM
         #endregion
 
         #region Parsing
-        public static AttributeValue Parse(AtomicName<EAttributeName> Name, string Input) 
+        public static AttributeValue Parse(AtomicName<EAttributeName> Name, string Input)
         {
             var Def = AttributeDefinition.Lookup(Name);
             Def.Parse(Input, out dynamic outVal);
@@ -262,7 +262,7 @@ namespace CssUI.DOM
 
             if (Type == other.Type)
             {
-                switch(Type)
+                switch (Type)
                 {
                     case EAttributeType.Boolean:
                         {// A boolean attributes value is based on it's mere existance. So if the other object exists then they are both true and equal!
@@ -284,7 +284,7 @@ namespace CssUI.DOM
                     case EAttributeType.NonZero_Percentage:
                     case EAttributeType.FloatingPoint:
                         {
-                            return ((double)Value ==  (double)other.Value);
+                            return ((double)Value == (double)other.Value);
                         }
                     default:
                         {

@@ -57,7 +57,7 @@ namespace CssUI.DOM.Mutation
                     if (ReferenceEquals(registered.observer, this))
                     {
                         /* 1) For each node of the context object’s node list, remove all transient registered observers whose source is registered from node’s registered observer list. */
-                        foreach(Node n in this.Nodes)
+                        foreach (Node n in this.Nodes)
                         {
                             n.RegisteredObservers.RemoveAll(R => R is TransientRegisteredObserver T && ReferenceEquals(T.source, registered));
                         }
@@ -78,7 +78,7 @@ namespace CssUI.DOM.Mutation
         public void Disconnect()
         {
             /* 1) For each node of the context object’s node list, remove any registered observer from node’s registered observer list for which the context object is the observer. */
-            foreach(Node N in Nodes)
+            foreach (Node N in Nodes)
             {
                 N.RegisteredObservers.RemoveAll(R => ReferenceEquals(this, R.observer));
             }

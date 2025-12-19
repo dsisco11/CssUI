@@ -101,7 +101,7 @@ namespace CssUI.CSS
             return retVal.ToArray();
         }
 
-        
+
         /// <summary>
         /// Performs matching against a single element
         /// </summary>
@@ -110,7 +110,7 @@ namespace CssUI.CSS
         /// <returns></returns>
         public bool Match(Element E, params Node[] scopeElements)
         {/* Docs: https://drafts.csswg.org/selectors-4/#match-a-selector-against-an-element */
-            
+
             /* We are a group of one or more complete(complex) selectors, so we only need this element to match ONE of those selectors */
             foreach (ComplexSelector Complex in this)
             {
@@ -120,7 +120,7 @@ namespace CssUI.CSS
 
             return false;
         }
-        
+
         /// <summary>
         /// Performs matching against a single element
         /// </summary>
@@ -135,7 +135,7 @@ namespace CssUI.CSS
 
             /* "All of the root elements must share the same root, or else calling this algorithm is invalid." */
             Node treeRoot = rootElements.First().getRootNode();
-            foreach(var element in rootElements)
+            foreach (var element in rootElements)
             {
                 if (!ReferenceEquals(treeRoot, element.getRootNode()))
                     throw new CssSelectorException("When matching a selector against a tree, all rootElements must share the same root!");
@@ -177,7 +177,7 @@ namespace CssUI.CSS
             }
 
             LinkedList<Element> matchList = new LinkedList<Element>();
-            foreach(Element candidate in candidateElements)
+            foreach (Element candidate in candidateElements)
             {
                 if (Match(candidate, scopeElements))
                     matchList.AddLast(candidate);
@@ -190,6 +190,6 @@ namespace CssUI.CSS
 
 
     }
-    
+
 }
 

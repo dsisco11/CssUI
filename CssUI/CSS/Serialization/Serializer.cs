@@ -68,7 +68,7 @@ namespace CssUI.CSS.Serialization
 
             StringBuilder sb = new StringBuilder(64);
             var characters = ident.ToCharArray();
-            for (int i=0; i<characters.Length; i++)
+            for (int i = 0; i < characters.Length; i++)
             {
                 char c = characters[i];
                 if (c == CHAR_NULL)

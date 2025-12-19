@@ -102,7 +102,7 @@ namespace CssUI.DOM
             /* 2) Set node to node’s first child if type is first, and node’s last child if type is last. */
             node = node.firstChild;
             /* 3) While node is non-null: */
-            while(node is object)
+            while (node is object)
             {
                 /* 1) Let result be the result of filtering node within walker. */
                 var result = filterNode(node);
@@ -113,7 +113,7 @@ namespace CssUI.DOM
                     return node;
                 }
                 /* 3) If result is FILTER_SKIP, then: */
-                if(result == ENodeFilterResult.FILTER_SKIP)
+                if (result == ENodeFilterResult.FILTER_SKIP)
                 {
                     /* 1) Let child be node’s first child if type is first, and node’s last child if type is last. */
                     var child = node.firstChild;
@@ -125,7 +125,7 @@ namespace CssUI.DOM
                     }
                 }
                 /* 4) While node is non-null: */
-                while(node is object)
+                while (node is object)
                 {
                     /* 1) Let sibling be node’s next sibling if type is first, and node’s previous sibling if type is last. */
                     var sibling = node.nextSibling;
@@ -255,12 +255,12 @@ namespace CssUI.DOM
             /* 2) If node is root, then return null. */
             if (ReferenceEquals(node, root)) return null;
             /* 3) While true: */
-            while(true)
+            while (true)
             {
                 /* 1) Let sibling be node’s next sibling if type is next, and node’s previous sibling if type is previous. */
                 var sibling = node.previousSibling;
                 /* 2) While sibling is non-null: */
-                while(sibling is object)
+                while (sibling is object)
                 {
                     /* 1) Set node to sibling. */
                     node = sibling;
@@ -303,14 +303,14 @@ namespace CssUI.DOM
                 /* 1) Let sibling be node’s previous sibling. */
                 var sibling = node.previousSibling;
                 /* 2) While sibling is non-null: */
-                while(sibling is object)
+                while (sibling is object)
                 {
                     /* 1) Set node to sibling. */
                     node = sibling;
                     /* 2) Let result be the result of filtering node within the context object. */
                     var result = filterNode(node);
                     /* 3) While result is not FILTER_REJECT and node has a child: */
-                    while( result != ENodeFilterResult.FILTER_REJECT && node.hasChildNodes())
+                    while (result != ENodeFilterResult.FILTER_REJECT && node.hasChildNodes())
                     {
                         /* 1) Set node to node’s last child. */
                         node = node.lastChild;

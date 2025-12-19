@@ -30,7 +30,7 @@ namespace CssUI
                 {/* Resolve the backing value */
                     if (IsCustom) throw new Exception("Name backing-value for custom event type is not set!");
 
-                    string name = Value_To_Name( Value );
+                    string name = Value_To_Name(Value);
                     if (ReferenceEquals(null, name)) throw new Exception($"Unable to convert \"{typeof(T).Name}\" value to string");
 
                     _name = name;

@@ -1,4 +1,4 @@
- 
+
 
 // Generated code
 using System.Collections.Generic;
@@ -7893,7 +7893,7 @@ namespace Foo
                 new ISO_639_3 { Id = "zyp", Part2B = "", Part2T = "", Part1 = "", Scope = "I", Language_Type = "L", Ref_Name = "Zyphe Chin", Comment = "" },
                 new ISO_639_3 { Id = "zza", Part2B = "zza", Part2T = "zza", Part1 = "", Scope = "M", Language_Type = "L", Ref_Name = "Zaza", Comment = "" },
                 new ISO_639_3 { Id = "zzj", Part2B = "", Part2T = "", Part1 = "", Scope = "I", Language_Type = "L", Ref_Name = "Zuojiang Zhuang", Comment = "" }
-  
+
             };
             return list;
         }

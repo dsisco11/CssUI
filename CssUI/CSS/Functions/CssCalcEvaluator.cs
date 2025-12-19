@@ -15,7 +15,7 @@ namespace CssUI.CSS.Functions
         #region Numeric Constants (CSS Values Level 4 §10.7)
         /// <summary>Mathematical constant e (Euler's number)</summary>
         public const double E = Math.E;  // ≈2.7182818284590452354
-        
+
         /// <summary>Mathematical constant π (pi)</summary>
         public const double Pi = Math.PI;  // ≈3.1415926535897932
         #endregion
@@ -104,7 +104,7 @@ namespace CssUI.CSS.Functions
             while (tokens.Count > 0)
             {
                 var token = tokens.Peek();
-                
+
                 if (token.Type == ECssTokenType.Whitespace)
                 {
                     tokens.Dequeue();
@@ -114,7 +114,7 @@ namespace CssUI.CSS.Functions
                 if (token.Type == ECssTokenType.Delim)
                 {
                     char delim = GetDelimChar(token);
-                    
+
                     if (delim == '+')
                     {
                         tokens.Dequeue();
@@ -152,7 +152,7 @@ namespace CssUI.CSS.Functions
             while (tokens.Count > 0)
             {
                 var token = tokens.Peek();
-                
+
                 if (token.Type == ECssTokenType.Whitespace)
                 {
                     tokens.Dequeue();
@@ -162,7 +162,7 @@ namespace CssUI.CSS.Functions
                 if (token.Type == ECssTokenType.Delim)
                 {
                     char delim = GetDelimChar(token);
-                    
+
                     if (delim == '*')
                     {
                         tokens.Dequeue();
@@ -221,7 +221,7 @@ namespace CssUI.CSS.Functions
                         if (token is DimensionToken dimToken)
                         {
                             double numericValue = Convert.ToDouble(dimToken.Number);
-                            
+
                             // Try to resolve the unit
                             if (unitResolver != null && Lookup.TryEnum(dimToken.Unit, out ECssUnit unit))
                             {
@@ -306,11 +306,11 @@ namespace CssUI.CSS.Functions
         {
             // NaN is infectious
             if (double.IsNaN(a) || double.IsNaN(b)) return double.NaN;
-            
+
             // 0 * ∞ = NaN
             if ((a == 0 && double.IsInfinity(b)) || (b == 0 && double.IsInfinity(a)))
                 return double.NaN;
-            
+
             return a * b;
         }
 
@@ -322,17 +322,17 @@ namespace CssUI.CSS.Functions
         {
             // NaN is infectious
             if (double.IsNaN(a) || double.IsNaN(b)) return double.NaN;
-            
+
             // 0/0 = NaN, ∞/∞ = NaN
             if ((a == 0 && b == 0) || (double.IsInfinity(a) && double.IsInfinity(b)))
                 return double.NaN;
-            
+
             // x/0 = ±∞ (sign determined by operands)
             if (b == 0)
             {
                 return a >= 0 ? double.PositiveInfinity : double.NegativeInfinity;
             }
-            
+
             return a / b;
         }
 
@@ -413,7 +413,7 @@ namespace CssUI.CSS.Functions
                 }
 
                 // Check for 'none' keyword
-                if (token is IdentToken identToken && 
+                if (token is IdentToken identToken &&
                     string.Equals(identToken.Value, "none", StringComparison.OrdinalIgnoreCase))
                 {
                     tokens.Dequeue();
@@ -457,22 +457,22 @@ namespace CssUI.CSS.Functions
         #endregion
 
         #region Trigonometric Functions (§10.4)
-        private static double EvaluateSingleArgFunc(CssFunction function, CssValue.StyleUnitResolverDelegate unitResolver, 
+        private static double EvaluateSingleArgFunc(CssFunction function, CssValue.StyleUnitResolverDelegate unitResolver,
             double percentageBase, Func<double, double> mathFunc, bool convertToRadians = false)
         {
             var tokens = new Queue<CssToken>(function.Arguments);
             SkipWhitespace(tokens);
-            
+
             double arg = EvaluateExpression(tokens, unitResolver, percentageBase);
-            
+
             if (convertToRadians)
             {
                 arg = DegToRad(arg);
             }
-            
+
             // NaN is infectious
             if (double.IsNaN(arg)) return double.NaN;
-            
+
             return mathFunc(arg);
         }
 
@@ -483,13 +483,13 @@ namespace CssUI.CSS.Functions
         {
             var tokens = new Queue<CssToken>(function.Arguments);
             SkipWhitespace(tokens);
-            
+
             double arg = EvaluateExpression(tokens, unitResolver, percentageBase);
-            
+
             // Infinite argument -> NaN
             if (double.IsInfinity(arg)) return double.NaN;
             if (double.IsNaN(arg)) return double.NaN;
-            
+
             double radians = DegToRad(arg);
             return Math.Tan(radians);
         }
@@ -498,12 +498,12 @@ namespace CssUI.CSS.Functions
         {
             var args = GetTwoArgs(function, unitResolver, percentageBase);
             if (args == null) return double.NaN;
-            
+
             double y = args.Value.Item1;
             double x = args.Value.Item2;
-            
+
             if (double.IsNaN(y) || double.IsNaN(x)) return double.NaN;
-            
+
             return RadToDeg(Math.Atan2(y, x));
         }
 
@@ -516,12 +516,12 @@ namespace CssUI.CSS.Functions
         {
             var args = GetTwoArgs(function, unitResolver, percentageBase);
             if (args == null) return double.NaN;
-            
+
             double baseVal = args.Value.Item1;
             double exponent = args.Value.Item2;
-            
+
             if (double.IsNaN(baseVal) || double.IsNaN(exponent)) return double.NaN;
-            
+
             return Math.Pow(baseVal, exponent);
         }
 
@@ -543,16 +543,16 @@ namespace CssUI.CSS.Functions
                 }
 
                 double value = EvaluateExpression(tokens, unitResolver, percentageBase);
-                
+
                 // If any argument is infinite, result is +∞
                 if (double.IsInfinity(value)) return double.PositiveInfinity;
                 if (double.IsNaN(value)) return double.NaN;
-                
+
                 values.Add(value);
             }
 
             if (values.Count == 0) return 0;
-            
+
             double sumOfSquares = 0;
             foreach (var v in values)
             {
@@ -582,21 +582,21 @@ namespace CssUI.CSS.Functions
             }
 
             if (args.Count == 0) return double.NaN;
-            
+
             double value = args[0];
             if (double.IsNaN(value)) return double.NaN;
             if (value < 0) return double.NaN;
             if (value == 0) return double.NegativeInfinity;
             if (double.IsPositiveInfinity(value)) return double.PositiveInfinity;
-            
+
             if (args.Count == 1)
             {
                 return Math.Log(value);  // Natural log
             }
-            
+
             double baseVal = args[1];
             if (double.IsNaN(baseVal) || baseVal <= 0 || baseVal == 1) return double.NaN;
-            
+
             return Math.Log(value, baseVal);
         }
         #endregion
@@ -641,15 +641,15 @@ namespace CssUI.CSS.Functions
             }
 
             if (args.Count == 0) return double.NaN;
-            
+
             double value = args[0];
             double step = args.Count > 1 ? args[1] : 1;  // Default step is 1
-            
+
             if (double.IsNaN(value) || double.IsNaN(step)) return double.NaN;
             if (step == 0) return double.NaN;
             if (double.IsInfinity(value) && double.IsInfinity(step)) return double.NaN;
             if (double.IsInfinity(value)) return value;  // Infinite value, finite step
-            
+
             // Finite value, infinite step
             if (double.IsInfinity(step))
             {
@@ -663,7 +663,7 @@ namespace CssUI.CSS.Functions
             }
 
             double quotient = value / step;
-            
+
             return strategy switch
             {
                 "nearest" => Math.Round(quotient) * step,
@@ -678,23 +678,23 @@ namespace CssUI.CSS.Functions
         {
             var args = GetTwoArgs(function, unitResolver, percentageBase);
             if (args == null) return double.NaN;
-            
+
             double a = args.Value.Item1;
             double b = args.Value.Item2;
-            
+
             if (double.IsNaN(a) || double.IsNaN(b)) return double.NaN;
             if (b == 0) return double.NaN;
             if (double.IsInfinity(a)) return double.NaN;
-            
+
             // mod(A, B) - result has same sign as B
             double result = a % b;
-            
+
             // Adjust sign to match B (modulus vs remainder)
             if (result != 0 && (result < 0) != (b < 0))
             {
                 result += b;
             }
-            
+
             return result;
         }
 
@@ -702,14 +702,14 @@ namespace CssUI.CSS.Functions
         {
             var args = GetTwoArgs(function, unitResolver, percentageBase);
             if (args == null) return double.NaN;
-            
+
             double a = args.Value.Item1;
             double b = args.Value.Item2;
-            
+
             if (double.IsNaN(a) || double.IsNaN(b)) return double.NaN;
             if (b == 0) return double.NaN;
             if (double.IsInfinity(a)) return double.NaN;
-            
+
             // rem(A, B) - result has same sign as A (C# % behavior)
             return a % b;
         }

@@ -16,10 +16,10 @@ namespace CssUI
         {
             POWER_LUT = new UInt64[POWER_LUT_SIZE][];
 
-            for (UInt64 i=0; i < POWER_LUT_SIZE; i++)
+            for (UInt64 i = 0; i < POWER_LUT_SIZE; i++)
             {
                 POWER_LUT[i] = new UInt64[POWER_LUT_SIZE];
-                for (UInt64 j =0; j < POWER_LUT_SIZE; j++)
+                for (UInt64 j = 0; j < POWER_LUT_SIZE; j++)
                 {
                     POWER_LUT[i][j] = (UInt64)Math.Pow(i, j);
                 }
@@ -64,7 +64,7 @@ namespace CssUI
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Double RangeClamp(Double value, Double a, Double b) => Math.Max(Math.Min(a, b), Math.Min(Math.Max(a, b), value));
         #endregion
-        
+
         #region Radians / Degrees
         internal const Double Radians = (Math.PI / 180.0);
         internal const Double Ratio_DegToRad = (Math.PI / 180.0);
@@ -283,7 +283,7 @@ namespace CssUI
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Int32 Pow(Int32 x, UInt32 y)
         {
-            if (x >=0 && x <= POWER_LUT_SIZE && y >= 0 && y <= POWER_LUT_SIZE) return (Int32)POWER_LUT[x][y];
+            if (x >= 0 && x <= POWER_LUT_SIZE && y >= 0 && y <= POWER_LUT_SIZE) return (Int32)POWER_LUT[x][y];
             /*Int32 n = 1;
 
             while (true)

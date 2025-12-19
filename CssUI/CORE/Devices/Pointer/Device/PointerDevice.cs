@@ -16,7 +16,7 @@ namespace CssUI.Devices
         public static IReadOnlyCollection<PointerDevice> Get_All()
         {
             int PointerTypes = Enum.GetValues(typeof(EPointerType)).Cast<int>().Max();
-            PrimaryDevice = new PointerDevice[PointerTypes+1];
+            PrimaryDevice = new PointerDevice[PointerTypes + 1];
             return DEVICE_LIST;
         }
 

@@ -38,7 +38,7 @@ namespace CssUI.DOM
         #endregion
 
         #region Mime Subtype definitions
-        static string[] FONT_APPLICATION_MIME_SUBTYPES = new string[] 
+        static string[] FONT_APPLICATION_MIME_SUBTYPES = new string[]
         {
             "font-cff",
             "font-off",
@@ -48,7 +48,7 @@ namespace CssUI.DOM
             "vnd.ms-fontobject",
             "vnd.ms-opentype",
         };
-        static string[] ARCHIVE_APPLICATION_MIME_SUBTYPES = new string[] 
+        static string[] ARCHIVE_APPLICATION_MIME_SUBTYPES = new string[]
         {
             "x-rar-compressed",
             "zip",
@@ -61,7 +61,7 @@ namespace CssUI.DOM
             "x-ecmascript",
             "x-javascript",
         };
-        static string[] JAVASCRIPT_TEXT_MIME_SUBTYPES = new string[] 
+        static string[] JAVASCRIPT_TEXT_MIME_SUBTYPES = new string[]
         {
             "ecmascript",
             "javascript",
@@ -105,7 +105,7 @@ namespace CssUI.DOM
                             Groups |= EMimeGroup.JSON;
                         else
                         {
-                            for(int i=0; i < JAVASCRIPT_TEXT_MIME_SUBTYPES.Length; i++)
+                            for (int i = 0; i < JAVASCRIPT_TEXT_MIME_SUBTYPES.Length; i++)
                             {
                                 if (SubType.Span.Equals(JAVASCRIPT_TEXT_MIME_SUBTYPES[i].AsSpan(), StringComparison.OrdinalIgnoreCase))
                                 {
@@ -334,7 +334,7 @@ namespace CssUI.DOM
                     const string escapedQuote = @"\?";
                     const string escapedSlash = @"\\";
 
-                    string escapedStr = StringCommon.Replace(kv.Value, false, false, 
+                    string escapedStr = StringCommon.Replace(kv.Value, false, false,
                         (CHAR_QUOTATION_MARK, escapedQuote), (CHAR_REVERSE_SOLIDUS, escapedSlash));
 
                     valueStr = string.Concat(CHAR_QUOTATION_MARK, escapedStr, CHAR_QUOTATION_MARK);
@@ -355,7 +355,7 @@ namespace CssUI.DOM
         #region /* HTML */
 
         static ReadOnlyMemory<byte> PATTERN_HTMLDOC = new ReadOnlyMemory<byte>(new byte[] { 0x3C, 0x21, 0x44, 0x4F, 0x43, 0x54, 0x59, 0x50, 0x45, 0x20, 0x48, 0x54, 0x4D, 0x4C });
-        static ReadOnlyMemory<byte> MASK_HTMLDOC =    new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xDF, 0xDF, 0xDF, 0xDF, 0xDF, 0xDF, 0xDF, 0xFF, 0xDF, 0xDF, 0xDF, 0xDF });
+        static ReadOnlyMemory<byte> MASK_HTMLDOC = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xDF, 0xDF, 0xDF, 0xDF, 0xDF, 0xDF, 0xDF, 0xFF, 0xDF, 0xDF, 0xDF, 0xDF });
 
         static ReadOnlyMemory<byte> PATTERN_TAG_HTML = new ReadOnlyMemory<byte>(new byte[] { 0x3C, 0x48, 0x54, 0x4D, 0x4C });/* The case-insensitive string "<HTML" followed by a tag-terminating byte. */
         static ReadOnlyMemory<byte> MASK_TAG_HTML = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xDF, 0xDF, 0xDF, 0xDF });
@@ -409,111 +409,111 @@ namespace CssUI.DOM
         static ReadOnlyMemory<byte> MASK_TAG_XML = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
 
         static ReadOnlyMemory<byte> PATTERN_PDF = new ReadOnlyMemory<byte>(new byte[] { 0x25, 0x50, 0x44, 0x46, 0x2D });/* The string "%PDF-", the PDF signature. */
-        static ReadOnlyMemory<byte> MASK_PDF    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_PDF = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
         #endregion
 
 
         #region /* MISC */
 
         static ReadOnlyMemory<byte> PATTERN_ADOBE_POSTSCRIPT = new ReadOnlyMemory<byte>(new byte[] { 0x25, 0x21, 0x50, 0x53, 0x2D, 0x41, 0x64, 0x6F, 0x62, 0x65, 0x2D });/* The string "%!PS-Adobe-", the PostScript signature. */
-        static ReadOnlyMemory<byte> MASK_ADOBE_POSTSCRIPT    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_ADOBE_POSTSCRIPT = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
 
         static ReadOnlyMemory<byte> PATTERN_UTF16BE_BOM = new ReadOnlyMemory<byte>(new byte[] { 0xFE, 0xFF, 0x00, 0x00 });/* UTF-16BE BOM */
-        static ReadOnlyMemory<byte> MASK_UTF16BE_BOM    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0x00, 0x00 });
+        static ReadOnlyMemory<byte> MASK_UTF16BE_BOM = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0x00, 0x00 });
 
         static ReadOnlyMemory<byte> PATTERN_UTF16LE_BOM = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFE, 0x00, 0x00 });/* UTF-16LE BOM */
-        static ReadOnlyMemory<byte> MASK_UTF16LE_BOM    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0x00, 0x00 });
+        static ReadOnlyMemory<byte> MASK_UTF16LE_BOM = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0x00, 0x00 });
 
         static ReadOnlyMemory<byte> PATTERN_UTF8_BOM = new ReadOnlyMemory<byte>(new byte[] { 0xEF, 0xBB, 0xBF, 0x00 });/* UTF-8 BOM */
-        static ReadOnlyMemory<byte> MASK_UTF8_BOM    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0x00 });
+        static ReadOnlyMemory<byte> MASK_UTF8_BOM = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0x00 });
         #endregion
 
 
         #region /* ARCHIVE */
 
         static ReadOnlyMemory<byte> PATTERN_GZIP = new ReadOnlyMemory<byte>(new byte[] { 0x1F, 0x8B, 0x08 });/* The GZIP archive signature. */
-        static ReadOnlyMemory<byte> MASK_GZIP    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_GZIP = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF });
 
         static ReadOnlyMemory<byte> PATTERN_ZIP = new ReadOnlyMemory<byte>(new byte[] { 0x50, 0x4B, 0x03, 0x04 });/* The string "PK" followed by ETX EOT, the ZIP archive signature. */
-        static ReadOnlyMemory<byte> MASK_ZIP    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_ZIP = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
 
         static ReadOnlyMemory<byte> PATTERN_RAR = new ReadOnlyMemory<byte>(new byte[] { 0x52, 0x61, 0x72, 0x20, 0x1A, 0x07, 0x00 });/* The string "Rar " followed by SUB BEL NUL, the RAR archive signature. */
-        static ReadOnlyMemory<byte> MASK_RAR    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_RAR = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
         #endregion
 
 
         #region /* FONT */
 
         static ReadOnlyMemory<byte> PATTERN_OPENTYPE_EMBEDDED = new ReadOnlyMemory<byte>(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4C, 0x50 });/* 34 bytes followed by the string "LP", the Embedded OpenType signature. */
-        static ReadOnlyMemory<byte> MASK_OPENTYPE_EMBEDDED    = new ReadOnlyMemory<byte>(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_OPENTYPE_EMBEDDED = new ReadOnlyMemory<byte>(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF });
 
         static ReadOnlyMemory<byte> PATTERN_TRUETYPE = new ReadOnlyMemory<byte>(new byte[] { 0x00, 0x01, 0x00, 0x00 });/* 4 bytes representing the version number 1.0, a TrueType signature. */
-        static ReadOnlyMemory<byte> MASK_TRUETYPE    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_TRUETYPE = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
 
         static ReadOnlyMemory<byte> PATTERN_OPENTYPE = new ReadOnlyMemory<byte>(new byte[] { 0x4F, 0x54, 0x54, 0x4F });/* The string "OTTO", the OpenType signature. */
-        static ReadOnlyMemory<byte> MASK_OPENTYPE    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_OPENTYPE = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
 
         static ReadOnlyMemory<byte> PATTERN_TRUETYPE_COLLECTION = new ReadOnlyMemory<byte>(new byte[] { 0x74, 0x74, 0x63, 0x66 });/* The string "ttcf", the TrueType Collection signature. */
-        static ReadOnlyMemory<byte> MASK_TRUETYPE_COLLECTION    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_TRUETYPE_COLLECTION = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
 
         static ReadOnlyMemory<byte> PATTERN_WEB_OPEN_FONT_FORMAT_V1 = new ReadOnlyMemory<byte>(new byte[] { 0x77, 0x4F, 0x46, 0x46 });/* The string "wOFF", the Web Open Font Format 1.0 signature. */
-        static ReadOnlyMemory<byte> MASK_WEB_OPEN_FONT_FORMAT_V1    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_WEB_OPEN_FONT_FORMAT_V1 = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
 
         static ReadOnlyMemory<byte> PATTERN_WEB_OPEN_FONT_FORMAT_V2 = new ReadOnlyMemory<byte>(new byte[] { 0x77, 0x4F, 0x46, 0x32 });/* The string "wOF2", the Web Open Font Format 2.0 signature. */
-        static ReadOnlyMemory<byte> MASK_WEB_OPEN_FONT_FORMAT_V2    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_WEB_OPEN_FONT_FORMAT_V2 = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
         #endregion
 
 
         #region /* IMAGES */
 
         static ReadOnlyMemory<byte> PATTERN_WINDOWS_ICON = new ReadOnlyMemory<byte>(new byte[] { 0x00, 0x00, 0x01, 0x00 });/* A Windows Icon signature. */
-        static ReadOnlyMemory<byte> MASK_WINDOWS_ICON    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_WINDOWS_ICON = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
 
         static ReadOnlyMemory<byte> PATTERN_WINDOWS_CURSOR = new ReadOnlyMemory<byte>(new byte[] { 0x00, 0x00, 0x02, 0x00 });/* A Windows Cursor signature. */
-        static ReadOnlyMemory<byte> MASK_WINDOWS_CURSOR    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_WINDOWS_CURSOR = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
 
         static ReadOnlyMemory<byte> PATTERN_IMAGE_BMP = new ReadOnlyMemory<byte>(new byte[] { 0x42, 0x4D });/* The string "BM", a BMP signature. */
-        static ReadOnlyMemory<byte> MASK_IMAGE_BMP    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_IMAGE_BMP = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF });
 
         static ReadOnlyMemory<byte> PATTERN_IMAGE_GIF87a = new ReadOnlyMemory<byte>(new byte[] { 0x47, 0x49, 0x46, 0x38, 0x37, 0x61 });/* The string "GIF87a", a GIF signature. */
-        static ReadOnlyMemory<byte> MASK_IMAGE_GIF87a    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_IMAGE_GIF87a = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
 
         static ReadOnlyMemory<byte> PATTERN_IMAGE_GIF89a = new ReadOnlyMemory<byte>(new byte[] { 0x47, 0x49, 0x46, 0x38, 0x39, 0x61 });/* The string "GIF89a", a GIF signature. */
-        static ReadOnlyMemory<byte> MASK_IMAGE_GIF89a    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_IMAGE_GIF89a = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
 
         static ReadOnlyMemory<byte> PATTERN_IMAGE_WEBP = new ReadOnlyMemory<byte>(new byte[] { 0x52, 0x49, 0x46, 0x46, 0x00, 0x00, 0x00, 0x00, 0x57, 0x45, 0x42, 0x50, 0x56, 0x50 });/* The string "RIFF" followed by four bytes followed by the string "WEBPVP". */
-        static ReadOnlyMemory<byte> MASK_IMAGE_WEBP    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_IMAGE_WEBP = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
 
         static ReadOnlyMemory<byte> PATTERN_IMAGE_PNG = new ReadOnlyMemory<byte>(new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A });/* An error-checking byte followed by the string "PNG" followed by CR LF SUB LF, the PNG signature. */
-        static ReadOnlyMemory<byte> MASK_IMAGE_PNG    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_IMAGE_PNG = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
 
         static ReadOnlyMemory<byte> PATTERN_IMAGE_JPEG = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xD8, 0xFF });/* The JPEG Start of Image marker followed by the indicator byte of another marker. */
-        static ReadOnlyMemory<byte> MASK_IMAGE_JPEG    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_IMAGE_JPEG = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF });
         #endregion
 
 
         #region /* AUDIO / VIDEO */
 
         static ReadOnlyMemory<byte> PATTERN_SND = new ReadOnlyMemory<byte>(new byte[] { 0x2E, 0x73, 0x6E, 0x64 });/* The string ".snd", the basic audio signature. */
-        static ReadOnlyMemory<byte> MASK_SND    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_SND = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
 
         static ReadOnlyMemory<byte> PATTERN_AIFF = new ReadOnlyMemory<byte>(new byte[] { 0x46, 0x4F, 0x52, 0x4D, 0x00, 0x00, 0x00, 0x00, 0x41, 0x49, 0x46, 0x46 });/* The string "FORM" followed by four bytes followed by the string "AIFF", the AIFF signature. */
-        static ReadOnlyMemory<byte> MASK_AIFF    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_AIFF = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF });
 
         static ReadOnlyMemory<byte> PATTERN_MP3 = new ReadOnlyMemory<byte>(new byte[] { 0x49, 0x44, 0x33 });/* The string "ID3", the ID3v2-tagged MP3 signature. */
-        static ReadOnlyMemory<byte> MASK_MP3    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_MP3 = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF });
 
         static ReadOnlyMemory<byte> PATTERN_OGG = new ReadOnlyMemory<byte>(new byte[] { 0x4F, 0x67, 0x67, 0x53, 0x00 });/* The string "OggS" followed by NUL, the Ogg container signature. */
-        static ReadOnlyMemory<byte> MASK_OGG    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_OGG = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
 
         static ReadOnlyMemory<byte> PATTERN_MIDI = new ReadOnlyMemory<byte>(new byte[] { 0x4D, 0x54, 0x68, 0x64, 0x00, 0x00, 0x00, 0x06 });/* The string "MThd" followed by four bytes representing the number 6 in 32 bits (big-endian), the MIDI signature. */
-        static ReadOnlyMemory<byte> MASK_MIDI    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_MIDI = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
 
         static ReadOnlyMemory<byte> PATTERN_AVI = new ReadOnlyMemory<byte>(new byte[] { 0x52, 0x49, 0x46, 0x46, 0x00, 0x00, 0x00, 0x00, 0x41, 0x56, 0x49, 0x20 });/* The string "RIFF" followed by four bytes followed by the string "AVI ", the AVI signature. */
-        static ReadOnlyMemory<byte> MASK_AVI    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_AVI = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF });
 
         static ReadOnlyMemory<byte> PATTERN_WAVE = new ReadOnlyMemory<byte>(new byte[] { 0x52, 0x49, 0x46, 0x46, 0x00, 0x00, 0x00, 0x00, 0x57, 0x41, 0x56, 0x45 });/* The string "RIFF" followed by four bytes followed by the string "WAVE", the WAVE signature. */
-        static ReadOnlyMemory<byte> MASK_WAVE    = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF });
+        static ReadOnlyMemory<byte> MASK_WAVE = new ReadOnlyMemory<byte>(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF });
         #endregion
 
 
@@ -671,7 +671,7 @@ namespace CssUI.DOM
                             /* 1) If sequence[s] is undefined, the computed MIME type is the supplied MIME type. */
                             if (Stream.Next == 0x0) return suppliedMIMEType;
 
-                            if (Stream.Remaining >= 3 && Stream.Slice(0,3).Span.SequenceEqual(seq_comment_end))
+                            if (Stream.Remaining >= 3 && Stream.Slice(0, 3).Span.SequenceEqual(seq_comment_end))
                             {
                                 Stream.Consume(3);
                                 EXIT_L = true;
@@ -896,7 +896,7 @@ namespace CssUI.DOM
             if (Header.Slice(8, 3).Span.SequenceEqual(PATTERN_MP4_MP4)) return true;
 
             var bytesRead = 16;
-            while(bytesRead < boxSize)
+            while (bytesRead < boxSize)
             {
                 if (Header.Slice(bytesRead, 3).Span.SequenceEqual(PATTERN_MP4_MP4)) return true;
                 bytesRead += 4;

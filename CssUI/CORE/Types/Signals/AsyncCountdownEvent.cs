@@ -22,10 +22,10 @@ namespace CssUI
             m_count = initialCount;
         }
         #endregion
-        
+
         public Task WaitAsync() => m_amre.WaitAsync();
 
-        public Task WaitAsync(TimeSpan Timeout) => m_amre.WaitAsync( Timeout );
+        public Task WaitAsync(TimeSpan Timeout) => m_amre.WaitAsync(Timeout);
 
         public void Signal()
         {

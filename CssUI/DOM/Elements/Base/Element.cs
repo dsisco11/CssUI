@@ -1495,7 +1495,7 @@ namespace CssUI.DOM
             }
 
             /* 10) If position is the same as scrolling box’s current scroll position, and scrolling box does not have an ongoing smooth scroll, abort these steps. */
-            if ((position.x ==  scrollBox.ScrollX) && (position.y ==  scrollBox.ScrollY) && !scrollBox.IsScrolling)
+            if ((position.x == scrollBox.ScrollX) && (position.y == scrollBox.ScrollY) && !scrollBox.IsScrolling)
                 return false;
 
             Element? associatedElement = null;
@@ -1770,7 +1770,7 @@ namespace CssUI.DOM
                 /* 2) Return the computed value of the border-top-width property plus the height of any scrollbar rendered between the top padding edge and the top border edge, 
                  * ignoring any transforms that apply to the element and its ancestors. */
                 double retVal = Style.Border_Top_Width;
-                retVal += (0 ==  ScrollBox.HScrollBar.Top) ? ScrollBox.HScrollBar.Height : 0;
+                retVal += (0 == ScrollBox.HScrollBar.Top) ? ScrollBox.HScrollBar.Height : 0;
                 return (long)retVal;
             }
         }
@@ -1784,7 +1784,7 @@ namespace CssUI.DOM
                 /* 2) Return the computed value of the border-left-width property plus the width of any scrollbar rendered between the left padding edge and the left border edge, 
                  * ignoring any transforms that apply to the element and its ancestors. */
                 double retVal = Style.Border_Left_Width;
-                retVal += (0 ==  ScrollBox.VScrollBar.Left) ? ScrollBox.VScrollBar.Width : 0;
+                retVal += (0 == ScrollBox.VScrollBar.Left) ? ScrollBox.VScrollBar.Width : 0;
                 return (long)retVal;
             }
         }

@@ -143,7 +143,7 @@ namespace CssUI
         /// <param name="color">Text color.</param>
         /// <param name="horizontalAlign">Horizontal alignment (0=left, 0.5=center, 1=right).</param>
         /// <param name="verticalAlign">Vertical alignment (0=top, 0.5=middle, 1=bottom).</param>
-        void DrawText(FontHandle font, ReadOnlySpan<char> text, RenderRect bounds, Color color, 
+        void DrawText(FontHandle font, ReadOnlySpan<char> text, RenderRect bounds, Color color,
                       float horizontalAlign = 0f, float verticalAlign = 0f);
 
         #endregion
@@ -153,7 +153,7 @@ namespace CssUI
         /// <summary>
         /// Draw CSS-style borders with potentially different styles/colors per side.
         /// </summary>
-        void DrawBorders(RenderRect rect, 
+        void DrawBorders(RenderRect rect,
                          float topWidth, float rightWidth, float bottomWidth, float leftWidth,
                          Color topColor, Color rightColor, Color bottomColor, Color leftColor,
                          EBorderStyle topStyle, EBorderStyle rightStyle, EBorderStyle bottomStyle, EBorderStyle leftStyle);

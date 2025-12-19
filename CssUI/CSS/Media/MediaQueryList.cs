@@ -24,7 +24,7 @@ namespace CssUI.DOM.Media
         {
             get
             {
-                foreach(MediaQuery query in QueryList)
+                foreach (MediaQuery query in QueryList)
                 {
                     if (!query.Matches(document))
                     {
@@ -81,7 +81,7 @@ namespace CssUI.DOM.Media
             {
                 oldMatchState = newMatchState;
                 var evt = new MediaQueryListEvent(EEventName.Change, new MediaQueryListEventInit(media, newMatchState));
-                dispatchEvent( evt );
+                dispatchEvent(evt);
             }
         }
 

@@ -137,7 +137,7 @@ namespace CssUI.DOM
         /// "The document element of a document is the element whose parent is that document, if it exists; otherwise null."
         /// Docs: https://dom.spec.whatwg.org/#document-element
         /// </summary>
-        public Element? documentElement 
+        public Element? documentElement
         {
             get
             {
@@ -723,7 +723,7 @@ namespace CssUI.DOM
             }
         }
         #endregion
-        
+
 
         #region Document Events
         public event EventCallback onCopy

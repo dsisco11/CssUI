@@ -677,7 +677,7 @@ namespace CssUI.CSS
         {
             if (0 == (StyleFlags & EPropertySystemDirtFlags.NeedsToResolveFont)) return;
 
-            if (!(FontSize ==  oldFontSize))
+            if (!(FontSize == oldFontSize))
             {
                 oldFontSize = FontSize;
                 Notify_Unit_Scale_Change(ECssUnit.EM);

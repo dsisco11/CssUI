@@ -68,7 +68,7 @@ namespace CssUI.Rendering
             byte[] bytes = new byte[4];
             fixed (byte* ptr = bytes)
                 *((uint*)ptr) = (uint)packed;
-            
+
             return bytes;
         }
 

@@ -140,24 +140,24 @@ namespace CssUI.DOM.Events
         #endregion
 
         #region Event Handler Processing
-/*
-        /// <summary>
-        /// </summary>
-        /// <param name="eventTarget"></param>
-        /// <param name="Name"></param>
-        /// <param name="event"></param>
-        internal static void Process_Handler(EventTarget eventTarget, EventName Name, Event @event)
-        {*//* Docs: https://html.spec.whatwg.org/multipage/webappapis.html#the-event-handler-processing-algorithm */
+        /*
+                /// <summary>
+                /// </summary>
+                /// <param name="eventTarget"></param>
+                /// <param name="Name"></param>
+                /// <param name="event"></param>
+                internal static void Process_Handler(EventTarget eventTarget, EventName Name, Event @event)
+                {*//* Docs: https://html.spec.whatwg.org/multipage/webappapis.html#the-event-handler-processing-algorithm */
 
-            /* Since CssUI's event handler system allows multiple callbacks per handler we do things slightly different from the DOM specifications *//*
-            var handlerList = eventTarget.handlerMap[Name];
-            foreach(EventHandler handler in handlerList)
-            {
-                *//* Invoke callback with one argument, the value of which is the Event object event, with the callback this value set to event's currentTarget. Let return value be the callback's return value. [WEBIDL] *//*
-                handler.callback?.Invoke(@event);
-            }
-
+        /* Since CssUI's event handler system allows multiple callbacks per handler we do things slightly different from the DOM specifications *//*
+        var handlerList = eventTarget.handlerMap[Name];
+        foreach(EventHandler handler in handlerList)
+        {
+            *//* Invoke callback with one argument, the value of which is the Event object event, with the callback this value set to event's currentTarget. Let return value be the callback's return value. [WEBIDL] *//*
+            handler.callback?.Invoke(@event);
         }
+
+    }
 */
         #endregion
 

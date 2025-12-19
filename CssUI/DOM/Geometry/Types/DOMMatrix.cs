@@ -16,7 +16,7 @@ namespace CssUI.DOM.Geometry
             set
             {
                 Data[_m13] = value;
-                if (!(value ==  0.0))
+                if (!(value == 0.0))
                     is2D = false;
             }
         }
@@ -26,7 +26,7 @@ namespace CssUI.DOM.Geometry
             set
             {
                 Data[3] = value;
-                if (!(value ==  0.0))
+                if (!(value == 0.0))
                     is2D = false;
             }
         }
@@ -38,7 +38,7 @@ namespace CssUI.DOM.Geometry
             set
             {
                 Data[_m23] = value;
-                if (!(value ==  0.0))
+                if (!(value == 0.0))
                     is2D = false;
             }
         }
@@ -48,7 +48,7 @@ namespace CssUI.DOM.Geometry
             set
             {
                 Data[_m24] = value;
-                if (!(value ==  0.0))
+                if (!(value == 0.0))
                     is2D = false;
             }
         }
@@ -58,7 +58,7 @@ namespace CssUI.DOM.Geometry
             set
             {
                 Data[_m31] = value;
-                if (!(value ==  1.0))
+                if (!(value == 1.0))
                     is2D = false;
             }
         }
@@ -68,7 +68,7 @@ namespace CssUI.DOM.Geometry
             set
             {
                 Data[_m32] = value;
-                if (!(value ==  0.0))
+                if (!(value == 0.0))
                     is2D = false;
             }
         }
@@ -78,7 +78,7 @@ namespace CssUI.DOM.Geometry
             set
             {
                 Data[_m33] = value;
-                if (!(value ==  1.0))
+                if (!(value == 1.0))
                     is2D = false;
             }
         }
@@ -88,7 +88,7 @@ namespace CssUI.DOM.Geometry
             set
             {
                 Data[_m34] = value;
-                if (!(value ==  0.0))
+                if (!(value == 0.0))
                     is2D = false;
             }
         }
@@ -100,7 +100,7 @@ namespace CssUI.DOM.Geometry
             set
             {
                 Data[_m43] = value;
-                if (!(value ==  0.0))
+                if (!(value == 0.0))
                     is2D = false;
             }
         }
@@ -110,7 +110,7 @@ namespace CssUI.DOM.Geometry
             set
             {
                 Data[_m44] = value;
-                if (!(value ==  1.0))
+                if (!(value == 1.0))
                     is2D = false;
             }
         }
@@ -185,7 +185,7 @@ namespace CssUI.DOM.Geometry
             return this;
         }
         #endregion
-        
+
         #region Rotation Transforms
         // helpers for Rotate
         public static DOMMatrix get_X_Rotation_Transform(double deg)
@@ -193,7 +193,7 @@ namespace CssUI.DOM.Geometry
             var matrix = new DOMMatrix();
             double rads = deg * MathExt.Radians;
             matrix.Data[5] = Math.Cos(rads);
-            matrix.Data[6] =  -Math.Sin(rads);
+            matrix.Data[6] = -Math.Sin(rads);
             matrix.Data[9] = Math.Sin(rads);
             matrix.Data[10] = Math.Cos(rads);
             return matrix;
@@ -315,7 +315,7 @@ namespace CssUI.DOM.Geometry
         /// <returns></returns>
         public DOMMatrix translateSelf(double tx, double ty, double tz = 0.0)
         {/* Docs: https://www.w3.org/TR/geometry-1/#dom-dommatrix-translateself */
-            if (!(tz ==  0.0)) is2D = false;
+            if (!(tz == 0.0)) is2D = false;
 
             for (int j = 0; j < 4; j++)
             {
@@ -337,7 +337,7 @@ namespace CssUI.DOM.Geometry
         /// <returns>This matrix with scaling applied to it</returns>
         public DOMMatrix scaleSelf(double scaleX, double scaleY, double scaleZ, double originX, double originY, double originZ)
         {/* Docs: https://www.w3.org/TR/geometry-1/#dom-dommatrix-scaleself */
-            if (!(scaleZ ==  1.0) || !(originZ ==  0.0)) is2D = false;
+            if (!(scaleZ == 1.0) || !(originZ == 0.0)) is2D = false;
             translateSelf(originX, originY, originZ);
 
             int x;
@@ -359,7 +359,7 @@ namespace CssUI.DOM.Geometry
         /// <returns>This matrix with scaling applied to it</returns>
         public DOMMatrix scale3DSelf(double scale, double originX, double originY, double originZ)
         {/* Docs: https://www.w3.org/TR/geometry-1/#dom-dommatrix-scale3dself */
-            if (!(scale ==  1.0)) is2D = false;
+            if (!(scale == 1.0)) is2D = false;
             translateSelf(originX, originY, originZ);
 
             int x;
@@ -380,7 +380,7 @@ namespace CssUI.DOM.Geometry
         /// <returns>This matrix with rotation applied to it</returns>
         public DOMMatrix rotateSelf(double rotX, double rotY, double rotZ)
         {/* Docs: https://www.w3.org/TR/geometry-1/#dom-dommatrix-rotateself */
-            if (!(rotX ==  0.0) || !(rotY ==  0.0)) is2D = false;
+            if (!(rotX == 0.0) || !(rotY == 0.0)) is2D = false;
             multiplySelf(get_Z_Rotation_Transform(rotZ));
             multiplySelf(get_Y_Rotation_Transform(rotY));
             multiplySelf(get_X_Rotation_Transform(rotX));
@@ -397,7 +397,7 @@ namespace CssUI.DOM.Geometry
         {/* Docs: https://www.w3.org/TR/geometry-1/#dom-dommatrix-rotatefromvectorself */
             /* "The rotation angle is determined by the angle between the vector (1,0)T and (x,y)T in the clockwise direction." */
             double alpha = 0;
-            if (!(x ==  0) || !(y ==  0))
+            if (!(x == 0) || !(y == 0))
                 alpha = Math.Atan((y - 0) / (x - 1));
             /* "The 2D rotation matrix is described in CSS Transforms where alpha is the angle between the vector (1,0)T and (x,y)T in degrees." */
             multiplySelf(get_Z_Rotation_Transform(alpha * (1.0 / MathExt.Radians)));
@@ -415,7 +415,7 @@ namespace CssUI.DOM.Geometry
         public DOMMatrix rotateAxisAngleSelf(double axisX = 0, double axisY = 0, double axisZ = 0, double alpha = 0)
         {/* Docs: https://www.w3.org/TR/geometry-1/#dom-dommatrix-rotateaxisangleself */
 
-            if (!(axisX ==  0) || !(axisY ==  0))
+            if (!(axisX == 0) || !(axisY == 0))
                 is2D = true;
 
             multiplySelf(get_Rotation_Transform(axisX, axisY, axisZ, alpha));

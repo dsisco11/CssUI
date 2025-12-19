@@ -102,7 +102,7 @@ namespace CssUI.DOM.Mutation
                     /* 2) If none of the following are true */
                     if (!(!ReferenceEquals(node, Record.target) && !options.subtree)
                     && !(Record.type == EMutationType.Attributes && !options.attributes)
-                    && !(Record.type == EMutationType.Attributes && (options.attributeFilter==null || (!options.attributeFilter.Contains("name") && options.attributeFilter.Contains("namespace"))))
+                    && !(Record.type == EMutationType.Attributes && (options.attributeFilter == null || (!options.attributeFilter.Contains("name") && options.attributeFilter.Contains("namespace"))))
                     && !(Record.type == EMutationType.CharacterData && !options.characterData)
                     && !(Record.type == EMutationType.ChildList && !options.childList))
                     {

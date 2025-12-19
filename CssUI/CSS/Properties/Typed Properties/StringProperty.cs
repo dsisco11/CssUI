@@ -17,7 +17,7 @@ namespace CssUI.CSS
         #endregion
 
         #region Constructors
-        public StringProperty(AtomicName<ECssPropertyID> CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked) 
+        public StringProperty(AtomicName<ECssPropertyID> CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
             : base(CssName, Owner, Source, Locked)
         {
         }
@@ -33,7 +33,7 @@ namespace CssUI.CSS
             }
         }
         #endregion
-        
+
     }
 }
 

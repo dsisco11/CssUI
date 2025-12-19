@@ -41,7 +41,7 @@ namespace CssUI.DOM
             this.altKey = altKey;
             this.metaKey = metaKey;
 
-            LinkedList <EKeyboardCode> keyList = new LinkedList<EKeyboardCode>();
+            LinkedList<EKeyboardCode> keyList = new LinkedList<EKeyboardCode>();
             foreach (EKeyboardCode key in keys)
             {
                 switch (key)

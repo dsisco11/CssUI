@@ -6,7 +6,8 @@ namespace CssUI.DOM.Exceptions
     {
         public readonly string Name;
         public readonly string Message;
-        public EDomExceptionCode Code {
+        public EDomExceptionCode Code
+        {
             get
             {
                 switch (this.Name)

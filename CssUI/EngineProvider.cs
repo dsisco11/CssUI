@@ -51,7 +51,7 @@ namespace CssUI
                     throw new InvalidOperationException("CssUI has already been initialized.");
 
                 config ??= new CssUIConfig();
-                
+
                 _fontEngine = config.FontEngine ?? CreateDefaultFontEngine();
                 _textureEngine = config.TextureEngine ?? CreateDefaultTextureEngine();
                 _renderEngine = config.RenderEngine ?? new NullRenderEngine();
@@ -66,7 +66,7 @@ namespace CssUI
         public static void EnsureInitialized()
         {
             if (_initialized) return;
-            
+
             lock (_lock)
             {
                 if (_initialized) return;

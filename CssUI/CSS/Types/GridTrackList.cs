@@ -168,15 +168,15 @@ namespace CssUI.CSS.Types
         /// <summary>
         /// For minmax(), gets the minimum size.
         /// </summary>
-        public GridTrackSize MinSize => Type == EGridTrackSizeType.Minmax 
-            ? new GridTrackSize(_minType, _minValue, _minUnit) 
+        public GridTrackSize MinSize => Type == EGridTrackSizeType.Minmax
+            ? new GridTrackSize(_minType, _minValue, _minUnit)
             : this;
 
         /// <summary>
         /// For minmax(), gets the maximum size.
         /// </summary>
-        public GridTrackSize MaxSize => Type == EGridTrackSizeType.Minmax 
-            ? new GridTrackSize(_maxType, _maxValue, _maxUnit) 
+        public GridTrackSize MaxSize => Type == EGridTrackSizeType.Minmax
+            ? new GridTrackSize(_maxType, _maxValue, _maxUnit)
             : this;
 
         #endregion

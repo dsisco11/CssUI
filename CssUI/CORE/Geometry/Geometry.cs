@@ -21,7 +21,7 @@ namespace CssUI
 
             Contract.EndContractBlock();
 
-            return (Rect.Left <=  X) && (Rect.Right >=  X) && (Rect.Top <=  Y) && (Rect.Bottom >=  Y);
+            return (Rect.Left <= X) && (Rect.Right >= X) && (Rect.Top <= Y) && (Rect.Bottom >= Y);
         }
         /// <summary>
         /// Returns True if the given point lies within this area
@@ -35,7 +35,7 @@ namespace CssUI
 
             Contract.EndContractBlock();
 
-            return (Rect.Left <=  X) && (Rect.Right >=  X) && (Rect.Top <=  Y) && (Rect.Bottom >=  Y);
+            return (Rect.Left <= X) && (Rect.Right >= X) && (Rect.Top <= Y) && (Rect.Bottom >= Y);
         }
         /// <summary>
         /// Returns True if the given point lies within this area
@@ -68,8 +68,8 @@ namespace CssUI
 
             Contract.EndContractBlock();
 
-            bool intersectsX = (Point.x >=  Rect.Left) && (Point.x <=  Rect.Right);
-            bool intersectsY = (Point.y >=  Rect.Top) && (Point.y <=  Rect.Bottom);
+            bool intersectsX = (Point.x >= Rect.Left) && (Point.x <= Rect.Right);
+            bool intersectsY = (Point.y >= Rect.Top) && (Point.y <= Rect.Bottom);
             return intersectsX && intersectsY;
             //return (point.x >= rect.left) && (point.x <= rect.right) && (point.y >= rect.top) && (point.y <= rect.bottom);
         }
@@ -90,8 +90,8 @@ namespace CssUI
 
             Contract.EndContractBlock();
 
-            bool intersectsX = (Left.Left <=  Right.Right) && (Left.Right >=  Right.Left);
-            bool intersectsY = (Left.Bottom <=  Right.Top) && (Left.Top >=  Right.Bottom);
+            bool intersectsX = (Left.Left <= Right.Right) && (Left.Right >= Right.Left);
+            bool intersectsY = (Left.Bottom <= Right.Top) && (Left.Top >= Right.Bottom);
             return intersectsX && intersectsY;
         }
         #endregion
@@ -103,14 +103,14 @@ namespace CssUI
         /// </summary>
         public static bool Intersects(in Rect4f Rect, int X, int Y)
         {
-            return (Rect.Left <=  X) && (Rect.Right >=  X) && (Rect.Top <=  Y) && (Rect.Bottom >=  Y);
+            return (Rect.Left <= X) && (Rect.Right >= X) && (Rect.Top <= Y) && (Rect.Bottom >= Y);
         }
         /// <summary>
         /// Returns True if the given point lies within this area
         /// </summary>
         public static bool Intersects(in Rect4f Rect, double X, double Y)
         {
-            return (Rect.Left <=  X) && (Rect.Right >=  X) && (Rect.Top <=  Y) && (Rect.Bottom >=  Y);
+            return (Rect.Left <= X) && (Rect.Right >= X) && (Rect.Top <= Y) && (Rect.Bottom >= Y);
         }
         /// <summary>
         /// Returns True if the given point lies within this area
@@ -124,8 +124,8 @@ namespace CssUI
         /// </summary>
         public static bool Intersects(in Rect4f Rect, in Point2f Point)
         {
-            bool intersectsX = (Point.X >=  Rect.Left) && (Point.X <=  Rect.Right);
-            bool intersectsY = (Point.Y >=  Rect.Top) && (Point.Y <=  Rect.Bottom);
+            bool intersectsX = (Point.X >= Rect.Left) && (Point.X <= Rect.Right);
+            bool intersectsY = (Point.Y >= Rect.Top) && (Point.Y <= Rect.Bottom);
             return intersectsX && intersectsY;
         }
         /// <summary>
@@ -133,8 +133,8 @@ namespace CssUI
         /// </summary>
         public static bool Intersects(in Rect4f Left, in Rect4f Right)
         {
-            bool intersectsX = (Left.Left <=  Right.Right) && (Left.Right >=  Right.Left);
-            bool intersectsY = (Left.Bottom <=  Right.Top) && (Left.Top >=  Right.Bottom);
+            bool intersectsX = (Left.Left <= Right.Right) && (Left.Right >= Right.Left);
+            bool intersectsY = (Left.Bottom <= Right.Top) && (Left.Top >= Right.Bottom);
             return intersectsX && intersectsY;
         }
         #endregion

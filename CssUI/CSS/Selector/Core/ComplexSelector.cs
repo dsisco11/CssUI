@@ -39,7 +39,7 @@ namespace CssUI.CSS.Selectors
             /* Right-to-Left matching enforced here */
             /* We run through our list of relative selectors and match them against our element, if ANY fail then the whole selector fails to match. */
             LinkedList<Element> matchList = new LinkedList<Element>(new Element[] { element });
-            for (int i=Count-1; i>=0; i--)
+            for (int i = Count - 1; i >= 0; i--)
             {
                 if (!this[i].Match(matchList, out LinkedList<Element> outMatchList, scopeElements))
                     return false;

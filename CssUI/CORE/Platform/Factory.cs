@@ -22,7 +22,7 @@ namespace CssUI.Platform
 
         public static ISystemMetricsHandler SystemMetrics { get { return self.SystemMetrics; } }
         public static ISystemScreensHandler SystemScreens { get { return self.SystemScreens; } }
-        public static ISystemWindowHandler  SystemWindows { get { return self.SystemWindows; } }
+        public static ISystemWindowHandler SystemWindows { get { return self.SystemWindows; } }
         #endregion
     }
 }

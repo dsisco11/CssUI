@@ -49,7 +49,7 @@ namespace CssUI.CSS.Functions
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
-            
+
             if (!IsValidCustomPropertyName(name))
                 throw new ArgumentException($"Invalid custom property name: {name}. Must start with '--'", nameof(name));
 
@@ -128,7 +128,7 @@ namespace CssUI.CSS.Functions
             get
             {
                 var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                
+
                 // Add local properties
                 foreach (var name in _properties.Keys)
                 {

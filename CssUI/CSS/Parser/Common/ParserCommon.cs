@@ -145,7 +145,7 @@ namespace CssUI.CSS.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Starts_Media_Condition(ReadOnlySpan<CssToken> Stream)
         {
-            if ( Stream.Length < 2 || Stream[0] == null || Stream[1] == null)
+            if (Stream.Length < 2 || Stream[0] == null || Stream[1] == null)
             {
                 return false;
             }

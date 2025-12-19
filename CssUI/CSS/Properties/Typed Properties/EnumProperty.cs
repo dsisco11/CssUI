@@ -22,7 +22,7 @@ namespace CssUI.CSS
 
         #region Constructors
 
-        public EnumProperty(AtomicName<ECssPropertyID> CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked) 
+        public EnumProperty(AtomicName<ECssPropertyID> CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
             : base(CssName, Owner, Source, Locked)
         {
         }
@@ -31,7 +31,7 @@ namespace CssUI.CSS
         #region Setters
         public void Set(Ty Value)
         {
-            Assigned = CssValue.From( Value );
+            Assigned = CssValue.From(Value);
         }
         #endregion
 
