@@ -23,7 +23,7 @@ public class EventName
     {
         get
         {
-            if (!ReferenceEquals(null, _name))
+            if (_name is not null)
             {/* Resolve the backing value */
                 if (IsCustom) throw new System.Exception("Name backing-value for custom event type is not set!");
                 string keyword = Lookup.Keyword((EEventName)Value);

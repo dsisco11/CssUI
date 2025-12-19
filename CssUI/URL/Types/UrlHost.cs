@@ -15,7 +15,7 @@ public class UrlHost
     public UrlHost(string host)
     {
         Value = host;
-        if (ReferenceEquals(null, host) || host.Length <= 0)
+        if (host is null || host.Length <= 0)
         {
             Type = EHostType.Empty;
         }

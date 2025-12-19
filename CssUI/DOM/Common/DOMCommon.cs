@@ -387,7 +387,7 @@ public static class DOMCommon
         var tree = new TreeWalker(A, Enums.ENodeFilterMask.SHOW_ALL);
         /* Proove it true */
         Node node = tree.parentNode();
-        while (!ReferenceEquals(node, null))
+        while (node is not null)
         {
             if (ReferenceEquals(node, B))
                 return true;
@@ -512,7 +512,7 @@ public static class DOMCommon
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool Is_Sibling(Node A, Node B)
     {/* Docs: https://dom.spec.whatwg.org/#concept-tree-sibling */
-        if (ReferenceEquals(A.parentNode, null) || ReferenceEquals(B.parentNode, null))
+        if (A.parentNode is null || B.parentNode is null)
             return false;
         return ReferenceEquals(A.parentNode, B.parentNode);
     }
@@ -539,7 +539,7 @@ public static class DOMCommon
 
         /* Proove it true */
         Node? node = A.nextSibling;
-        while (!ReferenceEquals(node, null))
+        while (node is not null)
         {
             if (ReferenceEquals(node, B))
                 return true;
@@ -561,7 +561,7 @@ public static class DOMCommon
 
         /* Proove it true */
         Node? node = A.previousSibling;
-        while (!ReferenceEquals(node, null))
+        while (node is not null)
         {
             if (ReferenceEquals(node, B))
                 return true;

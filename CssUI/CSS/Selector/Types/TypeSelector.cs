@@ -48,7 +48,7 @@ public class TypeSelector : SimpleSelector
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     override public bool Matches(Element E, params Node[] scopeElements)
     {
-        if (!ReferenceEquals(null, Namespace))
+        if (Namespace is not null)
         {
             if (!Namespace.AsSpan().Equals("*".AsSpan(), StringComparison.OrdinalIgnoreCase))
             {// Perform namespace matching

@@ -338,7 +338,7 @@ public class Url
                                 state = ESchemeState.File;
                             }
                             /* 6) Otherwise, if url is special, base is non-null, and base’s scheme is equal to url’s scheme, set state to special relative or authority state. */
-                            else if (url.IsSpecial && !ReferenceEquals(null, Base) && Base.Scheme == url.Scheme)
+                            else if (url.IsSpecial && Base is not null && Base.Scheme == url.Scheme)
                             {
                                 state = ESchemeState.SpecialRelativeOrAuthority;
                             }
@@ -1154,13 +1154,13 @@ public class Url
             }
         }
 
-        if (!ReferenceEquals(null, Query))
+        if (Query is not null)
         {
             output.Append(CHAR_QUESTION_MARK);
             output.Append(Query);
         }
 
-        if (!bExcludeFragmentFlag && !ReferenceEquals(null, Fragment))
+        if (!bExcludeFragmentFlag && Fragment is not null)
         {
             output.Append(CHAR_HASH);
             output.Append(Fragment);
@@ -1230,7 +1230,7 @@ public class Url
         /* 5) Let asciiDomain be the result of running domain to ASCII on domain. */
         var asciiDomain = Domain_To_ASCII(domain);
         /* 6) If asciiDomain is failure, validation error, return failure. */
-        if (ReferenceEquals(null, asciiDomain))
+        if (asciiDomain is null)
         {
             Log.Warn($"Validation error @ \"{ParsingCommon.Get_Location(Stream)}\"");
             outHost = null;

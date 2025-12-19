@@ -81,11 +81,11 @@ public class UrlOrigin
 
         if (Type == EOriginType.Tuple && other.Type == EOriginType.Tuple)
         {
-            if (Scheme == other.Scheme && !ReferenceEquals(null, Domain) && !ReferenceEquals(null, other.Domain) && Domain.AsSpan().Equals(other.Domain.AsSpan(), StringComparison.Ordinal))
+            if (Scheme == other.Scheme && Domain is not null && other.Domain is not null && Domain.AsSpan().Equals(other.Domain.AsSpan(), StringComparison.Ordinal))
             {
                 return true;
             }
-            else if (IsSameOrigin(other) && !ReferenceEquals(null, Domain) && !ReferenceEquals(null, other.Domain) && Domain.AsSpan().Equals(other.Domain.AsSpan(), StringComparison.Ordinal))
+            else if (IsSameOrigin(other) && Domain is not null && other.Domain is not null && Domain.AsSpan().Equals(other.Domain.AsSpan(), StringComparison.Ordinal))
             {
                 return true;
             }

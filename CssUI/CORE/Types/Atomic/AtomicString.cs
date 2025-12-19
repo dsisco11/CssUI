@@ -121,9 +121,9 @@ public sealed class AtomicString
     public static bool operator ==(AtomicString? A, AtomicString? B)
     {
         // If both object are NULL they match
-        if (ReferenceEquals(null, A) && ReferenceEquals(null, B)) return true;
+        if (A is null && B is null) return true;
         // If one object is null and not the other they do not match
-        if (ReferenceEquals(null, A) ^ ReferenceEquals(null, B)) return false;
+        if (A is null ^ B is null) return false;
         // Check if hashes match
         if (0 != ((A!.Flags ^ B!.Flags) & EAtomicStringFlags.CaseInsensitive))
         {/* Flag mismatch: the XOR of both flags still returned CaseInsensitive, meaning only one of these atomic-strings is trying to be case-insensitive */
@@ -138,9 +138,9 @@ public sealed class AtomicString
     public static bool operator !=(AtomicString? A, AtomicString? B)
     {
         // If both object are null they do not match
-        if (ReferenceEquals(null, A) && ReferenceEquals(null, B)) return false;
+        if (A is null && B is null) return false;
         // If one object is null and not the other they do match
-        if (ReferenceEquals(null, A) ^ ReferenceEquals(null, B)) return true;
+        if (A is null ^ B is null) return true;
         // Check if hashes match
         if (0 != ((A!.Flags ^ B!.Flags) & EAtomicStringFlags.CaseInsensitive))
         {/* Flag mismatch: the XOR of both flags still returned CaseInsensitive, meaning only one of these atomic-strings is trying to be case-insensitive */

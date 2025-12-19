@@ -18,7 +18,7 @@ public class FilterDescendantOf : NodeFilter
     public override ENodeFilterResult acceptNode(Node node)
     {
         /* omitting any node without a parent */
-        if (ReferenceEquals(node.parentNode, null))
+        if (node.parentNode is null)
             return ENodeFilterResult.FILTER_REJECT;
 
         if (DOMCommon.Is_Descendant(node, targetNode))

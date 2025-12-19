@@ -70,7 +70,7 @@ public class NodeIterator
             Node? next = null;
             var tree = new TreeWalker(toBeRemovedNode, ENodeFilterMask.SHOW_ALL);
             Node? n = tree.nextSibling();
-            while (!ReferenceEquals(n, null))
+            while (n is not null)
             {
                 if (DOMCommon.Is_Inclusive_Descendant(n, nodeIterator.root) && !DOMCommon.Is_Inclusive_Descendant(n, toBeRemovedNode))
                 {
@@ -80,7 +80,7 @@ public class NodeIterator
                 n = tree.nextSibling()!;
             }
             /* 2) If next is non-null, then set nodeIterator’s reference to next and return. */
-            if (!ReferenceEquals(next, null))
+            if (next is not null)
             {
                 nodeIterator.referenceNode = next;
                 return;

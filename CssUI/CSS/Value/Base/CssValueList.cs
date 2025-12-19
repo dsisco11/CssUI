@@ -98,16 +98,16 @@ public class CssValueList : IEnumerable<CssValue>
     public static bool operator ==(CssValueList? A, CssValueList? B)
     {
         // If either object is null return whether they are BOTH null
-        if (object.ReferenceEquals(A, null) || object.ReferenceEquals(B, null))
-            return (object.ReferenceEquals(A, null) && object.ReferenceEquals(B, null));
+        if (A is null || B is null)
+            return (A is null && B is null);
 
         return A.GetHashCode() == B.GetHashCode();
     }
     public static bool operator !=(CssValueList? A, CssValueList? B)
     {
         // If either object is null return whether they are BOTH null
-        if (object.ReferenceEquals(A, null) || object.ReferenceEquals(B, null))
-            return !(object.ReferenceEquals(A, null) && object.ReferenceEquals(B, null));
+        if (A is null || B is null)
+            return !(A is null && B is null);
 
         return A.GetHashCode() != B.GetHashCode();
     }

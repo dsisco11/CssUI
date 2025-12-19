@@ -83,7 +83,7 @@ public class CssProperty : CssPropertyBase, ICssProperty
             if (Locked) throw new Exception("Cannot modify the value of a locked css property!");
             Definition.CheckAndThrow(this, value);
             // Translate a value of NULL to CSSValue.Null
-            _assigned = ReferenceEquals(value, null) ? CssValue.Null : value;
+            _assigned = value is null ? CssValue.Null : value;
             //our assigned value has changed, this means our specified and computed valued are now incorrect.
             Update();
         }
@@ -229,7 +229,7 @@ public class CssProperty : CssPropertyBase, ICssProperty
     {
         _specified = Assigned.Derive_SpecifiedValue(this);
         // detect changes, fire events
-        if (ReferenceEquals(oldSpecified, null) || oldSpecified != _specified)
+        if (oldSpecified is null || oldSpecified != _specified)
         {// the computed value changed
             oldSpecified.Update(_specified);
             // FireValueChangeEvent(ECssPropertyStage.Specified);
@@ -244,7 +244,7 @@ public class CssProperty : CssPropertyBase, ICssProperty
     {
         _computed = Specified.Derive_ComputedValue(this);
         // detect changes, fire events
-        if (ReferenceEquals(oldComputed, null) || oldComputed != _computed)
+        if (oldComputed is null || oldComputed != _computed)
         {
             oldComputed.Update(_computed);
             // FireValueChangeEvent(ECssPropertyStage.Computed);
@@ -259,7 +259,7 @@ public class CssProperty : CssPropertyBase, ICssProperty
     {
         _used = Computed.Derive_UsedValue(this);
         // detect changes, fire events
-        if (ReferenceEquals(oldUsed, null) || oldUsed != _used)
+        if (oldUsed is null || oldUsed != _used)
         {
             oldUsed.Update(_used);
             // FireValueChangeEvent(ECssPropertyStage.Used);
@@ -273,7 +273,7 @@ public class CssProperty : CssPropertyBase, ICssProperty
     {
         _actual = Used.Derive_ActualValue(this);
         // detect changes, fire events
-        if (ReferenceEquals(oldActual, null) || oldActual != _actual)
+        if (oldActual is null || oldActual != _actual)
         {
             oldActual.Update(_actual);
             FireValueChangeEvent(EPropertyStage.Actual);
@@ -391,7 +391,7 @@ public class CssProperty : CssPropertyBase, ICssProperty
         _used = null;
         _actual = null;
 
-        if (ReferenceEquals(oldAssigned, null) || oldAssigned != Assigned)
+        if (oldAssigned is null || oldAssigned != Assigned)
         {
             oldAssigned.Update(Assigned);
             FireValueChangeEvent(EPropertyStage.Assigned);
@@ -401,15 +401,15 @@ public class CssProperty : CssPropertyBase, ICssProperty
         {
             Reinterpret_Specified();
             // check if we should reinterpreted Computed aswell
-            if (ReferenceEquals(_computed, null))
+            if (_computed is null)
                 Reinterpret_Computed();
 
             // check if we should reinterpreted Used aswell
-            if (ReferenceEquals(_used, null))
+            if (_used is null)
                 Reinterpret_Used();
 
             // check if we should reinterpreted Actual aswell
-            if (ReferenceEquals(_actual, null))
+            if (_actual is null)
                 Reinterpret_Actual();
         }
     }

@@ -31,7 +31,7 @@ public class AtomicName<T> : IConvertible, IComparable<Int32>, IEquatable<Int32>
                 if (IsCustom) throw new Exception("Name backing-value for custom event type is not set!");
 
                 string name = Value_To_Name(Value);
-                if (ReferenceEquals(null, name)) throw new Exception($"Unable to convert \"{typeof(T).Name}\" value to string");
+                if (name is null) throw new Exception($"Unable to convert \"{typeof(T).Name}\" value to string");
 
                 _name = name;
                 _name_lower = name.ToLowerInvariant();

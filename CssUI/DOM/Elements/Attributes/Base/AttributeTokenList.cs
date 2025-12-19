@@ -169,7 +169,7 @@ public abstract class AttributeTokenList<T> : IEnumerable<T>, IAttributeTokenLis
         {
             string tokenValue = Token_To_String(token);
             /* 1) If token is the empty string, then throw a "SyntaxError" DOMException. */
-            if (ReferenceEquals(null, tokenValue) || tokenValue.Length <= 0)
+            if (tokenValue is null || tokenValue.Length <= 0)
                 throw new DomSyntaxError();
             /* 2) If token contains any ASCII whitespace, then throw an "InvalidCharacterError" DOMException. */
             bool hasWhitespace = default(char) != tokenValue.ToString().ToCharArray().SingleOrDefault(c => UnicodeCommon.Is_Ascii_Whitespace(c));
@@ -194,7 +194,7 @@ public abstract class AttributeTokenList<T> : IEnumerable<T>, IAttributeTokenLis
         {
             string tokenValue = Token_To_String(token1);
             /* 1) If token is the empty string, then throw a "SyntaxError" DOMException. */
-            if (ReferenceEquals(null, tokenValue) || tokenValue.Length <= 0)
+            if (tokenValue is null || tokenValue.Length <= 0)
                 throw new DomSyntaxError("Token cannot be null.");
             /* 2) If token contains any ASCII whitespace, then throw an "InvalidCharacterError" DOMException. */
             bool hasWhitespace = default(char) != tokenValue.ToString().ToCharArray().SingleOrDefault(c => UnicodeCommon.Is_Ascii_Whitespace(c));
@@ -249,7 +249,7 @@ public abstract class AttributeTokenList<T> : IEnumerable<T>, IAttributeTokenLis
         /* The replace(token, newToken) method, when invoked, must run these steps: */
         /* 1) If token is the empty string, then throw a "SyntaxError" DOMException. */
         string tokenValue = Token_To_String(token);
-        if (ReferenceEquals(null, tokenValue) || tokenValue.Length <= 0)
+        if (tokenValue is null || tokenValue.Length <= 0)
             throw new DomSyntaxError("Token cannot be null or empty.");
         /* 2) If token contains any ASCII whitespace, then throw an "InvalidCharacterError" DOMException. */
         bool hasWhitespace = default(char) != tokenValue.ToString().ToCharArray().SingleOrDefault(c => UnicodeCommon.Is_Ascii_Whitespace(c));

@@ -30,7 +30,7 @@ public class FilterShadowIncludingDescendantOf : NodeFilter
     public override ENodeFilterResult acceptNode(Node node)
     {
         /* omitting any node without a parent */
-        if (ReferenceEquals(node.parentNode, null))
+        if (node.parentNode is null)
             return Negative;
 
         if (DOMCommon.Is_Shadow_Including_Descendant(node, targetNode))

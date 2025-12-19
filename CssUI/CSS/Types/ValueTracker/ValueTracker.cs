@@ -46,7 +46,7 @@ public class ValueTracker<Ty>
     /// <param name="suppress">If <c>True</c> the change event will not be fired</param>
     public void Update(Ty? newValue, bool suppress = false)
     {
-        if (ReferenceEquals(newValue, null))
+        if (newValue is null)
         {
             if (Hash != 0)
             {
@@ -81,12 +81,12 @@ public class ValueTracker<Ty>
     #region Operators
     public static bool operator ==(ValueTracker<Ty> Hash, object o)
     {
-        return !ReferenceEquals(o, null) && Hash.Hash == o.GetHashCode();
+        return o is not null && Hash.Hash == o.GetHashCode();
     }
 
     public static bool operator !=(ValueTracker<Ty> Hash, object o)
     {
-        return ReferenceEquals(o, null) || Hash.Hash != o.GetHashCode();
+        return o is null || Hash.Hash != o.GetHashCode();
     }
 
     public override int GetHashCode()

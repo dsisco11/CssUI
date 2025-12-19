@@ -25,7 +25,7 @@ public class DOMStringMap
         {
             string safeName = To_XML_Safe_Name(Name);
             string? Value = Owner.Attributes.getNamedItem(safeName.AsMemory())?.Value?.AsString();
-            return ReferenceEquals(null, Value) ? string.Empty : Value;
+            return Value is null ? string.Empty : Value;
         }
         set
         {
@@ -80,7 +80,7 @@ public class DOMStringMap
         {
             /* 3) For each name in list, for each U+002D HYPHEN-MINUS character (-) in the name that is followed by an ASCII lower alpha, remove the U+002D HYPHEN-MINUS character (-) and replace the character that followed it by the same character converted to ASCII uppercase. */
             string unsafeName = From_XML_Safe_Name(attr.Name);
-            if (!ReferenceEquals(null, unsafeName))
+            if (unsafeName is not null)
             {
                 list.AddLast(new KeyValuePair<string, string>(unsafeName, attr.Value!.AsString()));
             }

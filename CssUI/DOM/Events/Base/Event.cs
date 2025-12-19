@@ -121,7 +121,7 @@ public class Event : IEvent
         target = null;// again, redundant but whatever
         /* 5) Set event’s type attribute to type. */
         this.type = type;
-        if (!ReferenceEquals(eventInitDict, null))
+        if (eventInitDict is not null)
         {
             /* 6) Set event’s bubbles attribute to bubbles. */
             this.bubbles = eventInitDict.bubbles;

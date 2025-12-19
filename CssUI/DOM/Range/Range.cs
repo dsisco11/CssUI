@@ -202,7 +202,7 @@ public class Range : AbstractRange
     public void setStartBefore(Node node)
     {
         var parent = node.parentNode;
-        if (ReferenceEquals(parent, null)) throw new InvalidNodeTypeError();
+        if (parent is null) throw new InvalidNodeTypeError();
         /* 3) Set the start of the context object to boundary point (parent, node’s index). */
         startContainer = parent;
         startOffset = node.index;
@@ -211,7 +211,7 @@ public class Range : AbstractRange
     public void setStartAfter(Node node)
     {
         var parent = node.parentNode;
-        if (ReferenceEquals(parent, null)) throw new InvalidNodeTypeError();
+        if (parent is null) throw new InvalidNodeTypeError();
         /* 3) Set the start of the context object to boundary point (parent, node’s index plus 1). */
         startContainer = parent;
         startOffset = node.index + 1;
@@ -220,7 +220,7 @@ public class Range : AbstractRange
     public void setEndBefore(Node node)
     {
         var parent = node.parentNode;
-        if (ReferenceEquals(parent, null)) throw new InvalidNodeTypeError();
+        if (parent is null) throw new InvalidNodeTypeError();
         /* 3) Set the end of the context object to boundary point (parent, node’s index). */
         endContainer = parent;
         endOffset = node.index;
@@ -229,7 +229,7 @@ public class Range : AbstractRange
     public void setEndAfter(Node node)
     {
         var parent = node.parentNode;
-        if (ReferenceEquals(parent, null)) throw new InvalidNodeTypeError();
+        if (parent is null) throw new InvalidNodeTypeError();
         /* 3) Set the end of the context object to boundary point (parent, node’s index plus 1). */
         endContainer = parent;
         endOffset = node.index + 1;
@@ -260,7 +260,7 @@ public class Range : AbstractRange
         /* 1) Let parent be node’s parent. */
         var parent = node.parentNode;
         /* 2) If parent is null, then throw an "InvalidNodeTypeError" DOMException. */
-        if (ReferenceEquals(parent, null)) throw new InvalidNodeTypeError();
+        if (parent is null) throw new InvalidNodeTypeError();
         /* 3) Let index be node’s index. */
         var index = node.index;
         /* 4) Set range’s start to boundary point (parent, index). */
@@ -345,7 +345,7 @@ public class Range : AbstractRange
             var tree = new TreeWalker(startContainer, ENodeFilterMask.SHOW_ALL, new RangeDeleteFilter(this));
             // first look through the start node and all of its descendants
             Node node = tree.nextNode();
-            while (!ReferenceEquals(node, null))
+            while (node is not null)
             {
                 nodes_to_remove.AddLast(node);
                 node = tree.nextNode();
@@ -355,7 +355,7 @@ public class Range : AbstractRange
             // Now look through all the start nodes siblings & their descendants
 
             node = tree.nextSibling();
-            while (!ReferenceEquals(node, null))
+            while (node is not null)
             {
                 nodes_to_remove.AddLast(node);
                 node = tree.nextSibling();
@@ -375,7 +375,7 @@ public class Range : AbstractRange
                 Node refNode = startContainer;
                 /* 2) While reference node’s parent is not null and is not an inclusive ancestor of original end node, set reference node to its parent. */
                 /* (W3C NOTE) If reference node’s parent were null, it would be the root of the context object, so would be an inclusive ancestor of original end node, and we could not reach this point. */
-                while (!ReferenceEquals(refNode.parentNode, null) && !DOMCommon.Is_Inclusive_Ancestor(refNode, endContainer))
+                while (refNode.parentNode is not null && !DOMCommon.Is_Inclusive_Ancestor(refNode, endContainer))
                 {
                     refNode = refNode.parentNode;
                 }

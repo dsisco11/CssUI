@@ -13,7 +13,7 @@ public class RangeDeleteFilter : NodeFilter
     public override ENodeFilterResult acceptNode(Node node)
     {
         /* ...omitting any node whose parent is also contained in the context object. */
-        if (ReferenceEquals(node.parentNode, null))
+        if (node.parentNode is null)
             return ENodeFilterResult.FILTER_REJECT;
 
         if (targetRange.Contains(node.parentNode))

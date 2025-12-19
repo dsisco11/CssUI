@@ -319,7 +319,7 @@ public class CssBoxArea
     #region Cloning
     public static CssBoxArea? ShallowCopy(CssBoxArea? Area)
     {
-        if (ReferenceEquals(Area, null))
+        if (Area is null)
             return null;
 
         return new CssBoxArea(Area.Fragment!)
@@ -381,16 +381,16 @@ public class CssBoxArea
     public static bool operator ==(CssBoxArea A, CssBoxArea B)
     {
         // If either object is null return whether they are BOTH null
-        if (ReferenceEquals(A, null) || ReferenceEquals(B, null))
-            return ReferenceEquals(A, null) && ReferenceEquals(B, null);
+        if (A is null || B is null)
+            return A is null && B is null;
 
         return A.GetHashCode() == B.GetHashCode();
     }
     public static bool operator !=(CssBoxArea A, CssBoxArea B)
     {
         // If either object is null return whether they are BOTH null
-        if (ReferenceEquals(A, null) || ReferenceEquals(B, null))
-            return !(ReferenceEquals(A, null) && ReferenceEquals(B, null));
+        if (A is null || B is null)
+            return !(A is null && B is null);
 
         return A.GetHashCode() != B.GetHashCode();
     }

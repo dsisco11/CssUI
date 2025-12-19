@@ -293,7 +293,7 @@ public static class MimeType
             }
 
             /* 10) If all of the following are true */
-            if (!ReferenceEquals(null, parameterName) && parameterName.Length > 0 && !StringCommon.Contains(parameterName.AsSpan(), c => !HTTPCommon.Is_HTTP_Token(c)))
+            if (parameterName is not null && parameterName.Length > 0 && !StringCommon.Contains(parameterName.AsSpan(), c => !HTTPCommon.Is_HTTP_Token(c)))
             {
                 if (!StringCommon.Contains(parameterValue!.AsSpan(), c => !HTTPCommon.Is_HTTP_Quoted_String_Token(c)))
                 {
@@ -1066,7 +1066,7 @@ public static class MimeType
         var maskSpan = mask.Span;
 
         var s = 0;
-        if (!ReferenceEquals(null, ignore))
+        if (ignore is not null)
         {
             var ignoreSpan = ignore.Span;
             while (s < input.Length)

@@ -16,7 +16,7 @@ public class FileBlob : Blob
     public FileBlob(ReadOnlyMemory<byte> data, string name, FilePropertyBag? options = null) : base(new BlobPart[] { data }, options)
     {
         this.name = name;
-        if (ReferenceEquals(null, data) || data.IsEmpty)
+        if (data is null || data.IsEmpty)
         {
             this.data = Array.Empty<byte>();
         }
