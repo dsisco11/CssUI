@@ -165,10 +165,10 @@ Note: The HTML module requires significant work and is excluded from Core config
   - [ ] Simplification algorithm
   - [ ] Proper serialization
 
-### 4.3 Remaining Features
-- [ ] Flex fragmentation support
-- [ ] Grid fragmentation support
-- [ ] Performance optimization / caching
+### 4.3 Remaining Features ✅ COMPLETE
+- [x] Flex fragmentation support (FragmentationContext, FlexFormattingContext.HandleFragmentation)
+- [x] Grid fragmentation support (GridFormattingContext.HandleFragmentation)
+- [x] Performance optimization / caching (LayoutCache with weak references)
 
 ## Documentation
 - [x] Create STATUS.md
