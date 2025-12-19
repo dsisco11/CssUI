@@ -208,6 +208,76 @@ See [PARSING_ANALYSIS.md](CssUI/docs/PARSING_ANALYSIS.md) for detailed analysis.
   - Memory-efficient Span<char>/ReadOnlyMemory<char> operations needed
   - **Conclusion: Custom implementations required for spec compliance**
 
+## Architecture & Design
+
+### Dependency Injection Pattern
+- [ ] Explore DI pattern for engine subsystems
+  - [ ] Evaluate Microsoft.Extensions.DependencyInjection integration
+  - [ ] Design service interfaces for pluggable components:
+    - [ ] IRenderEngine (rendering backend)
+    - [ ] IFontEngine (font loading, metrics, glyph rendering)
+    - [ ] ITextureEngine (texture/image handling)
+    - [ ] IWindowingSystem (window creation, input events)
+  - [ ] Design IServiceProvider-based initialization
+  - [ ] Consider lifetime management (singleton vs scoped vs transient)
+  - [ ] Evaluate impact on existing EngineProvider pattern
+  - [ ] Create migration plan from static EngineProvider to DI
+
+## Test Coverage
+
+### CSS Systems Needing Tests
+- [ ] CSS Selector system (CSS/Selector/)
+  - [ ] SelectorParser tests
+  - [ ] Selector matching tests (ID, class, attribute, pseudo-class, pseudo-element)
+  - [ ] Combinator tests (descendant, child, sibling)
+  - [ ] Specificity calculation tests
+- [ ] CSS Properties system (CSS/Properties/)
+  - [ ] Property parsing tests
+  - [ ] Property inheritance tests
+  - [ ] Computed value resolution tests
+  - [ ] Shorthand property expansion tests
+- [ ] CSS Box Model (CSS/Box Model/)
+  - [ ] CssPrincipalBox tests
+  - [ ] BoxModel calculation tests
+  - [ ] Margin collapsing tests
+  - [ ] Containing block tests
+- [ ] CSS Parser (CSS/Parser/)
+  - [ ] Stylesheet parsing tests
+  - [ ] Rule parsing tests
+  - [ ] Declaration parsing tests
+  - [ ] Error recovery tests
+- [ ] CSS Stylesheet/Rules (CSS/Stylesheet/, CSS/Rules/)
+  - [ ] @media rule tests
+  - [ ] @import rule tests
+  - [ ] @font-face rule tests
+  - [ ] Cascade and specificity tests
+- [ ] CSS Custom Properties (CSS/Functions/)
+  - [ ] var() resolution tests
+  - [ ] Custom property inheritance tests
+  - [ ] Cycle detection tests
+- [ ] Block Formatting Context (CSS/Formatting/)
+  - [ ] BlockFormattingContext tests
+  - [ ] Float layout tests
+  - [ ] Clear property tests
+
+## Documentation
+
+### Getting Started Guide
+- [ ] Create GETTING_STARTED.md
+  - [ ] Minimal project setup (NuGet package, project references)
+  - [ ] Basic initialization code
+  - [ ] Creating a simple document
+  - [ ] Applying styles
+  - [ ] Rendering output
+  - [ ] Engine provider configuration
+  - [ ] Headless mode usage (for testing/server-side)
+- [ ] Add code examples for common scenarios
+  - [ ] Parse and apply CSS stylesheet
+  - [ ] Query elements by selector
+  - [ ] Computed style access
+  - [ ] Layout calculation
+  - [ ] Custom render engine integration
+
 ## Linting & Static Analysis
 
 ### Update linting rules
