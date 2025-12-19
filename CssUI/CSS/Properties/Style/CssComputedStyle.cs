@@ -365,6 +365,44 @@ namespace CssUI.CSS
         /// </summary>
         public StringProperty GridTemplateRows => (StringProperty)Get(ECssPropertyID.GridTemplateRows)!;
         #endregion
+
+        #region Fragmentation
+        /// <summary>
+        /// Specifies whether a box should break before the principal box.
+        /// Docs: https://www.w3.org/TR/css-break-3/#propdef-break-before
+        /// </summary>
+        public EnumProperty<EBreakValue> BreakBefore => (EnumProperty<EBreakValue>)Get(ECssPropertyID.BreakBefore)!;
+
+        /// <summary>
+        /// Specifies whether a box should break after the principal box.
+        /// Docs: https://www.w3.org/TR/css-break-3/#propdef-break-after
+        /// </summary>
+        public EnumProperty<EBreakValue> BreakAfter => (EnumProperty<EBreakValue>)Get(ECssPropertyID.BreakAfter)!;
+
+        /// <summary>
+        /// Specifies whether a box should avoid breaks inside.
+        /// Docs: https://www.w3.org/TR/css-break-3/#propdef-break-inside
+        /// </summary>
+        public EnumProperty<EBreakValue> BreakInside => (EnumProperty<EBreakValue>)Get(ECssPropertyID.BreakInside)!;
+
+        /// <summary>
+        /// Specifies the minimum number of lines in a block container that must be left before a fragmentation break.
+        /// Docs: https://www.w3.org/TR/css-break-3/#propdef-orphans
+        /// </summary>
+        public IntProperty Orphans => (IntProperty)Get(ECssPropertyID.Orphans)!;
+
+        /// <summary>
+        /// Specifies the minimum number of lines in a block container that must be left after a fragmentation break.
+        /// Docs: https://www.w3.org/TR/css-break-3/#propdef-widows
+        /// </summary>
+        public IntProperty Widows => (IntProperty)Get(ECssPropertyID.Widows)!;
+
+        /// <summary>
+        /// Specifies whether box decorations are cloned or sliced at fragment breaks.
+        /// Docs: https://www.w3.org/TR/css-break-3/#propdef-box-decoration-break
+        /// </summary>
+        public EnumProperty<EBoxDecorationBreak> BoxDecorationBreak => (EnumProperty<EBoxDecorationBreak>)Get(ECssPropertyID.BoxDecorationBreak)!;
+        #endregion
         #endregion
 
         #region Constructors

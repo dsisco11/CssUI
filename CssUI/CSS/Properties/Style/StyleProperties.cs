@@ -158,6 +158,14 @@ namespace CssUI.CSS
         public int GridRowEnd => Cascaded.GridRowEnd.Actual;
         public string? GridTemplateColumns => Cascaded.GridTemplateColumns?.Actual;
         public string? GridTemplateRows => Cascaded.GridTemplateRows?.Actual;
+
+        // Fragmentation properties
+        public EBreakValue BreakBefore => Cascaded.BreakBefore.Actual;
+        public EBreakValue BreakAfter => Cascaded.BreakAfter.Actual;
+        public EBreakValue BreakInside => Cascaded.BreakInside.Actual;
+        public int Orphans => Cascaded.Orphans.Actual;
+        public int Widows => Cascaded.Widows.Actual;
+        public EBoxDecorationBreak BoxDecorationBreak => Cascaded.BoxDecorationBreak.Actual;
         #endregion
 
         #region Block Values

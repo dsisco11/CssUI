@@ -87,6 +87,7 @@ namespace CssUI.CSS.Internal
             foreach (var def in Create_Flexbox_Property_Definitions()) { Definitions.AddLast(def); }
             foreach (var def in Create_Grid_Property_Definitions()) { Definitions.AddLast(def); }
             foreach (var def in Create_Alignment_Property_Definitions()) { Definitions.AddLast(def); }
+            foreach (var def in Create_Fragmentation_Property_Definitions()) { Definitions.AddLast(def); }
 
             // Add all of our definitions to a backing dictionary
             var Dict = new Dictionary<AtomicName<ECssPropertyID>, StyleDefinition>();
@@ -384,6 +385,33 @@ namespace CssUI.CSS.Internal
                 
                 // column-gap: normal | <length-percentage> (default normal)
                 new StyleDefinition(ECssPropertyID.ColumnGap, false, EPropertyDirtFlags.Flow, CssValue.From(0.0), ECssValueTypes.DIMENSION | ECssValueTypes.PERCENT, null, false, CssPercentageResolvers.Containing_Block_Logical_Width)
+            };
+        }
+
+        /// <summary>
+        /// Properties for CSS Fragmentation (break properties).
+        /// Docs: https://www.w3.org/TR/css-break-3/
+        /// </summary>
+        static IEnumerable<StyleDefinition> Create_Fragmentation_Property_Definitions()
+        {
+            return new StyleDefinition[] {
+                // break-before: auto | avoid | avoid-page | avoid-column | avoid-region | page | column | region | left | right | recto | verso
+                new StyleDefinition(ECssPropertyID.BreakBefore, false, EPropertyDirtFlags.Flow, CssValue.From(EBreakValue.Auto), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EBreakValue>()),
+                
+                // break-after: auto | avoid | avoid-page | avoid-column | avoid-region | page | column | region | left | right | recto | verso
+                new StyleDefinition(ECssPropertyID.BreakAfter, false, EPropertyDirtFlags.Flow, CssValue.From(EBreakValue.Auto), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EBreakValue>()),
+                
+                // break-inside: auto | avoid | avoid-page | avoid-column | avoid-region
+                new StyleDefinition(ECssPropertyID.BreakInside, false, EPropertyDirtFlags.Flow, CssValue.From(EBreakValue.Auto), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EBreakValue>()),
+                
+                // orphans: <integer> (default 2)
+                new StyleDefinition(ECssPropertyID.Orphans, true, EPropertyDirtFlags.Flow, CssValue.From(2), ECssValueTypes.INTEGER),
+                
+                // widows: <integer> (default 2)
+                new StyleDefinition(ECssPropertyID.Widows, true, EPropertyDirtFlags.Flow, CssValue.From(2), ECssValueTypes.INTEGER),
+                
+                // box-decoration-break: slice | clone (default slice)
+                new StyleDefinition(ECssPropertyID.BoxDecorationBreak, false, EPropertyDirtFlags.Flow, CssValue.From(EBoxDecorationBreak.Slice), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EBoxDecorationBreak>())
             };
         }
         #endregion

@@ -265,6 +265,47 @@ namespace CssUI.CSS
         ColumnGap,
         #endregion
 
+        #region Fragmentation Properties
+        /// <summary>
+        /// Specifies whether a box should break before the principal box.
+        /// Docs: https://www.w3.org/TR/css-break-3/#propdef-break-before
+        /// </summary>
+        [MetaKeyword("break-before")]
+        BreakBefore,
+        /// <summary>
+        /// Specifies whether a box should break after the principal box.
+        /// Docs: https://www.w3.org/TR/css-break-3/#propdef-break-after
+        /// </summary>
+        [MetaKeyword("break-after")]
+        BreakAfter,
+        /// <summary>
+        /// Specifies whether a box should avoid breaks inside.
+        /// Docs: https://www.w3.org/TR/css-break-3/#propdef-break-inside
+        /// </summary>
+        [MetaKeyword("break-inside")]
+        BreakInside,
+        /// <summary>
+        /// Specifies the minimum number of lines in a block container 
+        /// that must be left before a fragmentation break.
+        /// Docs: https://www.w3.org/TR/css-break-3/#propdef-orphans
+        /// </summary>
+        [MetaKeyword("orphans")]
+        Orphans,
+        /// <summary>
+        /// Specifies the minimum number of lines in a block container 
+        /// that must be left after a fragmentation break.
+        /// Docs: https://www.w3.org/TR/css-break-3/#propdef-widows
+        /// </summary>
+        [MetaKeyword("widows")]
+        Widows,
+        /// <summary>
+        /// Specifies whether box decorations are cloned or sliced at fragment breaks.
+        /// Docs: https://www.w3.org/TR/css-break-3/#propdef-box-decoration-break
+        /// </summary>
+        [MetaKeyword("box-decoration-break")]
+        BoxDecorationBreak,
+        #endregion
+
 
         MAX_VALUE,
     }
