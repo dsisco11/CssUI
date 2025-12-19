@@ -278,11 +278,15 @@ See [PARSING_ANALYSIS.md](CssUI/docs/PARSING_ANALYSIS.md) for detailed analysis.
   - [ ] Layout calculation
   - [ ] Custom render engine integration
 
-## Linting & Static Analysis
+## Linting & Static Analysis ✅ CONFIGURED
 
 ### Update linting rules
-- [ ] Enable "file scoped namespaces" rule
-- [ ] Enable "nullable reference types" rule
-- [ ] Enable "null-coalescing assignment" rule
-- [ ] Enable "pattern matching" rule
-- [ ] Enable "prefer is null" rule
+Rules configured in `.editorconfig` at solution root. Run `dotnet format` to apply fixes.
+
+- [x] Enable "file scoped namespaces" rule (IDE0161 - warning)
+- [x] Enable "nullable reference types" rule (IDE0240/IDE0241 - warning)
+- [x] Enable "null-coalescing assignment" rule (IDE0074 - suggestion)
+- [x] Enable "pattern matching" rule (IDE0019/IDE0020/IDE0038/IDE0083 - warning)
+- [x] Enable "prefer is null" rule (IDE0041 - warning)
+
+Note: Many files need updates. Use `dotnet format CssUI/CssUI.csproj` to auto-fix formatting issues.
