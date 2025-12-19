@@ -11,9 +11,9 @@ namespace CssUI
     public class RenderStack
     {
         #region Stacks
-        Stack<Matrix4> MatrixStack = new Stack<Matrix4>();
-        Stack<Color> ColorStack = new Stack<Color>();
-        Stack<Color> BlendingStack = new Stack<Color>();
+        Stack<Matrix4?> MatrixStack = new();
+        Stack<Color?> ColorStack = new();
+        Stack<Color?> BlendingStack = new();
         #endregion
 
         #region Properties

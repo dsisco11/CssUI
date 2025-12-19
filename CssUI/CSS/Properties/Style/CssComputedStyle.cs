@@ -45,7 +45,7 @@ namespace CssUI.CSS
         //public HashSet<AtomicName<ECssPropertyID>> SetProperties { get; private set; } = new HashSet<AtomicName<ECssPropertyID>>();
         public readonly FlagCollection<ECssPropertyID> SetProperties = new FlagCollection<ECssPropertyID>(MAX_PROPERTY_ID_INDEX + 1);
 
-        private List<ICssProperty>? CssProperties = null;
+        private List<ICssProperty?>? CssProperties = null;
         //private ConcurrentDictionary<AtomicName<ECssPropertyID>, ICssProperty> CssPropertyMap = null;
 
         /// <summary>
@@ -399,9 +399,9 @@ namespace CssUI.CSS
         /// </summary>
         /// <param name="ReadOnly">If TRUE then none of this instances property values may be set directly.</param>
         /// <param name="Unset">If TRUE then property values will all be set to <see cref="CssValue.Null"/>.</param>
-        public CssComputedStyle(string Name, CssSelector Selector, ICssElement Owner, bool ReadOnly = false, bool Unset = false, EPropertySetOrigin Origin = EPropertySetOrigin.Author)
+        public CssComputedStyle(string? Name, CssSelector? Selector, ICssElement Owner, bool ReadOnly = false, bool Unset = false, EPropertySetOrigin Origin = EPropertySetOrigin.Author)
         {
-            this.Name = Name;
+            this.Name = Name ?? Guid.NewGuid().ToString();
             this.Selector = Selector;
             this.Origin = Origin;
             this.ReadOnly = ReadOnly;
