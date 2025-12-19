@@ -41,6 +41,7 @@ namespace CssUI.Tests
                 foreach (var value in allValues)
                 {
                     var keyword = Enum.GetName(enumType, value);
+                    Assert.NotNull(keyword);
                     Assert.True(Lookup.Is_Declared(enumType, keyword));
                 }
             }
@@ -116,6 +117,7 @@ namespace CssUI.Tests
                 foreach (var value in allValues)
                 {
                     var keyword = Enum.GetName(enumType, value);
+                    Assert.NotNull(keyword);
                     Assert.True(Lookup.TryEnum(enumType, keyword, out var outValue));
                     Assert.Equal(value, outValue);
                 }
@@ -132,6 +134,7 @@ namespace CssUI.Tests
                 foreach (var value in allValues)
                 {
                     var keyword = Enum.GetName(enumType, value);
+                    Assert.NotNull(keyword);
                     var actual = Lookup.Enum(enumType, keyword);
                     Assert.Equal(value, actual);
                 }
@@ -148,6 +151,7 @@ namespace CssUI.Tests
                 foreach (var value in allValues)
                 {
                     var keyword = Enum.GetName(enumType, value);
+                    Assert.NotNull(keyword);
                     Assert.True(Lookup.Is_Declared(enumType, keyword));
                 }
             }

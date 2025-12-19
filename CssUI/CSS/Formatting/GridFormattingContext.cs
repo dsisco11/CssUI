@@ -131,7 +131,7 @@ namespace CssUI.CSS.Formatting
         /// <summary>
         /// Performs grid layout on the container and its children.
         /// </summary>
-        public void Flow(CssBoxTreeNode node)
+        public void Flow(CssBoxTreeNode? node)
         {
             if (node is null)
             {
@@ -140,7 +140,7 @@ namespace CssUI.CSS.Formatting
             Contract.EndContractBlock();
 
             _container = node as CssPrincipalBox;
-            if (_container == null)
+            if (_container is null)
             {
                 return;
             }

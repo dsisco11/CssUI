@@ -191,7 +191,7 @@ namespace CssUI.CSS.Types
         /// <param name="totalFlexFactor">Total flex factor for fr calculations.</param>
         /// <param name="freeSpace">Free space for fr calculations.</param>
         /// <returns>The resolved size in pixels, or null if intrinsic.</returns>
-        public double? Resolve(double availableSpace, CssValue.StyleUnitResolverDelegate unitResolver,
+        public double? Resolve(double availableSpace, CssValue.StyleUnitResolverDelegate? unitResolver,
             double totalFlexFactor = 0, double freeSpace = 0)
         {
             switch (Type)

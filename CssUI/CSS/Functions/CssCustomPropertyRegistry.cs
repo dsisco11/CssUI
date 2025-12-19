@@ -106,7 +106,7 @@ namespace CssUI.CSS.Functions
         /// <summary>
         /// Validates that a name is a valid custom property name (starts with "--").
         /// </summary>
-        public static bool IsValidCustomPropertyName(string name)
+        public static bool IsValidCustomPropertyName(string? name)
         {
             return !string.IsNullOrEmpty(name) && name.StartsWith("--", StringComparison.Ordinal);
         }
