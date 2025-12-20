@@ -188,7 +188,12 @@ public class SelectorParser
         // Check for CssSimpleBlock created by component value parsing (W3C CSS Syntax Level 3)
         // When Parse_ComponentValue_List encounters '[...]', it wraps content in a CssSimpleBlock
         if (A is CssSimpleBlock block && block.StartToken.Type == ECssTokenType.SqBracket_Open)
-            return true;
+        {
+            if (block.Values.Count > 1 && block.Values[1].Type == ECssTokenType.QualifiedName)
+            {
+                return true;
+            }
+        }
 
         return false;
     }
