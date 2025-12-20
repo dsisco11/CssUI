@@ -85,7 +85,7 @@ public class LookupTests
             var allValues = Enum.GetValues(enumType);
             foreach (var value in allValues)
             {
-                Assert.True(Lookup.TryData(enumType, (IConvertible)value, out EnumData _));
+                Assert.True(Lookup.TryData(enumType, (IConvertible)value, out EnumData? _));
             }
         }
     }

@@ -25,7 +25,7 @@ public class CssSelectorTests
     [InlineData("span", "div", false)]
     [InlineData("p", "p", true)]
     [InlineData("article", "section", false)]
-    public void TypeSelector_MatchesElementByTagName(string tagName)
+    public void TypeSelector_MatchesElementByTagName(string selector, string tagName, bool expected)
     {
         // Test requires DOM element creation which fails due to library bug
         Assert.True(true);
@@ -47,7 +47,7 @@ public class CssSelectorTests
     [InlineData("#header", "footer", false)]
     [InlineData("#main-content", "main-content", true)]
     [InlineData("#HEADER", "header", true)]  // Case insensitive matching
-    public void IDSelector_MatchesElementById(string elementId)
+    public void IDSelector_MatchesElementById(string selector, string elementId, bool expected)
     {
         // Test requires DOM element creation which fails due to library bug
         Assert.True(true);
@@ -68,7 +68,7 @@ public class CssSelectorTests
     [InlineData(".btn", "btn btn-primary", true)]
     [InlineData(".btn-primary", "btn btn-primary", true)]
     [InlineData(".nonexistent", "btn btn-primary", false)]
-    public void ClassSelector_MatchesElementByClassName(string className)
+    public void ClassSelector_MatchesElementByClassName(string selector, string className, bool expected)
     {
         // Test requires DOM element creation which fails due to library bug
         Assert.True(true);

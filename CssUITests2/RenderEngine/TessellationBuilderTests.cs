@@ -43,8 +43,8 @@ public class TessellationBuilderTests
     [Fact]
     public void Constructor_WithAllRequirements_CreatesFullLayout()
     {
-        var requirements = TessellationRequirements.TexCoord 
-                         | TessellationRequirements.Color 
+        var requirements = TessellationRequirements.TexCoord
+                         | TessellationRequirements.Color
                          | TessellationRequirements.Normal;
         var builder = new TessellationBuilder(requirements);
 
@@ -111,7 +111,7 @@ public class TessellationBuilderTests
     {
         var builder = new TessellationBuilder(TessellationRequirements.Normal);
 
-        builder.AddVertex(0, 0, 0, 0, 1, 0);
+        builder.AddVertex(0f, 0f, 0f, 0f, 1f, 0f);
         var result = builder.Build();
 
         Assert.Equal(1, result.VertexCount);
@@ -122,8 +122,8 @@ public class TessellationBuilderTests
     [Fact]
     public void AddVertex_FullOverload_StoresAllAttributes()
     {
-        var requirements = TessellationRequirements.TexCoord 
-                         | TessellationRequirements.Color 
+        var requirements = TessellationRequirements.TexCoord
+                         | TessellationRequirements.Color
                          | TessellationRequirements.Normal;
         var builder = new TessellationBuilder(requirements);
 
@@ -330,16 +330,17 @@ public class TessellationBuilderTests
     #region Layout Determination Tests
 
     [Theory]
-    [InlineData(TessellationRequirements.None, 12)]
-    [InlineData(TessellationRequirements.TexCoord, 20)]
-    [InlineData(TessellationRequirements.Color, 16)]
-    [InlineData(TessellationRequirements.TexCoord | TessellationRequirements.Color, 24)]
-    [InlineData(TessellationRequirements.Normal, 24)]
-    [InlineData(TessellationRequirements.TexCoord | TessellationRequirements.Normal, 32)]
-    [InlineData(TessellationRequirements.Color | TessellationRequirements.Normal, 28)]
-    [InlineData(TessellationRequirements.TexCoord | TessellationRequirements.Color | TessellationRequirements.Normal, 36)]
-    public void DetermineLayout_ProducesCorrectStride(TessellationRequirements requirements, int expectedStride)
+    [InlineData(0, 12)]  // None
+    [InlineData(1, 20)]  // TexCoord
+    [InlineData(2, 16)]  // Color
+    [InlineData(3, 24)]  // TexCoord | Color
+    [InlineData(4, 24)]  // Normal
+    [InlineData(5, 32)]  // TexCoord | Normal
+    [InlineData(6, 28)]  // Color | Normal
+    [InlineData(7, 36)]  // TexCoord | Color | Normal
+    public void DetermineLayout_ProducesCorrectStride(int requirementsValue, int expectedStride)
     {
+        var requirements = (TessellationRequirements)requirementsValue;
         var builder = new TessellationBuilder(requirements);
 
         // Add a vertex to trigger layout creation
