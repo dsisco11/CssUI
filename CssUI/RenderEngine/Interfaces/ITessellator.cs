@@ -13,8 +13,9 @@ internal interface ITessellator
     /// Creates a new tessellation builder configured for the specified requirements.
     /// </summary>
     /// <param name="requirements">The vertex attribute requirements.</param>
+    /// <param name="topology">The primitive topology. Defaults to <see cref="EPrimitiveTopology.TriangleList"/>.</param>
     /// <returns>A new tessellation builder.</returns>
-    ITessellationBuilder CreateBuilder(TessellationRequirements requirements);
+    ITessellationBuilder CreateBuilder(TessellationRequirements requirements, EPrimitiveTopology topology = EPrimitiveTopology.TriangleList);
 
     /// <summary>
     /// Tessellates a single object into mesh data.

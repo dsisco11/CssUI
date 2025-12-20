@@ -39,6 +39,11 @@ internal readonly record struct TessellationResult
     public int IndexCount { get; init; }
 
     /// <summary>
+    /// The primitive topology (triangles, lines, etc.).
+    /// </summary>
+    public EPrimitiveTopology Topology { get; init; }
+
+    /// <summary>
     /// Returns true if this result uses indexed drawing.
     /// </summary>
     public bool IsIndexed => IndexCount > 0;
@@ -57,6 +62,7 @@ internal readonly record struct TessellationResult
         Indices = ReadOnlyMemory<byte>.Empty,
         Layout = VertexLayout.PositionOnly,
         IndexFormat = EIndexFormat.UInt16,
+        Topology = EPrimitiveTopology.TriangleList,
         VertexCount = 0,
         IndexCount = 0
     };

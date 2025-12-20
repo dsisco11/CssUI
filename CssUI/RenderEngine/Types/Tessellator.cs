@@ -12,9 +12,9 @@ namespace CssUI;
 internal sealed class Tessellator : ITessellator
 {
     /// <inheritdoc/>
-    public ITessellationBuilder CreateBuilder(TessellationRequirements requirements)
+    public ITessellationBuilder CreateBuilder(TessellationRequirements requirements, EPrimitiveTopology topology = EPrimitiveTopology.TriangleList)
     {
-        return new TessellationBuilder(requirements);
+        return new TessellationBuilder(requirements, topology);
     }
 
     /// <inheritdoc/>

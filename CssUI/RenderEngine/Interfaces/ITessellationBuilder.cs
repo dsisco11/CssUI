@@ -18,6 +18,11 @@ internal interface ITessellationBuilder
     /// </summary>
     int IndexCount { get; }
 
+    /// <summary>
+    /// Gets the primitive topology for the resulting mesh.
+    /// </summary>
+    EPrimitiveTopology Topology { get; }
+
     #region Add Vertex Overloads
 
     /// <summary>

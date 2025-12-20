@@ -31,11 +31,13 @@ internal sealed class TessellationBuilder : ITessellationBuilder
     /// Creates a new tessellation builder with the specified vertex requirements.
     /// </summary>
     /// <param name="requirements">The vertex attribute requirements.</param>
-    public TessellationBuilder(TessellationRequirements requirements)
+    /// <param name="topology">The primitive topology. Defaults to <see cref="EPrimitiveTopology.TriangleList"/>.</param>
+    public TessellationBuilder(TessellationRequirements requirements, EPrimitiveTopology topology = EPrimitiveTopology.TriangleList)
     {
         _requirements = requirements;
         _layout = DetermineLayout(requirements);
         _vertexSize = _layout.Stride;
+        Topology = topology;
     }
 
     /// <inheritdoc/>
@@ -43,6 +45,9 @@ internal sealed class TessellationBuilder : ITessellationBuilder
 
     /// <inheritdoc/>
     public int IndexCount => _indices.Count;
+
+    /// <inheritdoc/>
+    public EPrimitiveTopology Topology { get; }
 
     #region Add Vertex Overloads
 
@@ -154,6 +159,11 @@ internal sealed class TessellationBuilder : ITessellationBuilder
     /// <inheritdoc/>
     public void AddTriangle(int i0, int i1, int i2)
     {
+        if (Topology != EPrimitiveTopology.TriangleList && Topology != EPrimitiveTopology.TriangleStrip && Topology != EPrimitiveTopology.TriangleFan)
+        {
+            throw new InvalidOperationException($"AddTriangle is not valid for topology {Topology}. Use TriangleList, TriangleStrip, or TriangleFan.");
+        }
+
         _indices.Add(i0);
         _indices.Add(i1);
         _indices.Add(i2);
@@ -162,6 +172,11 @@ internal sealed class TessellationBuilder : ITessellationBuilder
     /// <inheritdoc/>
     public void AddQuad(int i0, int i1, int i2, int i3)
     {
+        if (Topology != EPrimitiveTopology.TriangleList)
+        {
+            throw new InvalidOperationException($"AddQuad is only valid for TriangleList topology, not {Topology}.");
+        }
+
         // First triangle: i0, i1, i2
         _indices.Add(i0);
         _indices.Add(i1);
@@ -196,6 +211,7 @@ internal sealed class TessellationBuilder : ITessellationBuilder
             Indices = indexData,
             Layout = _layout,
             IndexFormat = indexFormat,
+            Topology = Topology,
             VertexCount = vertexCount,
             IndexCount = indexCount
         };
