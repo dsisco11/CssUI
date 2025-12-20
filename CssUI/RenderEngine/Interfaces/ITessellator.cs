@@ -32,10 +32,10 @@ internal interface ITessellator
     TessellationResult TessellateBatch(IEnumerable<ITessellatable> sources);
 
     /// <summary>
-    /// Creates a GPU mesh from a tessellation result.
+    /// Creates a managed mesh reference from a tessellation result.
     /// </summary>
     /// <param name="result">The tessellation result to upload.</param>
     /// <param name="meshService">The mesh service to create the GPU mesh.</param>
-    /// <returns>A handle to the created mesh, or <see cref="MeshHandle.Null"/> on failure.</returns>
-    ValueTask<MeshHandle> CreateMesh(TessellationResult result, IMeshService meshService);
+    /// <returns>A mesh reference that manages the GPU resource lifecycle, or null on failure.</returns>
+    ValueTask<MeshRef?> CreateMesh(TessellationResult result, IMeshService meshService);
 }

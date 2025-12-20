@@ -54,13 +54,34 @@ internal sealed class Tessellator : ITessellator
     }
 
     /// <inheritdoc/>
-    public async ValueTask<MeshHandle> CreateMesh(TessellationResult result, IMeshService meshService)
+    public async ValueTask<MeshRef?> CreateMesh(TessellationResult result, IMeshService meshService)
     {
         if (result.IsEmpty)
         {
-            return MeshHandle.Null;
+            return null;
         }
 
+        var handle = await CreateMeshHandle(result, meshService);
+        if (handle.IsNull)
+        {
+            return null;
+        }
+
+        var descriptor = new MeshDescriptor
+        {
+            Handle = handle,
+            VertexCount = result.VertexCount,
+            IndexCount = result.IndexCount,
+            Layout = result.Layout,
+            IndexFormat = result.IndexFormat,
+            Topology = result.Topology
+        };
+
+        return new MeshRef(descriptor, meshService);
+    }
+
+    private async ValueTask<MeshHandle> CreateMeshHandle(TessellationResult result, IMeshService meshService)
+    {
         if (result.IsIndexed)
         {
             return await meshService.CreateMesh(
