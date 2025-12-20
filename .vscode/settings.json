@@ -1,0 +1,16 @@
+{
+  // Format on save
+  "editor.formatOnSave": true,
+
+  // C# specific settings
+  "[csharp]": {
+    "editor.defaultFormatter": "ms-dotnettools.csharp",
+    "editor.formatOnSave": true
+  },
+
+  // Optional: Also organize usings and fix usings on save
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit",
+    "source.fixAll": "explicit"
+  }
+}
