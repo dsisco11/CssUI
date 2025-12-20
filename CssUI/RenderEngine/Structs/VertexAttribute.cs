@@ -22,6 +22,12 @@ public readonly struct VertexAttribute
     public readonly int Offset;
 
     /// <summary>
+    /// Byte stride between consecutive vertices.
+    /// If zero, the attribute is tightly packed (stride equals <see cref="TotalSize"/>).
+    /// </summary>
+    public readonly int Stride;
+
+    /// <summary>
     /// If true, integer types are normalized to [0,1] or [-1,1] range when read as floats.
     /// </summary>
     public readonly bool Normalized;
@@ -31,11 +37,17 @@ public readonly struct VertexAttribute
     /// </summary>
     public bool IsPresent => ComponentCount > 0;
 
-    public VertexAttribute(EVertexAttributeType type, int componentCount, int offset, bool normalized = false)
+    /// <summary>
+    /// Gets the effective stride (uses <see cref="TotalSize"/> if <see cref="Stride"/> is zero).
+    /// </summary>
+    public int EffectiveStride => Stride > 0 ? Stride : TotalSize;
+
+    public VertexAttribute(EVertexAttributeType type, int componentCount, int offset, int stride = 0, bool normalized = false)
     {
         Type = type;
         ComponentCount = componentCount;
         Offset = offset;
+        Stride = stride;
         Normalized = normalized;
     }
 
@@ -64,25 +76,25 @@ public readonly struct VertexAttribute
     /// <summary>
     /// Creates a 3-component float position attribute.
     /// </summary>
-    public static VertexAttribute Position3f(int offset) => new(EVertexAttributeType.Single, 3, offset);
+    public static VertexAttribute Position3f(int offset, int stride = 0) => new(EVertexAttributeType.Single, 3, offset, stride);
 
     /// <summary>
     /// Creates a 2-component float texture coordinate attribute.
     /// </summary>
-    public static VertexAttribute TexCoord2f(int offset) => new(EVertexAttributeType.Single, 2, offset);
+    public static VertexAttribute TexCoord2f(int offset, int stride = 0) => new(EVertexAttributeType.Single, 2, offset, stride);
 
     /// <summary>
     /// Creates a 4-component byte color attribute (normalized to 0-1).
     /// </summary>
-    public static VertexAttribute Color4b(int offset) => new(EVertexAttributeType.Byte, 4, offset, normalized: true);
+    public static VertexAttribute Color4b(int offset, int stride = 0) => new(EVertexAttributeType.Byte, 4, offset, stride, normalized: true);
 
     /// <summary>
     /// Creates a 4-component float color attribute.
     /// </summary>
-    public static VertexAttribute Color4f(int offset) => new(EVertexAttributeType.Single, 4, offset);
+    public static VertexAttribute Color4f(int offset, int stride = 0) => new(EVertexAttributeType.Single, 4, offset, stride);
 
     /// <summary>
     /// Creates a 3-component float normal attribute.
     /// </summary>
-    public static VertexAttribute Normal3f(int offset) => new(EVertexAttributeType.Single, 3, offset);
+    public static VertexAttribute Normal3f(int offset, int stride = 0) => new(EVertexAttributeType.Single, 3, offset, stride);
 }
