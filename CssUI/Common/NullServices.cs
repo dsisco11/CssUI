@@ -87,7 +87,7 @@ public sealed class NullTextureService : ITextureService
     public ImageData DecodeImage(Stream stream)
         => DecodeImage(ReadOnlySpan<byte>.Empty);
 
-    public TextureHandle CreateTexture(int width, int height, ReadOnlySpan<byte> rgbaPixels)
+    public TextureHandle CreateTexture(int width, int height, ReadOnlySpan<byte> pixels, EPixelFormat format)
         => new TextureHandle(_nextId++);
 
     public TextureHandle CreateTextureFromImage(ReadOnlySpan<byte> imageData)
@@ -96,7 +96,7 @@ public sealed class NullTextureService : ITextureService
     public TextureHandle CreateTextureFromImage(Stream stream)
         => new TextureHandle(_nextId++);
 
-    public void UpdateTexture(TextureHandle handle, int x, int y, int width, int height, ReadOnlySpan<byte> rgbaPixels) { }
+    public void UpdateTexture(TextureHandle handle, int x, int y, int width, int height, ReadOnlySpan<byte> pixels, EPixelFormat format) { }
 
     public (int Width, int Height) GetTextureSize(TextureHandle handle)
         => (1, 1);
@@ -104,13 +104,13 @@ public sealed class NullTextureService : ITextureService
     public bool IsValid(TextureHandle handle)
         => !handle.IsNull;
 
-    public void DestroyTexture(TextureHandle handle) { }
+    public void Release(TextureHandle handle) { }
 
     public Task<GpuTexture> LoadTextureAsync(ReadOnlyMemory<byte> imageData)
-        => Task.FromResult(new GpuTexture(ReadOnlySpan<byte>.Empty, Rect2i.Zero, EPixelFormat.RGBA));
+        => Task.FromResult(new GpuTexture(ReadOnlySpan<byte>.Empty, Rect2i.Zero, EPixelFormat.RGBA8));
 
     public Task<GpuTexture> LoadTextureFromFileAsync(string path)
-        => Task.FromResult(new GpuTexture(ReadOnlySpan<byte>.Empty, Rect2i.Zero, EPixelFormat.RGBA));
+        => Task.FromResult(new GpuTexture(ReadOnlySpan<byte>.Empty, Rect2i.Zero, EPixelFormat.RGBA8));
 }
 
 /// <summary>

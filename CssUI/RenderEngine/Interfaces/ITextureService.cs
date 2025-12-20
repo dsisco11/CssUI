@@ -5,6 +5,7 @@ using CssUI.Rendering;
 
 namespace CssUI;
 
+
 /// <summary>
 /// Service interface for image decoding and texture management.
 /// Implementations handle GPU resource allocation internally.
@@ -41,17 +42,10 @@ public interface ITextureService
     /// </summary>
     /// <param name="width">Texture width in pixels.</param>
     /// <param name="height">Texture height in pixels.</param>
-    /// <param name="rgbaPixels">Pixel data in RGBA format (4 bytes per pixel).</param>
+    /// <param name="pixels">The pixel data.</param>
+    /// <param name="format">The pixel format.</param>
     /// <returns>A handle to the created texture, or <see cref="TextureHandle.Null"/> on failure.</returns>
-    TextureHandle CreateTexture(int width, int height, ReadOnlySpan<byte> rgbaPixels);
-
-    /// <summary>
-    /// Create a texture directly from encoded image data.
-    /// Equivalent to DecodeImage + CreateTexture but may be more efficient.
-    /// </summary>
-    /// <param name="imageData">Encoded image data.</param>
-    /// <returns>A handle to the created texture, or <see cref="TextureHandle.Null"/> on failure.</returns>
-    TextureHandle CreateTextureFromImage(ReadOnlySpan<byte> imageData);
+    TextureHandle CreateTexture(int width, int height, ReadOnlySpan<byte> pixels, EPixelFormat format);
 
     /// <summary>
     /// Create a texture from a stream containing encoded image data.
@@ -68,8 +62,8 @@ public interface ITextureService
     /// <param name="y">Y offset of the region.</param>
     /// <param name="width">Width of the region.</param>
     /// <param name="height">Height of the region.</param>
-    /// <param name="rgbaPixels">New pixel data for the region.</param>
-    void UpdateTexture(TextureHandle handle, int x, int y, int width, int height, ReadOnlySpan<byte> rgbaPixels);
+    /// <param name="pixels">New pixel data for the region.</param>
+    void UpdateTexture(TextureHandle handle, int x, int y, int width, int height, ReadOnlySpan<byte> pixels, EPixelFormat format);
 
     /// <summary>
     /// Get texture dimensions.
@@ -86,7 +80,7 @@ public interface ITextureService
     /// <summary>
     /// Destroy a texture and free associated resources.
     /// </summary>
-    void DestroyTexture(TextureHandle handle);
+    void Release(TextureHandle handle);
 
     #endregion
 
