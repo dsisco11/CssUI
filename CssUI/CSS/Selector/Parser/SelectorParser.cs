@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using CssUI.CSS;
 using CssUI.CSS.Internal;
 using CssUI.CSS.Parser;
 using CssUI.CSS.Serialization;
@@ -180,7 +181,16 @@ public class SelectorParser
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     static bool Starts_Attribute_Selector(CssToken A, CssToken B)
     {
-        return (A.Type == ECssTokenType.SqBracket_Open && B.Type == ECssTokenType.QualifiedName);
+        // Original check for raw tokens (legacy path)
+        if (A.Type == ECssTokenType.SqBracket_Open && B.Type == ECssTokenType.QualifiedName)
+            return true;
+
+        // Check for CssSimpleBlock created by component value parsing (W3C CSS Syntax Level 3)
+        // When Parse_ComponentValue_List encounters '[...]', it wraps content in a CssSimpleBlock
+        if (A is CssSimpleBlock block && block.StartToken.Type == ECssTokenType.SqBracket_Open)
+            return true;
+
+        return false;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -471,12 +481,19 @@ public class SelectorParser
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     static AttributeSelector? Consume_Attribute_Selector(DataConsumer<CssToken> Stream)
     {
+        // Check if we have a CssSimpleBlock (from W3C CSS Syntax Level 3 component value parsing)
+        if (Stream.Next is CssSimpleBlock block && block.StartToken.Type == ECssTokenType.SqBracket_Open)
+        {
+            Stream.Consume(); // Consume the CssSimpleBlock
+            return Consume_Attribute_Selector_From_Block(block);
+        }
+
+        // Legacy path: raw tokens (if not wrapped in SimpleBlock)
         Stream.Consume();// Consume the '[' prefix
 
         NamespacePrefixToken? NS = null;
         if (Starts_NamespacePrefix(Stream.Next, Stream.NextNext)) NS = Consume_NamespacePrefix(Stream);
 
-        //QualifiedNameToken attrName = Stream.Consume<QualifiedNameToken>();
         IdentToken attrName = Stream.Consume<IdentToken>();
         CssToken Tok = Stream.Consume();
         if (Tok.Type == ECssTokenType.SqBracket_Close)
@@ -500,6 +517,85 @@ public class SelectorParser
         }
 
         return null;// Parse error
+    }
+
+    /// <summary>
+    /// Parses an attribute selector from a CssSimpleBlock's Values list.
+    /// Handles the W3C CSS Syntax Level 3 case where '[...]' content is wrapped in a block.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    static AttributeSelector? Consume_Attribute_Selector_From_Block(CssSimpleBlock block)
+    {
+        // Create a sub-stream from the block's values
+        var subStream = new DataConsumer<CssToken>(block.Values.ToArray(), CssToken.EOF);
+
+        // Skip leading whitespace
+        subStream.Consume_While(tok => tok.Type == ECssTokenType.Whitespace);
+
+        // Parse optional namespace prefix
+        NamespacePrefixToken? NS = null;
+        if (Starts_NamespacePrefix(subStream.Next, subStream.NextNext))
+        {
+            NS = Consume_NamespacePrefix(subStream);
+        }
+
+        // Parse attribute name (must be an identifier)
+        if (subStream.Next.Type != ECssTokenType.Ident)
+            return null; // Parse error: expected attribute name
+
+        string attrName = subStream.Consume<IdentToken>().Value!;
+
+        // Skip whitespace after attribute name
+        subStream.Consume_While(tok => tok.Type == ECssTokenType.Whitespace);
+
+        // Check if we're done (presence-only selector like [disabled])
+        if (subStream.Next.Type == ECssTokenType.EOF)
+        {
+            return new AttributeSelector(NS, attrName);
+        }
+
+        // Parse the attr-matcher operator (=, ~=, |=, ^=, $=, *=)
+        CssToken operatorToken = subStream.Consume();
+
+        // Skip whitespace after operator
+        subStream.Consume_While(tok => tok.Type == ECssTokenType.Whitespace);
+
+        // Parse the value (string or ident)
+        CssToken valueToken = subStream.Consume();
+        string? value = null;
+
+        if (valueToken.Type == ECssTokenType.String)
+        {
+            value = (valueToken as StringToken)!.Value!;
+        }
+        else if (valueToken.Type == ECssTokenType.Ident)
+        {
+            value = (valueToken as IdentToken)!.Value!;
+        }
+        else
+        {
+            return null; // Parse error: expected string or ident value
+        }
+
+        // Skip whitespace after value
+        subStream.Consume_While(tok => tok.Type == ECssTokenType.Whitespace);
+
+        // Parse optional attr-modifier (i or s) per W3C Selectors Level 4 §6.3
+        EAttributeCaseSensitivity caseSensitivity = EAttributeCaseSensitivity.Default;
+        if (subStream.Next.Type == ECssTokenType.Ident)
+        {
+            string modifier = (subStream.Consume() as IdentToken)!.Value!;
+            if (modifier.Equals("i", StringComparison.OrdinalIgnoreCase))
+            {
+                caseSensitivity = EAttributeCaseSensitivity.CaseInsensitive;
+            }
+            else if (modifier.Equals("s", StringComparison.OrdinalIgnoreCase))
+            {
+                caseSensitivity = EAttributeCaseSensitivity.CaseSensitive;
+            }
+        }
+
+        return new AttributeSelector(NS, attrName, operatorToken, value, caseSensitivity);
     }
 
     /// <summary>

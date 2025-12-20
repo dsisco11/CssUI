@@ -27,12 +27,12 @@ public class CssParser
     public CssParser(ReadOnlySpan<char> Text)
     {
         CssTokenizer Tokenizer = new CssTokenizer(Text);
-        Stream = new DataConsumer<CssToken>(Tokenizer.Tokens);
+        Stream = new DataConsumer<CssToken>(Tokenizer.Tokens, CssToken.EOF);
     }
 
     public CssParser(CssToken[] Tokens)
     {
-        Stream = new DataConsumer<CssToken>(Tokens);
+        Stream = new DataConsumer<CssToken>(Tokens, CssToken.EOF);
     }
     #endregion
 
