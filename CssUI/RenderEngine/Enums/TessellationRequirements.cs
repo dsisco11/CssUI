@@ -6,7 +6,7 @@ namespace CssUI;
 /// Flags indicating what vertex attributes a tessellatable object requires.
 /// </summary>
 [Flags]
-public enum TessellationRequirements
+internal enum TessellationRequirements
 {
     /// <summary>
     /// No special requirements (position only).

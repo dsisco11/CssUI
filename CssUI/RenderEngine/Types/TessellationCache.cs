@@ -7,7 +7,7 @@ namespace CssUI;
 /// <summary>
 /// Caches tessellation results keyed by source object and version.
 /// </summary>
-public sealed class TessellationCache
+internal sealed class TessellationCache
 {
     private readonly Dictionary<int, CacheEntry> _cache = new();
 

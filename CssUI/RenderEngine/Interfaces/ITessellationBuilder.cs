@@ -6,7 +6,7 @@ namespace CssUI;
 /// <summary>
 /// Builder that accumulates vertices and indices during tessellation.
 /// </summary>
-public interface ITessellationBuilder
+internal interface ITessellationBuilder
 {
     /// <summary>
     /// Gets the current vertex count. Use this to compute indices.

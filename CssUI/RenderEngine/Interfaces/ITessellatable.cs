@@ -3,7 +3,7 @@ namespace CssUI;
 /// <summary>
 /// Contract for objects that can be tessellated into mesh geometry.
 /// </summary>
-public interface ITessellatable
+internal interface ITessellatable
 {
     /// <summary>
     /// Gets the vertex attribute requirements for this object.

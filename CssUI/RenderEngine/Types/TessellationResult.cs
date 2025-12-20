@@ -6,7 +6,7 @@ namespace CssUI;
 /// <summary>
 /// The result of tessellating one or more objects into mesh data.
 /// </summary>
-public readonly record struct TessellationResult
+internal readonly record struct TessellationResult
 {
     /// <summary>
     /// Packed vertex data according to <see cref="Layout"/>.

@@ -9,7 +9,7 @@ namespace CssUI;
 /// Default implementation of <see cref="ITessellator"/> that orchestrates
 /// tessellation of objects into mesh data.
 /// </summary>
-public sealed class Tessellator : ITessellator
+internal sealed class Tessellator : ITessellator
 {
     /// <inheritdoc/>
     public ITessellationBuilder CreateBuilder(TessellationRequirements requirements)

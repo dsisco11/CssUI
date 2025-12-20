@@ -10,7 +10,7 @@ namespace CssUI;
 /// Default implementation of <see cref="ITessellationBuilder"/> that accumulates
 /// vertices and indices into byte arrays.
 /// </summary>
-public sealed class TessellationBuilder : ITessellationBuilder
+internal sealed class TessellationBuilder : ITessellationBuilder
 {
     private readonly TessellationRequirements _requirements;
     private readonly VertexLayout _layout;

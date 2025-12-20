@@ -7,7 +7,7 @@ namespace CssUI;
 /// <summary>
 /// Service that orchestrates tessellation of objects into mesh data.
 /// </summary>
-public interface ITessellator
+internal interface ITessellator
 {
     /// <summary>
     /// Creates a new tessellation builder configured for the specified requirements.
