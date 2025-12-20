@@ -70,7 +70,10 @@ public abstract class Node : EventTarget, INode
         get => _parentNode.TryGetTarget(out var outParentNode) ? outParentNode : null;
         internal set => _parentNode.SetTarget(value!);
     }
-    public Element? parentElement { get; private set; }
+    /// <summary>
+    /// Returns the parent element, or null if the parent is not an Element.
+    /// </summary>
+    public Element? parentElement => parentNode as Element;
     public ChildNodeList childNodes { get; private set; } = null!;
 
     public Node? firstChild { get => childNodes.Count > 0 ? childNodes[0] : null; }

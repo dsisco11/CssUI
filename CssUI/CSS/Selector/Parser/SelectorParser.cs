@@ -323,9 +323,9 @@ public class SelectorParser
         }
         else
         {
-            CombinatorToken Comb = Consume_Combinator(Stream);
+            CombinatorToken? Comb = Consume_Combinator(Stream);
             ESelectorCombinator Combinator = ESelectorCombinator.None;
-            if (Stream.Next.Type == ECssTokenType.Combinator)
+            if (Comb != null)
             {
                 switch (Comb.Value)
                 {

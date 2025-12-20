@@ -1,174 +1,258 @@
+using System.Linq;
+using CssUI.DOM;
 using Xunit;
 
 namespace CssUI.CSS.Selector.Tests;
 
 /// <summary>
-/// Tests for the <see cref="CssSelector"/> class and selector parsing.
+/// Tests for the <see cref="CssSelector"/> class and selector parsing/matching.
 /// </summary>
-/// <remarks>
-/// NOTE: Most tests in this class are skipped because Document creation has a bug in URL parsing
-/// that causes TypeInitializationException when creating elements.
-/// Bug location: CssUI.HTTP.Url.Parse_Basic -> ParsingCommon.Get_Location
-/// Error: ArgumentOutOfRangeException at ParsingCommon.Get_Location(DataConsumer`1 Stream)
-/// </remarks>
 public class CssSelectorTests
 {
     #region Test Infrastructure
-    private const string DocumentBugSkipReason = "Bug: Document creation fails due to URL parsing bug in library";
+    private static Document CreateTestDocument()
+    {
+        var dom = new DOMImplementation();
+        return dom.createDocument("CssUI", "cssui");
+    }
+
+    private static Element CreateTestElement(Document doc, string tagName)
+    {
+        return doc.createElement(tagName, new ElementCreationOptions(string.Empty));
+    }
     #endregion
 
     #region Type Selector Tests
-    [Theory(Skip = DocumentBugSkipReason)]
+    [Theory]
     [InlineData("div", "div", true)]
-    [InlineData("DIV", "div", true)]  // Case insensitive
-    [InlineData("div", "DIV", true)]  // Case insensitive
+    [InlineData("DIV", "div", true)]  // Case insensitive selector
+    [InlineData("div", "DIV", true)]  // Case insensitive element
     [InlineData("span", "div", false)]
     [InlineData("p", "p", true)]
     [InlineData("article", "section", false)]
-    public void TypeSelector_MatchesElementByTagName(string selector, string tagName, bool expected)
+    public void TypeSelector_MatchesElementByTagName(string selectorStr, string tagName, bool expected)
     {
-        // Test requires DOM element creation which fails due to library bug
-        Assert.True(true);
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc, tagName);
+        var selector = new CssSelector(selectorStr);
+
+        // Act
+        var matches = selector.Count > 0 && selector[0].Match(element);
+
+        // Assert
+        Assert.Equal(expected, matches);
     }
     #endregion
 
     #region Universal Selector Tests
-    [Fact(Skip = DocumentBugSkipReason)]
+    [Fact]
     public void UniversalSelector_MatchesAnyElement()
     {
-        // Test requires DOM element creation which fails due to library bug
-        Assert.True(true);
+        // Arrange
+        var doc = CreateTestDocument();
+        var div = CreateTestElement(doc, "div");
+        var span = CreateTestElement(doc, "span");
+        var p = CreateTestElement(doc, "p");
+        var selector = new CssSelector("*");
+
+        // Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.True(selector[0].Match(div), "Universal selector should match div");
+        Assert.True(selector[0].Match(span), "Universal selector should match span");
+        Assert.True(selector[0].Match(p), "Universal selector should match p");
     }
     #endregion
 
     #region ID Selector Tests
-    [Theory(Skip = DocumentBugSkipReason)]
+    [Theory]
     [InlineData("#header", "header", true)]
     [InlineData("#header", "footer", false)]
     [InlineData("#main-content", "main-content", true)]
     [InlineData("#HEADER", "header", true)]  // Case insensitive matching
-    public void IDSelector_MatchesElementById(string selector, string elementId, bool expected)
+    [InlineData("#header", "HEADER", true)]  // Case insensitive matching
+    public void IDSelector_MatchesElementById(string selectorStr, string elementId, bool expected)
     {
-        // Test requires DOM element creation which fails due to library bug
-        Assert.True(true);
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc, "div");
+        element.id = elementId;
+        var selector = new CssSelector(selectorStr);
+
+        // Act
+        var matches = selector.Count > 0 && selector[0].Match(element);
+
+        // Assert
+        Assert.Equal(expected, matches);
     }
 
-    [Fact(Skip = DocumentBugSkipReason)]
+    [Fact]
     public void IDSelector_DoesNotMatchElementWithoutId()
     {
-        // Test requires DOM element creation which fails due to library bug
-        Assert.True(true);
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc, "div");
+        var selector = new CssSelector("#someId");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.False(selector[0].Match(element), "Should not match element without ID");
     }
     #endregion
 
     #region Class Selector Tests
-    [Theory(Skip = DocumentBugSkipReason)]
+    [Theory]
     [InlineData(".active", "active", true)]
     [InlineData(".active", "inactive", false)]
     [InlineData(".btn", "btn btn-primary", true)]
     [InlineData(".btn-primary", "btn btn-primary", true)]
     [InlineData(".nonexistent", "btn btn-primary", false)]
-    public void ClassSelector_MatchesElementByClassName(string selector, string className, bool expected)
+    [InlineData(".ACTIVE", "active", true)]  // Case insensitive
+    [InlineData(".active", "ACTIVE", true)]  // Case insensitive
+    public void ClassSelector_MatchesElementByClassName(string selectorStr, string className, bool expected)
     {
-        // Test requires DOM element creation which fails due to library bug
-        Assert.True(true);
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc, "div");
+        element.className = className;
+        var selector = new CssSelector(selectorStr);
+
+        // Act
+        var matches = selector.Count > 0 && selector[0].Match(element);
+
+        // Assert
+        Assert.Equal(expected, matches);
     }
 
-    [Fact(Skip = DocumentBugSkipReason)]
+    [Fact]
     public void ClassSelector_DoesNotMatchElementWithoutClass()
     {
-        // Test requires DOM element creation which fails due to library bug
-        Assert.True(true);
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc, "div");
+        var selector = new CssSelector(".someClass");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.False(selector[0].Match(element), "Should not match element without class");
     }
 
-    [Fact(Skip = DocumentBugSkipReason)]
+    [Fact]
     public void MultipleClassSelectors_MatchElementWithAllClasses()
     {
-        // Test requires DOM element creation which fails due to library bug
-        Assert.True(true);
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc, "div");
+        element.className = "btn btn-primary active";
+        var selector = new CssSelector(".btn.btn-primary");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.True(selector[0].Match(element), "Should match element with all classes");
     }
 
-    [Fact(Skip = DocumentBugSkipReason)]
+    [Fact]
     public void MultipleClassSelectors_DoNotMatchElementMissingOneClass()
     {
-        // Test requires DOM element creation which fails due to library bug
-        Assert.True(true);
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc, "div");
+        element.className = "btn active";  // Missing btn-primary
+        var selector = new CssSelector(".btn.btn-primary");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.False(selector[0].Match(element), "Should not match element missing a class");
     }
     #endregion
 
     #region Compound Selector Tests
-    [Fact(Skip = DocumentBugSkipReason)]
+    [Fact]
     public void CompoundSelector_TypeAndClass_MatchesCorrectly()
     {
-        // Test requires DOM element creation which fails due to library bug
-        Assert.True(true);
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc, "div");
+        element.className = "container";
+        var selector = new CssSelector("div.container");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.True(selector[0].Match(element), "Should match div with container class");
     }
 
-    [Fact(Skip = DocumentBugSkipReason)]
+    [Fact]
+    public void CompoundSelector_TypeAndClass_DoesNotMatchWrongType()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc, "span");
+        element.className = "container";
+        var selector = new CssSelector("div.container");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.False(selector[0].Match(element), "Should not match span with container class");
+    }
+
+    [Fact]
     public void CompoundSelector_TypeAndId_MatchesCorrectly()
     {
-        // Test requires DOM element creation which fails due to library bug
-        Assert.True(true);
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc, "div");
+        element.id = "main";
+        var selector = new CssSelector("div#main");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.True(selector[0].Match(element), "Should match div with main ID");
     }
 
-    [Fact(Skip = DocumentBugSkipReason)]
+    [Fact]
     public void CompoundSelector_TypeIdAndClass_MatchesCorrectly()
     {
-        // Test requires DOM element creation which fails due to library bug
-        Assert.True(true);
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc, "div");
+        element.id = "main";
+        element.className = "container active";
+        var selector = new CssSelector("div#main.container");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.True(selector[0].Match(element), "Should match element with all attributes");
     }
     #endregion
 
     #region Selector List Tests
-    [Fact(Skip = DocumentBugSkipReason)]
+    [Fact]
     public void SelectorList_MatchesAnySelector()
     {
-        // Test requires DOM element creation which fails due to library bug
-        Assert.True(true);
+        // Arrange
+        var doc = CreateTestDocument();
+        var div = CreateTestElement(doc, "div");
+        var span = CreateTestElement(doc, "span");
+        var article = CreateTestElement(doc, "article");
+        var selector = new CssSelector("div, span, p");
+
+        // Act & Assert
+        Assert.True(selector.Any(s => s.Match(div)), "Should match div");
+        Assert.True(selector.Any(s => s.Match(span)), "Should match span");
+        Assert.False(selector.Any(s => s.Match(article)), "Should not match article");
     }
 
-    [Fact(Skip = DocumentBugSkipReason)]
+    [Fact]
     public void SelectorList_WithCompoundSelectors_MatchesCorrectly()
     {
-        // Test requires DOM element creation which fails due to library bug
-        Assert.True(true);
-    }
-    #endregion
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc, "div");
+        element.className = "active";
+        var selector = new CssSelector("span.inactive, div.active, p.pending");
 
-    #region Specificity Tests
-    [Fact(Skip = DocumentBugSkipReason)]
-    public void Specificity_UniversalSelector_HasZeroSpecificity()
-    {
-        // Test requires DOM element creation which fails due to library bug
-        Assert.True(true);
-    }
-
-    [Fact(Skip = DocumentBugSkipReason)]
-    public void Specificity_TypeSelector_HasLowestSpecificity()
-    {
-        // Test requires DOM element creation which fails due to library bug
-        Assert.True(true);
-    }
-
-    [Fact(Skip = DocumentBugSkipReason)]
-    public void Specificity_ClassSelector_IsHigherThanType()
-    {
-        // Test requires DOM element creation which fails due to library bug
-        Assert.True(true);
-    }
-
-    [Fact(Skip = DocumentBugSkipReason)]
-    public void Specificity_IdSelector_IsHigherThanClass()
-    {
-        // Test requires DOM element creation which fails due to library bug
-        Assert.True(true);
-    }
-
-    [Fact(Skip = DocumentBugSkipReason)]
-    public void Specificity_MultipleSelectors_CumulativeValues()
-    {
-        // Test requires DOM element creation which fails due to library bug
-        Assert.True(true);
+        // Act & Assert
+        Assert.True(selector.Any(s => s.Match(element)), "Should match div.active");
     }
     #endregion
 
