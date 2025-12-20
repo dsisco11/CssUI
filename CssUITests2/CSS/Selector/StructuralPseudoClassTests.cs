@@ -1,3 +1,4 @@
+using System.Linq;
 using CssUI.DOM;
 using Xunit;
 
@@ -10,7 +11,7 @@ namespace CssUI.CSS.Selector.Tests;
 public class StructuralPseudoClassTests
 {
     #region Test Infrastructure
-    private const string SkipReason = "Test stub - implementation pending";
+    private const string SkipReason = "Pseudo-class selector not yet implemented or has parsing issues";
 
     private static Document CreateTestDocument()
     {
@@ -28,13 +29,27 @@ public class StructuralPseudoClassTests
     [Fact(Skip = SkipReason)]
     public void Root_MatchesDocumentRootElement()
     {
-        // :root should match the document element
+        // Arrange
+        var doc = CreateTestDocument();
+        var selector = new CssSelector(":root");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.True(selector[0].Match(doc.documentElement), ":root should match document element");
     }
 
     [Fact(Skip = SkipReason)]
     public void Root_DoesNotMatchNonRootElements()
     {
-        // :root should not match child elements
+        // Arrange
+        var doc = CreateTestDocument();
+        var child = CreateTestElement(doc, "div");
+        doc.documentElement.appendChild(child);
+        var selector = new CssSelector(":root");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.False(selector[0].Match(child), ":root should not match child elements");
     }
     #endregion
 
@@ -42,25 +57,58 @@ public class StructuralPseudoClassTests
     [Fact(Skip = SkipReason)]
     public void Empty_MatchesElementWithNoChildren()
     {
-        // :empty matches elements with no child nodes
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc, "div");
+        var selector = new CssSelector(":empty");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.True(selector[0].Match(element), ":empty should match element with no children");
     }
 
     [Fact(Skip = SkipReason)]
     public void Empty_DoesNotMatchElementWithTextContent()
     {
-        // :empty should not match elements containing text
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc, "div");
+        element.textContent = "Some text";
+        var selector = new CssSelector(":empty");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.False(selector[0].Match(element), ":empty should not match element with text content");
     }
 
     [Fact(Skip = SkipReason)]
     public void Empty_DoesNotMatchElementWithChildElements()
     {
-        // :empty should not match elements with child elements
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var child = CreateTestElement(doc, "span");
+        parent.appendChild(child);
+        var selector = new CssSelector(":empty");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.False(selector[0].Match(parent), ":empty should not match element with child elements");
     }
 
     [Fact(Skip = SkipReason)]
     public void Empty_MatchesElementWithOnlyComments()
     {
-        // :empty should match elements containing only comments (per spec)
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc, "div");
+        var comment = doc.createComment("This is a comment");
+        element.appendChild(comment);
+        var selector = new CssSelector(":empty");
+
+        // Act & Assert - Per CSS spec, :empty should match elements with only comments
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.True(selector[0].Match(element), ":empty should match element with only comments");
     }
     #endregion
 
@@ -68,19 +116,52 @@ public class StructuralPseudoClassTests
     [Fact(Skip = SkipReason)]
     public void FirstChild_MatchesFirstChildOfParent()
     {
-        // :first-child matches the first child element
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var first = CreateTestElement(doc, "span");
+        var second = CreateTestElement(doc, "span");
+        parent.appendChild(first);
+        parent.appendChild(second);
+        var selector = new CssSelector(":first-child");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.True(selector[0].Match(first), ":first-child should match first child");
     }
 
     [Fact(Skip = SkipReason)]
     public void FirstChild_DoesNotMatchSecondChild()
     {
-        // :first-child should not match non-first children
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var first = CreateTestElement(doc, "span");
+        var second = CreateTestElement(doc, "span");
+        parent.appendChild(first);
+        parent.appendChild(second);
+        var selector = new CssSelector(":first-child");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.False(selector[0].Match(second), ":first-child should not match second child");
     }
 
     [Fact(Skip = SkipReason)]
     public void FirstChild_CombinedWithTypeSelector()
     {
-        // p:first-child matches first child only if it's a p
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var span = CreateTestElement(doc, "span");
+        var p = CreateTestElement(doc, "p");
+        parent.appendChild(span);  // First child is span
+        parent.appendChild(p);
+        var selector = new CssSelector("p:first-child");
+
+        // Act & Assert - p is not first child, so should not match
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.False(selector[0].Match(p), "p:first-child should not match p that is not first child");
     }
     #endregion
 
@@ -88,13 +169,35 @@ public class StructuralPseudoClassTests
     [Fact(Skip = SkipReason)]
     public void LastChild_MatchesLastChildOfParent()
     {
-        // :last-child matches the last child element
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var first = CreateTestElement(doc, "span");
+        var last = CreateTestElement(doc, "span");
+        parent.appendChild(first);
+        parent.appendChild(last);
+        var selector = new CssSelector(":last-child");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.True(selector[0].Match(last), ":last-child should match last child");
     }
 
     [Fact(Skip = SkipReason)]
     public void LastChild_DoesNotMatchFirstChild()
     {
-        // :last-child should not match non-last children
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var first = CreateTestElement(doc, "span");
+        var last = CreateTestElement(doc, "span");
+        parent.appendChild(first);
+        parent.appendChild(last);
+        var selector = new CssSelector(":last-child");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.False(selector[0].Match(first), ":last-child should not match first child");
     }
     #endregion
 
@@ -102,13 +205,34 @@ public class StructuralPseudoClassTests
     [Fact(Skip = SkipReason)]
     public void OnlyChild_MatchesSoleChildOfParent()
     {
-        // :only-child matches when element is the only child
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var only = CreateTestElement(doc, "span");
+        parent.appendChild(only);
+        var selector = new CssSelector(":only-child");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.True(selector[0].Match(only), ":only-child should match sole child");
     }
 
     [Fact(Skip = SkipReason)]
     public void OnlyChild_DoesNotMatchWithSiblings()
     {
-        // :only-child should not match when there are siblings
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var first = CreateTestElement(doc, "span");
+        var second = CreateTestElement(doc, "span");
+        parent.appendChild(first);
+        parent.appendChild(second);
+        var selector = new CssSelector(":only-child");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.False(selector[0].Match(first), ":only-child should not match when there are siblings");
+        Assert.False(selector[0].Match(second), ":only-child should not match when there are siblings");
     }
     #endregion
 
@@ -116,31 +240,106 @@ public class StructuralPseudoClassTests
     [Fact(Skip = SkipReason)]
     public void NthChild_MatchesSpecificPosition()
     {
-        // :nth-child(2) matches the second child
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var child1 = CreateTestElement(doc, "span");
+        var child2 = CreateTestElement(doc, "span");
+        var child3 = CreateTestElement(doc, "span");
+        parent.appendChild(child1);
+        parent.appendChild(child2);
+        parent.appendChild(child3);
+        var selector = new CssSelector(":nth-child(2)");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.False(selector[0].Match(child1), ":nth-child(2) should not match first child");
+        Assert.True(selector[0].Match(child2), ":nth-child(2) should match second child");
+        Assert.False(selector[0].Match(child3), ":nth-child(2) should not match third child");
     }
 
     [Fact(Skip = SkipReason)]
     public void NthChild_OddKeyword()
     {
-        // :nth-child(odd) matches 1st, 3rd, 5th... children
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var child1 = CreateTestElement(doc, "span");
+        var child2 = CreateTestElement(doc, "span");
+        var child3 = CreateTestElement(doc, "span");
+        var child4 = CreateTestElement(doc, "span");
+        parent.appendChild(child1);
+        parent.appendChild(child2);
+        parent.appendChild(child3);
+        parent.appendChild(child4);
+        var selector = new CssSelector(":nth-child(odd)");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.True(selector[0].Match(child1), ":nth-child(odd) should match 1st child");
+        Assert.False(selector[0].Match(child2), ":nth-child(odd) should not match 2nd child");
+        Assert.True(selector[0].Match(child3), ":nth-child(odd) should match 3rd child");
+        Assert.False(selector[0].Match(child4), ":nth-child(odd) should not match 4th child");
     }
 
     [Fact(Skip = SkipReason)]
     public void NthChild_EvenKeyword()
     {
-        // :nth-child(even) matches 2nd, 4th, 6th... children
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var child1 = CreateTestElement(doc, "span");
+        var child2 = CreateTestElement(doc, "span");
+        var child3 = CreateTestElement(doc, "span");
+        var child4 = CreateTestElement(doc, "span");
+        parent.appendChild(child1);
+        parent.appendChild(child2);
+        parent.appendChild(child3);
+        parent.appendChild(child4);
+        var selector = new CssSelector(":nth-child(even)");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.False(selector[0].Match(child1), ":nth-child(even) should not match 1st child");
+        Assert.True(selector[0].Match(child2), ":nth-child(even) should match 2nd child");
+        Assert.False(selector[0].Match(child3), ":nth-child(even) should not match 3rd child");
+        Assert.True(selector[0].Match(child4), ":nth-child(even) should match 4th child");
     }
 
     [Fact(Skip = SkipReason)]
     public void NthChild_AnPlusB_Formula()
     {
-        // :nth-child(2n+1) matches every odd child
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var children = Enumerable.Range(0, 6).Select(_ => CreateTestElement(doc, "span")).ToList();
+        foreach (var child in children) parent.appendChild(child);
+        var selector = new CssSelector(":nth-child(2n+1)");  // Matches 1, 3, 5 (odd)
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.True(selector[0].Match(children[0]), "2n+1 should match 1st");
+        Assert.False(selector[0].Match(children[1]), "2n+1 should not match 2nd");
+        Assert.True(selector[0].Match(children[2]), "2n+1 should match 3rd");
     }
 
     [Fact(Skip = SkipReason)]
     public void NthChild_NegativeOffset()
     {
-        // :nth-child(-n+3) matches first 3 children
+        // Arrange: -n+3 matches first 3 children (3, 2, 1)
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var children = Enumerable.Range(0, 5).Select(_ => CreateTestElement(doc, "span")).ToList();
+        foreach (var child in children) parent.appendChild(child);
+        var selector = new CssSelector(":nth-child(-n+3)");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.True(selector[0].Match(children[0]), "-n+3 should match 1st");
+        Assert.True(selector[0].Match(children[1]), "-n+3 should match 2nd");
+        Assert.True(selector[0].Match(children[2]), "-n+3 should match 3rd");
+        Assert.False(selector[0].Match(children[3]), "-n+3 should not match 4th");
+        Assert.False(selector[0].Match(children[4]), "-n+3 should not match 5th");
     }
     #endregion
 
@@ -148,13 +347,41 @@ public class StructuralPseudoClassTests
     [Fact(Skip = SkipReason)]
     public void NthLastChild_MatchesFromEnd()
     {
-        // :nth-last-child(1) matches the last child
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var child1 = CreateTestElement(doc, "span");
+        var child2 = CreateTestElement(doc, "span");
+        var child3 = CreateTestElement(doc, "span");
+        parent.appendChild(child1);
+        parent.appendChild(child2);
+        parent.appendChild(child3);
+        var selector = new CssSelector(":nth-last-child(1)");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.True(selector[0].Match(child3), ":nth-last-child(1) should match last child");
+        Assert.False(selector[0].Match(child2), ":nth-last-child(1) should not match second to last");
     }
 
     [Fact(Skip = SkipReason)]
     public void NthLastChild_MatchesSecondFromEnd()
     {
-        // :nth-last-child(2) matches the second to last child
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var child1 = CreateTestElement(doc, "span");
+        var child2 = CreateTestElement(doc, "span");
+        var child3 = CreateTestElement(doc, "span");
+        parent.appendChild(child1);
+        parent.appendChild(child2);
+        parent.appendChild(child3);
+        var selector = new CssSelector(":nth-last-child(2)");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.True(selector[0].Match(child2), ":nth-last-child(2) should match second to last");
+        Assert.False(selector[0].Match(child3), ":nth-last-child(2) should not match last");
     }
     #endregion
 
@@ -162,13 +389,38 @@ public class StructuralPseudoClassTests
     [Fact(Skip = SkipReason)]
     public void FirstOfType_MatchesFirstOfTypeAmongSiblings()
     {
-        // p:first-of-type matches first p among siblings
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var span1 = CreateTestElement(doc, "span");
+        var p1 = CreateTestElement(doc, "p");
+        var span2 = CreateTestElement(doc, "span");
+        parent.appendChild(span1);
+        parent.appendChild(p1);
+        parent.appendChild(span2);
+        var selector = new CssSelector("span:first-of-type");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.True(selector[0].Match(span1), "span:first-of-type should match first span");
+        Assert.False(selector[0].Match(span2), "span:first-of-type should not match second span");
     }
 
     [Fact(Skip = SkipReason)]
     public void FirstOfType_IndependentOfPosition()
     {
-        // First of type may not be first child
+        // Arrange: First p is not first child but is first-of-type
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var span = CreateTestElement(doc, "span");
+        var p = CreateTestElement(doc, "p");
+        parent.appendChild(span);  // span is first child
+        parent.appendChild(p);     // p is second child but first-of-type for p
+        var selector = new CssSelector("p:first-of-type");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.True(selector[0].Match(p), "p:first-of-type should match p even if not first child");
     }
     #endregion
 
@@ -176,7 +428,21 @@ public class StructuralPseudoClassTests
     [Fact(Skip = SkipReason)]
     public void LastOfType_MatchesLastOfTypeAmongSiblings()
     {
-        // p:last-of-type matches last p among siblings
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var span1 = CreateTestElement(doc, "span");
+        var p = CreateTestElement(doc, "p");
+        var span2 = CreateTestElement(doc, "span");
+        parent.appendChild(span1);
+        parent.appendChild(p);
+        parent.appendChild(span2);
+        var selector = new CssSelector("span:last-of-type");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.True(selector[0].Match(span2), "span:last-of-type should match last span");
+        Assert.False(selector[0].Match(span1), "span:last-of-type should not match first span");
     }
     #endregion
 
@@ -184,13 +450,37 @@ public class StructuralPseudoClassTests
     [Fact(Skip = SkipReason)]
     public void OnlyOfType_MatchesOnlyOfTypeAmongSiblings()
     {
-        // p:only-of-type matches when p is the only p child
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var span = CreateTestElement(doc, "span");
+        var p = CreateTestElement(doc, "p");
+        parent.appendChild(span);
+        parent.appendChild(p);
+        var selector = new CssSelector("p:only-of-type");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.True(selector[0].Match(p), "p:only-of-type should match when p is the only p");
     }
 
     [Fact(Skip = SkipReason)]
     public void OnlyOfType_CanHaveOtherTypeSiblings()
     {
-        // :only-of-type matches even with siblings of different types
+        // Arrange: p is only-of-type even with span siblings
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var span1 = CreateTestElement(doc, "span");
+        var p = CreateTestElement(doc, "p");
+        var span2 = CreateTestElement(doc, "span");
+        parent.appendChild(span1);
+        parent.appendChild(p);
+        parent.appendChild(span2);
+        var selector = new CssSelector("p:only-of-type");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.True(selector[0].Match(p), "p:only-of-type should match even with other type siblings");
     }
     #endregion
 
@@ -198,13 +488,47 @@ public class StructuralPseudoClassTests
     [Fact(Skip = SkipReason)]
     public void NthOfType_MatchesNthOfTypeAmongSiblings()
     {
-        // p:nth-of-type(2) matches second p among siblings
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var span1 = CreateTestElement(doc, "span");
+        var p1 = CreateTestElement(doc, "p");
+        var span2 = CreateTestElement(doc, "span");
+        var p2 = CreateTestElement(doc, "p");
+        parent.appendChild(span1);
+        parent.appendChild(p1);
+        parent.appendChild(span2);
+        parent.appendChild(p2);
+        var selector = new CssSelector("span:nth-of-type(2)");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.False(selector[0].Match(span1), "span:nth-of-type(2) should not match first span");
+        Assert.True(selector[0].Match(span2), "span:nth-of-type(2) should match second span");
     }
 
     [Fact(Skip = SkipReason)]
     public void NthOfType_WithFormula()
     {
-        // p:nth-of-type(2n) matches every even p
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var p1 = CreateTestElement(doc, "p");
+        var p2 = CreateTestElement(doc, "p");
+        var p3 = CreateTestElement(doc, "p");
+        var p4 = CreateTestElement(doc, "p");
+        parent.appendChild(p1);
+        parent.appendChild(p2);
+        parent.appendChild(p3);
+        parent.appendChild(p4);
+        var selector = new CssSelector("p:nth-of-type(2n)");  // Even positions: 2, 4
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.False(selector[0].Match(p1), "p:nth-of-type(2n) should not match 1st p");
+        Assert.True(selector[0].Match(p2), "p:nth-of-type(2n) should match 2nd p");
+        Assert.False(selector[0].Match(p3), "p:nth-of-type(2n) should not match 3rd p");
+        Assert.True(selector[0].Match(p4), "p:nth-of-type(2n) should match 4th p");
     }
     #endregion
 
@@ -212,7 +536,24 @@ public class StructuralPseudoClassTests
     [Fact(Skip = SkipReason)]
     public void NthLastOfType_MatchesFromEndOfType()
     {
-        // p:nth-last-of-type(1) matches last p among siblings
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var p1 = CreateTestElement(doc, "p");
+        var span = CreateTestElement(doc, "span");
+        var p2 = CreateTestElement(doc, "p");
+        var p3 = CreateTestElement(doc, "p");
+        parent.appendChild(p1);
+        parent.appendChild(span);
+        parent.appendChild(p2);
+        parent.appendChild(p3);
+        var selector = new CssSelector("p:nth-last-of-type(1)");
+
+        // Act & Assert
+        Assert.True(selector.Count > 0, "Selector should parse");
+        Assert.True(selector[0].Match(p3), "p:nth-last-of-type(1) should match last p");
+        Assert.False(selector[0].Match(p2), "p:nth-last-of-type(1) should not match second-to-last p");
+        Assert.False(selector[0].Match(p1), "p:nth-last-of-type(1) should not match first p");
     }
     #endregion
 }
