@@ -1,58 +1,25 @@
 using System;
-using System.IO;
 using System.Threading.Tasks;
-using CssUI.Rendering;
 
 namespace CssUI;
 
-
 /// <summary>
-/// Service interface for image decoding and texture management.
+/// Service interface for GPU texture management.
 /// Implementations handle GPU resource allocation internally.
 /// </summary>
 public interface ITextureService
 {
-    #region Image Decoding
+    #region Synchronous Texture Management
 
     /// <summary>
-    /// Decode image data (PNG, JPEG, GIF, WebP, etc.) into raw RGBA pixels.
-    /// </summary>
-    /// <param name="data">Encoded image data.</param>
-    /// <returns>Decoded image data, or default if decoding fails.</returns>
-    ImageData DecodeImage(ReadOnlySpan<byte> data);
-
-    /// <summary>
-    /// Decode image data from a stream.
-    /// </summary>
-    /// <param name="stream">Stream containing encoded image data.</param>
-    /// <returns>Decoded image data, or default if decoding fails.</returns>
-    ImageData DecodeImage(Stream stream);
-
-    /// <summary>
-    /// Get supported image format extensions (e.g., ".png", ".jpg", ".gif").
-    /// </summary>
-    ReadOnlySpan<string> SupportedFormats { get; }
-
-    #endregion
-
-    #region Texture Management
-
-    /// <summary>
-    /// Create a texture from raw RGBA pixel data.
+    /// Create a texture from raw pixel data.
     /// </summary>
     /// <param name="width">Texture width in pixels.</param>
     /// <param name="height">Texture height in pixels.</param>
     /// <param name="pixels">The pixel data.</param>
     /// <param name="format">The pixel format.</param>
-    /// <returns>A handle to the created texture, or <see cref="TextureHandle.Null"/> on failure.</returns>
-    TextureHandle CreateTexture(int width, int height, ReadOnlySpan<byte> pixels, EPixelFormat format);
-
-    /// <summary>
-    /// Create a texture from a stream containing encoded image data.
-    /// </summary>
-    /// <param name="stream">Stream containing encoded image data.</param>
-    /// <returns>A handle to the created texture, or <see cref="TextureHandle.Null"/> on failure.</returns>
-    TextureHandle CreateTextureFromImage(Stream stream);
+    /// <returns>A descriptor for the created texture, or default on failure.</returns>
+    TextureDescriptor CreateTexture(int width, int height, ReadOnlySpan<byte> pixels, EPixelFormat format);
 
     /// <summary>
     /// Update a region of an existing texture.
@@ -63,14 +30,8 @@ public interface ITextureService
     /// <param name="width">Width of the region.</param>
     /// <param name="height">Height of the region.</param>
     /// <param name="pixels">New pixel data for the region.</param>
+    /// <param name="format">The pixel format.</param>
     void UpdateTexture(TextureHandle handle, int x, int y, int width, int height, ReadOnlySpan<byte> pixels, EPixelFormat format);
-
-    /// <summary>
-    /// Get texture dimensions.
-    /// </summary>
-    /// <param name="handle">The texture handle.</param>
-    /// <returns>Width and height in pixels, or (0, 0) if handle is invalid.</returns>
-    (int Width, int Height) GetTextureSize(TextureHandle handle);
 
     /// <summary>
     /// Check if a texture handle is still valid.
@@ -84,21 +45,34 @@ public interface ITextureService
 
     #endregion
 
-    #region Async GpuTexture Loading
+    #region Asynchronous Texture Management
 
     /// <summary>
-    /// Load image data into a GpuTexture asynchronously.
+    /// Create a texture from raw pixel data asynchronously.
     /// </summary>
-    /// <param name="imageData">Encoded image data.</param>
-    /// <returns>A GpuTexture, or an empty texture on failure.</returns>
-    Task<GpuTexture> LoadTextureAsync(ReadOnlyMemory<byte> imageData);
+    /// <param name="width">Texture width in pixels.</param>
+    /// <param name="height">Texture height in pixels.</param>
+    /// <param name="pixels">The pixel data.</param>
+    /// <param name="format">The pixel format.</param>
+    /// <returns>A descriptor for the created texture, or default on failure.</returns>
+    ValueTask<TextureDescriptor> CreateTextureAsync(int width, int height, ReadOnlyMemory<byte> pixels, EPixelFormat format);
 
     /// <summary>
-    /// Load an image file into a GpuTexture asynchronously.
+    /// Update a region of an existing texture asynchronously.
     /// </summary>
-    /// <param name="path">Path to the image file.</param>
-    /// <returns>A GpuTexture, or an empty texture on failure.</returns>
-    Task<GpuTexture> LoadTextureFromFileAsync(string path);
+    /// <param name="handle">The texture to update.</param>
+    /// <param name="x">X offset of the region.</param>
+    /// <param name="y">Y offset of the region.</param>
+    /// <param name="width">Width of the region.</param>
+    /// <param name="height">Height of the region.</param>
+    /// <param name="pixels">New pixel data for the region.</param>
+    /// <param name="format">The pixel format.</param>
+    ValueTask UpdateTextureAsync(TextureHandle handle, int x, int y, int width, int height, ReadOnlyMemory<byte> pixels, EPixelFormat format);
+
+    /// <summary>
+    /// Destroy a texture and free associated resources asynchronously.
+    /// </summary>
+    ValueTask ReleaseAsync(TextureHandle handle);
 
     #endregion
 }
