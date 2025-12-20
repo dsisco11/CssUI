@@ -23,7 +23,7 @@ public class PseudoClassSelectorTests
     #endregion
 
     #region :root Tests
-    
+
     [Fact(Skip = DocumentBugSkipReason)]
     public void Root_DoesNotMatchNonRootElements()
     {

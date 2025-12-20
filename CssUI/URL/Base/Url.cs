@@ -208,6 +208,13 @@ public class Url
             return false;
         }
 
+        // Parse_Basic can return false with a null outUrl on validation errors
+        if (parsedUrl == null)
+        {
+            outUrl = null;
+            return false;
+        }
+
         if (parsedUrl.Scheme != EUrlScheme.Blob)
         {
             outUrl = parsedUrl;

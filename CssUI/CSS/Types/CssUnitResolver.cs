@@ -27,7 +27,7 @@ public class CssUnitResolver
     static CssUnitResolver()
     {
         /* Find the max unit enum value */
-        TABLE_SIZE = 1 + Enum.GetValues(typeof(ECssUnit)).Cast<byte>().Max();
+        TABLE_SIZE = 1 + Enum.GetValues(typeof(ECssUnit)).Cast<int>().Max();
     }
     #endregion
 
@@ -201,8 +201,16 @@ public class CssUnitResolver
     /// <returns></returns>
     private static double Get_Scale(Document document, ECssUnit Unit, bool anchor_to_dpi = false)
     {
+        // If defaultView is null (during Document construction), we can't use DPI-anchored values
+        bool canAnchorToDpi = anchor_to_dpi && document?.defaultView?.screen != null;
+        
         switch (Unit)
         {
+            /* None/Unitless - return scale of 1.0 (value is used as-is) */
+            case ECssUnit.None:
+                {
+                    return 1.0;
+                }
             /* Physical Units */
             /* Docs: https://www.w3.org/TR/css3-values/#physical-units */
             case ECssUnit.PX:
@@ -211,7 +219,7 @@ public class CssUnitResolver
                 }
             case ECssUnit.CM:
                 {
-                    if (anchor_to_dpi)
+                    if (canAnchorToDpi)
                     {
                         return (document.defaultView.screen.dpi / 2.54);
                     }
@@ -220,7 +228,7 @@ public class CssUnitResolver
                 }
             case ECssUnit.MM:
                 {
-                    if (anchor_to_dpi)
+                    if (canAnchorToDpi)
                     {
                         return (document.defaultView.screen.dpi / 2.54) / 10.0;
                     }
@@ -229,7 +237,7 @@ public class CssUnitResolver
                 }
             case ECssUnit.Q:
                 {
-                    if (anchor_to_dpi)
+                    if (canAnchorToDpi)
                     {
                         return (document.defaultView.screen.dpi / 2.54) / 40.0;
                     }
@@ -238,7 +246,7 @@ public class CssUnitResolver
                 }
             case ECssUnit.IN:
                 {
-                    if (anchor_to_dpi)
+                    if (canAnchorToDpi)
                     {
                         return (1.0 / document.defaultView.screen.dpi);
                     }
@@ -247,7 +255,7 @@ public class CssUnitResolver
                 }
             case ECssUnit.PC:
                 {
-                    if (anchor_to_dpi)
+                    if (canAnchorToDpi)
                     {
                         return (1.0 / document.defaultView.screen.dpi) / 6.0;
                     }
@@ -256,7 +264,7 @@ public class CssUnitResolver
                 }
             case ECssUnit.PT:
                 {
-                    if (anchor_to_dpi)
+                    if (canAnchorToDpi)
                     {
                         return (1.0 / document.defaultView.screen.dpi) / 72.0;
                     }
@@ -268,7 +276,7 @@ public class CssUnitResolver
             /* Docs: https://www.w3.org/TR/css3-values/#resolution-value */
             case ECssUnit.DPI:
                 {
-                    if (anchor_to_dpi)
+                    if (canAnchorToDpi)
                     {
                         return 1.0 / document.defaultView.screen.dpi;
                     }
@@ -277,7 +285,7 @@ public class CssUnitResolver
                 }
             case ECssUnit.DPCM:
                 {
-                    if (anchor_to_dpi)
+                    if (canAnchorToDpi)
                     {
                         return (document.defaultView.screen.dpi / 2.54);
                     }
@@ -337,24 +345,61 @@ public class CssUnitResolver
             /* Docs: https://www.w3.org/TR/css-values-3/#font-relative-lengths */
             case ECssUnit.REM:
                 {
-                    return document.body.Style.FontSize;
+                    // Return a default font size if body/documentElement is not yet available
+                    // Note: Must check documentElement first since body getter throws if it's null
+                    if (document?.documentElement == null) return 16.0;
+                    return document.body?.Style?.FontSize ?? 16.0;
                 }
             case ECssUnit.VMAX:
                 {
+                    // Return default viewport size if defaultView is not yet available
+                    if (document?.defaultView?.visualViewport == null) return 1.0;
                     return Math.Max(document.defaultView.visualViewport.Width, document.defaultView.visualViewport.Height);
                 }
             case ECssUnit.VMIN:
                 {
+                    // Return default viewport size if defaultView is not yet available
+                    if (document?.defaultView?.visualViewport == null) return 1.0;
                     return Math.Min(document.defaultView.visualViewport.Width, document.defaultView.visualViewport.Height);
                 }
             case ECssUnit.VW:
                 {
+                    // Return default viewport size if defaultView is not yet available
+                    if (document?.defaultView?.visualViewport == null) return 1.0;
                     return document.defaultView.visualViewport.Width;
                 }
             case ECssUnit.VH:
                 {
+                    // Return default viewport size if defaultView is not yet available
+                    if (document?.defaultView?.visualViewport == null) return 1.0;
                     return document.defaultView.visualViewport.Height;
                 }
+            
+            /* Font-relative units - these need element context for proper resolution,
+               but we provide default fallback values for table compilation */
+            case ECssUnit.EM:
+                {
+                    // Default em is typically the element's font size, use 16px as default
+                    return 16.0;
+                }
+            case ECssUnit.EX:
+                {
+                    // x-height is typically about half the font size
+                    return 8.0;
+                }
+            case ECssUnit.CH:
+                {
+                    // ch is the width of '0' glyph, typically about half the font size
+                    return 8.0;
+                }
+            
+            /* Grid Units */
+            case ECssUnit.FR:
+                {
+                    // Flexible length unit for grid - returns 1.0 as default scale factor
+                    return 1.0;
+                }
+            
             default:
                 {
                     throw new NotImplementedException($"CSS Unit type '{Enum.GetName(typeof(ECssUnit), Unit)}' has not been implemented!");

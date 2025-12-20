@@ -9,7 +9,7 @@ using CssUI.DOM.Nodes;
 
 namespace CssUI.CSS;
 
-// XXX: This class could be MUCH more performant if we didnt have to create an instance of every defined css property during creation, 
+// XXX: This class could be MUCH more performant if we didnt have to create an instance of every defined css property during creation,
 //      if we could just instantiate the properties when they are needed it would save a lot.
 
 /* XXX: lets move to referencing these by an AtomicName<ECssProperty> and then just instantiate a LUT which maps the AtomicName to an object pointer.
@@ -19,7 +19,7 @@ namespace CssUI.CSS;
 
 /// <summary>
 /// Holds an instance of all the defined css propertys that a css element can have
-/// Each different styling state of an element gets it's own instance of this class which 
+/// Each different styling state of an element gets it's own instance of this class which
 /// are then all cascaded together to determine the current value when the elements active state changes.
 /// </summary>
 [DebuggerDisplay("{Name}")]
@@ -445,7 +445,8 @@ public class CssComputedStyle
         this.ReadOnly = ReadOnly;
         var selfRef = new WeakReference<CssComputedStyle>(this);
 
-        CssProperties = new List<ICssProperty>(MAX_PROPERTY_ID_INDEX + 1);
+        // Create list with correct size (pre-populated with nulls) to allow indexing by property ID
+        CssProperties = new List<ICssProperty?>(new ICssProperty?[MAX_PROPERTY_ID_INDEX + 1]);
 
         CssProperties[(int)ECssPropertyID.Top] = new IntProperty(ECssPropertyID.Top, Owner, selfRef, this.ReadOnly);
         CssProperties[(int)ECssPropertyID.Right] = new IntProperty(ECssPropertyID.Right, Owner, selfRef, this.ReadOnly);

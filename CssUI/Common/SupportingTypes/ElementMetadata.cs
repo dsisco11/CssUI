@@ -6,15 +6,15 @@ namespace CssUI;
 
 public class ElementMetadata
 {
+    #region Static
+    static Type[] CtorTypes = new Type[] { typeof(Document), typeof(string), typeof(string), typeof(string) };
+    #endregion
+
     #region Instances
     public static ElementMetadata ElementMeta = new ElementMetadata(string.Empty, typeof(Element));
 #if ENABLE_HTML
     public static ElementMetadata UnknownMeta = new ElementMetadata(string.Empty, typeof(HTML.HTMLUnknownElement));
 #endif
-    #endregion
-
-    #region Static
-    static Type[] CtorTypes = new Type[] { typeof(Document), typeof(string), typeof(string), typeof(string) };
     #endregion
 
     #region Properties

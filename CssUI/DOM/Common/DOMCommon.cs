@@ -1876,7 +1876,7 @@ public static class DOMCommon
         if (ctor is null)
             throw new Exception($"Cannot find interface constructor for element type: \"{localName}\"");
         /* XXX: Just need to make sure that every tag type has an interface type correctly specified for it */
-        result = (Element)ctor.Invoke(new object?[] { document, localName, prefix, Namespace });
+        result = (Element)ctor.Invoke(new object?[] { document, localName.ToString(), prefix, Namespace });
 
         return result;
     }

@@ -116,9 +116,9 @@ public class ChildNodeList : IList<Node>
         Contract.EndContractBlock();
         if (Count <= 0) return;
 
-        var previousNode = (Count > (index - 1)) ? Items[index - 1] : null;
+        var previousNode = (index > 0) ? Items[index - 1] : null;
         var node = Items[index];
-        var nextNode = (Count > (index + 1)) ? Items[index + 1] : null;
+        var nextNode = (index + 1 < Count) ? Items[index + 1] : null;
 
         node.index = index;
 

@@ -86,11 +86,11 @@ public class MutationRecord
         /* 2) Let nodes be the inclusive ancestors of target. */
         List<Node> Nodes = new List<Node>();
         TreeWalker tree = new TreeWalker(Record.target!, ENodeFilterMask.SHOW_ALL);
-        Node ancestor = Record.target!;
+        Node? ancestor = Record.target!;
         while (ancestor != null)
         {
-            ancestor = tree.parentNode()!;
-            Nodes.Add(ancestor!);
+            Nodes.Add(ancestor);
+            ancestor = tree.parentNode();
         }
         /* 3) For each node in nodes, and then for each registered of node’s registered observer list: */
         foreach (Node node in Nodes)
@@ -126,7 +126,7 @@ public class MutationRecord
             kv.Key.Enqueue(record);
         }
         /* 5) Queue a mutation observer microtask. */
-        Record.target.ownerDocument.defaultView.QueueObserverMicroTask();
+        Record.target?.ownerDocument?.defaultView?.QueueObserverMicroTask();
     }
 
     #endregion

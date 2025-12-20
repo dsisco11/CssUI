@@ -856,7 +856,7 @@ public abstract class Node : EventTarget, INode
             }
         }
         /* 3) Let nodes be node’s children, if node is a DocumentFragment node; otherwise « node ». */
-        IEnumerable<Node> nodes = (node is DocumentFragment doc1) ? doc1.childNodes : (IEnumerable<Node>)Array.Empty<Node>();
+        IEnumerable<Node> nodes = (node is DocumentFragment doc1) ? doc1.childNodes : new Node[] { node };
         /* 4) If node is a DocumentFragment node, remove its children with the suppress observers flag set. */
         if (node is DocumentFragment doc2)
         {

@@ -43,10 +43,13 @@ public abstract class AttributeTokenList<T> : IEnumerable<T>, IAttributeTokenLis
             ownerElement.tokenListMap.Add(localName, this);
         }
         /* 3) Let value be the result of getting an attribute value given element and localName. */
-        this.ownerElement.find_attribute(localName, out Attr attr);
+        this.ownerElement.find_attribute(localName, out Attr? attr);
         //var value = attr?.Value.Get_String();
         /* 4) Run the attribute change steps for element, localName, value, value, and null. */
-        run_attribute_change_steps(ownerElement, localName, attr.Value, attr.Value, null);
+        if (attr != null)
+        {
+            run_attribute_change_steps(ownerElement, localName, attr.Value, attr.Value, null);
+        }
     }
 
     public AttributeTokenList(Element ownerElement, AtomicName<EAttributeName> localName) : this(ownerElement, localName, null)
