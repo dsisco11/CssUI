@@ -227,7 +227,6 @@ public static class Lookup
     }
     #endregion
 
-
     #region Enums
     /// <summary>
     /// Attempts to retrieve an enum value from a given keyword
@@ -339,7 +338,6 @@ public static class Lookup
 
     #endregion
 
-
     #region Checks
     [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
     public static bool Is_Declared<T>() where T : struct
@@ -380,7 +378,6 @@ public static class Lookup
         return EnumMetaTable.KEYWORD[outIndex]?.ContainsKey(Keyword) ?? false;
     }
     #endregion
-
 
     #region Fetches
     /// <summary>
