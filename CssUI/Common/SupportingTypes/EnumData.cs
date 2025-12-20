@@ -1,22 +1,14 @@
 namespace CssUI;
 
 /// <summary>
-/// Holds ancillary data about an enum value
+/// Holds metadata associated with an enum value at compile-time such that it can be queried at runtime.
+/// This allows us to associate extra data with enum values without using reflection.
 /// </summary>
-public struct EnumData
+public readonly record struct EnumData(string Keyword, params object[] Data)
 {
     #region Properties
-    public readonly object[] Data;
-    public readonly string Keyword;
-    #endregion
-
-    #region Constructor
-
-    public EnumData(string keyword, params object[] data)
-    {
-        Keyword = keyword;
-        Data = data;
-    }
+    public readonly object[] Data = Data;
+    public readonly string Keyword = Keyword;
     #endregion
 
     public object this[int i]

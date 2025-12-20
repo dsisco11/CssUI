@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 namespace CssUI;
 
 /// <summary>
-/// Provides utility functions for translating code values into their CSS string values
+/// Provides utility functions for looking up enum keywords and metadata
 /// </summary>
 public static class Lookup
 {
@@ -126,13 +126,13 @@ public static class Lookup
     /// <param name="outData">Returned value</param>
     /// <returns>Success</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
-    public static bool TryData<T>(T Value, out EnumData outData) where T : struct
+    public static bool TryData<T>(T Value, [MaybeNullWhen(false)] out EnumData? outData) where T : struct
     {
         int enumIndex = EnumMetaTable.Meta.Lookup<T>();
         if (enumIndex < 0)
         {
             /* Enum has no index */
-            outData = default;
+            outData = null;
             return false;
         }
 
@@ -149,7 +149,7 @@ public static class Lookup
     /// <param name="outData">Returned value</param>
     /// <returns>Success</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
-    public static bool TryData(Type enumType, object Value, out EnumData outData)
+    public static bool TryData(Type enumType, object Value, out EnumData? outData)
     {
         if (enumType is null) throw new ArgumentNullException(nameof(enumType));
         Contract.EndContractBlock();
@@ -158,7 +158,7 @@ public static class Lookup
         if (enumIndex < 0)
         {
             /* Enum has no index */
-            outData = default;
+            outData = null;
             return false;
         }
 
@@ -398,7 +398,7 @@ public static class Lookup
         if (enumIndex < 0)
             return Array.Empty<string>();/* Enum has no index */
 
-        return EnumMetaTable.KEYWORD[enumIndex].Keys.Select(k => k.ToString()).ToArray();
+        return EnumMetaTable.KEYWORD[enumIndex].Keys.Select(static k => k.ToString()).ToArray();
     }
 
     /// <summary>
@@ -412,7 +412,7 @@ public static class Lookup
         if (enumIndex < 0)
             return Array.Empty<string>();/* Enum has no index */
 
-        return EnumMetaTable.KEYWORD[enumIndex].Keys.Select(k => k.ToString()).ToArray();
+        return EnumMetaTable.KEYWORD[enumIndex].Keys.Select(static k => k.ToString()).ToArray();
     }
     #endregion
 }
