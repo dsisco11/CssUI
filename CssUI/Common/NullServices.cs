@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Immutable;
 using System.IO;
 using System.Numerics;
 using System.Threading.Tasks;
@@ -73,45 +74,74 @@ public sealed class NullFontService : IFontService
 }
 
 /// <summary>
+/// Null implementation of IImageService for headless/testing scenarios.
+/// </summary>
+public sealed class NullImageService : IImageService
+{
+    private static readonly ImmutableArray<string> _formats = [".png", ".jpg", ".jpeg", ".gif", ".webp"];
+
+    public ImmutableArray<string> SupportedFormats => _formats;
+
+    public ImageData DecodeImage(ReadOnlySpan<byte> data)
+        => new ImageData
+        {
+            Frames = [new ImageFrame
+            {
+                Width = 1,
+                Height = 1,
+                Pixels = new byte[4],
+                Format = EPixelFormat.RGBA8,
+                DelaySeconds = 0
+            }]
+        };
+
+    public ImageData DecodeImage(Stream stream)
+        => DecodeImage(ReadOnlySpan<byte>.Empty);
+
+    public ValueTask<ImageData> DecodeImageAsync(ReadOnlyMemory<byte> data)
+        => ValueTask.FromResult(DecodeImage(data.Span));
+
+    public ValueTask<ImageData> DecodeImageAsync(Stream stream)
+        => ValueTask.FromResult(DecodeImage(stream));
+}
+
+/// <summary>
 /// Null implementation of ITextureService for headless/testing scenarios.
 /// </summary>
 public sealed class NullTextureService : ITextureService
 {
     private int _nextId = 1;
-    private static readonly string[] _formats = { ".png", ".jpg", ".gif" };
 
-    public ReadOnlySpan<string> SupportedFormats => _formats;
-
-    public ImageData DecodeImage(ReadOnlySpan<byte> data)
-        => new ImageData { Width = 1, Height = 1, Pixels = new byte[4], FrameCount = 1, FrameDelaysMs = Array.Empty<int>() };
-
-    public ImageData DecodeImage(Stream stream)
-        => DecodeImage(ReadOnlySpan<byte>.Empty);
-
-    public TextureHandle CreateTexture(int width, int height, ReadOnlySpan<byte> pixels, EPixelFormat format)
-        => new TextureHandle(_nextId++);
-
-    public TextureHandle CreateTextureFromImage(ReadOnlySpan<byte> imageData)
-        => new TextureHandle(_nextId++);
-
-    public TextureHandle CreateTextureFromImage(Stream stream)
-        => new TextureHandle(_nextId++);
+    public TextureDescriptor CreateTexture(int width, int height, ReadOnlySpan<byte> pixels, EPixelFormat format)
+        => new TextureDescriptor
+        {
+            Handle = new TextureHandle(_nextId++),
+            Width = width,
+            Height = height,
+            Format = format
+        };
 
     public void UpdateTexture(TextureHandle handle, int x, int y, int width, int height, ReadOnlySpan<byte> pixels, EPixelFormat format) { }
-
-    public (int Width, int Height) GetTextureSize(TextureHandle handle)
-        => (1, 1);
 
     public bool IsValid(TextureHandle handle)
         => !handle.IsNull;
 
     public void Release(TextureHandle handle) { }
 
-    public Task<GpuTexture> LoadTextureAsync(ReadOnlyMemory<byte> imageData)
-        => Task.FromResult(new GpuTexture(ReadOnlySpan<byte>.Empty, Rect2i.Zero, EPixelFormat.RGBA8));
+    public ValueTask<TextureDescriptor> CreateTextureAsync(int width, int height, ReadOnlyMemory<byte> pixels, EPixelFormat format)
+        => ValueTask.FromResult(CreateTexture(width, height, pixels.Span, format));
 
-    public Task<GpuTexture> LoadTextureFromFileAsync(string path)
-        => Task.FromResult(new GpuTexture(ReadOnlySpan<byte>.Empty, Rect2i.Zero, EPixelFormat.RGBA8));
+    public ValueTask UpdateTextureAsync(TextureHandle handle, int x, int y, int width, int height, ReadOnlyMemory<byte> pixels, EPixelFormat format)
+    {
+        UpdateTexture(handle, x, y, width, height, pixels.Span, format);
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask ReleaseAsync(TextureHandle handle)
+    {
+        Release(handle);
+        return ValueTask.CompletedTask;
+    }
 }
 
 /// <summary>
