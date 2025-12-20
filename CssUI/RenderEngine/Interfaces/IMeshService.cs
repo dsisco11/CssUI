@@ -21,7 +21,7 @@ public interface IMeshService
     /// The vertex data is consumed immediately. The caller may reuse or release
     /// the buffer after this method completes.
     /// </remarks>
-    ValueTask<MeshHandle> CreateMeshAsync(ReadOnlyMemory<byte> vertices, VertexLayout layout);
+    ValueTask<MeshHandle> CreateMesh(ReadOnlyMemory<byte> vertices, VertexLayout layout);
 
     /// <summary>
     /// Create a mesh from vertex and index data.
@@ -35,7 +35,7 @@ public interface IMeshService
     /// The vertex and index data is consumed immediately. The caller may reuse or release
     /// the buffers after this method completes.
     /// </remarks>
-    ValueTask<MeshHandle> CreateMeshAsync(ReadOnlyMemory<byte> vertices, VertexLayout layout, ReadOnlyMemory<byte> indices, EIndexFormat indexFormat);
+    ValueTask<MeshHandle> CreateMesh(ReadOnlyMemory<byte> vertices, VertexLayout layout, ReadOnlyMemory<byte> indices, EIndexFormat indexFormat);
 
     #endregion
 
@@ -50,7 +50,7 @@ public interface IMeshService
     /// The vertex data is consumed immediately. The caller may reuse or release
     /// the buffer after this method completes.
     /// </remarks>
-    ValueTask UpdateVerticesAsync(MeshHandle handle, ReadOnlyMemory<byte> vertices);
+    ValueTask UpdateVertices(MeshHandle handle, ReadOnlyMemory<byte> vertices);
 
     /// <summary>
     /// Update a region of vertex data for an existing mesh.
@@ -62,7 +62,7 @@ public interface IMeshService
     /// The vertex data is consumed immediately. The caller may reuse or release
     /// the buffer after this method completes.
     /// </remarks>
-    ValueTask UpdateVerticesAsync(MeshHandle handle, int byteOffset, ReadOnlyMemory<byte> vertices);
+    ValueTask UpdateVertices(MeshHandle handle, int byteOffset, ReadOnlyMemory<byte> vertices);
 
     /// <summary>
     /// Update all index data for an existing mesh.
@@ -73,7 +73,7 @@ public interface IMeshService
     /// The index data is consumed immediately. The caller may reuse or release
     /// the buffer after this method completes.
     /// </remarks>
-    ValueTask UpdateIndicesAsync(MeshHandle handle, ReadOnlyMemory<byte> indices);
+    ValueTask UpdateIndices(MeshHandle handle, ReadOnlyMemory<byte> indices);
 
     #endregion
 
@@ -94,7 +94,7 @@ public interface IMeshService
     /// <summary>
     /// Destroy a mesh and free associated resources.
     /// </summary>
-    void DestroyMesh(MeshHandle handle);
+    void Release(MeshHandle handle);
 
     #endregion
 }

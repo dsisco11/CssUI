@@ -144,19 +144,19 @@ public sealed class NullMeshService : IMeshService
 {
     private int _nextId = 1;
 
-    public ValueTask<MeshHandle> CreateMeshAsync(ReadOnlyMemory<byte> vertices, VertexLayout layout)
+    public ValueTask<MeshHandle> CreateMesh(ReadOnlyMemory<byte> vertices, VertexLayout layout)
         => ValueTask.FromResult(new MeshHandle(_nextId++));
 
-    public ValueTask<MeshHandle> CreateMeshAsync(ReadOnlyMemory<byte> vertices, VertexLayout layout, ReadOnlyMemory<byte> indices, EIndexFormat indexFormat)
+    public ValueTask<MeshHandle> CreateMesh(ReadOnlyMemory<byte> vertices, VertexLayout layout, ReadOnlyMemory<byte> indices, EIndexFormat indexFormat)
         => ValueTask.FromResult(new MeshHandle(_nextId++));
 
-    public ValueTask UpdateVerticesAsync(MeshHandle handle, ReadOnlyMemory<byte> vertices)
+    public ValueTask UpdateVertices(MeshHandle handle, ReadOnlyMemory<byte> vertices)
         => ValueTask.CompletedTask;
 
-    public ValueTask UpdateVerticesAsync(MeshHandle handle, int byteOffset, ReadOnlyMemory<byte> vertices)
+    public ValueTask UpdateVertices(MeshHandle handle, int byteOffset, ReadOnlyMemory<byte> vertices)
         => ValueTask.CompletedTask;
 
-    public ValueTask UpdateIndicesAsync(MeshHandle handle, ReadOnlyMemory<byte> indices)
+    public ValueTask UpdateIndices(MeshHandle handle, ReadOnlyMemory<byte> indices)
         => ValueTask.CompletedTask;
 
     public MeshInfo GetMeshInfo(MeshHandle handle)
@@ -165,5 +165,5 @@ public sealed class NullMeshService : IMeshService
     public bool IsValid(MeshHandle handle)
         => !handle.IsNull;
 
-    public void DestroyMesh(MeshHandle handle) { }
+    public void Release(MeshHandle handle) { }
 }
