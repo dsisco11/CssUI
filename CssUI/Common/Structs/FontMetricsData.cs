@@ -1,4 +1,4 @@
-namespace CssUI;
+namespace CssUI.Common;
 
 /// <summary>
 /// Font metrics data for CSS unit resolution and text layout.

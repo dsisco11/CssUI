@@ -1,4 +1,4 @@
-namespace CssUI;
+namespace CssUI.Common;
 
 /// <summary>
 /// A rectangle with position and size for rendering operations.

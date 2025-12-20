@@ -1,4 +1,4 @@
-namespace CssUI;
+namespace CssUI.Common;
 
 /// <summary>
 /// Opaque handle to a font instance managed by an <see cref="IFontService"/>.

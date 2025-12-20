@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Immutable;
 
-namespace CssUI;
+namespace CssUI.Common;
 
 /// <summary>
 /// Represents a single frame of image data.

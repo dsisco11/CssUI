@@ -1,4 +1,4 @@
-namespace CssUI;
+namespace CssUI.Common;
 
 /// <summary>
 /// Describes a GPU texture created by an <see cref="ITextureService"/>.
