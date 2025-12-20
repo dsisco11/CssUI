@@ -67,13 +67,15 @@ internal sealed class Tessellator : ITessellator
                 result.Vertices,
                 result.Layout,
                 result.Indices,
-                result.IndexFormat);
+                result.IndexFormat,
+                result.Topology);
         }
         else
         {
             return await meshService.CreateMesh(
                 result.Vertices,
-                result.Layout);
+                result.Layout,
+                result.Topology);
         }
     }
 }

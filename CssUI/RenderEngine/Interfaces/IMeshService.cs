@@ -17,12 +17,13 @@ public interface IMeshService
     /// </summary>
     /// <param name="vertices">Raw vertex data.</param>
     /// <param name="layout">Describes the vertex data layout.</param>
+    /// <param name="topology">The primitive topology. Defaults to <see cref="EPrimitiveTopology.TriangleList"/>.</param>
     /// <returns>A handle to the created mesh, or <see cref="MeshHandle.Null"/> on failure.</returns>
     /// <remarks>
     /// The vertex data is consumed immediately. The caller may reuse or release
     /// the buffer after this method completes.
     /// </remarks>
-    ValueTask<MeshHandle> CreateMesh(ReadOnlyMemory<byte> vertices, VertexLayout layout);
+    ValueTask<MeshHandle> CreateMesh(ReadOnlyMemory<byte> vertices, VertexLayout layout, EPrimitiveTopology topology = EPrimitiveTopology.TriangleList);
 
     /// <summary>
     /// Create a mesh from vertex and index data.
@@ -31,12 +32,13 @@ public interface IMeshService
     /// <param name="layout">Describes the vertex data layout.</param>
     /// <param name="indices">Index data for indexed drawing.</param>
     /// <param name="indexFormat">Size of each index element.</param>
+    /// <param name="topology">The primitive topology. Defaults to <see cref="EPrimitiveTopology.TriangleList"/>.</param>
     /// <returns>A handle to the created mesh, or <see cref="MeshHandle.Null"/> on failure.</returns>
     /// <remarks>
     /// The vertex and index data is consumed immediately. The caller may reuse or release
     /// the buffers after this method completes.
     /// </remarks>
-    ValueTask<MeshHandle> CreateMesh(ReadOnlyMemory<byte> vertices, VertexLayout layout, ReadOnlyMemory<byte> indices, EIndexFormat indexFormat);
+    ValueTask<MeshHandle> CreateMesh(ReadOnlyMemory<byte> vertices, VertexLayout layout, ReadOnlyMemory<byte> indices, EIndexFormat indexFormat, EPrimitiveTopology topology = EPrimitiveTopology.TriangleList);
 
     #endregion
 

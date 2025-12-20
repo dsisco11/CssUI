@@ -17,14 +17,18 @@ public readonly struct MeshInfo
     /// <summary>The index format (only valid if IndexCount > 0).</summary>
     public readonly EIndexFormat IndexFormat;
 
+    /// <summary>The primitive topology of the mesh.</summary>
+    public readonly EPrimitiveTopology Topology;
+
     /// <summary>Whether this mesh uses indexed drawing.</summary>
     public bool IsIndexed => IndexCount > 0;
 
-    public MeshInfo(int vertexCount, VertexLayout layout, int indexCount = 0, EIndexFormat indexFormat = EIndexFormat.UInt16)
+    public MeshInfo(int vertexCount, VertexLayout layout, int indexCount = 0, EIndexFormat indexFormat = EIndexFormat.UInt16, EPrimitiveTopology topology = EPrimitiveTopology.TriangleList)
     {
         VertexCount = vertexCount;
         Layout = layout;
         IndexCount = indexCount;
         IndexFormat = indexFormat;
+        Topology = topology;
     }
 }

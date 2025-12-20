@@ -175,10 +175,10 @@ public sealed class NullMeshService : IMeshService
 {
     private int _nextId = 1;
 
-    public ValueTask<MeshHandle> CreateMesh(ReadOnlyMemory<byte> vertices, VertexLayout layout)
+    public ValueTask<MeshHandle> CreateMesh(ReadOnlyMemory<byte> vertices, VertexLayout layout, EPrimitiveTopology topology = EPrimitiveTopology.TriangleList)
         => ValueTask.FromResult(new MeshHandle(_nextId++));
 
-    public ValueTask<MeshHandle> CreateMesh(ReadOnlyMemory<byte> vertices, VertexLayout layout, ReadOnlyMemory<byte> indices, EIndexFormat indexFormat)
+    public ValueTask<MeshHandle> CreateMesh(ReadOnlyMemory<byte> vertices, VertexLayout layout, ReadOnlyMemory<byte> indices, EIndexFormat indexFormat, EPrimitiveTopology topology = EPrimitiveTopology.TriangleList)
         => ValueTask.FromResult(new MeshHandle(_nextId++));
 
     public ValueTask UpdateVertices(MeshHandle handle, ReadOnlyMemory<byte> vertices)
