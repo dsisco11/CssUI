@@ -147,7 +147,7 @@ public sealed class NullMeshService : IMeshService
     public ValueTask<MeshHandle> CreateMeshAsync(ReadOnlyMemory<byte> vertices, VertexLayout layout)
         => ValueTask.FromResult(new MeshHandle(_nextId++));
 
-    public ValueTask<MeshHandle> CreateMeshAsync(ReadOnlyMemory<byte> vertices, VertexLayout layout, ReadOnlyMemory<byte> indices, IndexFormat indexFormat)
+    public ValueTask<MeshHandle> CreateMeshAsync(ReadOnlyMemory<byte> vertices, VertexLayout layout, ReadOnlyMemory<byte> indices, EIndexFormat indexFormat)
         => ValueTask.FromResult(new MeshHandle(_nextId++));
 
     public ValueTask UpdateVerticesAsync(MeshHandle handle, ReadOnlyMemory<byte> vertices)

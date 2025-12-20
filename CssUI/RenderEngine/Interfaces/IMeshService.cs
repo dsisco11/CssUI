@@ -4,31 +4,6 @@ using System.Threading.Tasks;
 namespace CssUI;
 
 /// <summary>
-/// Numeric data types for vertex attributes.
-/// </summary>
-public enum VertexAttributeType
-{
-    /// <summary>8-bit signed integer.</summary>
-    SByte,
-    /// <summary>8-bit unsigned integer.</summary>
-    Byte,
-    /// <summary>16-bit signed integer.</summary>
-    Int16,
-    /// <summary>16-bit unsigned integer.</summary>
-    UInt16,
-    /// <summary>32-bit signed integer.</summary>
-    Int32,
-    /// <summary>32-bit unsigned integer.</summary>
-    UInt32,
-    /// <summary>16-bit floating point (half).</summary>
-    Half,
-    /// <summary>32-bit floating point (single).</summary>
-    Single,
-    /// <summary>64-bit floating point (double).</summary>
-    Double
-}
-
-/// <summary>
 /// Describes a single vertex attribute (position, color, etc.).
 /// </summary>
 public readonly struct VertexAttribute
@@ -36,7 +11,7 @@ public readonly struct VertexAttribute
     /// <summary>
     /// The numeric data type of each component.
     /// </summary>
-    public readonly VertexAttributeType Type;
+    public readonly EVertexAttributeType Type;
 
     /// <summary>
     /// Number of components (1-4). E.g., 3 for xyz position, 2 for uv coords.
@@ -59,7 +34,7 @@ public readonly struct VertexAttribute
     /// </summary>
     public bool IsPresent => ComponentCount > 0;
 
-    public VertexAttribute(VertexAttributeType type, int componentCount, int offset, bool normalized = false)
+    public VertexAttribute(EVertexAttributeType type, int componentCount, int offset, bool normalized = false)
     {
         Type = type;
         ComponentCount = componentCount;
@@ -72,15 +47,15 @@ public readonly struct VertexAttribute
     /// </summary>
     public int ComponentSize => Type switch
     {
-        VertexAttributeType.SByte => 1,
-        VertexAttributeType.Byte => 1,
-        VertexAttributeType.Int16 => 2,
-        VertexAttributeType.UInt16 => 2,
-        VertexAttributeType.Int32 => 4,
-        VertexAttributeType.UInt32 => 4,
-        VertexAttributeType.Half => 2,
-        VertexAttributeType.Single => 4,
-        VertexAttributeType.Double => 8,
+        EVertexAttributeType.SByte => 1,
+        EVertexAttributeType.Byte => 1,
+        EVertexAttributeType.Int16 => 2,
+        EVertexAttributeType.UInt16 => 2,
+        EVertexAttributeType.Int32 => 4,
+        EVertexAttributeType.UInt32 => 4,
+        EVertexAttributeType.Half => 2,
+        EVertexAttributeType.Single => 4,
+        EVertexAttributeType.Double => 8,
         _ => 0
     };
 
@@ -92,27 +67,27 @@ public readonly struct VertexAttribute
     /// <summary>
     /// Creates a 3-component float position attribute.
     /// </summary>
-    public static VertexAttribute Position3f(int offset) => new(VertexAttributeType.Single, 3, offset);
+    public static VertexAttribute Position3f(int offset) => new(EVertexAttributeType.Single, 3, offset);
 
     /// <summary>
     /// Creates a 2-component float texture coordinate attribute.
     /// </summary>
-    public static VertexAttribute TexCoord2f(int offset) => new(VertexAttributeType.Single, 2, offset);
+    public static VertexAttribute TexCoord2f(int offset) => new(EVertexAttributeType.Single, 2, offset);
 
     /// <summary>
     /// Creates a 4-component byte color attribute (normalized to 0-1).
     /// </summary>
-    public static VertexAttribute Color4b(int offset) => new(VertexAttributeType.Byte, 4, offset, normalized: true);
+    public static VertexAttribute Color4b(int offset) => new(EVertexAttributeType.Byte, 4, offset, normalized: true);
 
     /// <summary>
     /// Creates a 4-component float color attribute.
     /// </summary>
-    public static VertexAttribute Color4f(int offset) => new(VertexAttributeType.Single, 4, offset);
+    public static VertexAttribute Color4f(int offset) => new(EVertexAttributeType.Single, 4, offset);
 
     /// <summary>
     /// Creates a 3-component float normal attribute.
     /// </summary>
-    public static VertexAttribute Normal3f(int offset) => new(VertexAttributeType.Single, 3, offset);
+    public static VertexAttribute Normal3f(int offset) => new(EVertexAttributeType.Single, 3, offset);
 }
 
 /// <summary>
@@ -188,17 +163,6 @@ public readonly struct VertexLayout
 }
 
 /// <summary>
-/// Index element size for indexed drawing.
-/// </summary>
-public enum IndexFormat
-{
-    /// <summary>16-bit unsigned indices (ushort).</summary>
-    UInt16,
-    /// <summary>32-bit unsigned indices (uint).</summary>
-    UInt32
-}
-
-/// <summary>
 /// Service interface for mesh/geometry buffer management.
 /// Implementations handle GPU resource allocation internally.
 /// </summary>
@@ -230,7 +194,7 @@ public interface IMeshService
     /// The vertex and index data is consumed immediately. The caller may reuse or release
     /// the buffers after this method completes.
     /// </remarks>
-    ValueTask<MeshHandle> CreateMeshAsync(ReadOnlyMemory<byte> vertices, VertexLayout layout, ReadOnlyMemory<byte> indices, IndexFormat indexFormat);
+    ValueTask<MeshHandle> CreateMeshAsync(ReadOnlyMemory<byte> vertices, VertexLayout layout, ReadOnlyMemory<byte> indices, EIndexFormat indexFormat);
 
     #endregion
 
@@ -309,12 +273,12 @@ public readonly struct MeshInfo
     public readonly VertexLayout Layout;
 
     /// <summary>The index format (only valid if IndexCount > 0).</summary>
-    public readonly IndexFormat IndexFormat;
+    public readonly EIndexFormat IndexFormat;
 
     /// <summary>Whether this mesh uses indexed drawing.</summary>
     public bool IsIndexed => IndexCount > 0;
 
-    public MeshInfo(int vertexCount, VertexLayout layout, int indexCount = 0, IndexFormat indexFormat = IndexFormat.UInt16)
+    public MeshInfo(int vertexCount, VertexLayout layout, int indexCount = 0, EIndexFormat indexFormat = EIndexFormat.UInt16)
     {
         VertexCount = vertexCount;
         Layout = layout;
