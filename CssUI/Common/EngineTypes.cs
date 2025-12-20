@@ -1,7 +1,7 @@
 namespace CssUI;
 
 /// <summary>
-/// Opaque handle to a font instance managed by an <see cref="IFontEngine"/>.
+/// Opaque handle to a font instance managed by an <see cref="IFontService"/>.
 /// </summary>
 public readonly record struct FontHandle(int Id)
 {
@@ -19,7 +19,7 @@ public readonly record struct FontHandle(int Id)
 }
 
 /// <summary>
-/// Opaque handle to a texture managed by an <see cref="ITextureEngine"/>.
+/// Opaque handle to a texture managed by an <see cref="ITextureService"/>.
 /// </summary>
 public readonly record struct TextureHandle(int Id)
 {

@@ -180,9 +180,25 @@ public static class IntrinsicSizeCalculator
     /// <summary>
     /// Calculate intrinsic size for text content within a box.
     /// </summary>
+    /// <remarks>
+    /// Uses the <see cref="ITextIntrinsicSizer"/> from the context if available.
+    /// Returns zero size if no text sizer is configured.
+    /// </remarks>
     public static IntrinsicSize CalculateTextIntrinsicSize(CssPrincipalBox box, IntrinsicSizeContext context)
     {
-        return TextIntrinsicSizer.Calculate(box, context);
+        if (context.TextSizer == null)
+            return IntrinsicSize.Zero;
+            
+        return context.TextSizer.Calculate(box, context);
+    }
+
+    /// <summary>
+    /// Calculate intrinsic size for text content within a box using an explicit text sizer.
+    /// </summary>
+    public static IntrinsicSize CalculateTextIntrinsicSize(CssPrincipalBox box, IntrinsicSizeContext context, ITextIntrinsicSizer textSizer)
+    {
+        ArgumentNullException.ThrowIfNull(textSizer);
+        return textSizer.Calculate(box, context);
     }
 
     /// <summary>

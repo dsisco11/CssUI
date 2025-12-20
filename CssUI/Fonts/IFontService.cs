@@ -4,10 +4,10 @@ using CssUI.CSS;
 namespace CssUI;
 
 /// <summary>
-/// Engine interface for font resolution, metrics, and text measurement.
+/// Service interface for font resolution, metrics, and text measurement.
 /// Implementations handle font loading and caching internally.
 /// </summary>
-public interface IFontEngine
+public interface IFontService
 {
     /// <summary>
     /// Resolve a font from CSS font properties with fallback chain.
@@ -70,9 +70,8 @@ public interface IFontEngine
 
     /// <summary>
     /// Release a font handle when no longer needed.
-    /// The engine may cache fonts internally, so this is a hint that the handle
+    /// The service may cache fonts internally, so this is a hint that the handle
     /// is no longer in use rather than an immediate release.
     /// </summary>
     void Release(FontHandle font);
 }
-

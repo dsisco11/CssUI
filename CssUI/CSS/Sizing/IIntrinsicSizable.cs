@@ -75,37 +75,50 @@ public readonly struct IntrinsicSizeContext
     /// </summary>
     public readonly EIntrinsicSizeType SizeType;
 
+    /// <summary>
+    /// The text intrinsic sizer service for calculating text dimensions.
+    /// </summary>
+    public readonly ITextIntrinsicSizer? TextSizer;
+
     public IntrinsicSizeContext(
         double? availableInline = null,
         double? availableBlock = null,
         EWritingMode writingMode = EWritingMode.Horizontal_TB,
         EDirection direction = EDirection.LTR,
-        EIntrinsicSizeType sizeType = EIntrinsicSizeType.MaxContent)
+        EIntrinsicSizeType sizeType = EIntrinsicSizeType.MaxContent,
+        ITextIntrinsicSizer? textSizer = null)
     {
         AvailableInline = availableInline;
         AvailableBlock = availableBlock;
         WritingMode = writingMode;
         Direction = direction;
         SizeType = sizeType;
+        TextSizer = textSizer;
     }
 
     /// <summary>
     /// Create a context for min-content calculation.
     /// </summary>
     public IntrinsicSizeContext ForMinContent()
-        => new(AvailableInline, AvailableBlock, WritingMode, Direction, EIntrinsicSizeType.MinContent);
+        => new(AvailableInline, AvailableBlock, WritingMode, Direction, EIntrinsicSizeType.MinContent, TextSizer);
 
     /// <summary>
     /// Create a context for max-content calculation.
     /// </summary>
     public IntrinsicSizeContext ForMaxContent()
-        => new(AvailableInline, AvailableBlock, WritingMode, Direction, EIntrinsicSizeType.MaxContent);
+        => new(AvailableInline, AvailableBlock, WritingMode, Direction, EIntrinsicSizeType.MaxContent, TextSizer);
 
     /// <summary>
     /// Create a context with updated available space.
     /// </summary>
     public IntrinsicSizeContext WithAvailableSpace(double? inline, double? block)
-        => new(inline, block, WritingMode, Direction, SizeType);
+        => new(inline, block, WritingMode, Direction, SizeType, TextSizer);
+
+    /// <summary>
+    /// Create a context with a text sizer.
+    /// </summary>
+    public IntrinsicSizeContext WithTextSizer(ITextIntrinsicSizer textSizer)
+        => new(AvailableInline, AvailableBlock, WritingMode, Direction, SizeType, textSizer);
 
     /// <summary>
     /// Returns true if calculating min-content size.

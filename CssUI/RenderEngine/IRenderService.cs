@@ -5,10 +5,10 @@ using CssUI.Rendering;
 namespace CssUI;
 
 /// <summary>
-/// Engine interface for rendering primitives, textures, and text.
+/// Service interface for rendering primitives, textures, and text.
 /// Implementations handle the actual drawing to a render target.
 /// </summary>
-public interface IRenderEngine
+public interface IRenderService
 {
     #region Frame Management
 
@@ -128,7 +128,7 @@ public interface IRenderEngine
     /// <summary>
     /// Draw text at a position.
     /// </summary>
-    /// <param name="font">Font handle from <see cref="IFontEngine"/>.</param>
+    /// <param name="font">Font handle from <see cref="IFontService"/>.</param>
     /// <param name="text">Text to draw.</param>
     /// <param name="position">Top-left position for the text.</param>
     /// <param name="color">Text color.</param>
@@ -137,7 +137,7 @@ public interface IRenderEngine
     /// <summary>
     /// Draw text within a bounding box with alignment.
     /// </summary>
-    /// <param name="font">Font handle from <see cref="IFontEngine"/>.</param>
+    /// <param name="font">Font handle from <see cref="IFontService"/>.</param>
     /// <param name="text">Text to draw.</param>
     /// <param name="bounds">Bounding rectangle for the text.</param>
     /// <param name="color">Text color.</param>
@@ -177,4 +177,3 @@ public enum EBorderStyle
     Inset,
     Outset
 }
-

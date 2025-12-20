@@ -6,20 +6,20 @@ namespace CssUI.DependencyInjection;
 public sealed class CssUIOptions
 {
     /// <summary>
-    /// Gets or sets the font engine implementation.
-    /// If null, <see cref="NullFontEngine"/> will be used.
+    /// Gets or sets the font service implementation.
+    /// If null, <see cref="NullFontService"/> will be used.
     /// </summary>
-    public IFontEngine? FontEngine { get; set; }
+    public IFontService? FontService { get; set; }
 
     /// <summary>
-    /// Gets or sets the texture engine implementation.
-    /// If null, <see cref="NullTextureEngine"/> will be used.
+    /// Gets or sets the texture service implementation.
+    /// If null, <see cref="NullTextureService"/> will be used.
     /// </summary>
-    public ITextureEngine? TextureEngine { get; set; }
+    public ITextureService? TextureService { get; set; }
 
     /// <summary>
-    /// Gets or sets the render engine implementation.
-    /// If null, <see cref="NullRenderEngine"/> will be used.
+    /// Gets or sets the render service implementation.
+    /// If null, <see cref="NullRenderService"/> will be used.
     /// </summary>
-    public IRenderEngine? RenderEngine { get; set; }
+    public IRenderService? RenderService { get; set; }
 }

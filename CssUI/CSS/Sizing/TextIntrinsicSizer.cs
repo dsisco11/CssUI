@@ -5,6 +5,22 @@ using CssUI.DOM;
 namespace CssUI.CSS;
 
 /// <summary>
+/// Service interface for calculating intrinsic sizes for text content.
+/// </summary>
+public interface ITextIntrinsicSizer
+{
+    /// <summary>
+    /// Calculate intrinsic size for text content within a box.
+    /// </summary>
+    IntrinsicSize Calculate(CssPrincipalBox box, IntrinsicSizeContext context);
+
+    /// <summary>
+    /// Calculate intrinsic size for a text run with specific properties.
+    /// </summary>
+    IntrinsicSize CalculateTextRun(ReadOnlySpan<char> text, FontHandle font, double lineHeight);
+}
+
+/// <summary>
 /// Calculates intrinsic sizes for text content.
 /// </summary>
 /// <remarks>
@@ -15,12 +31,19 @@ namespace CssUI.CSS;
 /// 
 /// See: https://www.w3.org/TR/css-sizing-3/#intrinsic-sizes
 /// </remarks>
-public static class TextIntrinsicSizer
+public sealed class TextIntrinsicSizer : ITextIntrinsicSizer
 {
+    private readonly IFontService _fontService;
+
+    public TextIntrinsicSizer(IFontService fontService)
+    {
+        _fontService = fontService ?? throw new ArgumentNullException(nameof(fontService));
+    }
+
     /// <summary>
     /// Calculate intrinsic size for text content within a box.
     /// </summary>
-    public static IntrinsicSize Calculate(CssPrincipalBox box, IntrinsicSizeContext context)
+    public IntrinsicSize Calculate(CssPrincipalBox box, IntrinsicSizeContext context)
     {
         // Get the owning element to access text content
         var element = box.Owner;
@@ -36,18 +59,16 @@ public static class TextIntrinsicSizer
         var font = box.Style?.Font ?? FontHandle.Null;
         if (font.IsNull)
         {
-            font = EngineProvider.FontEngine.GetDefaultFont(16f);
+            font = _fontService.GetDefaultFont(16f);
         }
 
-        var fontEngine = EngineProvider.FontEngine;
-
         // Calculate max-content: measure entire text on single line
-        var fullMeasurement = fontEngine.MeasureText(font, textContent.AsSpan());
+        var fullMeasurement = _fontService.MeasureText(font, textContent.AsSpan());
         double maxContentInline = fullMeasurement.Width;
         double lineHeight = GetLineHeight(box, fullMeasurement.Height);
 
         // Calculate min-content: find longest "word" (break at soft wrap opportunities)
-        double minContentInline = CalculateMinContentWidth(textContent, font, fontEngine);
+        double minContentInline = CalculateMinContentWidth(textContent, font);
 
         return new IntrinsicSize(
             new IntrinsicAxisSize(minContentInline, maxContentInline),
@@ -57,7 +78,7 @@ public static class TextIntrinsicSizer
     /// <summary>
     /// Calculate min-content width by finding the longest unbreakable segment.
     /// </summary>
-    private static double CalculateMinContentWidth(string text, FontHandle font, IFontEngine fontEngine)
+    private double CalculateMinContentWidth(string text, FontHandle font)
     {
         if (string.IsNullOrEmpty(text))
             return 0;
@@ -76,7 +97,7 @@ public static class TextIntrinsicSizer
                 var word = text.AsSpan(wordStart, i - wordStart);
                 if (word.Length > 0)
                 {
-                    var measurement = fontEngine.MeasureText(font, word);
+                    var measurement = _fontService.MeasureText(font, word);
                     maxWordWidth = Math.Max(maxWordWidth, measurement.Width);
                 }
                 inWord = false;
@@ -171,7 +192,7 @@ public static class TextIntrinsicSizer
     /// <summary>
     /// Calculate intrinsic size for a text run with specific properties.
     /// </summary>
-    public static IntrinsicSize CalculateTextRun(
+    public IntrinsicSize CalculateTextRun(
         ReadOnlySpan<char> text,
         FontHandle font,
         double lineHeight)
@@ -179,14 +200,12 @@ public static class TextIntrinsicSizer
         if (text.IsEmpty || font.IsNull)
             return IntrinsicSize.Zero;
 
-        var fontEngine = EngineProvider.FontEngine;
-
         // Max-content: full text width
-        var fullMeasurement = fontEngine.MeasureText(font, text);
+        var fullMeasurement = _fontService.MeasureText(font, text);
         double maxContentInline = fullMeasurement.Width;
 
         // Min-content: longest word
-        double minContentInline = CalculateMinContentWidth(text.ToString(), font, fontEngine);
+        double minContentInline = CalculateMinContentWidth(text.ToString(), font);
 
         // Use provided line height or fallback to measured height
         double blockSize = lineHeight > 0 ? lineHeight : fullMeasurement.Height;
@@ -196,4 +215,3 @@ public static class TextIntrinsicSizer
             IntrinsicAxisSize.Definite(blockSize));
     }
 }
-

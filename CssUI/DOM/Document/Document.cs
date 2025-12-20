@@ -14,6 +14,7 @@ using CssUI.DOM.Internal;
 using CssUI.DOM.Media;
 using CssUI.DOM.Nodes;
 using CssUI.HTTP;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 #if ENABLE_HTML
 using CssUI.HTML;
@@ -21,7 +22,7 @@ using CssUI.HTML;
 
 namespace CssUI.DOM;
 
-public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEventCallbacks
+public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEventCallbacks, IDisposable
 {/* Docs: https://dom.spec.whatwg.org/#document */
 
     #region Backing Values
@@ -112,8 +113,8 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
             var oldValue = _designMode;
             _designMode = value;
 
-            /* When the designMode changes from being disabled to being enabled, 
-             * the user agent must immediately reset the document's active range's start and end boundary points to be at the start of the Document 
+            /* When the designMode changes from being disabled to being enabled,
+             * the user agent must immediately reset the document's active range's start and end boundary points to be at the start of the Document
              * and then run the focusing steps for the document element of the Document, if non-null. */
             if (value == EDesignMode.ON && oldValue == EDesignMode.OFF)
             {
@@ -182,6 +183,16 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
     #endregion
 
+    #region Dependency Injection
+    private readonly IServiceScope? _serviceScope;
+
+    /// <summary>
+    /// Gets the service provider for this document's scope.
+    /// Elements within this document should resolve services from this provider.
+    /// </summary>
+    public IServiceProvider? Services => _serviceScope?.ServiceProvider;
+    #endregion
+
     #region Constructor
     private Document()
     {
@@ -190,7 +201,18 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
         cssUnitResolver = new CssUnitResolver(this, true);
     }
 
+    private Document(IServiceProvider rootProvider) : this()
+    {
+        _serviceScope = rootProvider.CreateScope();
+    }
+
     protected Document(DocumentType doctype, string? contentType = null) : this()
+    {
+        this.contentType = contentType;
+        appendChild(doctype);
+    }
+
+    protected Document(IServiceProvider rootProvider, DocumentType doctype, string? contentType = null) : this(rootProvider)
     {
         this.contentType = contentType;
         appendChild(doctype);
@@ -297,7 +319,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// Returns a collection of the elements in the object on which the method was invoked (a document or an element) that have all the classes given by classNames. 
+    /// Returns a collection of the elements in the object on which the method was invoked (a document or an element) that have all the classes given by classNames.
     /// The classNames argument is interpreted as a space-separated list of classes.
     /// </summary>
     /// <param name="classNames"></param>
@@ -309,7 +331,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
 
     #region Element Creation
     /// <summary>
-    /// Returns an element with localName as local name (if document is an HTML document, localName gets lowercased). 
+    /// Returns an element with localName as local name (if document is an HTML document, localName gets lowercased).
     /// The element’s namespace is the HTML namespace when document is an HTML document or document’s content type is "application/xhtml+xml", and null otherwise.
     /// If localName does not match the Name production an "InvalidCharacterError" DOMException will be thrown.
     /// When supplied, options’s is can be used to create a customized built-in element.
@@ -398,8 +420,8 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// Returns a ProcessingInstruction node whose target is target and data is data. 
-    /// If target does not match the Name production an "InvalidCharacterError" DOMException will be thrown. 
+    /// Returns a ProcessingInstruction node whose target is target and data is data.
+    /// If target does not match the Name production an "InvalidCharacterError" DOMException will be thrown.
     /// If data contains "?>" an "InvalidCharacterError" DOMException will be thrown.
     /// </summary>
     /// <param name="target"></param>
@@ -754,7 +776,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     #region Window Events
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onAbort
     {
@@ -763,7 +785,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onAuxClick
     {
@@ -772,7 +794,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onBlur
     {
@@ -781,7 +803,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onCancel
     {
@@ -790,7 +812,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onCanPlay
     {
@@ -799,7 +821,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onCanPlayThrough
     {
@@ -808,7 +830,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onChange
     {
@@ -817,7 +839,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onClick
     {
@@ -826,7 +848,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onClose
     {
@@ -835,7 +857,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onContextMenu
     {
@@ -844,7 +866,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onCueChange
     {
@@ -853,7 +875,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onDblClick
     {
@@ -862,7 +884,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onDrag
     {
@@ -871,7 +893,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onDragEnd
     {
@@ -880,7 +902,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onDragEnter
     {
@@ -889,7 +911,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onDragExit
     {
@@ -898,7 +920,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onDragLeave
     {
@@ -907,7 +929,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onDragOver
     {
@@ -916,7 +938,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onDragStart
     {
@@ -925,7 +947,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onDrop
     {
@@ -934,7 +956,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onDurationChange
     {
@@ -943,7 +965,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onEmptied
     {
@@ -952,7 +974,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onEnded
     {
@@ -961,7 +983,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onFocus
     {
@@ -970,7 +992,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onFormData
     {
@@ -979,7 +1001,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onInput
     {
@@ -988,7 +1010,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onInvalid
     {
@@ -997,7 +1019,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onKeyDown
     {
@@ -1006,7 +1028,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onKeyPress
     {
@@ -1015,7 +1037,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onKeyUp
     {
@@ -1024,7 +1046,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onLoad
     {
@@ -1033,7 +1055,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onLoadedData
     {
@@ -1042,7 +1064,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onLoadedMetadata
     {
@@ -1051,7 +1073,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onLoadEnd
     {
@@ -1060,7 +1082,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onLoadStart
     {
@@ -1069,7 +1091,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onMouseDown
     {
@@ -1078,7 +1100,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onMouseEnter
     {
@@ -1087,7 +1109,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onMouseLeave
     {
@@ -1096,7 +1118,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onMouseMove
     {
@@ -1105,7 +1127,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onMouseOut
     {
@@ -1114,7 +1136,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onMouseOver
     {
@@ -1123,7 +1145,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onMouseUp
     {
@@ -1132,7 +1154,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onWheel
     {
@@ -1141,7 +1163,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onPause
     {
@@ -1150,7 +1172,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onPlay
     {
@@ -1159,7 +1181,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onPlaying
     {
@@ -1168,7 +1190,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onProgress
     {
@@ -1177,7 +1199,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onRateChange
     {
@@ -1186,7 +1208,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onReset
     {
@@ -1195,7 +1217,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onResize
     {
@@ -1204,7 +1226,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onScroll
     {
@@ -1213,7 +1235,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onSecurityPolicyViolation
     {
@@ -1222,7 +1244,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onSeeked
     {
@@ -1231,7 +1253,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onSeeking
     {
@@ -1240,7 +1262,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onSelect
     {
@@ -1249,7 +1271,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onStalled
     {
@@ -1258,7 +1280,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onSubmit
     {
@@ -1267,7 +1289,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onSuspend
     {
@@ -1276,7 +1298,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onTimeUpdate
     {
@@ -1285,7 +1307,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onToggle
     {
@@ -1294,7 +1316,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onVolumeChange
     {
@@ -1303,7 +1325,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onWaiting
     {
@@ -1312,7 +1334,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onSelectStart
     {
@@ -1321,12 +1343,34 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public event EventCallback onSelectionChange
     {
         add => handlerMap.Add(EEventName.SelectionChange, value);
         remove => handlerMap.Remove(EEventName.SelectionChange, value);
+    }
+    #endregion
+
+    #region IDisposable
+    private bool _disposed;
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed) return;
+
+        if (disposing)
+        {
+            _serviceScope?.Dispose();
+        }
+
+        _disposed = true;
     }
     #endregion
 

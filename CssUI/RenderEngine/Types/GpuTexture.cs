@@ -7,7 +7,7 @@ namespace CssUI.Rendering;
 
 /// <summary>
 /// Abstracted representation of a multi-frame animated texture used by UI elements.
-/// Concrete image loading implementations should be provided via ITextureEngine.
+/// Concrete image loading implementations should be provided via ITextureService.
 /// </summary>
 public class GpuTexture : IDisposable
 {
@@ -63,40 +63,51 @@ public class GpuTexture : IDisposable
 
     #region Image Loading
 
-    public static async Task<GpuTexture> fromStream(MemoryStream Stream)
+    public static async Task<GpuTexture> FromStream(ITextureService textureService, MemoryStream stream)
     {
-        return await fromData(Stream.ToArray());
+        return await FromData(textureService, stream.ToArray());
     }
 
     /// <summary>
     /// Creates a new GPU texture by decoding the given image data.
-    /// Note: Requires ITextureEngine implementation for actual image decoding.
     /// </summary>
-    public static async Task<GpuTexture> fromData(ReadOnlyMemory<byte> imgData)
+    /// <param name="textureService">The texture service to use for decoding.</param>
+    /// <param name="imgData">The encoded image data.</param>
+    public static async Task<GpuTexture> FromData(ITextureService textureService, ReadOnlyMemory<byte> imgData)
     {
-        // Use the texture engine if available for actual image loading
-        var textureEngine = EngineProvider.TextureEngine;
-        if (textureEngine != null && textureEngine is not NullTextureEngine)
+        ArgumentNullException.ThrowIfNull(textureService);
+
+        if (textureService is not NullTextureService)
         {
-            return await textureEngine.LoadTextureAsync(imgData);
+            return await textureService.LoadTextureAsync(imgData);
         }
 
         // Fallback: return empty texture
         return new GpuTexture(Rect2i.Zero);
     }
 
-    public static async Task<GpuTexture> fromFile(string path)
+    /// <summary>
+    /// Creates a new GPU texture by loading from a file.
+    /// </summary>
+    /// <param name="textureService">The texture service to use for loading.</param>
+    /// <param name="path">The path to the image file.</param>
+    public static async Task<GpuTexture> FromFile(ITextureService textureService, string path)
     {
-        // Use the texture engine if available for actual image loading
-        var textureEngine = EngineProvider.TextureEngine;
-        if (textureEngine != null && textureEngine is not NullTextureEngine)
+        ArgumentNullException.ThrowIfNull(textureService);
+
+        if (textureService is not NullTextureService)
         {
-            return await textureEngine.LoadTextureFromFileAsync(path);
+            return await textureService.LoadTextureFromFileAsync(path);
         }
 
         // Fallback: return empty texture
         return new GpuTexture(Rect2i.Zero);
     }
+
+    /// <summary>
+    /// Creates an empty GPU texture.
+    /// </summary>
+    public static GpuTexture Empty => new GpuTexture(Rect2i.Zero);
     #endregion
 
     #region Destructor
@@ -141,7 +152,7 @@ public class GpuTexture : IDisposable
             CurrentFrame = 0;// Start frame searching back from the beginning as we probably looped back around here
 
         Time = Time % Duration;// Loop the animation
-        if (Time < 0) Time += Duration;// Loop back to the beginning 
+        if (Time < 0) Time += Duration;// Loop back to the beginning
 
         // Find the current frame number using our timeline, but start searching from the last frame we were at.
         for (int fnum = CurrentFrame; fnum < Timeline.Length; fnum++)

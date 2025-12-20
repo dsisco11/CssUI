@@ -8,10 +8,10 @@ using CssUI.Rendering;
 namespace CssUI;
 
 /// <summary>
-/// Null implementation of IFontEngine for headless/testing scenarios.
+/// Null implementation of IFontService for headless/testing scenarios.
 /// Returns placeholder values without actual font rendering.
 /// </summary>
-public sealed class NullFontEngine : IFontEngine
+public sealed class NullFontService : IFontService
 {
     private const float DEFAULT_EM_SIZE = 16f;
     private const float DEFAULT_CHAR_WIDTH = 8f;
@@ -72,9 +72,9 @@ public sealed class NullFontEngine : IFontEngine
 }
 
 /// <summary>
-/// Null implementation of ITextureEngine for headless/testing scenarios.
+/// Null implementation of ITextureService for headless/testing scenarios.
 /// </summary>
-public sealed class NullTextureEngine : ITextureEngine
+public sealed class NullTextureService : ITextureService
 {
     private int _nextId = 1;
     private static readonly string[] _formats = { ".png", ".jpg", ".gif" };
@@ -114,10 +114,10 @@ public sealed class NullTextureEngine : ITextureEngine
 }
 
 /// <summary>
-/// Null implementation of IRenderEngine for headless/testing scenarios.
+/// Null implementation of IRenderService for headless/testing scenarios.
 /// All drawing operations are no-ops.
 /// </summary>
-public sealed class NullRenderEngine : IRenderEngine
+public sealed class NullRenderService : IRenderService
 {
     public void BeginFrame() { }
     public void EndFrame() { }
@@ -151,4 +151,3 @@ public sealed class NullRenderEngine : IRenderEngine
         EBorderStyle topStyle, EBorderStyle rightStyle, EBorderStyle bottomStyle, EBorderStyle leftStyle)
     { }
 }
-

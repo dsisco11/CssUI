@@ -7,23 +7,26 @@
 - [x] Fix RootBox.cs override errors
 - [ ] Fix nullable reference warnings (many throughout codebase)
 
-## Engine Plugin Architecture
+## Service Plugin Architecture (DI-based)
 ### Interface Definitions
 - [x] Create EngineTypes.cs (FontHandle, TextureHandle, FontMetrics, etc.)
-- [x] Create IFontEngine interface
-- [x] Create ITextureEngine interface
-- [x] Create IRenderEngine interface
-- [x] Create EngineProvider.cs (initialization and global access)
+- [x] Create IFontService interface (renamed from IFontEngine)
+- [x] Create ITextureService interface (renamed from ITextureEngine)
+- [x] Create IRenderService interface (renamed from IRenderEngine)
+- [x] Create DI extensions (CssUIServiceCollectionExtensions.cs)
+- [x] Implement scoped DI container per Document
 
 ### Implementations
-- [x] Create NullFontEngine, NullTextureEngine, NullRenderEngine (headless stubs)
-- [x] Update EngineProvider with auto-initialization and defaults
+- [x] Create NullFontService, NullTextureService, NullRenderService (headless stubs)
+- [x] Remove legacy static EngineProvider (replaced by DI)
+- [x] Remove ICssUIEngineProvider aggregator (inject services directly)
 - [x] Remove SixLabors implementations from core library (moved to separate project scope)
 
 ### CSS/DOM Decoupling (Completed)
 - [x] Create GenericFontFamilies.cs (works in headless mode)
 - [x] Refactor CssPropertyResolver_Font to use GenericFontFamilies
-- [x] Refactor StyleProperties.Font to use FontHandle + EngineProvider.FontEngine
+- [x] Refactor StyleProperties.Font to use FontHandle + IFontService
+- [x] Refactor TextIntrinsicSizer to instance class with IFontService injection
 - [x] Remove direct SixLabors references from CSS/DOM code
 - [x] Remove SixLabors package references from CssUI.csproj
 

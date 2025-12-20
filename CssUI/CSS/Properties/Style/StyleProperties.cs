@@ -10,6 +10,7 @@ using CssUI.CSS.Internal;
 using CssUI.DOM;
 using CssUI.DOM.Nodes;
 using CssUI.Rendering;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CssUI.CSS;
 
@@ -475,7 +476,7 @@ public partial class StyleProperties
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="Property"></param>
     /// <returns></returns>
@@ -692,13 +693,22 @@ public partial class StyleProperties
             Notify_Unit_Scale_Change(ECssUnit.CH);
         }
 
-        // Resolve font using the engine provider
-        var families = FontFamily.ToArray();
-        Font = EngineProvider.FontEngine.ResolveFont(
-            families,
-            (float)FontSize,
-            (EFontWeight)FontWeight,
-            FontStyle);
+        // Resolve font using the font service from DI
+        var fontService = owningElement?.ownerDocument?.Services?.GetService<IFontService>();
+        if (fontService != null)
+        {
+            var families = FontFamily.ToArray();
+            Font = fontService.ResolveFont(
+                families,
+                (float)FontSize,
+                (EFontWeight)FontWeight,
+                FontStyle);
+        }
+        else
+        {
+            // Fallback: use null font handle if no service available
+            Font = FontHandle.Null;
+        }
 
         // Remove font dirt flag
         ClearFlag(EPropertySystemDirtFlags.NeedsToResolveFont);

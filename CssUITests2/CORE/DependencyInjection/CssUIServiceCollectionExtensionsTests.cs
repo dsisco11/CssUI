@@ -1,290 +1,233 @@
 using System;
+using CssUI;
+using CssUI.CSS;
+using CssUI.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
-using CssUI;
-using CssUI.DependencyInjection;
 
 namespace CssUITests.CORE.DependencyInjection;
 
-public class CssUIServiceCollectionExtensionsTests : IDisposable
+public class CssUIServiceCollectionExtensionsTests
 {
-    public CssUIServiceCollectionExtensionsTests()
-    {
-        // Reset EngineProvider before each test
-        EngineProvider.Reset();
-    }
-
-    public void Dispose()
-    {
-        // Clean up after each test
-        EngineProvider.Reset();
-    }
-
     [Fact]
-    public void AddCssUI_WithNoConfiguration_RegistersDefaultNullEngines()
+    public void AddCssUI_RegistersDefaultNullServices()
     {
         // Arrange
         var services = new ServiceCollection();
 
         // Act
         services.AddCssUI();
-        var serviceProvider = services.BuildServiceProvider();
+        var provider = services.BuildServiceProvider();
 
         // Assert
-        var fontEngine = serviceProvider.GetRequiredService<IFontEngine>();
-        var textureEngine = serviceProvider.GetRequiredService<ITextureEngine>();
-        var renderEngine = serviceProvider.GetRequiredService<IRenderEngine>();
+        var fontService = provider.GetRequiredService<IFontService>();
+        var textureService = provider.GetRequiredService<ITextureService>();
+        var renderService = provider.GetRequiredService<IRenderService>();
 
-        Assert.NotNull(fontEngine);
-        Assert.NotNull(textureEngine);
-        Assert.NotNull(renderEngine);
-        Assert.IsType<NullFontEngine>(fontEngine);
-        Assert.IsType<NullTextureEngine>(textureEngine);
-        Assert.IsType<NullRenderEngine>(renderEngine);
+        Assert.NotNull(fontService);
+        Assert.NotNull(textureService);
+        Assert.NotNull(renderService);
+        Assert.IsType<NullFontService>(fontService);
+        Assert.IsType<NullTextureService>(textureService);
+        Assert.IsType<NullRenderService>(renderService);
     }
 
     [Fact]
-    public void AddCssUI_WithConfiguration_UsesProvidedEngines()
+    public void AddCssUI_WithOptions_RegistersConfiguredServices()
     {
         // Arrange
         var services = new ServiceCollection();
-        var customFontEngine = new NullFontEngine();
-        var customTextureEngine = new NullTextureEngine();
-        var customRenderEngine = new NullRenderEngine();
+        var customFontService = new NullFontService();
+        var customTextureService = new NullTextureService();
+        var customRenderService = new NullRenderService();
 
         // Act
         services.AddCssUI(options =>
         {
-            options.FontEngine = customFontEngine;
-            options.TextureEngine = customTextureEngine;
-            options.RenderEngine = customRenderEngine;
+            options.FontService = customFontService;
+            options.TextureService = customTextureService;
+            options.RenderService = customRenderService;
         });
-        var serviceProvider = services.BuildServiceProvider();
+        var provider = services.BuildServiceProvider();
 
         // Assert
-        var fontEngine = serviceProvider.GetRequiredService<IFontEngine>();
-        var textureEngine = serviceProvider.GetRequiredService<ITextureEngine>();
-        var renderEngine = serviceProvider.GetRequiredService<IRenderEngine>();
+        var fontService = provider.GetRequiredService<IFontService>();
+        var textureService = provider.GetRequiredService<ITextureService>();
+        var renderService = provider.GetRequiredService<IRenderService>();
 
-        Assert.Same(customFontEngine, fontEngine);
-        Assert.Same(customTextureEngine, textureEngine);
-        Assert.Same(customRenderEngine, renderEngine);
+        Assert.Same(customFontService, fontService);
+        Assert.Same(customTextureService, textureService);
+        Assert.Same(customRenderService, renderService);
     }
 
     [Fact]
-    public void AddCssUI_RegistersICssUIEngineProvider()
+    public void AddCssUI_RegistersTextIntrinsicSizer()
     {
         // Arrange
         var services = new ServiceCollection();
 
         // Act
         services.AddCssUI();
-        var serviceProvider = services.BuildServiceProvider();
+        var provider = services.BuildServiceProvider();
 
         // Assert
-        var engineProvider = serviceProvider.GetRequiredService<ICssUIEngineProvider>();
-        Assert.NotNull(engineProvider);
-        Assert.NotNull(engineProvider.FontEngine);
-        Assert.NotNull(engineProvider.TextureEngine);
-        Assert.NotNull(engineProvider.RenderEngine);
+        var textSizer = provider.GetRequiredService<ITextIntrinsicSizer>();
+        Assert.NotNull(textSizer);
+        Assert.IsType<TextIntrinsicSizer>(textSizer);
     }
 
     [Fact]
-    public void AddFontEngine_WithType_ReplacesDefaultRegistration()
-    {
-        // Arrange
-        var services = new ServiceCollection();
-
-        // Act
-        services.AddFontEngine<NullFontEngine>();
-        services.AddCssUI();
-        var serviceProvider = services.BuildServiceProvider();
-
-        // Assert
-        var fontEngine = serviceProvider.GetRequiredService<IFontEngine>();
-        Assert.IsType<NullFontEngine>(fontEngine);
-    }
-
-    [Fact]
-    public void AddFontEngine_WithInstance_RegistersInstance()
-    {
-        // Arrange
-        var services = new ServiceCollection();
-        var customEngine = new NullFontEngine();
-
-        // Act
-        services.AddFontEngine(customEngine);
-        services.AddCssUI();
-        var serviceProvider = services.BuildServiceProvider();
-
-        // Assert
-        var fontEngine = serviceProvider.GetRequiredService<IFontEngine>();
-        Assert.Same(customEngine, fontEngine);
-    }
-
-    [Fact]
-    public void AddFontEngine_WithFactory_UsesFactory()
-    {
-        // Arrange
-        var services = new ServiceCollection();
-        var expectedEngine = new NullFontEngine();
-
-        // Act
-        services.AddFontEngine(_ => expectedEngine);
-        services.AddCssUI();
-        var serviceProvider = services.BuildServiceProvider();
-
-        // Assert
-        var fontEngine = serviceProvider.GetRequiredService<IFontEngine>();
-        Assert.Same(expectedEngine, fontEngine);
-    }
-
-    [Fact]
-    public void AddTextureEngine_WithInstance_RegistersInstance()
-    {
-        // Arrange
-        var services = new ServiceCollection();
-        var customEngine = new NullTextureEngine();
-
-        // Act
-        services.AddTextureEngine(customEngine);
-        services.AddCssUI();
-        var serviceProvider = services.BuildServiceProvider();
-
-        // Assert
-        var textureEngine = serviceProvider.GetRequiredService<ITextureEngine>();
-        Assert.Same(customEngine, textureEngine);
-    }
-
-    [Fact]
-    public void AddRenderEngine_WithInstance_RegistersInstance()
-    {
-        // Arrange
-        var services = new ServiceCollection();
-        var customEngine = new NullRenderEngine();
-
-        // Act
-        services.AddRenderEngine(customEngine);
-        services.AddCssUI();
-        var serviceProvider = services.BuildServiceProvider();
-
-        // Assert
-        var renderEngine = serviceProvider.GetRequiredService<IRenderEngine>();
-        Assert.Same(customEngine, renderEngine);
-    }
-
-    [Fact]
-    public void UseCssUI_InitializesStaticEngineProvider()
-    {
-        // Arrange
-        var services = new ServiceCollection();
-        var customFontEngine = new NullFontEngine();
-
-        services.AddCssUI(options => options.FontEngine = customFontEngine);
-        var serviceProvider = services.BuildServiceProvider();
-
-        // Act
-        serviceProvider.UseCssUI();
-
-        // Assert
-        Assert.True(EngineProvider.IsInitialized);
-        Assert.Same(customFontEngine, EngineProvider.FontEngine);
-    }
-
-    [Fact]
-    public void UseCssUI_BridgesAllEnginesToStaticProvider()
-    {
-        // Arrange
-        var services = new ServiceCollection();
-        var customFontEngine = new NullFontEngine();
-        var customTextureEngine = new NullTextureEngine();
-        var customRenderEngine = new NullRenderEngine();
-
-        services.AddCssUI(options =>
-        {
-            options.FontEngine = customFontEngine;
-            options.TextureEngine = customTextureEngine;
-            options.RenderEngine = customRenderEngine;
-        });
-        var serviceProvider = services.BuildServiceProvider();
-
-        // Act
-        serviceProvider.UseCssUI();
-
-        // Assert
-        Assert.Same(customFontEngine, EngineProvider.FontEngine);
-        Assert.Same(customTextureEngine, EngineProvider.TextureEngine);
-        Assert.Same(customRenderEngine, EngineProvider.RenderEngine);
-    }
-
-    [Fact]
-    public void EnginesAreSingletons_ReturnsSameInstance()
+    public void AddFontService_Generic_RegistersService()
     {
         // Arrange
         var services = new ServiceCollection();
         services.AddCssUI();
-        var serviceProvider = services.BuildServiceProvider();
 
         // Act
-        var fontEngine1 = serviceProvider.GetRequiredService<IFontEngine>();
-        var fontEngine2 = serviceProvider.GetRequiredService<IFontEngine>();
-        var textureEngine1 = serviceProvider.GetRequiredService<ITextureEngine>();
-        var textureEngine2 = serviceProvider.GetRequiredService<ITextureEngine>();
-        var renderEngine1 = serviceProvider.GetRequiredService<IRenderEngine>();
-        var renderEngine2 = serviceProvider.GetRequiredService<IRenderEngine>();
+        services.AddFontService<NullFontService>();
+        var provider = services.BuildServiceProvider();
 
         // Assert
-        Assert.Same(fontEngine1, fontEngine2);
-        Assert.Same(textureEngine1, textureEngine2);
-        Assert.Same(renderEngine1, renderEngine2);
+        var fontService = provider.GetRequiredService<IFontService>();
+        Assert.IsType<NullFontService>(fontService);
     }
 
     [Fact]
-    public void AddCssUI_PreRegisteredEngines_AreNotOverwritten()
+    public void AddFontService_Instance_RegistersService()
     {
         // Arrange
         var services = new ServiceCollection();
-        var customFontEngine = new NullFontEngine();
-
-        // Pre-register custom engine
-        services.AddSingleton<IFontEngine>(customFontEngine);
+        var customInstance = new NullFontService();
 
         // Act
-        services.AddCssUI(); // Should NOT overwrite
-        var serviceProvider = services.BuildServiceProvider();
+        services.AddFontService(customInstance);
+        services.AddCssUI();
+        var provider = services.BuildServiceProvider();
 
         // Assert
-        var fontEngine = serviceProvider.GetRequiredService<IFontEngine>();
-        Assert.Same(customFontEngine, fontEngine);
+        var fontService = provider.GetRequiredService<IFontService>();
+        Assert.Same(customInstance, fontService);
     }
 
     [Fact]
-    public void AddCssUI_ThrowsWhenServicesIsNull()
+    public void AddFontService_Factory_RegistersService()
     {
         // Arrange
-        IServiceCollection? services = null;
+        var services = new ServiceCollection();
+        var customInstance = new NullFontService();
 
+        // Act
+        services.AddFontService(_ => customInstance);
+        services.AddCssUI();
+        var provider = services.BuildServiceProvider();
+
+        // Assert
+        var fontService = provider.GetRequiredService<IFontService>();
+        Assert.Same(customInstance, fontService);
+    }
+
+    [Fact]
+    public void AddTextureService_Generic_RegistersService()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        services.AddCssUI();
+
+        // Act
+        services.AddTextureService<NullTextureService>();
+        var provider = services.BuildServiceProvider();
+
+        // Assert
+        var textureService = provider.GetRequiredService<ITextureService>();
+        Assert.IsType<NullTextureService>(textureService);
+    }
+
+    [Fact]
+    public void AddRenderService_Generic_RegistersService()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        services.AddCssUI();
+
+        // Act
+        services.AddRenderService<NullRenderService>();
+        var provider = services.BuildServiceProvider();
+
+        // Assert
+        var renderService = provider.GetRequiredService<IRenderService>();
+        Assert.IsType<NullRenderService>(renderService);
+    }
+
+    [Fact]
+    public void AddCssUI_ServicesAreSingleton()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+
+        // Act
+        services.AddCssUI();
+        var provider = services.BuildServiceProvider();
+
+        // Assert - same instance returned on multiple resolutions
+        var fontService1 = provider.GetRequiredService<IFontService>();
+        var fontService2 = provider.GetRequiredService<IFontService>();
+        Assert.Same(fontService1, fontService2);
+
+        var textureService1 = provider.GetRequiredService<ITextureService>();
+        var textureService2 = provider.GetRequiredService<ITextureService>();
+        Assert.Same(textureService1, textureService2);
+
+        var renderService1 = provider.GetRequiredService<IRenderService>();
+        var renderService2 = provider.GetRequiredService<IRenderService>();
+        Assert.Same(renderService1, renderService2);
+    }
+
+    [Fact]
+    public void AddCssUI_UserRegistrationTakesPrecedence()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        var customFontService = new NullFontService();
+
+        // Act - register custom service before AddCssUI
+        services.AddSingleton<IFontService>(customFontService);
+        services.AddCssUI();
+        var provider = services.BuildServiceProvider();
+
+        // Assert - custom service is used, not the default
+        var fontService = provider.GetRequiredService<IFontService>();
+        Assert.Same(customFontService, fontService);
+    }
+
+    [Fact]
+    public void AddCssUI_ThrowsOnNullServices()
+    {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => services!.AddCssUI());
+        Assert.Throws<ArgumentNullException>(() =>
+            CssUIServiceCollectionExtensions.AddCssUI(null!));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            CssUIServiceCollectionExtensions.AddCssUI(null!, _ => { }));
+
+        var services = new ServiceCollection();
+        Assert.Throws<ArgumentNullException>(() =>
+            services.AddCssUI(null!));
     }
 
     [Fact]
-    public void AddCssUI_ThrowsWhenConfigureIsNull()
+    public void TextIntrinsicSizer_ReceivesFontService()
     {
         // Arrange
         var services = new ServiceCollection();
+        var customFontService = new NullFontService();
+        services.AddFontService(customFontService);
+        services.AddCssUI();
+        var provider = services.BuildServiceProvider();
 
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => services.AddCssUI(null!));
-    }
+        // Act
+        var textSizer = provider.GetRequiredService<ITextIntrinsicSizer>();
 
-    [Fact]
-    public void UseCssUI_ThrowsWhenServiceProviderIsNull()
-    {
-        // Arrange
-        IServiceProvider? serviceProvider = null;
-
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => serviceProvider!.UseCssUI());
+        // Assert - the sizer was created (which means IFontService was injected)
+        Assert.NotNull(textSizer);
     }
 }

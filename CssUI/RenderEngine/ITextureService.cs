@@ -6,10 +6,10 @@ using CssUI.Rendering;
 namespace CssUI;
 
 /// <summary>
-/// Engine interface for image decoding and texture management.
+/// Service interface for image decoding and texture management.
 /// Implementations handle GPU resource allocation internally.
 /// </summary>
-public interface ITextureEngine
+public interface ITextureService
 {
     #region Image Decoding
 
@@ -108,4 +108,3 @@ public interface ITextureEngine
 
     #endregion
 }
-

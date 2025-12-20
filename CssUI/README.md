@@ -163,28 +163,73 @@ var value = resolver.Resolve("var(--spacing)");  // Returns 16px
 var fallback = resolver.Resolve("var(--undefined, 10px)");  // Returns 10px
 ```
 
-## Engine Plugin Architecture
+## Service Plugin Architecture
 
-CssUI uses a plugin architecture for rendering backends:
+CssUI uses Microsoft.Extensions.DependencyInjection for service registration and resolution:
 
 ```csharp
-// Implement custom font engine
-public class MyFontEngine : IFontEngine
-{
-    public FontHandle LoadFont(string family, int size, FontStyle style) { ... }
-    public FontMetrics GetMetrics(FontHandle font) { ... }
-    public float MeasureText(FontHandle font, string text) { ... }
-}
+using CssUI;
+using CssUI.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
-// Register with provider
-EngineProvider.Initialize(
-    fontEngine: new MyFontEngine(),
-    textureEngine: new MyTextureEngine(),
-    renderEngine: new MyRenderEngine()
-);
+// Register CssUI services with your DI container
+var services = new ServiceCollection();
+services.AddCssUI(options =>
+{
+    options.FontService = new MyFontService();
+    options.TextureService = new MyTextureService();
+    options.RenderService = new MyRenderService();
+});
+var provider = services.BuildServiceProvider();
+
+// Or use the extension methods
+services.AddCssUI();
+services.AddFontService<MyFontService>();
+services.AddTextureService<MyTextureService>();
+services.AddRenderService<MyRenderService>();
 ```
 
-For headless operation (unit testing, server-side), null implementations are used by default.
+### Custom Service Implementations
+
+```csharp
+// Implement custom font service
+public class MyFontService : IFontService
+{
+    public FontHandle ResolveFont(ReadOnlySpan<string> familyNames, float size, 
+        EFontWeight weight, EFontStyle style) { ... }
+    public FontMetricsData GetMetrics(FontHandle font) { ... }
+    public TextMeasurement MeasureText(FontHandle font, ReadOnlySpan<char> text) { ... }
+    // ... other methods
+}
+
+// Implement custom texture service
+public class MyTextureService : ITextureService
+{
+    public ImageData DecodeImage(ReadOnlySpan<byte> data) { ... }
+    public TextureHandle CreateTexture(int width, int height, ReadOnlySpan<byte> rgbaPixels) { ... }
+    // ... other methods
+}
+
+// Implement custom render service
+public class MyRenderService : IRenderService
+{
+    public void BeginFrame() { ... }
+    public void FillRect(RenderRect rect, Color color) { ... }
+    public void DrawText(FontHandle font, ReadOnlySpan<char> text, RenderPoint position, Color color) { ... }
+    // ... other methods
+}
+```
+
+### Document Scoped Services
+
+Each `Document` maintains its own service scope for proper isolation:
+
+```csharp
+// Services are resolved from the document's scope
+var fontService = document.Services.GetRequiredService<IFontService>();
+```
+
+For headless operation (unit testing, server-side), null implementations (`NullFontService`, `NullTextureService`, `NullRenderService`) are used by default.
 
 ## Building
 
