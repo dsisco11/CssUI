@@ -223,7 +223,7 @@ internal static class CssCommon
 
                     var Tree = new DOM.TreeWalker(Left, DOM.Enums.ENodeFilterMask.SHOW_ELEMENT);
                     var Current = Tree.parentNode();
-                    while (Current is object)
+                    while (Current is not null)
                     {
                         if (Current is DOM.Element element)
                         {
@@ -254,7 +254,7 @@ internal static class CssCommon
 
                     var Tree = new DOM.TreeWalker(Left, DOM.Enums.ENodeFilterMask.SHOW_ELEMENT);
                     var Current = Tree.parentNode();
-                    while (Current is object)
+                    while (Current is not null)
                     {
                         if (Current is DOM.Element ancestor)
                         {
@@ -297,7 +297,7 @@ internal static class CssCommon
                      */
                     var Tree = new DOM.TreeWalker(Target, DOM.Enums.ENodeFilterMask.SHOW_ELEMENT);
                     var Current = Tree.parentNode();
-                    while (Current is object)
+                    while (Current is not null)
                     {
                         if (Current is DOM.Element element)
                         {
@@ -326,7 +326,7 @@ internal static class CssCommon
                      */
                     var Tree = new DOM.TreeWalker(Target, DOM.Enums.ENodeFilterMask.SHOW_ELEMENT);
                     var Current = Tree.parentNode();
-                    while (Current is object)
+                    while (Current is not null)
                     {
                         if (Current is DOM.Element ancestor)
                         {
@@ -339,7 +339,7 @@ internal static class CssCommon
 
                                     // find our first inline-level element and its padding-edges
                                     child = ancestor.firstElementChild;
-                                    while (child is object)
+                                    while (child is not null)
                                     {
                                         if (child.Box.DisplayType.Outer == EOuterDisplayType.Inline)
                                         {
@@ -353,7 +353,7 @@ internal static class CssCommon
 
                                     // find our last inline-level element and its padding-edges
                                     child = ancestor.lastElementChild;
-                                    while (child is object)
+                                    while (child is not null)
                                     {
                                         if (child.Box.DisplayType.Outer == EOuterDisplayType.Inline)
                                         {
@@ -404,7 +404,7 @@ internal static class CssCommon
         // Other Elements
         var Tree = new DOM.TreeWalker(Target, DOM.Enums.ENodeFilterMask.SHOW_ELEMENT);
         var Current = Tree.parentNode();
-        while (Current is object)
+        while (Current is not null)
         {
             if (Current is Element currentAsElement)
             {

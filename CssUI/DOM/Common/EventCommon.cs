@@ -128,10 +128,10 @@ public static class EventCommon
             var slotable = (target is Node targetNode && targetNode is ISlottable) ? target : null;
             bool slotInClosedTree = false;
             EventTarget? parent = target.get_the_parent(@event);
-            while (parent is object)
+            while (parent is not null)
             {
                 /* 1) If slotable is non-null: */
-                if (slotable is object)
+                if (slotable is not null)
                 {
                     /* 1) Assert: parent is a slot. */
                     if (parent is ISlot)
@@ -186,7 +186,7 @@ public static class EventCommon
                     EventCommon.append_to_event_path(@event, parent, target, relatedTarget!, touchTargets, slotInClosedTree);
                 }
                 /* 9) If parent is non-null, then set parent to the result of invoking parent’s get the parent with event. */
-                if (parent is object)
+                if (parent is not null)
                     parent = parent.get_the_parent(@event);
                 /* 10) Set slot-in-closed-tree to false. */
                 slotInClosedTree = false;
@@ -198,7 +198,7 @@ public static class EventCommon
                            || (clearTargetsStruct.relatedTarget is Node n2 && n2.getRootNode() is ShadowRoot)
                            || clearTargetsStruct.touch_target_list.Any(t => t is Node n3 && n3.getRootNode() is ShadowRoot);
             /* 12) If activationTarget is non-null and activationTarget has legacy-pre-activation behavior, then run activationTarget’s legacy-pre-activation behavior. */
-            if (activationTarget is object && activationTarget.has_legacy_activation_behaviour)
+            if (activationTarget is not null && activationTarget.has_legacy_activation_behaviour)
             {
                 activationTarget?.legacy_pre_activation_behaviour();
             }
@@ -208,7 +208,7 @@ public static class EventCommon
             {
                 EventPathItem @struct = @event.Path[i];
                 /* 1) If struct’s shadow-adjusted target is non-null, then set event’s eventPhase attribute to AT_TARGET. */
-                if (@struct.shadow_adjusted_target is object)
+                if (@struct.shadow_adjusted_target is not null)
                     @event.eventPhase = EEventPhase.AT_TARGET;
                 /* 2) Otherwise, set event’s eventPhase attribute to CAPTURING_PHASE. */
                 else
@@ -221,7 +221,7 @@ public static class EventCommon
             foreach (EventPathItem @struct in @event.Path)
             {
                 /* 1) If struct’s shadow-adjusted target is non-null, then set event’s eventPhase attribute to AT_TARGET. */
-                if (@struct.shadow_adjusted_target is object)
+                if (@struct.shadow_adjusted_target is not null)
                     @event.eventPhase = EEventPhase.AT_TARGET;
                 /* 2) Otherwise: */
                 else
@@ -249,7 +249,7 @@ public static class EventCommon
             @event.TouchTargetList.Clear();
         }
         /* 11) If activationTarget is non-null, then: */
-        if (activationTarget is object)
+        if (activationTarget is not null)
         {
             /* 1) If event’s canceled flag is unset, then run activationTarget’s activation behavior with event. */
             if (0 == (@event.Flags & EEventFlags.Canceled))
@@ -270,7 +270,7 @@ public static class EventCommon
     public static void invoke(EventPathItem @struct, Event @event, EEventPhase phase, bool legacyOutputDidListenersThrowFlag = false)
     {/* Docs: https://dom.spec.whatwg.org/#concept-event-listener-invoke */
         /* 1) Set event’s target to the shadow-adjusted target of the last struct in event’s path, that is either struct or preceding struct, whose shadow-adjusted target is non-null. */
-        if (@struct.shadow_adjusted_target is object)
+        if (@struct.shadow_adjusted_target is not null)
             @event.target = @struct.shadow_adjusted_target;
         else
         {
@@ -279,7 +279,7 @@ public static class EventCommon
             /* Find the path-item preceeding struct which has a valid shadow-adjusted target */
             for (int i = structIndex - 1; i >= 0; i--)
             {
-                if (@event.Path[i].shadow_adjusted_target is object)
+                if (@event.Path[i].shadow_adjusted_target is not null)
                 {
                     @event.target = @event.Path[i].shadow_adjusted_target;
                     break;

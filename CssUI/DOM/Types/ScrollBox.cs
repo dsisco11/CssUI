@@ -179,7 +179,7 @@ public class ScrollBox : EventTarget
 
                 var tree = new TreeWalker(View.document.documentElement!, Enums.ENodeFilterMask.SHOW_ELEMENT);
                 Node? node = tree.nextNode();
-                while (node is object)
+                while (node is not null)
                 {
                     if (node is Element E)
                     {

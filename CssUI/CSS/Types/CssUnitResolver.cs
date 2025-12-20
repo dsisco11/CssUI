@@ -112,7 +112,7 @@ public class CssUnitResolver
                     if (Property.CssName == "font-size" && ReferenceEquals(Property.Owner, Owner))
                     {// We are being called from the font-size property
 
-                        if (Property.Owner.parentElement is object)
+                        if (Property.Owner.parentElement is not null)
                         {// Basically just try and inherit our parents unit scale
                             return Get_Font_Unit_Scale(Owner.parentElement!, Property, Unit);
                         }

@@ -45,7 +45,7 @@ public partial class CssValue
                     {
                         // Try and use a resolver if one is specified
                         var ResolutionDelegate = Def.PropertyStageResolver[(int)EPropertyStage.Specified];
-                        if (ResolutionDelegate is object)
+                        if (ResolutionDelegate is not null)
                         {
                             return (CssValue)ResolutionDelegate.Invoke(Property);
                         }
@@ -113,7 +113,7 @@ public partial class CssValue
 
         // If we havent resolved a value yet that means this was meant to be handled by a custom handler
         var ResolutionDelegate = Def.PropertyStageResolver[(int)EPropertyStage.Computed];
-        if (ResolutionDelegate is object)
+        if (ResolutionDelegate is not null)
         {
             return (CssValue)ResolutionDelegate.Invoke(Property);
         }
@@ -131,7 +131,7 @@ public partial class CssValue
     internal CssValue Derive_UsedValue(ICssProperty Property)
     {/* Docs:  https://www.w3.org/TR/css-cascade-3/#used */
         var ResolutionDelegate = Property.Definition.PropertyStageResolver[(int)EPropertyStage.Used];
-        if (ResolutionDelegate is object)
+        if (ResolutionDelegate is not null)
         {
             return (CssValue)ResolutionDelegate.Invoke(Property);
         }
@@ -150,7 +150,7 @@ public partial class CssValue
         // the Actual value does not get 'resolved' it gets restricted.
 
         var ResolutionDelegate = Property.Definition.PropertyStageResolver[(int)EPropertyStage.Actual];
-        if (ResolutionDelegate is object)
+        if (ResolutionDelegate is not null)
         {
             return (CssValue)ResolutionDelegate(Property);
         }

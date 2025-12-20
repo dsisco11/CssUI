@@ -174,7 +174,7 @@ public class Text : CharacterData, ISlottable
                 RetList.AddFirst((Text)currentNode);
             }
         }
-        while (currentNode is object);
+        while (currentNode is not null);
         // 2) Add our self to the list too (maybe)
         if (!exclude_self)
             RetList.AddLast(node);
@@ -189,7 +189,7 @@ public class Text : CharacterData, ISlottable
                 RetList.AddLast((Text)currentNode);
             }
         }
-        while (currentNode is object);
+        while (currentNode is not null);
 
         return RetList;
     }

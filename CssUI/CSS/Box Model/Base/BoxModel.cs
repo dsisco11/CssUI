@@ -1436,7 +1436,7 @@ public static class BoxModel
 
             // find our first inline-level element and its top-margin-edge
             node = Box.Owner?.firstElementChild;
-            while (node is object)
+            while (node is not null)
             {
                 if (node.Box.DisplayType.Outer == EOuterDisplayType.Inline)
                 {
@@ -1449,7 +1449,7 @@ public static class BoxModel
 
             // find our last inline-level element and its bottom-margin-edge
             node = Box.Owner?.lastElementChild;
-            while (node is object)
+            while (node is not null)
             {
                 if (node.Box.DisplayType.Outer == EOuterDisplayType.Inline)
                 {
@@ -1470,7 +1470,7 @@ public static class BoxModel
 
             // find our first block-level element and its top-margin-edge
             node = Box.Owner?.firstElementChild;
-            while (node is object)
+            while (node is not null)
             {
                 if (node.Box.DisplayType.Outer == EOuterDisplayType.Block)
                 {
@@ -1483,7 +1483,7 @@ public static class BoxModel
 
             // find our last block-level element and its bottom-margin-edge
             node = Box.Owner?.lastElementChild;
-            while (node is object)
+            while (node is not null)
             {
                 if (node.Box.DisplayType.Outer == EOuterDisplayType.Block)
                 {

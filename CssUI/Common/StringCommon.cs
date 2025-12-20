@@ -1644,7 +1644,7 @@ public static class StringCommon
     {
         int Length = 0;
         LinkedListNode<StringChunk>? node = Chunks.First;
-        while (node is object)
+        while (node is not null)
         {
             StringChunk chunk = node.Value;
             if (chunk.IsDelimiter)
@@ -1695,7 +1695,7 @@ public static class StringCommon
         int writePos = 0;
 
         var node = Chunks.First;
-        while (node is object)
+        while (node is not null)
         {
             StringChunk Chunk = node.Value;
             node = node.Next;

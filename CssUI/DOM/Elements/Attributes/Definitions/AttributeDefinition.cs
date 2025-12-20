@@ -156,7 +156,7 @@ public class AttributeDefinition
                 break;
             case EAttributeType.Boolean:// we need no verification for booleans. they dont care what the value use, only whether its null or not
                 {
-                    outValue = Input is object;
+                    outValue = Input is not null;
                 }
                 break;
             case EAttributeType.Color:
@@ -202,13 +202,13 @@ public class AttributeDefinition
             case EAttributeType.Enumerated:
                 {
                     string strLower = Input.ToLowerInvariant();
-                    if (Keywords is object && Keywords.Count > 0)
+                    if (Keywords is not null && Keywords.Count > 0)
                     {
                         if (!Keywords.Contains(strLower))
                         {
                             throw new DomSyntaxError($"Attribute {Name}: \"{Input}\" is not an acceptable value, Acceptable values are: {StringCommon.Concat(", ".AsSpan(), Keywords.Select(o => o.AsMemory()))}");
                         }
-                        else if (enumType is object && CssUI.Lookup.TryEnum(enumType, strLower, out var outEnum))
+                        else if (enumType is not null && CssUI.Lookup.TryEnum(enumType, strLower, out var outEnum))
                         {
                             outValue = outEnum;
                             break;

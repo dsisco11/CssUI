@@ -158,7 +158,7 @@ public abstract class Node : EventTarget, INode
         }
 
         Node? current = parentNode;
-        while (current is object)
+        while (current is not null)
         {
             if (current.GetFlag(Flags))
                 break;
@@ -182,7 +182,7 @@ public abstract class Node : EventTarget, INode
         }
 
         Node? current = parentNode;
-        while (current is object)
+        while (current is not null)
         {
             if (current.GetFlag(StopFlags))
                 break;
@@ -840,7 +840,7 @@ public abstract class Node : EventTarget, INode
         /* 1) Let count be the number of children of node if it is a DocumentFragment node, and one otherwise. */
         int count = (node is DocumentFragment doc) ? doc.childNodes.Count : 1;
         /* 2) If child is non-null, then: */
-        if (child is object)
+        if (child is not null)
         {
             foreach (WeakReference<Range> weakRef in parent.nodeDocument.LIVE_RANGES)
             {
@@ -1037,7 +1037,7 @@ public abstract class Node : EventTarget, INode
         /* 11) Let removedNodes be the empty list. */
         var removedNodes = Array.Empty<Node>();
         /* 12) If child’s parent is not null, then: */
-        if (child.parentNode is object)
+        if (child.parentNode is not null)
         {
             /* 1) Set removedNodes to « child ». */
             removedNodes = new Node[] { child };
@@ -1061,7 +1061,7 @@ public abstract class Node : EventTarget, INode
     internal static void Dom_replace_all_within_node(Node? node, Node parent)
     {/* Docs: https://dom.spec.whatwg.org/#concept-node-replace-all */
         /* 1) If node is not null, adopt node into parent’s node document. */
-        if (node is object)
+        if (node is not null)
         {
             parent.ownerDocument.adoptNode(node);
         }
@@ -1071,7 +1071,7 @@ public abstract class Node : EventTarget, INode
 
         if (node is DocumentFragment)
             addedNodes = node.childNodes;
-        else if (node is object)
+        else if (node is not null)
             addedNodes = new Node[] { node };
         /* 6) Remove all parent’s children, in tree order, with the suppress observers flag set. */
         foreach (Node child in parent.childNodes)
@@ -1079,7 +1079,7 @@ public abstract class Node : EventTarget, INode
             Dom_remove_node_from_parent(child, parent, true);
         }
         /* 7) If node is not null, then insert node into parent before null with the suppress observers flag set. */
-        if (node is object)
+        if (node is not null)
         {
             Dom_insert_node_into_parent_before(node, parent, null, true);
         }
@@ -1103,7 +1103,7 @@ public abstract class Node : EventTarget, INode
             throw new HierarchyRequestError();
 
         /* 3) If child is not null and its parent is not parent, then throw a "NotFoundError" DOMException. */
-        if (child is object && !ReferenceEquals(parent, child.parentNode))
+        if (child is not null && !ReferenceEquals(parent, child.parentNode))
             throw new NotFoundError();
         /* 4) If node is not a DocumentFragment, DocumentType, Element, Text, ProcessingInstruction, or Comment node, throw a "HierarchyRequestError" DOMException. */
         if (node is not DocumentFragment && node is not DocumentType && node is not Element && node is not Text && node is not ProcessingInstruction && node is not Comment)
@@ -1132,7 +1132,7 @@ public abstract class Node : EventTarget, INode
                     {
                         throw new HierarchyRequestError();
                     }
-                    if (child is object && DOMCommon.Get_Following(child).Any(c => c is DocumentType))
+                    if (child is not null && DOMCommon.Get_Following(child).Any(c => c is DocumentType))
                     {
                         throw new HierarchyRequestError();
                     }
@@ -1140,14 +1140,14 @@ public abstract class Node : EventTarget, INode
             }
             else if (node is Element)
             {
-                if (parent.childNodes.Any(c => c is Element) || child is DocumentType || (child is object && DOMCommon.Get_Following(child).Any(c => c is DocumentType)))
+                if (parent.childNodes.Any(c => c is Element) || child is DocumentType || (child is not null && DOMCommon.Get_Following(child).Any(c => c is DocumentType)))
                 {
                     throw new HierarchyRequestError();
                 }
             }
             else if (node is DocumentType docType)
             {
-                if (parent.childNodes.Any(c => c is DocumentType) || (child is object && DOMCommon.Get_Preceeding(child).Any(c => c is Element)) || (child is null && parent.childNodes.Any(c => c is Element)))
+                if (parent.childNodes.Any(c => c is DocumentType) || (child is not null && DOMCommon.Get_Preceeding(child).Any(c => c is Element)) || (child is null && parent.childNodes.Any(c => c is Element)))
                 {
                     throw new HierarchyRequestError();
                 }

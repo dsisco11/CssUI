@@ -754,7 +754,7 @@ public static class Tree
     {
         LinkedList<ITreeNode> list = new LinkedList<ITreeNode>();
         ITreeNode child = node.firstChild;
-        if (Filter is object)
+        if (Filter is not null)
         {
             while (child is object)
             {
@@ -795,7 +795,7 @@ public static class Tree
 
         uint N = Nth;
         ITreeNode? child = node.firstChild;
-        if (Filter is object)
+        if (Filter is not null)
         {
             while (child is object)
             {
@@ -836,7 +836,7 @@ public static class Tree
     {
         LinkedList<NodeType> list = new LinkedList<NodeType>();
         ITreeNode child = node.firstChild;
-        if (Filter is object)
+        if (Filter is not null)
         {
             while (child is object)
             {
@@ -883,7 +883,7 @@ public static class Tree
 
         uint N = Nth;
         ITreeNode? child = node.firstChild;
-        if (Filter is object)
+        if (Filter is not null)
         {
             while (child is object)
             {
@@ -945,7 +945,7 @@ public static class Tree
         {
             if (child is NodeType childAsType)
             {
-                if (Filter is object)
+                if (Filter is not null)
                 {
                     var fr = Filter.acceptNode(child);
                     if (fr == EFilterResult.FILTER_REJECT) break;// abort and return

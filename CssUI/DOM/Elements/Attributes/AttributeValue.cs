@@ -266,7 +266,7 @@ public class AttributeValue
             {
                 case EAttributeType.Boolean:
                     {// A boolean attributes value is based on it's mere existance. So if the other object exists then they are both true and equal!
-                        return other.Value is object;
+                        return other.Value is not null;
                     }
                 case EAttributeType.Integer:
                     {// cast to large type just incase

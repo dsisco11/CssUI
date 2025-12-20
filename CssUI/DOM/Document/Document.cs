@@ -242,7 +242,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
         {
             TreeWalker Tree = new TreeWalker(body, ENodeFilterMask.SHOW_ALL, FilterNodeUpdate.Instance);
             Node current = Tree.nextNode();
-            while (current is object)
+            while (current is not null)
             {
                 if (current.GetFlag(ENodeFlags.NeedsBoxUpdate))
                 {
@@ -588,7 +588,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
         /* 1) Let oldDocument be node’s node document. */
         var oldDocument = node.ownerDocument;
         /* 2) If node’s parent is not null, remove node from its parent. */
-        if (node.parentNode is object)
+        if (node.parentNode is not null)
             node.parentNode.removeChild(node);
         /* 3) If document is not oldDocument, then: */
         if (!ReferenceEquals(this, oldDocument))
@@ -642,7 +642,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
         /* 2) If there is a layout box in the viewport that would be a target for hit testing at coordinates x,y, when applying the transforms that apply to the descendants of the viewport, return the associated element and terminate these steps. */
         var filter = new FilterLayoutBoxHitTest(x, y);
         var hit = DOMCommon.Get_Nth_Descendant<Element>(this, 1, filter, ENodeFilterMask.SHOW_ELEMENT);
-        if (hit is object)
+        if (hit is not null)
         {
             return hit;
         }
@@ -694,7 +694,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
             if (Mode == EQuirksMode.Quirks)
             {
                 /* 1) If the HTML body element exists, and it is not potentially scrollable, return the HTML body element and abort these steps. */
-                if (body is object && !body.is_potentially_scrollable) return body;
+                if (body is not null && !body.is_potentially_scrollable) return body;
                 /* 2) Return null and abort these steps. */
                 return null;
             }

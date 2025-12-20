@@ -57,7 +57,7 @@ public static class CssBoxTree
                 // 3) Unlink all box-nodes in the chain leading to the nodes real principal-box parent
                 // The current box might be wrapped in an anonymous box. in which case the index we WANT is actually THAT boxs'
                 int index = -1;
-                if (Box is object)
+                if (Box is not null)
                 {
                     var ChainRoot = Box.Unlink(nearestAncestor!.Box!);
                     index = ChainRoot.index;
@@ -214,9 +214,9 @@ public static class CssBoxTree
     private static Element? Get_Closest_Box_Generating_Ancestor(in Node node)
     {
         var current = node.parentNode;
-        while (current is object)
+        while (current is not null)
         {// Find the nearest ancestor element which has a box
-            if (current is Element element && element.Box is object)
+            if (current is Element element && element.Box is not null)
             {
                 return element;
             }

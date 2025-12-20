@@ -108,7 +108,7 @@ public class Attr : Node
             {
                 var def = Definition;
                 IsInvalidValue = false;
-                if (def is object)
+                if (def is not null)
                 {
                     def.CheckAndThrow(newValue!);
 

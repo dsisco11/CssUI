@@ -80,7 +80,7 @@ public static class Lookup
         {
             /* /!\ This conversion will fucking EXPLODE if the given generic type does not have an integer backing type /!\ */
             string keyword = EnumMetaTable.Get(enumIndex, CastTo<int>.From(Value)).Keyword;
-            if (keyword is object)
+            if (keyword is not null)
             {
                 return keyword;
             }
@@ -107,7 +107,7 @@ public static class Lookup
         {
             /* /!\ This conversion will fucking EXPLODE if the given generic type does not have an integer backing type /!\ */
             string keyword = EnumMetaTable.Get(enumIndex, CastTo<int>.From(Value)).Keyword;
-            if (keyword is object)
+            if (keyword is not null)
             {
                 return keyword;
             }

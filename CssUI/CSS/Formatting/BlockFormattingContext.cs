@@ -11,7 +11,7 @@ public class BlockFormattingContext : IFormattingContext
         Contract.EndContractBlock();
 
         CssBoxTreeNode Current = Node.firstChild;
-        while (Current is object)
+        while (Current is not null)
         {
             if (Current.previousSibling is null)
             {

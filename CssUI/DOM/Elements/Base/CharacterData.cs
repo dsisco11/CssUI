@@ -78,7 +78,7 @@ public abstract class CharacterData : Node, INonDocumentTypeChildNode
         }
 
         /* 12) If node’s parent is non-null, then run the children changed steps for node’s parent. */
-        if (parentNode is object)
+        if (parentNode is not null)
         {
             parentNode.Run_children_changed_steps();
             //parentNode.Run_child_text_node_change_steps(txtNode);

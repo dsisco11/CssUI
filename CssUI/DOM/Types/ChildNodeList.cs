@@ -55,7 +55,7 @@ public class ChildNodeList : IList<Node>
         else
         {// Scan through the list and 
             var current = ChildElements.First;
-            while (current is object)
+            while (current is not null)
             {
                 if (current.Value.index <= index)
                 {

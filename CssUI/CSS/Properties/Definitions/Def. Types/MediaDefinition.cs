@@ -120,7 +120,7 @@ public class MediaDefinition
         {
             case ECssValueTypes.KEYWORD:
                 {// check this value against our keyword whitelist
-                    if (KeywordWhitelist is object && KeywordWhitelist.Count > 0)
+                    if (KeywordWhitelist is not null && KeywordWhitelist.Count > 0)
                     {
                         //if (!Array.Exists(keywordWhitelist, x => x.Equals(Value.AsString(), StringComparison.InvariantCultureIgnoreCase)))
                         if (!KeywordWhitelist.Contains(Value.AsString()))

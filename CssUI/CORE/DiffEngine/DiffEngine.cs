@@ -58,7 +58,7 @@ public class DiffEngine<T> where T : class//, IEquatable<T>
                         RetList.AddLast(new DiffData<T>(EDiffAction.None, current.StartOffset, NewData.AsMemory().Slice(current.StartOffset, current.Length)));
                         Balance += current.Length;
                         var next = node.Next;
-                        if (next is object)
+                        if (next is not null)
                         {
                             /* The length of data we need to repeat is whatever was between our insertion pos and the start of the next diff */
                             var repeat_length = next.Value.StartOffset - current.StartOffset;
@@ -115,7 +115,7 @@ public class DiffEngine<T> where T : class//, IEquatable<T>
         var RetList = new LinkedList<DiffData<T>>();
         LinkedListNode<DiffNode<T>>? node = Diffs.First;
 
-        while (node is object)
+        while (node is not null)
         {
             DiffNode<T> current = node.Value;
             /* Add a node to contain the data that came before this node and after the last node */
@@ -124,7 +124,7 @@ public class DiffEngine<T> where T : class//, IEquatable<T>
                 int start = 0;
                 int end = current.StartOffset;
                 // If there was a previous node then our starting point should be it's ending point
-                if (node.Previous is object)
+                if (node.Previous is not null)
                     start = node.Previous.Value.EndOffset;
 
                 int len = (end - start);
@@ -313,7 +313,7 @@ public class DiffEngine<T> where T : class//, IEquatable<T>
                 return null;
             }
         }
-        else if (addDiff is object && rmvDiff is object)/* Else find the shorter of the two diffs and return that one */
+        else if (addDiff is not null && rmvDiff is not null)/* Else find the shorter of the two diffs and return that one */
         {
             if (addDiff.Length < rmvDiff.Length)
             {
@@ -324,11 +324,11 @@ public class DiffEngine<T> where T : class//, IEquatable<T>
                 return rmvDiff;
             }
         }
-        else if (addDiff is object)
+        else if (addDiff is not null)
         {
             return addDiff;
         }
-        else if (rmvDiff is object)
+        else if (rmvDiff is not null)
         {
             return rmvDiff;
         }

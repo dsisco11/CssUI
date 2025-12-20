@@ -80,7 +80,7 @@ public class CssParser
         if (Stream.Next.Type != ECssTokenType.Ident) throw new CssSyntaxErrorException(CssErrors.EXPECTING_IDENT, Stream);
 
         CssDecleration? Dec = Consume_Decleration(Stream);
-        if (Dec is object) throw new CssSyntaxErrorException(CssErrors.CANT_CONSUME_DECLERATION, Stream);
+        if (Dec is not null) throw new CssSyntaxErrorException(CssErrors.CANT_CONSUME_DECLERATION, Stream);
 
         return Dec;
     }
@@ -119,7 +119,7 @@ public class CssParser
 
             List.AddLast(Value);
         }
-        while (Value is object);
+        while (Value is not null);
 
         return List;
     }
@@ -168,21 +168,21 @@ public class CssParser
                         if (TopLevel) continue;
                         Stream.Reconsume();
                         var rule = Consume_QualifiedRule(Stream);
-                        if (rule is object) Rules.AddLast(rule);
+                        if (rule is not null) Rules.AddLast(rule);
                     }
                     break;
                 case ECssTokenType.At_Keyword:
                     {
                         Stream.Reconsume();
                         var rule = Consume_AtRule(Stream);
-                        if (rule is object) Rules.AddLast(rule);
+                        if (rule is not null) Rules.AddLast(rule);
                     }
                     break;
                 default:
                     {
                         Stream.Reconsume();
                         var rule = Consume_QualifiedRule(Stream);
-                        if (rule is object) Rules.AddLast(rule);
+                        if (rule is not null) Rules.AddLast(rule);
                     }
                     break;
             }

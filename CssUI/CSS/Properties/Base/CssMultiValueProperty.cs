@@ -289,7 +289,7 @@ public abstract class CssMultiValueProperty : CssPropertyBase, ICssProperty
         * CSS Specs:
         * 2. if the property is inherited and the element is not the root of the document tree, use the computed value of the parent element.
         */
-        if (Def is object && Def.Inherited)
+        if (Def is not null && Def.Inherited)
         {
             if (Owner.parentNode is null)
             {// Root elements cannot inherit, they use the INITIAL value
@@ -417,7 +417,7 @@ public abstract class CssMultiValueProperty : CssPropertyBase, ICssProperty
         _used = null;
         //var ResolutionDelegate = CssPropertyResolver.Get(CssName, ECssPropertyStage.Used);
         var ResolutionDelegate = Definition.PropertyStageResolver[(int)EPropertyStage.Used];
-        if (ResolutionDelegate is object)
+        if (ResolutionDelegate is not null)
         {
             _used = (CssValueList)ResolutionDelegate.Invoke(this);
         }
@@ -442,7 +442,7 @@ public abstract class CssMultiValueProperty : CssPropertyBase, ICssProperty
         _actual = null;
         //var ResolutionDelegate = CssPropertyResolver.Get(CssName, ECssPropertyStage.Actual);
         var ResolutionDelegate = Definition.PropertyStageResolver[(int)EPropertyStage.Actual];
-        if (ResolutionDelegate is object)
+        if (ResolutionDelegate is not null)
         {
             _actual = (CssValueList)ResolutionDelegate.Invoke(this);
         }

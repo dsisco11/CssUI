@@ -76,12 +76,12 @@ public class TreeWalker
         /* 1) Let node be the context object’s current. */
         Node? node = currentNode;
         /* 2) While node is non-null and is not the context object’s root: */
-        while (node is object && !ReferenceEquals(node, root))
+        while (node is not null && !ReferenceEquals(node, root))
         {
             /* 1) Set node to node’s parent. */
             node = node.parentNode;
             /* 2) If node is non-null and filtering node within the context object returns FILTER_ACCEPT, then set the context object’s current to node and return node. */
-            if (node is object && filterNode(node) == ENodeFilterResult.FILTER_ACCEPT)
+            if (node is not null && filterNode(node) == ENodeFilterResult.FILTER_ACCEPT)
             {
                 currentNode = node;
                 return node;
@@ -102,7 +102,7 @@ public class TreeWalker
         /* 2) Set node to node’s first child if type is first, and node’s last child if type is last. */
         node = node.firstChild;
         /* 3) While node is non-null: */
-        while (node is object)
+        while (node is not null)
         {
             /* 1) Let result be the result of filtering node within walker. */
             var result = filterNode(node);
@@ -118,19 +118,19 @@ public class TreeWalker
                 /* 1) Let child be node’s first child if type is first, and node’s last child if type is last. */
                 var child = node.firstChild;
                 /* 2) If child is non-null, then set node to child and continue. */
-                if (child is object)
+                if (child is not null)
                 {
                     node = child;
                     continue;
                 }
             }
             /* 4) While node is non-null: */
-            while (node is object)
+            while (node is not null)
             {
                 /* 1) Let sibling be node’s next sibling if type is first, and node’s previous sibling if type is last. */
                 var sibling = node.nextSibling;
                 /* 2) If sibling is non-null, then set node to sibling and break. */
-                if (sibling is object) break;
+                if (sibling is not null) break;
                 /* 3) Let parent be node’s parent. */
                 var parent = node.parentNode;
                 /* 4) If parent is null, walker’s root, or walker’s current, then return null. */
@@ -155,7 +155,7 @@ public class TreeWalker
         /* 2) Set node to node’s first child if type is first, and node’s last child if type is last. */
         node = node.lastChild;
         /* 3) While node is non-null: */
-        while (node is object)
+        while (node is not null)
         {
             /* 1) Let result be the result of filtering node within walker. */
             var result = filterNode(node);
@@ -171,19 +171,19 @@ public class TreeWalker
                 /* 1) Let child be node’s first child if type is first, and node’s last child if type is last. */
                 var child = node.lastChild;
                 /* 2) If child is non-null, then set node to child and continue. */
-                if (child is object)
+                if (child is not null)
                 {
                     node = child;
                     continue;
                 }
             }
             /* 4) While node is non-null: */
-            while (node is object)
+            while (node is not null)
             {
                 /* 1) Let sibling be node’s next sibling if type is first, and node’s previous sibling if type is last. */
                 var sibling = node.previousSibling;
                 /* 2) If sibling is non-null, then set node to sibling and break. */
-                if (sibling is object) break;
+                if (sibling is not null) break;
                 /* 3) Let parent be node’s parent. */
                 var parent = node.parentNode;
                 /* 4) If parent is null, walker’s root, or walker’s current, then return null. */
@@ -214,7 +214,7 @@ public class TreeWalker
             /* 1) Let sibling be node’s next sibling if type is next, and node’s previous sibling if type is previous. */
             var sibling = node.nextSibling;
             /* 2) While sibling is non-null: */
-            while (sibling is object)
+            while (sibling is not null)
             {
                 /* 1) Set node to sibling. */
                 node = sibling;
@@ -260,7 +260,7 @@ public class TreeWalker
             /* 1) Let sibling be node’s next sibling if type is next, and node’s previous sibling if type is previous. */
             var sibling = node.previousSibling;
             /* 2) While sibling is non-null: */
-            while (sibling is object)
+            while (sibling is not null)
             {
                 /* 1) Set node to sibling. */
                 node = sibling;
@@ -303,7 +303,7 @@ public class TreeWalker
             /* 1) Let sibling be node’s previous sibling. */
             var sibling = node.previousSibling;
             /* 2) While sibling is non-null: */
-            while (sibling is object)
+            while (sibling is not null)
             {
                 /* 1) Set node to sibling. */
                 node = sibling;
@@ -375,7 +375,7 @@ public class TreeWalker
             /* 3) Let temporary be node. */
             var temporary = node;
             /* 4) While temporary is non-null: */
-            while (temporary is object)
+            while (temporary is not null)
             {
                 /* 1) If temporary is the context object’s root, then return null. */
                 if (ReferenceEquals(temporary, root))
@@ -383,7 +383,7 @@ public class TreeWalker
                 /* 2) Set sibling to temporary’s next sibling. */
                 sibling = temporary.nextSibling;
                 /* 3) If sibling is non-null, then break. */
-                if (sibling is object) break;
+                if (sibling is not null) break;
                 /* 4) Set temporary to temporary’s parent. */
                 temporary = temporary.parentNode;
             }

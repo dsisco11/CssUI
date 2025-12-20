@@ -102,7 +102,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
             var tree = new TreeWalker(this, ENodeFilterMask.SHOW_TEXT);
             StringBuilder sb = new StringBuilder();
             Node n;
-            while ((n = tree.firstChild()) is object)
+            while ((n = tree.firstChild()) is not null)
                 sb.Append(n.textContent);
 
             return sb.ToString();
@@ -345,7 +345,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
     /// An element is being rendered if it has any associated CSS layout boxes, SVG layout boxes, or some equivalent in other styling languages.
     /// </summary>
     /// XXX: Implement this logic
-    internal virtual bool is_being_rendered => (Box is object);
+    internal virtual bool is_being_rendered => (Box is not null);
 
     internal bool is_in_formal_activation_state
     {/* Docs:  */
@@ -757,7 +757,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
             if (ReferenceEquals(attr, oldAttr))
                 return attr;
 
-            if (oldAttr is object)
+            if (oldAttr is not null)
             {
                 replace_attribute(oldAttr, attr);
             }
@@ -777,7 +777,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
         CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
         {
             find_attribute(Name, out Attr attr);
-            if (attr is object)
+            if (attr is not null)
             {
                 remove_attribute(attr);
             }
@@ -789,7 +789,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
         return CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
         {
             find_attribute(attr.Name, out Attr outAttr);
-            if (attr is object)
+            if (attr is not null)
             {
                 remove_attribute(attr);
             }
@@ -1244,7 +1244,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
                     hasAnon = false;
                     // Search all items in our current list
                     LinkedListNode<CssBox>? node = subBoxes.First;
-                    while (node is object)
+                    while (node is not null)
                     {
                         CssBox child = node.Value;
                         var NextNode = node.Next;

@@ -512,7 +512,7 @@ public class CssPrincipalBox : CssBox
         // Figure out if we have any block-level children
         HasBlockLevelChildren = false;
         Element? node = Owner?.firstElementChild;
-        while (node is object)
+        while (node is not null)
         {
             if (node.Box.DisplayType.Outer == EOuterDisplayType.Block)
             {

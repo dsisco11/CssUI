@@ -52,7 +52,7 @@ public class DOMImplementation
         var head = DOMCommon.createElementNS(doc, "head", DOMCommon.HTMLNamespace);
         html.append(head);
         /* 6) If title is given: */
-        if (title is object)
+        if (title is not null)
         {
             /* 1) Append the result of creating an element given doc, title, and the HTML namespace, to the head element created earlier. */
             var titleElement = DOMCommon.createElementNS(doc, "title", DOMCommon.HTMLNamespace);

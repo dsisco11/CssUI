@@ -112,7 +112,7 @@ public class EventTarget : IDisposable, IEventTarget
         bool once = false;
         bool passive = false;
 
-        if (options is object)
+        if (options is not null)
         {
             capture = options.capture;
             once = options.once;
@@ -143,14 +143,14 @@ public class EventTarget : IDisposable, IEventTarget
     public void removeEventListener(EventName eventName, EventCallback callback, EventListenerOptions? options = null)
     {
         bool capture = false;
-        if (options is object)
+        if (options is not null)
         {
             capture = options.capture;
         }
 
         /* 3) If the context object’s event listener list contains an event listener whose type is type, callback is callback, and capture is capture, then remove an event listener with the context object and that event listener. */
         var found = Find_Listener(eventName, callback, capture);
-        if (found is object)
+        if (found is not null)
         {
             found.removed = true;
             Listeners.Remove(found);

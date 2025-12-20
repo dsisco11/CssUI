@@ -472,7 +472,7 @@ public static class DOMCommon
         var root = B.getRootNode();
         if (root is DocumentFragment doc)
         {
-            if (doc.Host is object)
+            if (doc.Host is not null)
             {
                 return Is_Host_Including_Inclusive_Ancestor(A, doc.Host);
             }
@@ -606,7 +606,7 @@ public static class DOMCommon
         var list = new LinkedList<Node>();
         TreeWalker tree = new TreeWalker(node!, FilterMask, Filter);
         Node? current = tree.parentNode();
-        while (current is object)
+        while (current is not null)
         {
             list.AddLast(current);
             current = tree.parentNode();
@@ -628,7 +628,7 @@ public static class DOMCommon
         LinkedList<NodeType> list = new LinkedList<NodeType>();
         TreeWalker tree = new TreeWalker(node!, FilterMask, Filter);
         Node? current = tree.parentNode();
-        while (current is object)
+        while (current is not null)
         {
             if (current is NodeType currentAsType)
             {
@@ -658,7 +658,7 @@ public static class DOMCommon
 
         TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
         Node? current = tree.parentNode();
-        while (current is object)
+        while (current is not null)
         {
             if (--Nth <= 0) { return current; }
             current = tree.parentNode();
@@ -685,7 +685,7 @@ public static class DOMCommon
 
         TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
         Node? current = tree.parentNode();
-        while (current is object)
+        while (current is not null)
         {
             if (current is NodeType nodeAsType)
             {
@@ -712,7 +712,7 @@ public static class DOMCommon
         list.AddLast(node);
         TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
         Node? current = tree.parentNode();
-        while (current is object)
+        while (current is not null)
         {
             list.AddLast(current);
             current = tree.parentNode();
@@ -734,7 +734,7 @@ public static class DOMCommon
         var list = new LinkedList<Node>();
         TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
         Node? current = tree.nextNode();
-        while (current is object)
+        while (current is not null)
         {
             list.AddLast(current);
             current = tree.nextNode();
@@ -756,7 +756,7 @@ public static class DOMCommon
         LinkedList<NodeType> list = new LinkedList<NodeType>();
         TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
         Node? current = tree.nextNode();
-        while (current is object)
+        while (current is not null)
         {
             if (current is NodeType currentAsType)
             {
@@ -786,7 +786,7 @@ public static class DOMCommon
 
         TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
         Node? current = tree.nextNode();
-        while (current is object)
+        while (current is not null)
         {
             if (--Nth <= 0) { return current; }
             current = tree.nextNode();
@@ -813,7 +813,7 @@ public static class DOMCommon
 
         TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
         Node? current = tree.nextNode();
-        while (current is object)
+        while (current is not null)
         {
             if (current is NodeType nodeAsType)
             {
@@ -875,7 +875,7 @@ public static class DOMCommon
         list.AddLast(node);
         TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
         Node? current = tree.nextNode();
-        while (current is object)
+        while (current is not null)
         {
             list.AddLast(current);
             current = tree.nextNode();
@@ -912,7 +912,7 @@ public static class DOMCommon
         var list = new LinkedList<Node>();
 
         Node? current = node.previousSibling;
-        while (current is object)
+        while (current is not null)
         {
             var fres = Filter?.acceptNode(current) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
             if (fres == Enums.ENodeFilterResult.FILTER_REJECT)
@@ -939,7 +939,7 @@ public static class DOMCommon
         var list = new LinkedList<NodeType>();
 
         Node? current = node.previousSibling;
-        while (current is object)
+        while (current is not null)
         {
             if (current is NodeType nodeAsType)
             {
@@ -973,7 +973,7 @@ public static class DOMCommon
         }
 
         Node? current = node.previousSibling;
-        while (current is object)
+        while (current is not null)
         {
             var fres = Filter?.acceptNode(current) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
             if (fres == Enums.ENodeFilterResult.FILTER_REJECT)
@@ -1008,7 +1008,7 @@ public static class DOMCommon
         TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
 
         Node? current = tree.previousSibling();
-        while (current is object)
+        while (current is not null)
         {
             var fres = Filter?.acceptNode(current) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
             if (fres == Enums.ENodeFilterResult.FILTER_REJECT)
@@ -1037,7 +1037,7 @@ public static class DOMCommon
         TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
 
         Node? current = tree.previousSibling();
-        while (current is object)
+        while (current is not null)
         {
             if (current is NodeType nodeAsType)
             {
@@ -1073,7 +1073,7 @@ public static class DOMCommon
 
         TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
         Node? current = tree.previousSibling();
-        while (current is object)
+        while (current is not null)
         {
             if (--Nth <= 0) { return current; }
             current = tree.previousSibling();
@@ -1097,7 +1097,7 @@ public static class DOMCommon
         TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
 
         Node? current = tree.nextSibling();
-        while (current is object)
+        while (current is not null)
         {
             var fres = Filter?.acceptNode(current) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
             if (fres == Enums.ENodeFilterResult.FILTER_REJECT)
@@ -1126,7 +1126,7 @@ public static class DOMCommon
         TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
 
         Node? current = tree.nextSibling();
-        while (current is object)
+        while (current is not null)
         {
             if (current is NodeType nodeAsType)
             {
@@ -1162,7 +1162,7 @@ public static class DOMCommon
 
         TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
         Node? current = tree.nextSibling();
-        while (current is object)
+        while (current is not null)
         {
             if (--Nth <= 0) { return current; }
             current = tree.nextSibling();
@@ -1183,7 +1183,7 @@ public static class DOMCommon
     {
         var list = new LinkedList<Node>();
         Node? current = node.nextSibling;
-        while (current is object)
+        while (current is not null)
         {
             var fres = Filter?.acceptNode(current) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
             if (fres == Enums.ENodeFilterResult.FILTER_REJECT)
@@ -1209,7 +1209,7 @@ public static class DOMCommon
     {
         var list = new LinkedList<NodeType>();
         Node? current = node.nextSibling;
-        while (current is object)
+        while (current is not null)
         {
             if (current is NodeType nodeAsType)
             {
@@ -1243,7 +1243,7 @@ public static class DOMCommon
         }
 
         Node? current = node.nextSibling;
-        while (current is object)
+        while (current is not null)
         {
             var fres = Filter?.acceptNode(current) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
             if (fres == Enums.ENodeFilterResult.FILTER_REJECT)
@@ -1279,7 +1279,7 @@ public static class DOMCommon
             LinkedList<Element> descendents = new LinkedList<Element>();
             var tree = new TreeWalker(root, ENodeFilterMask.SHOW_ELEMENT);
             Node? current = tree.nextNode();
-            while (current is object)
+            while (current is not null)
             {
                 descendents.AddLast((Element)current);
                 current = tree.nextNode();
@@ -1296,7 +1296,7 @@ public static class DOMCommon
             LinkedList<Element> descendents = new LinkedList<Element>();
             var tree = new TreeWalker(root, ENodeFilterMask.SHOW_ELEMENT);
             Node? current = tree.nextNode();
-            while (current is object)
+            while (current is not null)
             {
                 var element = (Element)current;
                 if (StringCommon.StrEq(element.NamespaceURI, HTMLNamespace))
@@ -1322,7 +1322,7 @@ public static class DOMCommon
             LinkedList<Element> descendents = new LinkedList<Element>();
             var tree = new TreeWalker(root, ENodeFilterMask.SHOW_ELEMENT);
             Node node = tree.nextNode();
-            while (node is object)
+            while (node is not null)
             {
                 var element = (Element)node;
                 if (StringCommon.StrEq(element.NamespaceURI, HTMLNamespace))
@@ -1398,14 +1398,14 @@ public static class DOMCommon
         var descendents = new LinkedList<Element>();
         var tree = new TreeWalker(root, ENodeFilterMask.SHOW_ELEMENT);
         Node? current = tree.nextNode();
-        while (current is object)
+        while (current is not null)
         {
             Element? E = current as Element;
 
             if (E.classList.ContainsAll(classes))
                 descendents.AddLast(E);
 
-            if (E is object)
+            if (E is not null)
                 descendents.AddLast(E);
 
             current = tree.nextNode();
@@ -1463,9 +1463,9 @@ public static class DOMCommon
     {
         var list = new LinkedList<Node>();
         Node? current = node.firstChild;
-        if (Filter is object)
+        if (Filter is not null)
         {
-            while (current is object)
+            while (current is not null)
             {
                 var fr = Filter.acceptNode(current);
                 if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
@@ -1478,7 +1478,7 @@ public static class DOMCommon
         }
         else
         {
-            while (current is object)
+            while (current is not null)
             {
                 list.AddLast(current);
                 current = current.nextSibling;
@@ -1503,9 +1503,9 @@ public static class DOMCommon
         }
 
         Node? current = node.firstChild;
-        if (Filter is object)
+        if (Filter is not null)
         {
-            while (current is object)
+            while (current is not null)
             {
                 var fr = Filter.acceptNode(current);
                 if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
@@ -1521,7 +1521,7 @@ public static class DOMCommon
         }
         else
         {
-            while (current is object)
+            while (current is not null)
             {
                 if (--Nth <= 0)
                 {
@@ -1544,9 +1544,9 @@ public static class DOMCommon
     {
         LinkedList<NodeType> list = new LinkedList<NodeType>();
         Node? current = node.firstChild;
-        if (Filter is object)
+        if (Filter is not null)
         {
-            while (current is object)
+            while (current is not null)
             {
                 if (current is NodeType childAsType)
                 {
@@ -1562,7 +1562,7 @@ public static class DOMCommon
         }
         else
         {
-            while (current is object)
+            while (current is not null)
             {
                 if (current is NodeType childAsType)
                 {
@@ -1590,9 +1590,9 @@ public static class DOMCommon
         }
 
         Node? current = node.firstChild;
-        if (Filter is object)
+        if (Filter is not null)
         {
-            while (current is object)
+            while (current is not null)
             {
                 if (current is NodeType childAsType)
                 {
@@ -1611,7 +1611,7 @@ public static class DOMCommon
         }
         else
         {
-            while (current is object)
+            while (current is not null)
             {
                 if (current is NodeType childAsType)
                 {
@@ -1648,11 +1648,11 @@ public static class DOMCommon
     public static NodeType? Get_Last_Child<NodeType>(Node node, NodeFilter? Filter = null) where NodeType : INode
     {
         Node? current = node.lastChild;
-        while (current is object)
+        while (current is not null)
         {
             if (current is NodeType childAsType)
             {
-                if (Filter is object)
+                if (Filter is not null)
                 {
                     var fr = Filter.acceptNode(current);
                     if (fr == ENodeFilterResult.FILTER_REJECT) break;// abort and return
@@ -1684,9 +1684,9 @@ public static class DOMCommon
     {
         LinkedList<ElementType> list = new LinkedList<ElementType>();
         Element? child = element.firstElementChild;
-        if (Filter is object)
+        if (Filter is not null)
         {
-            while (child is object)
+            while (child is not null)
             {
                 if (child is ElementType childAsType)
                 {
@@ -1702,7 +1702,7 @@ public static class DOMCommon
         }
         else
         {
-            while (child is object)
+            while (child is not null)
             {
                 if (child is ElementType childAsType)
                 {
@@ -1729,9 +1729,9 @@ public static class DOMCommon
         }
 
         Element? child = element.firstElementChild;
-        if (Filter is object)
+        if (Filter is not null)
         {
-            while (child is object)
+            while (child is not null)
             {
                 if (child is ElementType childAsType)
                 {
@@ -1750,7 +1750,7 @@ public static class DOMCommon
         }
         else
         {
-            while (child is object)
+            while (child is not null)
             {
                 if (child is ElementType childAsType)
                 {
@@ -1786,9 +1786,9 @@ public static class DOMCommon
     public static ElementType? Get_Last_Element_Child<ElementType>(Element element, NodeFilter? Filter = null) where ElementType : Node
     {
         Element? child = element.lastElementChild;
-        if (Filter is object)
+        if (Filter is not null)
         {
-            while (child is object)
+            while (child is not null)
             {
                 if (child is ElementType childAsType)
                 {
@@ -1804,7 +1804,7 @@ public static class DOMCommon
         }
         else
         {
-            while (child is object)
+            while (child is not null)
             {
                 if (child is ElementType childAsType)
                 {
@@ -1837,7 +1837,7 @@ public static class DOMCommon
         }
 
         Node? current = node;
-        while (current is object && !ReferenceEquals(current.parentNode, ancestor))
+        while (current is not null && !ReferenceEquals(current.parentNode, ancestor))
         {
             current = current.parentNode;
         }
@@ -1901,7 +1901,7 @@ public static class DOMCommon
         /* 2) Let output be an empty list. */
         var output = new LinkedList<FocusableArea>();
         /* 3) Loop: Append current object to output. */
-        while (currentObject is object)
+        while (currentObject is not null)
         {
             output.AddLast(currentObject);
 

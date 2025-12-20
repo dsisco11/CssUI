@@ -265,7 +265,7 @@ public abstract partial class Window : BrowsingContext
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     protected void Run_Event_Loop()
     {
-        if (document is object)
+        if (document is not null)
         {
             document.Run_Event_Loop();
         }

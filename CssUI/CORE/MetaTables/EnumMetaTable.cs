@@ -46,7 +46,7 @@ internal static class EnumMetaTable
             // Find all the meta-values for this enum
             (Type, MetaEnumAttribute) metaInfo = Meta[enumIndex];
 
-            bool hasFlagsAttribute = (metaInfo.Item1.GetCustomAttribute<FlagsAttribute>() is object);
+            bool hasFlagsAttribute = (metaInfo.Item1.GetCustomAttribute<FlagsAttribute>() is not null);
             IS_FLAGS[enumIndex] = hasFlagsAttribute;
 
             (int, MetaKeywordAttribute?)[] metaValues = Get_Meta_Enum_Values(metaInfo.Item1);
