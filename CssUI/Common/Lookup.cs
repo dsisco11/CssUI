@@ -398,7 +398,7 @@ public static class Lookup
         if (enumIndex < 0)
             return Array.Empty<string>();/* Enum has no index */
 
-        return EnumMetaTable.KEYWORD[enumIndex].Keys.Cast<string>().ToArray();
+        return EnumMetaTable.KEYWORD[enumIndex].Keys.Select(k => k.ToString()).ToArray();
     }
 
     /// <summary>
@@ -412,7 +412,7 @@ public static class Lookup
         if (enumIndex < 0)
             return Array.Empty<string>();/* Enum has no index */
 
-        return EnumMetaTable.KEYWORD[enumIndex].Keys.Cast<string>().ToArray();
+        return EnumMetaTable.KEYWORD[enumIndex].Keys.Select(k => k.ToString()).ToArray();
     }
     #endregion
 }

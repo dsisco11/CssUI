@@ -49,15 +49,15 @@ public partial class CssValue
     /// As in they wont have an effect on the elements styling or block
     /// </summary>
     public static readonly CssValue None = new CssValue(ECssValueTypes.NONE);
-    /// <summary> 
+    /// <summary>
     /// integer 0
     /// </summary>
     public static readonly CssValue Zero = From(0);
-    /// <summary> 
+    /// <summary>
     /// 50%
     /// </summary>
     public static readonly CssValue Percent_50 = From_Percent(50d);
-    /// <summary> 
+    /// <summary>
     /// 100%
     /// </summary>
     public static readonly CssValue Percent_100 = From_Percent(100d);
@@ -778,7 +778,7 @@ public partial class CssValue
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public T AsEnum<T>() where T : struct, IConvertible => (T)value;
+    public T AsEnum<T>() where T : struct, IConvertible => (T)(value ?? default(T));
 
     /// <summary>
     /// Returns the value as a Color4 if possible, or NULL if not possible.
@@ -789,7 +789,7 @@ public partial class CssValue
         if (Type != ECssValueTypes.POSITION) throw new CssException($"{nameof(CssValue)} is not a Position! {this}");
         Contract.EndContractBlock();
 
-        return (Point2f)value;
+        return (Point2f)(value ?? default(Point2f));
     }
 
     /// <summary>
@@ -801,7 +801,7 @@ public partial class CssValue
         if (Type != ECssValueTypes.COLOR) throw new CssException($"{nameof(CssValue)} is not a Color! {this}");
         Contract.EndContractBlock();
 
-        return (int)value;
+        return (ReadOnlyColor)(int)(value ?? default(ReadOnlyColor));
     }
 
     /// <summary>
@@ -813,40 +813,40 @@ public partial class CssValue
         if (!IsCollection) throw new CssException($"{nameof(CssValue)} is not a collection! {this}");
         Contract.EndContractBlock();
 
-        return new ReadOnlyCollection<CssValue>((CssValue[])value!);
+        return new ReadOnlyCollection<CssValue>((CssValue[])(value ?? Array.Empty<CssValue>()));
     }
 
     /// <summary>
     /// Returns the value as the preferred Integer type
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int AsInteger() => (int)value;
+    public int AsInteger() => Convert.ToInt32(value);
 
     /// <summary>
     /// Returns the value as the preferred (Nullable) Integer type
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int? AsIntegerN() => !HasValue ? null : (int?)value;
+    public int? AsIntegerN() => !HasValue ? null : Convert.ToInt32(value);
 
     /// <summary>
     /// Returns the value as the preferred Decimal type
     /// </summary>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public double AsDecimal() => (double)value;
+    public double AsDecimal() => Convert.ToInt64(value);
 
     /// <summary>
     /// Returns the value as the preferred (Nullable) Decimal type
     /// </summary>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public double? AsDecimalN() => !HasValue ? null : (double?)value;
+    public double? AsDecimalN() => !HasValue ? null : Convert.ToInt64(value);
 
     /// <summary>
     /// Returns the value as a string
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public string AsString() => (string)value!;
+    public string AsString() => (string)(value ?? string.Empty);
 
     /// <summary>
     /// Returns the value as a CssFunction (for FUNCTION type values).
@@ -856,7 +856,7 @@ public partial class CssValue
     #endregion
 
     #region Operators
-    public static bool operator ==(CssValue? A, CssValue? B)
+    public static bool operator ==(in CssValue? A, in CssValue? B)
     {
         // If either object is null return whether they are BOTH null
         if (A is null || B is null)
@@ -873,9 +873,9 @@ public partial class CssValue
             case ECssValueTypes.INITIAL:
             case ECssValueTypes.INHERIT:
             case ECssValueTypes.NONE:
-                return true;
+                return true;// Types are already the same, meaning A/B are equal
             case ECssValueTypes.COLOR:
-                return EqualityComparer<int>.Default.Equals((int)A.value, (int)B.value);
+                return EqualityComparer<int>.Default.Equals(A.value, B.value);
             case ECssValueTypes.INTEGER:
                 return EqualityComparer<long>.Default.Equals((long)A.value!, (long)B.value!);
             case ECssValueTypes.NUMBER:
@@ -892,7 +892,7 @@ public partial class CssValue
         }
     }
 
-    public static bool operator !=(CssValue? A, CssValue? B)
+    public static bool operator !=(in CssValue? A, in CssValue? B)
     {
         return !(A == B);
     }
@@ -985,7 +985,7 @@ public partial class CssValue
                     }
                     else
                     {
-                        if (!Lookup.TryKeyword(Unit, out string unitStr))
+                        if (!Lookup.TryKeyword(Unit, out var unitStr))
                         {
                             throw new CssException($"Unable to find enum value {Unit} in CSS enum table");
                         }

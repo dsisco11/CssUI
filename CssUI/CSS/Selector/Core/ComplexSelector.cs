@@ -32,8 +32,8 @@ public class ComplexSelector : List<RelativeSelector>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Match(Element element, params Node[] scopeElements)
     {/* Docs: https://drafts.csswg.org/selectors-4/#match-a-complex-selector-against-an-element */
-        /* 
-         * So our selector implementation is a little different from the W3C specifications in how it STRUCTURES its matching process, but the logic is the same. 
+        /*
+         * So our selector implementation is a little different from the W3C specifications in how it STRUCTURES its matching process, but the logic is the same.
          */
         /* Right-to-Left matching enforced here */
         /* We run through our list of relative selectors and match them against our element, if ANY fail then the whole selector fails to match. */
@@ -81,7 +81,8 @@ public class ComplexSelector : List<RelativeSelector>
             }
         }
 
-        return ((A << 00) | (B << 16) | (C << 32));
+        // Specificity: A is most significant (IDs), B is middle (classes), C is least (types)
+        return ((A << 32) | (B << 16) | (C << 00));
     }
     #endregion
 }

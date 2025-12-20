@@ -18,25 +18,25 @@ namespace CssUI.DOM.Media.Tests
             document = DOM.createDocument("CssUI", "cssui");
         }
 
-        [Fact()]
+        [Fact(Skip = "Test stub - needs implementation")]
         public void MediaQueryListTest()
         {
             throw new NotImplementedException();
         }
 
-        [Fact()]
+        [Fact(Skip = "Test stub - needs implementation")]
         public void addEventListenerTest()
         {
             throw new NotImplementedException();
         }
 
-        [Fact()]
+        [Fact(Skip = "Test stub - needs implementation")]
         public void removeEventListenerTest()
         {
             throw new NotImplementedException();
         }
 
-        [Fact()]
+        [Fact(Skip = "Test stub - needs implementation")]
         public void SerializeTest()
         {
             throw new NotImplementedException();

@@ -624,7 +624,7 @@ public static class UnicodeCommon
     {
         return codePoint switch
         {
-            var c when (codePoint >= CHAR_A_UPPER && codePoint <= CHAR_Z_UPPER) => (char)(codePoint - 32),
+            var c when (codePoint >= CHAR_A_UPPER && codePoint <= CHAR_Z_UPPER) => (char)(codePoint + 32),
             // Add to lowercase 'a' the distance that c is from uppercase 'A'
             //return (char)(CHAR_A_LOWER + (c - CHAR_A_UPPER));
             _ => codePoint,
@@ -640,7 +640,7 @@ public static class UnicodeCommon
     {
         return codePoint switch
         {
-            var c when (codePoint >= CHAR_A_LOWER && codePoint <= CHAR_Z_LOWER) => (char)(codePoint + 32),
+            var c when (codePoint >= CHAR_A_LOWER && codePoint <= CHAR_Z_LOWER) => (char)(codePoint - 32),
             // Add to uppercase 'A' the distance that c is from lowercase 'a'
             //return (char)(CHAR_A_UPPER + (c - CHAR_A_LOWER));
             _ => codePoint,
