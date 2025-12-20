@@ -1,7 +1,5 @@
-using Xunit;
-using CssUI.CSS;
-using CssUI.CSS.Selectors;
 using CssUI.DOM;
+using Xunit;
 
 namespace CssUI.CSS.Selector.Tests;
 

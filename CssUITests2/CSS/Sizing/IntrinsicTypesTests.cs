@@ -1,5 +1,4 @@
 using Xunit;
-using CssUI.CSS;
 
 namespace CssUI.CSS.Tests;
 

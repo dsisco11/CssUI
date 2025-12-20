@@ -1,175 +1,172 @@
-﻿using Xunit;
-using CssUI;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Reflection;
+using Xunit;
 
-namespace CssUI.Tests
+namespace CssUI.Tests;
+
+public class LookupTests
 {
-    public class LookupTests
+    public List<Type> metaEnumList = new List<Type>();
+
+    public LookupTests()
     {
-        public List<Type> metaEnumList = new List<Type>();
+        metaEnumList = new List<Type>();
 
-        public LookupTests()
+        var allTypes = System.Reflection.Assembly.GetExecutingAssembly().DefinedTypes;
+        Attribute? attr = null;
+
+        foreach (Type type in allTypes)
         {
-            metaEnumList = new List<Type>();
-
-            var allTypes = System.Reflection.Assembly.GetExecutingAssembly().DefinedTypes;
-            Attribute? attr = null;
-
-            foreach (Type type in allTypes)
+            attr = type.GetCustomAttribute(typeof(CssUI.Internal.MetaEnumAttribute));
+            if (attr != null)
             {
-                attr = type.GetCustomAttribute(typeof(CssUI.Internal.MetaEnumAttribute));
-                if (attr != null)
-                {
-                    metaEnumList.Add(type);
-                }
+                metaEnumList.Add(type);
             }
         }
+    }
 
-        /// <summary>
-        /// Ensures that all enum types flagged as a MetaEnum have been compiled into a LUT
-        /// </summary>
-        [Fact(DisplayName = "Assert Meta Definitions")]
-        public void Test_Meta_Enums()
+    /// <summary>
+    /// Ensures that all enum types flagged as a MetaEnum have been compiled into a LUT
+    /// </summary>
+    [Fact(DisplayName = "Assert Meta Definitions")]
+    public void Test_Meta_Enums()
+    {
+        foreach (var enumType in metaEnumList)
         {
-            foreach (var enumType in metaEnumList)
+            /* Compile a list of all values from this enum */
+            var allValues = Enum.GetValues(enumType);
+            foreach (var value in allValues)
             {
-                /* Compile a list of all values from this enum */
-                var allValues = Enum.GetValues(enumType);
-                foreach (var value in allValues)
-                {
-                    var keyword = Enum.GetName(enumType, value);
-                    Assert.NotNull(keyword);
-                    Assert.True(Lookup.Is_Declared(enumType, keyword));
-                }
+                var keyword = Enum.GetName(enumType, value);
+                Assert.NotNull(keyword);
+                Assert.True(Lookup.Is_Declared(enumType, keyword));
             }
         }
+    }
 
 
 
-        [Fact()]
-        public void TryKeywordTest()
+    [Fact()]
+    public void TryKeywordTest()
+    {
+        foreach (var enumType in metaEnumList)
         {
-            foreach (var enumType in metaEnumList)
+            /* Compile a list of all values from this enum */
+            var allValues = Enum.GetValues(enumType);
+            foreach (var value in allValues)
             {
-                /* Compile a list of all values from this enum */
-                var allValues = Enum.GetValues(enumType);
-                foreach (var value in allValues)
-                {
-                    Assert.True(Lookup.TryKeyword(enumType, (IConvertible)value, out string _));
-                }
+                Assert.True(Lookup.TryKeyword(enumType, (IConvertible)value, out string _));
             }
         }
+    }
 
-        [Fact()]
-        public void KeywordTest()
+    [Fact()]
+    public void KeywordTest()
+    {
+        // Just make sure we wont ever get an exception thrown
+        foreach (var enumType in metaEnumList)
         {
-            // Just make sure we wont ever get an exception thrown
-            foreach (var enumType in metaEnumList)
+            /* Compile a list of all values from this enum */
+            var allValues = Enum.GetValues(enumType);
+            foreach (var value in allValues)
             {
-                /* Compile a list of all values from this enum */
-                var allValues = Enum.GetValues(enumType);
-                foreach (var value in allValues)
-                {
-                    Lookup.TryKeyword(enumType, (IConvertible)value, out string _);
-                }
+                Lookup.TryKeyword(enumType, (IConvertible)value, out string _);
             }
         }
+    }
 
-        [Fact()]
-        public void TryDataTest()
+    [Fact()]
+    public void TryDataTest()
+    {
+        foreach (var enumType in metaEnumList)
         {
-            foreach (var enumType in metaEnumList)
+            /* Compile a list of all values from this enum */
+            var allValues = Enum.GetValues(enumType);
+            foreach (var value in allValues)
             {
-                /* Compile a list of all values from this enum */
-                var allValues = Enum.GetValues(enumType);
-                foreach (var value in allValues)
-                {
-                    Assert.True(Lookup.TryData(enumType, (IConvertible)value, out EnumData _));
-                }
+                Assert.True(Lookup.TryData(enumType, (IConvertible)value, out EnumData _));
             }
         }
+    }
 
-        [Fact()]
-        public void DataTest()
+    [Fact()]
+    public void DataTest()
+    {
+        // Just make sure we wont ever get an exception thrown
+        foreach (var enumType in metaEnumList)
         {
-            // Just make sure we wont ever get an exception thrown
-            foreach (var enumType in metaEnumList)
+            /* Compile a list of all values from this enum */
+            var allValues = Enum.GetValues(enumType);
+            foreach (var value in allValues)
             {
-                /* Compile a list of all values from this enum */
-                var allValues = Enum.GetValues(enumType);
-                foreach (var value in allValues)
-                {
-                    Lookup.Data(enumType, (IConvertible)value);
-                }
+                Lookup.Data(enumType, (IConvertible)value);
             }
         }
+    }
 
-        [Fact()]
-        public void TryEnumTest()
+    [Fact()]
+    public void TryEnumTest()
+    {
+        foreach (var enumType in metaEnumList)
         {
-            foreach (var enumType in metaEnumList)
+            /* Compile a list of all values from this enum */
+            var allValues = Enum.GetValues(enumType);
+            foreach (var value in allValues)
             {
-                /* Compile a list of all values from this enum */
-                var allValues = Enum.GetValues(enumType);
-                foreach (var value in allValues)
-                {
-                    var keyword = Enum.GetName(enumType, value);
-                    Assert.NotNull(keyword);
-                    Assert.True(Lookup.TryEnum(enumType, keyword, out var outValue));
-                    Assert.Equal(value, outValue);
-                }
+                var keyword = Enum.GetName(enumType, value);
+                Assert.NotNull(keyword);
+                Assert.True(Lookup.TryEnum(enumType, keyword, out var outValue));
+                Assert.Equal(value, outValue);
             }
         }
+    }
 
-        [Fact()]
-        public void EnumTest()
+    [Fact()]
+    public void EnumTest()
+    {
+        foreach (var enumType in metaEnumList)
         {
-            foreach (var enumType in metaEnumList)
+            /* Compile a list of all values from this enum */
+            var allValues = Enum.GetValues(enumType);
+            foreach (var value in allValues)
             {
-                /* Compile a list of all values from this enum */
-                var allValues = Enum.GetValues(enumType);
-                foreach (var value in allValues)
-                {
-                    var keyword = Enum.GetName(enumType, value);
-                    Assert.NotNull(keyword);
-                    var actual = Lookup.Enum(enumType, keyword);
-                    Assert.Equal(value, actual);
-                }
+                var keyword = Enum.GetName(enumType, value);
+                Assert.NotNull(keyword);
+                var actual = Lookup.Enum(enumType, keyword);
+                Assert.Equal(value, actual);
             }
         }
+    }
 
-        [Fact()]
-        public void Is_DeclaredTest()
+    [Fact()]
+    public void Is_DeclaredTest()
+    {
+        foreach (var enumType in metaEnumList)
         {
-            foreach (var enumType in metaEnumList)
+            /* Compile a list of all values from this enum */
+            var allValues = Enum.GetValues(enumType);
+            foreach (var value in allValues)
             {
-                /* Compile a list of all values from this enum */
-                var allValues = Enum.GetValues(enumType);
-                foreach (var value in allValues)
-                {
-                    var keyword = Enum.GetName(enumType, value);
-                    Assert.NotNull(keyword);
-                    Assert.True(Lookup.Is_Declared(enumType, keyword));
-                }
+                var keyword = Enum.GetName(enumType, value);
+                Assert.NotNull(keyword);
+                Assert.True(Lookup.Is_Declared(enumType, keyword));
             }
         }
+    }
 
-        [Fact()]
-        public void Get_KeywordsTest()
+    [Fact()]
+    public void Get_KeywordsTest()
+    {
+        // Just make sure we wont ever get an exception thrown
+        foreach (var enumType in metaEnumList)
         {
-            // Just make sure we wont ever get an exception thrown
-            foreach (var enumType in metaEnumList)
+            /* Compile a list of all values from this enum */
+            var allValues = Enum.GetValues(enumType);
+            foreach (var value in allValues)
             {
-                /* Compile a list of all values from this enum */
-                var allValues = Enum.GetValues(enumType);
-                foreach (var value in allValues)
-                {
-                    var keyword = Enum.GetName(enumType, value);
-                    Lookup.Get_Keywords(enumType);
-                }
+                var keyword = Enum.GetName(enumType, value);
+                Lookup.Get_Keywords(enumType);
             }
         }
     }

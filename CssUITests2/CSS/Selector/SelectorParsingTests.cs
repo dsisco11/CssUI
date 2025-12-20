@@ -1,6 +1,4 @@
 using Xunit;
-using CssUI.CSS;
-using CssUI.CSS.Selectors;
 
 namespace CssUI.CSS.Selector.Tests;
 

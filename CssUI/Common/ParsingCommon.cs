@@ -43,10 +43,10 @@ public static class ParsingCommon
         int startPos = (int)Stream.LongPosition;
         int remaining = memory.Length - startPos;
         int length = Math.Min(remaining, 32);
-        
+
         if (length <= 0)
             return "<end of stream>";
-            
+
         return memory.Slice(startPos, length).ToString();
     }
 

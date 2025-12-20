@@ -1,6 +1,5 @@
 using System;
 using Xunit;
-using CssUI.CSS;
 
 namespace CssUI.CSS.Tests;
 
@@ -87,11 +86,11 @@ public class IntrinsicSizeCalculatorTests
         // Create a mock box with intrinsic dimensions
         // Since we can't easily mock CssPrincipalBox, we test the algorithm logic
         // This is tested via the actual box in integration tests
-        
+
         // Algorithm behavior: when both width and height are known
         // Result should be definite on both axes
         var expected = IntrinsicSize.Definite(800, 600);
-        
+
         Assert.Equal(800, expected.Inline.MinContent);
         Assert.Equal(800, expected.Inline.MaxContent);
         Assert.Equal(600, expected.Block.MinContent);

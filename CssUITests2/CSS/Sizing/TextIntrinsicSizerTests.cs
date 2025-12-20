@@ -1,5 +1,4 @@
 using Xunit;
-using CssUI.CSS;
 
 namespace CssUI.CSS.Tests;
 
@@ -24,7 +23,7 @@ public class TextIntrinsicSizerTests
         // This tests the conceptual behavior
         // A string with break opportunities should have min-content < max-content
         // A string without break opportunities should have min-content == max-content
-        
+
         bool hasBreakOpportunity = ContainsBreakOpportunity(text);
         Assert.Equal(expectsBreak, hasBreakOpportunity);
     }
@@ -32,12 +31,12 @@ public class TextIntrinsicSizerTests
     private static bool ContainsBreakOpportunity(string text)
     {
         if (string.IsNullOrEmpty(text)) return false;
-        
+
         for (int i = 0; i < text.Length; i++)
         {
             char c = text[i];
             if (char.IsWhiteSpace(c)) return true;
-            if (i > 0 && (text[i-1] == '-' || text[i-1] == '/')) return true;
+            if (i > 0 && (text[i - 1] == '-' || text[i - 1] == '/')) return true;
         }
         return false;
     }
@@ -81,12 +80,12 @@ public class TextIntrinsicSizerTests
         // For a single word with no break opportunities,
         // min-content should equal max-content
         string text = "supercalifragilisticexpialidocious";
-        
+
         // Conceptually:
         // min-content = width of longest unbreakable segment = entire word
         // max-content = width of all content = entire word
         // Therefore they should be equal
-        
+
         Assert.False(ContainsBreakOpportunity(text));
     }
 
@@ -95,12 +94,12 @@ public class TextIntrinsicSizerTests
     {
         // For multiple words, there are soft wrap opportunities
         string text = "The quick brown fox";
-        
+
         // Conceptually:
         // min-content = width of longest word (probably "quick" or "brown")
         // max-content = width of entire string
         // Therefore min < max
-        
+
         Assert.True(ContainsBreakOpportunity(text));
     }
 
@@ -109,7 +108,7 @@ public class TextIntrinsicSizerTests
     {
         // CJK text can break between any characters
         string text = "日本語";  // "Japanese" in Japanese
-        
+
         // Every character is a potential break point
         foreach (char c in text)
         {
@@ -126,7 +125,7 @@ public class TextIntrinsicSizerTests
     {
         // Empty string should return zero intrinsic size
         var size = IntrinsicSize.Zero;
-        
+
         Assert.Equal(0, size.Inline.MinContent);
         Assert.Equal(0, size.Inline.MaxContent);
     }
@@ -136,7 +135,7 @@ public class TextIntrinsicSizerTests
     {
         // Whitespace-only content typically collapses
         string text = "   ";
-        
+
         // All characters are break opportunities
         Assert.True(ContainsBreakOpportunity(text));
     }
@@ -146,7 +145,7 @@ public class TextIntrinsicSizerTests
     {
         // Mixed Latin and CJK
         string text = "Hello世界";  // "Hello World" with CJK for "world"
-        
+
         // Should be able to break between Latin and CJK
         bool hasCJK = false;
         bool hasLatin = false;
@@ -155,7 +154,7 @@ public class TextIntrinsicSizerTests
             if (IsCJKCharacter(c)) hasCJK = true;
             if (c >= 'A' && c <= 'z') hasLatin = true;
         }
-        
+
         Assert.True(hasCJK);
         Assert.True(hasLatin);
     }

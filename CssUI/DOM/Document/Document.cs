@@ -200,8 +200,8 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
         // Create a default document URL. The URL parser has issues with simple URLs
         // like "about:blank" and "file:///", so we construct a minimal valid URL directly.
         // This represents a placeholder document URL.
-        document_url = new Url 
-        { 
+        document_url = new Url
+        {
             Scheme = HTTP.EUrlScheme.Http,
             Host = new HTTP.UrlHost("localhost"),
             Path = new System.Collections.Generic.List<string> { "" }

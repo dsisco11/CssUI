@@ -1,26 +1,21 @@
-﻿using Xunit;
-using CssUI.CSS.Parser;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Xunit;
 
-namespace CssUI.CSS.Parser.Tests
+namespace CssUI.CSS.Parser.Tests;
+
+public class IdentTokenTests
 {
-    public class IdentTokenTests
+    [Theory()]
+    [InlineData("text"), InlineData("label"), InlineData("input")]
+    public void EqualsTest(string Value)
     {
-        [Theory()]
-        [InlineData("text"), InlineData("label"), InlineData("input")]
-        public void EqualsTest(string Value)
-        {
-            Assert.Equal(new IdentToken(Value), new IdentToken(Value));
-        }
+        Assert.Equal(new IdentToken(Value), new IdentToken(Value));
+    }
 
-        [Theory()]
-        [InlineData("text"), InlineData("label"), InlineData("input")]
-        public void EncodeTest(string Value)
-        {
-            string Actual = new IdentToken(Value).Encode();
-            Assert.Equal(Value, Actual);
-        }
+    [Theory()]
+    [InlineData("text"), InlineData("label"), InlineData("input")]
+    public void EncodeTest(string Value)
+    {
+        string Actual = new IdentToken(Value).Encode();
+        Assert.Equal(Value, Actual);
     }
 }

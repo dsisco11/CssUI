@@ -1,7 +1,7 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 using CssUI.CSS;
 using CssUI.CSS.Formatting;
-using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CssUITests.CSS.Formatting;
 
@@ -36,10 +36,10 @@ public class FragmentationTests
             EBreakValue.Recto,
             EBreakValue.Verso
         };
-        
+
         // Verify count matches expected spec values
         Assert.AreEqual(12, values.Length);
-        
+
         // Verify all values are distinct
         Assert.AreEqual(values.Length, values.Distinct().Count());
     }
@@ -54,7 +54,7 @@ public class FragmentationTests
             EBoxDecorationBreak.Slice,
             EBoxDecorationBreak.Clone
         };
-        
+
         Assert.AreEqual(2, values.Length);
         Assert.AreEqual(values.Length, values.Distinct().Count());
     }
@@ -195,7 +195,7 @@ public class FragmentationTests
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 800f);
         Assert.AreEqual(0, context.FragmentIndex);
-        
+
         context.AdvanceToNextFragmentainer();
         Assert.AreEqual(1, context.FragmentIndex);
         Assert.AreEqual(0f, context.CurrentBlockOffset);
@@ -209,7 +209,7 @@ public class FragmentationTests
         context.AdvanceBlockOffset(300f);
         context.AdvanceToNextFragmentainer();
         context.AdvanceBlockOffset(200f);
-        
+
         context.Reset();
         Assert.AreEqual(0, context.FragmentIndex);
         Assert.AreEqual(0f, context.CurrentBlockOffset);
@@ -275,8 +275,8 @@ public class FragmentationTests
     {
         var flexContext = new FlexFormattingContext();
         var fragmentationContext = new FragmentationContext(EFragmentainerType.Page, 800f);
-        
-        Assert.ThrowsException<System.ArgumentNullException>(() => 
+
+        Assert.ThrowsException<System.ArgumentNullException>(() =>
             flexContext.Flow(null!, fragmentationContext));
     }
 
@@ -286,7 +286,7 @@ public class FragmentationTests
     {
         var flexContext = new FlexFormattingContext();
         var fragmentationContext = new FragmentationContext(EFragmentainerType.Page, 800f);
-        
+
         // Verify the formatting context can be created with fragmentation support
         Assert.IsNotNull(flexContext);
         Assert.IsNotNull(fragmentationContext);
@@ -299,8 +299,8 @@ public class FragmentationTests
     {
         var gridContext = new GridFormattingContext();
         var fragmentationContext = new FragmentationContext(EFragmentainerType.Page, 800f);
-        
-        Assert.ThrowsException<System.ArgumentNullException>(() => 
+
+        Assert.ThrowsException<System.ArgumentNullException>(() =>
             gridContext.Flow(null!, fragmentationContext));
     }
 
@@ -310,7 +310,7 @@ public class FragmentationTests
     {
         var gridContext = new GridFormattingContext();
         var fragmentationContext = new FragmentationContext(EFragmentainerType.Page, 800f);
-        
+
         // Verify the formatting context can be created with fragmentation support
         Assert.IsNotNull(gridContext);
         Assert.IsNotNull(fragmentationContext);
@@ -326,11 +326,11 @@ public class FragmentationTests
     public void FragmentationContext_MultipleAdvanceToNextFragmentainer_IncrementsCorrectly()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 800f);
-        
+
         context.AdvanceToNextFragmentainer();
         context.AdvanceToNextFragmentainer();
         context.AdvanceToNextFragmentainer();
-        
+
         Assert.AreEqual(3, context.FragmentIndex);
     }
 
@@ -357,11 +357,11 @@ public class FragmentationTests
     public void FragmentationContext_AdvanceBlockOffset_AccumulatesCorrectly()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 800f);
-        
+
         context.AdvanceBlockOffset(100f);
         context.AdvanceBlockOffset(150f);
         context.AdvanceBlockOffset(50f);
-        
+
         Assert.AreEqual(300f, context.CurrentBlockOffset);
         Assert.AreEqual(500f, context.RemainingBlockSpace);
     }
@@ -371,10 +371,10 @@ public class FragmentationTests
     public void FragmentationContext_AdvanceToNextFragmentainer_ResetsOffset()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 800f);
-        
+
         context.AdvanceBlockOffset(400f);
         Assert.AreEqual(400f, context.CurrentBlockOffset);
-        
+
         context.AdvanceToNextFragmentainer();
         Assert.AreEqual(0f, context.CurrentBlockOffset);
         Assert.AreEqual(800f, context.RemainingBlockSpace);
@@ -386,7 +386,7 @@ public class FragmentationTests
     {
         var result1 = FragmentationBreakResult.ForcedBreak(EFragmentainerType.Page);
         var result2 = FragmentationBreakResult.ForcedBreak(EFragmentainerType.Page);
-        
+
         Assert.AreEqual(result1.ShouldBreak, result2.ShouldBreak);
         Assert.AreEqual(result1.BreakType, result2.BreakType);
         Assert.AreEqual(result1.FragmentainerType, result2.FragmentainerType);
@@ -398,7 +398,7 @@ public class FragmentationTests
     {
         var pageBreak = FragmentationBreakResult.ForcedBreak(EFragmentainerType.Page);
         var columnBreak = FragmentationBreakResult.ForcedBreak(EFragmentainerType.Column);
-        
+
         Assert.AreNotEqual(pageBreak.FragmentainerType, columnBreak.FragmentainerType);
     }
 
@@ -407,7 +407,7 @@ public class FragmentationTests
     public void FragmentationContext_ZeroBlockSize_CanFitOnlyZero()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 0f);
-        
+
         Assert.IsTrue(context.CanFit(0f));
         Assert.IsFalse(context.CanFit(1f));
     }
@@ -417,7 +417,7 @@ public class FragmentationTests
     public void FragmentationContext_VerySmallBlockSize_CanFitSmallContent()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 0.5f);
-        
+
         Assert.IsTrue(context.CanFit(0.5f));
         Assert.IsFalse(context.CanFit(0.6f));
     }

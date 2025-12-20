@@ -203,7 +203,7 @@ public class CssUnitResolver
     {
         // If defaultView is null (during Document construction), we can't use DPI-anchored values
         bool canAnchorToDpi = anchor_to_dpi && document?.defaultView?.screen != null;
-        
+
         switch (Unit)
         {
             /* None/Unitless - return scale of 1.0 (value is used as-is) */
@@ -374,7 +374,7 @@ public class CssUnitResolver
                     if (document?.defaultView?.visualViewport == null) return 1.0;
                     return document.defaultView.visualViewport.Height;
                 }
-            
+
             /* Font-relative units - these need element context for proper resolution,
                but we provide default fallback values for table compilation */
             case ECssUnit.EM:
@@ -392,14 +392,14 @@ public class CssUnitResolver
                     // ch is the width of '0' glyph, typically about half the font size
                     return 8.0;
                 }
-            
+
             /* Grid Units */
             case ECssUnit.FR:
                 {
                     // Flexible length unit for grid - returns 1.0 as default scale factor
                     return 1.0;
                 }
-            
+
             default:
                 {
                     throw new NotImplementedException($"CSS Unit type '{Enum.GetName(typeof(ECssUnit), Unit)}' has not been implemented!");
