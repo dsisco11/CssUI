@@ -110,7 +110,8 @@ public abstract class AttributeTokenList<T> : IEnumerable<T>, IAttributeTokenLis
     public void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue? oldValue, AttributeValue? newValue, ReadOnlyMemory<char>? Namespace)
     {
         if (localName != this.localName) return;
-        if (Namespace is not null) return;
+        // Per spec, only process if namespace is null or empty (no namespace)
+        if (Namespace is { Length: > 0 }) return;
 
         var value = newValue?.AsString();
         /* 1) If localName is associated attribute’s local name, namespace is null, and value is null, then empty token set. */

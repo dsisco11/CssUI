@@ -299,7 +299,7 @@ public class SpecificityTests
     #endregion
 
     #region DOM-based Matching Tests
-    [Fact(Skip = "Bug: ID selector matching doesn't find element.id - needs investigation")]
+    [Fact]
     public void Specificity_Matching_IdSelectorMatchesElement()
     {
         var doc = CreateTestDocument();
@@ -311,7 +311,7 @@ public class SpecificityTests
         Assert.True(selector[0].Match(element), "ID selector should match element with that ID");
     }
 
-    [Fact(Skip = "Bug: Class selector matching doesn't find element.className - needs investigation")]
+    [Fact]
     public void Specificity_Matching_ClassSelectorMatchesElement()
     {
         var doc = CreateTestDocument();
@@ -334,7 +334,7 @@ public class SpecificityTests
         Assert.True(selector[0].Match(element), "Type selector should match element with that tag name");
     }
 
-    [Fact(Skip = "Bug: Compound selector matching depends on ID/class matching which fails")]
+    [Fact]
     public void Specificity_Matching_CompoundSelectorMatchesElement()
     {
         var doc = CreateTestDocument();

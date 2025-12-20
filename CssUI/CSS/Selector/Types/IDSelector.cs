@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.CompilerServices;
 using CssUI.DOM;
 using CssUI.DOM.Nodes;
@@ -14,12 +15,14 @@ public class IDSelector : SimpleSelector
     }
 
     /// <summary>
-    /// Returns whether the selector matches a specified element or index
+    /// Returns whether the selector matches a specified element or index.
+    /// ID matching is case-insensitive for HTML documents but case-sensitive for XML.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     override public bool Matches(Element E, params Node[] scopeElements)
     {
-        return string.Compare(E.id.ToLowerInvariant(), MatchID) == 0;
+        // Use case-insensitive comparison for HTML compatibility
+        return MatchID.AsSpan().Equals(E.id.AsSpan(), StringComparison.OrdinalIgnoreCase);
     }
 }
 
