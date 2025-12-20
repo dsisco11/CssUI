@@ -4,42 +4,6 @@ using CssUI.Rendering;
 namespace CssUI;
 
 /// <summary>
-/// Primitive topology for mesh rendering.
-/// </summary>
-public enum PrimitiveTopology
-{
-    /// <summary>Each vertex is a separate point.</summary>
-    PointList,
-    /// <summary>Each pair of vertices forms a line.</summary>
-    LineList,
-    /// <summary>Vertices form a connected line strip.</summary>
-    LineStrip,
-    /// <summary>Each set of 3 vertices forms a triangle.</summary>
-    TriangleList,
-    /// <summary>Vertices form a connected triangle strip.</summary>
-    TriangleStrip,
-    /// <summary>Vertices form a triangle fan from the first vertex.</summary>
-    TriangleFan
-}
-
-/// <summary>
-/// Blend mode for rendering operations.
-/// </summary>
-public enum BlendMode
-{
-    /// <summary>No blending, source overwrites destination.</summary>
-    None,
-    /// <summary>Standard alpha blending: src * srcAlpha + dst * (1 - srcAlpha).</summary>
-    Alpha,
-    /// <summary>Additive blending: src + dst.</summary>
-    Additive,
-    /// <summary>Multiplicative blending: src * dst.</summary>
-    Multiply,
-    /// <summary>Pre-multiplied alpha blending.</summary>
-    PremultipliedAlpha
-}
-
-/// <summary>
 /// Service interface for rendering meshes, textures, and text.
 /// Implementations handle the actual drawing to a render target.
 /// </summary>
@@ -106,7 +70,7 @@ public interface IRenderService
     /// <summary>
     /// Set the blend mode for subsequent draw calls.
     /// </summary>
-    void SetBlendMode(BlendMode mode);
+    void SetBlendMode(EBlendMode mode);
 
     /// <summary>
     /// Set the color for subsequent draw calls.
@@ -128,7 +92,7 @@ public interface IRenderService
     /// </summary>
     /// <param name="mesh">The mesh to render.</param>
     /// <param name="topology">How to interpret the vertices.</param>
-    void DrawMesh(MeshHandle mesh, PrimitiveTopology topology);
+    void DrawMesh(MeshHandle mesh, EPrimitiveTopology topology);
 
     #endregion
 }

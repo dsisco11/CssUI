@@ -130,11 +130,11 @@ public sealed class NullRenderService : IRenderService
     public void ClearClipRect() { }
     public void SetTransform(Matrix3x2 transform) { }
     public void ClearTransform() { }
-    public void SetBlendMode(BlendMode mode) { }
+    public void SetBlendMode(EBlendMode mode) { }
     public void SetColor(Color color) { }
     public void SetTexture(TextureHandle texture) { }
 
-    public void DrawMesh(MeshHandle mesh, PrimitiveTopology topology) { }
+    public void DrawMesh(MeshHandle mesh, EPrimitiveTopology topology) { }
 }
 
 /// <summary>
