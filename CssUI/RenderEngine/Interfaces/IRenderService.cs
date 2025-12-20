@@ -50,7 +50,7 @@ public interface IRenderService
     /// <summary>
     /// Set the current clip rectangle. Drawing outside this area is clipped.
     /// </summary>
-    void SetClipRect(RenderRect rect);
+    void SetClipRect(in RenderRect rect);
 
     /// <summary>
     /// Clear the clip rectangle (disable clipping).
@@ -60,7 +60,7 @@ public interface IRenderService
     /// <summary>
     /// Set the current transform matrix.
     /// </summary>
-    void SetTransform(Matrix3x2 transform);
+    void SetTransform(in Matrix3x2 transform);
 
     /// <summary>
     /// Clear the transform (reset to identity).

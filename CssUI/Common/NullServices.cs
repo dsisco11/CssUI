@@ -126,9 +126,9 @@ public sealed class NullRenderService : IRenderService
 
     public void PushState() { }
     public void PopState() { }
-    public void SetClipRect(RenderRect rect) { }
+    public void SetClipRect(in RenderRect rect) { }
     public void ClearClipRect() { }
-    public void SetTransform(Matrix3x2 transform) { }
+    public void SetTransform(in Matrix3x2 transform) { }
     public void ClearTransform() { }
     public void SetBlendMode(EBlendMode mode) { }
     public void SetColor(Color color) { }
