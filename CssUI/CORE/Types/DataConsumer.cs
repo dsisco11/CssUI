@@ -56,10 +56,7 @@ public class DataConsumer<T>
     /// <param name="Items"></param>
     public DataConsumer(T[] Items)
     {
-        if (Items is null)
-        {
-            throw new ArgumentNullException(nameof(Items));
-        }
+        ArgumentNullException.ThrowIfNull(Items);
 
         Contract.EndContractBlock();
 
@@ -73,10 +70,7 @@ public class DataConsumer<T>
     /// <param name="EOF_ITEM"></param>
     public DataConsumer(T[] Items, T EOF_ITEM)
     {
-        if (Items is null)
-        {
-            throw new ArgumentNullException(nameof(Items));
-        }
+        ArgumentNullException.ThrowIfNull(Items);
 
         Contract.EndContractBlock();
 

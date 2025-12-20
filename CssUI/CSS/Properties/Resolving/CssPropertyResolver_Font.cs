@@ -14,7 +14,7 @@ public static partial class CssPropertyResolver
 
     public static CssValue Font_Size_Computed(ICssProperty Property)
     {/* Docs: https://www.w3.org/TR/css-fonts-3/#font-size-prop */
-        if (Property == null) throw new ArgumentNullException(nameof(Property));
+        ArgumentNullException.ThrowIfNull(Property);
         Contract.EndContractBlock();
 
         CssValue value = (Property as CssProperty).Specified;
@@ -94,7 +94,7 @@ public static partial class CssPropertyResolver
 
     public static CssValue Font_Size_Used(ICssProperty Property)
     {/* Docs: https://www.w3.org/TR/css-fonts-3/#font-size-prop */
-        if (Property == null) throw new ArgumentNullException(nameof(Property));
+        ArgumentNullException.ThrowIfNull(Property);
         Contract.EndContractBlock();
 
         double? v = (Property as CssProperty).Computed.Resolve();
@@ -116,7 +116,7 @@ public static partial class CssPropertyResolver
 
     public static CssValue Font_Weight_Computed(ICssProperty Property)
     {/* Docs: https://drafts.csswg.org/css-fonts-4/#valdef-font-weight-bolder */
-        if (Property == null) throw new ArgumentNullException(nameof(Property));
+        ArgumentNullException.ThrowIfNull(Property);
         Contract.EndContractBlock();
 
         // handle font-weight related keywords
@@ -171,7 +171,7 @@ public static partial class CssPropertyResolver
     /// <returns></returns>
     public static CssValueList? Font_Family_Used(ICssProperty Property)
     {
-        if (Property == null) throw new ArgumentNullException(nameof(Property));
+        ArgumentNullException.ThrowIfNull(Property);
         Contract.EndContractBlock();
 
         CssValueList curValues = (Property as CssMultiValueProperty).Computed;

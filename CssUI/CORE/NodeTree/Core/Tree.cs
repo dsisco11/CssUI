@@ -724,8 +724,8 @@ public static class Tree
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ITreeNode? Get_Junction(ITreeNode node, ITreeNode ancestor)
     {
-        if (node is null) throw new ArgumentNullException(nameof(node));
-        if (ancestor is null) throw new ArgumentNullException(nameof(ancestor));
+        ArgumentNullException.ThrowIfNull(node);
+        ArgumentNullException.ThrowIfNull(ancestor);
 
         if (ReferenceEquals(node, ancestor) || ReferenceEquals(node.parentNode, ancestor))
         {

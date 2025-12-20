@@ -8,7 +8,7 @@ public static partial class CssPropertyResolver
 
     public static CssValue Border_Width_Used(ICssProperty Property)
     {// Docs: https://www.w3.org/TR/css-backgrounds-3/#the-border-width
-        if (Property is null) throw new ArgumentNullException(nameof(Property));
+        ArgumentNullException.ThrowIfNull(Property);
         Contract.EndContractBlock();
 
         var prop = (Property as CssProperty);
@@ -73,7 +73,7 @@ public static partial class CssPropertyResolver
 
     public static CssValue Min_Width_Used(ICssProperty Property)
     {// Docs: https://www.w3.org/TR/css-sizing-3/#min-size-properties
-        if (Property is null) throw new ArgumentNullException(nameof(Property));
+        ArgumentNullException.ThrowIfNull(Property);
         Contract.EndContractBlock();
 
         var prop = (Property as CssProperty);
@@ -133,7 +133,7 @@ public static partial class CssPropertyResolver
 
     public static CssValue Min_Height_Used(ICssProperty Property)
     {// Docs: https://www.w3.org/TR/css-sizing-3/#min-size-properties
-        if (Property is null) throw new ArgumentNullException(nameof(Property));
+        ArgumentNullException.ThrowIfNull(Property);
         Contract.EndContractBlock();
 
         var prop = (Property as CssProperty);
@@ -193,7 +193,7 @@ public static partial class CssPropertyResolver
 
     public static CssValue Max_Width_Used(ICssProperty Property)
     {// Docs: https://www.w3.org/TR/css-sizing-3/#min-size-properties
-        if (Property is null) throw new ArgumentNullException(nameof(Property));
+        ArgumentNullException.ThrowIfNull(Property);
         Contract.EndContractBlock();
 
         var prop = (Property as CssProperty);
@@ -232,7 +232,7 @@ public static partial class CssPropertyResolver
 
     public static CssValue Max_Height_Used(ICssProperty Property)
     {// Docs: https://www.w3.org/TR/css-sizing-3/#min-size-properties
-        if (Property is null) throw new ArgumentNullException(nameof(Property));
+        ArgumentNullException.ThrowIfNull(Property);
         Contract.EndContractBlock();
 
         var prop = (Property as CssProperty);
@@ -273,7 +273,7 @@ public static partial class CssPropertyResolver
 
     public static CssValue Definite_Or_Zero_Used(ICssProperty Property)
     {
-        if (Property is null) throw new ArgumentNullException(nameof(Property));
+        ArgumentNullException.ThrowIfNull(Property);
         Contract.EndContractBlock();
 
         var prop = (Property as CssProperty);
@@ -288,7 +288,7 @@ public static partial class CssPropertyResolver
 
     public static CssValue Box_Top_Used(ICssProperty Property)
     {
-        if (Property is null) throw new ArgumentNullException(nameof(Property));
+        ArgumentNullException.ThrowIfNull(Property);
         Contract.EndContractBlock();
 
         var prop = (Property as CssProperty);
@@ -302,7 +302,7 @@ public static partial class CssPropertyResolver
 
     public static CssValue Box_Right_Used(ICssProperty Property)
     {
-        if (Property is null) throw new ArgumentNullException(nameof(Property));
+        ArgumentNullException.ThrowIfNull(Property);
         Contract.EndContractBlock();
 
         var prop = (Property as CssProperty);
@@ -316,7 +316,7 @@ public static partial class CssPropertyResolver
 
     public static CssValue Box_Bottom_Used(ICssProperty Property)
     {
-        if (Property is null) throw new ArgumentNullException(nameof(Property));
+        ArgumentNullException.ThrowIfNull(Property);
         Contract.EndContractBlock();
 
         var prop = (Property as CssProperty);
@@ -330,7 +330,7 @@ public static partial class CssPropertyResolver
 
     public static CssValue Box_Left_Used(ICssProperty Property)
     {
-        if (Property is null) throw new ArgumentNullException(nameof(Property));
+        ArgumentNullException.ThrowIfNull(Property);
         Contract.EndContractBlock();
 
         var prop = (Property as CssProperty);
@@ -346,7 +346,7 @@ public static partial class CssPropertyResolver
 
     public static CssValue Position_Computed(ICssProperty Property)
     {/* Docs: https://www.w3.org/TR/css-backgrounds-3/#propdef-background-position */
-        if (Property is null) throw new ArgumentNullException(nameof(Property));
+        ArgumentNullException.ThrowIfNull(Property);
         Contract.EndContractBlock();
 
         var prop = (Property as CssProperty);
@@ -363,7 +363,7 @@ public static partial class CssPropertyResolver
 
     public static CssValue Position_Used(ICssProperty Property)
     {
-        if (Property is null) throw new ArgumentNullException(nameof(Property));
+        ArgumentNullException.ThrowIfNull(Property);
         Contract.EndContractBlock();
 
         var prop = (Property as CssProperty);

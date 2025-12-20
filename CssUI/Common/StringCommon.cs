@@ -344,7 +344,7 @@ public static class StringCommon
     /// <returns></returns>
     public static String Concat(char Delim, IEnumerable<ReadOnlyMemory<char>> Args)
     {
-        if (Args is null) throw new ArgumentNullException(nameof(Args));
+        ArgumentNullException.ThrowIfNull(Args);
         Contract.EndContractBlock();
 
         int chunkCount = 0;
@@ -391,7 +391,7 @@ public static class StringCommon
     /// <returns></returns>
     public static String Concat(char Delim, params StringPtr[] Args)
     {
-        if (Args is null) throw new ArgumentNullException(nameof(Args));
+        ArgumentNullException.ThrowIfNull(Args);
         Contract.EndContractBlock();
 
         var chunkCount = Args.Length;
@@ -437,7 +437,7 @@ public static class StringCommon
     /// <returns></returns>
     public static String Concat(ReadOnlySpan<char> Delim, IEnumerable<ReadOnlyMemory<char>> Args)
     {
-        if (Args is null) throw new ArgumentNullException(nameof(Args));
+        ArgumentNullException.ThrowIfNull(Args);
         Contract.EndContractBlock();
 
         int chunkCount = 0;
@@ -482,7 +482,7 @@ public static class StringCommon
     /// <returns></returns>
     public static String Concat(ReadOnlySpan<char> Delim, params StringPtr[] Args)
     {
-        if (Args is null) throw new ArgumentNullException(nameof(Args));
+        ArgumentNullException.ThrowIfNull(Args);
         Contract.EndContractBlock();
 
         int chunkCount = Args.Length;
@@ -527,7 +527,7 @@ public static class StringCommon
     /// <returns></returns>
     public static String Concat(IEnumerable<ReadOnlyMemory<char>> Args)
     {
-        if (Args is null) throw new ArgumentNullException(nameof(Args));
+        ArgumentNullException.ThrowIfNull(Args);
         Contract.EndContractBlock();
 
         int chunkCount = 0;
@@ -560,7 +560,7 @@ public static class StringCommon
     /// <returns></returns>
     public static String Concat(params StringPtr[] Args)
     {
-        if (Args is null) throw new ArgumentNullException(nameof(Args));
+        ArgumentNullException.ThrowIfNull(Args);
         Contract.EndContractBlock();
         if (Args.Length <= 0) return String.Empty;
 
@@ -970,8 +970,8 @@ public static class StringCommon
     /// DO NOT INLINE THIS FUNCTION
     public static ReadOnlyMemory<char>[] Strtok(StringPtr Source, params char[] Delims)
     {
-        if (Source is null) throw new ArgumentNullException(nameof(Source));
-        if (Delims is null) throw new ArgumentNullException(nameof(Delims));
+        ArgumentNullException.ThrowIfNull(Source);
+        ArgumentNullException.ThrowIfNull(Delims);
         if (Delims.Length == 0) throw new ArgumentException("Delimeters must be non-null and contain one or more characters");
         Contract.EndContractBlock();
 
@@ -995,8 +995,8 @@ public static class StringCommon
     /// /// DO NOT INLINE THIS FUNCTION
     public static ReadOnlyMemory<char>[] Strtok(StringPtr Source, Filter<char>? Filter = null)
     {
-        if (Source is null) throw new ArgumentNullException(nameof(Source));
-        if (Filter is null) throw new ArgumentNullException(nameof(Filter));
+        ArgumentNullException.ThrowIfNull(Source);
+        ArgumentNullException.ThrowIfNull(Filter);
         Contract.EndContractBlock();
 
         // Split the source string into chunks using the given delimiters

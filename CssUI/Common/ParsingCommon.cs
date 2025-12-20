@@ -238,7 +238,7 @@ public static class ParsingCommon
     /// <inheritdoc cref="Parse_Integer(ReadOnlyMemory{char}, out long)"/>
     public static bool Parse_Integer(DataConsumer<char> Stream, out long outValue)
     {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#signed-integers */
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         bool sign = true;//Sign
@@ -336,7 +336,7 @@ public static class ParsingCommon
     /// <inheritdoc cref="Parse_FloatingPoint(ReadOnlyMemory{char}, out float)"/>
     public static bool Parse_FloatingPoint(DataConsumer<char> Stream, out double outValue)
     {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#rules-for-parsing-floating-point-number-values */
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         double value = 1;

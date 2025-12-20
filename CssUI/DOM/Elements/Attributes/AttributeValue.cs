@@ -49,8 +49,8 @@ public class AttributeValue
 
     public AttributeValue(EAttributeType Type, object Value, string Data) : this(Type, Data.ToString(CultureInfo.InvariantCulture))
     {
-        if (Data is null) throw new ArgumentNullException(nameof(Data));
-        if (Value is null) throw new ArgumentNullException(nameof(Value));
+        ArgumentNullException.ThrowIfNull(Data);
+        ArgumentNullException.ThrowIfNull(Value);
         Contract.EndContractBlock();
 
         this.Value = Value;

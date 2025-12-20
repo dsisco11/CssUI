@@ -28,8 +28,8 @@ public class DiffEngine<T> where T : class//, IEquatable<T>
     /// <returns></returns>
     public LinkedList<DiffData<T>> Compile_Transformations(DataConsumer<T> OldData, DataConsumer<T> NewData, out int outChange)
     {
-        if (OldData is null) throw new ArgumentNullException(nameof(OldData));
-        if (NewData is null) throw new ArgumentNullException(nameof(NewData));
+        ArgumentNullException.ThrowIfNull(OldData);
+        ArgumentNullException.ThrowIfNull(NewData);
         Contract.EndContractBlock();
 
         /* Get all of the places where we have changed */
@@ -104,8 +104,8 @@ public class DiffEngine<T> where T : class//, IEquatable<T>
     /// </summary>
     public LinkedList<DiffData<T>> Compile(DataConsumer<T> OldData, DataConsumer<T> NewData)
     {
-        if (OldData is null) throw new ArgumentNullException(nameof(OldData));
-        if (NewData is null) throw new ArgumentNullException(nameof(NewData));
+        ArgumentNullException.ThrowIfNull(OldData);
+        ArgumentNullException.ThrowIfNull(NewData);
         Contract.EndContractBlock();
 
         /* Get all of the places where we have changed */
@@ -345,8 +345,8 @@ public class DiffEngine<T> where T : class//, IEquatable<T>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool Scan_Lockstep_Match(DataConsumer<T> Old, DataConsumer<T> New, out int outOldPos, out int outNewPos, int Offset = 0)
     {
-        if (Old is null) throw new ArgumentNullException(nameof(Old));
-        if (New is null) throw new ArgumentNullException(nameof(New));
+        ArgumentNullException.ThrowIfNull(Old);
+        ArgumentNullException.ThrowIfNull(New);
         Contract.EndContractBlock();
 
         int oPos = Offset + Old.Position;
@@ -377,8 +377,8 @@ public class DiffEngine<T> where T : class//, IEquatable<T>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool Scan_Lockstep_Mismatch(DataConsumer<T> Old, DataConsumer<T> New, out int outOldPos, out int outNewPos, int Offset = 0)
     {
-        if (Old is null) throw new ArgumentNullException(nameof(Old));
-        if (New is null) throw new ArgumentNullException(nameof(New));
+        ArgumentNullException.ThrowIfNull(Old);
+        ArgumentNullException.ThrowIfNull(New);
         Contract.EndContractBlock();
 
         int oPos = Offset + Old.Position;
@@ -409,7 +409,7 @@ public class DiffEngine<T> where T : class//, IEquatable<T>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool Scan_Match(DataConsumer<T> Stream, T Match, out int outIndex, int Offset = 0)
     {
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         int Pos = Offset + Stream.Position;
@@ -430,7 +430,7 @@ public class DiffEngine<T> where T : class//, IEquatable<T>
     #region Formatting
     public string Format(IEnumerable<DiffNode<T>> Nodes)
     {
-        if (Nodes is null) throw new ArgumentNullException(nameof(Nodes));
+        ArgumentNullException.ThrowIfNull(Nodes);
         Contract.EndContractBlock();
 
         StringBuilder buf = new StringBuilder();

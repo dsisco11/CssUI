@@ -9,7 +9,7 @@ public static partial class CssPropertyResolver
 
     public static CssValue Color_Specified(ICssProperty Property)
     {
-        if (Property is null) throw new ArgumentNullException(nameof(Property));
+        ArgumentNullException.ThrowIfNull(Property);
         Contract.EndContractBlock();
 
         var prop = (Property as CssProperty);
@@ -36,7 +36,7 @@ public static partial class CssPropertyResolver
 
     public static CssValue Color_Computed(ICssProperty Property)
     {
-        if (Property is null) throw new ArgumentNullException(nameof(Property));
+        ArgumentNullException.ThrowIfNull(Property);
         Contract.EndContractBlock();
 
         var prop = (Property as CssProperty);
@@ -72,7 +72,7 @@ public static partial class CssPropertyResolver
 
     public static CssValue? Color_Used(ICssProperty Property)
     {
-        if (Property is null) throw new ArgumentNullException(nameof(Property));
+        ArgumentNullException.ThrowIfNull(Property);
         Contract.EndContractBlock();
 
         var prop = (Property as CssProperty);
@@ -96,7 +96,7 @@ public static partial class CssPropertyResolver
 
     public static CssValue Opacity_Computed(ICssProperty Property)
     {/* Docs: https://www.w3.org/TR/css-color-3/#opacity */
-        if (Property is null) throw new ArgumentNullException(nameof(Property));
+        ArgumentNullException.ThrowIfNull(Property);
         Contract.EndContractBlock();
 
         var prop = (Property as CssProperty);

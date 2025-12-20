@@ -75,7 +75,7 @@ public class Color : ColorObject<Color>
 
     public Color(IColorObject color)
     {
-        if (color is null) throw new ArgumentNullException(nameof(color));
+        ArgumentNullException.ThrowIfNull(color);
         Contract.EndContractBlock();
 
         uint packed = color.AsInteger();

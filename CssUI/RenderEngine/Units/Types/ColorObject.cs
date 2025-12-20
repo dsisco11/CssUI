@@ -29,8 +29,8 @@ public abstract class ColorObject<T> : IColorObject
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T operator *(ColorObject<T> left, IColorObject right)
     {
-        if (left is null) throw new ArgumentNullException(nameof(left));
-        if (right is null) throw new ArgumentNullException(nameof(right));
+        ArgumentNullException.ThrowIfNull(left);
+        ArgumentNullException.ThrowIfNull(right);
         Contract.EndContractBlock();
 
         return left.From((left.GetVector() * right.GetVector()));
@@ -39,8 +39,8 @@ public abstract class ColorObject<T> : IColorObject
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T operator /(ColorObject<T> left, IColorObject right)
     {
-        if (left is null) throw new ArgumentNullException(nameof(left));
-        if (right is null) throw new ArgumentNullException(nameof(right));
+        ArgumentNullException.ThrowIfNull(left);
+        ArgumentNullException.ThrowIfNull(right);
         Contract.EndContractBlock();
 
         return left.From(left.GetVector() / right.GetVector());
@@ -49,8 +49,8 @@ public abstract class ColorObject<T> : IColorObject
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T operator +(ColorObject<T> left, IColorObject right)
     {
-        if (left is null) throw new ArgumentNullException(nameof(left));
-        if (right is null) throw new ArgumentNullException(nameof(right));
+        ArgumentNullException.ThrowIfNull(left);
+        ArgumentNullException.ThrowIfNull(right);
         Contract.EndContractBlock();
 
         return left.From(left.GetVector() + right.GetVector());
@@ -59,8 +59,8 @@ public abstract class ColorObject<T> : IColorObject
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T operator -(ColorObject<T> left, IColorObject right)
     {
-        if (left is null) throw new ArgumentNullException(nameof(left));
-        if (right is null) throw new ArgumentNullException(nameof(right));
+        ArgumentNullException.ThrowIfNull(left);
+        ArgumentNullException.ThrowIfNull(right);
         Contract.EndContractBlock();
 
         return left.From(left.GetVector() - right.GetVector());
@@ -99,7 +99,7 @@ public abstract class ColorObject<T> : IColorObject
     /// <param name="blendFactor">[0-1] range factor for interpolation</param>
     public T Mix(IColorObject right, float blendFactor)
     {// Linear Interp:  (x * (1.0 - i) + y * i);
-        if (right is null) throw new ArgumentNullException(nameof(right));
+        ArgumentNullException.ThrowIfNull(right);
         //if (blendFactor < 0 || blendFactor > 1f) throw new ArgumentOutOfRangeException(nameof(blendFactor));// No need to constrain this, let them have freedom to abuse it
         Contract.EndContractBlock();
 

@@ -164,7 +164,7 @@ public class EventTarget : IDisposable, IEventTarget
     /// <returns></returns>
     public ValueTask<bool> dispatchEvent(Event Event)
     {/* Docs: https://dom.spec.whatwg.org/#dispatching-events */
-        if (Event is null) throw new ArgumentNullException(nameof(Event));
+        ArgumentNullException.ThrowIfNull(Event);
         Contract.EndContractBlock();
         /* The dispatchEvent(event) method, when invoked, must run these steps: */
         /* 1) If event’s dispatch flag is set, or if its initialized flag is not set, then throw an "InvalidStateError" DOMException. */

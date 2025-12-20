@@ -85,7 +85,7 @@ public class MediaFeature : IMediaCondition, ICssSerializeable
     #region Matching
     public bool Matches(Document document)
     {
-        if (document is null) throw new ArgumentNullException(nameof(document));
+        ArgumentNullException.ThrowIfNull(document);
         Contract.EndContractBlock();
 
         if (!IsValid)

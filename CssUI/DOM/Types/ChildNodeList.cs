@@ -40,7 +40,7 @@ public class ChildNodeList : IList<Node>
 
     private void _element_child_added(int index, in Element item)
     {
-        if (item is null) throw new ArgumentNullException(nameof(item));
+        ArgumentNullException.ThrowIfNull(item);
         Contract.EndContractBlock();
 
         // Figure out where to add this item in our list of child elements
@@ -70,7 +70,7 @@ public class ChildNodeList : IList<Node>
 
     private void _element_child_removed(int index, in Element item)
     {
-        if (item is null) throw new ArgumentNullException(nameof(item));
+        ArgumentNullException.ThrowIfNull(item);
         Contract.EndContractBlock();
 
         if (item.ptrSelfRef is null)

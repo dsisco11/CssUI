@@ -94,7 +94,7 @@ internal static class EnumMetaTable
 
     public static unsafe (int, MetaKeywordAttribute?)[] Get_Meta_Enum_Values(Type metaEnum)
     {
-        if (metaEnum is null) throw new ArgumentNullException(nameof(metaEnum));
+        ArgumentNullException.ThrowIfNull(metaEnum);
         Contract.EndContractBlock();
 
         Type underlyingType = metaEnum.GetEnumUnderlyingType();

@@ -32,7 +32,7 @@ public static class CssAlgorithms
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double Solve_Object_Axis_Position(CssValue Pos, double ObjectArea, double ObjectSize)
     {/* https://www.w3.org/TR/css-backgrounds-3/#the-background-position */
-        if (Pos is null) throw new ArgumentNullException(nameof(Pos));
+        ArgumentNullException.ThrowIfNull(Pos);
         if (Pos.Type != ECssValueTypes.PERCENT) throw new ArgumentException("Pos must be a CSS percent-type value!");
         Contract.EndContractBlock();
 
@@ -61,9 +61,9 @@ public static class CssAlgorithms
     /// </summary>
     public static Rect2f Default_Sizing_Algorithm(CssPrincipalBox Box, CssValue Specified_Width, CssValue Specified_Height, double Default_Width, double Default_Height)
     {/* Docs: https://www.w3.org/TR/css3-images/#default-object-size */
-        if (Box is null) throw new ArgumentNullException(nameof(Box));
-        if (Specified_Width is null) throw new ArgumentNullException(nameof(Specified_Width));
-        if (Specified_Height is null) throw new ArgumentNullException(nameof(Specified_Height));
+        ArgumentNullException.ThrowIfNull(Box);
+        ArgumentNullException.ThrowIfNull(Specified_Width);
+        ArgumentNullException.ThrowIfNull(Specified_Height);
         Contract.EndContractBlock();
 
         /* The default sizing algorithm is defined as follows: */
@@ -161,7 +161,7 @@ public static class CssAlgorithms
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Rect2f Contain_Constraint_Algorithm(CssPrincipalBox Box, double Width, double Height)
     {/* Docs: https://www.w3.org/TR/css3-images/#contain-constraint */
-        if (Box is null) throw new ArgumentNullException(nameof(Box));
+        ArgumentNullException.ThrowIfNull(Box);
         Contract.EndContractBlock();
 
         /* A contain constraint is resolved by setting the concrete object size to the largest rectangle that has the object's intrinsic aspect ratio and additionally has neither width nor height larger than the constraint rectangle's width and height, respectively. */
@@ -222,7 +222,7 @@ public static class CssAlgorithms
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Rect2f Cover_Constraint_Algorithm(CssPrincipalBox Box, double Width, double Height)
     {/* Docs: https://www.w3.org/TR/css3-images/#cover-constraint */
-        if (Box is null) throw new ArgumentNullException(nameof(Box));
+        ArgumentNullException.ThrowIfNull(Box);
         Contract.EndContractBlock();
 
         /* A cover constraint is resolved by setting the concrete object size to the smallest rectangle that has the object's intrinsic aspect ratio and additionally has neither width nor height smaller than the constraint rectangle's width and height, respectively. */

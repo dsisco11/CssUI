@@ -111,10 +111,7 @@ public class FlexFormattingContext : IFormattingContext
     /// </summary>
     public void Flow(CssBoxTreeNode? node, FragmentationContext fragmentationContext)
     {
-        if (node is null)
-        {
-            throw new ArgumentNullException(nameof(node));
-        }
+        ArgumentNullException.ThrowIfNull(node);
         Contract.EndContractBlock();
 
         _container = node as CssPrincipalBox;

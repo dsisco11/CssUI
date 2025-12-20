@@ -179,7 +179,7 @@ public class Selection
 
     public bool ContainsNode(Node node, bool allowPartialContainment = false)
     {
-        if (node == null) throw new ArgumentNullException(nameof(node));
+        ArgumentNullException.ThrowIfNull(node);
         if (_range == null || !ReferenceEquals(document, node.getRootNode())) return false;
 
         var first = new BoundaryPoint(node, 0);

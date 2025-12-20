@@ -23,10 +23,7 @@ public static class CssBoxTree
     /// <returns></returns>
     public static void Generate_Tree(Node StartNode, Node? EndNode = null)
     {
-        if (StartNode is null)
-        {
-            throw new ArgumentNullException(nameof(StartNode));
-        }
+        ArgumentNullException.ThrowIfNull(StartNode);
 
         if (!StartNode.GetFlag(ENodeFlags.NeedsBoxUpdate | ENodeFlags.ChildNeedsBoxUpdate))
         {

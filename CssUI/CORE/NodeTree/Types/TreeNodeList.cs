@@ -148,15 +148,9 @@ public class TreeNodeList : ICollection<ITreeNode>, IEnumerable<ITreeNode>, ILis
 
     public void Replace(ITreeNode node, ITreeNode child)
     {
-        if (node is null)
-        {
-            throw new ArgumentNullException(nameof(node));
-        }
+        ArgumentNullException.ThrowIfNull(node);
 
-        if (child is null)
-        {
-            throw new ArgumentNullException(nameof(child));
-        }
+        ArgumentNullException.ThrowIfNull(child);
         Contract.EndContractBlock();
 
         int index = Items.IndexOf(node);

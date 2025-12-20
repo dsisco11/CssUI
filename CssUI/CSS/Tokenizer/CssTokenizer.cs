@@ -95,7 +95,7 @@ public class CssTokenizer
     /// <returns></returns>
     private static char Consume_Escaped(DataConsumer<char> Stream)
     {// Docs:  https://www.w3.org/TR/css-syntax-3/#consume-escaped-code-point
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         if (Is_Ascii_Hex_Digit(Stream.Next))
@@ -128,7 +128,7 @@ public class CssTokenizer
     /// <returns>StringToken or BadStringToken</returns>
     private static CssToken Consume_String_Token(DataConsumer<char> Stream, char? EndChar = null)
     {// Docs: https://www.w3.org/TR/css-syntax-3/#consume-string-token
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
         /* 
          * This algorithm may be called with an ending code point, which denotes the code point that ends the string. 
@@ -199,7 +199,7 @@ public class CssTokenizer
 
     public static double Convert_String_To_Number(DataConsumer<char> Stream)
     {/* Docs: https://www.w3.org/TR/css-syntax-3/#convert-string-to-number */
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         //double S = 1;//Sign
@@ -271,7 +271,7 @@ public class CssTokenizer
 
     public static void Consume_Number(DataConsumer<char> Stream, out ReadOnlyMemory<char>/*  */ outResult, out object outNumber, out ENumericTokenType outType)
     {/* Docs: https://www.w3.org/TR/css-syntax-3/#consume-number */
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         outType = ENumericTokenType.Integer;
@@ -345,7 +345,7 @@ public class CssTokenizer
     /// </summary>
     private static CssToken Consume_Numeric_Token(DataConsumer<char> Stream)
     {// Docs:  https://www.w3.org/TR/css-syntax-3/#consume-a-numeric-token
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         Consume_Number(Stream, out ReadOnlyMemory<char> nStr, out object N, out ENumericTokenType nType);
@@ -367,7 +367,7 @@ public class CssTokenizer
 
     private static void Consume_Bad_Url_Remnants(DataConsumer<char> Stream)
     {
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         char tok;
@@ -388,7 +388,7 @@ public class CssTokenizer
 
     private static UrlToken Consume_Url_Token(DataConsumer<char> Stream)
     {// SEE:  https://www.w3.org/TR/css-syntax-3/#consume-a-url-token
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         string Result = string.Empty;
@@ -469,7 +469,7 @@ public class CssTokenizer
 
     private static CssToken Consume_Ident_Like_Token(DataConsumer<char> Stream)
     {// SEE:  https://www.w3.org/TR/css-syntax-3/#consume-an-ident-like-token0
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         string Name = Consume_Name(Stream);
@@ -490,7 +490,7 @@ public class CssTokenizer
 
     private static UnicodeRangeToken Consume_Unicode_Range_Token(DataConsumer<char> Stream)
     {// SEE:  https://www.w3.org/TR/css-syntax-3/#consume-a-unicode-range-token
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         // Consume hex and UnicodeCommon.CHAR_QUESTION_MARK digits up to a maximum of 6
@@ -524,7 +524,7 @@ public class CssTokenizer
 
     private static string Consume_Name(DataConsumer<char> Stream)
     {// Docs:  https://www.w3.org/TR/css-syntax-3/#consume-a-name
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         StringBuilder Result = new StringBuilder();
@@ -627,7 +627,7 @@ public class CssTokenizer
     /// <returns></returns>
     private static CssToken Consume_Token(DataConsumer<char> Stream)
     {// SEE:  https://www.w3.org/TR/css-syntax-3/#consume-a-token0
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         switch (Stream.Next)

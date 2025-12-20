@@ -31,7 +31,7 @@ public static class IColorObject_Extensions
     /// </summary>
     static public IColorObject Scale(this IColorObject color, float rgbaFactor)
     {
-        if (color is null) throw new ArgumentNullException(nameof(color));
+        ArgumentNullException.ThrowIfNull(color);
         Contract.EndContractBlock();
 
         Vector4 scale = new Vector4(rgbaFactor);
@@ -44,7 +44,7 @@ public static class IColorObject_Extensions
     /// </summary>
     public static IColorObject Scale(this IColorObject color, double rgbaFactor)
     {
-        if (color is null) throw new ArgumentNullException(nameof(color));
+        ArgumentNullException.ThrowIfNull(color);
         Contract.EndContractBlock();
 
         Vector4 scale = new Vector4((float)rgbaFactor);
@@ -57,7 +57,7 @@ public static class IColorObject_Extensions
     /// </summary>
     public static IColorObject Scale(this IColorObject color, float redFactor, float greenFactor, float blueFactor, float alphaFactor)
     {
-        if (color is null) throw new ArgumentNullException(nameof(color));
+        ArgumentNullException.ThrowIfNull(color);
         Contract.EndContractBlock();
 
         Vector4 scale = new Vector4(redFactor, greenFactor, blueFactor, alphaFactor);
@@ -70,7 +70,7 @@ public static class IColorObject_Extensions
     /// </summary>
     public static IColorObject Scale(this IColorObject color, double redFactor, double greenFactor, double blueFactor, double alphaFactor)
     {
-        if (color is null) throw new ArgumentNullException(nameof(color));
+        ArgumentNullException.ThrowIfNull(color);
         Contract.EndContractBlock();
 
         Vector4 scale = new Vector4((float)redFactor, (float)greenFactor, (float)blueFactor, (float)alphaFactor);
@@ -84,7 +84,7 @@ public static class IColorObject_Extensions
     /// <returns></returns>
     public static IColorObject Scale(this IColorObject color, float rgbFactor, float alphaFactor)
     {
-        if (color is null) throw new ArgumentNullException(nameof(color));
+        ArgumentNullException.ThrowIfNull(color);
         Contract.EndContractBlock();
 
         Vector4 scale = new Vector4(rgbFactor, rgbFactor, rgbFactor, alphaFactor);
@@ -98,7 +98,7 @@ public static class IColorObject_Extensions
     /// <returns></returns>
     public static IColorObject Scale(this IColorObject color, double rgbFactor, double alphaFactor)
     {
-        if (color is null) throw new ArgumentNullException(nameof(color));
+        ArgumentNullException.ThrowIfNull(color);
         Contract.EndContractBlock();
 
         Vector4 scale = new Vector4((float)rgbFactor, (float)rgbFactor, (float)rgbFactor, (float)alphaFactor);
@@ -111,7 +111,7 @@ public static class IColorObject_Extensions
     /// </summary>
     public static IColorObject ScaleAlpha(this IColorObject color, float alphaFactor)
     {
-        if (color is null) throw new ArgumentNullException(nameof(color));
+        ArgumentNullException.ThrowIfNull(color);
         Contract.EndContractBlock();
 
         var Scalar = color.GetVector();
@@ -125,7 +125,7 @@ public static class IColorObject_Extensions
     /// </summary>
     public static IColorObject ScaleAlpha(this IColorObject color, double alphaFactor)
     {
-        if (color is null) throw new ArgumentNullException(nameof(color));
+        ArgumentNullException.ThrowIfNull(color);
         Contract.EndContractBlock();
 
         var Scalar = color.GetVector();

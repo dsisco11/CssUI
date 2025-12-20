@@ -144,7 +144,7 @@ public class AttributeDefinition
     /// <exception cref="DomSyntaxError">On invalid value</exception>
     public void Parse(string Input, out object outValue)
     {
-        if (Input is null) throw new ArgumentNullException(nameof(Input));
+        ArgumentNullException.ThrowIfNull(Input);
         Contract.EndContractBlock();
 
         switch (Type)
@@ -382,10 +382,7 @@ public class AttributeDefinition
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static AttributeDefinition? Lookup(AtomicName<EAttributeName> Name, Type elementType)
     {
-        if (elementType == null)
-        {
-            throw new ArgumentNullException(nameof(elementType));
-        }
+        ArgumentNullException.ThrowIfNull(elementType);
 
         if (DomDefinitions.AttributeDefinitions.TryGetValue(Name, out var definitionList))
         {

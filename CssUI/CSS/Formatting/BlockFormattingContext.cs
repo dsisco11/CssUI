@@ -7,10 +7,7 @@ public class BlockFormattingContext : IFormattingContext
 {
     public void Flow(CssBoxTreeNode Node)
     {
-        if (Node is null)
-        {
-            throw new System.ArgumentNullException(nameof(Node));
-        }
+        System.ArgumentNullException.ThrowIfNull(Node);
         Contract.EndContractBlock();
 
         CssBoxTreeNode Current = Node.firstChild;

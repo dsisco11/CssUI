@@ -42,8 +42,8 @@ public static class BoxModel
 
     public static void Resolve(CssPrincipalBox Box, CssComputedStyle Cascaded)
     {
-        if (Box is null) throw new ArgumentNullException(nameof(Box));
-        if (Cascaded is null) throw new ArgumentNullException(nameof(Cascaded));
+        ArgumentNullException.ThrowIfNull(Box);
+        ArgumentNullException.ThrowIfNull(Cascaded);
         Contract.EndContractBlock();
 
 

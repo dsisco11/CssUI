@@ -52,10 +52,7 @@ public class UniqueID : IEquatable<UniqueID>
     /// </returns>
     public static implicit operator ulong(UniqueID uid)
     {
-        if (uid is null)
-        {
-            throw new ArgumentNullException(nameof(uid));
-        }
+        ArgumentNullException.ThrowIfNull(uid);
 
         return uid.Bits.Data;
     }

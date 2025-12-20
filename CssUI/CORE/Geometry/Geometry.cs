@@ -14,10 +14,7 @@ public static class Geometry
     /// </summary>
     public static bool Intersects(in DOMRectReadOnly Rect, int X, int Y)
     {
-        if (Rect is null)
-        {
-            throw new System.ArgumentNullException(nameof(Rect));
-        }
+        System.ArgumentNullException.ThrowIfNull(Rect);
 
         Contract.EndContractBlock();
 
@@ -28,10 +25,7 @@ public static class Geometry
     /// </summary>
     public static bool Intersects(in DOMRectReadOnly Rect, double X, double Y)
     {
-        if (Rect is null)
-        {
-            throw new System.ArgumentNullException(nameof(Rect));
-        }
+        System.ArgumentNullException.ThrowIfNull(Rect);
 
         Contract.EndContractBlock();
 
@@ -42,10 +36,7 @@ public static class Geometry
     /// </summary>
     public static bool Intersects(in DOMRectReadOnly Rect, in Point2i Point)
     {
-        if (Rect is null)
-        {
-            throw new System.ArgumentNullException(nameof(Rect));
-        }
+        System.ArgumentNullException.ThrowIfNull(Rect);
 
         Contract.EndContractBlock();
 
@@ -56,15 +47,9 @@ public static class Geometry
     /// </summary>
     public static bool Intersects(in DOMRectReadOnly Rect, in DOMPointReadOnly Point)
     {
-        if (Point is null)
-        {
-            throw new System.ArgumentNullException(nameof(Point));
-        }
+        System.ArgumentNullException.ThrowIfNull(Point);
 
-        if (Rect is null)
-        {
-            throw new System.ArgumentNullException(nameof(Rect));
-        }
+        System.ArgumentNullException.ThrowIfNull(Rect);
 
         Contract.EndContractBlock();
 
@@ -78,15 +63,9 @@ public static class Geometry
     /// </summary>
     public static bool Intersects(in DOMRectReadOnly Left, in DOMRectReadOnly Right)
     {
-        if (Left is null)
-        {
-            throw new System.ArgumentNullException(nameof(Left));
-        }
+        System.ArgumentNullException.ThrowIfNull(Left);
 
-        if (Right is null)
-        {
-            throw new System.ArgumentNullException(nameof(Right));
-        }
+        System.ArgumentNullException.ThrowIfNull(Right);
 
         Contract.EndContractBlock();
 

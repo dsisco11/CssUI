@@ -1828,8 +1828,8 @@ public static class DOMCommon
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Node? Get_Junction(Node node, Node ancestor)
     {
-        if (node is null) throw new ArgumentNullException(nameof(node));
-        if (ancestor is null) throw new ArgumentNullException(nameof(ancestor));
+        ArgumentNullException.ThrowIfNull(node);
+        ArgumentNullException.ThrowIfNull(ancestor);
 
         if (ReferenceEquals(node, ancestor) || ReferenceEquals(node.parentNode, ancestor))
         {

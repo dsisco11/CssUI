@@ -142,7 +142,7 @@ public static partial class HTMLParserCommon
     }
     public static bool Try_Parse_Integer(DataConsumer<char> Stream, out long outValue)
     {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#signed-integers */
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         bool sign = true;
@@ -191,7 +191,7 @@ public static partial class HTMLParserCommon
     }
     public static bool Is_Valid_FloatingPoint(DataConsumer<char> Stream)
     {
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         return Try_Parse_FloatingPoint(Stream, out double _);
@@ -206,7 +206,7 @@ public static partial class HTMLParserCommon
     }
     public static void Parse_FloatingPoint(DataConsumer<char> Stream, out float outValue)
     {
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         if (Try_Parse_FloatingPoint(Stream, out double outParsed))
@@ -230,7 +230,7 @@ public static partial class HTMLParserCommon
     }
     public static bool Try_Parse_FloatingPoint(DataConsumer<char> Stream, out float outValue)
     {
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         bool result = Try_Parse_FloatingPoint(Stream, out double outParsed);
@@ -247,7 +247,7 @@ public static partial class HTMLParserCommon
     }
     public static void Parse_FloatingPoint(DataConsumer<char> Stream, out double outValue)
     {
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         if (Try_Parse_FloatingPoint(Stream, out double outParsed))
@@ -272,7 +272,7 @@ public static partial class HTMLParserCommon
     public static bool Try_Parse_FloatingPoint(DataConsumer<char> Stream, out double outValue)
     {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#rules-for-parsing-floating-point-number-values */
 
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         double value = 1;
@@ -416,7 +416,7 @@ public static partial class HTMLParserCommon
     }
     public static bool Is_Valid_Length(DataConsumer<char> Stream)
     {
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         return Try_Parse_Length(Stream, out _, out _);
@@ -432,7 +432,7 @@ public static partial class HTMLParserCommon
     }
     public static void Parse_Length(DataConsumer<char> Stream, out float outValue, out EAttributeType outType)
     {
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         if (Try_Parse_Length(Stream, out double outParsedValue, out EAttributeType outParsedType))
@@ -458,7 +458,7 @@ public static partial class HTMLParserCommon
     }
     public static void Parse_Length(DataConsumer<char> Stream, out double outValue, out EAttributeType outType)
     {
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         if (Try_Parse_Length(Stream, out double outParsedValue, out EAttributeType outParsedType))
@@ -483,7 +483,7 @@ public static partial class HTMLParserCommon
     }
     public static bool Try_Parse_Length(DataConsumer<char> Stream, out double outValue, out EAttributeType outType)
     {/* Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#percentages-and-dimensions */
-        if (Stream is null) throw new ArgumentNullException(nameof(Stream));
+        ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
 
         /* 3) Skip ASCII whitespace within input given position. */

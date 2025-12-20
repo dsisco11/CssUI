@@ -31,7 +31,7 @@ public static class ParserCommon
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool Is_Combinator(CssToken A)
     {
-        if (A is null) throw new ArgumentNullException(nameof(A));
+        ArgumentNullException.ThrowIfNull(A);
         Contract.EndContractBlock();
 
         if (A.Type != ECssTokenType.Ident)

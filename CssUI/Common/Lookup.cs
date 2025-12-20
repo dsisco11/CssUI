@@ -46,8 +46,8 @@ public static class Lookup
     [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
     public static bool TryKeyword(Type enumType, object Value, [MaybeNullWhen(false)] out string? outKeyword)
     {
-        if (enumType is null) throw new ArgumentNullException(nameof(enumType));
-        if (Value is null) throw new ArgumentNullException(nameof(Value));
+        ArgumentNullException.ThrowIfNull(enumType);
+        ArgumentNullException.ThrowIfNull(Value);
         Contract.EndContractBlock();
 
         int enumIndex = EnumMetaTable.Meta.Lookup(enumType.TypeHandle);
@@ -99,7 +99,7 @@ public static class Lookup
     [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
     public static string Keyword(Type enumType, object Value)
     {
-        if (enumType is null) throw new ArgumentNullException(nameof(enumType));
+        ArgumentNullException.ThrowIfNull(enumType);
         Contract.EndContractBlock();
 
         int enumIndex = EnumMetaTable.Meta.Lookup(enumType.TypeHandle);
@@ -151,7 +151,7 @@ public static class Lookup
     [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
     public static bool TryData(Type enumType, object Value, out EnumData? outData)
     {
-        if (enumType is null) throw new ArgumentNullException(nameof(enumType));
+        ArgumentNullException.ThrowIfNull(enumType);
         Contract.EndContractBlock();
 
         int enumIndex = EnumMetaTable.Meta.Lookup(enumType.TypeHandle);
@@ -208,7 +208,7 @@ public static class Lookup
     public static EnumData Data(Type enumType, object Value)
     {
         /* /!\ This conversion will fucking EXPLODE if the given generic type does not have an integer backing type /!\ */
-        if (enumType is null) throw new ArgumentNullException(nameof(enumType));
+        ArgumentNullException.ThrowIfNull(enumType);
         int vIdx = CastTo<int>.From(Value);
         if (vIdx < 0) throw new IndexOutOfRangeException();
         Contract.EndContractBlock();
@@ -266,7 +266,7 @@ public static class Lookup
     [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
     public static bool TryEnum(Type enumType, AtomicString Keyword, out object? outEnum)
     {
-        if (enumType is null) throw new ArgumentNullException(nameof(enumType));
+        ArgumentNullException.ThrowIfNull(enumType);
         Contract.EndContractBlock();
 
         int enumIndex = EnumMetaTable.Meta.Lookup(enumType.TypeHandle);
@@ -321,7 +321,7 @@ public static class Lookup
     [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
     public static object Enum(Type enumType, AtomicString Keyword)
     {
-        if (enumType is null) throw new ArgumentNullException(nameof(enumType));
+        ArgumentNullException.ThrowIfNull(enumType);
         Contract.EndContractBlock();
 
         int enumIndex = EnumMetaTable.Meta.Lookup(enumType.TypeHandle);
@@ -349,7 +349,7 @@ public static class Lookup
     [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
     public static bool Is_Declared(Type enumType)
     {
-        if (enumType is null) throw new ArgumentNullException(nameof(enumType));
+        ArgumentNullException.ThrowIfNull(enumType);
         Contract.EndContractBlock();
 
         int enumIndex = EnumMetaTable.Meta.Lookup(enumType.TypeHandle);
@@ -359,7 +359,7 @@ public static class Lookup
     [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
     public static bool Is_Declared(Type enumType, AtomicString Keyword)
     {
-        if (enumType is null) throw new ArgumentNullException(nameof(enumType));
+        ArgumentNullException.ThrowIfNull(enumType);
         Contract.EndContractBlock();
 
         int enumIndex = EnumMetaTable.Meta.Lookup(enumType.TypeHandle);
@@ -388,7 +388,7 @@ public static class Lookup
     [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
     public static string[] Get_Keywords(Type enumType)
     {
-        if (enumType is null) throw new ArgumentNullException(nameof(enumType));
+        ArgumentNullException.ThrowIfNull(enumType);
         Contract.EndContractBlock();
 
         int enumIndex = EnumMetaTable.Meta.Lookup(enumType.TypeHandle);

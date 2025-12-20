@@ -551,7 +551,7 @@ public class CssComputedStyle
     /// <returns></returns>
     internal ICssProperty? Get(ICssProperty Property)
     {
-        if (Property is null) throw new ArgumentNullException(nameof(Property));
+        ArgumentNullException.ThrowIfNull(Property);
 
         Contract.EndContractBlock();
 
@@ -560,7 +560,7 @@ public class CssComputedStyle
 
     internal ICssProperty? Get(AtomicName<ECssPropertyID> CssName)
     {
-        if (CssName is null) throw new ArgumentNullException(nameof(CssName));
+        ArgumentNullException.ThrowIfNull(CssName);
         if (CssName.Value < 0) throw new ArgumentOutOfRangeException($"Invalid CSS property ID (negative value): {CssName}");
 
         Contract.EndContractBlock();
@@ -609,7 +609,7 @@ public class CssComputedStyle
     #region Setters
     internal void Set(ICssProperty Property, ICssProperty Value)
     {
-        if (Property is null) throw new ArgumentNullException(nameof(Property));
+        ArgumentNullException.ThrowIfNull(Property);
 
         Contract.EndContractBlock();
 
@@ -618,7 +618,7 @@ public class CssComputedStyle
 
     internal void Set(AtomicName<ECssPropertyID> CssName, ICssProperty Value)
     {
-        if (CssName is null) throw new ArgumentNullException(nameof(CssName));
+        ArgumentNullException.ThrowIfNull(CssName);
         if (CssName.Value < 0) throw new ArgumentOutOfRangeException($"Invalid CSS property ID (negative value): {CssName}");
 
         Contract.EndContractBlock();

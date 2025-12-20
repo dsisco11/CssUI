@@ -340,7 +340,7 @@ public partial class CssValue
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private double ResolveDimension(StyleUnitResolverDelegate UnitResolver)
     {
-        if (UnitResolver is null) throw new ArgumentNullException(nameof(UnitResolver));
+        ArgumentNullException.ThrowIfNull(UnitResolver);
         Contract.EndContractBlock();
 
         if (Unit == ECssUnit.None) return AsDecimal();
@@ -353,7 +353,7 @@ public partial class CssValue
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public double Resolve(CssUnitResolver UnitResolver)
     {
-        if (UnitResolver is null) throw new ArgumentNullException(nameof(UnitResolver));
+        ArgumentNullException.ThrowIfNull(UnitResolver);
         Contract.EndContractBlock();
 
         switch (Type)
@@ -378,7 +378,7 @@ public partial class CssValue
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public double? Resolve(StyleUnitResolverDelegate UnitResolver)
     {
-        if (UnitResolver is null) throw new ArgumentNullException(nameof(UnitResolver));
+        ArgumentNullException.ThrowIfNull(UnitResolver);
         Contract.EndContractBlock();
 
         switch (Type)
@@ -400,7 +400,7 @@ public partial class CssValue
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public double Resolve_Or_Default(StyleUnitResolverDelegate UnitResolver, double defaultValue)
     {
-        if (UnitResolver is null) throw new ArgumentNullException(nameof(UnitResolver));
+        ArgumentNullException.ThrowIfNull(UnitResolver);
         Contract.EndContractBlock();
 
         double? num = Resolve(UnitResolver);
@@ -414,8 +414,8 @@ public partial class CssValue
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public double? Resolve(StyleUnitResolverDelegate UnitResolver, Func<CssValue, bool> Predicate)
     {
-        if (UnitResolver is null) throw new ArgumentNullException(nameof(UnitResolver));
-        if (Predicate is null) throw new ArgumentNullException(nameof(Predicate));
+        ArgumentNullException.ThrowIfNull(UnitResolver);
+        ArgumentNullException.ThrowIfNull(Predicate);
         Contract.EndContractBlock();
 
         if (Predicate(this))
@@ -442,8 +442,8 @@ public partial class CssValue
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public double Resolve_Or_Default(StyleUnitResolverDelegate UnitResolver, double defaultValue, Func<CssValue, bool> Predicate)
     {
-        if (UnitResolver is null) throw new ArgumentNullException(nameof(UnitResolver));
-        if (Predicate is null) throw new ArgumentNullException(nameof(Predicate));
+        ArgumentNullException.ThrowIfNull(UnitResolver);
+        ArgumentNullException.ThrowIfNull(Predicate);
         Contract.EndContractBlock();
 
         double? num = Resolve(UnitResolver, Predicate);
@@ -457,7 +457,7 @@ public partial class CssValue
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public double? Resolve(StyleUnitResolverDelegate UnitResolver, double percentageMultiplier)
     {
-        if (UnitResolver is null) throw new ArgumentNullException(nameof(UnitResolver));
+        ArgumentNullException.ThrowIfNull(UnitResolver);
         Contract.EndContractBlock();
 
         switch (Type)
@@ -482,7 +482,7 @@ public partial class CssValue
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public double Resolve_Or_Default(StyleUnitResolverDelegate UnitResolver, double percentageMultiplier, double defaultValue)
     {
-        if (UnitResolver is null) throw new ArgumentNullException(nameof(UnitResolver));
+        ArgumentNullException.ThrowIfNull(UnitResolver);
         Contract.EndContractBlock();
 
         double? num = Resolve(UnitResolver, percentageMultiplier);
@@ -496,8 +496,8 @@ public partial class CssValue
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public double? Resolve(StyleUnitResolverDelegate UnitResolver, Func<double, double> percentageResolver)
     {
-        if (UnitResolver is null) throw new ArgumentNullException(nameof(UnitResolver));
-        if (percentageResolver is null) throw new ArgumentNullException(nameof(percentageResolver));
+        ArgumentNullException.ThrowIfNull(UnitResolver);
+        ArgumentNullException.ThrowIfNull(percentageResolver);
         Contract.EndContractBlock();
 
         switch (Type)
@@ -522,8 +522,8 @@ public partial class CssValue
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public double Resolve_Or_Default(StyleUnitResolverDelegate UnitResolver, Func<double, double> percentageResolver, double defaultValue)
     {
-        if (UnitResolver is null) throw new ArgumentNullException(nameof(UnitResolver));
-        if (percentageResolver is null) throw new ArgumentNullException(nameof(percentageResolver));
+        ArgumentNullException.ThrowIfNull(UnitResolver);
+        ArgumentNullException.ThrowIfNull(percentageResolver);
         Contract.EndContractBlock();
 
         double? num = Resolve(UnitResolver, percentageResolver);
@@ -539,8 +539,8 @@ public partial class CssValue
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int Resolve_Or_Default(StyleUnitResolverDelegate UnitResolver, int defaultValue, Func<CssValue, bool> Predicate)
     {
-        if (UnitResolver is null) throw new ArgumentNullException(nameof(UnitResolver));
-        if (Predicate is null) throw new ArgumentNullException(nameof(Predicate));
+        ArgumentNullException.ThrowIfNull(UnitResolver);
+        ArgumentNullException.ThrowIfNull(Predicate);
         Contract.EndContractBlock();
 
         int? num = (int?)Resolve(UnitResolver, Predicate);
@@ -554,7 +554,7 @@ public partial class CssValue
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int Resolve_Or_Default(StyleUnitResolverDelegate UnitResolver, double percentageMultiplier, int defaultValue)
     {
-        if (UnitResolver is null) throw new ArgumentNullException(nameof(UnitResolver));
+        ArgumentNullException.ThrowIfNull(UnitResolver);
         Contract.EndContractBlock();
 
         int? num = (int?)Resolve(UnitResolver, percentageMultiplier);
@@ -568,7 +568,7 @@ public partial class CssValue
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int Resolve_Or_Default(StyleUnitResolverDelegate UnitResolver, Func<double, double> percentageResolver, int defaultValue)
     {
-        if (UnitResolver is null) throw new ArgumentNullException(nameof(UnitResolver));
+        ArgumentNullException.ThrowIfNull(UnitResolver);
         Contract.EndContractBlock();
 
         int? num = (int?)Resolve(UnitResolver, percentageResolver);
@@ -631,7 +631,7 @@ public partial class CssValue
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public double? Resolve(Func<CssValue, bool> Predicate)
     {
-        if (Predicate is null) throw new ArgumentNullException(nameof(Predicate));
+        ArgumentNullException.ThrowIfNull(Predicate);
         Contract.EndContractBlock();
 
         if (Predicate(this))
@@ -656,7 +656,7 @@ public partial class CssValue
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public double Resolve_Or_Default(double defaultValue, Func<CssValue, bool> Predicate)
     {
-        if (Predicate is null) throw new ArgumentNullException(nameof(Predicate));
+        ArgumentNullException.ThrowIfNull(Predicate);
         Contract.EndContractBlock();
 
         double? num = Resolve(Predicate);
@@ -690,7 +690,7 @@ public partial class CssValue
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public double? Resolve(Func<double, double> percentageResolver)
     {
-        if (percentageResolver is null) throw new ArgumentNullException(nameof(percentageResolver));
+        ArgumentNullException.ThrowIfNull(percentageResolver);
         Contract.EndContractBlock();
 
         switch (Type)
@@ -713,7 +713,7 @@ public partial class CssValue
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public double Resolve_Or_Default(Func<double, double> percentageResolver, double defaultValue)
     {
-        if (percentageResolver is null) throw new ArgumentNullException(nameof(percentageResolver));
+        ArgumentNullException.ThrowIfNull(percentageResolver);
         Contract.EndContractBlock();
 
         switch (Type)
@@ -738,7 +738,7 @@ public partial class CssValue
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int Resolve_Or_Default(int defaultValue, Func<CssValue, bool> Predicate)
     {
-        if (Predicate is null) throw new ArgumentNullException(nameof(Predicate));
+        ArgumentNullException.ThrowIfNull(Predicate);
         Contract.EndContractBlock();
 
         int? num = (int?)Resolve(Predicate);
@@ -763,7 +763,7 @@ public partial class CssValue
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int Resolve_Or_Default(Func<double, double> percentageResolver, int defaultValue)
     {
-        if (percentageResolver is null) throw new ArgumentNullException(nameof(percentageResolver));
+        ArgumentNullException.ThrowIfNull(percentageResolver);
         Contract.EndContractBlock();
 
         int? num = (int?)Resolve(percentageResolver);

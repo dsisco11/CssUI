@@ -82,8 +82,7 @@ public abstract partial class Window : BrowsingContext
 
     public Window(Screen screen, string DocumentName) : this()
     {
-        if (screen is null)
-            throw new ArgumentNullException(nameof(screen));
+        ArgumentNullException.ThrowIfNull(screen);
         Contract.EndContractBlock();
 
         this.screen = screen;

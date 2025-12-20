@@ -93,7 +93,7 @@ public class MediaDefinition
     /// <returns></returns>
     public void CheckAndThrow(ICssProperty Owner, CssValueList Values)
     {
-        if (Values is null) throw new ArgumentNullException(nameof(Values));
+        ArgumentNullException.ThrowIfNull(Values);
         Contract.EndContractBlock();
 
         foreach (CssValue Value in Values)
@@ -109,8 +109,8 @@ public class MediaDefinition
     /// <returns></returns>
     public void CheckAndThrow(ICssProperty Owner, CssValue Value)
     {
-        if (Owner is null) throw new ArgumentNullException(nameof(Owner));
-        if (Value is null) throw new ArgumentNullException(nameof(Value));
+        ArgumentNullException.ThrowIfNull(Owner);
+        ArgumentNullException.ThrowIfNull(Value);
         Contract.EndContractBlock();
 
         if (!Is_Valid_Value_Type(Value.Type))
