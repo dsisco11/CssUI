@@ -126,8 +126,32 @@ Note: The HTML module requires significant work and is excluded from Core config
 - [x] Add gap calculations to GridFormattingContext (column & row gaps)
 - [x] Add gap unit tests (20 formatting tests passing)
 
-## Phase 4: Advanced Features ✅ PARTIAL
-### 4.1 CSS Functions ✅ PARTIAL
+## Phase 4: DOM System Investigation & Fixes
+### 4.1 Unit Test Coverage for DOM Attributes
+- [ ] Investigate setAttribute/hasAttribute bug (hasAttribute returns false after setAttribute)
+- [ ] Create DOM attribute unit tests
+  - [ ] Test setAttribute with empty string value
+  - [ ] Test setAttribute with non-empty string value
+  - [ ] Test hasAttribute after setAttribute
+  - [ ] Test getAttribute after setAttribute
+  - [ ] Test removeAttribute
+  - [ ] Test attribute enumeration (getAttributeNames)
+- [ ] Investigate AttributeValue.From() behavior with empty strings
+- [ ] Verify Attr.Value assignment and retrieval
+
+### 4.2 DOM Element Tests
+- [ ] Test element creation (createElement, createElementNS)
+- [ ] Test element hierarchy (appendChild, removeChild, insertBefore)
+- [ ] Test element queries (getElementById, getElementsByClassName, getElementsByTagName)
+- [ ] Test element matching (matches, closest, querySelector, querySelectorAll)
+
+### 4.3 DOM Document Tests
+- [ ] Test document creation (createDocument, createHTMLDocument)
+- [ ] Test document tree operations
+- [ ] Test document fragment operations
+
+## Phase 5: Advanced CSS Features ✅ PARTIAL
+### 5.1 CSS Functions ✅ PARTIAL
 - [x] Implement calc() evaluator (CssCalcEvaluator.cs)
   - [x] Basic arithmetic (+, -, *, /)
   - [x] Operator precedence
@@ -144,7 +168,7 @@ Note: The HTML module requires significant work and is excluded from Core config
 - [x] Add CssValue.AsFunction() accessor
 - [x] Unit tests (15 tests passing)
 
-### 4.2 CSS calc() Standards Compliance (CSS Values Level 4) ✅ COMPLETE
+### 5.2 CSS calc() Standards Compliance (CSS Values Level 4) ✅ COMPLETE
 - [x] IEEE-754 semantics
   - [x] Division by zero returns ±∞ instead of throwing
   - [x] NaN propagation
@@ -168,7 +192,7 @@ Note: The HTML module requires significant work and is excluded from Core config
   - [ ] Simplification algorithm
   - [ ] Proper serialization
 
-### 4.3 Remaining Features ✅ COMPLETE
+### 5.3 Remaining Features ✅ COMPLETE
 - [x] Flex fragmentation support (FragmentationContext, FlexFormattingContext.HandleFragmentation)
 - [x] Grid fragmentation support (GridFormattingContext.HandleFragmentation)
 - [x] Performance optimization / caching (LayoutCache with weak references)
