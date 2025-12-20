@@ -9,41 +9,41 @@ A comprehensive C# CSS rendering engine with DOM integration, implementing moder
 
 ### ✅ CSS Layout Engines
 
-- **Flexbox Layout** (CSS Flexible Box Layout Module Level 1)
+-   **Flexbox Layout** (CSS Flexible Box Layout Module Level 1)
 
-  - All flex container properties (`flex-direction`, `flex-wrap`, `justify-content`, `align-items`, `align-content`)
-  - All flex item properties (`flex-grow`, `flex-shrink`, `flex-basis`, `order`, `align-self`)
-  - Multi-line wrapping with proper cross-axis alignment
-  - Gap support (`row-gap`, `column-gap`)
+    -   All flex container properties (`flex-direction`, `flex-wrap`, `justify-content`, `align-items`, `align-content`)
+    -   All flex item properties (`flex-grow`, `flex-shrink`, `flex-basis`, `order`, `align-self`)
+    -   Multi-line wrapping with proper cross-axis alignment
+    -   Gap support (`row-gap`, `column-gap`)
 
-- **Grid Layout** (CSS Grid Layout Module Level 1)
+-   **Grid Layout** (CSS Grid Layout Module Level 1)
 
-  - Explicit grid definition (`grid-template-columns`, `grid-template-rows`)
-  - Flexible `fr` unit support with proper space distribution
-  - Auto-placement algorithm (row/column flow, dense packing)
-  - Grid item positioning (`grid-column-start/end`, `grid-row-start/end`)
-  - Track sizing: `auto`, `min-content`, `max-content`, `minmax()`, `fit-content()`
-  - Gap support (`row-gap`, `column-gap`)
+    -   Explicit grid definition (`grid-template-columns`, `grid-template-rows`)
+    -   Flexible `fr` unit support with proper space distribution
+    -   Auto-placement algorithm (row/column flow, dense packing)
+    -   Grid item positioning (`grid-column-start/end`, `grid-row-start/end`)
+    -   Track sizing: `auto`, `min-content`, `max-content`, `minmax()`, `fit-content()`
+    -   Gap support (`row-gap`, `column-gap`)
 
-- **Intrinsic Sizing**
-  - `min-content`, `max-content`, `fit-content` sizing
-  - Proper intrinsic size calculation for text, blocks, and replaced elements
+-   **Intrinsic Sizing**
+    -   `min-content`, `max-content`, `fit-content` sizing
+    -   Proper intrinsic size calculation for text, blocks, and replaced elements
 
 ### ✅ CSS Values & Units (Level 4)
 
-- **Math Functions**
+-   **Math Functions**
 
-  - Basic: `calc()`, `min()`, `max()`, `clamp()`
-  - Trigonometric: `sin()`, `cos()`, `tan()`, `asin()`, `acos()`, `atan()`, `atan2()`
-  - Exponential: `pow()`, `sqrt()`, `hypot()`, `log()`, `exp()`
-  - Sign-related: `abs()`, `sign()`
-  - Stepped values: `round()`, `mod()`, `rem()`
+    -   Basic: `calc()`, `min()`, `max()`, `clamp()`
+    -   Trigonometric: `sin()`, `cos()`, `tan()`, `asin()`, `acos()`, `atan()`, `atan2()`
+    -   Exponential: `pow()`, `sqrt()`, `hypot()`, `log()`, `exp()`
+    -   Sign-related: `abs()`, `sign()`
+    -   Stepped values: `round()`, `mod()`, `rem()`
 
-- **Numeric Constants**: `e`, `pi`, `infinity`, `-infinity`, `NaN`
+-   **Numeric Constants**: `e`, `pi`, `infinity`, `-infinity`, `NaN`
 
-- **IEEE-754 Semantics**: Division by zero returns ±∞, NaN propagation, signed zero handling
+-   **IEEE-754 Semantics**: Division by zero returns ±∞, NaN propagation, signed zero handling
 
-- **Custom Properties**: `var()` with fallback values, inheritance, cycle detection
+-   **Custom Properties**: `var()` with fallback values, inheritance, cycle detection
 
 ### ✅ CSS Properties (50+)
 
@@ -59,16 +59,16 @@ A comprehensive C# CSS rendering engine with DOM integration, implementing moder
 
 ### ✅ CSS Parser
 
-- Complete CSS Syntax Level 3 tokenizer and parser
-- Selector parsing with pseudo-classes/elements
-- At-rules and qualified rules
-- Function token parsing
+-   Complete CSS Syntax Level 3 tokenizer and parser
+-   Selector parsing with pseudo-classes/elements
+-   At-rules and qualified rules
+-   Function token parsing
 
 ### ✅ DOM Integration
 
-- CSS Box Tree generation from DOM
-- Style cascade and inheritance
-- Computed style resolution
+-   CSS Box Tree generation from DOM
+-   Style cascade and inheritance
+-   Computed style resolution
 
 ## Architecture
 
@@ -195,7 +195,7 @@ services.AddRenderService<MyRenderService>();
 // Implement custom font service
 public class MyFontService : IFontService
 {
-    public FontHandle ResolveFont(ReadOnlySpan<string> familyNames, float size, 
+    public FontHandle ResolveFont(ReadOnlySpan<string> familyNames, float size,
         EFontWeight weight, EFontStyle style) { ... }
     public FontMetricsData GetMetrics(FontHandle font) { ... }
     public TextMeasurement MeasureText(FontHandle font, ReadOnlySpan<char> text) { ... }
@@ -243,12 +243,12 @@ dotnet test CssUITests2/CssUITests.csproj --configuration "Core - Debug"
 
 ## Test Coverage
 
-- **Intrinsic Sizing**: 45 tests
-- **Flexbox**: 9 tests
-- **Grid**: 36 tests (9 formatting + 27 track list)
-- **CSS calc()**: 42 tests
-- **CSS var()**: 15 tests
-- **Total**: 150+ unit tests
+-   **Intrinsic Sizing**: 45 tests
+-   **Flexbox**: 9 tests
+-   **Grid**: 36 tests (9 formatting + 27 track list)
+-   **CSS calc()**: 42 tests
+-   **CSS var()**: 15 tests
+-   **Total**: 150+ unit tests
 
 ## Specifications Implemented
 

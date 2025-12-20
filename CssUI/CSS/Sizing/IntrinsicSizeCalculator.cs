@@ -49,7 +49,7 @@ public static class IntrinsicSizeCalculator
     /// For block containers:
     /// - Inline size: max of children's inline intrinsic sizes
     /// - Block size: sum of children's block intrinsic sizes (for block flow)
-    /// 
+    ///
     /// See: https://www.w3.org/TR/css-sizing-3/#block-intrinsic
     /// </remarks>
     public static IntrinsicSize CalculateBlockContainerIntrinsicSize(CssPrincipalBox box, IntrinsicSizeContext context)
@@ -188,7 +188,7 @@ public static class IntrinsicSizeCalculator
     {
         if (context.TextSizer == null)
             return IntrinsicSize.Zero;
-            
+
         return context.TextSizer.Calculate(box, context);
     }
 
@@ -336,7 +336,7 @@ public static class IntrinsicSizeCalculator
     /// <remarks>
     /// Shrink-to-fit is essentially fit-content behavior:
     /// min(max(min-content, available), max-content)
-    /// 
+    ///
     /// See: https://www.w3.org/TR/CSS2/visudet.html#shrink-to-fit-float
     /// </remarks>
     public static double ShrinkToFit(CssPrincipalBox box, double availableWidth, IntrinsicSizeContext context)

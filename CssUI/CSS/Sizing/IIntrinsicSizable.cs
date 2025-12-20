@@ -9,7 +9,7 @@ namespace CssUI.CSS;
 /// - Flex item sizing (flex-basis: content)
 /// - Grid track sizing (min-content, max-content, fit-content)
 /// - Table cell sizing
-/// 
+///
 /// See: https://www.w3.org/TR/css-sizing-3/#intrinsic-sizes
 /// </remarks>
 public interface IIntrinsicSizable

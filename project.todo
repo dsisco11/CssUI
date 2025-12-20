@@ -40,7 +40,7 @@ Note: The HTML module requires significant work and is excluded from Core config
   - Is_Submittable_Element, Is_Lableable_Element, Is_Submit_Button
   - Run_Dialog_Focusing_Steps, Modal_Dialog_Block_Document, Modal_Dialog_Unblock_Document
   - Is_Autocapitalize_Inheriting_Element, Is_Canvas_Fallback_Content, Potentially_Focusable, etc.
-- [x] Add missing HTML element types 
+- [x] Add missing HTML element types
   - HTMLOutputElement, HTMLMeterElement, HTMLProgressElement (new)
   - HTMLFieldSetElement, HTMLAElement, HTMLLinkElement, HTMLAreaElement (existing)
 - [x] Fix API signature changes (ReadOnlyMemory vs ReadOnlySpan) — ~20 call sites
