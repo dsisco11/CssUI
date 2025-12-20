@@ -30,7 +30,7 @@ public class AttributeSelectorTests
     #endregion
 
     #region Attribute Presence Tests [attr]
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributePresence_MatchesElementWithAttribute()
     {
         // Arrange - [disabled] matches any element with the disabled attribute
@@ -44,7 +44,7 @@ public class AttributeSelectorTests
         Assert.True(selector[0].Match(input), "[disabled] should match element with disabled attribute");
     }
 
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributePresence_DoesNotMatchElementWithoutAttribute()
     {
         // Arrange
@@ -57,7 +57,7 @@ public class AttributeSelectorTests
         Assert.False(selector[0].Match(input), "[disabled] should not match element without disabled attribute");
     }
 
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributePresence_MatchesElementWithAnyValue()
     {
         // Arrange - [data-value] matches regardless of value
@@ -71,7 +71,7 @@ public class AttributeSelectorTests
         Assert.True(selector[0].Match(div), "[data-value] should match element with data-value attribute");
     }
 
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributePresence_WithTypeSelector()
     {
         // Arrange - input[type] matches input elements with a type attribute
@@ -89,7 +89,7 @@ public class AttributeSelectorTests
     #endregion
 
     #region Attribute Equals Tests [attr=value]
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeEquals_MatchesExactValue()
     {
         // Arrange - [type="text"] matches elements with type exactly equal to "text"
@@ -103,7 +103,7 @@ public class AttributeSelectorTests
         Assert.True(selector[0].Match(input), "[type=\"text\"] should match input with type=text");
     }
 
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeEquals_DoesNotMatchPartialValue()
     {
         // Arrange - [type="text"] should not match "text-field"
@@ -117,7 +117,7 @@ public class AttributeSelectorTests
         Assert.False(selector[0].Match(input), "[type=\"text\"] should not match type=text-field");
     }
 
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeEquals_CaseSensitiveByDefault()
     {
         // Arrange - [type="TEXT"] should not match type="text" (case-sensitive)
@@ -131,7 +131,7 @@ public class AttributeSelectorTests
         Assert.False(selector[0].Match(input), "[type=\"TEXT\"] should not match type=text (case-sensitive)");
     }
 
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeEquals_CaseInsensitiveFlag()
     {
         // Arrange - [type="TEXT" i] should match type="text" with case-insensitive flag
@@ -145,7 +145,7 @@ public class AttributeSelectorTests
         Assert.True(selector[0].Match(input), "[type=\"TEXT\" i] should match type=text (case-insensitive)");
     }
 
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeEquals_SingleQuotedValue()
     {
         // Arrange - [type='text'] with single quotes
@@ -159,7 +159,7 @@ public class AttributeSelectorTests
         Assert.True(selector[0].Match(input), "[type='text'] should match");
     }
 
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeEquals_UnquotedValue()
     {
         // Arrange - [type=text] without quotes (valid for simple values)
@@ -175,7 +175,7 @@ public class AttributeSelectorTests
     #endregion
 
     #region Attribute Contains Word Tests [attr~=value]
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeContainsWord_MatchesWordInSpaceSeparatedList()
     {
         // Arrange - [class~="warning"] matches class containing "warning" as a whole word
@@ -189,7 +189,7 @@ public class AttributeSelectorTests
         Assert.True(selector[0].Match(div), "[class~=\"warning\"] should match class containing warning as word");
     }
 
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeContainsWord_DoesNotMatchPartialWord()
     {
         // Arrange - [class~="warn"] should not match "warning"
@@ -203,7 +203,7 @@ public class AttributeSelectorTests
         Assert.False(selector[0].Match(div), "[class~=\"warn\"] should not match partial word warning");
     }
 
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeContainsWord_MatchesSingleWord()
     {
         // Arrange - [class~="active"] matches when class is exactly "active"
@@ -219,7 +219,7 @@ public class AttributeSelectorTests
     #endregion
 
     #region Attribute Starts With Tests [attr^=value]
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeStartsWith_MatchesPrefix()
     {
         // Arrange - [href^="https"] matches href starting with "https"
@@ -233,7 +233,7 @@ public class AttributeSelectorTests
         Assert.True(selector[0].Match(a), "[href^=\"https\"] should match href starting with https");
     }
 
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeStartsWith_DoesNotMatchMiddle()
     {
         // Arrange - [href^="example"] should not match "https://example.com"
@@ -247,7 +247,7 @@ public class AttributeSelectorTests
         Assert.False(selector[0].Match(a), "[href^=\"example\"] should not match value in middle");
     }
 
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeStartsWith_MatchesExactValue()
     {
         // Arrange - [type^="text"] matches type="text" exactly too
@@ -263,7 +263,7 @@ public class AttributeSelectorTests
     #endregion
 
     #region Attribute Ends With Tests [attr$=value]
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeEndsWith_MatchesSuffix()
     {
         // Arrange - [href$=".pdf"] matches href ending with ".pdf"
@@ -277,7 +277,7 @@ public class AttributeSelectorTests
         Assert.True(selector[0].Match(a), "[href$=\".pdf\"] should match href ending with .pdf");
     }
 
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeEndsWith_DoesNotMatchMiddle()
     {
         // Arrange - [href$="document"] should not match "document.pdf"
@@ -291,7 +291,7 @@ public class AttributeSelectorTests
         Assert.False(selector[0].Match(a), "[href$=\"document\"] should not match value in middle");
     }
 
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeEndsWith_ImageExtensions()
     {
         // Arrange - [src$=".jpg"], [src$=".png"], etc.
@@ -309,7 +309,7 @@ public class AttributeSelectorTests
     #endregion
 
     #region Attribute Contains Tests [attr*=value]
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeContains_MatchesSubstring()
     {
         // Arrange - [href*="example"] matches href containing "example" anywhere
@@ -323,7 +323,7 @@ public class AttributeSelectorTests
         Assert.True(selector[0].Match(a), "[href*=\"example\"] should match href containing example");
     }
 
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeContains_MatchesAtStart()
     {
         // Arrange - [href*="https"] matches at start
@@ -337,7 +337,7 @@ public class AttributeSelectorTests
         Assert.True(selector[0].Match(a), "[href*=\"https\"] should match at start");
     }
 
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeContains_MatchesAtEnd()
     {
         // Arrange - [href*=".com"] matches at end
@@ -353,7 +353,7 @@ public class AttributeSelectorTests
     #endregion
 
     #region Attribute Dash Match Tests [attr|=value]
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeDashMatch_MatchesExactValue()
     {
         // Arrange - [lang|="en"] matches lang="en"
@@ -367,7 +367,7 @@ public class AttributeSelectorTests
         Assert.True(selector[0].Match(p), "[lang|=\"en\"] should match lang=en");
     }
 
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeDashMatch_MatchesHyphenatedPrefix()
     {
         // Arrange - [lang|="en"] matches lang="en-US"
@@ -381,7 +381,7 @@ public class AttributeSelectorTests
         Assert.True(selector[0].Match(p), "[lang|=\"en\"] should match lang=en-US");
     }
 
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeDashMatch_DoesNotMatchWithoutHyphen()
     {
         // Arrange - [lang|="en"] should not match lang="english"
@@ -397,7 +397,7 @@ public class AttributeSelectorTests
     #endregion
 
     #region Combined Attribute Tests
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void TypeAndAttribute_CombinedMatching()
     {
         // Arrange - input[type="text"] combines type and attribute selector
@@ -417,7 +417,7 @@ public class AttributeSelectorTests
         Assert.False(selector[0].Match(textDiv), "input[type=\"text\"] should not match div");
     }
 
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void MultipleAttributes_AllMustMatch()
     {
         // Arrange - [type="text"][required] must match both
@@ -435,7 +435,7 @@ public class AttributeSelectorTests
         Assert.False(selector[0].Match(optionalText), "Should not match element missing required");
     }
 
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeWithClass_CombinedMatching()
     {
         // Arrange - .btn[disabled] combines class and attribute
@@ -453,7 +453,7 @@ public class AttributeSelectorTests
         Assert.False(selector[0].Match(enabledBtn), ".btn[disabled] should not match enabled button");
     }
 
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeWithId_CombinedMatching()
     {
         // Arrange - #myId[data-active] combines id and attribute
@@ -473,7 +473,7 @@ public class AttributeSelectorTests
     #endregion
 
     #region Specificity Tests
-    [Fact(Skip = AttributeSelectorBugSkipReason)]
+    [Fact]
     public void AttributeSelector_HasCorrectSpecificity()
     {
         // Arrange - Attribute selectors have same specificity as class (0,1,0)
