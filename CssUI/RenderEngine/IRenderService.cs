@@ -5,7 +5,43 @@ using CssUI.Rendering;
 namespace CssUI;
 
 /// <summary>
-/// Service interface for rendering primitives, textures, and text.
+/// Primitive topology for mesh rendering.
+/// </summary>
+public enum PrimitiveTopology
+{
+    /// <summary>Each vertex is a separate point.</summary>
+    PointList,
+    /// <summary>Each pair of vertices forms a line.</summary>
+    LineList,
+    /// <summary>Vertices form a connected line strip.</summary>
+    LineStrip,
+    /// <summary>Each set of 3 vertices forms a triangle.</summary>
+    TriangleList,
+    /// <summary>Vertices form a connected triangle strip.</summary>
+    TriangleStrip,
+    /// <summary>Vertices form a triangle fan from the first vertex.</summary>
+    TriangleFan
+}
+
+/// <summary>
+/// Blend mode for rendering operations.
+/// </summary>
+public enum BlendMode
+{
+    /// <summary>No blending, source overwrites destination.</summary>
+    None,
+    /// <summary>Standard alpha blending: src * srcAlpha + dst * (1 - srcAlpha).</summary>
+    Alpha,
+    /// <summary>Additive blending: src + dst.</summary>
+    Additive,
+    /// <summary>Multiplicative blending: src * dst.</summary>
+    Multiply,
+    /// <summary>Pre-multiplied alpha blending.</summary>
+    PremultipliedAlpha
+}
+
+/// <summary>
+/// Service interface for rendering meshes, textures, and text.
 /// Implementations handle the actual drawing to a render target.
 /// </summary>
 public interface IRenderService
@@ -28,6 +64,11 @@ public interface IRenderService
     /// Set the render target size (typically the window size).
     /// </summary>
     void SetViewportSize(int width, int height);
+
+    /// <summary>
+    /// Clear the render target with a color.
+    /// </summary>
+    void Clear(Color color);
 
     #endregion
 
@@ -64,99 +105,31 @@ public interface IRenderService
     void ClearTransform();
 
     /// <summary>
-    /// Set the global opacity for subsequent drawing operations.
+    /// Set the blend mode for subsequent draw calls.
     /// </summary>
-    void SetOpacity(float opacity);
+    void SetBlendMode(BlendMode mode);
+
+    /// <summary>
+    /// Set the color for subsequent draw calls.
+    /// </summary>
+    void SetColor(Color color);
+
+    /// <summary>
+    /// Set the texture for subsequent draw calls.
+    /// Pass <see cref="TextureHandle.Null"/> to disable texturing.
+    /// </summary>
+    void SetTexture(TextureHandle texture);
 
     #endregion
 
-    #region Primitive Drawing
+    #region Mesh Rendering
 
     /// <summary>
-    /// Fill a rectangle with a solid color.
+    /// Draw a mesh with the current color and texture state.
     /// </summary>
-    void FillRect(RenderRect rect, Color color);
-
-    /// <summary>
-    /// Draw a rectangle outline.
-    /// </summary>
-    void StrokeRect(RenderRect rect, Color color, float strokeWidth);
-
-    /// <summary>
-    /// Fill a rounded rectangle with a solid color.
-    /// </summary>
-    void FillRoundedRect(RenderRect rect, float radiusX, float radiusY, Color color);
-
-    /// <summary>
-    /// Draw a rounded rectangle outline.
-    /// </summary>
-    void StrokeRoundedRect(RenderRect rect, float radiusX, float radiusY, Color color, float strokeWidth);
-
-    /// <summary>
-    /// Draw a line between two points.
-    /// </summary>
-    void DrawLine(RenderPoint start, RenderPoint end, Color color, float strokeWidth);
-
-    #endregion
-
-    #region Texture Drawing
-
-    /// <summary>
-    /// Draw a texture filling the destination rectangle.
-    /// </summary>
-    void DrawTexture(TextureHandle texture, RenderRect destRect);
-
-    /// <summary>
-    /// Draw a portion of a texture to a destination rectangle.
-    /// </summary>
-    void DrawTexture(TextureHandle texture, RenderRect srcRect, RenderRect destRect);
-
-    /// <summary>
-    /// Draw a texture with a color tint.
-    /// </summary>
-    void DrawTexture(TextureHandle texture, RenderRect destRect, Color tint);
-
-    /// <summary>
-    /// Draw a portion of a texture with a color tint.
-    /// </summary>
-    void DrawTexture(TextureHandle texture, RenderRect srcRect, RenderRect destRect, Color tint);
-
-    #endregion
-
-    #region Text Drawing
-
-    /// <summary>
-    /// Draw text at a position.
-    /// </summary>
-    /// <param name="font">Font handle from <see cref="IFontService"/>.</param>
-    /// <param name="text">Text to draw.</param>
-    /// <param name="position">Top-left position for the text.</param>
-    /// <param name="color">Text color.</param>
-    void DrawText(FontHandle font, ReadOnlySpan<char> text, RenderPoint position, Color color);
-
-    /// <summary>
-    /// Draw text within a bounding box with alignment.
-    /// </summary>
-    /// <param name="font">Font handle from <see cref="IFontService"/>.</param>
-    /// <param name="text">Text to draw.</param>
-    /// <param name="bounds">Bounding rectangle for the text.</param>
-    /// <param name="color">Text color.</param>
-    /// <param name="horizontalAlign">Horizontal alignment (0=left, 0.5=center, 1=right).</param>
-    /// <param name="verticalAlign">Vertical alignment (0=top, 0.5=middle, 1=bottom).</param>
-    void DrawText(FontHandle font, ReadOnlySpan<char> text, RenderRect bounds, Color color,
-                  float horizontalAlign = 0f, float verticalAlign = 0f);
-
-    #endregion
-
-    #region Border Drawing
-
-    /// <summary>
-    /// Draw CSS-style borders with potentially different styles/colors per side.
-    /// </summary>
-    void DrawBorders(RenderRect rect,
-                     float topWidth, float rightWidth, float bottomWidth, float leftWidth,
-                     Color topColor, Color rightColor, Color bottomColor, Color leftColor,
-                     EBorderStyle topStyle, EBorderStyle rightStyle, EBorderStyle bottomStyle, EBorderStyle leftStyle);
+    /// <param name="mesh">The mesh to render.</param>
+    /// <param name="topology">How to interpret the vertices.</param>
+    void DrawMesh(MeshHandle mesh, PrimitiveTopology topology);
 
     #endregion
 }

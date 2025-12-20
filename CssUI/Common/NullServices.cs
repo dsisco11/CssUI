@@ -122,6 +122,7 @@ public sealed class NullRenderService : IRenderService
     public void BeginFrame() { }
     public void EndFrame() { }
     public void SetViewportSize(int width, int height) { }
+    public void Clear(Color color) { }
 
     public void PushState() { }
     public void PopState() { }
@@ -129,27 +130,11 @@ public sealed class NullRenderService : IRenderService
     public void ClearClipRect() { }
     public void SetTransform(Matrix3x2 transform) { }
     public void ClearTransform() { }
-    public void SetOpacity(float opacity) { }
+    public void SetBlendMode(BlendMode mode) { }
+    public void SetColor(Color color) { }
+    public void SetTexture(TextureHandle texture) { }
 
-    public void FillRect(RenderRect rect, Color color) { }
-    public void StrokeRect(RenderRect rect, Color color, float strokeWidth) { }
-    public void FillRoundedRect(RenderRect rect, float radiusX, float radiusY, Color color) { }
-    public void StrokeRoundedRect(RenderRect rect, float radiusX, float radiusY, Color color, float strokeWidth) { }
-    public void DrawLine(RenderPoint start, RenderPoint end, Color color, float strokeWidth) { }
-
-    public void DrawTexture(TextureHandle texture, RenderRect destRect) { }
-    public void DrawTexture(TextureHandle texture, RenderRect srcRect, RenderRect destRect) { }
-    public void DrawTexture(TextureHandle texture, RenderRect destRect, Color tint) { }
-    public void DrawTexture(TextureHandle texture, RenderRect srcRect, RenderRect destRect, Color tint) { }
-
-    public void DrawText(FontHandle font, ReadOnlySpan<char> text, RenderPoint position, Color color) { }
-    public void DrawText(FontHandle font, ReadOnlySpan<char> text, RenderRect bounds, Color color, float horizontalAlign = 0, float verticalAlign = 0) { }
-
-    public void DrawBorders(RenderRect rect,
-        float topWidth, float rightWidth, float bottomWidth, float leftWidth,
-        Color topColor, Color rightColor, Color bottomColor, Color leftColor,
-        EBorderStyle topStyle, EBorderStyle rightStyle, EBorderStyle bottomStyle, EBorderStyle leftStyle)
-    { }
+    public void DrawMesh(MeshHandle mesh, PrimitiveTopology topology) { }
 }
 
 /// <summary>
