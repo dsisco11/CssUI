@@ -132,20 +132,3 @@ public interface IRenderService
 
     #endregion
 }
-
-/// <summary>
-/// Border style values matching CSS border-style.
-/// </summary>
-public enum EBorderStyle
-{
-    None,
-    Hidden,
-    Dotted,
-    Dashed,
-    Solid,
-    Double,
-    Groove,
-    Ridge,
-    Inset,
-    Outset
-}
