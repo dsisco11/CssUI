@@ -25,7 +25,7 @@ internal static class EnumMetaTable
     /// </summary>
     public static readonly Dictionary<AtomicString, object>[] KEYWORD;
     /// <summary>
-    /// Stores whether the given meta enum is a flags enum 
+    /// Stores whether the given meta enum is a flags enum
     /// </summary>
     private static readonly bool[] IS_FLAGS;
     #endregion
@@ -64,8 +64,15 @@ internal static class EnumMetaTable
                 int valueIndex = Get_Value_Index(enumIndex, enumValue);
 
                 var data = new EnumData(metadata.Keyword, metadata.Values!);
-                TABLE[enumIndex][valueIndex] = data;
-                KEYWORD[enumIndex].Add(new AtomicString(metadata.Keyword), valueIndex);
+                try
+                {
+                    TABLE[enumIndex][valueIndex] = data;
+                    KEYWORD[enumIndex].Add(new AtomicString(metadata.Keyword), valueIndex);
+                }
+                catch (Exception)
+                {
+                    System.Diagnostics.Debug.WriteLine($"EnumMetaTable: Failed to add metadata for enum '{metaInfo.Item1.Name}' value '{enumValue}' (index {valueIndex})");
+                }
             }
         }
 
@@ -127,7 +134,9 @@ internal static class EnumMetaTable
         // If the enum is a flags type then it's values index is actually its set bitnumber
         if (IS_FLAGS[enumIndex])
         {
-            return (int)BitOperations.CountLeadingZeros((uint)enumValue);
+            if (enumValue == 0) return 0;
+            return System.Numerics.BitOperations.TrailingZeroCount((uint)enumValue);
+            // return System.Numerics.BitOperations.LeadingZeroCount((uint)enumValue);
         }
 
         return enumValue;
