@@ -57,12 +57,12 @@ public static partial class CssPropertyResolver
                     }
                 default:
                     {
-                        if (!Lookup.TryData(keyword, out EnumData outData))
+                        if (!Lookup.TryData(keyword, out EnumData? outData))
                         {
                             throw new CssPropertyException($"No meta-enum data found for keyword '{keyword}'");
                         }
 
-                        return CssValue.From(new Color((int)outData.Data[0], (int)outData.Data[1], (int)outData.Data[2], (int)outData.Data[3]));
+                        return CssValue.From(new Color((int)outData.Value.Data[0], (int)outData.Value.Data[1], (int)outData.Value.Data[2], (int)outData.Value.Data[3]));
                     }
             }
         }

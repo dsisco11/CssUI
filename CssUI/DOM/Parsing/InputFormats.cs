@@ -1753,9 +1753,9 @@ public static partial class HTMLParserCommon
         /* Check and see if this is a named color */
         if (Lookup.TryEnum(StringCommon.Transform(mem, To_ASCII_Lower_Alpha), out EColor outEnumValue))
         {
-            if (Lookup.TryData(outEnumValue, out EnumData outColorData))
+            if (Lookup.TryData(outEnumValue, out EnumData? outColorData))
             {
-                outColor = new SimpleColor((byte)outColorData.Data[1], (byte)outColorData.Data[2], (byte)outColorData.Data[3]);
+                outColor = new SimpleColor((byte)outColorData.Value.Data[1], (byte)outColorData.Value.Data[2], (byte)outColorData.Value.Data[3]);
                 return true;
             }
         }

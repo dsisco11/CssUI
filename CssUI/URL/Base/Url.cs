@@ -153,9 +153,9 @@ public class Url
         {
             if (Scheme.IsCustom || !Scheme.EnumValue.HasValue) return null;
 
-            if (Lookup.TryData(Scheme.EnumValue.Value, out EnumData outData))
+            if (Lookup.TryData(Scheme.EnumValue.Value, out EnumData? outData))
             {
-                return (int)outData.Data[0];
+                return (int)outData.Value.Data[0];
             }
 
             return null;

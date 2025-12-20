@@ -875,17 +875,17 @@ public partial class CssValue
             case ECssValueTypes.NONE:
                 return true;// Types are already the same, meaning A/B are equal
             case ECssValueTypes.COLOR:
-                return EqualityComparer<int>.Default.Equals(A.value, B.value);
+                return (int?)A.value == (int?)B.value;
             case ECssValueTypes.INTEGER:
-                return EqualityComparer<long>.Default.Equals((long)A.value!, (long)B.value!);
+                return (long)A.value! == (long)B.value!;
             case ECssValueTypes.NUMBER:
             case ECssValueTypes.DIMENSION:
             case ECssValueTypes.PERCENT:
-                return EqualityComparer<double>.Default.Equals((double)A.value!, (double)B.value!);
+                return (double)A.value! == (double)B.value!;
             case ECssValueTypes.STRING:
-                return EqualityComparer<string>.Default.Equals((string)A.value!, (string)B.value!);
+                return string.Equals((string)A.value!, (string)B.value!, StringComparison.Ordinal);
             case ECssValueTypes.KEYWORD:
-                return A.value!.Equals(B.value);
+                return Equals(A.value, B.value);
             //return EqualityComparer<int>.Default.Equals((int)A.Value, (int)B.Value);
             default:
                 throw new NotImplementedException($"Equality comparison logic not implemented for type: {Enum.GetName(typeof(ECssValueTypes), A.Type)}");
