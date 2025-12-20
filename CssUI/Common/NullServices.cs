@@ -151,3 +151,34 @@ public sealed class NullRenderService : IRenderService
         EBorderStyle topStyle, EBorderStyle rightStyle, EBorderStyle bottomStyle, EBorderStyle leftStyle)
     { }
 }
+
+/// <summary>
+/// Null implementation of IMeshService for headless/testing scenarios.
+/// </summary>
+public sealed class NullMeshService : IMeshService
+{
+    private int _nextId = 1;
+
+    public ValueTask<MeshHandle> CreateMeshAsync(ReadOnlyMemory<byte> vertices, VertexLayout layout)
+        => ValueTask.FromResult(new MeshHandle(_nextId++));
+
+    public ValueTask<MeshHandle> CreateMeshAsync(ReadOnlyMemory<byte> vertices, VertexLayout layout, ReadOnlyMemory<byte> indices, IndexFormat indexFormat)
+        => ValueTask.FromResult(new MeshHandle(_nextId++));
+
+    public ValueTask UpdateVerticesAsync(MeshHandle handle, ReadOnlyMemory<byte> vertices)
+        => ValueTask.CompletedTask;
+
+    public ValueTask UpdateVerticesAsync(MeshHandle handle, int byteOffset, ReadOnlyMemory<byte> vertices)
+        => ValueTask.CompletedTask;
+
+    public ValueTask UpdateIndicesAsync(MeshHandle handle, ReadOnlyMemory<byte> indices)
+        => ValueTask.CompletedTask;
+
+    public MeshInfo GetMeshInfo(MeshHandle handle)
+        => default;
+
+    public bool IsValid(MeshHandle handle)
+        => !handle.IsNull;
+
+    public void DestroyMesh(MeshHandle handle) { }
+}

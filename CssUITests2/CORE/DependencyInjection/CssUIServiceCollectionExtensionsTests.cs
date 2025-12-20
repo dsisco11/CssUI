@@ -61,6 +61,38 @@ public class CssUIServiceCollectionExtensionsTests
     }
 
     [Fact]
+    public void AddCssUI_RegistersMeshService()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+
+        // Act
+        services.AddCssUI();
+        var provider = services.BuildServiceProvider();
+
+        // Assert
+        var meshService = provider.GetRequiredService<IMeshService>();
+        Assert.NotNull(meshService);
+        Assert.IsType<NullMeshService>(meshService);
+    }
+
+    [Fact]
+    public void AddMeshService_Generic_RegistersService()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        services.AddCssUI();
+
+        // Act
+        services.AddMeshService<NullMeshService>();
+        var provider = services.BuildServiceProvider();
+
+        // Assert
+        var meshService = provider.GetRequiredService<IMeshService>();
+        Assert.IsType<NullMeshService>(meshService);
+    }
+
+    [Fact]
     public void AddCssUI_RegistersTextIntrinsicSizer()
     {
         // Arrange

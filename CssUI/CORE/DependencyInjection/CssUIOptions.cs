@@ -18,6 +18,12 @@ public sealed class CssUIOptions
     public ITextureService? TextureService { get; set; }
 
     /// <summary>
+    /// Gets or sets the mesh service implementation.
+    /// If null, <see cref="NullMeshService"/> will be used.
+    /// </summary>
+    public IMeshService? MeshService { get; set; }
+
+    /// <summary>
     /// Gets or sets the render service implementation.
     /// If null, <see cref="NullRenderService"/> will be used.
     /// </summary>

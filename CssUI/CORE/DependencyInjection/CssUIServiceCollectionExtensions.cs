@@ -40,6 +40,7 @@ public static class CssUIServiceCollectionExtensions
         // TryAdd ensures user-provided registrations take precedence
         services.TryAddSingleton<IFontService>(sp => options.FontService ?? new NullFontService());
         services.TryAddSingleton<ITextureService>(sp => options.TextureService ?? new NullTextureService());
+        services.TryAddSingleton<IMeshService>(sp => options.MeshService ?? new NullMeshService());
         services.TryAddSingleton<IRenderService>(sp => options.RenderService ?? new NullRenderService());
 
         // Register internal services that depend on the above
@@ -120,6 +121,45 @@ public static class CssUIServiceCollectionExtensions
     /// <param name="factory">Factory function to create the texture service.</param>
     /// <returns>The service collection for chaining.</returns>
     public static IServiceCollection AddTextureService(this IServiceCollection services, Func<IServiceProvider, ITextureService> factory)
+    {
+        ArgumentNullException.ThrowIfNull(factory);
+        services.AddSingleton(factory);
+        return services;
+    }
+
+    /// <summary>
+    /// Adds a custom mesh service to the service collection.
+    /// </summary>
+    /// <typeparam name="TMeshService">The mesh service implementation type.</typeparam>
+    /// <param name="services">The service collection.</param>
+    /// <returns>The service collection for chaining.</returns>
+    public static IServiceCollection AddMeshService<TMeshService>(this IServiceCollection services)
+        where TMeshService : class, IMeshService
+    {
+        services.AddSingleton<IMeshService, TMeshService>();
+        return services;
+    }
+
+    /// <summary>
+    /// Adds a custom mesh service instance to the service collection.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="meshService">The mesh service instance.</param>
+    /// <returns>The service collection for chaining.</returns>
+    public static IServiceCollection AddMeshService(this IServiceCollection services, IMeshService meshService)
+    {
+        ArgumentNullException.ThrowIfNull(meshService);
+        services.AddSingleton(meshService);
+        return services;
+    }
+
+    /// <summary>
+    /// Adds a custom mesh service using a factory to the service collection.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="factory">Factory function to create the mesh service.</param>
+    /// <returns>The service collection for chaining.</returns>
+    public static IServiceCollection AddMeshService(this IServiceCollection services, Func<IServiceProvider, IMeshService> factory)
     {
         ArgumentNullException.ThrowIfNull(factory);
         services.AddSingleton(factory);
