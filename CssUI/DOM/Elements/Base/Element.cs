@@ -496,7 +496,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
     internal override bool Is_ShadowHost
     {/* Docs: https://dom.spec.whatwg.org/#element-shadow-host */
 #if ENABLE_HTML
-        get => shadowRoot != null;
+        get => _shadow_root != null;
 #else
         get => false;
 #endif
@@ -983,9 +983,28 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
         }
     }
 
+    /// <summary>
+    /// Set of HTML element names that support shadow DOM attachment per spec.
+    /// </summary>
+    private static readonly HashSet<string> ShadowableElements = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "article", "aside", "blockquote", "body", "div", "footer",
+        "h1", "h2", "h3", "h4", "h5", "h6", "header", "main", "nav", "p", "section", "span"
+    };
 
-    ShadowRoot attachShadow(ShadowRootInit init)
+    /// <summary>
+    /// Creates a shadow root for the element and returns it.
+    /// </summary>
+    /// <param name="init">The shadow root initialization options.</param>
+    /// <returns>The newly created ShadowRoot.</returns>
+    /// <exception cref="NotSupportedError">
+    /// Thrown if the element is not in the HTML namespace, is not a valid shadow host element,
+    /// or already has a shadow root attached.
+    /// </exception>
+    /// <remarks>Docs: https://dom.spec.whatwg.org/#dom-element-attachshadow</remarks>
+    public ShadowRoot attachShadow(ShadowRootInit init)
     {/* Docs: https://dom.spec.whatwg.org/#dom-element-attachshadow */
+        /* 1) If context object's namespace is not the HTML namespace, then throw a "NotSupportedError" DOMException. */
         if (!NamespaceURI.Equals(DOMCommon.HTMLNamespace))
         {
             throw new NotSupportedError("Elements must be in the HTML namespace to support a ShadowDOM");
@@ -994,9 +1013,10 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
         /* XXX: Implement checking for these html elements */
         /* 2) If context object’s local name is not a valid custom element name, "article", "aside", "blockquote", "body", "div", "footer", "h1", "h2", "h3", "h4", "h5", "h6", "header", "main" "nav", "p", "section", or "span", then throw a "NotSupportedError" DOMException */
         bool isValidCustomName = HTMLCommon.Is_Valid_Custom_Element_Name(localName.AsMemory());
-        if (!isValidCustomName)
+        bool isShadowableElement = ShadowableElements.Contains(localName);
+        if (!isValidCustomName && !isShadowableElement)
         {
-            throw new NotSupportedError($"Cannot attach ShadowDOM to invalid custom element");
+            throw new NotSupportedError($"Cannot attach ShadowDOM to element '{localName}': not a valid custom element name or shadowable element");
         }
         /* 3) If context object’s local name is a valid custom element name, or context object’s is value is not null, then:
                 Let definition be the result of looking up a custom element definition given context object’s node document, its namespace, its local name, and its is value.
@@ -1004,7 +1024,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
         */
         if (isValidCustomName || !ReferenceEquals(null, is_value))
         {
-            var definition = nodeDocument.defaultView.customElements.Lookup(nodeDocument, NamespaceURI!, localName, is_value!);
+            var definition = nodeDocument?.defaultView?.customElements?.Lookup(nodeDocument, NamespaceURI!, localName, is_value!);
             if (definition != null && definition.bDisableShadow)
             {
                 throw new NotSupportedError($"Cannot attach ShadowDOM to custom element whose definition has ShadowDOM disabled");
