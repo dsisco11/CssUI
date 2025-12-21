@@ -746,13 +746,17 @@ public abstract class Node : EventTarget, INode
             }
         }
         /* 6) For each NodeIterator object iterator whose root’s node document is node’s node document, run the NodeIterator pre-removing steps given node and iterator. */
-        foreach (var weakRef in NodeIterator.ALL)
+        var iteratorDoc = node.nodeDocument;
+        if (iteratorDoc != null)
         {
-            if (weakRef.TryGetTarget(out NodeIterator? iter))
+            lock (iteratorDoc.LIVE_ITERATORS_LOCK)
             {
-                if (ReferenceEquals(node.ownerDocument, iter.root.ownerDocument))
+                foreach (var weakRef in iteratorDoc.LIVE_ITERATORS)
                 {
-                    NodeIterator.pre_removing_steps(iter, node);
+                    if (weakRef.TryGetTarget(out NodeIterator? iter))
+                    {
+                        NodeIterator.pre_removing_steps(iter, node);
+                    }
                 }
             }
         }

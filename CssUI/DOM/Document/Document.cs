@@ -69,6 +69,10 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
 
     internal LinkedList<WeakReference<Range>> LIVE_RANGES = new LinkedList<WeakReference<Range>>();
+    internal readonly object LIVE_RANGES_LOCK = new object();
+
+    internal LinkedList<WeakReference<NodeIterator>> LIVE_ITERATORS = new LinkedList<WeakReference<NodeIterator>>();
+    internal readonly object LIVE_ITERATORS_LOCK = new object();
     #endregion
 
     #region Properties

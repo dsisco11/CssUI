@@ -15,10 +15,12 @@ namespace CssUI.DOM;
 /// <summary>
 /// Objects implementing the Range interface are known as live ranges.
 /// </summary>
-public class Range : AbstractRange
+public class Range : AbstractRange, IDisposable
 {/* Docs: https://dom.spec.whatwg.org/#interface-range */
 
     #region Properties
+    private bool _disposed = false;
+    private LinkedListNode<WeakReference<Range>>? _listNode;
     #endregion
 
     #region Accessors
@@ -43,7 +45,14 @@ public class Range : AbstractRange
     private Range()
     {
         /* Add self to list of live ranges */
-        root.nodeDocument.LIVE_RANGES.AddLast(new WeakReference<Range>(this));
+        var doc = root?.nodeDocument;
+        if (doc != null)
+        {
+            lock (doc.LIVE_RANGES_LOCK)
+            {
+                _listNode = doc.LIVE_RANGES.AddLast(new WeakReference<Range>(this));
+            }
+        }
     }
     public Range(Document document) : this()
     {
@@ -60,20 +69,31 @@ public class Range : AbstractRange
         this.endOffset = endOffset;
     }
 
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed) return;
+        _disposed = true;
+
+        var doc = root?.nodeDocument;
+        if (doc != null && _listNode != null)
+        {
+            lock (doc.LIVE_RANGES_LOCK)
+            {
+                doc.LIVE_RANGES.Remove(_listNode);
+            }
+            _listNode = null;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
     ~Range()
     {
-        /* Remove self from list of live ranges */
-        foreach (WeakReference<Range> weakRef in root.nodeDocument.LIVE_RANGES)
-        {
-            if (weakRef.TryGetTarget(out Range? r))
-            {
-                if (ReferenceEquals(this, r))
-                {
-                    root.nodeDocument.LIVE_RANGES.Remove(weakRef);
-                    break;
-                }
-            }
-        }
+        Dispose(false);
     }
     #endregion
 
@@ -818,11 +838,11 @@ public class Range : AbstractRange
                 continue;
             }
 
-            /* 
-             * For each Text node selected or partially selected by the range (including when the boundary-points are identical), 
-             * include a DOMRect object (for the part that is selected, not the whole line box). 
-             * The bounds of these DOMRect objects are computed using font metrics; thus, for horizontal writing, the vertical dimension of each box is determined by the font ascent and descent, 
-             * and the horizontal dimension by the text advance width. The transforms that apply to the ancestors are applied. 
+            /*
+             * For each Text node selected or partially selected by the range (including when the boundary-points are identical),
+             * include a DOMRect object (for the part that is selected, not the whole line box).
+             * The bounds of these DOMRect objects are computed using font metrics; thus, for horizontal writing, the vertical dimension of each box is determined by the font ascent and descent,
+             * and the horizontal dimension by the text advance width. The transforms that apply to the ancestors are applied.
              */
             if (node.nodeType == ENodeType.TEXT_NODE)
             {

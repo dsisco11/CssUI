@@ -6,11 +6,12 @@ using CssUI.DOM.Nodes;
 
 namespace CssUI.DOM;
 
-public class NodeIterator
-{/* Docs:  */
-    public static LinkedList<WeakReference<NodeIterator>> ALL = new LinkedList<WeakReference<NodeIterator>>();
+public class NodeIterator : IDisposable
+{/* Docs: https://dom.spec.whatwg.org/#interface-nodeiterator */
 
     #region Properties
+    private bool _disposed = false;
+    private LinkedListNode<WeakReference<NodeIterator>>? _listNode;
     public readonly Node? root = null;
     public readonly ENodeFilterMask whatToShow = 0x0;
     public readonly NodeFilter? Filter = null;
@@ -29,6 +30,7 @@ public class NodeIterator
         this.referenceNode = root;
         this.whatToShow = whatToShow;
         this.iterCollection = Array.Empty<Node>();
+        RegisterWithDocument();
     }
 
     public NodeIterator(Node root, IList<Node> Collection, ENodeFilterMask whatToShow, NodeFilter? Filter = null)
@@ -38,22 +40,46 @@ public class NodeIterator
         this.whatToShow = whatToShow;
         this.iterCollection = Collection;
         this.Filter = Filter;
+        RegisterWithDocument();
+    }
+
+    private void RegisterWithDocument()
+    {
+        var doc = root?.ownerDocument ?? (root as Document);
+        if (doc != null)
+        {
+            lock (doc.LIVE_ITERATORS_LOCK)
+            {
+                _listNode = doc.LIVE_ITERATORS.AddLast(new WeakReference<NodeIterator>(this));
+            }
+        }
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed) return;
+        _disposed = true;
+
+        var doc = root?.ownerDocument ?? (root as Document);
+        if (doc != null && _listNode != null)
+        {
+            lock (doc.LIVE_ITERATORS_LOCK)
+            {
+                doc.LIVE_ITERATORS.Remove(_listNode);
+            }
+            _listNode = null;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
     ~NodeIterator()
     {
-        /* Remove us from the list */
-        foreach (WeakReference<NodeIterator> weakRef in ALL)
-        {
-            if (weakRef.TryGetTarget(out NodeIterator? target))
-            {
-                if (ReferenceEquals(this, target))
-                {
-                    ALL.Remove(weakRef);
-                    break;
-                }
-            }
-        }
+        Dispose(false);
     }
     #endregion
 
