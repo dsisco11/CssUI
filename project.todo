@@ -31,8 +31,8 @@
 ### 4.2 DOM Element Tests ✅ COMPLETED
 - [x] Test element creation (createElement, createElementNS) - 14 tests passing
 - [x] Test element hierarchy (appendChild, removeChild, insertBefore) - 34 tests passing
-- [ ] Test element queries (getElementById, getElementsByClassName, getElementsByTagName)
-- [ ] Test element matching (matches, closest, querySelector, querySelectorAll)
+- [x] Test element queries (getElementById, getElementsByClassName, getElementsByTagName) - 21 tests passing
+- [x] Test element matching (matches, closest, querySelector, querySelectorAll) - 22 tests passing
 
 #### Bugs Fixed During Testing:
 1. DOMCommon.createElementNS() was passing Prefix as Namespace parameter to Create_Element()
@@ -41,6 +41,18 @@
 4. TreeWalker.filterNode() wasn't subtracting 1 from nodeType for bit mask calculation
 5. DOMCommon.Is_Descendant() was using TreeWalker incorrectly (root can't traverse to ancestors)
 6. Node.Dom_replace_node_within_parent() had validation checks in wrong scope (else instead of inside if parent is Document)
+
+#### Bugs Fixed During Query/Matching Tests:
+7. AttributeDefinition.Parse() for String type returned raw string instead of AtomicString (getElementById failed)
+8. AttributeValue.Parse() had arguments in wrong order (Value/Data swapped)
+9. AttributeValue.AsString() didn't handle AtomicString values (returned null)
+10. AtomicString.GetHashCode() was returning hash of MemoryHandle instead of string content
+11. Node.Dom_remove_node_from_parent() wasn't removing elements from Document's ID map
+12. DOMCommon.Get_Elements_By_Qualified_Name() case-insensitive comparison was backwards
+13. CssSelector.Match_Against_Tree() was adding LinkedListNode to another list (invalid operation)
+14. Element.closest() was using TreeWalker incorrectly (skipped self, started from wrong node)
+15. DOMCommon.Get_Ancestors() TreeWalker couldn't traverse ancestors (root was set to starting node)
+16. ComplexSelector.Match() applied combinator from wrong selector (broke descendant/child matching)
 
 ### 4.3 DOM Document Tests
 - [ ] Test document creation (createDocument, createHTMLDocument)
@@ -53,7 +65,7 @@
 - [ ] Simplification algorithm
 - [ ] Proper serialization
 
-## Test Coverage — 958 PASSING (after DOM element creation/hierarchy tests enabled)
+## Test Coverage — 1001 PASSING (after DOM element query/matching tests enabled)
 
 ### CSS Systems Test Status
 - [ ] CSS Properties system (CSS/Properties/)
