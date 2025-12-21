@@ -35,8 +35,8 @@ public sealed class AtomicString
             }
             else
             {
-                //return new string(Data.ToArray()).GetHashCode();
-                return Data.Pin().GetHashCode();
+                // Compute hash from the actual string content
+                return string.GetHashCode(Data.Span);
             }
         });
 
@@ -89,14 +89,18 @@ public sealed class AtomicString
 
     public bool Equals(AtomicString other)
     {
-        // Check if hashes match
+        // Quick hash check first for performance
         if (0 != ((other.Flags ^ Flags) & EAtomicStringFlags.CaseInsensitive))
         {/* Flag mismatch: the XOR of both flags still returned CaseInsensitive, meaning only one of these atomic-strings is trying to be case-insensitive */
-            return Hash_Lower == other.Hash_Lower;
+            if (Hash_Lower != other.Hash_Lower) return false;
+            // Hash match - verify with actual string comparison (case-insensitive)
+            return Data.Span.Equals(other.Data.Span, StringComparison.OrdinalIgnoreCase);
         }
         else
         {
-            return other.GetHashCode() == GetHashCode();
+            if (other.GetHashCode() != GetHashCode()) return false;
+            // Hash match - verify with actual string comparison
+            return Data.Span.SequenceEqual(other.Data.Span);
         }
     }
 
@@ -104,15 +108,7 @@ public sealed class AtomicString
     {
         if (obj is AtomicString atom)
         {
-            // Check if hashes match
-            if (0 != ((atom.Flags ^ Flags) & EAtomicStringFlags.CaseInsensitive))
-            {/* Flag mismatch: the XOR of both flags still returned CaseInsensitive, meaning only one of these atomic-strings is trying to be case-insensitive */
-                return Hash_Lower == atom.Hash_Lower;
-            }
-            else
-            {
-                return atom.GetHashCode() == GetHashCode();
-            }
+            return Equals(atom);
         }
 
         return false;
@@ -124,33 +120,13 @@ public sealed class AtomicString
         if (A is null && B is null) return true;
         // If one object is null and not the other they do not match
         if (A is null ^ B is null) return false;
-        // Check if hashes match
-        if (0 != ((A!.Flags ^ B!.Flags) & EAtomicStringFlags.CaseInsensitive))
-        {/* Flag mismatch: the XOR of both flags still returned CaseInsensitive, meaning only one of these atomic-strings is trying to be case-insensitive */
-            return A.Hash_Lower == B.Hash_Lower;
-        }
-        else
-        {
-            return A.GetHashCode() == B.GetHashCode();
-        }
+        // Use the Equals method for proper comparison
+        return A!.Equals(B!);
     }
 
     public static bool operator !=(AtomicString? A, AtomicString? B)
     {
-        // If both object are null they do not match
-        if (A is null && B is null) return false;
-        // If one object is null and not the other they do match
-        if (A is null ^ B is null) return true;
-        // Check if hashes match
-        if (0 != ((A!.Flags ^ B!.Flags) & EAtomicStringFlags.CaseInsensitive))
-        {/* Flag mismatch: the XOR of both flags still returned CaseInsensitive, meaning only one of these atomic-strings is trying to be case-insensitive */
-            return A.Hash_Lower != B.Hash_Lower;
-        }
-        else
-        {
-            return A.GetHashCode() != B.GetHashCode();
-        }
+        return !(A == B);
     }
     #endregion
 }
-

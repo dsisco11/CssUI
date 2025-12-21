@@ -167,9 +167,11 @@ public class CssSelector : List<ComplexSelector>
         foreach (Node root in rootElements)
         {
             var rootList = DOMCommon.Get_Shadow_Including_Inclusive_Descendents(root, Filter!, ENodeFilterMask.SHOW_ELEMENT);
-            LinkedListNode<Node>? firstNode = ((LinkedList<Node>)rootList).First;
-            if (firstNode != null)
-                candidateElements.AddLast(firstNode);
+            // Add all elements from the rootList to candidateElements
+            foreach (Node node in rootList)
+            {
+                candidateElements.AddLast(node);
+            }
         }
 
         LinkedList<Element> matchList = new LinkedList<Element>();

@@ -34,7 +34,7 @@ public class ElementQueryTests
 
     #region getElementById Tests
 
-    [Fact(Skip = "DOM query tests")]
+    [Fact]
     public void GetElementByID_ExistingId_ReturnsElement()
     {
         // Arrange
@@ -51,7 +51,7 @@ public class ElementQueryTests
         Assert.Same(element, result);
     }
 
-    [Fact(Skip = "DOM query tests")]
+    [Fact]
     public void GetElementByID_NonExistentId_ReturnsNull()
     {
         // Arrange
@@ -64,7 +64,7 @@ public class ElementQueryTests
         Assert.Null(result);
     }
 
-    [Fact(Skip = "DOM query tests")]
+    [Fact]
     public void GetElementByID_DuplicateIds_ReturnsFirst()
     {
         // Arrange
@@ -85,7 +85,7 @@ public class ElementQueryTests
         Assert.Same(element1, result);
     }
 
-    [Fact(Skip = "DOM query tests")]
+    [Fact]
     public void GetElementByID_NestedElement_FindsElement()
     {
         // Arrange
@@ -104,7 +104,7 @@ public class ElementQueryTests
         Assert.Same(child, result);
     }
 
-    [Fact(Skip = "DOM query tests")]
+    [Fact]
     public void GetElementByID_AfterIdChange_FindsNewId()
     {
         // Arrange
@@ -124,7 +124,7 @@ public class ElementQueryTests
         Assert.Same(element, newResult);
     }
 
-    [Fact(Skip = "DOM query tests")]
+    [Fact]
     public void GetElementByID_AfterRemoval_ReturnsNull()
     {
         // Arrange
@@ -145,7 +145,7 @@ public class ElementQueryTests
 
     #region getElementsByClassName Tests
 
-    [Fact(Skip = "DOM query tests")]
+    [Fact]
     public void GetElementsByClassName_SingleClass_ReturnsMatching()
     {
         // Arrange
@@ -165,7 +165,7 @@ public class ElementQueryTests
         Assert.Same(element1, results[0]);
     }
 
-    [Fact(Skip = "DOM query tests")]
+    [Fact]
     public void GetElementsByClassName_MultipleMatches_ReturnsAll()
     {
         // Arrange
@@ -187,7 +187,7 @@ public class ElementQueryTests
         Assert.Equal(2, results.Count);
     }
 
-    [Fact(Skip = "DOM query tests")]
+    [Fact]
     public void GetElementsByClassName_NoMatches_ReturnsEmpty()
     {
         // Arrange
@@ -203,7 +203,7 @@ public class ElementQueryTests
         Assert.Empty(results);
     }
 
-    [Fact(Skip = "DOM query tests")]
+    [Fact]
     public void GetElementsByClassName_MultipleClasses_MatchesAll()
     {
         // Arrange
@@ -223,7 +223,7 @@ public class ElementQueryTests
         Assert.Same(element1, results[0]);
     }
 
-    [Fact(Skip = "DOM query tests")]
+    [Fact]
     public void GetElementsByClassName_NestedElements_FindsAll()
     {
         // Arrange
@@ -242,7 +242,7 @@ public class ElementQueryTests
         Assert.Equal(2, results.Count);
     }
 
-    [Fact(Skip = "DOM query tests")]
+    [Fact]
     public void GetElementsByClassName_OnElement_SearchesDescendants()
     {
         // Arrange
@@ -270,7 +270,7 @@ public class ElementQueryTests
 
     #region getElementsByTagName Tests
 
-    [Fact(Skip = "DOM query tests")]
+    [Fact]
     public void GetElementsByTagName_SingleMatch_ReturnsElement()
     {
         // Arrange
@@ -288,7 +288,7 @@ public class ElementQueryTests
         Assert.Same(div, results[0]);
     }
 
-    [Fact(Skip = "DOM query tests")]
+    [Fact]
     public void GetElementsByTagName_MultipleMatches_ReturnsAll()
     {
         // Arrange
@@ -307,7 +307,7 @@ public class ElementQueryTests
         Assert.Equal(3, results.Count);
     }
 
-    [Fact(Skip = "DOM query tests")]
+    [Fact]
     public void GetElementsByTagName_NoMatches_ReturnsEmpty()
     {
         // Arrange
@@ -322,7 +322,7 @@ public class ElementQueryTests
         Assert.Empty(results);
     }
 
-    [Fact(Skip = "DOM query tests")]
+    [Fact]
     public void GetElementsByTagName_Wildcard_ReturnsAllDescendants()
     {
         // Arrange
@@ -341,7 +341,7 @@ public class ElementQueryTests
         Assert.Equal(3, results.Count);
     }
 
-    [Fact(Skip = "DOM query tests")]
+    [Fact]
     public void GetElementsByTagName_NestedElements_ReturnsTreeOrder()
     {
         // Arrange
@@ -360,7 +360,7 @@ public class ElementQueryTests
         Assert.Same(inner, results[1]);
     }
 
-    [Fact(Skip = "DOM query tests")]
+    [Fact]
     public void GetElementsByTagName_CaseInsensitive_MatchesHTMLElements()
     {
         // Arrange
@@ -382,7 +382,7 @@ public class ElementQueryTests
 
     #region getElementsByTagNameNS Tests
 
-    [Fact(Skip = "DOM query tests")]
+    [Fact]
     public void GetElementsByTagNameNS_MatchingNamespace_ReturnsElements()
     {
         // Arrange
@@ -399,7 +399,7 @@ public class ElementQueryTests
         Assert.Same(svgElement, results[0]);
     }
 
-    [Fact(Skip = "DOM query tests")]
+    [Fact]
     public void GetElementsByTagNameNS_WildcardNamespace_MatchesAllNamespaces()
     {
         // Arrange
@@ -418,7 +418,7 @@ public class ElementQueryTests
         Assert.Equal(2, results.Count);
     }
 
-    [Fact(Skip = "DOM query tests")]
+    [Fact]
     public void GetElementsByTagNameNS_WildcardLocalName_MatchesAllLocalNames()
     {
         // Arrange

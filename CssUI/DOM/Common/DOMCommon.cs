@@ -625,15 +625,24 @@ public static class DOMCommon
     public static LinkedList<NodeType> Get_Ancestors<NodeType>(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL) where NodeType : INode
     {
         LinkedList<NodeType> list = new LinkedList<NodeType>();
-        TreeWalker tree = new TreeWalker(node!, FilterMask, Filter);
-        Node? current = tree.parentNode();
+        // Walk up the parent chain directly instead of using TreeWalker
+        // (TreeWalker doesn't work well for ancestors since it stops at its root)
+        Node? current = node.parentNode;
         while (current is not null)
         {
-            if (current is NodeType currentAsType)
+            // Apply filter mask
+            int n = (int)current.nodeType - 1;
+            ulong mask = (1UL << n);
+            bool passedMask = (0 != ((ulong)FilterMask & mask));
+
+            // Apply filter
+            bool passedFilter = Filter is null || Filter.acceptNode(current) == Enums.ENodeFilterResult.FILTER_ACCEPT;
+
+            if (passedMask && passedFilter && current is NodeType currentAsType)
             {
                 list.AddLast(currentAsType);
             }
-            current = tree.parentNode();
+            current = current.parentNode;
         }
 
         return list;
@@ -1291,6 +1300,7 @@ public static class DOMCommon
         {
             /* 1) Whose namespace is the HTML namespace and whose qualified name is qualifiedName, in ASCII lowercase. */
             /* 2) Whose namespace is not the HTML namespace and whose qualified name is qualifiedName. */
+            string qualifiedNameLower = qualifiedName.ToLowerInvariant();
 
             LinkedList<Element> descendents = new LinkedList<Element>();
             var tree = new TreeWalker(root, ENodeFilterMask.SHOW_ELEMENT);
@@ -1300,7 +1310,8 @@ public static class DOMCommon
                 var element = (Element)current;
                 if (StringCommon.StrEq(element.NamespaceURI, HTMLNamespace))
                 {
-                    if (StringCommon.StrEq(qualifiedName, element.tagName.ToLowerInvariant()))
+                    // For HTML namespace elements, compare case-insensitively
+                    if (StringCommon.StrEq(qualifiedNameLower, element.tagName.ToLowerInvariant()))
                     {
                         descendents.AddLast(element);
                     }
@@ -1401,10 +1412,7 @@ public static class DOMCommon
         {
             Element? E = current as Element;
 
-            if (E.classList.ContainsAll(classes))
-                descendents.AddLast(E);
-
-            if (E is not null)
+            if (E is not null && E.classList.ContainsAll(classes))
                 descendents.AddLast(E);
 
             current = tree.nextNode();

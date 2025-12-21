@@ -151,7 +151,7 @@ public class AttributeDefinition
         {
             case EAttributeType.String:// strings accept any value
                 {
-                    outValue = Input;
+                    outValue = new AtomicString(Input);
                 }
                 break;
             case EAttributeType.Boolean:// we need no verification for booleans. they dont care what the value use, only whether its null or not

@@ -639,7 +639,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
         CEReactions.Enqueue_Reaction(this, EReactionName.AttributeChanged, attr.localName, attr.Value, attr.namespaceURI);
 
         /* 3) Run the attribute change steps with element, attribute’s local name, attribute’s value, value, and attribute’s namespace. */
-        run_attribute_change_steps(this, attr.localName, attr.Value!, newValue!, (attr.namespaceURI ?? string.Empty).AsMemory());
+        run_attribute_change_steps(this, attr.localName, oldValue!, newValue!, (attr.namespaceURI ?? string.Empty).AsMemory());
         /* 4) Set attribute’s value to value. */
         attr.Value = newValue;
     }
@@ -877,17 +877,14 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
             throw new DomSyntaxError("Could not parse selector.");
         }
         /* 3) Let elements be context object’s inclusive ancestors that are elements, in reverse tree order. */
-        TreeWalker tree = new TreeWalker(this, ENodeFilterMask.SHOW_ELEMENT);
-        //* 4) For each element in elements, if match a selector against an element, using s, element, and :scope element context object, returns success, return element. [SELECTORS4] *//*
-        while (true)
+        /* 4) For each element in elements, if match a selector against an element, using s, element, and :scope element context object, returns success, return element. [SELECTORS4] */
+        // Start with this element (inclusive ancestors includes self)
+        Element? current = this;
+        while (current is not null)
         {
-            Node n = tree.parentNode();
-            if (n is null)
-                break;
-
-            Element element = (Element)n;
-            if (Selector.Match(element, this))
-                return element;
+            if (Selector.Match(current, this))
+                return current;
+            current = current.parentElement;
         }
         /* 5) Return null */
         return null;

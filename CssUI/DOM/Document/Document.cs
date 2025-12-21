@@ -720,10 +720,10 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
         return null;
     }
 
-    internal void Update_Element_ID(Element element, AttributeValue oldValue, AttributeValue newValue)
+    internal void Update_Element_ID(Element element, AttributeValue? oldValue, AttributeValue? newValue)
     {
-        AtomicString? oldKey = oldValue.AsAtomic();
-        AtomicString? newKey = newValue.AsAtomic();
+        AtomicString? oldKey = oldValue?.AsAtomic();
+        AtomicString? newKey = newValue?.AsAtomic();
 
         if (oldKey is not null && (newKey is null ? false : oldKey.Equals(newKey))) return;
 
@@ -755,6 +755,26 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
             {
                 weakRef.SetTarget(owner);
                 Element_ID_Map[newKey] = weakRef;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Removes an element from the ID map (called when element is removed from document)
+    /// </summary>
+    internal void Remove_Element_From_ID_Map(Element element)
+    {
+        var idAttr = element.getAttribute(EAttributeName.ID);
+        if (idAttr is null) return;
+
+        AtomicString? idKey = idAttr.AsAtomic();
+        if (idKey is null) return;
+
+        if (Element_ID_Map.TryGetValue(idKey, out var weakRef))
+        {
+            if (weakRef.TryGetTarget(out var mappedElement) && ReferenceEquals(mappedElement, element))
+            {
+                Element_ID_Map.Remove(idKey);
             }
         }
     }

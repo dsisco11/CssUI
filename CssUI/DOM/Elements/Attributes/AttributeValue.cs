@@ -129,10 +129,10 @@ public class AttributeValue
         if (Def is null)
         {
             // For custom attributes (data-* or unknown), treat as string
-            return new AttributeValue(EAttributeType.String, Input, Input);
+            return new AttributeValue(EAttributeType.String, new AtomicString(Input), Input);
         }
         Def.Parse(Input, out dynamic outVal);
-        return new AttributeValue(Def.Type, Input, outVal);
+        return new AttributeValue(Def.Type, outVal, Input);
     }
     #endregion
 
@@ -145,7 +145,12 @@ public class AttributeValue
     /// <summary>
     /// Retreives this value as a string if possible
     /// </summary>
-    public string? AsString() => Value as string;
+    public string? AsString()
+    {
+        if (Value is AtomicString atomicStr)
+            return atomicStr.ToString();
+        return Value as string;
+    }
 
     /// <summary>
     /// Retreives the RAW backing value
@@ -295,7 +300,13 @@ public class AttributeValue
                     {
                         if (other.Type == EAttributeType.String)
                         {
-                            return ((AtomicString?)Value)?.Equals((AtomicString?)other.Value!) ?? false;
+                            // Check if both values are AtomicStrings before comparing
+                            if (Value is AtomicString atomicValue && other.Value is AtomicString otherAtomicValue)
+                            {
+                                return atomicValue.Equals(otherAtomicValue);
+                            }
+                            // Fall back to string comparison
+                            return StringCommon.StrEq(Data, other.Data);
                         }
                         else
                         {
