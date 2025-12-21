@@ -108,7 +108,7 @@ internal class CssDefinitions
     /// </summary>
     static IEnumerable<StyleDefinition> Create_Font_Property_Definitions()
     {
-        return new StyleDefinition[] {
+        return [
             // SEE: https://www.w3.org/TR/CSS2/visudet.html#propdef-line-height
             new StyleDefinition(ECssPropertyID.LineHeight, true, EPropertyDirtFlags.Flow, CssValue.From(1.0), Percentage_Resolver: (Prop, Pct) => CssValue.From(Pct * Prop.Owner.Style.FontSize)),
 
@@ -138,7 +138,7 @@ internal class CssDefinitions
                 new Tuple<EPropertyStage, PropertyResolverFunc>(EPropertyStage.Computed, CssPropertyResolver.Font_Size_Computed),
                 new Tuple<EPropertyStage, PropertyResolverFunc>(EPropertyStage.Used, CssPropertyResolver.Font_Size_Used)
                 ),
-        };
+        ];
     }
 
     /// <summary>
@@ -146,10 +146,10 @@ internal class CssDefinitions
     /// </summary>
     static IEnumerable<StyleDefinition> Create_System_Property_Definitions()
     {
-        return new StyleDefinition[] {
+        return [
             new StyleDefinition(ECssPropertyID.DpiX, true, EPropertyDirtFlags.Text | EPropertyDirtFlags.Flow, CssValue.Null, ECssValueTypes.NUMBER, null, false, (E, Pct) => CssValue.From(Pct * 72.0)),
             new StyleDefinition(ECssPropertyID.DpiY, true, EPropertyDirtFlags.Text | EPropertyDirtFlags.Flow, CssValue.Null, ECssValueTypes.NUMBER, null, false, (E, Pct) => CssValue.From(Pct * 72.0)),
-        };
+        ];
     }
 
     /// <summary>
@@ -157,7 +157,7 @@ internal class CssDefinitions
     /// </summary>
     static IEnumerable<StyleDefinition> Create_Rendering_Property_Definitions()
     {
-        return new StyleDefinition[] {
+        return [
             new StyleDefinition(ECssPropertyID.ScrollBehavior, false, EPropertyDirtFlags.Visual, CssValue.From(EScrollBehavior.Auto), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EScrollBehavior>()),
             new StyleDefinition(ECssPropertyID.OverflowX, false, EPropertyDirtFlags.Visual, CssValue.From(EOverflowMode.Visible), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EOverflowMode>()),
             new StyleDefinition(ECssPropertyID.OverflowY, false, EPropertyDirtFlags.Visual, CssValue.From(EOverflowMode.Visible), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EOverflowMode>()),
@@ -179,7 +179,7 @@ internal class CssDefinitions
             // SEE: https://www.w3.org/TR/css-transforms-1/#transform-property
             // The transform property is completely visual and does not change an elements box
             new StyleDefinition(ECssPropertyID.Transform, false, EPropertyDirtFlags.Visual, CssValue.None)
-        };
+        ];
     }
 
     /// <summary>
@@ -187,11 +187,11 @@ internal class CssDefinitions
     /// </summary>
     static IEnumerable<StyleDefinition> Create_Layout_Property_Definitions()
     {
-        return new StyleDefinition[] {
+        return [
             new StyleDefinition(ECssPropertyID.Direction, true, EPropertyDirtFlags.Flow, CssValue.From(EDirection.LTR), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EDirection>()),
             new StyleDefinition(ECssPropertyID.WritingMode, true, EPropertyDirtFlags.Flow, CssValue.From(EWritingMode.Horizontal_TB), 0x0, Lookup.Get_Keywords<EWritingMode>()),
             new StyleDefinition(ECssPropertyID.TextAlign, true, EPropertyDirtFlags.Flow, CssValue.From(ETextAlign.Start), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<ETextAlign>())
-        };
+        ];
     }
 
     /// <summary>
@@ -199,10 +199,10 @@ internal class CssDefinitions
     /// </summary>
     static IEnumerable<StyleDefinition> Create_Sizing_Property_Definitions()
     {
-        return new StyleDefinition[] {
+        return [
             // The ‘object-fit’ property specifies how the contents of a replaced element should be fitted to the box established by its used height and width.
             new StyleDefinition(ECssPropertyID.ObjectFit, false, EPropertyDirtFlags.Replaced_Area, CssValue.From(EObjectFit.Fill), ECssValueTypes.KEYWORD)
-        };
+        ];
     }
 
     /// <summary>
@@ -210,7 +210,7 @@ internal class CssDefinitions
     /// </summary>
     static IEnumerable<StyleDefinition> Create_Block_Property_Definitions()
     {
-        return new StyleDefinition[] {
+        return [
 
             /// XXX: Update 'Display' property to modern specifications (Docs: https://www.w3.org/TR/css-display-3/#the-display-properties)
             new StyleDefinition(ECssPropertyID.Display, false, EPropertyDirtFlags.Box, CssValue.From(EDisplayMode.INLINE_BLOCK), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EDisplayMode>()),
@@ -287,7 +287,7 @@ internal class CssDefinitions
             new StyleDefinition(ECssPropertyID.MarginRight, false, EPropertyDirtFlags.Margin_Area, CssValue.Zero, AllowedTypes: ECssValueTypes.AUTO | ECssValueTypes.PERCENT | ECssValueTypes.DIMENSION, Keywords: null, IsPrivate: false, Percentage_Resolver: CssPercentageResolvers.Containing_Block_Logical_Width),
             new StyleDefinition(ECssPropertyID.MarginBottom, false, EPropertyDirtFlags.Margin_Area, CssValue.Zero, AllowedTypes: ECssValueTypes.AUTO | ECssValueTypes.PERCENT | ECssValueTypes.DIMENSION, Keywords: null, IsPrivate: false, Percentage_Resolver: CssPercentageResolvers.Containing_Block_Logical_Width),
             new StyleDefinition(ECssPropertyID.MarginLeft, false, EPropertyDirtFlags.Margin_Area, CssValue.Zero, AllowedTypes: ECssValueTypes.AUTO | ECssValueTypes.PERCENT | ECssValueTypes.DIMENSION, Keywords: null, IsPrivate: false, Percentage_Resolver: CssPercentageResolvers.Containing_Block_Logical_Width)
-        };
+        ];
     }
 
     /// <summary>
@@ -296,7 +296,7 @@ internal class CssDefinitions
     /// </summary>
     static IEnumerable<StyleDefinition> Create_Flexbox_Property_Definitions()
     {
-        return new StyleDefinition[] {
+        return [
             // flex-direction: row | row-reverse | column | column-reverse
             new StyleDefinition(ECssPropertyID.FlexDirection, false, EPropertyDirtFlags.Flow, CssValue.From(EFlexDirection.Row), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EFlexDirection>()),
 
@@ -314,7 +314,7 @@ internal class CssDefinitions
 
             // order: <integer> (default 0)
             new StyleDefinition(ECssPropertyID.Order, false, EPropertyDirtFlags.Flow, CssValue.From(0), ECssValueTypes.INTEGER)
-        };
+        ];
     }
 
     /// <summary>
@@ -323,7 +323,7 @@ internal class CssDefinitions
     /// </summary>
     static IEnumerable<StyleDefinition> Create_Grid_Property_Definitions()
     {
-        return new StyleDefinition[] {
+        return [
             // grid-auto-columns: <track-size>+ (default auto)
             new StyleDefinition(ECssPropertyID.GridAutoColumns, false, EPropertyDirtFlags.Flow, CssValue.Auto, ECssValueTypes.AUTO | ECssValueTypes.DIMENSION | ECssValueTypes.PERCENT | ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EBoxSize>()),
 
@@ -350,7 +350,7 @@ internal class CssDefinitions
 
             // grid-template-rows: none | <track-list> (default none)
             new StyleDefinition(ECssPropertyID.GridTemplateRows, false, EPropertyDirtFlags.Flow, CssValue.From_String("none"), ECssValueTypes.KEYWORD | ECssValueTypes.STRING)
-        };
+        ];
     }
 
     /// <summary>
@@ -359,7 +359,7 @@ internal class CssDefinitions
     /// </summary>
     static IEnumerable<StyleDefinition> Create_Alignment_Property_Definitions()
     {
-        return new StyleDefinition[] {
+        return [
             // align-content: normal | <baseline-position> | <content-distribution> | <content-position> (default normal)
             new StyleDefinition(ECssPropertyID.AlignContent, false, EPropertyDirtFlags.Flow, CssValue.From(EAlignContent.Normal), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EAlignContent>()),
 
@@ -383,7 +383,7 @@ internal class CssDefinitions
 
             // column-gap: normal | <length-percentage> (default normal)
             new StyleDefinition(ECssPropertyID.ColumnGap, false, EPropertyDirtFlags.Flow, CssValue.From(0.0), ECssValueTypes.DIMENSION | ECssValueTypes.PERCENT, null, false, CssPercentageResolvers.Containing_Block_Logical_Width)
-        };
+        ];
     }
 
     /// <summary>
@@ -392,7 +392,7 @@ internal class CssDefinitions
     /// </summary>
     static IEnumerable<StyleDefinition> Create_Fragmentation_Property_Definitions()
     {
-        return new StyleDefinition[] {
+        return [
             // break-before: auto | avoid | avoid-page | avoid-column | avoid-region | page | column | region | left | right | recto | verso
             new StyleDefinition(ECssPropertyID.BreakBefore, false, EPropertyDirtFlags.Flow, CssValue.From(EBreakValue.Auto), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EBreakValue>()),
 
@@ -410,7 +410,7 @@ internal class CssDefinitions
 
             // box-decoration-break: slice | clone (default slice)
             new StyleDefinition(ECssPropertyID.BoxDecorationBreak, false, EPropertyDirtFlags.Flow, CssValue.From(EBoxDecorationBreak.Slice), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EBoxDecorationBreak>())
-        };
+        ];
     }
     #endregion
 }
