@@ -430,33 +430,33 @@ public abstract class Node : EventTarget, INode
         })!;
     }
 
-
     #region Equality
-    public bool isEqualNode(Node otherNode)
-    {
-        if (otherNode == null)
+    /// <summary>
+    /// Returns true if otherNode is structurally equal to this node per the DOM specification.
+    /// </summary>
+    /// <remarks>
+    /// Two nodes A and B are considered equal if all of the following conditions are true:
+    /// - A and B's nodeType attribute value is identical.
+    /// - A and B have the same number of children.
+    /// - Each child of A equals the child of B at the identical index.
+    /// </remarks>
+    /// <seealso href="https://dom.spec.whatwg.org/#concept-node-equals"/>
+    public virtual bool isEqualNode(Node? otherNode)
+    {/* Docs: https://dom.spec.whatwg.org/#concept-node-equals */
+        if (otherNode is null)
             return false;
 
-        return true;
-    }
-
-    public override bool Equals(object? obj)
-    {/* https://dom.spec.whatwg.org/#concept-node-equals */
-        if (obj is null)
-            return false;
-
-        if (ReferenceEquals(this, obj))
+        if (ReferenceEquals(this, otherNode))
             return true;
 
-        if (obj is not Node otherNode)
-            return false;
-        /* A and B’s nodeType attribute value is identical. */
+        /* A and B's nodeType attribute value is identical. */
         if (nodeType != otherNode.nodeType)
             return false;
 
         /* A and B have the same number of children. */
         if (childNodes.Count != otherNode.childNodes.Count)
             return false;
+
         /* Each child of A equals the child of B at the identical index. */
         for (int i = 0; i < childNodes.Count; i++)
         {
@@ -464,15 +464,18 @@ public abstract class Node : EventTarget, INode
                 return false;
         }
 
-        return isEqualNode(otherNode);
+        return true;
     }
 
-    public override int GetHashCode()
-    {
-        int hash = 17;
-        hash = hash * 31 + (int)nodeType;
-        return hash;
-    }
+    /// <summary>
+    /// Returns true if this node and the given object are the same instance (reference equality).
+    /// </summary>
+    /// <remarks>
+    /// Note: For DOM structural equality, use <see cref="isEqualNode(Node?)"/> instead.
+    /// </remarks>
+    public override bool Equals(object? obj) => ReferenceEquals(this, obj);
+
+    public override int GetHashCode() => RuntimeHelpers.GetHashCode(this);
     #endregion
 
     #region Internal
