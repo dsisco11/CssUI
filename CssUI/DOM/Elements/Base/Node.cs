@@ -869,6 +869,9 @@ public abstract class Node : EventTarget, INode
         /* 3) Let nodes be node’s children, if node is a DocumentFragment node; otherwise « node ». */
         IEnumerable<Node> nodes = (node is DocumentFragment doc1) ? doc1.childNodes.ToArray() : new Node[] { node };
         /* 4) If node is a DocumentFragment node, remove its children with the suppress observers flag set. */
+        // WHY .ToArray(): The childNodes collection is a live list. When Dom_remove_node_from_parent
+        // is called, it removes nodes from childNodes, modifying the collection we're iterating.
+        // By calling .ToArray() we create an independent snapshot that won't change during iteration.
         if (node is DocumentFragment doc2)
         {
             foreach (Node cn in nodes)
@@ -1077,10 +1080,16 @@ public abstract class Node : EventTarget, INode
             parent.ownerDocument.adoptNode(node);
         }
 
+        // WHY .ToArray(): The childNodes collection is a live list backed by List<Node>.
+        // The removal loop below calls Dom_remove_node_from_parent which removes nodes from
+        // parent.childNodes. If we iterated the live list directly, we'd get "Collection was
+        // modified during enumeration". ToArray() creates an independent copy to iterate safely.
         IEnumerable<Node> removedNodes = parent.childNodes.ToArray();
         IEnumerable<Node> addedNodes = Array.Empty<Node>();
 
         if (node is DocumentFragment)
+            // WHY .ToArray(): Same reason - these children will be moved to parent, clearing
+            // node.childNodes. We need a stable snapshot for the MutationRecord below.
             addedNodes = node.childNodes.ToArray();
         else if (node is not null)
             addedNodes = new Node[] { node };
