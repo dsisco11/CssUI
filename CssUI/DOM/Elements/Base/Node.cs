@@ -920,7 +920,7 @@ public abstract class Node : EventTarget, INode
                 parent.Run_child_text_node_change_steps(nodeAsText);
             }
             /* 6) If parent’s root is a shadow root, and parent is a slot whose assigned nodes is the empty list, then run signal a slot change for parent. */
-            if (parent.getRootNode().Is_ShadowHost && parent is ISlot parentSlot && !parentSlot.assignedNodes().Any())
+            if (parent.getRootNode() is ShadowRoot && parent is ISlot parentSlot && !parentSlot.assignedNodes().Any())
             {
                 parentSlot.Signal_Slot_Change();
             }
