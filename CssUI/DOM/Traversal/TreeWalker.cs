@@ -390,8 +390,9 @@ public class TreeWalker
                 }
                 /* 4) Set temporary to temporary's parent. */
                 temporary = temporary.parentNode;
-            }
-            /* 5) Set result to the result of filtering node within the context object. */
+            }            /* If temporary became null, we've exhausted the tree without finding root */
+            if (temporary is null)
+                return null;            /* 5) Set result to the result of filtering node within the context object. */
             result = filterNode(node);
             /* 6) If result is FILTER_ACCEPT, then set the context object's current to node and return node. */
             if (result == ENodeFilterResult.FILTER_ACCEPT)
