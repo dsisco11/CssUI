@@ -68,6 +68,20 @@ public class RelativeSelector : CompoundSelector
     }
 
     /// <summary>
+    /// Matches just the compound selector without applying the combinator.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void MatchCompound(IEnumerable<Element> MatchList, out LinkedList<Element> outMatchList, params Node[] scopeElements)
+    {
+        if (Count <= 0)
+        {
+            outMatchList = new LinkedList<Element>();
+            return;
+        }
+        base.Match(MatchList, out outMatchList, ESelectorMatchingOrder.RTL, scopeElements);
+    }
+
+    /// <summary>
     /// Applies the Complex selectors combinator to a single element
     /// </summary>
     /// <param name="element"></param>

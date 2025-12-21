@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using CssUI.CSS.Internal;
 using CssUI.DOM;
 using CssUI.DOM.Nodes;
 
@@ -33,17 +34,35 @@ public class ComplexSelector : List<RelativeSelector>
     public bool Match(Element element, params Node[] scopeElements)
     {/* Docs: https://drafts.csswg.org/selectors-4/#match-a-complex-selector-against-an-element */
         /*
-         * So our selector implementation is a little different from the W3C specifications in how it STRUCTURES its matching process, but the logic is the same.
+         * Right-to-Left matching: start from the rightmost selector (the subject) and work backwards.
+         * The combinator in selector[i] indicates how to find candidates for selector[i] from elements matching selector[i+1].
          */
-        /* Right-to-Left matching enforced here */
-        /* We run through our list of relative selectors and match them against our element, if ANY fail then the whole selector fails to match. */
         LinkedList<Element> matchList = new LinkedList<Element>(new Element[] { element });
+
         for (int i = Count - 1; i >= 0; i--)
         {
-            if (!this[i].Match(matchList, out LinkedList<Element> outMatchList, scopeElements))
+            // Match the compound selector against current candidates
+            this[i].MatchCompound(matchList, out LinkedList<Element> matches, scopeElements);
+
+            if (matches.Count == 0)
                 return false;
 
-            matchList = outMatchList;
+            // If this isn't the first selector (leftmost), apply the combinator to get next candidates
+            if (i > 0)
+            {
+                // Use the combinator from the selector to the LEFT (this[i-1]) to find candidates
+                var matchSet = new HashSet<Element>();
+                foreach (Element matched in matches)
+                {
+                    var candidates = this[i - 1].Apply_Combinator(matched, ESelectorMatchingOrder.RTL);
+                    matchSet.UnionWith(candidates);
+                }
+                matchList = new LinkedList<Element>(matchSet);
+            }
+            else
+            {
+                matchList = matches;
+            }
         }
 
         return true;
