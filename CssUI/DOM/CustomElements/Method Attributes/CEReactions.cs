@@ -65,8 +65,8 @@ public class CEReactions : Attribute
              * Fortunately creating a clone of this element and "stealing" its children will do exactly that!
              */
 
-            /* UPDATE: 
-             *      We cannot just replace the element because we cannot update any instances of it being referenced in memory, 
+            /* UPDATE:
+             *      We cannot just replace the element because we cannot update any instances of it being referenced in memory,
              *      so we need to figure out a way we can do the equivalent of this upgrade to the actual live element instance in memory */
 
             throw new NotImplementedException($"Custom element upgrading is not yet supported");
@@ -119,6 +119,10 @@ public class CEReactions : Attribute
 
     public static void Try_Upgrade_Element(Element element)
     {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#concept-try-upgrade */
+        // Early exit if custom elements aren't available (e.g., during document construction)
+        if (element.nodeDocument?.defaultView?.customElements == null)
+            return;
+
         var definition = element.nodeDocument.defaultView.customElements.Lookup(element.nodeDocument, element.NamespaceURI!, element.localName!, element.is_value!);
         if (definition != null)
         {
@@ -204,7 +208,7 @@ public class CEReactions : Attribute
         /* 5) If an exception exception was thrown by the original steps, rethrow exception. */
         if (exception != null)
         {
-            throw exception;
+            System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(exception).Throw();
         }
 #else
         wrappedMethod.Invoke();
@@ -245,7 +249,7 @@ public class CEReactions : Attribute
         /* 5) If an exception exception was thrown by the original steps, rethrow exception. */
         if (exception != null)
         {
-            throw exception;
+            System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(exception).Throw();
         }
 
         /* 6) If a value value was returned from the original steps, return value. */
