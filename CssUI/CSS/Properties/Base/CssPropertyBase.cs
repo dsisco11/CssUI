@@ -47,7 +47,6 @@ public abstract class CssPropertyBase : ICssProperty
 
     public CssComputedStyle? Source
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get
         {
             SourcePtr.TryGetTarget(out CssComputedStyle? src);
@@ -57,12 +56,11 @@ public abstract class CssPropertyBase : ICssProperty
 
     public StyleDefinition? Definition
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get
         {
             if (CssName is null)
                 return null;
-            return CssDefinitions.StyleDefinitions[CssName];
+            return CssDefinitions.StyleDefinitions.TryGetValue(CssName, out StyleDefinition? def) ? def : null;
         }
     }
     #endregion
