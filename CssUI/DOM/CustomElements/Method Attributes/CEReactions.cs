@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using CssUI.DOM.CustomElements;
+using CssUI.DOM.Enums;
 #if ENABLE_HTML
 using CssUI.HTML;
 using CssUI.HTML.CustomElements;
