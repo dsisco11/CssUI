@@ -18,7 +18,7 @@ public class NodeIterator
     // XXX: Still dont know where this collection comes from
     private IList<Node> iterCollection;// = new ICollection<Node>();
     private Node? referenceNode = null;
-    private bool pointerBeforeReferenceNode = false;
+    private bool pointerBeforeReferenceNode = true;  // DOM spec: starts as true
     private bool isActive = false;
     #endregion
 
@@ -124,7 +124,7 @@ public class NodeIterator
         /* 1) If traverser’s active flag is set, then throw an "InvalidStateError" DOMException. */
         if (isActive) throw new InvalidStateError();
         /* 2) Let n be node’s nodeType attribute value − 1. */
-        int n = (int)node.nodeType;
+        int n = (int)node.nodeType - 1;
         /* 3) If the nth bit (where 0 is the least significant bit) of traverser’s whatToShow is not set, then return FILTER_SKIP. */
         ulong mask = (1UL << n);
         if (0 == ((ulong)this.whatToShow & mask))
@@ -163,7 +163,7 @@ public class NodeIterator
             if (!beforeNode)
             {
                 int i = iterCollection.IndexOf(node);
-                if (i < (iterCollection.Count - 1))
+                if (i >= (iterCollection.Count - 1))
                     return null;
 
                 node = iterCollection[i + 1];
