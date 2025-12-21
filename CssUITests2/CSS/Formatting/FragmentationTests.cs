@@ -1,7 +1,7 @@
 using System.Linq;
 using CssUI.CSS;
 using CssUI.CSS.Formatting;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace CssUITests.CSS.Formatting;
 
@@ -10,13 +10,12 @@ namespace CssUITests.CSS.Formatting;
 /// Tests the CSS Fragmentation (break properties) implementation.
 /// Spec: https://www.w3.org/TR/css-break-3/
 /// </summary>
-[TestClass]
 public class FragmentationTests
 {
     #region EBreakValue Tests
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void EBreakValue_HasAllSpecValues()
     {
         // Verify all CSS Break Level 3 values exist by referencing them directly
@@ -38,14 +37,14 @@ public class FragmentationTests
         };
 
         // Verify count matches expected spec values
-        Assert.AreEqual(12, values.Length);
+        Assert.Equal(12, values.Length);
 
         // Verify all values are distinct
-        Assert.AreEqual(values.Length, values.Distinct().Count());
+        Assert.Equal(values.Length, values.Distinct().Count());
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void EBoxDecorationBreak_HasAllSpecValues()
     {
         // Reference values directly for compile-time verification
@@ -55,154 +54,154 @@ public class FragmentationTests
             EBoxDecorationBreak.Clone
         };
 
-        Assert.AreEqual(2, values.Length);
-        Assert.AreEqual(values.Length, values.Distinct().Count());
+        Assert.Equal(2, values.Length);
+        Assert.Equal(values.Length, values.Distinct().Count());
     }
 
     #endregion
 
     #region FragmentationTypes Tests
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void EFragmentainerType_HasExpectedValues()
     {
-        Assert.AreEqual(0, (int)EFragmentainerType.None);
-        Assert.AreEqual(1, (int)EFragmentainerType.Page);
-        Assert.AreEqual(2, (int)EFragmentainerType.Column);
-        Assert.AreEqual(3, (int)EFragmentainerType.Region);
+        Assert.Equal(0, (int)EFragmentainerType.None);
+        Assert.Equal(1, (int)EFragmentainerType.Page);
+        Assert.Equal(2, (int)EFragmentainerType.Column);
+        Assert.Equal(3, (int)EFragmentainerType.Region);
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void EBreakType_HasExpectedValues()
     {
-        Assert.AreEqual(0, (int)EBreakType.None);
-        Assert.AreEqual(1, (int)EBreakType.Soft);
-        Assert.AreEqual(2, (int)EBreakType.Forced);
+        Assert.Equal(0, (int)EBreakType.None);
+        Assert.Equal(1, (int)EBreakType.Soft);
+        Assert.Equal(2, (int)EBreakType.Forced);
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationBreakResult_NoBreak_DoesNotBreak()
     {
         var result = FragmentationBreakResult.NoBreak;
-        Assert.IsFalse(result.ShouldBreak);
-        Assert.AreEqual(EBreakType.None, result.BreakType);
+        Assert.False(result.ShouldBreak);
+        Assert.Equal(EBreakType.None, result.BreakType);
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationBreakResult_SoftBreak_ShouldBreak()
     {
         var result = FragmentationBreakResult.SoftBreak(EFragmentainerType.Page);
-        Assert.IsTrue(result.ShouldBreak);
-        Assert.AreEqual(EBreakType.Soft, result.BreakType);
-        Assert.AreEqual(EFragmentainerType.Page, result.FragmentainerType);
+        Assert.True(result.ShouldBreak);
+        Assert.Equal(EBreakType.Soft, result.BreakType);
+        Assert.Equal(EFragmentainerType.Page, result.FragmentainerType);
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationBreakResult_ForcedBreak_ShouldBreak()
     {
         var result = FragmentationBreakResult.ForcedBreak(EFragmentainerType.Column);
-        Assert.IsTrue(result.ShouldBreak);
-        Assert.AreEqual(EBreakType.Forced, result.BreakType);
-        Assert.AreEqual(EFragmentainerType.Column, result.FragmentainerType);
+        Assert.True(result.ShouldBreak);
+        Assert.Equal(EBreakType.Forced, result.BreakType);
+        Assert.Equal(EFragmentainerType.Column, result.FragmentainerType);
     }
 
     #endregion
 
     #region FragmentationContext Tests
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_DefaultConstructor_NoFragmentation()
     {
         var context = new FragmentationContext();
-        Assert.IsFalse(context.IsFragmenting);
-        Assert.AreEqual(EFragmentainerType.None, context.FragmentainerType);
-        Assert.AreEqual(float.MaxValue, context.FragmentainerBlockSize);
+        Assert.False(context.IsFragmenting);
+        Assert.Equal(EFragmentainerType.None, context.FragmentainerType);
+        Assert.Equal(float.MaxValue, context.FragmentainerBlockSize);
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_WithType_IsFragmenting()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 800f);
-        Assert.IsTrue(context.IsFragmenting);
-        Assert.AreEqual(EFragmentainerType.Page, context.FragmentainerType);
-        Assert.AreEqual(800f, context.FragmentainerBlockSize);
+        Assert.True(context.IsFragmenting);
+        Assert.Equal(EFragmentainerType.Page, context.FragmentainerType);
+        Assert.Equal(800f, context.FragmentainerBlockSize);
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_InitialBlockOffset_IsZero()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 800f);
-        Assert.AreEqual(0f, context.CurrentBlockOffset);
-        Assert.AreEqual(800f, context.RemainingBlockSpace);
+        Assert.Equal(0f, context.CurrentBlockOffset);
+        Assert.Equal(800f, context.RemainingBlockSpace);
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_AdvanceBlockOffset_UpdatesOffset()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 800f);
         context.AdvanceBlockOffset(200f);
-        Assert.AreEqual(200f, context.CurrentBlockOffset);
-        Assert.AreEqual(600f, context.RemainingBlockSpace);
+        Assert.Equal(200f, context.CurrentBlockOffset);
+        Assert.Equal(600f, context.RemainingBlockSpace);
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_CanFit_ReturnsTrueWhenEnoughSpace()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 800f);
-        Assert.IsTrue(context.CanFit(500f));
-        Assert.IsTrue(context.CanFit(799f));
+        Assert.True(context.CanFit(500f));
+        Assert.True(context.CanFit(799f));
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_CanFit_ReturnsTrueWhenExactFit()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 800f);
         // Edge case: exactly fills the fragmentainer
-        Assert.IsTrue(context.CanFit(800f));
+        Assert.True(context.CanFit(800f));
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_CanFit_ZeroSize_ReturnsTrue()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 800f);
-        Assert.IsTrue(context.CanFit(0f));
+        Assert.True(context.CanFit(0f));
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_CanFit_ReturnsFalseWhenNotEnoughSpace()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 800f);
         context.AdvanceBlockOffset(500f);
-        Assert.IsFalse(context.CanFit(400f));
+        Assert.False(context.CanFit(400f));
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_AdvanceToNextFragmentainer_IncrementsIndex()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 800f);
-        Assert.AreEqual(0, context.FragmentIndex);
+        Assert.Equal(0, context.FragmentIndex);
 
         context.AdvanceToNextFragmentainer();
-        Assert.AreEqual(1, context.FragmentIndex);
-        Assert.AreEqual(0f, context.CurrentBlockOffset);
+        Assert.Equal(1, context.FragmentIndex);
+        Assert.Equal(0f, context.CurrentBlockOffset);
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_Reset_ClearsState()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 800f);
@@ -211,118 +210,118 @@ public class FragmentationTests
         context.AdvanceBlockOffset(200f);
 
         context.Reset();
-        Assert.AreEqual(0, context.FragmentIndex);
-        Assert.AreEqual(0f, context.CurrentBlockOffset);
+        Assert.Equal(0, context.FragmentIndex);
+        Assert.Equal(0f, context.CurrentBlockOffset);
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_NoFragmentation_CanFitAlwaysTrue()
     {
         var context = new FragmentationContext();
-        Assert.IsTrue(context.CanFit(float.MaxValue));
+        Assert.True(context.CanFit(float.MaxValue));
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_EvaluateBreakBefore_NullBox_NoBreak()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 800f);
         var result = context.EvaluateBreakBefore(null);
-        Assert.IsFalse(result.ShouldBreak);
+        Assert.False(result.ShouldBreak);
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_EvaluateBreakAfter_NullBox_NoBreak()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 800f);
         var result = context.EvaluateBreakAfter(null);
-        Assert.IsFalse(result.ShouldBreak);
+        Assert.False(result.ShouldBreak);
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_ShouldAvoidBreakInside_NullBox_False()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 800f);
-        Assert.IsFalse(context.ShouldAvoidBreakInside(null));
+        Assert.False(context.ShouldAvoidBreakInside(null));
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_CheckOrphans_NullBox_True()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 800f);
-        Assert.IsTrue(context.CheckOrphans(null, 1));
+        Assert.True(context.CheckOrphans(null, 1));
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_CheckWidows_NullBox_True()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 800f);
-        Assert.IsTrue(context.CheckWidows(null, 1));
+        Assert.True(context.CheckWidows(null, 1));
     }
 
     #endregion
 
     #region IFormattingContext Fragmentation Support Tests
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FlexFormattingContext_Flow_NullNode_ThrowsArgumentNullException()
     {
         var flexContext = new FlexFormattingContext();
         var fragmentationContext = new FragmentationContext(EFragmentainerType.Page, 800f);
 
-        Assert.ThrowsException<System.ArgumentNullException>(() =>
+        Assert.Throws<System.ArgumentNullException>(() =>
             flexContext.Flow(null!, fragmentationContext));
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FlexFormattingContext_AcceptsFragmentationContext()
     {
         var flexContext = new FlexFormattingContext();
         var fragmentationContext = new FragmentationContext(EFragmentainerType.Page, 800f);
 
         // Verify the formatting context can be created with fragmentation support
-        Assert.IsNotNull(flexContext);
-        Assert.IsNotNull(fragmentationContext);
-        Assert.IsTrue(fragmentationContext.IsFragmenting);
+        Assert.NotNull(flexContext);
+        Assert.NotNull(fragmentationContext);
+        Assert.True(fragmentationContext.IsFragmenting);
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void GridFormattingContext_Flow_NullNode_ThrowsArgumentNullException()
     {
         var gridContext = new GridFormattingContext();
         var fragmentationContext = new FragmentationContext(EFragmentainerType.Page, 800f);
 
-        Assert.ThrowsException<System.ArgumentNullException>(() =>
+        Assert.Throws<System.ArgumentNullException>(() =>
             gridContext.Flow(null!, fragmentationContext));
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void GridFormattingContext_AcceptsFragmentationContext()
     {
         var gridContext = new GridFormattingContext();
         var fragmentationContext = new FragmentationContext(EFragmentainerType.Page, 800f);
 
         // Verify the formatting context can be created with fragmentation support
-        Assert.IsNotNull(gridContext);
-        Assert.IsNotNull(fragmentationContext);
-        Assert.IsTrue(fragmentationContext.IsFragmenting);
+        Assert.NotNull(gridContext);
+        Assert.NotNull(fragmentationContext);
+        Assert.True(fragmentationContext.IsFragmenting);
     }
 
     #endregion
 
     #region Additional Edge Case Tests
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_MultipleAdvanceToNextFragmentainer_IncrementsCorrectly()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 800f);
@@ -331,29 +330,29 @@ public class FragmentationTests
         context.AdvanceToNextFragmentainer();
         context.AdvanceToNextFragmentainer();
 
-        Assert.AreEqual(3, context.FragmentIndex);
+        Assert.Equal(3, context.FragmentIndex);
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_ColumnType_IsFragmenting()
     {
         var context = new FragmentationContext(EFragmentainerType.Column, 500f);
-        Assert.IsTrue(context.IsFragmenting);
-        Assert.AreEqual(EFragmentainerType.Column, context.FragmentainerType);
+        Assert.True(context.IsFragmenting);
+        Assert.Equal(EFragmentainerType.Column, context.FragmentainerType);
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_RegionType_IsFragmenting()
     {
         var context = new FragmentationContext(EFragmentainerType.Region, 600f);
-        Assert.IsTrue(context.IsFragmenting);
-        Assert.AreEqual(EFragmentainerType.Region, context.FragmentainerType);
+        Assert.True(context.IsFragmenting);
+        Assert.Equal(EFragmentainerType.Region, context.FragmentainerType);
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_AdvanceBlockOffset_AccumulatesCorrectly()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 800f);
@@ -362,64 +361,64 @@ public class FragmentationTests
         context.AdvanceBlockOffset(150f);
         context.AdvanceBlockOffset(50f);
 
-        Assert.AreEqual(300f, context.CurrentBlockOffset);
-        Assert.AreEqual(500f, context.RemainingBlockSpace);
+        Assert.Equal(300f, context.CurrentBlockOffset);
+        Assert.Equal(500f, context.RemainingBlockSpace);
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_AdvanceToNextFragmentainer_ResetsOffset()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 800f);
 
         context.AdvanceBlockOffset(400f);
-        Assert.AreEqual(400f, context.CurrentBlockOffset);
+        Assert.Equal(400f, context.CurrentBlockOffset);
 
         context.AdvanceToNextFragmentainer();
-        Assert.AreEqual(0f, context.CurrentBlockOffset);
-        Assert.AreEqual(800f, context.RemainingBlockSpace);
+        Assert.Equal(0f, context.CurrentBlockOffset);
+        Assert.Equal(800f, context.RemainingBlockSpace);
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationBreakResult_Equality_SameValues()
     {
         var result1 = FragmentationBreakResult.ForcedBreak(EFragmentainerType.Page);
         var result2 = FragmentationBreakResult.ForcedBreak(EFragmentainerType.Page);
 
-        Assert.AreEqual(result1.ShouldBreak, result2.ShouldBreak);
-        Assert.AreEqual(result1.BreakType, result2.BreakType);
-        Assert.AreEqual(result1.FragmentainerType, result2.FragmentainerType);
+        Assert.Equal(result1.ShouldBreak, result2.ShouldBreak);
+        Assert.Equal(result1.BreakType, result2.BreakType);
+        Assert.Equal(result1.FragmentainerType, result2.FragmentainerType);
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationBreakResult_DifferentTypes_DifferentFragmentainerType()
     {
         var pageBreak = FragmentationBreakResult.ForcedBreak(EFragmentainerType.Page);
         var columnBreak = FragmentationBreakResult.ForcedBreak(EFragmentainerType.Column);
 
-        Assert.AreNotEqual(pageBreak.FragmentainerType, columnBreak.FragmentainerType);
+        Assert.NotEqual(pageBreak.FragmentainerType, columnBreak.FragmentainerType);
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_ZeroBlockSize_CanFitOnlyZero()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 0f);
 
-        Assert.IsTrue(context.CanFit(0f));
-        Assert.IsFalse(context.CanFit(1f));
+        Assert.True(context.CanFit(0f));
+        Assert.False(context.CanFit(1f));
     }
 
-    [TestMethod]
-    [TestCategory("Fragmentation")]
+    [Fact]
+    [Trait("Category", "Fragmentation")]
     public void FragmentationContext_VerySmallBlockSize_CanFitSmallContent()
     {
         var context = new FragmentationContext(EFragmentainerType.Page, 0.5f);
 
-        Assert.IsTrue(context.CanFit(0.5f));
-        Assert.IsFalse(context.CanFit(0.6f));
+        Assert.True(context.CanFit(0.5f));
+        Assert.False(context.CanFit(0.6f));
     }
 
     #endregion

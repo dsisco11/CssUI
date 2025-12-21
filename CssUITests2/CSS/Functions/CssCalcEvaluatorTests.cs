@@ -2,7 +2,7 @@ using System;
 using CssUI.CSS;
 using CssUI.CSS.Functions;
 using CssUI.CSS.Parser;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace CssUITests.CSS.Functions;
 
@@ -10,503 +10,502 @@ namespace CssUITests.CSS.Functions;
 /// Unit tests for CSS calc() function and math functions per CSS Values Level 4.
 /// Tests IEEE-754 semantics, numeric constants, and all math functions.
 /// </summary>
-[TestClass]
 public class CssCalcEvaluatorTests
 {
     #region Infrastructure Tests
 
-    [TestMethod]
-    [TestCategory("Calc")]
+    [Fact]
+    [Trait("Category", "Calc")]
     public void ECssValueTypes_HasFunctionType()
     {
-        Assert.IsTrue(System.Enum.IsDefined(typeof(ECssValueTypes), "FUNCTION"));
+        Assert.True(System.Enum.IsDefined(typeof(ECssValueTypes), "FUNCTION"));
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
+    [Fact]
+    [Trait("Category", "Calc")]
     public void ECssValueTypes_FunctionValue()
     {
-        Assert.AreEqual(1 << 23, (int)ECssValueTypes.FUNCTION);
+        Assert.Equal(1 << 23, (int)ECssValueTypes.FUNCTION);
     }
 
     #endregion
 
     #region Numeric Constants Tests (CSS Values Level 4 §10.7)
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Constants")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Constants")]
     public void Constants_E_HasCorrectValue()
     {
-        Assert.AreEqual(Math.E, CssCalcEvaluator.E, 0.0000001);
+        Assert.Equal(Math.E, CssCalcEvaluator.E, 7);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Constants")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Constants")]
     public void Constants_Pi_HasCorrectValue()
     {
-        Assert.AreEqual(Math.PI, CssCalcEvaluator.Pi, 0.0000001);
+        Assert.Equal(Math.PI, CssCalcEvaluator.Pi, 7);
     }
 
     #endregion
 
     #region IEEE-754 Semantics Tests (CSS Values Level 4 §10.9.1)
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("IEEE754")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "IEEE754")]
     public void Division_ByZero_ReturnsPositiveInfinity()
     {
         // Test: 1 / 0 = +∞
         var func = CreateCalcFunction(1, "/", 0);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.IsTrue(double.IsPositiveInfinity(result.Value));
+        Assert.NotNull(result);
+        Assert.True(double.IsPositiveInfinity(result.Value));
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("IEEE754")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "IEEE754")]
     public void Division_NegativeByZero_ReturnsNegativeInfinity()
     {
         // Test: -1 / 0 = -∞
         var func = CreateCalcFunction(-1, "/", 0);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.IsTrue(double.IsNegativeInfinity(result.Value));
+        Assert.NotNull(result);
+        Assert.True(double.IsNegativeInfinity(result.Value));
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("IEEE754")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "IEEE754")]
     public void Division_ZeroByZero_ReturnsNaN()
     {
         // Test: 0 / 0 = NaN
         var func = CreateCalcFunction(0, "/", 0);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.IsTrue(double.IsNaN(result.Value));
+        Assert.NotNull(result);
+        Assert.True(double.IsNaN(result.Value));
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("IEEE754")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "IEEE754")]
     public void Multiplication_ZeroTimesInfinity_ReturnsNaN()
     {
         // Test: 0 * ∞ = NaN
         var func = CreateCalcWithIdentOp(0, "*", "infinity");
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.IsTrue(double.IsNaN(result.Value));
+        Assert.NotNull(result);
+        Assert.True(double.IsNaN(result.Value));
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("IEEE754")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "IEEE754")]
     public void NaN_IsInfectious()
     {
         // Test: NaN + 5 = NaN
         var func = CreateCalcWithIdentOp("nan", "+", 5);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.IsTrue(double.IsNaN(result.Value));
+        Assert.NotNull(result);
+        Assert.True(double.IsNaN(result.Value));
     }
 
     #endregion
 
     #region Comparison Functions Tests (CSS Values Level 4 §10.2)
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Comparison")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Comparison")]
     public void Min_WithMultipleValues_ReturnsSmallest()
     {
         var func = CreateMinMaxFunction("min", 10, 5, 20);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(5, result.Value);
+        Assert.NotNull(result);
+        Assert.Equal(5, result.Value);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Comparison")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Comparison")]
     public void Max_WithMultipleValues_ReturnsLargest()
     {
         var func = CreateMinMaxFunction("max", 10, 5, 20);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(20, result.Value);
+        Assert.NotNull(result);
+        Assert.Equal(20, result.Value);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Comparison")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Comparison")]
     public void Clamp_ValueInRange_ReturnsValue()
     {
         // clamp(10, 15, 20) = 15
         var func = CreateClampFunction(10, 15, 20);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(15, result.Value);
+        Assert.NotNull(result);
+        Assert.Equal(15, result.Value);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Comparison")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Comparison")]
     public void Clamp_ValueBelowMin_ReturnsMin()
     {
         // clamp(10, 5, 20) = 10
         var func = CreateClampFunction(10, 5, 20);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(10, result.Value);
+        Assert.NotNull(result);
+        Assert.Equal(10, result.Value);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Comparison")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Comparison")]
     public void Clamp_ValueAboveMax_ReturnsMax()
     {
         // clamp(10, 25, 20) = 20
         var func = CreateClampFunction(10, 25, 20);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(20, result.Value);
+        Assert.NotNull(result);
+        Assert.Equal(20, result.Value);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Comparison")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Comparison")]
     public void Clamp_MinGreaterThanMax_MinWins()
     {
         // clamp(100, 50, 20) = 100 (MIN wins per spec)
         var func = CreateClampFunction(100, 50, 20);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(100, result.Value);
+        Assert.NotNull(result);
+        Assert.Equal(100, result.Value);
     }
 
     #endregion
 
     #region Trigonometric Functions Tests (CSS Values Level 4 §10.4)
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Trig")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Trig")]
     public void Sin_Of0_Returns0()
     {
         var func = CreateSingleArgFunction("sin", 0);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(0, result.Value, 0.0001);
+        Assert.NotNull(result);
+        Assert.Equal(0, result.Value, 4);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Trig")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Trig")]
     public void Sin_Of90Degrees_Returns1()
     {
         var func = CreateSingleArgFunction("sin", 90);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(1, result.Value, 0.0001);
+        Assert.NotNull(result);
+        Assert.Equal(1, result.Value, 4);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Trig")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Trig")]
     public void Cos_Of0_Returns1()
     {
         var func = CreateSingleArgFunction("cos", 0);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(1, result.Value, 0.0001);
+        Assert.NotNull(result);
+        Assert.Equal(1, result.Value, 4);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Trig")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Trig")]
     public void Cos_Of90Degrees_Returns0()
     {
         var func = CreateSingleArgFunction("cos", 90);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(0, result.Value, 0.0001);
+        Assert.NotNull(result);
+        Assert.Equal(0, result.Value, 4);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Trig")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Trig")]
     public void Tan_OfInfinity_ReturnsNaN()
     {
         var func = CreateSingleArgFunctionWithIdent("tan", "infinity");
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.IsTrue(double.IsNaN(result.Value));
+        Assert.NotNull(result);
+        Assert.True(double.IsNaN(result.Value));
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Trig")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Trig")]
     public void Asin_Of0_Returns0()
     {
         var func = CreateSingleArgFunction("asin", 0);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(0, result.Value, 0.0001);
+        Assert.NotNull(result);
+        Assert.Equal(0, result.Value, 4);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Trig")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Trig")]
     public void Acos_Of1_Returns0()
     {
         var func = CreateSingleArgFunction("acos", 1);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(0, result.Value, 0.0001);
+        Assert.NotNull(result);
+        Assert.Equal(0, result.Value, 4);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Trig")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Trig")]
     public void Asin_OutOfRange_ReturnsNaN()
     {
         // asin(2) is undefined, should return NaN
         var func = CreateSingleArgFunction("asin", 2);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.IsTrue(double.IsNaN(result.Value));
+        Assert.NotNull(result);
+        Assert.True(double.IsNaN(result.Value));
     }
 
     #endregion
 
     #region Exponential Functions Tests (CSS Values Level 4 §10.5)
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Exponential")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Exponential")]
     public void Pow_2To3_Returns8()
     {
         var func = CreateTwoArgFunction("pow", 2, 3);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(8, result.Value, 0.0001);
+        Assert.NotNull(result);
+        Assert.Equal(8, result.Value, 4);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Exponential")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Exponential")]
     public void Sqrt_Of16_Returns4()
     {
         var func = CreateSingleArgFunction("sqrt", 16);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(4, result.Value, 0.0001);
+        Assert.NotNull(result);
+        Assert.Equal(4, result.Value, 4);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Exponential")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Exponential")]
     public void Sqrt_OfNegative_ReturnsNaN()
     {
         var func = CreateSingleArgFunction("sqrt", -4);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.IsTrue(double.IsNaN(result.Value));
+        Assert.NotNull(result);
+        Assert.True(double.IsNaN(result.Value));
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Exponential")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Exponential")]
     public void Hypot_3And4_Returns5()
     {
         // hypot(3, 4) = sqrt(3² + 4²) = 5
         var func = CreateTwoArgFunction("hypot", 3, 4);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(5, result.Value, 0.0001);
+        Assert.NotNull(result);
+        Assert.Equal(5, result.Value, 4);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Exponential")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Exponential")]
     public void Log_OfE_Returns1()
     {
         // ln(e) = 1
         var func = CreateSingleArgFunctionWithIdent("log", "e");
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(1, result.Value, 0.0001);
+        Assert.NotNull(result);
+        Assert.Equal(1, result.Value, 4);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Exponential")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Exponential")]
     public void Log_Of0_ReturnsNegativeInfinity()
     {
         var func = CreateSingleArgFunction("log", 0);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.IsTrue(double.IsNegativeInfinity(result.Value));
+        Assert.NotNull(result);
+        Assert.True(double.IsNegativeInfinity(result.Value));
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Exponential")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Exponential")]
     public void Exp_Of0_Returns1()
     {
         var func = CreateSingleArgFunction("exp", 0);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(1, result.Value, 0.0001);
+        Assert.NotNull(result);
+        Assert.Equal(1, result.Value, 4);
     }
 
     #endregion
 
     #region Sign Functions Tests (CSS Values Level 4 §10.6)
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Sign")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Sign")]
     public void Abs_OfNegative_ReturnsPositive()
     {
         var func = CreateSingleArgFunction("abs", -42);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(42, result.Value);
+        Assert.NotNull(result);
+        Assert.Equal(42, result.Value);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Sign")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Sign")]
     public void Abs_OfPositive_ReturnsPositive()
     {
         var func = CreateSingleArgFunction("abs", 42);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(42, result.Value);
+        Assert.NotNull(result);
+        Assert.Equal(42, result.Value);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Sign")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Sign")]
     public void Sign_OfPositive_Returns1()
     {
         var func = CreateSingleArgFunction("sign", 42);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(1, result.Value);
+        Assert.NotNull(result);
+        Assert.Equal(1, result.Value);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Sign")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Sign")]
     public void Sign_OfNegative_ReturnsNegative1()
     {
         var func = CreateSingleArgFunction("sign", -42);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(-1, result.Value);
+        Assert.NotNull(result);
+        Assert.Equal(-1, result.Value);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Sign")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Sign")]
     public void Sign_Of0_Returns0()
     {
         var func = CreateSingleArgFunction("sign", 0);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(0, result.Value);
+        Assert.NotNull(result);
+        Assert.Equal(0, result.Value);
     }
 
     #endregion
 
     #region Stepped Value Functions Tests (CSS Values Level 4 §10.3)
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Stepped")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Stepped")]
     public void Round_Nearest_18By5_Returns20()
     {
         // round(nearest, 18, 5) = 20 (18 is closer to 20 than 15)
         var func = CreateRoundFunction("nearest", 18, 5);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(20, result.Value);
+        Assert.NotNull(result);
+        Assert.Equal(20, result.Value);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Stepped")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Stepped")]
     public void Round_Up_18By5_Returns20()
     {
         // round(up, 18, 5) = 20
         var func = CreateRoundFunction("up", 18, 5);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(20, result.Value);
+        Assert.NotNull(result);
+        Assert.Equal(20, result.Value);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Stepped")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Stepped")]
     public void Round_Down_18By5_Returns15()
     {
         // round(down, 18, 5) = 15
         var func = CreateRoundFunction("down", 18, 5);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(15, result.Value);
+        Assert.NotNull(result);
+        Assert.Equal(15, result.Value);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Stepped")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Stepped")]
     public void Mod_18By5_Returns3()
     {
         // mod(18, 5) = 3
         var func = CreateTwoArgFunction("mod", 18, 5);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(3, result.Value);
+        Assert.NotNull(result);
+        Assert.Equal(3, result.Value);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Stepped")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Stepped")]
     public void Mod_ByZero_ReturnsNaN()
     {
         var func = CreateTwoArgFunction("mod", 18, 0);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.IsTrue(double.IsNaN(result.Value));
+        Assert.NotNull(result);
+        Assert.True(double.IsNaN(result.Value));
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Stepped")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Stepped")]
     public void Rem_18By5_Returns3()
     {
         // rem(18, 5) = 3
         var func = CreateTwoArgFunction("rem", 18, 5);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(3, result.Value);
+        Assert.NotNull(result);
+        Assert.Equal(3, result.Value);
     }
 
-    [TestMethod]
-    [TestCategory("Calc")]
-    [TestCategory("Stepped")]
+    [Fact]
+    [Trait("Category", "Calc")]
+    [Trait("Category", "Stepped")]
     public void Rem_Negative18By5_ReturnsNegative3()
     {
         // rem(-18, 5) = -3 (sign matches dividend)
         var func = CreateTwoArgFunction("rem", -18, 5);
         var result = CssCalcEvaluator.EvaluateMathFunction(func, null!, 0);
-        Assert.IsNotNull(result);
-        Assert.AreEqual(-3, result.Value);
+        Assert.NotNull(result);
+        Assert.Equal(-3, result.Value);
     }
 
     #endregion
@@ -624,4 +623,3 @@ public class CssCalcEvaluatorTests
 
     #endregion
 }
-

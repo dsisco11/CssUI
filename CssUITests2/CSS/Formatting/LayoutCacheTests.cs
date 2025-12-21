@@ -1,6 +1,6 @@
 using System;
 using CssUI.CSS.Formatting;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace CssUITests.CSS.Formatting;
 
@@ -8,44 +8,43 @@ namespace CssUITests.CSS.Formatting;
 /// Unit tests for LayoutCache.
 /// Tests caching of layout computation results.
 /// </summary>
-[TestClass]
 public class LayoutCacheTests
 {
     #region Initialization Tests
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_CanBeInstantiated()
     {
         var cache = new LayoutCache();
-        Assert.IsNotNull(cache);
+        Assert.NotNull(cache);
     }
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_InitialState_Empty()
     {
         var cache = new LayoutCache();
-        Assert.AreEqual(0, cache.FlexCacheCount);
-        Assert.AreEqual(0, cache.GridCacheCount);
+        Assert.Equal(0, cache.FlexCacheCount);
+        Assert.Equal(0, cache.GridCacheCount);
     }
 
     #endregion
 
     #region Flex Layout Cache Tests
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_TryGetFlexLayout_MissOnEmpty()
     {
         var cache = new LayoutCache();
         bool found = cache.TryGetFlexLayout(1, 100f, 100f, out var result);
-        Assert.IsFalse(found);
-        Assert.IsNull(result);
+        Assert.False(found);
+        Assert.Null(result);
     }
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_SetFlexLayout_IncrementsCount()
     {
         var cache = new LayoutCache();
@@ -56,11 +55,11 @@ public class LayoutCacheTests
         };
 
         cache.SetFlexLayout(1, 100f, 100f, result);
-        Assert.AreEqual(1, cache.FlexCacheCount);
+        Assert.Equal(1, cache.FlexCacheCount);
     }
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_TryGetFlexLayout_HitAfterSet()
     {
         var cache = new LayoutCache();
@@ -73,14 +72,14 @@ public class LayoutCacheTests
         cache.SetFlexLayout(1, 100f, 100f, expected);
         bool found = cache.TryGetFlexLayout(1, 100f, 100f, out var actual);
 
-        Assert.IsTrue(found);
-        Assert.IsNotNull(actual);
-        Assert.AreEqual(expected.LineCount, actual.LineCount);
-        CollectionAssert.AreEqual(expected.ItemMainSizes, actual.ItemMainSizes);
+        Assert.True(found);
+        Assert.NotNull(actual);
+        Assert.Equal(expected.LineCount, actual.LineCount);
+        Assert.Equal(expected.ItemMainSizes, actual.ItemMainSizes);
     }
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_TryGetFlexLayout_MissOnDifferentSize()
     {
         var cache = new LayoutCache();
@@ -89,11 +88,11 @@ public class LayoutCacheTests
         cache.SetFlexLayout(1, 100f, 100f, result);
         bool found = cache.TryGetFlexLayout(1, 200f, 100f, out _);
 
-        Assert.IsFalse(found);
+        Assert.False(found);
     }
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_TryGetFlexLayout_MissAfterInvalidate()
     {
         var cache = new LayoutCache();
@@ -103,25 +102,25 @@ public class LayoutCacheTests
         cache.InvalidateElement(1);
         bool found = cache.TryGetFlexLayout(1, 100f, 100f, out _);
 
-        Assert.IsFalse(found);
+        Assert.False(found);
     }
 
     #endregion
 
     #region Grid Layout Cache Tests
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_TryGetGridLayout_MissOnEmpty()
     {
         var cache = new LayoutCache();
         bool found = cache.TryGetGridLayout(1, 100f, 100f, out var result);
-        Assert.IsFalse(found);
-        Assert.IsNull(result);
+        Assert.False(found);
+        Assert.Null(result);
     }
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_SetGridLayout_IncrementsCount()
     {
         var cache = new LayoutCache();
@@ -132,11 +131,11 @@ public class LayoutCacheTests
         };
 
         cache.SetGridLayout(1, 100f, 100f, result);
-        Assert.AreEqual(1, cache.GridCacheCount);
+        Assert.Equal(1, cache.GridCacheCount);
     }
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_TryGetGridLayout_HitAfterSet()
     {
         var cache = new LayoutCache();
@@ -149,14 +148,14 @@ public class LayoutCacheTests
         cache.SetGridLayout(1, 100f, 100f, expected);
         bool found = cache.TryGetGridLayout(1, 100f, 100f, out var actual);
 
-        Assert.IsTrue(found);
-        Assert.IsNotNull(actual);
-        CollectionAssert.AreEqual(expected.ColumnTrackSizes, actual.ColumnTrackSizes);
-        CollectionAssert.AreEqual(expected.RowTrackSizes, actual.RowTrackSizes);
+        Assert.True(found);
+        Assert.NotNull(actual);
+        Assert.Equal(expected.ColumnTrackSizes, actual.ColumnTrackSizes);
+        Assert.Equal(expected.RowTrackSizes, actual.RowTrackSizes);
     }
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_TryGetGridLayout_MissOnDifferentSize()
     {
         var cache = new LayoutCache();
@@ -165,11 +164,11 @@ public class LayoutCacheTests
         cache.SetGridLayout(1, 100f, 100f, result);
         bool found = cache.TryGetGridLayout(1, 100f, 200f, out _);
 
-        Assert.IsFalse(found);
+        Assert.False(found);
     }
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_TryGetGridLayout_MissAfterInvalidate()
     {
         var cache = new LayoutCache();
@@ -179,15 +178,15 @@ public class LayoutCacheTests
         cache.InvalidateElement(1);
         bool found = cache.TryGetGridLayout(1, 100f, 100f, out _);
 
-        Assert.IsFalse(found);
+        Assert.False(found);
     }
 
     #endregion
 
     #region Invalidation Tests
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_InvalidateAll_ClearsBothCaches()
     {
         var cache = new LayoutCache();
@@ -195,17 +194,17 @@ public class LayoutCacheTests
         cache.SetFlexLayout(1, 100f, 100f, new LayoutCache.FlexLayoutResult());
         cache.SetGridLayout(2, 100f, 100f, new LayoutCache.GridLayoutResult());
 
-        Assert.AreEqual(1, cache.FlexCacheCount);
-        Assert.AreEqual(1, cache.GridCacheCount);
+        Assert.Equal(1, cache.FlexCacheCount);
+        Assert.Equal(1, cache.GridCacheCount);
 
         cache.InvalidateAll();
 
-        Assert.AreEqual(0, cache.FlexCacheCount);
-        Assert.AreEqual(0, cache.GridCacheCount);
+        Assert.Equal(0, cache.FlexCacheCount);
+        Assert.Equal(0, cache.GridCacheCount);
     }
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_InvalidateElement_OnlyAffectsSpecificElement()
     {
         var cache = new LayoutCache();
@@ -217,15 +216,15 @@ public class LayoutCacheTests
 
         // Element 1 should miss
         bool found1 = cache.TryGetFlexLayout(1, 100f, 100f, out _);
-        Assert.IsFalse(found1);
+        Assert.False(found1);
 
         // Element 2 should still hit
         bool found2 = cache.TryGetFlexLayout(2, 100f, 100f, out _);
-        Assert.IsTrue(found2);
+        Assert.True(found2);
     }
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_Clear_RemovesEverything()
     {
         var cache = new LayoutCache();
@@ -236,16 +235,16 @@ public class LayoutCacheTests
 
         cache.Clear();
 
-        Assert.AreEqual(0, cache.FlexCacheCount);
-        Assert.AreEqual(0, cache.GridCacheCount);
+        Assert.Equal(0, cache.FlexCacheCount);
+        Assert.Equal(0, cache.GridCacheCount);
     }
 
     #endregion
 
     #region Edge Cases
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_MultipleElementsSameSize_IndependentCaching()
     {
         var cache = new LayoutCache();
@@ -259,12 +258,12 @@ public class LayoutCacheTests
         cache.TryGetFlexLayout(1, 100f, 100f, out var actual1);
         cache.TryGetFlexLayout(2, 100f, 100f, out var actual2);
 
-        Assert.AreEqual(1, actual1!.LineCount);
-        Assert.AreEqual(2, actual2!.LineCount);
+        Assert.Equal(1, actual1!.LineCount);
+        Assert.Equal(2, actual2!.LineCount);
     }
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_SameElementDifferentSizes_LatestEntryPreferred()
     {
         var cache = new LayoutCache();
@@ -279,12 +278,12 @@ public class LayoutCacheTests
         // or may cache multiple size variants - either is valid
         bool found200 = cache.TryGetFlexLayout(1, 200f, 200f, out var actual200);
 
-        Assert.IsTrue(found200, "Latest entry should always be cached");
-        Assert.AreEqual(2, actual200!.LineCount);
+        Assert.True(found200);
+        Assert.Equal(2, actual200!.LineCount);
     }
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_SizeTolerance_VerifyBehavior()
     {
         var cache = new LayoutCache();
@@ -300,16 +299,16 @@ public class LayoutCacheTests
 
         // Note: The actual tolerance depends on implementation
         // This test documents expected behavior - adjust if implementation differs
-        Assert.IsTrue(foundTiny, "Very small size differences should be tolerated");
-        Assert.IsFalse(foundLarger, "Larger size differences should result in cache miss");
+        Assert.True(foundTiny);
+        Assert.False(foundLarger);
     }
 
     #endregion
 
     #region Additional Edge Cases and Boundary Tests
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_ZeroElementId_WorksCorrectly()
     {
         var cache = new LayoutCache();
@@ -318,12 +317,12 @@ public class LayoutCacheTests
         cache.SetFlexLayout(0, 100f, 100f, result);
         bool found = cache.TryGetFlexLayout(0, 100f, 100f, out var actual);
 
-        Assert.IsTrue(found);
-        Assert.AreEqual(1, actual!.LineCount);
+        Assert.True(found);
+        Assert.Equal(1, actual!.LineCount);
     }
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_NegativeElementId_WorksCorrectly()
     {
         var cache = new LayoutCache();
@@ -332,12 +331,12 @@ public class LayoutCacheTests
         cache.SetFlexLayout(-1, 100f, 100f, result);
         bool found = cache.TryGetFlexLayout(-1, 100f, 100f, out var actual);
 
-        Assert.IsTrue(found);
-        Assert.AreEqual(2, actual!.LineCount);
+        Assert.True(found);
+        Assert.Equal(2, actual!.LineCount);
     }
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_ZeroSize_WorksCorrectly()
     {
         var cache = new LayoutCache();
@@ -346,12 +345,12 @@ public class LayoutCacheTests
         cache.SetFlexLayout(1, 0f, 0f, result);
         bool found = cache.TryGetFlexLayout(1, 0f, 0f, out var actual);
 
-        Assert.IsTrue(found);
-        Assert.AreEqual(1, actual!.LineCount);
+        Assert.True(found);
+        Assert.Equal(1, actual!.LineCount);
     }
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_VeryLargeSize_WorksCorrectly()
     {
         var cache = new LayoutCache();
@@ -360,12 +359,12 @@ public class LayoutCacheTests
         cache.SetFlexLayout(1, float.MaxValue, float.MaxValue, result);
         bool found = cache.TryGetFlexLayout(1, float.MaxValue, float.MaxValue, out var actual);
 
-        Assert.IsTrue(found);
-        Assert.AreEqual(1, actual!.LineCount);
+        Assert.True(found);
+        Assert.Equal(1, actual!.LineCount);
     }
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_FlexLayoutResult_EmptyArrays_WorksCorrectly()
     {
         var cache = new LayoutCache();
@@ -380,13 +379,13 @@ public class LayoutCacheTests
         cache.SetFlexLayout(1, 100f, 100f, result);
         bool found = cache.TryGetFlexLayout(1, 100f, 100f, out var actual);
 
-        Assert.IsTrue(found);
-        Assert.AreEqual(0, actual!.LineCount);
-        Assert.AreEqual(0, actual.ItemMainSizes?.Length ?? 0);
+        Assert.True(found);
+        Assert.Equal(0, actual!.LineCount);
+        Assert.Equal(0, actual.ItemMainSizes?.Length ?? 0);
     }
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_GridLayoutResult_AllFields_PreservedCorrectly()
     {
         var cache = new LayoutCache();
@@ -399,14 +398,14 @@ public class LayoutCacheTests
         cache.SetGridLayout(1, 450f, 125f, result);
         bool found = cache.TryGetGridLayout(1, 450f, 125f, out var actual);
 
-        Assert.IsTrue(found);
-        Assert.IsNotNull(actual);
-        CollectionAssert.AreEqual(result.ColumnTrackSizes, actual.ColumnTrackSizes);
-        CollectionAssert.AreEqual(result.RowTrackSizes, actual.RowTrackSizes);
+        Assert.True(found);
+        Assert.NotNull(actual);
+        Assert.Equal(result.ColumnTrackSizes, actual.ColumnTrackSizes);
+        Assert.Equal(result.RowTrackSizes, actual.RowTrackSizes);
     }
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_OverwriteExistingEntry_ReplacesValue()
     {
         var cache = new LayoutCache();
@@ -419,12 +418,12 @@ public class LayoutCacheTests
 
         bool found = cache.TryGetFlexLayout(1, 100f, 100f, out var actual);
 
-        Assert.IsTrue(found);
-        Assert.AreEqual(5, actual!.LineCount, "Should return the most recent value");
+        Assert.True(found);
+        Assert.Equal(5, actual!.LineCount);
     }
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_MixedFlexAndGrid_IndependentCaches()
     {
         var cache = new LayoutCache();
@@ -439,21 +438,21 @@ public class LayoutCacheTests
         cache.SetFlexLayout(1, 100f, 100f, flexResult);
         cache.SetGridLayout(1, 100f, 100f, gridResult);
 
-        Assert.AreEqual(1, cache.FlexCacheCount);
-        Assert.AreEqual(1, cache.GridCacheCount);
+        Assert.Equal(1, cache.FlexCacheCount);
+        Assert.Equal(1, cache.GridCacheCount);
 
         // Both should still be retrievable
         bool foundFlex = cache.TryGetFlexLayout(1, 100f, 100f, out var actualFlex);
         bool foundGrid = cache.TryGetGridLayout(1, 100f, 100f, out var actualGrid);
 
-        Assert.IsTrue(foundFlex);
-        Assert.IsTrue(foundGrid);
-        Assert.AreEqual(1, actualFlex!.LineCount);
-        Assert.AreEqual(1, actualGrid!.ColumnTrackSizes?.Length ?? 0);
+        Assert.True(foundFlex);
+        Assert.True(foundGrid);
+        Assert.Equal(1, actualFlex!.LineCount);
+        Assert.Equal(1, actualGrid!.ColumnTrackSizes?.Length ?? 0);
     }
 
-    [TestMethod]
-    [TestCategory("LayoutCache")]
+    [Fact]
+    [Trait("Category", "LayoutCache")]
     public void LayoutCache_InvalidateElement_AffectsBothCaches()
     {
         var cache = new LayoutCache();
@@ -466,8 +465,8 @@ public class LayoutCacheTests
         bool foundFlex = cache.TryGetFlexLayout(1, 100f, 100f, out _);
         bool foundGrid = cache.TryGetGridLayout(1, 100f, 100f, out _);
 
-        Assert.IsFalse(foundFlex, "Flex cache should be invalidated");
-        Assert.IsFalse(foundGrid, "Grid cache should be invalidated");
+        Assert.False(foundFlex);
+        Assert.False(foundGrid);
     }
 
     #endregion
