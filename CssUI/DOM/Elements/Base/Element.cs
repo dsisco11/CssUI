@@ -502,6 +502,17 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
 #endif
     }
 
+    /// <summary>
+    /// Runs the W3C specification defined removing steps for this element.
+    /// </summary>
+    /// <param name="node">The node being removed.</param>
+    internal override void Run_node_removing_steps(Node node)
+    {/* Docs: https://dom.spec.whatwg.org/#concept-node-remove */
+        base.Run_node_removing_steps(node);
+        // Remove element from document's ID map (implementation-specific extension)
+        nodeDocument?.Remove_Element_From_ID_Map(this);
+    }
+
     internal bool is_potentially_scrollable
     {/* Docs: https://www.w3.org/TR/cssom-view-1/#potentially-scrollable */
         get

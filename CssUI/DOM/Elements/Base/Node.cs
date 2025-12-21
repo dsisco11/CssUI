@@ -481,9 +481,9 @@ public abstract class Node : EventTarget, INode
     /// </summary>
     public bool isRoot => (parentNode is null);
     /// <summary>
-    /// A node (in particular elements and text nodes) can be marked as inert. 
-    /// When a node is inert, then the user agent must act as if the node was absent for the purposes of targeting user interaction events, 
-    /// may ignore the node for the purposes of text search user interfaces (commonly known as "find in page"), 
+    /// A node (in particular elements and text nodes) can be marked as inert.
+    /// When a node is inert, then the user agent must act as if the node was absent for the purposes of targeting user interaction events,
+    /// may ignore the node for the purposes of text search user interfaces (commonly known as "find in page"),
     /// and may prevent the user from selecting text in that node. User agents should allow the user to override the restrictions on search and text selection, however.
     /// </summary>
     internal bool isInert = false;
@@ -784,26 +784,29 @@ public abstract class Node : EventTarget, INode
         /* 13) Run the removing steps with node and parent. */
         parent.Run_node_removing_steps(node);
 
-        /* 14) If node is custom, then enqueue a custom element callback reaction with node, callback name "disconnectedCallback", and an empty argument list. */
-        if (node is Element nodeElement)
+        /* 14) Let isParentConnected be parent's connected. */
+        bool isParentConnected = parent.isConnected;
+
+        /* 15) If node is custom and isParentConnected is true, then enqueue a custom element callback reaction with node, callback name "disconnectedCallback", and an empty argument list. */
+        if (node is Element nodeElement && nodeElement.isCustom && isParentConnected)
         {
             CEReactions.Enqueue_Reaction(nodeElement, EReactionName.Disconnected, Array.Empty<object>());
         }
 
-        /* 15) For each shadow-including descendant descendant of node, in shadow-including tree order, then: */
+        /* 16) For each shadow-including descendant descendant of node, in shadow-including tree order, then: */
         foreach (Node descendant in DOMCommon.Get_Shadow_Including_Descendents(node))
         {
-            /* 1) Run the removing steps with descendant. */
-            Dom_remove_node_from_parent(descendant, node);
-            /* 2) If descendant is custom, then enqueue a custom element callback reaction with descendant, callback name "disconnectedCallback", and an empty argument list. */
-            if (descendant is Element childElement)
+            /* 1) Run the removing steps with descendant and null. */
+            descendant.Run_node_removing_steps(descendant);
+            /* 2) If descendant is custom and isParentConnected is true, then enqueue a custom element callback reaction with descendant, callback name "disconnectedCallback", and an empty argument list. */
+            if (descendant is Element childElement && childElement.isCustom && isParentConnected)
             {
                 CEReactions.Enqueue_Reaction(childElement, EReactionName.Disconnected, Array.Empty<object>());
             }
         }
 
-        /* 16) For each inclusive ancestor inclusiveAncestor of parent, and then for each registered of inclusiveAncestor’s registered observer list, 
-         * if registered’s options’s subtree is true, then append a new transient registered observer whose observer is registered’s observer, 
+        /* 16) For each inclusive ancestor inclusiveAncestor of parent, and then for each registered of inclusiveAncestor’s registered observer list,
+         * if registered’s options’s subtree is true, then append a new transient registered observer whose observer is registered’s observer,
          * options is registered’s options, and source is registered to node’s registered observer list. */
         var ancestors = DOMCommon.Get_Inclusive_Ancestors(parent);
         foreach (Node inclusiveAncestor in ancestors)
@@ -1120,9 +1123,9 @@ public abstract class Node : EventTarget, INode
         {
             if (node is DocumentFragment docFrag)
             {
-                /* 
+                /*
                  * If node has more than one element child or has a Text node child.
-                 * Otherwise, if node has one element child and either parent has an element child, child is a doctype, or child is not null and a doctype is following child. 
+                 * Otherwise, if node has one element child and either parent has an element child, child is a doctype, or child is not null and a doctype is following child.
                  */
                 var eCount = docFrag.childNodes.Count(c => c is Element);
                 if (eCount > 1 || docFrag.childNodes.Any(c => c is Text))
