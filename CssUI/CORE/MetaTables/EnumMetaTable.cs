@@ -50,6 +50,15 @@ internal static class EnumMetaTable
             IS_FLAGS[enumIndex] = hasFlagsAttribute;
 
             (int, MetaKeywordAttribute?)[] metaValues = Get_Meta_Enum_Values(metaInfo.Item1);
+
+            // Skip enums with no values (can happen with conditionally compiled enums)
+            if (metaValues.Length == 0)
+            {
+                TABLE[enumIndex] = Array.Empty<EnumData>();
+                KEYWORD[enumIndex] = new Dictionary<AtomicString, object>();
+                continue;
+            }
+
             // Initialize the tables for this enum
             int maxValue = metaValues.Max(x => x.Item1);
             TABLE[enumIndex] = new EnumData[maxValue + 1];
@@ -89,7 +98,13 @@ internal static class EnumMetaTable
     }
     public static object EnumMaxValue<T>() where T : struct
     {
-        return Enum.GetValues(typeof(T)).Cast<T>().Max();
+        var values = Enum.GetValues(typeof(T)).Cast<T>();
+        if (!values.Any())
+        {
+            // Return 0 for empty enums (can happen with conditionally compiled enums)
+            return default(T);
+        }
+        return values.Max();
     }
 
     public static unsafe (int, MetaKeywordAttribute?)[] Get_Meta_Enum_Values(Type metaEnum)

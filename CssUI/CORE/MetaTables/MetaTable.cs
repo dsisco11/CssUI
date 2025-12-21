@@ -49,13 +49,11 @@ public class MetaTable<TAttribute> where TAttribute : Attribute
 
         foreach (TypeInfo ty in assembly.DefinedTypes)
         {
-            if (ty.IsEnum)
+            // Scan all types that have the attribute (enums for MetaEnumAttribute, classes for MetaElementAttribute, etc.)
+            var metaAttr = (TAttribute?)ty.GetCustomAttribute(MetaAttributeType, false);
+            if (metaAttr != null)
             {
-                var metaAttr = (TAttribute?)ty.GetCustomAttribute(MetaAttributeType, false);
-                if (metaAttr != null)
-                {
-                    RetVal.Add((ty, metaAttr));
-                }
+                RetVal.Add((ty, metaAttr));
             }
         }
 
