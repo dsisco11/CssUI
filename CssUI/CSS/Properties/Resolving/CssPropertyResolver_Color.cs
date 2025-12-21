@@ -76,8 +76,7 @@ public static partial class CssPropertyResolver
         Contract.EndContractBlock();
 
         var prop = (Property as CssProperty);
-        CssValue Value = prop.Computed;
-
+        CssValue Value = (prop?.Computed) ?? throw new CssPropertyException($"No computed value found for property '{Property.CssName}'");
         if (Value.Type == ECssValueTypes.KEYWORD)
         {
             var keyword = Value.AsEnum<EColor>();
@@ -100,8 +99,7 @@ public static partial class CssPropertyResolver
         Contract.EndContractBlock();
 
         var prop = (Property as CssProperty);
-        CssValue Value = prop.Computed;
-
+        CssValue Value = (prop?.Specified) ?? throw new CssPropertyException($"No specified value found for property '{Property.CssName}'");
         double n = Value.AsDecimal();
         if (n < 0d)
         {
