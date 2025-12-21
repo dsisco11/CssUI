@@ -714,7 +714,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     #endregion
 
     #region ID Map
-    Dictionary<AtomicString, WeakReference<Element>> Element_ID_Map = new Dictionary<AtomicString, WeakReference<Element>>();
+    private readonly Dictionary<AtomicString, WeakReference<Element>> Element_ID_Map = [];
 
     public Element? getElementByID(AtomicString id)
     {
@@ -779,13 +779,15 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
         AtomicString? idKey = idAttr.AsAtomic();
         if (idKey is null) return;
 
-        if (Element_ID_Map.TryGetValue(idKey, out var weakRef))
-        {
-            if (weakRef.TryGetTarget(out var mappedElement) && ReferenceEquals(mappedElement, element))
-            {
-                Element_ID_Map.Remove(idKey);
-            }
-        }
+        Element_ID_Map.Remove(idKey);
+        // We don't need to check that the ref matches, because IDs are unique per document (and refusing to remove has lead to bugs before)
+        // if (Element_ID_Map.TryGetValue(idKey, out var weakRef))
+        // {
+        //     if (weakRef.TryGetTarget(out var mappedElement) && ReferenceEquals(mappedElement, element))
+        //     {
+        //         Element_ID_Map.Remove(idKey);
+        //     }
+        // }
     }
     #endregion
 
