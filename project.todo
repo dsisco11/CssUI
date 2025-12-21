@@ -7,17 +7,26 @@
 - [ ] IWindowingSystem (window creation, input events) - pending
 
 ## Phase 4: DOM System Investigation & Fixes
-### 4.1 Unit Test Coverage for DOM Attributes
-- [ ] Investigate setAttribute/hasAttribute bug (hasAttribute returns false after setAttribute)
-- [ ] Create DOM attribute unit tests
-  - [ ] Test setAttribute with empty string value
-  - [ ] Test setAttribute with non-empty string value
-  - [ ] Test hasAttribute after setAttribute
-  - [ ] Test getAttribute after setAttribute
-  - [ ] Test removeAttribute
-  - [ ] Test attribute enumeration (getAttributeNames)
-- [ ] Investigate AttributeValue.From() behavior with empty strings
-- [ ] Verify Attr.Value assignment and retrieval
+### 4.1 Unit Test Coverage for DOM Attributes ✅ COMPLETED
+- [x] Investigate setAttribute/hasAttribute bug (hasAttribute returns false after setAttribute) - FIXED
+- [x] Create DOM attribute unit tests (24 tests passing)
+  - [x] Test setAttribute with empty string value
+  - [x] Test setAttribute with non-empty string value
+  - [x] Test hasAttribute after setAttribute
+  - [x] Test getAttribute after setAttribute
+  - [x] Test removeAttribute
+  - [x] Test attribute enumeration (getAttributeNames)
+  - [x] Test toggleAttribute
+  - [x] Test hasAttributes
+- [x] Investigate AttributeValue.From() behavior with empty strings - WORKS CORRECTLY
+- [x] Verify Attr.Value assignment and retrieval - WORKS CORRECTLY
+
+#### Bugs Fixed During Testing:
+1. XMLCommon.Is_NameChar() was missing '-' and '.' characters per XML spec
+2. OrderedDictionary.Remove() wasn't updating MapInverse (index mapping corruption)
+3. OrderedDictionary.UpdateIndicesAfterRemoval() wasn't decrementing indices after removal
+4. Element.toggleAttribute() was passing Document instead of Element as owner to Attr constructor
+5. AttributeValue.Parse() wasn't handling custom/data-* attributes (returned null definition)
 
 ### 4.2 DOM Element Tests
 - [ ] Test element creation (createElement, createElementNS)
@@ -36,7 +45,7 @@
 - [ ] Simplification algorithm
 - [ ] Proper serialization
 
-## Test Coverage — 793 PASSING, 152 SKIPPED (known bugs)
+## Test Coverage — 165 PASSING (after DOM attribute tests enabled)
 
 ### CSS Systems Test Status
 - [ ] CSS Properties system (CSS/Properties/)
