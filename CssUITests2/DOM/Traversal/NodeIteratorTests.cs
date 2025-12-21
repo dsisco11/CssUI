@@ -243,7 +243,7 @@ public class NodeIteratorTests
         Assert.Null(result);
     }
 
-    [Fact(Skip = "Pending CSS StyleProperty stack overflow investigation")]
+    [Fact]
     public void PreviousNode_AfterNextNode_ReturnsPrevious()
     {
         // Arrange
@@ -255,11 +255,15 @@ public class NodeIteratorTests
 
         // Act
         iterator.nextNode(); // root
-        iterator.nextNode(); // child
-        var result = iterator.previousNode();
+        iterator.nextNode(); // child - pointer is now AFTER child
+        var result1 = iterator.previousNode(); // Per DOM spec: returns child, moves pointer BEFORE child
+        var result2 = iterator.previousNode(); // Now returns root
 
-        // Assert
-        Assert.Same(root, result);
+        // Assert - Per DOM spec, first previousNode() after forward traversal returns
+        // the current node (child) because the pointer was AFTER it, then moves pointer before it.
+        // The second previousNode() returns the actual previous node (root).
+        Assert.Same(child, result1);
+        Assert.Same(root, result2);
     }
 
     [Fact]
@@ -274,12 +278,14 @@ public class NodeIteratorTests
         root.appendChild(child2);
         var iterator = CreateNodeIterator(root, ENodeFilterMask.SHOW_ELEMENT);
 
-        // Forward traverse
+        // Forward traverse - pointer ends AFTER child2
         iterator.nextNode(); // root
         iterator.nextNode(); // child1
         iterator.nextNode(); // child2
 
         // Act & Assert - Backward traverse
+        // Per DOM spec: first previousNode() returns current node (child2) and moves pointer before it
+        Assert.Same(child2, iterator.previousNode());
         Assert.Same(child1, iterator.previousNode());
         Assert.Same(root, iterator.previousNode());
         Assert.Null(iterator.previousNode());
@@ -297,13 +303,15 @@ public class NodeIteratorTests
         root.appendChild(child2);
         var iterator = CreateNodeIterator(root, ENodeFilterMask.SHOW_ELEMENT);
 
-        // Act & Assert
-        Assert.Same(root, iterator.nextNode());
-        Assert.Same(child1, iterator.nextNode());
-        Assert.Same(root, iterator.previousNode());
-        Assert.Same(child1, iterator.nextNode());
-        Assert.Same(child2, iterator.nextNode());
-        Assert.Same(child1, iterator.previousNode());
+        // Act & Assert - Per DOM spec:
+        // When pointer is AFTER a node and we call previousNode(), it returns that node and moves pointer before it
+        // When pointer is BEFORE a node and we call nextNode(), it returns that node and moves pointer after it
+        Assert.Same(root, iterator.nextNode());     // returns root, pointer now AFTER root
+        Assert.Same(child1, iterator.nextNode());   // returns child1, pointer now AFTER child1
+        Assert.Same(child1, iterator.previousNode()); // pointer was AFTER child1, returns child1, pointer now BEFORE child1
+        Assert.Same(child1, iterator.nextNode());   // pointer was BEFORE child1, returns child1, pointer now AFTER child1
+        Assert.Same(child2, iterator.nextNode());   // returns child2, pointer now AFTER child2
+        Assert.Same(child2, iterator.previousNode()); // pointer was AFTER child2, returns child2, pointer now BEFORE child2
     }
 
     #endregion
@@ -390,7 +398,7 @@ public class NodeIteratorTests
 
     #region NodeFilter Tests
 
-    [Fact(Skip = "Pending CSS StyleProperty stack overflow investigation")]
+    [Fact]
     public void NextNode_WithFilter_SkipsFilteredNodes()
     {
         // Arrange
@@ -456,9 +464,12 @@ public class NodeIteratorTests
 
         // Forward traverse to end
         iterator.nextNode(); // root (p)
-        iterator.nextNode(); // child2 (p)
+        iterator.nextNode(); // child2 (p) - pointer is now AFTER child2
 
-        // Act & Assert - Backward traverse should skip span
+        // Act & Assert - Backward traverse
+        // Per DOM spec: first previousNode() returns current node (child2), moves pointer BEFORE it
+        // Then previousNode() skips child1(span) and returns root(p)
+        Assert.Same(child2, iterator.previousNode());
         Assert.Same(root, iterator.previousNode());
         Assert.Null(iterator.previousNode());
     }
