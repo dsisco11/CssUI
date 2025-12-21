@@ -146,7 +146,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
      */
 
     /// <summary>
-    /// A completely unique identifier for this element 
+    /// A completely unique identifier for this element
     /// </summary>
     [CEReactions]
     public string? id
@@ -352,8 +352,8 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
         get
         {
             /*
-             * An element is said to be in a formal activation state between the time the user begins to indicate an 
-             * intent to trigger the element's activation behavior and either the time the user stops indicating an intent to trigger the element's activation behavior, 
+             * An element is said to be in a formal activation state between the time the user begins to indicate an
+             * intent to trigger the element's activation behavior and either the time the user stops indicating an intent to trigger the element's activation behavior,
              * or the time the element's activation behavior has finished running, which ever comes first.
              */
             return is_actively_pointed_at;
@@ -368,7 +368,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
         get
         {
             /*
-             * An element is said to be being actively pointed at while the user indicates the element using a pointing device while that pointing device is in the "down" state 
+             * An element is said to be being actively pointed at while the user indicates the element using a pointing device while that pointing device is in the "down" state
              * (e.g. for a mouse, between the time the mouse button is pressed and the time it is depressed; for a finger in a multitouch environment, while the finger is touching the display surface).
              */
             foreach (PointerDevice pointer in PointerDevice.Get_All())
@@ -442,11 +442,11 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
     {/* Docs:  */
         get
         {
-            /* An element that is the DOM anchor of a focusable area is said to gain focus when that focusable area becomes the currently focused area of a top-level browsing context. 
+            /* An element that is the DOM anchor of a focusable area is said to gain focus when that focusable area becomes the currently focused area of a top-level browsing context.
              * When an element is the DOM anchor of a focusable area of the currently focused area of a top-level browsing context, it is focused. */
 
             /*
-             * For the purposes of the CSS :focus pseudo-class, an element has the focus when its top-level browsing context has the system focus, 
+             * For the purposes of the CSS :focus pseudo-class, an element has the focus when its top-level browsing context has the system focus,
              * it is not itself a browsing context container, and it is one of the elements listed in the focus chain of the currently focused area of the top-level browsing context.
              */
             var focusedElement = ownerDocument?.defaultView?.FocusedArea?.DOMAnchor;
@@ -821,7 +821,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
                 /* 1) If force is not given or is true, create an attribute whose local name is qualifiedName, value is the empty string, and node document is the context object’s node document, then append this attribute to the context object, and then return true. */
                 if (!force.HasValue || force.Value)
                 {
-                    var newAttr = new Attr(Name, nodeDocument) { Value = AttributeValue.Parse(Name, string.Empty) };
+                    var newAttr = new Attr(Name, this, nodeDocument) { Value = AttributeValue.Parse(Name, string.Empty) };
                     append_attribute(newAttr);
                     return true;
                 }
@@ -938,7 +938,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
     }
 
     /// <summary>
-    /// Returns a collection of the elements in the object on which the method was invoked (a document or an element) that have all the classes given by classNames. 
+    /// Returns a collection of the elements in the object on which the method was invoked (a document or an element) that have all the classes given by classNames.
     /// The classNames argument is interpreted as a space-separated list of classes.
     /// </summary>
     /// <param name="classNames"></param>
@@ -988,7 +988,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
         }
         /* 3) If context object’s local name is a valid custom element name, or context object’s is value is not null, then:
                 Let definition be the result of looking up a custom element definition given context object’s node document, its namespace, its local name, and its is value.
-                If definition is not null and definition’s disable shadow is true, then throw a "NotSupportedError" DOMException. 
+                If definition is not null and definition’s disable shadow is true, then throw a "NotSupportedError" DOMException.
         */
         if (isValidCustomName || !ReferenceEquals(null, is_value))
         {
@@ -1285,9 +1285,9 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
         }
         else
         {
-            // 1) Apply the transforms that apply to the element and its ancestors. 
-            // 2) If the element on which the method was invoked has a computed value for the display property of table or inline-table include both the table box and the caption box, if any, but not the anonymous container box. 
-            // 3) Replace each anonymous block box with its child box(es) and repeat this until no anonymous block boxes are left in the final list. 
+            // 1) Apply the transforms that apply to the element and its ancestors.
+            // 2) If the element on which the method was invoked has a computed value for the display property of table or inline-table include both the table box and the caption box, if any, but not the anonymous container box.
+            // 3) Replace each anonymous block box with its child box(es) and repeat this until no anonymous block boxes are left in the final list.
 
             /*foreach (CssBoxFragment fragment in Box.Fragments)
             {
@@ -1522,8 +1522,8 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
     /// <param name="inline"></param>
     internal void scroll_element_into_view(EScrollLogicalPosition block, EScrollLogicalPosition inline, EScrollBehavior behavior = EScrollBehavior.Auto)
     {/* Docs: https://www.w3.org/TR/cssom-view-1/#scroll-an-element-into-view */
-        /* To scroll an element into view element, with a ScrollIntoViewOptions dictionary options, 
-         * means to run these steps for each ancestor element or viewport that establishes a scrolling box scrolling box, 
+        /* To scroll an element into view element, with a ScrollIntoViewOptions dictionary options,
+         * means to run these steps for each ancestor element or viewport that establishes a scrolling box scrolling box,
          * in order of innermost to outermost scrolling box: */
 
         var tree = new TreeWalker(this, ENodeFilterMask.SHOW_ALL);
@@ -1770,7 +1770,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
             if (Box == null || Box.DisplayType.Outer == EOuterDisplayType.Inline)
                 return 0;
 
-            /* 2) Return the computed value of the border-top-width property plus the height of any scrollbar rendered between the top padding edge and the top border edge, 
+            /* 2) Return the computed value of the border-top-width property plus the height of any scrollbar rendered between the top padding edge and the top border edge,
              * ignoring any transforms that apply to the element and its ancestors. */
             double retVal = Style.Border_Top_Width;
             retVal += (0 == ScrollBox.HScrollBar.Top) ? ScrollBox.HScrollBar.Height : 0;
@@ -1784,7 +1784,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
             if (Box == null || Box.DisplayType.Outer == EOuterDisplayType.Inline)
                 return 0;
 
-            /* 2) Return the computed value of the border-left-width property plus the width of any scrollbar rendered between the left padding edge and the left border edge, 
+            /* 2) Return the computed value of the border-left-width property plus the width of any scrollbar rendered between the left padding edge and the left border edge,
              * ignoring any transforms that apply to the element and its ancestors. */
             double retVal = Style.Border_Left_Width;
             retVal += (0 == ScrollBox.VScrollBar.Left) ? ScrollBox.VScrollBar.Width : 0;
@@ -1798,8 +1798,8 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
             if (Box == null || Box.DisplayType.Outer == EOuterDisplayType.Inline)
                 return 0;
 
-            /* 2) If the element is the root element and the element’s node document is not in quirks mode, 
-             * sor if the element is the HTML body element and the element’s node document is in quirks mode, 
+            /* 2) If the element is the root element and the element’s node document is not in quirks mode,
+             * sor if the element is the HTML body element and the element’s node document is in quirks mode,
              * return the viewport width excluding the size of a rendered scroll bar (if any). */
             if ((isRoot && ownerDocument.Mode != EQuirksMode.Quirks) || (ReferenceEquals(this, ownerDocument.body) && ownerDocument.Mode == EQuirksMode.Quirks))
             {
@@ -1821,8 +1821,8 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
             if (Box == null || Box.DisplayType.Outer == EOuterDisplayType.Inline)
                 return 0;
 
-            /* 2) If the element is the root element and the element’s node document is not in quirks mode, 
-             * or if the element is the HTML body element and the element’s node document is in quirks mode, 
+            /* 2) If the element is the root element and the element’s node document is not in quirks mode,
+             * or if the element is the HTML body element and the element’s node document is in quirks mode,
              * return the viewport height excluding the size of a rendered scroll bar (if any). */
             if ((isRoot && ownerDocument.Mode != EQuirksMode.Quirks) || (ReferenceEquals(this, ownerDocument.body) && ownerDocument.Mode == EQuirksMode.Quirks))
             {

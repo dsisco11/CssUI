@@ -126,6 +126,11 @@ public class AttributeValue
     public static AttributeValue Parse(AtomicName<EAttributeName> Name, string Input)
     {
         var Def = AttributeDefinition.Lookup(Name);
+        if (Def is null)
+        {
+            // For custom attributes (data-* or unknown), treat as string
+            return new AttributeValue(EAttributeType.String, Input, Input);
+        }
         Def.Parse(Input, out dynamic outVal);
         return new AttributeValue(Def.Type, Input, outVal);
     }

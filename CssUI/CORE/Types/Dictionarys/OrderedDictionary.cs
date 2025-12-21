@@ -80,12 +80,14 @@ public class OrderedDictionary<KeyTy, ValueTy> : IEnumerable<ValueTy>
         if (!KeyIndex.TryGetValue(key, out int index))
             return false;
 
-        /* 2) Remove the key */
-        if (!KeyIndex.Remove(key))
-            return false;
+        /* 2) Remove the key (use the ReversableDictionary Remove that updates MapInverse) */
+        KeyIndex.Remove(key, out _);
 
         /* 3) Remove value */
         Items.RemoveAt(index);
+
+        /* 4) Update all indices greater than the removed index */
+        UpdateIndicesAfterRemoval(index);
 
         return true;
     }
@@ -98,6 +100,9 @@ public class OrderedDictionary<KeyTy, ValueTy> : IEnumerable<ValueTy>
     public bool RemoveValue(ValueTy item)
     {
         int index = Items.IndexOf(item);
+        if (index < 0)
+            return false;
+
         /* 1) Remove the value */
         if (!Items.Remove(item))
             return false;
@@ -105,6 +110,9 @@ public class OrderedDictionary<KeyTy, ValueTy> : IEnumerable<ValueTy>
         /* 2) Remove the key */
         if (!KeyIndex.RemoveInverse(index))
             return false;
+
+        /* 3) Update all indices greater than the removed index */
+        UpdateIndicesAfterRemoval(index);
 
         return true;
     }
@@ -122,7 +130,34 @@ public class OrderedDictionary<KeyTy, ValueTy> : IEnumerable<ValueTy>
         if (!KeyIndex.RemoveInverse(index))
             return false;
 
+        /* 3) Update all indices greater than the removed index */
+        UpdateIndicesAfterRemoval(index);
+
         return true;
+    }
+
+    /// <summary>
+    /// Updates all indices in KeyIndex that are greater than the removed index by decrementing them by 1.
+    /// This is necessary because when an item is removed from the Items list, all subsequent items shift down.
+    /// </summary>
+    /// <param name="removedIndex">The index of the item that was removed</param>
+    private void UpdateIndicesAfterRemoval(int removedIndex)
+    {
+        // Collect keys that need to be updated (can't modify while iterating)
+        var keysToUpdate = new List<(KeyTy key, int oldIndex)>();
+        foreach (var key in KeyIndex.Keys)
+        {
+            if (KeyIndex.TryGetValue(key, out int currentIndex) && currentIndex > removedIndex)
+            {
+                keysToUpdate.Add((key, currentIndex));
+            }
+        }
+
+        // Now update each key's index
+        foreach (var (key, oldIndex) in keysToUpdate)
+        {
+            KeyIndex.Update(key, oldIndex - 1, oldIndex);
+        }
     }
 
     public void Clear()

@@ -30,7 +30,7 @@ public class AttributeOperationsTests
 
     #region setAttribute Tests
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void SetAttribute_WithEmptyStringValue_SetsAttribute()
     {
         // Arrange
@@ -46,7 +46,7 @@ public class AttributeOperationsTests
         Assert.True(element.hasAttribute(attrName), "hasAttribute should return true after setAttribute with empty string");
     }
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void SetAttribute_WithNonEmptyStringValue_SetsAttribute()
     {
         // Arrange
@@ -62,7 +62,7 @@ public class AttributeOperationsTests
         Assert.True(element.hasAttribute(attrName), "hasAttribute should return true after setAttribute with non-empty string");
     }
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void SetAttribute_WithIntegerValue_SetsAttribute()
     {
         // Arrange
@@ -78,7 +78,7 @@ public class AttributeOperationsTests
         Assert.True(element.hasAttribute(attrName), "hasAttribute should return true after setAttribute with integer value");
     }
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void SetAttribute_WithBooleanValue_SetsAttribute()
     {
         // Arrange
@@ -94,7 +94,7 @@ public class AttributeOperationsTests
         Assert.True(element.hasAttribute(attrName), "hasAttribute should return true after setAttribute with boolean value");
     }
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void SetAttribute_OverwriteExistingValue_UpdatesValue()
     {
         // Arrange
@@ -118,7 +118,7 @@ public class AttributeOperationsTests
 
     #region hasAttribute Tests
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void HasAttribute_AfterSetAttribute_ReturnsTrue()
     {
         // Arrange
@@ -135,7 +135,7 @@ public class AttributeOperationsTests
         Assert.True(result, "hasAttribute should return true after setAttribute");
     }
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void HasAttribute_WithoutSetting_ReturnsFalse()
     {
         // Arrange
@@ -150,7 +150,7 @@ public class AttributeOperationsTests
         Assert.False(result, "hasAttribute should return false for non-existent attribute");
     }
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void HasAttribute_AfterRemoveAttribute_ReturnsFalse()
     {
         // Arrange
@@ -172,7 +172,7 @@ public class AttributeOperationsTests
 
     #region getAttribute Tests
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void GetAttribute_AfterSetAttribute_ReturnsCorrectValue()
     {
         // Arrange
@@ -190,7 +190,7 @@ public class AttributeOperationsTests
         Assert.Equal("expected-value", result.Data);
     }
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void GetAttribute_WithoutSetting_ReturnsNull()
     {
         // Arrange
@@ -205,7 +205,7 @@ public class AttributeOperationsTests
         Assert.Null(result);
     }
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void GetAttribute_AfterRemoveAttribute_ReturnsNull()
     {
         // Arrange
@@ -223,7 +223,7 @@ public class AttributeOperationsTests
         Assert.Null(result);
     }
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void GetAttribute_EmptyStringValue_ReturnsEmptyString()
     {
         // Arrange
@@ -245,7 +245,7 @@ public class AttributeOperationsTests
 
     #region removeAttribute Tests
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void RemoveAttribute_ExistingAttribute_RemovesAttribute()
     {
         // Arrange
@@ -263,7 +263,7 @@ public class AttributeOperationsTests
         Assert.Null(element.getAttribute(attrName));
     }
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void RemoveAttribute_NonExistentAttribute_DoesNotThrow()
     {
         // Arrange
@@ -276,7 +276,7 @@ public class AttributeOperationsTests
         Assert.Null(exception);
     }
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void RemoveAttribute_MultipleAttributes_OnlyRemovesSpecifiedOne()
     {
         // Arrange
@@ -299,7 +299,7 @@ public class AttributeOperationsTests
 
     #region getAttributeNames Tests
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void GetAttributeNames_NoAttributes_ReturnsEmpty()
     {
         // Arrange
@@ -313,7 +313,7 @@ public class AttributeOperationsTests
         Assert.Empty(names);
     }
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void GetAttributeNames_WithMultipleAttributes_ReturnsAllNames()
     {
         // Arrange
@@ -336,7 +336,7 @@ public class AttributeOperationsTests
         Assert.Contains("data-third", names);
     }
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void GetAttributeNames_AfterRemove_DoesNotIncludeRemoved()
     {
         // Arrange
@@ -360,7 +360,7 @@ public class AttributeOperationsTests
 
     #region toggleAttribute Tests
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void ToggleAttribute_NonExistent_AddsAttribute()
     {
         // Arrange
@@ -376,7 +376,7 @@ public class AttributeOperationsTests
         Assert.True(element.hasAttribute(attrName), "Attribute should exist after toggle");
     }
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void ToggleAttribute_Existing_RemovesAttribute()
     {
         // Arrange
@@ -393,7 +393,7 @@ public class AttributeOperationsTests
         Assert.False(element.hasAttribute(attrName), "Attribute should not exist after toggle");
     }
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void ToggleAttribute_WithForceTrue_AlwaysAdds()
     {
         // Arrange
@@ -409,7 +409,7 @@ public class AttributeOperationsTests
         Assert.True(element.hasAttribute(attrName), "Attribute should exist");
     }
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void ToggleAttribute_WithForceFalse_AlwaysRemoves()
     {
         // Arrange
@@ -430,7 +430,7 @@ public class AttributeOperationsTests
 
     #region hasAttributes Tests
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void HasAttributes_NoAttributes_ReturnsFalse()
     {
         // Arrange
@@ -441,7 +441,7 @@ public class AttributeOperationsTests
         Assert.False(element.hasAttributes(), "hasAttributes should return false for element with no attributes");
     }
 
-    [Fact(Skip = "Investigating setAttribute/hasAttribute bug")]
+    [Fact]
     public void HasAttributes_WithAttributes_ReturnsTrue()
     {
         // Arrange

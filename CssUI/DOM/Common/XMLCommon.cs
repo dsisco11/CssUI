@@ -65,7 +65,9 @@ public static class XMLCommon
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool Is_NameChar(char c)
     {
-        return Is_NameStartChar(c) || (c >= '0' && c <= '9') || c == 0xB7 || (c >= 0x0300 && c <= 0x036F) || (c >= 0x203F && c <= 0x2040);
+        // XML NameChar ::= NameStartChar | "-" | "." | [0-9] | #xB7 | [#x0300-#x036F] | [#x203F-#x2040]
+        // Ref: https://www.w3.org/TR/xml/#NT-NameChar
+        return Is_NameStartChar(c) || c == '-' || c == '.' || (c >= '0' && c <= '9') || c == 0xB7 || (c >= 0x0300 && c <= 0x036F) || (c >= 0x203F && c <= 0x2040);
     }
 
     /// <summary>
