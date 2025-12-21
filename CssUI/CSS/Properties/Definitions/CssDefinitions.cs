@@ -324,14 +324,6 @@ internal class CssDefinitions
     static IEnumerable<StyleDefinition> Create_Grid_Property_Definitions()
     {
         return new StyleDefinition[] {
-            // grid-template-columns: none | <track-list> (default none)
-            // TODO: Implement proper track-list parsing
-            new StyleDefinition(ECssPropertyID.GridTemplateColumns, false, EPropertyDirtFlags.Flow, CssValue.None, ECssValueTypes.NONE | ECssValueTypes.STRING),
-
-            // grid-template-rows: none | <track-list> (default none)
-            // TODO: Implement proper track-list parsing
-            new StyleDefinition(ECssPropertyID.GridTemplateRows, false, EPropertyDirtFlags.Flow, CssValue.None, ECssValueTypes.NONE | ECssValueTypes.STRING),
-
             // grid-auto-columns: <track-size>+ (default auto)
             new StyleDefinition(ECssPropertyID.GridAutoColumns, false, EPropertyDirtFlags.Flow, CssValue.Auto, ECssValueTypes.AUTO | ECssValueTypes.DIMENSION | ECssValueTypes.PERCENT | ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EBoxSize>()),
 
