@@ -233,28 +233,21 @@ public partial class CssValue
                 }
             case ECssValueTypes.COLLECTION:// A collections flags are the combined flags of all it's sub-values
                 {
-                    if (Value is Array array)
-                    {// Multi object
-                        foreach (object o in array)
-                        {
-                            if (o is CssValue cssValue)
-                            {
-                                Flags |= Get_Inherent_Value_Type_Flags(cssValue.Type, cssValue.Unit, cssValue.value);
-                            }
-                            else
-                            {
-                                throw new CssException($"All {nameof(CssValue)} collection members must be {nameof(CssValue)}s");
-                            }
-                        }
-                        return Flags;
-                    }
-                    else if (Value is CssValue cssValue)
-                    {// Single object
+                    if (Value is null)
+                        break;
+
+                    if (Value is CssValue cssValue)
+                    {// we are a nested collection.
                         Flags |= Get_Inherent_Value_Type_Flags(cssValue.Type, cssValue.Unit, cssValue.value);
+                        break;
                     }
-                    else
+
+                    if (Value is not CssValue[] valueArray)
+                        throw new CssException($"Expected an array of {nameof(CssValue)}s for a collection type!");
+
+                    foreach (CssValue val in valueArray)
                     {
-                        throw new CssException($"All {nameof(CssValue)} collection members must be {nameof(CssValue)}s");
+                        Flags |= Get_Inherent_Value_Type_Flags(val.Type, val.Unit, val.value);
                     }
                     break;
                 }
