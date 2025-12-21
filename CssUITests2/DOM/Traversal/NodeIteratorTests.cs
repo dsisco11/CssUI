@@ -571,4 +571,286 @@ public class NodeIteratorTests
     }
 
     #endregion
+
+    #region referenceNode and pointerBeforeReferenceNode Tests
+
+    [Fact]
+    public void ReferenceNode_InitialValue_IsRoot()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var root = CreateTestElement(doc, "div");
+
+        // Act
+        var iterator = CreateNodeIterator(root, ENodeFilterMask.SHOW_ELEMENT);
+
+        // Assert - Per DOM spec, referenceNode starts as root
+        Assert.Same(root, iterator.referenceNode);
+    }
+
+    [Fact]
+    public void PointerBeforeReferenceNode_InitialValue_IsTrue()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var root = CreateTestElement(doc, "div");
+
+        // Act
+        var iterator = CreateNodeIterator(root, ENodeFilterMask.SHOW_ELEMENT);
+
+        // Assert - Per DOM spec, pointerBeforeReferenceNode starts as true
+        Assert.True(iterator.pointerBeforeReferenceNode);
+    }
+
+    [Fact]
+    public void ReferenceNode_AfterNextNode_UpdatesCorrectly()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var root = CreateTestElement(doc, "div");
+        var child = CreateTestElement(doc, "span");
+        root.appendChild(child);
+        var iterator = CreateNodeIterator(root, ENodeFilterMask.SHOW_ELEMENT);
+
+        // Act
+        iterator.nextNode(); // Returns root, pointer now AFTER root
+
+        // Assert - referenceNode should be root
+        Assert.Same(root, iterator.referenceNode);
+        Assert.False(iterator.pointerBeforeReferenceNode); // Pointer is AFTER reference node
+    }
+
+    [Fact]
+    public void ReferenceNode_AfterMultipleNextNode_TracksLastNode()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var root = CreateTestElement(doc, "div");
+        var child1 = CreateTestElement(doc, "span");
+        var child2 = CreateTestElement(doc, "p");
+        root.appendChild(child1);
+        root.appendChild(child2);
+        var iterator = CreateNodeIterator(root, ENodeFilterMask.SHOW_ELEMENT);
+
+        // Act
+        iterator.nextNode(); // root
+        iterator.nextNode(); // child1
+        iterator.nextNode(); // child2
+
+        // Assert
+        Assert.Same(child2, iterator.referenceNode);
+        Assert.False(iterator.pointerBeforeReferenceNode);
+    }
+
+    [Fact]
+    public void PointerBeforeReferenceNode_AfterPreviousNode_IsTrue()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var root = CreateTestElement(doc, "div");
+        var child = CreateTestElement(doc, "span");
+        root.appendChild(child);
+        var iterator = CreateNodeIterator(root, ENodeFilterMask.SHOW_ELEMENT);
+
+        // Act
+        iterator.nextNode(); // root - pointer AFTER root
+        iterator.nextNode(); // child - pointer AFTER child
+        iterator.previousNode(); // Returns child, moves pointer BEFORE child
+
+        // Assert - After previousNode(), pointer should be BEFORE referenceNode
+        Assert.Same(child, iterator.referenceNode);
+        Assert.True(iterator.pointerBeforeReferenceNode);
+    }
+
+    [Fact]
+    public void ReferenceNode_AlternatingTraversal_UpdatesCorrectly()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var root = CreateTestElement(doc, "div");
+        var child1 = CreateTestElement(doc, "span");
+        var child2 = CreateTestElement(doc, "p");
+        root.appendChild(child1);
+        root.appendChild(child2);
+        var iterator = CreateNodeIterator(root, ENodeFilterMask.SHOW_ELEMENT);
+
+        // Act & Assert - Track state through alternating traversal
+        iterator.nextNode(); // root
+        Assert.Same(root, iterator.referenceNode);
+        Assert.False(iterator.pointerBeforeReferenceNode);
+
+        iterator.nextNode(); // child1
+        Assert.Same(child1, iterator.referenceNode);
+        Assert.False(iterator.pointerBeforeReferenceNode);
+
+        iterator.previousNode(); // Returns child1, moves pointer before
+        Assert.Same(child1, iterator.referenceNode);
+        Assert.True(iterator.pointerBeforeReferenceNode);
+
+        iterator.nextNode(); // Returns child1 again (pointer was before it)
+        Assert.Same(child1, iterator.referenceNode);
+        Assert.False(iterator.pointerBeforeReferenceNode);
+    }
+
+    #endregion
+
+    #region FILTER_REJECT vs FILTER_SKIP Tests
+
+    [Fact]
+    public void NextNode_WithRejectFilter_BehavesLikeSkip()
+    {
+        // Arrange - For NodeIterator (not TreeWalker), REJECT behaves same as SKIP
+        var doc = CreateTestDocument();
+        var root = CreateTestElement(doc, "div");
+        var child1 = CreateTestElement(doc, "span");
+        var child2 = CreateTestElement(doc, "p");
+        root.appendChild(child1);
+        root.appendChild(child2);
+
+        var filter = new RejectAllFilter();
+        var iterator = CreateNodeIterator(root, ENodeFilterMask.SHOW_ELEMENT, filter);
+
+        // Act - All nodes will be rejected, so we should get nothing
+        var result = iterator.nextNode();
+
+        // Assert - FILTER_REJECT in NodeIterator simply skips to next node
+        // Since all nodes are rejected, iterator should loop until end and return null
+        Assert.Null(result);
+    }
+
+    #endregion
+
+    #region Document.createNodeIterator Tests
+
+    [Fact]
+    public void Document_CreateNodeIterator_ReturnsValidIterator()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var root = CreateTestElement(doc, "div");
+        doc.documentElement!.appendChild(root);
+
+        // Act
+        var iterator = doc.createNodeIterator(root);
+
+        // Assert
+        Assert.NotNull(iterator);
+        Assert.Same(root, iterator.root);
+        Assert.Equal(ENodeFilterMask.SHOW_ALL, iterator.whatToShow);
+        Assert.Null(iterator.Filter);
+    }
+
+    [Fact]
+    public void Document_CreateNodeIterator_WithWhatToShow_FiltersCorrectly()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var root = CreateTestElement(doc, "div");
+        var text = CreateTextNode(doc, "Hello");
+        var child = CreateTestElement(doc, "span");
+        root.appendChild(text);
+        root.appendChild(child);
+
+        // Act
+        var iterator = doc.createNodeIterator(root, ENodeFilterMask.SHOW_ELEMENT);
+
+        // Assert - Should only see elements, not text
+        Assert.Same(root, iterator.nextNode());
+        Assert.Same(child, iterator.nextNode());
+        Assert.Null(iterator.nextNode());
+    }
+
+    [Fact]
+    public void Document_CreateNodeIterator_WithFilter_FiltersCorrectly()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var root = CreateTestElement(doc, "div");
+        var child1 = CreateTestElement(doc, "span");
+        var child2 = CreateTestElement(doc, "p");
+        root.appendChild(child1);
+        root.appendChild(child2);
+        var filter = new TagNameFilter("p");
+
+        // Act
+        var iterator = doc.createNodeIterator(root, ENodeFilterMask.SHOW_ELEMENT, filter);
+
+        // Assert - Should only see p elements
+        Assert.Same(child2, iterator.nextNode());
+        Assert.Null(iterator.nextNode());
+    }
+
+    [Fact]
+    public void Document_CreateNodeIterator_CollectsAllDescendants()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var root = CreateTestElement(doc, "div");
+        var child = CreateTestElement(doc, "span");
+        var grandchild = CreateTestElement(doc, "p");
+        root.appendChild(child);
+        child.appendChild(grandchild);
+
+        // Act
+        var iterator = doc.createNodeIterator(root, ENodeFilterMask.SHOW_ELEMENT);
+
+        // Assert - Should traverse depth-first
+        Assert.Same(root, iterator.nextNode());
+        Assert.Same(child, iterator.nextNode());
+        Assert.Same(grandchild, iterator.nextNode());
+        Assert.Null(iterator.nextNode());
+    }
+
+    #endregion
+
+    #region Document.createTreeWalker Tests
+
+    [Fact]
+    public void Document_CreateTreeWalker_ReturnsValidTreeWalker()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var root = CreateTestElement(doc, "div");
+        doc.documentElement!.appendChild(root);
+
+        // Act
+        var walker = doc.createTreeWalker(root);
+
+        // Assert
+        Assert.NotNull(walker);
+        Assert.Same(root, walker.root);
+        Assert.Equal(ENodeFilterMask.SHOW_ALL, walker.whatToShow);
+        Assert.Null(walker.Filter);
+    }
+
+    [Fact]
+    public void Document_CreateTreeWalker_WithWhatToShow_SetsCorrectly()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var root = CreateTestElement(doc, "div");
+
+        // Act
+        var walker = doc.createTreeWalker(root, ENodeFilterMask.SHOW_TEXT);
+
+        // Assert
+        Assert.Equal(ENodeFilterMask.SHOW_TEXT, walker.whatToShow);
+    }
+
+    [Fact]
+    public void Document_CreateTreeWalker_WithFilter_SetsCorrectly()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var root = CreateTestElement(doc, "div");
+        var filter = new TagNameFilter("div");
+
+        // Act
+        var walker = doc.createTreeWalker(root, ENodeFilterMask.SHOW_ELEMENT, filter);
+
+        // Assert
+        Assert.Same(filter, walker.Filter);
+    }
+
+    #endregion
 }

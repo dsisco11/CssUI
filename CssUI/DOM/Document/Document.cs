@@ -542,6 +542,47 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     }
     #endregion
 
+    #region Traversal
+    /// <summary>
+    /// Creates a NodeIterator object that traverses the subtree rooted at root,
+    /// visiting all nodes that pass the filter.
+    /// </summary>
+    /// <param name="root">The root node to start traversal from.</param>
+    /// <param name="whatToShow">A bitmask specifying which node types to show.</param>
+    /// <param name="filter">An optional NodeFilter to accept or reject nodes.</param>
+    /// <returns>A new NodeIterator object.</returns>
+    /// <remarks>Docs: https://dom.spec.whatwg.org/#dom-document-createnodeiterator</remarks>
+    public NodeIterator createNodeIterator(Node root, ENodeFilterMask whatToShow = ENodeFilterMask.SHOW_ALL, NodeFilter? filter = null)
+    {
+        var nodes = new List<Node>();
+        CollectDescendantsForIterator(root, nodes);
+        return new NodeIterator(root, nodes, whatToShow, filter);
+    }
+
+    /// <summary>
+    /// Creates a TreeWalker object that traverses the subtree rooted at root,
+    /// visiting all nodes that pass the filter.
+    /// </summary>
+    /// <param name="root">The root node to start traversal from.</param>
+    /// <param name="whatToShow">A bitmask specifying which node types to show.</param>
+    /// <param name="filter">An optional NodeFilter to accept or reject nodes.</param>
+    /// <returns>A new TreeWalker object.</returns>
+    /// <remarks>Docs: https://dom.spec.whatwg.org/#dom-document-createtreewalker</remarks>
+    public TreeWalker createTreeWalker(Node root, ENodeFilterMask whatToShow = ENodeFilterMask.SHOW_ALL, NodeFilter? filter = null)
+    {
+        return new TreeWalker(root, whatToShow, filter);
+    }
+
+    private static void CollectDescendantsForIterator(Node node, List<Node> nodes)
+    {
+        nodes.Add(node);
+        foreach (var child in node.childNodes)
+        {
+            CollectDescendantsForIterator(child, nodes);
+        }
+    }
+    #endregion
+
     #region EventTarget Overrides
     public override EventTarget? get_the_parent(Event @event)
     {

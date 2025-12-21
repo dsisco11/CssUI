@@ -69,11 +69,13 @@
 23. XMLDocument constructor always added doctype (added withoutDoctype constructor for createDocument)
 
 ### 4.4 DOM Advanced Features Tests
-- [ ] NodeIterator tests
-  - [ ] Test createNodeIterator with various filters
-  - [ ] Test nextNode/previousNode traversal
-  - [ ] Test filter callback behavior
-  - [ ] Test referenceNode and pointerBeforeReferenceNode
+- [x] NodeIterator tests - 37 tests passing
+  - [x] Test createNodeIterator with various filters
+  - [x] Test nextNode/previousNode traversal
+  - [x] Test filter callback behavior
+  - [x] Test referenceNode and pointerBeforeReferenceNode
+  - [x] Added Document.createNodeIterator() and Document.createTreeWalker() methods
+  - [x] Exposed referenceNode and pointerBeforeReferenceNode as public properties per DOM spec
 - [ ] ShadowRoot tests
   - [ ] Test attachShadow (open/closed modes)
   - [ ] Test shadowRoot property access
@@ -105,7 +107,7 @@
 - [ ] Simplification algorithm
 - [ ] Proper serialization
 
-## Test Coverage — 1099 PASSING (after DOM document tests enabled)
+## Test Coverage — 1137 PASSING (after NodeIterator tests completed)
 
 ### CSS Systems Test Status
 - [ ] CSS Properties system (CSS/Properties/)

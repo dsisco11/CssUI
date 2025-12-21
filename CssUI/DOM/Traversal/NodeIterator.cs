@@ -18,8 +18,20 @@ public class NodeIterator : IDisposable
 
     // XXX: Still dont know where this collection comes from
     private IList<Node> iterCollection;// = new ICollection<Node>();
-    private Node? referenceNode = null;
-    private bool pointerBeforeReferenceNode = true;  // DOM spec: starts as true
+
+    /// <summary>
+    /// Returns the reference node. The reference node is the node from which
+    /// navigation starts (in combination with <see cref="pointerBeforeReferenceNode"/>).
+    /// </summary>
+    /// <remarks>Per DOM spec: https://dom.spec.whatwg.org/#dom-nodeiterator-referencenode</remarks>
+    public Node? referenceNode { get; private set; } = null;
+
+    /// <summary>
+    /// Returns true if the pointer is before the reference node, and false otherwise.
+    /// </summary>
+    /// <remarks>Per DOM spec: https://dom.spec.whatwg.org/#dom-nodeiterator-pointerbeforereferencenode</remarks>
+    public bool pointerBeforeReferenceNode { get; private set; } = true;  // DOM spec: starts as true
+
     private bool isActive = false;
     #endregion
 
@@ -121,7 +133,7 @@ public class NodeIterator : IDisposable
         }
         else
         {
-            /* 
+            /*
              * "the inclusive descendant of toBeRemovedNode’s previous sibling that appears last in tree order"
              *  That would just be the previous sibling itsself yea? or is it the most-descended last child? wtf
              */
