@@ -59,6 +59,37 @@
 - [ ] Test document tree operations
 - [ ] Test document fragment operations
 
+### 4.4 DOM Advanced Features Tests
+- [ ] NodeIterator tests
+  - [ ] Test createNodeIterator with various filters
+  - [ ] Test nextNode/previousNode traversal
+  - [ ] Test filter callback behavior
+  - [ ] Test referenceNode and pointerBeforeReferenceNode
+- [ ] ShadowRoot tests
+  - [ ] Test attachShadow (open/closed modes)
+  - [ ] Test shadowRoot property access
+  - [ ] Test slot assignment
+  - [ ] Test event retargeting
+- [ ] Events tests
+  - [ ] Test addEventListener/removeEventListener
+  - [ ] Test dispatchEvent
+  - [ ] Test event bubbling and capturing
+  - [ ] Test stopPropagation/stopImmediatePropagation
+  - [ ] Test event.target vs event.currentTarget
+  - [ ] Test custom events
+- [ ] Range tests
+  - [ ] Test createRange
+  - [ ] Test setStart/setEnd operations
+  - [ ] Test selectNode/selectNodeContents
+  - [ ] Test extractContents/cloneContents/deleteContents
+  - [ ] Test Range boundary points
+- [ ] MutationObserver tests
+  - [ ] Test observe with childList option
+  - [ ] Test observe with attributes option
+  - [ ] Test observe with characterData option
+  - [ ] Test subtree observation
+  - [ ] Test disconnect and takeRecords
+
 ## Phase 5: Advanced CSS Features
 ### 5.1 CSS calc() Formal Tree (future enhancement)
 - [ ] Sum/Product/Negate/Invert nodes (per spec)
