@@ -26,7 +26,7 @@ public class ElementHierarchyTests
 
     #region appendChild Tests
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void AppendChild_SingleChild_AddsChild()
     {
         // Arrange
@@ -42,7 +42,7 @@ public class ElementHierarchyTests
         Assert.Same(child, parent.childNodes[0]);
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void AppendChild_MultipleChildren_AddsInOrder()
     {
         // Arrange
@@ -64,7 +64,7 @@ public class ElementHierarchyTests
         Assert.Same(child3, parent.childNodes[2]);
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void AppendChild_SetsParentNode()
     {
         // Arrange
@@ -79,7 +79,7 @@ public class ElementHierarchyTests
         Assert.Same(parent, child.parentNode);
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void AppendChild_ReturnsAppendedChild()
     {
         // Arrange
@@ -94,7 +94,7 @@ public class ElementHierarchyTests
         Assert.Same(child, result);
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void AppendChild_MovesFromOtherParent()
     {
         // Arrange
@@ -113,7 +113,7 @@ public class ElementHierarchyTests
         Assert.Same(parent2, child.parentNode);
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void AppendChild_Text_AddsTextNode()
     {
         // Arrange
@@ -133,7 +133,7 @@ public class ElementHierarchyTests
 
     #region removeChild Tests
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void RemoveChild_ExistingChild_RemovesChild()
     {
         // Arrange
@@ -149,7 +149,7 @@ public class ElementHierarchyTests
         Assert.Empty(parent.childNodes);
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void RemoveChild_ClearsParentNode()
     {
         // Arrange
@@ -165,7 +165,7 @@ public class ElementHierarchyTests
         Assert.Null(child.parentNode);
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void RemoveChild_ReturnsRemovedChild()
     {
         // Arrange
@@ -181,7 +181,7 @@ public class ElementHierarchyTests
         Assert.Same(child, result);
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void RemoveChild_MiddleChild_PreservesOrder()
     {
         // Arrange
@@ -207,7 +207,7 @@ public class ElementHierarchyTests
 
     #region insertBefore Tests
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void InsertBefore_InsertsAtCorrectPosition()
     {
         // Arrange
@@ -226,7 +226,7 @@ public class ElementHierarchyTests
         Assert.Same(existing, parent.childNodes[1]);
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void InsertBefore_NullReference_AppendsChild()
     {
         // Arrange
@@ -245,7 +245,7 @@ public class ElementHierarchyTests
         Assert.Same(newChild, parent.childNodes[1]);
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void InsertBefore_SetsParentNode()
     {
         // Arrange
@@ -262,7 +262,7 @@ public class ElementHierarchyTests
         Assert.Same(parent, newChild.parentNode);
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void InsertBefore_ReturnsInsertedNode()
     {
         // Arrange
@@ -279,7 +279,7 @@ public class ElementHierarchyTests
         Assert.Same(newChild, result);
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void InsertBefore_MovesFromOtherParent()
     {
         // Arrange
@@ -304,7 +304,7 @@ public class ElementHierarchyTests
 
     #region replaceChild Tests
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void ReplaceChild_ReplacesExistingChild()
     {
         // Arrange
@@ -322,7 +322,7 @@ public class ElementHierarchyTests
         Assert.Same(newChild, parent.childNodes[0]);
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void ReplaceChild_ReturnsOldChild()
     {
         // Arrange
@@ -339,7 +339,7 @@ public class ElementHierarchyTests
         Assert.Same(oldChild, result);
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void ReplaceChild_ClearsOldChildParent()
     {
         // Arrange
@@ -356,7 +356,7 @@ public class ElementHierarchyTests
         Assert.Null(oldChild.parentNode);
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void ReplaceChild_SetsNewChildParent()
     {
         // Arrange
@@ -373,7 +373,7 @@ public class ElementHierarchyTests
         Assert.Same(parent, newChild.parentNode);
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void ReplaceChild_PreservesPosition()
     {
         // Arrange
@@ -401,7 +401,7 @@ public class ElementHierarchyTests
 
     #region contains Tests
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void Contains_DirectChild_ReturnsTrue()
     {
         // Arrange
@@ -414,7 +414,7 @@ public class ElementHierarchyTests
         Assert.True(parent.contains(child));
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void Contains_NestedDescendant_ReturnsTrue()
     {
         // Arrange
@@ -429,7 +429,7 @@ public class ElementHierarchyTests
         Assert.True(grandparent.contains(child));
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void Contains_Self_ReturnsTrue()
     {
         // Arrange
@@ -440,7 +440,7 @@ public class ElementHierarchyTests
         Assert.True(element.contains(element));
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void Contains_Sibling_ReturnsFalse()
     {
         // Arrange
@@ -456,7 +456,7 @@ public class ElementHierarchyTests
         Assert.False(child2.contains(child1));
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void Contains_Ancestor_ReturnsFalse()
     {
         // Arrange
@@ -469,7 +469,7 @@ public class ElementHierarchyTests
         Assert.False(child.contains(parent));
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void Contains_Unrelated_ReturnsFalse()
     {
         // Arrange
@@ -486,7 +486,7 @@ public class ElementHierarchyTests
 
     #region firstChild / lastChild Tests
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void FirstChild_WithChildren_ReturnsFirstChild()
     {
         // Arrange
@@ -501,7 +501,7 @@ public class ElementHierarchyTests
         Assert.Same(child1, parent.firstChild);
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void FirstChild_NoChildren_ReturnsNull()
     {
         // Arrange
@@ -512,7 +512,7 @@ public class ElementHierarchyTests
         Assert.Null(parent.firstChild);
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void LastChild_WithChildren_ReturnsLastChild()
     {
         // Arrange
@@ -527,7 +527,7 @@ public class ElementHierarchyTests
         Assert.Same(child2, parent.lastChild);
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void LastChild_NoChildren_ReturnsNull()
     {
         // Arrange
@@ -542,7 +542,7 @@ public class ElementHierarchyTests
 
     #region previousSibling / nextSibling Tests
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void NextSibling_HasSibling_ReturnsNextSibling()
     {
         // Arrange
@@ -557,7 +557,7 @@ public class ElementHierarchyTests
         Assert.Same(child2, child1.nextSibling);
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void NextSibling_LastChild_ReturnsNull()
     {
         // Arrange
@@ -570,7 +570,7 @@ public class ElementHierarchyTests
         Assert.Null(child.nextSibling);
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void PreviousSibling_HasSibling_ReturnsPreviousSibling()
     {
         // Arrange
@@ -585,7 +585,7 @@ public class ElementHierarchyTests
         Assert.Same(child1, child2.previousSibling);
     }
 
-    [Fact(Skip = "DOM hierarchy tests")]
+    [Fact]
     public void PreviousSibling_FirstChild_ReturnsNull()
     {
         // Arrange

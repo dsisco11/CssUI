@@ -28,11 +28,19 @@
 4. Element.toggleAttribute() was passing Document instead of Element as owner to Attr constructor
 5. AttributeValue.Parse() wasn't handling custom/data-* attributes (returned null definition)
 
-### 4.2 DOM Element Tests
-- [ ] Test element creation (createElement, createElementNS)
-- [ ] Test element hierarchy (appendChild, removeChild, insertBefore)
+### 4.2 DOM Element Tests ✅ COMPLETED
+- [x] Test element creation (createElement, createElementNS) - 14 tests passing
+- [x] Test element hierarchy (appendChild, removeChild, insertBefore) - 34 tests passing
 - [ ] Test element queries (getElementById, getElementsByClassName, getElementsByTagName)
 - [ ] Test element matching (matches, closest, querySelector, querySelectorAll)
+
+#### Bugs Fixed During Testing:
+1. DOMCommon.createElementNS() was passing Prefix as Namespace parameter to Create_Element()
+2. DOMImplementation.createHTMLDocument() was adding duplicate DOCTYPE (HTMLDocument already adds one)
+3. TreeWalker.nextNode() wasn't advancing node to sibling after finding it
+4. TreeWalker.filterNode() wasn't subtracting 1 from nodeType for bit mask calculation
+5. DOMCommon.Is_Descendant() was using TreeWalker incorrectly (root can't traverse to ancestors)
+6. Node.Dom_replace_node_within_parent() had validation checks in wrong scope (else instead of inside if parent is Document)
 
 ### 4.3 DOM Document Tests
 - [ ] Test document creation (createDocument, createHTMLDocument)
@@ -45,7 +53,7 @@
 - [ ] Simplification algorithm
 - [ ] Proper serialization
 
-## Test Coverage — 165 PASSING (after DOM attribute tests enabled)
+## Test Coverage — 958 PASSING (after DOM element creation/hierarchy tests enabled)
 
 ### CSS Systems Test Status
 - [ ] CSS Properties system (CSS/Properties/)

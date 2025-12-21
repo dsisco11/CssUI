@@ -44,7 +44,7 @@ public class DOMImplementation
     public Document createHTMLDocument(string title)
     {
         var doc = new HTMLDocument("text/html");
-        doc.append(new DocumentType("html") { nodeDocument = doc });
+        // Note: HTMLDocument constructor already appends a DOCTYPE via base(DocumentType.HTML, contentType)
         /* 4) Append the result of creating an element given doc, html, and the HTML namespace, to doc. */
         var html = DOMCommon.createElementNS(doc, "html", DOMCommon.HTMLNamespace);
         doc.append(html);

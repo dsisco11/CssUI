@@ -38,7 +38,7 @@ public class TreeWalker
         /* 1) If traverser’s active flag is set, then throw an "InvalidStateError" DOMException. */
         if (isActive) throw new InvalidStateError();
         /* 2) Let n be node’s nodeType attribute value − 1. */
-        int n = (int)node.nodeType;
+        int n = (int)node.nodeType - 1;
         /* 3) If the nth bit (where 0 is the least significant bit) of traverser’s whatToShow is not set, then return FILTER_SKIP. */
         ulong mask = (1UL << n);
         if (0 == ((ulong)whatToShow & mask))
@@ -382,14 +382,18 @@ public class TreeWalker
                     return null;
                 /* 2) Set sibling to temporary’s next sibling. */
                 sibling = temporary.nextSibling;
-                /* 3) If sibling is non-null, then break. */
-                if (sibling is not null) break;
-                /* 4) Set temporary to temporary’s parent. */
+                /* 3) If sibling is non-null, then set node to sibling and break. */
+                if (sibling is not null)
+                {
+                    node = sibling;
+                    break;
+                }
+                /* 4) Set temporary to temporary's parent. */
                 temporary = temporary.parentNode;
             }
             /* 5) Set result to the result of filtering node within the context object. */
             result = filterNode(node);
-            /* 6) If result is FILTER_ACCEPT, then set the context object’s current to node and return node. */
+            /* 6) If result is FILTER_ACCEPT, then set the context object's current to node and return node. */
             if (result == ENodeFilterResult.FILTER_ACCEPT)
             {
                 currentNode = node;

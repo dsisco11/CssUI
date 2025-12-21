@@ -101,8 +101,8 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
             /* The descendant text content of a node node is the concatenation of the data of all the Text node descendants of node, in tree order. */
             var tree = new TreeWalker(this, ENodeFilterMask.SHOW_TEXT);
             StringBuilder sb = new StringBuilder();
-            Node n;
-            while ((n = tree.firstChild()) is not null)
+            Node? n;
+            while ((n = tree.nextNode()) is not null)
                 sb.Append(n.textContent);
 
             return sb.ToString();

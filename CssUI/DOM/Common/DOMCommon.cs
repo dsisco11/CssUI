@@ -305,7 +305,7 @@ public static class DOMCommon
 
         /* 6) Return result. */
         return result;
-#else 
+#else
         return new List<ISlottable>();
 #endif
     }
@@ -323,7 +323,7 @@ public static class DOMCommon
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="slot"></param>
     internal static void Assign_Slottables(ISlot slot)
@@ -361,7 +361,7 @@ public static class DOMCommon
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="slotable"></param>
     internal static void Assign_A_Slot(ISlottable slotable)
@@ -384,14 +384,13 @@ public static class DOMCommon
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool Is_Descendant(Node A, Node B)
     {/* Docs: https://dom.spec.whatwg.org/#concept-tree-descendant */
-        var tree = new TreeWalker(A, Enums.ENodeFilterMask.SHOW_ALL);
-        /* Proove it true */
-        Node node = tree.parentNode();
+        /* Walk up the parent chain from A to see if we reach B */
+        Node? node = A.parentNode;
         while (node is not null)
         {
             if (ReferenceEquals(node, B))
                 return true;
-            node = tree.parentNode();
+            node = node.parentNode;
         }
 
         return false;
@@ -995,7 +994,7 @@ public static class DOMCommon
 
 
     /// <summary>
-    /// Returns a list of all tree-order preceeding (sibling) nodes for the given node 
+    /// Returns a list of all tree-order preceeding (sibling) nodes for the given node
     /// </summary>
     /// <param name="node">The node to start searching from</param>
     /// <param name="Filter">Filter used for determining which nodes to allow</param>
@@ -1084,7 +1083,7 @@ public static class DOMCommon
 
 
     /// <summary>
-    /// Returns a list of all tree-order following (sibling) nodes for the given node 
+    /// Returns a list of all tree-order following (sibling) nodes for the given node
     /// </summary>
     /// <param name="node">The node to start searching from</param>
     /// <param name="Filter">Filter used for determining which nodes to allow</param>
@@ -1113,7 +1112,7 @@ public static class DOMCommon
     }
 
     /// <summary>
-    /// Returns a list of all tree-order following (sibling) nodes for the given node 
+    /// Returns a list of all tree-order following (sibling) nodes for the given node
     /// </summary>
     /// <param name="node">The node to start searching from</param>
     /// <param name="Filter">Filter used for determining which nodes to allow</param>
@@ -1853,7 +1852,7 @@ public static class DOMCommon
     internal static Element createElementNS(Document document, string qualifiedName, string Namespace, ElementCreationOptions? options = null)
     {
         XMLCommon.Validate_And_Extract(Namespace, qualifiedName, out string? Prefix, out string LocalName);
-        return Create_Element(document, LocalName, Prefix!);
+        return Create_Element(document, LocalName, Namespace, Prefix);
     }
 
     internal static Element Create_Element(Document document, AtomicString localName, string? Namespace, string? prefix = null, string? customClassName = null, bool synchronousCustomElementsFlag = false)
@@ -1915,10 +1914,10 @@ public static class DOMCommon
             else
             {
 #endif
-            if (currentObject.DOMAnchor is Element element && !ReferenceEquals(currentObject.DOMAnchor, currentObject.FocusTarget))
-            {
-                output.AddLast(element);
-            }
+                if (currentObject.DOMAnchor is Element element && !ReferenceEquals(currentObject.DOMAnchor, currentObject.FocusTarget))
+                {
+                    output.AddLast(element);
+                }
 #if ENABLE_HTML
             }
 #endif
@@ -2142,7 +2141,7 @@ public static class DOMCommon
 #if ENABLE_HTML
     /// <summary>
     /// Checks if an element is an editing host.
-    /// An editing host is an HTML element with contenteditable="true" or "plaintext-only", 
+    /// An editing host is an HTML element with contenteditable="true" or "plaintext-only",
     /// or a child HTML element of a Document with designMode enabled.
     /// </summary>
     /// <param name="element">The element to check</param>
@@ -2189,14 +2188,14 @@ public static class DOMCommon
 #if ENABLE_HTML
     /// <summary>
     /// Checks if an element is being used as relevant canvas fallback content.
-    /// An element is being used as canvas fallback content if its nearest canvas element ancestor 
+    /// An element is being used as canvas fallback content if its nearest canvas element ancestor
     /// is being rendered and represents embedded content.
     /// </summary>
     /// <param name="element">The element to check</param>
     /// <returns>True if the element is being used as canvas fallback content; otherwise, false</returns>
     /// <remarks>
     /// Docs: https://html.spec.whatwg.org/multipage/canvas.html#being-used-as-relevant-canvas-fallback-content
-    /// An element whose nearest canvas element ancestor is being rendered and represents 
+    /// An element whose nearest canvas element ancestor is being rendered and represents
     /// embedded content is an element that is being used as relevant canvas fallback content.
     /// This affects focusability - such elements can still be focused even though the canvas shows graphics.
     /// </remarks>
@@ -2292,7 +2291,7 @@ public static class DOMCommon
         // The focus delegate is the first element in tree order that:
         // 1. Has the autofocus attribute, OR
         // 2. Is a focusable area (like a form control)
-        
+
         // First, look for an element with autofocus
         var tree = new TreeWalker(element, ENodeFilterMask.SHOW_ELEMENT);
         var current = tree.nextNode();
@@ -2334,7 +2333,7 @@ public static class DOMCommon
     {
         // Simplified focusability check
         // A proper implementation would check many more conditions
-        
+
         if (element is HTML.HTMLInputElement inputEl)
         {
             return inputEl.type != HTML.EInputType.Hidden && !inputEl.disabled;
@@ -2371,7 +2370,7 @@ public static class DOMCommon
     /// <param name="dialog">The modal dialog blocking the document</param>
     /// <remarks>
     /// Docs: https://html.spec.whatwg.org/multipage/interaction.html#blocked-by-a-modal-dialog
-    /// A Document is blocked by a modal dialog subject when the subject element is in the 
+    /// A Document is blocked by a modal dialog subject when the subject element is in the
     /// document's top layer. This causes elements outside the dialog to become inert.
     /// </remarks>
     internal static void Modal_Dialog_Block_Document(Document document, Element dialog)

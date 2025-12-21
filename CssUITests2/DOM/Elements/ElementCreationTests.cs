@@ -27,7 +27,7 @@ public class ElementCreationTests
 
     #region createElement Tests
 
-    [Fact(Skip = "DOM Element creation tests")]
+    [Fact]
     public void CreateElement_ValidTagName_CreatesElement()
     {
         // Arrange
@@ -41,7 +41,7 @@ public class ElementCreationTests
         Assert.Equal("div", element.localName);
     }
 
-    [Fact(Skip = "DOM Element creation tests")]
+    [Fact]
     public void CreateElement_CaseInsensitive_NormalizesTagName()
     {
         // Arrange
@@ -56,7 +56,7 @@ public class ElementCreationTests
         Assert.Equal("div", element.localName.ToLowerInvariant());
     }
 
-    [Fact(Skip = "DOM Element creation tests")]
+    [Fact]
     public void CreateElement_DifferentTagNames_CreatesDifferentElements()
     {
         // Arrange
@@ -73,7 +73,7 @@ public class ElementCreationTests
         Assert.Equal("p", p.localName);
     }
 
-    [Fact(Skip = "DOM Element creation tests")]
+    [Fact]
     public void CreateElement_HasCorrectNodeType()
     {
         // Arrange
@@ -86,7 +86,7 @@ public class ElementCreationTests
         Assert.Equal(CssUI.DOM.Enums.ENodeType.ELEMENT_NODE, element.nodeType);
     }
 
-    [Fact(Skip = "DOM Element creation tests")]
+    [Fact]
     public void CreateElement_HasNoChildren()
     {
         // Arrange
@@ -99,7 +99,7 @@ public class ElementCreationTests
         Assert.Empty(element.childNodes);
     }
 
-    [Fact(Skip = "DOM Element creation tests")]
+    [Fact]
     public void CreateElement_HasNoParent()
     {
         // Arrange
@@ -112,7 +112,7 @@ public class ElementCreationTests
         Assert.Null(element.parentNode);
     }
 
-    [Fact(Skip = "DOM Element creation tests")]
+    [Fact]
     public void CreateElement_HasCorrectOwnerDocument()
     {
         // Arrange
@@ -125,7 +125,7 @@ public class ElementCreationTests
         Assert.Same(doc, element.ownerDocument);
     }
 
-    [Fact(Skip = "DOM Element creation tests")]
+    [Fact]
     public void CreateElement_HasNoAttributes()
     {
         // Arrange
@@ -142,7 +142,7 @@ public class ElementCreationTests
 
     #region createElementNS Tests
 
-    [Fact(Skip = "DOM Element creation tests")]
+    [Fact]
     public void CreateElementNS_HTMLNamespace_CreatesHTMLElement()
     {
         // Arrange
@@ -158,7 +158,7 @@ public class ElementCreationTests
         Assert.Equal("div", element.localName);
     }
 
-    [Fact(Skip = "DOM Element creation tests")]
+    [Fact]
     public void CreateElementNS_SVGNamespace_CreatesSVGElement()
     {
         // Arrange
@@ -174,7 +174,7 @@ public class ElementCreationTests
         Assert.Equal("svg", element.localName);
     }
 
-    [Fact(Skip = "DOM Element creation tests")]
+    [Fact]
     public void CreateElementNS_WithPrefix_HasCorrectQualifiedName()
     {
         // Arrange
@@ -190,7 +190,7 @@ public class ElementCreationTests
         // Prefix handling depends on implementation
     }
 
-    [Fact(Skip = "DOM Element creation tests")]
+    [Fact]
     public void CreateElementNS_NullNamespace_CreatesElement()
     {
         // Arrange
@@ -208,7 +208,7 @@ public class ElementCreationTests
 
     #region tagName Tests
 
-    [Fact(Skip = "DOM Element creation tests")]
+    [Fact]
     public void TagName_HTMLElement_IsUpperCase()
     {
         // Arrange
@@ -221,7 +221,7 @@ public class ElementCreationTests
         Assert.Equal("DIV", element.tagName);
     }
 
-    [Fact(Skip = "DOM Element creation tests")]
+    [Fact]
     public void TagName_XMLElement_PreservesCase()
     {
         // Arrange

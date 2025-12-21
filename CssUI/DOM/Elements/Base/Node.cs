@@ -1000,31 +1000,31 @@ public abstract class Node : EventTarget, INode
                     }
                 }
             }
-        }
-        else if (node is Element)
-        {
-            /* parent has an element child that is not child or a doctype is following child. */
-            var eChildren = parent.childNodes.Where(c => c is Element);
-            if (eChildren.Any(c => !ReferenceEquals(c, child)))// parent has element that is not child
+            else if (node is Element)
             {
-                throw new HierarchyRequestError();
+                /* parent has an element child that is not child or a doctype is following child. */
+                var eChildren = parent.childNodes.Where(c => c is Element);
+                if (eChildren.Any(c => !ReferenceEquals(c, child)))// parent has element that is not child
+                {
+                    throw new HierarchyRequestError();
+                }
+                else if (DOMCommon.Get_Following(child).Any(c => c is DocumentType))// doctype is following child
+                {
+                    throw new HierarchyRequestError();
+                }
             }
-            else if (DOMCommon.Get_Following(child).Any(c => c is DocumentType))// doctype is following child
+            else if (node is DocumentType)
             {
-                throw new HierarchyRequestError();
-            }
-        }
-        else if (node is DocumentType)
-        {
-            /* parent has a doctype child that is not child, or an element is preceding child. */
-            var eChildren = parent.childNodes.Where(c => c is DocumentType);
-            if (eChildren.Any(c => !ReferenceEquals(c, child)))// parent has a doctype that is not child
-            {
-                throw new HierarchyRequestError();
-            }
-            else if (DOMCommon.Get_Preceeding(child, FilterElements.Instance).Count > 0)// element is preceeding child
-            {
-                throw new HierarchyRequestError();
+                /* parent has a doctype child that is not child, or an element is preceding child. */
+                var dtChildren = parent.childNodes.Where(c => c is DocumentType);
+                if (dtChildren.Any(c => !ReferenceEquals(c, child)))// parent has a doctype that is not child
+                {
+                    throw new HierarchyRequestError();
+                }
+                else if (DOMCommon.Get_Preceeding(child, FilterElements.Instance).Count > 0)// element is preceeding child
+                {
+                    throw new HierarchyRequestError();
+                }
             }
         }
 
