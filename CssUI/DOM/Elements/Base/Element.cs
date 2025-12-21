@@ -510,7 +510,11 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
     {/* Docs: https://dom.spec.whatwg.org/#concept-node-remove */
         base.Run_node_removing_steps(node);
         // Remove element from document's ID map (implementation-specific extension)
-        nodeDocument?.Remove_Element_From_ID_Map(this);
+        // Note: 'node' is the element being removed, not 'this' (which is the parent when called from step 13)
+        if (node is Element element)
+        {
+            nodeDocument?.Remove_Element_From_ID_Map(element);
+        }
     }
 
     internal bool is_potentially_scrollable
