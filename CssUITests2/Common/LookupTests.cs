@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Xunit;
+using CssUI;
 
-namespace CssUI.Tests;
+namespace CssUITests.CORE;
 
 public class LookupTests
 {

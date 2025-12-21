@@ -1,7 +1,8 @@
 using System.Numerics;
 using Xunit;
+using CssUI.Rendering;
 
-namespace CssUI.Rendering.Tests;
+namespace CssUITests.Rendering;
 
 public class ColorTests
 {

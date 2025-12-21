@@ -1,6 +1,7 @@
+using CssUI.CSS.Parser;
 using Xunit;
 
-namespace CssUI.CSS.Parser.Tests;
+namespace CssUITests.CSS.Parser.Tests;
 
 public class HashTokenTests
 {

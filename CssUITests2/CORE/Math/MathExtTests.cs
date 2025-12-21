@@ -1,46 +1,47 @@
 using System;
 using Xunit;
+using CssUI;
 
-namespace CssUI.Tests;
+namespace CssUITests.Math;
 
 public class MathExtTests
 {
     [Fact()]
     public void MinTest()
     {
-        Assert.Equal(0, Math.Min(0, 0));
-        Assert.Equal(0, Math.Min(0, 1));
-        Assert.Equal(1, Math.Min(1, 2));
-        Assert.Equal(2, Math.Min(2, 4));
-        Assert.Equal(4, Math.Min(4, 8));
-        Assert.Equal(8, Math.Min(8, 16));
-        Assert.Equal(16, Math.Min(16, 32));
-        Assert.Equal(32, Math.Min(32, 64));
-        Assert.Equal(Int32.MinValue, Math.Min(Int32.MinValue, Int32.MaxValue));
+        Assert.Equal(0, System.Math.Min(0, 0));
+        Assert.Equal(0, System.Math.Min(0, 1));
+        Assert.Equal(1, System.Math.Min(1, 2));
+        Assert.Equal(2, System.Math.Min(2, 4));
+        Assert.Equal(4, System.Math.Min(4, 8));
+        Assert.Equal(8, System.Math.Min(8, 16));
+        Assert.Equal(16, System.Math.Min(16, 32));
+        Assert.Equal(32, System.Math.Min(32, 64));
+        Assert.Equal(Int32.MinValue, System.Math.Min(Int32.MinValue, Int32.MaxValue));
     }
 
     [Fact()]
     public void MaxTest()
     {
-        Assert.Equal(0, Math.Max(0, 0));
-        Assert.Equal(1, Math.Max(0, 1));
-        Assert.Equal(2, Math.Max(1, 2));
-        Assert.Equal(4, Math.Max(2, 4));
-        Assert.Equal(8, Math.Max(4, 8));
-        Assert.Equal(16, Math.Max(8, 16));
-        Assert.Equal(32, Math.Max(16, 32));
-        Assert.Equal(64, Math.Max(32, 64));
-        Assert.Equal(Int32.MaxValue, Math.Max(Int32.MinValue, Int32.MaxValue));
+        Assert.Equal(0, System.Math.Max(0, 0));
+        Assert.Equal(1, System.Math.Max(0, 1));
+        Assert.Equal(2, System.Math.Max(1, 2));
+        Assert.Equal(4, System.Math.Max(2, 4));
+        Assert.Equal(8, System.Math.Max(4, 8));
+        Assert.Equal(16, System.Math.Max(8, 16));
+        Assert.Equal(32, System.Math.Max(16, 32));
+        Assert.Equal(64, System.Math.Max(32, 64));
+        Assert.Equal(Int32.MaxValue, System.Math.Max(Int32.MinValue, Int32.MaxValue));
     }
 
     [Fact()]
     public void ClampTest()
     {
-        Assert.Equal(0, Math.Clamp(-1, 0, 1));
-        Assert.Equal(8, Math.Clamp(0x00, 8, 16));
-        Assert.Equal(16, Math.Clamp(0xFF, 8, 16));
-        Assert.Equal(Int32.MinValue, Math.Clamp(-0xFFFFFFFF, Int32.MinValue, Int32.MaxValue));
-        Assert.Equal(Int32.MaxValue, Math.Clamp(0xFFFFFFFF, Int32.MinValue, Int32.MaxValue));
+        Assert.Equal(0, System.Math.Clamp(-1, 0, 1));
+        Assert.Equal(8, System.Math.Clamp(0x00, 8, 16));
+        Assert.Equal(16, System.Math.Clamp(0xFF, 8, 16));
+        Assert.Equal(Int32.MinValue, System.Math.Clamp(-0xFFFFFFFF, Int32.MinValue, Int32.MaxValue));
+        Assert.Equal(Int32.MaxValue, System.Math.Clamp(0xFFFFFFFF, Int32.MinValue, Int32.MaxValue));
     }
 
     [Fact()]
@@ -66,10 +67,10 @@ public class MathExtTests
     public void DegreesToRadiansTest()
     {
         Assert.Equal(0, MathExt.DegreesToRadians(0));
-        Assert.Equal((float)Math.PI * 0.5f, MathExt.DegreesToRadians(90));
-        Assert.Equal((float)Math.PI * 1.0f, MathExt.DegreesToRadians(180));
-        Assert.Equal((float)Math.PI * 1.5f, MathExt.DegreesToRadians(270));
-        Assert.Equal((float)Math.PI * 2.0f, MathExt.DegreesToRadians(360));
+        Assert.Equal((float)System.Math.PI * 0.5f, MathExt.DegreesToRadians(90));
+        Assert.Equal((float)System.Math.PI * 1.0f, MathExt.DegreesToRadians(180));
+        Assert.Equal((float)System.Math.PI * 1.5f, MathExt.DegreesToRadians(270));
+        Assert.Equal((float)System.Math.PI * 2.0f, MathExt.DegreesToRadians(360));
     }
 
     [Fact()]

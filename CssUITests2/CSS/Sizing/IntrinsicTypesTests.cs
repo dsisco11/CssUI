@@ -1,6 +1,7 @@
+using CssUI.CSS;
 using Xunit;
 
-namespace CssUI.CSS.Tests;
+namespace CssUITests.CSS.Tests;
 
 /// <summary>
 /// Tests for IntrinsicAxisSize struct operations.

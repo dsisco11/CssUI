@@ -37,7 +37,7 @@ public class CssCalcEvaluatorTests
     [Trait("Category", "Constants")]
     public void Constants_E_HasCorrectValue()
     {
-        Assert.Equal(Math.E, CssCalcEvaluator.E, 7);
+        Assert.Equal(System.Math.E, CssCalcEvaluator.E, 7);
     }
 
     [Fact]
@@ -45,7 +45,7 @@ public class CssCalcEvaluatorTests
     [Trait("Category", "Constants")]
     public void Constants_Pi_HasCorrectValue()
     {
-        Assert.Equal(Math.PI, CssCalcEvaluator.Pi, 7);
+        Assert.Equal(System.Math.PI, CssCalcEvaluator.Pi, 7);
     }
 
     #endregion
@@ -613,7 +613,7 @@ public class CssCalcEvaluatorTests
     private static NumberToken CreateNumberToken(double value)
     {
         string strVal = value.ToString();
-        bool isInteger = value == Math.Floor(value) && !double.IsInfinity(value);
+        bool isInteger = value == System.Math.Floor(value) && !double.IsInfinity(value);
         return new NumberToken(
             isInteger ? ENumericTokenType.Integer : ENumericTokenType.Number,
             strVal.AsSpan(),

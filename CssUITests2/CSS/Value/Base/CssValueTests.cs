@@ -1,7 +1,8 @@
 using System;
+using CssUI.CSS;
 using Xunit;
 
-namespace CssUI.CSS.Tests;
+namespace CssUITests.CSS.Tests;
 
 public class CssValueTests
 {

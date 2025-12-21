@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace CssUI.CSS.Selector.Tests;
+namespace CssUITests.CSS.Selector.Tests;
 
 /// <summary>
 /// Tests for pseudo-class selectors (:root, :empty, :checked, :not, etc.).

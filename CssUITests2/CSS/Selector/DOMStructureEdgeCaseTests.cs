@@ -1,8 +1,9 @@
 using System.Linq;
+using CssUI.CSS;
 using CssUI.DOM;
 using Xunit;
 
-namespace CssUI.CSS.Selector.Tests;
+namespace CssUITests.CSS.Selector.Tests;
 
 /// <summary>
 /// Tests for DOM structure edge cases in selector matching.

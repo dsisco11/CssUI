@@ -1,8 +1,9 @@
 using System.Linq;
+using CssUI.CSS;
 using CssUI.DOM;
 using Xunit;
 
-namespace CssUI.CSS.Selector.Tests;
+namespace CssUITests.CSS.Selector.Tests;
 
 /// <summary>
 /// Tests for the <see cref="CssSelector"/> class and selector parsing/matching.
@@ -265,7 +266,7 @@ public class CssSelectorTests
         // Arrange & Act
         var selector = new CssSelector(input);
 
-        // Note: The library currently returns a non-empty collection with an empty 
+        // Note: The library currently returns a non-empty collection with an empty
         // complex selector for empty/whitespace input, rather than an empty collection.
         // This is the actual behavior - ideally it would return an empty collection.
         Assert.NotNull(selector);

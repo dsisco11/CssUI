@@ -1,7 +1,8 @@
 using System;
+using CssUI.CSS;
 using Xunit;
 
-namespace CssUI.CSS.Tests;
+namespace CssUITests.CSS.Tests;
 
 /// <summary>
 /// Tests for IntrinsicSizeCalculator algorithms.
@@ -234,7 +235,7 @@ public class IntrinsicSizeCalculatorTests
 
         // Manual calculation per spec:
         // min(max(75, 200), 350) = min(200, 350) = 200
-        double specResult = Math.Min(Math.Max(minContent, available), maxContent);
+        double specResult = System.Math.Min(System.Math.Max(minContent, available), maxContent);
 
         Assert.Equal(specResult, result);
     }

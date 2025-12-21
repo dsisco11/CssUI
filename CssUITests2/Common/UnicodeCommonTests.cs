@@ -2,7 +2,7 @@ using System;
 using Xunit;
 using static CssUI.UnicodeCommon;
 
-namespace CssUI.Tests;
+namespace CssUITests;
 
 public class UnicodeCommonTests
 {

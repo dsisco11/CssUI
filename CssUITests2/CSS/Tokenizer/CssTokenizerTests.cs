@@ -1,7 +1,11 @@
 using System;
+using CssUI;
+using CssUI.CSS;
+using CssUI.CSS.Parser;
+using CssUI.Difference;
 using Xunit;
 
-namespace CssUI.CSS.Parser.Tests;
+namespace CssUITests.CSS.Parser.Tests;
 
 public class CssTokenizerTests
 {
@@ -25,7 +29,7 @@ html {
             BracketCloseToken.Instance, WhitespaceToken.LFLF, EOFToken.Instance
         };
 
-        var Engine = new Difference.DiffEngine<CssToken>();
+        var Engine = new DiffEngine<CssToken>();
         var diff = Engine.Compile(Expected, Actual);
         if (diff.Count > 1)
         {
@@ -48,7 +52,7 @@ a:hover {
             new IdentToken("outline"), ColonToken.Instance, WhitespaceToken.Space, new NumberToken(ENumericTokenType.Integer, "0", 0), SemicolonToken.Instance, WhitespaceToken.Space, BracketCloseToken.Instance, EOFToken.Instance
         };
 
-        var Engine = new Difference.DiffEngine<CssToken>();
+        var Engine = new DiffEngine<CssToken>();
         var diff = Engine.Compile(Expected, Actual);
         if (diff.Count > 1)
         {
@@ -76,7 +80,7 @@ a:hover {
             EOFToken.Instance
         };
 
-        var Engine = new Difference.DiffEngine<CssToken>();
+        var Engine = new DiffEngine<CssToken>();
         var diff = Engine.Compile(Expected, Actual);
         if (diff.Count > 1)
         {
@@ -100,7 +104,7 @@ a:hover {
             EOFToken.Instance
         };
 
-        var Engine = new Difference.DiffEngine<CssToken>();
+        var Engine = new DiffEngine<CssToken>();
         var diff = Engine.Compile(Expected, Actual);
         if (diff.Count > 1)
         {
@@ -125,7 +129,7 @@ a:hover {
             EOFToken.Instance
         };
 
-        var Engine = new Difference.DiffEngine<CssToken>();
+        var Engine = new DiffEngine<CssToken>();
         var diff = Engine.Compile(Expected, Actual);
         if (diff.Count > 1)
         {

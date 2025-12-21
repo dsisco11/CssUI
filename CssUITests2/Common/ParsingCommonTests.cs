@@ -1,7 +1,8 @@
 using System;
+using CssUI;
 using Xunit;
 
-namespace CssUI.Tests;
+namespace CssUITests;
 
 public class ParsingCommonTests
 {

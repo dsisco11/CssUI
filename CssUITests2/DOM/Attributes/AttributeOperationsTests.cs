@@ -1,7 +1,6 @@
 using System.Linq;
 using CssUI;
 using CssUI.DOM;
-using CssUI.DOM.Enums;
 using Xunit;
 
 namespace CssUITests.DOM.Attributes;

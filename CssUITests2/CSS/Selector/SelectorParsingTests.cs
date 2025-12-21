@@ -1,6 +1,7 @@
+using CssUI.CSS;
 using Xunit;
 
-namespace CssUI.CSS.Selector.Tests;
+namespace CssUITests.CSS.Selector.Tests;
 
 /// <summary>
 /// Tests for CSS selector parsing and structure validation.

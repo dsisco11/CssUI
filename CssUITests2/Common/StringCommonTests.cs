@@ -1,9 +1,10 @@
 using System;
 using System.Linq;
+using CssUI;
 using CssUI.Filters;
 using Xunit;
 
-namespace CssUI.Tests;
+namespace CssUITests;
 
 public class StringCommonTests
 {

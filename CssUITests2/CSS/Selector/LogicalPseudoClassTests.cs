@@ -1,8 +1,9 @@
+using CssUI.CSS;
 using CssUI.CSS.Selectors;
 using CssUI.DOM;
 using Xunit;
 
-namespace CssUI.CSS.Selector.Tests;
+namespace CssUITests.CSS.Selector.Tests;
 
 /// <summary>
 /// Tests for logical combination pseudo-class selectors.

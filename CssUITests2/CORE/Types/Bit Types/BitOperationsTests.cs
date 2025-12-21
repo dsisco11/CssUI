@@ -1,6 +1,7 @@
 using Xunit;
+using CssUI;
 
-namespace CssUI.Tests;
+namespace CssUITests.Math;
 
 public class BitOperationsTests
 {

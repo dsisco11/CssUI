@@ -1,7 +1,7 @@
 using CssUI.DOM;
 using Xunit;
 
-namespace CssUI.CSS.Selector.Tests;
+namespace CssUITests.CSS.Selector.Tests;
 
 /// <summary>
 /// Tests to verify that Document creation works after the Get_Location fix.

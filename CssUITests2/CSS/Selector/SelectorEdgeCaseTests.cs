@@ -1,9 +1,10 @@
 using System;
 using System.Linq;
+using CssUI.CSS;
 using CssUI.DOM;
 using Xunit;
 
-namespace CssUI.CSS.Selector.Tests;
+namespace CssUITests.CSS.Selector.Tests;
 
 /// <summary>
 /// Tests for edge cases and error handling in selector parsing and matching.

@@ -1,7 +1,7 @@
 using System;
 using Xunit;
 
-namespace CssUI.DOM.Tests;
+namespace CssUITests.DOM;
 
 public class AttributeTokenListTests
 {

@@ -1,7 +1,8 @@
+using CssUI.CSS;
 using CssUI.DOM;
 using Xunit;
 
-namespace CssUI.CSS.Selector.Tests;
+namespace CssUITests.CSS.Selector.Tests;
 
 /// <summary>
 /// Tests for attribute selectors ([attr], [attr=value], [attr~=value], etc.).

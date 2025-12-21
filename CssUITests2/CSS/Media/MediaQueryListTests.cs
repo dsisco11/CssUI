@@ -1,7 +1,8 @@
 using System;
+using CssUI.DOM;
 using Xunit;
 
-namespace CssUI.DOM.Media.Tests;
+namespace CssUITests.DOM.Media;
 
 public class MediaQueryListTests
 {

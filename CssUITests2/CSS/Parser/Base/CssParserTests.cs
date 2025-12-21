@@ -1,8 +1,11 @@
 using System;
+using CssUI;
+using CssUI.CSS.Parser;
+using CssUI.CSS.Serialization;
 using CssUI.DOM;
 using Xunit;
 
-namespace CssUI.CSS.Serialization.Tests;
+namespace CssUITests.CSS.Serialization.Tests;
 
 public class CssParserTests
 {
