@@ -220,6 +220,11 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
         appendChild(doctype);
     }
 
+    protected Document(string? contentType) : this()
+    {
+        this.contentType = contentType;
+    }
+
     protected Document(IServiceProvider rootProvider, DocumentType doctype, string? contentType = null) : this(rootProvider)
     {
         this.contentType = contentType;

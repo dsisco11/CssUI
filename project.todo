@@ -54,10 +54,19 @@
 15. DOMCommon.Get_Ancestors() TreeWalker couldn't traverse ancestors (root was set to starting node)
 16. ComplexSelector.Match() applied combinator from wrong selector (broke descendant/child matching)
 
-### 4.3 DOM Document Tests
-- [ ] Test document creation (createDocument, createHTMLDocument)
-- [ ] Test document tree operations
-- [ ] Test document fragment operations
+### 4.3 DOM Document Tests ✅ COMPLETED
+- [x] Test document creation (createDocument, createHTMLDocument) - 14 tests passing
+- [x] Test document tree operations - 8 tests passing
+- [x] Test document fragment operations - 15 tests passing
+
+#### Bugs Fixed During Document Tests:
+17. Node.Dom_insert_node_into_parent_before() collection modification (iterate over ToArray() copy)
+18. Node.Dom_replace_all_within_node() collection modification (iterate over ToArray() copy)
+19. Element.textContent setter was using parentNode instead of this
+20. DocumentFragment.textContent setter was using parentNode instead of this
+21. DocumentFragment.textContent getter was using firstChild() instead of nextNode()
+22. CssSelector.Match_Against_Tree() was casting DocumentFragment to Element (filter to Element only)
+23. XMLDocument constructor always added doctype (added withoutDoctype constructor for createDocument)
 
 ### 4.4 DOM Advanced Features Tests
 - [ ] NodeIterator tests
@@ -96,7 +105,7 @@
 - [ ] Simplification algorithm
 - [ ] Proper serialization
 
-## Test Coverage — 1001 PASSING (after DOM element query/matching tests enabled)
+## Test Coverage — 1099 PASSING (after DOM document tests enabled)
 
 ### CSS Systems Test Status
 - [ ] CSS Properties system (CSS/Properties/)

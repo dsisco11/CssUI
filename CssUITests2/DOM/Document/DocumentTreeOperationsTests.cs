@@ -34,7 +34,7 @@ public class DocumentTreeOperationsTests
 
     #region documentElement Tests
 
-    [Fact(Skip = "DOM document tree tests")]
+    [Fact]
     public void DocumentElement_NewDocument_IsNotNull()
     {
         // Arrange
@@ -47,7 +47,7 @@ public class DocumentTreeOperationsTests
         Assert.NotNull(doc.documentElement);
     }
 
-    [Fact(Skip = "DOM document tree tests")]
+    [Fact]
     public void DocumentElement_IsFirstElementChild()
     {
         // Arrange
@@ -58,7 +58,7 @@ public class DocumentTreeOperationsTests
         Assert.Same(doc.documentElement, doc.childNodes.OfType<Element>().First());
     }
 
-    [Fact(Skip = "DOM document tree tests")]
+    [Fact]
     public void DocumentElement_ParentIsDocument()
     {
         // Arrange
@@ -73,7 +73,7 @@ public class DocumentTreeOperationsTests
 
     #region createElement Tests (on Document)
 
-    [Fact(Skip = "DOM document tree tests")]
+    [Fact]
     public void Document_CreateElement_CreatesOrphanElement()
     {
         // Arrange
@@ -88,7 +88,7 @@ public class DocumentTreeOperationsTests
         Assert.Same(doc, element.ownerDocument);
     }
 
-    [Fact(Skip = "DOM document tree tests")]
+    [Fact]
     public void Document_CreateElement_CanBeAppendedToDocumentElement()
     {
         // Arrange
@@ -106,7 +106,7 @@ public class DocumentTreeOperationsTests
 
     #region createTextNode Tests
 
-    [Fact(Skip = "DOM document tree tests")]
+    [Fact]
     public void Document_CreateTextNode_CreatesTextNode()
     {
         // Arrange
@@ -120,7 +120,7 @@ public class DocumentTreeOperationsTests
         Assert.Equal("Hello World", textNode.data);
     }
 
-    [Fact(Skip = "DOM document tree tests")]
+    [Fact]
     public void Document_CreateTextNode_HasCorrectOwnerDocument()
     {
         // Arrange
@@ -133,7 +133,7 @@ public class DocumentTreeOperationsTests
         Assert.Same(doc, textNode.ownerDocument);
     }
 
-    [Fact(Skip = "DOM document tree tests")]
+    [Fact]
     public void Document_CreateTextNode_CanBeAppended()
     {
         // Arrange
@@ -150,7 +150,7 @@ public class DocumentTreeOperationsTests
         Assert.Equal("Hello", element.textContent);
     }
 
-    [Fact(Skip = "DOM document tree tests")]
+    [Fact]
     public void Document_CreateTextNode_EmptyString_CreatesEmptyTextNode()
     {
         // Arrange
@@ -168,7 +168,7 @@ public class DocumentTreeOperationsTests
 
     #region textContent Tests
 
-    [Fact(Skip = "DOM document tree tests")]
+    [Fact]
     public void TextContent_SingleElement_ReturnsDescendantText()
     {
         // Arrange
@@ -182,7 +182,7 @@ public class DocumentTreeOperationsTests
         Assert.Equal("Hello World", element.textContent);
     }
 
-    [Fact(Skip = "DOM document tree tests")]
+    [Fact]
     public void TextContent_NestedElements_ConcatenatesText()
     {
         // Arrange
@@ -200,7 +200,7 @@ public class DocumentTreeOperationsTests
         Assert.Equal("Hello World", parent.textContent);
     }
 
-    [Fact(Skip = "DOM document tree tests")]
+    [Fact]
     public void TextContent_Set_ReplacesAllChildren()
     {
         // Arrange
@@ -219,7 +219,7 @@ public class DocumentTreeOperationsTests
         Assert.Equal("New Text", element.textContent);
     }
 
-    [Fact(Skip = "DOM document tree tests")]
+    [Fact]
     public void TextContent_NoChildren_ReturnsEmpty()
     {
         // Arrange
@@ -235,7 +235,7 @@ public class DocumentTreeOperationsTests
 
     #region append / prepend Tests
 
-    [Fact(Skip = "DOM document tree tests")]
+    [Fact]
     public void Append_MultipleNodes_AppendsAll()
     {
         // Arrange
@@ -254,7 +254,7 @@ public class DocumentTreeOperationsTests
         Assert.Same(child2, parent.childNodes[1]);
     }
 
-    [Fact(Skip = "DOM document tree tests")]
+    [Fact]
     public void Append_StringNodes_CreatesTextNodes()
     {
         // Arrange
@@ -269,7 +269,7 @@ public class DocumentTreeOperationsTests
         Assert.Equal("Hello World", parent.textContent);
     }
 
-    [Fact(Skip = "DOM document tree tests")]
+    [Fact]
     public void Append_MixedNodesAndStrings_AddsAll()
     {
         // Arrange
@@ -289,7 +289,7 @@ public class DocumentTreeOperationsTests
 
     #region Document nodeValue / textContent Tests
 
-    [Fact(Skip = "DOM document tree tests")]
+    [Fact]
     public void Document_NodeValue_IsNull()
     {
         // Arrange
@@ -299,7 +299,7 @@ public class DocumentTreeOperationsTests
         Assert.Null(doc.nodeValue);
     }
 
-    [Fact(Skip = "DOM document tree tests")]
+    [Fact]
     public void Document_TextContent_IsNull()
     {
         // Arrange
@@ -309,7 +309,7 @@ public class DocumentTreeOperationsTests
         Assert.Null(doc.textContent);
     }
 
-    [Fact(Skip = "DOM document tree tests")]
+    [Fact]
     public void Document_NodeValue_SetDoesNothing()
     {
         // Arrange
@@ -322,7 +322,7 @@ public class DocumentTreeOperationsTests
         Assert.Null(doc.nodeValue);
     }
 
-    [Fact(Skip = "DOM document tree tests")]
+    [Fact]
     public void Document_TextContent_SetDoesNothing()
     {
         // Arrange

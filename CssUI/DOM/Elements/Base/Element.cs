@@ -114,9 +114,9 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
             Node? node = null;
             /* 2) If string is not the empty string, then set node to a new Text node whose data is string and node document is parent’s node document. */
             if (!string.IsNullOrEmpty(value))
-                node = new Text(parentNode!.ownerDocument!, value);
+                node = new Text(ownerDocument!, value);
             /* 3) Replace all with node within parent. */
-            Node.Dom_replace_all_within_node(node, parentNode!);
+            Node.Dom_replace_all_within_node(node, this);
         }
     }
     #endregion

@@ -617,6 +617,11 @@ public abstract class Node : EventTarget, INode
                             copy = new Attr(natr.Name, document!, natr.namespaceURI) { Value = natr.Value };
                         }
                         break;
+                    case ENodeType.DOCUMENT_FRAGMENT_NODE:
+                        {
+                            copy = new DocumentFragment(null, document);
+                        }
+                        break;
                     default:
                         {
                             if (node is Text)
@@ -862,11 +867,11 @@ public abstract class Node : EventTarget, INode
             }
         }
         /* 3) Let nodes be node’s children, if node is a DocumentFragment node; otherwise « node ». */
-        IEnumerable<Node> nodes = (node is DocumentFragment doc1) ? doc1.childNodes : new Node[] { node };
+        IEnumerable<Node> nodes = (node is DocumentFragment doc1) ? doc1.childNodes.ToArray() : new Node[] { node };
         /* 4) If node is a DocumentFragment node, remove its children with the suppress observers flag set. */
         if (node is DocumentFragment doc2)
         {
-            foreach (Node cn in doc2.childNodes)
+            foreach (Node cn in nodes)
             {
                 Dom_remove_node_from_parent(cn, doc2, true);
             }
@@ -1072,15 +1077,15 @@ public abstract class Node : EventTarget, INode
             parent.ownerDocument.adoptNode(node);
         }
 
-        IEnumerable<Node> removedNodes = parent.childNodes;
+        IEnumerable<Node> removedNodes = parent.childNodes.ToArray();
         IEnumerable<Node> addedNodes = Array.Empty<Node>();
 
         if (node is DocumentFragment)
-            addedNodes = node.childNodes;
+            addedNodes = node.childNodes.ToArray();
         else if (node is not null)
             addedNodes = new Node[] { node };
         /* 6) Remove all parent’s children, in tree order, with the suppress observers flag set. */
-        foreach (Node child in parent.childNodes)
+        foreach (Node child in removedNodes)
         {
             Dom_remove_node_from_parent(child, parent, true);
         }
@@ -1224,9 +1229,9 @@ public abstract class Node : EventTarget, INode
         else
         {
             node = new DocumentFragment(null, document);
-            foreach (Node child in (Node[])nodes)
+            foreach (object item in nodes)
             {
-                node.appendChild(child);
+                node.appendChild((Node)item);
             }
         }
 

@@ -163,14 +163,15 @@ public class CssSelector : List<ComplexSelector>
         if (scopingRoot != null)
             Filter = new FilterDescendantOf(scopingRoot);
 
-        LinkedList<Node> candidateElements = new LinkedList<Node>();
+        LinkedList<Element> candidateElements = new LinkedList<Element>();
         foreach (Node root in rootElements)
         {
             var rootList = DOMCommon.Get_Shadow_Including_Inclusive_Descendents(root, Filter!, ENodeFilterMask.SHOW_ELEMENT);
-            // Add all elements from the rootList to candidateElements
+            // Add all elements from the rootList to candidateElements (filter to Element only)
             foreach (Node node in rootList)
             {
-                candidateElements.AddLast(node);
+                if (node is Element elem)
+                    candidateElements.AddLast(elem);
             }
         }
 

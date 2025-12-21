@@ -13,7 +13,7 @@ public class DocumentCreationTests
 {
     #region createDocument Tests
 
-    [Fact(Skip = "DOM document creation tests")]
+    [Fact]
     public void CreateDocument_WithNamespace_CreatesDocument()
     {
         // Arrange
@@ -28,7 +28,7 @@ public class DocumentCreationTests
         Assert.Equal("root", doc.documentElement.localName);
     }
 
-    [Fact(Skip = "DOM document creation tests")]
+    [Fact]
     public void CreateDocument_HasCorrectNodeType()
     {
         // Arrange
@@ -41,7 +41,7 @@ public class DocumentCreationTests
         Assert.Equal(ENodeType.DOCUMENT_NODE, doc.nodeType);
     }
 
-    [Fact(Skip = "DOM document creation tests")]
+    [Fact]
     public void CreateDocument_HasCorrectNodeName()
     {
         // Arrange
@@ -54,7 +54,7 @@ public class DocumentCreationTests
         Assert.Equal("#document", doc.nodeName);
     }
 
-    [Fact(Skip = "DOM document creation tests")]
+    [Fact]
     public void CreateDocument_DocumentElement_HasCorrectNamespace()
     {
         // Arrange
@@ -68,7 +68,7 @@ public class DocumentCreationTests
         Assert.Equal(ns, doc.documentElement!.NamespaceURI);
     }
 
-    [Fact(Skip = "DOM document creation tests")]
+    [Fact]
     public void CreateDocument_WithDoctype_AppendsDoctype()
     {
         // Arrange
@@ -83,7 +83,7 @@ public class DocumentCreationTests
         Assert.Equal("root", doc.doctype.name);
     }
 
-    [Fact(Skip = "DOM document creation tests")]
+    [Fact]
     public void CreateDocument_EmptyQualifiedName_NoDocumentElement()
     {
         // Arrange
@@ -100,7 +100,7 @@ public class DocumentCreationTests
 
     #region createHTMLDocument Tests
 
-    [Fact(Skip = "DOM document creation tests")]
+    [Fact]
     public void CreateHTMLDocument_CreatesValidStructure()
     {
         // Arrange
@@ -114,7 +114,7 @@ public class DocumentCreationTests
         Assert.NotNull(doc.documentElement);
     }
 
-    [Fact(Skip = "DOM document creation tests")]
+    [Fact]
     public void CreateHTMLDocument_HasDoctype()
     {
         // Arrange
@@ -128,7 +128,7 @@ public class DocumentCreationTests
         Assert.Equal("html", doc.doctype.name);
     }
 
-    [Fact(Skip = "DOM document creation tests")]
+    [Fact]
     public void CreateHTMLDocument_HasHtmlElement()
     {
         // Arrange
@@ -142,7 +142,7 @@ public class DocumentCreationTests
         Assert.Equal("html", doc.documentElement.localName.ToLowerInvariant());
     }
 
-    [Fact(Skip = "DOM document creation tests")]
+    [Fact]
     public void CreateHTMLDocument_HasHeadElement()
     {
         // Arrange
@@ -156,7 +156,7 @@ public class DocumentCreationTests
         Assert.NotNull(head);
     }
 
-    [Fact(Skip = "DOM document creation tests")]
+    [Fact]
     public void CreateHTMLDocument_HasBodyElement()
     {
         // Arrange
@@ -170,7 +170,7 @@ public class DocumentCreationTests
         Assert.NotNull(body);
     }
 
-    [Fact(Skip = "DOM document creation tests")]
+    [Fact]
     public void CreateHTMLDocument_HasTitleElement()
     {
         // Arrange
@@ -185,7 +185,7 @@ public class DocumentCreationTests
         Assert.Equal("My Title", title.textContent);
     }
 
-    [Fact(Skip = "DOM document creation tests")]
+    [Fact]
     public void CreateHTMLDocument_EmptyTitle_CreatesNoTitleElement()
     {
         // Arrange
@@ -199,7 +199,7 @@ public class DocumentCreationTests
         Assert.Null(title);
     }
 
-    [Fact(Skip = "DOM document creation tests")]
+    [Fact]
     public void CreateHTMLDocument_ContentType_IsTextHtml()
     {
         // Arrange
@@ -216,7 +216,7 @@ public class DocumentCreationTests
 
     #region createDocumentType Tests
 
-    [Fact(Skip = "DOM document creation tests")]
+    [Fact]
     public void CreateDocumentType_ValidName_CreatesDoctype()
     {
         // Arrange
@@ -230,7 +230,7 @@ public class DocumentCreationTests
         Assert.Equal("html", doctype.name);
     }
 
-    [Fact(Skip = "DOM document creation tests")]
+    [Fact]
     public void CreateDocumentType_WithPublicId_SetsPublicId()
     {
         // Arrange
@@ -244,7 +244,7 @@ public class DocumentCreationTests
         Assert.Equal(publicId, doctype.publicId);
     }
 
-    [Fact(Skip = "DOM document creation tests")]
+    [Fact]
     public void CreateDocumentType_WithSystemId_SetsSystemId()
     {
         // Arrange
@@ -258,7 +258,7 @@ public class DocumentCreationTests
         Assert.Equal(systemId, doctype.systemId);
     }
 
-    [Fact(Skip = "DOM document creation tests")]
+    [Fact]
     public void CreateDocumentType_HasCorrectNodeType()
     {
         // Arrange

@@ -20,8 +20,8 @@ public class DocumentFragment : ParentNode
             /* The descendant text content of a node node is the concatenation of the data of all the Text node descendants of node, in tree order. */
             var tree = new TreeWalker(this, ENodeFilterMask.SHOW_TEXT);
             StringBuilder sb = new StringBuilder();
-            Node n;
-            while ((n = tree.firstChild()) != null)
+            Node? n;
+            while ((n = tree.nextNode()) != null)
                 sb.Append(n.textContent);
 
             return sb.ToString();
@@ -33,9 +33,9 @@ public class DocumentFragment : ParentNode
             Node? node = null;
             /* 2) If string is not the empty string, then set node to a new Text node whose data is string and node document is parent's node document. */
             if (!string.IsNullOrEmpty(value))
-                node = new Text(parentNode!.ownerDocument!, value);
+                node = new Text(ownerDocument!, value);
             /* 3) Replace all with node within parent. */
-            Dom_replace_all_within_node(node, parentNode!);
+            Dom_replace_all_within_node(node, this);
             node = null;
         }
     }
