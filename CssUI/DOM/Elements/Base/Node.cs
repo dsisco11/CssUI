@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -18,10 +19,11 @@ namespace CssUI.DOM.Nodes;
 
 /// <summary>
 /// </summary>
+[DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
 public abstract class Node : EventTarget, INode
 {/* Docs: https://dom.spec.whatwg.org/#interface-node */
 
-    internal ILogger Log { get => nodeDocument!.Log; }
+    internal ILogger? Log { get => nodeDocument!.Log; }
     #region Properties
     private ENodeFlags nodeFlags = ENodeFlags.Clear;
     internal List<RegisteredObserver> RegisteredObservers = new List<RegisteredObserver>();
@@ -1263,6 +1265,11 @@ public abstract class Node : EventTarget, INode
     /// <param name="newNode">The node to copy data too</param>
     /// <param name="deep">Whether to also copy all child nodes</param>
     protected virtual void CopyTo(ref Node newNode, bool deep = false) { }
+
+    private string GetDebuggerDisplay()
+    {
+        return ToString();
+    }
     #endregion
 
 }

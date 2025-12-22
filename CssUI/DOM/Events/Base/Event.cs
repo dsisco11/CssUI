@@ -233,7 +233,11 @@ public class Event : IEvent
     /// </summary>
     public void preventDefault()
     {/* The preventDefault() method, when invoked, must set the canceled flag with the context object. */
-        Flags |= EEventFlags.Canceled;
+        /* Per spec: only set canceled flag if event is cancelable and not in passive listener */
+        if (this.cancelable && 0 == (Flags & EEventFlags.InPassiveListener))
+        {
+            Flags |= EEventFlags.Canceled;
+        }
     }
 
     /// <summary>

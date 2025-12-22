@@ -333,7 +333,7 @@ public static class EventCommon
                 @event.Flags |= EEventFlags.InPassiveListener;
 
             /* 10) Call a user object’s operation with listener’s callback, "handleEvent", « event », and event’s currentTarget attribute value. If this throws an exception, then: */
-            listener?.callback?.Method.Invoke(@event.currentTarget, new object[] { @event });
+            listener.callback?.Invoke(@event);
 
             /* 11) Unset event’s in passive listener flag. */
             @event.Flags &= ~EEventFlags.InPassiveListener;

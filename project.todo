@@ -82,13 +82,18 @@
   - [x] Test slot assignment
   - [x] Test ShadowRoot content manipulation
   - [x] Test shadowable/non-shadowable elements
-- [ ] Events tests
-  - [ ] Test addEventListener/removeEventListener
-  - [ ] Test dispatchEvent
-  - [ ] Test event bubbling and capturing
-  - [ ] Test stopPropagation/stopImmediatePropagation
-  - [ ] Test event.target vs event.currentTarget
-  - [ ] Test custom events
+- [x] Events tests - 49 tests passing
+  - [x] Test addEventListener/removeEventListener
+  - [x] Test dispatchEvent
+  - [x] Test event bubbling and capturing
+  - [x] Test stopPropagation/stopImmediatePropagation
+  - [x] Test event.target vs event.currentTarget
+  - [x] Test custom events
+
+#### Bugs Fixed During Events Tests:
+24. EventCommon.inner_invoke() was using reflection Method.Invoke incorrectly (delegate should be invoked directly)
+25. Event.preventDefault() wasn't checking if event is cancelable (per spec, only cancelable events can be canceled)
+
 - [ ] Range tests
   - [ ] Test createRange
   - [ ] Test setStart/setEnd operations
@@ -108,7 +113,7 @@
 - [ ] Simplification algorithm
 - [ ] Proper serialization
 
-## Test Coverage — 1078 PASSING + 48 new ShadowRoot tests = ~1126 total
+## Test Coverage — 1126 PASSING + 49 new Events tests = ~1175 total
 
 ### CSS Systems Test Status
 - [ ] CSS Properties system (CSS/Properties/)
