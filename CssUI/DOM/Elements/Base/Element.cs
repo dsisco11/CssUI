@@ -664,13 +664,13 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
     {
         /* To append an attribute attribute to an element element, run these steps: */
         /* 1) Queue an attribute mutation record for element with attribute’s local name, attribute’s namespace, and null. */
-        MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.namespaceURI ?? string.Empty, attr.Value);
+        MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.namespaceURI ?? string.Empty, null!);
 
         /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute’s local name, null, attribute’s value, and attribute’s namespace. */
         CEReactions.Enqueue_Reaction(this, EReactionName.AttributeChanged, attr.localName, null, attr.Value, attr.namespaceURI);
 
         /* 3) Run the attribute change steps with element, attribute’s local name, null, attribute’s value, and attribute’s namespace. */
-        change_attribute(attr, null, attr.Value);
+        run_attribute_change_steps(this, attr.localName, null!, attr.Value!, (attr.namespaceURI ?? string.Empty).AsMemory());
 
         /* 4) Append attribute to element’s attribute list. */
         //AttributeList.Add(attr.Name.ToLowerInvariant(), attr);
@@ -691,7 +691,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
         CEReactions.Enqueue_Reaction(this, EReactionName.AttributeChanged, attr.localName, attr.Value, null, attr.namespaceURI);
 
         /* 3) Run the attribute change steps with element, attribute’s local name, attribute’s value, null, and attribute’s namespace. */
-        change_attribute(attr, attr.Value, null);
+        run_attribute_change_steps(this, attr.localName, attr.Value!, null!, (attr.namespaceURI ?? string.Empty).AsMemory());
         /* 4) Remove attribute from element’s attribute list. */
         //AttributeList.Remove(attr.Name.ToLowerInvariant());
         AttributeList.Remove(attr.localName);
