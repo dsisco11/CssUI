@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using CssUI.DOM.Exceptions;
 using CssUI.DOM.Nodes;
@@ -10,8 +11,8 @@ namespace CssUI.DOM.Mutation;
 public class MutationObserver
 {
     #region Properties
-    internal List<Node> Nodes = new List<Node>();
-    private Queue<MutationRecord> RecordQueue = new Queue<MutationRecord>();
+    internal List<Node> Nodes = [];
+    private ConcurrentQueue<MutationRecord> RecordQueue = new();
     public MutationCallback? callback { get; private set; } = null;
     #endregion
 
