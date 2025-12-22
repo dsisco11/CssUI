@@ -85,12 +85,11 @@ public class MutationRecord
         Dictionary<MutationObserver, string?> interestedObservers = new Dictionary<MutationObserver, string?>();
         /* 2) Let nodes be the inclusive ancestors of target. */
         List<Node> Nodes = new List<Node>();
-        TreeWalker tree = new TreeWalker(Record.target!, ENodeFilterMask.SHOW_ALL);
-        Node? ancestor = Record.target!;
+        Node? ancestor = Record.target;
         while (ancestor != null)
         {
             Nodes.Add(ancestor);
-            ancestor = tree.parentNode();
+            ancestor = ancestor.parentNode;
         }
         /* 3) For each node in nodes, and then for each registered of node’s registered observer list: */
         foreach (Node node in Nodes)
