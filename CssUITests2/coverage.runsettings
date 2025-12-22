@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <!-- Output format: lcov for Coverage Gutters compatibility -->
+          <Format>lcov</Format>
+
+          <!-- Exclude test assemblies and generated code from coverage -->
+          <Exclude>
+            [CssUITests*]*,
+            [CssUI.Benchmarks*]*,
+            [xunit.*]*,
+            [coverlet.*]*
+          </Exclude>
+
+          <!-- Exclude generated files by attribute -->
+          <ExcludeByAttribute>
+            Obsolete,
+            GeneratedCodeAttribute,
+            CompilerGeneratedAttribute,
+            ExcludeFromCodeCoverageAttribute
+          </ExcludeByAttribute>
+
+          <!-- Exclude generated files by pattern -->
+          <ExcludeByFile>
+            **/*.Designer.cs,
+            **/obj/**/*.cs
+          </ExcludeByFile>
+
+          <!-- Include only the main CssUI assembly -->
+          <Include>
+            [CssUI]*
+          </Include>
+
+          <!-- Single hit: faster, sufficient for most cases -->
+          <SingleHit>false</SingleHit>
+
+          <!-- Include line numbers for better reporting -->
+          <UseSourceLink>true</UseSourceLink>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>
