@@ -685,7 +685,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
     {
         /* To remove an attribute attribute from an element element, run these steps: */
         /* 1) Queue an attribute mutation record for element with attribute’s local name, attribute’s namespace, and attribute’s value. */
-        MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.namespaceURI, attr.Value);
+        MutationRecord.Queue_Attribute_Mutation_Record(this, attr.Name, attr.namespaceURI ?? string.Empty, attr.Value);
 
         /* 2) If element is custom, then enqueue a custom element callback reaction with element, callback name "attributeChangedCallback", and an argument list containing attribute’s local name, attribute’s value, null, and attribute’s namespace. */
         CEReactions.Enqueue_Reaction(this, EReactionName.AttributeChanged, attr.localName, attr.Value, null, attr.namespaceURI);

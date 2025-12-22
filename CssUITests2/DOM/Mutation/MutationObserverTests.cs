@@ -543,7 +543,7 @@ public class MutationObserverTests
         Assert.Equal("data-test", record.attributeName);
     }
 
-    [Fact(Skip = "Known bug: remove_attribute queues record but the observer is not properly registered")]
+    [Fact(Skip = "Known bug: QueueRecord doesn't find observers - records collection remains empty despite observer being registered")]
     public void Attributes_RemoveAttribute_RecordsMutation()
     {
         // Arrange
@@ -552,11 +552,28 @@ public class MutationObserverTests
         var div = CreateTestElement(doc, "div");
         doc.documentElement!.appendChild(div);
         SetAttribute(div, "data-test", "value");
+
+        // Verify attribute was set
+        Assert.True(div.hasAttribute(new AtomicName<EAttributeName>("data-test")));
+
         var observer = new MutationObserver(window, (m, o) => { });
         observer.Observe(div, new MutationObserverInit { attributes = true });
 
+        // Verify observer is registered
+        Assert.Single(div.RegisteredObservers);
+        var registered = div.RegisteredObservers[0];
+        Assert.True(registered.options!.attributes);
+        Assert.Same(observer, registered.observer);
+
         // Act
         RemoveAttribute(div, "data-test");
+
+        // Verify attribute was removed
+        Assert.False(div.hasAttribute(new AtomicName<EAttributeName>("data-test")));
+
+        // Verify observer is still registered (sanity check)
+        Assert.Single(div.RegisteredObservers);
+
         var records = observer.TakeRecords();
 
         // Assert
