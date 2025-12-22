@@ -5,6 +5,11 @@
 
 ## Architecture & Design
 - [ ] IWindowingSystem (window creation, input events) - pending
+- [ ] Implement proper microtask queue system
+  - [ ] Create microtask queue that executes after synchronous code completes (like JS event loop)
+  - [ ] Integrate with .NET Task system (e.g., SynchronizationContext or custom scheduler)
+  - [ ] Update Window.QueueObserverMicroTask() to use new system
+  - [ ] Ensure MutationObserver callbacks fire at correct timing per W3C spec
 
 ## Phase 4: DOM System Investigation & Fixes
 ### 4.1 Unit Test Coverage for DOM Attributes ✅ COMPLETED
