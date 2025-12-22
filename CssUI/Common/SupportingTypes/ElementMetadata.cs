@@ -7,7 +7,13 @@ namespace CssUI;
 public class ElementMetadata
 {
     #region Static
-    static Type[] CtorTypes = new Type[] { typeof(Document), typeof(string), typeof(string), typeof(string) };
+    // Possible constructor signatures for HTML elements (tried in order)
+    static Type[][] CtorSignatures = new Type[][]
+    {
+        new Type[] { typeof(Document), typeof(string), typeof(string), typeof(string) },  // Element(doc, localName, prefix, namespace)
+        new Type[] { typeof(Document), typeof(string) },                                   // HTMLElement(doc, localName)
+        new Type[] { typeof(Document) }                                                    // HTMLBodyElement(doc)
+    };
     #endregion
 
     #region Instances
@@ -21,6 +27,7 @@ public class ElementMetadata
     public readonly string LocalName;
     public readonly Type ElementType;
     public readonly ConstructorInfo? ctor;
+    public readonly int CtorParameterCount;
     #endregion
 
     #region Constructors
@@ -28,10 +35,18 @@ public class ElementMetadata
     {
         LocalName = localName;
         ElementType = elementType;
-        ctor = elementType.GetConstructor(CtorTypes);
+
+        // Try each constructor signature in order
+        foreach (var ctorTypes in CtorSignatures)
+        {
+            ctor = elementType.GetConstructor(ctorTypes);
+            if (ctor != null)
+            {
+                CtorParameterCount = ctorTypes.Length;
+                break;
+            }
+        }
     }
     #endregion
-
-
 }
 

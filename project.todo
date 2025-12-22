@@ -76,11 +76,12 @@
   - [x] Test referenceNode and pointerBeforeReferenceNode
   - [x] Added Document.createNodeIterator() and Document.createTreeWalker() methods
   - [x] Exposed referenceNode and pointerBeforeReferenceNode as public properties per DOM spec
-- [ ] ShadowRoot tests
-  - [ ] Test attachShadow (open/closed modes)
-  - [ ] Test shadowRoot property access
-  - [ ] Test slot assignment
-  - [ ] Test event retargeting
+- [x] ShadowRoot tests - 48 tests passing
+  - [x] Test attachShadow (open/closed modes)
+  - [x] Test shadowRoot property access
+  - [x] Test slot assignment
+  - [x] Test ShadowRoot content manipulation
+  - [x] Test shadowable/non-shadowable elements
 - [ ] Events tests
   - [ ] Test addEventListener/removeEventListener
   - [ ] Test dispatchEvent
@@ -107,7 +108,7 @@
 - [ ] Simplification algorithm
 - [ ] Proper serialization
 
-## Test Coverage — 1137 PASSING (after NodeIterator tests completed)
+## Test Coverage — 1078 PASSING + 48 new ShadowRoot tests = ~1126 total
 
 ### CSS Systems Test Status
 - [ ] CSS Properties system (CSS/Properties/)

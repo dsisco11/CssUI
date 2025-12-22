@@ -111,8 +111,8 @@ namespace CssUI.HTML.CustomElements
                     throw new NotSupportedError($"Custom element cannot extend \"{extends}\"");
                 }
                 /* 2) If the element interface for extends and the HTML namespace is HTMLUnknownElement (e.g., if extends does not indicate an element definition in this specification), then throw a "NotSupportedError" DOMException. */
-                var ctor = DOMCommon.Lookup_Element_Interface(extends, DOMCommon.HTMLNamespace);
-                Type? interfaceType = ctor?.DeclaringType;
+                var metadata = DOMCommon.Lookup_Element_Metadata(extends, DOMCommon.HTMLNamespace);
+                Type? interfaceType = metadata?.ctor?.DeclaringType;
                 if (interfaceType == typeof(HTMLUnknownElement))
                 {
                     throw new NotSupportedError($"Cannot extend non existant element type \"{extends}\"");

@@ -64,7 +64,7 @@ public static class DOMCommon
         }
     }
 
-    internal static ConstructorInfo? Lookup_Element_Interface(AtomicString localName, AtomicString Namespace)
+    internal static ElementMetadata Lookup_Element_Metadata(AtomicString localName, AtomicString Namespace)
     {
 #if ENABLE_HTML
         if (Namespace.Equals(HTMLNamespace))
@@ -72,15 +72,15 @@ public static class DOMCommon
             //ElementMetadata outMetadata = HTML.HTMLElementTable.TABLE[(int)localName.EnumValue.Value];
             if (!HTML.HTMLElementTable.KEYWORD.TryGetValue(localName, out ElementMetadata outMetadata))
             {
-                return ElementMetadata.UnknownMeta.ctor;
+                return ElementMetadata.UnknownMeta;
                 // throw new Exception($"unable to find tag type for HTML tag matching \"{localName}\"");
             }
 
-            return outMetadata.ctor;
+            return outMetadata;
         }
 #endif
 
-        return ElementMetadata.ElementMeta.ctor;
+        return ElementMetadata.ElementMeta;
     }
     #endregion
 
@@ -880,7 +880,11 @@ public static class DOMCommon
     public static LinkedList<Node> Get_Inclusive_Descendents(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
     {
         var list = new LinkedList<Node>();
-        list.AddLast(node);
+        // Only add the root node if it passes the filter (or no filter is specified)
+        if (Filter == null || Filter.acceptNode(node) == ENodeFilterResult.FILTER_ACCEPT)
+        {
+            list.AddLast(node);
+        }
         TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
         Node? current = tree.nextNode();
         while (current is not null)
@@ -1879,11 +1883,19 @@ public static class DOMCommon
         /* 2) Set result to a new element that implements interface, with no attributes, namespace set to namespace, namespace prefix set to prefix, local name set to localName, custom element state set to "uncustomized", custom element definition set to null, is value set to is, and node document set to document. */
         /* 3) If namespace is the HTML namespace, and either localName is a valid custom element name or is is non-null, then set result’s custom element state to "undefined". */
 
-        var ctor = Lookup_Element_Interface(localName, Namespace ?? string.Empty);
-        if (ctor is null)
+        var metadata = Lookup_Element_Metadata(localName, Namespace ?? string.Empty);
+        if (metadata?.ctor is null)
             throw new Exception($"Cannot find interface constructor for element type: \"{localName}\"");
+        
         /* XXX: Just need to make sure that every tag type has an interface type correctly specified for it */
-        result = (Element)ctor.Invoke(new object?[] { document, localName.ToString(), prefix, Namespace });
+        // Invoke the constructor with the appropriate number of arguments based on what the element type expects
+        object?[] args = metadata.CtorParameterCount switch
+        {
+            1 => new object?[] { document },
+            2 => new object?[] { document, localName.ToString() },
+            _ => new object?[] { document, localName.ToString(), prefix, Namespace }
+        };
+        result = (Element)metadata.ctor.Invoke(args);
 
         return result;
     }

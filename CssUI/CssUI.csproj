@@ -5,7 +5,7 @@
     <LangVersion>12.0</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
-    <Configurations>CssUI - Debug;CssUI - Release;Core - Debug;Core - Release</Configurations>
+    <Configurations>Debug;Release;CssUI - Debug;CssUI - Release;Core - Debug;Core - Release</Configurations>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
@@ -13,6 +13,18 @@
   <ItemGroup>
     <InternalsVisibleTo Include="CssUITests" />
   </ItemGroup>
+
+  <!-- Default Debug configuration - includes HTML support -->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE;WINDOWS;ENABLE_HTML</DefineConstants>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+
+  <!-- Default Release configuration - includes HTML support -->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>TRACE;WINDOWS;ENABLE_HTML</DefineConstants>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Core - Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE;WINDOWS;ENABLE_HEADLESS;DISABLE_FONT_SYSTEM</DefineConstants>
