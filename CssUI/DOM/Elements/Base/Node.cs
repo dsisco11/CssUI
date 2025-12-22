@@ -119,6 +119,43 @@ public abstract class Node : EventTarget, INode
     /// Note: The index for nodes is now automatically assigned and updated by the ChildNodeList class
     public int index { get; internal set; }
 
+    /// <summary>
+    /// Enumerates this node and all of its ancestors up to the root.
+    /// </summary>
+    /// <remarks>
+    /// Per DOM spec "inclusive ancestors" - yields self first, then parent, grandparent, etc.
+    /// </remarks>
+    /// <seealso href="https://dom.spec.whatwg.org/#concept-tree-inclusive-ancestor"/>
+    public IEnumerable<Node> inclusiveAncestors
+    {
+        get
+        {
+            Node? current = this;
+            while (current is not null)
+            {
+                yield return current;
+                current = current.parentNode;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Enumerates all ancestors of this node (excluding self).
+    /// </summary>
+    /// <seealso href="https://dom.spec.whatwg.org/#concept-tree-ancestor"/>
+    public IEnumerable<Node> ancestors
+    {
+        get
+        {
+            Node? current = parentNode;
+            while (current is not null)
+            {
+                yield return current;
+                current = current.parentNode;
+            }
+        }
+    }
+
     #endregion
 
     #region CSS
