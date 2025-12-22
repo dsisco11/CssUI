@@ -587,12 +587,10 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     public override EventTarget? get_the_parent(Event @event)
     {
         /* A document’s get the parent algorithm, given an event, returns null if event’s type attribute value is "load" or document does not have a browsing context, and the document’s relevant global object otherwise. */
-        /* Note: We arent a browser implementation so we will never have a browsing context, knowing this I think we should direguard the check and allow Document to return itsself except for when event is "load" */
-        //if (0 == string.Compare(@event.type, "load"))
         if (@event.type == EEventName.Load)
             return null;
 
-        return this;
+        return defaultView;
     }
     #endregion
 
