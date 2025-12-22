@@ -105,6 +105,11 @@ public class AttributeValue
     public static AttributeValue From(AtomicString str) => new AttributeValue(EAttributeType.String, str, str);
 
     /// <summary>
+    /// Creates a new <see cref="EAttributeType.String"/> type attribute value from a plain string
+    /// </summary>
+    public static AttributeValue From(string str) => new AttributeValue(EAttributeType.String, new AtomicString(str), str);
+
+    /// <summary>
     /// Creates a new <see cref="EAttributeType.Enumerated"/> type attribute value
     /// </summary>
     /// <typeparam name="T"></typeparam>

@@ -29,7 +29,7 @@ public class AttrValueTests
 
     #region Attr Creation Tests
 
-    [Fact(Skip = "Investigating Attr.Value behavior")]
+    [Fact]
     public void Attr_Creation_HasCorrectLocalName()
     {
         // Arrange
@@ -44,7 +44,7 @@ public class AttrValueTests
         Assert.Equal(attrName, attr.localName);
     }
 
-    [Fact(Skip = "Investigating Attr.Value behavior")]
+    [Fact]
     public void Attr_Creation_HasCorrectOwnerElement()
     {
         // Arrange
@@ -59,7 +59,7 @@ public class AttrValueTests
         Assert.Same(element, attr.ownerElement);
     }
 
-    [Fact(Skip = "Investigating Attr.Value behavior")]
+    [Fact]
     public void Attr_Creation_InitialValueIsNull()
     {
         // Arrange
@@ -78,7 +78,7 @@ public class AttrValueTests
 
     #region Attr.Value Assignment Tests
 
-    [Fact(Skip = "Investigating Attr.Value behavior")]
+    [Fact]
     public void Attr_ValueAssignment_SetsValue()
     {
         // Arrange
@@ -96,7 +96,7 @@ public class AttrValueTests
         Assert.Equal("test-value", attr.Value.Data);
     }
 
-    [Fact(Skip = "Investigating Attr.Value behavior")]
+    [Fact]
     public void Attr_ValueAssignment_EmptyString_SetsValue()
     {
         // Arrange
@@ -114,7 +114,7 @@ public class AttrValueTests
         Assert.False(attr.IsMissingValue, "Attr should not be missing after setting empty string value");
     }
 
-    [Fact(Skip = "Investigating Attr.Value behavior")]
+    [Fact]
     public void Attr_ValueAssignment_Integer_SetsValue()
     {
         // Arrange
@@ -132,7 +132,7 @@ public class AttrValueTests
         Assert.Equal("42", attr.Value.Data);
     }
 
-    [Fact(Skip = "Investigating Attr.Value behavior")]
+    [Fact]
     public void Attr_ValueAssignment_PreservesValue()
     {
         // Arrange
@@ -154,7 +154,7 @@ public class AttrValueTests
 
     #region Attr.Value Retrieval Tests
 
-    [Fact(Skip = "Investigating Attr.Value behavior")]
+    [Fact]
     public void Attr_nodeValue_MatchesValueData()
     {
         // Arrange
@@ -168,7 +168,7 @@ public class AttrValueTests
         Assert.Equal("test-value", attr.nodeValue);
     }
 
-    [Fact(Skip = "Investigating Attr.Value behavior")]
+    [Fact]
     public void Attr_textContent_MatchesValueData()
     {
         // Arrange
@@ -182,7 +182,7 @@ public class AttrValueTests
         Assert.Equal("test-value", attr.textContent);
     }
 
-    [Fact(Skip = "Investigating Attr.Value behavior")]
+    [Fact]
     public void Attr_nodeValue_Assignment_UpdatesValue()
     {
         // Arrange
@@ -202,7 +202,7 @@ public class AttrValueTests
 
     #region IsMissingValue / IsInvalidValue Tests
 
-    [Fact(Skip = "Investigating Attr.Value behavior")]
+    [Fact]
     public void Attr_IsMissingValue_TrueWhenNoValueSet()
     {
         // Arrange
@@ -215,7 +215,7 @@ public class AttrValueTests
         Assert.True(attr.IsMissingValue);
     }
 
-    [Fact(Skip = "Investigating Attr.Value behavior")]
+    [Fact]
     public void Attr_IsMissingValue_FalseAfterValueSet()
     {
         // Arrange
@@ -231,7 +231,7 @@ public class AttrValueTests
         Assert.False(attr.IsMissingValue);
     }
 
-    [Fact(Skip = "Investigating Attr.Value behavior")]
+    [Fact]
     public void Attr_IsDefined_TrueForValidValue()
     {
         // Arrange
@@ -245,7 +245,7 @@ public class AttrValueTests
         Assert.True(attr.IsDefined);
     }
 
-    [Fact(Skip = "Investigating Attr.Value behavior")]
+    [Fact]
     public void Attr_IsDefined_FalseForMissingValue()
     {
         // Arrange
@@ -262,7 +262,7 @@ public class AttrValueTests
 
     #region getAttributeNode Tests
 
-    [Fact(Skip = "Investigating Attr.Value behavior")]
+    [Fact]
     public void GetAttributeNode_ReturnsAttrWithCorrectValue()
     {
         // Arrange
@@ -279,7 +279,7 @@ public class AttrValueTests
         Assert.Equal("test-value", attr.Value?.Data);
     }
 
-    [Fact(Skip = "Investigating Attr.Value behavior")]
+    [Fact]
     public void GetAttributeNode_NonExistent_ReturnsNull()
     {
         // Arrange
@@ -294,7 +294,7 @@ public class AttrValueTests
         Assert.Null(attr);
     }
 
-    [Fact(Skip = "Investigating Attr.Value behavior")]
+    [Fact]
     public void SetAttributeNode_AddsNewAttribute()
     {
         // Arrange
@@ -312,7 +312,7 @@ public class AttrValueTests
         Assert.True(element.hasAttribute(attrName));
     }
 
-    [Fact(Skip = "Investigating Attr.Value behavior")]
+    [Fact]
     public void SetAttributeNode_ReplacesExisting_ReturnsOldAttr()
     {
         // Arrange
@@ -333,7 +333,7 @@ public class AttrValueTests
         Assert.Equal("new-value", element.getAttribute(attrName)?.Data);
     }
 
-    [Fact(Skip = "Investigating Attr.Value behavior")]
+    [Fact]
     public void RemoveAttributeNode_RemovesAndReturnsAttr()
     {
         // Arrange

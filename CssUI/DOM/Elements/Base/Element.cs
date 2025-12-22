@@ -710,7 +710,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
         CEReactions.Enqueue_Reaction(this, EReactionName.AttributeChanged, oldAttr.localName, oldAttr.Value, newAttr.Value, oldAttr.namespaceURI);
 
         /* 3) Run the attribute change steps with element, oldAttr’s local name, oldAttr’s value, newAttr’s value, and oldAttr’s namespace. */
-        change_attribute(oldAttr, oldAttr.Value, newAttr.Value);
+        run_attribute_change_steps(this, oldAttr.localName, oldAttr.Value!, newAttr.Value!, (oldAttr.namespaceURI ?? string.Empty).AsMemory());
         /* 4) Replace oldAttr by newAttr in element’s attribute list. */
         //string lowerName = StringCommon.Transform(oldAttr.Name.AsMemory(), UnicodeCommon.To_ASCII_Lower_Alpha);
         //AttributeList[lowerName] = newAttr;
