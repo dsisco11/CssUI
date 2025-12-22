@@ -94,12 +94,28 @@
 24. EventCommon.inner_invoke() was using reflection Method.Invoke incorrectly (delegate should be invoked directly)
 25. Event.preventDefault() wasn't checking if event is cancelable (per spec, only cancelable events can be canceled)
 
-- [ ] Range tests
-  - [ ] Test createRange
-  - [ ] Test setStart/setEnd operations
-  - [ ] Test selectNode/selectNodeContents
-  - [ ] Test extractContents/cloneContents/deleteContents
-  - [ ] Test Range boundary points
+- [x] Range tests - 82 tests passing
+  - [x] Test createRange
+  - [x] Test setStart/setEnd operations
+  - [x] Test selectNode/selectNodeContents
+  - [x] Test extractContents/cloneContents/deleteContents
+  - [x] Test Range boundary points
+  - [x] Test collapse, compareBoundaryPoints, Contains
+  - [x] Test insertNode, surroundContents
+  - [x] Test cloneRange, isPointInRange, comparePoint
+
+#### Bugs Fixed During Range Tests:
+26. Range.cloneContents() had missing `!` in while loop condition causing infinite loop
+27. Range.setStart()/setEnd() had incorrect `else` clause preventing start/end from always being set
+28. Range.commonAncestorContainer used equality instead of bitwise check for CONTAINED_BY flag
+29. Range.cloneContents() missing `else` keywords caused text nodes to be processed twice (infinite recursion)
+30. CharacterData.replace_data() used nodeLength instead of data.Length for delete offset calculation
+31. CharacterData.replace_data() range update conditions used < instead of <= for boundary checks
+32. Range.Get_Boundary_Position() multiple issues with boundary position comparison logic and containment handling
+33. Range.Contains() had arguments to Get_Boundary_Position swapped
+34. Range constructor tried to register as live range before startContainer was set (ranges never registered for DOM mutations)
+35. Refactored manual bitwise flag operations to use HasFlag() method
+
 - [ ] MutationObserver tests
   - [ ] Test observe with childList option
   - [ ] Test observe with attributes option
@@ -113,7 +129,7 @@
 - [ ] Simplification algorithm
 - [ ] Proper serialization
 
-## Test Coverage — 1126 PASSING + 49 new Events tests = ~1175 total
+## Test Coverage — 1126 PASSING + 49 Events + 82 Range tests = ~1257 total
 
 ### CSS Systems Test Status
 - [ ] CSS Properties system (CSS/Properties/)

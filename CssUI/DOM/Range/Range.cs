@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -32,17 +33,17 @@ public class Range : AbstractRange, IDisposable
         get
         {
             var container = startContainer;
-            while (!ReferenceEquals(endContainer, container) && container.compareDocumentPosition(endContainer) != EDocumentPosition.CONTAINED_BY)
+            while (container is not null && !ReferenceEquals(endContainer, container) && !container.compareDocumentPosition(endContainer).HasFlag(EDocumentPosition.CONTAINED_BY))
             {
                 container = container.parentNode;
             }
-            return container;
+            return container!;
         }
     }
     #endregion
 
     #region Constructors
-    private Range()
+    private void RegisterAsLiveRange()
     {
         /* Add self to list of live ranges */
         var doc = root?.nodeDocument;
@@ -54,19 +55,20 @@ public class Range : AbstractRange, IDisposable
             }
         }
     }
-    public Range(Document document) : this()
+    public Range(Document document)
     {
-        /*  */
         startContainer = endContainer = document.body;
         startOffset = endOffset = 0;
+        RegisterAsLiveRange();
     }
 
-    public Range(Node startNode, int startOffset, Node endNode, int endOffset) : this()
+    public Range(Node startNode, int startOffset, Node endNode, int endOffset)
     {
         startContainer = startNode;
         endContainer = endNode;
         this.startOffset = startOffset;
         this.endOffset = endOffset;
+        RegisterAsLiveRange();
     }
 
     protected virtual void Dispose(bool disposing)
@@ -121,11 +123,18 @@ public class Range : AbstractRange, IDisposable
             return false;
 
         var st = new BoundaryPoint() { node = node, offset = 0 };
-        if (Get_Boundary_Position(start, st) != EBoundaryPosition.After)
+        // We want (node, 0) to be after start, i.e., start is before (node, 0)
+        // Get_Boundary_Position returns whether B is before/after A
+        // So Get_Boundary_Position(st, start) returns whether start is before/after st
+        // If start is Before st, then st is after start ✓
+        if (Get_Boundary_Position(st, start) != EBoundaryPosition.Before)
             return false;
 
         var en = new BoundaryPoint() { node = node, offset = node.nodeLength };
-        if (Get_Boundary_Position(end, en) != EBoundaryPosition.Before)
+        // We want (node, length) to be before end, i.e., end is after (node, length)
+        // Get_Boundary_Position(en, end) returns whether end is before/after en
+        // If end is After en, then en is before end ✓
+        if (Get_Boundary_Position(en, end) != EBoundaryPosition.After)
             return false;
 
         return true;
@@ -156,41 +165,58 @@ public class Range : AbstractRange, IDisposable
         }
         /* 3) If nodeA is following nodeB, then if the position of (nodeB, offsetB) relative to (nodeA, offsetA) is before, return after, and if it is after, return before. */
         var docPos = nodeB.compareDocumentPosition(nodeA);
-        if ((docPos & EDocumentPosition.FOLLOWING) != 0)
+        if (docPos.HasFlag(EDocumentPosition.FOLLOWING) && !docPos.HasFlag(EDocumentPosition.CONTAINED_BY))
         {
-            // Swap and invert: compare B relative to A
-            var swappedDocPos = nodeA.compareDocumentPosition(nodeB);
-            
-            // If nodeB is preceding nodeA (which it should be if nodeA follows nodeB)
-            if ((swappedDocPos & EDocumentPosition.PRECEDING) != 0)
+            // nodeA follows nodeB in document order (not as a descendant)
+            // We need to compute position of B relative to A (without recursion)
+            // Check if nodeA contains nodeB (i.e., nodeB is a descendant of nodeA)
+            if (docPos.HasFlag(EDocumentPosition.CONTAINS))
             {
-                // nodeA follows nodeB, so (A, offsetA) is after (B, offsetB) unless offset comparison changes it
-                // Check if B is an ancestor of A
-                if ((swappedDocPos & EDocumentPosition.CONTAINED_BY) != 0)
+                // nodeA contains nodeB, so nodeB is a descendant of nodeA
+                // Find the child of nodeA that is an ancestor of (or is) nodeB
+                var child = nodeB;
+                while (!ReferenceEquals(child.parentNode, nodeA))
                 {
-                    var child = nodeA;
-                    while (!ReferenceEquals(child.parentNode, nodeB))
-                    {
-                        child = child.parentNode;
-                    }
-                    if (offsetB > child.index) return EBoundaryPosition.Before;
+                    child = child.parentNode;
                 }
-                return EBoundaryPosition.After;
+                // Position of B relative to A: if child's index < offsetA, B is before A (so return After)
+                // if child's index >= offsetA, B is after A (so return Before)
+                if (child.index < offsetA) return EBoundaryPosition.After;
+                else return EBoundaryPosition.Before;
             }
+            // nodeA follows nodeB and doesn't contain it, so A is simply after B
+            return EBoundaryPosition.After;
         }
-        /* 4) If nodeA is an ancestor of nodeB: */
-        if ((docPos & EDocumentPosition.CONTAINED_BY) != 0)
+        /* 4) If nodeA is an ancestor of nodeB (nodeA contains nodeB): */
+        if (docPos.HasFlag(EDocumentPosition.CONTAINS))
         {
+            // nodeB is a descendant of nodeA
             var child = nodeB;
-            /* 2) While child is not a child of nodeA, set child to its parent. */
+            /* While child is not a child of nodeA, set child to its parent. */
             while (!ReferenceEquals(child.parentNode, nodeA))
             {
                 child = child.parentNode;
             }
-            /* 3) If child’s index is less than offsetA, then return after. */
-            if (offsetA > child.index) return EBoundaryPosition.After;
+            /* If child's index is less than offsetA, then return after. */
+            if (child.index < offsetA) return EBoundaryPosition.After;
+        }
+        /* 4b) If nodeA is a descendant of nodeB (nodeB contains nodeA): */
+        if (docPos.HasFlag(EDocumentPosition.CONTAINED_BY))
+        {
+            // nodeA is a descendant of nodeB
+            var child = nodeA;
+            /* While child is not a child of nodeB, set child to its parent. */
+            while (!ReferenceEquals(child.parentNode, nodeB))
+            {
+                child = child.parentNode;
+            }
+            /* If child's index is less than offsetB, then A is after B (A comes after offset in B). */
+            /* If child's index >= offsetB, then A is before B (A comes before offset in B). */
+            if (child.index < offsetB) return EBoundaryPosition.After;
+            else return EBoundaryPosition.Before;
         }
 
+        /* 5) Return before. */
         return EBoundaryPosition.Before;
     }
     #endregion
@@ -208,11 +234,9 @@ public class Range : AbstractRange, IDisposable
             endContainer = bp.node;
             endOffset = bp.offset;
         }
-        else /* 2) Set range’s start to bp. */
-        {
-            startContainer = bp.node;
-            startOffset = bp.offset;
-        }
+        /* 2) Set range's start to bp. */
+        startContainer = bp.node;
+        startOffset = bp.offset;
     }
 
     public void setEnd(Node node, int offset)
@@ -228,11 +252,9 @@ public class Range : AbstractRange, IDisposable
             startContainer = bp.node;
             startOffset = bp.offset;
         }
-        else /* 2) Set range’s end to bp. */
-        {
-            endContainer = bp.node;
-            endOffset = bp.offset;
-        }
+        /* 2) Set range's end to bp. */
+        endContainer = bp.node;
+        endOffset = bp.offset;
     }
 
     public void setStartBefore(Node node)
@@ -579,9 +601,12 @@ public class Range : AbstractRange, IDisposable
             }
             var commonAncestor = startContainer;
             /* 6) While common ancestor is not an inclusive ancestor of original end node, set common ancestor to its own parent. */
-            while (DOMCommon.Is_Inclusive_Ancestor(commonAncestor, endContainer))
+            while (!DOMCommon.Is_Inclusive_Ancestor(commonAncestor, endContainer))
             {
+                var prev = commonAncestor;
                 commonAncestor = commonAncestor.parentNode!;
+                Debug.Assert(commonAncestor != null);
+                Debug.Assert(commonAncestor != prev);
             }
             Node? firstPartiallyContainedChild = null;
             var partialFilter = new FilterRangePartiallyContains(this);
@@ -609,11 +634,11 @@ public class Range : AbstractRange, IDisposable
             {
                 CharacterData clone = (CharacterData)startContainer.cloneNode();
                 /* 2) Set the data of clone to the result of substringing data with node original start node, offset original start offset, and count original start node’s length minus original start offset. */
-                clone.data = ((CharacterData)startContainer).substringData(startOffset, endOffset - startOffset);
+                clone.data = ((CharacterData)startContainer).substringData(startOffset, startContainer.nodeLength - startOffset);
                 fragment.appendChild(clone);
             }
             /* 14) Otherwise, if first partially contained child is not null: */
-            if (firstPartiallyContainedChild != null)
+            else if (firstPartiallyContainedChild != null)
             {
                 Node clone = firstPartiallyContainedChild.cloneNode();
                 fragment.appendChild(clone);
@@ -638,7 +663,7 @@ public class Range : AbstractRange, IDisposable
                 fragment.appendChild(clone);
             }
             /* 17) Otherwise, if last partially contained child is not null: */
-            if (lastPartiallyContainedChild != null)
+            else if (lastPartiallyContainedChild != null)
             {
                 var clone = lastPartiallyContainedChild.cloneNode();
                 fragment.appendChild(clone);

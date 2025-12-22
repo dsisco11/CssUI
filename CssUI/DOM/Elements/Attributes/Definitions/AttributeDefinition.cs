@@ -27,7 +27,7 @@ public class AttributeDefinition
     /// Docs: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#missing-value-default
     public readonly AttributeValue? MissingValueDefault = null;
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public readonly AttributeValue? InvalidValueDefault = null;
     /// <summary>
@@ -82,7 +82,7 @@ public class AttributeDefinition
         }
         else
         {
-            var set = SupportedTokens.Select(word => word.ToLowerInvariant()).Cast<AtomicString>();
+            var set = SupportedTokens.Select(word => new AtomicString(word.ToLowerInvariant()));
             this.SupportedTokens = new HashSet<AtomicString>(set);
         }
     }
@@ -137,7 +137,7 @@ public class AttributeDefinition
 
     #region Parsing
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="Input"></param>
     /// <param name="outValue"></param>

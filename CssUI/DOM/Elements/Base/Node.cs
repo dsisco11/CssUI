@@ -23,7 +23,7 @@ namespace CssUI.DOM.Nodes;
 public abstract class Node : EventTarget, INode
 {/* Docs: https://dom.spec.whatwg.org/#interface-node */
 
-    internal ILogger? Log { get => nodeDocument!.Log; }
+    //internal ILogger? Log { get => nodeDocument!.Log; }
     #region Properties
     private ENodeFlags nodeFlags = ENodeFlags.Clear;
     internal List<RegisteredObserver> RegisteredObservers = new List<RegisteredObserver>();

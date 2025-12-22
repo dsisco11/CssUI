@@ -43,7 +43,7 @@ public abstract class CharacterData : Node, INonDocumentTypeChildNode
         /* 5) Insert data into node’s data after offset code units. */
         string newData = this.data.Insert(offset, data);
         /* 6) Let delete offset be offset + data’s length. */
-        var delete = offset + nodeLength;
+        var delete = offset + data.Length;
         /* 7) Starting from delete offset code units, remove count code units from node’s data. */
         this.data = newData.Remove(delete, count);
         foreach (var weakRef in nodeDocument.LIVE_RANGES)
@@ -51,24 +51,24 @@ public abstract class CharacterData : Node, INonDocumentTypeChildNode
             if (weakRef.TryGetTarget(out Range? liveRange))
             {
                 /* 8) For each live range whose start node is node and start offset is greater than offset but less than or equal to offset plus count, set its start offset to offset. */
-                if (ReferenceEquals(this, liveRange.startContainer) && liveRange.startOffset > offset && liveRange.startOffset < (offset + count))
+                if (ReferenceEquals(this, liveRange.startContainer) && liveRange.startOffset > offset && liveRange.startOffset <= (offset + count))
                 {
                     liveRange.startOffset = offset;
                 }
                 /* 9) For each live range whose end node is node and end offset is greater than offset but less than or equal to offset plus count, set its end offset to offset. */
-                if (ReferenceEquals(this, liveRange.endContainer) && liveRange.endOffset > offset && liveRange.endOffset < (offset + count))
+                if (ReferenceEquals(this, liveRange.endContainer) && liveRange.endOffset > offset && liveRange.endOffset <= (offset + count))
                 {
                     liveRange.endOffset = offset;
                 }
                 /* 10) For each live range whose start node is node and start offset is greater than offset plus count, increase its start offset by data’s length and decrease it by count. */
                 if (ReferenceEquals(this, liveRange.startContainer) && liveRange.startOffset > (offset + count))
                 {
-                    liveRange.startOffset += (nodeLength - count);
+                    liveRange.startOffset += (data.Length - count);
                 }
                 /* 11) For each live range whose end node is node and end offset is greater than offset plus count, increase its end offset by data’s length and decrease it by count. */
                 if (ReferenceEquals(this, liveRange.endContainer) && liveRange.endOffset > (offset + count))
                 {
-                    liveRange.endOffset += (nodeLength - count);
+                    liveRange.endOffset += (data.Length - count);
                 }
             }
             else

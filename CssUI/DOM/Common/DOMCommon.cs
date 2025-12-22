@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -388,9 +389,12 @@ public static class DOMCommon
         Node? node = A.parentNode;
         while (node is not null)
         {
-            if (ReferenceEquals(node, B))
+            if (node.Equals(B))
                 return true;
+
+            var prev = node;
             node = node.parentNode;
+            Debug.Assert(node != prev);
         }
 
         return false;
@@ -1886,7 +1890,7 @@ public static class DOMCommon
         var metadata = Lookup_Element_Metadata(localName, Namespace ?? string.Empty);
         if (metadata?.ctor is null)
             throw new Exception($"Cannot find interface constructor for element type: \"{localName}\"");
-        
+
         /* XXX: Just need to make sure that every tag type has an interface type correctly specified for it */
         // Invoke the constructor with the appropriate number of arguments based on what the element type expects
         object?[] args = metadata.CtorParameterCount switch
