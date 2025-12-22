@@ -41,7 +41,7 @@ public abstract partial class Window : BrowsingContext
     #region Properties
     static string CSSUI_VERSION_STRING = $"CssUI v{FileVersionInfo.GetVersionInfo(Assembly.GetCallingAssembly().Location).FileVersion}";
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public string Name { get; private set; } = CSSUI_VERSION_STRING;
     public Document document { get; private set; } = null!;
@@ -104,7 +104,9 @@ public abstract partial class Window : BrowsingContext
         /* To queue a mutation observer microtask, run these steps: */
         /* 1) If the surrounding agent’s mutation observer microtask queued is true, then return. */
         /* 2) Set the surrounding agent’s mutation observer microtask queued to true. */
-        if (0 == Interlocked.CompareExchange(ref mutation_observer_microtask_queued, 1, 0)) return;
+        // CompareExchange returns the ORIGINAL value. If original was 0, it sets to 1 and returns 0.
+        // We return early only if the original value was already 1 (task already queued).
+        if (1 == Interlocked.CompareExchange(ref mutation_observer_microtask_queued, 1, 0)) return;
         /* 3) Queue a microtask to notify mutation observers. */
         observer_task = Task.Factory.StartNew(Task_Notify_Mutation_Observers);
     }
@@ -217,7 +219,7 @@ public abstract partial class Window : BrowsingContext
             var candidate = this.Get_Top_Level_Browsing_Context().activeDocument;
             while (true)
             {
-                /* 2) If the designated focused area of the document is a browsing context container with a non-null nested browsing context, 
+                /* 2) If the designated focused area of the document is a browsing context container with a non-null nested browsing context,
                  * then let candidate be the active document of that browsing context container's nested browsing context, and redo this step. */
                 if (candidate.focusedArea is IBrowsingContextContainer container && container.Nested_Browsing_Context != null)
                 {
