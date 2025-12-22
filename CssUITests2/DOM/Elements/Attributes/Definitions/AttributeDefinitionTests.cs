@@ -1,4 +1,5 @@
 using System;
+using CssUI;
 using CssUI.DOM;
 using CssUI.DOM.Enums;
 using CssUI.DOM.Exceptions;
@@ -6,22 +7,109 @@ using Xunit;
 
 namespace CssUITests.DOM;
 
+/// <summary>
+/// Unit tests for AttributeDefinition functionality.
+/// </summary>
 public class AttributeDefinitionTests
 {
-    [Fact(Skip = "Test stub - needs implementation")]
-    public void AttributeDefinitionTest()
+    #region Constructor Tests
+
+    [Fact]
+    public void Constructor_SetsName()
     {
-        throw new NotImplementedException();
+        // Arrange & Act
+        var def = new AttributeDefinition("test-attr", EAttributeType.String);
+
+        // Assert
+        Assert.Equal("test-attr", def.Name!.Name);
     }
 
-    [Fact(Skip = "Test stub - needs implementation")]
-    public void ParseTest()
+    [Fact]
+    public void Constructor_SetsType()
     {
-        throw new NotImplementedException();
+        // Arrange & Act
+        var def = new AttributeDefinition("test-attr", EAttributeType.Boolean);
+
+        // Assert
+        Assert.Equal(EAttributeType.Boolean, def.Type);
     }
 
-    [Fact()]
-    public void CheckAndThrowTest()
+    [Fact]
+    public void Constructor_SetsFlags()
+    {
+        // Arrange & Act
+        var def = new AttributeDefinition("test-attr", EAttributeType.String, null, null, EAttributeFlags.Inherited);
+
+        // Assert
+        Assert.True(def.Flags.HasFlag(EAttributeFlags.Inherited));
+    }
+
+    [Fact]
+    public void Constructor_SetsKeywords()
+    {
+        // Arrange
+        var keywords = new[] { "value1", "value2" };
+
+        // Act
+        var def = new AttributeDefinition("test-attr", EAttributeType.Enumerated, null, null, EAttributeFlags.None, keywords);
+
+        // Assert
+        Assert.NotNull(def.Keywords);
+        Assert.Contains(new AtomicString("value1"), def.Keywords);
+        Assert.Contains(new AtomicString("value2"), def.Keywords);
+    }
+
+    #endregion
+
+    #region Parse Tests
+
+    [Fact]
+    public void Parse_StringType_ReturnsValue()
+    {
+        // Arrange
+        var def = new AttributeDefinition("test-attr", EAttributeType.String);
+
+        // Act
+        def.Parse("test-value", out object result);
+
+        // Assert
+        Assert.NotNull(result);
+    }
+
+    [Fact]
+    public void Parse_BooleanType_ReturnsValue()
+    {
+        // Arrange
+        var def = new AttributeDefinition("test-attr", EAttributeType.Boolean);
+
+        // Act
+        def.Parse("true", out object resultTrue);
+        def.Parse("false", out object resultFalse);
+
+        // Assert
+        Assert.NotNull(resultTrue);
+        Assert.NotNull(resultFalse);
+    }
+
+    [Fact]
+    public void Parse_IntegerType_ReturnsValue()
+    {
+        // Arrange
+        var def = new AttributeDefinition("test-attr", EAttributeType.Integer);
+
+        // Act
+        def.Parse("42", out object result);
+
+        // Assert
+        Assert.NotNull(result);
+    }
+
+    #endregion
+
+    #region CheckAndThrow Tests
+
+    [Fact]
+    public void CheckAndThrow_ValidatesCorrectly()
     {
         string AttrName = "test";
         AttributeDefinition def;
@@ -99,8 +187,11 @@ public class AttributeDefinitionTests
         def.CheckAndThrow("1.0%");
         Assert.Throws<DomSyntaxError>(() => def.CheckAndThrow("ABC"));
         Assert.Throws<DomSyntaxError>(() => def.CheckAndThrow("-1%"));
-
     }
+
+    #endregion
+
+    #region Lookup Tests
 
     [Fact(Skip = "Bug: Not all EAttributeName values have definitions registered")]
     public void LookupTest()
@@ -112,4 +203,6 @@ public class AttributeDefinitionTests
             Assert.NotNull(def);
         }
     }
+
+    #endregion
 }
