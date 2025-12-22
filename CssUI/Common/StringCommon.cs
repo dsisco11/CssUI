@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
@@ -34,6 +35,10 @@ namespace CssUI;
 /// </remarks>
 public static class StringCommon
 {
+    /// <summary>
+    /// WHATWG-defined ASCII whitespace characters for spec-compliant operations.
+    /// </summary>
+    private static readonly SearchValues<char> AsciiWhitespace = SearchValues.Create("\t\n\f\r ");
 
     #region Checks
 
@@ -116,89 +121,50 @@ public static class StringCommon
     /// Returns whether <paramref name="Str"/> contains any characters matching the given filter
     /// </summary>
     /// <returns>True if string contains a character which the given filter matches</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool Contains(ReadOnlySpan<char> Str, char Search)
     {
-        if (Str.Length == 0)
-            return false;
-
-        var Span = Str;//.Data.Span;
-        for (int i = 0; i < Span.Length; i++)
-        {
-            if (Span[i] == Search)
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return Str.Contains(Search);
     }
 
     /// <summary>
-    /// Returns whether <paramref name="Str"/> contains any characters matching the given filter
+    /// Returns whether <paramref name="Str"/> contains the specified substring
     /// </summary>
-    /// <returns>True if string contains a character which the given filter matches</returns>
+    /// <returns>True if string contains the search substring</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool Contains(ReadOnlySpan<char> Str, ReadOnlySpan<char> Search)
     {
-        if (Str.Length == 0)
+        if (Search.IsEmpty)
             return false;
 
-        if (Search.Length == 0)
-            return false;
-
-        var Span = Str;//.Data.Span;
-        var SearchSpan = Search;//.Data.Span;
-        for (int i = 0; i < Span.Length; i++)
-        {
-            if (Span[i] == SearchSpan[0])
-            {
-                bool bMismatch = false;
-                i++;
-                for (int j = 1; j < SearchSpan.Length; j++, i++)
-                {
-                    if (Span[i] != SearchSpan[j])
-                    {
-                        bMismatch = true;
-                        break;
-                    }
-                }
-
-                if (bMismatch)
-                {
-                    continue;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return Str.IndexOf(Search) >= 0;
     }
     #endregion
 
     #region ContainsOnly
     /// <summary>
-    /// Returns the index of the first character which matches none of the <paramref name="Search"/> characters
+    /// Returns true if all characters in <paramref name="Str"/> are present in <paramref name="Search"/>
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool ContainsOnly(ReadOnlySpan<char> Str, ReadOnlySpan<char> Search)
     {
-        if (Str.Length == 0)
+        if (Str.IsEmpty || Search.IsEmpty)
             return false;
 
-        if (Search.Length == 0)
+        // IndexOfAnyExcept returns -1 if all characters match the search set
+        return Str.IndexOfAnyExcept(Search) < 0;
+    }
+
+    /// <summary>
+    /// Returns true if all characters in <paramref name="Str"/> are present in <paramref name="searchValues"/>
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool ContainsOnly(ReadOnlySpan<char> Str, SearchValues<char> searchValues)
+    {
+        if (Str.IsEmpty)
             return false;
 
-        var Span = Str;
-        for (int i = 0; i < Span.Length; i++)
-        {
-            if (Search.IndexOf(Span[i]) < 0)
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return Str.IndexOfAnyExcept(searchValues) < 0;
     }
     #endregion
 
@@ -260,24 +226,10 @@ public static class StringCommon
     /// Returns the number of characters within <paramref name="Str"/> matching the given <paramref name="Search"/> character
     /// </summary>
     /// <returns>Number of matching characters</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int Count(ReadOnlySpan<char> Str, char Search)
     {
-        if (Str.Length == 0)
-            return 0;
-
-
-        int RetVal = 0;
-        var Span = Str;//.Data.Span;
-        for (int i = 0; i < Span.Length; i++)
-        {
-            char c = Span[i];
-            if (c.Equals(Search))
-            {
-                RetVal++;
-            }
-        }
-
-        return RetVal;
+        return Str.Count(Search);
     }
     #endregion
 
@@ -337,9 +289,9 @@ public static class StringCommon
 
     #region Concatenation
     /// <summary>
-    /// Concatenates an array of strings into a single string with each original string seperated from the next by a given delimiter
+    /// Concatenates an array of strings into a single string with each original string separated from the next by a given delimiter
     /// </summary>
-    /// <param name="Delim">The delimiter(s) that should seperate each token</param>
+    /// <param name="Delim">The delimiter(s) that should separate each token</param>
     /// <param name="Args">The strings to join</param>
     /// <returns></returns>
     public static String Concat(char Delim, IEnumerable<ReadOnlyMemory<char>> Args)
@@ -347,92 +299,80 @@ public static class StringCommon
         ArgumentNullException.ThrowIfNull(Args);
         Contract.EndContractBlock();
 
-        int chunkCount = 0;
+        // Materialize to list to avoid double enumeration
+        var chunks = Args as IList<ReadOnlyMemory<char>> ?? Args.ToList();
+        if (chunks.Count == 0) return string.Empty;
+
         int newLength = 0;
-        foreach (var chunk in Args)
+        for (int i = 0; i < chunks.Count; i++)
         {
-            chunkCount++;
-            newLength += chunk.Length;
+            newLength += chunks[i].Length;
         }
 
-        // Compile the new string
+        // Add delimiter space
         if (Delim != '\0')
         {
-            var insertCount = (chunkCount - 1);// Number of delimiters we will insert into new string
-            newLength += insertCount;
+            newLength += chunks.Count - 1;
         }
 
-        char[] dataPtr = new char[newLength];
-        Memory<char> data = new Memory<char>(dataPtr);
-
-        int index = 0;
-        foreach (var chunk in Args)
+        return string.Create(newLength, (chunks, Delim), static (span, state) =>
         {
-            // Insert delimiter
-            if (Delim != '\0' && index > 0)
+            int pos = 0;
+            for (int i = 0; i < state.chunks.Count; i++)
             {
-                data.Span[index] = Delim;
-                index += 1;
+                if (i > 0 && state.Delim != '\0')
+                {
+                    span[pos++] = state.Delim;
+                }
+                state.chunks[i].Span.CopyTo(span.Slice(pos));
+                pos += state.chunks[i].Length;
             }
-
-            // Copy substring 
-            chunk.CopyTo(data.Slice(index));
-            index += chunk.Length;
-        }
-
-        return new string(dataPtr);
+        });
     }
 
     /// <summary>
-    /// Concatenates an array of strings into a single string with each original string seperated from the next by a given delimiter
+    /// Concatenates an array of strings into a single string with each original string separated from the next by a given delimiter
     /// </summary>
-    /// <param name="Delim">The delimiter(s) that should seperate each token</param>
+    /// <param name="Delim">The delimiter(s) that should separate each token</param>
     /// <param name="Args">The strings to join</param>
     /// <returns></returns>
     public static String Concat(char Delim, params StringPtr[] Args)
     {
         ArgumentNullException.ThrowIfNull(Args);
         Contract.EndContractBlock();
+        if (Args.Length == 0) return string.Empty;
 
-        var chunkCount = Args.Length;
         int newLength = 0;
-        for (int i = 0; i < chunkCount; i++)
+        for (int i = 0; i < Args.Length; i++)
         {
             newLength += Args[i].Length;
         }
 
-        // Compile the new string
+        // Add delimiter space
         if (Delim != '\0')
         {
-            var insertCount = (chunkCount - 1);// Number of delimiters we will insert into new string
-            newLength += insertCount;
+            newLength += Args.Length - 1;
         }
 
-        char[] dataPtr = new char[newLength];
-        Memory<char> data = new Memory<char>(dataPtr);
-
-        int index = 0;
-        foreach (var chunk in Args)
+        return string.Create(newLength, (Args, Delim), static (span, state) =>
         {
-            // Insert delimiter
-            if (Delim != '\0' && index > 0)
+            int pos = 0;
+            for (int i = 0; i < state.Args.Length; i++)
             {
-                data.Span[index] = Delim;
-                index += 1;
+                if (i > 0 && state.Delim != '\0')
+                {
+                    span[pos++] = state.Delim;
+                }
+                state.Args[i].Data.Span.CopyTo(span.Slice(pos));
+                pos += state.Args[i].Length;
             }
-
-            // Copy substring 
-            chunk.Data.CopyTo(data.Slice(index));
-            index += chunk.Length;
-        }
-
-        return new string(dataPtr);
+        });
     }
 
     /// <summary>
-    /// Concatenates an array of strings into a single string with each original string seperated from the next by a given delimiter
+    /// Concatenates an array of strings into a single string with each original string separated from the next by a given delimiter
     /// </summary>
-    /// <param name="Delim">The delimiter(s) that should seperate each token</param>
+    /// <param name="Delim">The delimiter(s) that should separate each token</param>
     /// <param name="Args">The strings to join</param>
     /// <returns></returns>
     public static String Concat(ReadOnlySpan<char> Delim, IEnumerable<ReadOnlyMemory<char>> Args)
@@ -440,82 +380,78 @@ public static class StringCommon
         ArgumentNullException.ThrowIfNull(Args);
         Contract.EndContractBlock();
 
-        int chunkCount = 0;
+        // Materialize to list to avoid double enumeration
+        var chunks = Args as IList<ReadOnlyMemory<char>> ?? Args.ToList();
+        if (chunks.Count == 0) return string.Empty;
+
         int newLength = 0;
-        foreach (var chunk in Args)
+        for (int i = 0; i < chunks.Count; i++)
         {
-            chunkCount++;
-            newLength += chunk.Length;
+            newLength += chunks[i].Length;
         }
 
-        // Compile the new string
-        var substituteLength = Delim.Length;
-        var insertCount = (chunkCount - 1);// Number of delimiters we will insert into new string
-        newLength += insertCount * substituteLength;
+        // Add delimiter space
+        var delimiterLength = Delim.Length;
+        newLength += (chunks.Count - 1) * delimiterLength;
 
-        char[] dataPtr = new char[newLength];
-        Memory<char> data = new Memory<char>(dataPtr);
+        // Must copy delimiter since ReadOnlySpan can't be captured in lambda
+        var delimStr = Delim.ToString();
 
-        int index = 0;
-        foreach (var chunk in Args)
+        return string.Create(newLength, (chunks, delimStr), static (span, state) =>
         {
-            // Insert delimiter
-            if (index > 0)
+            int pos = 0;
+            for (int i = 0; i < state.chunks.Count; i++)
             {
-                Delim.CopyTo(data.Span.Slice(index));
-                index += substituteLength;
+                if (i > 0 && state.delimStr.Length > 0)
+                {
+                    state.delimStr.AsSpan().CopyTo(span.Slice(pos));
+                    pos += state.delimStr.Length;
+                }
+                state.chunks[i].Span.CopyTo(span.Slice(pos));
+                pos += state.chunks[i].Length;
             }
-
-            // Copy substring 
-            chunk.CopyTo(data.Slice(index));
-            index += chunk.Length;
-        }
-
-        return new string(dataPtr);
+        });
     }
 
     /// <summary>
-    /// Concatenates an array of strings into a single string with each original string seperated from the next by a given delimiter
+    /// Concatenates an array of strings into a single string with each original string separated from the next by a given delimiter
     /// </summary>
-    /// <param name="Delim">The delimiter(s) that should seperate each token</param>
+    /// <param name="Delim">The delimiter(s) that should separate each token</param>
     /// <param name="Args">The strings to join</param>
     /// <returns></returns>
     public static String Concat(ReadOnlySpan<char> Delim, params StringPtr[] Args)
     {
         ArgumentNullException.ThrowIfNull(Args);
         Contract.EndContractBlock();
+        if (Args.Length == 0) return string.Empty;
 
-        int chunkCount = Args.Length;
         int newLength = 0;
-        for (int i = 0; i < chunkCount; i++)
+        for (int i = 0; i < Args.Length; i++)
         {
             newLength += Args[i].Length;
         }
 
-        // Compile the new string
-        var substituteLength = Delim.Length;
-        var insertCount = (chunkCount - 1);// Number of delimiters we will insert into new string
-        newLength += insertCount * substituteLength;
+        // Add delimiter space
+        var delimiterLength = Delim.Length;
+        newLength += (Args.Length - 1) * delimiterLength;
 
-        char[] dataPtr = new char[newLength];
-        Memory<char> data = new Memory<char>(dataPtr);
+        // Must copy delimiter since ReadOnlySpan can't be captured in lambda
+        var delimStr = Delim.ToString();
 
-        int index = 0;
-        foreach (var chunk in Args)
+        return string.Create(newLength, (Args, delimStr), static (span, state) =>
         {
-            // Insert delimiter
-            if (index > 0)
+            int pos = 0;
+            for (int i = 0; i < state.Args.Length; i++)
             {
-                Delim.CopyTo(data.Span.Slice(index));
-                index += substituteLength;
+                if (i > 0 && state.delimStr.Length > 0)
+                {
+                    state.delimStr.AsSpan().CopyTo(span.Slice(pos));
+                    pos += state.delimStr.Length;
+                }
+                state.Args[i].Data.Span.CopyTo(span.Slice(pos));
+                pos += state.Args[i].Length;
             }
-
-            // Copy substring 
-            chunk.Data.CopyTo(data.Slice(index));
-            index += chunk.Length;
-        }
-
-        return new string(dataPtr);
+        });
     }
 
     /* Delimitless concats */
@@ -530,27 +466,25 @@ public static class StringCommon
         ArgumentNullException.ThrowIfNull(Args);
         Contract.EndContractBlock();
 
-        int chunkCount = 0;
+        // Materialize to list to avoid double enumeration
+        var chunks = Args as IList<ReadOnlyMemory<char>> ?? Args.ToList();
+        if (chunks.Count == 0) return string.Empty;
+
         int newLength = 0;
-        foreach (var chunk in Args)
+        for (int i = 0; i < chunks.Count; i++)
         {
-            chunkCount++;
-            newLength += chunk.Length;
+            newLength += chunks[i].Length;
         }
 
-        // Compile the new string
-        char[] dataPtr = new char[newLength];
-        Memory<char> data = new Memory<char>(dataPtr);
-
-        int index = 0;
-        foreach (var chunk in Args)
+        return string.Create(newLength, chunks, static (span, state) =>
         {
-            // Copy substring
-            chunk.CopyTo(data.Slice(index));
-            index += chunk.Length;
-        }
-
-        return new string(dataPtr);
+            int pos = 0;
+            for (int i = 0; i < state.Count; i++)
+            {
+                state[i].Span.CopyTo(span.Slice(pos));
+                pos += state[i].Length;
+            }
+        });
     }
 
     /// <summary>
@@ -562,28 +496,23 @@ public static class StringCommon
     {
         ArgumentNullException.ThrowIfNull(Args);
         Contract.EndContractBlock();
-        if (Args.Length <= 0) return String.Empty;
+        if (Args.Length == 0) return string.Empty;
 
-        int chunkCount = Args.Length;
         int newLength = 0;
-        for (int i = 0; i < chunkCount; i++)
+        for (int i = 0; i < Args.Length; i++)
         {
             newLength += Args[i].Length;
         }
 
-        // Compile the new string
-        char[] dataPtr = new char[newLength];
-        Memory<char> data = new Memory<char>(dataPtr);
-
-        int index = 0;
-        foreach (var chunk in Args)
+        return string.Create(newLength, Args, static (span, state) =>
         {
-            // Copy substring 
-            chunk.AsMemory().CopyTo(data.Slice(index));
-            index += chunk.Length;
-        }
-
-        return new string(dataPtr);
+            int pos = 0;
+            for (int i = 0; i < state.Length; i++)
+            {
+                state[i].Data.Span.CopyTo(span.Slice(pos));
+                pos += state[i].Length;
+            }
+        });
     }
     #endregion
 
@@ -614,7 +543,7 @@ public static class StringCommon
         {
             if (Ptr.Data.Span[i] != Delim)
             {
-                Ptr = Ptr.Data.Slice(0, Ptr.Length - i);
+                Ptr = Ptr.Data.Slice(0, i + 1);
                 break;
             }
         }
@@ -669,7 +598,7 @@ public static class StringCommon
 
             if (!found)
             {
-                Ptr = Ptr.Data.Slice(0, Ptr.Length - i);
+                Ptr = Ptr.Data.Slice(0, i + 1);
                 break;
             }
         }
@@ -701,7 +630,7 @@ public static class StringCommon
         {
             if (Filter.acceptData(Ptr.Data.Span[i]) == EFilterResult.FILTER_ACCEPT)
             {
-                Ptr = Ptr.Data.Slice(0, Ptr.Length - i);
+                Ptr = Ptr.Data.Slice(0, i + 1);
                 break;
             }
         }
@@ -733,7 +662,7 @@ public static class StringCommon
         {
             if (!Predicate(Ptr.Data.Span[i]))
             {
-                Ptr = Ptr.Data.Slice(0, Ptr.Length - i);
+                Ptr = Ptr.Data.Slice(0, i + 1);
                 break;
             }
         }
@@ -860,7 +789,7 @@ public static class StringCommon
         {
             if (Ptr.Data.Span[i] != Delim)
             {
-                Ptr = Ptr.Data.Slice(0, Ptr.Length - i);
+                Ptr = Ptr.Data.Slice(0, i + 1);
                 break;
             }
         }
@@ -894,7 +823,7 @@ public static class StringCommon
 
             if (!found)
             {
-                Ptr = Ptr.Data.Slice(0, Ptr.Length - i);
+                Ptr = Ptr.Data.Slice(0, i + 1);
                 break;
             }
         }
@@ -916,7 +845,7 @@ public static class StringCommon
         {
             if (Filter.acceptData(Ptr.Data.Span[i]) == EFilterResult.FILTER_ACCEPT)
             {
-                Ptr = Ptr.Data.Slice(0, Ptr.Length - i);
+                Ptr = Ptr.Data.Slice(0, i + 1);
                 break;
             }
         }
@@ -938,7 +867,7 @@ public static class StringCommon
         {
             if (!Predicate(Ptr.Data.Span[i]))
             {
-                Ptr = Ptr.Data.Slice(0, Ptr.Length - i);
+                Ptr = Ptr.Data.Slice(0, i + 1);
                 break;
             }
         }
@@ -953,7 +882,7 @@ public static class StringCommon
     /// Splits a string <paramref name="Source"/> into tokens based on a given delimiter(s)
     /// </summary>
     /// <param name="Source">The string to tokenize</param>
-    /// <param name="Delim">The delimiter(s) that should seperate each token</param>
+    /// <param name="Delim">The delimiter(s) that should separate each token</param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ReadOnlyMemory<char>[] Strtok(StringPtr Source, char Delim)
@@ -965,32 +894,47 @@ public static class StringCommon
     /// Splits a string <paramref name="Source"/> into tokens based on a given delimiter(s)
     /// </summary>
     /// <param name="Source">The string to tokenize</param>
-    /// <param name="Delims">The delimiter(s) that should seperate each token</param>
+    /// <param name="Delims">The delimiter(s) that should separate each token</param>
     /// <returns></returns>
     /// DO NOT INLINE THIS FUNCTION
     public static ReadOnlyMemory<char>[] Strtok(StringPtr Source, params char[] Delims)
     {
         ArgumentNullException.ThrowIfNull(Source);
         ArgumentNullException.ThrowIfNull(Delims);
-        if (Delims.Length == 0) throw new ArgumentException("Delimeters must be non-null and contain one or more characters");
+        if (Delims.Length == 0) throw new ArgumentException("Delimiters must be non-null and contain one or more characters");
         Contract.EndContractBlock();
 
         // Split the source string into chunks using the given delimiters
-        IEnumerable<StringChunk> AllChunks = _chunkify(Source.AsSpan(), true, Delims);
-        // We only want to return chunks that arent delimiters
-        IEnumerable<StringChunk> Chunks = AllChunks.Where(x => !x.IsDelimiter);
+        var AllChunks = _chunkify(Source.AsSpan(), true, Delims);
+
+        // Count non-delimiter chunks first
+        int count = 0;
+        for (int i = 0; i < AllChunks.Count; i++)
+        {
+            if (!AllChunks[i].IsDelimiter) count++;
+        }
+
         // Compile the return list of memory segments
         var Src = Source.AsMemory();
-        ReadOnlyMemory<char>[] RetVal = Chunks.Select(Chunk => Src.Slice(Chunk.Start, Chunk.Size)).ToArray();
+        var RetVal = new ReadOnlyMemory<char>[count];
+        int idx = 0;
+        for (int i = 0; i < AllChunks.Count; i++)
+        {
+            var chunk = AllChunks[i];
+            if (!chunk.IsDelimiter)
+            {
+                RetVal[idx++] = Src.Slice(chunk.Start, chunk.Size);
+            }
+        }
 
         return RetVal;
     }
 
     /// <summary>
-    /// Splits a string <paramref name="Source"/> into tokens based on a given delimeter(s)
+    /// Splits a string <paramref name="Source"/> into tokens based on a given delimiter(s)
     /// </summary>
     /// <param name="Source">The string to tokenize</param>
-    /// <param name="Filter">The delimiter(s) that should seperate each token</param>
+    /// <param name="Filter">The delimiter(s) that should separate each token</param>
     /// <returns></returns>
     /// /// DO NOT INLINE THIS FUNCTION
     public static ReadOnlyMemory<char>[] Strtok(StringPtr Source, Filter<char>? Filter = null)
@@ -1000,12 +944,27 @@ public static class StringCommon
         Contract.EndContractBlock();
 
         // Split the source string into chunks using the given delimiters
-        IEnumerable<StringChunk> AllChunks = _chunkify(Source.AsSpan(), true, Filter);
-        // We only want to return chunks that arent delimiters
-        IEnumerable<StringChunk> Chunks = AllChunks.Where(x => !x.IsDelimiter);
+        var AllChunks = _chunkify(Source.AsSpan(), true, Filter);
+
+        // Count non-delimiter chunks first
+        int count = 0;
+        for (int i = 0; i < AllChunks.Count; i++)
+        {
+            if (!AllChunks[i].IsDelimiter) count++;
+        }
+
         // Compile the return list of memory segments
         var Src = Source.AsMemory();
-        ReadOnlyMemory<char>[] RetVal = Chunks.Select(Chunk => Src.Slice(Chunk.Start, Chunk.Size)).ToArray();
+        var RetVal = new ReadOnlyMemory<char>[count];
+        int idx = 0;
+        for (int i = 0; i < AllChunks.Count; i++)
+        {
+            var chunk = AllChunks[i];
+            if (!chunk.IsDelimiter)
+            {
+                RetVal[idx++] = Src.Slice(chunk.Start, chunk.Size);
+            }
+        }
 
         return RetVal;
     }
@@ -1056,13 +1015,24 @@ public static class StringCommon
         char[] Delimiters = Replacements.Select(o => o.Item1).ToArray();
         StringPtr[] Substitutions = Replacements.Select(o => o.Item2).ToArray();
 
-        // Seperate the source memory into chunks using the given predicates
+        // Separate the source memory into chunks using the given predicates
         var Chunks = _chunkify(Source, Collapse, Delimiters);
         // Calculate size of the new string
-        int newLength = _tally_chunks(ref Chunks, Trim, Substitutions);
-        // Allocate final string
-        char[] pBuffer = _compile_chunks(Source, Chunks, newLength, Substitutions);
-        return new string(pBuffer);
+        int newLength = _tally_chunks(Chunks, Trim, Substitutions);
+
+        if (newLength == 0) return string.Empty;
+
+        // Use ArrayPool for the buffer
+        char[] rentedBuffer = ArrayPool<char>.Shared.Rent(newLength);
+        try
+        {
+            _compile_chunks(Source, Chunks, rentedBuffer.AsSpan(0, newLength), Substitutions);
+            return new string(rentedBuffer, 0, newLength);
+        }
+        finally
+        {
+            ArrayPool<char>.Shared.Return(rentedBuffer);
+        }
     }
 
     /// <summary>
@@ -1082,13 +1052,24 @@ public static class StringCommon
         Predicate<char>[] Predicates = Replacements.Select(o => o.Item1).ToArray();
         StringPtr[] Substitutions = Replacements.Select(o => o.Item2).ToArray();
 
-        // Seperate the source memory into chunks using the given predicates
+        // Separate the source memory into chunks using the given predicates
         var Chunks = _chunkify(Source, Collapse, Predicates);
         // Calculate size of the new string
-        int newLength = _tally_chunks(ref Chunks, Trim, Substitutions);
-        // Allocate final string
-        char[] pBuffer = _compile_chunks(Source, Chunks, newLength, Substitutions);
-        return new string(pBuffer);
+        int newLength = _tally_chunks(Chunks, Trim, Substitutions);
+
+        if (newLength == 0) return string.Empty;
+
+        // Use ArrayPool for the buffer
+        char[] rentedBuffer = ArrayPool<char>.Shared.Rent(newLength);
+        try
+        {
+            _compile_chunks(Source, Chunks, rentedBuffer.AsSpan(0, newLength), Substitutions);
+            return new string(rentedBuffer, 0, newLength);
+        }
+        finally
+        {
+            ArrayPool<char>.Shared.Return(rentedBuffer);
+        }
     }
 
     /// <summary>
@@ -1103,17 +1084,29 @@ public static class StringCommon
         if (Source.IsEmpty) return string.Empty;
         if (Replacements.Length <= 0) return Source.ToString();
         Contract.EndContractBlock();
+
         // Prepare the arrays needed for the generic chunking functions
         Filter<char>[] Filters = Replacements.Select(o => o.Item1).ToArray();
         StringPtr[] Substitutions = Replacements.Select(o => o.Item2).ToArray();
 
-        // Seperate the source memory into chunks using the given predicates
+        // Separate the source memory into chunks using the given predicates
         var Chunks = _chunkify(Source, Collapse, Filters);
         // Calculate size of the new string
-        int newLength = _tally_chunks(ref Chunks, Trim, Substitutions);
-        // Allocate final string
-        char[] pBuffer = _compile_chunks(Source, Chunks, newLength, Substitutions);
-        return new string(pBuffer);
+        int newLength = _tally_chunks(Chunks, Trim, Substitutions);
+
+        if (newLength == 0) return string.Empty;
+
+        // Use ArrayPool for the buffer
+        char[] rentedBuffer = ArrayPool<char>.Shared.Rent(newLength);
+        try
+        {
+            _compile_chunks(Source, Chunks, rentedBuffer.AsSpan(0, newLength), Substitutions);
+            return new string(rentedBuffer, 0, newLength);
+        }
+        finally
+        {
+            ArrayPool<char>.Shared.Return(rentedBuffer);
+        }
     }
 
 
@@ -1136,20 +1129,28 @@ public static class StringCommon
     /// <returns>Altered string</returns>
     public static string Transform(ReadOnlySpan<char> buffMem, Func<char, char> Transform)
     {
+        if (buffMem.IsEmpty) return string.Empty;
+
         int Length = buffMem.Length;
-        char[] data = new char[Length];
-        int idx = 0;
-
-        for (int i = 0; i < Length; i++)
+        char[] rentedBuffer = ArrayPool<char>.Shared.Rent(Length);
+        try
         {
-            char ch = Transform(buffMem[i]);
-            if (ch != CHAR_NULL)
+            int idx = 0;
+            for (int i = 0; i < Length; i++)
             {
-                data[idx++] = ch;
+                char ch = Transform(buffMem[i]);
+                if (ch != CHAR_NULL)
+                {
+                    rentedBuffer[idx++] = ch;
+                }
             }
-        }
 
-        return new string(data, 0, idx);
+            return new string(rentedBuffer, 0, idx);
+        }
+        finally
+        {
+            ArrayPool<char>.Shared.Return(rentedBuffer);
+        }
     }
     #endregion
 
@@ -1423,9 +1424,9 @@ public static class StringCommon
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static LinkedList<StringChunk> _chunkify(ReadOnlySpan<char> Source, bool Collapse, params char[] Delimiters)
+    private static List<StringChunk> _chunkify(ReadOnlySpan<char> Source, bool Collapse, params char[] Delimiters)
     {
-        var Chunks = new LinkedList<StringChunk>();
+        var Chunks = new List<StringChunk>();
 
         // Scan for replacement characters, when encountered create a new chunk(non inclusive).
         for (int chunkStart = 0; chunkStart < Source.Length;)
@@ -1440,7 +1441,7 @@ public static class StringCommon
                 int tailLen = Source.Length - lastChunkEnd;
                 if (tailLen > 0)
                 {
-                    Chunks.AddLast(new StringChunk(lastChunkEnd, tailLen));
+                    Chunks.Add(new StringChunk(lastChunkEnd, tailLen));
                 }
                 break;
             }
@@ -1450,7 +1451,7 @@ public static class StringCommon
                 var interChunkLen = chunkStart - lastChunkEnd;
                 if (interChunkLen > 0)
                 {
-                    Chunks.AddLast(new StringChunk(lastChunkEnd, interChunkLen));
+                    Chunks.Add(new StringChunk(lastChunkEnd, interChunkLen));
                 }
             }
 
@@ -1461,14 +1462,14 @@ public static class StringCommon
             {// In order to collapse we have to consume all consecutive replacements
                 chunkEnd = Scan_Mismatch(Source, Delimiters, chunkStart);
                 if (chunkEnd < 0)
-                {// If no character mismatch could be found then the rest of the string consists of amtches
+                {// If no character mismatch could be found then the rest of the string consists of matches
                     chunkEnd = Source.Length;
                 }
             }
 
             var chunkSize = chunkEnd - chunkStart;
             // Push new chunk
-            Chunks.AddLast(new StringChunk(chunkStart, chunkSize, DelimiterIndex));
+            Chunks.Add(new StringChunk(chunkStart, chunkSize, DelimiterIndex));
             // Move our read position forward for the next pass
             chunkStart = chunkEnd;
         }
@@ -1477,9 +1478,9 @@ public static class StringCommon
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static LinkedList<StringChunk> _chunkify(ReadOnlySpan<char> Source, bool Collapse, params Predicate<char>[] Predicates)
+    private static List<StringChunk> _chunkify(ReadOnlySpan<char> Source, bool Collapse, params Predicate<char>[] Predicates)
     {
-        var Chunks = new LinkedList<StringChunk>();
+        var Chunks = new List<StringChunk>();
 
         // Scan for replacement characters, when encountered create a new chunk(non inclusive).
         for (int chunkStart = 0; chunkStart < Source.Length;)
@@ -1494,7 +1495,7 @@ public static class StringCommon
                 int tailLen = Source.Length - lastChunkEnd;
                 if (tailLen > 0)
                 {
-                    Chunks.AddLast(new StringChunk(lastChunkEnd, tailLen));
+                    Chunks.Add(new StringChunk(lastChunkEnd, tailLen));
                 }
                 break;
             }
@@ -1504,7 +1505,7 @@ public static class StringCommon
                 var interChunkLen = chunkStart - lastChunkEnd;
                 if (interChunkLen > 0)
                 {
-                    Chunks.AddLast(new StringChunk(lastChunkEnd, interChunkLen));
+                    Chunks.Add(new StringChunk(lastChunkEnd, interChunkLen));
                 }
             }
 
@@ -1515,14 +1516,14 @@ public static class StringCommon
             {// In order to collapse we have to consume all consecutive replacements
                 chunkEnd = Scan_Mismatch(Source, Predicates, chunkStart);
                 if (chunkEnd < 0)
-                {// If no character mismatch could be found then the rest of the string consists of amtches
+                {// If no character mismatch could be found then the rest of the string consists of matches
                     chunkEnd = Source.Length;
                 }
             }
 
             var chunkSize = chunkEnd - chunkStart;
             // Push new chunk
-            Chunks.AddLast(new StringChunk(chunkStart, chunkSize, DelimiterIndex));
+            Chunks.Add(new StringChunk(chunkStart, chunkSize, DelimiterIndex));
             // Move our read position forward for the next pass
             chunkStart = chunkEnd;
         }
@@ -1531,9 +1532,9 @@ public static class StringCommon
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static LinkedList<StringChunk> _chunkify(ReadOnlySpan<char> Source, bool Collapse, Filter<char> Filter)
+    private static List<StringChunk> _chunkify(ReadOnlySpan<char> Source, bool Collapse, Filter<char> Filter)
     {
-        var Chunks = new LinkedList<StringChunk>();
+        var Chunks = new List<StringChunk>();
         const int DelimiterIndex = 0;// We just use this here to keep this generic code the same
 
         // Scan for replacement characters, when encountered create a new chunk(non inclusive).
@@ -1549,7 +1550,7 @@ public static class StringCommon
                 int tailLen = Source.Length - lastChunkEnd;
                 if (tailLen > 0)
                 {
-                    Chunks.AddLast(new StringChunk(lastChunkEnd, tailLen));
+                    Chunks.Add(new StringChunk(lastChunkEnd, tailLen));
                 }
                 break;
             }
@@ -1559,7 +1560,7 @@ public static class StringCommon
                 var interChunkLen = chunkStart - lastChunkEnd;
                 if (interChunkLen > 0)
                 {
-                    Chunks.AddLast(new StringChunk(lastChunkEnd, interChunkLen));
+                    Chunks.Add(new StringChunk(lastChunkEnd, interChunkLen));
                 }
             }
 
@@ -1570,14 +1571,14 @@ public static class StringCommon
             {// In order to collapse we have to consume all consecutive replacements
                 chunkEnd = Scan_Mismatch(Source, Filter, chunkStart);
                 if (chunkEnd < 0)
-                {// If no character mismatch could be found then the rest of the string consists of amtches
+                {// If no character mismatch could be found then the rest of the string consists of matches
                     chunkEnd = Source.Length;
                 }
             }
 
             var chunkSize = chunkEnd - chunkStart;
             // Push new chunk
-            Chunks.AddLast(new StringChunk(chunkStart, chunkSize, DelimiterIndex));
+            Chunks.Add(new StringChunk(chunkStart, chunkSize, DelimiterIndex));
             // Move our read position forward for the next pass
             chunkStart = chunkEnd;
         }
@@ -1586,9 +1587,9 @@ public static class StringCommon
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static LinkedList<StringChunk> _chunkify(ReadOnlySpan<char> Source, bool Collapse, params Filter<char>[] Delimiters)
+    private static List<StringChunk> _chunkify(ReadOnlySpan<char> Source, bool Collapse, params Filter<char>[] Delimiters)
     {
-        var Chunks = new LinkedList<StringChunk>();
+        var Chunks = new List<StringChunk>();
 
         // Scan for replacement characters, when encountered create a new chunk(non inclusive).
         for (int chunkStart = 0; chunkStart < Source.Length;)
@@ -1603,7 +1604,7 @@ public static class StringCommon
                 int tailLen = Source.Length - lastChunkEnd;
                 if (tailLen > 0)
                 {
-                    Chunks.AddLast(new StringChunk(lastChunkEnd, tailLen));
+                    Chunks.Add(new StringChunk(lastChunkEnd, tailLen));
                 }
                 break;
             }
@@ -1613,7 +1614,7 @@ public static class StringCommon
                 var interChunkLen = chunkStart - lastChunkEnd;
                 if (interChunkLen > 0)
                 {
-                    Chunks.AddLast(new StringChunk(lastChunkEnd, interChunkLen));
+                    Chunks.Add(new StringChunk(lastChunkEnd, interChunkLen));
                 }
             }
 
@@ -1624,14 +1625,14 @@ public static class StringCommon
             {// In order to collapse we have to consume all consecutive replacements
                 chunkEnd = Scan_Mismatch(Source, Delimiters, chunkStart);
                 if (chunkEnd < 0)
-                {// If no character mismatch could be found then the rest of the string consists of amtches
+                {// If no character mismatch could be found then the rest of the string consists of matches
                     chunkEnd = Source.Length;
                 }
             }
 
             var chunkSize = chunkEnd - chunkStart;
             // Push new chunk
-            Chunks.AddLast(new StringChunk(chunkStart, chunkSize, DelimiterIndex));
+            Chunks.Add(new StringChunk(chunkStart, chunkSize, DelimiterIndex));
             // Move our read position forward for the next pass
             chunkStart = chunkEnd;
         }
@@ -1640,46 +1641,33 @@ public static class StringCommon
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static int _tally_chunks(ref LinkedList<StringChunk> Chunks, bool Trim, StringPtr[] Substitutions)
+    private static int _tally_chunks(List<StringChunk> Chunks, bool Trim, StringPtr[] Substitutions)
     {
         int Length = 0;
-        LinkedListNode<StringChunk>? node = Chunks.First;
-        while (node is not null)
+
+        // Trim leading delimiter chunks
+        while (Trim && Chunks.Count > 0 && Chunks[0].IsDelimiter)
         {
-            StringChunk chunk = node.Value;
+            Chunks.RemoveAt(0);
+        }
+
+        // Trim trailing delimiter chunks
+        while (Trim && Chunks.Count > 0 && Chunks[^1].IsDelimiter)
+        {
+            Chunks.RemoveAt(Chunks.Count - 1);
+        }
+
+        // Calculate total length
+        for (int i = 0; i < Chunks.Count; i++)
+        {
+            StringChunk chunk = Chunks[i];
             if (chunk.IsDelimiter)
             {
-                // Check if this chunk qualifies to be trimmed
-                if (Trim && node.Previous is null)
-                {
-                    node = node.Next;
-                    Chunks.RemoveFirst();
-                    continue;
-                }
-                else if (Trim && node.Next is null)
-                {
-                    node = node.Next;
-                    Chunks.RemoveLast();
-                    continue;
-                }
-
                 Length += Substitutions[chunk.DelimiterIndex].Length;
             }
             else
             {
                 Length += chunk.Size;
-            }
-
-            node = node.Next;
-        }
-
-        if (Trim && Chunks.Last!.Value.IsDelimiter)
-        {
-            // Make sure theres no trailing delimiter chunks
-            while (Chunks.Last!.Value.IsDelimiter)
-            {
-                Length -= Substitutions[Chunks.Last.Value.DelimiterIndex].Length;
-                Chunks.RemoveLast();
             }
         }
 
@@ -1687,18 +1675,13 @@ public static class StringCommon
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static char[] _compile_chunks(ReadOnlySpan<char> Source, LinkedList<StringChunk> Chunks, int Length, StringPtr[] Substitutions)
+    private static void _compile_chunks(ReadOnlySpan<char> Source, List<StringChunk> Chunks, Span<char> Buffer, StringPtr[] Substitutions)
     {
-        // Allocate final string
-        char[] pBuffer = new char[Length];
-        Memory<char> Buffer = new Memory<char>(pBuffer);
         int writePos = 0;
 
-        var node = Chunks.First;
-        while (node is not null)
+        for (int i = 0; i < Chunks.Count; i++)
         {
-            StringChunk Chunk = node.Value;
-            node = node.Next;
+            StringChunk Chunk = Chunks[i];
             int chunkEnd = Chunk.Start + Chunk.Size;
 
             if (Chunk.IsDelimiter)
@@ -1709,11 +1692,8 @@ public static class StringCommon
                     if (Substitution.Length > 0)
                     {
                         // Insert substitute
-                        var replaceTarget = Buffer.Slice(writePos);
-                        var replaceSource = Substitution.AsMemory();
-                        replaceSource.CopyTo(replaceTarget);
-                        // Increase writePos
-                        writePos += replaceSource.Length;
+                        Substitution.Data.Span.CopyTo(Buffer.Slice(writePos));
+                        writePos += Substitution.Length;
                     }
                 }
             }
@@ -1724,14 +1704,11 @@ public static class StringCommon
 
                 if (Chunk.Start < Source.Length && Chunk.Size > 0)
                 {
-                    Source.Slice(Chunk.Start, Chunk.Size).CopyTo(Buffer.Span.Slice(writePos));
-                    // Increase writePos
+                    Source.Slice(Chunk.Start, Chunk.Size).CopyTo(Buffer.Slice(writePos));
                     writePos += Chunk.Size;
                 }
             }
         }
-
-        return pBuffer;
     }
     #endregion
 }
