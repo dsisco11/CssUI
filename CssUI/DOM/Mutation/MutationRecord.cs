@@ -84,15 +84,8 @@ public class MutationRecord
         /* 1) Let interestedObservers be an empty map. */
         Dictionary<MutationObserver, string?> interestedObservers = new Dictionary<MutationObserver, string?>();
         /* 2) Let nodes be the inclusive ancestors of target. */
-        List<Node> Nodes = new List<Node>();
-        Node? ancestor = Record.target;
-        while (ancestor != null)
-        {
-            Nodes.Add(ancestor);
-            ancestor = ancestor.parentNode;
-        }
-        /* 3) For each node in nodes, and then for each registered of node’s registered observer list: */
-        foreach (Node node in Nodes)
+        /* 3) For each node in nodes, and then for each registered of node's registered observer list: */
+        foreach (Node node in Record.target!.inclusiveAncestors)
         {
             foreach (var registered in node.RegisteredObservers)
             {
