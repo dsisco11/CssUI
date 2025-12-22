@@ -49,7 +49,7 @@ public static class EventCommon
         {
             if (A is not Node)
                 return (EventTarget)A;
-            if (A is Node nA && nA.getRootNode() is ShadowRoot)
+            if (A is Node nA && nA.getRootNode() is not ShadowRoot)
                 return (EventTarget)A;
             if (B is Node nB && DOMCommon.Is_Shadow_Including_Inclusive_Ancestor(((Node)A).getRootNode(), (Node)B))
                 return (EventTarget)A;
@@ -386,7 +386,7 @@ public static class EventCommon
 
     #region Classification
     /// <summary>
-    /// Returns true if the given event-name is 
+    /// Returns true if the given event-name is
     /// </summary>
     /// <param name="Name"></param>
     /// <returns></returns>
