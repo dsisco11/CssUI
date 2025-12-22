@@ -6,8 +6,8 @@ namespace CssUI.DOM;
 public class DocumentType : Node
 {
     #region Instances
-    public static DocumentType XML = new DocumentType("xml");
-    public static DocumentType HTML = new DocumentType("html");
+    public static DocumentType XML => new DocumentType("xml");
+    public static DocumentType HTML => new DocumentType("html");
     #endregion
 
     #region Properties

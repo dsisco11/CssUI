@@ -17,7 +17,7 @@ namespace CssUI.HTML
         # region Metadata Attributes
 
         /// <summary>
-        /// The lang attribute (in no namespace) specifies the primary language for the element's contents and for any of the element's attributes that contain text. 
+        /// The lang attribute (in no namespace) specifies the primary language for the element's contents and for any of the element's attributes that contain text.
         /// Its value must be a valid BCP 47 language tag, or the empty string. Setting the attribute to the empty string indicates that the primary language is unknown.
         /// </summary>
         [CEReactions]
@@ -87,7 +87,7 @@ namespace CssUI.HTML
                 {
                     *//* If the element's value contains a character of bidirectional character type AL or R, and there is no character of bidirectional character type L anywhere before it in the element's value, then the directionality of the element is 'rtl'. [BIDI]
                      * Otherwise, if the element's value is not the empty string, or if the element is a document element, the directionality of the element is 'ltr'.
-                     * Otherwise, the directionality of the element is the same as the element's parent element's directionality. 
+                     * Otherwise, the directionality of the element is the same as the element's parent element's directionality.
                      *//*
 
                 }
@@ -147,7 +147,7 @@ namespace CssUI.HTML
         /// </summary>
         /// <param name="document">The document this element resides in</param>
         /// <param name="localName">Also know as the HTML tag</param>
-        public HTMLElement(Document document, string localName) : base(document, localName, "html", DOMCommon.HTMLNamespace)
+        public HTMLElement(Document document, string localName) : base(document, localName, null!, DOMCommon.HTMLNamespace)
         {
             SetFlag(ENodeFlags.IsHTML);
             dataset = new DOMStringMap(this);
@@ -252,7 +252,7 @@ namespace CssUI.HTML
                 }
                 /*
                  * If the element has its tabindex focus flag set
-                 * The element is being activated if it is in a formal activation state. 
+                 * The element is being activated if it is in a formal activation state.
                  */
                 if (tabindex_focus_flag)
                 {
@@ -321,8 +321,8 @@ namespace CssUI.HTML
                 {
                     return (long)(Box.Border.Top - ownerDocument.Initial_Containing_Block.Top);
                 }
-                /* 3) Return the result of subtracting the y-coordinate of the top padding edge of the first CSS layout box associated with the offsetParent 
-                 * of the element from the y-coordinate of the top border edge of the first CSS layout box associated with the element, 
+                /* 3) Return the result of subtracting the y-coordinate of the top padding edge of the first CSS layout box associated with the offsetParent
+                 * of the element from the y-coordinate of the top border edge of the first CSS layout box associated with the element,
                  * relative to the initial containing block origin, ignoring any transforms that apply to the element and its ancestors. */
                 return (long)(Box.Border.Top - offsetParent.Box.Padding.Top - ownerDocument.Initial_Containing_Block.Top);
             }
@@ -342,8 +342,8 @@ namespace CssUI.HTML
                 {
                     return (long)(Box.Border.Left - ownerDocument.Initial_Containing_Block.Left);
                 }
-                /* 3) Return the result of subtracting the x-coordinate of the left padding edge of the first CSS layout box associated with the offsetParent 
-                 * of the element from the x-coordinate of the left border edge of the first CSS layout box associated with the element, 
+                /* 3) Return the result of subtracting the x-coordinate of the left padding edge of the first CSS layout box associated with the offsetParent
+                 * of the element from the x-coordinate of the left border edge of the first CSS layout box associated with the element,
                  * relative to the initial containing block origin, ignoring any transforms that apply to the element and its ancestors. */
                 return (long)(Box.Border.Left - offsetParent.Box.Padding.Left - ownerDocument.Initial_Containing_Block.Left);
             }
@@ -393,8 +393,8 @@ namespace CssUI.HTML
                 /* If the attribute is omitted or parsing the value returns an error */
                 if (Attrib?.Value == null || Attrib.IsMissingValue || Attrib.IsInvalidValue)
                 {
-                    /* The tabIndex IDL attribute must reflect the value of the tabindex content attribute. 
-                     * The default value is 0 if the element is an a, area, button, iframe, input, select, or textarea element, or is a summary element that is a summary for its parent details. 
+                    /* The tabIndex IDL attribute must reflect the value of the tabindex content attribute.
+                     * The default value is 0 if the element is an a, area, button, iframe, input, select, or textarea element, or is a summary element that is a summary for its parent details.
                      * The default value is −1 otherwise. */
                     if (Attrib.IsMissingValue)
                     {
@@ -403,7 +403,7 @@ namespace CssUI.HTML
 
                     /*
                      * Modulo platform conventions, it is suggested that for the following elements, the tabindex focus flag be set:
-                     * 
+                     *
                      * - a elements that have an href attribute
                      * - link elements that have an href attribute
                      * - button elements
@@ -412,7 +412,7 @@ namespace CssUI.HTML
                      * - textarea elements
                      * - summary elements that are the first summary element child of a details element
                      * - Elements with a draggable attribute set, if that would enable the user agent to allow the user to begin a drag operations for those elements without the use of a pointing device
-                     * 
+                     *
                      */
 
                     if ((this is HTMLAElement || this is HTMLLinkElement) && hasAttribute(EAttributeName.Href))
@@ -487,7 +487,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [CEReactions]
         public bool Hidden
@@ -529,7 +529,7 @@ namespace CssUI.HTML
         //public void blur(); /* "User agents are encouraged to ignore calls to this blur() method entirely." - https://html.spec.whatwg.org/multipage/interaction.html#dom-window-blur */
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// Docs: https://html.spec.whatwg.org/multipage/interaction.html#assigned-access-key
         public KeyCombination assignedAccessKey { get; private set; } = null;
@@ -551,7 +551,7 @@ namespace CssUI.HTML
 
         internal void update_accessKey()
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#assigned-access-key */
-         /* Whenever an element's accesskey attribute is set, changed, or removed, the user agent must update the element's assigned access key by running the following steps: */
+            /* Whenever an element's accesskey attribute is set, changed, or removed, the user agent must update the element's assigned access key by running the following steps: */
 
             /* 1) If the element has no accesskey attribute, then skip to the fallback step below. */
             if (hasAttribute(EAttributeName.AccessKey, out Attr outAttr) && outAttr.IsDefined)
@@ -566,7 +566,7 @@ namespace CssUI.HTML
                     char key = keyStr.Span[0];
                     /* 2) If the value does not correspond to a key on the system's keyboard, then skip the remainder of these steps for this value. */
                     if (!nodeDocument.defaultView.Keyboard.Has_Key(key)) continue;
-                    /* 3) If the user agent can find a mix of zero or more modifier keys that, combined with the key that corresponds to the value given in the attribute, 
+                    /* 3) If the user agent can find a mix of zero or more modifier keys that, combined with the key that corresponds to the value given in the attribute,
                      * can be used as the access key, then the user agent may assign that combination of keys as the element's assigned access key and return. */
                     KeyCombination combo;
 
@@ -645,9 +645,9 @@ namespace CssUI.HTML
         {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#spelling-and-grammar-checking */
             get
             {
-                /* The spellcheck IDL attribute, on getting, must return true if the element's spellcheck content attribute is in the true state, 
-                 * or if the element's spellcheck content attribute is in the default state and the element's default behavior is true-by-default, 
-                 * or if the element's spellcheck content attribute is in the default state and the element's default behavior is inherit-by-default and the element's parent element's spellcheck IDL attribute would return true; 
+                /* The spellcheck IDL attribute, on getting, must return true if the element's spellcheck content attribute is in the true state,
+                 * or if the element's spellcheck content attribute is in the default state and the element's default behavior is true-by-default,
+                 * or if the element's spellcheck content attribute is in the default state and the element's default behavior is inherit-by-default and the element's parent element's spellcheck IDL attribute would return true;
                  * otherwise, if none of those conditions applies, then the attribute must instead return false. */
                 ESpellcheck enumValue = getAttribute(EAttributeName.Spellcheck).AsEnum<ESpellcheck>();
 
@@ -687,8 +687,8 @@ namespace CssUI.HTML
         /// </summary>
         protected bool Autocapitalize_Inherited = false;
         /// <summary>
-        /// Returns the current autocapitalization state for the element, or an empty string if it hasn't been set. Note that for input and textarea elements that inherit their state from a form element, 
-        /// this will return the autocapitalization state of the form element, but for an element in an editable region, 
+        /// Returns the current autocapitalization state for the element, or an empty string if it hasn't been set. Note that for input and textarea elements that inherit their state from a form element,
+        /// this will return the autocapitalization state of the form element, but for an element in an editable region,
         /// this will not return the autocapitalization state of the editing host (unless this element is, in fact, the editing host).
         /// Can be set, to set the autocapitalize content attribute(and thereby change the autocapitalization behavior for the element).
         /// </summary>
@@ -829,7 +829,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onAuxClick
         {
@@ -838,7 +838,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onBlur
         {
@@ -847,7 +847,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onCancel
         {
@@ -856,7 +856,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onCanPlay
         {
@@ -865,7 +865,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onCanPlayThrough
         {
@@ -874,7 +874,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onChange
         {
@@ -883,7 +883,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onClick
         {
@@ -892,7 +892,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onClose
         {
@@ -901,7 +901,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onContextMenu
         {
@@ -910,7 +910,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onCueChange
         {
@@ -919,7 +919,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onDblClick
         {
@@ -928,7 +928,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onDrag
         {
@@ -937,7 +937,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onDragEnd
         {
@@ -946,7 +946,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onDragEnter
         {
@@ -955,7 +955,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onDragExit
         {
@@ -964,7 +964,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onDragLeave
         {
@@ -973,7 +973,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onDragOver
         {
@@ -982,7 +982,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onDragStart
         {
@@ -991,7 +991,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onDrop
         {
@@ -1000,7 +1000,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onDurationChange
         {
@@ -1009,7 +1009,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onEmptied
         {
@@ -1018,7 +1018,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onEnded
         {
@@ -1027,7 +1027,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onFocus
         {
@@ -1036,7 +1036,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onFormData
         {
@@ -1045,7 +1045,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onInput
         {
@@ -1054,7 +1054,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onInvalid
         {
@@ -1063,7 +1063,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onKeyDown
         {
@@ -1072,7 +1072,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onKeyPress
         {
@@ -1081,7 +1081,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onKeyUp
         {
@@ -1090,7 +1090,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onLoad
         {
@@ -1099,7 +1099,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onLoadedData
         {
@@ -1108,7 +1108,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onLoadedMetadata
         {
@@ -1117,7 +1117,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onLoadEnd
         {
@@ -1126,7 +1126,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onLoadStart
         {
@@ -1135,7 +1135,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onMouseDown
         {
@@ -1144,7 +1144,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onMouseEnter
         {
@@ -1153,7 +1153,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onMouseLeave
         {
@@ -1162,7 +1162,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onMouseMove
         {
@@ -1171,7 +1171,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onMouseOut
         {
@@ -1180,7 +1180,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onMouseOver
         {
@@ -1189,7 +1189,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onMouseUp
         {
@@ -1198,7 +1198,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onWheel
         {
@@ -1207,7 +1207,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onPause
         {
@@ -1216,7 +1216,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onPlay
         {
@@ -1225,7 +1225,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onPlaying
         {
@@ -1234,7 +1234,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onProgress
         {
@@ -1243,7 +1243,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onRateChange
         {
@@ -1252,7 +1252,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onReset
         {
@@ -1261,7 +1261,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onResize
         {
@@ -1270,7 +1270,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onScroll
         {
@@ -1279,7 +1279,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onSecurityPolicyViolation
         {
@@ -1288,7 +1288,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onSeeked
         {
@@ -1297,7 +1297,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onSeeking
         {
@@ -1306,7 +1306,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onSelect
         {
@@ -1315,7 +1315,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onStalled
         {
@@ -1324,7 +1324,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onSubmit
         {
@@ -1333,7 +1333,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onSuspend
         {
@@ -1342,7 +1342,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onTimeUpdate
         {
@@ -1351,7 +1351,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onToggle
         {
@@ -1360,7 +1360,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onVolumeChange
         {
@@ -1369,7 +1369,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onWaiting
         {
@@ -1378,7 +1378,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onSelectStart
         {
@@ -1387,7 +1387,7 @@ namespace CssUI.HTML
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public event EventCallback onSelectionChange
         {

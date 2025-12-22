@@ -1021,19 +1021,26 @@ public static class DOMCommon
     public static LinkedList<Node> Get_Preceeding(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
     {
         var list = new LinkedList<Node>();
-        TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
 
-        Node? current = tree.previousSibling();
+        // Iterate through previous siblings directly rather than using TreeWalker
+        // (TreeWalker with node as root can't traverse to siblings since currentNode == root)
+        Node? current = node.previousSibling;
         while (current is not null)
         {
-            var fres = Filter?.acceptNode(current) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
-            if (fres == Enums.ENodeFilterResult.FILTER_REJECT)
-                break;
+            // Check if node type matches the filter mask
+            int n = (int)current.nodeType - 1;
+            ulong mask = (1UL << n);
+            if (((ulong)FilterMask & mask) != 0)
+            {
+                var fres = Filter?.acceptNode(current) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
+                if (fres == Enums.ENodeFilterResult.FILTER_REJECT)
+                    break;
 
-            if (fres == Enums.ENodeFilterResult.FILTER_ACCEPT)
-                list.AddLast(current);
+                if (fres == Enums.ENodeFilterResult.FILTER_ACCEPT)
+                    list.AddLast(current);
+            }
 
-            current = tree.previousSibling();
+            current = current.previousSibling;
         }
 
         return list;
@@ -1050,22 +1057,29 @@ public static class DOMCommon
     public static LinkedList<NodeType> Get_Preceeding<NodeType>(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
     {
         LinkedList<NodeType> list = new LinkedList<NodeType>();
-        TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
 
-        Node? current = tree.previousSibling();
+        // Iterate through previous siblings directly rather than using TreeWalker
+        // (TreeWalker with node as root can't traverse to siblings since currentNode == root)
+        Node? current = node.previousSibling;
         while (current is not null)
         {
             if (current is NodeType nodeAsType)
             {
-                var fres = Filter?.acceptNode(current) ?? ENodeFilterResult.FILTER_ACCEPT;
-                if (fres == ENodeFilterResult.FILTER_REJECT)
-                    break;
+                // Check if node type matches the filter mask
+                int n = (int)current.nodeType - 1;
+                ulong mask = (1UL << n);
+                if (((ulong)FilterMask & mask) != 0)
+                {
+                    var fres = Filter?.acceptNode(current) ?? ENodeFilterResult.FILTER_ACCEPT;
+                    if (fres == ENodeFilterResult.FILTER_REJECT)
+                        break;
 
-                if (fres == ENodeFilterResult.FILTER_ACCEPT)
-                    list.AddLast(nodeAsType);
+                    if (fres == ENodeFilterResult.FILTER_ACCEPT)
+                        list.AddLast(nodeAsType);
+                }
             }
 
-            current = tree.previousSibling();
+            current = current.previousSibling;
         }
 
         return list;
@@ -1087,12 +1101,27 @@ public static class DOMCommon
             throw new IndexOutOfRangeException("N must be greater than 0");
         }
 
-        TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
-        Node? current = tree.previousSibling();
+        // Iterate through previous siblings directly rather than using TreeWalker
+        // (TreeWalker with node as root can't traverse to siblings since currentNode == root)
+        Node? current = node.previousSibling;
         while (current is not null)
         {
-            if (--Nth <= 0) { return current; }
-            current = tree.previousSibling();
+            // Check if node type matches the filter mask
+            int n = (int)current.nodeType - 1;
+            ulong mask = (1UL << n);
+            if (((ulong)FilterMask & mask) != 0)
+            {
+                var fres = Filter?.acceptNode(current) ?? ENodeFilterResult.FILTER_ACCEPT;
+                if (fres == ENodeFilterResult.FILTER_ACCEPT)
+                {
+                    if (--Nth <= 0) { return current; }
+                }
+                else if (fres == ENodeFilterResult.FILTER_REJECT)
+                {
+                    break;
+                }
+            }
+            current = current.previousSibling;
         }
 
         return null;
@@ -1110,19 +1139,26 @@ public static class DOMCommon
     public static LinkedList<Node> Get_Following(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
     {
         var list = new LinkedList<Node>();
-        TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
 
-        Node? current = tree.nextSibling();
+        // Iterate through next siblings directly rather than using TreeWalker
+        // (TreeWalker with node as root can't traverse to siblings since currentNode == root)
+        Node? current = node.nextSibling;
         while (current is not null)
         {
-            var fres = Filter?.acceptNode(current) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
-            if (fres == Enums.ENodeFilterResult.FILTER_REJECT)
-                break;
+            // Check if node type matches the filter mask
+            int n = (int)current.nodeType - 1;
+            ulong mask = (1UL << n);
+            if (((ulong)FilterMask & mask) != 0)
+            {
+                var fres = Filter?.acceptNode(current) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
+                if (fres == Enums.ENodeFilterResult.FILTER_REJECT)
+                    break;
 
-            if (fres == Enums.ENodeFilterResult.FILTER_ACCEPT)
-                list.AddLast(current);
+                if (fres == Enums.ENodeFilterResult.FILTER_ACCEPT)
+                    list.AddLast(current);
+            }
 
-            current = tree.nextSibling();
+            current = current.nextSibling;
         }
 
         return list;
@@ -1139,22 +1175,28 @@ public static class DOMCommon
     public static LinkedList<NodeType> Get_Following<NodeType>(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL) where NodeType : INode
     {
         var list = new LinkedList<NodeType>();
-        TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
 
-        Node? current = tree.nextSibling();
+        // Iterate through next siblings directly rather than using TreeWalker
+        // (TreeWalker with node as root can't traverse to siblings since currentNode == root)
+        Node? current = node.nextSibling;
         while (current is not null)
         {
             if (current is NodeType nodeAsType)
             {
-                var fres = Filter?.acceptNode(current) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
-                if (fres == Enums.ENodeFilterResult.FILTER_REJECT)
-                    break;
+                // Check if node type matches the filter mask
+                int n = (int)current.nodeType - 1;
+                ulong mask = (1UL << n);
+                if (((ulong)FilterMask & mask) != 0)
+                {
+                    var fres = Filter?.acceptNode(current) ?? Enums.ENodeFilterResult.FILTER_ACCEPT;
+                    if (fres == Enums.ENodeFilterResult.FILTER_REJECT)
+                        break;
 
-                if (fres == Enums.ENodeFilterResult.FILTER_ACCEPT)
-                    list.AddLast(nodeAsType);
-
+                    if (fres == Enums.ENodeFilterResult.FILTER_ACCEPT)
+                        list.AddLast(nodeAsType);
+                }
             }
-            current = tree.nextSibling();
+            current = current.nextSibling;
         }
 
         return list;
@@ -1176,12 +1218,27 @@ public static class DOMCommon
             throw new IndexOutOfRangeException("N must be greater than 0");
         }
 
-        TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
-        Node? current = tree.nextSibling();
+        // Iterate through next siblings directly rather than using TreeWalker
+        // (TreeWalker with node as root can't traverse to siblings since currentNode == root)
+        Node? current = node.nextSibling;
         while (current is not null)
         {
-            if (--Nth <= 0) { return current; }
-            current = tree.nextSibling();
+            // Check if node type matches the filter mask
+            int n = (int)current.nodeType - 1;
+            ulong mask = (1UL << n);
+            if (((ulong)FilterMask & mask) != 0)
+            {
+                var fres = Filter?.acceptNode(current) ?? ENodeFilterResult.FILTER_ACCEPT;
+                if (fres == ENodeFilterResult.FILTER_ACCEPT)
+                {
+                    if (--Nth <= 0) { return current; }
+                }
+                else if (fres == ENodeFilterResult.FILTER_REJECT)
+                {
+                    break;
+                }
+            }
+            current = current.nextSibling;
         }
 
         return null;
