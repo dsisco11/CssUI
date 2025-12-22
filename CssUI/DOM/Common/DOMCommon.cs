@@ -386,18 +386,7 @@ public static class DOMCommon
     public static bool Is_Descendant(Node A, Node B)
     {/* Docs: https://dom.spec.whatwg.org/#concept-tree-descendant */
         /* Walk up the parent chain from A to see if we reach B */
-        Node? node = A.parentNode;
-        while (node is not null)
-        {
-            if (node.Equals(B))
-                return true;
-
-            var prev = node;
-            node = node.parentNode;
-            Debug.Assert(node != prev);
-        }
-
-        return false;
+        return A.ancestors.Any(ancestor => ancestor.Equals(B));
     }
 
     /// <summary>
@@ -586,11 +575,8 @@ public static class DOMCommon
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static LinkedList<Node> Get_Range_Nodes(Range range)
     {
-        var commonAncestor = range.startContainer;
-        while (!Is_Inclusive_Ancestor(commonAncestor, range.endContainer))
-        {
-            commonAncestor = commonAncestor.parentNode!;
-        }
+        var commonAncestor = range.startContainer.inclusiveAncestors
+            .First(a => Is_Inclusive_Ancestor(a, range.endContainer));
 
         var containedChildren = Get_Descendents(commonAncestor, new FilterRangeContains(range));
         return containedChildren;
@@ -607,12 +593,20 @@ public static class DOMCommon
     public static LinkedList<Node> Get_Ancestors(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
     {
         var list = new LinkedList<Node>();
-        TreeWalker tree = new TreeWalker(node!, FilterMask, Filter);
-        Node? current = tree.parentNode();
-        while (current is not null)
+        foreach (var ancestor in node.ancestors)
         {
-            list.AddLast(current);
-            current = tree.parentNode();
+            // Apply filter mask
+            int n = (int)ancestor.nodeType - 1;
+            ulong mask = (1UL << n);
+            bool passedMask = (0 != ((ulong)FilterMask & mask));
+
+            // Apply filter
+            bool passedFilter = Filter is null || Filter.acceptNode(ancestor) == Enums.ENodeFilterResult.FILTER_ACCEPT;
+
+            if (passedMask && passedFilter)
+            {
+                list.AddLast(ancestor);
+            }
         }
 
         return list;
@@ -629,24 +623,20 @@ public static class DOMCommon
     public static LinkedList<NodeType> Get_Ancestors<NodeType>(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL) where NodeType : INode
     {
         LinkedList<NodeType> list = new LinkedList<NodeType>();
-        // Walk up the parent chain directly instead of using TreeWalker
-        // (TreeWalker doesn't work well for ancestors since it stops at its root)
-        Node? current = node.parentNode;
-        while (current is not null)
+        foreach (var ancestor in node.ancestors)
         {
             // Apply filter mask
-            int n = (int)current.nodeType - 1;
+            int n = (int)ancestor.nodeType - 1;
             ulong mask = (1UL << n);
             bool passedMask = (0 != ((ulong)FilterMask & mask));
 
             // Apply filter
-            bool passedFilter = Filter is null || Filter.acceptNode(current) == Enums.ENodeFilterResult.FILTER_ACCEPT;
+            bool passedFilter = Filter is null || Filter.acceptNode(ancestor) == Enums.ENodeFilterResult.FILTER_ACCEPT;
 
-            if (passedMask && passedFilter && current is NodeType currentAsType)
+            if (passedMask && passedFilter && ancestor is NodeType ancestorAsType)
             {
-                list.AddLast(currentAsType);
+                list.AddLast(ancestorAsType);
             }
-            current = current.parentNode;
         }
 
         return list;
@@ -721,13 +711,20 @@ public static class DOMCommon
     public static LinkedList<Node> Get_Inclusive_Ancestors(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
     {
         var list = new LinkedList<Node>();
-        list.AddLast(node);
-        TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
-        Node? current = tree.parentNode();
-        while (current is not null)
+        foreach (var ancestor in node.inclusiveAncestors)
         {
-            list.AddLast(current);
-            current = tree.parentNode();
+            // Apply filter mask
+            int n = (int)ancestor.nodeType - 1;
+            ulong mask = (1UL << n);
+            bool passedMask = (0 != ((ulong)FilterMask & mask));
+
+            // Apply filter
+            bool passedFilter = Filter is null || Filter.acceptNode(ancestor) == Enums.ENodeFilterResult.FILTER_ACCEPT;
+
+            if (passedMask && passedFilter)
+            {
+                list.AddLast(ancestor);
+            }
         }
 
         return list;
@@ -1903,18 +1900,7 @@ public static class DOMCommon
         ArgumentNullException.ThrowIfNull(node);
         ArgumentNullException.ThrowIfNull(ancestor);
 
-        if (ReferenceEquals(node, ancestor) || ReferenceEquals(node.parentNode, ancestor))
-        {
-            return node;
-        }
-
-        Node? current = node;
-        while (current is not null && !ReferenceEquals(current.parentNode, ancestor))
-        {
-            current = current.parentNode;
-        }
-
-        return current;
+        return node.inclusiveAncestors.FirstOrDefault(n => ReferenceEquals(n, ancestor) || ReferenceEquals(n.parentNode, ancestor));
     }
     #endregion
     #endregion
@@ -2287,21 +2273,10 @@ public static class DOMCommon
             return false;
 
         // Find the nearest canvas element ancestor
-        Node? current = element.parentNode;
-        while (current != null)
-        {
-            if (current is HTML.HTMLCanvasElement canvasElement)
-            {
-                // Check if the canvas is being rendered and represents embedded content
-                // A canvas represents embedded content when it has a rendering context bound to it
-                // TODO: Implement proper check for canvas rendering context
-                // For now, return true if we found an ancestor canvas element
-                return true;
-            }
-            current = current.parentNode;
-        }
-
-        return false;
+        // A canvas represents embedded content when it has a rendering context bound to it
+        // TODO: Implement proper check for canvas rendering context
+        // For now, return true if we found an ancestor canvas element
+        return element.ancestors.OfType<HTML.HTMLCanvasElement>().Any();
     }
 #endif
     #endregion

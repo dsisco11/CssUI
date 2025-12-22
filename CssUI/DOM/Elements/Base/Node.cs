@@ -199,14 +199,12 @@ public abstract class Node : EventTarget, INode
             SetFlag(Flags);
         }
 
-        Node? current = parentNode;
-        while (current is not null)
+        foreach (var ancestor in ancestors)
         {
-            if (current.GetFlag(Flags))
+            if (ancestor.GetFlag(Flags))
                 break;
 
-            current.SetFlag(Flags);
-            current = current.parentNode;
+            ancestor.SetFlag(Flags);
         }
     }
 
@@ -223,14 +221,12 @@ public abstract class Node : EventTarget, INode
             ClearFlag(Flags);
         }
 
-        Node? current = parentNode;
-        while (current is not null)
+        foreach (var ancestor in ancestors)
         {
-            if (current.GetFlag(StopFlags))
+            if (ancestor.GetFlag(StopFlags))
                 break;
 
-            current.ClearFlag(Flags);
-            current = current.parentNode;
+            ancestor.ClearFlag(Flags);
         }
     }
     #endregion

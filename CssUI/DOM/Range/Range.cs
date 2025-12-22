@@ -174,11 +174,7 @@ public class Range : AbstractRange, IDisposable
             {
                 // nodeA contains nodeB, so nodeB is a descendant of nodeA
                 // Find the child of nodeA that is an ancestor of (or is) nodeB
-                var child = nodeB;
-                while (!ReferenceEquals(child.parentNode, nodeA))
-                {
-                    child = child.parentNode;
-                }
+                var child = nodeB.inclusiveAncestors.First(n => ReferenceEquals(n.parentNode, nodeA));
                 // Position of B relative to A: if child's index < offsetA, B is before A (so return After)
                 // if child's index >= offsetA, B is after A (so return Before)
                 if (child.index < offsetA) return EBoundaryPosition.After;
@@ -191,12 +187,7 @@ public class Range : AbstractRange, IDisposable
         if (docPos.HasFlag(EDocumentPosition.CONTAINS))
         {
             // nodeB is a descendant of nodeA
-            var child = nodeB;
-            /* While child is not a child of nodeA, set child to its parent. */
-            while (!ReferenceEquals(child.parentNode, nodeA))
-            {
-                child = child.parentNode;
-            }
+            var child = nodeB.inclusiveAncestors.First(n => ReferenceEquals(n.parentNode, nodeA));
             /* If child's index is less than offsetA, then return after. */
             if (child.index < offsetA) return EBoundaryPosition.After;
         }
@@ -204,12 +195,7 @@ public class Range : AbstractRange, IDisposable
         if (docPos.HasFlag(EDocumentPosition.CONTAINED_BY))
         {
             // nodeA is a descendant of nodeB
-            var child = nodeA;
-            /* While child is not a child of nodeB, set child to its parent. */
-            while (!ReferenceEquals(child.parentNode, nodeB))
-            {
-                child = child.parentNode;
-            }
+            var child = nodeA.inclusiveAncestors.First(n => ReferenceEquals(n.parentNode, nodeB));
             /* If child's index is less than offsetB, then A is after B (A comes after offset in B). */
             /* If child's index >= offsetB, then A is before B (A comes before offset in B). */
             if (child.index < offsetB) return EBoundaryPosition.After;
@@ -484,11 +470,8 @@ public class Range : AbstractRange, IDisposable
                 return fragment;
             }
             /* 5) Let common ancestor be original start node. */
-            var commonAncestor = startContainer;
-            while (!DOMCommon.Is_Inclusive_Ancestor(commonAncestor, endContainer))
-            {
-                commonAncestor = commonAncestor.parentNode!;
-            }
+            var commonAncestor = startContainer.inclusiveAncestors
+                .First(a => DOMCommon.Is_Inclusive_Ancestor(a, endContainer));
             /* 7) Let first partially contained child be null. */
             Node? firstPartiallyContainedChild = null;
             var partialFilter = new FilterRangePartiallyContains(this);
@@ -599,15 +582,8 @@ public class Range : AbstractRange, IDisposable
                 fragment.appendChild(clone);
                 return fragment;
             }
-            var commonAncestor = startContainer;
-            /* 6) While common ancestor is not an inclusive ancestor of original end node, set common ancestor to its own parent. */
-            while (!DOMCommon.Is_Inclusive_Ancestor(commonAncestor, endContainer))
-            {
-                var prev = commonAncestor;
-                commonAncestor = commonAncestor.parentNode!;
-                Debug.Assert(commonAncestor != null);
-                Debug.Assert(commonAncestor != prev);
-            }
+            var commonAncestor = startContainer.inclusiveAncestors
+                .First(a => DOMCommon.Is_Inclusive_Ancestor(a, endContainer));
             Node? firstPartiallyContainedChild = null;
             var partialFilter = new FilterRangePartiallyContains(this);
             /* 8) If original start node is not an inclusive ancestor of original end node, set first partially contained child to the first child of common ancestor that is partially contained in range. */
