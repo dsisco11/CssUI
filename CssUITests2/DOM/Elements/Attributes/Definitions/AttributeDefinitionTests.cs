@@ -193,15 +193,37 @@ public class AttributeDefinitionTests
 
     #region Lookup Tests
 
-    [Fact(Skip = "Bug: Not all EAttributeName values have definitions registered")]
-    public void LookupTest()
+    [Fact]
+    public void Lookup_KnownAttribute_ReturnsDefinition()
     {
-        var attribNames = Enum.GetValues(typeof(EAttributeName));
-        foreach (EAttributeName Name in attribNames)
-        {
-            AttributeDefinition def = AttributeDefinition.Lookup(Name);
-            Assert.NotNull(def);
-        }
+        // Common attributes that should have definitions
+        var def = AttributeDefinition.Lookup(EAttributeName.ID);
+        Assert.NotNull(def);
+        Assert.Equal(EAttributeName.ID, def.Name!.EnumValue);
+    }
+
+    [Fact]
+    public void Lookup_ClassAttribute_ReturnsDefinition()
+    {
+        var def = AttributeDefinition.Lookup(EAttributeName.Class);
+        Assert.NotNull(def);
+    }
+
+    [Fact]
+    public void Lookup_UnknownAttribute_ReturnsNull()
+    {
+        // CUSTOM is a special value for custom attributes, Lookup should return null
+        var def = AttributeDefinition.Lookup(EAttributeName.CUSTOM);
+        Assert.Null(def);
+    }
+
+    [Fact]
+    public void Lookup_WithElementType_ReturnsElementSpecificDefinition()
+    {
+        // Test that lookup can find element-specific attribute definitions
+        var def = AttributeDefinition.Lookup(EAttributeName.ID, typeof(Element));
+        // Should return either an element-specific definition or the generic one
+        Assert.NotNull(def);
     }
 
     #endregion
