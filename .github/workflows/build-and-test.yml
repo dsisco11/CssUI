@@ -1,0 +1,71 @@
+name: Build and Test
+
+on:
+    push:
+        branches: [main, master, develop]
+    pull_request:
+        branches: [main, master, develop]
+    workflow_dispatch:
+
+env:
+    DOTNET_VERSION: "8.0.x"
+    DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+    DOTNET_NOLOGO: true
+
+jobs:
+    build-and-test:
+        name: Build and Test
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v4
+              with:
+                  dotnet-version: ${{ env.DOTNET_VERSION }}
+
+            - name: Restore dependencies
+              run: dotnet restore CssUI.sln
+
+            - name: Build solution
+              run: dotnet build CssUI.sln --configuration Release --no-restore
+
+            - name: Run tests with coverage
+              run: |
+                  dotnet test CssUITests2/CssUITests.csproj \
+                    --configuration Release \
+                    --no-build \
+                    --verbosity normal \
+                    --settings CssUITests2/coverage.ci.runsettings \
+                    --collect:"XPlat Code Coverage" \
+                    --results-directory ./TestResults
+
+            - name: Generate coverage report
+              uses: danielpalme/ReportGenerator-GitHub-Action@5
+              with:
+                  reports: "TestResults/**/coverage.cobertura.xml"
+                  targetdir: "CoverageReport"
+                  reporttypes: "HtmlInline_AzurePipelines;Cobertura;MarkdownSummaryGithub"
+                  assemblyfilters: "+CssUI;-CssUITests;-CssUI.Benchmarks"
+
+            - name: Upload coverage report artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: coverage-report
+                  path: CoverageReport
+                  retention-days: 30
+
+            - name: Add coverage summary to job
+              run: |
+                  if [ -f "CoverageReport/SummaryGithub.md" ]; then
+                    cat CoverageReport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
+                  fi
+
+            - name: Add coverage PR comment
+              uses: marocchino/sticky-pull-request-comment@v2
+              if: github.event_name == 'pull_request'
+              with:
+                  recreate: true
+                  path: CoverageReport/SummaryGithub.md
