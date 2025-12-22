@@ -3,5 +3,6 @@
   "diagnosticMessages": true,
   "parallelizeTestCollections": true,
   "longRunningTestSeconds": 2,
+  "maxTestExecutionSeconds": 15,
   "preEnumerateTheories": true
 }
