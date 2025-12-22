@@ -543,7 +543,7 @@ public class MutationObserverTests
         Assert.Equal("data-test", record.attributeName);
     }
 
-    [Fact(Skip = "Known bug: QueueRecord doesn't find observers - records collection remains empty despite observer being registered")]
+    [Fact(Skip = "Known bug: QueueRecord doesn't find observers for attribute removal - records collection remains empty")]
     public void Attributes_RemoveAttribute_RecordsMutation()
     {
         // Arrange
@@ -604,7 +604,7 @@ public class MutationObserverTests
         Assert.NotEmpty(records);
     }
 
-    [Fact(Skip = "Known bug: AttributeValue type not properly converted to string in QueueRecord")]
+    [Fact]
     public void Attributes_WithOldValue_RecordsOldValue()
     {
         // Arrange
@@ -725,7 +725,7 @@ public class MutationObserverTests
 
     #region Subtree Observation Tests
 
-    [Fact(Skip = "Known bug: TreeWalker ancestor traversal in QueueRecord doesn't properly find subtree observers")]
+    [Fact]
     public void Subtree_ObservesDescendantChildList()
     {
         // Arrange
@@ -749,7 +749,7 @@ public class MutationObserverTests
         Assert.Same(child, records.First().target);
     }
 
-    [Fact(Skip = "Known bug: TreeWalker ancestor traversal in QueueRecord doesn't properly find subtree observers")]
+    [Fact(Skip = "Known bug: Attribute subtree observation doesn't work - records collection empty despite correct setup")]
     public void Subtree_ObservesDescendantAttributes()
     {
         // Arrange
@@ -759,19 +759,37 @@ public class MutationObserverTests
         var child = CreateTestElement(doc, "span");
         doc.documentElement!.appendChild(div);
         div.appendChild(child);
+
+        // Verify parent relationship
+        Assert.Same(div, child.parentNode);
+
         var observer = new MutationObserver(window, (m, o) => { });
         observer.Observe(div, new MutationObserverInit { attributes = true, subtree = true });
 
-        // Act
+        // Verify observer is registered on div with correct options
+        Assert.Single(div.RegisteredObservers);
+        var registeredOptions = div.RegisteredObservers[0].options!;
+        Assert.True(registeredOptions.subtree, "subtree should be true");
+        Assert.True(registeredOptions.attributes, "attributes should be true");
+
+        // Act - Clear any initial records, then set attribute
+        observer.TakeRecords();
+
+        // Verify child has no observers (observer is on parent)
+        Assert.Empty(child.RegisteredObservers);
+
         SetAttribute(child, "data-test", "value");
         var records = observer.TakeRecords();
+
+        // Debug output - what's in records?
+        // Assert.True(records.Count > 0, $"Expected records but got {records.Count}. Child parent is: {child.parentNode?.GetType().Name ?? "null"}");
 
         // Assert
         Assert.Single(records);
         Assert.Same(child, records.First().target);
     }
 
-    [Fact(Skip = "Known bug: TreeWalker ancestor traversal in QueueRecord doesn't properly find subtree observers")]
+    [Fact]
     public void Subtree_ObservesDescendantCharacterData()
     {
         // Arrange
@@ -898,7 +916,7 @@ public class MutationObserverTests
         Assert.Single(records2);
     }
 
-    [Fact(Skip = "Known bug: Multiple observers on same target don't all receive records properly")]
+    [Fact(Skip = "Known bug: Attribute observer doesn't receive records when childList observer is also registered")]
     public void MultipleObservers_DifferentOptions()
     {
         // Arrange
@@ -911,6 +929,9 @@ public class MutationObserverTests
         var observer2 = new MutationObserver(window, (m, o) => { });
         observer1.Observe(div, new MutationObserverInit { childList = true });
         observer2.Observe(div, new MutationObserverInit { attributes = true });
+
+        // Verify both are registered
+        Assert.Equal(2, div.RegisteredObservers.Count);
 
         // Act
         var child = CreateTestElement(doc, "span");
@@ -975,7 +996,7 @@ public class MutationObserverTests
         Assert.Equal(EMutationType.ChildList, records.First().type);
     }
 
-    [Fact(Skip = "Known bug: TakeRecords() has race condition with concurrent queue modification")]
+    [Fact]
     public void MutationRecord_HasCorrectType_ForAttributes()
     {
         // Arrange

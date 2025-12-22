@@ -134,7 +134,11 @@ public class MutationRecord
                         interestedObservers.Add(mo!, null);
                     /* 3) If either type is "attributes" and options’s attributeOldValue is true, or type is "characterData" and options’s characterDataOldValue is true, then set interestedObservers[mo] to oldValue. */
                     if ((Record.type == EMutationType.Attributes && options.attributeOldValue) || (Record.type == EMutationType.CharacterData && options.characterDataOldValue))
-                        interestedObservers[mo] = Record.oldValue;
+                    {
+                        // Convert AttributeValue to string if needed
+                        string? oldValueStr = Record.oldValue is AttributeValue av ? av.Data : Record.oldValue?.ToString();
+                        interestedObservers[mo] = oldValueStr;
+                    }
                 }
             }
         }
