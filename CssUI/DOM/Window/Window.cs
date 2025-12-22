@@ -99,7 +99,7 @@ public abstract partial class Window : BrowsingContext
     internal Task observer_task = Task.FromResult(true);
 
     // XXX: I'm thinking we just throw a new task up instead of bothering to implement the task queue system. Its basically the same concept(~ish).
-    internal void QueueObserverMicroTask()
+    internal virtual void QueueObserverMicroTask()
     {
         /* To queue a mutation observer microtask, run these steps: */
         /* 1) If the surrounding agent’s mutation observer microtask queued is true, then return. */

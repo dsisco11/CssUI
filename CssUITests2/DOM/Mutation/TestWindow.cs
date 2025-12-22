@@ -46,6 +46,15 @@ internal class TestWindow : Window
     #endregion
 
     /// <summary>
+    /// Override to prevent the async microtask from racing with synchronous TakeRecords() calls in tests.
+    /// Tests should use ProcessMutationRecords() or TakeRecords() directly to check mutation records.
+    /// </summary>
+    internal override void QueueObserverMicroTask()
+    {
+        // No-op: Prevents race condition between async task and synchronous test assertions
+    }
+
+    /// <summary>
     /// Synchronously processes all pending mutation records by invoking callbacks.
     /// This is useful for testing since the normal microtask queue is asynchronous.
     /// </summary>
