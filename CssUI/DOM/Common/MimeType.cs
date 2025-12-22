@@ -335,7 +335,7 @@ public static class MimeType
                 const string escapedSlash = @"\\";
 
                 string escapedStr = StringCommon.Replace(kv.Value, false, false,
-                    (CHAR_QUOTATION_MARK, escapedQuote), (CHAR_REVERSE_SOLIDUS, escapedSlash));
+                    (CHAR_QUOTATION_MARK, escapedQuote.AsMemory()), (CHAR_REVERSE_SOLIDUS, escapedSlash.AsMemory()));
 
                 valueStr = string.Concat(CHAR_QUOTATION_MARK, escapedStr, CHAR_QUOTATION_MARK);
             }

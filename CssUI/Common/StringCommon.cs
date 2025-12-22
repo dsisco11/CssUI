@@ -235,13 +235,13 @@ public static class StringCommon
 
 
     #region Transformations
-    static ValueTuple<char, StringPtr>[] WhitespaceReplacements = new ValueTuple<char, StringPtr>[]
+    static ValueTuple<char, ReadOnlyMemory<char>>[] WhitespaceReplacements = new ValueTuple<char, ReadOnlyMemory<char>>[]
     {
-        (CHAR_TAB, " "),
-        (CHAR_LINE_FEED, " "),
-        (CHAR_FORM_FEED, " "),
-        (CHAR_CARRIAGE_RETURN, " "),
-        (CHAR_SPACE, " "),
+        (CHAR_TAB, " ".AsMemory()),
+        (CHAR_LINE_FEED, " ".AsMemory()),
+        (CHAR_FORM_FEED, " ".AsMemory()),
+        (CHAR_CARRIAGE_RETURN, " ".AsMemory()),
+        (CHAR_SPACE, " ".AsMemory()),
     };
 
     /// <summary>
@@ -336,7 +336,7 @@ public static class StringCommon
     /// <param name="Delim">The delimiter(s) that should separate each token</param>
     /// <param name="Args">The strings to join</param>
     /// <returns></returns>
-    public static String Concat(char Delim, params StringPtr[] Args)
+    public static String Concat(char Delim, params ReadOnlyMemory<char>[] Args)
     {
         ArgumentNullException.ThrowIfNull(Args);
         Contract.EndContractBlock();
@@ -363,7 +363,7 @@ public static class StringCommon
                 {
                     span[pos++] = state.Delim;
                 }
-                state.Args[i].Data.Span.CopyTo(span.Slice(pos));
+                state.Args[i].Span.CopyTo(span.Slice(pos));
                 pos += state.Args[i].Length;
             }
         });
@@ -419,7 +419,7 @@ public static class StringCommon
     /// <param name="Delim">The delimiter(s) that should separate each token</param>
     /// <param name="Args">The strings to join</param>
     /// <returns></returns>
-    public static String Concat(ReadOnlySpan<char> Delim, params StringPtr[] Args)
+    public static String Concat(ReadOnlySpan<char> Delim, params ReadOnlyMemory<char>[] Args)
     {
         ArgumentNullException.ThrowIfNull(Args);
         Contract.EndContractBlock();
@@ -448,7 +448,7 @@ public static class StringCommon
                     state.delimStr.AsSpan().CopyTo(span.Slice(pos));
                     pos += state.delimStr.Length;
                 }
-                state.Args[i].Data.Span.CopyTo(span.Slice(pos));
+                state.Args[i].Span.CopyTo(span.Slice(pos));
                 pos += state.Args[i].Length;
             }
         });
@@ -492,7 +492,7 @@ public static class StringCommon
     /// </summary>
     /// <param name="Args">The strings to join</param>
     /// <returns></returns>
-    public static String Concat(params StringPtr[] Args)
+    public static String Concat(params ReadOnlyMemory<char>[] Args)
     {
         ArgumentNullException.ThrowIfNull(Args);
         Contract.EndContractBlock();
@@ -509,7 +509,7 @@ public static class StringCommon
             int pos = 0;
             for (int i = 0; i < state.Length; i++)
             {
-                state[i].Data.Span.CopyTo(span.Slice(pos));
+                state[i].Span.CopyTo(span.Slice(pos));
                 pos += state[i].Length;
             }
         });
@@ -525,15 +525,15 @@ public static class StringCommon
     /// <param name="Input">The string memory to trim</param>
     /// <param name="Delim">The character to trim out of the input</param>
     /// <returns></returns>
-    public static ReadOnlyMemory<char> Trim(StringPtr Input, char Delim)
+    public static ReadOnlyMemory<char> Trim(ReadOnlyMemory<char> Input, char Delim)
     {
-        StringPtr Ptr = Input;
+        ReadOnlyMemory<char> Ptr = Input;
         /* Trim start */
         for (int i = 0; i < Ptr.Length; i++)
         {
-            if (Ptr.Data.Span[i] != Delim)
+            if (Ptr.Span[i] != Delim)
             {
-                Ptr = Ptr.Data.Slice(i);
+                Ptr = Ptr.Slice(i);
                 break;
             }
         }
@@ -541,9 +541,9 @@ public static class StringCommon
         /* Trim end */
         for (int i = Ptr.Length - 1; i > -1; i--)
         {
-            if (Ptr.Data.Span[i] != Delim)
+            if (Ptr.Span[i] != Delim)
             {
-                Ptr = Ptr.Data.Slice(0, i + 1);
+                Ptr = Ptr.Slice(0, i + 1);
                 break;
             }
         }
@@ -557,12 +557,12 @@ public static class StringCommon
     /// <param name="Input">The string memory to trim</param>
     /// <param name="Delims">The characters to trim out of the input</param>
     /// <returns></returns>
-    public static ReadOnlyMemory<char> Trim(StringPtr Input, params char[] Delims)
+    public static ReadOnlyMemory<char> Trim(ReadOnlyMemory<char> Input, params char[] Delims)
     {
         if (Delims.Length <= 0) return Input;
 
-        StringPtr Ptr = Input;
-        var span = Ptr.Data.Span;
+        ReadOnlyMemory<char> Ptr = Input;
+        var span = Ptr.Span;
         /* Trim start */
         for (int i = 0; i < Ptr.Length; i++)
         {
@@ -578,7 +578,7 @@ public static class StringCommon
 
             if (!found)
             {
-                Ptr = Ptr.Data.Slice(i);
+                Ptr = Ptr.Slice(i);
                 break;
             }
         }
@@ -598,7 +598,7 @@ public static class StringCommon
 
             if (!found)
             {
-                Ptr = Ptr.Data.Slice(0, i + 1);
+                Ptr = Ptr.Slice(0, i + 1);
                 break;
             }
         }
@@ -612,15 +612,15 @@ public static class StringCommon
     /// <param name="Input">The string memory to trim</param>
     /// <param name="Filter">The filter used to trim characters out of the input</param>
     /// <returns></returns>
-    public static ReadOnlyMemory<char> Trim(StringPtr Input, Filter<char> Filter)
+    public static ReadOnlyMemory<char> Trim(ReadOnlyMemory<char> Input, Filter<char> Filter)
     {
         var Ptr = Input;
         /* Trim start */
         for (int i = 0; i < Ptr.Length; i++)
         {
-            if (Filter.acceptData(Ptr.Data.Span[i]) == EFilterResult.FILTER_ACCEPT)
+            if (Filter.acceptData(Ptr.Span[i]) == EFilterResult.FILTER_ACCEPT)
             {
-                Ptr = Ptr.Data.Slice(i);
+                Ptr = Ptr.Slice(i);
                 break;
             }
         }
@@ -628,9 +628,9 @@ public static class StringCommon
         /* Trim end */
         for (int i = Ptr.Length - 1; i > -1; i--)
         {
-            if (Filter.acceptData(Ptr.Data.Span[i]) == EFilterResult.FILTER_ACCEPT)
+            if (Filter.acceptData(Ptr.Span[i]) == EFilterResult.FILTER_ACCEPT)
             {
-                Ptr = Ptr.Data.Slice(0, i + 1);
+                Ptr = Ptr.Slice(0, i + 1);
                 break;
             }
         }
@@ -644,15 +644,15 @@ public static class StringCommon
     /// <param name="Input">The string memory to trim</param>
     /// <param name="Predicate">The filter used to trim characters out of the input</param>
     /// <returns></returns>
-    public static ReadOnlyMemory<char> Trim(StringPtr Input, Predicate<char> Predicate)
+    public static ReadOnlyMemory<char> Trim(ReadOnlyMemory<char> Input, Predicate<char> Predicate)
     {
         var Ptr = Input;
         /* Trim start */
         for (int i = 0; i < Ptr.Length; i++)
         {
-            if (!Predicate(Ptr.Data.Span[i]))
+            if (!Predicate(Ptr.Span[i]))
             {
-                Ptr = Ptr.Data.Slice(i);
+                Ptr = Ptr.Slice(i);
                 break;
             }
         }
@@ -660,9 +660,9 @@ public static class StringCommon
         /* Trim end */
         for (int i = Ptr.Length - 1; i > -1; i--)
         {
-            if (!Predicate(Ptr.Data.Span[i]))
+            if (!Predicate(Ptr.Span[i]))
             {
-                Ptr = Ptr.Data.Slice(0, i + 1);
+                Ptr = Ptr.Slice(0, i + 1);
                 break;
             }
         }
@@ -678,15 +678,15 @@ public static class StringCommon
     /// <param name="Input">The string memory to trim</param>
     /// <param name="Delim">The character to trim out of the input</param>
     /// <returns></returns>
-    public static ReadOnlyMemory<char> TrimStart(StringPtr Input, char Delim)
+    public static ReadOnlyMemory<char> TrimStart(ReadOnlyMemory<char> Input, char Delim)
     {
         var Ptr = Input;
         /* Trim start */
         for (int i = 0; i < Ptr.Length; i++)
         {
-            if (Ptr.Data.Span[i] != Delim)
+            if (Ptr.Span[i] != Delim)
             {
-                Ptr = Ptr.Data.Slice(i);
+                Ptr = Ptr.Slice(i);
                 break;
             }
         }
@@ -700,12 +700,12 @@ public static class StringCommon
     /// <param name="Input">The string memory to trim</param>
     /// <param name="Delims">The characters to trim out of the input</param>
     /// <returns></returns>
-    public static ReadOnlyMemory<char> TrimStart(StringPtr Input, params char[] Delims)
+    public static ReadOnlyMemory<char> TrimStart(ReadOnlyMemory<char> Input, params char[] Delims)
     {
         if (Delims.Length <= 0) return Input;
 
         var Ptr = Input;
-        var span = Ptr.Data.Span;
+        var span = Ptr.Span;
         /* Trim start */
         for (int i = 0; i < Ptr.Length; i++)
         {
@@ -721,7 +721,7 @@ public static class StringCommon
 
             if (!found)
             {
-                Ptr = Ptr.Data.Slice(i);
+                Ptr = Ptr.Slice(i);
                 break;
             }
         }
@@ -735,15 +735,15 @@ public static class StringCommon
     /// <param name="Input">The string memory to trim</param>
     /// <param name="Filter">The filter used to trim characters out of the input</param>
     /// <returns></returns>
-    public static ReadOnlyMemory<char> TrimStart(StringPtr Input, Filter<char> Filter)
+    public static ReadOnlyMemory<char> TrimStart(ReadOnlyMemory<char> Input, Filter<char> Filter)
     {
         var Ptr = Input;
         /* Trim start */
         for (int i = 0; i < Ptr.Length; i++)
         {
-            if (Filter.acceptData(Ptr.Data.Span[i]) == EFilterResult.FILTER_ACCEPT)
+            if (Filter.acceptData(Ptr.Span[i]) == EFilterResult.FILTER_ACCEPT)
             {
-                Ptr = Ptr.Data.Slice(i);
+                Ptr = Ptr.Slice(i);
                 break;
             }
         }
@@ -757,15 +757,15 @@ public static class StringCommon
     /// <param name="Input">The string memory to trim</param>
     /// <param name="Predicate">The filter used to trim characters out of the input</param>
     /// <returns></returns>
-    public static ReadOnlyMemory<char> TrimStart(StringPtr Input, Predicate<char> Predicate)
+    public static ReadOnlyMemory<char> TrimStart(ReadOnlyMemory<char> Input, Predicate<char> Predicate)
     {
         var Ptr = Input;
         /* Trim start */
         for (int i = 0; i < Ptr.Length; i++)
         {
-            if (!Predicate(Ptr.Data.Span[i]))
+            if (!Predicate(Ptr.Span[i]))
             {
-                Ptr = Ptr.Data.Slice(i);
+                Ptr = Ptr.Slice(i);
                 break;
             }
         }
@@ -781,15 +781,15 @@ public static class StringCommon
     /// <param name="Input">The string memory to trim</param>
     /// <param name="Delim">The character to trim out of the input</param>
     /// <returns></returns>
-    public static ReadOnlyMemory<char> TrimEnd(StringPtr Input, char Delim)
+    public static ReadOnlyMemory<char> TrimEnd(ReadOnlyMemory<char> Input, char Delim)
     {
         var Ptr = Input;
         /* Trim end */
         for (int i = Ptr.Length - 1; i > -1; i--)
         {
-            if (Ptr.Data.Span[i] != Delim)
+            if (Ptr.Span[i] != Delim)
             {
-                Ptr = Ptr.Data.Slice(0, i + 1);
+                Ptr = Ptr.Slice(0, i + 1);
                 break;
             }
         }
@@ -803,7 +803,7 @@ public static class StringCommon
     /// <param name="Input">The string memory to trim</param>
     /// <param name="Delims">The characters to trim out of the input</param>
     /// <returns></returns>
-    public static ReadOnlyMemory<char> TrimEnd(StringPtr Input, params char[] Delims)
+    public static ReadOnlyMemory<char> TrimEnd(ReadOnlyMemory<char> Input, params char[] Delims)
     {
         if (Delims.Length <= 0) return Input;
 
@@ -814,7 +814,7 @@ public static class StringCommon
             bool found = false;
             for (int x = 0; x < Delims.Length; x++)
             {
-                if (Delims[x] == Ptr.Data.Span[i])
+                if (Delims[x] == Ptr.Span[i])
                 {
                     found = true;
                     break;
@@ -823,7 +823,7 @@ public static class StringCommon
 
             if (!found)
             {
-                Ptr = Ptr.Data.Slice(0, i + 1);
+                Ptr = Ptr.Slice(0, i + 1);
                 break;
             }
         }
@@ -837,15 +837,15 @@ public static class StringCommon
     /// <param name="Input">The string memory to trim</param>
     /// <param name="Filter">The filter used to trim characters out of the input</param>
     /// <returns></returns>
-    public static ReadOnlyMemory<char> TrimEnd(StringPtr Input, Filter<char> Filter)
+    public static ReadOnlyMemory<char> TrimEnd(ReadOnlyMemory<char> Input, Filter<char> Filter)
     {
         var Ptr = Input;
         /* Trim end */
         for (int i = Ptr.Length - 1; i > -1; i--)
         {
-            if (Filter.acceptData(Ptr.Data.Span[i]) == EFilterResult.FILTER_ACCEPT)
+            if (Filter.acceptData(Ptr.Span[i]) == EFilterResult.FILTER_ACCEPT)
             {
-                Ptr = Ptr.Data.Slice(0, i + 1);
+                Ptr = Ptr.Slice(0, i + 1);
                 break;
             }
         }
@@ -859,15 +859,15 @@ public static class StringCommon
     /// <param name="Input">The string memory to trim</param>
     /// <param name="Predicate">The filter used to trim characters out of the input</param>
     /// <returns></returns>
-    public static ReadOnlyMemory<char> TrimEnd(StringPtr Input, Predicate<char> Predicate)
+    public static ReadOnlyMemory<char> TrimEnd(ReadOnlyMemory<char> Input, Predicate<char> Predicate)
     {
         var Ptr = Input;
         /* Trim end */
         for (int i = Ptr.Length - 1; i > -1; i--)
         {
-            if (!Predicate(Ptr.Data.Span[i]))
+            if (!Predicate(Ptr.Span[i]))
             {
-                Ptr = Ptr.Data.Slice(0, i + 1);
+                Ptr = Ptr.Slice(0, i + 1);
                 break;
             }
         }
@@ -885,7 +885,7 @@ public static class StringCommon
     /// <param name="Delim">The delimiter(s) that should separate each token</param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ReadOnlyMemory<char>[] Strtok(StringPtr Source, char Delim)
+    public static ReadOnlyMemory<char>[] Strtok(ReadOnlyMemory<char> Source, char Delim)
     {
         return Strtok(Source, new char[1] { Delim });
     }
@@ -897,15 +897,13 @@ public static class StringCommon
     /// <param name="Delims">The delimiter(s) that should separate each token</param>
     /// <returns></returns>
     /// DO NOT INLINE THIS FUNCTION
-    public static ReadOnlyMemory<char>[] Strtok(StringPtr Source, params char[] Delims)
+    public static ReadOnlyMemory<char>[] Strtok(ReadOnlyMemory<char> Source, params char[] Delims)
     {
-        ArgumentNullException.ThrowIfNull(Source);
-        ArgumentNullException.ThrowIfNull(Delims);
         if (Delims.Length == 0) throw new ArgumentException("Delimiters must be non-null and contain one or more characters");
         Contract.EndContractBlock();
 
         // Split the source string into chunks using the given delimiters
-        var AllChunks = _chunkify(Source.AsSpan(), true, Delims);
+        var AllChunks = _chunkify(Source.Span, true, Delims);
 
         // Count non-delimiter chunks first
         int count = 0;
@@ -915,7 +913,6 @@ public static class StringCommon
         }
 
         // Compile the return list of memory segments
-        var Src = Source.AsMemory();
         var RetVal = new ReadOnlyMemory<char>[count];
         int idx = 0;
         for (int i = 0; i < AllChunks.Count; i++)
@@ -923,7 +920,7 @@ public static class StringCommon
             var chunk = AllChunks[i];
             if (!chunk.IsDelimiter)
             {
-                RetVal[idx++] = Src.Slice(chunk.Start, chunk.Size);
+                RetVal[idx++] = Source.Slice(chunk.Start, chunk.Size);
             }
         }
 
@@ -937,14 +934,13 @@ public static class StringCommon
     /// <param name="Filter">The delimiter(s) that should separate each token</param>
     /// <returns></returns>
     /// /// DO NOT INLINE THIS FUNCTION
-    public static ReadOnlyMemory<char>[] Strtok(StringPtr Source, Filter<char>? Filter = null)
+    public static ReadOnlyMemory<char>[] Strtok(ReadOnlyMemory<char> Source, Filter<char>? Filter = null)
     {
-        ArgumentNullException.ThrowIfNull(Source);
         ArgumentNullException.ThrowIfNull(Filter);
         Contract.EndContractBlock();
 
         // Split the source string into chunks using the given delimiters
-        var AllChunks = _chunkify(Source.AsSpan(), true, Filter);
+        var AllChunks = _chunkify(Source.Span, true, Filter);
 
         // Count non-delimiter chunks first
         int count = 0;
@@ -954,7 +950,6 @@ public static class StringCommon
         }
 
         // Compile the return list of memory segments
-        var Src = Source.AsMemory();
         var RetVal = new ReadOnlyMemory<char>[count];
         int idx = 0;
         for (int i = 0; i < AllChunks.Count; i++)
@@ -962,7 +957,7 @@ public static class StringCommon
             var chunk = AllChunks[i];
             if (!chunk.IsDelimiter)
             {
-                RetVal[idx++] = Src.Slice(chunk.Start, chunk.Size);
+                RetVal[idx++] = Source.Slice(chunk.Start, chunk.Size);
             }
         }
 
@@ -983,7 +978,7 @@ public static class StringCommon
     /// <returns>Altered string</returns>
     public static string Replace(ReadOnlyMemory<char> Source, Filter<char> Filter, string Replacement)
     {
-        return Replace(Source.Span, false, false, (Filter, (StringPtr)Replacement));
+        return Replace(Source.Span, false, false, (Filter, Replacement.AsMemory()));
     }
 
     /// <summary>
@@ -995,7 +990,7 @@ public static class StringCommon
     /// <returns>Altered string</returns>
     public static string Replace(ReadOnlySpan<char> Source, Filter<char> Filter, string Replacement)
     {
-        return Replace(Source, false, false, (Filter, (StringPtr)Replacement));
+        return Replace(Source, false, false, (Filter, Replacement.AsMemory()));
     }
 
     /// <summary>
@@ -1005,7 +1000,7 @@ public static class StringCommon
     /// <param name="Trim">If <c>True</c> then leading and trailing ends of the returned string will have the <paramref name="substituteData"/> stripped from them</param>
     /// <param name="Replacements">A series of tuples containing characters to be replaced and the characters which will replace each of them</param>
     /// <returns>Altered string</returns>
-    public static string Replace(ReadOnlySpan<char> Source, bool Trim = false, bool Collapse = false, params ValueTuple<char, StringPtr>[] Replacements)
+    public static string Replace(ReadOnlySpan<char> Source, bool Trim = false, bool Collapse = false, params ValueTuple<char, ReadOnlyMemory<char>>[] Replacements)
     {
         if (Source.IsEmpty) return string.Empty;
         if (Replacements.Length <= 0) return Source.ToString();
@@ -1013,7 +1008,7 @@ public static class StringCommon
 
         // Prepare the arrays needed for the generic chunking functions
         char[] Delimiters = Replacements.Select(o => o.Item1).ToArray();
-        StringPtr[] Substitutions = Replacements.Select(o => o.Item2).ToArray();
+        ReadOnlyMemory<char>[] Substitutions = Replacements.Select(o => o.Item2).ToArray();
 
         // Separate the source memory into chunks using the given predicates
         var Chunks = _chunkify(Source, Collapse, Delimiters);
@@ -1042,7 +1037,7 @@ public static class StringCommon
     /// <param name="Trim">If <c>True</c> then leading and trailing ends of the returned string will have the <paramref name="substituteData"/> stripped from them</param>
     /// <param name="Replacements">A series of tuples containing characters to be replaced and the characters which will replace each of them</param>
     /// <returns>Altered string</returns>
-    public static string Replace(ReadOnlySpan<char> Source, bool Trim = false, bool Collapse = false, params ValueTuple<Predicate<char>, StringPtr>[] Replacements)
+    public static string Replace(ReadOnlySpan<char> Source, bool Trim = false, bool Collapse = false, params ValueTuple<Predicate<char>, ReadOnlyMemory<char>>[] Replacements)
     {
         if (Source.IsEmpty) return string.Empty;
         if (Replacements.Length <= 0) return Source.ToString();
@@ -1050,7 +1045,7 @@ public static class StringCommon
 
         // Prepare the arrays needed for the generic chunking functions
         Predicate<char>[] Predicates = Replacements.Select(o => o.Item1).ToArray();
-        StringPtr[] Substitutions = Replacements.Select(o => o.Item2).ToArray();
+        ReadOnlyMemory<char>[] Substitutions = Replacements.Select(o => o.Item2).ToArray();
 
         // Separate the source memory into chunks using the given predicates
         var Chunks = _chunkify(Source, Collapse, Predicates);
@@ -1079,7 +1074,7 @@ public static class StringCommon
     /// <param name="Trim">If <c>True</c> then leading and trailing ends of the returned string will have the <paramref name="substituteData"/> stripped from them</param>
     /// <param name="Replacements">A series of tuples containing characters to be replaced and the characters which will replace each of them</param>
     /// <returns>Altered string</returns>
-    public static string Replace(ReadOnlySpan<char> Source, bool Trim = false, bool Collapse = false, params ValueTuple<Filter<char>, StringPtr>[] Replacements)
+    public static string Replace(ReadOnlySpan<char> Source, bool Trim = false, bool Collapse = false, params ValueTuple<Filter<char>, ReadOnlyMemory<char>>[] Replacements)
     {
         if (Source.IsEmpty) return string.Empty;
         if (Replacements.Length <= 0) return Source.ToString();
@@ -1087,7 +1082,7 @@ public static class StringCommon
 
         // Prepare the arrays needed for the generic chunking functions
         Filter<char>[] Filters = Replacements.Select(o => o.Item1).ToArray();
-        StringPtr[] Substitutions = Replacements.Select(o => o.Item2).ToArray();
+        ReadOnlyMemory<char>[] Substitutions = Replacements.Select(o => o.Item2).ToArray();
 
         // Separate the source memory into chunks using the given predicates
         var Chunks = _chunkify(Source, Collapse, Filters);
@@ -1641,7 +1636,7 @@ public static class StringCommon
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static int _tally_chunks(List<StringChunk> Chunks, bool Trim, StringPtr[] Substitutions)
+    private static int _tally_chunks(List<StringChunk> Chunks, bool Trim, ReadOnlyMemory<char>[] Substitutions)
     {
         int Length = 0;
 
@@ -1675,7 +1670,7 @@ public static class StringCommon
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void _compile_chunks(ReadOnlySpan<char> Source, List<StringChunk> Chunks, Span<char> Buffer, StringPtr[] Substitutions)
+    private static void _compile_chunks(ReadOnlySpan<char> Source, List<StringChunk> Chunks, Span<char> Buffer, ReadOnlyMemory<char>[] Substitutions)
     {
         int writePos = 0;
 
@@ -1692,7 +1687,7 @@ public static class StringCommon
                     if (Substitution.Length > 0)
                     {
                         // Insert substitute
-                        Substitution.Data.Span.CopyTo(Buffer.Slice(writePos));
+                        Substitution.Span.CopyTo(Buffer.Slice(writePos));
                         writePos += Substitution.Length;
                     }
                 }

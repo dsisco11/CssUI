@@ -17,7 +17,7 @@ public static partial class HTMLParserCommon
     // Week 1 is the 1st week of the year with a Thursday in it.
     public static int GetIso8601WeekOfYear(DateTime time)
     {
-        // Seriously cheat.  If its Monday, Tuesday or Wednesday, then it'll 
+        // Seriously cheat.  If its Monday, Tuesday or Wednesday, then it'll
         // be the same week# as whatever Thursday, Friday or Saturday are,
         // and we always get those right
         DayOfWeek day = CultureInfo.InvariantCulture.Calendar.GetDayOfWeek(time);
@@ -1771,7 +1771,7 @@ public static partial class HTMLParserCommon
             return true;
         }
 
-        string input = StringCommon.Replace(mem.Span, true, false, (FilterUnicodeOOB.Instance, "00"));
+        string input = StringCommon.Replace(mem.Span, true, false, (FilterUnicodeOOB.Instance, "00".AsMemory()));
 
         int startOffset = input[0] == CHAR_HASH ? 1 : 0;
         input = input.Substring(startOffset, Math.Min(input.Length, 128));

@@ -149,42 +149,42 @@ public class StringCommonTests
     [Fact()]
     public void StrtokCharTest()
     {
-        Assert.Equal(new string[] { "A", "B", "C" }, StringCommon.Strtok(" A B C ", UnicodeCommon.CHAR_SPACE).Select(x => x.ToString()).ToArray());
-        Assert.Equal(new string[] { "-1", "2", "3 " }, StringCommon.Strtok("-1,2,3 ", UnicodeCommon.CHAR_COMMA).Select(x => x.ToString()).ToArray());
+        Assert.Equal(new string[] { "A", "B", "C" }, StringCommon.Strtok(" A B C ".AsMemory(), UnicodeCommon.CHAR_SPACE).Select(x => x.ToString()).ToArray());
+        Assert.Equal(new string[] { "-1", "2", "3 " }, StringCommon.Strtok("-1,2,3 ".AsMemory(), UnicodeCommon.CHAR_COMMA).Select(x => x.ToString()).ToArray());
     }
 
     [Fact()]
     public void StrtokCharArrayTest()
     {
-        Assert.Equal(new string[] { "A", "B", "C" }, StringCommon.Strtok(", A ,B C, ", UnicodeCommon.CHAR_SPACE, UnicodeCommon.CHAR_COMMA).Select(x => x.ToString()).ToArray());
+        Assert.Equal(new string[] { "A", "B", "C" }, StringCommon.Strtok(", A ,B C, ".AsMemory(), UnicodeCommon.CHAR_SPACE, UnicodeCommon.CHAR_COMMA).Select(x => x.ToString()).ToArray());
     }
 
     [Fact()]
     public void StrtokDataFilterTest()
     {
-        Assert.Equal(new string[] { "A", "B", "C" }, StringCommon.Strtok(" A B C ", FilterWhitespace.Instance).Select(x => x.ToString()).ToArray());
-        Assert.Equal(new string[] { "A", "B", "C" }, StringCommon.Strtok(" A\r\n B \tC \n\r ", FilterWhitespace.Instance).Select(x => x.ToString()).ToArray());
+        Assert.Equal(new string[] { "A", "B", "C" }, StringCommon.Strtok(" A B C ".AsMemory(), FilterWhitespace.Instance).Select(x => x.ToString()).ToArray());
+        Assert.Equal(new string[] { "A", "B", "C" }, StringCommon.Strtok(" A\r\n B \tC \n\r ".AsMemory(), FilterWhitespace.Instance).Select(x => x.ToString()).ToArray());
     }
 
 
     [Fact()]
     public void ReplaceCharTest()
     {
-        Assert.Equal("A,B,C", StringCommon.Replace("A,  B, C  ", false, true, (' ', "")));
-        Assert.Equal("A, B, C ", StringCommon.Replace("A,  B, C  ", false, true, (' ', " ")));
-        Assert.Equal("A, B, C", StringCommon.Replace("A,  B, C  ", true, true, (' ', " ")));
+        Assert.Equal("A,B,C", StringCommon.Replace("A,  B, C  ", false, true, (' ', "".AsMemory())));
+        Assert.Equal("A, B, C ", StringCommon.Replace("A,  B, C  ", false, true, (' ', " ".AsMemory())));
+        Assert.Equal("A, B, C", StringCommon.Replace("A,  B, C  ", true, true, (' ', " ".AsMemory())));
 
-        Assert.Equal("A,B,C", StringCommon.Replace(" A,  B, C", false, true, (' ', "")));
-        Assert.Equal(" A, B, C", StringCommon.Replace(" A,  B, C", false, true, (' ', " ")));
-        Assert.Equal("A, B, C", StringCommon.Replace(" A,  B, C", true, true, (' ', " ")));
+        Assert.Equal("A,B,C", StringCommon.Replace(" A,  B, C", false, true, (' ', "".AsMemory())));
+        Assert.Equal(" A, B, C", StringCommon.Replace(" A,  B, C", false, true, (' ', " ".AsMemory())));
+        Assert.Equal("A, B, C", StringCommon.Replace(" A,  B, C", true, true, (' ', " ".AsMemory())));
 
-        Assert.Equal("ABC", StringCommon.Replace(" A      B   C  ", false, true, (' ', "")));
-        Assert.Equal(" A B C ", StringCommon.Replace(" A      B   C  ", false, true, (' ', " ")));
-        Assert.Equal("A B C", StringCommon.Replace(" A      B   C  ", true, true, (' ', " ")));
+        Assert.Equal("ABC", StringCommon.Replace(" A      B   C  ", false, true, (' ', "".AsMemory())));
+        Assert.Equal(" A B C ", StringCommon.Replace(" A      B   C  ", false, true, (' ', " ".AsMemory())));
+        Assert.Equal("A B C", StringCommon.Replace(" A      B   C  ", true, true, (' ', " ".AsMemory())));
 
-        Assert.Equal("A,B,C", StringCommon.Replace("A,0B,C0", true, true, ('0', "")));
-        Assert.Equal("A,11B,C", StringCommon.Replace("A,0B,C0", true, true, ('0', "11")));
-        Assert.Equal("A,11B11,C", StringCommon.Replace("0A,0B0,C0", true, true, ('0', "11")));
+        Assert.Equal("A,B,C", StringCommon.Replace("A,0B,C0", true, true, ('0', "".AsMemory())));
+        Assert.Equal("A,11B,C", StringCommon.Replace("A,0B,C0", true, true, ('0', "11".AsMemory())));
+        Assert.Equal("A,11B11,C", StringCommon.Replace("0A,0B0,C0", true, true, ('0', "11".AsMemory())));
     }
 
 
@@ -201,7 +201,7 @@ public class StringCommonTests
     [InlineData("A000B000C", " A    \t\n  B   C  ", true, true, "000")]
     public void ReplacePredicateTest(string Expected, string Input, bool Trim, bool Collapse, string Replacement)
     {
-        string Actual = StringCommon.Replace(Input, Trim, Collapse, (UnicodeCommon.Is_Ascii_Whitespace, Replacement));
+        string Actual = StringCommon.Replace(Input, Trim, Collapse, (UnicodeCommon.Is_Ascii_Whitespace, Replacement.AsMemory()));
         Assert.Equal(Expected, Actual);
     }
 
@@ -219,7 +219,7 @@ public class StringCommonTests
     [InlineData("A000B000C", "A      B   C  ", true, true, "000")]
     public void ReplaceDataFilterTest(string Expected, string Input, bool Trim, bool Collapse, string Replacement)
     {
-        string Actual = StringCommon.Replace(Input, Trim, Collapse, (FilterWhitespace.Instance, Replacement));
+        string Actual = StringCommon.Replace(Input, Trim, Collapse, (FilterWhitespace.Instance, Replacement.AsMemory()));
         Assert.Equal(Expected, Actual);
     }
 

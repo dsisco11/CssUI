@@ -142,7 +142,7 @@ public static class DOMCommon
         return StringCommon.Concat(UnicodeCommon.CHAR_SPACE, set);
     }
 
-    public static IReadOnlyList<ReadOnlyMemory<char>> Parse_Ordered_Set(StringPtr Input)
+    public static IReadOnlyList<ReadOnlyMemory<char>> Parse_Ordered_Set(ReadOnlyMemory<char> Input)
     {
         return StringCommon.Strtok(Input, UnicodeCommon.CHAR_SPACE);
     }
@@ -153,7 +153,7 @@ public static class DOMCommon
         return StringCommon.Concat(UnicodeCommon.CHAR_SPACE, list);
     }
 
-    public static IReadOnlyList<ReadOnlyMemory<char>> Parse_Comma_Seperated_List(StringPtr Input)
+    public static IReadOnlyList<ReadOnlyMemory<char>> Parse_Comma_Seperated_List(ReadOnlyMemory<char> Input)
     {/* Docs: https://infra.spec.whatwg.org/#split-on-commas */
         var Tokens = StringCommon.Strtok(Input, UnicodeCommon.CHAR_COMMA);
         var newList = new ReadOnlyMemory<char>[Tokens.Length];

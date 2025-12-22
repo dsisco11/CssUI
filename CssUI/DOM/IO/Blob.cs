@@ -50,8 +50,8 @@ public class Blob
                         }
 
                         string native_line_ending = StringCommon.Replace(s, false, false,
-                                                                         (UnicodeCommon.CHAR_CARRIAGE_RETURN, CorrectEnding),
-                                                                         (UnicodeCommon.CHAR_LINE_FEED, CorrectEnding));
+                                                                         (UnicodeCommon.CHAR_CARRIAGE_RETURN, CorrectEnding.AsMemory()),
+                                                                         (UnicodeCommon.CHAR_LINE_FEED, CorrectEnding.AsMemory()));
                         var encodedBytes = System.Text.Encoding.UTF8.GetBytes(native_line_ending);
                         Stream.Write(encodedBytes, (int)Stream.Position, encodedBytes.Length);
                     }
