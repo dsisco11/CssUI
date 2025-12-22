@@ -156,14 +156,30 @@ public class Range : AbstractRange, IDisposable
         }
         /* 3) If nodeA is following nodeB, then if the position of (nodeB, offsetB) relative to (nodeA, offsetA) is before, return after, and if it is after, return before. */
         var docPos = nodeB.compareDocumentPosition(nodeA);
-        if (docPos == EDocumentPosition.FOLLOWING)
+        if ((docPos & EDocumentPosition.FOLLOWING) != 0)
         {
-            EBoundaryPosition pos = Get_Boundary_Position(B, A);
-            if (pos == EBoundaryPosition.Before) return EBoundaryPosition.After;
-            else if (pos == EBoundaryPosition.After) return EBoundaryPosition.Before;
+            // Swap and invert: compare B relative to A
+            var swappedDocPos = nodeA.compareDocumentPosition(nodeB);
+            
+            // If nodeB is preceding nodeA (which it should be if nodeA follows nodeB)
+            if ((swappedDocPos & EDocumentPosition.PRECEDING) != 0)
+            {
+                // nodeA follows nodeB, so (A, offsetA) is after (B, offsetB) unless offset comparison changes it
+                // Check if B is an ancestor of A
+                if ((swappedDocPos & EDocumentPosition.CONTAINED_BY) != 0)
+                {
+                    var child = nodeA;
+                    while (!ReferenceEquals(child.parentNode, nodeB))
+                    {
+                        child = child.parentNode;
+                    }
+                    if (offsetB > child.index) return EBoundaryPosition.Before;
+                }
+                return EBoundaryPosition.After;
+            }
         }
         /* 4) If nodeA is an ancestor of nodeB: */
-        if (docPos == EDocumentPosition.CONTAINED_BY)
+        if ((docPos & EDocumentPosition.CONTAINED_BY) != 0)
         {
             var child = nodeB;
             /* 2) While child is not a child of nodeA, set child to its parent. */
