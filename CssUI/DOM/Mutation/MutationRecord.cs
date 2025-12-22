@@ -100,11 +100,33 @@ public class MutationRecord
                 /* 1) Let options be registered’s options. */
                 var options = registered.options;
                 /* 2) If none of the following are true */
-                if (!(!ReferenceEquals(node, Record.target) && !options.subtree)
-                && !(Record.type == EMutationType.Attributes && !options.attributes)
-                && !(Record.type == EMutationType.Attributes && (options.attributeFilter == null || (!options.attributeFilter.Contains("name") && options.attributeFilter.Contains("namespace"))))
-                && !(Record.type == EMutationType.CharacterData && !options.characterData)
-                && !(Record.type == EMutationType.ChildList && !options.childList))
+                /* Per spec:
+                 * - node is not target and options["subtree"] is false
+                 * - type is "attributes" and options["attributes"] either does not exist or is false
+                 * - type is "attributes", options["attributeFilter"] exists, and options["attributeFilter"] does not contain name or namespace is non-null
+                 * - type is "characterData" and options["characterData"] either does not exist or is false
+                 * - type is "childList" and options["childList"] is false
+                 */
+                bool shouldSkip = false;
+
+                // node is not target and options["subtree"] is false
+                if (!ReferenceEquals(node, Record.target) && !options.subtree)
+                    shouldSkip = true;
+                // type is "attributes" and options["attributes"] is false
+                else if (Record.type == EMutationType.Attributes && !options.attributes)
+                    shouldSkip = true;
+                // type is "attributes", options["attributeFilter"] exists, and filter doesn't contain attribute name
+                else if (Record.type == EMutationType.Attributes && options.attributeFilter != null &&
+                         !options.attributeFilter.Contains(Record.attributeName ?? string.Empty))
+                    shouldSkip = true;
+                // type is "characterData" and options["characterData"] is false
+                else if (Record.type == EMutationType.CharacterData && !options.characterData)
+                    shouldSkip = true;
+                // type is "childList" and options["childList"] is false
+                else if (Record.type == EMutationType.ChildList && !options.childList)
+                    shouldSkip = true;
+
+                if (!shouldSkip)
                 {
                     /* 1) Let mo be registered’s observer. */
                     var mo = registered.observer;
