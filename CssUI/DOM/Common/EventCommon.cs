@@ -311,7 +311,7 @@ public static class EventCommon
         /* 2) For each listener in listeners, whose removed is false: */
         foreach (EventListener listener in listeners)
         {
-            if (!listener.removed)
+            if (listener.removed)
                 continue;
 
             if (@event.type != listener.type!)
