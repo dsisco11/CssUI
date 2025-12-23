@@ -120,6 +120,64 @@
   - [ ] max(value1, value2, ...)
   - [ ] clamp(min, preferred, max)
 
+### 7.7 CssParser Missing W3C Spec Algorithms (CSS/Parser/)
+Spec Reference: https://www.w3.org/TR/css-syntax-3/
+
+#### 7.7.1 Parser Entry Points (§5.3)
+- [ ] Parse_Stylesheet with location parameter (§5.3.3)
+  - [ ] Accept optional URL location for stylesheet
+  - [ ] Return stylesheet object with location set
+- [ ] Parse_Style_Block_Contents (§5.3.7)
+  - [ ] Parse contents of style rules allowing nested rules
+  - [ ] Required for CSS Nesting support
+- [ ] Normalize input token stream (§5.3)
+  - [ ] Handle string → token list conversion
+  - [ ] Handle component value list → token list
+
+#### 7.7.2 Parser Algorithms (§5.4)
+- [ ] Consume_Style_Block_Contents (§5.4.4)
+  - [ ] Create declarations list and rules list
+  - [ ] Handle nested at-rules
+  - [ ] Handle nested qualified rules (& selector)
+  - [ ] Different from Consume_Decleration_List - supports nesting
+- [ ] Handle <delim-token> with value "&" for nested selectors
+
+#### 7.7.3 An+B Microsyntax Parsing (§6)
+- [ ] Parse <an+b> type for :nth-child(), :nth-of-type(), etc.
+  - [ ] Parse 'odd' keyword → A=2, B=1
+  - [ ] Parse 'even' keyword → A=2, B=0
+  - [ ] Parse <integer> → A=0, B=value
+  - [ ] Parse <n-dimension> (e.g., 2n, -3n)
+  - [ ] Parse An+B syntax (e.g., 2n+1, -n+6, 3n-2)
+  - [ ] Parse n syntax (e.g., n, -n, +n)
+- [ ] Serialize <an+b> value (§10.1)
+
+#### 7.7.4 Unicode-Range Microsyntax Parsing (§7)
+- [ ] Parse <urange> type for @font-face unicode-range descriptor
+  - [ ] Single codepoint: U+0001
+  - [ ] Range: U+0001-00ff
+  - [ ] Wildcard range: U+00??
+  - [ ] Validate start ≤ end
+  - [ ] Validate ≤ maximum allowed code point (U+10FFFF)
+
+#### 7.7.5 Error Recovery and Parse Errors
+- [ ] Proper parse error reporting infrastructure
+  - [ ] Track parse error locations
+  - [ ] Allow error recovery vs abort modes
+- [ ] Handle <bad-string-token> gracefully
+- [ ] Handle <bad-url-token> gracefully
+- [ ] Handle unmatched <}-token>, <)-token>, <]-token>
+- [ ] Auto-close unclosed constructs at EOF per spec
+
+#### 7.7.6 Production Matching (§8)
+- [ ] Implement <declaration-value> production
+  - [ ] Match any sequence except bad tokens and unmatched brackets
+  - [ ] Exclude top-level semicolons and !
+- [ ] Implement <any-value> production
+  - [ ] Like <declaration-value> but allows semicolons and !
+- [ ] Implement <style-block> production handling
+- [ ] Implement <rule-list> vs <stylesheet> distinction
+
 ### 7.2 Color Serialization in CSS Serializer (CSS/Serialization/)
 - [ ] Implement canonical color serialization per CSS Color 4 spec
   - [ ] sRGB colors serialize as rgb()/rgba()
@@ -128,6 +186,31 @@
 - [ ] Add CssColorHdr → canonical CSS string conversion
 - [ ] Handle currentColor keyword serialization
 - [ ] Handle transparent keyword serialization
+
+### 7.8 CSS Token/Component Value Serialization (CSS/Serialization/)
+Spec Reference: https://www.w3.org/TR/css-syntax-3/#serialization
+
+#### 7.8.1 Core Serialization Requirements (§10)
+- [ ] Round-trip guarantee: parse → serialize → parse = same result
+- [ ] Handle consecutive whitespace tokens (may collapse)
+- [ ] Insert comments between tokens that would otherwise merge
+  - [ ] Build token adjacency table per spec §10
+  - [ ] ident + ident requires separator
+  - [ ] number + ident requires separator
+  - [ ] etc. (see full table in spec)
+
+#### 7.8.2 Token Serialization
+- [ ] Serialize <delim-token> containing \ as \+newline
+- [ ] Serialize <hash-token> with proper type flag handling
+- [ ] Serialize <dimension-token> unit with escaping for scientific notation ambiguity
+- [ ] Serialize all token types to canonical form
+
+#### 7.8.3 Component Value Serialization
+- [ ] Serialize CssFunction to function-name(values)
+- [ ] Serialize CssSimpleBlock with proper brackets
+- [ ] Serialize CssAtRule with prelude and optional block
+- [ ] Serialize CssQualifiedRule with prelude and block
+- [ ] Serialize CssDecleration with name: value; format
 
 ### 7.3 Color Parsing Tests
 - [x] Hex color parsing tests (all formats)
