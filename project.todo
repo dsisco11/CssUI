@@ -143,9 +143,82 @@
   - [x] Tests: 27 tests for named color parsing (CssNamedColorTests.cs)
 
 ### 7.2 Review CSS color parser implementation (CSS/Parser/)
-- [ ] Ensure compliance with CSS Color 4 spec
+- [x] Ensure compliance with CSS Color 4 spec
+  - [x] Fixed: 'none' keyword now correctly rejected in legacy rgb()/hsl() syntax per §4.1.2
 - [ ] Ensure that parsing follows W3C algorithms exactly
+  - [x] Modern vs legacy syntax detection is correct
+  - [x] Legacy syntax enforces all-number or all-percentage for RGB components
+  - [x] Modern syntax allows freely mixing numbers and percentages
+  - [x] HSL saturation clamping to 0 for negative values at parse time
+  - [x] HWB, Lab, LCH, OKLab, OKLCh correctly reject legacy comma syntax
+  - [ ] Consider adding validation for extra tokens after expected components
 - [ ] Ensure that parsing uses the same data types and patterns as the core CssParser
+  - [x] Uses CssToken types consistently (NumberToken, PercentageToken, IdentToken, etc.)
+  - [x] Returns CssColor values consumed by CssParser.Consume_CssValue()
+  - [ ] Note: Uses List<CssToken> with index access vs DataConsumer<CssToken> stream pattern
+    - Architectural difference but functionally correct; consider refactoring for consistency
+- [x] Color space conversions verified against W3C spec matrices (Lab, OKLab, Display-P3, etc.)
+
+### 7.3 CssColorFunctionParser Refactoring (CSS/Parser/Common/)
+Refactor to use DataConsumer<CssToken> for consistency with CssParser.cs patterns.
+
+#### 7.3.1 Infrastructure
+- [ ] Extract shared parsing helpers to CssParsingHelpers.cs
+  - [ ] TryGetNumber(CssToken, out double)
+  - [ ] TryGetPercentage(CssToken, out double)
+  - [ ] TryGetHueValue(CssToken, out double) - handles deg/rad/grad/turn
+  - [ ] TryGetAlphaValue(CssToken, out double)
+  - [ ] TryGetAlphaValueNormalized(CssToken, out double)
+- [ ] Create CreateTokenStream() helper in CssColorFunctionParser.cs
+  - [ ] Filter whitespace from CssFunction.Arguments
+  - [ ] Return DataConsumer<CssToken> for streaming access
+
+#### 7.3.2 RGB Function Refactoring
+- [ ] Refactor TryParseRgb() to use DataConsumer pattern
+  - [ ] Detect legacy (comma) vs modern (space) syntax during consumption
+  - [ ] Add validation for extra tokens after expected components (atEOF check)
+  - [ ] Run tests to validate
+
+#### 7.3.3 HSL Function Refactoring
+- [ ] Refactor TryParseHsl() to use DataConsumer pattern
+  - [ ] Detect legacy vs modern syntax during consumption
+  - [ ] Add extra token validation
+  - [ ] Run tests to validate
+
+#### 7.3.4 HWB Function Refactoring
+- [ ] Refactor TryParseHwb() to use DataConsumer pattern
+  - [ ] Modern syntax only (no comma detection needed)
+  - [ ] Add extra token validation
+  - [ ] Run tests to validate
+
+#### 7.3.5 Lab/LCH Function Refactoring
+- [ ] Refactor TryParseLab() to use DataConsumer pattern
+- [ ] Refactor TryParseLch() to use DataConsumer pattern
+  - [ ] Modern syntax only
+  - [ ] Add extra token validation
+  - [ ] Run tests to validate
+
+#### 7.3.6 OKLab/OKLCh Function Refactoring
+- [ ] Refactor TryParseOklab() to use DataConsumer pattern
+- [ ] Refactor TryParseOklch() to use DataConsumer pattern
+  - [ ] Modern syntax only
+  - [ ] Add extra token validation
+  - [ ] Run tests to validate
+
+#### 7.3.7 color() Function Refactoring
+- [ ] Refactor TryParseColorFunction() to use DataConsumer pattern
+  - [ ] Handle color space identifier
+  - [ ] Add extra token validation
+  - [ ] Run tests to validate
+
+#### 7.3.8 Cleanup
+- [ ] Remove obsolete helpers once all functions migrated
+  - [ ] ExtractMeaningfulTokens()
+  - [ ] ContainsCommas()
+  - [ ] FindSlashIndex()
+- [ ] Add tests for malformed input rejection
+  - [ ] Extra tokens after components
+  - [ ] Invalid token sequences
 
 ### 7.6 Additional CssParser Value Types (CSS/Parser/)
 - [ ] Handle URL token → CssValue (IMAGE/URL)

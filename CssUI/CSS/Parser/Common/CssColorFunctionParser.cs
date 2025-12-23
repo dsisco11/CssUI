@@ -107,7 +107,9 @@ internal static class CssColorFunctionParser
     /// Parses legacy comma-separated rgb()/rgba() syntax.
     /// Legacy syntax: rgb(r, g, b) or rgba(r, g, b, a)
     /// Components must be all numbers (0-255) or all percentages.
+    /// Per CSS Color 4 §4.1.2: the 'none' value is NOT allowed in legacy syntax.
     /// </summary>
+    /// <seealso href="https://www.w3.org/TR/css-color-4/#legacy-color-syntax"/>
     private static bool TryParseRgbLegacy(List<CssToken> tokens, out CssColor color)
     {
         color = CssColor.Transparent;
@@ -117,6 +119,15 @@ internal static class CssColorFunctionParser
         if (tokens.Count < 3 || tokens.Count > 4)
         {
             return false;
+        }
+
+        // Per spec: 'none' keyword is NOT allowed in legacy syntax
+        foreach (var token in tokens)
+        {
+            if (token is IdentToken ident && ident.Value.Equals("none", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
         }
 
         // Determine if we're using percentages or numbers based on first token
@@ -269,7 +280,9 @@ internal static class CssColorFunctionParser
     /// Parses legacy comma-separated hsl()/hsla() syntax.
     /// Legacy syntax: hsl(hue, saturation%, lightness%) or hsla(hue, sat%, light%, alpha)
     /// Saturation and lightness must be percentages in legacy syntax.
+    /// Per CSS Color 4 §4.1.2: the 'none' value is NOT allowed in legacy syntax.
     /// </summary>
+    /// <seealso href="https://www.w3.org/TR/css-color-4/#legacy-color-syntax"/>
     private static bool TryParseHslLegacy(List<CssToken> tokens, out CssColor color)
     {
         color = CssColor.Transparent;
@@ -278,6 +291,15 @@ internal static class CssColorFunctionParser
         if (tokens.Count < 3 || tokens.Count > 4)
         {
             return false;
+        }
+
+        // Per spec: 'none' keyword is NOT allowed in legacy syntax
+        foreach (var token in tokens)
+        {
+            if (token is IdentToken ident && ident.Value.Equals("none", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
         }
 
         // Parse hue (number or angle)
