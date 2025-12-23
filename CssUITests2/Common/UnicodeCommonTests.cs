@@ -484,18 +484,20 @@ public class UnicodeCommonTests
     #region Ascii_Hex_To_Value Exception Tests
 
     [Theory()]
-    [InlineData(CHAR_G_LOWER)]
-    [InlineData(CHAR_Z_UPPER)]
+    [InlineData(CHAR_Z_UPPER)]  // 'Z' = 0x5A = 90, within table bounds but not hex
+    [InlineData(CHAR_SPACE)]    // ' ' = 0x20 = 32, within table bounds but not hex
     public void Ascii_Hex_To_ValueTest_ReturnsInvalidForNonHex(char code)
     {
-        // Non-hex characters return 0xFF (255) from the lookup table
+        // Non-hex characters within table bounds return 0xFF (255) from the lookup table
         Assert.Equal(0xFF, Ascii_Hex_To_Value(code));
     }
 
-    [Fact()]
-    public void Ascii_Hex_To_ValueTest_ThrowsOnOutOfRange()
+    [Theory()]
+    [InlineData(CHAR_G_LOWER)]  // 'g' = 0x67 = 103, beyond table length (103 entries: 0-102)
+    [InlineData('\u0100')]
+    public void Ascii_Hex_To_ValueTest_ThrowsOnOutOfRange(char code)
     {
-        Assert.Throws<IndexOutOfRangeException>(() => Ascii_Hex_To_Value('\u0100'));
+        Assert.Throws<IndexOutOfRangeException>(() => Ascii_Hex_To_Value(code));
     }
 
     #endregion
