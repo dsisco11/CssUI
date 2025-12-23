@@ -17,7 +17,7 @@
 - [ ] Simplification algorithm
 - [ ] Proper serialization
 
-## Test Coverage — Total: 2374 passing, 221 skipped, 19 failing = 2614 tests
+## Test Coverage — Total: 2536 passing, 221 skipped, 19 failing = 2776 tests
 ### DOM Tests: 518 passing, 3 skipped = 521 total
 
 ## Phase 6: CSS Test Coverage
@@ -62,11 +62,13 @@
 - [x] Token iteration behavior tests
 - [x] Lookahead/consume tests
 
-### 6.6 Parser Complex Tokens (CSS/Parser/Complex Tokens/)
-- [ ] CssComponent tests
-- [ ] CssFunction tests
-- [ ] CssDecleration tests
-- [ ] CssSimpleBlock tests
+### 6.6 Parser Complex Tokens (CSS/Parser/Complex Tokens/) ✓
+- [x] CssComponent tests (10 tests)
+- [x] CssFunction tests (27 tests)
+- [x] CssDecleration tests (27 tests)
+- [x] CssSimpleBlock tests (26 tests)
+- [x] CssAtRule tests (42 tests)
+- [x] CssQualifiedRule tests (30 tests)
 
 ## Phase 7: CSS Properties System
 
