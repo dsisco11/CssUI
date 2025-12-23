@@ -5,9 +5,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using CssUI.DOM.Exceptions;
 
-#if ENABLE_HTML
-#endif
-
 namespace CssUI.DOM;
 
 public abstract class AttributeTokenList<T> : IEnumerable<T>, IAttributeTokenList

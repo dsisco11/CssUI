@@ -19,7 +19,6 @@ public class Text : CharacterData, ISlottable
     #endregion
 
     #region Slottable
-#if ENABLE_HTML
     private string _name = string.Empty;
     public string Slot_Name
     {/* Docs: https://dom.spec.whatwg.org/#slotable-name */
@@ -51,7 +50,6 @@ public class Text : CharacterData, ISlottable
 
     /* Docs: https://dom.spec.whatwg.org/#slotable-assigned-slot */
     public ISlot assignedSlot { get; set; } = null;
-#endif
     #endregion
 
     #region CSS

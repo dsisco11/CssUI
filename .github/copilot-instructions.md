@@ -11,17 +11,16 @@ CssUI is a C# CSS rendering engine implementing modern CSS specifications (Flexb
 ## Build & Test Commands
 
 ```bash
-# Build (use "Core - Debug" for headless mode without font system)
-dotnet build CssUI/CssUI.csproj --configuration "Core - Debug"
+# Build
+dotnet build CssUI/CssUI.csproj --configuration "Debug"
 
 # Run tests
-dotnet test CssUITests2/CssUITests.csproj --configuration "Core - Debug"
+dotnet test CssUITests2/CssUITests.csproj --configuration "Debug"
 ```
 
 **Build Configurations:**
 
--   `Core - Debug/Release` — Headless mode, no HTML support
--   `CssUI - Debug/Release` — Full build with HTML support
+-   `Debug/Release` — Standard build configurations
 
 ## Architecture
 

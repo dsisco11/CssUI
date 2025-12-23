@@ -16,11 +16,8 @@ using CssUI.DOM.Geometry;
 using CssUI.DOM.Mutation;
 using CssUI.DOM.Nodes;
 using CssUI.HTTP;
-
-#if ENABLE_HTML
 using CssUI.HTML;
 using CssUI.HTML.CustomElements;
-#endif
 
 namespace CssUI.DOM;
 
@@ -74,7 +71,6 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
     #endregion
 
     #region Custom Element
-#if ENABLE_HTML
     internal readonly Queue<IElementReaction> Custom_Element_Reaction_Queue = new Queue<IElementReaction>();
     /// <summary>
     /// This elements custom element state
@@ -85,7 +81,6 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
     /// </summary>
     public WeakReference<CustomElementDefinition> Definition { get; internal set; } = null;
     internal ElementInternals internals = null;
-#endif
     #endregion
 
     #region Node Overrides
@@ -183,27 +178,19 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
     /// </summary>
     public string? is_value
     {/* Docs: https://dom.spec.whatwg.org/#concept-element-is-value */
-#if ENABLE_HTML
         get => getAttribute(EAttributeName.IS)?.AsString();
         set => setAttribute(EAttributeName.IS, AttributeValue.From(value));
-#else
-        get => string.Empty;
-        set { }
-#endif
     }
 
-#if ENABLE_HTML
     [CEReactions]
     public string? slot
     {/* The slot attribute must reflect the "slot" content attribute. */
         get => getAttribute(EAttributeName.Slot)?.AsString();
         set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Slot, AttributeValue.From(value)));
     }
-#endif
     #endregion
 
     #region Slottable
-#if ENABLE_HTML
     private string _slot_Name = string.Empty;
     /// <summary>
     /// Returns the slot name
@@ -244,7 +231,6 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
 
     /* Docs: https://dom.spec.whatwg.org/#slotable-assigned-slot */
     public ISlot assignedSlot { get; set; } = null;
-#endif
     #endregion
 
     #region INonDocumentTypeChildNode Implementation
@@ -402,7 +388,6 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
                     return true;
             }
 
-#if ENABLE_HTML
             if (this is ILableableElement labelable)
             {
                 CssSelector hoverSelector = new CssSelector(":hover");
@@ -415,7 +400,6 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
                     }
                 }
             }
-#endif
 
             var tree = new TreeWalker(this, ENodeFilterMask.SHOW_ELEMENT);
             var descendant = tree.nextNode();
@@ -473,11 +457,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
     /// </summary>
     internal bool Is_Defined
     {/* Docs: https://dom.spec.whatwg.org/#concept-element-defined */
-#if ENABLE_HTML
         get => CustomElementState == Enums.ECustomElement.Uncustomized || CustomElementState == Enums.ECustomElement.Custom;
-#else
-        get => false;
-#endif
     }
 
     /// <summary>
@@ -486,20 +466,12 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
     /// </summary>
     internal bool isCustom
     {/* Docs: https://dom.spec.whatwg.org/#concept-element-custom */
-#if ENABLE_HTML
         get => CustomElementState == Enums.ECustomElement.Custom;
-#else
-        get => false;
-#endif
     }
 
     internal override bool Is_ShadowHost
     {/* Docs: https://dom.spec.whatwg.org/#element-shadow-host */
-#if ENABLE_HTML
         get => _shadow_root != null;
-#else
-        get => false;
-#endif
     }
 
     /// <summary>
@@ -962,7 +934,6 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
 
     #region Shadow DOM
 
-#if ENABLE_HTML
     private ShadowRoot? _shadow_root = null;
     public ShadowRoot? shadowRoot
     {
@@ -1043,7 +1014,6 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
         return shadow;
 
     }
-#endif
     #endregion
 
     #region ChildNode Implementation

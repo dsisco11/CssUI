@@ -2,9 +2,7 @@ using CssUI.DOM.Events;
 using CssUI.DOM.Internal;
 using CssUI.DOM.Nodes;
 
-#if ENABLE_HTML
 using CssUI.HTML;
-#endif
 
 namespace CssUI.DOM;
 
@@ -50,7 +48,6 @@ internal class FocusableArea
 
         /* This list may be incomplete, there may be other valid focusable areas not accounted for here */
 
-#if ENABLE_HTML
         /* Elements that have their tabindex focus flag set, that are not actually disabled, that are not expressly inert, and that are either being rendered or being used as relevant canvas fallback content. */
         if (target is HTMLElement htmlElement)
         {
@@ -77,7 +74,6 @@ internal class FocusableArea
                 return true;
             }
         }
-#endif
         /* The scrollable regions of elements that are being rendered and are not expressly inert. */
         if (target is ScrollBox scrollbox && scrollbox.Owner.is_being_rendered && !scrollbox.Owner.isExpresslyInert)
         {

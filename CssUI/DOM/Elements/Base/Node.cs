@@ -50,11 +50,7 @@ public abstract class Node : EventTarget, INode
     /// <summary>
     /// Returns whether this node has been assigned a slot
     /// </summary>
-#if ENABLE_HTML
     public bool isAssigned => (this is ISlottable slotable && slotable.assignedSlot != null);
-#else
-    public bool isAssigned => false;
-#endif
     #endregion
 
     #region DOM
@@ -535,11 +531,9 @@ public abstract class Node : EventTarget, INode
     #region Event Stuff
     public override EventTarget? get_the_parent(Event @event)
     {
-#if ENABLE_HTML
         /* A node’s get the parent algorithm, given an event, returns the node’s assigned slot, if node is assigned, and node’s parent otherwise. */
         if (this is ISlottable slottable && slottable.isAssigned)
             return (EventTarget)slottable.assignedSlot;
-#endif
         return parentNode;
     }
     #endregion
@@ -587,11 +581,7 @@ public abstract class Node : EventTarget, INode
     #region Internal Utilitys
     internal virtual bool Is_ShadowHost
     {/* Docs: https://dom.spec.whatwg.org/#element-shadow-host */
-#if ENABLE_HTML
         get => this is Element asElement && asElement.shadowRoot is object;
-#else
-        get => false;
-#endif
     }
 
 
@@ -806,12 +796,10 @@ public abstract class Node : EventTarget, INode
         parent.childNodes.Remove(node);
         /* 10) If node is assigned, then run assign slotables for node’s assigned slot. */
 
-#if ENABLE_HTML
         if (node.isAssigned)
         {
             DOMCommon.Assign_Slottables((node as ISlottable).assignedSlot);
         }
-#endif
         /* 11) If parent’s root is a shadow root, and parent is a slot whose assigned nodes is the empty list, then run signal a slot change for parent. */
         Node parentRoot = parent.getRootNode();
         if (parentRoot is ShadowRoot && parent is ISlot parentSlot && !parentSlot.assignedNodes().Any())
@@ -972,7 +960,6 @@ public abstract class Node : EventTarget, INode
                 /* 2) If inclusiveDescendant is connected, then: */
                 if (inclusiveDescendant.isConnected)
                 {
-#if ENABLE_HTML
                     /* 1) If inclusiveDescendant is custom, then enqueue a custom element callback reaction with inclusiveDescendant, callback name "connectedCallback", and an empty argument list. */
                     if (inclusiveDescendant is Element elem)
                     {
@@ -980,7 +967,6 @@ public abstract class Node : EventTarget, INode
                         /* 2) Otherwise, try to upgrade inclusiveDescendant. */
                         CEReactions.Try_Upgrade_Element(elem);
                     }
-#endif
                 }
             }
         }

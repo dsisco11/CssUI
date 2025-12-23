@@ -11,9 +11,7 @@ using CssUI.DOM.Exceptions;
 using CssUI.DOM.Geometry;
 using CssUI.DOM.Nodes;
 using CssUI.DOM.Traversal;
-#if ENABLE_HTML
 using CssUI.HTML;
-#endif
 
 namespace CssUI.DOM;
 
@@ -67,7 +65,6 @@ public static class DOMCommon
 
     internal static ElementMetadata Lookup_Element_Metadata(AtomicString localName, AtomicString Namespace)
     {
-#if ENABLE_HTML
         if (Namespace.Equals(HTMLNamespace))
         {
             //ElementMetadata outMetadata = HTML.HTMLElementTable.TABLE[(int)localName.EnumValue.Value];
@@ -79,7 +76,6 @@ public static class DOMCommon
 
             return outMetadata;
         }
-#endif
 
         return ElementMetadata.ElementMeta;
     }
@@ -213,7 +209,6 @@ public static class DOMCommon
     #region Slottables
     internal static ISlot? Find_Slot(ISlottable slottable, bool open_flag = false)
     {/* Docs: https://dom.spec.whatwg.org/#find-a-slot */
-#if ENABLE_HTML
         if (slottable.parentNode == null)
             return null;
 
@@ -236,14 +231,12 @@ public static class DOMCommon
             }
             node = tree.nextNode();
         }
-#endif
 
         return null;
     }
 
     internal static List<ISlottable> Find_Slotables(ISlot slot)
     {/* Docs: https://dom.spec.whatwg.org/#find-slotables */
-#if ENABLE_HTML
         var result = new List<ISlottable>();
         var root = (slot as Node).getRootNode();
         if (!(root is ShadowRoot))
@@ -265,14 +258,10 @@ public static class DOMCommon
         }
 
         return result;
-#else
-        return new List<ISlottable>();
-#endif
     }
 
     internal static List<ISlottable> Find_Flattened_Slotables(ISlot slot)
     {/* Docs: https://dom.spec.whatwg.org/#find-flattened-slotables */
-#if ENABLE_HTML
         var result = new List<ISlottable>();
         if (!(slot.getRootNode() is ShadowRoot))
             return result;
@@ -306,21 +295,16 @@ public static class DOMCommon
 
         /* 6) Return result. */
         return result;
-#else
-        return new List<ISlottable>();
-#endif
     }
 
     internal static void Assign_Slottables_For_Tree(Node root)
     {/* Docs: https://dom.spec.whatwg.org/#assign-slotables-for-a-tree */
-#if ENABLE_HTML
         /* To assign slotables for a tree, given a node root, run assign slotables for each slot slot in root’s inclusive descendants, in tree order. */
         var inclusiveDescendants = Get_Inclusive_Descendents(root, FilterSlots.Instance);
         foreach (ISlot descendant in inclusiveDescendants)
         {
             Assign_Slottables(descendant);
         }
-#endif
     }
 
     /// <summary>
@@ -329,7 +313,6 @@ public static class DOMCommon
     /// <param name="slot"></param>
     internal static void Assign_Slottables(ISlot slot)
     {/* Docs: https://dom.spec.whatwg.org/#assign-slotables */
-#if ENABLE_HTML
         var slotables = DOMCommon.Find_Slotables(slot);
 
         bool match = true;
@@ -358,7 +341,6 @@ public static class DOMCommon
         {
             slotable.assignedSlot = slot;
         }
-#endif
     }
 
     /// <summary>
@@ -367,11 +349,9 @@ public static class DOMCommon
     /// <param name="slotable"></param>
     internal static void Assign_A_Slot(ISlottable slotable)
     {/* Docs: https://dom.spec.whatwg.org/#assign-a-slot */
-#if ENABLE_HTML
         var slot = DOMCommon.Find_Slot(slotable);
         if (slot is object)
             DOMCommon.Assign_Slottables(slot);
-#endif
     }
     #endregion
 
@@ -408,10 +388,8 @@ public static class DOMCommon
     {/* Docs: https://dom.spec.whatwg.org/#concept-shadow-including-descendant */
         if (Is_Descendant(A, B))
             return true;
-#if ENABLE_HTML
         if (A.getRootNode() is ShadowRoot aRootShadow && Is_Shadow_Including_Inclusive_Descendant(aRootShadow.Host!, B))
             return true;
-#endif
 
         return false;
     }
@@ -845,7 +823,6 @@ public static class DOMCommon
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static LinkedList<Node> Get_Shadow_Including_Descendents(Node node, NodeFilter? Filter = null, ENodeFilterMask FilterMask = ENodeFilterMask.SHOW_ALL)
     {
-#if ENABLE_HTML
         var list = new LinkedList<Node>();
         TreeWalker tree = new TreeWalker(node, FilterMask, Filter);
         Node? current = tree.nextNode();
@@ -865,9 +842,6 @@ public static class DOMCommon
         }
 
         return list;
-#else
-        return Get_Descendents(node, Filter, FilterMask);
-#endif
     }
 
     /// <summary>
@@ -1971,7 +1945,6 @@ public static class DOMCommon
         {
             output.AddLast(currentObject);
 
-#if ENABLE_HTML
             /* 4) If current object is an area element's shape, append that area element to output. */
             if (currentObject.FocusTarget is HTMLAreaElement area)
             {
@@ -1980,14 +1953,11 @@ public static class DOMCommon
             /* Otherwise) if current object is a focusable area whose DOM anchor is an element that is not current object itself, append that DOM anchor element to output. */
             else
             {
-#endif
                 if (currentObject.DOMAnchor is Element element && !ReferenceEquals(currentObject.DOMAnchor, currentObject.FocusTarget))
                 {
                     output.AddLast(element);
                 }
-#if ENABLE_HTML
             }
-#endif
 
             /* 5) If current object is a Document in a nested browsing context, let current object be its browsing context container, and return to the step labeled loop. */
             if (currentObject.FocusTarget is Document document && document.BrowsingContext is IBrowsingContextContainer)
@@ -2023,7 +1993,6 @@ public static class DOMCommon
     #endregion
 
     #region Form-Associated Elements
-#if ENABLE_HTML
     /// <summary>
     /// Checks if an element is a form-associated custom element.
     /// A form-associated custom element is an autonomous custom element whose definition has form-associated set to true.
@@ -2201,11 +2170,9 @@ public static class DOMCommon
                element is HTML.HTMLSelectElement ||
                element is HTML.HTMLTextAreaElement;
     }
-#endif
     #endregion
 
     #region Editing
-#if ENABLE_HTML
     /// <summary>
     /// Checks if an element is an editing host.
     /// An editing host is an HTML element with contenteditable="true" or "plaintext-only",
@@ -2248,11 +2215,9 @@ public static class DOMCommon
 
         return false;
     }
-#endif
     #endregion
 
     #region Canvas
-#if ENABLE_HTML
     /// <summary>
     /// Checks if an element is being used as relevant canvas fallback content.
     /// An element is being used as canvas fallback content if its nearest canvas element ancestor
@@ -2278,11 +2243,9 @@ public static class DOMCommon
         // For now, return true if we found an ancestor canvas element
         return element.ancestors.OfType<HTML.HTMLCanvasElement>().Any();
     }
-#endif
     #endregion
 
     #region Dialog
-#if ENABLE_HTML
     /// <summary>
     /// Runs the dialog focusing steps for a dialog element.
     /// This focuses the appropriate element within the dialog when it is shown.
@@ -2462,7 +2425,6 @@ public static class DOMCommon
         // - Restore interactivity to previously inert elements
         // - Update accessibility tree
     }
-#endif
     #endregion
 }
 

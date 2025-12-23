@@ -18,9 +18,7 @@ public class ElementMetadata
 
     #region Instances
     public static ElementMetadata ElementMeta = new ElementMetadata(string.Empty, typeof(Element));
-#if ENABLE_HTML
     public static ElementMetadata UnknownMeta = new ElementMetadata(string.Empty, typeof(HTML.HTMLUnknownElement));
-#endif
     #endregion
 
     #region Properties

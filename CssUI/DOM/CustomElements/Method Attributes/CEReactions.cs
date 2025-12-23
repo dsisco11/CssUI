@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using CssUI.DOM.CustomElements;
 using CssUI.DOM.Enums;
-#if ENABLE_HTML
 using CssUI.HTML;
 using CssUI.HTML.CustomElements;
 using CssUI.HTML.Internal;
-#endif
 
 namespace CssUI.DOM;
 
@@ -22,7 +20,6 @@ public class CEReactions : Attribute
 
 
 
-#if ENABLE_HTML
     public static void Upgrade_Element(Element element, ref CustomElementDefinition definition)
     {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#upgrades */
         if (element.isCustom)
@@ -137,12 +134,10 @@ public class CEReactions : Attribute
         element.Custom_Element_Reaction_Queue.Enqueue(reaction);
         element.ownerDocument.defaultView.Reactions.Enqueue_Element(element);
     }
-#endif
 
 
     public static void Enqueue_Reaction(Element element, AtomicName<EReactionName> Reaction, params object?[] Args)
     {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#enqueue-a-custom-element-callback-reaction */
-#if ENABLE_HTML
         if (!element.isCustom)
             return;
         /* 1) Let definition be element's custom element definition. */
@@ -170,7 +165,6 @@ public class CEReactions : Attribute
         element.Custom_Element_Reaction_Queue.Enqueue(new ReactionCallback(callback, Args));
         /* 6) Enqueue an element on the appropriate element queue given element. */
         element.ownerDocument.defaultView.Reactions.Enqueue_Element(element);
-#endif
     }
 
 
@@ -181,12 +175,9 @@ public class CEReactions : Attribute
     /// <param name="element">Element to queue this reaction for</param>
     /// <param name="wrappedMethod">The specifications dictate that for any [CEReaction] attributed method, the original steps given for said method must be encompassed by the callback reaction steps, this method is those original steps</param>
 
-#if ENABLE_HTML
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
     public static void Wrap_CEReaction(Window? window, Action wrappedMethod)
     {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#cereactions */
-#if ENABLE_HTML
         /* 1) Push a new element queue onto this object's relevant agent's custom element reactions stack. */
         window?.Reactions.Stack.Push(new Queue<Element>());
 
@@ -210,9 +201,6 @@ public class CEReactions : Attribute
         {
             System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(exception).Throw();
         }
-#else
-        wrappedMethod.Invoke();
-#endif
     }
 
     /// <summary>
@@ -221,12 +209,9 @@ public class CEReactions : Attribute
     /// <param name="element">Element to queue this reaction for</param>
     /// <param name="wrappedMethod">The specifications dictate that for any [CEReaction] attributed method, the original steps given for said method must be encompassed by the callback reaction steps, this method is those original steps</param>
 
-#if ENABLE_HTML
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
     public static ReturnType? Wrap_CEReaction<ReturnType>(Window? window, Func<ReturnType> wrappedMethod)
     {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#cereactions */
-#if ENABLE_HTML
         /* 1) Push a new element queue onto this object's relevant agent's custom element reactions stack. */
         window?.Reactions.Stack.Push(new Queue<Element>());
 
@@ -254,9 +239,6 @@ public class CEReactions : Attribute
 
         /* 6) If a value value was returned from the original steps, return value. */
         return retValue;
-#else
-        return wrappedMethod.Invoke();
-#endif
     }
 }
 

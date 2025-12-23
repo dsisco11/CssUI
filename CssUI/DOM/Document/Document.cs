@@ -16,9 +16,7 @@ using CssUI.DOM.Nodes;
 using CssUI.HTTP;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-#if ENABLE_HTML
 using CssUI.HTML;
-#endif
 
 namespace CssUI.DOM;
 
@@ -154,10 +152,8 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
         }
     }
 
-#if ENABLE_HTML
     /* XXX: */
     public LinkedList<HTMLImageElement> Images = new LinkedList<HTMLImageElement>();
-#endif
 
     private ConcurrentDictionary<KeyCombination, Action> KeyCommands = new ConcurrentDictionary<KeyCombination, Action>();
     #endregion
@@ -298,17 +294,10 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     /// The root CssUI element
     /// </summary>
     /* The body element of a document is the first of the html element's children that is either a body element or a frameset element, or null if there is no such element. */
-#if ENABLE_HTML
     public HTMLElement? body
     {
         get => DOMCommon.Get_Nth_Child<HTMLBodyElement>(documentElement!, 1);
     }
-#else
-    public Element? body
-    {
-        get => DOMCommon.Get_Nth_Child<Element>(documentElement!, 1);
-    }
-#endif
 
 
     /// <summary>

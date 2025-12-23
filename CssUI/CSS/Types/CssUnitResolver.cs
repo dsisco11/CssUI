@@ -134,12 +134,8 @@ public class CssUnitResolver
 
                         }
                     }
-#if DISABLE_FONT_SYSTEM
-                    return 1;
-#else 
                     // Em size is based on the computed font size
                     return Owner.Style.FontSize;
-#endif
                 }
             case ECssUnit.EX:
                 {
@@ -174,14 +170,11 @@ public class CssUnitResolver
                         }
                     }
 
-#if DISABLE_FONT_SYSTEM
-#else
                     if (!Owner.Style.Font.IsNull)
                     {
                         // XXX: implement logic to measure the 'x' height for our font. SEE: https://www.w3.org/TR/css-values-3/#font-relative-lengths
                         throw new NotImplementedException();
                     }
-#endif
                     /*
                      * CSS Specs:
                      * In the cases where it is impossible or impractical to determine the x-height, a value of 0.5em should be used.

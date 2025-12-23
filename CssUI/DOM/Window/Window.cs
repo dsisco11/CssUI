@@ -13,9 +13,7 @@ using CssUI.DOM.Internal;
 using CssUI.DOM.Mutation;
 using CssUI.DOM.Nodes;
 
-#if ENABLE_HTML
 using CssUI.HTML.CustomElements;
-#endif
 
 namespace CssUI.DOM;
 
@@ -33,9 +31,7 @@ public abstract partial class Window : BrowsingContext
     internal BrowsingContext? BrowsingContext => document?.BrowsingContext;
     internal override Window WindowProxy { get => this; }
 
-#if ENABLE_HTML
     internal readonly ElementReactionStack Reactions;
-#endif
     #endregion
 
     #region Properties
@@ -51,9 +47,7 @@ public abstract partial class Window : BrowsingContext
     /// </summary>
     public readonly VisualViewport visualViewport = null!;
     public readonly Screen screen = null!;
-#if ENABLE_HTML
     public readonly CustomElementRegistry customElements = null!;
-#endif
     #endregion
 
     #region Devices
@@ -74,10 +68,8 @@ public abstract partial class Window : BrowsingContext
     private Window() : base()
     {
         visualViewport = new VisualViewport(this);
-#if ENABLE_HTML
         Reactions = new ElementReactionStack(this);
         customElements = new CustomElementRegistry(this);
-#endif
     }
 
     public Window(Screen screen, string DocumentName) : this()

@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using CssUI.DOM.Enums;
-#if ENABLE_HTML
 using CssUI.HTML;
-#endif
 
 namespace CssUI.DOM;
 
@@ -55,7 +53,6 @@ public static class DomDefinitions
             new AttributeDefinition(EAttributeName.AccessKey, EAttributeType.KeyCombo, null, null, EAttributeFlags.None),
             
             /* HTML Element Attributes */
-#if ENABLE_HTML
             new AttributeDefinition(EAttributeName.Lang, EAttributeType.String, null, null, EAttributeFlags.None),
             new AttributeDefinition(EAttributeName.Translate, EAttributeType.Boolean, null, null, EAttributeFlags.None),
             new AttributeDefinition(EAttributeName.Nonce, EAttributeType.String, null, null, EAttributeFlags.None),
@@ -177,7 +174,6 @@ public static class DomDefinitions
             new AttributeDefinition(EAttributeName.Shape, EAttributeType.Enumerated, AttributeValue.From(EAreaShape.Rectangle), AttributeValue.From(EAreaShape.Rectangle), EAttributeFlags.None, Lookup.Get_Keywords<EAreaShape>()),
             new AttributeDefinition(EAttributeName.Coords, EAttributeType.String, null, null, EAttributeFlags.None),
 
-#endif
         };
     }
 }
