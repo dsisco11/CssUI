@@ -259,48 +259,73 @@ internal static class CssParsingHelpers
     #region Token Stream Creation
 
     /// <summary>
-    /// Creates a token stream from a list of CSS tokens, filtering out whitespace.
-    /// Returns a <see cref="DataConsumer{T}"/> for streaming access to meaningful tokens.
+    /// Creates a token stream (DataConsumer) directly from a list of CSS tokens.
+    /// The stream includes all tokens including whitespace - use <see cref="SkipWhitespace"/>
+    /// to advance past whitespace during consumption.
     /// </summary>
     /// <param name="tokens">The original token list.</param>
-    /// <returns>A DataConsumer stream of non-whitespace tokens.</returns>
+    /// <returns>A DataConsumer wrapping the token array.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DataConsumer<CssToken> CreateTokenStream(List<CssToken> tokens)
     {
-        // Pre-allocate with estimated capacity (most tokens aren't whitespace)
-        var meaningful = new List<CssToken>(tokens.Count);
-        
-        foreach (var token in tokens)
-        {
-            if (token.Type != ECssTokenType.Whitespace)
-            {
-                meaningful.Add(token);
-            }
-        }
-        
-        return new DataConsumer<CssToken>(meaningful.ToArray());
+        return new DataConsumer<CssToken>(tokens.ToArray());
     }
 
     /// <summary>
-    /// Creates a token stream from a list of CSS tokens, filtering out whitespace and commas.
-    /// Useful for parsing color function arguments where commas are syntax separators.
-    /// Returns a <see cref="DataConsumer{T}"/> for streaming access to meaningful tokens.
+    /// Skips whitespace tokens in the stream, advancing until the next token is not whitespace.
+    /// Call this before consuming meaningful tokens.
     /// </summary>
-    /// <param name="tokens">The original token list.</param>
-    /// <returns>A DataConsumer stream of meaningful tokens (no whitespace or commas).</returns>
-    public static DataConsumer<CssToken> CreateTokenStreamNoCommas(List<CssToken> tokens)
+    /// <param name="stream">The token stream.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void SkipWhitespace(DataConsumer<CssToken> stream)
     {
-        // Pre-allocate with estimated capacity
-        var meaningful = new List<CssToken>(tokens.Count);
-        
-        foreach (var token in tokens)
+        while (stream.Next != null && stream.Next.Type == ECssTokenType.Whitespace)
         {
-            if (token.Type != ECssTokenType.Whitespace && token.Type != ECssTokenType.Comma)
-            {
-                meaningful.Add(token);
-            }
+            stream.Consume();
         }
-        
-        return new DataConsumer<CssToken>(meaningful.ToArray());
+    }
+
+    /// <summary>
+    /// Consumes and returns the next non-whitespace token from the stream.
+    /// Returns null if the stream is exhausted.
+    /// </summary>
+    /// <param name="stream">The token stream.</param>
+    /// <returns>The next non-whitespace token, or null if at end.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static CssToken? ConsumeNonWhitespace(DataConsumer<CssToken> stream)
+    {
+        SkipWhitespace(stream);
+        return stream.atEOF ? null : stream.Consume();
+    }
+
+    /// <summary>
+    /// Peeks at the next non-whitespace token without consuming it.
+    /// Returns null if no more non-whitespace tokens exist.
+    /// </summary>
+    /// <param name="stream">The token stream.</param>
+    /// <returns>The next non-whitespace token, or null if at end.</returns>
+    public static CssToken? PeekNonWhitespace(DataConsumer<CssToken> stream)
+    {
+        // We need to skip whitespace to peek, but DataConsumer doesn't support
+        // non-destructive lookahead past whitespace, so we use the position
+        int savedPos = stream.Position;
+        SkipWhitespace(stream);
+        var result = stream.Next;
+        // Note: We can't restore position in DataConsumer, so this advances past whitespace
+        // This is acceptable as whitespace is not meaningful
+        return result;
+    }
+
+    /// <summary>
+    /// Checks if the stream has reached the end (no more non-whitespace tokens).
+    /// </summary>
+    /// <param name="stream">The token stream.</param>
+    /// <returns>True if no more non-whitespace tokens remain.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsAtEnd(DataConsumer<CssToken> stream)
+    {
+        SkipWhitespace(stream);
+        return stream.atEOF;
     }
 
     /// <summary>

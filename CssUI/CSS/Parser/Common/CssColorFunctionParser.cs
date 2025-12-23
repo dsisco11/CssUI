@@ -26,81 +26,73 @@ internal static class CssColorFunctionParser
         ArgumentNullException.ThrowIfNull(function);
 
         color = CssColor.Transparent;
+        var arguments = function.Arguments;
+
+        // Pre-check for legacy syntax (comma-separated) vs modern syntax (space-separated)
+        bool isLegacySyntax = ContainsCommas(arguments);
+
+        // Create the token stream once for all parsing
+        var stream = CssParsingHelpers.CreateTokenStream(arguments);
+        if (CssParsingHelpers.IsAtEnd(stream))
+        {
+            return false;
+        }
 
         // Check function name (case-insensitive)
         var name = function.Name;
         if (name.Equals("rgb", StringComparison.OrdinalIgnoreCase) ||
             name.Equals("rgba", StringComparison.OrdinalIgnoreCase))
         {
-            return TryParseRgb(function.Arguments, out color);
+            return isLegacySyntax
+                ? TryParseRgbLegacy(stream, out color)
+                : TryParseRgbModern(stream, out color);
         }
 
         if (name.Equals("hsl", StringComparison.OrdinalIgnoreCase) ||
             name.Equals("hsla", StringComparison.OrdinalIgnoreCase))
         {
-            return TryParseHsl(function.Arguments, out color);
+            return isLegacySyntax
+                ? TryParseHslLegacy(stream, out color)
+                : TryParseHslModern(stream, out color);
+        }
+
+        // Modern-only functions reject legacy comma syntax
+        if (isLegacySyntax)
+        {
+            return false; // hwb, lab, lch, oklab, oklch, color() do not support comma syntax
         }
 
         if (name.Equals("hwb", StringComparison.OrdinalIgnoreCase))
         {
-            return TryParseHwb(function.Arguments, out color);
+            return TryParseHwb(stream, out color);
         }
 
         if (name.Equals("lab", StringComparison.OrdinalIgnoreCase))
         {
-            return TryParseLab(function.Arguments, out color);
+            return TryParseLab(stream, out color);
         }
 
         if (name.Equals("lch", StringComparison.OrdinalIgnoreCase))
         {
-            return TryParseLch(function.Arguments, out color);
+            return TryParseLch(stream, out color);
         }
 
         if (name.Equals("oklab", StringComparison.OrdinalIgnoreCase))
         {
-            return TryParseOklab(function.Arguments, out color);
+            return TryParseOklab(stream, out color);
         }
 
         if (name.Equals("oklch", StringComparison.OrdinalIgnoreCase))
         {
-            return TryParseOklch(function.Arguments, out color);
+            return TryParseOklch(stream, out color);
         }
 
         if (name.Equals("color", StringComparison.OrdinalIgnoreCase))
         {
-            return TryParseColorFunction(function.Arguments, out color);
+            return TryParseColorFunction(stream, out color);
         }
 
         return false;
-    }
-
-    /// <summary>
-    /// Parses rgb() and rgba() color functions.
-    /// Supports both legacy (comma-separated) and modern (space-separated) syntax.
-    /// </summary>
-    /// <seealso href="https://www.w3.org/TR/css-color-4/#rgb-functions"/>
-    private static bool TryParseRgb(List<CssToken> arguments, out CssColor color)
-    {
-        color = CssColor.Transparent;
-
-        // Create streaming token consumer (filters whitespace)
-        var stream = CssParsingHelpers.CreateTokenStream(arguments);
-        if (stream.atEnd)
-        {
-            return false;
-        }
-
-        // Detect syntax type: legacy uses commas, modern uses spaces
-        bool isLegacySyntax = ContainsCommas(arguments);
-
-        if (isLegacySyntax)
-        {
-            return TryParseRgbLegacy(stream, out color);
-        }
-        else
-        {
-            return TryParseRgbModern(stream, out color);
-        }
     }
 
     /// <summary>
@@ -114,13 +106,14 @@ internal static class CssColorFunctionParser
     {
         color = CssColor.Transparent;
 
-        // Collect all meaningful tokens to check count
-        var tokens = new List<CssToken>();
-        while (!stream.atEnd)
+        // Collect meaningful tokens (skip whitespace and commas) to validate type consistency
+        // Legacy syntax requires validation that all RGB components use same type
+        var tokens = new List<CssToken>(4);
+        while (!CssParsingHelpers.IsAtEnd(stream))
         {
             var token = stream.Consume();
-            // Skip commas in legacy syntax (already filtered whitespace in CreateTokenStream)
-            if (token.Type == ECssTokenType.Comma)
+            // Skip whitespace and commas - commas are separators in legacy syntax
+            if (token.Type == ECssTokenType.Whitespace || token.Type == ECssTokenType.Comma)
             {
                 continue;
             }
@@ -136,7 +129,7 @@ internal static class CssColorFunctionParser
         // Per spec: 'none' keyword is NOT allowed in legacy syntax
         foreach (var token in tokens)
         {
-            if (token is IdentToken ident && ident.Value.Equals("none", StringComparison.OrdinalIgnoreCase))
+            if (CssParsingHelpers.IsNoneKeyword(token))
             {
                 return false;
             }
@@ -211,38 +204,37 @@ internal static class CssColorFunctionParser
         color = CssColor.Transparent;
 
         // Modern syntax: at least 3 components, optionally alpha after '/'
-        if (stream.atEnd)
-        {
-            return false;
-        }
-
         // Parse R component
-        if (!TryGetRgbComponent(stream.Consume(), out double r))
+        var rToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (rToken == null || !TryGetRgbComponent(rToken, out double r))
         {
             return false;
         }
 
         // Parse G component
-        if (stream.atEnd || !TryGetRgbComponent(stream.Consume(), out double g))
+        var gToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (gToken == null || !TryGetRgbComponent(gToken, out double g))
         {
             return false;
         }
 
         // Parse B component
-        if (stream.atEnd || !TryGetRgbComponent(stream.Consume(), out double b))
+        var bToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (bToken == null || !TryGetRgbComponent(bToken, out double b))
         {
             return false;
         }
 
         // Parse alpha if present (after the slash)
         double a = BYTE_MAX; // Default to fully opaque
-        if (!stream.atEnd)
+        var nextToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (nextToken != null)
         {
-            var next = stream.Consume();
-            if (next is DelimToken delim && delim.Value == '/')
+            if (CssParsingHelpers.IsSlash(nextToken))
             {
                 // Alpha value expected after slash
-                if (stream.atEnd || !TryGetAlphaValue(stream.Consume(), out a))
+                var alphaToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+                if (alphaToken == null || !TryGetAlphaValue(alphaToken, out a))
                 {
                     return false;
                 }
@@ -255,7 +247,7 @@ internal static class CssColorFunctionParser
         }
 
         // Verify no extra tokens remain
-        if (!stream.atEnd)
+        if (!CssParsingHelpers.IsAtEnd(stream))
         {
             return false;
         }
@@ -265,35 +257,6 @@ internal static class CssColorFunctionParser
     }
 
     #region HSL Parsing
-
-    /// <summary>
-    /// Parses hsl() and hsla() color functions.
-    /// Supports both legacy (comma-separated) and modern (space-separated) syntax.
-    /// </summary>
-    /// <seealso href="https://www.w3.org/TR/css-color-4/#the-hsl-notation"/>
-    private static bool TryParseHsl(List<CssToken> arguments, out CssColor color)
-    {
-        color = CssColor.Transparent;
-
-        // Create token stream from arguments (filters whitespace)
-        var stream = CssParsingHelpers.CreateTokenStream(arguments);
-        if (stream.atEnd)
-        {
-            return false;
-        }
-
-        // Detect syntax type: legacy uses commas, modern uses spaces
-        bool isLegacySyntax = ContainsCommas(arguments);
-
-        if (isLegacySyntax)
-        {
-            return TryParseHslLegacy(stream, out color);
-        }
-        else
-        {
-            return TryParseHslModern(stream, out color);
-        }
-    }
 
     /// <summary>
     /// Parses legacy comma-separated hsl()/hsla() syntax.
@@ -306,15 +269,17 @@ internal static class CssColorFunctionParser
     {
         color = CssColor.Transparent;
 
-        // Collect all non-comma tokens for validation
-        var tokens = new List<CssToken>();
-        while (!stream.atEnd)
+        // Collect meaningful tokens (skip whitespace and commas) for validation
+        var tokens = new List<CssToken>(4);
+        while (!CssParsingHelpers.IsAtEnd(stream))
         {
             var token = stream.Consume();
-            if (token is not CommaToken)
+            // Skip whitespace and commas - commas are separators in legacy syntax
+            if (token.Type == ECssTokenType.Whitespace || token.Type == ECssTokenType.Comma)
             {
-                tokens.Add(token);
+                continue;
             }
+            tokens.Add(token);
         }
 
         // Legacy syntax requires 3 or 4 values separated by commas
@@ -326,7 +291,7 @@ internal static class CssColorFunctionParser
         // Per spec: 'none' keyword is NOT allowed in legacy syntax
         foreach (var token in tokens)
         {
-            if (token is IdentToken ident && ident.Value.Equals("none", StringComparison.OrdinalIgnoreCase))
+            if (CssParsingHelpers.IsNoneKeyword(token))
             {
                 return false;
             }
@@ -378,25 +343,23 @@ internal static class CssColorFunctionParser
         color = CssColor.Transparent;
 
         // Modern syntax: at least 3 components, optionally alpha after '/'
-        if (stream.atEnd)
-        {
-            return false;
-        }
-
         // Parse hue (number or angle)
-        if (!TryGetHueValue(stream.Consume(), out double hue))
+        var hueToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (hueToken == null || !TryGetHueValue(hueToken, out double hue))
         {
             return false;
         }
 
         // Parse saturation (percentage or number, where number is treated as percentage)
-        if (stream.atEnd || !TryGetSaturationOrLightness(stream.Consume(), out double saturation))
+        var satToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (satToken == null || !TryGetSaturationOrLightness(satToken, out double saturation))
         {
             return false;
         }
 
         // Parse lightness (percentage or number, where number is treated as percentage)
-        if (stream.atEnd || !TryGetSaturationOrLightness(stream.Consume(), out double lightness))
+        var lightToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (lightToken == null || !TryGetSaturationOrLightness(lightToken, out double lightness))
         {
             return false;
         }
@@ -406,13 +369,14 @@ internal static class CssColorFunctionParser
 
         // Parse alpha if present (after the slash)
         double alpha = 1.0; // Default to fully opaque
-        if (!stream.atEnd)
+        var nextToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (nextToken != null)
         {
-            var next = stream.Consume();
-            if (next is DelimToken delim && delim.Value == '/')
+            if (CssParsingHelpers.IsSlash(nextToken))
             {
                 // Alpha value expected after slash
-                if (stream.atEnd || !TryGetAlphaValueNormalized(stream.Consume(), out alpha))
+                var alphaToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+                if (alphaToken == null || !TryGetAlphaValueNormalized(alphaToken, out alpha))
                 {
                     return false;
                 }
@@ -425,7 +389,7 @@ internal static class CssColorFunctionParser
         }
 
         // Verify no extra tokens remain
-        if (!stream.atEnd)
+        if (!CssParsingHelpers.IsAtEnd(stream))
         {
             return false;
         }
@@ -557,51 +521,41 @@ internal static class CssColorFunctionParser
     /// HWB only supports modern (space-separated) syntax - no legacy comma syntax.
     /// </summary>
     /// <seealso href="https://www.w3.org/TR/css-color-4/#the-hwb-notation"/>
-    private static bool TryParseHwb(List<CssToken> arguments, out CssColor color)
+    private static bool TryParseHwb(DataConsumer<CssToken> stream, out CssColor color)
     {
         color = CssColor.Transparent;
 
-        // HWB does NOT support legacy comma syntax per spec
-        // "Using commas inside hwb() is an error."
-        if (ContainsCommas(arguments))
-        {
-            return false;
-        }
-
-        // Create token stream from arguments (filters whitespace)
-        var stream = CssParsingHelpers.CreateTokenStream(arguments);
-        if (stream.atEnd)
-        {
-            return false;
-        }
-
         // Parse hue (number or angle) - same as HSL
-        if (!TryGetHueValue(stream.Consume(), out double hue))
+        var hueToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (hueToken == null || !TryGetHueValue(hueToken, out double hue))
         {
             return false;
         }
 
         // Parse whiteness (percentage or number, where number is treated as percentage)
-        if (stream.atEnd || !TryGetWhitenessOrBlackness(stream.Consume(), out double whiteness))
+        var whiteToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (whiteToken == null || !TryGetWhitenessOrBlackness(whiteToken, out double whiteness))
         {
             return false;
         }
 
         // Parse blackness (percentage or number, where number is treated as percentage)
-        if (stream.atEnd || !TryGetWhitenessOrBlackness(stream.Consume(), out double blackness))
+        var blackToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (blackToken == null || !TryGetWhitenessOrBlackness(blackToken, out double blackness))
         {
             return false;
         }
 
         // Parse alpha if present (after the slash)
         double alpha = 1.0; // Default to fully opaque
-        if (!stream.atEnd)
+        var nextToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (nextToken != null)
         {
-            var next = stream.Consume();
-            if (next is DelimToken delim && delim.Value == '/')
+            if (CssParsingHelpers.IsSlash(nextToken))
             {
                 // Alpha value expected after slash
-                if (stream.atEnd || !TryGetAlphaValueNormalized(stream.Consume(), out alpha))
+                var alphaToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+                if (alphaToken == null || !TryGetAlphaValueNormalized(alphaToken, out alpha))
                 {
                     return false;
                 }
@@ -614,7 +568,7 @@ internal static class CssColorFunctionParser
         }
 
         // Verify no extra tokens remain
-        if (!stream.atEnd)
+        if (!CssParsingHelpers.IsAtEnd(stream))
         {
             return false;
         }
@@ -731,51 +685,41 @@ internal static class CssColorFunctionParser
     /// Lab only supports modern (space-separated) syntax - no legacy comma syntax.
     /// </summary>
     /// <seealso href="https://www.w3.org/TR/css-color-4/#specifying-lab-lch"/>
-    private static bool TryParseLab(List<CssToken> arguments, out CssColor color)
+    private static bool TryParseLab(DataConsumer<CssToken> stream, out CssColor color)
     {
         color = CssColor.Transparent;
 
-        // Lab does NOT support legacy comma syntax per spec
-        // "Using commas inside lab() is an error."
-        if (ContainsCommas(arguments))
-        {
-            return false;
-        }
-
-        // Create token stream from arguments (filters whitespace)
-        var stream = CssParsingHelpers.CreateTokenStream(arguments);
-        if (stream.atEnd)
-        {
-            return false;
-        }
-
         // Parse L (Lightness) - 0-100 or 0%-100%, clamped to [0,100]
-        if (!TryGetLabLightness(stream.Consume(), out double lightness))
+        var lToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (lToken == null || !TryGetLabLightness(lToken, out double lightness))
         {
             return false;
         }
 
         // Parse a - signed value, percentage maps to [-125, 125]
-        if (stream.atEnd || !TryGetLabAB(stream.Consume(), out double a))
+        var aToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (aToken == null || !TryGetLabAB(aToken, out double a))
         {
             return false;
         }
 
         // Parse b - signed value, percentage maps to [-125, 125]
-        if (stream.atEnd || !TryGetLabAB(stream.Consume(), out double b))
+        var bToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (bToken == null || !TryGetLabAB(bToken, out double b))
         {
             return false;
         }
 
         // Parse alpha if present (after the slash)
         double alpha = 1.0;
-        if (!stream.atEnd)
+        var nextToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (nextToken != null)
         {
-            var next = stream.Consume();
-            if (next is DelimToken delim && delim.Value == '/')
+            if (CssParsingHelpers.IsSlash(nextToken))
             {
                 // Alpha value expected after slash
-                if (stream.atEnd || !TryGetAlphaValueNormalized(stream.Consume(), out alpha))
+                var alphaToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+                if (alphaToken == null || !TryGetAlphaValueNormalized(alphaToken, out alpha))
                 {
                     return false;
                 }
@@ -788,7 +732,7 @@ internal static class CssColorFunctionParser
         }
 
         // Verify no extra tokens remain
-        if (!stream.atEnd)
+        if (!CssParsingHelpers.IsAtEnd(stream))
         {
             return false;
         }
@@ -802,51 +746,41 @@ internal static class CssColorFunctionParser
     /// LCH only supports modern (space-separated) syntax - no legacy comma syntax.
     /// </summary>
     /// <seealso href="https://www.w3.org/TR/css-color-4/#specifying-lab-lch"/>
-    private static bool TryParseLch(List<CssToken> arguments, out CssColor color)
+    private static bool TryParseLch(DataConsumer<CssToken> stream, out CssColor color)
     {
         color = CssColor.Transparent;
 
-        // LCH does NOT support legacy comma syntax per spec
-        // "Using commas inside lch() is an error."
-        if (ContainsCommas(arguments))
-        {
-            return false;
-        }
-
-        // Create token stream from arguments (filters whitespace)
-        var stream = CssParsingHelpers.CreateTokenStream(arguments);
-        if (stream.atEnd)
-        {
-            return false;
-        }
-
         // Parse L (Lightness) - 0-100 or 0%-100%, clamped to [0,100]
-        if (!TryGetLabLightness(stream.Consume(), out double lightness))
+        var lToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (lToken == null || !TryGetLabLightness(lToken, out double lightness))
         {
             return false;
         }
 
         // Parse C (Chroma) - >= 0, percentage maps to [0, 150], clamped to >= 0
-        if (stream.atEnd || !TryGetLchChroma(stream.Consume(), out double chroma))
+        var cToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (cToken == null || !TryGetLchChroma(cToken, out double chroma))
         {
             return false;
         }
 
         // Parse H (Hue) - same as HSL/HWB
-        if (stream.atEnd || !TryGetHueValue(stream.Consume(), out double hue))
+        var hToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (hToken == null || !TryGetHueValue(hToken, out double hue))
         {
             return false;
         }
 
         // Parse alpha if present (after the slash)
         double alpha = 1.0;
-        if (!stream.atEnd)
+        var nextToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (nextToken != null)
         {
-            var next = stream.Consume();
-            if (next is DelimToken delim && delim.Value == '/')
+            if (CssParsingHelpers.IsSlash(nextToken))
             {
                 // Alpha value expected after slash
-                if (stream.atEnd || !TryGetAlphaValueNormalized(stream.Consume(), out alpha))
+                var alphaToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+                if (alphaToken == null || !TryGetAlphaValueNormalized(alphaToken, out alpha))
                 {
                     return false;
                 }
@@ -859,7 +793,7 @@ internal static class CssColorFunctionParser
         }
 
         // Verify no extra tokens remain
-        if (!stream.atEnd)
+        if (!CssParsingHelpers.IsAtEnd(stream))
         {
             return false;
         }
@@ -1172,51 +1106,41 @@ internal static class CssColorFunctionParser
     /// OKLab only supports modern (space-separated) syntax - no legacy comma syntax.
     /// </summary>
     /// <seealso href="https://www.w3.org/TR/css-color-4/#specifying-oklab-oklch"/>
-    private static bool TryParseOklab(List<CssToken> arguments, out CssColor color)
+    private static bool TryParseOklab(DataConsumer<CssToken> stream, out CssColor color)
     {
         color = CssColor.Transparent;
 
-        // OKLab does NOT support legacy comma syntax per spec
-        // "Using commas inside oklab() is an error."
-        if (ContainsCommas(arguments))
-        {
-            return false;
-        }
-
-        // Create token stream from arguments (filters whitespace)
-        var stream = CssParsingHelpers.CreateTokenStream(arguments);
-        if (stream.atEnd)
-        {
-            return false;
-        }
-
         // Parse L (Lightness) - 0-1 or 0%-100%, clamped to [0,1]
-        if (!TryGetOklabLightness(stream.Consume(), out double lightness))
+        var lToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (lToken == null || !TryGetOklabLightness(lToken, out double lightness))
         {
             return false;
         }
 
         // Parse a - signed value, percentage maps to [-0.4, 0.4]
-        if (stream.atEnd || !TryGetOklabAB(stream.Consume(), out double a))
+        var aToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (aToken == null || !TryGetOklabAB(aToken, out double a))
         {
             return false;
         }
 
         // Parse b - signed value, percentage maps to [-0.4, 0.4]
-        if (stream.atEnd || !TryGetOklabAB(stream.Consume(), out double b))
+        var bToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (bToken == null || !TryGetOklabAB(bToken, out double b))
         {
             return false;
         }
 
         // Parse alpha if present (after the slash)
         double alpha = 1.0;
-        if (!stream.atEnd)
+        var nextToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (nextToken != null)
         {
-            var next = stream.Consume();
-            if (next is DelimToken delim && delim.Value == '/')
+            if (CssParsingHelpers.IsSlash(nextToken))
             {
                 // Alpha value expected after slash
-                if (stream.atEnd || !TryGetAlphaValueNormalized(stream.Consume(), out alpha))
+                var alphaToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+                if (alphaToken == null || !TryGetAlphaValueNormalized(alphaToken, out alpha))
                 {
                     return false;
                 }
@@ -1229,7 +1153,7 @@ internal static class CssColorFunctionParser
         }
 
         // Verify no extra tokens remain
-        if (!stream.atEnd)
+        if (!CssParsingHelpers.IsAtEnd(stream))
         {
             return false;
         }
@@ -1243,51 +1167,41 @@ internal static class CssColorFunctionParser
     /// OKLCh only supports modern (space-separated) syntax - no legacy comma syntax.
     /// </summary>
     /// <seealso href="https://www.w3.org/TR/css-color-4/#specifying-oklab-oklch"/>
-    private static bool TryParseOklch(List<CssToken> arguments, out CssColor color)
+    private static bool TryParseOklch(DataConsumer<CssToken> stream, out CssColor color)
     {
         color = CssColor.Transparent;
 
-        // OKLCh does NOT support legacy comma syntax per spec
-        // "Using commas inside oklch() is an error."
-        if (ContainsCommas(arguments))
-        {
-            return false;
-        }
-
-        // Create token stream from arguments (filters whitespace)
-        var stream = CssParsingHelpers.CreateTokenStream(arguments);
-        if (stream.atEnd)
-        {
-            return false;
-        }
-
         // Parse L (Lightness) - 0-1 or 0%-100%, clamped to [0,1]
-        if (!TryGetOklabLightness(stream.Consume(), out double lightness))
+        var lToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (lToken == null || !TryGetOklabLightness(lToken, out double lightness))
         {
             return false;
         }
 
         // Parse C (Chroma) - >= 0, percentage maps to [0, 0.4], clamped to >= 0
-        if (stream.atEnd || !TryGetOklchChroma(stream.Consume(), out double chroma))
+        var cToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (cToken == null || !TryGetOklchChroma(cToken, out double chroma))
         {
             return false;
         }
 
         // Parse H (Hue) - same as HSL/HWB/LCH
-        if (stream.atEnd || !TryGetHueValue(stream.Consume(), out double hue))
+        var hToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (hToken == null || !TryGetHueValue(hToken, out double hue))
         {
             return false;
         }
 
         // Parse alpha if present (after the slash)
         double alpha = 1.0;
-        if (!stream.atEnd)
+        var nextToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (nextToken != null)
         {
-            var next = stream.Consume();
-            if (next is DelimToken delim && delim.Value == '/')
+            if (CssParsingHelpers.IsSlash(nextToken))
             {
                 // Alpha value expected after slash
-                if (stream.atEnd || !TryGetAlphaValueNormalized(stream.Consume(), out alpha))
+                var alphaToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+                if (alphaToken == null || !TryGetAlphaValueNormalized(alphaToken, out alpha))
                 {
                     return false;
                 }
@@ -1300,7 +1214,7 @@ internal static class CssColorFunctionParser
         }
 
         // Verify no extra tokens remain
-        if (!stream.atEnd)
+        if (!CssParsingHelpers.IsAtEnd(stream))
         {
             return false;
         }
@@ -1537,61 +1451,52 @@ internal static class CssColorFunctionParser
     /// Syntax: color(&lt;color-space&gt; c1 c2 c3 [ / alpha ])
     /// </summary>
     /// <seealso href="https://www.w3.org/TR/css-color-4/#color-function"/>
-    private static bool TryParseColorFunction(List<CssToken> arguments, out CssColor color)
+    private static bool TryParseColorFunction(DataConsumer<CssToken> stream, out CssColor color)
     {
         color = CssColor.Transparent;
 
-        // color() does NOT support legacy comma syntax per spec
-        // "Using commas inside color() is an error."
-        if (ContainsCommas(arguments))
-        {
-            return false;
-        }
-
-        // Create token stream from arguments (filters whitespace)
-        var stream = CssParsingHelpers.CreateTokenStream(arguments);
-        if (stream.atEnd)
-        {
-            return false;
-        }
-
         // First token must be an identifier for the color space
-        if (stream.Consume() is not IdentToken colorSpaceToken)
+        var colorSpaceToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (colorSpaceToken is not IdentToken identToken)
         {
             return false;
         }
 
         // Parse the color space name
-        if (!TryParseColorSpaceName(colorSpaceToken.Value, out var colorSpace))
+        if (!TryParseColorSpaceName(identToken.Value, out var colorSpace))
         {
             return false; // Unknown color space = invalid color
         }
 
         // Parse the three color components
-        if (stream.atEnd || !TryGetColorComponent(stream.Consume(), colorSpace, 0, out double c1))
+        var c1Token = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (c1Token == null || !TryGetColorComponent(c1Token, colorSpace, 0, out double c1))
         {
             return false;
         }
 
-        if (stream.atEnd || !TryGetColorComponent(stream.Consume(), colorSpace, 1, out double c2))
+        var c2Token = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (c2Token == null || !TryGetColorComponent(c2Token, colorSpace, 1, out double c2))
         {
             return false;
         }
 
-        if (stream.atEnd || !TryGetColorComponent(stream.Consume(), colorSpace, 2, out double c3))
+        var c3Token = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (c3Token == null || !TryGetColorComponent(c3Token, colorSpace, 2, out double c3))
         {
             return false;
         }
 
         // Parse alpha if present (after the slash)
         double alpha = 1.0;
-        if (!stream.atEnd)
+        var nextToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+        if (nextToken != null)
         {
-            var next = stream.Consume();
-            if (next is DelimToken delim && delim.Value == '/')
+            if (CssParsingHelpers.IsSlash(nextToken))
             {
                 // Alpha value expected after slash
-                if (stream.atEnd || !TryGetAlphaValueNormalized(stream.Consume(), out alpha))
+                var alphaToken = CssParsingHelpers.ConsumeNonWhitespace(stream);
+                if (alphaToken == null || !TryGetAlphaValueNormalized(alphaToken, out alpha))
                 {
                     return false;
                 }
@@ -1604,7 +1509,7 @@ internal static class CssColorFunctionParser
         }
 
         // Verify no extra tokens remain
-        if (!stream.atEnd)
+        if (!CssParsingHelpers.IsAtEnd(stream))
         {
             return false;
         }
