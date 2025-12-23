@@ -9,7 +9,7 @@ namespace CssUI.CSS;
 public sealed class BracketCloseToken : CssToken
 {
     public static BracketCloseToken Instance = new BracketCloseToken();
-    public BracketCloseToken() : base(ECssTokenType.Bracket_Open)
+    public BracketCloseToken() : base(ECssTokenType.Bracket_Close)
     {
     }
 
