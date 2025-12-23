@@ -23,17 +23,17 @@ public interface ICssProperty
     /// <summary>
     /// Tracks which styling rule block this property came from
     /// </summary>
-    CssSelector Selector { get; set; }
+    CssSelector? Selector { get; set; }
     /// <summary>
     /// The property we belong to
     /// </summary>
     /// <returns></returns>
-    CssComputedStyle Source { get; }
+    CssComputedStyle? Source { get; }
     /// <summary>
     /// Returns the definition for this property
     /// </summary>
     /// <returns></returns>
-    StyleDefinition Definition { get; }
+    StyleDefinition? Definition { get; }
     #endregion
 
     #region Accessors
@@ -46,7 +46,7 @@ public interface ICssProperty
     /// <summary>
     /// Tracks which styling rule block this property came from
     /// </summary>
-    WeakReference<CssComputedStyle> SourcePtr { get; set; }
+    WeakReference<CssComputedStyle>? SourcePtr { get; set; }
 
     /// <summary>
     /// Returns whether or not the property has a set value that should take affect during cascading.

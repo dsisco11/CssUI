@@ -50,23 +50,23 @@ public class CssProperty : CssPropertyBase, ICssProperty
     /// <summary>
     /// Tracks the previous value for <see cref="Assigned"/> so we can detect when changes occur
     /// </summary>
-    ValueTracker<CssValue> oldAssigned = new ValueTracker<CssValue>();
+    ValueTracker<CssValue> oldAssigned = new();
     /// <summary>
     /// Tracks the previous value for <see cref="Specified"/> so we can detect when changes occur
     /// </summary>
-    ValueTracker<CssValue> oldSpecified = new ValueTracker<CssValue>();
+    ValueTracker<CssValue> oldSpecified = new();
     /// <summary>
     /// Tracks the previous value for <see cref="Computed"/> so we can detect when changes occur
     /// </summary>
-    ValueTracker<CssValue> oldComputed = new ValueTracker<CssValue>();
+    ValueTracker<CssValue> oldComputed = new();
     /// <summary>
     /// Tracks the previous value for <see cref="Used"/> so we can detect when changes occur
     /// </summary>
-    ValueTracker<CssValue> oldUsed = new ValueTracker<CssValue>();
+    ValueTracker<CssValue> oldUsed = new();
     /// <summary>
     /// Tracks the previous value for <see cref="Actual"/> so we can detect when changes occur
     /// </summary>
-    ValueTracker<CssValue> oldActual = new ValueTracker<CssValue>();
+    ValueTracker<CssValue> oldActual = new();
     #endregion
 
     #region Values
@@ -80,8 +80,8 @@ public class CssProperty : CssPropertyBase, ICssProperty
         get { return _assigned; }
         set
         {
-            if (Locked) throw new Exception("Cannot modify the value of a locked css property!");
-            Definition.CheckAndThrow(this, value);
+            if (Locked) throw new InvalidOperationException("Cannot modify the value of a locked css property!");
+            Definition?.CheckAndThrow(this, value);
             // Translate a value of NULL to CSSValue.Null
             _assigned = value is null ? CssValue.Null : value;
             //our assigned value has changed, this means our specified and computed valued are now incorrect.
@@ -96,7 +96,7 @@ public class CssProperty : CssPropertyBase, ICssProperty
     {
         get
         {
-            if (_specified == null)
+            if (_specified is null)
             {// Whomever is asking for this value obviously didnt want the later ones yet, also properties used-value resolution can access early stages of other properties
                 Reinterpret_Specified(false);
             }
@@ -113,7 +113,7 @@ public class CssProperty : CssPropertyBase, ICssProperty
     {
         get
         {
-            if (_computed == null)
+            if (_computed is null)
             {// Whomever is asking for this value obviously didnt want the later ones yet, also properties used-value resolution can access early stages of other properties
                 Reinterpret_Computed(false);
             }
@@ -129,7 +129,7 @@ public class CssProperty : CssPropertyBase, ICssProperty
     {
         get
         {
-            if (_used == null)
+            if (_used is null)
             {// Whomever is asking for this value obviously didnt want the later ones yet, also properties used-value resolution can access early stages of other properties
                 Reinterpret_Used(false);
             }
@@ -146,7 +146,7 @@ public class CssProperty : CssPropertyBase, ICssProperty
     {
         get
         {
-            if (_actual == null)
+            if (_actual is null)
             {
                 Reinterpret_Actual();
             }
@@ -161,7 +161,7 @@ public class CssProperty : CssPropertyBase, ICssProperty
     /// <summary>
     /// Returns TRUE if the <see cref="Assigned"/> value is non-null
     /// </summary>
-    public override bool HasValue { get => !Assigned.HasValue; }
+    public override bool HasValue { get => Assigned.HasValue; }
     /// <summary>
     /// Returns TRUE if the <see cref="Assigned"/> value is <see cref="ECssValueTypes.NONE"/>
     /// </summary>
@@ -192,7 +192,7 @@ public class CssProperty : CssPropertyBase, ICssProperty
     /// <summary>
     /// All flags which are present for all currently computed <see cref="CssValue"/>'s
     /// </summary>
-    public override ECssValueFlags Flags => Specified.Flags;
+    public override ECssValueFlags Flags => Specified?.Flags ?? ECssValueFlags.None;
     #endregion
 
     #region Constructor
@@ -231,7 +231,7 @@ public class CssProperty : CssPropertyBase, ICssProperty
         // detect changes, fire events
         if (oldSpecified is null || oldSpecified != _specified)
         {// the computed value changed
-            oldSpecified.Update(_specified);
+            oldSpecified?.Update(_specified);
             // FireValueChangeEvent(ECssPropertyStage.Specified);
 
             // update the Computed value
@@ -242,11 +242,11 @@ public class CssProperty : CssPropertyBase, ICssProperty
     /// <param name="Auto_Interpret_Next">Determines whether the next value stage will also be re-interpreted if the current stage changes due to this re-interpretation</param>
     private void Reinterpret_Computed(bool Auto_Interpret_Next = true)
     {
-        _computed = Specified.Derive_ComputedValue(this);
+        _computed = Specified?.Derive_ComputedValue(this);
         // detect changes, fire events
         if (oldComputed is null || oldComputed != _computed)
         {
-            oldComputed.Update(_computed);
+            oldComputed?.Update(_computed);
             // FireValueChangeEvent(ECssPropertyStage.Computed);
 
             // Update the Used value
@@ -257,11 +257,11 @@ public class CssProperty : CssPropertyBase, ICssProperty
     /// <param name="Auto_Interpret_Next">Determines whether the next value stage will also be re-interpreted if the current stage changes due to this re-interpretation</param>
     private void Reinterpret_Used(bool Auto_Interpret_Next = true)
     {
-        _used = Computed.Derive_UsedValue(this);
+        _used = Computed?.Derive_UsedValue(this);
         // detect changes, fire events
         if (oldUsed is null || oldUsed != _used)
         {
-            oldUsed.Update(_used);
+            oldUsed?.Update(_used);
             // FireValueChangeEvent(ECssPropertyStage.Used);
 
             // update the Actual value
@@ -271,11 +271,11 @@ public class CssProperty : CssPropertyBase, ICssProperty
 
     private void Reinterpret_Actual()
     {
-        _actual = Used.Derive_ActualValue(this);
+        _actual = Used?.Derive_ActualValue(this);
         // detect changes, fire events
         if (oldActual is null || oldActual != _actual)
         {
-            oldActual.Update(_actual);
+            oldActual?.Update(_actual);
             FireValueChangeEvent(EPropertyStage.Actual);
         }
     }
@@ -287,7 +287,7 @@ public class CssProperty : CssPropertyBase, ICssProperty
     /// </summary>
     public override void Handle_Unit_Change(ECssUnit Unit)
     {
-        if (Specified.Unit == Unit)
+        if (Unit == Specified?.Unit)
         {// We are using this unit and its change will affect our computed value
             FireValueChangeEvent(EPropertyStage.Computed);
         }
@@ -326,7 +326,7 @@ public class CssProperty : CssPropertyBase, ICssProperty
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override async Task<bool> CascadeAsync(ICssProperty prop)
     {
-        return await Task.Factory.StartNew(() => Cascade(prop)).ConfigureAwait(continueOnCapturedContext: false);
+        return await Task.Run(() => Cascade(prop)).ConfigureAwait(continueOnCapturedContext: false);
     }
     #endregion
 
@@ -393,7 +393,7 @@ public class CssProperty : CssPropertyBase, ICssProperty
 
         if (oldAssigned is null || oldAssigned != Assigned)
         {
-            oldAssigned.Update(Assigned);
+            oldAssigned?.Update(Assigned);
             FireValueChangeEvent(EPropertyStage.Assigned);
         }
 

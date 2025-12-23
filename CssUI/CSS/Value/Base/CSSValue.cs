@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Globalization;
@@ -885,6 +884,7 @@ public partial class CssValue
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator !=(in CssValue? A, in CssValue? B)
     {
         return !(A == B);

@@ -5,6 +5,9 @@ namespace CssUI.CSS.Internal;
 /// <summary>
 /// Stores the hash for an generic object such that changes to it may be detected.
 /// </summary>
+/// <remarks>
+/// TODO: This functionality might have a modern built-in dotnet replacement now? Investigate. (e.g. observable objects or similar)
+/// </remarks>
 public class ValueTracker<Ty>
 {
     #region Properties
@@ -34,7 +37,7 @@ public class ValueTracker<Ty>
     }
     public ValueTracker(Ty value)
     {
-        Hash = value.GetHashCode();
+        Hash = value?.GetHashCode() ?? 0;
     }
     #endregion
 

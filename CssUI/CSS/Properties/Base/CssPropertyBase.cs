@@ -43,14 +43,16 @@ public abstract class CssPropertyBase : ICssProperty
     /// <summary>
     /// Returns TRUE if this property is inheritable according to its definition
     /// </summary>
-    public virtual bool IsInheritable { get => Definition.Inherited; }
+    public virtual bool IsInheritable { get => Definition?.Inherited ?? false; }
 
     public CssComputedStyle? Source
     {
         get
         {
-            SourcePtr.TryGetTarget(out CssComputedStyle? src);
-            return src;
+            if (SourcePtr is not null && SourcePtr.TryGetTarget(out CssComputedStyle? src))
+                return src;
+
+            return null;
         }
     }
 
@@ -116,18 +118,23 @@ public abstract class CssPropertyBase : ICssProperty
     /// <summary>
     /// Returns the inherited value from the properties owners parent element
     /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public CssValue Find_Inherited_Value()
     {
-        if (Owner.parentNode is null)
+        // Check for parentElement (not parentNode) because Document is not an Element
+        // and cannot provide style/property values to inherit from
+        if (Owner.parentElement is null)
         {// Root elements cannot inherit, they use the INITIAL value
-            return new CssValue(Definition.Initial);
+            // Definition can be null if property isn't registered
+            var def = Definition;
+            if (def is null)
+                return CssValue.Null;
+            return new CssValue(def.Initial);
         }
         else
         {// Take our parents computed value
-            ICssProperty prop = Owner.parentElement.Style.Cascaded.Get(CssName);
-            if (prop is object)
-                return new CssValue((prop as CssProperty)!.Computed!);
+            ICssProperty? prop = Owner.parentElement.Style?.Cascaded?.Get(CssName);
+            if (prop is CssProperty cssProp)
+                return new CssValue(cssProp.Computed!);
             else
                 throw new CssPropertyException($"Cannot read parent element property: {CssName}");
         }
