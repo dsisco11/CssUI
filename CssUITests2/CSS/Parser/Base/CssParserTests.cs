@@ -53,7 +53,7 @@ public class CssParserTests
     #endregion
 
     #region Declaration Parsing Tests
-    [Fact(Skip = "Bug: Parse_Decleration has inverted null check - throws when declaration IS parsed")]
+    [Fact]
     [Trait("Category", "Parser")]
     [Trait("Category", "Bug")]
     public void ParseDecleration_SimpleProperty_ReturnsDeclaration()
@@ -728,7 +728,7 @@ public class CssParserTests
     #endregion
 
     #region Media Query Tests (Known Bug)
-    [Fact(Skip = "Bug: CSS parser fails on media query parsing - expects ident token")]
+    [Fact]
     [Trait("Category", "Parser")]
     [Trait("Category", "Bug")]
     public void ParseMediaQueryList_SingleCondition_ReturnsMediaQueryList()
@@ -737,7 +737,7 @@ public class CssParserTests
         Assert.NotNull(parser.Parse_Media_Query_List(document));
     }
 
-    [Fact(Skip = "Bug: CSS parser fails on media query parsing - expects ident token")]
+    [Fact]
     [Trait("Category", "Parser")]
     [Trait("Category", "Bug")]
     public void ParseMediaQueryList_NotCondition_ReturnsMediaQueryList()
@@ -746,7 +746,7 @@ public class CssParserTests
         Assert.NotNull(parser.Parse_Media_Query_List(document));
     }
 
-    [Fact(Skip = "Bug: CSS parser fails on media query parsing - expects ident token")]
+    [Fact]
     [Trait("Category", "Parser")]
     [Trait("Category", "Bug")]
     public void ParseMediaQueryList_MultipleConditions_ReturnsMediaQueryList()
@@ -755,7 +755,7 @@ public class CssParserTests
         Assert.NotNull(parser.Parse_Media_Query_List(document));
     }
 
-    [Fact(Skip = "Bug: CSS parser fails on media query parsing - expects ident token")]
+    [Fact]
     [Trait("Category", "Parser")]
     [Trait("Category", "Bug")]
     public void ParseMediaQueryList_NestedConditions_ReturnsMediaQueryList()
@@ -764,7 +764,7 @@ public class CssParserTests
         Assert.NotNull(parser.Parse_Media_Query_List(document));
     }
 
-    [Fact(Skip = "Bug: CSS parser fails on media query parsing - expects ident token")]
+    [Fact]
     [Trait("Category", "Parser")]
     [Trait("Category", "Bug")]
     public void ParseMediaQueryList_ComplexQuery_ReturnsMediaQueryList()
@@ -773,7 +773,7 @@ public class CssParserTests
         Assert.NotNull(parser.Parse_Media_Query_List(document));
     }
 
-    [Fact(Skip = "Bug: CSS parser fails on media query parsing - expects ident token")]
+    [Fact]
     [Trait("Category", "Parser")]
     [Trait("Category", "Bug")]
     public void ParseMediaQueryList_UnsupportedFeature_ThrowsCssSyntaxError()
@@ -782,7 +782,7 @@ public class CssParserTests
         Assert.Throws<CssSyntaxErrorException>(() => parser.Parse_Media_Query_List(document));
     }
 
-    [Fact(Skip = "Bug: CSS parser fails on media query parsing - expects ident token")]
+    [Fact]
     [Trait("Category", "Parser")]
     [Trait("Category", "Bug")]
     public void ParseMediaQueryList_MixedCombinators_ThrowsCssSyntaxError()
