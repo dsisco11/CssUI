@@ -17,21 +17,26 @@
 - [ ] Simplification algorithm
 - [ ] Proper serialization
 
-## Test Coverage — Total: 1424 passing, 276 skipped, 24 failing = 1724 tests
+## Test Coverage — Total: 1508 passing, 285 skipped, 24 failing = 1817 tests
 ### DOM Tests: 518 passing, 3 skipped = 521 total
 
 ## Phase 6: CSS Test Coverage
 
-### 6.1 Simple Tokens (CSS/Tokens/Simple/)
-- [ ] ColonToken, CommaToken, SemicolonToken tests
-- [ ] Bracket tokens (Square, Curly, Paren) tests
-- [ ] Whitespace and Delim token tests
+### 6.1 Simple Tokens (CSS/Tokens/Simple/) ✓
+- [x] ColonToken, CommaToken, SemicolonToken tests
+- [x] Bracket tokens (Square, Curly, Paren) tests
+- [x] Whitespace and Delim token tests
 
-### 6.2 CSSValue System (CSS/Value/Base/)
-- [ ] Activate and implement CssValueTests.cs stubs
-- [ ] From_CSS parsing tests
-- [ ] Type conversion tests
-- [ ] Known bug: Parser fails to parse '1em' dimension
+### 6.2 CSSValue System (CSS/Value/Base/) ✓
+- [x] Activate and implement CssValueTests.cs stubs (71 passing, 9 skipped)
+- [x] From_CSS parsing tests
+- [x] Type conversion tests
+- [x] Known bugs documented:
+  - Bug: AsDecimal uses Convert.ToInt64 instead of Convert.ToDouble
+  - Bug: CssValue.Equals throws InvalidCastException for integer comparison
+  - Bug: From(double, ECssUnit) doesn't distinguish RESOLUTION from DIMENSION
+  - Bug: CssTokenizer throws InvalidCastException when parsing percentages
+  - Bug: Parser fails to parse '1em' dimension
 
 ### 6.3 CssParser (CSS/Parser/Base/)
 - [ ] Activate and implement CssParserTests.cs stubs
