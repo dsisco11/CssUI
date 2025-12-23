@@ -1064,4 +1064,528 @@ public class CssColorFunctionParserTests
     }
 
     #endregion
+
+    #region lab() Basic Syntax Tests
+
+    [Fact]
+    public void TryParseLab_BasicNumberSyntax_ReturnsColor()
+    {
+        // Arrange & Act - lab(50 0 0) = mid-gray
+        var value = ParseColorValue("lab(50 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // L=50, a=0, b=0 should produce a mid-gray
+        Assert.InRange(color.R, 115, 120); // Expected ~119
+        Assert.InRange(color.G, 115, 120);
+        Assert.InRange(color.B, 115, 120);
+        Assert.Equal(255, color.A);
+    }
+
+    [Fact]
+    public void TryParseLab_WithPercentageLightness_ReturnsColor()
+    {
+        // Arrange & Act - lab(50% 0 0) = lab(50 0 0) = mid-gray
+        var value = ParseColorValue("lab(50% 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.InRange(color.R, 115, 120);
+        Assert.InRange(color.G, 115, 120);
+        Assert.InRange(color.B, 115, 120);
+    }
+
+    [Fact]
+    public void TryParseLab_WithAlpha_ReturnsColorWithAlpha()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("lab(50 0 0 / 0.5)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.InRange(color.A, 127, 128); // 50% alpha
+    }
+
+    [Fact]
+    public void TryParseLab_WithPercentageAlpha_ReturnsColorWithAlpha()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("lab(50 0 0 / 50%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.InRange(color.A, 127, 128);
+    }
+
+    [Fact]
+    public void TryParseLab_Black_ReturnsBlack()
+    {
+        // Arrange & Act - lab(0 0 0) = black (L=0)
+        var value = ParseColorValue("lab(0 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+    }
+
+    [Fact]
+    public void TryParseLab_White_ReturnsWhite()
+    {
+        // Arrange & Act - lab(100 0 0) = white (L=100)
+        var value = ParseColorValue("lab(100 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(255, color.B);
+    }
+
+    [Fact]
+    public void TryParseLab_PositiveA_ShiftsTowardRed()
+    {
+        // Arrange & Act - Positive 'a' shifts toward red/magenta
+        var value = ParseColorValue("lab(50 80 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Should have more red than gray
+        Assert.True(color.R > color.G);
+    }
+
+    [Fact]
+    public void TryParseLab_NegativeA_ShiftsTowardGreen()
+    {
+        // Arrange & Act - Negative 'a' shifts toward green
+        var value = ParseColorValue("lab(50 -80 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Should have more green than red (after gamut mapping/clamping)
+        Assert.True(color.G > color.R);
+    }
+
+    [Fact]
+    public void TryParseLab_PositiveB_ShiftsTowardYellow()
+    {
+        // Arrange & Act - Positive 'b' shifts toward yellow
+        var value = ParseColorValue("lab(50 0 80)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Yellow = high R, high G, low B
+        Assert.True(color.R > color.B);
+        Assert.True(color.G > color.B);
+    }
+
+    [Fact]
+    public void TryParseLab_NegativeB_ShiftsTowardBlue()
+    {
+        // Arrange & Act - Negative 'b' shifts toward blue
+        var value = ParseColorValue("lab(50 0 -80)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Should have more blue (after gamut mapping/clamping)
+        Assert.True(color.B > color.R);
+    }
+
+    [Fact]
+    public void TryParseLab_PercentageAB_MapsToCorrectRange()
+    {
+        // Arrange & Act - 100% on a/b axis = 125, so lab(50 100% 0) = lab(50 125 0)
+        var value = ParseColorValue("lab(50 100% 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Very high positive 'a' - should be strongly red-shifted
+        Assert.True(color.R > 200);
+    }
+
+    [Fact]
+    public void TryParseLab_LightnessClampedToZero()
+    {
+        // Arrange & Act - Negative lightness clamped to 0
+        var value = ParseColorValue("lab(-50 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Should be black (L clamped to 0)
+        Assert.Equal(0, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+    }
+
+    [Fact]
+    public void TryParseLab_LightnessClampedTo100()
+    {
+        // Arrange & Act - Lightness > 100 clamped to 100
+        var value = ParseColorValue("lab(150 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Should be white (L clamped to 100)
+        Assert.Equal(255, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(255, color.B);
+    }
+
+    [Fact]
+    public void TryParseLab_LegacyCommas_ReturnsFalse()
+    {
+        // Arrange & Act - lab() does NOT support comma syntax
+        var value = ParseColorValue("lab(50, 0, 0)");
+
+        // Assert - Should fail to parse as color (no legacy comma syntax)
+        Assert.NotEqual(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseLab_CaseInsensitive()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("LAB(50 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+    }
+
+    #endregion
+
+    #region lch() Basic Syntax Tests
+
+    [Fact]
+    public void TryParseLch_BasicNumberSyntax_ReturnsColor()
+    {
+        // Arrange & Act - lch(50 0 0) = mid-gray (chroma=0 means no color, just gray)
+        var value = ParseColorValue("lch(50 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.InRange(color.R, 115, 120);
+        Assert.InRange(color.G, 115, 120);
+        Assert.InRange(color.B, 115, 120);
+    }
+
+    [Fact]
+    public void TryParseLch_WithPercentageLightness_ReturnsColor()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("lch(50% 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.InRange(color.R, 115, 120);
+    }
+
+    [Fact]
+    public void TryParseLch_WithAlpha_ReturnsColorWithAlpha()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("lch(50 0 0 / 0.5)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.InRange(color.A, 127, 128);
+    }
+
+    [Fact]
+    public void TryParseLch_Black_ReturnsBlack()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("lch(0 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+    }
+
+    [Fact]
+    public void TryParseLch_White_ReturnsWhite()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("lch(100 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(255, color.B);
+    }
+
+    [Fact]
+    public void TryParseLch_Red_Hue0_ReturnsReddish()
+    {
+        // Arrange & Act - lch(50 100 40) should be roughly red-ish
+        // LCH hue ~40 is in the red-orange range
+        var value = ParseColorValue("lch(50 100 40)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.True(color.R > color.G && color.R > color.B);
+    }
+
+    [Fact]
+    public void TryParseLch_Green_Hue130_ReturnsGreenish()
+    {
+        // Arrange & Act - lch(50 100 130) should be roughly green-ish
+        var value = ParseColorValue("lch(50 100 130)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.True(color.G > color.R && color.G > color.B);
+    }
+
+    [Fact]
+    public void TryParseLch_Blue_Hue300_ReturnsBluish()
+    {
+        // Arrange & Act - lch(50 100 300) should be roughly blue-ish
+        var value = ParseColorValue("lch(50 100 300)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.True(color.B > color.R || color.B > color.G); // Some blue component
+    }
+
+    [Fact]
+    public void TryParseLch_DegUnit_ParsesCorrectly()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("lch(50 100 40deg)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseLch_RadUnit_ParsesCorrectly()
+    {
+        // Arrange & Act - 0.698rad ≈ 40deg
+        var value = ParseColorValue("lch(50 100 0.698rad)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseLch_TurnUnit_ParsesCorrectly()
+    {
+        // Arrange & Act - 0.5turn = 180deg
+        var value = ParseColorValue("lch(50 100 0.5turn)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseLch_GradUnit_ParsesCorrectly()
+    {
+        // Arrange & Act - 100grad = 90deg
+        var value = ParseColorValue("lch(50 100 100grad)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseLch_PercentageChroma_MapsCorrectly()
+    {
+        // Arrange & Act - 100% chroma = 150
+        var value = ParseColorValue("lch(50 100% 40)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseLch_NegativeChroma_ClampedToZero()
+    {
+        // Arrange & Act - Negative chroma clamped to 0
+        var value = ParseColorValue("lch(50 -50 40)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // With chroma clamped to 0, should be gray
+        Assert.InRange(color.R, 115, 120);
+        Assert.InRange(color.G, 115, 120);
+        Assert.InRange(color.B, 115, 120);
+    }
+
+    [Fact]
+    public void TryParseLch_NegativeHue_NormalizesToPositive()
+    {
+        // Arrange & Act - -60deg = 300deg
+        var value = ParseColorValue("lch(50 100 -60)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseLch_HueOver360_NormalizesCorrectly()
+    {
+        // Arrange & Act - 400deg = 40deg
+        var value = ParseColorValue("lch(50 100 400)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseLch_LegacyCommas_ReturnsFalse()
+    {
+        // Arrange & Act - lch() does NOT support comma syntax
+        var value = ParseColorValue("lch(50, 0, 0)");
+
+        // Assert - Should fail to parse as color
+        Assert.NotEqual(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseLch_CaseInsensitive()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("LCH(50 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+    }
+
+    #endregion
+
+    #region lab()/lch() W3C Spec Examples
+
+    [Fact]
+    public void TryParseLab_W3CExample_Yellow()
+    {
+        // From W3C spec: lab(97.607% -15.753 93.388) is sRGB yellow
+        var value = ParseColorValue("lab(97.607 -15.753 93.388)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Should be close to yellow (high R, high G, low B)
+        Assert.True(color.R > 240);
+        Assert.True(color.G > 240);
+        Assert.True(color.B < 50);
+    }
+
+    [Fact]
+    public void TryParseLab_W3CExample_Blue()
+    {
+        // From W3C spec: lab(29.567% 68.298 -112.0294) is sRGB blue
+        var value = ParseColorValue("lab(29.567 68.298 -112.0294)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Should be roughly blue-ish (though out of gamut gets clamped)
+        Assert.True(color.B > color.R);
+    }
+
+    [Fact]
+    public void TryParseLch_W3CExample_Basic()
+    {
+        // From W3C spec: lch(52.2345% 72.2 56.2)
+        var value = ParseColorValue("lch(52.2345% 72.2 56.2)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseLch_W3CExample_WithPercentageChroma()
+    {
+        // From W3C spec: lch(29.69% 45.553% 327.1)
+        // 45.553% of 150 = ~68.33 chroma
+        var value = ParseColorValue("lch(29.69% 45.553% 327.1)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+    }
+
+    #endregion
+
+    #region lab()/lch() Property Parsing Tests
+
+    [Fact]
+    public void Parse_ColorProperty_WithLabFunction_ReturnsColorValue()
+    {
+        // Arrange
+        var css = "color: lab(50 0 0)";
+        var parser = new CssParser(css);
+
+        // Act
+        var declaration = parser.Parse_Decleration();
+
+        // Assert
+        Assert.NotNull(declaration);
+        Assert.Equal("color", declaration.Name);
+        Assert.Single(declaration.Values);
+        Assert.True(declaration.Values[0] is CssFunction);
+        var func = (CssFunction)declaration.Values[0];
+        Assert.Equal("lab", func.Name, ignoreCase: true);
+    }
+
+    [Fact]
+    public void Parse_ColorProperty_WithLchFunction_ReturnsColorValue()
+    {
+        // Arrange
+        var css = "color: lch(50 100 40)";
+        var parser = new CssParser(css);
+
+        // Act
+        var declaration = parser.Parse_Decleration();
+
+        // Assert
+        Assert.NotNull(declaration);
+        Assert.Equal("color", declaration.Name);
+        Assert.Single(declaration.Values);
+        Assert.True(declaration.Values[0] is CssFunction);
+        var func = (CssFunction)declaration.Values[0];
+        Assert.Equal("lch", func.Name, ignoreCase: true);
+    }
+
+    [Fact]
+    public void Parse_BackgroundColorProperty_WithLabAlpha_ReturnsColorValue()
+    {
+        // Arrange
+        var css = "background-color: lab(50 25 -25 / 0.8)";
+        var parser = new CssParser(css);
+
+        // Act
+        var declaration = parser.Parse_Decleration();
+
+        // Assert
+        Assert.NotNull(declaration);
+        Assert.Equal("background-color", declaration.Name);
+    }
+
+    #endregion
 }

@@ -103,7 +103,17 @@
   - [x] Achromatic handling when W+B >= 100%
   - [x] HWB to RGB conversion per W3C spec
   - [x] Tests: 23 tests for hwb parsing (CssColorFunctionParserTests.cs)
-- [ ] Handle lab()/lch() functions → CssValue (COLOR_HDR)
+- [x] Handle lab()/lch() functions → CssValue (COLOR)
+  - [x] Modern syntax only: lab(L a b) / lch(L C H) - no legacy comma syntax
+  - [x] L (Lightness): percentage or number (0-100), clamped to [0,100]
+  - [x] a, b (Lab): signed numbers or percentages (-100% to 100% → -125 to 125)
+  - [x] C (Chroma): ≥0, percentage maps to 0-150 range
+  - [x] H (Hue): angle with deg, rad, grad, turn units
+  - [x] Alpha channel: lab(50 40 -30 / 0.5), lch(50 60 180 / 50%)
+  - [x] Lab to XYZ to sRGB conversion per W3C CSS Color 4 spec
+  - [x] LCH to Lab conversion (polar to cartesian)
+  - [x] Gamma correction for sRGB output
+  - [x] Tests: 36 tests for lab/lch parsing (CssColorFunctionParserTests.cs)
 - [ ] Handle oklab()/oklch() functions → CssValue (COLOR_HDR)
 - [ ] Handle color() function for custom color spaces
 - [ ] Handle named color keywords (e.g., 'red', 'blue', 'transparent')
