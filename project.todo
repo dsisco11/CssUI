@@ -111,6 +111,11 @@
   - [ ] 'transparent' keyword → CssColor(0, 0, 0, 0)
   - [ ] 'currentColor' keyword → special value
 
+### 7.2 Review CSS color parser implementation (CSS/Parser/)
+- [ ] Ensure compliance with CSS Color 4 spec
+- [ ] Ensure that parsing follows W3C algorithms exactly
+- [ ] Ensure that parsing uses the same data types and patterns as the core CssParser
+
 ### 7.6 Additional CssParser Value Types (CSS/Parser/)
 - [ ] Handle URL token → CssValue (IMAGE/URL)
   - [ ] Parse url() function syntax
