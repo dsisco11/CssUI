@@ -63,10 +63,10 @@ public static partial class CssPropertyResolver
                         }
 
                         return CssValue.From(CssColor.FromRgba(
-                            (byte)outData.Value.Data[0], 
-                            (byte)outData.Value.Data[1], 
-                            (byte)outData.Value.Data[2], 
-                            (byte)outData.Value.Data[3]));
+                            Convert.ToByte(outData.Value.Data[0]), 
+                            Convert.ToByte(outData.Value.Data[1]), 
+                            Convert.ToByte(outData.Value.Data[2]), 
+                            Convert.ToByte(outData.Value.Data[3])));
                     }
             }
         }
