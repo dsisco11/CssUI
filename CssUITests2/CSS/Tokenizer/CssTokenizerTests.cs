@@ -672,22 +672,24 @@ public class CssTokenizerTests
     [Fact]
     [Trait("Category", "Tokenizer")]
     [Trait("TokenType", "URL")]
-    public void Parse_UrlWithQuotes_ReturnsUrlToken()
+    public void Parse_UrlWithQuotes_ReturnsFunctionToken()
     {
+        // Per spec §4.3.4: url() with quoted strings is parsed as a function-token
         var token = FirstToken("url(\"http://example.com\")");
 
-        Assert.Equal(ECssTokenType.Url, token.Type);
-        Assert.IsType<UrlToken>(token);
+        Assert.Equal(ECssTokenType.FunctionName, token.Type);
+        Assert.IsType<FunctionNameToken>(token);
     }
 
     [Fact]
     [Trait("Category", "Tokenizer")]
     [Trait("TokenType", "URL")]
-    public void Parse_UrlWithSingleQuotes_ReturnsUrlToken()
+    public void Parse_UrlWithSingleQuotes_ReturnsFunctionToken()
     {
+        // Per spec §4.3.4: url() with quoted strings is parsed as a function-token
         var token = FirstToken("url('http://example.com')");
 
-        Assert.Equal(ECssTokenType.Url, token.Type);
+        Assert.Equal(ECssTokenType.FunctionName, token.Type);
     }
 
     [Fact]
@@ -703,11 +705,12 @@ public class CssTokenizerTests
     [Fact]
     [Trait("Category", "Tokenizer")]
     [Trait("TokenType", "URL")]
-    public void Parse_UrlUppercase_ReturnsUrlToken()
+    public void Parse_UrlUppercase_ReturnsFunctionToken()
     {
+        // Per spec §4.3.4: url() with quoted strings is parsed as a function-token
         var token = FirstToken("URL(\"http://example.com\")");
 
-        Assert.Equal(ECssTokenType.Url, token.Type);
+        Assert.Equal(ECssTokenType.FunctionName, token.Type);
     }
 
     [Fact]
@@ -723,11 +726,12 @@ public class CssTokenizerTests
     [Fact]
     [Trait("Category", "Tokenizer")]
     [Trait("TokenType", "URL")]
-    public void Parse_UrlWithWhitespace_ReturnsUrlToken()
+    public void Parse_UrlWithWhitespace_ReturnsFunctionToken()
     {
+        // Per spec §4.3.4: url() with whitespace followed by quote is parsed as function-token
         var token = FirstToken("url(  \"test\"  )");
 
-        Assert.Equal(ECssTokenType.Url, token.Type);
+        Assert.Equal(ECssTokenType.FunctionName, token.Type);
     }
 
     [Fact]

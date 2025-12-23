@@ -130,8 +130,8 @@ public class CssTokenizer
     {// Docs: https://www.w3.org/TR/css-syntax-3/#consume-string-token
         ArgumentNullException.ThrowIfNull(Stream);
         Contract.EndContractBlock();
-        /* 
-         * This algorithm may be called with an ending code point, which denotes the code point that ends the string. 
+        /*
+         * This algorithm may be called with an ending code point, which denotes the code point that ends the string.
          * If an ending code point is not specified, the current input code point is used.
          */
 
@@ -156,7 +156,7 @@ public class CssTokenizer
                     }
                 case CHAR_LINE_FEED:
                     {
-                        Stream.Consume();
+                        // Per spec §4.3.5: This is a parse error. Reconsume (don't consume) and return bad-string-token.
                         return new BadStringToken(Buf.ToString());
                     }
                 case CHAR_REVERSE_SOLIDUS:
@@ -316,7 +316,7 @@ public class CssTokenizer
             char afterE = Stream.NextNext;
             bool validExponent = Is_Ascii_Digit(afterE) ||
                 ((afterE == CHAR_HYPHEN_MINUS || afterE == CHAR_PLUS_SIGN) && Is_Ascii_Digit(Stream.NextNextNext));
-            
+
             if (validExponent)
             {
                 HasExponent = true;
@@ -437,9 +437,22 @@ public class CssTokenizer
             {
                 case char _ when (Is_Ascii_Whitespace(Stream.Next)):
                     {
+                        // Per spec §4.3.6: Consume whitespace, then check for ) or EOF
                         Stream.Consume_While(Is_Ascii_Whitespace);
+                        if (Stream.Next == CHAR_RIGHT_PARENTHESES)
+                        {
+                            Stream.Consume();
+                            return new UrlToken(Result);
+                        }
+                        else if (Stream.Next == EOF)
+                        {
+                            // This is a parse error per spec
+                            return new UrlToken(Result);
+                        }
+                        // Otherwise, consume remnants of bad url
+                        Consume_Bad_Url_Remnants(Stream);
+                        return new BadUrlToken();
                     }
-                    break;
                 case EOF:
                 case CHAR_RIGHT_PARENTHESES:
                     {
@@ -488,7 +501,19 @@ public class CssTokenizer
 
         if (Name.Equals("url", StringComparison.InvariantCultureIgnoreCase) && Stream.Next == CHAR_LEFT_PARENTHESES)
         {
-            Stream.Consume();
+            Stream.Consume(); // Consume '('
+            // Per spec §4.3.4: Consume whitespace, then check if next 1-2 chars indicate a quoted string
+            // If so, return function-token; otherwise consume url token
+            while (Is_Ascii_Whitespace(Stream.Next) && Is_Ascii_Whitespace(Stream.NextNext))
+            {
+                Stream.Consume();
+            }
+            // Check if next is quote, or whitespace followed by quote
+            if (Stream.Next == CHAR_QUOTATION_MARK || Stream.Next == CHAR_APOSTRAPHE ||
+                (Is_Ascii_Whitespace(Stream.Next) && (Stream.NextNext == CHAR_QUOTATION_MARK || Stream.NextNext == CHAR_APOSTRAPHE)))
+            {
+                return new FunctionNameToken(Name);
+            }
             return Consume_Url_Token(Stream);
         }
         else if (Stream.Next == CHAR_LEFT_PARENTHESES)
@@ -714,12 +739,13 @@ public class CssTokenizer
                 }
             case CHAR_PLUS_SIGN:
                 {
-                    Stream.Consume();
+                    // Per spec §4.3.1: Check if input stream starts with a number (including this +)
                     if (Is_Number_Start(Stream.Next, Stream.NextNext, Stream.NextNextNext))
                     {
+                        // Don't consume - let Consume_Numeric_Token handle the sign
                         return Consume_Numeric_Token(Stream);
                     }
-
+                    Stream.Consume();
                     return new DelimToken(CHAR_PLUS_SIGN);
                 }
             case CHAR_COMMA:
@@ -729,32 +755,35 @@ public class CssTokenizer
                 }
             case CHAR_HYPHEN_MINUS:
                 {
-                    Stream.Consume();
+                    // Per spec §4.3.1: Check conditions before consuming
                     if (Is_Number_Start(Stream.Next, Stream.NextNext, Stream.NextNextNext))
                     {
+                        // Don't consume - let Consume_Numeric_Token handle the sign
                         return Consume_Numeric_Token(Stream);
                     }
-                    else if (Is_Identifier_Start(CHAR_HYPHEN_MINUS, Stream.Next, Stream.NextNext))
+                    // Check for CDC token (-->) - next 2 input code points are ->
+                    else if (Stream.NextNext == CHAR_HYPHEN_MINUS && Stream.NextNextNext == CHAR_RIGHT_CHEVRON)
                     {
-                        Stream.Reconsume();
-                        return Consume_Ident_Like_Token(Stream);
-                    }
-                    else if (Stream.Next == CHAR_HYPHEN_MINUS && Stream.NextNext == CHAR_RIGHT_CHEVRON)
-                    {
-                        Stream.Consume(2);
+                        Stream.Consume(3); // Consume -->
                         return CdcToken.Instance;
                     }
-
+                    else if (Is_Identifier_Start(Stream.Next, Stream.NextNext, Stream.NextNextNext))
+                    {
+                        // Don't consume - let Consume_Ident_Like_Token handle it
+                        return Consume_Ident_Like_Token(Stream);
+                    }
+                    Stream.Consume();
                     return new DelimToken(CHAR_HYPHEN_MINUS);
                 }
             case CHAR_FULL_STOP:
                 {
-                    Stream.Consume();
-                    if (Is_Number_Start(CHAR_FULL_STOP, Stream.Next, Stream.NextNext))
+                    // Per spec §4.3.1: Check if input stream starts with a number (including this .)
+                    if (Is_Number_Start(Stream.Next, Stream.NextNext, Stream.NextNextNext))
                     {
+                        // Don't consume - let Consume_Numeric_Token handle the decimal point
                         return Consume_Numeric_Token(Stream);
                     }
-
+                    Stream.Consume();
                     return new DelimToken(CHAR_FULL_STOP);
                 }
             case CHAR_SOLIDUS:
