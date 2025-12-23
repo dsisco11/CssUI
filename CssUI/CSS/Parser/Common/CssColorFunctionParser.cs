@@ -41,7 +41,12 @@ internal static class CssColorFunctionParser
             return TryParseHsl(function.Arguments, out color);
         }
 
-        // @todo: Add hwb, lab, lch, oklab, oklch, color() parsing
+        if (name.Equals("hwb", StringComparison.OrdinalIgnoreCase))
+        {
+            return TryParseHwb(function.Arguments, out color);
+        }
+
+        // @todo: Add lab, lch, oklab, oklch, color() parsing
 
         return false;
     }
@@ -437,7 +442,7 @@ internal static class CssColorFunctionParser
         // Dimension token: angle with unit
         if (token is DimensionToken dimToken)
         {
-            double value = dimToken.Number;
+            double value = Convert.ToDouble(dimToken.Number);
             var unit = dimToken.Unit;
 
             // Convert to degrees based on unit
@@ -544,6 +549,172 @@ internal static class CssColorFunctionParser
         if (token is IdentToken ident && ident.Value.Equals("none", StringComparison.OrdinalIgnoreCase))
         {
             alpha = 1.0; // 'none' alpha defaults to fully opaque
+            return true;
+        }
+
+        return false;
+    }
+
+    #endregion
+
+    #region HWB Parsing
+
+    /// <summary>
+    /// Parses hwb() color function.
+    /// HWB only supports modern (space-separated) syntax - no legacy comma syntax.
+    /// </summary>
+    /// <seealso href="https://www.w3.org/TR/css-color-4/#the-hwb-notation"/>
+    private static bool TryParseHwb(List<CssToken> arguments, out CssColor color)
+    {
+        color = CssColor.Transparent;
+
+        // HWB does NOT support legacy comma syntax per spec
+        // "Using commas inside hwb() is an error."
+        if (ContainsCommas(arguments))
+        {
+            return false;
+        }
+
+        // Extract meaningful tokens (skip whitespace)
+        var tokens = ExtractMeaningfulTokens(arguments);
+        if (tokens.Count < 3)
+        {
+            return false;
+        }
+
+        // Find the slash separator for alpha
+        int slashIndex = -1;
+        for (int i = 0; i < tokens.Count; i++)
+        {
+            if (tokens[i] is DelimToken delim && delim.Value == '/')
+            {
+                slashIndex = i;
+                break;
+            }
+        }
+
+        // Determine HWB token count (should be at least 3 before slash)
+        int hwbCount = slashIndex >= 0 ? slashIndex : tokens.Count;
+        if (hwbCount < 3)
+        {
+            return false;
+        }
+
+        // Parse hue (number or angle) - same as HSL
+        if (!TryGetHueValue(tokens[0], out double hue))
+        {
+            return false;
+        }
+
+        // Parse whiteness (percentage or number, where number is treated as percentage)
+        if (!TryGetWhitenessOrBlackness(tokens[1], out double whiteness))
+        {
+            return false;
+        }
+
+        // Parse blackness (percentage or number, where number is treated as percentage)
+        if (!TryGetWhitenessOrBlackness(tokens[2], out double blackness))
+        {
+            return false;
+        }
+
+        // Parse alpha if present (after the slash)
+        double alpha = 1.0; // Default to fully opaque
+        if (slashIndex >= 0 && slashIndex + 1 < tokens.Count)
+        {
+            if (!TryGetAlphaValueNormalized(tokens[slashIndex + 1], out alpha))
+            {
+                return false;
+            }
+        }
+
+        // Convert HWB to RGB
+        return HwbToRgb(hue, whiteness, blackness, alpha, out color);
+    }
+
+    /// <summary>
+    /// Converts HWB color values to an RGB CssColor.
+    /// Algorithm per CSS Color Level 4 specification.
+    /// </summary>
+    /// <param name="hue">Hue angle in degrees (will be normalized to [0,360))</param>
+    /// <param name="whiteness">Whiteness percentage (0-100)</param>
+    /// <param name="blackness">Blackness percentage (0-100)</param>
+    /// <param name="alpha">Alpha value (0-1)</param>
+    /// <param name="color">The resulting RGB color</param>
+    /// <seealso href="https://www.w3.org/TR/css-color-4/#hwb-to-rgb"/>
+    private static bool HwbToRgb(double hue, double whiteness, double blackness, double alpha, out CssColor color)
+    {
+        // Normalize whiteness and blackness to [0, 1]
+        double white = whiteness / 100.0;
+        double black = blackness / 100.0;
+
+        // Per spec: If white + black >= 1, the result is an achromatic (gray) color
+        // The hue becomes powerless and the result is gray = white / (white + black)
+        if (white + black >= 1.0)
+        {
+            double gray = white / (white + black);
+            int grayByte = (int)Math.Round(Math.Clamp(gray, 0, 1) * 255);
+            int a = (int)Math.Round(Math.Clamp(alpha, 0, 1) * 255);
+            color = new CssColor((byte)grayByte, (byte)grayByte, (byte)grayByte, (byte)a);
+            return true;
+        }
+
+        // First, convert HSL(hue, 100%, 50%) to get the base RGB color
+        // This is the fully saturated color at the given hue
+        hue = NormalizeHue(hue);
+        double r = HslF(0, hue, 1.0, 0.5);
+        double g = HslF(8, hue, 1.0, 0.5);
+        double b = HslF(4, hue, 1.0, 0.5);
+
+        // Apply whiteness and blackness
+        // Per spec: rgb[i] = rgb[i] * (1 - white - black) + white
+        r = r * (1.0 - white - black) + white;
+        g = g * (1.0 - white - black) + white;
+        b = b * (1.0 - white - black) + white;
+
+        // Convert to 0-255 range and clamp
+        int red = (int)Math.Round(Math.Clamp(r, 0, 1) * 255);
+        int green = (int)Math.Round(Math.Clamp(g, 0, 1) * 255);
+        int blue = (int)Math.Round(Math.Clamp(b, 0, 1) * 255);
+        int aVal = (int)Math.Round(Math.Clamp(alpha, 0, 1) * 255);
+
+        color = new CssColor((byte)red, (byte)green, (byte)blue, (byte)aVal);
+        return true;
+    }
+
+    /// <summary>
+    /// Tries to get a whiteness or blackness value from a token.
+    /// Can be a percentage (0-100%) or a number (interpreted as 0-100).
+    /// </summary>
+    private static bool TryGetWhitenessOrBlackness(CssToken token, out double value)
+    {
+        value = 0;
+
+        if (token.Type == ECssTokenType.Percentage)
+        {
+            if (!TryGetPercentage(token, out value))
+            {
+                return false;
+            }
+            // Per spec: whiteness and blackness are not clamped until conversion
+            return true;
+        }
+
+        if (token.Type == ECssTokenType.Number)
+        {
+            if (!TryGetNumber(token, out value))
+            {
+                return false;
+            }
+            // Numbers are interpreted as the same scale as percentages
+            // Per spec: 0% = 0.0, 100% = 100.0 for W and B
+            return true;
+        }
+
+        // 'none' keyword support (CSS Color 4)
+        if (token is IdentToken ident && ident.Value.Equals("none", StringComparison.OrdinalIgnoreCase))
+        {
+            value = 0;
             return true;
         }
 

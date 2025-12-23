@@ -95,7 +95,14 @@
   - [x] Hue angle units: deg, rad, grad, turn
   - [x] HSL to RGB conversion per W3C spec
   - [x] Tests: 20+ tests for hsl/hsla parsing (CssColorFunctionParserTests.cs)
-- [ ] Handle hwb() function → CssValue (COLOR)
+- [x] Handle hwb() function → CssValue (COLOR)
+  - [x] Modern syntax only: hwb(0 0% 0%) - no legacy comma syntax
+  - [x] Whiteness/Blackness: percentage or number (0-100)
+  - [x] Alpha channel: hwb(0 0% 0% / 0.5)
+  - [x] Hue angle units: deg, rad, grad, turn
+  - [x] Achromatic handling when W+B >= 100%
+  - [x] HWB to RGB conversion per W3C spec
+  - [x] Tests: 23 tests for hwb parsing (CssColorFunctionParserTests.cs)
 - [ ] Handle lab()/lch() functions → CssValue (COLOR_HDR)
 - [ ] Handle oklab()/oklch() functions → CssValue (COLOR_HDR)
 - [ ] Handle color() function for custom color spaces

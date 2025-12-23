@@ -1,3 +1,4 @@
+using System;
 using CssUI;
 using CssUI.CSS;
 using CssUI.CSS.Parser;
@@ -704,6 +705,362 @@ public class CssColorFunctionParserTests
         Assert.True(declaration.Values[0] is CssFunction);
         var func = (CssFunction)declaration.Values[0];
         Assert.Equal("hsl", func.Name, ignoreCase: true);
+    }
+
+    #endregion
+
+    #region hwb() Modern Syntax Tests (Space-Separated Only)
+
+    [Fact]
+    public void TryParseHwb_Modern_PercentageSyntax_ReturnsColor()
+    {
+        // Arrange & Act - hwb(0 100% 0%) = pure white
+        var value = ParseColorValue("hwb(0 100% 0%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(255, color.B);
+        Assert.Equal(255, color.A);
+    }
+
+    [Fact]
+    public void TryParseHwb_Modern_NumberSyntax_ReturnsColor()
+    {
+        // Arrange & Act - hwb(0 0 0) = pure red (0 whiteness, 0 blackness)
+        var value = ParseColorValue("hwb(0 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+        Assert.Equal(255, color.A);
+    }
+
+    [Fact]
+    public void TryParseHwb_Modern_WithAlphaSlash_ReturnsColor()
+    {
+        // Arrange & Act - hwb(0 0% 0% / 0.5) = 50% transparent red
+        var value = ParseColorValue("hwb(0 0% 0% / 0.5)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+        Assert.Equal(128, color.A); // 0.5 * 255 = 127.5, rounds to 128
+    }
+
+    [Fact]
+    public void TryParseHwb_Modern_WithAlphaPercentage_ReturnsColor()
+    {
+        // Arrange & Act - hwb(0 0% 0% / 50%) = 50% transparent red
+        var value = ParseColorValue("hwb(0 0% 0% / 50%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+        Assert.Equal(128, color.A);
+    }
+
+    [Fact]
+    public void TryParseHwb_Green_ReturnsCorrectColor()
+    {
+        // Arrange & Act - hwb(120 0% 0%) = pure green
+        var value = ParseColorValue("hwb(120 0% 0%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(0, color.B);
+    }
+
+    [Fact]
+    public void TryParseHwb_Blue_ReturnsCorrectColor()
+    {
+        // Arrange & Act - hwb(240 0% 0%) = pure blue
+        var value = ParseColorValue("hwb(240 0% 0%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(255, color.B);
+    }
+
+    [Fact]
+    public void TryParseHwb_WithWhiteness_LightensColor()
+    {
+        // Arrange & Act - hwb(0 50% 0%) = red lightened with 50% white
+        var value = ParseColorValue("hwb(0 50% 0%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // With 50% whiteness: r = 1.0 * 0.5 + 0.5 = 1.0, g = 0 * 0.5 + 0.5 = 0.5, b = 0 * 0.5 + 0.5 = 0.5
+        Assert.Equal(255, color.R);
+        Assert.Equal(128, color.G);
+        Assert.Equal(128, color.B);
+    }
+
+    [Fact]
+    public void TryParseHwb_WithBlackness_DarkensColor()
+    {
+        // Arrange & Act - hwb(0 0% 50%) = red darkened with 50% black
+        var value = ParseColorValue("hwb(0 0% 50%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // With 50% blackness: r = 1.0 * 0.5 + 0 = 0.5, g = 0 * 0.5 + 0 = 0, b = 0 * 0.5 + 0 = 0
+        Assert.Equal(128, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+    }
+
+    [Fact]
+    public void TryParseHwb_AchromaticColor_WhiteAndBlackOver100_ReturnsGray()
+    {
+        // Arrange & Act - hwb(0 40% 80%) = achromatic, gray = 40 / (40 + 80) = 0.333...
+        var value = ParseColorValue("hwb(0 40% 80%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Per spec: when W+B >= 100%, result is gray = W / (W + B) = 40 / 120 = 0.333...
+        int expectedGray = (int)Math.Round(40.0 / 120.0 * 255);
+        Assert.Equal(expectedGray, color.R);
+        Assert.Equal(expectedGray, color.G);
+        Assert.Equal(expectedGray, color.B);
+    }
+
+    [Fact]
+    public void TryParseHwb_AchromaticColor_ExactlyAt100_ReturnsGray()
+    {
+        // Arrange & Act - hwb(0 50% 50%) = achromatic, gray = 50 / (50 + 50) = 0.5
+        var value = ParseColorValue("hwb(0 50% 50%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        int expectedGray = (int)Math.Round(0.5 * 255); // 128
+        Assert.Equal(expectedGray, color.R);
+        Assert.Equal(expectedGray, color.G);
+        Assert.Equal(expectedGray, color.B);
+    }
+
+    [Fact]
+    public void TryParseHwb_DegUnit_ReturnsCorrectColor()
+    {
+        // Arrange & Act - hwb(120deg 0% 0%) = pure green
+        var value = ParseColorValue("hwb(120deg 0% 0%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(0, color.B);
+    }
+
+    [Fact]
+    public void TryParseHwb_TurnUnit_ReturnsCorrectColor()
+    {
+        // Arrange & Act - hwb(0.5turn 0% 0%) = cyan (180 degrees)
+        var value = ParseColorValue("hwb(0.5turn 0% 0%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(255, color.B);
+    }
+
+    [Fact]
+    public void TryParseHwb_NegativeHue_NormalizesCorrectly()
+    {
+        // Arrange & Act - hwb(-60 0% 0%) = magenta (300 degrees)
+        var value = ParseColorValue("hwb(-60 0% 0%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // -60 normalizes to 300 degrees = magenta
+        Assert.Equal(255, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(255, color.B);
+    }
+
+    [Fact]
+    public void TryParseHwb_HueOver360_NormalizesCorrectly()
+    {
+        // Arrange & Act - hwb(480 0% 0%) = green (480 - 360 = 120 degrees)
+        var value = ParseColorValue("hwb(480 0% 0%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(0, color.B);
+    }
+
+    [Fact]
+    public void TryParseHwb_CaseInsensitive_ReturnsColor()
+    {
+        // Arrange & Act - HWB in uppercase
+        var value = ParseColorValue("HWB(0 0% 0%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+    }
+
+    [Fact]
+    public void TryParseHwb_PureBlack_ReturnsBlack()
+    {
+        // Arrange & Act - hwb(0 0% 100%) = pure black
+        var value = ParseColorValue("hwb(0 0% 100%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Per achromatic rule: 0 / (0 + 100) = 0
+        Assert.Equal(0, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+    }
+
+    [Fact]
+    public void TryParseHwb_PureWhite_ReturnsWhite()
+    {
+        // Arrange & Act - hwb(0 100% 0%) = pure white
+        var value = ParseColorValue("hwb(0 100% 0%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Per achromatic rule: 100 / (100 + 0) = 1
+        Assert.Equal(255, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(255, color.B);
+    }
+
+    [Fact]
+    public void TryParseHwb_SpecExample_ReturnsCorrectColor()
+    {
+        // Arrange & Act - hwb(150 20% 10%) is the same as hsl(150 77.78% 55%)
+        // Per W3C spec example
+        var value = ParseColorValue("hwb(150 20% 10%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Expected: rgb(20% 90% 55%) = rgb(51, 230, 140) approximately
+        // Let's verify the calculation:
+        // H=150, W=0.2, B=0.1, so scale factor = 1 - 0.2 - 0.1 = 0.7
+        // Base HSL(150, 100%, 50%) = (0, 255, 128) approx
+        // Actually for H=150: r=0, g=1, b=0.5 (roughly)
+        // Result: r = 0*0.7 + 0.2 = 0.2, g = 1*0.7 + 0.2 = 0.9, b = 0.5*0.7 + 0.2 = 0.55
+        Assert.InRange(color.R, 48, 56);   // ~51 (20%)
+        Assert.InRange(color.G, 226, 234); // ~230 (90%)
+        Assert.InRange(color.B, 136, 144); // ~140 (55%)
+    }
+
+    [Fact]
+    public void TryParseHwb_LegacySyntaxWithCommas_ReturnsNull()
+    {
+        // Arrange & Act - HWB does NOT support legacy comma syntax per spec
+        var value = ParseColorValue("hwb(0, 0%, 0%)");
+
+        // Assert - should fail to parse as color (commas are invalid)
+        Assert.NotEqual(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseHwb_RadUnit_ReturnsCorrectColor()
+    {
+        // Arrange & Act - hwb(3.14159rad 0% 0%) ≈ hwb(180deg 0% 0%) = cyan
+        var value = ParseColorValue("hwb(3.14159rad 0% 0%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.InRange(color.G, 254, 255); // Allow for rounding
+        Assert.InRange(color.B, 254, 255);
+    }
+
+    [Fact]
+    public void TryParseHwb_GradUnit_ReturnsCorrectColor()
+    {
+        // Arrange & Act - hwb(200grad 0% 0%) = hwb(180deg 0% 0%) = cyan
+        // 200 grads = 200 * (360/400) = 180 degrees
+        var value = ParseColorValue("hwb(200grad 0% 0%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(255, color.B);
+    }
+
+    #endregion
+
+    #region hwb() Property Parsing Tests
+
+    [Fact]
+    public void Parse_ColorProperty_WithHwbFunction_ReturnsColorValue()
+    {
+        // Arrange
+        var css = "color: hwb(0 0% 0%)";
+        var parser = new CssParser(css);
+
+        // Act
+        var declaration = parser.Parse_Decleration();
+
+        // Assert
+        Assert.NotNull(declaration);
+        Assert.Equal("color", declaration.Name);
+        Assert.Single(declaration.Values);
+        Assert.True(declaration.Values[0] is CssFunction);
+        var func = (CssFunction)declaration.Values[0];
+        Assert.Equal("hwb", func.Name, ignoreCase: true);
+    }
+
+    [Fact]
+    public void Parse_BackgroundColorProperty_WithHwbFunction_ReturnsColorValue()
+    {
+        // Arrange
+        var css = "background-color: hwb(240 20% 30% / 0.8)";
+        var parser = new CssParser(css);
+
+        // Act
+        var declaration = parser.Parse_Decleration();
+
+        // Assert
+        Assert.NotNull(declaration);
+        Assert.Equal("background-color", declaration.Name);
+        Assert.Single(declaration.Values);
+        Assert.True(declaration.Values[0] is CssFunction);
+        var func = (CssFunction)declaration.Values[0];
+        Assert.Equal("hwb", func.Name, ignoreCase: true);
     }
 
     #endregion
