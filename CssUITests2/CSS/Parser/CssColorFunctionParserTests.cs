@@ -1,7 +1,5 @@
 using System;
-using CssUI;
 using CssUI.CSS;
-using CssUI.CSS.Parser;
 using CssUI.CSS.Serialization;
 using Xunit;
 

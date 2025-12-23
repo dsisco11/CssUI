@@ -72,18 +72,16 @@ public class CssValueTests
         Assert.Equal(0, CssValue.Zero.AsInteger());
     }
 
-    [Fact(Skip = "Bug: AsDecimal uses Convert.ToInt64 instead of Convert.ToDouble, truncating decimal values")]
+    [Fact]
     [Trait("Category", "CssValue")]
-    [Trait("Category", "Bug")]
     public void CssValue_Percent50_HasCorrectValue()
     {
         Assert.Equal(ECssValueTypes.PERCENT, CssValue.Percent_50.Type);
         Assert.Equal(50d, CssValue.Percent_50.AsDecimal());
     }
 
-    [Fact(Skip = "Bug: AsDecimal uses Convert.ToInt64 instead of Convert.ToDouble, truncating decimal values")]
+    [Fact]
     [Trait("Category", "CssValue")]
-    [Trait("Category", "Bug")]
     public void CssValue_Percent100_HasCorrectValue()
     {
         Assert.Equal(ECssValueTypes.PERCENT, CssValue.Percent_100.Type);
@@ -246,9 +244,8 @@ public class CssValueTests
     #endregion
 
     #region From Factory Methods Tests - Resolution
-    [Fact(Skip = "Bug: From(double, ECssUnit) doesn't distinguish RESOLUTION from DIMENSION for DPI/DPPX units")]
+    [Fact]
     [Trait("Category", "CssValue")]
-    [Trait("Category", "Bug")]
     public void From_Resolution_DPI_Type()
     {
         var value = CssValue.From(96.0, ECssUnit.DPI);
@@ -268,9 +265,8 @@ public class CssValueTests
         Assert.Equal(96, value.AsInteger());
     }
 
-    [Fact(Skip = "Bug: From(double, ECssUnit) doesn't distinguish RESOLUTION from DIMENSION for DPI/DPPX units")]
+    [Fact]
     [Trait("Category", "CssValue")]
-    [Trait("Category", "Bug")]
     public void From_Resolution_DPPX_Type()
     {
         var value = CssValue.From(2.0, ECssUnit.DPPX);
@@ -433,9 +429,8 @@ public class CssValueTests
         Assert.Equal(100, value.AsInteger());
     }
 
-    [Fact(Skip = "Bug: CssTokenizer throws InvalidCastException when parsing percentages")]
+    [Fact]
     [Trait("Category", "CssValue")]
-    [Trait("Category", "Bug")]
     public void From_CSS_Percentage()
     {
         var value = CssValue.From_CSS("100%");
@@ -469,9 +464,8 @@ public class CssValueTests
         Assert.Equal(ECssValueTypes.DIMENSION, value.Type);
     }
 
-    [Fact(Skip = "Known bug: Parser fails to parse '1em' dimension - throws CssParserException")]
+    [Fact]
     [Trait("Category", "CssValue")]
-    [Trait("Category", "Bug")]
     public void From_CSS_DimensionEM()
     {
         var value = CssValue.From_CSS("1em");
@@ -614,9 +608,8 @@ public class CssValueTests
     #endregion
 
     #region Type Conversion Tests - AsDecimal (documents current buggy behavior)
-    [Fact(Skip = "Bug: AsDecimal uses Convert.ToInt64 instead of Convert.ToDouble")]
+    [Fact]
     [Trait("Category", "CssValue")]
-    [Trait("Category", "Bug")]
     public void AsDecimal_FromNumber_ReturnsCorrectValue()
     {
         var value = CssValue.From(3.14159);
@@ -681,9 +674,8 @@ public class CssValueTests
     #endregion
 
     #region Equality Tests (documents current buggy behavior)
-    [Fact(Skip = "Bug: CssValue.Equals throws InvalidCastException for integer comparison")]
+    [Fact]
     [Trait("Category", "CssValue")]
-    [Trait("Category", "Bug")]
     public void Equals_SameIntegerValues_ReturnsTrue()
     {
         var value1 = CssValue.From(42);
@@ -692,9 +684,8 @@ public class CssValueTests
         Assert.Equal(value1, value2);
     }
 
-    [Fact(Skip = "Bug: CssValue.Equals throws InvalidCastException for integer comparison")]
+    [Fact]
     [Trait("Category", "CssValue")]
-    [Trait("Category", "Bug")]
     public void Equals_DifferentIntegerValues_ReturnsFalse()
     {
         var value1 = CssValue.From(42);
