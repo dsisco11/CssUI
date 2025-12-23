@@ -406,7 +406,7 @@ public class CssParserTests
         Assert.Equal("var", func!.Name);
     }
 
-    [Fact(Skip = "Bug: Nested functions cause infinite loop in CssParser")]
+    [Fact]
     [Trait("Category", "Parser")]
     [Trait("Category", "Bug")]
     public void ParseComponentValueList_NestedFunctions_ParsesCorrectly()

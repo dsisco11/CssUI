@@ -14,7 +14,7 @@ namespace CssUI.CSS.Serialization;
 /* Docs: https://www.w3.org/TR/css-syntax-3/ */
 
 /// <summary>
-/// Parses a stream of <see cref="CssToken"/>s and returns 
+/// Parses a stream of <see cref="CssToken"/>s and returns
 /// </summary>
 public class CssParser
 {
@@ -208,8 +208,8 @@ public class CssParser
                 case ECssTokenType.EOF:
                     return Rule;
                 case ECssTokenType.Bracket_Open:
-                    Rule.Block = Consume_SimpleBlock(Stream);
-                    break;
+                    Rule.Block = Consume_SimpleBlock(Stream, Token);
+                    return Rule;
                 default:
                     {
                         Stream.Reconsume();
@@ -237,10 +237,15 @@ public class CssParser
                     return null;
                 case ECssTokenType.Bracket_Open:
                     {
-                        Rule.Block = Consume_SimpleBlock(Stream);
+                        Rule.Block = Consume_SimpleBlock(Stream, Token);
                         return Rule;
                     }
-
+                default:
+                    {
+                        Stream.Reconsume();
+                        Rule.Prelude.Add(Consume_ComponentValue(Stream));
+                    }
+                    break;
             }
         }
         while (Token.Type != ECssTokenType.EOF);
@@ -356,98 +361,138 @@ public class CssParser
     }
 
     /// <summary>
-    /// Consumes a block of tokens encased inbetween one of: [], {}, or ()
+    /// Consumes a simple block per CSS Syntax Level 3 §5.4.8.
     /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
-    static CssSimpleBlock Consume_SimpleBlock(DataConsumer<CssToken> Stream)
+    /// <remarks>
+    /// This algorithm assumes that the current input token has already been
+    /// checked to be a <c>&lt;{-token&gt;</c>, <c>&lt;[-token&gt;</c>, or <c>&lt;(-token&gt;</c>.
+    /// The opening token should be passed via <paramref name="startToken"/>.
+    /// </remarks>
+    /// <param name="Stream">The token stream.</param>
+    /// <param name="startToken">The already-consumed opening bracket token.</param>
+    /// <returns>A simple block containing the consumed tokens.</returns>
+    /// <seealso href="https://www.w3.org/TR/css-syntax-3/#consume-simple-block"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    static CssSimpleBlock Consume_SimpleBlock(DataConsumer<CssToken> Stream, CssToken startToken)
     {
         if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
-        CssToken StartToken = Stream.Consume();
-        CssToken EndToken;
-        switch (StartToken.Type)
+
+        // Determine the ending token (mirror variant of start token)
+        ECssTokenType endTokenType = startToken.Type switch
         {
-            case ECssTokenType.Bracket_Open:
-                EndToken = BracketCloseToken.Instance;
-                break;
-            case ECssTokenType.Parenth_Open:
-                EndToken = ParenthesisCloseToken.Instance;
-                break;
-            case ECssTokenType.SqBracket_Open:
-                EndToken = SqBracketCloseToken.Instance;
-                break;
-            default:
-                throw new CssSyntaxErrorException(CssErrors.EXPECTING_SIMPLE_BLOCK_START, Stream);
-        }
+            ECssTokenType.Bracket_Open => ECssTokenType.Bracket_Close,
+            ECssTokenType.Parenth_Open => ECssTokenType.Parenth_Close,
+            ECssTokenType.SqBracket_Open => ECssTokenType.SqBracket_Close,
+            _ => throw new CssSyntaxErrorException(CssErrors.EXPECTING_SIMPLE_BLOCK_START, Stream)
+        };
 
-        CssSimpleBlock Block = new CssSimpleBlock(StartToken);
-        CssToken Token;
-        do
+        CssSimpleBlock block = new CssSimpleBlock(startToken);
+
+        // Repeatedly consume the next input token
+        while (true)
         {
-            Token = Stream.Consume();
-            if (Token.Type == EndToken.Type) return Block;
-            if (Token.Type == ECssTokenType.EOF) return Block;
+            CssToken token = Stream.Consume();
 
-            Block.Values.Add(Consume_ComponentValue(Stream));
-        }
-        while (Token.Type != ECssTokenType.EOF);
-
-        return Block;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
-    static CssFunction Consume_Function(DataConsumer<CssToken> Stream)
-    {
-        if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
-        if (Stream.Next.Type != ECssTokenType.FunctionName) throw new CssParserException(CssErrors.EXPECTING_FUNCTION_NAME_TOKEN, Stream);
-
-        var name = (Stream.Next as FunctionNameToken).Value;
-        CssFunction Func = new CssFunction(name);
-
-        CssToken Token;
-        do
-        {
-            Token = Stream.Consume();
-            switch (Token.Type)
+            if (token.Type == endTokenType)
             {
-                case ECssTokenType.EOF:
-                case ECssTokenType.Parenth_Close:
-                    return Func;
-                default:
-                    Stream.Reconsume();
-                    Func.Arguments.Add(Consume_ComponentValue(Stream));
-                    break;
+                // ending token: Return the block
+                return block;
             }
-        }
-        while (Token.Type != ECssTokenType.EOF);
 
-        return Func;
+            if (token.Type == ECssTokenType.EOF)
+            {
+                // EOF: This is a parse error. Return the block.
+                return block;
+            }
+
+            // anything else: Reconsume the current input token.
+            // Consume a component value and append it to the value of the block.
+            Stream.Reconsume();
+            block.Values.Add(Consume_ComponentValue(Stream));
+        }
     }
 
     /// <summary>
-    /// Attempts to consume all tokens within a matching pair of () or {} brackets and otherwise just returns the next token.
+    /// Consumes a function per CSS Syntax Level 3 §5.4.9.
     /// </summary>
-    /// <param name="Stream"></param>
-    /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
+    /// <remarks>
+    /// This algorithm assumes that the current input token has already been
+    /// checked to be a <c>&lt;function-token&gt;</c>.
+    /// The function token should be passed via <paramref name="functionToken"/>.
+    /// </remarks>
+    /// <param name="Stream">The token stream.</param>
+    /// <param name="functionToken">The already-consumed function-name token.</param>
+    /// <returns>A function containing the consumed tokens.</returns>
+    /// <seealso href="https://www.w3.org/TR/css-syntax-3/#consume-function"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    static CssFunction Consume_Function(DataConsumer<CssToken> Stream, FunctionNameToken functionToken)
+    {
+        if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
+
+        // Create a function with its name equal to the value of the current input token
+        CssFunction func = new CssFunction(functionToken.Value);
+
+        // Repeatedly consume the next input token
+        while (true)
+        {
+            CssToken token = Stream.Consume();
+
+            switch (token.Type)
+            {
+                case ECssTokenType.Parenth_Close:
+                    // <)-token>: Return the function
+                    return func;
+
+                case ECssTokenType.EOF:
+                    // EOF: This is a parse error. Return the function.
+                    return func;
+
+                default:
+                    // anything else: Reconsume the current input token.
+                    // Consume a component value and append the returned value to the function's value.
+                    Stream.Reconsume();
+                    func.Arguments.Add(Consume_ComponentValue(Stream));
+                    break;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Consumes a component value per CSS Syntax Level 3 §5.4.7.
+    /// </summary>
+    /// <remarks>
+    /// Attempts to consume all tokens within a matching pair of <c>()</c>, <c>{}</c>, or <c>[]</c> brackets,
+    /// or a function, and otherwise just returns the next token.
+    /// </remarks>
+    /// <param name="Stream">The token stream.</param>
+    /// <returns>The consumed component value (token, simple block, or function).</returns>
+    /// <seealso href="https://www.w3.org/TR/css-syntax-3/#consume-component-value"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     static CssToken Consume_ComponentValue(DataConsumer<CssToken> Stream)
     {
         if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
-        switch (Stream.Next.Type)
+
+        // Consume the next input token
+        CssToken token = Stream.Consume();
+
+        switch (token.Type)
         {
+            // If the current input token is a <{-token>, <[-token>, or <(-token>,
+            // consume a simple block and return it.
             case ECssTokenType.Bracket_Open:
             case ECssTokenType.SqBracket_Open:
             case ECssTokenType.Parenth_Open:
-                {
-                    return Consume_SimpleBlock(Stream);
-                }
-            case ECssTokenType.FunctionName:
-                {
-                    return Consume_Function(Stream);
-                }
-        }
+                return Consume_SimpleBlock(Stream, token);
 
-        //return new CssPreservedToken(Stream.Consume());
-        return Stream.Consume();
+            // Otherwise, if the current input token is a <function-token>,
+            // consume a function and return it.
+            case ECssTokenType.FunctionName:
+                return Consume_Function(Stream, (FunctionNameToken)token);
+
+            // Otherwise, return the current input token.
+            default:
+                return token;
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
@@ -462,10 +507,17 @@ public class CssParser
         {
             switch (Stream.Next.Type)
             {
-                case ECssTokenType.Comma:
                 case ECssTokenType.EOF:
                     {
+                        // Don't consume EOF, just add final node and exit
                         cvls.AddLast(node);
+                        return cvls;
+                    }
+                case ECssTokenType.Comma:
+                    {
+                        Stream.Consume(); // Consume the comma
+                        cvls.AddLast(node);
+                        node = cvls.AddLast(new LinkedList<CssToken>());
                     }
                     break;
                 default:
@@ -526,7 +578,8 @@ public class CssParser
                 }
             case ECssTokenType.FunctionName:
                 {
-                    CssFunction func = Consume_Function(Stream);
+                    var funcToken = Stream.Consume() as FunctionNameToken;
+                    CssFunction func = Consume_Function(Stream, funcToken!);
                     return new CssValue(func);
                 }
             case ECssTokenType.Function:
@@ -556,11 +609,11 @@ public class CssParser
     {/* Docs: https://www.w3.org/TR/mediaqueries-4/#mq-syntax */
         Consume_All_Whitespace(Stream);
 
-        /* 
-         * To parse a <media-query-list> production, 
-         * parse a comma-separated list of component values, 
-         * then parse each entry in the returned list as a <media-query>. 
-         * Its value is the list of <media-query>s so produced. 
+        /*
+         * To parse a <media-query-list> production,
+         * parse a comma-separated list of component values,
+         * then parse each entry in the returned list as a <media-query>.
+         * Its value is the list of <media-query>s so produced.
          */
         var cvls = Consume_Comma_Seperated_Component_Value_List(Stream);
         LinkedList<MediaQuery> queryList = new LinkedList<MediaQuery>();
