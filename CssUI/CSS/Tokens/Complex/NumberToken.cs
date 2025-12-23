@@ -52,8 +52,15 @@ public sealed class NumberToken : ValuedTokenBase
     public NumberToken(ENumericTokenType DataType, ReadOnlySpan<char> Value, object number) : base(ECssTokenType.Number, Value)
     {
         this.DataType = DataType;
-        if (DataType == ENumericTokenType.Integer && number is int intValue)
+        if (DataType == ENumericTokenType.Integer)
         {
+            // Handle both int and long from tokenizer's ToInteger which returns long
+            int intValue = number switch
+            {
+                int i => i,
+                long l => (int)l,
+                _ => Convert.ToInt32(number)
+            };
             this.data = NumericTokenData.FromInteger(intValue);
         }
         else
