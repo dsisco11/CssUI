@@ -57,10 +57,11 @@ public class MediaFeature : IMediaCondition, ICssSerializeable
         {
             /* This isnt a supported feature, therefore it should always evaluate to false */
             IsValid = false;
+            Values = Array.Empty<CssValue>();
         }
 
         /* For sanity just catch the case where we dont have values to compare here */
-        if (Values.Length <= 0)
+        if (Values == null || Values.Length <= 0)
         {
             IsValid = false;
         }
@@ -114,8 +115,8 @@ public class MediaFeature : IMediaCondition, ICssSerializeable
             case EMediaFeatureContext.Boolean:
                 {
                     /*
-                     * ...the media feature is evaluated in a boolean context. 
-                     * If the feature would be true for any value other than the number 0, a <dimension> with the value 0, or the keyword none, the media feature evaluates to true. 
+                     * ...the media feature is evaluated in a boolean context.
+                     * If the feature would be true for any value other than the number 0, a <dimension> with the value 0, or the keyword none, the media feature evaluates to true.
                      * Otherwise, it evaluates to false.
                      */
                     CssValue value = Values[0];

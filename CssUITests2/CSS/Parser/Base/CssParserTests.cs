@@ -730,64 +730,68 @@ public class CssParserTests
     #region Media Query Tests (Known Bug)
     [Fact]
     [Trait("Category", "Parser")]
-    [Trait("Category", "Bug")]
+    [Trait("Category", "MediaQuery")]
     public void ParseMediaQueryList_SingleCondition_ReturnsMediaQueryList()
     {
-        var parser = new CssParser("@media (width <= 320px)");
+        var parser = new CssParser("(width <= 320px)");
         Assert.NotNull(parser.Parse_Media_Query_List(document));
     }
 
     [Fact]
     [Trait("Category", "Parser")]
-    [Trait("Category", "Bug")]
+    [Trait("Category", "MediaQuery")]
     public void ParseMediaQueryList_NotCondition_ReturnsMediaQueryList()
     {
-        var parser = new CssParser("@media not (color)");
+        var parser = new CssParser("not (color)");
         Assert.NotNull(parser.Parse_Media_Query_List(document));
     }
 
     [Fact]
     [Trait("Category", "Parser")]
-    [Trait("Category", "Bug")]
+    [Trait("Category", "MediaQuery")]
     public void ParseMediaQueryList_MultipleConditions_ReturnsMediaQueryList()
     {
-        var parser = new CssParser("@media (width <= 320px) or (height <= 100px)");
+        var parser = new CssParser("(width <= 320px) or (height <= 100px)");
         Assert.NotNull(parser.Parse_Media_Query_List(document));
     }
 
     [Fact]
     [Trait("Category", "Parser")]
-    [Trait("Category", "Bug")]
+    [Trait("Category", "MediaQuery")]
     public void ParseMediaQueryList_NestedConditions_ReturnsMediaQueryList()
     {
-        var parser = new CssParser("@media (not (color)) or (width <= 320px)");
+        var parser = new CssParser("(not (color)) or (width <= 320px)");
         Assert.NotNull(parser.Parse_Media_Query_List(document));
     }
 
     [Fact]
     [Trait("Category", "Parser")]
-    [Trait("Category", "Bug")]
+    [Trait("Category", "MediaQuery")]
     public void ParseMediaQueryList_ComplexQuery_ReturnsMediaQueryList()
     {
-        var parser = new CssParser("@media (not ((color) or (grid)) or ((width <= 320px) and (height < 1080px))");
+        // Note: This is a complex nested condition with mixed and/or at different levels
+        var parser = new CssParser("(not ((color) or (grid))) or ((width <= 320px) and (height < 1080px))");
         Assert.NotNull(parser.Parse_Media_Query_List(document));
     }
 
     [Fact]
     [Trait("Category", "Parser")]
-    [Trait("Category", "Bug")]
-    public void ParseMediaQueryList_UnsupportedFeature_ThrowsCssSyntaxError()
+    [Trait("Category", "MediaQuery")]
+    public void ParseMediaQueryList_BooleanFeature_ReturnsMediaQueryList()
     {
-        var parser = new CssParser("@media (hover)");
-        Assert.Throws<CssSyntaxErrorException>(() => parser.Parse_Media_Query_List(document));
+        // (hover) is a valid boolean media feature
+        var parser = new CssParser("(hover)");
+        var result = parser.Parse_Media_Query_List(document);
+        Assert.NotNull(result);
     }
 
     [Fact]
     [Trait("Category", "Parser")]
-    [Trait("Category", "Bug")]
+    [Trait("Category", "MediaQuery")]
     public void ParseMediaQueryList_MixedCombinators_ThrowsCssSyntaxError()
     {
-        var parser = new CssParser("@media not (color) or (grid)");
+        // Mixing 'and' and 'or' at the same level is invalid per spec
+        var parser = new CssParser("(color) and (pointer) or (hover)");
         Assert.Throws<CssSyntaxErrorException>(() => parser.Parse_Media_Query_List(document));
     }
     #endregion

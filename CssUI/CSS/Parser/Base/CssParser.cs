@@ -142,7 +142,7 @@ public class CssParser
         if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
         Contract.EndContractBlock();
 
-        while (Stream.Next.Type == ECssTokenType.Whitespace) { Stream.Consume(); }
+        while (Stream.Next != null && Stream.Next != CssToken.EOF && Stream.Next.Type == ECssTokenType.Whitespace) { Stream.Consume(); }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -669,286 +669,602 @@ public class CssParser
         return new MediaQueryList(document, queryList);
     }
 
+    /// <summary>
+    /// Consumes a media query per Media Queries Level 4 §3 Syntax.
+    /// </summary>
+    /// <remarks>
+    /// Grammar:
+    /// <code>
+    /// &lt;media-query&gt; = &lt;media-condition&gt;
+    ///              | [ not | only ]? &lt;media-type&gt; [ and &lt;media-condition-without-or&gt; ]?
+    /// </code>
+    /// </remarks>
+    /// <seealso href="https://drafts.csswg.org/mediaqueries-4/#mq-syntax"/>
     static MediaQuery Consume_MediaQuery(DataConsumer<CssToken>? Stream = null)
-    {/* Docs: https://drafts.csswg.org/mediaqueries-4/#mq-syntax */
+    {
         if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
 
-        if (Stream.Next.Type != ECssTokenType.Ident)
-        {
-            throw new CssSyntaxErrorException(CssErrors.EXPECTING_IDENT, Stream);
-        }
-        EMediaQueryModifier modifier = 0x0;
-        EMediaType mediaType = 0x0;
-        LinkedList<IMediaCondition> conditionList = new LinkedList<IMediaCondition>();
-
-        /* First check for media modifier */
-        if (Stream.Next.Type != ECssTokenType.Ident)
-        {
-            throw new CssSyntaxErrorException(CssErrors.EXPECTING_IDENT, Stream);
-        }
-        if (Lookup.TryEnum((Stream.Next as IdentToken).Value, out EMediaQueryModifier mod))
-        {
-            Stream.Consume();// consume this token
-            modifier = mod;
-        }
-
-        /* Skip 'and' keyword if present */
-        if (ParserCommon.Is_Combinator(Stream.Next))
-        {
-            Stream.Consume();
-        }
-
-        /* Set the media type */
-        if (Stream.Next.Type != ECssTokenType.Ident)
-        {
-            throw new CssSyntaxErrorException(CssErrors.EXPECTING_IDENT, Stream);
-        }
-
-        if (!Lookup.TryEnum((Stream.Next as IdentToken).Value, out EMediaType type))
-        {
-            throw new CssParserException(String.Format(CultureInfo.InvariantCulture, CssErrors.INVALID_MEDIA_TYPE, (Stream.Next as IdentToken).Value), Stream);
-        }
-        else
-        {
-            Stream.Consume();
-        }
-
-        /* Skip thew first combinator keyword if present */
         Consume_All_Whitespace(Stream);
-        if (ParserCommon.Is_Combinator(Stream.Next))
+
+        // Handle empty media query (evaluates to true per spec)
+        if (Stream.Next.Type == ECssTokenType.EOF)
         {
-            Stream.Consume();
+            return new MediaQuery(EMediaQueryModifier.None, EMediaType.All, new LinkedList<IMediaCondition>());
         }
 
+        // Determine which branch of the grammar we're in:
+        // Branch 1: <media-condition> - starts with '(' or 'not ('
+        // Branch 2: [ not | only ]? <media-type> [ and <media-condition-without-or> ]?
 
-        /* Now consume media conditions until we cant anymore */
-        do
+        bool isConditionOnlyBranch = false;
+
+        // Check if this is a standalone <media-condition>
+        // A <media-condition> starts with:
+        // - '(' for <media-in-parens> (appears as SimpleBlock after component value parsing)
+        // - 'not' followed by '(' for <media-not>
+        // Note: After Consume_Comma_Seperated_Component_Value_List, parenthesized content 
+        // becomes SimpleBlock tokens, not raw Parenth_Open tokens.
+        if (Stream.Next.Type == ECssTokenType.SimpleBlock)
         {
-            Consume_All_Whitespace(Stream);
-            if (Stream.Next.Type != ECssTokenType.Parenth_Open)
-            {/* This isn't invalid, it just signals that we have no more features to consume */
-                break;
+            // Starts with '(...)' block - this is the <media-condition> branch
+            var block = (CssSimpleBlock)Stream.Next;
+            if (block.StartToken.Type == ECssTokenType.Parenth_Open)
+            {
+                isConditionOnlyBranch = true;
+            }
+        }
+        else if (Stream.Next.Type == ECssTokenType.Ident)
+        {
+            var identValue = ((IdentToken)Stream.Next).Value;
+
+            // Check if it's 'not' followed by '(...)' (media-not branch of media-condition)
+            // vs 'not' followed by media-type (modifier branch)
+            if (identValue.Equals("not", StringComparison.OrdinalIgnoreCase))
+            {
+                // Look ahead: 'not' + '(...)' means <media-not> (condition branch)
+                // 'not' + <ident> means modifier + media-type
+                int peekIdx = 1;
+
+                // Skip whitespace in lookahead
+                while (Stream.Peek(peekIdx).Type == ECssTokenType.Whitespace)
+                    peekIdx++;
+
+                var nextToken = Stream.Peek(peekIdx);
+                if (nextToken.Type == ECssTokenType.SimpleBlock)
+                {
+                    var block = (CssSimpleBlock)nextToken;
+                    if (block.StartToken.Type == ECssTokenType.Parenth_Open)
+                    {
+                        // 'not' followed by '(...)' - this is <media-not> in <media-condition>
+                        isConditionOnlyBranch = true;
+                    }
+                }
+                // Otherwise it's 'not <media-type>' (modifier branch)
+            }
+            // 'only' is always a modifier, never starts a condition
+        }
+
+        if (isConditionOnlyBranch)
+        {
+            // Branch 1: <media-condition>
+            // Parse as a standalone condition with implicit 'all' media type
+            var condition = Consume_Media_Condition(Stream, allowOr: true);
+            var conditionList = new LinkedList<IMediaCondition>();
+            if (condition is not null)
+            {
+                conditionList.AddLast(condition);
             }
 
-            var condition = Consume_Media_Condition(Stream);
-            conditionList.AddLast(condition!);
+            return new MediaQuery(EMediaQueryModifier.None, EMediaType.All, conditionList);
         }
-        while (Stream.Next.Type != ECssTokenType.EOF);
 
-        return new MediaQuery(modifier, mediaType, conditionList);
+        // Branch 2: [ not | only ]? <media-type> [ and <media-condition-without-or> ]?
+        EMediaQueryModifier modifier = EMediaQueryModifier.None;
+        EMediaType mediaType = EMediaType.All;
+        var conditions = new LinkedList<IMediaCondition>();
+
+        // Check for optional modifier (not | only)
+        if (Stream.Next.Type == ECssTokenType.Ident)
+        {
+            if (Lookup.TryEnum(((IdentToken)Stream.Next).Value, out EMediaQueryModifier mod))
+            {
+                Stream.Consume();
+                modifier = mod;
+                Consume_All_Whitespace(Stream);
+            }
+        }
+
+        // Consume the media type (required in this branch after optional modifier)
+        if (Stream.Next.Type == ECssTokenType.Ident)
+        {
+            var typeIdent = (IdentToken)Stream.Consume();
+            if (!Lookup.TryEnum(typeIdent.Value, out EMediaType type))
+            {
+                // Unknown media type - per spec, unknown media types don't match
+                // but we still parse them. Use NONE to indicate unknown.
+                mediaType = EMediaType.NONE;
+            }
+            else
+            {
+                mediaType = type;
+            }
+        }
+        else if (modifier != EMediaQueryModifier.None)
+        {
+            // Had a modifier but no media type following - syntax error
+            throw new CssSyntaxErrorException(CssErrors.EXPECTING_IDENT, Stream);
+        }
+
+        Consume_All_Whitespace(Stream);
+
+        // Check for optional 'and <media-condition-without-or>'
+        if (Stream.Next.Type == ECssTokenType.Ident)
+        {
+            var nextIdent = (IdentToken)Stream.Next;
+            if (nextIdent.Value.Equals("and", StringComparison.OrdinalIgnoreCase))
+            {
+                Stream.Consume(); // consume 'and'
+                Consume_All_Whitespace(Stream);
+
+                // Now consume <media-condition-without-or>
+                // This is: <media-not> | <media-in-parens> <media-and>*
+                // (no 'or' allowed at the top level)
+                while (Stream.Next.Type != ECssTokenType.EOF)
+                {
+                    Consume_All_Whitespace(Stream);
+
+                    if (Stream.Next.Type != ECssTokenType.Parenth_Open &&
+                        !(Stream.Next.Type == ECssTokenType.Ident &&
+                          ((IdentToken)Stream.Next).Value.Equals("not", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        break;
+                    }
+
+                    var condition = Consume_Media_Condition(Stream, allowOr: false);
+                    if (condition is not null)
+                    {
+                        conditions.AddLast(condition);
+                    }
+
+                    Consume_All_Whitespace(Stream);
+
+                    // Check for 'and' to continue
+                    if (Stream.Next.Type == ECssTokenType.Ident)
+                    {
+                        var combIdent = (IdentToken)Stream.Next;
+                        if (combIdent.Value.Equals("and", StringComparison.OrdinalIgnoreCase))
+                        {
+                            Stream.Consume();
+                            Consume_All_Whitespace(Stream);
+                        }
+                        else if (combIdent.Value.Equals("or", StringComparison.OrdinalIgnoreCase))
+                        {
+                            // 'or' not allowed in <media-condition-without-or>
+                            throw new CssSyntaxErrorException(CssErrors.INVALID_MULTIPLE_COMBINATORS_ON_MEDIARULE, Stream);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return new MediaQuery(modifier, mediaType, conditions);
     }
 
     /// <summary>
-    /// Consumes a new <see cref="MediaCondition"/> or <see cref="MediaFeature"/>
+    /// Consumes a media condition per Media Queries Level 4 §3 Syntax.
     /// </summary>
-    /// <param name="Stream"></param>
-    /// <returns></returns>
-    static IMediaCondition? Consume_Media_Condition(DataConsumer<CssToken> Stream)
-    {/* Docs: https://www.w3.org/TR/mediaqueries-4/#media-condition */
+    /// <remarks>
+    /// Grammar:
+    /// <code>
+    /// &lt;media-condition&gt; = &lt;media-not&gt; | &lt;media-in-parens&gt; [ &lt;media-and&gt;* | &lt;media-or&gt;* ]
+    /// &lt;media-condition-without-or&gt; = &lt;media-not&gt; | &lt;media-in-parens&gt; &lt;media-and&gt;*
+    /// &lt;media-not&gt; = not &lt;media-in-parens&gt;
+    /// &lt;media-and&gt; = and &lt;media-in-parens&gt;
+    /// &lt;media-or&gt; = or &lt;media-in-parens&gt;
+    /// &lt;media-in-parens&gt; = ( &lt;media-condition&gt; ) | ( &lt;media-feature&gt; ) | &lt;general-enclosed&gt;
+    /// </code>
+    /// </remarks>
+    /// <param name="Stream">The token stream.</param>
+    /// <param name="allowOr">If false, enforces &lt;media-condition-without-or&gt; (no 'or' allowed).</param>
+    /// <returns>The parsed media condition, or null if parsing fails.</returns>
+    /// <seealso href="https://www.w3.org/TR/mediaqueries-4/#media-condition"/>
+    static IMediaCondition? Consume_Media_Condition(DataConsumer<CssToken> Stream, bool allowOr = true)
+    {
         if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
 
         Consume_All_Whitespace(Stream);
-        if (ParserCommon.Starts_Media_Feature(Stream.AsSpan()))
+
+        // Handle EOF/null token
+        if (Stream.Next == null || Stream.Next == CssToken.EOF || Stream.Next.Type == ECssTokenType.EOF)
         {
-            /* Consume opening parentheses */
-            Stream.Consume();
-            var feature = Consume_Media_Feature(Stream);
-
-            /* Consume closing parentheses */
-            if (Stream.Next.Type == ECssTokenType.Parenth_Close)
-            {
-                Stream.Consume();
-            }
-
-            return feature;
+            return null;
         }
-        else if (ParserCommon.Starts_Media_Condition(Stream.AsSpan()))
+
+        // Check for <media-not>: 'not' <media-in-parens>
+        if (Stream.Next.Type == ECssTokenType.Ident)
         {
-            EMediaCombinator Combinator = EMediaCombinator.None;
-            var conditionList = new LinkedList<IMediaCondition>();
-
-
-            if (Stream.Next.Type == ECssTokenType.Parenth_Close)
+            var identValue = ((IdentToken)Stream.Next).Value;
+            if (identValue.Equals("not", StringComparison.OrdinalIgnoreCase))
             {
-                /* Empty media condition block */
-                Stream.Consume();
-                return new MediaCondition(EMediaCombinator.None, Array.Empty<MediaFeature>());
-            }
-            else if (Stream.Next.Type == ECssTokenType.Parenth_Open)
-            {
-                Stream.Consume();
-            }
-
-            Consume_All_Whitespace(Stream);
-            /* Repeatedly consume sub-media-conditions until we hit a closing parentheses */
-            do
-            {
+                Stream.Consume(); // consume 'not'
                 Consume_All_Whitespace(Stream);
 
-                if (Stream.Next.Type == ECssTokenType.Parenth_Close)
-                {
-                    /* End of this media condition block */
-                    break;
-                }
-
-                /* Anything other than the first condition *MUST* specify a combinator */
-                if (conditionList.Count > 0)
-                {
-                    if (!ParserCommon.Is_Combinator(Stream.Next))
-                    {
-                        throw new CssSyntaxErrorException(CssErrors.EXPECTING_COMBINATOR, Stream);
-                    }
-                }
-
-                /* Otherwise we just COULD have a combinator */
-                if (ParserCommon.Is_Combinator(Stream.Next))
-                {
-                    /* Consume combinator */
-                    IdentToken? combinatorToken = Stream.Consume() as IdentToken;
-                    if (!Lookup.TryEnum(combinatorToken.Value, out EMediaCombinator combLookup))
-                    {
-                        throw new CssSyntaxErrorException(String.Format(CultureInfo.InvariantCulture, CssErrors.INVALID_COMBINATOR, combinatorToken.Value), Stream);
-                    }
-                    else if (Combinator == EMediaCombinator.None)
-                    {/* This is the first combinator specified */
-                        Combinator = combLookup;
-                    }
-                    else if (Combinator != EMediaCombinator.None && combLookup != Combinator)
-                    {/* Ensure this new combinator matches the combinator for this method group */
-                        throw new CssSyntaxErrorException(CssErrors.INVALID_MULTIPLE_COMBINATORS_ON_MEDIARULE, Stream);
-                    }
-                }
-
-                Consume_All_Whitespace(Stream);
-                if (Stream.Next.Type != ECssTokenType.Parenth_Open)
+                // Must be followed by <media-in-parens>
+                var innerCondition = Consume_Media_In_Parens(Stream, allowOr);
+                if (innerCondition is null)
                 {
                     throw new CssSyntaxErrorException(CssErrors.EXPECTING_OPENING_PARENTHESES, Stream);
                 }
 
-                /* Oh look a yummy little sub-condition for us to gobble up! */
-                var feature = Consume_Media_Condition(Stream);
-                conditionList.AddLast(feature!);
+                // Wrap in a MediaCondition with NOT combinator
+                var notConditionList = new LinkedList<IMediaCondition>();
+                notConditionList.AddLast(innerCondition);
+                return new MediaCondition(EMediaCombinator.NOT, notConditionList);
             }
-            while (Stream.Next.Type != ECssTokenType.EOF);
-
-            /* Consume closing parentheses */
-            if (Stream.Next.Type == ECssTokenType.Parenth_Close)
-            {
-                Stream.Consume();
-            }
-
-            return new MediaCondition(Combinator, conditionList);
         }
 
-        throw new CssSyntaxErrorException(CssErrors.EXPECTING_MEDIA_CONDITION_START, Stream);
+        // Otherwise: <media-in-parens> [ <media-and>* | <media-or>* ]
+        var firstCondition = Consume_Media_In_Parens(Stream, allowOr);
+        if (firstCondition is null)
+        {
+            return null;
+        }
+
+        Consume_All_Whitespace(Stream);
+
+        // Check for chained conditions (and/or)
+        EMediaCombinator combinator = EMediaCombinator.None;
+        var conditionList = new LinkedList<IMediaCondition>();
+        conditionList.AddLast(firstCondition);
+
+        while (Stream.Next != null && Stream.Next != CssToken.EOF && Stream.Next.Type == ECssTokenType.Ident)
+        {
+            var combIdent = (IdentToken)Stream.Next;
+            var combValue = combIdent.Value;
+
+            EMediaCombinator currentCombinator;
+            if (combValue.Equals("and", StringComparison.OrdinalIgnoreCase))
+            {
+                currentCombinator = EMediaCombinator.AND;
+            }
+            else if (combValue.Equals("or", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!allowOr)
+                {
+                    // 'or' not allowed in <media-condition-without-or>
+                    throw new CssSyntaxErrorException(CssErrors.INVALID_MULTIPLE_COMBINATORS_ON_MEDIARULE, Stream);
+                }
+                currentCombinator = EMediaCombinator.OR;
+            }
+            else
+            {
+                // Not a combinator, stop here
+                break;
+            }
+
+            // Validate combinator consistency (can't mix 'and' and 'or' at same level)
+            if (combinator == EMediaCombinator.None)
+            {
+                combinator = currentCombinator;
+            }
+            else if (combinator != currentCombinator)
+            {
+                throw new CssSyntaxErrorException(CssErrors.INVALID_MULTIPLE_COMBINATORS_ON_MEDIARULE, Stream);
+            }
+
+            Stream.Consume(); // consume combinator
+            Consume_All_Whitespace(Stream);
+
+            var nextCondition = Consume_Media_In_Parens(Stream, allowOr);
+            if (nextCondition is null)
+            {
+                throw new CssSyntaxErrorException(CssErrors.EXPECTING_OPENING_PARENTHESES, Stream);
+            }
+
+            conditionList.AddLast(nextCondition);
+            Consume_All_Whitespace(Stream);
+        }
+
+        // If only one condition and no combinator, return it directly
+        if (conditionList.Count == 1 && combinator == EMediaCombinator.None)
+        {
+            return firstCondition;
+        }
+
+        return new MediaCondition(combinator, conditionList);
+    }
+
+    /// <summary>
+    /// Consumes a &lt;media-in-parens&gt; production.
+    /// </summary>
+    /// <remarks>
+    /// Grammar: &lt;media-in-parens&gt; = ( &lt;media-condition&gt; ) | ( &lt;media-feature&gt; ) | &lt;general-enclosed&gt;
+    /// Note: After component value parsing, parenthesized content appears as SimpleBlock tokens.
+    /// </remarks>
+    static IMediaCondition? Consume_Media_In_Parens(DataConsumer<CssToken> Stream, bool allowOr)
+    {
+        Consume_All_Whitespace(Stream);
+
+        // After Consume_Comma_Seperated_Component_Value_List, parenthesized content
+        // becomes SimpleBlock tokens, not raw Parenth_Open tokens.
+        if (Stream.Next.Type != ECssTokenType.SimpleBlock)
+        {
+            return null;
+        }
+
+        var block = (CssSimpleBlock)Stream.Next;
+        if (block.StartToken.Type != ECssTokenType.Parenth_Open)
+        {
+            return null;
+        }
+
+        // Consume the SimpleBlock
+        Stream.Consume();
+
+        // Create a stream from the block's contents
+        var innerStream = new DataConsumer<CssToken>(block.Values.ToArray(), CssToken.EOF);
+
+        Consume_All_Whitespace(innerStream);
+
+        // Check if it's a <media-feature> by looking at the contents
+        // Media features are: <mf-plain> | <mf-boolean> | <mf-range>
+        // They have an ident (feature name) possibly followed by ':' and value, or comparison operators
+        if (Starts_Media_Feature_In_Block(innerStream))
+        {
+            var feature = Consume_Media_Feature(innerStream);
+            return feature;
+        }
+
+        // Otherwise, it's a nested <media-condition>
+        var nestedCondition = Consume_Media_Condition(innerStream, allowOr);
+        return nestedCondition;
+    }
+
+    /// <summary>
+    /// Checks if the stream appears to start a media feature (vs a nested condition).
+    /// Media features start with an ident that's a known feature name,
+    /// or contain comparison operators like '&lt;', '&gt;', '&lt;=', '&gt;=', '='.
+    /// </summary>
+    static bool Starts_Media_Feature_In_Block(DataConsumer<CssToken> Stream)
+    {
+        // Skip whitespace
+        int idx = 0;
+        while (Stream.Peek(idx) != null && Stream.Peek(idx) != CssToken.EOF && Stream.Peek(idx).Type == ECssTokenType.Whitespace)
+            idx++;
+
+        var firstToken = Stream.Peek(idx);
+
+        // Handle empty block or EOF
+        if (firstToken == null || firstToken == CssToken.EOF || firstToken.Type == ECssTokenType.EOF)
+        {
+            return false;
+        }
+
+        // If it starts with 'not' followed by '(' or SimpleBlock, it's a condition
+        if (firstToken.Type == ECssTokenType.Ident)
+        {
+            var identValue = ((IdentToken)firstToken).Value;
+            if (identValue.Equals("not", StringComparison.OrdinalIgnoreCase))
+            {
+                // Check next non-whitespace token
+                idx++;
+                while (Stream.Peek(idx).Type == ECssTokenType.Whitespace)
+                    idx++;
+
+                var nextToken = Stream.Peek(idx);
+                if (nextToken.Type == ECssTokenType.SimpleBlock || nextToken.Type == ECssTokenType.Parenth_Open)
+                {
+                    return false; // It's a nested condition starting with 'not'
+                }
+            }
+
+            // If it's an ident, check what follows
+            idx++;
+            while (Stream.Peek(idx).Type == ECssTokenType.Whitespace)
+                idx++;
+
+            var afterIdent = Stream.Peek(idx);
+
+            // If followed by ':' it's a plain feature (name: value)
+            if (afterIdent.Type == ECssTokenType.Colon)
+            {
+                return true;
+            }
+
+            // If followed by comparison delims it's a range feature
+            if (afterIdent.Type == ECssTokenType.Delim)
+            {
+                var delimChar = ((DelimToken)afterIdent).Value;
+                if (delimChar == '<' || delimChar == '>' || delimChar == '=')
+                {
+                    return true;
+                }
+            }
+
+            // If followed by EOF or ')' it's a boolean feature (just the name)
+            if (afterIdent.Type == ECssTokenType.EOF || afterIdent.Type == ECssTokenType.Parenth_Close)
+            {
+                return true;
+            }
+
+            // If followed by 'and' or 'or' it might be a boolean feature followed by more conditions
+            // but at the block level, we only have one feature, so check if it's a known feature name
+            // For simplicity, treat lone idents as boolean features
+            if (afterIdent.Type == ECssTokenType.Ident)
+            {
+                var nextIdent = ((IdentToken)afterIdent).Value;
+                if (nextIdent.Equals("and", StringComparison.OrdinalIgnoreCase) ||
+                    nextIdent.Equals("or", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Boolean feature followed by combinator - this is a feature
+                    return true;
+                }
+            }
+
+            // Default: treat as feature if starts with ident (could be boolean feature)
+            return true;
+        }
+
+        // If it starts with '(' or SimpleBlock, it's a nested condition
+        if (firstToken.Type == ECssTokenType.Parenth_Open || firstToken.Type == ECssTokenType.SimpleBlock)
+        {
+            return false;
+        }
+
+        // If it starts with a number/dimension (for range syntax like "320px < width")
+        if (firstToken.Type == ECssTokenType.Number || firstToken.Type == ECssTokenType.Dimension)
+        {
+            return true; // Range feature with value first
+        }
+
+        return false;
     }
 
     static IMediaCondition? Consume_Media_Feature(DataConsumer<CssToken> Stream)
     {/* Docs: https://drafts.csswg.org/mediaqueries-4/#mq-syntax */
         if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
 
+        Consume_All_Whitespace(Stream);
 
-        /* Consume feature name */
-        if (ParserCommon.Starts_Boolean_Feature(Stream.AsSpan()))
+        // Media feature syntax:
+        // <mf-boolean> = <mf-name>
+        // <mf-plain> = <mf-name> : <mf-value>
+        // <mf-range> = <mf-name> <mf-comparison> <mf-value>
+        //            | <mf-value> <mf-comparison> <mf-name>
+        //            | <mf-value> <mf-comparison> <mf-name> <mf-comparison> <mf-value>
+
+        // Collect all tokens that are part of the feature
+        var values = new LinkedList<CssValue>();
+        var ops = new LinkedList<EMediaOperator>();
+        bool expectValue = true;
+        EMediaFeatureName? featureName = null;
+
+        while (Stream.Next.Type != ECssTokenType.EOF && Stream.Next.Type != ECssTokenType.Parenth_Close)
         {
-            /* Consume feature name */
-            IdentToken? nameTok = Stream.Consume() as IdentToken;
-
-            /* Resolve the name */
-            if (!Lookup.TryEnum(nameTok.Value, out EMediaFeatureName Name))
-            {
-                throw new CssParserException(String.Format(CultureInfo.InvariantCulture, CssErrors.INVALID_MEDIA_TYPE, nameTok.Value), Stream);
-            }
-
-            return new MediaFeature(Name);
-        }
-        else if (ParserCommon.Starts_Discreet_Feature(Stream.AsSpan()))
-        {
-            /* Consume feature name */
-            IdentToken? nameTok = Stream.Consume() as IdentToken;
-
-            /* Resolve the name */
-            if (!Lookup.TryEnum(nameTok.Value, out EMediaFeatureName Name))
-            {
-                throw new CssParserException(String.Format(CultureInfo.InvariantCulture, CssErrors.INVALID_MEDIA_TYPE, nameTok.Value), Stream);
-            }
-
-            /* Consume the value to match */
             Consume_All_Whitespace(Stream);
-            var value = Consume_MediaFeature_Value(Stream);
 
-            return new MediaFeature(new CssValue[] { CssValue.From(Name), value }, new EMediaOperator[] { EMediaOperator.EqualTo });
-        }
-        else if (ParserCommon.Starts_Range_Feature(Stream.AsSpan()))
-        {
-            /* This is a range feature of some sort, it could be a short one or a long one */
-            /* Repeatedly consume CssValues, operator, and a single ident */
-            LinkedList<CssValue> Values = new LinkedList<CssValue>();
-            LinkedList<EMediaOperator> Ops = new LinkedList<EMediaOperator>();
-            bool firstToken = true;
-            bool lastWasComparator = false;
+            if (Stream.Next.Type == ECssTokenType.EOF)
+                break;
 
-            while (Stream.Next != CssToken.EOF)
+            // Check for colon (plain feature syntax: name: value)
+            if (Stream.Next.Type == ECssTokenType.Colon)
             {
+                Stream.Consume(); // consume ':'
                 Consume_All_Whitespace(Stream);
 
-                if (Stream.Next.Type == ECssTokenType.Parenth_Close)
+                // What follows is the value
+                var value = Consume_MediaFeature_Value(Stream);
+
+                // This is a plain feature: (name: value)
+                if (featureName.HasValue)
                 {
-                    break;
+                    return new MediaFeature(
+                        new CssValue[] { CssValue.From(featureName.Value), value },
+                        new EMediaOperator[] { EMediaOperator.EqualTo });
                 }
-                else if (Stream.Next.Type == ECssTokenType.Ident)
-                {
-                    if (!firstToken && !lastWasComparator)
-                    {
-                        throw new CssSyntaxErrorException(CssErrors.EXPECTING_COMPARATOR, Stream);
-                    }
-
-                    var nameTok = (IdentToken)Stream.Consume();
-                    /* Resolve the name */
-                    if (!Lookup.TryEnum(nameTok.Value, out EMediaFeatureName Name))
-                    {
-                        throw new CssParserException(String.Format(CultureInfo.InvariantCulture, CssErrors.INVALID_MEDIA_TYPE, nameTok.Value), Stream);
-                    }
-
-                    var value = CssValue.From(Name);
-                    Values.AddLast(value);
-                    lastWasComparator = false;
-                }
-                else if (ParserCommon.Starts_MF_Ident_Or_Value(Stream.AsSpan()))
-                {
-                    if (!firstToken && !lastWasComparator)
-                    {
-                        throw new CssSyntaxErrorException(CssErrors.EXPECTING_COMPARATOR, Stream);
-                    }
-
-                    CssValue value = Consume_MediaFeature_Value(Stream);
-                    Values.AddLast(value);
-                    lastWasComparator = false;
-                }
-                else if (ParserCommon.Is_Comparator(Stream.Next))
-                {
-                    if (lastWasComparator || firstToken)
-                    {
-                        throw new CssSyntaxErrorException(CssErrors.UNEXPECTED_TOKEN, Stream);
-                    }
-
-                    var comparatorTok = (ValuedTokenBase)Stream.Consume();
-                    if (!Lookup.TryEnum(comparatorTok.Value, out EMediaOperator outComparator))
-                    {
-                        throw new CssParserException(CssErrors.EXPECTING_COMPARATOR, Stream);
-                    }
-
-                    Ops.AddLast(outComparator);
-                    lastWasComparator = true;
-                }
-
-                firstToken = false;
+                continue;
             }
 
-            return new MediaFeature(Values.ToArray(), Ops.ToArray());
+            // Check for comparator
+            if (ParserCommon.Is_Comparator(Stream.Next))
+            {
+                string comparatorStr;
+                var token = Stream.Consume();
+
+                if (token is DelimToken delimTok)
+                {
+                    // Single-char operator: <, >, =
+                    // Check for compound operators like <=, >=
+                    Consume_All_Whitespace(Stream);
+                    if (Stream.Next is DelimToken nextDelim && nextDelim.Value == '=')
+                    {
+                        Stream.Consume();
+                        comparatorStr = delimTok.Value.ToString() + "=";
+                    }
+                    else
+                    {
+                        comparatorStr = delimTok.Value.ToString();
+                    }
+                }
+                else if (token is IdentToken identTok)
+                {
+                    // Multi-char operator like <=, >= stored as ident (shouldn't happen with correct tokenizer)
+                    comparatorStr = identTok.Value;
+                }
+                else
+                {
+                    throw new CssParserException(CssErrors.EXPECTING_COMPARATOR, Stream);
+                }
+
+                if (!Lookup.TryEnum(comparatorStr, out EMediaOperator outComparator))
+                {
+                    throw new CssParserException(CssErrors.EXPECTING_COMPARATOR, Stream);
+                }
+                ops.AddLast(outComparator);
+                expectValue = true;
+                continue;
+            }
+
+            // Check for ident (could be feature name)
+            if (Stream.Next.Type == ECssTokenType.Ident)
+            {
+                var identTok = (IdentToken)Stream.Consume();
+
+                // Try to resolve as media feature name
+                if (Lookup.TryEnum(identTok.Value, out EMediaFeatureName name))
+                {
+                    featureName = name;
+                    values.AddLast(CssValue.From(name));
+                    expectValue = false;
+                }
+                else
+                {
+                    // Unknown feature name - per spec, unknown features should be
+                    // parsed but evaluate to "unknown" state. We use Unknown enum value.
+                    featureName = EMediaFeatureName.Unknown;
+                    // Store the Unknown enum value (the raw string is lost)
+                    values.AddLast(CssValue.From(EMediaFeatureName.Unknown));
+                    expectValue = false;
+                }
+                continue;
+            }
+
+            // Otherwise it's a value (number, dimension, ratio)
+            if (Stream.Next.Type == ECssTokenType.Number ||
+                Stream.Next.Type == ECssTokenType.Dimension)
+            {
+                var value = Consume_MediaFeature_Value(Stream);
+                values.AddLast(value);
+                expectValue = false;
+                continue;
+            }
+
+            // Unknown token - stop parsing
+            break;
         }
 
-        return null;
+        // Determine the type of feature
+        if (values.Count == 0)
+        {
+            return null;
+        }
+
+        if (values.Count == 1 && ops.Count == 0 && featureName.HasValue)
+        {
+            // Boolean feature: just (name)
+            return new MediaFeature(featureName.Value);
+        }
+
+        // Range or plain feature
+        return new MediaFeature(values.ToArray(), ops.ToArray());
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
