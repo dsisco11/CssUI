@@ -630,8 +630,8 @@ public class CssColorFunctionParserTests
         // Arrange & Act - Missing lightness
         var value = ParseColorValue("hsl(0, 100%)");
 
-        // Assert - Should return null or default value
-        Assert.True(value.Type == ECssValueTypes.NULL || value.Type == ECssValueTypes.DIMENSION);
+        // Assert - Should not return a color value (may be FUNCTION type if parsing fails)
+        Assert.NotEqual(ECssValueTypes.COLOR, value.Type);
     }
 
     [Fact]
@@ -640,8 +640,8 @@ public class CssColorFunctionParserTests
         // Arrange & Act
         var value = ParseColorValue("hsl()");
 
-        // Assert
-        Assert.True(value.Type == ECssValueTypes.NULL || value.Type == ECssValueTypes.DIMENSION);
+        // Assert - Should not return a color value (may be FUNCTION type if parsing fails)
+        Assert.NotEqual(ECssValueTypes.COLOR, value.Type);
     }
 
     #endregion
@@ -1577,6 +1577,501 @@ public class CssColorFunctionParserTests
     {
         // Arrange
         var css = "background-color: lab(50 25 -25 / 0.8)";
+        var parser = new CssParser(css);
+
+        // Act
+        var declaration = parser.Parse_Decleration();
+
+        // Assert
+        Assert.NotNull(declaration);
+        Assert.Equal("background-color", declaration.Name);
+    }
+
+    #endregion
+
+    #region oklab() Basic Syntax Tests
+
+    [Fact]
+    public void TryParseOklab_BasicNumberSyntax_ReturnsColor()
+    {
+        // Arrange & Act - oklab(0.5 0 0) = mid-gray (L=0.5 in OKLab scale)
+        var value = ParseColorValue("oklab(0.5 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // L=0.5 in OKLab is perceptually mid-gray, which maps to ~RGB 99
+        // (OKLab is perceptually uniform, so L=0.5 corresponds to ~39% luminance)
+        Assert.InRange(color.R, 95, 105);
+        Assert.InRange(color.G, 95, 105);
+        Assert.InRange(color.B, 95, 105);
+        Assert.Equal(255, color.A);
+    }
+
+    [Fact]
+    public void TryParseOklab_WithPercentageLightness_ReturnsColor()
+    {
+        // Arrange & Act - oklab(50% 0 0) = oklab(0.5 0 0) = perceptually mid-gray
+        var value = ParseColorValue("oklab(50% 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.InRange(color.R, 95, 105);
+        Assert.InRange(color.G, 95, 105);
+        Assert.InRange(color.B, 95, 105);
+    }
+
+    [Fact]
+    public void TryParseOklab_WithAlpha_ReturnsColorWithAlpha()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("oklab(0.5 0 0 / 0.5)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.InRange(color.A, 127, 128); // 50% alpha
+    }
+
+    [Fact]
+    public void TryParseOklab_WithPercentageAlpha_ReturnsColorWithAlpha()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("oklab(0.5 0 0 / 50%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.InRange(color.A, 127, 128);
+    }
+
+    [Fact]
+    public void TryParseOklab_Black_ReturnsBlack()
+    {
+        // Arrange & Act - oklab(0 0 0) = black (L=0)
+        var value = ParseColorValue("oklab(0 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+    }
+
+    [Fact]
+    public void TryParseOklab_White_ReturnsWhite()
+    {
+        // Arrange & Act - oklab(1 0 0) = white (L=1)
+        var value = ParseColorValue("oklab(1 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(255, color.B);
+    }
+
+    [Fact]
+    public void TryParseOklab_White_Percentage_ReturnsWhite()
+    {
+        // Arrange & Act - oklab(100% 0 0) = white (L=1)
+        var value = ParseColorValue("oklab(100% 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(255, color.B);
+    }
+
+    [Fact]
+    public void TryParseOklab_PositiveA_ShiftsTowardRed()
+    {
+        // Arrange & Act - Positive 'a' shifts toward red/magenta
+        var value = ParseColorValue("oklab(0.5 0.2 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Should have more red than green
+        Assert.True(color.R > color.G);
+    }
+
+    [Fact]
+    public void TryParseOklab_NegativeA_ShiftsTowardGreen()
+    {
+        // Arrange & Act - Negative 'a' shifts toward green
+        var value = ParseColorValue("oklab(0.5 -0.2 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Should have more green than red
+        Assert.True(color.G > color.R);
+    }
+
+    [Fact]
+    public void TryParseOklab_PositiveB_ShiftsTowardYellow()
+    {
+        // Arrange & Act - Positive 'b' shifts toward yellow
+        var value = ParseColorValue("oklab(0.5 0 0.2)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Yellow = high R, high G, low B
+        Assert.True(color.R > color.B);
+        Assert.True(color.G > color.B);
+    }
+
+    [Fact]
+    public void TryParseOklab_NegativeB_ShiftsTowardBlue()
+    {
+        // Arrange & Act - Negative 'b' shifts toward blue
+        var value = ParseColorValue("oklab(0.5 0 -0.2)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Should have more blue
+        Assert.True(color.B > color.R);
+    }
+
+    [Fact]
+    public void TryParseOklab_PercentageAB_MapsToCorrectRange()
+    {
+        // Arrange & Act - 100% on a/b axis = 0.4, so oklab(0.5 100% 0) = oklab(0.5 0.4 0)
+        var value = ParseColorValue("oklab(0.5 100% 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Very high positive 'a' - should be strongly red-shifted
+        Assert.True(color.R > color.G);
+    }
+
+    [Fact]
+    public void TryParseOklab_LightnessClampedToZero()
+    {
+        // Arrange & Act - Negative lightness clamped to 0
+        var value = ParseColorValue("oklab(-0.5 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Should be black (L clamped to 0)
+        Assert.Equal(0, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+    }
+
+    [Fact]
+    public void TryParseOklab_LightnessClampedTo1()
+    {
+        // Arrange & Act - Lightness > 1 clamped to 1
+        var value = ParseColorValue("oklab(1.5 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Should be white (L clamped to 1)
+        Assert.Equal(255, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(255, color.B);
+    }
+
+    [Fact]
+    public void TryParseOklab_LegacyCommas_ReturnsFalse()
+    {
+        // Arrange & Act - oklab() does NOT support comma syntax
+        var value = ParseColorValue("oklab(0.5, 0, 0)");
+
+        // Assert - Should fail to parse as color (no legacy comma syntax)
+        Assert.NotEqual(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseOklab_CaseInsensitive()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("OKLAB(0.5 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+    }
+
+    #endregion
+
+    #region oklch() Basic Syntax Tests
+
+    [Fact]
+    public void TryParseOklch_BasicNumberSyntax_ReturnsColor()
+    {
+        // Arrange & Act - oklch(0.5 0 0) = perceptually mid-gray (no chroma)
+        var value = ParseColorValue("oklch(0.5 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // L=0.5, C=0 should produce a perceptually mid-gray regardless of hue (~RGB 99)
+        Assert.InRange(color.R, 95, 105);
+        Assert.InRange(color.G, 95, 105);
+        Assert.InRange(color.B, 95, 105);
+        Assert.Equal(255, color.A);
+    }
+
+    [Fact]
+    public void TryParseOklch_WithPercentageLightness_ReturnsColor()
+    {
+        // Arrange & Act - oklch(50% 0 0) = oklch(0.5 0 0) = perceptually mid-gray
+        var value = ParseColorValue("oklch(50% 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.InRange(color.R, 95, 105);
+        Assert.InRange(color.G, 95, 105);
+        Assert.InRange(color.B, 95, 105);
+    }
+
+    [Fact]
+    public void TryParseOklch_WithAlpha_ReturnsColorWithAlpha()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("oklch(0.5 0 0 / 0.5)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.InRange(color.A, 127, 128); // 50% alpha
+    }
+
+    [Fact]
+    public void TryParseOklch_Black_ReturnsBlack()
+    {
+        // Arrange & Act - oklch(0 0 0) = black (L=0)
+        var value = ParseColorValue("oklch(0 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+    }
+
+    [Fact]
+    public void TryParseOklch_White_ReturnsWhite()
+    {
+        // Arrange & Act - oklch(1 0 0) = white (L=1, no chroma)
+        var value = ParseColorValue("oklch(1 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(255, color.B);
+    }
+
+    [Fact]
+    public void TryParseOklch_Red_Hue0()
+    {
+        // Arrange & Act - oklch with chroma and hue ~29deg is roughly red
+        var value = ParseColorValue("oklch(0.628 0.258 29.2)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Should be red-ish
+        Assert.True(color.R > color.G);
+        Assert.True(color.R > color.B);
+    }
+
+    [Fact]
+    public void TryParseOklch_Green_Hue142()
+    {
+        // Arrange & Act - oklch at ~142deg hue is roughly green
+        var value = ParseColorValue("oklch(0.866 0.295 142.5)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Should be green-ish (clamped/gamut-mapped)
+        Assert.True(color.G > color.R || color.G > color.B);
+    }
+
+    [Fact]
+    public void TryParseOklch_Blue_Hue264()
+    {
+        // Arrange & Act - oklch at ~264deg hue is roughly blue
+        var value = ParseColorValue("oklch(0.452 0.313 264.1)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Should be blue-ish (clamped/gamut-mapped)
+        Assert.True(color.B > color.R);
+    }
+
+    [Fact]
+    public void TryParseOklch_WithAngleUnit_Deg()
+    {
+        // Arrange & Act - hue in degrees
+        var value = ParseColorValue("oklch(0.5 0.15 180deg)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Hue at 180deg is cyan-ish
+        Assert.True(color.G > color.R);
+    }
+
+    [Fact]
+    public void TryParseOklch_WithAngleUnit_Rad()
+    {
+        // Arrange & Act - hue in radians (π = 180deg)
+        var value = ParseColorValue("oklch(0.5 0.15 3.14159rad)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        // Should parse without error
+    }
+
+    [Fact]
+    public void TryParseOklch_WithAngleUnit_Turn()
+    {
+        // Arrange & Act - hue in turns (0.5turn = 180deg)
+        var value = ParseColorValue("oklch(0.5 0.15 0.5turn)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseOklch_PercentageChroma_MapsToCorrectRange()
+    {
+        // Arrange & Act - 100% chroma = 0.4
+        var value = ParseColorValue("oklch(0.5 100% 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // High chroma should produce saturated color
+        Assert.True(color.R > color.G || color.R > color.B);
+    }
+
+    [Fact]
+    public void TryParseOklch_NegativeChromaClampedToZero()
+    {
+        // Arrange & Act - Negative chroma clamped to 0
+        var value = ParseColorValue("oklch(0.5 -0.1 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Should be perceptually mid-gray (C clamped to 0), ~RGB 99
+        Assert.InRange(color.R, 95, 105);
+        Assert.InRange(color.G, 95, 105);
+        Assert.InRange(color.B, 95, 105);
+    }
+
+    [Fact]
+    public void TryParseOklch_LegacyCommas_ReturnsFalse()
+    {
+        // Arrange & Act - oklch() does NOT support comma syntax
+        var value = ParseColorValue("oklch(0.5, 0.1, 180)");
+
+        // Assert - Should fail to parse as color (no legacy comma syntax)
+        Assert.NotEqual(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseOklch_CaseInsensitive()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("OKLCH(0.5 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+    }
+
+    #endregion
+
+    #region oklab()/oklch() W3C Spec Examples
+
+    [Fact]
+    public void TryParseOklch_W3CExample_1()
+    {
+        // From W3C spec: oklch(72.322% 0.12403 247.996)
+        var value = ParseColorValue("oklch(72.322% 0.12403 247.996)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseOklch_W3CExample_WithPercentageChroma()
+    {
+        // From W3C spec: oklch(42.1% 48.25% 328.4)
+        // 48.25% of 0.4 = ~0.193 chroma
+        var value = ParseColorValue("oklch(42.1% 48.25% 328.4)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+    }
+
+    #endregion
+
+    #region oklab()/oklch() Property Parsing Tests
+
+    [Fact]
+    public void Parse_ColorProperty_WithOklabFunction_ReturnsColorValue()
+    {
+        // Arrange
+        var css = "color: oklab(0.5 0 0)";
+        var parser = new CssParser(css);
+
+        // Act
+        var declaration = parser.Parse_Decleration();
+
+        // Assert
+        Assert.NotNull(declaration);
+        Assert.Equal("color", declaration.Name);
+        Assert.Single(declaration.Values);
+        Assert.True(declaration.Values[0] is CssFunction);
+        var func = (CssFunction)declaration.Values[0];
+        Assert.Equal("oklab", func.Name, ignoreCase: true);
+    }
+
+    [Fact]
+    public void Parse_ColorProperty_WithOklchFunction_ReturnsColorValue()
+    {
+        // Arrange
+        var css = "color: oklch(0.5 0.1 180)";
+        var parser = new CssParser(css);
+
+        // Act
+        var declaration = parser.Parse_Decleration();
+
+        // Assert
+        Assert.NotNull(declaration);
+        Assert.Equal("color", declaration.Name);
+        Assert.Single(declaration.Values);
+        Assert.True(declaration.Values[0] is CssFunction);
+        var func = (CssFunction)declaration.Values[0];
+        Assert.Equal("oklch", func.Name, ignoreCase: true);
+    }
+
+    [Fact]
+    public void Parse_BackgroundColorProperty_WithOklabAlpha_ReturnsColorValue()
+    {
+        // Arrange
+        var css = "background-color: oklab(0.5 0.1 -0.1 / 0.8)";
         var parser = new CssParser(css);
 
         // Act

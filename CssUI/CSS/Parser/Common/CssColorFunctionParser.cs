@@ -56,7 +56,17 @@ internal static class CssColorFunctionParser
             return TryParseLch(function.Arguments, out color);
         }
 
-        // @todo: Add oklab, oklch, color() parsing
+        if (name.Equals("oklab", StringComparison.OrdinalIgnoreCase))
+        {
+            return TryParseOklab(function.Arguments, out color);
+        }
+
+        if (name.Equals("oklch", StringComparison.OrdinalIgnoreCase))
+        {
+            return TryParseOklch(function.Arguments, out color);
+        }
+
+        // @todo: Add color() parsing
 
         return false;
     }
@@ -1183,6 +1193,359 @@ internal static class CssColorFunctionParser
             matrix[1, 0] * vector[0] + matrix[1, 1] * vector[1] + matrix[1, 2] * vector[2],
             matrix[2, 0] * vector[0] + matrix[2, 1] * vector[1] + matrix[2, 2] * vector[2]
         };
+    }
+
+    #endregion
+
+    #region OKLab/OKLCh Parsing
+
+    /// <summary>
+    /// Parses oklab() color function.
+    /// OKLab only supports modern (space-separated) syntax - no legacy comma syntax.
+    /// </summary>
+    /// <seealso href="https://www.w3.org/TR/css-color-4/#specifying-oklab-oklch"/>
+    private static bool TryParseOklab(List<CssToken> arguments, out CssColor color)
+    {
+        color = CssColor.Transparent;
+
+        // OKLab does NOT support legacy comma syntax per spec
+        // "Using commas inside oklab() is an error."
+        if (ContainsCommas(arguments))
+        {
+            return false;
+        }
+
+        // Extract meaningful tokens (skip whitespace)
+        var tokens = ExtractMeaningfulTokens(arguments);
+        if (tokens.Count < 3)
+        {
+            return false;
+        }
+
+        // Find the slash separator for alpha
+        int slashIndex = FindSlashIndex(tokens);
+
+        // Determine OKLab token count (should be at least 3 before slash)
+        int oklabCount = slashIndex >= 0 ? slashIndex : tokens.Count;
+        if (oklabCount < 3)
+        {
+            return false;
+        }
+
+        // Parse L (Lightness) - 0-1 or 0%-100%, clamped to [0,1]
+        if (!TryGetOklabLightness(tokens[0], out double lightness))
+        {
+            return false;
+        }
+
+        // Parse a - signed value, percentage maps to [-0.4, 0.4]
+        if (!TryGetOklabAB(tokens[1], out double a))
+        {
+            return false;
+        }
+
+        // Parse b - signed value, percentage maps to [-0.4, 0.4]
+        if (!TryGetOklabAB(tokens[2], out double b))
+        {
+            return false;
+        }
+
+        // Parse alpha if present (after the slash)
+        double alpha = 1.0;
+        if (slashIndex >= 0 && slashIndex + 1 < tokens.Count)
+        {
+            if (!TryGetAlphaValueNormalized(tokens[slashIndex + 1], out alpha))
+            {
+                return false;
+            }
+        }
+
+        // Convert OKLab to sRGB
+        return OklabToRgb(lightness, a, b, alpha, out color);
+    }
+
+    /// <summary>
+    /// Parses oklch() color function.
+    /// OKLCh only supports modern (space-separated) syntax - no legacy comma syntax.
+    /// </summary>
+    /// <seealso href="https://www.w3.org/TR/css-color-4/#specifying-oklab-oklch"/>
+    private static bool TryParseOklch(List<CssToken> arguments, out CssColor color)
+    {
+        color = CssColor.Transparent;
+
+        // OKLCh does NOT support legacy comma syntax per spec
+        // "Using commas inside oklch() is an error."
+        if (ContainsCommas(arguments))
+        {
+            return false;
+        }
+
+        // Extract meaningful tokens (skip whitespace)
+        var tokens = ExtractMeaningfulTokens(arguments);
+        if (tokens.Count < 3)
+        {
+            return false;
+        }
+
+        // Find the slash separator for alpha
+        int slashIndex = FindSlashIndex(tokens);
+
+        // Determine OKLCh token count (should be at least 3 before slash)
+        int oklchCount = slashIndex >= 0 ? slashIndex : tokens.Count;
+        if (oklchCount < 3)
+        {
+            return false;
+        }
+
+        // Parse L (Lightness) - 0-1 or 0%-100%, clamped to [0,1]
+        if (!TryGetOklabLightness(tokens[0], out double lightness))
+        {
+            return false;
+        }
+
+        // Parse C (Chroma) - >= 0, percentage maps to [0, 0.4], clamped to >= 0
+        if (!TryGetOklchChroma(tokens[1], out double chroma))
+        {
+            return false;
+        }
+
+        // Parse H (Hue) - same as HSL/HWB/LCH
+        if (!TryGetHueValue(tokens[2], out double hue))
+        {
+            return false;
+        }
+
+        // Parse alpha if present (after the slash)
+        double alpha = 1.0;
+        if (slashIndex >= 0 && slashIndex + 1 < tokens.Count)
+        {
+            if (!TryGetAlphaValueNormalized(tokens[slashIndex + 1], out alpha))
+            {
+                return false;
+            }
+        }
+
+        // Convert OKLCh to OKLab, then OKLab to sRGB
+        return OklchToRgb(lightness, chroma, hue, alpha, out color);
+    }
+
+    /// <summary>
+    /// Tries to get an OKLab/OKLCh Lightness value from a token.
+    /// Can be a number (0-1) or percentage (0%-100%).
+    /// Clamped to [0, 1] at parse time per spec.
+    /// </summary>
+    private static bool TryGetOklabLightness(CssToken token, out double value)
+    {
+        value = 0;
+
+        if (token.Type == ECssTokenType.Number)
+        {
+            if (!TryGetNumber(token, out value))
+            {
+                return false;
+            }
+            // Clamp to [0, 1] at parse time per spec
+            value = Math.Clamp(value, 0, 1);
+            return true;
+        }
+
+        if (token.Type == ECssTokenType.Percentage)
+        {
+            if (!TryGetPercentage(token, out value))
+            {
+                return false;
+            }
+            // Percentage: 0% = 0, 100% = 1
+            value = value / 100.0;
+            // Clamp to [0, 1] at parse time per spec
+            value = Math.Clamp(value, 0, 1);
+            return true;
+        }
+
+        // 'none' keyword support (CSS Color 4)
+        if (token is IdentToken ident && ident.Value.Equals("none", StringComparison.OrdinalIgnoreCase))
+        {
+            value = 0;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Tries to get an OKLab 'a' or 'b' axis value from a token.
+    /// Can be a number (unbounded, typically -0.5 to +0.5) or percentage (-100% to 100% maps to -0.4 to +0.4).
+    /// </summary>
+    private static bool TryGetOklabAB(CssToken token, out double value)
+    {
+        value = 0;
+
+        if (token.Type == ECssTokenType.Number)
+        {
+            if (!TryGetNumber(token, out value))
+            {
+                return false;
+            }
+            // No clamping - values are signed and theoretically unbounded
+            return true;
+        }
+
+        if (token.Type == ECssTokenType.Percentage)
+        {
+            if (!TryGetPercentage(token, out value))
+            {
+                return false;
+            }
+            // Percentage: -100% = -0.4, 0% = 0, 100% = 0.4
+            value = value / 100.0 * 0.4;
+            return true;
+        }
+
+        // 'none' keyword support (CSS Color 4)
+        if (token is IdentToken ident && ident.Value.Equals("none", StringComparison.OrdinalIgnoreCase))
+        {
+            value = 0;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Tries to get an OKLCh Chroma value from a token.
+    /// Can be a number (>= 0, typically 0-0.5) or percentage (0-100% maps to 0-0.4).
+    /// Negative values are clamped to 0 at parse time per spec.
+    /// </summary>
+    private static bool TryGetOklchChroma(CssToken token, out double value)
+    {
+        value = 0;
+
+        if (token.Type == ECssTokenType.Number)
+        {
+            if (!TryGetNumber(token, out value))
+            {
+                return false;
+            }
+            // Clamp negative to 0 at parse time per spec
+            value = Math.Max(0, value);
+            return true;
+        }
+
+        if (token.Type == ECssTokenType.Percentage)
+        {
+            if (!TryGetPercentage(token, out value))
+            {
+                return false;
+            }
+            // Percentage: 0% = 0, 100% = 0.4
+            value = value / 100.0 * 0.4;
+            // Clamp negative to 0 at parse time per spec
+            value = Math.Max(0, value);
+            return true;
+        }
+
+        // 'none' keyword support (CSS Color 4)
+        if (token is IdentToken ident && ident.Value.Equals("none", StringComparison.OrdinalIgnoreCase))
+        {
+            value = 0;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Converts OKLab color values to an sRGB CssColor.
+    /// Algorithm per CSS Color Level 4 specification.
+    /// OKLab uses D65 white point natively, so no chromatic adaptation is needed.
+    /// </summary>
+    /// <param name="lightness">L lightness (0-1)</param>
+    /// <param name="a">a axis (typically -0.5 to +0.5)</param>
+    /// <param name="b">b axis (typically -0.5 to +0.5)</param>
+    /// <param name="alpha">Alpha value (0-1)</param>
+    /// <param name="color">The resulting sRGB color</param>
+    /// <seealso href="https://www.w3.org/TR/css-color-4/#oklab-to-predefined"/>
+    private static bool OklabToRgb(double lightness, double a, double b, double alpha, out CssColor color)
+    {
+        // Step 1: Convert OKLab to D65-adapted XYZ
+        var xyz = OklabToXyz(lightness, a, b);
+
+        // Step 2: Convert D65 XYZ to linear sRGB (no chromatic adaptation needed - same white point)
+        var linearRgb = XyzToLinearSrgb(xyz);
+
+        // Step 3: Apply sRGB gamma encoding
+        var srgb = LinearSrgbToSrgb(linearRgb);
+
+        // Step 4: Clamp to [0, 1] and convert to bytes
+        // Note: Out-of-gamut colors are allowed but must be gamut-mapped for display
+        int red = (int)Math.Round(Math.Clamp(srgb[0], 0, 1) * 255);
+        int green = (int)Math.Round(Math.Clamp(srgb[1], 0, 1) * 255);
+        int blue = (int)Math.Round(Math.Clamp(srgb[2], 0, 1) * 255);
+        int aVal = (int)Math.Round(Math.Clamp(alpha, 0, 1) * 255);
+
+        color = new CssColor((byte)red, (byte)green, (byte)blue, (byte)aVal);
+        return true;
+    }
+
+    /// <summary>
+    /// Converts OKLCh color values to an sRGB CssColor.
+    /// First converts OKLCh to OKLab, then OKLab to sRGB.
+    /// </summary>
+    /// <param name="lightness">L lightness (0-1)</param>
+    /// <param name="chroma">C chroma (>= 0)</param>
+    /// <param name="hue">H hue angle in degrees</param>
+    /// <param name="alpha">Alpha value (0-1)</param>
+    /// <param name="color">The resulting sRGB color</param>
+    private static bool OklchToRgb(double lightness, double chroma, double hue, double alpha, out CssColor color)
+    {
+        // Convert OKLCh to OKLab
+        // a = C * cos(H)
+        // b = C * sin(H)
+        hue = NormalizeHue(hue);
+        double hueRad = hue * Math.PI / 180.0;
+        double a = chroma * Math.Cos(hueRad);
+        double b = chroma * Math.Sin(hueRad);
+
+        // Now convert OKLab to sRGB
+        return OklabToRgb(lightness, a, b, alpha, out color);
+    }
+
+    /// <summary>
+    /// Converts OKLab to D65-adapted XYZ.
+    /// Uses matrices from CSS Color 4 spec / color.js library.
+    /// </summary>
+    /// <seealso href="https://www.w3.org/TR/css-color-4/#color-conversion-code"/>
+    private static double[] OklabToXyz(double L, double a, double b)
+    {
+        // Matrix to convert OKLab to non-linear LMS (LMS^(1/3))
+        // From W3C spec: https://www.w3.org/TR/css-color-4/#color-conversion-code
+        double[,] OKLabToLMS = {
+            { 1.0000000000000000,  0.3963377773761749,  0.2158037573099136 },
+            { 1.0000000000000000, -0.1055613458156586, -0.0638541728258133 },
+            { 1.0000000000000000, -0.0894841775298119, -1.2914855480194092 }
+        };
+
+        // Matrix to convert linear LMS to XYZ (D65)
+        // From W3C spec: https://www.w3.org/TR/css-color-4/#color-conversion-code
+        double[,] LMSToXYZ = {
+            {  1.2268798758459243, -0.5578149944602171,  0.2813910456659647 },
+            { -0.0405757452148008,  1.1122868032803170, -0.0717110580655164 },
+            { -0.0763729366746601, -0.4214933324022432,  1.5869240198367816 }
+        };
+
+        // Step 1: Convert OKLab to non-linear LMS
+        double[] oklab = { L, a, b };
+        double[] lmsNonLinear = MultiplyMatrix3x3(OKLabToLMS, oklab);
+
+        // Step 2: Cube to get linear LMS (undo the cube root)
+        double[] lmsLinear = {
+            lmsNonLinear[0] * lmsNonLinear[0] * lmsNonLinear[0],
+            lmsNonLinear[1] * lmsNonLinear[1] * lmsNonLinear[1],
+            lmsNonLinear[2] * lmsNonLinear[2] * lmsNonLinear[2]
+        };
+
+        // Step 3: Convert linear LMS to XYZ
+        return MultiplyMatrix3x3(LMSToXYZ, lmsLinear);
     }
 
     #endregion
