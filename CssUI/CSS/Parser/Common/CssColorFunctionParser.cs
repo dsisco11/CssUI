@@ -83,9 +83,9 @@ internal static class CssColorFunctionParser
     {
         color = CssColor.Transparent;
 
-        // Extract meaningful tokens (skip whitespace)
-        var tokens = ExtractMeaningfulTokens(arguments);
-        if (tokens.Count == 0)
+        // Create streaming token consumer (filters whitespace)
+        var stream = CssParsingHelpers.CreateTokenStream(arguments);
+        if (stream.atEnd)
         {
             return false;
         }
@@ -95,11 +95,11 @@ internal static class CssColorFunctionParser
 
         if (isLegacySyntax)
         {
-            return TryParseRgbLegacy(tokens, out color);
+            return TryParseRgbLegacy(stream, out color);
         }
         else
         {
-            return TryParseRgbModern(tokens, out color);
+            return TryParseRgbModern(stream, out color);
         }
     }
 
@@ -110,12 +110,24 @@ internal static class CssColorFunctionParser
     /// Per CSS Color 4 §4.1.2: the 'none' value is NOT allowed in legacy syntax.
     /// </summary>
     /// <seealso href="https://www.w3.org/TR/css-color-4/#legacy-color-syntax"/>
-    private static bool TryParseRgbLegacy(List<CssToken> tokens, out CssColor color)
+    private static bool TryParseRgbLegacy(DataConsumer<CssToken> stream, out CssColor color)
     {
         color = CssColor.Transparent;
 
+        // Collect all meaningful tokens to check count
+        var tokens = new List<CssToken>();
+        while (!stream.atEnd)
+        {
+            var token = stream.Consume();
+            // Skip commas in legacy syntax (already filtered whitespace in CreateTokenStream)
+            if (token.Type == ECssTokenType.Comma)
+            {
+                continue;
+            }
+            tokens.Add(token);
+        }
+
         // Legacy syntax requires 3 or 4 values separated by commas
-        // After filtering, we should have 3 or 4 meaningful tokens
         if (tokens.Count < 3 || tokens.Count > 4)
         {
             return false;
@@ -194,51 +206,58 @@ internal static class CssColorFunctionParser
     /// Modern syntax: rgb(r g b) or rgb(r g b / alpha)
     /// Components can freely mix numbers and percentages.
     /// </summary>
-    private static bool TryParseRgbModern(List<CssToken> tokens, out CssColor color)
+    private static bool TryParseRgbModern(DataConsumer<CssToken> stream, out CssColor color)
     {
         color = CssColor.Transparent;
 
         // Modern syntax: at least 3 components, optionally alpha after '/'
-        if (tokens.Count < 3)
+        if (stream.atEnd)
         {
             return false;
         }
 
-        // Find the slash separator for alpha
-        int slashIndex = -1;
-        for (int i = 0; i < tokens.Count; i++)
-        {
-            if (tokens[i] is DelimToken delim && delim.Value == '/')
-            {
-                slashIndex = i;
-                break;
-            }
-        }
-
-        // Determine RGB token count
-        int rgbCount = slashIndex >= 0 ? slashIndex : tokens.Count;
-        if (rgbCount < 3)
+        // Parse R component
+        if (!TryGetRgbComponent(stream.Consume(), out double r))
         {
             return false;
         }
 
-        // Parse R, G, B (first 3 tokens before slash or at indices 0,1,2)
-        double r, g, b;
-        if (!TryGetRgbComponent(tokens[0], out r) ||
-            !TryGetRgbComponent(tokens[1], out g) ||
-            !TryGetRgbComponent(tokens[2], out b))
+        // Parse G component
+        if (stream.atEnd || !TryGetRgbComponent(stream.Consume(), out double g))
+        {
+            return false;
+        }
+
+        // Parse B component
+        if (stream.atEnd || !TryGetRgbComponent(stream.Consume(), out double b))
         {
             return false;
         }
 
         // Parse alpha if present (after the slash)
         double a = BYTE_MAX; // Default to fully opaque
-        if (slashIndex >= 0 && slashIndex + 1 < tokens.Count)
+        if (!stream.atEnd)
         {
-            if (!TryGetAlphaValue(tokens[slashIndex + 1], out a))
+            var next = stream.Consume();
+            if (next is DelimToken delim && delim.Value == '/')
             {
+                // Alpha value expected after slash
+                if (stream.atEnd || !TryGetAlphaValue(stream.Consume(), out a))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                // Extra tokens after RGB components (not a slash) - invalid
                 return false;
             }
+        }
+
+        // Verify no extra tokens remain
+        if (!stream.atEnd)
+        {
+            return false;
         }
 
         color = new CssColor((byte)Math.Round(r), (byte)Math.Round(g), (byte)Math.Round(b), (byte)Math.Round(a));
@@ -256,9 +275,9 @@ internal static class CssColorFunctionParser
     {
         color = CssColor.Transparent;
 
-        // Extract meaningful tokens (skip whitespace and commas for detection)
-        var tokens = ExtractMeaningfulTokens(arguments);
-        if (tokens.Count == 0)
+        // Create token stream from arguments (filters whitespace)
+        var stream = CssParsingHelpers.CreateTokenStream(arguments);
+        if (stream.atEnd)
         {
             return false;
         }
@@ -268,11 +287,11 @@ internal static class CssColorFunctionParser
 
         if (isLegacySyntax)
         {
-            return TryParseHslLegacy(tokens, out color);
+            return TryParseHslLegacy(stream, out color);
         }
         else
         {
-            return TryParseHslModern(tokens, out color);
+            return TryParseHslModern(stream, out color);
         }
     }
 
@@ -283,9 +302,20 @@ internal static class CssColorFunctionParser
     /// Per CSS Color 4 §4.1.2: the 'none' value is NOT allowed in legacy syntax.
     /// </summary>
     /// <seealso href="https://www.w3.org/TR/css-color-4/#legacy-color-syntax"/>
-    private static bool TryParseHslLegacy(List<CssToken> tokens, out CssColor color)
+    private static bool TryParseHslLegacy(DataConsumer<CssToken> stream, out CssColor color)
     {
         color = CssColor.Transparent;
+
+        // Collect all non-comma tokens for validation
+        var tokens = new List<CssToken>();
+        while (!stream.atEnd)
+        {
+            var token = stream.Consume();
+            if (token is not CommaToken)
+            {
+                tokens.Add(token);
+            }
+        }
 
         // Legacy syntax requires 3 or 4 values separated by commas
         if (tokens.Count < 3 || tokens.Count > 4)
@@ -343,48 +373,30 @@ internal static class CssColorFunctionParser
     /// Modern syntax: hsl(hue saturation lightness) or hsl(hue sat light / alpha)
     /// Saturation and lightness can be percentages or numbers.
     /// </summary>
-    private static bool TryParseHslModern(List<CssToken> tokens, out CssColor color)
+    private static bool TryParseHslModern(DataConsumer<CssToken> stream, out CssColor color)
     {
         color = CssColor.Transparent;
 
         // Modern syntax: at least 3 components, optionally alpha after '/'
-        if (tokens.Count < 3)
-        {
-            return false;
-        }
-
-        // Find the slash separator for alpha
-        int slashIndex = -1;
-        for (int i = 0; i < tokens.Count; i++)
-        {
-            if (tokens[i] is DelimToken delim && delim.Value == '/')
-            {
-                slashIndex = i;
-                break;
-            }
-        }
-
-        // Determine HSL token count (should be at least 3 before slash)
-        int hslCount = slashIndex >= 0 ? slashIndex : tokens.Count;
-        if (hslCount < 3)
+        if (stream.atEnd)
         {
             return false;
         }
 
         // Parse hue (number or angle)
-        if (!TryGetHueValue(tokens[0], out double hue))
+        if (!TryGetHueValue(stream.Consume(), out double hue))
         {
             return false;
         }
 
         // Parse saturation (percentage or number, where number is treated as percentage)
-        if (!TryGetSaturationOrLightness(tokens[1], out double saturation))
+        if (stream.atEnd || !TryGetSaturationOrLightness(stream.Consume(), out double saturation))
         {
             return false;
         }
 
         // Parse lightness (percentage or number, where number is treated as percentage)
-        if (!TryGetSaturationOrLightness(tokens[2], out double lightness))
+        if (stream.atEnd || !TryGetSaturationOrLightness(stream.Consume(), out double lightness))
         {
             return false;
         }
@@ -394,12 +406,28 @@ internal static class CssColorFunctionParser
 
         // Parse alpha if present (after the slash)
         double alpha = 1.0; // Default to fully opaque
-        if (slashIndex >= 0 && slashIndex + 1 < tokens.Count)
+        if (!stream.atEnd)
         {
-            if (!TryGetAlphaValueNormalized(tokens[slashIndex + 1], out alpha))
+            var next = stream.Consume();
+            if (next is DelimToken delim && delim.Value == '/')
             {
+                // Alpha value expected after slash
+                if (stream.atEnd || !TryGetAlphaValueNormalized(stream.Consume(), out alpha))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                // Extra tokens after HSL components (not a slash) - invalid
                 return false;
             }
+        }
+
+        // Verify no extra tokens remain
+        if (!stream.atEnd)
+        {
+            return false;
         }
 
         // Convert HSL to RGB
@@ -470,59 +498,9 @@ internal static class CssColorFunctionParser
     /// Tries to get a hue value from a token.
     /// Hue can be a number (interpreted as degrees), or an angle with unit (deg, rad, grad, turn).
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryGetHueValue(CssToken token, out double hue)
-    {
-        hue = 0;
-
-        // Number token: interpreted as degrees
-        if (token.Type == ECssTokenType.Number)
-        {
-            if (!TryGetNumber(token, out hue))
-            {
-                return false;
-            }
-            return true;
-        }
-
-        // Dimension token: angle with unit
-        if (token is DimensionToken dimToken)
-        {
-            double value = Convert.ToDouble(dimToken.Number);
-            var unit = dimToken.Unit;
-
-            // Convert to degrees based on unit
-            if (unit.Equals("deg", StringComparison.OrdinalIgnoreCase))
-            {
-                hue = value;
-            }
-            else if (unit.Equals("rad", StringComparison.OrdinalIgnoreCase))
-            {
-                hue = value * (180.0 / Math.PI);
-            }
-            else if (unit.Equals("grad", StringComparison.OrdinalIgnoreCase))
-            {
-                hue = value * (360.0 / 400.0);
-            }
-            else if (unit.Equals("turn", StringComparison.OrdinalIgnoreCase))
-            {
-                hue = value * 360.0;
-            }
-            else
-            {
-                return false; // Unknown angle unit
-            }
-            return true;
-        }
-
-        // 'none' keyword support (CSS Color 4)
-        if (token is IdentToken ident && ident.Value.Equals("none", StringComparison.OrdinalIgnoreCase))
-        {
-            hue = 0; // 'none' hue is treated as 0 for calculation purposes
-            return true;
-        }
-
-        return false;
-    }
+        => CssParsingHelpers.TryGetHueValue(token, out hue);
 
     /// <summary>
     /// Tries to get a saturation or lightness value from a token.
@@ -566,39 +544,9 @@ internal static class CssColorFunctionParser
     /// Tries to get a normalized alpha value (0-1) from a token.
     /// Alpha can be a number (0-1) or percentage (0-100%).
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryGetAlphaValueNormalized(CssToken token, out double alpha)
-    {
-        alpha = 1.0; // Default fully opaque
-
-        if (token.Type == ECssTokenType.Number)
-        {
-            if (!TryGetNumber(token, out var num))
-            {
-                return false;
-            }
-            alpha = Math.Clamp(num, 0, 1);
-            return true;
-        }
-
-        if (token.Type == ECssTokenType.Percentage)
-        {
-            if (!TryGetPercentage(token, out var pct))
-            {
-                return false;
-            }
-            alpha = Math.Clamp(pct / 100.0, 0, 1);
-            return true;
-        }
-
-        // 'none' keyword support (CSS Color 4)
-        if (token is IdentToken ident && ident.Value.Equals("none", StringComparison.OrdinalIgnoreCase))
-        {
-            alpha = 1.0; // 'none' alpha defaults to fully opaque
-            return true;
-        }
-
-        return false;
-    }
+        => CssParsingHelpers.TryGetAlphaValueNormalized(token, out alpha);
 
     #endregion
 
@@ -620,57 +568,55 @@ internal static class CssColorFunctionParser
             return false;
         }
 
-        // Extract meaningful tokens (skip whitespace)
-        var tokens = ExtractMeaningfulTokens(arguments);
-        if (tokens.Count < 3)
-        {
-            return false;
-        }
-
-        // Find the slash separator for alpha
-        int slashIndex = -1;
-        for (int i = 0; i < tokens.Count; i++)
-        {
-            if (tokens[i] is DelimToken delim && delim.Value == '/')
-            {
-                slashIndex = i;
-                break;
-            }
-        }
-
-        // Determine HWB token count (should be at least 3 before slash)
-        int hwbCount = slashIndex >= 0 ? slashIndex : tokens.Count;
-        if (hwbCount < 3)
+        // Create token stream from arguments (filters whitespace)
+        var stream = CssParsingHelpers.CreateTokenStream(arguments);
+        if (stream.atEnd)
         {
             return false;
         }
 
         // Parse hue (number or angle) - same as HSL
-        if (!TryGetHueValue(tokens[0], out double hue))
+        if (!TryGetHueValue(stream.Consume(), out double hue))
         {
             return false;
         }
 
         // Parse whiteness (percentage or number, where number is treated as percentage)
-        if (!TryGetWhitenessOrBlackness(tokens[1], out double whiteness))
+        if (stream.atEnd || !TryGetWhitenessOrBlackness(stream.Consume(), out double whiteness))
         {
             return false;
         }
 
         // Parse blackness (percentage or number, where number is treated as percentage)
-        if (!TryGetWhitenessOrBlackness(tokens[2], out double blackness))
+        if (stream.atEnd || !TryGetWhitenessOrBlackness(stream.Consume(), out double blackness))
         {
             return false;
         }
 
         // Parse alpha if present (after the slash)
         double alpha = 1.0; // Default to fully opaque
-        if (slashIndex >= 0 && slashIndex + 1 < tokens.Count)
+        if (!stream.atEnd)
         {
-            if (!TryGetAlphaValueNormalized(tokens[slashIndex + 1], out alpha))
+            var next = stream.Consume();
+            if (next is DelimToken delim && delim.Value == '/')
             {
+                // Alpha value expected after slash
+                if (stream.atEnd || !TryGetAlphaValueNormalized(stream.Consume(), out alpha))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                // Extra tokens after HWB components (not a slash) - invalid
                 return false;
             }
+        }
+
+        // Verify no extra tokens remain
+        if (!stream.atEnd)
+        {
+            return false;
         }
 
         // Convert HWB to RGB
@@ -796,49 +742,55 @@ internal static class CssColorFunctionParser
             return false;
         }
 
-        // Extract meaningful tokens (skip whitespace)
-        var tokens = ExtractMeaningfulTokens(arguments);
-        if (tokens.Count < 3)
-        {
-            return false;
-        }
-
-        // Find the slash separator for alpha
-        int slashIndex = FindSlashIndex(tokens);
-
-        // Determine Lab token count (should be at least 3 before slash)
-        int labCount = slashIndex >= 0 ? slashIndex : tokens.Count;
-        if (labCount < 3)
+        // Create token stream from arguments (filters whitespace)
+        var stream = CssParsingHelpers.CreateTokenStream(arguments);
+        if (stream.atEnd)
         {
             return false;
         }
 
         // Parse L (Lightness) - 0-100 or 0%-100%, clamped to [0,100]
-        if (!TryGetLabLightness(tokens[0], out double lightness))
+        if (!TryGetLabLightness(stream.Consume(), out double lightness))
         {
             return false;
         }
 
         // Parse a - signed value, percentage maps to [-125, 125]
-        if (!TryGetLabAB(tokens[1], out double a))
+        if (stream.atEnd || !TryGetLabAB(stream.Consume(), out double a))
         {
             return false;
         }
 
         // Parse b - signed value, percentage maps to [-125, 125]
-        if (!TryGetLabAB(tokens[2], out double b))
+        if (stream.atEnd || !TryGetLabAB(stream.Consume(), out double b))
         {
             return false;
         }
 
         // Parse alpha if present (after the slash)
         double alpha = 1.0;
-        if (slashIndex >= 0 && slashIndex + 1 < tokens.Count)
+        if (!stream.atEnd)
         {
-            if (!TryGetAlphaValueNormalized(tokens[slashIndex + 1], out alpha))
+            var next = stream.Consume();
+            if (next is DelimToken delim && delim.Value == '/')
             {
+                // Alpha value expected after slash
+                if (stream.atEnd || !TryGetAlphaValueNormalized(stream.Consume(), out alpha))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                // Extra tokens after Lab components (not a slash) - invalid
                 return false;
             }
+        }
+
+        // Verify no extra tokens remain
+        if (!stream.atEnd)
+        {
+            return false;
         }
 
         // Convert Lab to sRGB
@@ -861,68 +813,59 @@ internal static class CssColorFunctionParser
             return false;
         }
 
-        // Extract meaningful tokens (skip whitespace)
-        var tokens = ExtractMeaningfulTokens(arguments);
-        if (tokens.Count < 3)
-        {
-            return false;
-        }
-
-        // Find the slash separator for alpha
-        int slashIndex = FindSlashIndex(tokens);
-
-        // Determine LCH token count (should be at least 3 before slash)
-        int lchCount = slashIndex >= 0 ? slashIndex : tokens.Count;
-        if (lchCount < 3)
+        // Create token stream from arguments (filters whitespace)
+        var stream = CssParsingHelpers.CreateTokenStream(arguments);
+        if (stream.atEnd)
         {
             return false;
         }
 
         // Parse L (Lightness) - 0-100 or 0%-100%, clamped to [0,100]
-        if (!TryGetLabLightness(tokens[0], out double lightness))
+        if (!TryGetLabLightness(stream.Consume(), out double lightness))
         {
             return false;
         }
 
         // Parse C (Chroma) - >= 0, percentage maps to [0, 150], clamped to >= 0
-        if (!TryGetLchChroma(tokens[1], out double chroma))
+        if (stream.atEnd || !TryGetLchChroma(stream.Consume(), out double chroma))
         {
             return false;
         }
 
         // Parse H (Hue) - same as HSL/HWB
-        if (!TryGetHueValue(tokens[2], out double hue))
+        if (stream.atEnd || !TryGetHueValue(stream.Consume(), out double hue))
         {
             return false;
         }
 
         // Parse alpha if present (after the slash)
         double alpha = 1.0;
-        if (slashIndex >= 0 && slashIndex + 1 < tokens.Count)
+        if (!stream.atEnd)
         {
-            if (!TryGetAlphaValueNormalized(tokens[slashIndex + 1], out alpha))
+            var next = stream.Consume();
+            if (next is DelimToken delim && delim.Value == '/')
             {
+                // Alpha value expected after slash
+                if (stream.atEnd || !TryGetAlphaValueNormalized(stream.Consume(), out alpha))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                // Extra tokens after LCH components (not a slash) - invalid
                 return false;
             }
         }
 
+        // Verify no extra tokens remain
+        if (!stream.atEnd)
+        {
+            return false;
+        }
+
         // Convert LCH to Lab, then Lab to sRGB
         return LchToRgb(lightness, chroma, hue, alpha, out color);
-    }
-
-    /// <summary>
-    /// Finds the index of the slash separator in the token list.
-    /// </summary>
-    private static int FindSlashIndex(List<CssToken> tokens)
-    {
-        for (int i = 0; i < tokens.Count; i++)
-        {
-            if (tokens[i] is DelimToken delim && delim.Value == '/')
-            {
-                return i;
-            }
-        }
-        return -1;
     }
 
     /// <summary>
@@ -1240,49 +1183,55 @@ internal static class CssColorFunctionParser
             return false;
         }
 
-        // Extract meaningful tokens (skip whitespace)
-        var tokens = ExtractMeaningfulTokens(arguments);
-        if (tokens.Count < 3)
-        {
-            return false;
-        }
-
-        // Find the slash separator for alpha
-        int slashIndex = FindSlashIndex(tokens);
-
-        // Determine OKLab token count (should be at least 3 before slash)
-        int oklabCount = slashIndex >= 0 ? slashIndex : tokens.Count;
-        if (oklabCount < 3)
+        // Create token stream from arguments (filters whitespace)
+        var stream = CssParsingHelpers.CreateTokenStream(arguments);
+        if (stream.atEnd)
         {
             return false;
         }
 
         // Parse L (Lightness) - 0-1 or 0%-100%, clamped to [0,1]
-        if (!TryGetOklabLightness(tokens[0], out double lightness))
+        if (!TryGetOklabLightness(stream.Consume(), out double lightness))
         {
             return false;
         }
 
         // Parse a - signed value, percentage maps to [-0.4, 0.4]
-        if (!TryGetOklabAB(tokens[1], out double a))
+        if (stream.atEnd || !TryGetOklabAB(stream.Consume(), out double a))
         {
             return false;
         }
 
         // Parse b - signed value, percentage maps to [-0.4, 0.4]
-        if (!TryGetOklabAB(tokens[2], out double b))
+        if (stream.atEnd || !TryGetOklabAB(stream.Consume(), out double b))
         {
             return false;
         }
 
         // Parse alpha if present (after the slash)
         double alpha = 1.0;
-        if (slashIndex >= 0 && slashIndex + 1 < tokens.Count)
+        if (!stream.atEnd)
         {
-            if (!TryGetAlphaValueNormalized(tokens[slashIndex + 1], out alpha))
+            var next = stream.Consume();
+            if (next is DelimToken delim && delim.Value == '/')
             {
+                // Alpha value expected after slash
+                if (stream.atEnd || !TryGetAlphaValueNormalized(stream.Consume(), out alpha))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                // Extra tokens after OKLab components (not a slash) - invalid
                 return false;
             }
+        }
+
+        // Verify no extra tokens remain
+        if (!stream.atEnd)
+        {
+            return false;
         }
 
         // Convert OKLab to sRGB
@@ -1305,49 +1254,55 @@ internal static class CssColorFunctionParser
             return false;
         }
 
-        // Extract meaningful tokens (skip whitespace)
-        var tokens = ExtractMeaningfulTokens(arguments);
-        if (tokens.Count < 3)
-        {
-            return false;
-        }
-
-        // Find the slash separator for alpha
-        int slashIndex = FindSlashIndex(tokens);
-
-        // Determine OKLCh token count (should be at least 3 before slash)
-        int oklchCount = slashIndex >= 0 ? slashIndex : tokens.Count;
-        if (oklchCount < 3)
+        // Create token stream from arguments (filters whitespace)
+        var stream = CssParsingHelpers.CreateTokenStream(arguments);
+        if (stream.atEnd)
         {
             return false;
         }
 
         // Parse L (Lightness) - 0-1 or 0%-100%, clamped to [0,1]
-        if (!TryGetOklabLightness(tokens[0], out double lightness))
+        if (!TryGetOklabLightness(stream.Consume(), out double lightness))
         {
             return false;
         }
 
         // Parse C (Chroma) - >= 0, percentage maps to [0, 0.4], clamped to >= 0
-        if (!TryGetOklchChroma(tokens[1], out double chroma))
+        if (stream.atEnd || !TryGetOklchChroma(stream.Consume(), out double chroma))
         {
             return false;
         }
 
         // Parse H (Hue) - same as HSL/HWB/LCH
-        if (!TryGetHueValue(tokens[2], out double hue))
+        if (stream.atEnd || !TryGetHueValue(stream.Consume(), out double hue))
         {
             return false;
         }
 
         // Parse alpha if present (after the slash)
         double alpha = 1.0;
-        if (slashIndex >= 0 && slashIndex + 1 < tokens.Count)
+        if (!stream.atEnd)
         {
-            if (!TryGetAlphaValueNormalized(tokens[slashIndex + 1], out alpha))
+            var next = stream.Consume();
+            if (next is DelimToken delim && delim.Value == '/')
             {
+                // Alpha value expected after slash
+                if (stream.atEnd || !TryGetAlphaValueNormalized(stream.Consume(), out alpha))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                // Extra tokens after OKLCh components (not a slash) - invalid
                 return false;
             }
+        }
+
+        // Verify no extra tokens remain
+        if (!stream.atEnd)
+        {
+            return false;
         }
 
         // Convert OKLCh to OKLab, then OKLab to sRGB
@@ -1593,15 +1548,15 @@ internal static class CssColorFunctionParser
             return false;
         }
 
-        // Extract meaningful tokens (skip whitespace)
-        var tokens = ExtractMeaningfulTokens(arguments);
-        if (tokens.Count < 4) // Need at least: colorspace c1 c2 c3
+        // Create token stream from arguments (filters whitespace)
+        var stream = CssParsingHelpers.CreateTokenStream(arguments);
+        if (stream.atEnd)
         {
             return false;
         }
 
         // First token must be an identifier for the color space
-        if (tokens[0] is not IdentToken colorSpaceToken)
+        if (stream.Consume() is not IdentToken colorSpaceToken)
         {
             return false;
         }
@@ -1612,32 +1567,46 @@ internal static class CssColorFunctionParser
             return false; // Unknown color space = invalid color
         }
 
-        // Find the slash separator for alpha
-        int slashIndex = FindSlashIndex(tokens);
-
-        // Determine component count (should be exactly 3 before slash, starting at index 1)
-        int componentCount = slashIndex >= 0 ? slashIndex - 1 : tokens.Count - 1;
-        if (componentCount != 3)
+        // Parse the three color components
+        if (stream.atEnd || !TryGetColorComponent(stream.Consume(), colorSpace, 0, out double c1))
         {
             return false;
         }
 
-        // Parse the three color components (starting at index 1)
-        if (!TryGetColorComponent(tokens[1], colorSpace, 0, out double c1) ||
-            !TryGetColorComponent(tokens[2], colorSpace, 1, out double c2) ||
-            !TryGetColorComponent(tokens[3], colorSpace, 2, out double c3))
+        if (stream.atEnd || !TryGetColorComponent(stream.Consume(), colorSpace, 1, out double c2))
+        {
+            return false;
+        }
+
+        if (stream.atEnd || !TryGetColorComponent(stream.Consume(), colorSpace, 2, out double c3))
         {
             return false;
         }
 
         // Parse alpha if present (after the slash)
         double alpha = 1.0;
-        if (slashIndex >= 0 && slashIndex + 1 < tokens.Count)
+        if (!stream.atEnd)
         {
-            if (!TryGetAlphaValueNormalized(tokens[slashIndex + 1], out alpha))
+            var next = stream.Consume();
+            if (next is DelimToken delim && delim.Value == '/')
             {
+                // Alpha value expected after slash
+                if (stream.atEnd || !TryGetAlphaValueNormalized(stream.Consume(), out alpha))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                // Extra tokens after color components (not a slash) - invalid
                 return false;
             }
+        }
+
+        // Verify no extra tokens remain
+        if (!stream.atEnd)
+        {
+            return false;
         }
 
         // Convert from the specified color space to sRGB
@@ -2022,25 +1991,6 @@ internal static class CssColorFunctionParser
     #region Helper Methods
 
     /// <summary>
-    /// Extracts meaningful tokens from the arguments list, skipping whitespace and commas.
-    /// </summary>
-    private static List<CssToken> ExtractMeaningfulTokens(List<CssToken> arguments)
-    {
-        var result = new List<CssToken>();
-        foreach (var token in arguments)
-        {
-            // Skip whitespace and commas
-            if (token.Type == ECssTokenType.Whitespace ||
-                token.Type == ECssTokenType.Comma)
-            {
-                continue;
-            }
-            result.Add(token);
-        }
-        return result;
-    }
-
-    /// <summary>
     /// Checks if the arguments contain comma separators (indicating legacy syntax).
     /// </summary>
     private static bool ContainsCommas(List<CssToken> arguments)
@@ -2099,73 +2049,23 @@ internal static class CssColorFunctionParser
     /// Tries to get an alpha value from a token.
     /// Alpha can be a number (0-1) or percentage (0-100%).
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryGetAlphaValue(CssToken token, out double value)
-    {
-        value = BYTE_MAX; // Default fully opaque
-
-        if (token.Type == ECssTokenType.Number)
-        {
-            if (!TryGetNumber(token, out var num))
-            {
-                return false;
-            }
-            // Alpha as number is 0-1 range, convert to 0-255
-            value = Math.Clamp(num, 0, 1) * BYTE_MAX;
-            return true;
-        }
-
-        if (token.Type == ECssTokenType.Percentage)
-        {
-            if (!TryGetPercentage(token, out var pct))
-            {
-                return false;
-            }
-            // Alpha as percentage is 0-100, convert to 0-255
-            value = Math.Clamp(pct, 0, 100) / PERCENT_MAX * BYTE_MAX;
-            return true;
-        }
-
-        // 'none' keyword support (CSS Color 4)
-        if (token is IdentToken ident && ident.Value.Equals("none", StringComparison.OrdinalIgnoreCase))
-        {
-            value = BYTE_MAX; // 'none' alpha defaults to fully opaque per spec
-            return true;
-        }
-
-        return false;
-    }
+        => CssParsingHelpers.TryGetAlphaValue(token, out value);
 
     /// <summary>
     /// Extracts a numeric value from a NumberToken.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryGetNumber(CssToken token, out double value)
-    {
-        value = 0;
-        if (token is not NumberToken numToken || numToken.Number is null)
-        {
-            return false;
-        }
-
-        value = Convert.ToDouble(numToken.Number);
-        return true;
-    }
+        => CssParsingHelpers.TryGetNumber(token, out value);
 
     /// <summary>
     /// Extracts a percentage value from a PercentageToken.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryGetPercentage(CssToken token, out double value)
-    {
-        value = 0;
-        if (token is not PercentageToken pctToken)
-        {
-            return false;
-        }
-
-        value = pctToken.Number;
-        return true;
-    }
+        => CssParsingHelpers.TryGetPercentage(token, out value);
 
     /// <summary>
     /// Converts a percentage (0-100) to an RGB component (0-255).

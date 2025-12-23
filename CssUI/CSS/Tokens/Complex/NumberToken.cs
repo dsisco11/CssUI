@@ -7,6 +7,7 @@ public sealed class NumberToken : ValuedTokenBase
     /// <summary>
     /// Holds the numeric representation of this token value
     /// </summary>
+    // TODO: Change to a union struct to avoid boxing
     public readonly object? Number = null;
     /// <summary>
     /// Specifies the type of value stored in the <see cref="Number"/> field. (int or float)

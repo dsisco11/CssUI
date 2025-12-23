@@ -2480,4 +2480,88 @@ public class CssColorFunctionParserTests
     }
 
     #endregion
+
+    #region Malformed Input Rejection Tests
+
+    [Fact]
+    public void TryParseRgb_ExtraTokensAfterComponents_ReturnsNull()
+    {
+        // Arrange & Act - Extra number after RGB components
+        var value = ParseColorValue("rgb(255 128 0 50)");
+
+        // Assert - Should not return a color value
+        Assert.NotEqual(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseRgb_ExtraTokensAfterAlpha_ReturnsNull()
+    {
+        // Arrange & Act - Extra number after alpha
+        var value = ParseColorValue("rgb(255 128 0 / 0.5 50)");
+
+        // Assert - Should not return a color value
+        Assert.NotEqual(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseHsl_ExtraTokensAfterComponents_ReturnsNull()
+    {
+        // Arrange & Act - Extra number after HSL components
+        var value = ParseColorValue("hsl(180 50% 50% 0.5)");
+
+        // Assert - Should not return a color value (without slash, 4th value is invalid)
+        Assert.NotEqual(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseHwb_ExtraTokensAfterAlpha_ReturnsNull()
+    {
+        // Arrange & Act - Extra number after alpha
+        var value = ParseColorValue("hwb(180 20% 30% / 0.5 extra)");
+
+        // Assert - Should not return a color value
+        Assert.NotEqual(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseLab_ExtraTokensAfterComponents_ReturnsNull()
+    {
+        // Arrange & Act - Extra number after Lab components
+        var value = ParseColorValue("lab(50 40 -30 25)");
+
+        // Assert - Should not return a color value (without slash, 4th value is invalid)
+        Assert.NotEqual(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseOklab_ExtraTokensAfterAlpha_ReturnsNull()
+    {
+        // Arrange & Act - Extra number after alpha
+        var value = ParseColorValue("oklab(0.5 0.1 -0.1 / 0.8 0.5)");
+
+        // Assert - Should not return a color value
+        Assert.NotEqual(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseColor_ExtraTokensAfterComponents_ReturnsNull()
+    {
+        // Arrange & Act - Extra value after color components
+        var value = ParseColorValue("color(srgb 1 0.5 0.5 0.3)");
+
+        // Assert - Should not return a color value (without slash, 4th value is invalid)
+        Assert.NotEqual(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseColor_ExtraTokensAfterAlpha_ReturnsNull()
+    {
+        // Arrange & Act - Extra value after alpha
+        var value = ParseColorValue("color(srgb 1 0.5 0.5 / 0.8 extra)");
+
+        // Assert - Should not return a color value
+        Assert.NotEqual(ECssValueTypes.COLOR, value.Type);
+    }
+
+    #endregion
 }
