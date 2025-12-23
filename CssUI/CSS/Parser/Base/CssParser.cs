@@ -622,11 +622,25 @@ public class CssParser
                 {
                     var funcToken = Stream.Consume() as FunctionNameToken;
                     CssFunction func = Consume_Function(Stream, funcToken!);
+
+                    // Check if this is a color function (rgb, rgba, hsl, hsla, etc.)
+                    if (CssColorFunctionParser.TryParseColorFunction(func, out CssColor color))
+                    {
+                        return CssValue.From(color);
+                    }
+
                     return new CssValue(func);
                 }
             case ECssTokenType.Function:
                 {
                     var func = Stream.Consume() as CssFunction;
+
+                    // Check if this is a color function (rgb, rgba, hsl, hsla, etc.)
+                    if (CssColorFunctionParser.TryParseColorFunction(func!, out CssColor color))
+                    {
+                        return CssValue.From(color);
+                    }
+
                     return new CssValue(func!);
                 }
             case ECssTokenType.Url:
