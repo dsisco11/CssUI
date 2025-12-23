@@ -35,7 +35,13 @@ internal static class CssColorFunctionParser
             return TryParseRgb(function.Arguments, out color);
         }
 
-        // @todo: Add hsl, hsla, hwb, lab, lch, oklab, oklch, color() parsing
+        if (name.Equals("hsl", StringComparison.OrdinalIgnoreCase) ||
+            name.Equals("hsla", StringComparison.OrdinalIgnoreCase))
+        {
+            return TryParseHsl(function.Arguments, out color);
+        }
+
+        // @todo: Add hwb, lab, lch, oklab, oklch, color() parsing
 
         return false;
     }
@@ -199,6 +205,352 @@ internal static class CssColorFunctionParser
         color = new CssColor((byte)Math.Round(r), (byte)Math.Round(g), (byte)Math.Round(b), (byte)Math.Round(a));
         return true;
     }
+
+    #region HSL Parsing
+
+    /// <summary>
+    /// Parses hsl() and hsla() color functions.
+    /// Supports both legacy (comma-separated) and modern (space-separated) syntax.
+    /// </summary>
+    /// <seealso href="https://www.w3.org/TR/css-color-4/#the-hsl-notation"/>
+    private static bool TryParseHsl(List<CssToken> arguments, out CssColor color)
+    {
+        color = CssColor.Transparent;
+
+        // Extract meaningful tokens (skip whitespace and commas for detection)
+        var tokens = ExtractMeaningfulTokens(arguments);
+        if (tokens.Count == 0)
+        {
+            return false;
+        }
+
+        // Detect syntax type: legacy uses commas, modern uses spaces
+        bool isLegacySyntax = ContainsCommas(arguments);
+
+        if (isLegacySyntax)
+        {
+            return TryParseHslLegacy(tokens, out color);
+        }
+        else
+        {
+            return TryParseHslModern(tokens, out color);
+        }
+    }
+
+    /// <summary>
+    /// Parses legacy comma-separated hsl()/hsla() syntax.
+    /// Legacy syntax: hsl(hue, saturation%, lightness%) or hsla(hue, sat%, light%, alpha)
+    /// Saturation and lightness must be percentages in legacy syntax.
+    /// </summary>
+    private static bool TryParseHslLegacy(List<CssToken> tokens, out CssColor color)
+    {
+        color = CssColor.Transparent;
+
+        // Legacy syntax requires 3 or 4 values separated by commas
+        if (tokens.Count < 3 || tokens.Count > 4)
+        {
+            return false;
+        }
+
+        // Parse hue (number or angle)
+        if (!TryGetHueValue(tokens[0], out double hue))
+        {
+            return false;
+        }
+
+        // In legacy syntax, saturation and lightness must be percentages
+        if (tokens[1].Type != ECssTokenType.Percentage ||
+            tokens[2].Type != ECssTokenType.Percentage)
+        {
+            return false;
+        }
+
+        if (!TryGetPercentage(tokens[1], out double saturation) ||
+            !TryGetPercentage(tokens[2], out double lightness))
+        {
+            return false;
+        }
+
+        // Per spec: negative saturation is clamped to 0 at parse time
+        saturation = Math.Max(0, saturation);
+
+        // Parse alpha if present
+        double alpha = 1.0; // Default to fully opaque
+        if (tokens.Count == 4)
+        {
+            if (!TryGetAlphaValueNormalized(tokens[3], out alpha))
+            {
+                return false;
+            }
+        }
+
+        // Convert HSL to RGB
+        return HslToRgb(hue, saturation, lightness, alpha, out color);
+    }
+
+    /// <summary>
+    /// Parses modern space-separated hsl()/hsla() syntax.
+    /// Modern syntax: hsl(hue saturation lightness) or hsl(hue sat light / alpha)
+    /// Saturation and lightness can be percentages or numbers.
+    /// </summary>
+    private static bool TryParseHslModern(List<CssToken> tokens, out CssColor color)
+    {
+        color = CssColor.Transparent;
+
+        // Modern syntax: at least 3 components, optionally alpha after '/'
+        if (tokens.Count < 3)
+        {
+            return false;
+        }
+
+        // Find the slash separator for alpha
+        int slashIndex = -1;
+        for (int i = 0; i < tokens.Count; i++)
+        {
+            if (tokens[i] is DelimToken delim && delim.Value == '/')
+            {
+                slashIndex = i;
+                break;
+            }
+        }
+
+        // Determine HSL token count (should be at least 3 before slash)
+        int hslCount = slashIndex >= 0 ? slashIndex : tokens.Count;
+        if (hslCount < 3)
+        {
+            return false;
+        }
+
+        // Parse hue (number or angle)
+        if (!TryGetHueValue(tokens[0], out double hue))
+        {
+            return false;
+        }
+
+        // Parse saturation (percentage or number, where number is treated as percentage)
+        if (!TryGetSaturationOrLightness(tokens[1], out double saturation))
+        {
+            return false;
+        }
+
+        // Parse lightness (percentage or number, where number is treated as percentage)
+        if (!TryGetSaturationOrLightness(tokens[2], out double lightness))
+        {
+            return false;
+        }
+
+        // Per spec: negative saturation is clamped to 0 at parse time
+        saturation = Math.Max(0, saturation);
+
+        // Parse alpha if present (after the slash)
+        double alpha = 1.0; // Default to fully opaque
+        if (slashIndex >= 0 && slashIndex + 1 < tokens.Count)
+        {
+            if (!TryGetAlphaValueNormalized(tokens[slashIndex + 1], out alpha))
+            {
+                return false;
+            }
+        }
+
+        // Convert HSL to RGB
+        return HslToRgb(hue, saturation, lightness, alpha, out color);
+    }
+
+    /// <summary>
+    /// Converts HSL color values to an RGB CssColor.
+    /// Algorithm per CSS Color Level 4 specification.
+    /// </summary>
+    /// <param name="hue">Hue angle in degrees (will be normalized to [0,360))</param>
+    /// <param name="saturation">Saturation percentage (0-100)</param>
+    /// <param name="lightness">Lightness percentage (0-100)</param>
+    /// <param name="alpha">Alpha value (0-1)</param>
+    /// <param name="color">The resulting RGB color</param>
+    /// <seealso href="https://www.w3.org/TR/css-color-4/#hsl-to-rgb"/>
+    private static bool HslToRgb(double hue, double saturation, double lightness, double alpha, out CssColor color)
+    {
+        // Normalize hue to [0, 360)
+        hue = NormalizeHue(hue);
+
+        // Convert to [0,1] range
+        double sat = saturation / 100.0;
+        double light = lightness / 100.0;
+
+        // HSL to RGB conversion per W3C spec
+        // https://www.w3.org/TR/css-color-4/#hsl-to-rgb
+        double r = HslF(0, hue, sat, light);
+        double g = HslF(8, hue, sat, light);
+        double b = HslF(4, hue, sat, light);
+
+        // Convert to 0-255 range and clamp
+        int red = (int)Math.Round(Math.Clamp(r, 0, 1) * 255);
+        int green = (int)Math.Round(Math.Clamp(g, 0, 1) * 255);
+        int blue = (int)Math.Round(Math.Clamp(b, 0, 1) * 255);
+        int a = (int)Math.Round(Math.Clamp(alpha, 0, 1) * 255);
+
+        color = new CssColor((byte)red, (byte)green, (byte)blue, (byte)a);
+        return true;
+    }
+
+    /// <summary>
+    /// Helper function for HSL to RGB conversion per W3C spec.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static double HslF(int n, double hue, double sat, double light)
+    {
+        double k = (n + hue / 30.0) % 12.0;
+        double a = sat * Math.Min(light, 1.0 - light);
+        return light - a * Math.Max(-1.0, Math.Min(Math.Min(k - 3.0, 9.0 - k), 1.0));
+    }
+
+    /// <summary>
+    /// Normalizes a hue angle to the range [0, 360).
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static double NormalizeHue(double hue)
+    {
+        hue = hue % 360.0;
+        if (hue < 0)
+        {
+            hue += 360.0;
+        }
+        return hue;
+    }
+
+    /// <summary>
+    /// Tries to get a hue value from a token.
+    /// Hue can be a number (interpreted as degrees), or an angle with unit (deg, rad, grad, turn).
+    /// </summary>
+    private static bool TryGetHueValue(CssToken token, out double hue)
+    {
+        hue = 0;
+
+        // Number token: interpreted as degrees
+        if (token.Type == ECssTokenType.Number)
+        {
+            if (!TryGetNumber(token, out hue))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        // Dimension token: angle with unit
+        if (token is DimensionToken dimToken)
+        {
+            double value = dimToken.Number;
+            var unit = dimToken.Unit;
+
+            // Convert to degrees based on unit
+            if (unit.Equals("deg", StringComparison.OrdinalIgnoreCase))
+            {
+                hue = value;
+            }
+            else if (unit.Equals("rad", StringComparison.OrdinalIgnoreCase))
+            {
+                hue = value * (180.0 / Math.PI);
+            }
+            else if (unit.Equals("grad", StringComparison.OrdinalIgnoreCase))
+            {
+                hue = value * (360.0 / 400.0);
+            }
+            else if (unit.Equals("turn", StringComparison.OrdinalIgnoreCase))
+            {
+                hue = value * 360.0;
+            }
+            else
+            {
+                return false; // Unknown angle unit
+            }
+            return true;
+        }
+
+        // 'none' keyword support (CSS Color 4)
+        if (token is IdentToken ident && ident.Value.Equals("none", StringComparison.OrdinalIgnoreCase))
+        {
+            hue = 0; // 'none' hue is treated as 0 for calculation purposes
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Tries to get a saturation or lightness value from a token.
+    /// Can be a percentage (0-100%) or a number (interpreted as 0-100).
+    /// </summary>
+    private static bool TryGetSaturationOrLightness(CssToken token, out double value)
+    {
+        value = 0;
+
+        if (token.Type == ECssTokenType.Percentage)
+        {
+            if (!TryGetPercentage(token, out value))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        if (token.Type == ECssTokenType.Number)
+        {
+            if (!TryGetNumber(token, out value))
+            {
+                return false;
+            }
+            // Numbers are interpreted as the same scale as percentages
+            // Per spec: 0% = 0.0, 100% = 100.0 for S and L
+            return true;
+        }
+
+        // 'none' keyword support (CSS Color 4)
+        if (token is IdentToken ident && ident.Value.Equals("none", StringComparison.OrdinalIgnoreCase))
+        {
+            value = 0;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Tries to get a normalized alpha value (0-1) from a token.
+    /// Alpha can be a number (0-1) or percentage (0-100%).
+    /// </summary>
+    private static bool TryGetAlphaValueNormalized(CssToken token, out double alpha)
+    {
+        alpha = 1.0; // Default fully opaque
+
+        if (token.Type == ECssTokenType.Number)
+        {
+            if (!TryGetNumber(token, out var num))
+            {
+                return false;
+            }
+            alpha = Math.Clamp(num, 0, 1);
+            return true;
+        }
+
+        if (token.Type == ECssTokenType.Percentage)
+        {
+            if (!TryGetPercentage(token, out var pct))
+            {
+                return false;
+            }
+            alpha = Math.Clamp(pct / 100.0, 0, 1);
+            return true;
+        }
+
+        // 'none' keyword support (CSS Color 4)
+        if (token is IdentToken ident && ident.Value.Equals("none", StringComparison.OrdinalIgnoreCase))
+        {
+            alpha = 1.0; // 'none' alpha defaults to fully opaque
+            return true;
+        }
+
+        return false;
+    }
+
+    #endregion
 
     #region Helper Methods
 

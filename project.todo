@@ -88,10 +88,13 @@
   - [x] Alpha channel: rgb(255 128 0 / 0.5)
   - [x] CssColorFunctionParser helper class created
   - [x] Tests: 20 tests for rgb/rgba parsing (CssColorFunctionParserTests.cs)
-- [ ] Handle hsl()/hsla() function → CssValue (COLOR)
-  - [ ] Legacy syntax: hsl(120, 100%, 50%)
-  - [ ] Modern syntax: hsl(120 100% 50%)
-  - [ ] Alpha channel: hsl(120 100% 50% / 0.5)
+- [x] Handle hsl()/hsla() function → CssValue (COLOR)
+  - [x] Legacy syntax: hsl(120, 100%, 50%)
+  - [x] Modern syntax: hsl(120 100% 50%)
+  - [x] Alpha channel: hsl(120 100% 50% / 0.5)
+  - [x] Hue angle units: deg, rad, grad, turn
+  - [x] HSL to RGB conversion per W3C spec
+  - [x] Tests: 20+ tests for hsl/hsla parsing (CssColorFunctionParserTests.cs)
 - [ ] Handle hwb() function → CssValue (COLOR)
 - [ ] Handle lab()/lch() functions → CssValue (COLOR_HDR)
 - [ ] Handle oklab()/oklch() functions → CssValue (COLOR_HDR)

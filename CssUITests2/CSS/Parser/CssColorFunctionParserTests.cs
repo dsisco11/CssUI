@@ -298,6 +298,353 @@ public class CssColorFunctionParserTests
 
     #endregion
 
+    #region hsl() Legacy Syntax Tests (Comma-Separated)
+
+    [Fact]
+    public void TryParseHsl_Legacy_BasicSyntax_ReturnsColor()
+    {
+        // Arrange & Act - Pure red: hue=0, sat=100%, light=50%
+        var value = ParseColorValue("hsl(0, 100%, 50%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+        Assert.Equal(255, color.A);
+    }
+
+    [Fact]
+    public void TryParseHsl_Legacy_Green_ReturnsColor()
+    {
+        // Arrange & Act - Pure green: hue=120, sat=100%, light=50%
+        var value = ParseColorValue("hsl(120, 100%, 50%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(0, color.B);
+    }
+
+    [Fact]
+    public void TryParseHsl_Legacy_Blue_ReturnsColor()
+    {
+        // Arrange & Act - Pure blue: hue=240, sat=100%, light=50%
+        var value = ParseColorValue("hsl(240, 100%, 50%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(255, color.B);
+    }
+
+    [Fact]
+    public void TryParseHsla_Legacy_WithAlpha_ReturnsColor()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("hsla(0, 100%, 50%, 0.5)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+        Assert.Equal(128, color.A); // 0.5 * 255 = 127.5, rounds to 128
+    }
+
+    [Fact]
+    public void TryParseHsla_Legacy_WithAlphaPercentage_ReturnsColor()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("hsla(120, 100%, 50%, 50%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(0, color.B);
+        Assert.Equal(128, color.A); // 50% of 255 = 127.5, rounds to 128
+    }
+
+    #endregion
+
+    #region hsl() Modern Syntax Tests (Space-Separated)
+
+    [Fact]
+    public void TryParseHsl_Modern_BasicSyntax_ReturnsColor()
+    {
+        // Arrange & Act - Pure red: hue=0, sat=100%, light=50%
+        var value = ParseColorValue("hsl(0 100% 50%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+        Assert.Equal(255, color.A);
+    }
+
+    [Fact]
+    public void TryParseHsl_Modern_WithSlashAlpha_ReturnsColor()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("hsl(0 100% 50% / 0.5)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+        Assert.Equal(128, color.A);
+    }
+
+    [Fact]
+    public void TryParseHsl_Modern_WithSlashAlphaPercentage_ReturnsColor()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("hsl(120 100% 50% / 75%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(0, color.B);
+        Assert.Equal(191, color.A); // 75% of 255 = 191.25, rounds to 191
+    }
+
+    [Fact]
+    public void TryParseHsl_Modern_WithNumberSaturationAndLightness_ReturnsColor()
+    {
+        // Arrange & Act - Modern syntax allows numbers for S and L
+        var value = ParseColorValue("hsl(0 100 50)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+    }
+
+    #endregion
+
+    #region HSL Hue Angle Unit Tests
+
+    [Fact]
+    public void TryParseHsl_HueWithDegUnit_ReturnsColor()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("hsl(120deg 100% 50%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(0, color.B);
+    }
+
+    [Fact]
+    public void TryParseHsl_HueWithTurnUnit_ReturnsColor()
+    {
+        // Arrange & Act - 0.5turn = 180deg = cyan
+        var value = ParseColorValue("hsl(0.5turn 100% 50%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(255, color.B); // Cyan
+    }
+
+    [Fact]
+    public void TryParseHsl_HueWithRadUnit_ReturnsColor()
+    {
+        // Arrange & Act - π rad = 180deg = cyan
+        var value = ParseColorValue("hsl(3.14159rad 100% 50%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // At 180deg with 100% sat 50% light = cyan (0, 255, 255)
+        Assert.Equal(0, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(255, color.B);
+    }
+
+    [Fact]
+    public void TryParseHsl_HueWithGradUnit_ReturnsColor()
+    {
+        // Arrange & Act - 200grad = 180deg = cyan
+        var value = ParseColorValue("hsl(200grad 100% 50%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(255, color.B); // Cyan
+    }
+
+    #endregion
+
+    #region HSL Edge Cases and Normalization
+
+    [Fact]
+    public void TryParseHsl_NegativeHue_NormalizesToPositive()
+    {
+        // Arrange & Act - -120deg should normalize to 240deg (blue)
+        var value = ParseColorValue("hsl(-120 100% 50%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(255, color.B); // Blue at 240deg
+    }
+
+    [Fact]
+    public void TryParseHsl_HueOver360_NormalizesToRange()
+    {
+        // Arrange & Act - 480deg should normalize to 120deg (green)
+        var value = ParseColorValue("hsl(480 100% 50%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(0, color.B); // Green at 120deg
+    }
+
+    [Fact]
+    public void TryParseHsl_ZeroSaturation_ReturnsGray()
+    {
+        // Arrange & Act - 0% saturation = grayscale
+        var value = ParseColorValue("hsl(0 0% 50%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(128, color.R);
+        Assert.Equal(128, color.G);
+        Assert.Equal(128, color.B);
+    }
+
+    [Fact]
+    public void TryParseHsl_ZeroLightness_ReturnsBlack()
+    {
+        // Arrange & Act - 0% lightness = black
+        var value = ParseColorValue("hsl(0 100% 0%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+    }
+
+    [Fact]
+    public void TryParseHsl_FullLightness_ReturnsWhite()
+    {
+        // Arrange & Act - 100% lightness = white
+        var value = ParseColorValue("hsl(0 100% 100%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(255, color.B);
+    }
+
+    [Fact]
+    public void TryParseHsl_NegativeSaturation_ClampedToZero()
+    {
+        // Arrange & Act - Per spec, negative saturation is clamped to 0
+        var value = ParseColorValue("hsl(0 -50% 50%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // With 0% saturation, result is gray at 50% lightness
+        Assert.Equal(128, color.R);
+        Assert.Equal(128, color.G);
+        Assert.Equal(128, color.B);
+    }
+
+    #endregion
+
+    #region HSL Case Insensitivity Tests
+
+    [Fact]
+    public void TryParseHsl_UppercaseFunctionName_ReturnsColor()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("HSL(120, 100%, 50%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(0, color.B);
+    }
+
+    [Fact]
+    public void TryParseHsla_MixedCaseFunctionName_ReturnsColor()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("HsLa(240, 100%, 50%, 0.8)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(255, color.B);
+        Assert.Equal(204, color.A); // 0.8 * 255 = 204
+    }
+
+    #endregion
+
+    #region HSL Invalid Input Tests
+
+    [Fact]
+    public void TryParseHsl_InvalidArguments_ReturnsNull()
+    {
+        // Arrange & Act - Missing lightness
+        var value = ParseColorValue("hsl(0, 100%)");
+
+        // Assert - Should return null or default value
+        Assert.True(value.Type == ECssValueTypes.NULL || value.Type == ECssValueTypes.DIMENSION);
+    }
+
+    [Fact]
+    public void TryParseHsl_EmptyFunction_ReturnsNull()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("hsl()");
+
+        // Assert
+        Assert.True(value.Type == ECssValueTypes.NULL || value.Type == ECssValueTypes.DIMENSION);
+    }
+
+    #endregion
+
     #region Property Value Integration Tests
 
     [Fact]
@@ -338,6 +685,25 @@ public class CssColorFunctionParserTests
         Assert.True(declaration.Values[0] is CssFunction);
         var func = (CssFunction)declaration.Values[0];
         Assert.Equal("rgba", func.Name, ignoreCase: true);
+    }
+
+    [Fact]
+    public void Parse_ColorProperty_WithHslFunction_ReturnsColorValue()
+    {
+        // Arrange
+        var css = "color: hsl(120, 100%, 50%)";
+        var parser = new CssParser(css);
+
+        // Act
+        var declaration = parser.Parse_Decleration();
+
+        // Assert
+        Assert.NotNull(declaration);
+        Assert.Equal("color", declaration.Name);
+        Assert.Single(declaration.Values);
+        Assert.True(declaration.Values[0] is CssFunction);
+        var func = (CssFunction)declaration.Values[0];
+        Assert.Equal("hsl", func.Name, ignoreCase: true);
     }
 
     #endregion
