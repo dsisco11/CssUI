@@ -527,28 +527,25 @@ public static class StringCommon
     /// <returns></returns>
     public static ReadOnlyMemory<char> Trim(ReadOnlyMemory<char> Input, char Delim)
     {
-        ReadOnlyMemory<char> Ptr = Input;
+        if (Input.Length == 0) return Input;
+
+        int start = 0;
+        int end = Input.Length;
+        var span = Input.Span;
+
         /* Trim start */
-        for (int i = 0; i < Ptr.Length; i++)
+        while (start < end && span[start] == Delim)
         {
-            if (Ptr.Span[i] != Delim)
-            {
-                Ptr = Ptr.Slice(i);
-                break;
-            }
+            start++;
         }
 
         /* Trim end */
-        for (int i = Ptr.Length - 1; i > -1; i--)
+        while (end > start && span[end - 1] == Delim)
         {
-            if (Ptr.Span[i] != Delim)
-            {
-                Ptr = Ptr.Slice(0, i + 1);
-                break;
-            }
+            end--;
         }
 
-        return Ptr;
+        return Input.Slice(start, end - start);
     }
 
     /// <summary>
@@ -559,51 +556,25 @@ public static class StringCommon
     /// <returns></returns>
     public static ReadOnlyMemory<char> Trim(ReadOnlyMemory<char> Input, params char[] Delims)
     {
-        if (Delims.Length <= 0) return Input;
+        if (Delims.Length == 0 || Input.Length == 0) return Input;
 
-        ReadOnlyMemory<char> Ptr = Input;
-        var span = Ptr.Span;
+        int start = 0;
+        int end = Input.Length;
+        var span = Input.Span;
+
         /* Trim start */
-        for (int i = 0; i < Ptr.Length; i++)
+        while (start < end && Delims.AsSpan().Contains(span[start]))
         {
-            bool found = false;
-            for (int x = 0; x < Delims.Length; x++)
-            {
-                if (Delims[x] == span[i])
-                {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found)
-            {
-                Ptr = Ptr.Slice(i);
-                break;
-            }
+            start++;
         }
 
         /* Trim end */
-        for (int i = Ptr.Length - 1; i > -1; i--)
+        while (end > start && Delims.AsSpan().Contains(span[end - 1]))
         {
-            bool found = false;
-            for (int x = 0; x < Delims.Length; x++)
-            {
-                if (Delims[x] == span[i])
-                {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found)
-            {
-                Ptr = Ptr.Slice(0, i + 1);
-                break;
-            }
+            end--;
         }
 
-        return Ptr;
+        return Input.Slice(start, end - start);
     }
 
     /// <summary>
@@ -614,28 +585,25 @@ public static class StringCommon
     /// <returns></returns>
     public static ReadOnlyMemory<char> Trim(ReadOnlyMemory<char> Input, Filter<char> Filter)
     {
-        var Ptr = Input;
-        /* Trim start */
-        for (int i = 0; i < Ptr.Length; i++)
+        if (Input.Length == 0) return Input;
+
+        int start = 0;
+        int end = Input.Length;
+        var span = Input.Span;
+
+        /* Trim start - skip chars that the filter SKIPS (they are delimiters) */
+        while (start < end && Filter.acceptData(span[start]) == EFilterResult.FILTER_SKIP)
         {
-            if (Filter.acceptData(Ptr.Span[i]) == EFilterResult.FILTER_ACCEPT)
-            {
-                Ptr = Ptr.Slice(i);
-                break;
-            }
+            start++;
         }
 
-        /* Trim end */
-        for (int i = Ptr.Length - 1; i > -1; i--)
+        /* Trim end - skip chars that the filter SKIPS (they are delimiters) */
+        while (end > start && Filter.acceptData(span[end - 1]) == EFilterResult.FILTER_SKIP)
         {
-            if (Filter.acceptData(Ptr.Span[i]) == EFilterResult.FILTER_ACCEPT)
-            {
-                Ptr = Ptr.Slice(0, i + 1);
-                break;
-            }
+            end--;
         }
 
-        return Ptr;
+        return Input.Slice(start, end - start);
     }
 
     /// <summary>
@@ -646,28 +614,25 @@ public static class StringCommon
     /// <returns></returns>
     public static ReadOnlyMemory<char> Trim(ReadOnlyMemory<char> Input, Predicate<char> Predicate)
     {
-        var Ptr = Input;
-        /* Trim start */
-        for (int i = 0; i < Ptr.Length; i++)
+        if (Input.Length == 0) return Input;
+
+        int start = 0;
+        int end = Input.Length;
+        var span = Input.Span;
+
+        /* Trim start - skip chars that match the predicate (they are delimiters) */
+        while (start < end && Predicate(span[start]))
         {
-            if (!Predicate(Ptr.Span[i]))
-            {
-                Ptr = Ptr.Slice(i);
-                break;
-            }
+            start++;
         }
 
-        /* Trim end */
-        for (int i = Ptr.Length - 1; i > -1; i--)
+        /* Trim end - skip chars that match the predicate (they are delimiters) */
+        while (end > start && Predicate(span[end - 1]))
         {
-            if (!Predicate(Ptr.Span[i]))
-            {
-                Ptr = Ptr.Slice(0, i + 1);
-                break;
-            }
+            end--;
         }
 
-        return Ptr;
+        return Input.Slice(start, end - start);
     }
     #endregion
 
@@ -680,18 +645,17 @@ public static class StringCommon
     /// <returns></returns>
     public static ReadOnlyMemory<char> TrimStart(ReadOnlyMemory<char> Input, char Delim)
     {
-        var Ptr = Input;
-        /* Trim start */
-        for (int i = 0; i < Ptr.Length; i++)
+        if (Input.Length == 0) return Input;
+
+        int start = 0;
+        var span = Input.Span;
+
+        while (start < Input.Length && span[start] == Delim)
         {
-            if (Ptr.Span[i] != Delim)
-            {
-                Ptr = Ptr.Slice(i);
-                break;
-            }
+            start++;
         }
 
-        return Ptr;
+        return Input.Slice(start);
     }
 
     /// <summary>
@@ -702,31 +666,17 @@ public static class StringCommon
     /// <returns></returns>
     public static ReadOnlyMemory<char> TrimStart(ReadOnlyMemory<char> Input, params char[] Delims)
     {
-        if (Delims.Length <= 0) return Input;
+        if (Delims.Length == 0 || Input.Length == 0) return Input;
 
-        var Ptr = Input;
-        var span = Ptr.Span;
-        /* Trim start */
-        for (int i = 0; i < Ptr.Length; i++)
+        int start = 0;
+        var span = Input.Span;
+
+        while (start < Input.Length && Delims.AsSpan().Contains(span[start]))
         {
-            bool found = false;
-            for (int x = 0; x < Delims.Length; x++)
-            {
-                if (Delims[x] == span[i])
-                {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found)
-            {
-                Ptr = Ptr.Slice(i);
-                break;
-            }
+            start++;
         }
 
-        return Ptr;
+        return Input.Slice(start);
     }
 
     /// <summary>
@@ -737,18 +687,17 @@ public static class StringCommon
     /// <returns></returns>
     public static ReadOnlyMemory<char> TrimStart(ReadOnlyMemory<char> Input, Filter<char> Filter)
     {
-        var Ptr = Input;
-        /* Trim start */
-        for (int i = 0; i < Ptr.Length; i++)
+        if (Input.Length == 0) return Input;
+
+        int start = 0;
+        var span = Input.Span;
+
+        while (start < Input.Length && Filter.acceptData(span[start]) == EFilterResult.FILTER_SKIP)
         {
-            if (Filter.acceptData(Ptr.Span[i]) == EFilterResult.FILTER_ACCEPT)
-            {
-                Ptr = Ptr.Slice(i);
-                break;
-            }
+            start++;
         }
 
-        return Ptr;
+        return Input.Slice(start);
     }
 
     /// <summary>
@@ -759,18 +708,17 @@ public static class StringCommon
     /// <returns></returns>
     public static ReadOnlyMemory<char> TrimStart(ReadOnlyMemory<char> Input, Predicate<char> Predicate)
     {
-        var Ptr = Input;
-        /* Trim start */
-        for (int i = 0; i < Ptr.Length; i++)
+        if (Input.Length == 0) return Input;
+
+        int start = 0;
+        var span = Input.Span;
+
+        while (start < Input.Length && Predicate(span[start]))
         {
-            if (!Predicate(Ptr.Span[i]))
-            {
-                Ptr = Ptr.Slice(i);
-                break;
-            }
+            start++;
         }
 
-        return Ptr;
+        return Input.Slice(start);
     }
     #endregion
 
@@ -783,18 +731,17 @@ public static class StringCommon
     /// <returns></returns>
     public static ReadOnlyMemory<char> TrimEnd(ReadOnlyMemory<char> Input, char Delim)
     {
-        var Ptr = Input;
-        /* Trim end */
-        for (int i = Ptr.Length - 1; i > -1; i--)
+        if (Input.Length == 0) return Input;
+
+        int end = Input.Length;
+        var span = Input.Span;
+
+        while (end > 0 && span[end - 1] == Delim)
         {
-            if (Ptr.Span[i] != Delim)
-            {
-                Ptr = Ptr.Slice(0, i + 1);
-                break;
-            }
+            end--;
         }
 
-        return Ptr;
+        return Input.Slice(0, end);
     }
 
     /// <summary>
@@ -805,30 +752,17 @@ public static class StringCommon
     /// <returns></returns>
     public static ReadOnlyMemory<char> TrimEnd(ReadOnlyMemory<char> Input, params char[] Delims)
     {
-        if (Delims.Length <= 0) return Input;
+        if (Delims.Length == 0 || Input.Length == 0) return Input;
 
-        var Ptr = Input;
-        /* Trim end */
-        for (int i = Ptr.Length - 1; i > -1; i--)
+        int end = Input.Length;
+        var span = Input.Span;
+
+        while (end > 0 && Delims.AsSpan().Contains(span[end - 1]))
         {
-            bool found = false;
-            for (int x = 0; x < Delims.Length; x++)
-            {
-                if (Delims[x] == Ptr.Span[i])
-                {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found)
-            {
-                Ptr = Ptr.Slice(0, i + 1);
-                break;
-            }
+            end--;
         }
 
-        return Ptr;
+        return Input.Slice(0, end);
     }
 
     /// <summary>
@@ -839,18 +773,17 @@ public static class StringCommon
     /// <returns></returns>
     public static ReadOnlyMemory<char> TrimEnd(ReadOnlyMemory<char> Input, Filter<char> Filter)
     {
-        var Ptr = Input;
-        /* Trim end */
-        for (int i = Ptr.Length - 1; i > -1; i--)
+        if (Input.Length == 0) return Input;
+
+        int end = Input.Length;
+        var span = Input.Span;
+
+        while (end > 0 && Filter.acceptData(span[end - 1]) == EFilterResult.FILTER_SKIP)
         {
-            if (Filter.acceptData(Ptr.Span[i]) == EFilterResult.FILTER_ACCEPT)
-            {
-                Ptr = Ptr.Slice(0, i + 1);
-                break;
-            }
+            end--;
         }
 
-        return Ptr;
+        return Input.Slice(0, end);
     }
 
     /// <summary>
@@ -861,18 +794,17 @@ public static class StringCommon
     /// <returns></returns>
     public static ReadOnlyMemory<char> TrimEnd(ReadOnlyMemory<char> Input, Predicate<char> Predicate)
     {
-        var Ptr = Input;
-        /* Trim end */
-        for (int i = Ptr.Length - 1; i > -1; i--)
+        if (Input.Length == 0) return Input;
+
+        int end = Input.Length;
+        var span = Input.Span;
+
+        while (end > 0 && Predicate(span[end - 1]))
         {
-            if (!Predicate(Ptr.Span[i]))
-            {
-                Ptr = Ptr.Slice(0, i + 1);
-                break;
-            }
+            end--;
         }
 
-        return Ptr;
+        return Input.Slice(0, end);
     }
     #endregion
     #endregion

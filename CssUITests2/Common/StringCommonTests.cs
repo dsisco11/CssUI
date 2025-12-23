@@ -235,4 +235,178 @@ public class StringCommonTests
         string Actual = StringCommon.Transform(Input, UnicodeCommon.To_ASCII_Lower_Alpha);
         Assert.Equal(Expected, Actual);
     }
+
+    #region Trim Tests
+
+    [Theory()]
+    [InlineData("ABC", "  ABC  ", ' ')]
+    [InlineData("ABC", "ABC", ' ')]
+    [InlineData("ABC", "   ABC", ' ')]
+    [InlineData("ABC", "ABC   ", ' ')]
+    [InlineData("A B C", "  A B C  ", ' ')]
+    [InlineData("", "   ", ' ')]
+    [InlineData("", "", ' ')]
+    [InlineData("ABC", "000ABC000", '0')]
+    public void TrimCharTest(string Expected, string Input, char Delim)
+    {
+        var Actual = StringCommon.Trim(Input.AsMemory(), Delim);
+        Assert.Equal(Expected, Actual.ToString());
+    }
+
+    [Theory()]
+    [InlineData("ABC", "  ABC  ", ' ', '\t')]
+    [InlineData("ABC", "\t\tABC\t\t", ' ', '\t')]
+    [InlineData("ABC", " \t ABC \t ", ' ', '\t')]
+    [InlineData("A B C", "  A B C  ", ' ', '\t')]
+    [InlineData("", "   \t\t  ", ' ', '\t')]
+    [InlineData("", "", ' ', '\t')]
+    public void TrimCharArrayTest(string Expected, string Input, char Delim1, char Delim2)
+    {
+        var Actual = StringCommon.Trim(Input.AsMemory(), Delim1, Delim2);
+        Assert.Equal(Expected, Actual.ToString());
+    }
+
+    [Theory()]
+    [InlineData("ABC", "  ABC  ")]
+    [InlineData("ABC", "\t\nABC\r\n")]
+    [InlineData("ABC", " \t\r\n ABC \t\r\n ")]
+    [InlineData("A B C", "  A B C  ")]
+    [InlineData("", "   \t\n\r  ")]
+    [InlineData("", "")]
+    public void TrimFilterTest(string Expected, string Input)
+    {
+        var Actual = StringCommon.Trim(Input.AsMemory(), FilterWhitespace.Instance);
+        Assert.Equal(Expected, Actual.ToString());
+    }
+
+    [Theory()]
+    [InlineData("ABC", "  ABC  ")]
+    [InlineData("ABC", "\t\nABC\r\n")]
+    [InlineData("ABC", " \t\r\n ABC \t\r\n ")]
+    [InlineData("A B C", "  A B C  ")]
+    [InlineData("", "   \t\n\r  ")]
+    [InlineData("", "")]
+    public void TrimPredicateTest(string Expected, string Input)
+    {
+        var Actual = StringCommon.Trim(Input.AsMemory(), UnicodeCommon.Is_Ascii_Whitespace);
+        Assert.Equal(Expected, Actual.ToString());
+    }
+
+    #endregion
+
+    #region TrimStart Tests
+
+    [Theory()]
+    [InlineData("ABC  ", "  ABC  ", ' ')]
+    [InlineData("ABC", "ABC", ' ')]
+    [InlineData("ABC", "   ABC", ' ')]
+    [InlineData("ABC   ", "ABC   ", ' ')]
+    [InlineData("A B C  ", "  A B C  ", ' ')]
+    [InlineData("", "   ", ' ')]
+    [InlineData("", "", ' ')]
+    [InlineData("ABC000", "000ABC000", '0')]
+    public void TrimStartCharTest(string Expected, string Input, char Delim)
+    {
+        var Actual = StringCommon.TrimStart(Input.AsMemory(), Delim);
+        Assert.Equal(Expected, Actual.ToString());
+    }
+
+    [Theory()]
+    [InlineData("ABC  ", "  ABC  ", ' ', '\t')]
+    [InlineData("ABC\t\t", "\t\tABC\t\t", ' ', '\t')]
+    [InlineData("ABC \t ", " \t ABC \t ", ' ', '\t')]
+    [InlineData("A B C  ", "  A B C  ", ' ', '\t')]
+    [InlineData("", "   \t\t  ", ' ', '\t')]
+    [InlineData("", "", ' ', '\t')]
+    public void TrimStartCharArrayTest(string Expected, string Input, char Delim1, char Delim2)
+    {
+        var Actual = StringCommon.TrimStart(Input.AsMemory(), Delim1, Delim2);
+        Assert.Equal(Expected, Actual.ToString());
+    }
+
+    [Theory()]
+    [InlineData("ABC  ", "  ABC  ")]
+    [InlineData("ABC\r\n", "\t\nABC\r\n")]
+    [InlineData("ABC \t\r\n ", " \t\r\n ABC \t\r\n ")]
+    [InlineData("A B C  ", "  A B C  ")]
+    [InlineData("", "   \t\n\r  ")]
+    [InlineData("", "")]
+    public void TrimStartFilterTest(string Expected, string Input)
+    {
+        var Actual = StringCommon.TrimStart(Input.AsMemory(), FilterWhitespace.Instance);
+        Assert.Equal(Expected, Actual.ToString());
+    }
+
+    [Theory()]
+    [InlineData("ABC  ", "  ABC  ")]
+    [InlineData("ABC\r\n", "\t\nABC\r\n")]
+    [InlineData("ABC \t\r\n ", " \t\r\n ABC \t\r\n ")]
+    [InlineData("A B C  ", "  A B C  ")]
+    [InlineData("", "   \t\n\r  ")]
+    [InlineData("", "")]
+    public void TrimStartPredicateTest(string Expected, string Input)
+    {
+        var Actual = StringCommon.TrimStart(Input.AsMemory(), UnicodeCommon.Is_Ascii_Whitespace);
+        Assert.Equal(Expected, Actual.ToString());
+    }
+
+    #endregion
+
+    #region TrimEnd Tests
+
+    [Theory()]
+    [InlineData("  ABC", "  ABC  ", ' ')]
+    [InlineData("ABC", "ABC", ' ')]
+    [InlineData("   ABC", "   ABC", ' ')]
+    [InlineData("ABC", "ABC   ", ' ')]
+    [InlineData("  A B C", "  A B C  ", ' ')]
+    [InlineData("", "   ", ' ')]
+    [InlineData("", "", ' ')]
+    [InlineData("000ABC", "000ABC000", '0')]
+    public void TrimEndCharTest(string Expected, string Input, char Delim)
+    {
+        var Actual = StringCommon.TrimEnd(Input.AsMemory(), Delim);
+        Assert.Equal(Expected, Actual.ToString());
+    }
+
+    [Theory()]
+    [InlineData("  ABC", "  ABC  ", ' ', '\t')]
+    [InlineData("\t\tABC", "\t\tABC\t\t", ' ', '\t')]
+    [InlineData(" \t ABC", " \t ABC \t ", ' ', '\t')]
+    [InlineData("  A B C", "  A B C  ", ' ', '\t')]
+    [InlineData("", "   \t\t  ", ' ', '\t')]
+    [InlineData("", "", ' ', '\t')]
+    public void TrimEndCharArrayTest(string Expected, string Input, char Delim1, char Delim2)
+    {
+        var Actual = StringCommon.TrimEnd(Input.AsMemory(), Delim1, Delim2);
+        Assert.Equal(Expected, Actual.ToString());
+    }
+
+    [Theory()]
+    [InlineData("  ABC", "  ABC  ")]
+    [InlineData("\t\nABC", "\t\nABC\r\n")]
+    [InlineData(" \t\r\n ABC", " \t\r\n ABC \t\r\n ")]
+    [InlineData("  A B C", "  A B C  ")]
+    [InlineData("", "   \t\n\r  ")]
+    [InlineData("", "")]
+    public void TrimEndFilterTest(string Expected, string Input)
+    {
+        var Actual = StringCommon.TrimEnd(Input.AsMemory(), FilterWhitespace.Instance);
+        Assert.Equal(Expected, Actual.ToString());
+    }
+
+    [Theory()]
+    [InlineData("  ABC", "  ABC  ")]
+    [InlineData("\t\nABC", "\t\nABC\r\n")]
+    [InlineData(" \t\r\n ABC", " \t\r\n ABC \t\r\n ")]
+    [InlineData("  A B C", "  A B C  ")]
+    [InlineData("", "   \t\n\r  ")]
+    [InlineData("", "")]
+    public void TrimEndPredicateTest(string Expected, string Input)
+    {
+        var Actual = StringCommon.TrimEnd(Input.AsMemory(), UnicodeCommon.Is_Ascii_Whitespace);
+        Assert.Equal(Expected, Actual.ToString());
+    }
+
+    #endregion
 }
