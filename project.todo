@@ -72,11 +72,11 @@
 
 ## Phase 7: CSS Properties System
 
-### 7.1 CSS Properties (CSS/Properties/)
-- [ ] Property parsing tests
-- [ ] Property inheritance tests
-- [ ] Computed value resolution tests
-- [ ] Shorthand property expansion tests
+### 7.1 CSS Properties (CSS/Properties/) ✓
+- [x] Property parsing tests
+- [x] Property inheritance tests
+- [x] Computed value resolution tests
+- [ ] Shorthand property expansion tests (pending)
 
 ### 7.2 CSS Box Model (CSS/Box Model/)
 - [ ] CssPrincipalBox tests
