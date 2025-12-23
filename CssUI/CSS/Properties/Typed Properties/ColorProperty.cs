@@ -7,7 +7,15 @@ namespace CssUI.CSS;
 public class ColorProperty : CssProperty
 {
     #region Value Overrides
-    public new ReadOnlyColor Actual => base.Actual.AsColor();
+    /// <summary>
+    /// Returns the actual computed color value as a <see cref="CssColor"/>.
+    /// </summary>
+    public new CssColor Actual => base.Actual.AsCssColor();
+
+    /// <summary>
+    /// Returns the actual computed color as a rendering-layer <see cref="Rgba"/>.
+    /// </summary>
+    public Rgba ActualRenderColor => Actual.ToRenderColor();
     #endregion
 
     #region Constructors

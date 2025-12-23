@@ -66,11 +66,10 @@ public partial class CssValue
     private readonly ECssValueFlags flags = ECssValueFlags.None;
     private readonly ECssValueTypes type = ECssValueTypes.NULL;
     private readonly ECssUnit unit = ECssUnit.None;
-#if ALLOW_DYNAMIC
-    private readonly dynamic value = null;
-#else
-    private readonly object? value = null;
-#endif
+    /// <summary>
+    /// Union storage for primitive values (numbers, integers, colors) without boxing.
+    /// </summary>
+    private readonly CssValueData data;
     #endregion
 
     #region Accessors
@@ -108,10 +107,17 @@ public partial class CssValue
             if (Type == ECssValueTypes.NULL)
                 return false;
 
-            if (value is null)
-                return false;
+            // For primitive types stored in the union, they always have a value
+            if (Type == ECssValueTypes.INTEGER || Type == ECssValueTypes.NUMBER ||
+                Type == ECssValueTypes.COLOR || Type == ECssValueTypes.COLOR_HDR ||
+                Type == ECssValueTypes.PERCENT || Type == ECssValueTypes.DIMENSION ||
+                Type == ECssValueTypes.RESOLUTION)
+            {
+                return true;
+            }
 
-            return true;
+            // For reference types, check if ObjectValue is set
+            return data.ObjectValue is not null;
         }
     }
     #endregion
@@ -120,38 +126,38 @@ public partial class CssValue
     internal CssValue(CssFunction function)
     {
         type = ECssValueTypes.FUNCTION;
-        value = function;
+        data = CssValueData.FromObject(function);
     }
 
     private CssValue(ECssValueTypes type)
     {
         this.type = type;
-        flags |= Get_Inherent_Value_Type_Flags(type, unit, value);
+        this.data = default;
+        flags |= Get_Inherent_Value_Type_Flags(type, unit, in data);
     }
 
-    internal CssValue(ECssValueTypes type, object? value = null) : this(type)
+    internal CssValue(ECssValueTypes type, CssValueData data) : this(type)
     {
-        this.value = value;
+        this.data = data;
     }
 
-    internal CssValue(ECssValueTypes type, object? value, ECssValueFlags flags) : this(type)
+    internal CssValue(ECssValueTypes type, CssValueData data, ECssValueFlags flags) : this(type)
     {
-        this.value = value;
+        this.data = data;
         this.flags |= flags;
-        this.value = value;
     }
 
-    internal CssValue(ECssValueTypes type, object? value, ECssUnit unit) : this(type)
+    internal CssValue(ECssValueTypes type, CssValueData data, ECssUnit unit) : this(type)
     {
         this.unit = unit;
-        this.value = value;
+        this.data = data;
 
         if (type == ECssValueTypes.KEYWORD)// Try and catch some common IMPORTANT keywords
         {
             /* If our keyword can be resolved to another ECssValueType then its an global keyword */
-            if (value is string strValue && Lookup.TryEnum(strValue, out ECssValueTypes outKeyword))
+            if (data.ObjectValue is string strValue && Lookup.TryEnum(strValue, out ECssValueTypes outKeyword))
             {
-                type = outKeyword;
+                this.type = outKeyword;
             }
         }
         else if (type == ECssValueTypes.DIMENSION || type == ECssValueTypes.RESOLUTION)
@@ -162,10 +168,10 @@ public partial class CssValue
                 case ECssUnit.DPI:
                 case ECssUnit.DPCM:
                 case ECssUnit.DPPX:
-                    type = ECssValueTypes.RESOLUTION;
+                    this.type = ECssValueTypes.RESOLUTION;
                     break;
                 default:
-                    type = ECssValueTypes.DIMENSION;
+                    this.type = ECssValueTypes.DIMENSION;
                     break;
             }
         }
@@ -177,20 +183,68 @@ public partial class CssValue
     internal CssValue(CssValue sv)
     {
         type = sv.Type;
-        value = sv.value;
+        data = sv.data;
         unit = sv.Unit;
         flags = sv.Flags;
     }
+
+    #region Legacy Constructors (for internal parser/resolver compatibility)
+    /// <summary>
+    /// Legacy constructor for parsers - creates a value from an object (will be boxed for non-primitives).
+    /// </summary>
+    internal CssValue(ECssValueTypes type, object? value) : this(type)
+    {
+        this.data = value switch
+        {
+            int i => CssValueData.FromInteger(i),
+            double d => CssValueData.FromNumber(d),
+            float f => CssValueData.FromNumber(f),
+            string s => CssValueData.FromObject(s),
+            CssColor c => CssValueData.FromColor(c),
+            CssColorHdr ch => CssValueData.FromColorHdr(ch),
+            _ => CssValueData.FromObject(value)
+        };
+    }
+
+    /// <summary>
+    /// Legacy constructor for parsers - creates a dimension value.
+    /// </summary>
+    internal CssValue(ECssValueTypes type, object? value, ECssUnit unit) : this(type)
+    {
+        this.unit = unit;
+        this.data = value switch
+        {
+            int i => CssValueData.FromNumber(i),
+            double d => CssValueData.FromNumber(d),
+            float f => CssValueData.FromNumber(f),
+            _ => CssValueData.FromObject(value)
+        };
+
+        if (type == ECssValueTypes.KEYWORD && data.ObjectValue is string strValue && Lookup.TryEnum(strValue, out ECssValueTypes outKeyword))
+        {
+            this.type = outKeyword;
+        }
+        else if (type == ECssValueTypes.DIMENSION || type == ECssValueTypes.RESOLUTION)
+        {
+            switch (unit)
+            {
+                case ECssUnit.DPI:
+                case ECssUnit.DPCM:
+                case ECssUnit.DPPX:
+                    this.type = ECssValueTypes.RESOLUTION;
+                    break;
+                default:
+                    this.type = ECssValueTypes.DIMENSION;
+                    break;
+            }
+        }
+    }
+    #endregion
     #endregion
 
-    private static ECssValueFlags Get_Inherent_Value_Type_Flags(ECssValueTypes Type, ECssUnit Unit, object? Value)
+    private static ECssValueFlags Get_Inherent_Value_Type_Flags(ECssValueTypes Type, ECssUnit Unit, in CssValueData Data)
     {
         ECssValueFlags Flags = ECssValueFlags.None;
-
-        /*if (Value is Array)
-        {
-            Flags |= ECssValueFlags.Collection;
-        }*/
 
         switch (Type)
         {
@@ -210,6 +264,7 @@ public partial class CssValue
             case ECssValueTypes.STRING:
             case ECssValueTypes.KEYWORD:
             case ECssValueTypes.COLOR:
+            case ECssValueTypes.COLOR_HDR:
             case ECssValueTypes.IMAGE:
             case ECssValueTypes.POSITION:// The position has already been resolved here.
             case ECssValueTypes.FUNCTION:// The function args have already been resolved here.
@@ -232,21 +287,21 @@ public partial class CssValue
                 }
             case ECssValueTypes.COLLECTION:// A collections flags are the combined flags of all it's sub-values
                 {
-                    if (Value is null)
+                    if (Data.ObjectValue is null)
                         break;
 
-                    if (Value is CssValue cssValue)
+                    if (Data.ObjectValue is CssValue cssValue)
                     {// we are a nested collection.
-                        Flags |= Get_Inherent_Value_Type_Flags(cssValue.Type, cssValue.Unit, cssValue.value);
+                        Flags |= Get_Inherent_Value_Type_Flags(cssValue.Type, cssValue.Unit, in cssValue.data);
                         break;
                     }
 
-                    if (Value is not CssValue[] valueArray)
+                    if (Data.ObjectValue is not CssValue[] valueArray)
                         throw new CssException($"Expected an array of {nameof(CssValue)}s for a collection type!");
 
                     foreach (CssValue val in valueArray)
                     {
-                        Flags |= Get_Inherent_Value_Type_Flags(val.Type, val.Unit, val.value);
+                        Flags |= Get_Inherent_Value_Type_Flags(val.Type, val.Unit, in val.data);
                     }
                     break;
                 }
@@ -272,38 +327,49 @@ public partial class CssValue
         }
         Contract.EndContractBlock();
 
-        return new CssValue(ECssValueTypes.KEYWORD, value);
+        return new CssValue(ECssValueTypes.KEYWORD, CssValueData.FromObject(value));
     }
 
     /// <summary>Create an absolute integer value</summary>
-    public static CssValue From(int value) => new CssValue(ECssValueTypes.INTEGER, value);
+    public static CssValue From(int value) => new CssValue(ECssValueTypes.INTEGER, CssValueData.FromInteger(value));
 
     /// <summary>Create an absolute integer value if not null, or return the given default value</summary>
-    public static CssValue From(int? value, CssValue defaultValue) => (!value.HasValue ? defaultValue : new CssValue(ECssValueTypes.INTEGER, value.Value));
+    public static CssValue From(int? value, CssValue defaultValue) => (!value.HasValue ? defaultValue : new CssValue(ECssValueTypes.INTEGER, CssValueData.FromInteger(value.Value)));
 
     /// <summary>Create an absolute number value</summary>
-    public static CssValue From(double value) => new CssValue(ECssValueTypes.NUMBER, value);
+    public static CssValue From(double value) => new CssValue(ECssValueTypes.NUMBER, CssValueData.FromNumber(value));
 
     /// <summary>Create an absolute number value if not null, or return the given default value</summary>
-    public static CssValue From(double? value, CssValue defaultValue) => (!value.HasValue ? defaultValue : new CssValue(ECssValueTypes.NUMBER, value.Value));
+    public static CssValue From(double? value, CssValue defaultValue) => (!value.HasValue ? defaultValue : new CssValue(ECssValueTypes.NUMBER, CssValueData.FromNumber(value.Value)));
 
     /// <summary>Create a percentage value</summary>
     /// <param name="value">Floating-point value in the range [0 - 100]</param>
-    public static CssValue From_Percent(double value) => new CssValue(ECssValueTypes.PERCENT, value);
+    public static CssValue From_Percent(double value) => new CssValue(ECssValueTypes.PERCENT, CssValueData.FromNumber(value));
 
     /// <summary>Create an absolute length value</summary>
-    public static CssValue From(double value, ECssUnit Unit) => new CssValue(ECssValueTypes.DIMENSION, value, Unit);
+    public static CssValue From(double value, ECssUnit Unit) => new CssValue(ECssValueTypes.DIMENSION, CssValueData.FromNumber(value), Unit);
 
     /// <summary>Create an absolute length value if not null, or return the given default value</summary>
-    public static CssValue From(double? value, ECssUnit Unit, CssValue defaultValue) => (!value.HasValue ? defaultValue : new CssValue(ECssValueTypes.DIMENSION, value.Value, Unit));
+    public static CssValue From(double? value, ECssUnit Unit, CssValue defaultValue) => (!value.HasValue ? defaultValue : new CssValue(ECssValueTypes.DIMENSION, CssValueData.FromNumber(value.Value), Unit));
 
+    /// <summary>Create an 8-bit RGBA CSS color value</summary>
+    public static CssValue From(CssColor value) => new CssValue(ECssValueTypes.COLOR, CssValueData.FromColor(value));
 
+    /// <summary>Create an HDR (wide-gamut) CSS color value</summary>
+    public static CssValue From(CssColorHdr value) => new CssValue(ECssValueTypes.COLOR_HDR, CssValueData.FromColorHdr(value));
 
-    /// <summary>Create an RGBA color value</summary>
-    public static CssValue From(ReadOnlyColor value) => new CssValue(ECssValueTypes.COLOR, value.AsInteger());
+    /// <summary>Create an RGBA color value from rendering Color class</summary>
+    public static CssValue From(Rendering.Color value) => new CssValue(ECssValueTypes.COLOR, CssValueData.FromColor(new CssColor(value.R, value.G, value.B, value.A)));
+
+    /// <summary>Create an RGBA color value from rendering Rgba struct</summary>
+    public static CssValue From(Rgba value) => new CssValue(ECssValueTypes.COLOR, CssValueData.FromColor(new CssColor(value.Red, value.Green, value.Blue, value.Alpha)));
+
+    /// <summary>Create an RGBA color value from a ReadOnlyColor (legacy)</summary>
+    [Obsolete("Use CssValue.From(CssColor) instead")]
+    public static CssValue From(ReadOnlyColor value) => new CssValue(ECssValueTypes.COLOR, CssValueData.FromColor(new CssColor(value.R, value.G, value.B, value.A)));
 
     /// <summary>Create a string value</summary>
-    public static CssValue From_String(string value) => new CssValue(ECssValueTypes.STRING, value);
+    public static CssValue From_String(string value) => new CssValue(ECssValueTypes.STRING, CssValueData.FromObject(value));
 
     /// <summary>Create a css-value by parsing the given string as CSS markup</summary>
     public static CssValue From_CSS(string css) => new CssParser(css).Parse_CssValue();
@@ -314,7 +380,7 @@ public partial class CssValue
         if (values.Length <= 0) throw new ArgumentException("One or more values must be specified");
         Contract.EndContractBlock();
 
-        return new CssValue(ECssValueTypes.COLLECTION, values);
+        return new CssValue(ECssValueTypes.COLLECTION, CssValueData.FromObject(values));
     }
 
 
@@ -770,10 +836,10 @@ public partial class CssValue
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public T AsEnum<T>() where T : struct, IConvertible => (T)(value ?? default(T));
+    public T AsEnum<T>() where T : struct, IConvertible => (T)(data.ObjectValue ?? default(T));
 
     /// <summary>
-    /// Returns the value as a Color4 if possible, or NULL if not possible.
+    /// Returns the value as a Point2f position if possible.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Point2f AsPosition()
@@ -781,23 +847,71 @@ public partial class CssValue
         if (Type != ECssValueTypes.POSITION) throw new CssException($"{nameof(CssValue)} is not a Position! {this}");
         Contract.EndContractBlock();
 
-        return (Point2f)(value ?? default(Point2f));
+        return (Point2f)(data.ObjectValue ?? default(Point2f));
     }
 
     /// <summary>
-    /// Returns the value as a Color4 if possible, or NULL if not possible.
+    /// Returns the value as a CssColor.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public CssColor AsCssColor()
+    {
+        if (Type != ECssValueTypes.COLOR) throw new CssException($"{nameof(CssValue)} is not a Color! {this}");
+        Contract.EndContractBlock();
+
+        return data.ColorValue;
+    }
+
+    /// <summary>
+    /// Returns the value as a CssColorHdr (wide-gamut HDR color).
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public CssColorHdr AsCssColorHdr()
+    {
+        if (Type != ECssValueTypes.COLOR_HDR) throw new CssException($"{nameof(CssValue)} is not an HDR Color! {this}");
+        Contract.EndContractBlock();
+
+        return data.ColorHdrValue;
+    }
+
+    /// <summary>
+    /// Returns the value as a ReadOnlyColor (legacy accessor, prefer AsCssColor).
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [Obsolete("Use AsCssColor() instead")]
     public ReadOnlyColor AsColor()
     {
         if (Type != ECssValueTypes.COLOR) throw new CssException($"{nameof(CssValue)} is not a Color! {this}");
         Contract.EndContractBlock();
 
-        return (ReadOnlyColor)(int)(value ?? default(ReadOnlyColor));
+        var color = data.ColorValue;
+        return new ReadOnlyColor(color.R, color.G, color.B, color.A);
     }
 
     /// <summary>
-    /// Returns the value as a Color4 if possible, or NULL if not possible.
+    /// Attempts to get the color value regardless of whether it's standard or HDR.
+    /// </summary>
+    /// <param name="color">The color value if successful.</param>
+    /// <returns>True if this is a color type.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool TryGetColor(out CssColor color)
+    {
+        if (Type == ECssValueTypes.COLOR)
+        {
+            color = data.ColorValue;
+            return true;
+        }
+        if (Type == ECssValueTypes.COLOR_HDR)
+        {
+            color = data.ColorHdrValue.ToCssColor();
+            return true;
+        }
+        color = default;
+        return false;
+    }
+
+    /// <summary>
+    /// Returns the value as a collection of CssValues.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ReadOnlyCollection<CssValue> AsCollection()
@@ -805,46 +919,48 @@ public partial class CssValue
         if (!IsCollection) throw new CssException($"{nameof(CssValue)} is not a collection! {this}");
         Contract.EndContractBlock();
 
-        return new ReadOnlyCollection<CssValue>((CssValue[])(value ?? Array.Empty<CssValue>()));
+        return new ReadOnlyCollection<CssValue>((CssValue[])(data.ObjectValue ?? Array.Empty<CssValue>()));
     }
 
     /// <summary>
-    /// Returns the value as the preferred Integer type
+    /// Returns the value as the preferred Integer type.
+    /// For INTEGER types, returns the stored integer. For NUMBER/DIMENSION/PERCENT, converts from double with banker's rounding.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int AsInteger() => Convert.ToInt32(value);
+    public int AsInteger() => Type == ECssValueTypes.INTEGER ? data.IntegerValue : Convert.ToInt32(data.NumberValue);
 
     /// <summary>
     /// Returns the value as the preferred (Nullable) Integer type
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int? AsIntegerN() => !HasValue ? null : Convert.ToInt32(value);
+    public int? AsIntegerN() => !HasValue ? null : AsInteger();
 
     /// <summary>
-    /// Returns the value as the preferred Decimal type
+    /// Returns the value as the preferred Decimal type.
+    /// For INTEGER types, converts from int. For NUMBER/DIMENSION/PERCENT, returns the stored double.
     /// </summary>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public double AsDecimal() => Convert.ToInt64(value);
+    public double AsDecimal() => Type == ECssValueTypes.INTEGER ? data.IntegerValue : data.NumberValue;
 
     /// <summary>
     /// Returns the value as the preferred (Nullable) Decimal type
     /// </summary>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public double? AsDecimalN() => !HasValue ? null : Convert.ToInt64(value);
+    public double? AsDecimalN() => !HasValue ? null : AsDecimal();
 
     /// <summary>
     /// Returns the value as a string
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public string AsString() => (string)(value ?? string.Empty);
+    public string AsString() => (string)(data.ObjectValue ?? string.Empty);
 
     /// <summary>
     /// Returns the value as a CssFunction (for FUNCTION type values).
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal CssFunction? AsFunction() => value as CssFunction;
+    internal CssFunction? AsFunction() => data.ObjectValue as CssFunction;
     #endregion
 
     #region Operators
@@ -867,18 +983,19 @@ public partial class CssValue
             case ECssValueTypes.NONE:
                 return true;// Types are already the same, meaning A/B are equal
             case ECssValueTypes.COLOR:
-                return (int?)A.value == (int?)B.value;
+                return A.data.ColorValue == B.data.ColorValue;
+            case ECssValueTypes.COLOR_HDR:
+                return A.data.ColorHdrValue == B.data.ColorHdrValue;
             case ECssValueTypes.INTEGER:
-                return (long)A.value! == (long)B.value!;
+                return A.data.IntegerValue == B.data.IntegerValue;
             case ECssValueTypes.NUMBER:
             case ECssValueTypes.DIMENSION:
             case ECssValueTypes.PERCENT:
-                return (double)A.value! == (double)B.value!;
+                return A.data.NumberValue == B.data.NumberValue;
             case ECssValueTypes.STRING:
-                return string.Equals((string)A.value!, (string)B.value!, StringComparison.Ordinal);
+                return string.Equals((string?)A.data.ObjectValue, (string?)B.data.ObjectValue, StringComparison.Ordinal);
             case ECssValueTypes.KEYWORD:
-                return Equals(A.value, B.value);
-            //return EqualityComparer<int>.Default.Equals((int)A.Value, (int)B.Value);
+                return Equals(A.data.ObjectValue, B.data.ObjectValue);
             default:
                 throw new NotImplementedException($"Equality comparison logic not implemented for type: {Enum.GetName(typeof(ECssValueTypes), A.Type)}");
         }
@@ -918,7 +1035,9 @@ public partial class CssValue
         switch (Type)
         {
             case ECssValueTypes.COLOR:
-                return AsColor().Serialize();
+                return AsCssColor().ToCssString();
+            case ECssValueTypes.COLOR_HDR:
+                return AsCssColorHdr().ToCssString();
             case ECssValueTypes.INTEGER:
                 return AsInteger().ToString(CultureInfo.InvariantCulture);
             case ECssValueTypes.NUMBER:
@@ -931,9 +1050,9 @@ public partial class CssValue
             case ECssValueTypes.PERCENT:
                 return string.Concat(AsDecimal().ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture), "%");
             case ECssValueTypes.STRING:
-                return string.Concat(UnicodeCommon.CHAR_QUOTATION_MARK, (string)value!, UnicodeCommon.CHAR_QUOTATION_MARK);
+                return string.Concat(UnicodeCommon.CHAR_QUOTATION_MARK, AsString(), UnicodeCommon.CHAR_QUOTATION_MARK);
             case ECssValueTypes.KEYWORD:
-                return Lookup.Keyword(value!.GetType(), value);// Enum.GetName(value.GetType(), value)
+                return Lookup.Keyword(data.ObjectValue!.GetType(), data.ObjectValue);// Enum.GetName(value.GetType(), value)
             default:
                 return string.Concat("[", Enum.GetName(typeof(ECssValueTypes), Type), "]");
         }
@@ -960,15 +1079,19 @@ public partial class CssValue
                 }
             case ECssValueTypes.KEYWORD:
                 {
-                    return (string)value!;
+                    return AsString();
                 }
             case ECssValueTypes.STRING:
                 {
-                    return string.Concat(UnicodeCommon.CHAR_QUOTATION_MARK, (string)value!, UnicodeCommon.CHAR_QUOTATION_MARK);
+                    return string.Concat(UnicodeCommon.CHAR_QUOTATION_MARK, AsString(), UnicodeCommon.CHAR_QUOTATION_MARK);
                 }
             case ECssValueTypes.COLOR:
                 {
-                    return AsColor().Serialize();
+                    return AsCssColor().ToCssString();
+                }
+            case ECssValueTypes.COLOR_HDR:
+                {
+                    return AsCssColorHdr().ToCssString();
                 }
             case ECssValueTypes.DIMENSION:
                 {

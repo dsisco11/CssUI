@@ -53,7 +53,7 @@ public static partial class CssPropertyResolver
                     }
                 case EColor.Transparent:
                     {/* The computed value of the keyword ‘transparent’ is the quadruplet of all zero numerical RGBA values, e.g. rgba(0,0,0,0). */
-                        return new CssValue(ECssValueTypes.COLOR, 0x0);
+                        return CssValue.From(CssColor.Transparent);
                     }
                 default:
                     {
@@ -62,7 +62,11 @@ public static partial class CssPropertyResolver
                             throw new CssPropertyException($"No meta-enum data found for keyword '{keyword}'");
                         }
 
-                        return CssValue.From(new Color((int)outData.Value.Data[0], (int)outData.Value.Data[1], (int)outData.Value.Data[2], (int)outData.Value.Data[3]));
+                        return CssValue.From(CssColor.FromRgba(
+                            (byte)outData.Value.Data[0], 
+                            (byte)outData.Value.Data[1], 
+                            (byte)outData.Value.Data[2], 
+                            (byte)outData.Value.Data[3]));
                     }
             }
         }

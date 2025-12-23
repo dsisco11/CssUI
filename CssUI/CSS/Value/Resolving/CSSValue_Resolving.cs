@@ -100,7 +100,7 @@ public partial class CssValue
                 {
                     if (Def.Percentage_Resolver != null)
                     {
-                        return Def.Percentage_Resolver(Property, (double)value);
+                        return Def.Percentage_Resolver(Property, AsDecimal());
                     }
                 }
                 break;

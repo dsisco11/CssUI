@@ -18,10 +18,10 @@ public struct Vertex2i
     /// <summary>
     /// Color of the vertex
     /// </summary>
-    public ReadOnlyColor Color;
+    public Rgba Color;
     #endregion
 
-    public Vertex2i(int X, int Y, ReadOnlyColor Color)
+    public Vertex2i(int X, int Y, Rgba Color)
     {
         this.X = X;
         this.Y = Y;

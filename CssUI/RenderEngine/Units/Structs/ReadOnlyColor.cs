@@ -7,6 +7,11 @@ using System.Runtime.InteropServices;
 
 namespace CssUI.Rendering;
 
+/// <summary>
+/// Legacy immutable color struct. Use <see cref="CssUI.CSS.CssColor"/> for CSS color values
+/// or <see cref="Rgba"/> for rendering operations.
+/// </summary>
+[Obsolete("Use CssColor (CSS layer) or Rgba (rendering layer) instead")]
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct ReadOnlyColor : IColorObject
 {
@@ -17,6 +22,7 @@ public struct ReadOnlyColor : IColorObject
     public readonly static ReadOnlyColor MinValue = new ReadOnlyColor(byte.MinValue, byte.MinValue, byte.MinValue, byte.MinValue);
     public readonly static ReadOnlyColor MaxValue = new ReadOnlyColor(byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue);
     #endregion
+
 
     #region Properties
     /// <summary>Red channel value in the range [0-255]</summary>

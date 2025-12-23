@@ -80,19 +80,24 @@ public enum ECssValueTypes : int
     /// </summary>
     FUNCTION = (1 << 23),
     /// <summary>
+    /// Value is a wide-gamut HDR color represented as <see cref="CssColorHdr"/>.
     /// </summary>
-    IMAGE = (1 << 24),
+    COLOR_HDR = (1 << 24),
+    /// <summary>
+    /// Value is an image reference.
+    /// </summary>
+    IMAGE = (1 << 25),
     /// <summary>
     /// Specifies the position of an object area inside a positioning area.
     /// The value is an instance of <see cref="Point2f"/>.
     /// This value initially consists of multiple sub-values eg: 'left' and '50%' and it's type before the computed stage is <see cref="COLLECTION"/>.
     /// Docs: https://www.w3.org/TR/css-values-4/#position
     /// </summary>
-    POSITION = (1 << 25),
+    POSITION = (1 << 26),
     /// <summary>
     /// Collection values are actually an array of multiple sub values
     /// </summary>
-    COLLECTION = (1 << 26),
+    COLLECTION = (1 << 27),
 
 
 

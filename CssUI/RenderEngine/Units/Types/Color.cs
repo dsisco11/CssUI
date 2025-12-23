@@ -241,7 +241,7 @@ public class Color : ColorObject<Color>
     #endregion
 
     #region Casts
-    public static implicit operator ReadOnlyColor(Color color) => new ReadOnlyColor(color.red, color.green, color.blue, color.alpha);
+    public static implicit operator Rgba(Color color) => new Rgba(color.red, color.green, color.blue, color.alpha);
     public static implicit operator SimpleColor(Color color) => new SimpleColor(color.red, color.green, color.blue);
     public static implicit operator Color(uint color) => color;
     #endregion
