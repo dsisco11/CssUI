@@ -17,7 +17,7 @@
 - [ ] Simplification algorithm
 - [ ] Proper serialization
 
-## Test Coverage — Total: 2249 passing, 221 skipped, 19 failing = 2489 tests
+## Test Coverage — Total: 2294 passing, 233 skipped, 19 failing = 2546 tests
 ### DOM Tests: 518 passing, 3 skipped = 521 total
 
 ## Phase 6: CSS Test Coverage
@@ -49,9 +49,14 @@
 - [x] CssFunction encoding tests
 - [x] Error recovery tests
 
-### 6.4 CssUnitResolver (CSS/Types/)
-- [ ] Unit conversion tests (px, em, rem, %, etc.)
-- [ ] Relative unit resolution tests
+### 6.4 CssUnitResolver (CSS/Types/) ✓
+- [x] Unit conversion tests (px, em, rem, %, etc.)
+- [x] Relative unit resolution tests
+- [x] Known bugs documented:
+  - Bug: Physical unit constants (INCH_TO_PX, MM_TO_PX, PT_TO_PX, PC_TO_PX, Q_TO_PX) use integer division
+  - Bug: Resolution unit scales (DPI, DPCM) use integer division
+  - Bug: GRAD scale uses integer division (400/360 = 1 instead of ~1.11)
+  - Bug: Viewport units (VW, VH, VMIN, VMAX) return 1.0 fallback when visualViewport is unavailable
 
 ### 6.5 TokenStream (CSS/Deserialization/)
 - [ ] Token iteration behavior tests
