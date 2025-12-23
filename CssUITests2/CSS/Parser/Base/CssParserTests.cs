@@ -1552,4 +1552,220 @@ public class CssParserTests
         Assert.Equal(2, rules.Count);
     }
     #endregion
+
+    #region Hex Color Parsing Tests (Phase 7.1)
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "Color")]
+    public void ParseCssValue_HexColor3Digit_ReturnsColorValue()
+    {
+        // #RGB format (3-digit hex)
+        var parser = new CssParser("#f00");
+        var value = parser.Parse_CssValue();
+
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+        Assert.Equal(255, color.A);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "Color")]
+    public void ParseCssValue_HexColor4Digit_ReturnsColorValueWithAlpha()
+    {
+        // #RGBA format (4-digit hex)
+        var parser = new CssParser("#f008");
+        var value = parser.Parse_CssValue();
+
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+        Assert.Equal(136, color.A); // 0x88 = 136
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "Color")]
+    public void ParseCssValue_HexColor6Digit_ReturnsColorValue()
+    {
+        // #RRGGBB format (6-digit hex)
+        var parser = new CssParser("#ff5500");
+        var value = parser.Parse_CssValue();
+
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(85, color.G);
+        Assert.Equal(0, color.B);
+        Assert.Equal(255, color.A);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "Color")]
+    public void ParseCssValue_HexColor8Digit_ReturnsColorValueWithAlpha()
+    {
+        // #RRGGBBAA format (8-digit hex)
+        var parser = new CssParser("#ff550080");
+        var value = parser.Parse_CssValue();
+
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(85, color.G);
+        Assert.Equal(0, color.B);
+        Assert.Equal(128, color.A);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "Color")]
+    public void ParseCssValue_HexColorUppercase_ReturnsColorValue()
+    {
+        // Uppercase hex should work
+        var parser = new CssParser("#FF5500");
+        var value = parser.Parse_CssValue();
+
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(85, color.G);
+        Assert.Equal(0, color.B);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "Color")]
+    public void ParseCssValue_HexColorMixedCase_ReturnsColorValue()
+    {
+        // Mixed case hex should work
+        var parser = new CssParser("#fF5500");
+        var value = parser.Parse_CssValue();
+
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(85, color.G);
+        Assert.Equal(0, color.B);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "Color")]
+    public void ParseCssValue_HexColorBlack_ReturnsBlack()
+    {
+        var parser = new CssParser("#000000");
+        var value = parser.Parse_CssValue();
+
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+        Assert.Equal(255, color.A);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "Color")]
+    public void ParseCssValue_HexColorWhite_ReturnsWhite()
+    {
+        var parser = new CssParser("#ffffff");
+        var value = parser.Parse_CssValue();
+
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(255, color.B);
+        Assert.Equal(255, color.A);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "Color")]
+    public void ParseCssValue_HexColorShortBlack_ReturnsBlack()
+    {
+        var parser = new CssParser("#000");
+        var value = parser.Parse_CssValue();
+
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "Color")]
+    public void ParseCssValue_HexColorShortWhite_ReturnsWhite()
+    {
+        var parser = new CssParser("#fff");
+        var value = parser.Parse_CssValue();
+
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(255, color.B);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "Color")]
+    public void ParseCssValue_HexColorTransparent_ReturnsTransparent()
+    {
+        var parser = new CssParser("#00000000");
+        var value = parser.Parse_CssValue();
+
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+        Assert.Equal(0, color.A);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "Color")]
+    public void ParseCssValue_HexColorShortTransparent_ReturnsTransparent()
+    {
+        var parser = new CssParser("#0000");
+        var value = parser.Parse_CssValue();
+
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+        Assert.Equal(0, color.A);
+    }
+
+    [Theory]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "Color")]
+    [InlineData("#abc", 170, 187, 204, 255)]      // #RGB
+    [InlineData("#abcd", 170, 187, 204, 221)]     // #RGBA
+    [InlineData("#aabbcc", 170, 187, 204, 255)]   // #RRGGBB
+    [InlineData("#aabbccdd", 170, 187, 204, 221)] // #RRGGBBAA
+    public void ParseCssValue_HexColorVariousFormats_ReturnsCorrectColor(string hex, int r, int g, int b, int a)
+    {
+        var parser = new CssParser(hex);
+        var value = parser.Parse_CssValue();
+
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsColor();
+        Assert.Equal(r, color.R);
+        Assert.Equal(g, color.G);
+        Assert.Equal(b, color.B);
+        Assert.Equal(a, color.A);
+    }
+    #endregion
 }

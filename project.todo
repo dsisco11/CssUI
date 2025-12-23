@@ -76,11 +76,11 @@
 - CSS Color Level 3: https://www.w3.org/TR/css-color-3/
 
 ### 7.1 Color Parsing in CssValueParser (CSS/Parser/)
-- [ ] Handle HashToken → CssValue (COLOR) in Consume_Value()
-  - [ ] Parse #RGB (3-digit hex)
-  - [ ] Parse #RGBA (4-digit hex)
-  - [ ] Parse #RRGGBB (6-digit hex)
-  - [ ] Parse #RRGGBBAA (8-digit hex)
+- [x] Handle HashToken → CssValue (COLOR) in Consume_Value()
+  - [x] Parse #RGB (3-digit hex)
+  - [x] Parse #RGBA (4-digit hex)
+  - [x] Parse #RRGGBB (6-digit hex)
+  - [x] Parse #RRGGBBAA (8-digit hex)
 - [ ] Handle rgb()/rgba() function → CssValue (COLOR)
   - [ ] Legacy syntax: rgb(255, 128, 0)
   - [ ] Modern syntax: rgb(255 128 0)
@@ -105,7 +105,7 @@
 - [ ] Handle transparent keyword serialization
 
 ### 7.3 Color Parsing Tests
-- [ ] Hex color parsing tests (all formats)
+- [x] Hex color parsing tests (all formats)
 - [ ] rgb()/rgba() parsing tests (legacy + modern syntax)
 - [ ] hsl()/hsla() parsing tests
 - [ ] hwb() parsing tests

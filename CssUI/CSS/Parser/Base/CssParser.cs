@@ -633,6 +633,25 @@ public class CssParser
                 {/* XXX: Finish this */
                     throw new NotSupportedException("URL values are not supported as of yet!");
                 }
+            case ECssTokenType.Hash:
+                {
+                    // Parse hex color values: #RGB, #RGBA, #RRGGBB, #RRGGBBAA
+                    var tok = Stream.Consume() as HashToken;
+                    if (tok is null)
+                    {
+                        throw new CssParserException("Expected HashToken but received null", Stream);
+                    }
+
+                    // Attempt to parse the hash value as a color
+                    // The HashToken.Value does NOT include the leading '#'
+                    if (CssColor.TryFromHex(tok.Value, out CssColor color))
+                    {
+                        return CssValue.From(color);
+                    }
+
+                    // If not a valid hex color, treat as a parse error
+                    throw new CssParserException($"Invalid hex color value: #{tok.Value}", Stream);
+                }
             case ECssTokenType.EOF:
                 {
                     return CssValue.Null;
@@ -702,7 +721,7 @@ public class CssParser
         // A <media-condition> starts with:
         // - '(' for <media-in-parens> (appears as SimpleBlock after component value parsing)
         // - 'not' followed by '(' for <media-not>
-        // Note: After Consume_Comma_Seperated_Component_Value_List, parenthesized content 
+        // Note: After Consume_Comma_Seperated_Component_Value_List, parenthesized content
         // becomes SimpleBlock tokens, not raw Parenth_Open tokens.
         if (Stream.Next.Type == ECssTokenType.SimpleBlock)
         {
