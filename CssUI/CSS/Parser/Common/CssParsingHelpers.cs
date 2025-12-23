@@ -21,12 +21,12 @@ internal static class CssParsingHelpers
     public static bool TryGetNumber(CssToken token, out double value)
     {
         value = 0;
-        if (token is not NumberToken numToken || numToken.Number is null)
+        if (token is not NumberToken numToken)
         {
             return false;
         }
 
-        value = Convert.ToDouble(numToken.Number);
+        value = numToken.AsNumber;
         return true;
     }
 
@@ -78,7 +78,7 @@ internal static class CssParsingHelpers
         // Dimension token: angle with unit
         if (token is DimensionToken dimToken)
         {
-            double value = Convert.ToDouble(dimToken.Number);
+            double value = dimToken.AsNumber;
             var unit = dimToken.Unit;
 
             // Convert to degrees based on unit

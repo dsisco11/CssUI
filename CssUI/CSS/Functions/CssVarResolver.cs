@@ -122,7 +122,7 @@ public static class CssVarResolver
                     case ECssTokenType.Number:
                         if (token is NumberToken numToken)
                         {
-                            fallback = CssValue.From(Convert.ToDouble(numToken.Number));
+                            fallback = CssValue.From(numToken.AsNumber);
                         }
                         break;
                     case ECssTokenType.Dimension:

@@ -210,7 +210,7 @@ public static class CssCalcEvaluator
                 {
                     if (token is NumberToken numToken)
                     {
-                        return Convert.ToDouble(numToken.Number);
+                        return numToken.AsNumber;
                     }
                     return 0;
                 }
@@ -219,7 +219,7 @@ public static class CssCalcEvaluator
                 {
                     if (token is DimensionToken dimToken)
                     {
-                        double numericValue = Convert.ToDouble(dimToken.Number);
+                        double numericValue = dimToken.AsNumber;
 
                         // Try to resolve the unit
                         if (unitResolver != null && Lookup.TryEnum(dimToken.Unit!, out ECssUnit unit))
