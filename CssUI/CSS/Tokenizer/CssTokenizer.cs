@@ -293,8 +293,7 @@ public class CssTokenizer
             Stream.Consume();
         }
 
-        if (!Stream.Consume_While(Is_Ascii_Digit, out ReadOnlySpan<char> Integer))
-            throw new CssParserException(ParserErrors.PARSING_FAILED);
+        Stream.Consume_While(Is_Ascii_Digit, out ReadOnlySpan<char> Integer);
 
         if (Stream.Next == CHAR_FULL_STOP)
         {
@@ -306,19 +305,32 @@ public class CssTokenizer
         if (!Stream.Consume_While(Is_Ascii_Digit, out ReadOnlySpan<char> Fraction) && Decimal)
             throw new CssParserException(ParserErrors.PARSING_FAILED);
 
+        // Must have at least integer or fraction digits
+        if (Integer.IsEmpty && Fraction.IsEmpty)
+            throw new CssParserException(ParserErrors.PARSING_FAILED);
+
+        // Check for exponent: e/E followed by optional sign and required digit(s)
+        // Per CSS spec: only recognize e/E as exponent if followed by digit or sign+digit
         if (Stream.Next == CHAR_E_UPPER || Stream.Next == CHAR_E_LOWER)
         {
-            HasExponent = true;
-            outType = ENumericTokenType.Number;
-            Stream.Consume();
+            char afterE = Stream.NextNext;
+            bool validExponent = Is_Ascii_Digit(afterE) ||
+                ((afterE == CHAR_HYPHEN_MINUS || afterE == CHAR_PLUS_SIGN) && Is_Ascii_Digit(Stream.NextNextNext));
+            
+            if (validExponent)
+            {
+                HasExponent = true;
+                outType = ENumericTokenType.Number;
+                Stream.Consume();
+            }
         }
 
-        if (Stream.Next == CHAR_HYPHEN_MINUS)
+        if (HasExponent && Stream.Next == CHAR_HYPHEN_MINUS)
         {
             Exponent_IsPositive = false;
             Stream.Consume();
         }
-        else if (Stream.Next == CHAR_PLUS_SIGN)
+        else if (HasExponent && Stream.Next == CHAR_PLUS_SIGN)
         {
             Stream.Consume();
         }
@@ -330,7 +342,7 @@ public class CssTokenizer
         outResult = Stream.AsMemory().Slice(Start, len);
 
         //return S * (I + (F * Math.Pow(10, -D))) * Math.Pow(10, T*E);
-        if (Decimal)
+        if (Decimal || HasExponent)
         {
             outNumber = ParsingCommon.ToDecimal(IsPositive ? 1 : -1, Integer, Fraction, Exponent_IsPositive ? 1 : -1, Exponent);
         }
@@ -359,7 +371,7 @@ public class CssTokenizer
         if (Stream.Next == CHAR_PERCENT)
         {
             Stream.Consume();
-            return new PercentageToken(nStr.Span, (double)N);
+            return new PercentageToken(nStr.Span, Convert.ToDouble(N));
         }
 
         return new NumberToken(nType, nStr.Span, N);
@@ -716,13 +728,14 @@ public class CssTokenizer
                     {
                         return Consume_Numeric_Token(Stream);
                     }
-                    else if (Is_Identifier_Start(Stream.Next, Stream.NextNext, Stream.NextNextNext))
+                    else if (Is_Identifier_Start(CHAR_HYPHEN_MINUS, Stream.Next, Stream.NextNext))
                     {
+                        Stream.Reconsume();
                         return Consume_Ident_Like_Token(Stream);
                     }
-                    else if (Stream.NextNext == CHAR_HYPHEN_MINUS && Stream.NextNextNext == CHAR_RIGHT_CHEVRON)
+                    else if (Stream.Next == CHAR_HYPHEN_MINUS && Stream.NextNext == CHAR_RIGHT_CHEVRON)
                     {
-                        Stream.Consume(1);
+                        Stream.Consume(2);
                         return CdcToken.Instance;
                     }
 
@@ -750,6 +763,7 @@ public class CssTokenizer
                             if (c == CHAR_ASTERISK && Stream.Next == CHAR_SOLIDUS)
                             {
                                 Stream.Consume();
+                                // Comment consumed, continue tokenizing
                                 return Consume_Token(Stream);
                             }
                         }
@@ -840,11 +854,11 @@ public class CssTokenizer
             case CHAR_U_UPPER:
             case CHAR_U_LOWER:
                 {
-                    Stream.Consume();
-                    if (Stream.Next == CHAR_PLUS_SIGN
-                        && (Is_Ascii_Hex_Digit(Stream.NextNext) || Stream.NextNext == CHAR_QUESTION_MARK))
+                    // Check for unicode range without consuming 'u' first
+                    if (Stream.NextNext == CHAR_PLUS_SIGN
+                        && (Is_Ascii_Hex_Digit(Stream.NextNextNext) || Stream.NextNextNext == CHAR_QUESTION_MARK))
                     {
-                        Stream.Consume(1);
+                        Stream.Consume(2); // Consume 'u' and '+'
                         return Consume_Unicode_Range_Token(Stream);
                     }
 

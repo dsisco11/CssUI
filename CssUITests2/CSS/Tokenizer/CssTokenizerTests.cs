@@ -1213,12 +1213,14 @@ public class CssTokenizerTests
     {
         var tokens = Tokenize("a /* comment */ b");
 
-        // Should get: ident("a"), whitespace, ident("b"), EOF
-        Assert.Equal(4, tokens.Length);
+        // Per CSS Syntax spec, comments are discarded but don't merge surrounding whitespace
+        // Tokens: ident("a"), whitespace(before), whitespace(after), ident("b"), EOF = 5 tokens
+        Assert.Equal(5, tokens.Length);
         Assert.Equal(ECssTokenType.Ident, tokens[0].Type);
         Assert.Equal(ECssTokenType.Whitespace, tokens[1].Type);
-        Assert.Equal(ECssTokenType.Ident, tokens[2].Type);
-        Assert.Equal(ECssTokenType.EOF, tokens[3].Type);
+        Assert.Equal(ECssTokenType.Whitespace, tokens[2].Type);
+        Assert.Equal(ECssTokenType.Ident, tokens[3].Type);
+        Assert.Equal(ECssTokenType.EOF, tokens[4].Type);
     }
 
     [Fact]
@@ -1228,7 +1230,9 @@ public class CssTokenizerTests
     {
         var tokens = Tokenize("a /* multi\nline\ncomment */ b");
 
-        Assert.Equal(4, tokens.Length);
+        // Per CSS Syntax spec, comments are discarded but don't merge surrounding whitespace
+        // Tokens: a, whitespace(before comment), whitespace(after comment), b, EOF = 5 tokens
+        Assert.Equal(5, tokens.Length);
     }
 
     [Fact]

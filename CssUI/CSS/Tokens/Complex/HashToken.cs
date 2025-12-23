@@ -14,7 +14,7 @@ public sealed class HashToken : ValuedTokenBase
     public readonly EHashTokenType HashType = EHashTokenType.Unrestricted;
     #endregion
 
-    public HashToken(EHashTokenType HashType, ReadOnlySpan<char> Value) : base(ECssTokenType.Hash, Value)
+    public HashToken(EHashTokenType HashType, ReadOnlySpan<char> Value) : base(ECssTokenType.Hash, Value, AutoLowercase: false)
     {
         this.HashType = HashType;
     }
