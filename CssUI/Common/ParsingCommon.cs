@@ -126,9 +126,15 @@ public static class ParsingCommon
         {
             var E = Digits_To_Base10_Unsigned(exponentDigits);
             long Exp = MathExt.Pow(10L, E);
-            if (exponent_sign != 1) Exp = -Exp;
-
-            I *= Exp;
+            if (exponent_sign != 1)
+            {
+                // Negative exponent means divide (result truncates toward zero for integers)
+                I /= Exp;
+            }
+            else
+            {
+                I *= Exp;
+            }
         }
 
         return I;
@@ -151,10 +157,16 @@ public static class ParsingCommon
         if (exponentDigits.Length > 0)
         {
             var E = Digits_To_Base10_Unsigned(exponentDigits);
-            var Exp = MathExt.Pow(10L, E);
-            if (exponent_sign != 1) Exp = -Exp;
-
-            RetVal *= Exp;
+            double Exp = MathExt.Pow(10L, E);
+            if (exponent_sign != 1)
+            {
+                // Negative exponent means divide
+                RetVal /= Exp;
+            }
+            else
+            {
+                RetVal *= Exp;
+            }
         }
 
         return (sign == 1) ? RetVal : -RetVal;
@@ -368,9 +380,9 @@ public static class ParsingCommon
         if (Stream.Next == EOF)
             throw new DomSyntaxError();
 
-        /* 9) If the character indicated by position is a U+002E FULL STOP (.), 
-         * and that is not the last character in input, 
-         * and the character after the character indicated by position is an ASCII digit, 
+        /* 9) If the character indicated by position is a U+002E FULL STOP (.),
+         * and that is not the last character in input,
+         * and the character after the character indicated by position is an ASCII digit,
          * then set value to zero and jump to the step labeled fraction. */
         if (Stream.Next == CHAR_FULL_STOP && Stream.NextNext != EOF && Is_Ascii_Digit(Stream.NextNext))
         {
@@ -448,8 +460,8 @@ public static class ParsingCommon
         }
 
         /* 15) Conversion: Let S be the set of finite IEEE 754 double-precision floating-point values except −0, but with two special values added: 2^1024 and −2^1024. */
-        /* 16) Let rounded-value be the number in S that is closest to value, 
-         * selecting the number with an even significand if there are two equally close values. 
+        /* 16) Let rounded-value be the number in S that is closest to value,
+         * selecting the number with an even significand if there are two equally close values.
          * (The two special values 2^1024 and −2^1024 are considered to have even significands for this purpose.) */
         var roundedValue = value;
         if (roundedValue == -0D) roundedValue = -roundedValue;
