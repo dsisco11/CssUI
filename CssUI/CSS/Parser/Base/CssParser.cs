@@ -273,6 +273,7 @@ public class CssParser
                 case ECssTokenType.EOF:
                     return List;
                 case ECssTokenType.At_Keyword:
+                    Stream.Reconsume();
                     List.AddLast(Consume_AtRule(Stream));
                     break;
                 case ECssTokenType.Ident:
