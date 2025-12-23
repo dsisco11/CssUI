@@ -102,7 +102,8 @@ public class CssPropertyTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.Auto);
@@ -119,7 +120,8 @@ public class CssPropertyTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.From(100.0, ECssUnit.PX));
@@ -138,7 +140,8 @@ public class CssPropertyTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.Inherit);
@@ -155,7 +158,8 @@ public class CssPropertyTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.From(50.0, ECssUnit.PX));
@@ -206,7 +210,8 @@ public class CssPropertyTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.Auto);
@@ -264,7 +269,8 @@ public class CssPropertyTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         // Should not throw
@@ -280,7 +286,8 @@ public class CssPropertyTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         // Should not throw
@@ -296,7 +303,8 @@ public class CssPropertyTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         // Should not throw
@@ -314,7 +322,8 @@ public class CssPropertyTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         // Width accepts dimensions
@@ -332,7 +341,9 @@ public class CssPropertyTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.FlexGrow) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        // FlexGrow is now initialized per W3C CSS Flexbox spec
+        var prop = element.Style.UserRules.Get(ECssPropertyID.FlexGrow) as CssProperty;
         Assert.NotNull(prop);
 
         // FlexGrow accepts numbers
@@ -350,7 +361,8 @@ public class CssPropertyTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Display) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Display) as CssProperty;
         Assert.NotNull(prop);
 
         // Display accepts keywords
@@ -368,7 +380,9 @@ public class CssPropertyTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Order) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        // Order is now initialized per W3C CSS Flexbox spec
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Order) as CssProperty;
         Assert.NotNull(prop);
 
         // Order accepts integers
@@ -390,8 +404,9 @@ public class CssPropertyTests
         doc.documentElement?.appendChild(element1);
         doc.documentElement?.appendChild(element2);
 
-        var prop1 = element1.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
-        var prop2 = element2.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop1 = element1.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
+        var prop2 = element2.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
 
         Assert.NotNull(prop1);
         Assert.NotNull(prop2);
@@ -469,7 +484,8 @@ public class CssPropertyTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var style = element.Style.Cascaded;
+        // Use UserRules for modification tests
+        var style = element.Style.UserRules;
 
         Assert.NotNull(style.Get(ECssPropertyID.FlexDirection));
         Assert.NotNull(style.Get(ECssPropertyID.FlexWrap));
@@ -488,7 +504,8 @@ public class CssPropertyTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var style = element.Style.Cascaded;
+        // Use UserRules for modification tests
+        var style = element.Style.UserRules;
 
         Assert.NotNull(style.Get(ECssPropertyID.AlignContent));
         Assert.NotNull(style.Get(ECssPropertyID.JustifyContent));

@@ -35,7 +35,8 @@ public class ComputedValueResolutionTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.From(100.0, ECssUnit.PX));
@@ -53,7 +54,8 @@ public class ComputedValueResolutionTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.From(100.0, ECssUnit.PX));
@@ -71,7 +73,8 @@ public class ComputedValueResolutionTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.From(100.0, ECssUnit.PX));
@@ -89,7 +92,8 @@ public class ComputedValueResolutionTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.From(100.0, ECssUnit.PX));
@@ -107,7 +111,8 @@ public class ComputedValueResolutionTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.From(100.0, ECssUnit.PX));
@@ -127,7 +132,8 @@ public class ComputedValueResolutionTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.From(150.0, ECssUnit.PX));
@@ -145,7 +151,8 @@ public class ComputedValueResolutionTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.Initial);
@@ -167,8 +174,9 @@ public class ComputedValueResolutionTests
         doc.documentElement?.appendChild(parent);
         parent.appendChild(child);
 
+        // Use UserRules instead of Cascaded (which is read-only)
         // Color is inheritable
-        var childProp = child.Style.Cascaded.Get(ECssPropertyID.Color) as CssProperty;
+        var childProp = child.Style.UserRules.Get(ECssPropertyID.Color) as CssProperty;
         Assert.NotNull(childProp);
 
         childProp.Set(CssValue.Inherit);
@@ -188,8 +196,9 @@ public class ComputedValueResolutionTests
         doc.documentElement?.appendChild(parent);
         parent.appendChild(child);
 
+        // Use UserRules instead of Cascaded (which is read-only)
         // Color is inheritable, so unset acts like inherit
-        var childProp = child.Style.Cascaded.Get(ECssPropertyID.Color) as CssProperty;
+        var childProp = child.Style.UserRules.Get(ECssPropertyID.Color) as CssProperty;
         Assert.NotNull(childProp);
 
         childProp.Set(CssValue.Unset);
@@ -207,8 +216,9 @@ public class ComputedValueResolutionTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
+        // Use UserRules instead of Cascaded (which is read-only)
         // Width is not inheritable, so unset acts like initial
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.Unset);
@@ -228,7 +238,8 @@ public class ComputedValueResolutionTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         // Set a dimension value that should be resolved to px
@@ -247,7 +258,8 @@ public class ComputedValueResolutionTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.FlexGrow) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.FlexGrow) as CssProperty;
         Assert.NotNull(prop);
 
         // Numbers don't need resolution
@@ -266,7 +278,8 @@ public class ComputedValueResolutionTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.FlexDirection) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.FlexDirection) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.From(EFlexDirection.Column));
@@ -284,7 +297,8 @@ public class ComputedValueResolutionTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.Auto);
@@ -428,7 +442,8 @@ public class ComputedValueResolutionTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         // Set initial value
@@ -453,7 +468,8 @@ public class ComputedValueResolutionTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.From(100.0, ECssUnit.PX));
@@ -490,7 +506,8 @@ public class ComputedValueResolutionTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.MaxWidth) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.MaxWidth) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.None);
@@ -507,7 +524,8 @@ public class ComputedValueResolutionTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.Auto);
@@ -527,7 +545,8 @@ public class ComputedValueResolutionTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.From(100.0, ECssUnit.PX));
@@ -549,7 +568,8 @@ public class ComputedValueResolutionTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.From(100.0, ECssUnit.PX));

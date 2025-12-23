@@ -513,6 +513,45 @@ public class CssComputedStyle
         CssProperties[(int)ECssPropertyID.LineHeight] = new IntProperty(ECssPropertyID.LineHeight, Owner, selfRef, this.ReadOnly);
         CssProperties[(int)ECssPropertyID.Transform] = new TransformListProperty(ECssPropertyID.Transform, Owner, selfRef, this.ReadOnly);
 
+        // Flexbox properties per CSS Flexbox Level 1 specification
+        // https://www.w3.org/TR/css-flexbox-1/
+        CssProperties[(int)ECssPropertyID.FlexDirection] = new EnumProperty<EFlexDirection>(ECssPropertyID.FlexDirection, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.FlexWrap] = new EnumProperty<EFlexWrap>(ECssPropertyID.FlexWrap, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.FlexGrow] = new NumberProperty(ECssPropertyID.FlexGrow, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.FlexShrink] = new NumberProperty(ECssPropertyID.FlexShrink, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.FlexBasis] = new IntProperty(ECssPropertyID.FlexBasis, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.Order] = new IntProperty(ECssPropertyID.Order, Owner, selfRef, this.ReadOnly);
+
+        // Alignment properties per CSS Box Alignment Module Level 3
+        // https://www.w3.org/TR/css-align-3/
+        CssProperties[(int)ECssPropertyID.AlignContent] = new EnumProperty<EAlignContent>(ECssPropertyID.AlignContent, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.JustifyContent] = new EnumProperty<EJustifyContent>(ECssPropertyID.JustifyContent, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.AlignItems] = new EnumProperty<EAlignItems>(ECssPropertyID.AlignItems, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.AlignSelf] = new EnumProperty<EAlignItems>(ECssPropertyID.AlignSelf, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.JustifyItems] = new EnumProperty<EAlignItems>(ECssPropertyID.JustifyItems, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.JustifySelf] = new EnumProperty<EAlignItems>(ECssPropertyID.JustifySelf, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.RowGap] = new IntProperty(ECssPropertyID.RowGap, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.ColumnGap] = new IntProperty(ECssPropertyID.ColumnGap, Owner, selfRef, this.ReadOnly);
+
+        // Grid properties per CSS Grid Layout Module Level 1
+        // https://www.w3.org/TR/css-grid-1/
+        CssProperties[(int)ECssPropertyID.GridAutoFlow] = new EnumProperty<EGridAutoFlow>(ECssPropertyID.GridAutoFlow, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.GridColumnStart] = new IntProperty(ECssPropertyID.GridColumnStart, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.GridColumnEnd] = new IntProperty(ECssPropertyID.GridColumnEnd, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.GridRowStart] = new IntProperty(ECssPropertyID.GridRowStart, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.GridRowEnd] = new IntProperty(ECssPropertyID.GridRowEnd, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.GridTemplateColumns] = new StringProperty(ECssPropertyID.GridTemplateColumns, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.GridTemplateRows] = new StringProperty(ECssPropertyID.GridTemplateRows, Owner, selfRef, this.ReadOnly);
+
+        // Fragmentation properties per CSS Fragmentation Module Level 3
+        // https://www.w3.org/TR/css-break-3/
+        CssProperties[(int)ECssPropertyID.BreakBefore] = new EnumProperty<EBreakValue>(ECssPropertyID.BreakBefore, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.BreakAfter] = new EnumProperty<EBreakValue>(ECssPropertyID.BreakAfter, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.BreakInside] = new EnumProperty<EBreakValue>(ECssPropertyID.BreakInside, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.Orphans] = new IntProperty(ECssPropertyID.Orphans, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.Widows] = new IntProperty(ECssPropertyID.Widows, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.BoxDecorationBreak] = new EnumProperty<EBoxDecorationBreak>(ECssPropertyID.BoxDecorationBreak, Owner, selfRef, this.ReadOnly);
+
         /*CssPropertyMap = new ConcurrentDictionary<AtomicName<ECssPropertyID>, ICssProperty>(3, CssProperties.Count);
         for (int i = 0; i < CssProperties.Count; i++)
         {

@@ -260,13 +260,14 @@ public class PropertyInheritanceTests
         doc.documentElement?.appendChild(parent);
         parent.appendChild(child);
 
+        // Use UserRules instead of Cascaded (which is read-only)
         // Set parent width
-        var parentProp = parent.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        var parentProp = parent.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(parentProp);
         parentProp.Set(CssValue.From(200.0, ECssUnit.PX));
 
         // Set child to inherit (normally width doesn't inherit)
-        var childProp = child.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        var childProp = child.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(childProp);
         childProp.Set(CssValue.Inherit);
 
@@ -282,7 +283,8 @@ public class PropertyInheritanceTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Color) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Color) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.Inherit);
@@ -301,7 +303,8 @@ public class PropertyInheritanceTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        // Use UserRules instead of Cascaded (which is read-only)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         // First set a value, then reset to initial
@@ -321,8 +324,9 @@ public class PropertyInheritanceTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
+        // Use UserRules instead of Cascaded (which is read-only)
         // Color is inherited, but initial should still work
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Color) as CssProperty;
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Color) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.Initial);
@@ -341,8 +345,9 @@ public class PropertyInheritanceTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
+        // Use UserRules instead of Cascaded (which is read-only)
         // Color is inheritable, so unset should act like inherit
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Color) as CssProperty;
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Color) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.Unset);
@@ -359,8 +364,9 @@ public class PropertyInheritanceTests
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
 
+        // Use UserRules instead of Cascaded (which is read-only)
         // Width is not inheritable, so unset should act like initial
-        var prop = element.Style.Cascaded.Get(ECssPropertyID.Width) as CssProperty;
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
         prop.Set(CssValue.Unset);
