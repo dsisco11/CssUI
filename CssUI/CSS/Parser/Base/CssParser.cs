@@ -80,13 +80,14 @@ public class CssParser
         if (Stream.Next.Type != ECssTokenType.Ident) throw new CssSyntaxErrorException(CssErrors.EXPECTING_IDENT, Stream);
 
         CssDecleration? Dec = Consume_Decleration(Stream);
-        if (Dec is not null) throw new CssSyntaxErrorException(CssErrors.CANT_CONSUME_DECLERATION, Stream);
+        if (Dec is null) throw new CssSyntaxErrorException(CssErrors.CANT_CONSUME_DECLERATION, Stream);
 
         return Dec;
     }
 
     public IEnumerable<CssComponent> Parse_Decleration_List()
     {
+        if (Stream is null) throw new System.InvalidOperationException("Stream is null - parser not properly initialized");
         return Consume_Decleration_List(Stream);
     }
 
@@ -196,7 +197,9 @@ public class CssParser
     static CssAtRule Consume_AtRule(DataConsumer<CssToken> Stream)
     {
         if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
-        var name = (Stream.Next as ValuedTokenBase).Value;
+        // Consume the at-keyword token and get its name
+        var atToken = Stream.Consume();
+        var name = (atToken as ValuedTokenBase)?.Value ?? string.Empty;
         CssAtRule Rule = new CssAtRule(name);
         CssToken Token;
         do
@@ -251,15 +254,17 @@ public class CssParser
         while (Token.Type != ECssTokenType.EOF);
         return Rule;
     }
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
+
     static IEnumerable<CssComponent> Consume_Decleration_List(DataConsumer<CssToken> Stream)
     {// SEE:  https://www.w3.org/TR/css-syntax-3/#consume-a-list-of-declarations0
         if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
         LinkedList<CssComponent> List = new LinkedList<CssComponent>();
-        CssToken Token;
+        CssToken? Token;
         do
         {
             Token = Stream.Consume();
+            if (Token is null) return List; // Safety check for null token
+
             switch (Token.Type)
             {
                 case ECssTokenType.Whitespace:
@@ -274,89 +279,125 @@ public class CssParser
                     {
                         List<CssToken> tmp = new List<CssToken>();
                         tmp.Add(Token);
-                        Stream.Consume();
-                        do
+                        // Collect all tokens until EOF or semicolon for this declaration
+                        while (Stream.Next is CssToken next && next.Type != ECssTokenType.EOF && next.Type != ECssTokenType.Semicolon)
                         {
-                            if (Stream.Next.Type == ECssTokenType.EOF) break;
-                            else if (Stream.Next.Type == ECssTokenType.Semicolon) break;
-
-                            tmp.Add(Stream.Next);
-                            Stream.Consume();
+                            tmp.Add(Stream.Consume());
                         }
-                        while (Stream.Next.Type != ECssTokenType.EOF);
+                        // Add EOF token so sub-stream has proper termination
+                        tmp.Add(EOFToken.Instance);
 
-                        List.AddLast(Consume_Decleration(new DataConsumer<CssToken>(tmp.ToArray()))!);
+                        var decl = Consume_Decleration(new DataConsumer<CssToken>(tmp.ToArray(), CssToken.EOF));
+                        if (decl is not null)
+                        {
+                            List.AddLast(decl);
+                        }
                     }
                     break;
                 default:
                     {// parse error, consume tokens until reaching an EOF or semicolon
-                        do
+                        while (Stream.Next is CssToken nextToken && nextToken.Type != ECssTokenType.EOF && nextToken.Type != ECssTokenType.Semicolon)
                         {
-                            if (Stream.Next.Type == ECssTokenType.EOF) break;
-                            else if (Stream.Next.Type == ECssTokenType.Semicolon) break;
                             Stream.Consume();
                         }
-                        while (Stream.Next.Type != ECssTokenType.EOF);
                     }
                     break;
             }
         }
-        while (Token.Type != ECssTokenType.EOF);
+        while (Token is not null && Token.Type != ECssTokenType.EOF);
 
         return List;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
+    /// <summary>
+    /// Consumes a declaration per CSS Syntax Level 3 §5.4.6.
+    /// </summary>
+    /// <remarks>
+    /// This algorithm assumes that the next input token has already been checked to be an &lt;ident-token&gt;.
+    /// </remarks>
+    /// <seealso href="https://www.w3.org/TR/css-syntax-3/#consume-a-declaration"/>
     static CssDecleration? Consume_Decleration(DataConsumer<CssToken> Stream)
     {
         if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
-        var name = (Stream.Consume() as ValuedTokenBase)?.Value;
 
+        // Consume the next input token. Create a new declaration with its name set to
+        // the value of the current input token and its value initially set to an empty list.
+        var nameToken = Stream.Consume();
+        var name = (nameToken as ValuedTokenBase)?.Value;
         CssDecleration Decleration = new CssDecleration(name);
-        // Consume all whitespace
+
+        // Step 1: While the next input token is a <whitespace-token>, consume the next input token.
         Consume_All_Whitespace(Stream);
-        //while (Stream.Next.Type == ECssTokenType.Whitespace) { Stream.Consume(); }
 
-        if (Stream.Next.Type != ECssTokenType.Colon) return null;// Parser error
-        Stream.Consume();// Consume the colon
+        // Step 2: If the next input token is anything other than a <colon-token>, this is a parse error. Return nothing.
+        // Otherwise, consume the next input token.
+        if (Stream.Next.Type != ECssTokenType.Colon) return null;
+        Stream.Consume(); // Consume the colon
 
-        CssToken Token;
-        do
-        {// Find all of the decleration values
-            Token = Stream.Consume();
-            if (Token.Type == ECssTokenType.EOF) break;
-            //Decleration.Value.Add(new CssPreservedToken(Token));
-            Decleration.Values.Add((Token as CssComponent)!);// upcast to Component (Preserve the token)
+        // Step 3: While the next input token is a <whitespace-token>, consume the next input token.
+        Consume_All_Whitespace(Stream);
+
+        // Step 4: As long as the next input token is anything other than an <EOF-token>,
+        // consume a component value and append it to the declaration's value.
+        while (Stream.Next.Type != ECssTokenType.EOF)
+        {
+            var componentValue = Consume_ComponentValue(Stream);
+            Decleration.Values.Add(componentValue);
         }
-        while (Token.Type != ECssTokenType.EOF);
 
+        // Step 5: If the last two non-<whitespace-token>s in the declaration's value are a <delim-token>
+        // with the value "!" followed by an <ident-token> with a value that is an ASCII case-insensitive
+        // match for "important", remove them from the declaration's value and set the declaration's important flag to true.
+        int indexA = -1, indexB = -1;
         CssToken? A = null, B = null;
-        // Find the last two non-whitespace tokens out of the declerations values
+
+        // Find the last two non-whitespace tokens and their indices
         for (int i = Decleration.Values.Count - 1; i >= 0; i--)
         {
-            CssToken t = Decleration.Values[i];// (Decleration.Value[i] as CssPreservedToken).Value;
+            CssToken t = Decleration.Values[i];
             if (t.Type != ECssTokenType.Whitespace)
             {
                 if (B is null)
                 {
                     B = t;
+                    indexB = i;
                 }
                 else
                 {
                     A = t;
+                    indexA = i;
                     break;
                 }
             }
         }
-        // Check if those last two values indicate this declerations 'important' flag is set
+
+        // Check if those last two values indicate this declaration's 'important' flag is set
         if (A?.Type == ECssTokenType.Delim && (A as DelimToken)?.Value == UnicodeCommon.CHAR_EXCLAMATION_POINT)
         {
             if (B?.Type == ECssTokenType.Ident && (B as IdentToken)?.Value.Equals("important", StringComparison.OrdinalIgnoreCase) == true)
             {
                 Decleration.Important = true;
+                // Remove the "!" and "important" tokens (remove higher index first to preserve lower index)
+                if (indexB > indexA)
+                {
+                    Decleration.Values.RemoveAt(indexB);
+                    Decleration.Values.RemoveAt(indexA);
+                }
+                else
+                {
+                    Decleration.Values.RemoveAt(indexA);
+                    Decleration.Values.RemoveAt(indexB);
+                }
             }
         }
 
+        // Step 6: While the last token in the declaration's value is a <whitespace-token>, remove that token.
+        while (Decleration.Values.Count > 0 && Decleration.Values[^1].Type == ECssTokenType.Whitespace)
+        {
+            Decleration.Values.RemoveAt(Decleration.Values.Count - 1);
+        }
+
+        // Step 7: Return the declaration.
         return Decleration;
     }
 

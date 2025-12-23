@@ -563,12 +563,18 @@ public class CssTokenizer
     #endregion
 
     #region Character Identification
+    /// <summary>
+    /// Checks if three code points would start an ident sequence per CSS Syntax Level 3 §4.3.10.
+    /// </summary>
+    /// <seealso href="https://www.w3.org/TR/css-syntax-3/#would-start-an-identifier"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     static bool Is_Identifier_Start(char A, char B, char C)
     {
         if (A == CHAR_HYPHEN_MINUS)
         {
-            return (Is_Name_Start_Char(B) || Is_Valid_Escape(B, C));
+            // If the second code point is a name-start code point or a hyphen-minus,
+            // or the second and third code points are a valid escape, return true.
+            return (Is_Name_Start_Char(B) || B == CHAR_HYPHEN_MINUS || Is_Valid_Escape(B, C));
         }
         else if (Is_Name_Start_Char(A))
         {
