@@ -1,12 +1,12 @@
 # CssUI - AI Coding Agent Instructions
 
+**Important:** Do NOT use PowerShell or command line to manipulate files. Always use VS Code's built-in tools for file operations (create, edit, find-replace, rename, delete).
+
 ## Project Overview
 
 CssUI is a C# CSS rendering engine implementing modern CSS specifications (Flexbox, Grid, CSS Values Level 4). It includes a DOM implementation, CSS parser, box tree model, and formatting contexts for layout.
 
 **Code Standards:** Target .NET 8 with modern C# patterns. Prioritize performance-optimized abstractions: `Span<T>`, `ReadOnlySpan<T>`, `stackalloc`, pooled collections, and avoid allocations in hot paths.
-
-**Important:** Do NOT use PowerShell or command line to manipulate files. Always use VS Code's built-in tools for file operations (create, edit, find-replace, rename, delete).
 
 ## Build & Test Commands
 
