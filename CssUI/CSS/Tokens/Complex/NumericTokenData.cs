@@ -5,7 +5,7 @@ namespace CssUI.CSS.Parser;
 
 /// <summary>
 /// A union struct for storing numeric token data without boxing.
-/// Uses explicit layout to overlay int and double at the same memory location.
+/// Uses explicit layout to overlay long and double at the same memory location.
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 8)]
 public readonly struct NumericTokenData
@@ -14,7 +14,7 @@ public readonly struct NumericTokenData
     /// Storage for integer values.
     /// </summary>
     [FieldOffset(0)]
-    public readonly int IntegerValue;
+    public readonly long IntegerValue;
 
     /// <summary>
     /// Storage for double/number values.
@@ -23,7 +23,7 @@ public readonly struct NumericTokenData
     public readonly double NumberValue;
 
     #region Constructors
-    private NumericTokenData(int value)
+    private NumericTokenData(long value)
     {
         // Initialize double first to zero out all bytes
         NumberValue = 0;
@@ -32,7 +32,7 @@ public readonly struct NumericTokenData
 
     private NumericTokenData(double value)
     {
-        // Initialize int first to zero out all bytes
+        // Initialize long first to zero out all bytes
         IntegerValue = 0;
         NumberValue = value;
     }
@@ -43,7 +43,7 @@ public readonly struct NumericTokenData
     /// Creates a <see cref="NumericTokenData"/> containing an integer value.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static NumericTokenData FromInteger(int value) => new NumericTokenData(value);
+    public static NumericTokenData FromInteger(long value) => new NumericTokenData(value);
 
     /// <summary>
     /// Creates a <see cref="NumericTokenData"/> containing a double value.

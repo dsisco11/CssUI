@@ -30,7 +30,7 @@ public sealed class DimensionToken : ValuedTokenBase
     /// <summary>
     /// Gets the value as an integer. Only valid when <see cref="DataType"/> is <see cref="ENumericTokenType.Integer"/>.
     /// </summary>
-    public int AsInteger => data.IntegerValue;
+    public long AsInteger => data.IntegerValue;
 
     /// <summary>
     /// Gets the value as a double. Works for both integer and number types.
@@ -39,7 +39,7 @@ public sealed class DimensionToken : ValuedTokenBase
         ? data.IntegerValue
         : data.NumberValue;
 
-    public DimensionToken(ENumericTokenType DataType, ReadOnlySpan<char> Value, int number, ReadOnlySpan<char> Unit) : base(ECssTokenType.Dimension, Value)
+    public DimensionToken(ENumericTokenType DataType, ReadOnlySpan<char> Value, long number, ReadOnlySpan<char> Unit) : base(ECssTokenType.Dimension, Value)
     {
         this.DataType = DataType;
         this.data = NumericTokenData.FromInteger(number);
@@ -61,12 +61,11 @@ public sealed class DimensionToken : ValuedTokenBase
         this.DataType = DataType;
         if (DataType == ENumericTokenType.Integer)
         {
-            // Handle both int and long from tokenizer's ToInteger which returns long
-            int intValue = number switch
+            long intValue = number switch
             {
                 int i => i,
-                long l => (int)l,
-                _ => Convert.ToInt32(number)
+                long l => l,
+                _ => Convert.ToInt64(number)
             };
             this.data = NumericTokenData.FromInteger(intValue);
         }

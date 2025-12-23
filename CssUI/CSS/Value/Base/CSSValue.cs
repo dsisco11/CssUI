@@ -927,7 +927,7 @@ public partial class CssValue
     /// For INTEGER types, returns the stored integer. For NUMBER/DIMENSION/PERCENT, converts from double with banker's rounding.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int AsInteger() => Type == ECssValueTypes.INTEGER ? data.IntegerValue : Convert.ToInt32(data.NumberValue);
+    public int AsInteger() => Type == ECssValueTypes.INTEGER ? (int)data.IntegerValue : Convert.ToInt32(data.NumberValue);
 
     /// <summary>
     /// Returns the value as the preferred (Nullable) Integer type

@@ -28,7 +28,7 @@ internal struct CssValueData
     /// Storage for integer values.
     /// </summary>
     [FieldOffset(0)]
-    public int IntegerValue;
+    public long IntegerValue;
 
     /// <summary>
     /// Storage for 8-bit RGBA color values.
@@ -65,7 +65,7 @@ internal struct CssValueData
     /// <summary>
     /// Creates a <see cref="CssValueData"/> containing an integer value.
     /// </summary>
-    public static CssValueData FromInteger(int value)
+    public static CssValueData FromInteger(long value)
     {
         var data = new CssValueData();
         data.IntegerValue = value;
