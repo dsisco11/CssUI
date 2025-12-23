@@ -20,7 +20,7 @@ public static class Lookup
     /// <param name="outKeyword">Returned value</param>
     /// <returns>Success</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
-    public static bool TryKeyword<T>(T Value, [MaybeNullWhen(false)] out string? outKeyword) where T : struct
+    public static bool TryKeyword<T>(T Value, [MaybeNullWhen(false)][NotNullWhen(true)] out string? outKeyword) where T : struct
     {
         int enumIndex = EnumMetaTable.Meta.Lookup<T>();
         if (enumIndex < 0)
@@ -44,7 +44,7 @@ public static class Lookup
     /// <param name="outKeyword">Returned value</param>
     /// <returns>Success</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
-    public static bool TryKeyword(Type enumType, object Value, [MaybeNullWhen(false)] out string? outKeyword)
+    public static bool TryKeyword(Type enumType, object Value, [MaybeNullWhen(false)][NotNullWhen(true)] out string? outKeyword)
     {
         ArgumentNullException.ThrowIfNull(enumType);
         ArgumentNullException.ThrowIfNull(Value);
@@ -126,7 +126,7 @@ public static class Lookup
     /// <param name="outData">Returned value</param>
     /// <returns>Success</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
-    public static bool TryData<T>(T Value, [MaybeNullWhen(false)] out EnumData? outData) where T : struct
+    public static bool TryData<T>(T Value, [MaybeNullWhen(false)][NotNullWhen(true)] out EnumData? outData) where T : struct
     {
         int enumIndex = EnumMetaTable.Meta.Lookup<T>();
         if (enumIndex < 0)
