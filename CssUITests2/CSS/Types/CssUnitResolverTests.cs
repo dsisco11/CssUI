@@ -367,16 +367,15 @@ public class CssUnitResolverTests
     [Fact]
     [Trait("Category", "UnitResolver")]
     [Trait("Category", "AngleUnits")]
-    [Trait("Category", "Bug")]
     public void Resolve_Gradians_ConvertsToDegrees()
     {
-        // 400 gradians = 360 degrees, so scale = 400/360 ≈ 1.111
+        // 400 gradians = 360 degrees, so scale = 360/400 = 0.9
+        // 100 grad * 0.9 = 90 degrees
         var resolver = CreateResolver();
 
         var result = resolver.Resolve(100.0, ECssUnit.GRAD);
 
-        // 100 grad * (400/360) = 111.11...
-        Assert.True(result > 100.0, "Gradians should scale up when converting to degrees");
+        Assert.Equal(90.0, result);
     }
 
     [Fact]
@@ -384,14 +383,12 @@ public class CssUnitResolverTests
     [Trait("Category", "AngleUnits")]
     public void Resolve_Gradians_400GradEquals360Deg()
     {
+        // 400 grad * (360/400) = 360 deg
         var resolver = CreateResolver();
 
         var result = resolver.Resolve(400.0, ECssUnit.GRAD);
 
-        // 400 grad * (400/360) ≈ 444.44 deg (this is the scaling factor applied)
-        // Note: The expected behavior is that 400 grad = 360 deg, but the scale factor
-        // is 400/360, so this test validates the current implementation
-        Assert.True(result > 0.0, "400 grad should produce a positive degree value");
+        Assert.Equal(360.0, result);
     }
 
     [Fact]

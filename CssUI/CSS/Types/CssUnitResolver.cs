@@ -13,16 +13,30 @@ public class CssUnitResolver
 {
 
     #region Constants
+    // CSS absolute length units relative to pixels (CSS reference pixel at 96 DPI)
+    // Spec: https://www.w3.org/TR/css-values-4/#absolute-lengths
+    const double INCH_TO_PX = 96.0;           // 1in = 96px
+    const double CM_TO_PX = 96.0 / 2.54;      // 1cm = 96px / 2.54 ≈ 37.795px
+    const double MM_TO_PX = CM_TO_PX / 10.0;  // 1mm = 1cm / 10 ≈ 3.7795px
+    const double Q_TO_PX = CM_TO_PX / 40.0;   // 1Q = 1cm / 40 ≈ 0.945px
+    const double PT_TO_PX = INCH_TO_PX / 72.0; // 1pt = 1in / 72 ≈ 1.333px
+    const double PC_TO_PX = INCH_TO_PX / 6.0;  // 1pc = 1in / 6 = 16px
 
-    const double INCH_TO_PX = 1 / 96;
-    const double CM_TO_PX = 96 / 2.54;
-    const double MM_TO_PX = (1 / 10) / CM_TO_PX;
-    const double PT_TO_PX = (1 / 72) / INCH_TO_PX;
-    const double PC_TO_PX = (1 / 6) / INCH_TO_PX;
-    const double Q_TO_PX = (1 / 40) / CM_TO_PX;
+    // Resolution unit conversion factors
+    const double DPI_TO_DPPX = 1.0 / 96.0;    // 96dpi = 1dppx
+    const double DPCM_TO_DPPX = 2.54 / 96.0;  // ~37.8dpcm = 1dppx
+
+    // Time unit conversion factors
+    const double MS_TO_S = 1.0 / 1000.0;      // 1000ms = 1s
+
+    // Frequency unit conversion factors
+    const double KHZ_TO_HZ = 1000.0;          // 1kHz = 1000Hz
+
+    // Angle unit conversion factors (to degrees)
+    const double GRAD_TO_DEG = 360.0 / 400.0; // 400grad = 360deg
     #endregion
 
-    #region Static 
+    #region Static
     private static int TABLE_SIZE = 0;
     static CssUnitResolver()
     {
@@ -102,10 +116,10 @@ public class CssUnitResolver
                 {
                     /*
                      * CSS Specs:
-                     * When used in the value of the font-size property on the element they refer to, 
-                     * these units refer to the computed font metrics of the parent element 
-                     * (or the computed font metrics corresponding to the initial values of the font property, if the element has no parent). 
-                     * When used outside the context of an element (such as in media queries), 
+                     * When used in the value of the font-size property on the element they refer to,
+                     * these units refer to the computed font metrics of the parent element
+                     * (or the computed font metrics corresponding to the initial values of the font property, if the element has no parent).
+                     * When used outside the context of an element (such as in media queries),
                      * these units refer to the computed font metrics corresponding to the initial values of the font property.
                      */
 
@@ -120,8 +134,8 @@ public class CssUnitResolver
                         {
                             /*
                              * CSS Specs:
-                             * When used in the value of the font-size property on the element they refer to, 
-                             * these units refer to the computed font metrics of the parent element 
+                             * When used in the value of the font-size property on the element they refer to,
+                             * these units refer to the computed font metrics of the parent element
                              * (or the computed font metrics corresponding to the initial values of the font property, if the element has no parent)
                              */
 
@@ -141,8 +155,8 @@ public class CssUnitResolver
                 {
                     /*
                      * CSS Specs:
-                     * The 'ex' unit is defined by the element's first available font. 
-                     * The exception is when 'ex' occurs in the value of the 'font-size' property, 
+                     * The 'ex' unit is defined by the element's first available font.
+                     * The exception is when 'ex' occurs in the value of the 'font-size' property,
                      * in which case it refers to the 'ex' of the parent element.
                      */
                     if (Property.CssName.Equals("font-size") && Property.Owner == Owner)
@@ -156,8 +170,8 @@ public class CssUnitResolver
                         {
                             /*
                              * CSS Specs:
-                             * When used in the value of the font-size property on the element they refer to, 
-                             * these units refer to the computed font metrics of the parent element 
+                             * When used in the value of the font-size property on the element they refer to,
+                             * these units refer to the computed font metrics of the parent element
                              * (or the computed font metrics corresponding to the initial values of the font property, if the element has no parent)
                              */
 
@@ -241,7 +255,7 @@ public class CssUnitResolver
                 {
                     if (canAnchorToDpi)
                     {
-                        return (1.0 / document.defaultView.screen.dpi);
+                        return document.defaultView.screen.dpi;
                     }
 
                     return INCH_TO_PX;
@@ -250,7 +264,7 @@ public class CssUnitResolver
                 {
                     if (canAnchorToDpi)
                     {
-                        return (1.0 / document.defaultView.screen.dpi) / 6.0;
+                        return document.defaultView.screen.dpi / 6.0;
                     }
 
                     return PC_TO_PX;
@@ -259,7 +273,7 @@ public class CssUnitResolver
                 {
                     if (canAnchorToDpi)
                     {
-                        return (1.0 / document.defaultView.screen.dpi) / 72.0;
+                        return document.defaultView.screen.dpi / 72.0;
                     }
 
                     return PT_TO_PX;
@@ -274,16 +288,16 @@ public class CssUnitResolver
                         return 1.0 / document.defaultView.screen.dpi;
                     }
 
-                    return 1 / 96;
+                    return DPI_TO_DPPX;
                 }
             case ECssUnit.DPCM:
                 {
                     if (canAnchorToDpi)
                     {
-                        return (document.defaultView.screen.dpi / 2.54);
+                        return 2.54 / document.defaultView.screen.dpi;
                     }
 
-                    return PT_TO_PX;
+                    return DPCM_TO_DPPX;
                 }
             case ECssUnit.DPPX:
                 {
@@ -298,7 +312,7 @@ public class CssUnitResolver
                 }
             case ECssUnit.MS:
                 {
-                    return (1 / 1000);
+                    return MS_TO_S;
                 }
 
             /* <Frequency> Units */
@@ -309,7 +323,7 @@ public class CssUnitResolver
                 }
             case ECssUnit.KHZ:
                 {
-                    return (1 / 1000);
+                    return KHZ_TO_HZ;
                 }
 
 
@@ -323,7 +337,7 @@ public class CssUnitResolver
                 }
             case ECssUnit.GRAD:
                 {
-                    return (400 / 360);
+                    return GRAD_TO_DEG;
                 }
             case ECssUnit.RAD:
                 {
@@ -345,27 +359,39 @@ public class CssUnitResolver
                 }
             case ECssUnit.VMAX:
                 {
-                    // Return default viewport size if defaultView is not yet available
+                    // Return default viewport size if defaultView is not yet available or document isn't fully active
                     if (document?.defaultView?.visualViewport == null) return 1.0;
-                    return Math.Max(document.defaultView.visualViewport.Width, document.defaultView.visualViewport.Height);
+                    var vw = document.defaultView.visualViewport.Width;
+                    var vh = document.defaultView.visualViewport.Height;
+                    // If viewport returns 0 (document not fully active), use 1.0 as fallback
+                    var max = Math.Max(vw, vh);
+                    return max > 0 ? max : 1.0;
                 }
             case ECssUnit.VMIN:
                 {
-                    // Return default viewport size if defaultView is not yet available
+                    // Return default viewport size if defaultView is not yet available or document isn't fully active
                     if (document?.defaultView?.visualViewport == null) return 1.0;
-                    return Math.Min(document.defaultView.visualViewport.Width, document.defaultView.visualViewport.Height);
+                    var vw = document.defaultView.visualViewport.Width;
+                    var vh = document.defaultView.visualViewport.Height;
+                    // If viewport returns 0 (document not fully active), use 1.0 as fallback
+                    if (vw <= 0 || vh <= 0) return 1.0;
+                    return Math.Min(vw, vh);
                 }
             case ECssUnit.VW:
                 {
-                    // Return default viewport size if defaultView is not yet available
+                    // Return default viewport size if defaultView is not yet available or document isn't fully active
                     if (document?.defaultView?.visualViewport == null) return 1.0;
-                    return document.defaultView.visualViewport.Width;
+                    var vw = document.defaultView.visualViewport.Width;
+                    // If viewport returns 0 (document not fully active), use 1.0 as fallback
+                    return vw > 0 ? vw : 1.0;
                 }
             case ECssUnit.VH:
                 {
-                    // Return default viewport size if defaultView is not yet available
+                    // Return default viewport size if defaultView is not yet available or document isn't fully active
                     if (document?.defaultView?.visualViewport == null) return 1.0;
-                    return document.defaultView.visualViewport.Height;
+                    var vh = document.defaultView.visualViewport.Height;
+                    // If viewport returns 0 (document not fully active), use 1.0 as fallback
+                    return vh > 0 ? vh : 1.0;
                 }
 
             /* Font-relative units - these need element context for proper resolution,
