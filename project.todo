@@ -20,35 +20,74 @@
 ## Test Coverage — Total: 1424 passing, 276 skipped, 24 failing = 1724 tests
 ### DOM Tests: 518 passing, 3 skipped = 521 total
 
-### CSS Systems Test Status
-- [ ] CSS Properties system (CSS/Properties/)
-  - [ ] Property parsing tests
-  - [ ] Property inheritance tests
-  - [ ] Computed value resolution tests
-  - [ ] Shorthand property expansion tests
-- [ ] CSS Box Model (CSS/Box Model/)
-  - [ ] CssPrincipalBox tests
-  - [ ] BoxModel calculation tests
-  - [ ] Margin collapsing tests
-  - [ ] Containing block tests
-- [ ] CSS Parser (CSS/Parser/) — Has known bugs
-  - [ ] Stylesheet parsing tests
-  - [ ] Rule parsing tests
-  - [ ] Declaration parsing tests
-  - [ ] Error recovery tests
-- [ ] CSS Stylesheet/Rules (CSS/Stylesheet/, CSS/Rules/)
-  - [ ] @media rule tests
-  - [ ] @import rule tests
-  - [ ] @font-face rule tests
-  - [ ] Cascade and specificity tests
-- [ ] CSS Custom Properties (CSS/Functions/)
-  - [ ] var() resolution tests
-  - [ ] Custom property inheritance tests
-  - [ ] Cycle detection tests
-- [ ] Block Formatting Context (CSS/Formatting/)
-  - [ ] BlockFormattingContext tests
-  - [ ] Float layout tests
-  - [ ] Clear property tests
+## Phase 6: CSS Test Coverage
+
+### 6.1 Simple Tokens (CSS/Tokens/Simple/)
+- [ ] ColonToken, CommaToken, SemicolonToken tests
+- [ ] Bracket tokens (Square, Curly, Paren) tests
+- [ ] Whitespace and Delim token tests
+
+### 6.2 CSSValue System (CSS/Value/Base/)
+- [ ] Activate and implement CssValueTests.cs stubs
+- [ ] From_CSS parsing tests
+- [ ] Type conversion tests
+- [ ] Known bug: Parser fails to parse '1em' dimension
+
+### 6.3 CssParser (CSS/Parser/Base/)
+- [ ] Activate and implement CssParserTests.cs stubs
+- [ ] Declaration parsing tests
+- [ ] Value list parsing tests
+- [ ] Function parsing tests
+
+### 6.4 CssUnitResolver (CSS/Types/)
+- [ ] Unit conversion tests (px, em, rem, %, etc.)
+- [ ] Relative unit resolution tests
+
+### 6.5 TokenStream (CSS/Deserialization/)
+- [ ] Token iteration behavior tests
+- [ ] Lookahead/consume tests
+
+### 6.6 Parser Complex Tokens (CSS/Parser/Complex Tokens/)
+- [ ] CssComponent tests
+- [ ] CssFunction tests
+- [ ] CssDecleration tests
+- [ ] CssSimpleBlock tests
+
+## Phase 7: CSS Properties System
+
+### 7.1 CSS Properties (CSS/Properties/)
+- [ ] Property parsing tests
+- [ ] Property inheritance tests
+- [ ] Computed value resolution tests
+- [ ] Shorthand property expansion tests
+
+### 7.2 CSS Box Model (CSS/Box Model/)
+- [ ] CssPrincipalBox tests
+- [ ] BoxModel calculation tests
+- [ ] Margin collapsing tests
+- [ ] Containing block tests
+
+### 7.3 CSS Parser Integration (CSS/Parser/)
+- [ ] Stylesheet parsing tests
+- [ ] Rule parsing tests
+- [ ] Declaration parsing tests
+- [ ] Error recovery tests
+
+### 7.4 CSS Stylesheet/Rules (CSS/Stylesheet/, CSS/Rules/)
+- [ ] @media rule tests
+- [ ] @import rule tests
+- [ ] @font-face rule tests
+- [ ] Cascade and specificity tests
+
+### 7.5 CSS Custom Properties (CSS/Functions/)
+- [ ] var() resolution tests
+- [ ] Custom property inheritance tests
+- [ ] Cycle detection tests
+
+### 7.6 Block Formatting Context (CSS/Formatting/)
+- [ ] BlockFormattingContext tests
+- [ ] Float layout tests
+- [ ] Clear property tests
 
 ## Documentation
 
