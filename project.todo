@@ -124,7 +124,15 @@
   - [x] OKLab to XYZ to sRGB conversion per W3C CSS Color 4 spec
   - [x] OKLCh to OKLab conversion (polar to cartesian)
   - [x] Tests: 35 tests for oklab/oklch parsing (CssColorFunctionParserTests.cs)
-- [ ] Handle color() function for custom color spaces
+- [x] Handle color() function for custom color spaces
+  - [x] Modern syntax only: color(<color-space> c1 c2 c3 [/ alpha]) - no legacy comma syntax
+  - [x] Predefined RGB color spaces: srgb, srgb-linear, display-p3, a98-rgb, prophoto-rgb, rec2020
+  - [x] XYZ color spaces: xyz, xyz-d50, xyz-d65 (xyz is alias for xyz-d65)
+  - [x] Component values: number [0-1] or percentage [0%-100%], out-of-gamut allowed
+  - [x] Alpha channel: color(srgb 1 0 0 / 0.5), color(display-p3 1 0 0 / 50%)
+  - [x] All predefined color space to sRGB conversions implemented
+  - [x] EColorSpace enum extended with A98Rgb, ProPhotoRgb, Rec2020, XyzD50, XyzD65
+  - [x] Tests: 29 tests for color() parsing (CssColorFunctionParserTests.cs)
 - [x] Handle named color keywords (e.g., 'red', 'blue', 'transparent')
   - [x] CSS Color 4 named colors (147 extended colors)
   - [x] 'transparent' keyword → CssColor(0, 0, 0, 0)

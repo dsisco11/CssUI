@@ -2083,4 +2083,401 @@ public class CssColorFunctionParserTests
     }
 
     #endregion
+
+    #region color() Function - sRGB Color Space
+
+    [Fact]
+    public void TryParseColor_Srgb_BasicValues_ReturnsColor()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("color(srgb 1 0.5 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(128, color.G); // 0.5 * 255 = 127.5, rounds to 128
+        Assert.Equal(0, color.B);
+        Assert.Equal(255, color.A);
+    }
+
+    [Fact]
+    public void TryParseColor_Srgb_WithPercentages_ReturnsColor()
+    {
+        // Arrange & Act - percentages map 100% = 1.0
+        var value = ParseColorValue("color(srgb 100% 50% 0%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(128, color.G);
+        Assert.Equal(0, color.B);
+    }
+
+    [Fact]
+    public void TryParseColor_Srgb_WithAlpha_ReturnsColor()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("color(srgb 1 0 0 / 0.5)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+        Assert.Equal(128, color.A); // 0.5 * 255 = 127.5, rounds to 128
+    }
+
+    [Fact]
+    public void TryParseColor_Srgb_WithAlphaPercentage_ReturnsColor()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("color(srgb 1 0 0 / 50%)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(128, color.A);
+    }
+
+    [Fact]
+    public void TryParseColor_Srgb_WithNone_ReturnsColor()
+    {
+        // Arrange & Act - 'none' is treated as 0
+        var value = ParseColorValue("color(srgb none 0.5 1)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R);
+        Assert.Equal(128, color.G);
+        Assert.Equal(255, color.B);
+    }
+
+    #endregion
+
+    #region color() Function - sRGB-Linear Color Space
+
+    [Fact]
+    public void TryParseColor_SrgbLinear_BasicValues_ReturnsColor()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("color(srgb-linear 1 0 0)");
+
+        // Assert - linear 1 = gamma 1 (identity)
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(0, color.G);
+        Assert.Equal(0, color.B);
+    }
+
+    [Fact]
+    public void TryParseColor_SrgbLinear_MidValue_ReturnsColor()
+    {
+        // Arrange & Act - linear 0.5 converts to gamma ~0.735
+        var value = ParseColorValue("color(srgb-linear 0.5 0.5 0.5)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // 0.5 linear -> ~0.735 gamma -> ~187 (approx)
+        Assert.True(color.R >= 180 && color.R <= 195); // Allow some tolerance
+    }
+
+    #endregion
+
+    #region color() Function - Display P3 Color Space
+
+    [Fact]
+    public void TryParseColor_DisplayP3_BasicValues_ReturnsColor()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("color(display-p3 1 0 0)");
+
+        // Assert - display-p3 red should convert to sRGB
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        // P3 red is more saturated than sRGB, so G and B might be slightly different
+        Assert.True(color.R == 255);
+    }
+
+    [Fact]
+    public void TryParseColor_DisplayP3_W3CExample_ReturnsColor()
+    {
+        // From W3C spec: color(display-p3 0.43313 0.50108 0.37950)
+        var value = ParseColorValue("color(display-p3 0.43313 0.50108 0.37950)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Should convert to approximately the same sRGB color
+        Assert.True(color.R > 0);
+        Assert.True(color.G > 0);
+        Assert.True(color.B > 0);
+    }
+
+    [Fact]
+    public void TryParseColor_DisplayP3_WithAlpha_ReturnsColor()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("color(display-p3 1 0 0 / 0.8)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(204, color.A); // 0.8 * 255 = 204
+    }
+
+    #endregion
+
+    #region color() Function - A98-RGB Color Space
+
+    [Fact]
+    public void TryParseColor_A98Rgb_BasicValues_ReturnsColor()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("color(a98-rgb 1 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+    }
+
+    [Fact]
+    public void TryParseColor_A98Rgb_W3CExample_ReturnsColor()
+    {
+        // From W3C spec: color(a98-rgb 0.44091 0.49971 0.37408)
+        var value = ParseColorValue("color(a98-rgb 0.44091 0.49971 0.37408)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+    }
+
+    #endregion
+
+    #region color() Function - ProPhoto-RGB Color Space
+
+    [Fact]
+    public void TryParseColor_ProPhotoRgb_BasicValues_ReturnsColor()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("color(prophoto-rgb 1 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // ProPhoto red is very saturated, will be clamped
+        Assert.Equal(255, color.R);
+    }
+
+    [Fact]
+    public void TryParseColor_ProPhotoRgb_W3CExample_ReturnsColor()
+    {
+        // From W3C spec: color(prophoto-rgb 0.36589 0.41717 0.31333)
+        var value = ParseColorValue("color(prophoto-rgb 0.36589 0.41717 0.31333)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+    }
+
+    #endregion
+
+    #region color() Function - Rec2020 Color Space
+
+    [Fact]
+    public void TryParseColor_Rec2020_BasicValues_ReturnsColor()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("color(rec2020 1 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+    }
+
+    [Fact]
+    public void TryParseColor_Rec2020_W3CExample_ReturnsColor()
+    {
+        // From W3C spec: color(rec2020 0.42210 0.47580 0.35605)
+        var value = ParseColorValue("color(rec2020 0.42210 0.47580 0.35605)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+    }
+
+    #endregion
+
+    #region color() Function - XYZ Color Spaces
+
+    [Fact]
+    public void TryParseColor_XyzD65_BasicValues_ReturnsColor()
+    {
+        // Arrange & Act - white in XYZ D65
+        var value = ParseColorValue("color(xyz-d65 0.9505 1 1.089)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(255, color.B);
+    }
+
+    [Fact]
+    public void TryParseColor_Xyz_AliasForXyzD65_ReturnsColor()
+    {
+        // Arrange & Act - 'xyz' is an alias for 'xyz-d65'
+        var value = ParseColorValue("color(xyz 0.9505 1 1.089)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(255, color.B);
+    }
+
+    [Fact]
+    public void TryParseColor_XyzD50_BasicValues_ReturnsColor()
+    {
+        // Arrange & Act - white in XYZ D50
+        var value = ParseColorValue("color(xyz-d50 0.9643 1 0.8251)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R);
+        Assert.Equal(255, color.G);
+        Assert.Equal(255, color.B);
+    }
+
+    [Fact]
+    public void TryParseColor_XyzD65_W3CExample_ReturnsColor()
+    {
+        // From W3C spec: color(xyz-d65 0.21661 0.14602 0.59452)
+        // This is equivalent to #7654CD
+        var value = ParseColorValue("color(xyz-d65 0.21661 0.14602 0.59452)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        // Should be approximately #7654CD (118, 84, 205)
+        Assert.True(color.R >= 110 && color.R <= 125);
+        Assert.True(color.G >= 80 && color.G <= 90);
+        Assert.True(color.B >= 200 && color.B <= 210);
+    }
+
+    #endregion
+
+    #region color() Function - Error Cases
+
+    [Fact]
+    public void TryParseColor_WithCommas_DoesNotReturnColor()
+    {
+        // Arrange & Act - color() does NOT support legacy comma syntax
+        var value = ParseColorValue("color(srgb, 1, 0, 0)");
+
+        // Assert - Should not return a color value (may be FUNCTION type if parsing fails)
+        Assert.NotEqual(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseColor_UnknownColorSpace_DoesNotReturnColor()
+    {
+        // Arrange & Act - unknown color space should not return a color
+        var value = ParseColorValue("color(unknown-space 1 0 0)");
+
+        // Assert - Should not return a color value
+        Assert.NotEqual(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseColor_MissingComponents_DoesNotReturnColor()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("color(srgb 1 0)");
+
+        // Assert - Should not return a color value
+        Assert.NotEqual(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseColor_TooManyComponents_DoesNotReturnColor()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("color(srgb 1 0 0 0.5)");
+
+        // Assert - This should fail because there's no slash separator
+        Assert.NotEqual(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseColor_NoColorSpace_DoesNotReturnColor()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("color(1 0 0)");
+
+        // Assert - Should not return a color value
+        Assert.NotEqual(ECssValueTypes.COLOR, value.Type);
+    }
+
+    #endregion
+
+    #region color() Function - Out of Gamut Values
+
+    [Fact]
+    public void TryParseColor_Srgb_OutOfGamutPositive_ClampedTo255()
+    {
+        // Arrange & Act - values > 1 should be clamped
+        var value = ParseColorValue("color(srgb 1.5 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(255, color.R); // Clamped from 1.5 to 1.0
+    }
+
+    [Fact]
+    public void TryParseColor_Srgb_OutOfGamutNegative_ClampedTo0()
+    {
+        // Arrange & Act - negative values should be clamped
+        var value = ParseColorValue("color(srgb -0.5 0.5 0.5)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+        var color = value.AsCssColor();
+        Assert.Equal(0, color.R); // Clamped from -0.5 to 0
+    }
+
+    #endregion
+
+    #region color() Function - Case Insensitivity
+
+    [Fact]
+    public void TryParseColor_ColorSpaceNameCaseInsensitive_ReturnsColor()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("color(SRGB 1 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+    }
+
+    [Fact]
+    public void TryParseColor_DisplayP3_MixedCase_ReturnsColor()
+    {
+        // Arrange & Act
+        var value = ParseColorValue("color(Display-P3 1 0 0)");
+
+        // Assert
+        Assert.Equal(ECssValueTypes.COLOR, value.Type);
+    }
+
+    #endregion
 }

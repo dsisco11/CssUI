@@ -66,7 +66,10 @@ internal static class CssColorFunctionParser
             return TryParseOklch(function.Arguments, out color);
         }
 
-        // @todo: Add color() parsing
+        if (name.Equals("color", StringComparison.OrdinalIgnoreCase))
+        {
+            return TryParseColorFunction(function.Arguments, out color);
+        }
 
         return false;
     }
@@ -1546,6 +1549,450 @@ internal static class CssColorFunctionParser
 
         // Step 3: Convert linear LMS to XYZ
         return MultiplyMatrix3x3(LMSToXYZ, lmsLinear);
+    }
+
+    #endregion
+
+    #region color() Function Parsing
+
+    /// <summary>
+    /// Parses the CSS color() function for predefined color spaces.
+    /// Syntax: color(&lt;color-space&gt; c1 c2 c3 [ / alpha ])
+    /// </summary>
+    /// <seealso href="https://www.w3.org/TR/css-color-4/#color-function"/>
+    private static bool TryParseColorFunction(List<CssToken> arguments, out CssColor color)
+    {
+        color = CssColor.Transparent;
+
+        // color() does NOT support legacy comma syntax per spec
+        // "Using commas inside color() is an error."
+        if (ContainsCommas(arguments))
+        {
+            return false;
+        }
+
+        // Extract meaningful tokens (skip whitespace)
+        var tokens = ExtractMeaningfulTokens(arguments);
+        if (tokens.Count < 4) // Need at least: colorspace c1 c2 c3
+        {
+            return false;
+        }
+
+        // First token must be an identifier for the color space
+        if (tokens[0] is not IdentToken colorSpaceToken)
+        {
+            return false;
+        }
+
+        // Parse the color space name
+        if (!TryParseColorSpaceName(colorSpaceToken.Value, out var colorSpace))
+        {
+            return false; // Unknown color space = invalid color
+        }
+
+        // Find the slash separator for alpha
+        int slashIndex = FindSlashIndex(tokens);
+
+        // Determine component count (should be exactly 3 before slash, starting at index 1)
+        int componentCount = slashIndex >= 0 ? slashIndex - 1 : tokens.Count - 1;
+        if (componentCount != 3)
+        {
+            return false;
+        }
+
+        // Parse the three color components (starting at index 1)
+        if (!TryGetColorComponent(tokens[1], colorSpace, 0, out double c1) ||
+            !TryGetColorComponent(tokens[2], colorSpace, 1, out double c2) ||
+            !TryGetColorComponent(tokens[3], colorSpace, 2, out double c3))
+        {
+            return false;
+        }
+
+        // Parse alpha if present (after the slash)
+        double alpha = 1.0;
+        if (slashIndex >= 0 && slashIndex + 1 < tokens.Count)
+        {
+            if (!TryGetAlphaValueNormalized(tokens[slashIndex + 1], out alpha))
+            {
+                return false;
+            }
+        }
+
+        // Convert from the specified color space to sRGB
+        return ConvertColorSpaceToSrgb(colorSpace, c1, c2, c3, alpha, out color);
+    }
+
+    /// <summary>
+    /// Attempts to parse a color space name from a string.
+    /// </summary>
+    private static bool TryParseColorSpaceName(string name, out EColorSpace colorSpace)
+    {
+        colorSpace = EColorSpace.sRGB;
+
+        // Case-insensitive matching per spec
+        if (name.Equals("srgb", StringComparison.OrdinalIgnoreCase))
+        {
+            colorSpace = EColorSpace.sRGB;
+            return true;
+        }
+
+        if (name.Equals("srgb-linear", StringComparison.OrdinalIgnoreCase))
+        {
+            colorSpace = EColorSpace.sRGBLinear;
+            return true;
+        }
+
+        if (name.Equals("display-p3", StringComparison.OrdinalIgnoreCase))
+        {
+            colorSpace = EColorSpace.DisplayP3;
+            return true;
+        }
+
+        if (name.Equals("a98-rgb", StringComparison.OrdinalIgnoreCase))
+        {
+            colorSpace = EColorSpace.A98Rgb;
+            return true;
+        }
+
+        if (name.Equals("prophoto-rgb", StringComparison.OrdinalIgnoreCase))
+        {
+            colorSpace = EColorSpace.ProPhotoRgb;
+            return true;
+        }
+
+        if (name.Equals("rec2020", StringComparison.OrdinalIgnoreCase))
+        {
+            colorSpace = EColorSpace.Rec2020;
+            return true;
+        }
+
+        if (name.Equals("xyz", StringComparison.OrdinalIgnoreCase) ||
+            name.Equals("xyz-d65", StringComparison.OrdinalIgnoreCase))
+        {
+            colorSpace = EColorSpace.XyzD65;
+            return true;
+        }
+
+        if (name.Equals("xyz-d50", StringComparison.OrdinalIgnoreCase))
+        {
+            colorSpace = EColorSpace.XyzD50;
+            return true;
+        }
+
+        // Unknown color space
+        return false;
+    }
+
+    /// <summary>
+    /// Attempts to get a color component value from a token for the color() function.
+    /// RGB spaces: percentage maps to [0,1]; XYZ spaces: percentage maps to [0,1].
+    /// </summary>
+    private static bool TryGetColorComponent(CssToken token, EColorSpace colorSpace, int componentIndex, out double value)
+    {
+        value = 0;
+
+        if (token.Type == ECssTokenType.Number)
+        {
+            if (!TryGetNumber(token, out value))
+            {
+                return false;
+            }
+            // No clamping - out of gamut values are allowed per spec
+            return true;
+        }
+
+        if (token.Type == ECssTokenType.Percentage)
+        {
+            if (!TryGetPercentage(token, out value))
+            {
+                return false;
+            }
+            // For all predefined RGB and XYZ color spaces: 0% = 0.0, 100% = 1.0
+            value = value / 100.0;
+            return true;
+        }
+
+        // 'none' keyword support (CSS Color 4)
+        if (token is IdentToken ident && ident.Value.Equals("none", StringComparison.OrdinalIgnoreCase))
+        {
+            value = 0;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Converts a color from a predefined color space to sRGB.
+    /// </summary>
+    private static bool ConvertColorSpaceToSrgb(EColorSpace colorSpace, double c1, double c2, double c3, double alpha, out CssColor color)
+    {
+        double[] rgb;
+
+        switch (colorSpace)
+        {
+            case EColorSpace.sRGB:
+                // Already in sRGB, just clamp and convert
+                rgb = new[] { c1, c2, c3 };
+                break;
+
+            case EColorSpace.sRGBLinear:
+                // Apply sRGB gamma encoding
+                rgb = LinearSrgbToSrgb(new[] { c1, c2, c3 });
+                break;
+
+            case EColorSpace.DisplayP3:
+                rgb = DisplayP3ToSrgb(c1, c2, c3);
+                break;
+
+            case EColorSpace.A98Rgb:
+                rgb = A98RgbToSrgb(c1, c2, c3);
+                break;
+
+            case EColorSpace.ProPhotoRgb:
+                rgb = ProPhotoRgbToSrgb(c1, c2, c3);
+                break;
+
+            case EColorSpace.Rec2020:
+                rgb = Rec2020ToSrgb(c1, c2, c3);
+                break;
+
+            case EColorSpace.XyzD65:
+                rgb = XyzD65ToSrgb(c1, c2, c3);
+                break;
+
+            case EColorSpace.XyzD50:
+                rgb = XyzD50ToSrgb(c1, c2, c3);
+                break;
+
+            default:
+                color = CssColor.Transparent;
+                return false;
+        }
+
+        // Clamp to [0, 1] and convert to bytes
+        int red = (int)Math.Round(Math.Clamp(rgb[0], 0, 1) * 255);
+        int green = (int)Math.Round(Math.Clamp(rgb[1], 0, 1) * 255);
+        int blue = (int)Math.Round(Math.Clamp(rgb[2], 0, 1) * 255);
+        int a = (int)Math.Round(Math.Clamp(alpha, 0, 1) * 255);
+
+        color = new CssColor((byte)red, (byte)green, (byte)blue, (byte)a);
+        return true;
+    }
+
+    #endregion
+
+    #region Predefined Color Space Conversions
+
+    /// <summary>
+    /// Converts Display P3 to sRGB via XYZ D65.
+    /// Display P3 uses the same transfer function as sRGB.
+    /// </summary>
+    private static double[] DisplayP3ToSrgb(double r, double g, double b)
+    {
+        // Step 1: Undo gamma to get linear P3
+        double[] linear = {
+            GammaToLinear(r),
+            GammaToLinear(g),
+            GammaToLinear(b)
+        };
+
+        // Step 2: Linear P3 to XYZ (D65)
+        double[,] P3ToXYZ = {
+            { 0.4865709486482162, 0.26566769316909306, 0.1982172852343625 },
+            { 0.2289745640697488, 0.6917385218365064,  0.079286914093745   },
+            { 0.0000000000000000, 0.04511338185890264, 1.043944368900976   }
+        };
+        var xyz = MultiplyMatrix3x3(P3ToXYZ, linear);
+
+        // Step 3: XYZ to linear sRGB
+        var linearSrgb = XyzToLinearSrgb(xyz);
+
+        // Step 4: Apply sRGB gamma
+        return LinearSrgbToSrgb(linearSrgb);
+    }
+
+    /// <summary>
+    /// Converts A98 RGB to sRGB via XYZ D65.
+    /// A98 RGB uses a gamma of 563/256 ≈ 2.2.
+    /// </summary>
+    private static double[] A98RgbToSrgb(double r, double g, double b)
+    {
+        // Step 1: Undo A98 gamma (563/256)
+        double[] linear = {
+            A98RgbGammaToLinear(r),
+            A98RgbGammaToLinear(g),
+            A98RgbGammaToLinear(b)
+        };
+
+        // Step 2: Linear A98 to XYZ (D65)
+        double[,] A98ToXYZ = {
+            { 0.5766690429101305,  0.1855582379065463,  0.1882286462349947 },
+            { 0.29734497525053605, 0.6273635662554661,  0.07529145849399788 },
+            { 0.02703136138641234, 0.07068885253582723, 0.9913375368376388 }
+        };
+        var xyz = MultiplyMatrix3x3(A98ToXYZ, linear);
+
+        // Step 3: XYZ to linear sRGB
+        var linearSrgb = XyzToLinearSrgb(xyz);
+
+        // Step 4: Apply sRGB gamma
+        return LinearSrgbToSrgb(linearSrgb);
+    }
+
+    /// <summary>
+    /// Converts ProPhoto RGB to sRGB via XYZ.
+    /// ProPhoto RGB uses D50 white point and gamma 1.8 with a linear portion.
+    /// </summary>
+    private static double[] ProPhotoRgbToSrgb(double r, double g, double b)
+    {
+        // Step 1: Undo ProPhoto gamma
+        double[] linear = {
+            ProPhotoGammaToLinear(r),
+            ProPhotoGammaToLinear(g),
+            ProPhotoGammaToLinear(b)
+        };
+
+        // Step 2: Linear ProPhoto to XYZ (D50)
+        double[,] ProPhotoToXYZ = {
+            { 0.7977666449006423,  0.13518129740053308, 0.0313477341283922  },
+            { 0.2880748288194013,  0.7118352342418731,  0.00008993693872564 },
+            { 0.0000000000000000,  0.0000000000000000,  0.8251046025104602  }
+        };
+        var xyzD50 = MultiplyMatrix3x3(ProPhotoToXYZ, linear);
+
+        // Step 3: Chromatic adaptation from D50 to D65
+        var xyzD65 = D50ToD65(xyzD50);
+
+        // Step 4: XYZ to linear sRGB
+        var linearSrgb = XyzToLinearSrgb(xyzD65);
+
+        // Step 5: Apply sRGB gamma
+        return LinearSrgbToSrgb(linearSrgb);
+    }
+
+    /// <summary>
+    /// Converts Rec. 2020 to sRGB via XYZ D65.
+    /// Rec. 2020 has its own transfer function defined in ITU-R BT.2020-2.
+    /// </summary>
+    private static double[] Rec2020ToSrgb(double r, double g, double b)
+    {
+        // Step 1: Undo Rec2020 gamma
+        double[] linear = {
+            Rec2020GammaToLinear(r),
+            Rec2020GammaToLinear(g),
+            Rec2020GammaToLinear(b)
+        };
+
+        // Step 2: Linear Rec2020 to XYZ (D65)
+        double[,] Rec2020ToXYZ = {
+            { 0.6369580483012914,  0.14461690358620832, 0.1688809751641721  },
+            { 0.2627002120112671,  0.6779980715188708,  0.05930171646986196 },
+            { 0.0000000000000000,  0.028072693049087428, 1.0609850577107909 }
+        };
+        var xyz = MultiplyMatrix3x3(Rec2020ToXYZ, linear);
+
+        // Step 3: XYZ to linear sRGB
+        var linearSrgb = XyzToLinearSrgb(xyz);
+
+        // Step 4: Apply sRGB gamma
+        return LinearSrgbToSrgb(linearSrgb);
+    }
+
+    /// <summary>
+    /// Converts XYZ (D65) to sRGB.
+    /// </summary>
+    private static double[] XyzD65ToSrgb(double x, double y, double z)
+    {
+        // XYZ to linear sRGB
+        var linearSrgb = XyzToLinearSrgb(new[] { x, y, z });
+
+        // Apply sRGB gamma
+        return LinearSrgbToSrgb(linearSrgb);
+    }
+
+    /// <summary>
+    /// Converts XYZ (D50) to sRGB.
+    /// </summary>
+    private static double[] XyzD50ToSrgb(double x, double y, double z)
+    {
+        // Step 1: Chromatic adaptation from D50 to D65
+        var xyzD65 = D50ToD65(new[] { x, y, z });
+
+        // Step 2: XYZ to linear sRGB
+        var linearSrgb = XyzToLinearSrgb(xyzD65);
+
+        // Step 3: Apply sRGB gamma
+        return LinearSrgbToSrgb(linearSrgb);
+    }
+
+    #endregion
+
+    #region Transfer Functions
+
+    /// <summary>
+    /// Removes sRGB gamma encoding (gamma to linear).
+    /// Extended transfer function handles negative values.
+    /// </summary>
+    private static double GammaToLinear(double c)
+    {
+        double sign = c < 0 ? -1.0 : 1.0;
+        double abs = Math.Abs(c);
+
+        if (abs <= 0.04045)
+        {
+            return c / 12.92;
+        }
+
+        return sign * Math.Pow((abs + 0.055) / 1.055, 2.4);
+    }
+
+    /// <summary>
+    /// Applies A98 RGB gamma encoding.
+    /// A98 uses a simple gamma of 256/563.
+    /// </summary>
+    private static double A98RgbGammaToLinear(double c)
+    {
+        double sign = c < 0 ? -1.0 : 1.0;
+        double abs = Math.Abs(c);
+        return sign * Math.Pow(abs, 563.0 / 256.0);
+    }
+
+    /// <summary>
+    /// Removes ProPhoto RGB gamma encoding.
+    /// ProPhoto uses gamma 1.8 with a small linear portion near black.
+    /// </summary>
+    private static double ProPhotoGammaToLinear(double c)
+    {
+        const double Et2 = 16.0 / 512.0;
+        double sign = c < 0 ? -1.0 : 1.0;
+        double abs = Math.Abs(c);
+
+        if (abs <= Et2)
+        {
+            return c / 16.0;
+        }
+
+        return sign * Math.Pow(abs, 1.8);
+    }
+
+    /// <summary>
+    /// Removes Rec. 2020 gamma encoding per ITU-R BT.2020-2.
+    /// </summary>
+    private static double Rec2020GammaToLinear(double c)
+    {
+        const double alpha = 1.09929682680944;
+        const double beta = 0.018053968510807;
+
+        double sign = c < 0 ? -1.0 : 1.0;
+        double abs = Math.Abs(c);
+
+        if (abs < beta * 4.5)
+        {
+            return c / 4.5;
+        }
+
+        return sign * Math.Pow((abs + alpha - 1) / alpha, 1.0 / 0.45);
     }
 
     #endregion
