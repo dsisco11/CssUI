@@ -17,7 +17,7 @@
 - [ ] Simplification algorithm
 - [ ] Proper serialization
 
-## Test Coverage — Total: 2294 passing, 233 skipped, 19 failing = 2546 tests
+## Test Coverage — Total: 2374 passing, 221 skipped, 19 failing = 2614 tests
 ### DOM Tests: 518 passing, 3 skipped = 521 total
 
 ## Phase 6: CSS Test Coverage
@@ -58,9 +58,9 @@
   - Bug: GRAD scale uses integer division (400/360 = 1 instead of ~1.11)
   - Bug: Viewport units (VW, VH, VMIN, VMAX) return 1.0 fallback when visualViewport is unavailable
 
-### 6.5 TokenStream (CSS/Deserialization/)
-- [ ] Token iteration behavior tests
-- [ ] Lookahead/consume tests
+### 6.5 TokenStream (CSS/Deserialization/) ✓
+- [x] Token iteration behavior tests
+- [x] Lookahead/consume tests
 
 ### 6.6 Parser Complex Tokens (CSS/Parser/Complex Tokens/)
 - [ ] CssComponent tests
