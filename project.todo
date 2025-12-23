@@ -70,38 +70,96 @@
 - [x] CssAtRule tests (42 tests)
 - [x] CssQualifiedRule tests (30 tests)
 
-## Phase 7: CSS Properties System
+## Phase 7: CSS Color Parsing & Serialization (W3C Compliance)
+### Spec References
+- CSS Color Level 4: https://www.w3.org/TR/css-color-4/
+- CSS Color Level 3: https://www.w3.org/TR/css-color-3/
 
-### 7.1 CSS Properties (CSS/Properties/) ✓
+### 7.1 Color Parsing in CssValueParser (CSS/Parser/)
+- [ ] Handle HashToken → CssValue (COLOR) in Consume_Value()
+  - [ ] Parse #RGB (3-digit hex)
+  - [ ] Parse #RGBA (4-digit hex)
+  - [ ] Parse #RRGGBB (6-digit hex)
+  - [ ] Parse #RRGGBBAA (8-digit hex)
+- [ ] Handle rgb()/rgba() function → CssValue (COLOR)
+  - [ ] Legacy syntax: rgb(255, 128, 0)
+  - [ ] Modern syntax: rgb(255 128 0)
+  - [ ] Percentage values: rgb(100%, 50%, 0%)
+  - [ ] Alpha channel: rgb(255 128 0 / 0.5)
+- [ ] Handle hsl()/hsla() function → CssValue (COLOR)
+  - [ ] Legacy syntax: hsl(120, 100%, 50%)
+  - [ ] Modern syntax: hsl(120 100% 50%)
+  - [ ] Alpha channel: hsl(120 100% 50% / 0.5)
+- [ ] Handle hwb() function → CssValue (COLOR)
+- [ ] Handle lab()/lch() functions → CssValue (COLOR_HDR)
+- [ ] Handle oklab()/oklch() functions → CssValue (COLOR_HDR)
+- [ ] Handle color() function for custom color spaces
+
+### 7.2 Color Serialization in CSS Serializer (CSS/Serialization/)
+- [ ] Implement canonical color serialization per CSS Color 4 spec
+  - [ ] sRGB colors serialize as rgb()/rgba()
+  - [ ] HDR colors serialize in their original color space
+- [ ] Add CssColor → canonical CSS string conversion
+- [ ] Add CssColorHdr → canonical CSS string conversion
+- [ ] Handle currentColor keyword serialization
+- [ ] Handle transparent keyword serialization
+
+### 7.3 Color Parsing Tests
+- [ ] Hex color parsing tests (all formats)
+- [ ] rgb()/rgba() parsing tests (legacy + modern syntax)
+- [ ] hsl()/hsla() parsing tests
+- [ ] hwb() parsing tests
+- [ ] lab()/lch() parsing tests
+- [ ] oklab()/oklch() parsing tests
+- [ ] color() function parsing tests
+- [ ] Invalid color value error handling tests
+
+### 7.4 Color Serialization Tests
+- [ ] Round-trip parsing/serialization tests
+- [ ] Canonical form serialization tests
+- [ ] Alpha channel serialization tests (omit when 1.0)
+
+### 7.5 Cleanup: Remove Parsing/Serialization from Color Types
+- [ ] Remove CssColor.FromHex() - use parser instead
+- [ ] Remove CssColor.ToCssString() - use serializer instead
+- [ ] Remove CssColor.ToHexString() - use serializer instead
+- [ ] Remove CssColorHdr parsing methods - use parser instead
+- [ ] Remove CssColorHdr serialization methods - use serializer instead
+- [ ] Update all call sites to use formal parser/serializer
+- [ ] Ensure color types are pure value holders (FromRgba, FromHsl, etc. for programmatic construction only)
+
+## Phase 8: CSS Properties System
+
+### 8.1 CSS Properties (CSS/Properties/) ✓
 - [x] Property parsing tests
 - [x] Property inheritance tests
 - [x] Computed value resolution tests
 - [ ] Shorthand property expansion tests (pending)
 
-### 7.2 CSS Box Model (CSS/Box Model/)
+### 8.2 CSS Box Model (CSS/Box Model/)
 - [ ] CssPrincipalBox tests
 - [ ] BoxModel calculation tests
 - [ ] Margin collapsing tests
 - [ ] Containing block tests
 
-### 7.3 CSS Parser Integration (CSS/Parser/)
+### 8.3 CSS Parser Integration (CSS/Parser/)
 - [ ] Stylesheet parsing tests
 - [ ] Rule parsing tests
 - [ ] Declaration parsing tests
 - [ ] Error recovery tests
 
-### 7.4 CSS Stylesheet/Rules (CSS/Stylesheet/, CSS/Rules/)
+### 8.4 CSS Stylesheet/Rules (CSS/Stylesheet/, CSS/Rules/)
 - [ ] @media rule tests
 - [ ] @import rule tests
 - [ ] @font-face rule tests
 - [ ] Cascade and specificity tests
 
-### 7.5 CSS Custom Properties (CSS/Functions/)
+### 8.5 CSS Custom Properties (CSS/Functions/)
 - [ ] var() resolution tests
 - [ ] Custom property inheritance tests
 - [ ] Cycle detection tests
 
-### 7.6 Block Formatting Context (CSS/Formatting/)
+### 8.6 Block Formatting Context (CSS/Formatting/)
 - [ ] BlockFormattingContext tests
 - [ ] Float layout tests
 - [ ] Clear property tests
