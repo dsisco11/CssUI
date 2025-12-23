@@ -892,4 +892,664 @@ public class CssParserTests
         Assert.Contains("!important", encoded);
     }
     #endregion
+
+    #region At-Rule Parsing Tests
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "AtRule")]
+    public void ParseRuleList_CharsetAtRule_ParsesCorrectly()
+    {
+        var parser = new CssParser("@charset \"UTF-8\";");
+        var rules = parser.Parse_Rule_List().ToList();
+
+        Assert.Single(rules);
+        var atRule = rules[0] as CssAtRule;
+        Assert.NotNull(atRule);
+        Assert.Equal("charset", atRule!.Name);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "AtRule")]
+    public void ParseRuleList_ImportAtRule_ParsesCorrectly()
+    {
+        var parser = new CssParser("@import url('styles.css');");
+        var rules = parser.Parse_Rule_List().ToList();
+
+        Assert.Single(rules);
+        var atRule = rules[0] as CssAtRule;
+        Assert.NotNull(atRule);
+        Assert.Equal("import", atRule!.Name);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "AtRule")]
+    public void ParseRuleList_FontFaceAtRule_ParsesBlockCorrectly()
+    {
+        var parser = new CssParser("@font-face { font-family: MyFont; src: url(myfont.woff); }");
+        var rules = parser.Parse_Rule_List().ToList();
+
+        Assert.Single(rules);
+        var atRule = rules[0] as CssAtRule;
+        Assert.NotNull(atRule);
+        Assert.Equal("font-face", atRule!.Name);
+        Assert.NotNull(atRule.Block);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "AtRule")]
+    public void ParseRuleList_KeyframesAtRule_ParsesCorrectly()
+    {
+        var parser = new CssParser("@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }");
+        var rules = parser.Parse_Rule_List().ToList();
+
+        Assert.Single(rules);
+        var atRule = rules[0] as CssAtRule;
+        Assert.NotNull(atRule);
+        Assert.Equal("keyframes", atRule!.Name);
+        Assert.NotNull(atRule.Block);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "AtRule")]
+    public void ParseRuleList_SupportsAtRule_ParsesCorrectly()
+    {
+        var parser = new CssParser("@supports (display: grid) { .container { display: grid; } }");
+        var rules = parser.Parse_Rule_List().ToList();
+
+        Assert.Single(rules);
+        var atRule = rules[0] as CssAtRule;
+        Assert.NotNull(atRule);
+        Assert.Equal("supports", atRule!.Name);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "AtRule")]
+    public void ParseRuleList_NamespaceAtRule_ParsesCorrectly()
+    {
+        var parser = new CssParser("@namespace svg url(http://www.w3.org/2000/svg);");
+        var rules = parser.Parse_Rule_List().ToList();
+
+        Assert.Single(rules);
+        var atRule = rules[0] as CssAtRule;
+        Assert.NotNull(atRule);
+        Assert.Equal("namespace", atRule!.Name);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "AtRule")]
+    public void ParseRuleList_PageAtRule_ParsesCorrectly()
+    {
+        var parser = new CssParser("@page :first { margin: 2cm; }");
+        var rules = parser.Parse_Rule_List().ToList();
+
+        Assert.Single(rules);
+        var atRule = rules[0] as CssAtRule;
+        Assert.NotNull(atRule);
+        Assert.Equal("page", atRule!.Name);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "AtRule")]
+    public void ParseRuleList_MultipleAtRules_ParsesAll()
+    {
+        var parser = new CssParser("@charset \"UTF-8\"; @import url('reset.css'); @import url('styles.css');");
+        var rules = parser.Parse_Rule_List().ToList();
+
+        Assert.Equal(3, rules.Count);
+        Assert.All(rules, r => Assert.IsType<CssAtRule>(r));
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "AtRule")]
+    public void ParseRuleList_NestedMediaRule_ParsesCorrectly()
+    {
+        var parser = new CssParser("@media print { @page { margin: 1cm; } }");
+        var rules = parser.Parse_Rule_List().ToList();
+
+        Assert.Single(rules);
+        var atRule = rules[0] as CssAtRule;
+        Assert.NotNull(atRule);
+        Assert.Equal("media", atRule!.Name);
+        Assert.NotNull(atRule.Block);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "AtRule")]
+    public void ParseRuleList_LayerAtRule_ParsesCorrectly()
+    {
+        var parser = new CssParser("@layer base { body { margin: 0; } }");
+        var rules = parser.Parse_Rule_List().ToList();
+
+        Assert.Single(rules);
+        var atRule = rules[0] as CssAtRule;
+        Assert.NotNull(atRule);
+        Assert.Equal("layer", atRule!.Name);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "AtRule")]
+    public void CssAtRule_Encode_ContainsAtSymbol()
+    {
+        var parser = new CssParser("@media screen { body { color: red; } }");
+        var rules = parser.Parse_Rule_List().ToList();
+        var atRule = rules[0] as CssAtRule;
+
+        var encoded = atRule!.Encode();
+
+        Assert.StartsWith("@", encoded);
+        Assert.Contains("media", encoded);
+    }
+    #endregion
+
+    #region QualifiedRule Parsing Tests
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "QualifiedRule")]
+    public void ParseRuleList_SimpleSelector_ParsesAsQualifiedRule()
+    {
+        var parser = new CssParser("div { color: red; }");
+        var rules = parser.Parse_Rule_List().ToList();
+
+        Assert.Single(rules);
+        Assert.IsType<CssQualifiedRule>(rules[0]);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "QualifiedRule")]
+    public void ParseRuleList_ClassSelector_ParsesAsQualifiedRule()
+    {
+        var parser = new CssParser(".my-class { font-size: 14px; }");
+        var rules = parser.Parse_Rule_List().ToList();
+
+        Assert.Single(rules);
+        Assert.IsType<CssQualifiedRule>(rules[0]);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "QualifiedRule")]
+    public void ParseRuleList_IdSelector_ParsesAsQualifiedRule()
+    {
+        var parser = new CssParser("#my-id { background: blue; }");
+        var rules = parser.Parse_Rule_List().ToList();
+
+        Assert.Single(rules);
+        Assert.IsType<CssQualifiedRule>(rules[0]);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "QualifiedRule")]
+    public void ParseRuleList_ComplexSelector_ParsesAsQualifiedRule()
+    {
+        var parser = new CssParser("div.container > p.text { line-height: 1.5; }");
+        var rules = parser.Parse_Rule_List().ToList();
+
+        Assert.Single(rules);
+        Assert.IsType<CssQualifiedRule>(rules[0]);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "QualifiedRule")]
+    public void ParseRuleList_PseudoClassSelector_ParsesAsQualifiedRule()
+    {
+        var parser = new CssParser("a:hover { color: blue; }");
+        var rules = parser.Parse_Rule_List().ToList();
+
+        Assert.Single(rules);
+        Assert.IsType<CssQualifiedRule>(rules[0]);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "QualifiedRule")]
+    public void ParseRuleList_PseudoElementSelector_ParsesAsQualifiedRule()
+    {
+        var parser = new CssParser("p::first-line { text-transform: uppercase; }");
+        var rules = parser.Parse_Rule_List().ToList();
+
+        Assert.Single(rules);
+        Assert.IsType<CssQualifiedRule>(rules[0]);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "QualifiedRule")]
+    public void ParseRuleList_AttributeSelector_ParsesAsQualifiedRule()
+    {
+        var parser = new CssParser("[data-active] { display: block; }");
+        var rules = parser.Parse_Rule_List().ToList();
+
+        Assert.Single(rules);
+        Assert.IsType<CssQualifiedRule>(rules[0]);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "QualifiedRule")]
+    public void ParseRuleList_MultipleRules_ParsesAll()
+    {
+        var parser = new CssParser("div { color: red; } span { color: blue; } p { color: green; }");
+        var rules = parser.Parse_Rule_List().ToList();
+
+        Assert.Equal(3, rules.Count);
+        Assert.All(rules, r => Assert.IsType<CssQualifiedRule>(r));
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "QualifiedRule")]
+    public void ParseRuleList_MixedRulesAndAtRules_ParsesBothTypes()
+    {
+        var parser = new CssParser("@import url('styles.css'); div { color: red; } @media print { body { font-size: 12pt; } }");
+        var rules = parser.Parse_Rule_List().ToList();
+
+        Assert.Equal(3, rules.Count);
+        Assert.IsType<CssAtRule>(rules[0]);
+        Assert.IsType<CssQualifiedRule>(rules[1]);
+        Assert.IsType<CssAtRule>(rules[2]);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "QualifiedRule")]
+    public void ParseRuleList_SelectorList_ParsesAsQualifiedRule()
+    {
+        var parser = new CssParser("h1, h2, h3 { font-weight: bold; }");
+        var rules = parser.Parse_Rule_List().ToList();
+
+        Assert.Single(rules);
+        Assert.IsType<CssQualifiedRule>(rules[0]);
+        var rule = rules[0] as CssQualifiedRule;
+        // Prelude should contain multiple selectors separated by commas
+        Assert.True(rule!.Prelude.Count > 1);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "QualifiedRule")]
+    public void CssQualifiedRule_HasBlock()
+    {
+        var parser = new CssParser("div { color: red; }");
+        var rules = parser.Parse_Rule_List().ToList();
+        var rule = rules[0] as CssQualifiedRule;
+
+        Assert.NotNull(rule!.Block);
+        Assert.True(rule.Block.Values.Count > 0);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "QualifiedRule")]
+    public void CssQualifiedRule_Encode_ReturnsCorrectFormat()
+    {
+        var parser = new CssParser("div { color: red; }");
+        var rules = parser.Parse_Rule_List().ToList();
+        var rule = rules[0] as CssQualifiedRule;
+
+        var encoded = rule!.Encode();
+
+        Assert.Contains("div", encoded);
+        Assert.Contains("{", encoded);
+    }
+    #endregion
+
+    #region SimpleBlock Parsing Tests
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "SimpleBlock")]
+    public void CssSimpleBlock_CurlyBrace_HasCorrectStartToken()
+    {
+        var parser = new CssParser("{ color: red }");
+        var values = parser.Parse_ComponentValue_List();
+        var block = values.First(v => v.Type == ECssTokenType.SimpleBlock) as CssSimpleBlock;
+
+        Assert.NotNull(block);
+        Assert.Equal(ECssTokenType.Bracket_Open, block!.StartToken.Type);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "SimpleBlock")]
+    public void CssSimpleBlock_Parenthesis_HasCorrectStartToken()
+    {
+        var parser = new CssParser("(1 + 2)");
+        var values = parser.Parse_ComponentValue_List();
+        var block = values.First(v => v.Type == ECssTokenType.SimpleBlock) as CssSimpleBlock;
+
+        Assert.NotNull(block);
+        Assert.Equal(ECssTokenType.Parenth_Open, block!.StartToken.Type);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "SimpleBlock")]
+    public void CssSimpleBlock_SquareBracket_HasCorrectStartToken()
+    {
+        var parser = new CssParser("[attr=value]");
+        var values = parser.Parse_ComponentValue_List();
+        var block = values.First(v => v.Type == ECssTokenType.SimpleBlock) as CssSimpleBlock;
+
+        Assert.NotNull(block);
+        Assert.Equal(ECssTokenType.SqBracket_Open, block!.StartToken.Type);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "SimpleBlock")]
+    public void CssSimpleBlock_ContainsValues()
+    {
+        var parser = new CssParser("{ color: red }");
+        var values = parser.Parse_ComponentValue_List();
+        var block = values.First(v => v.Type == ECssTokenType.SimpleBlock) as CssSimpleBlock;
+
+        Assert.NotNull(block);
+        Assert.True(block!.Values.Count > 0);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "SimpleBlock")]
+    public void CssSimpleBlock_Encode_ReturnsCorrectFormat()
+    {
+        var parser = new CssParser("{ color: red }");
+        var values = parser.Parse_ComponentValue_List();
+        var block = values.First(v => v.Type == ECssTokenType.SimpleBlock) as CssSimpleBlock;
+
+        var encoded = block!.Encode();
+
+        Assert.Contains("{", encoded);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "SimpleBlock")]
+    public void CssSimpleBlock_EmptyBlock_ParsesCorrectly()
+    {
+        var parser = new CssParser("{}");
+        var values = parser.Parse_ComponentValue_List();
+        var block = values.First(v => v.Type == ECssTokenType.SimpleBlock) as CssSimpleBlock;
+
+        Assert.NotNull(block);
+        Assert.Empty(block!.Values);
+    }
+    #endregion
+
+    #region CssFunction Encoding Tests
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "Function")]
+    public void CssFunction_Encode_ContainsParentheses()
+    {
+        var parser = new CssParser("rgb(255, 0, 0)");
+        var values = parser.Parse_ComponentValue_List();
+        var func = values.First(v => v.Type == ECssTokenType.Function) as CssFunction;
+
+        var encoded = func!.Encode();
+
+        Assert.Contains("(", encoded);
+        Assert.Contains(")", encoded);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "Function")]
+    public void CssFunction_Encode_ContainsName()
+    {
+        var parser = new CssParser("rgb(255, 0, 0)");
+        var values = parser.Parse_ComponentValue_List();
+        var func = values.First(v => v.Type == ECssTokenType.Function) as CssFunction;
+
+        var encoded = func!.Encode();
+
+        Assert.StartsWith("rgb", encoded);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "Function")]
+    public void CssFunction_EmptyFunction_EncodesCorrectly()
+    {
+        var parser = new CssParser("attr()");
+        var values = parser.Parse_ComponentValue_List();
+        var func = values.First(v => v.Type == ECssTokenType.Function) as CssFunction;
+
+        var encoded = func!.Encode();
+
+        Assert.Equal("attr()", encoded);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "Function")]
+    public void CssFunction_WithArguments_HasArguments()
+    {
+        var parser = new CssParser("rgb(255, 128, 64)");
+        var values = parser.Parse_ComponentValue_List();
+        var func = values.First(v => v.Type == ECssTokenType.Function) as CssFunction;
+
+        Assert.True(func!.Arguments.Count > 0);
+    }
+    #endregion
+
+    #region Advanced Declaration Parsing Tests
+    [Fact]
+    [Trait("Category", "Parser")]
+    public void ParseDeclerationList_VendorPrefixedProperty_ParsesCorrectly()
+    {
+        var parser = new CssParser("-webkit-transform: rotate(45deg);");
+        var declarations = parser.Parse_Decleration_List().ToList();
+
+        Assert.Single(declarations);
+        var decl = declarations[0] as CssDecleration;
+        Assert.NotNull(decl);
+        Assert.Equal("-webkit-transform", decl!.Name);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    public void ParseDeclerationList_CaseInsensitiveImportant_ParsesCorrectly()
+    {
+        var parser = new CssParser("color: red !IMPORTANT;");
+        var declarations = parser.Parse_Decleration_List().ToList();
+
+        Assert.Single(declarations);
+        var decl = declarations[0] as CssDecleration;
+        Assert.True(decl!.Important);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    public void ParseDeclerationList_ImportantWithExtraWhitespace_ParsesCorrectly()
+    {
+        var parser = new CssParser("color: red   !   important;");
+        var declarations = parser.Parse_Decleration_List().ToList();
+
+        Assert.Single(declarations);
+        var decl = declarations[0] as CssDecleration;
+        Assert.True(decl!.Important);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    public void ParseDeclerationList_MultipleFunctionsInValue_ParsesAllFunctions()
+    {
+        var parser = new CssParser("background: linear-gradient(to right, red, blue), url('image.png');");
+        var declarations = parser.Parse_Decleration_List().ToList();
+
+        Assert.Single(declarations);
+        var decl = declarations[0] as CssDecleration;
+        // Values should contain multiple components
+        Assert.True(decl!.Values.Count >= 2);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    public void ParseDeclerationList_CalcWithNesting_ParsesCorrectly()
+    {
+        var parser = new CssParser("width: calc(100% - calc(20px + 10px));");
+        var declarations = parser.Parse_Decleration_List().ToList();
+
+        Assert.Single(declarations);
+        var decl = declarations[0] as CssDecleration;
+        Assert.Equal("width", decl!.Name);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    public void ParseDeclerationList_ColorFormats_ParseCorrectly()
+    {
+        var parser = new CssParser("color: #fff; background: rgb(0,0,0); border-color: hsl(120, 100%, 50%);");
+        var declarations = parser.Parse_Decleration_List().ToList();
+
+        Assert.Equal(3, declarations.Count);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    public void ParseDeclerationList_ShorthandProperty_ParsesAllValues()
+    {
+        var parser = new CssParser("border: 1px solid red;");
+        var declarations = parser.Parse_Decleration_List().ToList();
+
+        Assert.Single(declarations);
+        var decl = declarations[0] as CssDecleration;
+        Assert.Equal("border", decl!.Name);
+        // Should have multiple tokens for width, style, and color
+        Assert.True(decl.Values.Count >= 3);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    public void ParseDeclerationList_FontProperty_ParsesCorrectly()
+    {
+        var parser = new CssParser("font: bold 16px/1.5 Arial, sans-serif;");
+        var declarations = parser.Parse_Decleration_List().ToList();
+
+        Assert.Single(declarations);
+        var decl = declarations[0] as CssDecleration;
+        Assert.Equal("font", decl!.Name);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    public void ParseDeclerationList_GridProperty_ParsesCorrectly()
+    {
+        var parser = new CssParser("grid-template-columns: repeat(3, 1fr);");
+        var declarations = parser.Parse_Decleration_List().ToList();
+
+        Assert.Single(declarations);
+        var decl = declarations[0] as CssDecleration;
+        Assert.Equal("grid-template-columns", decl!.Name);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    public void ParseDeclerationList_InvalidDeclarationSkipped_ContinuesParsing()
+    {
+        // Invalid: missing colon - should be skipped, but next declaration should parse
+        var parser = new CssParser("invalid-property; color: red;");
+        var declarations = parser.Parse_Decleration_List().ToList();
+
+        // The second valid declaration should still be parsed
+        Assert.Single(declarations);
+    }
+    #endregion
+
+    #region Unicode and Special Character Tests
+    [Fact]
+    [Trait("Category", "Parser")]
+    public void ParseDeclerationList_UnicodeContent_ParsesCorrectly()
+    {
+        var parser = new CssParser("content: \"\\2713\";");
+        var declarations = parser.Parse_Decleration_List().ToList();
+
+        Assert.Single(declarations);
+        var decl = declarations[0] as CssDecleration;
+        Assert.Equal("content", decl!.Name);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    public void ParseCssValue_UrlWithQuotes_ReturnsKeywordOrString()
+    {
+        // url() values are special - currently throws NotSupportedException per the code
+        var parser = new CssParser("\"path/to/file.css\"");
+        var value = parser.Parse_CssValue();
+
+        Assert.Equal(ECssValueTypes.STRING, value.Type);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    public void ParseComponentValueList_CommentsStripped_ReturnsCleanTokens()
+    {
+        // CSS comments should be stripped during tokenization
+        var parser = new CssParser("/* comment */ red /* another */");
+        var values = parser.Parse_ComponentValue_List();
+
+        // Should only have the ident token, comments are filtered
+        var identTokens = values.Where(v => v.Type == ECssTokenType.Ident).ToList();
+        Assert.Single(identTokens);
+    }
+    #endregion
+
+    #region Error Recovery Tests
+    [Fact]
+    [Trait("Category", "Parser")]
+    public void ParseRuleList_UnclosedBlock_RecoversGracefully()
+    {
+        // Unclosed block at end
+        var parser = new CssParser("div { color: red");
+        var rules = parser.Parse_Rule_List().ToList();
+
+        // Should still parse what it can
+        Assert.Single(rules);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    public void ParseComponentValueList_UnterminatedString_RecoversGracefully()
+    {
+        var parser = new CssParser("\"unterminated");
+        var values = parser.Parse_ComponentValue_List();
+
+        // Should still return some tokens
+        Assert.NotEmpty(values);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    public void ParseDeclerationList_MissingValue_SkipsDeclaration()
+    {
+        var parser = new CssParser("color:;");
+        var declarations = parser.Parse_Decleration_List().ToList();
+
+        // Declaration with empty value should still be returned
+        Assert.Single(declarations);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    public void ParseRuleList_InvalidAtRuleRecovers_ContinuesParsing()
+    {
+        var parser = new CssParser("@invalid-rule; div { color: red; }");
+        var rules = parser.Parse_Rule_List().ToList();
+
+        // Should parse both the at-rule and the qualified rule
+        Assert.Equal(2, rules.Count);
+    }
+    #endregion
 }

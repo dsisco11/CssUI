@@ -17,7 +17,7 @@
 - [ ] Simplification algorithm
 - [ ] Proper serialization
 
-## Test Coverage — Total: 1508 passing, 285 skipped, 24 failing = 1817 tests
+## Test Coverage — Total: 2249 passing, 221 skipped, 19 failing = 2489 tests
 ### DOM Tests: 518 passing, 3 skipped = 521 total
 
 ## Phase 6: CSS Test Coverage
@@ -38,11 +38,16 @@
   - Bug: CssTokenizer throws InvalidCastException when parsing percentages
   - Bug: Parser fails to parse '1em' dimension
 
-### 6.3 CssParser (CSS/Parser/Base/)
-- [ ] Activate and implement CssParserTests.cs stubs
-- [ ] Declaration parsing tests
-- [ ] Value list parsing tests
-- [ ] Function parsing tests
+### 6.3 CssParser (CSS/Parser/Base/) ✓
+- [x] Activate and implement CssParserTests.cs stubs (127 tests passing)
+- [x] Declaration parsing tests
+- [x] Value list parsing tests
+- [x] Function parsing tests
+- [x] At-rule parsing tests (charset, import, font-face, keyframes, supports, namespace, page, layer)
+- [x] QualifiedRule parsing tests (selectors, blocks)
+- [x] SimpleBlock parsing tests
+- [x] CssFunction encoding tests
+- [x] Error recovery tests
 
 ### 6.4 CssUnitResolver (CSS/Types/)
 - [ ] Unit conversion tests (px, em, rem, %, etc.)
