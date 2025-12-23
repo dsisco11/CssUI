@@ -616,6 +616,21 @@ public class CssParser
             case ECssTokenType.Ident:// Keyword
                 {
                     var tok = Stream.Consume() as IdentToken;
+
+                    // Check if this is a named color keyword (e.g., "red", "blue", "transparent")
+                    // Per CSS Color Level 4 spec: https://www.w3.org/TR/css-color-4/#named-colors
+                    if (CssColor.TryFromNamedColor(tok!.Value.AsSpan(), out CssColor namedColor, out bool isCurrentColor))
+                    {
+                        // Handle 'currentColor' keyword specially - it's a valid color but needs context resolution
+                        if (isCurrentColor)
+                        {
+                            // Return as a keyword for now; it will be resolved during cascade/inheritance
+                            return new CssValue(ECssValueTypes.KEYWORD, tok.Value);
+                        }
+
+                        return CssValue.From(namedColor);
+                    }
+
                     return new CssValue(ECssValueTypes.KEYWORD, tok!.Value);
                 }
             case ECssTokenType.FunctionName:

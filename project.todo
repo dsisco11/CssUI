@@ -125,10 +125,14 @@
   - [x] OKLCh to OKLab conversion (polar to cartesian)
   - [x] Tests: 35 tests for oklab/oklch parsing (CssColorFunctionParserTests.cs)
 - [ ] Handle color() function for custom color spaces
-- [ ] Handle named color keywords (e.g., 'red', 'blue', 'transparent')
-  - [ ] CSS Color 4 named colors (147 extended colors)
-  - [ ] 'transparent' keyword → CssColor(0, 0, 0, 0)
-  - [ ] 'currentColor' keyword → special value
+- [x] Handle named color keywords (e.g., 'red', 'blue', 'transparent')
+  - [x] CSS Color 4 named colors (147 extended colors)
+  - [x] 'transparent' keyword → CssColor(0, 0, 0, 0)
+  - [x] 'currentColor' keyword → special value
+  - [x] TryFromNamedColor method on CssColor for case-insensitive lookup
+  - [x] FromEColor factory method for creating colors from EColor enum
+  - [x] CssParser integration for parsing IdentToken as named colors
+  - [x] Tests: 27 tests for named color parsing (CssNamedColorTests.cs)
 
 ### 7.2 Review CSS color parser implementation (CSS/Parser/)
 - [ ] Ensure compliance with CSS Color 4 spec

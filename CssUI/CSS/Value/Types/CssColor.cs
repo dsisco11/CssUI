@@ -182,6 +182,100 @@ public readonly record struct CssColor : IEquatable<CssColor>
             return false;
         }
     }
+
+    /// <summary>
+    /// Creates a <see cref="CssColor"/> from a named CSS color keyword.
+    /// </summary>
+    /// <param name="ecolor">The CSS named color enum value.</param>
+    /// <returns>The corresponding color, or <see cref="Transparent"/> for special keywords like currentColor.</returns>
+    /// <remarks>
+    /// For <see cref="EColor.CurrentColor"/>, returns <see cref="Transparent"/> as it requires context resolution.
+    /// For <see cref="EColor.Transparent"/>, returns rgba(0, 0, 0, 0).
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static CssColor FromEColor(EColor ecolor)
+    {
+        // Handle special keywords
+        if (ecolor == EColor.CurrentColor || ecolor == EColor.Transparent)
+        {
+            return Transparent;
+        }
+
+        // Get the RGB values from the MetaKeyword attribute data
+        if (Lookup.TryData(ecolor, out EnumData? data) && data is { Length: >= 4 } enumData)
+        {
+            // MetaKeyword format: keyword, hex, r, g, b
+            // Data[0] = hex value (unused), Data[1] = R, Data[2] = G, Data[3] = B
+            return new CssColor(
+                (byte)(int)enumData.Data[1],
+                (byte)(int)enumData.Data[2],
+                (byte)(int)enumData.Data[3],
+                255
+            );
+        }
+
+        return Transparent;
+    }
+
+    /// <summary>
+    /// Attempts to create a <see cref="CssColor"/> from a named CSS color keyword string.
+    /// </summary>
+    /// <param name="keyword">The CSS color keyword (e.g., "red", "blue", "transparent").</param>
+    /// <param name="color">The resulting color if successful.</param>
+    /// <param name="isCurrentColor">True if the keyword was "currentColor" (requires context resolution).</param>
+    /// <returns>True if the keyword is a valid CSS named color.</returns>
+    /// <remarks>
+    /// Per CSS Color Level 4 spec: https://www.w3.org/TR/css-color-4/#named-colors
+    /// Named colors are case-insensitive.
+    /// </remarks>
+    public static bool TryFromNamedColor(ReadOnlySpan<char> keyword, out CssColor color, out bool isCurrentColor)
+    {
+        color = Transparent;
+        isCurrentColor = false;
+
+        if (keyword.IsEmpty)
+        {
+            return false;
+        }
+
+        // CSS color keywords are case-insensitive
+        // Create a lowercased string for lookup
+        var loweredString = new string(keyword).ToLowerInvariant();
+        var atomicKeyword = new AtomicString(loweredString);
+
+        if (Lookup.TryEnum<EColor>(atomicKeyword, out EColor ecolor))
+        {
+            // Check for special keywords
+            if (ecolor == EColor.CurrentColor)
+            {
+                isCurrentColor = true;
+                color = CurrentColor;
+                return true;
+            }
+
+            if (ecolor == EColor.Transparent)
+            {
+                color = Transparent;
+                return true;
+            }
+
+            color = FromEColor(ecolor);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Attempts to create a <see cref="CssColor"/> from a named CSS color keyword string.
+    /// </summary>
+    /// <param name="keyword">The CSS color keyword (e.g., "red", "blue", "transparent").</param>
+    /// <param name="color">The resulting color if successful.</param>
+    /// <returns>True if the keyword is a valid CSS named color.</returns>
+    public static bool TryFromNamedColor(ReadOnlySpan<char> keyword, out CssColor color)
+    {
+        return TryFromNamedColor(keyword, out color, out _);
+    }
     #endregion
 
     #region Conversion Methods
