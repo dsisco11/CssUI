@@ -58,9 +58,9 @@ public static class CssHexColorParser
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryParseHex3(ReadOnlySpan<char> hex, out CssColor color)
     {
-        if (TryParseHexNibble(hex[0], out byte r) &&
-            TryParseHexNibble(hex[1], out byte g) &&
-            TryParseHexNibble(hex[2], out byte b))
+        if (UnicodeCommon.TryParseHexNibble(hex[0], out byte r) &&
+            UnicodeCommon.TryParseHexNibble(hex[1], out byte g) &&
+            UnicodeCommon.TryParseHexNibble(hex[2], out byte b))
         {
             color = new CssColor((byte)(r | (r << 4)), (byte)(g | (g << 4)), (byte)(b | (b << 4)), 255);
             return true;
@@ -73,10 +73,10 @@ public static class CssHexColorParser
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryParseHex4(ReadOnlySpan<char> hex, out CssColor color)
     {
-        if (TryParseHexNibble(hex[0], out byte r) &&
-            TryParseHexNibble(hex[1], out byte g) &&
-            TryParseHexNibble(hex[2], out byte b) &&
-            TryParseHexNibble(hex[3], out byte a))
+        if (UnicodeCommon.TryParseHexNibble(hex[0], out byte r) &&
+            UnicodeCommon.TryParseHexNibble(hex[1], out byte g) &&
+            UnicodeCommon.TryParseHexNibble(hex[2], out byte b) &&
+            UnicodeCommon.TryParseHexNibble(hex[3], out byte a))
         {
             color = new CssColor((byte)(r | (r << 4)), (byte)(g | (g << 4)), (byte)(b | (b << 4)), (byte)(a | (a << 4)));
             return true;
@@ -89,9 +89,9 @@ public static class CssHexColorParser
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryParseHex6(ReadOnlySpan<char> hex, out CssColor color)
     {
-        if (TryParseHexByte(hex[0], hex[1], out byte r) &&
-            TryParseHexByte(hex[2], hex[3], out byte g) &&
-            TryParseHexByte(hex[4], hex[5], out byte b))
+        if (UnicodeCommon.TryParseHexByte(hex[0], hex[1], out byte r) &&
+            UnicodeCommon.TryParseHexByte(hex[2], hex[3], out byte g) &&
+            UnicodeCommon.TryParseHexByte(hex[4], hex[5], out byte b))
         {
             color = new CssColor(r, g, b, 255);
             return true;
@@ -104,49 +104,16 @@ public static class CssHexColorParser
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryParseHex8(ReadOnlySpan<char> hex, out CssColor color)
     {
-        if (TryParseHexByte(hex[0], hex[1], out byte r) &&
-            TryParseHexByte(hex[2], hex[3], out byte g) &&
-            TryParseHexByte(hex[4], hex[5], out byte b) &&
-            TryParseHexByte(hex[6], hex[7], out byte a))
+        if (UnicodeCommon.TryParseHexByte(hex[0], hex[1], out byte r) &&
+            UnicodeCommon.TryParseHexByte(hex[2], hex[3], out byte g) &&
+            UnicodeCommon.TryParseHexByte(hex[4], hex[5], out byte b) &&
+            UnicodeCommon.TryParseHexByte(hex[6], hex[7], out byte a))
         {
             color = new CssColor(r, g, b, a);
             return true;
         }
 
         color = CssColor.Transparent;
-        return false;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool TryParseHexNibble(char c, out byte value)
-    {
-        value = c switch
-        {
-            >= '0' and <= '9' => (byte)(c - '0'),
-            >= 'a' and <= 'f' => (byte)(c - 'a' + 10),
-            >= 'A' and <= 'F' => (byte)(c - 'A' + 10),
-            _ => 0
-        };
-
-        return c switch
-        {
-            >= '0' and <= '9' => true,
-            >= 'a' and <= 'f' => true,
-            >= 'A' and <= 'F' => true,
-            _ => false
-        };
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool TryParseHexByte(char high, char low, out byte value)
-    {
-        if (TryParseHexNibble(high, out byte h) && TryParseHexNibble(low, out byte l))
-        {
-            value = (byte)((h << 4) | l);
-            return true;
-        }
-
-        value = 0;
         return false;
     }
     #endregion

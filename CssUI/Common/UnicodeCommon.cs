@@ -676,7 +676,7 @@ public static class UnicodeCommon
     #region Hexadecimal
     /// <summary>
     /// Map of ASCII code points to their hex value.
-    /// 0xFF is a placeholder.
+    /// 0xFF is a placeholder for invalid hex characters.
     /// </summary>
     private static ReadOnlySpan<byte> HexLookupTable => new byte[]
     {
@@ -690,9 +690,49 @@ public static class UnicodeCommon
     };
 
     /// <summary>
+    /// Attempts to parse a single hexadecimal character to its numeric value (0-15).
+    /// </summary>
+    /// <param name="c">Character to parse (0-9, a-f, A-F)</param>
+    /// <param name="value">The parsed value on success (0-15)</param>
+    /// <returns>True if the character is a valid hex digit, false otherwise.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool TryParseHexNibble(char c, out byte value)
+    {
+        if ((uint)c >= (uint)HexLookupTable.Length)
+        {
+            value = 0;
+            return false;
+        }
+
+        value = HexLookupTable[c];
+        return value != 0xFF;
+    }
+
+    /// <summary>
+    /// Attempts to parse two hexadecimal characters to a single byte value (0-255).
+    /// </summary>
+    /// <param name="high">High nibble character (0-9, a-f, A-F)</param>
+    /// <param name="low">Low nibble character (0-9, a-f, A-F)</param>
+    /// <param name="value">The parsed byte value on success</param>
+    /// <returns>True if both characters are valid hex digits, false otherwise.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool TryParseHexByte(char high, char low, out byte value)
+    {
+        if (TryParseHexNibble(high, out byte h) && TryParseHexNibble(low, out byte l))
+        {
+            value = (byte)((h << 4) | l);
+            return true;
+        }
+
+        value = 0;
+        return false;
+    }
+
+    /// <summary>
     /// Converts an ASCII hexadecimal character to its numeric value
     /// </summary>
     /// <param name="c">Code point to convert</param>
+    /// <exception cref="IndexOutOfRangeException">Thrown if character is not a valid hex digit.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int Ascii_Hex_To_Value(char c)
     {
