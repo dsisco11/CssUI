@@ -357,8 +357,23 @@ Implemented in Phase 6.7
   - [x] CssDecleration.ValueValidation property for production match result
   - [x] CssDecleration.IsValueValid convenience property
   - [x] Tests: 14 tests for custom property validation (CssDeclerationTests.cs)
-- [ ] Integrate with @supports rule parsing
-  - [ ] @supports condition values should use <any-value> production
+- [x] Integrate with @supports rule parsing
+  - [x] CssSupportsCondition type hierarchy (CSS/Parser/Common/CssSupportsCondition.cs)
+    - [x] CssSupportsCondition base class with Evaluate() method
+    - [x] CssSupportsDeclaration - tests property:value support
+    - [x] CssSupportsNot - logical NOT operator
+    - [x] CssSupportsAnd - logical AND conjunction
+    - [x] CssSupportsOr - logical OR disjunction
+    - [x] CssSupportsGeneralEnclosed - future-compatible general-enclosed syntax
+  - [x] CssSupportsConditionParser (CSS/Parser/Common/CssSupportsConditionParser.cs)
+    - [x] TryParse entry point with success/error result
+    - [x] <supports-condition> parsing per CSS Conditional Rules 3
+    - [x] <supports-in-parens> parsing
+    - [x] <supports-decl> validation using <any-value> production
+    - [x] Conjunction/disjunction with consistent combinator requirement
+    - [x] 'not' keyword requires whitespace separation (per CSS tokenizer rules)
+    - [x] <general-enclosed> function syntax support
+  - [x] Tests: 34 tests for @supports condition parsing (CssSupportsConditionParserTests.cs)
 - [ ] Integrate with CSS Nesting (future)
   - [ ] Use ECssBlockContentsType for nested rule parsing
   - [ ] Distinguish style-block vs rule-list contexts
