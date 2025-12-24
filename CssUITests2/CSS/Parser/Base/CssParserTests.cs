@@ -549,7 +549,8 @@ public class CssParserTests
     [Trait("Category", "Parser")]
     public void ParseCssValue_Function_ReturnsFunctionValue()
     {
-        var parser = new CssParser("rgb(255, 0, 0)");
+        // Use a custom function that isn't parsed as a specific value type
+        var parser = new CssParser("custom-func(1, 2, 3)");
         var value = parser.Parse_CssValue();
 
         Assert.Equal(ECssValueTypes.FUNCTION, value.Type);
@@ -833,7 +834,7 @@ public class CssParserTests
     public void ParseCssValue_UnclosedFunction_HandleGracefully()
     {
         // Parser should return what it can parse
-        var parser = new CssParser("rgb(255, 0, 0");
+        var parser = new CssParser("custom-func(1, 2, 3");
         var value = parser.Parse_CssValue();
 
         // Should still return a function value even if unclosed
