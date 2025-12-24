@@ -272,12 +272,13 @@ internal static class CssParsingHelpers
     }
 
     /// <summary>
-    /// Creates a token stream (DataConsumer) from a list of CSS tokens, optionally preserving whitespace.
+    /// Creates a token stream (DataConsumer) from a list of CSS tokens, optionally filtering whitespace.
     /// </summary>
     /// <param name="tokens">The original token list.</param>
     /// <param name="preserveWhitespace">If true, whitespace is preserved in the stream.
     /// This is important for calc() where whitespace around + and - is significant.</param>
-    /// <returns>A DataConsumer wrapping the token array.</returns>
+    /// <returns>A DataConsumer wrapping the token array. When filtering whitespace,
+    /// returns a <see cref="FilteringDataConsumer{T}"/> that skips whitespace transparently.</returns>
     public static DataConsumer<CssToken> CreateTokenStream(List<CssToken> tokens, bool preserveWhitespace)
     {
         if (preserveWhitespace)
@@ -285,16 +286,37 @@ internal static class CssParsingHelpers
             return new DataConsumer<CssToken>(tokens.ToArray());
         }
 
-        // Filter out whitespace tokens
-        var filtered = new List<CssToken>(tokens.Count);
-        foreach (var token in tokens)
-        {
-            if (token.Type != ECssTokenType.Whitespace)
-            {
-                filtered.Add(token);
-            }
-        }
-        return new DataConsumer<CssToken>(filtered.ToArray());
+        // Return a filtering consumer that skips whitespace without copying data
+        return new FilteringDataConsumer<CssToken>(
+            tokens.ToArray(),
+            static token => token.Type == ECssTokenType.Whitespace);
+    }
+
+    /// <summary>
+    /// Creates a token stream that automatically filters out whitespace tokens.
+    /// Use this for most CSS parsing where whitespace is not significant.
+    /// </summary>
+    /// <param name="tokens">The original token list.</param>
+    /// <returns>A <see cref="FilteringDataConsumer{T}"/> that skips whitespace transparently.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static FilteringDataConsumer<CssToken> CreateFilteredTokenStream(List<CssToken> tokens)
+    {
+        return new FilteringDataConsumer<CssToken>(
+            tokens.ToArray(),
+            static token => token.Type == ECssTokenType.Whitespace);
+    }
+
+    /// <summary>
+    /// Creates a token stream with a custom filter predicate.
+    /// Items matching the predicate will be automatically skipped during iteration.
+    /// </summary>
+    /// <param name="tokens">The original token list.</param>
+    /// <param name="skipPredicate">Predicate returning true for tokens to skip.</param>
+    /// <returns>A <see cref="FilteringDataConsumer{T}"/> that skips matching tokens.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static FilteringDataConsumer<CssToken> CreateFilteredTokenStream(List<CssToken> tokens, Predicate<CssToken> skipPredicate)
+    {
+        return new FilteringDataConsumer<CssToken>(tokens.ToArray(), skipPredicate);
     }
 
     /// <summary>
