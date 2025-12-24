@@ -220,11 +220,16 @@ Refactored to use DataConsumer<CssToken> for consistency with CssParser.cs patte
   - [x] Invalid token sequences
 
 ### 7.6 Additional CssParser Value Types (CSS/Parser/)
-- [ ] Handle URL token → CssValue (IMAGE/URL)
-  - [ ] Parse url() function syntax
-  - [ ] Parse url("path") with quoted string
-  - [ ] Parse url(path) without quotes
-  - [ ] Handle relative and absolute URLs
+- [x] Handle URL token → CssValue (IMAGE/URL)
+  - [x] Parse url() function syntax
+  - [x] Parse url("path") with quoted string
+  - [x] Parse url(path) without quotes
+  - [x] Handle relative and absolute URLs
+  - [x] CssUrl struct created (CssUI/CSS/Types/CssUrl.cs)
+  - [x] CssValue.From(CssUrl) factory method
+  - [x] ECssValueTypes.URL flag added
+  - [x] CssParser handles URL tokens and url() functions with strings
+  - [x] Tests: 26 tests for URL parsing (CssUrlParsingTests.cs)
 - [ ] Handle Calc() function → CssValue (FUNCTION)
   - [ ] Support basic arithmetic: +, -, *, /
   - [ ] Support nested calc() expressions

@@ -644,6 +644,12 @@ public class CssParser
                         return CssValue.From(color);
                     }
 
+                    // Check if this is a url() function with quoted string
+                    if (CssUrl.TryFromFunction(func, out CssUrl url))
+                    {
+                        return CssValue.From(url);
+                    }
+
                     return new CssValue(func);
                 }
             case ECssTokenType.Function:
@@ -656,11 +662,30 @@ public class CssParser
                         return CssValue.From(color);
                     }
 
+                    // Check if this is a url() function with quoted string
+                    if (CssUrl.TryFromFunction(func!, out CssUrl url))
+                    {
+                        return CssValue.From(url);
+                    }
+
                     return new CssValue(func!);
                 }
             case ECssTokenType.Url:
-                {/* XXX: Finish this */
-                    throw new NotSupportedException("URL values are not supported as of yet!");
+                {
+                    // Handle unquoted URL token: url(path)
+                    // Per CSS Syntax Level 3, <url-token> contains the URL value directly
+                    var tok = Stream.Consume() as UrlToken;
+                    if (tok is null)
+                    {
+                        throw new CssParserException("Expected UrlToken but received null", Stream);
+                    }
+                    return CssValue.From(new CssUrl(tok.Value));
+                }
+            case ECssTokenType.Bad_Url:
+                {
+                    // Bad URL tokens are parse errors per CSS Syntax Level 3
+                    Stream.Consume(); // Consume the bad token
+                    throw new CssParserException("Invalid URL syntax (bad-url-token)", Stream);
                 }
             case ECssTokenType.Hash:
                 {

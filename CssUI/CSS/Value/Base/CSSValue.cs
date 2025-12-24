@@ -266,6 +266,7 @@ public partial class CssValue
             case ECssValueTypes.COLOR:
             case ECssValueTypes.COLOR_HDR:
             case ECssValueTypes.IMAGE:
+            case ECssValueTypes.URL:
             case ECssValueTypes.POSITION:// The position has already been resolved here.
             case ECssValueTypes.FUNCTION:// The function args have already been resolved here.
                 {
@@ -370,6 +371,12 @@ public partial class CssValue
 
     /// <summary>Create a string value</summary>
     public static CssValue From_String(string value) => new CssValue(ECssValueTypes.STRING, CssValueData.FromObject(value));
+
+    /// <summary>Create a URL value</summary>
+    public static CssValue From(CssUrl value) => new CssValue(ECssValueTypes.URL, CssValueData.FromObject(value));
+
+    /// <summary>Create a URL value from a string</summary>
+    public static CssValue From_Url(string url) => new CssValue(ECssValueTypes.URL, CssValueData.FromObject(new CssUrl(url)));
 
     /// <summary>Create a css-value by parsing the given string as CSS markup</summary>
     public static CssValue From_CSS(string css) => new CssParser(css).Parse_CssValue();
@@ -872,6 +879,18 @@ public partial class CssValue
         Contract.EndContractBlock();
 
         return data.ColorHdrValue;
+    }
+
+    /// <summary>
+    /// Returns the value as a CssUrl.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public CssUrl AsUrl()
+    {
+        if (Type != ECssValueTypes.URL) throw new CssException($"{nameof(CssValue)} is not a URL! {this}");
+        Contract.EndContractBlock();
+
+        return (CssUrl)(data.ObjectValue ?? CssUrl.Empty);
     }
 
     /// <summary>

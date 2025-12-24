@@ -98,7 +98,12 @@ public enum ECssValueTypes : int
     /// Collection values are actually an array of multiple sub values
     /// </summary>
     COLLECTION = (1 << 27),
-
+    /// <summary>
+    /// Value is a URL reference represented as <see cref="CssUrl"/>.
+    /// URLs can reference external resources like stylesheets, fonts, images, etc.
+    /// Docs: https://www.w3.org/TR/css-values-4/#urls
+    /// </summary>
+    URL = (1 << 28),
 
 
     /// <summary>
