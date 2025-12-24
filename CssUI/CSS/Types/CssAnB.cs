@@ -1,3 +1,5 @@
+using System;
+
 namespace CssUI.CSS;
 
 /// <summary>
@@ -15,7 +17,7 @@ namespace CssUI.CSS;
 /// </para>
 /// </remarks>
 /// <seealso href="https://www.w3.org/TR/css-syntax-3/#anb-microsyntax"/>
-public readonly struct CssAnB
+public readonly struct CssAnB : ISpanFormattable
 {
     /// <summary>
     /// The step value (coefficient of n).
@@ -105,55 +107,76 @@ public readonly struct CssAnB
     /// Serialization follows CSS Syntax Level 3 §10.1.
     /// </remarks>
     /// <seealso href="https://www.w3.org/TR/css-syntax-3/#serializing-anb"/>
-    public string Serialize()
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
     {
+        charsWritten = 0;
+
         // 1. If A is zero, return the serialization of B.
         if (A == 0)
         {
-            return B.ToString();
+            return B.TryFormat(destination, out charsWritten, default, provider);
         }
 
-        // 2. Otherwise, let result initially be an empty string.
-        var result = new System.Text.StringBuilder();
-
-        // 3. Handle A value
+        // 2. Handle A value
         if (A == 1)
         {
             // Append "n" to result.
-            result.Append('n');
+            if (destination.Length < 1) return false;
+            destination[0] = 'n';
+            charsWritten = 1;
         }
         else if (A == -1)
         {
             // Append "-n" to result.
-            result.Append("-n");
+            if (destination.Length < 2) return false;
+            destination[0] = '-';
+            destination[1] = 'n';
+            charsWritten = 2;
         }
         else
         {
             // Serialize A and append it to result, then append "n" to result.
-            result.Append(A);
-            result.Append('n');
+            if (!A.TryFormat(destination, out int aWritten, default, provider)) return false;
+            charsWritten = aWritten;
+            if (destination.Length <= charsWritten) return false;
+            destination[charsWritten] = 'n';
+            charsWritten++;
         }
 
-        // 4. Handle B value
+        // 3. Handle B value
         if (B > 0)
         {
             // Append "+" to result, then append the serialization of B to result.
-            result.Append('+');
-            result.Append(B);
+            if (destination.Length <= charsWritten) return false;
+            destination[charsWritten] = '+';
+            charsWritten++;
+            if (!B.TryFormat(destination[charsWritten..], out int bWritten, default, provider)) return false;
+            charsWritten += bWritten;
         }
         else if (B < 0)
         {
             // Append the serialization of B to result (includes the minus sign).
-            result.Append(B);
+            if (!B.TryFormat(destination[charsWritten..], out int bWritten, default, provider)) return false;
+            charsWritten += bWritten;
         }
         // If B == 0, append nothing
 
-        // 5. Return result.
-        return result.ToString();
+        return true;
     }
 
     /// <inheritdoc/>
-    public override string ToString() => Serialize();
+    public string ToString(string? format, IFormatProvider? formatProvider)
+    {
+        Span<char> buffer = stackalloc char[32];
+        if (TryFormat(buffer, out int charsWritten, format.AsSpan(), formatProvider))
+        {
+            return buffer[..charsWritten].ToString();
+        }
+        return string.Empty;
+    }
+
+    /// <inheritdoc/>
+    public override string ToString() => ToString(null, null);
 
     /// <inheritdoc/>
     public override bool Equals(object? obj)

@@ -771,7 +771,7 @@ public class CssValueTests
     public void Serialize_Integer_ReturnsCorrectString()
     {
         var value = CssValue.From(42);
-        var serialized = value.Serialize();
+        var serialized = value.ToString();
 
         Assert.Equal("42", serialized);
     }
@@ -781,7 +781,7 @@ public class CssValueTests
     public void Serialize_DimensionPX()
     {
         var value = CssValue.From(100.0, ECssUnit.PX);
-        var serialized = value.Serialize();
+        var serialized = value.ToString();
 
         Assert.Contains("100", serialized);
         Assert.Contains("px", serialized.ToLowerInvariant());

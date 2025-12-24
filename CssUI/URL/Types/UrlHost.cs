@@ -3,7 +3,7 @@ using System;
 namespace CssUI.HTTP;
 
 
-public class UrlHost
+public class UrlHost : ISpanFormattable
 {/* Docs: https://url.spec.whatwg.org/#concept-host */
 
     #region Properties
@@ -45,25 +45,57 @@ public class UrlHost
     #region Accessors
     #endregion
 
-    public virtual string Serialize()
-    {/* Docs: https://url.spec.whatwg.org/#concept-host-serializer */
+    #region ISpanFormattable
+    /// <summary>
+    /// Serializes this host to its canonical string representation.
+    /// </summary>
+    /// <seealso href="https://url.spec.whatwg.org/#concept-host-serializer"/>
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+    {
+        charsWritten = 0;
         switch (Type)
         {
             case EHostType.Domain:
             case EHostType.Opaque:
-                return Value;
+                {
+                    string value = Value;
+                    if (destination.Length < value.Length) return false;
+                    value.AsSpan().CopyTo(destination);
+                    charsWritten = value.Length;
+                    return true;
+                }
             case EHostType.IPV4Address:
-                return ((IPV4Address)Value).Serialize();
+                return ((IPV4Address)Value).TryFormat(destination, out charsWritten, format, provider);
             case EHostType.IPV6Address:
-                return string.Concat(UnicodeCommon.CHAR_LEFT_SQUARE_BRACKET, ((IPV6Address)Value).Serialize(), UnicodeCommon.CHAR_RIGHT_SQUARE_BRACKET);
+                {
+                    if (destination.Length < 2) return false;
+                    destination[0] = UnicodeCommon.CHAR_LEFT_SQUARE_BRACKET;
+                    charsWritten = 1;
+                    if (!((IPV6Address)Value).TryFormat(destination[1..], out int ipv6Written, format, provider))
+                        return false;
+                    charsWritten += ipv6Written;
+                    if (destination.Length <= charsWritten) return false;
+                    destination[charsWritten++] = UnicodeCommon.CHAR_RIGHT_SQUARE_BRACKET;
+                    return true;
+                }
             default:
-                return string.Empty;
+                return true; // Empty string
         }
     }
 
-    public override string ToString()
+    /// <inheritdoc/>
+    public string ToString(string? format, IFormatProvider? formatProvider)
     {
-        return Serialize();
+        Span<char> buffer = stackalloc char[256];
+        if (TryFormat(buffer, out int charsWritten, format.AsSpan(), formatProvider))
+        {
+            return buffer[..charsWritten].ToString();
+        }
+        return string.Empty;
     }
+
+    /// <inheritdoc/>
+    public override string ToString() => ToString(null, null);
+    #endregion
 }
 

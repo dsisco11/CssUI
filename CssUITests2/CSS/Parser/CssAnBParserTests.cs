@@ -380,7 +380,7 @@ public class CssAnBParserTests
         var anb = new CssAnB(0, 5);
 
         // Act
-        var result = anb.Serialize();
+        var result = anb.ToString();
 
         // Assert
         Assert.Equal("5", result);
@@ -393,7 +393,7 @@ public class CssAnBParserTests
         var anb = new CssAnB(0, -3);
 
         // Act
-        var result = anb.Serialize();
+        var result = anb.ToString();
 
         // Assert
         Assert.Equal("-3", result);
@@ -406,7 +406,7 @@ public class CssAnBParserTests
         var anb = new CssAnB(1, 0);
 
         // Act
-        var result = anb.Serialize();
+        var result = anb.ToString();
 
         // Assert
         Assert.Equal("n", result);
@@ -419,7 +419,7 @@ public class CssAnBParserTests
         var anb = new CssAnB(-1, 0);
 
         // Act
-        var result = anb.Serialize();
+        var result = anb.ToString();
 
         // Assert
         Assert.Equal("-n", result);
@@ -432,7 +432,7 @@ public class CssAnBParserTests
         var anb = new CssAnB(2, 0);
 
         // Act
-        var result = anb.Serialize();
+        var result = anb.ToString();
 
         // Assert
         Assert.Equal("2n", result);
@@ -445,7 +445,7 @@ public class CssAnBParserTests
         var anb = new CssAnB(2, 1);
 
         // Act
-        var result = anb.Serialize();
+        var result = anb.ToString();
 
         // Assert
         Assert.Equal("2n+1", result);
@@ -458,7 +458,7 @@ public class CssAnBParserTests
         var anb = new CssAnB(3, -2);
 
         // Act
-        var result = anb.Serialize();
+        var result = anb.ToString();
 
         // Assert
         Assert.Equal("3n-2", result);
@@ -471,7 +471,7 @@ public class CssAnBParserTests
         var anb = CssAnB.Odd;
 
         // Act
-        var result = anb.Serialize();
+        var result = anb.ToString();
 
         // Assert
         Assert.Equal("2n+1", result);
@@ -484,7 +484,7 @@ public class CssAnBParserTests
         var anb = CssAnB.Even;
 
         // Act
-        var result = anb.Serialize();
+        var result = anb.ToString();
 
         // Assert
         Assert.Equal("2n", result);

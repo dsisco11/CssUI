@@ -1,12 +1,11 @@
 using System;
-using System.Text;
 
 namespace CssUI.HTTP;
 
-public class UrlOrigin
+public class UrlOrigin : ISpanFormattable
 {/* Docs: https://html.spec.whatwg.org/multipage/origin.html#concept-origin-opaque */
 
-    #region Static 
+    #region Static
     public static UrlOrigin Opaque = new UrlOrigin();
     public static UrlOrigin Default = new UrlOrigin(null, null, null, "CSSUI");
     #endregion
@@ -35,26 +34,69 @@ public class UrlOrigin
     }
     #endregion
 
-    #region Serialization
-    public string Serialize()
-    {/* Docs: https://html.spec.whatwg.org/multipage/origin.html#ascii-serialisation-of-an-origin */
+    #region ISpanFormattable
+    /// <summary>
+    /// Serializes this origin to its ASCII representation.
+    /// </summary>
+    /// <seealso href="https://html.spec.whatwg.org/multipage/origin.html#ascii-serialisation-of-an-origin"/>
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+    {
+        charsWritten = 0;
+
         if (Type == EOriginType.Opaque)
         {
-            return "null";
+            if (destination.Length < 4) return false;
+            "null".AsSpan().CopyTo(destination);
+            charsWritten = 4;
+            return true;
         }
 
-        StringBuilder result = new StringBuilder();
-        result.Append(Scheme.NameLower);
-        result.Append("://");
-        result.Append(Host.Serialize());
+        // Append scheme
+        var schemeName = Scheme!.NameLower;
+        if (destination.Length < schemeName.Length) return false;
+        schemeName.AsSpan().CopyTo(destination);
+        charsWritten = schemeName.Length;
+
+        // Append "://"
+        if (destination.Length < charsWritten + 3) return false;
+        destination[charsWritten++] = ':';
+        destination[charsWritten++] = '/';
+        destination[charsWritten++] = '/';
+
+        // Append host
+        if (Host is not null)
+        {
+            if (!Host.TryFormat(destination[charsWritten..], out int hostWritten, format, provider))
+                return false;
+            charsWritten += hostWritten;
+        }
+
+        // Append port if present
         if (Port.HasValue)
         {
-            result.Append(":");
-            result.Append(Port.Value);
+            if (destination.Length <= charsWritten) return false;
+            destination[charsWritten++] = ':';
+            if (!Port.Value.TryFormat(destination[charsWritten..], out int portWritten, default, provider))
+                return false;
+            charsWritten += portWritten;
         }
 
-        return result.ToString();
+        return true;
     }
+
+    /// <inheritdoc/>
+    public string ToString(string? format, IFormatProvider? formatProvider)
+    {
+        Span<char> buffer = stackalloc char[512];
+        if (TryFormat(buffer, out int charsWritten, format.AsSpan(), formatProvider))
+        {
+            return buffer[..charsWritten].ToString();
+        }
+        return string.Empty;
+    }
+
+    /// <inheritdoc/>
+    public override string ToString() => ToString(null, null);
     #endregion
 
     #region Equality

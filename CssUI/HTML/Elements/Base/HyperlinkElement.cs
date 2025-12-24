@@ -29,14 +29,15 @@ namespace CssUI.HTML
         /// Returns the hyperlink's URL.
         /// Can be set, to change the URL.
         /// </summary>
-        [CEReactions] public string href
+        [CEReactions]
+        public string href
         {
             get
             {
                 reinitialize_url();
                 if (!hasAttribute(EAttributeName.Href, out Attr outAttr) && url == null) return string.Empty;
                 if (url == null) return outAttr.Value?.AsString() ?? string.Empty;
-                return url.Serialize();
+                return url.ToString();
             }
             set => CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () => setAttribute(EAttributeName.Href, AttributeValue.From(value)));
         }
@@ -50,7 +51,7 @@ namespace CssUI.HTML
             {
                 reinitialize_url();
                 if (url == null) return string.Empty;
-                return url?.Origin?.Serialize() ?? string.Empty;
+                return url?.Origin?.ToString() ?? string.Empty;
             }
         }
 
@@ -58,7 +59,8 @@ namespace CssUI.HTML
         /// Returns the hyperlink's URL's scheme.
         /// Can be set, to change the URL's scheme.
         /// </summary>
-        [CEReactions] public string protocol
+        [CEReactions]
+        public string protocol
         {
             get
             {
@@ -88,7 +90,8 @@ namespace CssUI.HTML
         /// Returns the hyperlink's URL's username.
         /// Can be set, to change the URL's username.
         /// </summary>
-        [CEReactions] public string username
+        [CEReactions]
+        public string username
         {
             get
             {
@@ -111,7 +114,8 @@ namespace CssUI.HTML
         /// Returns the hyperlink's URL's password.
         /// Can be set, to change the URL's password.
         /// </summary>
-        [CEReactions] public string password
+        [CEReactions]
+        public string password
         {
             get
             {
@@ -134,14 +138,15 @@ namespace CssUI.HTML
         /// Returns the hyperlink's URL's host and port (if different from the default port for the scheme).
         /// Can be set, to change the URL's host and port.
         /// </summary>
-        [CEReactions] public string host
+        [CEReactions]
+        public string host
         {
             get
             {
                 reinitialize_url();
                 if (url?.Host == null) return string.Empty;
-                if (url.Port == null) return url.Host.Serialize();
-                return string.Concat(url.Host.Serialize(), UnicodeCommon.CHAR_COLON, url.Port.Value);
+                if (url.Port == null) return url.Host.ToString();
+                return string.Concat(url.Host.ToString(), UnicodeCommon.CHAR_COLON, url.Port.Value);
             }
             set
             {
@@ -162,12 +167,13 @@ namespace CssUI.HTML
         /// Returns the hyperlink's URL's host.
         /// Can be set, to change the URL's host.
         /// </summary>
-        [CEReactions] public string hostname
+        [CEReactions]
+        public string hostname
         {
             get
             {
                 reinitialize_url();
-                return url?.Host?.Serialize() ?? string.Empty;
+                return url?.Host?.ToString() ?? string.Empty;
             }
             set
             {
@@ -188,7 +194,8 @@ namespace CssUI.HTML
         /// Returns the hyperlink's URL's port.
         /// Can be set, to change the URL's port.
         /// </summary>
-        [CEReactions] public string port
+        [CEReactions]
+        public string port
         {
             get
             {
@@ -222,7 +229,8 @@ namespace CssUI.HTML
         /// Returns the hyperlink's URL's path.
         /// Can be set, to change the URL's path.
         /// </summary>
-        [CEReactions] public string pathname
+        [CEReactions]
+        public string pathname
         {
             get
             {
@@ -253,7 +261,8 @@ namespace CssUI.HTML
         /// Returns the hyperlink's URL's query (includes leading "?" if non-empty).
         /// Can be set, to change the URL's query (ignores leading "?").
         /// </summary>
-        [CEReactions] public string search
+        [CEReactions]
+        public string search
         {
             get
             {
@@ -289,7 +298,8 @@ namespace CssUI.HTML
         /// Returns the hyperlink's URL's fragment (includes leading "#" if non-empty).
         /// Can be set, to change the URL's fragment (ignores leading "#").
         /// </summary>
-        [CEReactions] public string hash
+        [CEReactions]
+        public string hash
         {
             get
             {

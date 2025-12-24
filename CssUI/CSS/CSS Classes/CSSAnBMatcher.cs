@@ -137,7 +137,7 @@ public class CssAnBMatcher
     /// <returns>The serialized An+B string.</returns>
     public override string ToString()
     {
-        return _anb.Serialize();
+        return _anb.ToString();
     }
 }
 

@@ -10,7 +10,7 @@ using static CssUI.UnicodeCommon;
 namespace CssUI.HTTP;
 
 /* Docs: https://url.spec.whatwg.org/ */
-public class Url
+public class Url : ISpanFormattable
 {
     #region Static
     static ILogger Logger = CssUI.Log.GetLogger<Url>();
@@ -23,7 +23,7 @@ public class Url
 
     #region Properties
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public AtomicName<EUrlScheme> Scheme = string.Empty;
 
@@ -260,7 +260,7 @@ public class Url
         bool bAtFlag = false, bSquareBracketFlag = false, bPasswordTokenSeenFlag = false;
         DataConsumer<char> Stream = new DataConsumer<char>(input, EOF);
 
-        /* Keep running the following state machine by switching on state. If after a run pointer points to the EOF code point, go to the next step. 
+        /* Keep running the following state machine by switching on state. If after a run pointer points to the EOF code point, go to the next step.
          * Otherwise, increase pointer by one and continue with the state machine. */
         while (!Stream.atEOF)
         {
@@ -1135,7 +1135,7 @@ public class Url
                 output.Append(CHAR_AT_SIGN);
             }
 
-            output.Append(Host.Serialize());
+            output.Append(Host);
             if (Port.HasValue)
             {
                 output.Append(CHAR_COLON);
@@ -1175,6 +1175,112 @@ public class Url
 
         return output.ToString();
     }
+
+    /// <summary>
+    /// Formats this URL to the specified span.
+    /// </summary>
+    /// <seealso href="https://url.spec.whatwg.org/#concept-url-serializer"/>
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+    {
+        charsWritten = 0;
+
+        // Scheme
+        var schemeName = Scheme.NameLower;
+        if (destination.Length < schemeName.Length + 1) return false;
+        schemeName.AsSpan().CopyTo(destination);
+        charsWritten = schemeName.Length;
+        destination[charsWritten++] = CHAR_COLON;
+
+        if (Host != null)
+        {
+            if (destination.Length < charsWritten + 2) return false;
+            destination[charsWritten++] = CHAR_SOLIDUS;
+            destination[charsWritten++] = CHAR_SOLIDUS;
+
+            if (IncludesCredentials)
+            {
+                if (destination.Length < charsWritten + Username.Length) return false;
+                Username.AsSpan().CopyTo(destination[charsWritten..]);
+                charsWritten += Username.Length;
+
+                if (Password.Length > 0)
+                {
+                    if (destination.Length < charsWritten + 1 + Password.Length) return false;
+                    destination[charsWritten++] = CHAR_COLON;
+                    Password.AsSpan().CopyTo(destination[charsWritten..]);
+                    charsWritten += Password.Length;
+                }
+
+                if (destination.Length <= charsWritten) return false;
+                destination[charsWritten++] = CHAR_AT_SIGN;
+            }
+
+            if (!Host.TryFormat(destination[charsWritten..], out int hostWritten, format, provider))
+                return false;
+            charsWritten += hostWritten;
+
+            if (Port.HasValue)
+            {
+                if (destination.Length <= charsWritten) return false;
+                destination[charsWritten++] = CHAR_COLON;
+                if (!Port.Value.TryFormat(destination[charsWritten..], out int portWritten, default, provider))
+                    return false;
+                charsWritten += portWritten;
+            }
+        }
+        else if (Host == null && Scheme == EUrlScheme.File)
+        {
+            if (destination.Length < charsWritten + 2) return false;
+            destination[charsWritten++] = CHAR_SOLIDUS;
+            destination[charsWritten++] = CHAR_SOLIDUS;
+        }
+
+        if (bCannotBeBaseURLFlag)
+        {
+            var path0 = Path[0];
+            if (destination.Length < charsWritten + path0.Length) return false;
+            path0.AsSpan().CopyTo(destination[charsWritten..]);
+            charsWritten += path0.Length;
+        }
+        else
+        {
+            foreach (string path in Path)
+            {
+                if (destination.Length < charsWritten + 1 + path.Length) return false;
+                destination[charsWritten++] = CHAR_SOLIDUS;
+                path.AsSpan().CopyTo(destination[charsWritten..]);
+                charsWritten += path.Length;
+            }
+        }
+
+        if (Query is not null)
+        {
+            if (destination.Length < charsWritten + 1 + Query.Length) return false;
+            destination[charsWritten++] = CHAR_QUESTION_MARK;
+            Query.AsSpan().CopyTo(destination[charsWritten..]);
+            charsWritten += Query.Length;
+        }
+
+        if (Fragment is not null)
+        {
+            if (destination.Length < charsWritten + 1 + Fragment.Length) return false;
+            destination[charsWritten++] = CHAR_HASH;
+            Fragment.AsSpan().CopyTo(destination[charsWritten..]);
+            charsWritten += Fragment.Length;
+        }
+
+        return true;
+    }
+
+    /// <inheritdoc/>
+    public string ToString(string? format, IFormatProvider? formatProvider)
+    {
+        // Use Serialize() for the allocating path since it's already implemented
+        return Serialize(bExcludeFragmentFlag: false);
+    }
+
+    /// <inheritdoc/>
+    public override string ToString() => Serialize(bExcludeFragmentFlag: false);
     #endregion
 
 

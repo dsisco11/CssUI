@@ -1,8 +1,8 @@
-using System.Text;
+using System;
 
 namespace CssUI.HTTP;
 
-public struct IPV6Address
+public struct IPV6Address : ISpanFormattable
 {/* Docs: https://url.spec.whatwg.org/#concept-ipv6 */
 
     #region Properties
@@ -53,11 +53,18 @@ public struct IPV6Address
         return address;
     }
 
-    public string Serialize()
-    {/* Docs: https://url.spec.whatwg.org/#concept-ipv6-serializer */
-        StringBuilder output = new StringBuilder();
+    #region ISpanFormattable
+    /// <summary>
+    /// Serializes this IPv6 address to its canonical string representation.
+    /// </summary>
+    /// <seealso href="https://url.spec.whatwg.org/#concept-ipv6-serializer"/>
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+    {
+        charsWritten = 0;
         int? compress = null;
         bool bCompress = false;
+
+        // Find compression point (longest run of zeros)
         for (int i = 0; i < Parts.Length; i++)
         {
             var part = Parts[i];
@@ -89,24 +96,48 @@ public struct IPV6Address
             {
                 if (pieceIndex == 0)
                 {
-                    output.Append(UnicodeCommon.CHAR_COLON);
-                    output.Append(UnicodeCommon.CHAR_COLON);
+                    if (destination.Length < charsWritten + 2) return false;
+                    destination[charsWritten++] = UnicodeCommon.CHAR_COLON;
+                    destination[charsWritten++] = UnicodeCommon.CHAR_COLON;
                 }
                 else
                 {
-                    output.Append(UnicodeCommon.CHAR_COLON);
+                    if (destination.Length <= charsWritten) return false;
+                    destination[charsWritten++] = UnicodeCommon.CHAR_COLON;
                 }
 
                 ignore0 = true;
                 continue;
             }
 
-            output.Append(UnicodeCommon.Ascii_Value_To_Hex(Parts[pieceIndex]));
+            var hexValue = UnicodeCommon.Ascii_Value_To_Hex(Parts[pieceIndex]);
+            if (destination.Length < charsWritten + hexValue.Length) return false;
+            hexValue.AsSpan().CopyTo(destination[charsWritten..]);
+            charsWritten += hexValue.Length;
 
-            if (pieceIndex != 7) output.Append(UnicodeCommon.CHAR_COLON);
+            if (pieceIndex != 7)
+            {
+                if (destination.Length <= charsWritten) return false;
+                destination[charsWritten++] = UnicodeCommon.CHAR_COLON;
+            }
         }
 
-        return output.ToString();
+        return true;
     }
+
+    /// <inheritdoc/>
+    public string ToString(string? format, IFormatProvider? formatProvider)
+    {
+        Span<char> buffer = stackalloc char[39]; // Max: "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
+        if (TryFormat(buffer, out int charsWritten, format.AsSpan(), formatProvider))
+        {
+            return buffer[..charsWritten].ToString();
+        }
+        return string.Empty;
+    }
+
+    /// <inheritdoc/>
+    public override string ToString() => ToString(null, null);
+    #endregion
 }
 

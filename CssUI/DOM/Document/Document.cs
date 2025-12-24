@@ -159,9 +159,9 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     #endregion
 
     #region Accessors
-    public string URL => document_url.Serialize();
-    public string documentURI => document_url.Serialize();
-    public string Origin => document_origin.Serialize();
+    public string URL => document_url.ToString();
+    public string documentURI => document_url.ToString();
+    public string Origin => document_origin.ToString();
     public string characterSet => characterEncoding.WebName;
     #endregion
 

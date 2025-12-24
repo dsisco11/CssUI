@@ -191,7 +191,7 @@ public static class HTTPCommon
             return false;
         }
 
-        var urlString = urlRecord.Serialize();
+        var urlString = urlRecord.ToString();
 
         outUrl = urlRecord;
         outUrlString = urlString;
