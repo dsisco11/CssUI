@@ -428,4 +428,466 @@ public class CssColorSerializerTests
     }
 
     #endregion
+
+    #region Round-Trip Parsing/Serialization Tests
+
+    [Theory]
+    [Trait("Category", "Color")]
+    [Trait("Category", "Serialization")]
+    [Trait("Category", "RoundTrip")]
+    [InlineData("rgb(255, 0, 0)")]
+    [InlineData("rgb(0, 255, 0)")]
+    [InlineData("rgb(0, 0, 255)")]
+    [InlineData("rgb(128, 128, 128)")]
+    [InlineData("rgb(0, 0, 0)")]
+    [InlineData("rgb(255, 255, 255)")]
+    public void RoundTrip_OpaqueRgb_ParseSerializeParse_Equals(string input)
+    {
+        // Parse the input
+        var parser = new CssParser(input);
+        var value1 = parser.Parse_CssValue();
+        var color1 = value1.AsCssColor();
+
+        // Serialize
+        var serialized = CssColorSerializer.Serialize(color1);
+
+        // Parse the serialized output
+        var parser2 = new CssParser(serialized);
+        var value2 = parser2.Parse_CssValue();
+        var color2 = value2.AsCssColor();
+
+        // Assert the colors are equal
+        Assert.Equal(color1.R, color2.R);
+        Assert.Equal(color1.G, color2.G);
+        Assert.Equal(color1.B, color2.B);
+        Assert.Equal(color1.A, color2.A);
+    }
+
+    [Theory]
+    [Trait("Category", "Color")]
+    [Trait("Category", "Serialization")]
+    [Trait("Category", "RoundTrip")]
+    [InlineData("rgba(255, 0, 0, 0.5)")]
+    [InlineData("rgba(0, 255, 0, 0.25)")]
+    [InlineData("rgba(0, 0, 255, 0.75)")]
+    [InlineData("rgba(128, 128, 128, 0)")]
+    public void RoundTrip_TransparentRgba_ParseSerializeParse_Equals(string input)
+    {
+        // Parse the input
+        var parser = new CssParser(input);
+        var value1 = parser.Parse_CssValue();
+        var color1 = value1.AsCssColor();
+
+        // Serialize
+        var serialized = CssColorSerializer.Serialize(color1);
+
+        // Parse the serialized output
+        var parser2 = new CssParser(serialized);
+        var value2 = parser2.Parse_CssValue();
+        var color2 = value2.AsCssColor();
+
+        // Assert the colors are equal (within rounding tolerance for alpha)
+        Assert.Equal(color1.R, color2.R);
+        Assert.Equal(color1.G, color2.G);
+        Assert.Equal(color1.B, color2.B);
+        // Alpha might differ slightly due to 8-bit → float → 8-bit conversion
+        Assert.InRange(System.Math.Abs(color1.A - color2.A), 0, 1);
+    }
+
+    [Theory]
+    [Trait("Category", "Color")]
+    [Trait("Category", "Serialization")]
+    [Trait("Category", "RoundTrip")]
+    [InlineData("rgb(255 128 0)")]          // Modern syntax
+    [InlineData("rgb(100% 50% 0%)")]        // Percentage syntax
+    [InlineData("rgb(255 128 0 / 0.5)")]    // Modern with alpha
+    [InlineData("rgb(100% 50% 0% / 50%)")]  // Percentage with percentage alpha
+    public void RoundTrip_ModernRgbSyntax_ParseSerializeParse_PreservesColor(string input)
+    {
+        // Parse the input (modern syntax)
+        var parser = new CssParser(input);
+        var value1 = parser.Parse_CssValue();
+        var color1 = value1.AsCssColor();
+
+        // Serialize (uses legacy syntax per spec)
+        var serialized = CssColorSerializer.Serialize(color1);
+
+        // Parse the serialized output
+        var parser2 = new CssParser(serialized);
+        var value2 = parser2.Parse_CssValue();
+        var color2 = value2.AsCssColor();
+
+        // Assert the colors are equal
+        Assert.Equal(color1.R, color2.R);
+        Assert.Equal(color1.G, color2.G);
+        Assert.Equal(color1.B, color2.B);
+        Assert.InRange(System.Math.Abs(color1.A - color2.A), 0, 1);
+    }
+
+    [Theory]
+    [Trait("Category", "Color")]
+    [Trait("Category", "Serialization")]
+    [Trait("Category", "RoundTrip")]
+    [InlineData("hsl(0, 100%, 50%)")]     // Red
+    [InlineData("hsl(120, 100%, 50%)")]   // Green
+    [InlineData("hsl(240, 100%, 50%)")]   // Blue
+    [InlineData("hsl(60, 100%, 50%)")]    // Yellow
+    [InlineData("hsl(180, 100%, 50%)")]   // Cyan
+    [InlineData("hsl(300, 100%, 50%)")]   // Magenta
+    public void RoundTrip_HslColor_ParseSerializeParse_PreservesColor(string input)
+    {
+        // Parse HSL input
+        var parser = new CssParser(input);
+        var value1 = parser.Parse_CssValue();
+        var color1 = value1.AsCssColor();
+
+        // Serialize (converts to rgb())
+        var serialized = CssColorSerializer.Serialize(color1);
+
+        // Parse the serialized output
+        var parser2 = new CssParser(serialized);
+        var value2 = parser2.Parse_CssValue();
+        var color2 = value2.AsCssColor();
+
+        // Assert the colors are equal
+        Assert.Equal(color1.R, color2.R);
+        Assert.Equal(color1.G, color2.G);
+        Assert.Equal(color1.B, color2.B);
+        Assert.Equal(color1.A, color2.A);
+    }
+
+    [Theory]
+    [Trait("Category", "Color")]
+    [Trait("Category", "Serialization")]
+    [Trait("Category", "RoundTrip")]
+    [InlineData("hwb(0 0% 0%)")]      // Red
+    [InlineData("hwb(120 0% 0%)")]    // Green
+    [InlineData("hwb(240 0% 0%)")]    // Blue
+    [InlineData("hwb(0 50% 50%)")]    // Gray (achromatic)
+    public void RoundTrip_HwbColor_ParseSerializeParse_PreservesColor(string input)
+    {
+        // Parse HWB input
+        var parser = new CssParser(input);
+        var value1 = parser.Parse_CssValue();
+        var color1 = value1.AsCssColor();
+
+        // Serialize (converts to rgb())
+        var serialized = CssColorSerializer.Serialize(color1);
+
+        // Parse the serialized output
+        var parser2 = new CssParser(serialized);
+        var value2 = parser2.Parse_CssValue();
+        var color2 = value2.AsCssColor();
+
+        // Assert the colors are equal
+        Assert.Equal(color1.R, color2.R);
+        Assert.Equal(color1.G, color2.G);
+        Assert.Equal(color1.B, color2.B);
+        Assert.Equal(color1.A, color2.A);
+    }
+
+    [Theory]
+    [Trait("Category", "Color")]
+    [Trait("Category", "Serialization")]
+    [Trait("Category", "RoundTrip")]
+    [InlineData("#ff0000")]
+    [InlineData("#00ff00")]
+    [InlineData("#0000ff")]
+    [InlineData("#abcdef")]
+    [InlineData("#123456")]
+    public void RoundTrip_HexColor_ParseSerializeParse_PreservesColor(string input)
+    {
+        // Parse hex input
+        var parser = new CssParser(input);
+        var value1 = parser.Parse_CssValue();
+        var color1 = value1.AsCssColor();
+
+        // Serialize (converts to rgb())
+        var serialized = CssColorSerializer.Serialize(color1);
+
+        // Parse the serialized output
+        var parser2 = new CssParser(serialized);
+        var value2 = parser2.Parse_CssValue();
+        var color2 = value2.AsCssColor();
+
+        // Assert the colors are equal
+        Assert.Equal(color1.R, color2.R);
+        Assert.Equal(color1.G, color2.G);
+        Assert.Equal(color1.B, color2.B);
+        Assert.Equal(color1.A, color2.A);
+    }
+
+    [Theory]
+    [Trait("Category", "Color")]
+    [Trait("Category", "Serialization")]
+    [Trait("Category", "RoundTrip")]
+    [InlineData("#f00")]     // Short hex red
+    [InlineData("#0f0")]     // Short hex green
+    [InlineData("#00f")]     // Short hex blue
+    [InlineData("#abc")]     // Short hex mixed
+    [InlineData("#fff")]     // Short hex white
+    [InlineData("#000")]     // Short hex black
+    public void RoundTrip_ShortHexColor_ParseSerializeParse_PreservesColor(string input)
+    {
+        // Parse short hex input
+        var parser = new CssParser(input);
+        var value1 = parser.Parse_CssValue();
+        var color1 = value1.AsCssColor();
+
+        // Serialize
+        var serialized = CssColorSerializer.Serialize(color1);
+
+        // Parse the serialized output
+        var parser2 = new CssParser(serialized);
+        var value2 = parser2.Parse_CssValue();
+        var color2 = value2.AsCssColor();
+
+        // Assert the colors are equal
+        Assert.Equal(color1.R, color2.R);
+        Assert.Equal(color1.G, color2.G);
+        Assert.Equal(color1.B, color2.B);
+        Assert.Equal(color1.A, color2.A);
+    }
+
+    [Theory]
+    [Trait("Category", "Color")]
+    [Trait("Category", "Serialization")]
+    [Trait("Category", "RoundTrip")]
+    [InlineData("#ff000080")]  // Red with 50% alpha
+    [InlineData("#00ff0040")]  // Green with 25% alpha
+    [InlineData("#0000ffbf")]  // Blue with 75% alpha
+    public void RoundTrip_HexColorWithAlpha_ParseSerializeParse_PreservesColor(string input)
+    {
+        // Parse 8-digit hex input
+        var parser = new CssParser(input);
+        var value1 = parser.Parse_CssValue();
+        var color1 = value1.AsCssColor();
+
+        // Serialize
+        var serialized = CssColorSerializer.Serialize(color1);
+
+        // Parse the serialized output
+        var parser2 = new CssParser(serialized);
+        var value2 = parser2.Parse_CssValue();
+        var color2 = value2.AsCssColor();
+
+        // Assert the colors are equal
+        Assert.Equal(color1.R, color2.R);
+        Assert.Equal(color1.G, color2.G);
+        Assert.Equal(color1.B, color2.B);
+        Assert.InRange(System.Math.Abs(color1.A - color2.A), 0, 1);
+    }
+
+    #endregion
+
+    #region Canonical Form Serialization Tests
+
+    [Fact]
+    [Trait("Category", "Color")]
+    [Trait("Category", "Serialization")]
+    public void Serialize_OpaqueColor_UsesRgbNotRgba()
+    {
+        var color = CssColor.FromRgba(255, 128, 64, 255);
+        var result = CssColorSerializer.Serialize(color);
+
+        // Per spec: opaque colors use rgb() not rgba()
+        Assert.StartsWith("rgb(", result);
+        Assert.DoesNotContain("rgba", result);
+    }
+
+    [Fact]
+    [Trait("Category", "Color")]
+    [Trait("Category", "Serialization")]
+    public void Serialize_NonOpaqueColor_UsesRgba()
+    {
+        var color = CssColor.FromRgba(255, 128, 64, 128);
+        var result = CssColorSerializer.Serialize(color);
+
+        // Per spec: non-opaque colors use rgba()
+        Assert.StartsWith("rgba(", result);
+    }
+
+    [Fact]
+    [Trait("Category", "Color")]
+    [Trait("Category", "Serialization")]
+    public void Serialize_LegacySyntax_UsesCommas()
+    {
+        var color = CssColor.FromRgba(255, 128, 64, 255);
+        var result = CssColorSerializer.Serialize(color);
+
+        // Per spec: sRGB uses legacy comma-separated syntax
+        Assert.Contains(", ", result);
+        Assert.DoesNotContain(" / ", result);
+    }
+
+    [Fact]
+    [Trait("Category", "Color")]
+    [Trait("Category", "Serialization")]
+    public void Serialize_LabColor_UsesModernSyntax()
+    {
+        var color = new CssColorHdr(50f, 25f, -25f, 1f, EColorSpace.Lab);
+        var result = CssColorSerializer.Serialize(color);
+
+        // HDR colors use modern space-separated syntax
+        Assert.DoesNotContain(",", result);
+        Assert.Equal("lab(50 25 -25)", result);
+    }
+
+    [Fact]
+    [Trait("Category", "Color")]
+    [Trait("Category", "Serialization")]
+    public void Serialize_ColorFunction_UsesModernSyntax()
+    {
+        var color = new CssColorHdr(1f, 0f, 0f, 1f, EColorSpace.DisplayP3);
+        var result = CssColorSerializer.Serialize(color);
+
+        // color() function uses modern space-separated syntax
+        Assert.DoesNotContain(",", result);
+        Assert.Equal("color(display-p3 1 0 0)", result);
+    }
+
+    [Theory]
+    [Trait("Category", "Color")]
+    [Trait("Category", "Serialization")]
+    [InlineData(EColorSpace.sRGB, "srgb")]
+    [InlineData(EColorSpace.sRGBLinear, "srgb-linear")]
+    [InlineData(EColorSpace.DisplayP3, "display-p3")]
+    [InlineData(EColorSpace.A98Rgb, "a98-rgb")]
+    [InlineData(EColorSpace.ProPhotoRgb, "prophoto-rgb")]
+    [InlineData(EColorSpace.Rec2020, "rec2020")]
+    [InlineData(EColorSpace.XyzD50, "xyz-d50")]
+    [InlineData(EColorSpace.XyzD65, "xyz-d65")]
+    public void Serialize_ColorFunction_UsesCorrectColorSpaceName(EColorSpace colorSpace, string expectedName)
+    {
+        var color = new CssColorHdr(0.5f, 0.5f, 0.5f, 1f, colorSpace);
+        var result = CssColorSerializer.Serialize(color);
+
+        Assert.StartsWith($"color({expectedName} ", result);
+    }
+
+    [Fact]
+    [Trait("Category", "Color")]
+    [Trait("Category", "Serialization")]
+    public void Serialize_IntegerComponentValues_OmitsDecimalPoint()
+    {
+        var color = CssColor.FromRgba(100, 200, 50, 255);
+        var result = CssColorSerializer.Serialize(color);
+
+        // Integer values should not have decimal points
+        Assert.Equal("rgb(100, 200, 50)", result);
+        Assert.DoesNotContain(".", result);
+    }
+
+    #endregion
+
+    #region Alpha Channel Omission Tests
+
+    [Fact]
+    [Trait("Category", "Color")]
+    [Trait("Category", "Serialization")]
+    public void Serialize_Alpha255_OmitsAlpha()
+    {
+        var color = CssColor.FromRgba(255, 128, 0, 255);
+        var result = CssColorSerializer.Serialize(color);
+
+        // Alpha exactly 1 (255) should be omitted
+        Assert.Equal("rgb(255, 128, 0)", result);
+        Assert.DoesNotContain(",", result.Substring(result.LastIndexOf(')')));
+    }
+
+    [Fact]
+    [Trait("Category", "Color")]
+    [Trait("Category", "Serialization")]
+    public void Serialize_Alpha254_IncludesAlpha()
+    {
+        var color = CssColor.FromRgba(255, 128, 0, 254);
+        var result = CssColorSerializer.Serialize(color);
+
+        // Alpha not exactly 1 should be included
+        Assert.StartsWith("rgba(", result);
+    }
+
+    [Fact]
+    [Trait("Category", "Color")]
+    [Trait("Category", "Serialization")]
+    public void Serialize_Alpha0_IncludesAlpha()
+    {
+        var color = CssColor.FromRgba(255, 128, 0, 0);
+        var result = CssColorSerializer.Serialize(color);
+
+        // Alpha 0 should be included
+        Assert.Equal("rgba(255, 128, 0, 0)", result);
+    }
+
+    [Fact]
+    [Trait("Category", "Color")]
+    [Trait("Category", "Serialization")]
+    public void Serialize_HdrOpaqueAlpha_OmitsAlpha()
+    {
+        var color = new CssColorHdr(50f, 25f, -25f, 1f, EColorSpace.Lab);
+        var result = CssColorSerializer.Serialize(color);
+
+        // Opaque HDR colors should omit alpha
+        Assert.Equal("lab(50 25 -25)", result);
+        Assert.DoesNotContain("/", result);
+    }
+
+    [Fact]
+    [Trait("Category", "Color")]
+    [Trait("Category", "Serialization")]
+    public void Serialize_HdrNonOpaqueAlpha_IncludesSlashAlpha()
+    {
+        var color = new CssColorHdr(50f, 25f, -25f, 0.5f, EColorSpace.Lab);
+        var result = CssColorSerializer.Serialize(color);
+
+        // Non-opaque HDR colors should include slash alpha
+        Assert.Equal("lab(50 25 -25 / 0.5)", result);
+        Assert.Contains(" / ", result);
+    }
+
+    [Theory]
+    [Trait("Category", "Color")]
+    [Trait("Category", "Serialization")]
+    [InlineData(1f, false)]   // Opaque - no alpha
+    [InlineData(0.999f, true)] // Nearly opaque - includes alpha
+    [InlineData(0.5f, true)]   // Semi-transparent - includes alpha
+    [InlineData(0f, true)]     // Transparent - includes alpha
+    public void Serialize_HdrLabAlpha_OmittedOnlyWhenExactlyOne(float alpha, bool shouldIncludeAlpha)
+    {
+        var color = new CssColorHdr(50f, 25f, -25f, alpha, EColorSpace.Lab);
+        var result = CssColorSerializer.Serialize(color);
+
+        if (shouldIncludeAlpha)
+        {
+            Assert.Contains(" / ", result);
+        }
+        else
+        {
+            Assert.DoesNotContain(" / ", result);
+        }
+    }
+
+    [Theory]
+    [Trait("Category", "Color")]
+    [Trait("Category", "Serialization")]
+    [InlineData(1f, false)]
+    [InlineData(0.999f, true)]
+    [InlineData(0.5f, true)]
+    [InlineData(0f, true)]
+    public void Serialize_ColorFunctionAlpha_OmittedOnlyWhenExactlyOne(float alpha, bool shouldIncludeAlpha)
+    {
+        var color = new CssColorHdr(0.5f, 0.5f, 0.5f, alpha, EColorSpace.DisplayP3);
+        var result = CssColorSerializer.Serialize(color);
+
+        if (shouldIncludeAlpha)
+        {
+            Assert.Contains(" / ", result);
+        }
+        else
+        {
+            Assert.DoesNotContain(" / ", result);
+        }
+    }
+
+    #endregion
 }

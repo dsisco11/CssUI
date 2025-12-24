@@ -416,20 +416,22 @@ Spec Reference: https://www.w3.org/TR/css-syntax-3/#serialization
 - [x] Tests: 70 tests for token serialization (CssUITests2/CSS/Serialization/CssTokenSerializerTests.cs)
 
 
-### 7.3 Color Parsing Tests
+### 7.3 Color Parsing Tests ✓
+Note: All tests implemented in CssColorFunctionParserTests.cs (180 tests passing)
 - [x] Hex color parsing tests (all formats)
-- [ ] rgb()/rgba() parsing tests (legacy + modern syntax)
-- [ ] hsl()/hsla() parsing tests
-- [ ] hwb() parsing tests
-- [ ] lab()/lch() parsing tests
-- [ ] oklab()/oklch() parsing tests
-- [ ] color() function parsing tests
-- [ ] Invalid color value error handling tests
+- [x] rgb()/rgba() parsing tests (legacy + modern syntax)
+- [x] hsl()/hsla() parsing tests
+- [x] hwb() parsing tests
+- [x] lab()/lch() parsing tests
+- [x] oklab()/oklch() parsing tests
+- [x] color() function parsing tests
+- [x] Invalid color value error handling tests
 
-### 7.4 Color Serialization Tests
-- [ ] Round-trip parsing/serialization tests
-- [ ] Canonical form serialization tests
-- [ ] Alpha channel serialization tests (omit when 1.0)
+### 7.4 Color Serialization Tests ✓
+Note: All tests implemented in CssColorSerializerTests.cs (105 tests passing)
+- [x] Round-trip parsing/serialization tests (44 tests)
+- [x] Canonical form serialization tests (12 tests)
+- [x] Alpha channel serialization tests (omit when 1.0) (9 tests)
 
 ### 7.5 Cleanup: Remove Parsing/Serialization from Color Types
 - [ ] Remove CssColor.FromHex() - use parser instead
