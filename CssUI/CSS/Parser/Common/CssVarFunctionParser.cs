@@ -23,6 +23,7 @@ namespace CssUI.CSS.Parser;
 /// - Property names are case-sensitive
 /// - var(--a,) is valid (empty fallback)
 /// - The fallback can contain commas: var(--font, Arial, sans-serif)
+/// - The fallback must match the &lt;declaration-value&gt; production
 /// </remarks>
 internal static class CssVarFunctionParser
 {
@@ -34,6 +35,10 @@ internal static class CssVarFunctionParser
     /// <param name="function">The CSS function to parse.</param>
     /// <param name="result">The resulting var function reference if successful.</param>
     /// <returns>True if the function was a valid var() and parsing succeeded.</returns>
+    /// <remarks>
+    /// The fallback value (if present) is validated against the &lt;declaration-value&gt; production
+    /// per CSS Syntax Level 3 §8.2. The validation result is stored in <see cref="CssVarFunction.FallbackValidation"/>.
+    /// </remarks>
     public static bool TryParseVarFunction(CssFunction function, out CssVarFunction result)
     {
         ArgumentNullException.ThrowIfNull(function);
@@ -105,18 +110,21 @@ internal static class CssVarFunctionParser
         // Collect remaining tokens as fallback
         var fallbackTokens = CollectFallbackTokens(stream);
 
+        // Validate fallback against <declaration-value> production per CSS Variables spec
+        var validationResult = CssProductionMatcher.MatchDeclarationValue(fallbackTokens);
+
         // Try to parse the fallback as a CssValue
         // The fallback can be complex (multiple values, nested var(), etc.)
         CssValue? fallbackValue = TryParseFallbackValue(fallbackTokens);
 
         if (fallbackValue is not null)
         {
-            result = new CssVarFunction(propertyName, fallbackValue, new ReadOnlyMemory<CssToken>(fallbackTokens));
+            result = new CssVarFunction(propertyName, fallbackValue, new ReadOnlyMemory<CssToken>(fallbackTokens), validationResult);
         }
         else
         {
             // Store just the raw tokens if we couldn't parse a simple value
-            result = new CssVarFunction(propertyName, new ReadOnlyMemory<CssToken>(fallbackTokens));
+            result = new CssVarFunction(propertyName, new ReadOnlyMemory<CssToken>(fallbackTokens), validationResult);
         }
 
         return true;

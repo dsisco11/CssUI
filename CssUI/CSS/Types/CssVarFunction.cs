@@ -8,16 +8,16 @@ namespace CssUI.CSS;
 /// </summary>
 /// <remarks>
 /// Spec Reference: https://www.w3.org/TR/css-variables-1/#using-variables
-/// 
+///
 /// Grammar:
 /// <code>
 /// var() = var( &lt;custom-property-name&gt; [, &lt;declaration-value&gt;]? )
 /// </code>
-/// 
+///
 /// The var() function allows referencing custom properties (CSS variables)
 /// defined elsewhere in the cascade. Custom property names must start with
 /// two dashes (--).
-/// 
+///
 /// Examples:
 /// - var(--main-color)
 /// - var(--fallback-font, sans-serif)
@@ -78,6 +78,26 @@ public readonly struct CssVarFunction : IEquatable<CssVarFunction>
     /// </summary>
     public bool IsValid => !string.IsNullOrEmpty(PropertyName) && PropertyName.StartsWith("--", StringComparison.Ordinal);
 
+    /// <summary>
+    /// Gets the result of validating the fallback against the &lt;declaration-value&gt; production.
+    /// </summary>
+    /// <remarks>
+    /// Per CSS Variables Level 1, the fallback must match the &lt;declaration-value&gt; production.
+    /// This property holds the validation result, which indicates whether the fallback is valid
+    /// and if not, why it failed.
+    /// </remarks>
+    public CssProductionMatchResult? FallbackValidation { get; }
+
+    /// <summary>
+    /// Indicates whether the fallback value matches the &lt;declaration-value&gt; production.
+    /// </summary>
+    /// <remarks>
+    /// Returns true if there is no fallback, or if the fallback passes &lt;declaration-value&gt; validation.
+    /// Returns false if the fallback contains invalid constructs such as bad-string-token, bad-url-token,
+    /// unmatched brackets, top-level semicolons, or top-level "!" delimiters.
+    /// </remarks>
+    public bool IsFallbackValid => !HasFallback || (FallbackValidation?.IsMatch ?? true);
+
     #endregion
 
     #region Constructors
@@ -91,6 +111,7 @@ public readonly struct CssVarFunction : IEquatable<CssVarFunction>
         PropertyName = propertyName ?? string.Empty;
         Fallback = null;
         FallbackTokens = null;
+        FallbackValidation = null;
     }
 
     /// <summary>
@@ -103,6 +124,7 @@ public readonly struct CssVarFunction : IEquatable<CssVarFunction>
         PropertyName = propertyName ?? string.Empty;
         Fallback = fallback;
         FallbackTokens = null;
+        FallbackValidation = null;
     }
 
     /// <summary>
@@ -115,6 +137,7 @@ public readonly struct CssVarFunction : IEquatable<CssVarFunction>
         PropertyName = propertyName ?? string.Empty;
         Fallback = null;
         FallbackTokens = fallbackTokens;
+        FallbackValidation = null;
     }
 
     /// <summary>
@@ -128,6 +151,36 @@ public readonly struct CssVarFunction : IEquatable<CssVarFunction>
         PropertyName = propertyName ?? string.Empty;
         Fallback = fallback;
         FallbackTokens = fallbackTokens;
+        FallbackValidation = null;
+    }
+
+    /// <summary>
+    /// Creates a new var() function reference with fallback tokens and validation result.
+    /// </summary>
+    /// <param name="propertyName">The custom property name (must include -- prefix).</param>
+    /// <param name="fallbackTokens">The raw tokens making up the fallback value.</param>
+    /// <param name="validationResult">The result of validating the fallback against &lt;declaration-value&gt;.</param>
+    public CssVarFunction(string propertyName, ReadOnlyMemory<CssToken> fallbackTokens, CssProductionMatchResult validationResult)
+    {
+        PropertyName = propertyName ?? string.Empty;
+        Fallback = null;
+        FallbackTokens = fallbackTokens;
+        FallbackValidation = validationResult;
+    }
+
+    /// <summary>
+    /// Creates a new var() function reference with parsed fallback, raw tokens, and validation result.
+    /// </summary>
+    /// <param name="propertyName">The custom property name (must include -- prefix).</param>
+    /// <param name="fallback">The parsed fallback value.</param>
+    /// <param name="fallbackTokens">The raw tokens making up the fallback value.</param>
+    /// <param name="validationResult">The result of validating the fallback against &lt;declaration-value&gt;.</param>
+    public CssVarFunction(string propertyName, CssValue fallback, ReadOnlyMemory<CssToken> fallbackTokens, CssProductionMatchResult validationResult)
+    {
+        PropertyName = propertyName ?? string.Empty;
+        Fallback = fallback;
+        FallbackTokens = fallbackTokens;
+        FallbackValidation = validationResult;
     }
 
     #endregion

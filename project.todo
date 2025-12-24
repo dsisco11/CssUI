@@ -347,9 +347,9 @@ Implemented in Phase 6.7
 - [x] Tests: 12 tests for block contents type (CssUITests2/CSS/Parser/CssBlockContentsTypeTests.cs)
 
 #### 7.7.7 Production Matching Integration
-- [ ] Integrate CssProductionMatcher with CssVarFunctionParser
-  - [ ] Validate var() fallback values against <declaration-value> production
-  - [ ] Tests for invalid fallback rejection (bad-string, unmatched brackets)
+- [x] Integrate CssProductionMatcher with CssVarFunctionParser
+  - [x] Validate var() fallback values against <declaration-value> production
+  - [x] Tests for invalid fallback rejection (bad-string, unmatched brackets)
 - [ ] Integrate with custom property declaration parsing
   - [ ] Custom property values (--prop: value) must match <declaration-value>
   - [ ] Add validation in Consume_Decleration for --* properties

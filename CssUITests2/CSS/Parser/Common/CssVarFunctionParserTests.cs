@@ -1,3 +1,4 @@
+using System;
 using CssUI;
 using CssUI.CSS;
 using CssUI.CSS.Parser;
@@ -468,6 +469,119 @@ public class CssVarFunctionParserTests
         var varFunc = value.AsVarFunction();
         Assert.Equal("--gap", varFunc.PropertyName);
         Assert.True(varFunc.HasFallback);
+    }
+
+    #endregion
+
+    #region Fallback Validation - <declaration-value> Production
+
+    [Fact]
+    public void Parse_VarWithValidFallback_IsFallbackValidIsTrue()
+    {
+        // Arrange - simple valid fallback
+        var css = "var(--color, red)";
+        var parser = new CssParser(css);
+
+        // Act
+        var result = parser.Parse_CssValue();
+
+        // Assert
+        Assert.Equal(ECssValueTypes.VAR, result.Type);
+        var varFunc = result.AsVarFunction();
+        Assert.True(varFunc.IsFallbackValid);
+        Assert.True(varFunc.FallbackValidation?.IsMatch ?? true);
+    }
+
+    [Fact]
+    public void Parse_VarWithNoFallback_IsFallbackValidIsTrue()
+    {
+        // Arrange - no fallback means validation passes by default
+        var css = "var(--color)";
+        var parser = new CssParser(css);
+
+        // Act
+        var result = parser.Parse_CssValue();
+
+        // Assert
+        Assert.Equal(ECssValueTypes.VAR, result.Type);
+        var varFunc = result.AsVarFunction();
+        Assert.True(varFunc.IsFallbackValid);
+        Assert.Null(varFunc.FallbackValidation);
+    }
+
+    [Fact]
+    public void Parse_VarWithComplexValidFallback_IsFallbackValidIsTrue()
+    {
+        // Arrange - complex fallback with multiple tokens
+        var css = "var(--font, Arial, sans-serif)";
+        var parser = new CssParser(css);
+
+        // Act
+        var result = parser.Parse_CssValue();
+
+        // Assert
+        Assert.Equal(ECssValueTypes.VAR, result.Type);
+        var varFunc = result.AsVarFunction();
+        Assert.True(varFunc.IsFallbackValid);
+    }
+
+    [Fact]
+    public void Parse_VarWithNestedFallback_IsFallbackValidIsTrue()
+    {
+        // Arrange - nested parentheses are valid if balanced
+        var css = "var(--func, calc(100% - 20px))";
+        var parser = new CssParser(css);
+
+        // Act
+        var result = parser.Parse_CssValue();
+
+        // Assert
+        Assert.Equal(ECssValueTypes.VAR, result.Type);
+        var varFunc = result.AsVarFunction();
+        Assert.True(varFunc.IsFallbackValid);
+    }
+
+    [Fact]
+    public void CssVarFunction_IsFallbackValid_DefaultsToTrue()
+    {
+        // Arrange - constructor without validation result
+        var varFunc = new CssVarFunction("--test", CssValue.From(10));
+
+        // Assert - IsFallbackValid should be true when FallbackValidation is null
+        Assert.True(varFunc.IsFallbackValid);
+        Assert.Null(varFunc.FallbackValidation);
+    }
+
+    [Fact]
+    public void CssVarFunction_WithValidFallbackTokens_IsFallbackValidIsTrue()
+    {
+        // Arrange
+        var tokens = new CssToken[]
+        {
+            new IdentToken("red")
+        };
+        var validationResult = CssProductionMatcher.MatchDeclarationValue(tokens);
+        var varFunc = new CssVarFunction("--color", new ReadOnlyMemory<CssToken>(tokens), validationResult);
+
+        // Assert
+        Assert.True(varFunc.IsFallbackValid);
+        Assert.True(varFunc.FallbackValidation?.IsMatch);
+    }
+
+    [Fact]
+    public void CssVarFunction_FallbackValidation_MatchesProductionMatcherResult()
+    {
+        // Arrange - create valid tokens and verify validation result matches
+        var tokens = new CssToken[]
+        {
+            new NumberToken(ENumericTokenType.Integer, "42", 42L)
+        };
+        var validationResult = CssProductionMatcher.MatchDeclarationValue(tokens);
+        var varFunc = new CssVarFunction("--value", new ReadOnlyMemory<CssToken>(tokens), validationResult);
+
+        // Assert
+        Assert.Equal(validationResult.IsMatch, varFunc.FallbackValidation?.IsMatch);
+        Assert.Equal(validationResult.FailureType, varFunc.FallbackValidation?.FailureType);
     }
 
     #endregion
