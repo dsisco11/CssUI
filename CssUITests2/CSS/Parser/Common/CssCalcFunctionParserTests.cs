@@ -550,4 +550,403 @@ public class CssCalcFunctionParserTests
     }
 
     #endregion
+
+    #region Min Function
+
+    [Fact]
+    public void Parse_Min_SingleValue_ReturnsCalcExpression()
+    {
+        // Arrange
+        var css = "min(100px)";
+        var parser = new CssParser(css);
+
+        // Act
+        var result = parser.Parse_CssValue();
+
+        // Assert
+        Assert.Equal(ECssValueTypes.CALC, result.Type);
+        var expr = result.AsCalcExpression();
+        Assert.NotNull(expr);
+        Assert.True(expr.IsValid);
+    }
+
+    [Fact]
+    public void Parse_Min_TwoValues_ReturnsCalcExpression()
+    {
+        // Arrange
+        var css = "min(100px, 50px)";
+        var parser = new CssParser(css);
+
+        // Act
+        var result = parser.Parse_CssValue();
+
+        // Assert
+        Assert.Equal(ECssValueTypes.CALC, result.Type);
+        var expr = result.AsCalcExpression();
+        Assert.NotNull(expr);
+        Assert.True(expr.IsValid);
+    }
+
+    [Fact]
+    public void Parse_Min_ThreeValues_ReturnsCalcExpression()
+    {
+        // Arrange
+        var css = "min(200px, 100px, 50px)";
+        var parser = new CssParser(css);
+
+        // Act
+        var result = parser.Parse_CssValue();
+
+        // Assert
+        Assert.Equal(ECssValueTypes.CALC, result.Type);
+        var expr = result.AsCalcExpression();
+        Assert.NotNull(expr);
+        Assert.True(expr.IsValid);
+    }
+
+    [Fact]
+    public void Parse_Min_WithCalcExpression_ReturnsCalcExpression()
+    {
+        // Arrange - min() can contain full calc-sum expressions
+        var css = "min(100px + 50px, 200px)";
+        var parser = new CssParser(css);
+
+        // Act
+        var result = parser.Parse_CssValue();
+
+        // Assert
+        Assert.Equal(ECssValueTypes.CALC, result.Type);
+        var expr = result.AsCalcExpression();
+        Assert.NotNull(expr);
+        Assert.True(expr.IsValid);
+    }
+
+    [Fact]
+    public void Parse_Min_CaseInsensitive_ReturnsCalcExpression()
+    {
+        // Arrange
+        var css = "MIN(100px, 50px)";
+        var parser = new CssParser(css);
+
+        // Act
+        var result = parser.Parse_CssValue();
+
+        // Assert
+        Assert.Equal(ECssValueTypes.CALC, result.Type);
+    }
+
+    #endregion
+
+    #region Max Function
+
+    [Fact]
+    public void Parse_Max_SingleValue_ReturnsCalcExpression()
+    {
+        // Arrange
+        var css = "max(100px)";
+        var parser = new CssParser(css);
+
+        // Act
+        var result = parser.Parse_CssValue();
+
+        // Assert
+        Assert.Equal(ECssValueTypes.CALC, result.Type);
+        var expr = result.AsCalcExpression();
+        Assert.NotNull(expr);
+        Assert.True(expr.IsValid);
+    }
+
+    [Fact]
+    public void Parse_Max_TwoValues_ReturnsCalcExpression()
+    {
+        // Arrange
+        var css = "max(100px, 50px)";
+        var parser = new CssParser(css);
+
+        // Act
+        var result = parser.Parse_CssValue();
+
+        // Assert
+        Assert.Equal(ECssValueTypes.CALC, result.Type);
+        var expr = result.AsCalcExpression();
+        Assert.NotNull(expr);
+        Assert.True(expr.IsValid);
+    }
+
+    [Fact]
+    public void Parse_Max_ThreeValues_ReturnsCalcExpression()
+    {
+        // Arrange
+        var css = "max(50px, 100px, 200px)";
+        var parser = new CssParser(css);
+
+        // Act
+        var result = parser.Parse_CssValue();
+
+        // Assert
+        Assert.Equal(ECssValueTypes.CALC, result.Type);
+        var expr = result.AsCalcExpression();
+        Assert.NotNull(expr);
+        Assert.True(expr.IsValid);
+    }
+
+    [Fact]
+    public void Parse_Max_WithCalcExpression_ReturnsCalcExpression()
+    {
+        // Arrange - max() can contain full calc-sum expressions
+        var css = "max(100px - 50px, 200px)";
+        var parser = new CssParser(css);
+
+        // Act
+        var result = parser.Parse_CssValue();
+
+        // Assert
+        Assert.Equal(ECssValueTypes.CALC, result.Type);
+        var expr = result.AsCalcExpression();
+        Assert.NotNull(expr);
+        Assert.True(expr.IsValid);
+    }
+
+    [Fact]
+    public void Parse_Max_CaseInsensitive_ReturnsCalcExpression()
+    {
+        // Arrange
+        var css = "MAX(100px, 50px)";
+        var parser = new CssParser(css);
+
+        // Act
+        var result = parser.Parse_CssValue();
+
+        // Assert
+        Assert.Equal(ECssValueTypes.CALC, result.Type);
+    }
+
+    #endregion
+
+    #region Clamp Function
+
+    [Fact]
+    public void Parse_Clamp_AllValues_ReturnsCalcExpression()
+    {
+        // Arrange
+        var css = "clamp(10px, 50px, 100px)";
+        var parser = new CssParser(css);
+
+        // Act
+        var result = parser.Parse_CssValue();
+
+        // Assert
+        Assert.Equal(ECssValueTypes.CALC, result.Type);
+        var expr = result.AsCalcExpression();
+        Assert.NotNull(expr);
+        Assert.True(expr.IsValid);
+    }
+
+    [Fact]
+    public void Parse_Clamp_NoneMin_ReturnsCalcExpression()
+    {
+        // Arrange - clamp(none, VAL, MAX) is equivalent to min(VAL, MAX)
+        var css = "clamp(none, 50px, 100px)";
+        var parser = new CssParser(css);
+
+        // Act
+        var result = parser.Parse_CssValue();
+
+        // Assert
+        Assert.Equal(ECssValueTypes.CALC, result.Type);
+        var expr = result.AsCalcExpression();
+        Assert.NotNull(expr);
+        Assert.True(expr.IsValid);
+    }
+
+    [Fact]
+    public void Parse_Clamp_NoneMax_ReturnsCalcExpression()
+    {
+        // Arrange - clamp(MIN, VAL, none) is equivalent to max(MIN, VAL)
+        var css = "clamp(10px, 50px, none)";
+        var parser = new CssParser(css);
+
+        // Act
+        var result = parser.Parse_CssValue();
+
+        // Assert
+        Assert.Equal(ECssValueTypes.CALC, result.Type);
+        var expr = result.AsCalcExpression();
+        Assert.NotNull(expr);
+        Assert.True(expr.IsValid);
+    }
+
+    [Fact]
+    public void Parse_Clamp_BothNone_ReturnsCalcExpression()
+    {
+        // Arrange - clamp(none, VAL, none) is equivalent to calc(VAL)
+        var css = "clamp(none, 50px, none)";
+        var parser = new CssParser(css);
+
+        // Act
+        var result = parser.Parse_CssValue();
+
+        // Assert
+        Assert.Equal(ECssValueTypes.CALC, result.Type);
+        var expr = result.AsCalcExpression();
+        Assert.NotNull(expr);
+        Assert.True(expr.IsValid);
+    }
+
+    [Fact]
+    public void Parse_Clamp_WithCalcExpressions_ReturnsCalcExpression()
+    {
+        // Arrange - clamp() can contain full calc-sum expressions
+        var css = "clamp(10px + 5px, 50px * 2, 100px - 10px)";
+        var parser = new CssParser(css);
+
+        // Act
+        var result = parser.Parse_CssValue();
+
+        // Assert
+        Assert.Equal(ECssValueTypes.CALC, result.Type);
+        var expr = result.AsCalcExpression();
+        Assert.NotNull(expr);
+        Assert.True(expr.IsValid);
+    }
+
+    [Fact]
+    public void Parse_Clamp_CaseInsensitive_ReturnsCalcExpression()
+    {
+        // Arrange
+        var css = "CLAMP(10px, 50px, 100px)";
+        var parser = new CssParser(css);
+
+        // Act
+        var result = parser.Parse_CssValue();
+
+        // Assert
+        Assert.Equal(ECssValueTypes.CALC, result.Type);
+    }
+
+    [Fact]
+    public void Parse_Clamp_CaseInsensitiveNone_ReturnsCalcExpression()
+    {
+        // Arrange - 'none' keyword should be case-insensitive
+        var css = "clamp(NONE, 50px, None)";
+        var parser = new CssParser(css);
+
+        // Act
+        var result = parser.Parse_CssValue();
+
+        // Assert
+        Assert.Equal(ECssValueTypes.CALC, result.Type);
+        var expr = result.AsCalcExpression();
+        Assert.NotNull(expr);
+        Assert.True(expr.IsValid);
+    }
+
+    #endregion
+
+    #region Comparison Function Evaluation
+
+    [Fact]
+    public void Evaluate_Min_ReturnsSmallestValue()
+    {
+        // Arrange
+        var css = "min(100, 50, 75)";
+        var parser = new CssParser(css);
+        var result = parser.Parse_CssValue();
+        var expr = result.AsCalcExpression();
+
+        // Act
+        var evaluated = expr.Evaluate(null);
+
+        // Assert
+        Assert.NotNull(evaluated);
+        Assert.Equal(50.0, evaluated.Value);
+    }
+
+    [Fact]
+    public void Evaluate_Max_ReturnsLargestValue()
+    {
+        // Arrange
+        var css = "max(100, 50, 75)";
+        var parser = new CssParser(css);
+        var result = parser.Parse_CssValue();
+        var expr = result.AsCalcExpression();
+
+        // Act
+        var evaluated = expr.Evaluate(null);
+
+        // Assert
+        Assert.NotNull(evaluated);
+        Assert.Equal(100.0, evaluated.Value);
+    }
+
+    [Fact]
+    public void Evaluate_Clamp_ValueBelowMin_ReturnsMin()
+    {
+        // Arrange - value 5 is below min 10
+        var css = "clamp(10, 5, 100)";
+        var parser = new CssParser(css);
+        var result = parser.Parse_CssValue();
+        var expr = result.AsCalcExpression();
+
+        // Act
+        var evaluated = expr.Evaluate(null);
+
+        // Assert
+        Assert.NotNull(evaluated);
+        Assert.Equal(10.0, evaluated.Value);
+    }
+
+    [Fact]
+    public void Evaluate_Clamp_ValueAboveMax_ReturnsMax()
+    {
+        // Arrange - value 150 is above max 100
+        var css = "clamp(10, 150, 100)";
+        var parser = new CssParser(css);
+        var result = parser.Parse_CssValue();
+        var expr = result.AsCalcExpression();
+
+        // Act
+        var evaluated = expr.Evaluate(null);
+
+        // Assert
+        Assert.NotNull(evaluated);
+        Assert.Equal(100.0, evaluated.Value);
+    }
+
+    [Fact]
+    public void Evaluate_Clamp_ValueInRange_ReturnsValue()
+    {
+        // Arrange - value 50 is within range [10, 100]
+        var css = "clamp(10, 50, 100)";
+        var parser = new CssParser(css);
+        var result = parser.Parse_CssValue();
+        var expr = result.AsCalcExpression();
+
+        // Act
+        var evaluated = expr.Evaluate(null);
+
+        // Assert
+        Assert.NotNull(evaluated);
+        Assert.Equal(50.0, evaluated.Value);
+    }
+
+    [Fact]
+    public void Evaluate_Clamp_MinExceedsMax_MinWins()
+    {
+        // Arrange - Per spec, min wins when it conflicts with max
+        // clamp(100, 50, 50) should return 100 because min > max
+        var css = "clamp(100, 50, 50)";
+        var parser = new CssParser(css);
+        var result = parser.Parse_CssValue();
+        var expr = result.AsCalcExpression();
+
+        // Act
+        var evaluated = expr.Evaluate(null);
+
+        // Assert
+        Assert.NotNull(evaluated);
+        Assert.Equal(100.0, evaluated.Value); // min wins
+    }
+
+    #endregion
 }

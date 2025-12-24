@@ -85,9 +85,299 @@ internal static class CssCalcFunctionParser
     /// <returns>True if parsing succeeded.</returns>
     public static bool TryParseComparisonFunction(CssFunction function, out CssCalcExpression? expression)
     {
-        // @todo: Implement min(), max(), clamp() parsing
+        ArgumentNullException.ThrowIfNull(function);
+
         expression = null;
+        var name = function.Name;
+
+        // Check function name (case-insensitive)
+        if (name.Equals("min", StringComparison.OrdinalIgnoreCase))
+        {
+            return TryParseMinFunction(function, out expression);
+        }
+        if (name.Equals("max", StringComparison.OrdinalIgnoreCase))
+        {
+            return TryParseMaxFunction(function, out expression);
+        }
+        if (name.Equals("clamp", StringComparison.OrdinalIgnoreCase))
+        {
+            return TryParseClampFunction(function, out expression);
+        }
+
         return false;
+    }
+
+    /// <summary>
+    /// Attempts to parse a min() function.
+    /// Grammar: min( &lt;calc-sum&gt;# )
+    /// </summary>
+    public static bool TryParseMinFunction(CssFunction function, out CssCalcExpression? expression)
+    {
+        ArgumentNullException.ThrowIfNull(function);
+
+        expression = null;
+
+        if (!function.Name.Equals("min", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        var arguments = function.Arguments;
+        if (arguments is null || arguments.Count == 0)
+        {
+            return false;
+        }
+
+        // Parse comma-separated arguments
+        var children = ParseCommaDelimitedCalcSums(arguments);
+        if (children is null || children.Count == 0)
+        {
+            return false;
+        }
+
+        var root = new CssCalcMinNode(children);
+        expression = new CssCalcExpression(root);
+        return expression.IsValid;
+    }
+
+    /// <summary>
+    /// Attempts to parse a max() function.
+    /// Grammar: max( &lt;calc-sum&gt;# )
+    /// </summary>
+    public static bool TryParseMaxFunction(CssFunction function, out CssCalcExpression? expression)
+    {
+        ArgumentNullException.ThrowIfNull(function);
+
+        expression = null;
+
+        if (!function.Name.Equals("max", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        var arguments = function.Arguments;
+        if (arguments is null || arguments.Count == 0)
+        {
+            return false;
+        }
+
+        // Parse comma-separated arguments
+        var children = ParseCommaDelimitedCalcSums(arguments);
+        if (children is null || children.Count == 0)
+        {
+            return false;
+        }
+
+        var root = new CssCalcMaxNode(children);
+        expression = new CssCalcExpression(root);
+        return expression.IsValid;
+    }
+
+    /// <summary>
+    /// Attempts to parse a clamp() function.
+    /// Grammar: clamp( [ &lt;calc-sum&gt; | none ], &lt;calc-sum&gt;, [ &lt;calc-sum&gt; | none ] )
+    /// </summary>
+    public static bool TryParseClampFunction(CssFunction function, out CssCalcExpression? expression)
+    {
+        ArgumentNullException.ThrowIfNull(function);
+
+        expression = null;
+
+        if (!function.Name.Equals("clamp", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        var arguments = function.Arguments;
+        if (arguments is null || arguments.Count == 0)
+        {
+            return false;
+        }
+
+        // Parse the three arguments
+        var args = ParseCommaDelimitedCalcSumsWithNone(arguments);
+        if (args is null || args.Count != 3)
+        {
+            return false; // clamp() requires exactly 3 arguments
+        }
+
+        // args[0] = min (can be null for 'none')
+        // args[1] = value (must not be null)
+        // args[2] = max (can be null for 'none')
+
+        if (args[1] is null)
+        {
+            return false; // Central value cannot be 'none'
+        }
+
+        var root = new CssCalcClampNode(args[0], args[1], args[2]);
+        expression = new CssCalcExpression(root);
+        return expression.IsValid;
+    }
+
+    /// <summary>
+    /// Parses a comma-delimited list of calc-sum expressions.
+    /// Used for min() and max() functions.
+    /// </summary>
+    private static List<CssCalcNode>? ParseCommaDelimitedCalcSums(List<CssToken> arguments)
+    {
+        var results = new List<CssCalcNode>();
+        var currentGroup = new List<CssToken>();
+
+        foreach (var token in arguments)
+        {
+            // Check for comma delimiter
+            if (token.Type == ECssTokenType.Comma)
+            {
+                if (currentGroup.Count == 0)
+                {
+                    return null; // Empty argument before comma
+                }
+
+                // Parse this argument group
+                var node = ParseCalcSumFromComponents(currentGroup);
+                if (node is null)
+                {
+                    return null;
+                }
+                results.Add(node);
+                currentGroup.Clear();
+            }
+            else
+            {
+                currentGroup.Add(token);
+            }
+        }
+
+        // Parse the last argument group
+        if (currentGroup.Count > 0)
+        {
+            var node = ParseCalcSumFromComponents(currentGroup);
+            if (node is null)
+            {
+                return null;
+            }
+            results.Add(node);
+        }
+
+        return results;
+    }
+
+    /// <summary>
+    /// Parses a comma-delimited list of calc-sum expressions, allowing 'none' keyword.
+    /// Used for clamp() function.
+    /// </summary>
+    private static List<CssCalcNode?>? ParseCommaDelimitedCalcSumsWithNone(List<CssToken> arguments)
+    {
+        var results = new List<CssCalcNode?>();
+        var currentGroup = new List<CssToken>();
+
+        foreach (var token in arguments)
+        {
+            // Check for comma delimiter
+            if (token.Type == ECssTokenType.Comma)
+            {
+                // Parse this argument group (may be 'none')
+                var node = ParseCalcSumOrNoneFromComponents(currentGroup);
+                if (currentGroup.Count > 0 && node is null && !IsNoneKeyword(currentGroup))
+                {
+                    return null; // Invalid argument
+                }
+                results.Add(node);
+                currentGroup.Clear();
+            }
+            else
+            {
+                currentGroup.Add(token);
+            }
+        }
+
+        // Parse the last argument group
+        if (currentGroup.Count > 0)
+        {
+            var node = ParseCalcSumOrNoneFromComponents(currentGroup);
+            if (node is null && !IsNoneKeyword(currentGroup))
+            {
+                return null;
+            }
+            results.Add(node);
+        }
+        else if (results.Count < 3)
+        {
+            // Handle trailing comma case - add null for 'none'
+            results.Add(null);
+        }
+
+        return results;
+    }
+
+    /// <summary>
+    /// Checks if a component list contains only the 'none' keyword.
+    /// </summary>
+    private static bool IsNoneKeyword(List<CssToken> components)
+    {
+        // Skip whitespace and look for a single 'none' ident
+        foreach (var token in components)
+        {
+            if (token.Type == ECssTokenType.Whitespace)
+                continue;
+
+            if (token.Type == ECssTokenType.Ident)
+            {
+                var identToken = (IdentToken)token;
+                return identToken.Value.Equals("none", StringComparison.OrdinalIgnoreCase);
+            }
+
+            return false;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Parses a calc-sum expression from component values, or returns null for 'none'.
+    /// </summary>
+    private static CssCalcNode? ParseCalcSumOrNoneFromComponents(List<CssToken> components)
+    {
+        if (IsNoneKeyword(components))
+        {
+            return null; // 'none' is represented as null
+        }
+
+        return ParseCalcSumFromComponents(components);
+    }
+
+    /// <summary>
+    /// Parses a calc-sum expression from component values.
+    /// </summary>
+    private static CssCalcNode? ParseCalcSumFromComponents(List<CssToken> components)
+    {
+        if (components.Count == 0)
+        {
+            return null;
+        }
+
+        var stream = CssParsingHelpers.CreateTokenStream(components, preserveWhitespace: true);
+        if (CssParsingHelpers.IsAtEnd(stream))
+        {
+            return null;
+        }
+
+        var node = ParseCalcSum(stream);
+        if (node is null)
+        {
+            return null;
+        }
+
+        // Skip trailing whitespace
+        SkipWhitespace(stream);
+
+        // Ensure we consumed all tokens
+        if (!CssParsingHelpers.IsAtEnd(stream))
+        {
+            return null;
+        }
+
+        return node;
     }
 
     #endregion

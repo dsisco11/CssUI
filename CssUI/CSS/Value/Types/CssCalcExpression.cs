@@ -57,7 +57,13 @@ public enum ECssCalcNodeType
     /// <summary>A parenthesized sub-expression.</summary>
     Parentheses,
     /// <summary>A nested calc() or other math function.</summary>
-    Function
+    Function,
+    /// <summary>A min() function node that returns the smallest of its arguments.</summary>
+    Min,
+    /// <summary>A max() function node that returns the largest of its arguments.</summary>
+    Max,
+    /// <summary>A clamp() function node that clamps a value between min and max.</summary>
+    Clamp
 }
 
 /// <summary>
@@ -453,6 +459,369 @@ public sealed class CssCalcInvertNode : CssCalcNode
     public override string ToCssString()
     {
         return $"(1 / {Child.ToCssString()})";
+    }
+}
+
+/// <summary>
+/// Represents a min() function node in a calc() expression.
+/// Returns the smallest (most negative) of its arguments.
+/// </summary>
+/// <remarks>
+/// Per CSS Values Level 4 §10.2:
+/// - min() contains one or more comma-separated calculations
+/// - Returns the smallest (most negative) value
+/// Docs: https://www.w3.org/TR/css-values-4/#comp-func
+/// </remarks>
+public sealed class CssCalcMinNode : CssCalcNode
+{
+    /// <summary>Gets the children of this min() function.</summary>
+    public ImmutableArray<CssCalcNode> Children { get; }
+
+    public override ECssCalcNodeType NodeType => ECssCalcNodeType.Min;
+
+    public override ECssCalcResultType ResultType
+    {
+        get
+        {
+            if (Children.IsEmpty)
+                return ECssCalcResultType.Invalid;
+
+            // All children must have consistent types
+            var firstType = Children[0].ResultType;
+            if (firstType == ECssCalcResultType.Invalid)
+                return ECssCalcResultType.Invalid;
+
+            foreach (var child in Children)
+            {
+                var childType = child.ResultType;
+                if (childType == ECssCalcResultType.Invalid)
+                    return ECssCalcResultType.Invalid;
+
+                // Numbers are compatible with anything
+                if (childType == ECssCalcResultType.Number || firstType == ECssCalcResultType.Number)
+                    continue;
+
+                // Percentages are compatible with dimensions
+                if (childType == ECssCalcResultType.Percentage || firstType == ECssCalcResultType.Percentage)
+                    continue;
+
+                // Types must match
+                if (childType != firstType)
+                    return ECssCalcResultType.Invalid;
+            }
+
+            // Find the first non-number type
+            foreach (var child in Children)
+            {
+                var type = child.ResultType;
+                if (type != ECssCalcResultType.Number)
+                    return type;
+            }
+
+            return ECssCalcResultType.Number;
+        }
+    }
+
+    public CssCalcMinNode(IEnumerable<CssCalcNode> children)
+    {
+        Children = children.ToImmutableArray();
+        if (Children.IsEmpty)
+            throw new ArgumentException("min() requires at least one argument", nameof(children));
+    }
+
+    public CssCalcMinNode(params CssCalcNode[] children)
+    {
+        Children = children.ToImmutableArray();
+        if (Children.IsEmpty)
+            throw new ArgumentException("min() requires at least one argument", nameof(children));
+    }
+
+    public override double? Evaluate(CssUnitResolver? resolver)
+    {
+        if (Children.IsEmpty)
+            return null;
+
+        double? minValue = null;
+        foreach (var child in Children)
+        {
+            var value = child.Evaluate(resolver);
+            if (!value.HasValue)
+                return null;
+
+            if (!minValue.HasValue || value.Value < minValue.Value)
+                minValue = value.Value;
+        }
+        return minValue;
+    }
+
+    public override string ToCssString()
+    {
+        if (Children.IsEmpty)
+            return "min()";
+
+        var sb = new StringBuilder();
+        sb.Append("min(");
+
+        for (int i = 0; i < Children.Length; i++)
+        {
+            if (i > 0)
+                sb.Append(", ");
+            sb.Append(Children[i].ToCssString());
+        }
+
+        sb.Append(')');
+        return sb.ToString();
+    }
+}
+
+/// <summary>
+/// Represents a max() function node in a calc() expression.
+/// Returns the largest (most positive) of its arguments.
+/// </summary>
+/// <remarks>
+/// Per CSS Values Level 4 §10.2:
+/// - max() contains one or more comma-separated calculations
+/// - Returns the largest (most positive) value
+/// Docs: https://www.w3.org/TR/css-values-4/#comp-func
+/// </remarks>
+public sealed class CssCalcMaxNode : CssCalcNode
+{
+    /// <summary>Gets the children of this max() function.</summary>
+    public ImmutableArray<CssCalcNode> Children { get; }
+
+    public override ECssCalcNodeType NodeType => ECssCalcNodeType.Max;
+
+    public override ECssCalcResultType ResultType
+    {
+        get
+        {
+            if (Children.IsEmpty)
+                return ECssCalcResultType.Invalid;
+
+            // All children must have consistent types
+            var firstType = Children[0].ResultType;
+            if (firstType == ECssCalcResultType.Invalid)
+                return ECssCalcResultType.Invalid;
+
+            foreach (var child in Children)
+            {
+                var childType = child.ResultType;
+                if (childType == ECssCalcResultType.Invalid)
+                    return ECssCalcResultType.Invalid;
+
+                // Numbers are compatible with anything
+                if (childType == ECssCalcResultType.Number || firstType == ECssCalcResultType.Number)
+                    continue;
+
+                // Percentages are compatible with dimensions
+                if (childType == ECssCalcResultType.Percentage || firstType == ECssCalcResultType.Percentage)
+                    continue;
+
+                // Types must match
+                if (childType != firstType)
+                    return ECssCalcResultType.Invalid;
+            }
+
+            // Find the first non-number type
+            foreach (var child in Children)
+            {
+                var type = child.ResultType;
+                if (type != ECssCalcResultType.Number)
+                    return type;
+            }
+
+            return ECssCalcResultType.Number;
+        }
+    }
+
+    public CssCalcMaxNode(IEnumerable<CssCalcNode> children)
+    {
+        Children = children.ToImmutableArray();
+        if (Children.IsEmpty)
+            throw new ArgumentException("max() requires at least one argument", nameof(children));
+    }
+
+    public CssCalcMaxNode(params CssCalcNode[] children)
+    {
+        Children = children.ToImmutableArray();
+        if (Children.IsEmpty)
+            throw new ArgumentException("max() requires at least one argument", nameof(children));
+    }
+
+    public override double? Evaluate(CssUnitResolver? resolver)
+    {
+        if (Children.IsEmpty)
+            return null;
+
+        double? maxValue = null;
+        foreach (var child in Children)
+        {
+            var value = child.Evaluate(resolver);
+            if (!value.HasValue)
+                return null;
+
+            if (!maxValue.HasValue || value.Value > maxValue.Value)
+                maxValue = value.Value;
+        }
+        return maxValue;
+    }
+
+    public override string ToCssString()
+    {
+        if (Children.IsEmpty)
+            return "max()";
+
+        var sb = new StringBuilder();
+        sb.Append("max(");
+
+        for (int i = 0; i < Children.Length; i++)
+        {
+            if (i > 0)
+                sb.Append(", ");
+            sb.Append(Children[i].ToCssString());
+        }
+
+        sb.Append(')');
+        return sb.ToString();
+    }
+}
+
+/// <summary>
+/// Represents a clamp() function node in a calc() expression.
+/// Clamps a value between a minimum and maximum.
+/// </summary>
+/// <remarks>
+/// Per CSS Values Level 4 §10.2:
+/// - clamp(MIN, VAL, MAX) is equivalent to max(MIN, min(VAL, MAX))
+/// - If MIN conflicts with MAX, MIN wins
+/// - MIN or MAX can be 'none' to indicate no clamping from that side
+/// Docs: https://www.w3.org/TR/css-values-4/#comp-func
+/// </remarks>
+public sealed class CssCalcClampNode : CssCalcNode
+{
+    /// <summary>Gets the minimum value, or null if 'none'.</summary>
+    public CssCalcNode? Min { get; }
+
+    /// <summary>Gets the central value to be clamped.</summary>
+    public CssCalcNode Value { get; }
+
+    /// <summary>Gets the maximum value, or null if 'none'.</summary>
+    public CssCalcNode? Max { get; }
+
+    public override ECssCalcNodeType NodeType => ECssCalcNodeType.Clamp;
+
+    public override ECssCalcResultType ResultType
+    {
+        get
+        {
+            // The central value must be valid
+            var valueType = Value.ResultType;
+            if (valueType == ECssCalcResultType.Invalid)
+                return ECssCalcResultType.Invalid;
+
+            // Check min compatibility if present
+            if (Min is not null)
+            {
+                var minType = Min.ResultType;
+                if (minType == ECssCalcResultType.Invalid)
+                    return ECssCalcResultType.Invalid;
+
+                // Must be compatible types
+                if (minType != ECssCalcResultType.Number && valueType != ECssCalcResultType.Number &&
+                    minType != ECssCalcResultType.Percentage && valueType != ECssCalcResultType.Percentage &&
+                    minType != valueType)
+                    return ECssCalcResultType.Invalid;
+            }
+
+            // Check max compatibility if present
+            if (Max is not null)
+            {
+                var maxType = Max.ResultType;
+                if (maxType == ECssCalcResultType.Invalid)
+                    return ECssCalcResultType.Invalid;
+
+                // Must be compatible types
+                if (maxType != ECssCalcResultType.Number && valueType != ECssCalcResultType.Number &&
+                    maxType != ECssCalcResultType.Percentage && valueType != ECssCalcResultType.Percentage &&
+                    maxType != valueType)
+                    return ECssCalcResultType.Invalid;
+            }
+
+            // Return the most specific type
+            if (valueType != ECssCalcResultType.Number)
+                return valueType;
+            if (Min is not null && Min.ResultType != ECssCalcResultType.Number)
+                return Min.ResultType;
+            if (Max is not null && Max.ResultType != ECssCalcResultType.Number)
+                return Max.ResultType;
+
+            return ECssCalcResultType.Number;
+        }
+    }
+
+    /// <summary>
+    /// Creates a new clamp() node.
+    /// </summary>
+    /// <param name="min">The minimum value, or null for 'none'.</param>
+    /// <param name="value">The central value to be clamped.</param>
+    /// <param name="max">The maximum value, or null for 'none'.</param>
+    public CssCalcClampNode(CssCalcNode? min, CssCalcNode value, CssCalcNode? max)
+    {
+        Min = min;
+        Value = value ?? throw new ArgumentNullException(nameof(value));
+        Max = max;
+    }
+
+    public override double? Evaluate(CssUnitResolver? resolver)
+    {
+        var value = Value.Evaluate(resolver);
+        if (!value.HasValue)
+            return null;
+
+        double result = value.Value;
+
+        // Apply max first (min wins if they conflict)
+        if (Max is not null)
+        {
+            var maxValue = Max.Evaluate(resolver);
+            if (!maxValue.HasValue)
+                return null;
+            result = Math.Min(result, maxValue.Value);
+        }
+
+        // Apply min (this wins if it conflicts with max)
+        if (Min is not null)
+        {
+            var minValue = Min.Evaluate(resolver);
+            if (!minValue.HasValue)
+                return null;
+            result = Math.Max(result, minValue.Value);
+        }
+
+        return result;
+    }
+
+    public override string ToCssString()
+    {
+        var sb = new StringBuilder();
+        sb.Append("clamp(");
+
+        if (Min is not null)
+            sb.Append(Min.ToCssString());
+        else
+            sb.Append("none");
+
+        sb.Append(", ");
+        sb.Append(Value.ToCssString());
+        sb.Append(", ");
+
+        if (Max is not null)
+            sb.Append(Max.ToCssString());
+        else
+            sb.Append("none");
+
+        sb.Append(')');
+        return sb.ToString();
     }
 }
 

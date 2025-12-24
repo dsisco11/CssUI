@@ -17,7 +17,7 @@
 - [ ] Simplification algorithm
 - [ ] Proper serialization
 
-## Test Coverage — Total: 2536 passing, 221 skipped, 19 failing = 2776 tests
+## Test Coverage — Total: 3055 passing, 0 skipped, 231 failing = 3286 tests
 ### DOM Tests: 518 passing, 3 skipped = 521 total
 
 ## Phase 6: CSS Test Coverage
@@ -261,10 +261,15 @@ Refactored to use DataConsumer<CssToken> for consistency with CssParser.cs patte
   - [x] Support for safe-area-inset-* and other environment variables
   - [x] Support fallback values: env(name, fallback)
   - [x] Support dimension fallbacks with integer index: env(name, 10px)
-- [ ] Handle min()/max()/clamp() functions → CssValue (FUNCTION)
-  - [ ] min(value1, value2, ...)
-  - [ ] max(value1, value2, ...)
-  - [ ] clamp(min, preferred, max)
+- [x] Handle min()/max()/clamp() functions → CssValue (CALC)
+  - [x] min(value1, value2, ...) - returns smallest of comma-delimited calc-sum values
+  - [x] max(value1, value2, ...) - returns largest of comma-delimited calc-sum values
+  - [x] clamp(min, preferred, max) - with 'none' keyword support per CSS Values 4
+  - [x] CssCalcMinNode, CssCalcMaxNode, CssCalcClampNode AST node classes
+  - [x] ECssCalcNodeType.Min, Max, Clamp enum values added
+  - [x] TryParseComparisonFunction() in CssCalcFunctionParser
+  - [x] Integration with CssParser.cs Parse_CssValue() and Try_Consume_Function()
+  - [x] Tests: 27 tests for min/max/clamp parsing and evaluation (CssCalcFunctionParserTests.cs)
 
 ### 7.7 CssParser Missing W3C Spec Algorithms (CSS/Parser/)
 Spec Reference: https://www.w3.org/TR/css-syntax-3/

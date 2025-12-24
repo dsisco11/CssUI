@@ -656,6 +656,12 @@ public class CssParser
                         return CssValue.From(calcExpr!);
                     }
 
+                    // Check if this is a min(), max(), or clamp() function
+                    if (CssCalcFunctionParser.TryParseComparisonFunction(func, out CssCalcExpression? compExpr))
+                    {
+                        return CssValue.From(compExpr!);
+                    }
+
                     // Check if this is a var() function (CSS custom property reference)
                     if (CssVarFunctionParser.TryParseVarFunction(func, out CssVarFunction varFunc))
                     {
@@ -690,6 +696,12 @@ public class CssParser
                     if (CssCalcFunctionParser.TryParseCalcFunction(func!, out CssCalcExpression? calcExpr2))
                     {
                         return CssValue.From(calcExpr2!);
+                    }
+
+                    // Check if this is a min(), max(), or clamp() function
+                    if (CssCalcFunctionParser.TryParseComparisonFunction(func!, out CssCalcExpression? compExpr2))
+                    {
+                        return CssValue.From(compExpr2!);
                     }
 
                     // Check if this is a var() function (CSS custom property reference)
