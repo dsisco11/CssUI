@@ -321,6 +321,35 @@ public class CssParser
     }
 
     /// <summary>
+    /// Parses block contents according to the specified content type.
+    /// </summary>
+    /// <param name="contentsType">The type of block contents to parse.</param>
+    /// <returns>A list of parsed components (declarations, rules, or both).</returns>
+    /// <remarks>
+    /// <para>
+    /// This method dispatches to the appropriate parser algorithm based on the content type:
+    /// </para>
+    /// <list type="bullet">
+    /// <item><description><see cref="ECssBlockContentsType.StyleBlock"/> - Uses <c>Consume_Style_Block_Contents</c></description></item>
+    /// <item><description><see cref="ECssBlockContentsType.DeclarationList"/> - Uses <c>Consume_Decleration_List</c></description></item>
+    /// <item><description><see cref="ECssBlockContentsType.RuleList"/> - Uses <c>Consume_Rule_List</c> (top-level = false)</description></item>
+    /// <item><description><see cref="ECssBlockContentsType.Stylesheet"/> - Uses <c>Consume_Rule_List</c> (top-level = true)</description></item>
+    /// </list>
+    /// </remarks>
+    /// <seealso href="https://www.w3.org/TR/css-syntax-3/#declaration-rule-list"/>
+    public IEnumerable<CssComponent> Parse_Block_Contents(ECssBlockContentsType contentsType)
+    {
+        return contentsType switch
+        {
+            ECssBlockContentsType.StyleBlock => Consume_Style_Block_Contents(Stream),
+            ECssBlockContentsType.DeclarationList => Consume_Decleration_List(Stream),
+            ECssBlockContentsType.RuleList => Consume_Rule_List(Stream, TopLevel: false),
+            ECssBlockContentsType.Stylesheet => Consume_Rule_List(Stream, TopLevel: true),
+            _ => throw new ArgumentOutOfRangeException(nameof(contentsType), contentsType, "Unknown block contents type")
+        };
+    }
+
+    /// <summary>
     /// Parses and returns a list of rules
     /// </summary>
     /// <returns></returns>

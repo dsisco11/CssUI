@@ -333,14 +333,18 @@ Implemented in Phase 6.7
 - [ ] Handle unmatched <}-token>, <)-token>, <]-token> (TODO: needs deeper parser integration)
 - [x] Auto-close unclosed constructs at EOF per spec (already implemented in Consume_SimpleBlock)
 
-#### 7.7.6 Production Matching (§8)
-- [ ] Implement <declaration-value> production
-  - [ ] Match any sequence except bad tokens and unmatched brackets
-  - [ ] Exclude top-level semicolons and !
-- [ ] Implement <any-value> production
-  - [ ] Like <declaration-value> but allows semicolons and !
-- [ ] Implement <style-block> production handling
-- [ ] Implement <rule-list> vs <stylesheet> distinction
+#### 7.7.6 Production Matching (§8) ✓
+- [x] Implement <declaration-value> production
+  - [x] Match any sequence except bad tokens and unmatched brackets
+  - [x] Exclude top-level semicolons and !
+- [x] Implement <any-value> production
+  - [x] Like <declaration-value> but allows semicolons and !
+- [x] Implement <style-block> production handling
+- [x] Implement <rule-list> vs <stylesheet> distinction
+- [x] CssProductionMatcher class (CssUI/CSS/Parser/Common/CssProductionMatcher.cs)
+- [x] ECssBlockContentsType enum (CssUI/CSS/Enums/ECssBlockContentsType.cs)
+- [x] Tests: 41 tests for production matching (CssUITests2/CSS/Parser/CssProductionMatcherTests.cs)
+- [x] Tests: 12 tests for block contents type (CssUITests2/CSS/Parser/CssBlockContentsTypeTests.cs)
 
 ### 7.2 Color Serialization in CSS Serializer (CSS/Serialization/)
 - [ ] Implement canonical color serialization per CSS Color 4 spec
