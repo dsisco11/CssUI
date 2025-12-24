@@ -12,7 +12,7 @@ namespace CssUI.CSS;
 /// <summary>
 /// Represents a CSS Value
 /// </summary>
-public partial class CssValue
+public partial class CssValue : ISpanFormattable, IFormattable
 {
     #region Delegates
     public delegate double StyleUnitResolverDelegate(ECssUnit unit);
@@ -1152,6 +1152,202 @@ public partial class CssValue
             default:
                 return string.Concat("[", Enum.GetName(typeof(ECssValueTypes), Type), "]");
         }
+    }
+
+    /// <inheritdoc/>
+    public string ToString(string? format, IFormatProvider? formatProvider) => ToString();
+
+    /// <summary>
+    /// Tries to format this CSS value into the provided span.
+    /// </summary>
+    /// <param name="destination">The span to write to.</param>
+    /// <param name="charsWritten">The number of characters written.</param>
+    /// <param name="format">The format string (ignored).</param>
+    /// <param name="provider">The format provider (ignored for CSS values).</param>
+    /// <returns>True if formatting succeeded; otherwise, false.</returns>
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+    {
+        charsWritten = 0;
+
+        switch (Type)
+        {
+            case ECssValueTypes.INTEGER:
+                return AsInteger().TryFormat(destination, out charsWritten, default, CultureInfo.InvariantCulture);
+
+            case ECssValueTypes.NUMBER:
+                return AsDecimal().TryFormat(destination, out charsWritten, "0.###", CultureInfo.InvariantCulture);
+
+            case ECssValueTypes.PERCENT:
+                {
+                    if (!AsDecimal().TryFormat(destination, out charsWritten, "0.###", CultureInfo.InvariantCulture))
+                        return false;
+
+                    if (destination.Length <= charsWritten)
+                        return false;
+
+                    destination[charsWritten] = '%';
+                    charsWritten++;
+                    return true;
+                }
+
+            case ECssValueTypes.DIMENSION:
+                return TryFormatDimension(destination, out charsWritten);
+
+            case ECssValueTypes.COLOR:
+                return AsCssColor().TryFormat(destination, out charsWritten, format, provider);
+
+            case ECssValueTypes.COLOR_HDR:
+                // HDR colors fall back to string allocation (complex formatting)
+                return TryFormatFromString(CssColorSerializer.Serialize(AsCssColorHdr()), destination, out charsWritten);
+
+            case ECssValueTypes.STRING:
+                return TryFormatString(destination, out charsWritten);
+
+            case ECssValueTypes.KEYWORD:
+                {
+                    var keyword = Lookup.Keyword(data.ObjectValue!.GetType(), data.ObjectValue);
+                    return TryFormatFromString(keyword, destination, out charsWritten);
+                }
+
+            case ECssValueTypes.AUTO:
+                return TryFormatFromSpan("auto".AsSpan(), destination, out charsWritten);
+
+            case ECssValueTypes.INHERIT:
+                return TryFormatFromSpan("inherit".AsSpan(), destination, out charsWritten);
+
+            case ECssValueTypes.INITIAL:
+                return TryFormatFromSpan("initial".AsSpan(), destination, out charsWritten);
+
+            case ECssValueTypes.DEFAULT:
+                return TryFormatFromSpan("default".AsSpan(), destination, out charsWritten);
+
+            case ECssValueTypes.UNSET:
+                return TryFormatFromSpan("unset".AsSpan(), destination, out charsWritten);
+
+            case ECssValueTypes.NONE:
+                return TryFormatFromSpan("none".AsSpan(), destination, out charsWritten);
+
+            case ECssValueTypes.NULL:
+                // Empty string for null values
+                charsWritten = 0;
+                return true;
+
+            default:
+                // For unhandled types, format as "[TYPE]"
+                return TryFormatAsTypeName(destination, out charsWritten);
+        }
+    }
+
+    /// <summary>
+    /// Formats a dimension value (number + unit) into the span.
+    /// </summary>
+    private bool TryFormatDimension(Span<char> destination, out int charsWritten)
+    {
+        charsWritten = 0;
+
+        // Format the numeric part
+        if (!AsDecimal().TryFormat(destination, out charsWritten, "0.###", CultureInfo.InvariantCulture))
+            return false;
+
+        // Format the unit
+        if (Unit == ECssUnit.None)
+        {
+            // Special case: no unit → "<none>" for debugging
+            ReadOnlySpan<char> noneStr = "<none>".AsSpan();
+            if (destination.Length < charsWritten + noneStr.Length)
+                return false;
+
+            noneStr.CopyTo(destination[charsWritten..]);
+            charsWritten += noneStr.Length;
+            return true;
+        }
+        else
+        {
+            // Get unit string
+            if (!Lookup.TryKeyword(Unit, out var unitStr) || unitStr is null)
+                return false;
+
+            if (destination.Length < charsWritten + unitStr.Length)
+                return false;
+
+            unitStr.AsSpan().CopyTo(destination[charsWritten..]);
+            charsWritten += unitStr.Length;
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// Formats a quoted CSS string value into the span.
+    /// </summary>
+    private bool TryFormatString(Span<char> destination, out int charsWritten)
+    {
+        charsWritten = 0;
+        var str = AsString();
+
+        // Need space for: quote + string + quote
+        int required = 1 + str.Length + 1;
+        if (destination.Length < required)
+            return false;
+
+        destination[0] = UnicodeCommon.CHAR_QUOTATION_MARK;
+        str.AsSpan().CopyTo(destination[1..]);
+        destination[1 + str.Length] = UnicodeCommon.CHAR_QUOTATION_MARK;
+        charsWritten = required;
+        return true;
+    }
+
+    /// <summary>
+    /// Formats unhandled value types as "[TYPE]" for debugging.
+    /// </summary>
+    private bool TryFormatAsTypeName(Span<char> destination, out int charsWritten)
+    {
+        charsWritten = 0;
+
+        var typeName = Enum.GetName(typeof(ECssValueTypes), Type) ?? "UNKNOWN";
+        int required = 1 + typeName.Length + 1; // "[" + typeName + "]"
+
+        if (destination.Length < required)
+            return false;
+
+        destination[0] = '[';
+        typeName.AsSpan().CopyTo(destination[1..]);
+        destination[1 + typeName.Length] = ']';
+        charsWritten = required;
+        return true;
+    }
+
+    /// <summary>
+    /// Helper to copy a pre-formatted string into the destination span.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool TryFormatFromString(string value, Span<char> destination, out int charsWritten)
+    {
+        if (destination.Length < value.Length)
+        {
+            charsWritten = 0;
+            return false;
+        }
+
+        value.AsSpan().CopyTo(destination);
+        charsWritten = value.Length;
+        return true;
+    }
+
+    /// <summary>
+    /// Helper to copy a pre-formatted span into the destination span.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool TryFormatFromSpan(ReadOnlySpan<char> value, Span<char> destination, out int charsWritten)
+    {
+        if (destination.Length < value.Length)
+        {
+            charsWritten = 0;
+            return false;
+        }
+
+        value.CopyTo(destination);
+        charsWritten = value.Length;
+        return true;
     }
     #endregion
 
