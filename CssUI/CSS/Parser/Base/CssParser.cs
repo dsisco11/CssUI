@@ -34,9 +34,142 @@ public class CssParser
     {
         Stream = new DataConsumer<CssToken>(Tokens, CssToken.EOF);
     }
+
+    /// <summary>
+    /// Creates a CssParser from a list of CSS component values.
+    /// </summary>
+    /// <param name="componentValues">The component values to parse.</param>
+    public CssParser(IEnumerable<CssToken> componentValues)
+    {
+        Stream = new DataConsumer<CssToken>(componentValues.ToArray(), CssToken.EOF);
+    }
+    #endregion
+
+    #region Static Normalization (§5.3)
+    /// <summary>
+    /// Normalizes input into a token stream per CSS Syntax Level 3 §5.3.
+    /// </summary>
+    /// <param name="input">A string containing CSS text.</param>
+    /// <returns>An array of CSS tokens.</returns>
+    /// <remarks>
+    /// <para>
+    /// To normalize into a token stream a given input:
+    /// </para>
+    /// <list type="number">
+    /// <item>If input is a list of CSS tokens, return input.</item>
+    /// <item>If input is a list of CSS component values, return input.</item>
+    /// <item>If input is a string, then filter code points from input, tokenize the result, and return the final result.</item>
+    /// </list>
+    /// </remarks>
+    /// <seealso href="https://www.w3.org/TR/css-syntax-3/#normalize-into-a-token-stream"/>
+    public static CssToken[] Normalize(string input)
+    {
+        // If input is a string, then filter code points from input, tokenize the result, and return the final result.
+        // Note: CssTokenizer already handles code point filtering per §3.3
+        var tokenizer = new CssTokenizer(input.AsSpan());
+        return tokenizer.Tokens.ToArray();
+    }
+
+    /// <summary>
+    /// Normalizes input into a token stream per CSS Syntax Level 3 §5.3.
+    /// </summary>
+    /// <param name="tokens">A list of CSS tokens.</param>
+    /// <returns>The same array of CSS tokens (identity operation).</returns>
+    /// <remarks>
+    /// When input is already a list of CSS tokens, it is returned as-is.
+    /// </remarks>
+    /// <seealso href="https://www.w3.org/TR/css-syntax-3/#normalize-into-a-token-stream"/>
+    public static CssToken[] Normalize(CssToken[] tokens)
+    {
+        // If input is a list of CSS tokens, return input.
+        return tokens;
+    }
+
+    /// <summary>
+    /// Normalizes input into a token stream per CSS Syntax Level 3 §5.3.
+    /// </summary>
+    /// <param name="componentValues">A list of CSS component values.</param>
+    /// <returns>An array of CSS tokens.</returns>
+    /// <remarks>
+    /// <para>
+    /// When input is a list of CSS component values, it is returned as-is.
+    /// </para>
+    /// <para>
+    /// Note: The only difference between a list of tokens and a list of component values is
+    /// that some objects that "contain" things, like functions or blocks, are a single
+    /// entity in the component-value list, but are multiple entities in a token list.
+    /// This makes no difference to any of the algorithms in this specification.
+    /// </para>
+    /// </remarks>
+    /// <seealso href="https://www.w3.org/TR/css-syntax-3/#normalize-into-a-token-stream"/>
+    public static CssToken[] Normalize(IEnumerable<CssToken> componentValues)
+    {
+        // If input is a list of CSS component values, return input.
+        return componentValues.ToArray();
+    }
     #endregion
 
     #region Parsing
+
+    #region Parser Entry Points (§5.3)
+    /// <summary>
+    /// Parses a stylesheet per CSS Syntax Level 3 §5.3.3.
+    /// </summary>
+    /// <param name="location">Optional URL location of the stylesheet.</param>
+    /// <returns>A stylesheet result containing the parsed rules and location.</returns>
+    /// <remarks>
+    /// <para>
+    /// To parse a stylesheet from an input given an optional url location:
+    /// </para>
+    /// <list type="number">
+    /// <item>If input is a byte stream for stylesheet, decode bytes from input, and set input to the result.</item>
+    /// <item>Normalize input, and set input to the result.</item>
+    /// <item>Create a new stylesheet, with its location set to location (or null, if location was not passed).</item>
+    /// <item>Consume a list of rules from input, with the top-level flag set, and set the stylesheet's value to the result.</item>
+    /// <item>Return the stylesheet.</item>
+    /// </list>
+    /// </remarks>
+    /// <seealso href="https://www.w3.org/TR/css-syntax-3/#parse-stylesheet"/>
+    public CssParsedStylesheet Parse_Stylesheet(Uri? location = null)
+    {
+        // Note: Byte stream decoding is handled externally before CssParser is constructed
+        // Input normalization is handled by the tokenizer (CssTokenizer filters code points)
+
+        // Consume a list of rules with the top-level flag set
+        TopLevel = true;
+        var rules = Consume_Rule_List(Stream, TopLevel);
+
+        // Return the stylesheet with its location
+        return new CssParsedStylesheet(rules, location);
+    }
+
+    /// <summary>
+    /// Parses a style block's contents per CSS Syntax Level 3 §5.3.7.
+    /// </summary>
+    /// <returns>
+    /// A list containing both declarations and nested rules from the style block.
+    /// </returns>
+    /// <remarks>
+    /// <para>
+    /// This algorithm parses the contents of style rules, which need to allow nested style rules
+    /// and other at-rules. If you don't need nested style rules, such as in @page or in @keyframes
+    /// child rules, use Parse_Decleration_List instead.
+    /// </para>
+    /// <para>
+    /// To parse a style block's contents from input:
+    /// </para>
+    /// <list type="number">
+    /// <item>Normalize input, and set input to the result.</item>
+    /// <item>Consume a style block's contents from input, and return the result.</item>
+    /// </list>
+    /// </remarks>
+    /// <seealso href="https://www.w3.org/TR/css-syntax-3/#parse-style-blocks-contents"/>
+    public IEnumerable<CssComponent> Parse_Style_Block_Contents()
+    {
+        // Input normalization is handled by the tokenizer
+        return Consume_Style_Block_Contents(Stream);
+    }
+
     /// <summary>
     /// Parses and returns a list of rules
     /// </summary>
@@ -46,6 +179,7 @@ public class CssParser
         TopLevel = false;
         return Consume_Rule_List(Stream, TopLevel);
     }
+    #endregion
 
     /// <summary>
     /// Parses and returns a single rule
@@ -253,6 +387,119 @@ public class CssParser
         }
         while (Token.Type != ECssTokenType.EOF);
         return Rule;
+    }
+
+    /// <summary>
+    /// Consumes a style block's contents per CSS Syntax Level 3 §5.4.4.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This algorithm is used for parsing the contents of style rules, which support nested rules.
+    /// It differs from Consume_Decleration_List by handling:
+    /// </para>
+    /// <list type="bullet">
+    /// <item>&lt;ident-token&gt; starts a declaration</item>
+    /// <item>&lt;at-keyword-token&gt; starts a nested at-rule (added to rules list)</item>
+    /// <item>&lt;delim-token&gt; with value "&amp;" starts a nested qualified rule (CSS Nesting)</item>
+    /// </list>
+    /// <para>
+    /// Returns declarations and rules in a single list, with rules appended after declarations.
+    /// </para>
+    /// </remarks>
+    /// <seealso href="https://www.w3.org/TR/css-syntax-3/#consume-style-block"/>
+    static IEnumerable<CssComponent> Consume_Style_Block_Contents(DataConsumer<CssToken> Stream)
+    {
+        if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
+
+        // Create an initially empty list of declarations decls, and an initially empty list of rules rules.
+        LinkedList<CssComponent> decls = new LinkedList<CssComponent>();
+        LinkedList<CssComponent> rules = new LinkedList<CssComponent>();
+
+        CssToken? Token;
+        do
+        {
+            Token = Stream.Consume();
+            if (Token is null) break;
+
+            switch (Token.Type)
+            {
+                // <whitespace-token> or <semicolon-token>: Do nothing.
+                case ECssTokenType.Whitespace:
+                case ECssTokenType.Semicolon:
+                    continue;
+
+                // <EOF-token>: Extend decls with rules, then return decls.
+                case ECssTokenType.EOF:
+                    foreach (var rule in rules)
+                    {
+                        decls.AddLast(rule);
+                    }
+                    return decls;
+
+                // <at-keyword-token>: Reconsume the current input token.
+                // Consume an at-rule, and append the result to rules.
+                case ECssTokenType.At_Keyword:
+                    Stream.Reconsume();
+                    rules.AddLast(Consume_AtRule(Stream));
+                    break;
+
+                // <ident-token>: Initialize a temporary list initially filled with the current input token.
+                // As long as the next input token is anything other than a <semicolon-token> or <EOF-token>,
+                // consume a component value and append it to the temporary list.
+                // Consume a declaration from the temporary list. If anything was returned, append it to decls.
+                case ECssTokenType.Ident:
+                    {
+                        List<CssToken> tmp = new List<CssToken> { Token };
+                        while (Stream.Next is CssToken next &&
+                               next.Type != ECssTokenType.EOF &&
+                               next.Type != ECssTokenType.Semicolon)
+                        {
+                            tmp.Add(Consume_ComponentValue(Stream));
+                        }
+                        tmp.Add(EOFToken.Instance);
+
+                        var decl = Consume_Decleration(new DataConsumer<CssToken>(tmp.ToArray(), CssToken.EOF));
+                        if (decl is not null)
+                        {
+                            decls.AddLast(decl);
+                        }
+                    }
+                    break;
+
+                // <delim-token> with a value of "&" (U+0026 AMPERSAND):
+                // Reconsume the current input token. Consume a qualified rule.
+                // If anything was returned, append it to rules.
+                case ECssTokenType.Delim when Token is DelimToken delimToken && delimToken.Value == UnicodeCommon.CHAR_AMPERSAND:
+                    Stream.Reconsume();
+                    var qualifiedRule = Consume_QualifiedRule(Stream);
+                    if (qualifiedRule is not null)
+                    {
+                        rules.AddLast(qualifiedRule);
+                    }
+                    break;
+
+                // anything else: This is a parse error. Reconsume the current input token.
+                // As long as the next input token is anything other than a <semicolon-token> or <EOF-token>,
+                // consume a component value and throw away the returned value.
+                default:
+                    Stream.Reconsume();
+                    while (Stream.Next is CssToken nextToken &&
+                           nextToken.Type != ECssTokenType.EOF &&
+                           nextToken.Type != ECssTokenType.Semicolon)
+                    {
+                        Consume_ComponentValue(Stream);
+                    }
+                    break;
+            }
+        }
+        while (Token is not null && Token.Type != ECssTokenType.EOF);
+
+        // Extend decls with rules, then return decls.
+        foreach (var rule in rules)
+        {
+            decls.AddLast(rule);
+        }
+        return decls;
     }
 
     static IEnumerable<CssComponent> Consume_Decleration_List(DataConsumer<CssToken> Stream)

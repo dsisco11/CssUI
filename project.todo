@@ -70,6 +70,16 @@
 - [x] CssAtRule tests (42 tests)
 - [x] CssQualifiedRule tests (30 tests)
 
+### 6.7 CSS Syntax Entry Points (CSS/Parser/Base/) ✓
+Per CSS Syntax Level 3 §5 (https://www.w3.org/TR/css-syntax-3/#parsing)
+- [x] Parse_Stylesheet entry point with optional location URL parameter
+- [x] CssParsedStylesheet type with Rules and Location properties
+- [x] Parse_Style_Block_Contents entry point for parsing rule bodies
+- [x] Consume_Style_Block_Contents algorithm per §5.4.4
+- [x] Input normalization method per §5.3.2 (string/tokens/component-values)
+- [x] IEnumerable<CssToken> constructor overload for CssParser
+- [x] Tests: 26 tests for entry point methods (CssParserEntryPointTests.cs)
+
 ## Phase 7: CSS Color Parsing & Serialization (W3C Compliance)
 ### Spec References
 - CSS Color Level 4: https://www.w3.org/TR/css-color-4/
