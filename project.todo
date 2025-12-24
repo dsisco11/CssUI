@@ -241,9 +241,16 @@ Refactored to use DataConsumer<CssToken> for consistency with CssParser.cs patte
   - [x] CssValue.From(CssCalcExpression) factory method
   - [x] Whitespace-significant parsing for + and - operators per spec
   - [x] Tests: 42 tests for calc() parsing (CssCalcFunctionParserTests.cs)
-- [ ] Handle var() function → CssValue (FUNCTION)
-  - [ ] Parse CSS custom property references
-  - [ ] Support fallback values: var(--prop, fallback)
+- [x] Handle var() function → CssValue (VAR)
+  - [x] Parse CSS custom property references
+  - [x] Support fallback values: var(--prop, fallback)
+  - [x] CssVarFunction struct created (CssUI/CSS/Types/CssVarFunction.cs)
+  - [x] CssVarFunctionParser for parsing var() function arguments
+  - [x] ECssValueTypes.VAR flag added
+  - [x] CssValue.From(CssVarFunction) factory method
+  - [x] CssValue.AsVarFunction() accessor
+  - [x] Tests: 27 tests for var() parsing (CssVarFunctionParserTests.cs)
+  - [x] Case-sensitive custom property names (tokenizer updated to preserve case for --* identifiers)
 - [ ] Handle env() function → CssValue (FUNCTION)
   - [ ] Parse environment variable references
   - [ ] Support fallback values
