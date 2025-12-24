@@ -521,6 +521,128 @@ Prerequisites: Phase 6 (CSS Parser), Phase 7.7.2 (Consume_Style_Block_Contents)
 - [ ] Float layout tests
 - [ ] Clear property tests
 
+## Phase 9: ISpanFormattable & Serialization Modernization
+Migrate from ICssSerializeable.Serialize(StringBuilder) pattern to ISpanFormattable for better performance and .NET interop.
+
+### 9.1 Simple Types ✓
+- [x] CssAnB (CSS/Types/) - An+B microsyntax
+- [x] IPV4Address (URL/Types/) - IPv4 address serialization
+- [x] IPV6Address (URL/Types/) - IPv6 address serialization
+- [x] UrlHost (URL/Types/) - URL host wrapper
+- [x] UrlOrigin (URL/Types/) - URL origin tuples
+- [x] Url (URL/Base/) - Full URL serialization
+
+### 9.2 Media Query Types (CSS/Media/)
+- [ ] MediaFeature
+- [ ] MediaQuery
+- [ ] MediaQueryList
+- [ ] MediaCondition
+
+### 9.3 CSS Selector Types (CSS/Selector/)
+- [ ] CssSelector
+- [ ] CssSelectorList
+- [ ] CssSimpleSelector
+- [ ] CssCompoundSelector
+- [ ] CssComplexSelector
+- [ ] CssPseudoClassSelector
+- [ ] CssPseudoElementSelector
+- [ ] CssAttributeSelector
+
+### 9.4 CSS Rule Types (CSS/Rules/)
+- [ ] CssStyleRule
+- [ ] CssMediaRule
+- [ ] CssImportRule
+- [ ] CssFontFaceRule
+- [ ] CssKeyframesRule
+- [ ] CssSupportsRule
+- [ ] CssNamespaceRule
+- [ ] CssPageRule
+- [ ] CssLayerRule
+
+### 9.5 CSS Value Types (CSS/Value/)
+- [ ] CssValue serialization modernization
+- [ ] CssColor/CssColorHdr ISpanFormattable
+- [ ] CssCalcExpression tree serialization
+- [ ] CssUrl serialization
+- [ ] CssVarFunction serialization
+- [ ] CssEnvFunction serialization
+- [ ] CssUnicodeRange serialization
+
+### 9.6 StringBuilder Call Site Migration
+- [ ] Identify all StringBuilder.Append(x.Serialize()) patterns
+- [ ] Replace with StringBuilder.Append(x) or string interpolation
+- [ ] Update property getters returning serialized strings
+
+### 9.7 Cleanup
+- [ ] Delete ICssSerializeable interface
+- [ ] Remove Serialize(StringBuilder) methods from migrated types
+- [ ] Update documentation
+
+## Phase 10: IParsable<T> & Parsing Modernization
+Migrate to standard .NET IParsable<T>/ISpanParsable<T> interfaces for consistent parsing that integrates with generic constraints and modern .NET APIs.
+
+**Pattern:** Follow CssColor exemplar. Keep parser classes as internal implementation called by type's TryParse. IFormatProvider parameter ignored (CSS is locale-independent).
+
+### 10.1 Simple Value Types
+- [ ] CssAnB (CSS/Types/)
+  - [ ] Implement IParsable<CssAnB>, ISpanParsable<CssAnB>
+  - [ ] Delegate to CssAnBParser internally
+  - [ ] Mark CssAnBParser.Parse(string) as [Obsolete]
+- [ ] CssUnicodeRange (CSS/Types/)
+  - [ ] Implement IParsable<CssUnicodeRange>, ISpanParsable<CssUnicodeRange>
+  - [ ] Delegate to CssUnicodeRangeParser internally
+  - [ ] Mark CssUnicodeRangeParser.Parse(string) as [Obsolete]
+
+### 10.2 URL Types
+- [ ] Url (URL/Base/)
+  - [ ] Implement IParsable<Url>, ISpanParsable<Url>
+  - [ ] Wrap existing Url.TryParse() logic
+- [ ] IPV4Address (URL/Types/)
+  - [ ] Implement IParsable<IPV4Address>, ISpanParsable<IPV4Address>
+- [ ] IPV6Address (URL/Types/)
+  - [ ] Implement IParsable<IPV6Address>, ISpanParsable<IPV6Address>
+- [ ] UrlHost (URL/Types/)
+  - [ ] Implement IParsable<UrlHost>, ISpanParsable<UrlHost>
+- [ ] UrlOrigin (URL/Types/)
+  - [ ] Implement IParsable<UrlOrigin>, ISpanParsable<UrlOrigin>
+
+### 10.3 Color Types
+- [x] CssColor (RenderEngine/Color/) - Already implements IParsable<CssColor>
+- [ ] CssColorHdr (RenderEngine/Color/)
+  - [ ] Implement IParsable<CssColorHdr>, ISpanParsable<CssColorHdr>
+  - [ ] Delegate to CssColorFunctionParser internally
+
+### 10.4 CSS Value Types (Token-Based - Facade Pattern)
+These parse from token streams; IParsable facade tokenizes string first, then delegates to parser.
+- [ ] CssValue (CSS/Value/)
+  - [ ] Implement IParsable<CssValue>, ISpanParsable<CssValue>
+  - [ ] Delegate to CssParser.Parse_CssValue() internally
+  - [ ] Mark From_CSS(string) as [Obsolete]
+- [ ] CssVarFunction (CSS/Types/)
+  - [ ] Implement IParsable<CssVarFunction>
+  - [ ] Tokenize → parse via CssVarFunctionParser
+- [ ] CssEnvFunction (CSS/Types/)
+  - [ ] Implement IParsable<CssEnvFunction>
+  - [ ] Tokenize → parse via CssEnvFunctionParser
+- [ ] CssCalcExpression (CSS/Types/)
+  - [ ] Implement IParsable<CssCalcExpression>
+  - [ ] Tokenize → parse via CssCalcFunctionParser
+- [ ] CssUrl (CSS/Types/)
+  - [ ] Implement IParsable<CssUrl>
+  - [ ] Tokenize → parse via CssUrlFunctionParser
+
+### 10.5 Call Site Migration
+- [ ] Replace CssAnBParser.Parse(x) → CssAnB.Parse(x, null)
+- [ ] Replace CssUnicodeRangeParser.Parse(x) → CssUnicodeRange.Parse(x, null)
+- [ ] Replace CssValue.From_CSS(x) → CssValue.Parse(x, null)
+- [ ] Replace Url.TryParse(x, out y) → Url.TryParse(x, null, out y)
+- [ ] Enable generic T.Parse<T>() usage in utilities
+
+### 10.6 Cleanup
+- [ ] Mark deprecated Parse methods with [Obsolete] pointing to IParsable
+- [ ] Keep internal TryParse(DataConsumer<CssToken>) overloads on parser classes
+- [ ] Update XML documentation
+
 ## Documentation
 
 ### Getting Started Guide
