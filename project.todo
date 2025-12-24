@@ -303,15 +303,19 @@ Spec Reference: https://www.w3.org/TR/css-syntax-3/
   - [ ] Different from Consume_Decleration_List - supports nesting
 - [ ] Handle <delim-token> with value "&" for nested selectors
 
-#### 7.7.3 An+B Microsyntax Parsing (§6)
-- [ ] Parse <an+b> type for :nth-child(), :nth-of-type(), etc.
-  - [ ] Parse 'odd' keyword → A=2, B=1
-  - [ ] Parse 'even' keyword → A=2, B=0
-  - [ ] Parse <integer> → A=0, B=value
-  - [ ] Parse <n-dimension> (e.g., 2n, -3n)
-  - [ ] Parse An+B syntax (e.g., 2n+1, -n+6, 3n-2)
-  - [ ] Parse n syntax (e.g., n, -n, +n)
-- [ ] Serialize <an+b> value (§10.1)
+#### 7.7.3 An+B Microsyntax Parsing (§6) ✓
+- [x] Parse <an+b> type for :nth-child(), :nth-of-type(), etc.
+  - [x] Parse 'odd' keyword → A=2, B=1
+  - [x] Parse 'even' keyword → A=2, B=0
+  - [x] Parse <integer> → A=0, B=value
+  - [x] Parse <n-dimension> (e.g., 2n, -3n)
+  - [x] Parse An+B syntax (e.g., 2n+1, -n+6, 3n-2)
+  - [x] Parse n syntax (e.g., n, -n, +n)
+- [x] Serialize <an+b> value (§10.1)
+- [x] CssAnB struct (CssUI/CSS/Types/CssAnB.cs)
+- [x] CssAnBParser class (CssUI/CSS/Parser/Common/CssAnBParser.cs)
+- [x] CssAnBMatcher updated to use new parser
+- [x] Tests: 47 tests (CssUITests2/CSS/Parser/CssAnBParserTests.cs)
 
 #### 7.7.4 Unicode-Range Microsyntax Parsing (§7)
 - [ ] Parse <urange> type for @font-face unicode-range descriptor

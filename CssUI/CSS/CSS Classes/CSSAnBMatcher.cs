@@ -5,79 +5,139 @@ using CssUI.CSS.Serialization;
 namespace CssUI.CSS;
 
 /// <summary>
-/// Handles An+B syntax matching
-/// <para>Only used by certain CSS functions</para>
+/// Handles An+B syntax matching for CSS pseudo-classes like :nth-child().
 /// </summary>
+/// <remarks>
+/// <para>
+/// This class wraps the <see cref="CssAnB"/> struct and <see cref="CssAnBParser"/> 
+/// for backward compatibility with existing code.
+/// </para>
+/// <para>
+/// For new code, prefer using <see cref="CssAnB"/> and <see cref="CssAnBParser"/> directly.
+/// </para>
+/// </remarks>
+/// <seealso href="https://www.w3.org/TR/css-syntax-3/#anb-microsyntax"/>
 public class CssAnBMatcher
-{/* Docs: https://www.w3.org/TR/css-syntax-3/#anb-syntax */
+{
+    /// <summary>
+    /// The underlying An+B value.
+    /// </summary>
+    private readonly CssAnB _anb;
 
-    readonly int A;
-    readonly int B;
+    /// <summary>
+    /// Gets the step value (coefficient of n).
+    /// </summary>
+    public int A => _anb.A;
+
+    /// <summary>
+    /// Gets the offset value.
+    /// </summary>
+    public int B => _anb.B;
 
     #region Constructors
+    /// <summary>
+    /// Creates a new An+B matcher with the specified values.
+    /// </summary>
+    /// <param name="A">The step value (coefficient of n).</param>
+    /// <param name="B">The offset value.</param>
     public CssAnBMatcher(int A, int B)
     {
-        this.A = A;
-        this.B = B;
+        _anb = new CssAnB(A, B);
     }
 
     /// <summary>
-    /// Consumes and returns an An+B token from a <see cref="TokenStream"/>
+    /// Creates a new An+B matcher from an existing <see cref="CssAnB"/> value.
     /// </summary>
-    /// <param name="Tokens"></param>
-    /// <returns></returns>
+    /// <param name="anb">The An+B value.</param>
+    public CssAnBMatcher(CssAnB anb)
+    {
+        _anb = anb;
+    }
+
+    /// <summary>
+    /// Consumes and returns an An+B token from a <see cref="DataConsumer{T}"/> token stream.
+    /// </summary>
+    /// <param name="Stream">The token stream to consume from.</param>
+    /// <returns>A new <see cref="CssAnBMatcher"/> representing the parsed An+B value.</returns>
+    /// <exception cref="CssSyntaxErrorException">Thrown when the input is not a valid An+B syntax.</exception>
     public static CssAnBMatcher Consume(DataConsumer<CssToken> Stream)
     {
-        // TODO: Test An+B syntax parsing
-        int A = 0;
-        int B = 0;
-        if (Stream.Next.Type == ECssTokenType.Ident)// this token is a word, but we only accept 'even' or 'odd'
+        if (CssAnBParser.TryParse(Stream, out var result))
         {
-            IdentToken word = Stream.Consume<IdentToken>();
-            if (word.Value.Equals("even", StringComparison.OrdinalIgnoreCase)) return new CssAnBMatcher(2, 0);//{ A = 2; B = 0; }
-            else if (word.Value.Equals("odd", StringComparison.OrdinalIgnoreCase)) return new CssAnBMatcher(2, 1);//{ A = 2; B = 1; }
-            else throw new CssSyntaxErrorException($"Invalid identity token ({word.Value}) within An+B syntax");
-
-            // if (Stream.Next != Stream.EOF_ITEM) throw new CssSyntaxError("Expected EOF!");
-            // return null;
-        }
-        else if (Stream.Next.Type == ECssTokenType.Dimension)
-        {
-            DimensionToken? dim = Stream.Consume() as DimensionToken;
-            if (dim!.DataType == ENumericTokenType.Integer && dim.Unit.Equals("n", StringComparison.OrdinalIgnoreCase))
-            {// <n-dimension>
-                throw new NotImplementedException($"{nameof(CssAnBMatcher)} Has not implemented parsing support for {nameof(ECssTokenType.Dimension)}");
-
-            }
-            else if (dim.DataType == ENumericTokenType.Integer && dim.Unit.Equals("n-", StringComparison.OrdinalIgnoreCase))
-            {// <ndash-dimension>
-                throw new NotImplementedException($"{nameof(CssAnBMatcher)} Has not implemented parsing support for {nameof(ECssTokenType.Dimension)}");
-            }
-            else if (dim.DataType == ENumericTokenType.Integer && dim.Unit.StartsWith("n-", StringComparison.OrdinalIgnoreCase))
-            {// <ndashdigit-dimension>
-                throw new NotImplementedException($"{nameof(CssAnBMatcher)} Has not implemented parsing support for {nameof(ECssTokenType.Dimension)}");
-            }
-        }
-        else if (Stream.Next.Type == ECssTokenType.Ident)
-        {
-            throw new NotImplementedException($"{nameof(CssAnBMatcher)} Has not implemented parsing support for {nameof(ECssTokenType.Ident)}");
-        }
-        else if (Stream.Next.Type == ECssTokenType.Number)
-        {
-            throw new NotImplementedException($"{nameof(CssAnBMatcher)} Has not implemented parsing support for {nameof(ECssTokenType.Number)}");
+            return new CssAnBMatcher(result.Value);
         }
 
-        return new CssAnBMatcher(A, B);
+        throw new CssSyntaxErrorException("Invalid An+B syntax");
+    }
+
+    /// <summary>
+    /// Attempts to consume an An+B value from a token stream.
+    /// </summary>
+    /// <param name="Stream">The token stream to consume from.</param>
+    /// <param name="matcher">When this method returns, contains the parsed matcher, if successful.</param>
+    /// <returns>True if the An+B value was successfully parsed; otherwise, false.</returns>
+    public static bool TryConsume(DataConsumer<CssToken> Stream, out CssAnBMatcher? matcher)
+    {
+        if (CssAnBParser.TryParse(Stream, out var result))
+        {
+            matcher = new CssAnBMatcher(result.Value);
+            return true;
+        }
+
+        matcher = null;
+        return false;
+    }
+
+    /// <summary>
+    /// Parses an An+B value from a string.
+    /// </summary>
+    /// <param name="input">The CSS string to parse.</param>
+    /// <returns>A new <see cref="CssAnBMatcher"/> representing the parsed An+B value.</returns>
+    /// <exception cref="CssSyntaxErrorException">Thrown when the input is not a valid An+B syntax.</exception>
+    public static CssAnBMatcher Parse(string input)
+    {
+        return new CssAnBMatcher(CssAnBParser.Parse(input));
+    }
+
+    /// <summary>
+    /// Attempts to parse an An+B value from a string.
+    /// </summary>
+    /// <param name="input">The CSS string to parse.</param>
+    /// <param name="matcher">When this method returns, contains the parsed matcher, if successful.</param>
+    /// <returns>True if the An+B value was successfully parsed; otherwise, false.</returns>
+    public static bool TryParse(string input, out CssAnBMatcher? matcher)
+    {
+        if (CssAnBParser.TryParse(input, out var result))
+        {
+            matcher = new CssAnBMatcher(result.Value);
+            return true;
+        }
+
+        matcher = null;
+        return false;
     }
     #endregion
 
     /// <summary>
-    /// Checks if a given index matches
+    /// Checks if a given 1-based index matches this An+B pattern.
     /// </summary>
-    /// <param name="index">The index to check</param>
+    /// <param name="index">The 1-based index to check.</param>
+    /// <returns>True if the index matches the An+B pattern; otherwise, false.</returns>
+    /// <remarks>
+    /// The first element in a list has index 1 (not 0).
+    /// </remarks>
     public bool Match(int index)
     {
-        return (A % (index + B)) == 0;
+        return _anb.Matches(index);
+    }
+
+    /// <summary>
+    /// Gets the canonical CSS string representation of this An+B value.
+    /// </summary>
+    /// <returns>The serialized An+B string.</returns>
+    public override string ToString()
+    {
+        return _anb.Serialize();
     }
 }
 
