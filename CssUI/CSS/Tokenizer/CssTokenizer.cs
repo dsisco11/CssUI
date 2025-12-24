@@ -522,7 +522,10 @@ public class CssTokenizer
             return new FunctionNameToken(Name);
         }
 
-        return new IdentToken(Name);
+        // Custom property names (dashed-idents starting with --) are case-sensitive per CSS spec
+        // Preserve case for these identifiers
+        bool preserveCase = Name.StartsWith("--", StringComparison.Ordinal);
+        return new IdentToken(Name, preserveCase);
     }
 
     private static UnicodeRangeToken Consume_Unicode_Range_Token(DataConsumer<char> Stream)

@@ -279,6 +279,7 @@ public partial class CssValue
             case ECssValueTypes.RATIO:
             case ECssValueTypes.RESOLUTION:
             case ECssValueTypes.CALC:// calc() expressions may contain percentages that need resolution
+            case ECssValueTypes.VAR:// var() references need to be resolved by looking up custom properties
                 {
                     /* XXX:
                      * These values when used on properties CAN be dependant but arent always so idk maybe its best to leave them as absolute?
@@ -381,6 +382,13 @@ public partial class CssValue
 
     /// <summary>Create a calc() expression value</summary>
     public static CssValue From(CssCalcExpression value) => new CssValue(ECssValueTypes.CALC, CssValueData.FromObject(value));
+
+    /// <summary>Create a var() function reference value</summary>
+    /// <remarks>
+    /// var() references custom properties and are resolved during computed value time.
+    /// Docs: https://www.w3.org/TR/css-variables-1/#using-variables
+    /// </remarks>
+    public static CssValue From(CssVarFunction value) => new CssValue(ECssValueTypes.VAR, CssValueData.FromObject(value));
 
     /// <summary>Create a css-value by parsing the given string as CSS markup</summary>
     public static CssValue From_CSS(string css) => new CssParser(css).Parse_CssValue();
@@ -907,6 +915,18 @@ public partial class CssValue
         Contract.EndContractBlock();
 
         return (CssCalcExpression)(data.ObjectValue ?? throw new CssException("calc() expression is null"));
+    }
+
+    /// <summary>
+    /// Returns the value as a CssVarFunction.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public CssVarFunction AsVarFunction()
+    {
+        if (Type != ECssValueTypes.VAR) throw new CssException($"{nameof(CssValue)} is not a var() function! {this}");
+        Contract.EndContractBlock();
+
+        return (CssVarFunction)(data.ObjectValue ?? throw new CssException("var() function is null"));
     }
 
     /// <summary>

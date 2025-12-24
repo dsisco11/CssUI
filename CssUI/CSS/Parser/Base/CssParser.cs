@@ -656,6 +656,12 @@ public class CssParser
                         return CssValue.From(calcExpr!);
                     }
 
+                    // Check if this is a var() function (CSS custom property reference)
+                    if (CssVarFunctionParser.TryParseVarFunction(func, out CssVarFunction varFunc))
+                    {
+                        return CssValue.From(varFunc);
+                    }
+
                     return new CssValue(func);
                 }
             case ECssTokenType.Function:
@@ -678,6 +684,12 @@ public class CssParser
                     if (CssCalcFunctionParser.TryParseCalcFunction(func!, out CssCalcExpression? calcExpr2))
                     {
                         return CssValue.From(calcExpr2!);
+                    }
+
+                    // Check if this is a var() function (CSS custom property reference)
+                    if (CssVarFunctionParser.TryParseVarFunction(func!, out CssVarFunction varFunc2))
+                    {
+                        return CssValue.From(varFunc2);
                     }
 
                     return new CssValue(func!);
