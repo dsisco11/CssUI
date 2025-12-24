@@ -231,7 +231,7 @@ internal static class CssVarFunctionParser
     /// </summary>
     private static CssValue? TryParseHashColor(HashToken token)
     {
-        if (CssColor.TryFromHex(token.Value, out CssColor color))
+        if (CssHexColorParser.TryParse(token.Value, out CssColor color))
         {
             return CssValue.From(color);
         }

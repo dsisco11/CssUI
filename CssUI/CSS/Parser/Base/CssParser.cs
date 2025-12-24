@@ -1186,7 +1186,7 @@ public class CssParser
 
                     // Attempt to parse the hash value as a color
                     // The HashToken.Value does NOT include the leading '#'
-                    if (CssColor.TryFromHex(tok.Value, out CssColor color))
+                    if (CssHexColorParser.TryParse(tok.Value, out CssColor color))
                     {
                         return CssValue.From(color);
                     }

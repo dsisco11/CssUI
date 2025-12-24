@@ -1131,9 +1131,9 @@ public partial class CssValue
         switch (Type)
         {
             case ECssValueTypes.COLOR:
-                return AsCssColor().ToCssString();
+                return CssColorSerializer.Serialize(AsCssColor());
             case ECssValueTypes.COLOR_HDR:
-                return AsCssColorHdr().ToCssString();
+                return CssColorSerializer.Serialize(AsCssColorHdr());
             case ECssValueTypes.INTEGER:
                 return AsInteger().ToString(CultureInfo.InvariantCulture);
             case ECssValueTypes.NUMBER:
@@ -1183,11 +1183,11 @@ public partial class CssValue
                 }
             case ECssValueTypes.COLOR:
                 {
-                    return AsCssColor().ToCssString();
+                    return CssColorSerializer.Serialize(AsCssColor());
                 }
             case ECssValueTypes.COLOR_HDR:
                 {
-                    return AsCssColorHdr().ToCssString();
+                    return CssColorSerializer.Serialize(AsCssColorHdr());
                 }
             case ECssValueTypes.DIMENSION:
                 {

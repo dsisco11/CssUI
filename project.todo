@@ -433,14 +433,17 @@ Note: All tests implemented in CssColorSerializerTests.cs (105 tests passing)
 - [x] Canonical form serialization tests (12 tests)
 - [x] Alpha channel serialization tests (omit when 1.0) (9 tests)
 
-### 7.5 Cleanup: Remove Parsing/Serialization from Color Types
-- [ ] Remove CssColor.FromHex() - use parser instead
-- [ ] Remove CssColor.ToCssString() - use serializer instead
-- [ ] Remove CssColor.ToHexString() - use serializer instead
-- [ ] Remove CssColorHdr parsing methods - use parser instead
-- [ ] Remove CssColorHdr serialization methods - use serializer instead
-- [ ] Update all call sites to use formal parser/serializer
-- [ ] Ensure color types are pure value holders (FromRgba, FromHsl, etc. for programmatic construction only)
+### 7.5 Cleanup: Remove Parsing/Serialization from Color Types ✓
+- [x] Remove CssColor.FromHex() - use parser instead
+- [x] Remove CssColor.ToCssString() - use serializer instead
+- [x] Remove CssColor.ToHexString() - use serializer instead
+- [x] Remove CssColorHdr parsing methods - N/A (CssColorHdr has no parsing methods)
+- [x] Remove CssColorHdr serialization methods - use serializer instead
+- [x] Update all call sites to use formal parser/serializer
+  - [x] CssParser, CssEnvFunctionParser, CssVarFunctionParser → use CssHexColorParser
+  - [x] CSSValue.ToString/Serialize → use CssColorSerializer
+- [x] Ensure color types are pure value holders (FromRgba, FromHsl, etc. for programmatic construction only)
+- [x] Created CssHexColorParser class (CSS/Parser/Common/) for centralized hex parsing
 
 ## Phase 7.9: CSS Nesting
 Spec Reference: https://www.w3.org/TR/css-nesting-1/

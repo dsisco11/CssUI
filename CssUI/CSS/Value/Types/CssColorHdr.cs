@@ -6,7 +6,7 @@ using CssUI.Rendering;
 namespace CssUI.CSS;
 
 /// <summary>
-/// Represents a high dynamic range CSS color value with floating-point components 
+/// Represents a high dynamic range CSS color value with floating-point components
 /// supporting wide-gamut color spaces.
 /// </summary>
 /// <remarks>
@@ -325,30 +325,8 @@ public readonly record struct CssColorHdr : IEquatable<CssColorHdr>
     #endregion
 
     #region Formatting
-    /// <summary>
-    /// Returns the CSS color() function representation.
-    /// </summary>
-    public string ToCssString()
-    {
-        string spaceName = _colorSpace switch
-        {
-            EColorSpace.sRGB => "srgb",
-            EColorSpace.sRGBLinear => "srgb-linear",
-            EColorSpace.DisplayP3 => "display-p3",
-            EColorSpace.Lab => "lab",
-            EColorSpace.Lch => "lch",
-            EColorSpace.OkLab => "oklab",
-            EColorSpace.OkLCh => "oklch",
-            _ => "srgb"
-        };
-
-        return Math.Abs(_alpha - 1f) < Epsilon
-            ? $"color({spaceName} {_c1:F4} {_c2:F4} {_c3:F4})"
-            : $"color({spaceName} {_c1:F4} {_c2:F4} {_c3:F4} / {_alpha:F3})";
-    }
-
     /// <inheritdoc/>
-    public override string ToString() => ToCssString();
+    public override string ToString() => Serialization.CssColorSerializer.Serialize(this);
     #endregion
 
     #region Equality

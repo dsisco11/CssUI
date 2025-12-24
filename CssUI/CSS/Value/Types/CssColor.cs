@@ -144,46 +144,6 @@ public readonly record struct CssColor : IEquatable<CssColor>
     public static CssColor FromPacked(uint packed) => new(packed);
 
     /// <summary>
-    /// Creates a <see cref="CssColor"/> from a hexadecimal color string.
-    /// </summary>
-    /// <param name="hex">Hex string in format: #RGB, #RGBA, #RRGGBB, or #RRGGBBAA</param>
-    public static CssColor FromHex(ReadOnlySpan<char> hex)
-    {
-        if (hex.IsEmpty)
-            return Transparent;
-
-        // Skip leading '#' if present
-        if (hex[0] == '#')
-            hex = hex[1..];
-
-        return hex.Length switch
-        {
-            3 => ParseHex3(hex),    // #RGB
-            4 => ParseHex4(hex),    // #RGBA
-            6 => ParseHex6(hex),    // #RRGGBB
-            8 => ParseHex8(hex),    // #RRGGBBAA
-            _ => throw new FormatException($"Invalid hex color format: #{hex.ToString()}")
-        };
-    }
-
-    /// <summary>
-    /// Attempts to parse a hexadecimal color string.
-    /// </summary>
-    public static bool TryFromHex(ReadOnlySpan<char> hex, out CssColor color)
-    {
-        try
-        {
-            color = FromHex(hex);
-            return true;
-        }
-        catch
-        {
-            color = Transparent;
-            return false;
-        }
-    }
-
-    /// <summary>
     /// Creates a <see cref="CssColor"/> from a named CSS color keyword.
     /// </summary>
     /// <param name="ecolor">The CSS named color enum value.</param>
@@ -353,87 +313,9 @@ public readonly record struct CssColor : IEquatable<CssColor>
     }
     #endregion
 
-    #region Parsing Helpers
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static CssColor ParseHex3(ReadOnlySpan<char> hex)
-    {
-        byte r = ParseHexNibble(hex[0]);
-        byte g = ParseHexNibble(hex[1]);
-        byte b = ParseHexNibble(hex[2]);
-        return new CssColor((byte)(r | (r << 4)), (byte)(g | (g << 4)), (byte)(b | (b << 4)), 255);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static CssColor ParseHex4(ReadOnlySpan<char> hex)
-    {
-        byte r = ParseHexNibble(hex[0]);
-        byte g = ParseHexNibble(hex[1]);
-        byte b = ParseHexNibble(hex[2]);
-        byte a = ParseHexNibble(hex[3]);
-        return new CssColor((byte)(r | (r << 4)), (byte)(g | (g << 4)), (byte)(b | (b << 4)), (byte)(a | (a << 4)));
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static CssColor ParseHex6(ReadOnlySpan<char> hex)
-    {
-        byte r = ParseHexByte(hex[0], hex[1]);
-        byte g = ParseHexByte(hex[2], hex[3]);
-        byte b = ParseHexByte(hex[4], hex[5]);
-        return new CssColor(r, g, b, 255);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static CssColor ParseHex8(ReadOnlySpan<char> hex)
-    {
-        byte r = ParseHexByte(hex[0], hex[1]);
-        byte g = ParseHexByte(hex[2], hex[3]);
-        byte b = ParseHexByte(hex[4], hex[5]);
-        byte a = ParseHexByte(hex[6], hex[7]);
-        return new CssColor(r, g, b, a);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static byte ParseHexNibble(char c)
-    {
-        return c switch
-        {
-            >= '0' and <= '9' => (byte)(c - '0'),
-            >= 'a' and <= 'f' => (byte)(c - 'a' + 10),
-            >= 'A' and <= 'F' => (byte)(c - 'A' + 10),
-            _ => throw new FormatException($"Invalid hex character: {c}")
-        };
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static byte ParseHexByte(char high, char low)
-    {
-        return (byte)((ParseHexNibble(high) << 4) | ParseHexNibble(low));
-    }
-    #endregion
-
     #region Formatting
-    /// <summary>
-    /// Returns the hex string representation of this color (e.g., "#FF0000FF").
-    /// </summary>
-    public string ToHexString()
-    {
-        return _a == 255
-            ? $"#{_r:X2}{_g:X2}{_b:X2}"
-            : $"#{_r:X2}{_g:X2}{_b:X2}{_a:X2}";
-    }
-
-    /// <summary>
-    /// Returns the CSS rgb() or rgba() function representation.
-    /// </summary>
-    public string ToCssString()
-    {
-        return _a == 255
-            ? $"rgb({_r}, {_g}, {_b})"
-            : $"rgba({_r}, {_g}, {_b}, {(_a / ByteMaxF).ToString("F3", CultureInfo.InvariantCulture)})";
-    }
-
     /// <inheritdoc/>
-    public override string ToString() => ToCssString();
+    public override string ToString() => Serialization.CssColorSerializer.Serialize(this);
     #endregion
 
     #region Equality
