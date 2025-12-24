@@ -280,6 +280,7 @@ public partial class CssValue
             case ECssValueTypes.RESOLUTION:
             case ECssValueTypes.CALC:// calc() expressions may contain percentages that need resolution
             case ECssValueTypes.VAR:// var() references need to be resolved by looking up custom properties
+            case ECssValueTypes.ENV:// env() references need to be resolved by looking up environment variables
                 {
                     /* XXX:
                      * These values when used on properties CAN be dependant but arent always so idk maybe its best to leave them as absolute?
@@ -389,6 +390,14 @@ public partial class CssValue
     /// Docs: https://www.w3.org/TR/css-variables-1/#using-variables
     /// </remarks>
     public static CssValue From(CssVarFunction value) => new CssValue(ECssValueTypes.VAR, CssValueData.FromObject(value));
+
+    /// <summary>Create an env() function reference value</summary>
+    /// <remarks>
+    /// env() references environment variables and are resolved during computed value time.
+    /// Unlike var(), env() variables are global to a document.
+    /// Docs: https://www.w3.org/TR/css-env-1/
+    /// </remarks>
+    public static CssValue From(CssEnvFunction value) => new CssValue(ECssValueTypes.ENV, CssValueData.FromObject(value));
 
     /// <summary>Create a css-value by parsing the given string as CSS markup</summary>
     public static CssValue From_CSS(string css) => new CssParser(css).Parse_CssValue();
@@ -927,6 +936,18 @@ public partial class CssValue
         Contract.EndContractBlock();
 
         return (CssVarFunction)(data.ObjectValue ?? throw new CssException("var() function is null"));
+    }
+
+    /// <summary>
+    /// Returns the value as a CssEnvFunction.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public CssEnvFunction AsEnvFunction()
+    {
+        if (Type != ECssValueTypes.ENV) throw new CssException($"{nameof(CssValue)} is not an env() function! {this}");
+        Contract.EndContractBlock();
+
+        return (CssEnvFunction)(data.ObjectValue ?? throw new CssException("env() function is null"));
     }
 
     /// <summary>

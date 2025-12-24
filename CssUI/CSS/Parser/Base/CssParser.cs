@@ -662,6 +662,12 @@ public class CssParser
                         return CssValue.From(varFunc);
                     }
 
+                    // Check if this is an env() function (CSS environment variable reference)
+                    if (CssEnvFunctionParser.TryParseEnvFunction(func, out CssEnvFunction envFunc))
+                    {
+                        return CssValue.From(envFunc);
+                    }
+
                     return new CssValue(func);
                 }
             case ECssTokenType.Function:
@@ -690,6 +696,12 @@ public class CssParser
                     if (CssVarFunctionParser.TryParseVarFunction(func!, out CssVarFunction varFunc2))
                     {
                         return CssValue.From(varFunc2);
+                    }
+
+                    // Check if this is an env() function (CSS environment variable reference)
+                    if (CssEnvFunctionParser.TryParseEnvFunction(func!, out CssEnvFunction envFunc2))
+                    {
+                        return CssValue.From(envFunc2);
                     }
 
                     return new CssValue(func!);

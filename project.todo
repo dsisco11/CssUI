@@ -251,9 +251,16 @@ Refactored to use DataConsumer<CssToken> for consistency with CssParser.cs patte
   - [x] CssValue.AsVarFunction() accessor
   - [x] Tests: 27 tests for var() parsing (CssVarFunctionParserTests.cs)
   - [x] Case-sensitive custom property names (tokenizer updated to preserve case for --* identifiers)
-- [ ] Handle env() function → CssValue (FUNCTION)
-  - [ ] Parse environment variable references
-  - [ ] Support fallback values
+- [x] Handle env() function → CssValue (ENV)
+  - [x] CssEnvFunction struct created (CssUI/CSS/Types/CssEnvFunction.cs)
+  - [x] CssEnvFunctionParser for parsing env() function arguments
+  - [x] ECssValueTypes.ENV flag added
+  - [x] CssValue.From(CssEnvFunction) factory method
+  - [x] CssValue.AsEnvFunction() accessor
+  - [x] Tests: 29 tests for env() parsing (CssEnvFunctionParserTests.cs)
+  - [x] Support for safe-area-inset-* and other environment variables
+  - [x] Support fallback values: env(name, fallback)
+  - [x] Support dimension fallbacks with integer index: env(name, 10px)
 - [ ] Handle min()/max()/clamp() functions → CssValue (FUNCTION)
   - [ ] min(value1, value2, ...)
   - [ ] max(value1, value2, ...)

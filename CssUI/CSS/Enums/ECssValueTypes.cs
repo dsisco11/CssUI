@@ -47,8 +47,12 @@ public enum ECssValueTypes : int
     /// Docs: https://www.w3.org/TR/css-variables-1/#using-variables
     /// </summary>
     VAR = (1 << 7),
-    /// <summary>
-    /// An integer is one or more decimal digits ‘0’ through ‘9’ and corresponds to a subset of the NUMBER token in the grammar. Integers may be immediately preceded by ‘-’ or ‘+’ to indicate the sign.
+    /// <summary>    /// Value is an env() function reference to a CSS environment variable.
+    /// The value is an instance of <see cref="CssEnvFunction"/>.
+    /// Docs: https://www.w3.org/TR/css-env-1/
+    /// </summary>
+    ENV = (1 << 8),
+    /// <summary>    /// An integer is one or more decimal digits ‘0’ through ‘9’ and corresponds to a subset of the NUMBER token in the grammar. Integers may be immediately preceded by ‘-’ or ‘+’ to indicate the sign.
     /// </summary>
     INTEGER = (1 << 16),
     /// <summary>
