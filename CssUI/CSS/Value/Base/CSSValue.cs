@@ -267,6 +267,7 @@ public partial class CssValue
             case ECssValueTypes.COLOR_HDR:
             case ECssValueTypes.IMAGE:
             case ECssValueTypes.URL:
+            case ECssValueTypes.UNICODE_RANGE:// Unicode ranges are absolute values
             case ECssValueTypes.POSITION:// The position has already been resolved here.
             case ECssValueTypes.FUNCTION:// The function args have already been resolved here.
                 {
@@ -398,6 +399,13 @@ public partial class CssValue
     /// Docs: https://www.w3.org/TR/css-env-1/
     /// </remarks>
     public static CssValue From(CssEnvFunction value) => new CssValue(ECssValueTypes.ENV, CssValueData.FromObject(value));
+
+    /// <summary>Create a unicode-range value</summary>
+    /// <remarks>
+    /// Unicode-ranges are used in @font-face rules to specify which characters a font supports.
+    /// Docs: https://www.w3.org/TR/css-syntax-3/#urange
+    /// </remarks>
+    public static CssValue From(CssUnicodeRange value) => new CssValue(ECssValueTypes.UNICODE_RANGE, CssValueData.FromObject(value));
 
     /// <summary>Create a css-value by parsing the given string as CSS markup</summary>
     public static CssValue From_CSS(string css) => new CssParser(css).Parse_CssValue();
@@ -948,6 +956,18 @@ public partial class CssValue
         Contract.EndContractBlock();
 
         return (CssEnvFunction)(data.ObjectValue ?? throw new CssException("env() function is null"));
+    }
+
+    /// <summary>
+    /// Returns the value as a CssUnicodeRange.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public CssUnicodeRange AsUnicodeRange()
+    {
+        if (Type != ECssValueTypes.UNICODE_RANGE) throw new CssException($"{nameof(CssValue)} is not a unicode-range! {this}");
+        Contract.EndContractBlock();
+
+        return (CssUnicodeRange)(data.ObjectValue ?? throw new CssException("unicode-range is null"));
     }
 
     /// <summary>

@@ -51,8 +51,12 @@ public enum ECssValueTypes : int
     /// The value is an instance of <see cref="CssEnvFunction"/>.
     /// Docs: https://www.w3.org/TR/css-env-1/
     /// </summary>
-    ENV = (1 << 8),
-    /// <summary>    /// An integer is one or more decimal digits ‘0’ through ‘9’ and corresponds to a subset of the NUMBER token in the grammar. Integers may be immediately preceded by ‘-’ or ‘+’ to indicate the sign.
+    ENV = (1 << 8),    /// <summary>
+    /// Value is a unicode-range represented as <see cref="CssUnicodeRange"/>.
+    /// Unicode-ranges are used in @font-face rules to specify which characters a font supports.
+    /// Docs: https://www.w3.org/TR/css-syntax-3/#urange
+    /// </summary>
+    UNICODE_RANGE = (1 << 9),    /// <summary>    /// An integer is one or more decimal digits ‘0’ through ‘9’ and corresponds to a subset of the NUMBER token in the grammar. Integers may be immediately preceded by ‘-’ or ‘+’ to indicate the sign.
     /// </summary>
     INTEGER = (1 << 16),
     /// <summary>

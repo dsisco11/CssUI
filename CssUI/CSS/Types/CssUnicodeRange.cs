@@ -1,0 +1,142 @@
+using System;
+
+namespace CssUI.CSS;
+
+/// <summary>
+/// Represents a unicode-range value from the CSS Unicode-Range microsyntax.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Some constructs, such as the 'unicode-range' descriptor for the '@font-face' rule,
+/// need a way to describe one or more unicode code points. The '&lt;urange&gt;' production
+/// represents a range of one or more unicode code points.
+/// </para>
+/// <para>
+/// Informally, the &lt;urange&gt; production has three forms:
+/// <list type="bullet">
+/// <item><description>U+0001 - Defines a range consisting of a single code point.</description></item>
+/// <item><description>U+0001-00ff - Defines a range of codepoints between the first and second value inclusive.</description></item>
+/// <item><description>U+00?? - Defines a range using wildcards, where '?' characters range over all hex digits.</description></item>
+/// </list>
+/// </para>
+/// <para>
+/// In each form, a maximum of 6 digits is allowed for each hexadecimal number.
+/// </para>
+/// </remarks>
+/// <seealso href="https://www.w3.org/TR/css-syntax-3/#urange"/>
+public readonly struct CssUnicodeRange
+{
+    /// <summary>
+    /// The maximum allowed code point defined by Unicode: U+10FFFF.
+    /// </summary>
+    public const int MaxCodePoint = 0x10FFFF;
+
+    /// <summary>
+    /// The start value of the unicode range (inclusive).
+    /// </summary>
+    public readonly int Start;
+
+    /// <summary>
+    /// The end value of the unicode range (inclusive).
+    /// </summary>
+    public readonly int End;
+
+    /// <summary>
+    /// Creates a new unicode range with the specified start and end values.
+    /// </summary>
+    /// <param name="start">The start value of the range (inclusive).</param>
+    /// <param name="end">The end value of the range (inclusive).</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when end is greater than the maximum allowed code point,
+    /// or when start is greater than end.
+    /// </exception>
+    public CssUnicodeRange(int start, int end)
+    {
+        if (end > MaxCodePoint)
+        {
+            throw new ArgumentOutOfRangeException(nameof(end), $"End value {end:X} exceeds maximum allowed code point U+{MaxCodePoint:X}.");
+        }
+        if (start > end)
+        {
+            throw new ArgumentOutOfRangeException(nameof(start), $"Start value U+{start:X} is greater than end value U+{end:X}.");
+        }
+        if (start < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(start), "Start value cannot be negative.");
+        }
+
+        Start = start;
+        End = end;
+    }
+
+    /// <summary>
+    /// Creates a new unicode range for a single code point.
+    /// </summary>
+    /// <param name="codePoint">The single code point.</param>
+    /// <returns>A unicode range representing the single code point.</returns>
+    public static CssUnicodeRange SingleCodePoint(int codePoint)
+    {
+        return new CssUnicodeRange(codePoint, codePoint);
+    }
+
+    /// <summary>
+    /// Gets whether this range represents a single code point.
+    /// </summary>
+    public bool IsSingleCodePoint => Start == End;
+
+    /// <summary>
+    /// Gets the number of code points in this range.
+    /// </summary>
+    public int Count => End - Start + 1;
+
+    /// <summary>
+    /// Checks if a given code point is within this unicode range.
+    /// </summary>
+    /// <param name="codePoint">The code point to check.</param>
+    /// <returns>True if the code point is within this range; otherwise, false.</returns>
+    public bool Contains(int codePoint)
+    {
+        return codePoint >= Start && codePoint <= End;
+    }
+
+    /// <summary>
+    /// Serializes this unicode range to its canonical CSS string representation.
+    /// </summary>
+    /// <returns>The canonical serialization of this unicode range.</returns>
+    /// <remarks>
+    /// <para>
+    /// For a single code point, returns "U+XXXX" where XXXX is the hexadecimal value.
+    /// For a range, returns "U+XXXX-YYYY" where XXXX and YYYY are the start and end values.
+    /// </para>
+    /// <para>
+    /// Note: This method does not attempt to serialize using the wildcard (?) syntax,
+    /// as the canonical form uses explicit ranges.
+    /// </para>
+    /// </remarks>
+    public string Serialize()
+    {
+        if (IsSingleCodePoint)
+        {
+            return $"U+{Start:X}";
+        }
+        return $"U+{Start:X}-{End:X}";
+    }
+
+    /// <inheritdoc/>
+    public override string ToString() => Serialize();
+
+    /// <inheritdoc/>
+    public override bool Equals(object? obj)
+    {
+        return obj is CssUnicodeRange other && Start == other.Start && End == other.End;
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Start, End);
+    }
+
+    public static bool operator ==(CssUnicodeRange left, CssUnicodeRange right) => left.Equals(right);
+    public static bool operator !=(CssUnicodeRange left, CssUnicodeRange right) => !left.Equals(right);
+}
