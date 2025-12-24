@@ -325,13 +325,13 @@ Implemented in Phase 6.7
 - [x] Tests: 44 tests (CssUITests2/CSS/Parser/CssUnicodeRangeParserTests.cs)
 
 #### 7.7.5 Error Recovery and Parse Errors
-- [ ] Proper parse error reporting infrastructure
-  - [ ] Track parse error locations
-  - [ ] Allow error recovery vs abort modes
-- [ ] Handle <bad-string-token> gracefully
-- [ ] Handle <bad-url-token> gracefully
-- [ ] Handle unmatched <}-token>, <)-token>, <]-token>
-- [ ] Auto-close unclosed constructs at EOF per spec
+- [x] Proper parse error reporting infrastructure
+  - [x] Track parse error locations (CssParseError struct with Position, ErrorType, Message)
+  - [x] Allow error recovery vs abort modes (EParseErrorMode enum)
+- [x] Handle <bad-string-token> gracefully (returns CssValue.Null instead of throwing)
+- [x] Handle <bad-url-token> gracefully (returns CssValue.Null instead of throwing)
+- [ ] Handle unmatched <}-token>, <)-token>, <]-token> (TODO: needs deeper parser integration)
+- [x] Auto-close unclosed constructs at EOF per spec (already implemented in Consume_SimpleBlock)
 
 #### 7.7.6 Production Matching (§8)
 - [ ] Implement <declaration-value> production

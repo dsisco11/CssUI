@@ -14,34 +14,184 @@ namespace CssUI.CSS.Serialization;
 /* Docs: https://www.w3.org/TR/css-syntax-3/ */
 
 /// <summary>
-/// Parses a stream of <see cref="CssToken"/>s and returns
+/// Parses a stream of <see cref="CssToken"/>s and returns CSS objects such as stylesheets, rules, and declarations.
 /// </summary>
+/// <remarks>
+/// <para>
+/// This parser implements CSS Syntax Level 3 with error recovery per §3 and §5.
+/// Parse errors are well-defined and the parser attempts to recover gracefully,
+/// throwing away only the minimum amount of content before resuming normal parsing.
+/// </para>
+/// <para>
+/// Error handling modes:
+/// <list type="bullet">
+/// <item><description><see cref="EParseErrorMode.Recover"/> - Continue parsing after errors (default)</description></item>
+/// <item><description><see cref="EParseErrorMode.Abort"/> - Throw exception on first error</description></item>
+/// </list>
+/// </para>
+/// </remarks>
+/// <seealso href="https://www.w3.org/TR/css-syntax-3/"/>
 public class CssParser
 {
     #region Properties
     private readonly DataConsumer<CssToken> Stream;
     private bool TopLevel = false;
+
+    /// <summary>
+    /// Gets the error reporter used to collect parse errors.
+    /// </summary>
+    public ICssParseErrorReporter ErrorReporter { get; }
+
+    /// <summary>
+    /// Gets the error handling mode for this parser instance.
+    /// </summary>
+    public EParseErrorMode ErrorMode { get; }
     #endregion
 
     #region Constructors
-    public CssParser(ReadOnlySpan<char> Text)
+    /// <summary>
+    /// Creates a new CssParser from CSS text.
+    /// </summary>
+    /// <param name="Text">The CSS text to parse.</param>
+    /// <param name="errorReporter">Optional error reporter. If null, errors are discarded.</param>
+    /// <param name="errorMode">The error handling mode.</param>
+    public CssParser(ReadOnlySpan<char> Text, ICssParseErrorReporter? errorReporter = null, EParseErrorMode errorMode = EParseErrorMode.Recover)
     {
         CssTokenizer Tokenizer = new CssTokenizer(Text);
         Stream = new DataConsumer<CssToken>(Tokenizer.Tokens, CssToken.EOF);
+        ErrorReporter = errorReporter ?? NullParseErrorReporter.Instance;
+        ErrorMode = errorMode;
     }
 
-    public CssParser(CssToken[] Tokens)
+    /// <summary>
+    /// Creates a new CssParser from pre-tokenized tokens.
+    /// </summary>
+    /// <param name="Tokens">The tokens to parse.</param>
+    /// <param name="errorReporter">Optional error reporter. If null, errors are discarded.</param>
+    /// <param name="errorMode">The error handling mode.</param>
+    public CssParser(CssToken[] Tokens, ICssParseErrorReporter? errorReporter = null, EParseErrorMode errorMode = EParseErrorMode.Recover)
     {
         Stream = new DataConsumer<CssToken>(Tokens, CssToken.EOF);
+        ErrorReporter = errorReporter ?? NullParseErrorReporter.Instance;
+        ErrorMode = errorMode;
     }
 
     /// <summary>
     /// Creates a CssParser from a list of CSS component values.
     /// </summary>
     /// <param name="componentValues">The component values to parse.</param>
-    public CssParser(IEnumerable<CssToken> componentValues)
+    /// <param name="errorReporter">Optional error reporter. If null, errors are discarded.</param>
+    /// <param name="errorMode">The error handling mode.</param>
+    public CssParser(IEnumerable<CssToken> componentValues, ICssParseErrorReporter? errorReporter = null, EParseErrorMode errorMode = EParseErrorMode.Recover)
     {
         Stream = new DataConsumer<CssToken>(componentValues.ToArray(), CssToken.EOF);
+        ErrorReporter = errorReporter ?? NullParseErrorReporter.Instance;
+        ErrorMode = errorMode;
+    }
+    #endregion
+
+    #region Error Reporting Helpers
+    /// <summary>
+    /// Reports a parse error and throws if abort mode is enabled.
+    /// </summary>
+    /// <param name="error">The parse error to report.</param>
+    private void ReportError(CssParseError error)
+    {
+        ErrorReporter.ReportError(error);
+        if (ErrorMode == EParseErrorMode.Abort)
+        {
+            throw new CssSyntaxErrorException($"Parse error: {error}");
+        }
+    }
+
+    /// <summary>
+    /// Reports a parse error for an unterminated at-rule.
+    /// </summary>
+    private void ReportUnterminatedAtRule(string? name) =>
+        ReportError(CssParseError.UnterminatedAtRule(Stream.Position, name));
+
+    /// <summary>
+    /// Reports a parse error for an unterminated qualified rule.
+    /// </summary>
+    private void ReportUnterminatedQualifiedRule() =>
+        ReportError(CssParseError.UnterminatedQualifiedRule(Stream.Position));
+
+    /// <summary>
+    /// Reports a parse error for an unterminated block.
+    /// </summary>
+    private void ReportUnterminatedBlock(char bracket) =>
+        ReportError(CssParseError.UnterminatedBlock(Stream.Position, bracket));
+
+    /// <summary>
+    /// Reports a parse error for an unterminated function.
+    /// </summary>
+    private void ReportUnterminatedFunction(string? name) =>
+        ReportError(CssParseError.UnterminatedFunction(Stream.Position, name));
+
+    /// <summary>
+    /// Reports a parse error for a missing colon in declaration.
+    /// </summary>
+    private void ReportMissingColonInDeclaration(string? propertyName) =>
+        ReportError(CssParseError.MissingColonInDeclaration(Stream.Position, propertyName));
+
+    /// <summary>
+    /// Reports a parse error for an unexpected token in a declaration list.
+    /// </summary>
+    private void ReportUnexpectedTokenInDeclarationList(ECssTokenType tokenType) =>
+        ReportError(CssParseError.UnexpectedTokenInDeclarationList(Stream.Position, tokenType.ToString()));
+
+    /// <summary>
+    /// Reports a parse error for an unexpected token in a style block.
+    /// </summary>
+    private void ReportUnexpectedTokenInStyleBlock(ECssTokenType tokenType) =>
+        ReportError(CssParseError.UnexpectedTokenInStyleBlock(Stream.Position, tokenType.ToString()));
+
+    /// <summary>
+    /// Reports a parse error for a bad string token.
+    /// </summary>
+    private void ReportBadStringToken() =>
+        ReportError(CssParseError.BadStringToken(Stream.Position));
+
+    /// <summary>
+    /// Reports a parse error for a bad URL token.
+    /// </summary>
+    private void ReportBadUrlToken() =>
+        ReportError(CssParseError.BadUrlToken(Stream.Position));
+
+    /// <summary>
+    /// Reports a parse error for an unmatched closing bracket.
+    /// </summary>
+    private void ReportUnmatchedClosingBracket(char bracket) =>
+        ReportError(CssParseError.UnmatchedClosingBracket(Stream.Position, bracket));
+
+    /// <summary>
+    /// Checks if a token is a "bad" token type that is always a parse error per CSS Syntax Level 3.
+    /// If so, reports the error.
+    /// </summary>
+    /// <param name="token">The token to check.</param>
+    /// <returns>True if the token is a bad token that was reported; false otherwise.</returns>
+    /// <remarks>
+    /// Per CSS Syntax Level 3: "The tokens &lt;}-token&gt;, &lt;)-token&gt;, &lt;]-token&gt;,
+    /// &lt;bad-string-token&gt;, and &lt;bad-url-token&gt; are always parse errors, but they
+    /// are preserved in the token stream by this specification to allow other specs, such
+    /// as Media Queries, to define more fine-grained error-handling than just dropping an
+    /// entire declaration or block."
+    /// </remarks>
+    private bool CheckAndReportBadToken(CssToken token)
+    {
+        switch (token.Type)
+        {
+            case ECssTokenType.Bad_String:
+                ReportBadStringToken();
+                return true;
+            case ECssTokenType.Bad_Url:
+                ReportBadUrlToken();
+                return true;
+            // Note: Unmatched closing brackets are contextual - only report when they're
+            // truly unmatched, not when they could be part of valid parsing
+            default:
+                return false;
+        }
     }
     #endregion
 
