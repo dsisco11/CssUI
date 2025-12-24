@@ -645,7 +645,7 @@ public class CssParser
                     }
 
                     // Check if this is a url() function with quoted string
-                    if (CssUrl.TryFromFunction(func, out CssUrl url))
+                    if (CssUrlFunctionParser.TryParseUrlFunction(func, out CssUrl url))
                     {
                         return CssValue.From(url);
                     }
@@ -663,7 +663,7 @@ public class CssParser
                     }
 
                     // Check if this is a url() function with quoted string
-                    if (CssUrl.TryFromFunction(func!, out CssUrl url))
+                    if (CssUrlFunctionParser.TryParseUrlFunction(func!, out CssUrl url))
                     {
                         return CssValue.From(url);
                     }
@@ -674,12 +674,11 @@ public class CssParser
                 {
                     // Handle unquoted URL token: url(path)
                     // Per CSS Syntax Level 3, <url-token> contains the URL value directly
-                    var tok = Stream.Consume() as UrlToken;
-                    if (tok is null)
+                    if (Stream.Consume() is not UrlToken tok)
                     {
                         throw new CssParserException("Expected UrlToken but received null", Stream);
                     }
-                    return CssValue.From(new CssUrl(tok.Value));
+                    return CssValue.From(new CssUrl(tok.Value ?? string.Empty));
                 }
             case ECssTokenType.Bad_Url:
                 {
@@ -690,8 +689,7 @@ public class CssParser
             case ECssTokenType.Hash:
                 {
                     // Parse hex color values: #RGB, #RGBA, #RRGGBB, #RRGGBBAA
-                    var tok = Stream.Consume() as HashToken;
-                    if (tok is null)
+                    if (Stream.Consume() is not HashToken tok)
                     {
                         throw new CssParserException("Expected HashToken but received null", Stream);
                     }

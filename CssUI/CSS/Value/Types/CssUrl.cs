@@ -67,64 +67,6 @@ public readonly record struct CssUrl : IEquatable<CssUrl>
     public static CssUrl Empty => new(string.Empty);
     #endregion
 
-    #region Parsing
-    /// <summary>
-    /// Attempts to parse a URL from a CSS function with quoted string argument.
-    /// Handles: url("path"), url('path')
-    /// </summary>
-    /// <param name="func">The CSS function token.</param>
-    /// <param name="result">The parsed URL if successful.</param>
-    /// <returns>True if the function was a valid url() with a quoted string.</returns>
-    internal static bool TryFromFunction(CssFunction func, out CssUrl result)
-    {
-        result = Empty;
-
-        if (func is null)
-            return false;
-
-        // Check for url() function name (case-insensitive per CSS spec)
-        if (!func.Name.Equals("url", StringComparison.OrdinalIgnoreCase))
-            return false;
-
-        // The url() function should have a single string argument
-        var args = func.Arguments;
-        if (args is null || args.Count == 0)
-        {
-            // url() with no args is valid - empty URL
-            result = Empty;
-            return true;
-        }
-
-        // Skip whitespace to find the string argument
-        CssUI.CSS.Parser.CssToken? stringToken = null;
-        foreach (var token in args)
-        {
-            if (token is Parser.WhitespaceToken)
-                continue;
-
-            if (token is Parser.StringToken str)
-            {
-                stringToken = str;
-                break;
-            }
-
-            // url() function form only accepts quoted strings
-            // Raw URLs come as <url-token>, not <function-token>
-            return false;
-        }
-
-        if (stringToken is Parser.StringToken strTok)
-        {
-            result = new CssUrl(strTok.Value);
-            return true;
-        }
-
-        // No string found - this is valid, empty URL
-        result = Empty;
-        return true;
-    }
-    #endregion
-
     #region Serialization
     /// <summary>
     /// Returns the CSS serialization of this URL value.
