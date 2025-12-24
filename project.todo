@@ -346,6 +346,19 @@ Implemented in Phase 6.7
 - [x] Tests: 41 tests for production matching (CssUITests2/CSS/Parser/CssProductionMatcherTests.cs)
 - [x] Tests: 12 tests for block contents type (CssUITests2/CSS/Parser/CssBlockContentsTypeTests.cs)
 
+#### 7.7.7 Production Matching Integration
+- [ ] Integrate CssProductionMatcher with CssVarFunctionParser
+  - [ ] Validate var() fallback values against <declaration-value> production
+  - [ ] Tests for invalid fallback rejection (bad-string, unmatched brackets)
+- [ ] Integrate with custom property declaration parsing
+  - [ ] Custom property values (--prop: value) must match <declaration-value>
+  - [ ] Add validation in Consume_Decleration for --* properties
+- [ ] Integrate with @supports rule parsing
+  - [ ] @supports condition values should use <any-value> production
+- [ ] Integrate with CSS Nesting (future)
+  - [ ] Use ECssBlockContentsType for nested rule parsing
+  - [ ] Distinguish style-block vs rule-list contexts
+
 ### 7.2 Color Serialization in CSS Serializer (CSS/Serialization/)
 - [ ] Implement canonical color serialization per CSS Color 4 spec
   - [ ] sRGB colors serialize as rgb()/rgba()
