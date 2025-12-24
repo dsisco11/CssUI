@@ -388,30 +388,33 @@ Implemented in Phase 6.7
 - [x] Handle transparent keyword serialization
 - [x] Tests: 40 tests for color serialization (CssColorSerializerTests.cs)
 
-### 7.8 CSS Token/Component Value Serialization (CSS/Serialization/)
+### 7.8 CSS Token/Component Value Serialization (CSS/Serialization/) ✓
 Spec Reference: https://www.w3.org/TR/css-syntax-3/#serialization
 
-#### 7.8.1 Core Serialization Requirements (§10)
-- [ ] Round-trip guarantee: parse → serialize → parse = same result
-- [ ] Handle consecutive whitespace tokens (may collapse)
-- [ ] Insert comments between tokens that would otherwise merge
-  - [ ] Build token adjacency table per spec §10
-  - [ ] ident + ident requires separator
-  - [ ] number + ident requires separator
-  - [ ] etc. (see full table in spec)
+#### 7.8.1 Core Serialization Requirements (§10) ✓
+- [x] Round-trip guarantee: parse → serialize → parse = same result
+- [x] Handle consecutive whitespace tokens (may collapse)
+- [x] Insert comments between tokens that would otherwise merge
+  - [x] Build token adjacency table per spec §10
+  - [x] ident + ident requires separator
+  - [x] number + ident requires separator
+  - [x] etc. (see full table in spec)
 
-#### 7.8.2 Token Serialization
-- [ ] Serialize <delim-token> containing \ as \+newline
-- [ ] Serialize <hash-token> with proper type flag handling
-- [ ] Serialize <dimension-token> unit with escaping for scientific notation ambiguity
-- [ ] Serialize all token types to canonical form
+#### 7.8.2 Token Serialization ✓
+- [x] Serialize <delim-token> containing \ as \+newline
+- [x] Serialize <hash-token> with proper type flag handling
+- [x] Serialize <dimension-token> unit with escaping for scientific notation ambiguity
+- [x] Serialize all token types to canonical form
 
-#### 7.8.3 Component Value Serialization
-- [ ] Serialize CssFunction to function-name(values)
-- [ ] Serialize CssSimpleBlock with proper brackets
-- [ ] Serialize CssAtRule with prelude and optional block
-- [ ] Serialize CssQualifiedRule with prelude and block
-- [ ] Serialize CssDecleration with name: value; format
+#### 7.8.3 Component Value Serialization ✓
+- [x] Serialize CssFunction to function-name(values)
+- [x] Serialize CssSimpleBlock with proper brackets
+- [x] Serialize CssAtRule with prelude and optional block
+- [x] Serialize CssQualifiedRule with prelude and block
+- [x] Serialize CssDecleration with name: value; format
+- [x] CssTokenSerializer class (CssUI/CSS/Serialization/CssTokenSerializer.cs)
+- [x] Tests: 70 tests for token serialization (CssUITests2/CSS/Serialization/CssTokenSerializerTests.cs)
+
 
 ### 7.3 Color Parsing Tests
 - [x] Hex color parsing tests (all formats)
