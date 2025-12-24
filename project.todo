@@ -350,9 +350,13 @@ Implemented in Phase 6.7
 - [x] Integrate CssProductionMatcher with CssVarFunctionParser
   - [x] Validate var() fallback values against <declaration-value> production
   - [x] Tests for invalid fallback rejection (bad-string, unmatched brackets)
-- [ ] Integrate with custom property declaration parsing
-  - [ ] Custom property values (--prop: value) must match <declaration-value>
-  - [ ] Add validation in Consume_Decleration for --* properties
+- [x] Integrate with custom property declaration parsing
+  - [x] Custom property values (--prop: value) must match <declaration-value>
+  - [x] Add validation in Consume_Decleration for --* properties
+  - [x] CssDecleration.IsCustomProperty property to identify custom properties
+  - [x] CssDecleration.ValueValidation property for production match result
+  - [x] CssDecleration.IsValueValid convenience property
+  - [x] Tests: 14 tests for custom property validation (CssDeclerationTests.cs)
 - [ ] Integrate with @supports rule parsing
   - [ ] @supports condition values should use <any-value> production
 - [ ] Integrate with CSS Nesting (future)

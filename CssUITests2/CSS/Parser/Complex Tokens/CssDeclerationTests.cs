@@ -407,4 +407,208 @@ public class CssDeclerationTests
         Assert.True(reparsed!.Important);
     }
     #endregion
+
+    #region Custom Property Tests
+    [Fact]
+    [Trait("Category", "ComplexTokens")]
+    [Trait("Category", "CssDecleration")]
+    [Trait("Category", "CustomProperty")]
+    public void IsCustomProperty_NameStartsWithDoubleDash_ReturnsTrue()
+    {
+        var decl = new CssDecleration("--my-color".AsSpan());
+        Assert.True(decl.IsCustomProperty);
+    }
+
+    [Fact]
+    [Trait("Category", "ComplexTokens")]
+    [Trait("Category", "CssDecleration")]
+    [Trait("Category", "CustomProperty")]
+    public void IsCustomProperty_RegularProperty_ReturnsFalse()
+    {
+        var decl = new CssDecleration("color".AsSpan());
+        Assert.False(decl.IsCustomProperty);
+    }
+
+    [Fact]
+    [Trait("Category", "ComplexTokens")]
+    [Trait("Category", "CssDecleration")]
+    [Trait("Category", "CustomProperty")]
+    public void IsCustomProperty_SingleDash_ReturnsFalse()
+    {
+        var decl = new CssDecleration("-webkit-transform".AsSpan());
+        Assert.False(decl.IsCustomProperty);
+    }
+
+    [Fact]
+    [Trait("Category", "ComplexTokens")]
+    [Trait("Category", "CssDecleration")]
+    [Trait("Category", "CustomProperty")]
+    public void ValueValidation_DefaultsToSuccess()
+    {
+        var decl = new CssDecleration("color".AsSpan());
+        Assert.True(decl.ValueValidation.IsMatch);
+    }
+
+    [Fact]
+    [Trait("Category", "ComplexTokens")]
+    [Trait("Category", "CssDecleration")]
+    [Trait("Category", "CustomProperty")]
+    public void IsValueValid_DefaultsToTrue()
+    {
+        var decl = new CssDecleration("color".AsSpan());
+        Assert.True(decl.IsValueValid);
+    }
+
+    [Fact]
+    [Trait("Category", "ComplexTokens")]
+    [Trait("Category", "CssDecleration")]
+    [Trait("Category", "CustomProperty")]
+    public void Parse_CustomPropertyWithValidValue_IsValueValidTrue()
+    {
+        var parser = new CssParser("--my-color: red;");
+        var declarations = parser.Parse_Decleration_List().ToList();
+        var decl = declarations[0] as CssDecleration;
+
+        Assert.NotNull(decl);
+        Assert.True(decl!.IsCustomProperty);
+        Assert.True(decl.IsValueValid);
+    }
+
+    [Fact]
+    [Trait("Category", "ComplexTokens")]
+    [Trait("Category", "CssDecleration")]
+    [Trait("Category", "CustomProperty")]
+    public void Parse_CustomPropertyWithComplexValue_IsValueValidTrue()
+    {
+        // Complex value with functions, whitespace, etc.
+        var parser = new CssParser("--complex: calc(100% - 20px) rgba(255, 0, 0, 0.5);");
+        var declarations = parser.Parse_Decleration_List().ToList();
+        var decl = declarations[0] as CssDecleration;
+
+        Assert.NotNull(decl);
+        Assert.True(decl!.IsCustomProperty);
+        Assert.True(decl.IsValueValid);
+    }
+
+    [Fact]
+    [Trait("Category", "ComplexTokens")]
+    [Trait("Category", "CssDecleration")]
+    [Trait("Category", "CustomProperty")]
+    public void Parse_CustomPropertyWithNestedParens_IsValueValidTrue()
+    {
+        var parser = new CssParser("--nested: url(test.png) linear-gradient(to right, red, blue);");
+        var declarations = parser.Parse_Decleration_List().ToList();
+        var decl = declarations[0] as CssDecleration;
+
+        Assert.NotNull(decl);
+        Assert.True(decl!.IsCustomProperty);
+        Assert.True(decl.IsValueValid);
+    }
+
+    [Fact]
+    [Trait("Category", "ComplexTokens")]
+    [Trait("Category", "CssDecleration")]
+    [Trait("Category", "CustomProperty")]
+    public void Parse_CustomPropertyWithBrackets_IsValueValidTrue()
+    {
+        var parser = new CssParser("--brackets: [a] {b};");
+        var declarations = parser.Parse_Decleration_List().ToList();
+        var decl = declarations[0] as CssDecleration;
+
+        Assert.NotNull(decl);
+        Assert.True(decl!.IsCustomProperty);
+        Assert.True(decl.IsValueValid);
+    }
+
+    [Fact]
+    [Trait("Category", "ComplexTokens")]
+    [Trait("Category", "CssDecleration")]
+    [Trait("Category", "CustomProperty")]
+    public void Parse_RegularProperty_IsValueValidTrue()
+    {
+        // Regular properties don't go through custom property validation
+        var parser = new CssParser("color: red;");
+        var declarations = parser.Parse_Decleration_List().ToList();
+        var decl = declarations[0] as CssDecleration;
+
+        Assert.NotNull(decl);
+        Assert.False(decl!.IsCustomProperty);
+        Assert.True(decl.IsValueValid);
+    }
+
+    [Fact]
+    [Trait("Category", "ComplexTokens")]
+    [Trait("Category", "CssDecleration")]
+    [Trait("Category", "CustomProperty")]
+    public void Parse_CustomPropertyWithEmptyValue_IsValueValidTrue()
+    {
+        // Empty values are valid (will be Success by default since validation is skipped for empty)
+        var parser = new CssParser("--empty:;");
+        var declarations = parser.Parse_Decleration_List().ToList();
+        var decl = declarations[0] as CssDecleration;
+
+        Assert.NotNull(decl);
+        Assert.True(decl!.IsCustomProperty);
+        Assert.True(decl.IsValueValid); // Default success for empty value
+    }
+
+    [Fact]
+    [Trait("Category", "ComplexTokens")]
+    [Trait("Category", "CssDecleration")]
+    [Trait("Category", "CustomProperty")]
+    public void Parse_CustomPropertyCaseSensitiveName_PreservesCase()
+    {
+        var parser = new CssParser("--myCustomProperty: test;");
+        var declarations = parser.Parse_Decleration_List().ToList();
+        var decl = declarations[0] as CssDecleration;
+
+        Assert.NotNull(decl);
+        Assert.Equal("--myCustomProperty", decl!.Name);
+    }
+
+    [Fact]
+    [Trait("Category", "ComplexTokens")]
+    [Trait("Category", "CssDecleration")]
+    [Trait("Category", "CustomProperty")]
+    public void Parse_CustomPropertyWithVarFunction_IsValueValidTrue()
+    {
+        var parser = new CssParser("--theme-color: var(--base-color, blue);");
+        var declarations = parser.Parse_Decleration_List().ToList();
+        var decl = declarations[0] as CssDecleration;
+
+        Assert.NotNull(decl);
+        Assert.True(decl!.IsCustomProperty);
+        Assert.True(decl.IsValueValid);
+    }
+
+    [Fact]
+    [Trait("Category", "ComplexTokens")]
+    [Trait("Category", "CssDecleration")]
+    [Trait("Category", "CustomProperty")]
+    public void Parse_CustomPropertyWithMultipleValues_IsValueValidTrue()
+    {
+        var parser = new CssParser("--margin: 10px 20px 30px 40px;");
+        var declarations = parser.Parse_Decleration_List().ToList();
+        var decl = declarations[0] as CssDecleration;
+
+        Assert.NotNull(decl);
+        Assert.True(decl!.IsCustomProperty);
+        Assert.True(decl.IsValueValid);
+    }
+
+    [Fact]
+    [Trait("Category", "ComplexTokens")]
+    [Trait("Category", "CssDecleration")]
+    [Trait("Category", "CustomProperty")]
+    public void Parse_CustomPropertyWithUrlFunction_IsValueValidTrue()
+    {
+        var parser = new CssParser("--bg-image: url('test.png');");
+        var declarations = parser.Parse_Decleration_List().ToList();
+        var decl = declarations[0] as CssDecleration;
+
+        Assert.NotNull(decl);
+        Assert.True(decl!.IsCustomProperty);
+        Assert.True(decl.IsValueValid);
+    }
+    #endregion
 }

@@ -740,9 +740,16 @@ public class CssParser
     /// Consumes a declaration per CSS Syntax Level 3 §5.4.6.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// This algorithm assumes that the next input token has already been checked to be an &lt;ident-token&gt;.
+    /// </para>
+    /// <para>
+    /// For custom properties (names starting with "--"), the value is validated against
+    /// the <c>&lt;declaration-value&gt;</c> production per CSS Syntax Level 3 §8.2.
+    /// </para>
     /// </remarks>
     /// <seealso href="https://www.w3.org/TR/css-syntax-3/#consume-a-declaration"/>
+    /// <seealso href="https://www.w3.org/TR/css-variables-1/#defining-variables"/>
     static CssDecleration? Consume_Decleration(DataConsumer<CssToken> Stream)
     {
         if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
@@ -824,7 +831,16 @@ public class CssParser
             Decleration.Values.RemoveAt(Decleration.Values.Count - 1);
         }
 
-        // Step 7: Return the declaration.
+        // Step 7: For custom properties, validate the value against <declaration-value> production.
+        // Per CSS Custom Properties Level 1: "The value of a custom property is everything after
+        // the property name, up to the end of the declaration."
+        // Per CSS Syntax Level 3 §8.2: custom property values must match <declaration-value>.
+        if (Decleration.IsCustomProperty && Decleration.Values.Count > 0)
+        {
+            Decleration.ValueValidation = CssProductionMatcher.MatchDeclarationValue(Decleration.Values);
+        }
+
+        // Step 8: Return the declaration.
         return Decleration;
     }
 
