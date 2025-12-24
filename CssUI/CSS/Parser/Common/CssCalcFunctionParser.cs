@@ -286,6 +286,13 @@ internal static class CssCalcFunctionParser
                         stream.Consume();
                         return new CssCalcValueNode(double.PositiveInfinity);
                     }
+                    // Note: -infinity is tokenized as a single ident token by the CSS tokenizer
+                    // because `-` followed by a name-start character forms an identifier
+                    if (value.Equals("-infinity", StringComparison.OrdinalIgnoreCase))
+                    {
+                        stream.Consume();
+                        return new CssCalcValueNode(double.NegativeInfinity);
+                    }
                     if (value.Equals("NaN", StringComparison.OrdinalIgnoreCase))
                     {
                         stream.Consume();
