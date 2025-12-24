@@ -650,6 +650,12 @@ public class CssParser
                         return CssValue.From(url);
                     }
 
+                    // Check if this is a calc() function
+                    if (CssCalcFunctionParser.TryParseCalcFunction(func, out CssCalcExpression? calcExpr))
+                    {
+                        return CssValue.From(calcExpr!);
+                    }
+
                     return new CssValue(func);
                 }
             case ECssTokenType.Function:
@@ -666,6 +672,12 @@ public class CssParser
                     if (CssUrlFunctionParser.TryParseUrlFunction(func!, out CssUrl url))
                     {
                         return CssValue.From(url);
+                    }
+
+                    // Check if this is a calc() function
+                    if (CssCalcFunctionParser.TryParseCalcFunction(func!, out CssCalcExpression? calcExpr2))
+                    {
+                        return CssValue.From(calcExpr2!);
                     }
 
                     return new CssValue(func!);

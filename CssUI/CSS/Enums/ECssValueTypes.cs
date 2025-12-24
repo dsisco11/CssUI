@@ -104,6 +104,12 @@ public enum ECssValueTypes : int
     /// Docs: https://www.w3.org/TR/css-values-4/#urls
     /// </summary>
     URL = (1 << 28),
+    /// <summary>
+    /// Value is a calc() expression represented as <see cref="CssCalcExpression"/>.
+    /// calc() allows mathematical expressions with CSS values.
+    /// Docs: https://www.w3.org/TR/css-values-4/#calc-func
+    /// </summary>
+    CALC = (1 << 29),
 
 
     /// <summary>

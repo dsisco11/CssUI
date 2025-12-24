@@ -278,6 +278,7 @@ public partial class CssValue
             case ECssValueTypes.DIMENSION:
             case ECssValueTypes.RATIO:
             case ECssValueTypes.RESOLUTION:
+            case ECssValueTypes.CALC:// calc() expressions may contain percentages that need resolution
                 {
                     /* XXX:
                      * These values when used on properties CAN be dependant but arent always so idk maybe its best to leave them as absolute?
@@ -377,6 +378,9 @@ public partial class CssValue
 
     /// <summary>Create a URL value from a string</summary>
     public static CssValue From_Url(string url) => new CssValue(ECssValueTypes.URL, CssValueData.FromObject(new CssUrl(url)));
+
+    /// <summary>Create a calc() expression value</summary>
+    public static CssValue From(CssCalcExpression value) => new CssValue(ECssValueTypes.CALC, CssValueData.FromObject(value));
 
     /// <summary>Create a css-value by parsing the given string as CSS markup</summary>
     public static CssValue From_CSS(string css) => new CssParser(css).Parse_CssValue();
@@ -891,6 +895,18 @@ public partial class CssValue
         Contract.EndContractBlock();
 
         return (CssUrl)(data.ObjectValue ?? CssUrl.Empty);
+    }
+
+    /// <summary>
+    /// Returns the value as a CssCalcExpression.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public CssCalcExpression AsCalcExpression()
+    {
+        if (Type != ECssValueTypes.CALC) throw new CssException($"{nameof(CssValue)} is not a calc() expression! {this}");
+        Contract.EndContractBlock();
+
+        return (CssCalcExpression)(data.ObjectValue ?? throw new CssException("calc() expression is null"));
     }
 
     /// <summary>

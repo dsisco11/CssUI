@@ -272,6 +272,32 @@ internal static class CssParsingHelpers
     }
 
     /// <summary>
+    /// Creates a token stream (DataConsumer) from a list of CSS tokens, optionally preserving whitespace.
+    /// </summary>
+    /// <param name="tokens">The original token list.</param>
+    /// <param name="preserveWhitespace">If true, whitespace is preserved in the stream.
+    /// This is important for calc() where whitespace around + and - is significant.</param>
+    /// <returns>A DataConsumer wrapping the token array.</returns>
+    public static DataConsumer<CssToken> CreateTokenStream(List<CssToken> tokens, bool preserveWhitespace)
+    {
+        if (preserveWhitespace)
+        {
+            return new DataConsumer<CssToken>(tokens.ToArray());
+        }
+
+        // Filter out whitespace tokens
+        var filtered = new List<CssToken>(tokens.Count);
+        foreach (var token in tokens)
+        {
+            if (token.Type != ECssTokenType.Whitespace)
+            {
+                filtered.Add(token);
+            }
+        }
+        return new DataConsumer<CssToken>(filtered.ToArray());
+    }
+
+    /// <summary>
     /// Skips whitespace tokens in the stream, advancing until the next token is not whitespace.
     /// Call this before consuming meaningful tokens.
     /// </summary>

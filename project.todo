@@ -230,10 +230,17 @@ Refactored to use DataConsumer<CssToken> for consistency with CssParser.cs patte
   - [x] ECssValueTypes.URL flag added
   - [x] CssParser handles URL tokens and url() functions with strings
   - [x] Tests: 26 tests for URL parsing (CssUrlParsingTests.cs)
-- [ ] Handle Calc() function → CssValue (FUNCTION)
-  - [ ] Support basic arithmetic: +, -, *, /
-  - [ ] Support nested calc() expressions
-  - [ ] Support mixing units: calc(100% - 20px)
+- [x] Handle calc() function → CssValue (CALC)
+  - [x] Support basic arithmetic: +, -, *, /
+  - [x] Support nested parentheses: calc((100px + 50px) * 2)
+  - [x] Support mixing units: calc(100% - 20px)
+  - [x] Support CSS constants: pi, e, infinity, -infinity, NaN
+  - [x] CssCalcExpression AST types (CssCalcNode, CssCalcSumNode, CssCalcProductNode, CssCalcValueNode)
+  - [x] CssCalcFunctionParser for parsing calc() function arguments
+  - [x] ECssValueTypes.CALC flag added
+  - [x] CssValue.From(CssCalcExpression) factory method
+  - [x] Whitespace-significant parsing for + and - operators per spec
+  - [x] Tests: 42 tests for calc() parsing (CssCalcFunctionParserTests.cs)
 - [ ] Handle var() function → CssValue (FUNCTION)
   - [ ] Parse CSS custom property references
   - [ ] Support fallback values: var(--prop, fallback)
