@@ -284,24 +284,16 @@ Refactored to use DataConsumer<CssToken> for consistency with CssParser.cs patte
 ### 7.7 CssParser Missing W3C Spec Algorithms (CSS/Parser/)
 Spec Reference: https://www.w3.org/TR/css-syntax-3/
 
-#### 7.7.1 Parser Entry Points (§5.3)
-- [ ] Parse_Stylesheet with location parameter (§5.3.3)
-  - [ ] Accept optional URL location for stylesheet
-  - [ ] Return stylesheet object with location set
-- [ ] Parse_Style_Block_Contents (§5.3.7)
-  - [ ] Parse contents of style rules allowing nested rules
-  - [ ] Required for CSS Nesting support
-- [ ] Normalize input token stream (§5.3)
-  - [ ] Handle string → token list conversion
-  - [ ] Handle component value list → token list
+#### 7.7.1 Parser Entry Points (§5.3) ✓
+Implemented in Phase 6.7 - see CssParserEntryPointTests.cs (26 tests)
+- [x] Parse_Stylesheet with location parameter (§5.3.3)
+- [x] Parse_Style_Block_Contents (§5.3.7)
+- [x] Normalize input token stream (§5.3)
+- [x] IEnumerable<CssToken> constructor overload
 
-#### 7.7.2 Parser Algorithms (§5.4)
-- [ ] Consume_Style_Block_Contents (§5.4.4)
-  - [ ] Create declarations list and rules list
-  - [ ] Handle nested at-rules
-  - [ ] Handle nested qualified rules (& selector)
-  - [ ] Different from Consume_Decleration_List - supports nesting
-- [ ] Handle <delim-token> with value "&" for nested selectors
+#### 7.7.2 Parser Algorithms (§5.4) ✓
+Implemented in Phase 6.7
+- [x] Consume_Style_Block_Contents (§5.4.4)
 
 #### 7.7.3 An+B Microsyntax Parsing (§6) ✓
 - [x] Parse <an+b> type for :nth-child(), :nth-of-type(), etc.
@@ -400,6 +392,46 @@ Spec Reference: https://www.w3.org/TR/css-syntax-3/#serialization
 - [ ] Remove CssColorHdr serialization methods - use serializer instead
 - [ ] Update all call sites to use formal parser/serializer
 - [ ] Ensure color types are pure value holders (FromRgba, FromHsl, etc. for programmatic construction only)
+
+## Phase 7.9: CSS Nesting
+Spec Reference: https://www.w3.org/TR/css-nesting-1/
+Prerequisites: Phase 6 (CSS Parser), Phase 7.7.2 (Consume_Style_Block_Contents)
+
+### 7.9.1 Nesting Selector (&)
+- [ ] Parse <delim-token> with value "&" as nesting selector
+- [ ] CssNestingSelector type (CSS/Selector/)
+- [ ] Nesting selector represents the parent rule's selector list
+- [ ] Handle & at any position in compound selector: &.class, .class&, &::before
+
+### 7.9.2 Nested Style Rules
+- [ ] Allow style rules inside other style rules
+- [ ] Nested rule parsing in Consume_Style_Block_Contents
+- [ ] Implicit & prepending when nested selector doesn't start with &
+- [ ] Relative selector handling (> .child, + .sibling)
+
+### 7.9.3 Nested Group Rules
+- [ ] Allow @media, @supports, @layer, @scope inside style rules
+- [ ] Conditional rules inherit parent's selector context
+- [ ] Proper scoping of nested conditional rules
+
+### 7.9.4 Selector Specificity
+- [ ] & inherits specificity of parent selector
+- [ ] :is() wrapping for implicit & (specificity calculation)
+- [ ] Multiple & in same selector (specificity stacking)
+
+### 7.9.5 Serialization
+- [ ] Serialize nested rules with proper indentation
+- [ ] Round-trip: parse → serialize → parse = same result
+- [ ] Flatten nested rules to non-nested form (optional)
+
+### 7.9.6 Tests
+- [ ] Nesting selector parsing tests
+- [ ] Nested style rule tests
+- [ ] Nested @media tests
+- [ ] Nested @supports tests
+- [ ] Specificity calculation tests
+- [ ] Serialization round-trip tests
+- [ ] Edge cases: deeply nested rules, multiple & usage
 
 ## Phase 8: CSS Properties System
 
