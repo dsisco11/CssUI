@@ -263,3 +263,9 @@ __pycache__/
 # Code coverage
 TestResults/
 CoverageReport/
+
+# BenchmarkDotNet Artifacts
+BenchmarkDotNet.Artifacts/
+
+# XML Documentation files
+*.xml
