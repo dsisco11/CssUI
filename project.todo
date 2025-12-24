@@ -378,14 +378,15 @@ Implemented in Phase 6.7
   - [ ] Use ECssBlockContentsType for nested rule parsing
   - [ ] Distinguish style-block vs rule-list contexts
 
-### 7.2 Color Serialization in CSS Serializer (CSS/Serialization/)
-- [ ] Implement canonical color serialization per CSS Color 4 spec
-  - [ ] sRGB colors serialize as rgb()/rgba()
-  - [ ] HDR colors serialize in their original color space
-- [ ] Add CssColor → canonical CSS string conversion
-- [ ] Add CssColorHdr → canonical CSS string conversion
-- [ ] Handle currentColor keyword serialization
-- [ ] Handle transparent keyword serialization
+### 7.2 Color Serialization in CSS Serializer (CSS/Serialization/) ✓
+- [x] Implement canonical color serialization per CSS Color 4 spec
+  - [x] sRGB colors serialize as rgb()/rgba()
+  - [x] HDR colors serialize in their original color space
+- [x] Add CssColor → canonical CSS string conversion
+- [x] Add CssColorHdr → canonical CSS string conversion
+- [x] Handle currentColor keyword serialization
+- [x] Handle transparent keyword serialization
+- [x] Tests: 40 tests for color serialization (CssColorSerializerTests.cs)
 
 ### 7.8 CSS Token/Component Value Serialization (CSS/Serialization/)
 Spec Reference: https://www.w3.org/TR/css-syntax-3/#serialization
