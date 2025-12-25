@@ -56,10 +56,10 @@ foreach(EnvDTE.ProjectItem item in projectItems)
 *	ANY CHANGES ARE SUBJECT TO BEING OVERWRITTEN
 * =====================================================
 */
-using CssUI.Internal;
+using EnumRecords;
 namespace CssUI
 {
-	[MetaEnum]
+	[EnumRecord<KeywordProperties>]
    public enum EElementTag : int
    {
    <#
@@ -73,7 +73,7 @@ namespace CssUI
 
 			WriteLine("");
 			WriteLine($"///<summary> {className}</summary>");
-			WriteLine($"[MetaKeyword(\"{tagName}\")]");
+			WriteLine($"[EnumRecordProperties(\"{tagName}\")]");
 			WriteLine($"{System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase( tagName )} = { index },");
 			index++;
 		}

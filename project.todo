@@ -35,38 +35,24 @@ Add helper method to preserve existing API signature for 40+ call sites:
 
 ### 8.5.1 Migrate Remaining MetaEnum-based Enums to EnumRecords
 These enums still use `[MetaEnum]`/`[MetaKeyword]` and need migration:
-- [ ] `EDisplayMode` (CSS/Enums/Style Properties/) - used by DisplayType.cs
-- [ ] `EBorderStyle` (CSS/Enums/Style Properties/) - border styling enum
-- [ ] `ECssValueTypes` (CSS/Enums/) - used by CSSValue.cs serialization (Note: this is a Flags enum, may not need keywords)
+- [x] `EDisplayMode` (CSS/Enums/Style Properties/) - used by DisplayType.cs
+- [x] `EBorderStyle` (CSS/Enums/Style Properties/) - border styling enum
+- [x] `ECssValueTypes` (CSS/Enums/) - NO MIGRATION NEEDED: plain Flags enum, no keywords
 
 ### 8.5.2 Address Generic/Runtime Lookup Usages
 These use `Lookup.TryKeyword<T>`/`Lookup.Keyword<T>` with generic type parameters.
-Requires either: (a) constrain T to have extension method, (b) use interface, or (c) keep reflection fallback.
+**RESOLVED:** `Lookup.cs` already provides reflection-based bridge methods that call generated EnumRecords extensions.
 
-- [ ] `AtomicName<T>` (CORE/Types/Atomic/AtomicName.cs)
-  - Lines 116, 131, 149, 166 use `Lookup.TryKeyword<T>(enumValue, out string)`
-  - Consider: Add `IHasKeyword` interface or keep reflection for generic flexibility
-
-- [ ] `DOMEnumList<EnumType>` (DOM/Elements/Attributes/Base/DOMEnumList.cs)
-  - Line 24 uses `Lookup.Keyword(token)` in generic `Token_To_String` method
-  - Consider: Add `IHasKeyword` interface constraint
-
-- [ ] `AttributeValue.From<T>` (DOM/Elements/Attributes/AttributeValue.cs)
-  - Line 123 uses `Lookup.TryKeyword(enumValue, out string?)` in generic factory
-  - Consider: Add overloads for common attribute enum types
-
-- [ ] `Serializer.Identifier<Ty>` (CSS/Serialization/Serializer.cs)
-  - Line 54 uses `Lookup.Keyword<Ty>(ident)` in generic method
-  - Consider: Add specific overloads for serialized enum types
+- [x] `AtomicName<T>` (CORE/Types/Atomic/AtomicName.cs) - Uses Lookup.TryKeyword<T>, works via reflection bridge
+- [x] `DOMEnumList<EnumType>` (DOM/Elements/Attributes/Base/DOMEnumList.cs) - Uses Lookup.Keyword<T>, works via reflection bridge
+- [x] `AttributeValue.From<T>` (DOM/Elements/Attributes/AttributeValue.cs) - Uses Lookup.TryKeyword<T>, works via reflection bridge
+- [x] `Serializer.Identifier<Ty>` (CSS/Serialization/Serializer.cs) - Uses Lookup.Keyword<T>, works via reflection bridge
 
 ### 8.5.3 Address Runtime Type Lookup Usages
 These determine enum type at runtime and cannot use compile-time extension methods:
+**RESOLVED:** `Lookup.Keyword(Type, object)` method provides runtime dispatch via reflection to EnumRecords extensions.
 
-- [ ] `CSSValue.ToString()` (CSS/Value/Base/CSSValue.cs)
-  - Line 1151 uses `Lookup.Keyword(data.ObjectValue!.GetType(), data.ObjectValue)`
-  - Line 1208 uses same pattern in `TryFormat`
-  - CssValue stores arbitrary enum keywords; runtime dispatch required
-  - Consider: Cache delegate per enum type, or switch on known keyword enum types
+- [x] `CSSValue.ToString()` (CSS/Value/Base/CSSValue.cs) - Uses Lookup.Keyword(Type, object), works via reflection bridge
 
 ### 8.6 Cleanup
 - [ ] Delete MetaEnumAttribute.cs (CORE/MetaTables/)

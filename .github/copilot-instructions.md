@@ -50,21 +50,25 @@ CssUI/
 
 All enums use **E-prefix**: `EDisplayMode`, `ECssUnit`, `EFlexDirection`, `ENodeType`
 
-### MetaEnum System for Keyword Mapping
+### EnumRecords System for Keyword Mapping
 
-Enums with CSS keyword mappings use `[MetaEnum]` + `[MetaKeyword]` attributes:
+Enums with CSS keyword mappings use `[EnumRecord<KeywordProperties>]` + `[EnumRecordProperties]` attributes (via EnumRecords package):
 
 ```csharp
-[MetaEnum]
+[Flags, EnumRecord<KeywordProperties>]
 public enum EDisplayMode : int
 {
-    [MetaKeyword("none")] NONE = (1 << 0),
-    [MetaKeyword("block")] BLOCK = (1 << 4),
-    [MetaKeyword("flex")] FLEX = (1 << 6),
+    [EnumRecordProperties("none")] NONE = (1 << 0),
+    [EnumRecordProperties("block")] BLOCK = (1 << 4),
+    [EnumRecordProperties("flex")] FLEX = (1 << 6),
 }
 ```
 
-Use `Lookup.Get_Keywords<TEnum>()` to retrieve keyword↔enum mappings.
+Use generated extension methods for enum↔keyword conversion:
+
+-   `enumValue.Keyword()` — Get keyword string for an enum value
+-   `EDisplayModeExtensions.TryFromKeyword(keyword, out result)` — Parse keyword to enum
+-   `Lookup.Get_Keywords<TEnum>()` — Get all keywords (legacy API, uses reflection)
 
 ### CSS Property Definition Pattern
 
