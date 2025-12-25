@@ -14,95 +14,6 @@
 ## Test Coverage — Total: 3055 passing, 0 skipped, 231 failing = 3286 tests
 ### DOM Tests: 518 passing, 3 skipped = 521 total
 
-## Phase 7: CSS Color Parsing & Serialization (W3C Compliance)
-### Spec References
-- CSS Color Level 4: https://www.w3.org/TR/css-color-4/
-- CSS Color Level 3: https://www.w3.org/TR/css-color-3/
-
-### 7.7 CssParser Missing W3C Spec Algorithms (CSS/Parser/)
-Spec Reference: https://www.w3.org/TR/css-syntax-3/
-
-#### 7.7.5 Error Recovery and Parse Errors
-- [ ] Handle unmatched <}-token>, <)-token>, <]-token> (TODO: needs deeper parser integration)
-
-#### 7.7.7 Production Matching Integration
-- [ ] Integrate with CSS Nesting (future)
-  - [ ] Use ECssBlockContentsType for nested rule parsing
-  - [ ] Distinguish style-block vs rule-list contexts
-
-## Phase 7.9: CSS Nesting
-Spec Reference: https://www.w3.org/TR/css-nesting-1/
-Prerequisites: Phase 6 (CSS Parser), Phase 7.7.2 (Consume_Style_Block_Contents)
-
-### 7.9.1 Nesting Selector (&)
-- [ ] Parse <delim-token> with value "&" as nesting selector
-- [ ] CssNestingSelector type (CSS/Selector/)
-- [ ] Nesting selector represents the parent rule's selector list
-- [ ] Handle & at any position in compound selector: &.class, .class&, &::before
-
-### 7.9.2 Nested Style Rules
-- [ ] Allow style rules inside other style rules
-- [ ] Nested rule parsing in Consume_Style_Block_Contents
-- [ ] Implicit & prepending when nested selector doesn't start with &
-- [ ] Relative selector handling (> .child, + .sibling)
-
-### 7.9.3 Nested Group Rules
-- [ ] Allow @media, @supports, @layer, @scope inside style rules
-- [ ] Conditional rules inherit parent's selector context
-- [ ] Proper scoping of nested conditional rules
-
-### 7.9.4 Selector Specificity
-- [ ] & inherits specificity of parent selector
-- [ ] :is() wrapping for implicit & (specificity calculation)
-- [ ] Multiple & in same selector (specificity stacking)
-
-### 7.9.5 Serialization
-- [ ] Serialize nested rules with proper indentation
-- [ ] Round-trip: parse → serialize → parse = same result
-- [ ] Flatten nested rules to non-nested form (optional)
-
-### 7.9.6 Tests
-- [ ] Nesting selector parsing tests
-- [ ] Nested style rule tests
-- [ ] Nested @media tests
-- [ ] Nested @supports tests
-- [ ] Specificity calculation tests
-- [ ] Serialization round-trip tests
-- [ ] Edge cases: deeply nested rules, multiple & usage
-
-## Phase 8: CSS Properties System
-
-### 8.1 CSS Properties (CSS/Properties/)
-- [ ] Shorthand property expansion tests (pending)
-
-### 8.2 CSS Box Model (CSS/Box Model/)
-- [ ] CssPrincipalBox tests
-- [ ] BoxModel calculation tests
-- [ ] Margin collapsing tests
-- [ ] Containing block tests
-
-### 8.3 CSS Parser Integration (CSS/Parser/)
-- [ ] Stylesheet parsing tests
-- [ ] Rule parsing tests
-- [ ] Declaration parsing tests
-- [ ] Error recovery tests
-
-### 8.4 CSS Stylesheet/Rules (CSS/Stylesheet/, CSS/Rules/)
-- [ ] @media rule tests
-- [ ] @import rule tests
-- [ ] @font-face rule tests
-- [ ] Cascade and specificity tests
-
-### 8.5 CSS Custom Properties (CSS/Functions/)
-- [ ] var() resolution tests
-- [ ] Custom property inheritance tests
-- [ ] Cycle detection tests
-
-### 8.6 Block Formatting Context (CSS/Formatting/)
-- [ ] BlockFormattingContext tests
-- [ ] Float layout tests
-- [ ] Clear property tests
-
 ## Phase 9: ISpanFormattable & Serialization Modernization
 Migrate from ICssSerializeable.Serialize(StringBuilder) pattern to ISpanFormattable for better performance and .NET interop.
 
@@ -215,6 +126,95 @@ These parse from token streams; IParsable facade tokenizes string first, then de
 - [ ] Mark deprecated Parse methods with [Obsolete] pointing to IParsable
 - [ ] Keep internal TryParse(DataConsumer<CssToken>) overloads on parser classes
 - [ ] Update XML documentation
+
+## Phase 11: CSS Color Parsing & Serialization (W3C Compliance)
+### Spec References
+- CSS Color Level 4: https://www.w3.org/TR/css-color-4/
+- CSS Color Level 3: https://www.w3.org/TR/css-color-3/
+
+### 11.7 CssParser Missing W3C Spec Algorithms (CSS/Parser/)
+Spec Reference: https://www.w3.org/TR/css-syntax-3/
+
+#### 11.7.5 Error Recovery and Parse Errors
+- [ ] Handle unmatched <}-token>, <)-token>, <]-token> (TODO: needs deeper parser integration)
+
+#### 11.7.7 Production Matching Integration
+- [ ] Integrate with CSS Nesting (future)
+  - [ ] Use ECssBlockContentsType for nested rule parsing
+  - [ ] Distinguish style-block vs rule-list contexts
+
+## Phase 11.9: CSS Nesting
+Spec Reference: https://www.w3.org/TR/css-nesting-1/
+Prerequisites: Phase 6 (CSS Parser), Phase 11.7.2 (Consume_Style_Block_Contents)
+
+### 11.9.1 Nesting Selector (&)
+- [ ] Parse <delim-token> with value "&" as nesting selector
+- [ ] CssNestingSelector type (CSS/Selector/)
+- [ ] Nesting selector represents the parent rule's selector list
+- [ ] Handle & at any position in compound selector: &.class, .class&, &::before
+
+### 11.9.2 Nested Style Rules
+- [ ] Allow style rules inside other style rules
+- [ ] Nested rule parsing in Consume_Style_Block_Contents
+- [ ] Implicit & prepending when nested selector doesn't start with &
+- [ ] Relative selector handling (> .child, + .sibling)
+
+### 11.9.3 Nested Group Rules
+- [ ] Allow @media, @supports, @layer, @scope inside style rules
+- [ ] Conditional rules inherit parent's selector context
+- [ ] Proper scoping of nested conditional rules
+
+### 11.9.4 Selector Specificity
+- [ ] & inherits specificity of parent selector
+- [ ] :is() wrapping for implicit & (specificity calculation)
+- [ ] Multiple & in same selector (specificity stacking)
+
+### 11.9.5 Serialization
+- [ ] Serialize nested rules with proper indentation
+- [ ] Round-trip: parse → serialize → parse = same result
+- [ ] Flatten nested rules to non-nested form (optional)
+
+### 11.9.6 Tests
+- [ ] Nesting selector parsing tests
+- [ ] Nested style rule tests
+- [ ] Nested @media tests
+- [ ] Nested @supports tests
+- [ ] Specificity calculation tests
+- [ ] Serialization round-trip tests
+- [ ] Edge cases: deeply nested rules, multiple & usage
+
+## Phase 12: CSS Properties System
+
+### 12.1 CSS Properties (CSS/Properties/)
+- [ ] Shorthand property expansion tests (pending)
+
+### 12.2 CSS Box Model (CSS/Box Model/)
+- [ ] CssPrincipalBox tests
+- [ ] BoxModel calculation tests
+- [ ] Margin collapsing tests
+- [ ] Containing block tests
+
+### 12.3 CSS Parser Integration (CSS/Parser/)
+- [ ] Stylesheet parsing tests
+- [ ] Rule parsing tests
+- [ ] Declaration parsing tests
+- [ ] Error recovery tests
+
+### 12.4 CSS Stylesheet/Rules (CSS/Stylesheet/, CSS/Rules/)
+- [ ] @media rule tests
+- [ ] @import rule tests
+- [ ] @font-face rule tests
+- [ ] Cascade and specificity tests
+
+### 12.5 CSS Custom Properties (CSS/Functions/)
+- [ ] var() resolution tests
+- [ ] Custom property inheritance tests
+- [ ] Cycle detection tests
+
+### 12.6 Block Formatting Context (CSS/Formatting/)
+- [ ] BlockFormattingContext tests
+- [ ] Float layout tests
+- [ ] Clear property tests
 
 ## Phase 25: Advanced CSS Features
 ### 25.1 CSS calc() Formal Tree (future enhancement)
