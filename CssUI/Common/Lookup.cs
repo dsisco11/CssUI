@@ -7,8 +7,16 @@ using System.Runtime.CompilerServices;
 namespace CssUI;
 
 /// <summary>
-/// Provides utility functions for looking up enum keywords and metadata
+/// Provides utility functions for looking up enum keywords and metadata.
 /// </summary>
+/// <remarks>
+/// After migration to EnumRecords, prefer using the generated extension methods directly:
+/// <list type="bullet">
+/// <item><c>enumValue.Keyword()</c> — Get keyword for an enum value</item>
+/// <item><c>TExtensions.TryFromKeyword(keyword, out result)</c> — Parse keyword to enum</item>
+/// </list>
+/// The methods in this class are retained for backward compatibility during migration.
+/// </remarks>
 public static class Lookup
 {
     #region Keywords
@@ -381,35 +389,64 @@ public static class Lookup
 
     #region Fetches
     /// <summary>
-    /// Returns ALL keywords defined for the given enum
+    /// Returns ALL keywords defined for the given enum.
     /// </summary>
-    /// <param name="enumType"></param>
-    /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
+    /// <remarks>
+    /// This method uses reflection to invoke the EnumRecords-generated Keyword() extension method.
+    /// For hot paths, consider caching the result or using the generated extension methods directly.
+    /// </remarks>
+    /// <param name="enumType">The enum type</param>
+    /// <returns>Array of keyword strings</returns>
     public static string[] Get_Keywords(Type enumType)
     {
         ArgumentNullException.ThrowIfNull(enumType);
         Contract.EndContractBlock();
 
-        int enumIndex = EnumMetaTable.Meta.Lookup(enumType.TypeHandle);
-        if (enumIndex < 0)
-            return Array.Empty<string>();/* Enum has no index */
+        // Find the generated extension class (e.g., EFlexDirectionExtensions)
+        var extensionsClassName = $"{enumType.Name}Extensions";
+        var extensionsType = enumType.Assembly.GetType($"{enumType.Namespace}.{extensionsClassName}")
+                          ?? enumType.Assembly.GetType($"CssUI.{extensionsClassName}")
+                          ?? enumType.Assembly.GetType($"CssUI.CSS.{extensionsClassName}")
+                          ?? enumType.Assembly.GetType($"CssUI.CSS.Media.{extensionsClassName}")
+                          ?? enumType.Assembly.GetType($"CssUI.CSS.Enums.{extensionsClassName}")
+                          ?? enumType.Assembly.GetType($"CssUI.CSS.Internal.{extensionsClassName}")
+                          ?? enumType.Assembly.GetType($"CssUI.DOM.{extensionsClassName}")
+                          ?? enumType.Assembly.GetType($"CssUI.HTTP.{extensionsClassName}");
 
-        return EnumMetaTable.KEYWORD[enumIndex].Keys.Select(static k => k.ToString()).ToArray();
+        if (extensionsType is null)
+            return Array.Empty<string>();
+
+        // Find the Keyword extension method
+        var keywordMethod = extensionsType.GetMethod("Keyword", new[] { enumType });
+        if (keywordMethod is null)
+            return Array.Empty<string>();
+
+        // Get all enum values and map to keywords
+        var enumValues = System.Enum.GetValues(enumType);
+        var keywords = new string[enumValues.Length];
+
+        for (int i = 0; i < enumValues.Length; i++)
+        {
+            var result = keywordMethod.Invoke(null, new[] { enumValues.GetValue(i) });
+            keywords[i] = result?.ToString() ?? string.Empty;
+        }
+
+        return keywords.Where(static k => !string.IsNullOrEmpty(k)).ToArray();
     }
 
     /// <summary>
-    /// Returns ALL keywords defined for the given enum
+    /// Returns ALL keywords defined for the given enum.
     /// </summary>
-    /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]// Small function which is called frequently in loops, inline it
-    public static string[] Get_Keywords<T>()
+    /// <typeparam name="T">The enum type</typeparam>
+    /// <returns>Array of keyword strings</returns>
+    /// <remarks>
+    /// This method uses reflection to invoke the EnumRecords-generated Keyword() extension method.
+    /// For hot paths, consider caching the result or using the generated extension methods directly.
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string[] Get_Keywords<T>() where T : struct, System.Enum
     {
-        int enumIndex = EnumMetaTable.Meta.Lookup<T>();
-        if (enumIndex < 0)
-            return Array.Empty<string>();/* Enum has no index */
-
-        return EnumMetaTable.KEYWORD[enumIndex].Keys.Select(static k => k.ToString()).ToArray();
+        return Get_Keywords(typeof(T));
     }
     #endregion
 }

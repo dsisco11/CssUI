@@ -26,7 +26,8 @@ Replace `[MetaEnum]`/`[MetaKeyword]` with `[EnumRecord<T>]`/`[EnumRecordProperti
 
 ### 8.4 Update Lookup.cs Helper
 Add helper method to preserve existing API signature for 40+ call sites:
-- [ ] Add `Get_Keywords<T>()` implementation using `Enum.GetValues<T>().Select(v => v.Keyword()).ToArray()`
+- [x] Add `Get_Keywords<T>()` implementation using reflection to call generated Keyword() method
+- [ ] Mark legacy EnumMetaTable-based methods as obsolete (defer to 8.5)
 
 ### 8.5 Update Consumer Call Sites
 - [ ] `Lookup.Get_Keyword(enumValue)` → `enumValue.Keyword()`
