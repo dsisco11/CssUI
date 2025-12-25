@@ -18,10 +18,10 @@
 Migrate from ICssSerializeable.Serialize(StringBuilder) pattern to ISpanFormattable for better performance and .NET interop.
 
 ### 9.2 Media Query Types (CSS/Media/)
-- [ ] MediaFeature
+- [x] MediaFeature
 - [ ] MediaQuery
 - [ ] MediaQueryList
-- [ ] MediaCondition
+- [x] MediaCondition
 
 ### 9.3 CSS Selector Types (CSS/Selector/)
 - [ ] CssSelector

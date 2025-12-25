@@ -85,7 +85,7 @@ public class MediaQuery : ICssSerializeable
                 sb.Append(UnicodeCommon.CHAR_SPACE);
             }
 
-            sb.Append(Condition.Serialize());
+            sb.Append(Condition.ToString());
             first = false;
         }
 

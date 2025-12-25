@@ -1,16 +1,20 @@
 using System;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
-using System.Text;
 using CssUI.CSS.Internal;
-using CssUI.CSS.Serialization;
 using CssUI.DOM;
 
 namespace CssUI.CSS.Media;
 
 /// <summary>
+/// Represents a media feature condition in a media query.
 /// </summary>
-public class MediaFeature : IMediaCondition, ICssSerializeable
+/// <remarks>
+/// Media features describe specific characteristics of the user agent, output device, or environment.
+/// They can be used in boolean context (e.g., <c>(color)</c>) or range context (e.g., <c>(width > 500px)</c>).
+/// </remarks>
+/// <seealso href="https://www.w3.org/TR/mediaqueries-4/#mq-features"/>
+public class MediaFeature : IMediaCondition
 {/* Docs: https://www.w3.org/TR/mediaqueries-4/#mq-features */
     #region Properties
     private readonly EMediaCombinator Combinator = EMediaCombinator.None;
@@ -382,59 +386,112 @@ public class MediaFeature : IMediaCondition, ICssSerializeable
         }
     }
 
-    public string Serialize()
+    #endregion
+
+    #region Formatting (ISpanFormattable)
+
+    /// <inheritdoc/>
+    public override string ToString() => ToString(null, null);
+
+    /// <inheritdoc/>
+    public string ToString(string? format, IFormatProvider? formatProvider)
     {
+        Span<char> buffer = stackalloc char[256];
+        if (TryFormat(buffer, out int charsWritten, format.AsSpan(), formatProvider))
+        {
+            return buffer[..charsWritten].ToString();
+        }
+        return string.Empty;
+    }
+
+    /// <summary>
+    /// Tries to format the media feature into the provided span.
+    /// </summary>
+    /// <param name="destination">The span to write to.</param>
+    /// <param name="charsWritten">The number of characters written.</param>
+    /// <param name="format">The format string (ignored).</param>
+    /// <param name="provider">The format provider (ignored).</param>
+    /// <returns><c>true</c> if formatting succeeded; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    /// Serialization follows CSS Media Queries Level 4 §4.
+    /// Format: (name) for boolean, (name: value) for plain range, or (value op name op value) for range.
+    /// </remarks>
+    /// <seealso href="https://www.w3.org/TR/mediaqueries-4/#mq-features"/>
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+    {
+        charsWritten = 0;
+
         if (!IsValid)
         {
-            return string.Empty;
+            return true; // Empty string is valid for invalid features
         }
 
-        if (!Lookup.TryKeyword(Values[0].AsEnum<EMediaFeatureName>(), out string Name))
+        if (!Lookup.TryKeyword(Values![0].AsEnum<EMediaFeatureName>(), out string? featureName))
         {
-            throw new CssSyntaxErrorException("Could not find media-feature name");
+            return false;
         }
 
+        int pos = 0;
 
-        StringBuilder sb = new StringBuilder();
-        /* 1) Append a "(" (U+0028), followed by the media feature name, converted to ASCII lowercase, to s. */
-        sb.Append(UnicodeCommon.CHAR_LEFT_PARENTHESES);
+        // 1) Append opening parenthesis
+        if (destination.Length < 1) return false;
+        destination[pos++] = UnicodeCommon.CHAR_LEFT_PARENTHESES;
 
         if (Context == EMediaFeatureContext.Boolean)
         {
-            sb.Append(Name);
+            // Boolean context: (name)
+            if (destination.Length < pos + featureName.Length) return false;
+            featureName.AsSpan().CopyTo(destination[pos..]);
+            pos += featureName.Length;
         }
         else if (Context == EMediaFeatureContext.Range)
         {
-            sb.Append(Name);
+            // Append feature name
+            if (destination.Length < pos + featureName.Length) return false;
+            featureName.AsSpan().CopyTo(destination[pos..]);
+            pos += featureName.Length;
 
-            if (Operators.Length == 0 && Values.Length == 2)
+            if (Operators!.Length == 0 && Values.Length == 2)
             {
-                /* If a value is given append a ":" (U+003A), followed by a single SPACE (U+0020), followed by the serialized media feature value. */
-                sb.Append(UnicodeCommon.CHAR_COLON);
-                sb.Append(UnicodeCommon.CHAR_SPACE);
-                sb.Append(Values[1].Serialize());
+                // Plain range: (name: value)
+                if (destination.Length < pos + 2) return false;
+                destination[pos++] = UnicodeCommon.CHAR_COLON;
+                destination[pos++] = UnicodeCommon.CHAR_SPACE;
+
+                if (!Values[1].TryFormat(destination[pos..], out int valueWritten, default, provider))
+                    return false;
+                pos += valueWritten;
             }
             else
             {
-                /* Serialize all value/operator pairs  */
+                // Range with operators: serialize all value/operator pairs
                 for (int i = 1; i < Operators.Length; i++)
                 {
-                    CssValue B = Values[i];
+                    CssValue value = Values[i];
                     EMediaOperator op = Operators[i - 1];
-                    if (!Lookup.TryKeyword(op, out string outComparator))
+
+                    if (!Lookup.TryKeyword(op, out string? comparator))
                     {
-                        throw new CssSyntaxErrorException("Unable to find the specified comparator within the CSS enum LUT");
+                        return false;
                     }
 
-                    sb.Append(B.Serialize());
-                    sb.Append(outComparator);
+                    if (!value.TryFormat(destination[pos..], out int valueWritten, default, provider))
+                        return false;
+                    pos += valueWritten;
+
+                    if (destination.Length < pos + comparator.Length) return false;
+                    comparator.AsSpan().CopyTo(destination[pos..]);
+                    pos += comparator.Length;
                 }
             }
         }
-        /* 3) Append a ")" (U+0029) to s. */
-        sb.Append(UnicodeCommon.CHAR_RIGHT_PARENTHESES);
 
-        return sb.ToString();
+        // 3) Append closing parenthesis
+        if (destination.Length <= pos) return false;
+        destination[pos++] = UnicodeCommon.CHAR_RIGHT_PARENTHESES;
+
+        charsWritten = pos;
+        return true;
     }
 
     #endregion

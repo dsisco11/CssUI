@@ -1,19 +1,29 @@
+using System;
 using System.Collections.Generic;
-using System.Text;
-using CssUI.CSS.Serialization;
 using CssUI.DOM;
 
 namespace CssUI.CSS.Media;
 
-public class MediaCondition : IMediaCondition, ICssSerializeable
-{/* https://www.w3.org/TR/mediaqueries-4/#media-condition */
-
-    #region Properites
+/// <summary>
+/// Represents a compound media condition combining multiple sub-conditions with a logical operator.
+/// </summary>
+/// <remarks>
+/// Media conditions can combine sub-conditions using AND, OR, or NOT combinators.
+/// </remarks>
+/// <seealso href="https://www.w3.org/TR/mediaqueries-4/#media-condition"/>
+public class MediaCondition : IMediaCondition
+{
+    #region Properties
     private readonly LinkedList<IMediaCondition> Conditions;
     private readonly EMediaCombinator Op;
     #endregion
 
     #region Constructor
+    /// <summary>
+    /// Creates a new compound media condition.
+    /// </summary>
+    /// <param name="op">The logical combinator (AND, OR, NOT).</param>
+    /// <param name="conditions">The sub-conditions to combine.</param>
     public MediaCondition(EMediaCombinator op, IEnumerable<IMediaCondition> conditions)
     {
         Conditions = new LinkedList<IMediaCondition>(conditions);
@@ -21,7 +31,7 @@ public class MediaCondition : IMediaCondition, ICssSerializeable
     }
     #endregion
 
-
+    /// <inheritdoc/>
     public bool Matches(Document document)
     {
         bool matches = true;
@@ -53,37 +63,84 @@ public class MediaCondition : IMediaCondition, ICssSerializeable
         return matches;
     }
 
+    #region Formatting (ISpanFormattable)
 
+    /// <inheritdoc/>
+    public override string ToString() => ToString(null, null);
 
-    public string Serialize()
+    /// <inheritdoc/>
+    public string ToString(string? format, IFormatProvider? formatProvider)
     {
+        Span<char> buffer = stackalloc char[1024];
+        if (TryFormat(buffer, out int charsWritten, format.AsSpan(), formatProvider))
+        {
+            return buffer[..charsWritten].ToString();
+        }
+        return string.Empty;
+    }
+
+    /// <summary>
+    /// Tries to format the media condition into the provided span.
+    /// </summary>
+    /// <param name="destination">The span to write to.</param>
+    /// <param name="charsWritten">The number of characters written.</param>
+    /// <param name="format">The format string (ignored).</param>
+    /// <param name="provider">The format provider (ignored).</param>
+    /// <returns><c>true</c> if formatting succeeded; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    /// Serialization follows CSS Media Queries Level 4 §3.
+    /// Format: (condition1 and/or condition2 ...)
+    /// </remarks>
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+    {
+        charsWritten = 0;
+
         if (Conditions.Count <= 0)
         {
-            return string.Empty;
+            return true; // Empty string is valid for empty conditions
         }
 
-        StringBuilder sb = new StringBuilder();
+        int pos = 0;
 
-        sb.Append(UnicodeCommon.CHAR_LEFT_PARENTHESES);
+        // Opening parenthesis
+        if (destination.Length < 1) return false;
+        destination[pos++] = UnicodeCommon.CHAR_LEFT_PARENTHESES;
 
         bool first = true;
-        foreach (IMediaCondition Condition in Conditions)
+        string? keyword = Lookup.Keyword(Op);
+
+        foreach (IMediaCondition condition in Conditions)
         {
             if (!first)
             {
-                sb.Append(UnicodeCommon.CHAR_SPACE);
-                sb.Append(Lookup.Keyword(Op));
-                sb.Append(UnicodeCommon.CHAR_SPACE);
+                // Space + keyword + space
+                int separatorLen = 2 + (keyword?.Length ?? 0);
+                if (destination.Length < pos + separatorLen) return false;
+
+                destination[pos++] = UnicodeCommon.CHAR_SPACE;
+                if (keyword != null)
+                {
+                    keyword.AsSpan().CopyTo(destination[pos..]);
+                    pos += keyword.Length;
+                }
+                destination[pos++] = UnicodeCommon.CHAR_SPACE;
             }
 
-            sb.Append(Condition.Serialize());
+            if (!condition.TryFormat(destination[pos..], out int conditionWritten, default, provider))
+                return false;
+            pos += conditionWritten;
+
             first = false;
         }
 
-        sb.Append(UnicodeCommon.CHAR_RIGHT_PARENTHESES);
-        return sb.ToString();
+        // Closing parenthesis
+        if (destination.Length <= pos) return false;
+        destination[pos++] = UnicodeCommon.CHAR_RIGHT_PARENTHESES;
+
+        charsWritten = pos;
+        return true;
     }
 
-
+    #endregion
 }
 
