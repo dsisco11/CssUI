@@ -17,7 +17,7 @@ public static class MimeType
 
     public static MimeTypeRecord CreateRecord(EMimeType mime)
     {
-        string mimeString = Lookup.Keyword(mime);
+        string mimeString = mime.Keyword();
         return CreateRecord(mimeString);
     }
 
@@ -535,7 +535,7 @@ public static class MimeType
         if (suppliedMimeType.Equals("unknown/unknown") || suppliedMimeType.Equals("application/unknown") || suppliedMimeType.Equals("*/*"))
         {
             var mimeType = Identify_Unknown_MIME_Type(Header, !bNoSniff);
-            outMIME = Lookup.Keyword(mimeType);
+            outMIME = mimeType.Keyword();
             return true;
         }
 
@@ -549,13 +549,13 @@ public static class MimeType
         {
             if (Header.Length >= 2)
             {
-                if (PatternMatch(Header, PATTERN_UTF16BE_BOM, MASK_UTF16BE_BOM, null, true)) { outMIME = Lookup.Keyword(EMimeType.Plain); return true; }
-                if (PatternMatch(Header, PATTERN_UTF16LE_BOM, MASK_UTF16LE_BOM, null, true)) { outMIME = Lookup.Keyword(EMimeType.Plain); return true; }
+                if (PatternMatch(Header, PATTERN_UTF16BE_BOM, MASK_UTF16BE_BOM, null, true)) { outMIME = EMimeType.Plain.Keyword(); return true; }
+                if (PatternMatch(Header, PATTERN_UTF16LE_BOM, MASK_UTF16LE_BOM, null, true)) { outMIME = EMimeType.Plain.Keyword(); return true; }
             }
 
             if (Header.Length >= 3)
             {
-                if (PatternMatch(Header, PATTERN_UTF8_BOM, MASK_UTF8_BOM, null, true)) { outMIME = Lookup.Keyword(EMimeType.Plain); return true; }
+                if (PatternMatch(Header, PATTERN_UTF8_BOM, MASK_UTF8_BOM, null, true)) { outMIME = EMimeType.Plain.Keyword(); return true; }
             }
 
             bool foundBinaryDataByte = false;
@@ -569,9 +569,9 @@ public static class MimeType
                 }
             }
 
-            if (!foundBinaryDataByte) { outMIME = Lookup.Keyword(EMimeType.Plain); return true; }
+            if (!foundBinaryDataByte) { outMIME = EMimeType.Plain.Keyword(); return true; }
 
-            outMIME = Lookup.Keyword(EMimeType.OctetStream);
+            outMIME = EMimeType.OctetStream.Keyword();
             return true;
         }
 
@@ -595,7 +595,7 @@ public static class MimeType
         {
             if (Identify_Image_MIME_Type(Header, out EMimeType outImageMIME))
             {
-                outMIME = Lookup.Keyword(outImageMIME);
+                outMIME = outImageMIME.Keyword();
                 return true;
             }
         }
@@ -604,7 +604,7 @@ public static class MimeType
         {
             if (Identify_Audio_Or_Video_MIME_Type(Header, out EMimeType outVideoMIME))
             {
-                outMIME = Lookup.Keyword(outVideoMIME);
+                outMIME = outVideoMIME.Keyword();
                 return true;
             }
         }

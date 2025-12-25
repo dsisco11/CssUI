@@ -277,7 +277,7 @@ namespace CssUI.HTML
                 else if (field is HTMLInputElement && (field as HTMLInputElement).type == EInputType.Hidden && (field as HTMLInputElement).name.Equals("_charset_"))
                 {
                     var inputElement = (HTMLInputElement)field;
-                    var charset = inputElement.formEnctype.HasValue ? Lookup.Keyword(inputElement.formEnctype.Value) : "UTF-8";
+                    var charset = inputElement.formEnctype.HasValue ? inputElement.formEnctype.Value.Keyword() : "UTF-8";
                     Append_Entry_To_List(ref entryList, name, charset);
                 }
                 /* 11) Otherwise, if the field element is a textarea element, append an entry to entry list with name and the value of the field element, and the prevent line break normalization flag set. */

@@ -2293,7 +2293,7 @@ namespace CssUI.HTML
                             break;
                         default:
                             {
-                                if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError(string.Format(CultureInfo.InvariantCulture, ExceptionMessages.ERROR_InputElement_Property_Unsupported_By_InputType, Lookup.Keyword(inputElement.type)));
+                                if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError(string.Format(CultureInfo.InvariantCulture, ExceptionMessages.ERROR_InputElement_Property_Unsupported_By_InputType, inputElement.type.Keyword()));
                                 else return;
                             }
                     }
@@ -2346,7 +2346,7 @@ namespace CssUI.HTML
                             break;
                         default:
                             {
-                                if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError(string.Format(CultureInfo.InvariantCulture, ExceptionMessages.ERROR_InputElement_Property_Unsupported_By_InputType, Lookup.Keyword(inputElement.type)));
+                                if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError(string.Format(CultureInfo.InvariantCulture, ExceptionMessages.ERROR_InputElement_Property_Unsupported_By_InputType, inputElement.type.Keyword()));
                                 else return;
                             }
                     }
@@ -2390,7 +2390,7 @@ namespace CssUI.HTML
                             break;
                         default:
                             {
-                                if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError(string.Format(CultureInfo.InvariantCulture, ExceptionMessages.ERROR_InputElement_Property_Unsupported_By_InputType, Lookup.Keyword(inputElement.type)));
+                                if (THROW_FOR_ATTR_INVALID_TYPES) throw new InvalidStateError(string.Format(CultureInfo.InvariantCulture, ExceptionMessages.ERROR_InputElement_Property_Unsupported_By_InputType, inputElement.type.Keyword()));
                                 else return;
                             }
                     }
@@ -2414,7 +2414,7 @@ namespace CssUI.HTML
                         break;
                     default:
                         {
-                            if (THROW_FOR_METHOD_INVALID_TYPES) throw new InvalidStateError(string.Format(CultureInfo.InvariantCulture, ExceptionMessages.ERROR_InputElement_Method_Unsupported_By_InputType, Lookup.Keyword(inputElement.type)));
+                            if (THROW_FOR_METHOD_INVALID_TYPES) throw new InvalidStateError(string.Format(CultureInfo.InvariantCulture, ExceptionMessages.ERROR_InputElement_Method_Unsupported_By_InputType, inputElement.type.Keyword()));
                             else return;
                         }
                 }
@@ -2478,7 +2478,7 @@ namespace CssUI.HTML
                         break;
                     default:
                         {
-                            if (THROW_FOR_METHOD_INVALID_TYPES) throw new InvalidStateError(string.Format(CultureInfo.InvariantCulture, ExceptionMessages.ERROR_InputElement_Method_Unsupported_By_InputType, Lookup.Keyword(inputElement.type)));
+                            if (THROW_FOR_METHOD_INVALID_TYPES) throw new InvalidStateError(string.Format(CultureInfo.InvariantCulture, ExceptionMessages.ERROR_InputElement_Method_Unsupported_By_InputType, inputElement.type.Keyword()));
                             else return;
                         }
                 }
@@ -2553,7 +2553,7 @@ namespace CssUI.HTML
                         break;
                     default:
                         {
-                            if (THROW_FOR_METHOD_INVALID_TYPES) throw new InvalidStateError(string.Format(CultureInfo.InvariantCulture, ExceptionMessages.ERROR_InputElement_Method_Unsupported_By_InputType, Lookup.Keyword(inputElement.type)));
+                            if (THROW_FOR_METHOD_INVALID_TYPES) throw new InvalidStateError(string.Format(CultureInfo.InvariantCulture, ExceptionMessages.ERROR_InputElement_Method_Unsupported_By_InputType, inputElement.type.Keyword()));
                             else return;
                         }
                 }

@@ -107,7 +107,7 @@ public class MediaCondition : IMediaCondition
         destination[pos++] = UnicodeCommon.CHAR_LEFT_PARENTHESES;
 
         bool first = true;
-        string? keyword = Lookup.Keyword(Op);
+        string? keyword = Op.Keyword();
 
         foreach (IMediaCondition condition in Conditions)
         {

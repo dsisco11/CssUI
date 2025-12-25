@@ -426,10 +426,7 @@ public class MediaFeature : IMediaCondition
             return true; // Empty string is valid for invalid features
         }
 
-        if (!Lookup.TryKeyword(Values![0].AsEnum<EMediaFeatureName>(), out string? featureName))
-        {
-            return false;
-        }
+        string featureName = Values![0].AsEnum<EMediaFeatureName>().Keyword();
 
         int pos = 0;
 
@@ -470,10 +467,7 @@ public class MediaFeature : IMediaCondition
                     CssValue value = Values[i];
                     EMediaOperator op = Operators[i - 1];
 
-                    if (!Lookup.TryKeyword(op, out string? comparator))
-                    {
-                        return false;
-                    }
+                    string comparator = op.Keyword();
 
                     if (!value.TryFormat(destination[pos..], out int valueWritten, default, provider))
                         return false;

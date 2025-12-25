@@ -178,12 +178,9 @@ public sealed class CssCalcValueNode : CssCalcNode
         if (Unit == ECssUnit.None)
             return valueStr;
 
-        // Get the unit string from the MetaEnum keyword table
-        if (Lookup.TryKeyword(Unit, out var unitStr))
-            return $"{valueStr}{unitStr}";
-
-        // Fallback for unmapped units
-        return $"{valueStr}{Unit.ToString().ToLowerInvariant()}";
+        // Get the unit string from the extension method
+        string unitStr = Unit.Keyword();
+        return $"{valueStr}{unitStr}";
     }
 }
 

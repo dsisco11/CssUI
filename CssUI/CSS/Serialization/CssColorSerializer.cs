@@ -260,7 +260,7 @@ public static class CssColorSerializer
     /// </remarks>
     private static string SerializeColorFunction(CssColorHdr color)
     {
-        string colorSpaceName = Lookup.Keyword(color.ColorSpace);
+        string colorSpaceName = color.ColorSpace.Keyword();
         int precision = GetColorSpacePrecision(color.ColorSpace);
 
         var sb = new StringBuilder(48);

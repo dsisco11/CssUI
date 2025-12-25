@@ -1142,7 +1142,7 @@ public partial class CssValue : ISpanFormattable, IFormattable
                 if (Unit == ECssUnit.None)
                     return string.Concat(AsDecimal().ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture), "<none>");
                 else
-                    return string.Concat(AsDecimal().ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture), Lookup.Keyword(unit));
+                    return string.Concat(AsDecimal().ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture), unit.Keyword());
             case ECssValueTypes.PERCENT:
                 return string.Concat(AsDecimal().ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture), "%");
             case ECssValueTypes.STRING:
@@ -1264,8 +1264,7 @@ public partial class CssValue : ISpanFormattable, IFormattable
         else
         {
             // Get unit string
-            if (!Lookup.TryKeyword(Unit, out var unitStr) || unitStr is null)
-                return false;
+            string unitStr = Unit.Keyword();
 
             if (destination.Length < charsWritten + unitStr.Length)
                 return false;
@@ -1393,10 +1392,7 @@ public partial class CssValue : ISpanFormattable, IFormattable
                     }
                     else
                     {
-                        if (!Lookup.TryKeyword(Unit, out var unitStr))
-                        {
-                            throw new CssException($"Unable to find enum value {Unit} in CSS enum table");
-                        }
+                        string unitStr = Unit.Keyword();
 
                         return string.Concat(AsDecimal().ToString(CultureInfo.InvariantCulture), unitStr);
                     }
