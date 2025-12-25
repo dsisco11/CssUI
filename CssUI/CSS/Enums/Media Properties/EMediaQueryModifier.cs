@@ -10,12 +10,12 @@ public enum EMediaQueryModifier : int
     /// <summary>
     /// Negates the media query result
     /// </summary>
-    [EnumRecordProperties("not")]
+    [EnumData("not")]
     Not,
     /// <summary>
     /// The only keyword has no effect on the media query's result, but will cause the media query to be parsed by legacy user agents as specifying the unknown media type "only", and thus be ignored.
     /// </summary>
-    [EnumRecordProperties("only")]
+    [EnumData("only")]
     Only,
 }
 

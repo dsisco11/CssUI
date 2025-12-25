@@ -6,10 +6,10 @@ namespace CssUI.DOM;
 public enum EDesignMode : int
 {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#designMode */
 
-    [EnumRecordProperties("on")]
+    [EnumData("on")]
     ON,
 
-    [EnumRecordProperties("off")]
+    [EnumData("off")]
     OFF,
 }
 

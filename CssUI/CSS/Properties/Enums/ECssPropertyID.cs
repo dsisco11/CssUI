@@ -5,117 +5,117 @@ namespace CssUI.CSS;
 [EnumRecord<KeywordProperties>]
 public enum ECssPropertyID : int
 {
-    [EnumRecordProperties("line-height")]
+    [EnumData("line-height")]
     LineHeight,
-    [EnumRecordProperties("font-family")]
+    [EnumData("font-family")]
     FontFamily,
-    [EnumRecordProperties("font-weight")]
+    [EnumData("font-weight")]
     FontWeight,
-    [EnumRecordProperties("font-style")]
+    [EnumData("font-style")]
     FontStyle,
-    [EnumRecordProperties("font-size")]
+    [EnumData("font-size")]
     FontSize,
-    [EnumRecordProperties("dpi-x")]
+    [EnumData("dpi-x")]
     DpiX,
-    [EnumRecordProperties("dpi-y")]
+    [EnumData("dpi-y")]
     DpiY,
-    [EnumRecordProperties("scroll-behavior")]
+    [EnumData("scroll-behavior")]
     ScrollBehavior,
-    [EnumRecordProperties("overflow-x")]
+    [EnumData("overflow-x")]
     OverflowX,
-    [EnumRecordProperties("overflow-y")]
+    [EnumData("overflow-y")]
     OverflowY,
-    [EnumRecordProperties("color")]
+    [EnumData("color")]
     Color,
     /// <summary>
     /// Docs: https://www.w3.org/TR/css-color-3/#opacity
     /// </summary>
-    [EnumRecordProperties("opacity")]
+    [EnumData("opacity")]
     Opacity,
-    [EnumRecordProperties("border-top-color")]
+    [EnumData("border-top-color")]
     BorderTopColor,
-    [EnumRecordProperties("border-right-color")]
+    [EnumData("border-right-color")]
     BorderRightColor,
-    [EnumRecordProperties("border-bottom-color")]
+    [EnumData("border-bottom-color")]
     BorderBottomColor,
-    [EnumRecordProperties("border-left-color")]
+    [EnumData("border-left-color")]
     BorderLeftColor,
-    [EnumRecordProperties("border-top-style")]
+    [EnumData("border-top-style")]
     BorderTopStyle,
-    [EnumRecordProperties("border-right-style")]
+    [EnumData("border-right-style")]
     BorderRightStyle,
-    [EnumRecordProperties("border-bottom-style")]
+    [EnumData("border-bottom-style")]
     BorderBottomStyle,
-    [EnumRecordProperties("border-left-style")]
+    [EnumData("border-left-style")]
     BorderLeftStyle,
-    [EnumRecordProperties("transform")]
+    [EnumData("transform")]
     Transform,
-    [EnumRecordProperties("direction")]
+    [EnumData("direction")]
     Direction,
-    [EnumRecordProperties("writing-mode")]
+    [EnumData("writing-mode")]
     WritingMode,
-    [EnumRecordProperties("text-align")]
+    [EnumData("text-align")]
     TextAlign,
-    [EnumRecordProperties("object-fit")]
+    [EnumData("object-fit")]
     ObjectFit,
-    [EnumRecordProperties("display")]
+    [EnumData("display")]
     Display,
-    [EnumRecordProperties("box-sizing")]
+    [EnumData("box-sizing")]
     BoxSizing,
-    [EnumRecordProperties("positioning")]
+    [EnumData("positioning")]
     Positioning,
     /// <summary>
     /// Docs: https://www.w3.org/TR/css3-images/#object-position
     /// </summary>
-    [EnumRecordProperties("object-position")]
+    [EnumData("object-position")]
     ObjectPosition,
-    /*[EnumRecordProperties("object-position-x")]
+    /*[EnumData("object-position-x")]
     ObjectPositionX,
-    [EnumRecordProperties("object-position-y")]
+    [EnumData("object-position-y")]
     ObjectPositionY,*/
-    [EnumRecordProperties("top")]
+    [EnumData("top")]
     Top,
-    [EnumRecordProperties("right")]
+    [EnumData("right")]
     Right,
-    [EnumRecordProperties("bottom")]
+    [EnumData("bottom")]
     Bottom,
-    [EnumRecordProperties("left")]
+    [EnumData("left")]
     Left,
-    [EnumRecordProperties("width")]
+    [EnumData("width")]
     Width,
-    [EnumRecordProperties("height")]
+    [EnumData("height")]
     Height,
-    [EnumRecordProperties("min-width")]
+    [EnumData("min-width")]
     MinWidth,
-    [EnumRecordProperties("min-height")]
+    [EnumData("min-height")]
     MinHeight,
-    [EnumRecordProperties("max-width")]
+    [EnumData("max-width")]
     MaxWidth,
-    [EnumRecordProperties("max-height")]
+    [EnumData("max-height")]
     MaxHeight,
-    [EnumRecordProperties("padding-top")]
+    [EnumData("padding-top")]
     PaddingTop,
-    [EnumRecordProperties("padding-right")]
+    [EnumData("padding-right")]
     PaddingRight,
-    [EnumRecordProperties("padding-bottom")]
+    [EnumData("padding-bottom")]
     PaddingBottom,
-    [EnumRecordProperties("padding-left")]
+    [EnumData("padding-left")]
     PaddingLeft,
-    [EnumRecordProperties("border-top-width")]
+    [EnumData("border-top-width")]
     BorderTopWidth,
-    [EnumRecordProperties("border-right-width")]
+    [EnumData("border-right-width")]
     BorderRightWidth,
-    [EnumRecordProperties("border-bottom-width")]
+    [EnumData("border-bottom-width")]
     BorderBottomWidth,
-    [EnumRecordProperties("border-left-width")]
+    [EnumData("border-left-width")]
     BorderLeftWidth,
-    [EnumRecordProperties("margin-top")]
+    [EnumData("margin-top")]
     MarginTop,
-    [EnumRecordProperties("margin-right")]
+    [EnumData("margin-right")]
     MarginRight,
-    [EnumRecordProperties("margin-bottom")]
+    [EnumData("margin-bottom")]
     MarginBottom,
-    [EnumRecordProperties("margin-left")]
+    [EnumData("margin-left")]
     MarginLeft,
 
     #region Flexbox Properties
@@ -123,37 +123,37 @@ public enum ECssPropertyID : int
     /// Specifies how flex items are placed in the flex container.
     /// Docs: https://www.w3.org/TR/css-flexbox-1/#propdef-flex-direction
     /// </summary>
-    [EnumRecordProperties("flex-direction")]
+    [EnumData("flex-direction")]
     FlexDirection,
     /// <summary>
     /// Controls whether the flex container is single-line or multi-line.
     /// Docs: https://www.w3.org/TR/css-flexbox-1/#propdef-flex-wrap
     /// </summary>
-    [EnumRecordProperties("flex-wrap")]
+    [EnumData("flex-wrap")]
     FlexWrap,
     /// <summary>
     /// Specifies the flex grow factor.
     /// Docs: https://www.w3.org/TR/css-flexbox-1/#propdef-flex-grow
     /// </summary>
-    [EnumRecordProperties("flex-grow")]
+    [EnumData("flex-grow")]
     FlexGrow,
     /// <summary>
     /// Specifies the flex shrink factor.
     /// Docs: https://www.w3.org/TR/css-flexbox-1/#propdef-flex-shrink
     /// </summary>
-    [EnumRecordProperties("flex-shrink")]
+    [EnumData("flex-shrink")]
     FlexShrink,
     /// <summary>
     /// Specifies the initial main size of a flex item.
     /// Docs: https://www.w3.org/TR/css-flexbox-1/#propdef-flex-basis
     /// </summary>
-    [EnumRecordProperties("flex-basis")]
+    [EnumData("flex-basis")]
     FlexBasis,
     /// <summary>
     /// Controls the order of flex/grid items.
     /// Docs: https://www.w3.org/TR/css-display-3/#propdef-order
     /// </summary>
-    [EnumRecordProperties("order")]
+    [EnumData("order")]
     Order,
     #endregion
 
@@ -162,55 +162,55 @@ public enum ECssPropertyID : int
     /// Specifies the sizing of grid columns.
     /// Docs: https://www.w3.org/TR/css-grid-1/#propdef-grid-template-columns
     /// </summary>
-    [EnumRecordProperties("grid-template-columns")]
+    [EnumData("grid-template-columns")]
     GridTemplateColumns,
     /// <summary>
     /// Specifies the sizing of grid rows.
     /// Docs: https://www.w3.org/TR/css-grid-1/#propdef-grid-template-rows
     /// </summary>
-    [EnumRecordProperties("grid-template-rows")]
+    [EnumData("grid-template-rows")]
     GridTemplateRows,
     /// <summary>
     /// Specifies the sizing of implicitly-created columns.
     /// Docs: https://www.w3.org/TR/css-grid-1/#propdef-grid-auto-columns
     /// </summary>
-    [EnumRecordProperties("grid-auto-columns")]
+    [EnumData("grid-auto-columns")]
     GridAutoColumns,
     /// <summary>
     /// Specifies the sizing of implicitly-created rows.
     /// Docs: https://www.w3.org/TR/css-grid-1/#propdef-grid-auto-rows
     /// </summary>
-    [EnumRecordProperties("grid-auto-rows")]
+    [EnumData("grid-auto-rows")]
     GridAutoRows,
     /// <summary>
     /// Controls the auto-placement algorithm.
     /// Docs: https://www.w3.org/TR/css-grid-1/#propdef-grid-auto-flow
     /// </summary>
-    [EnumRecordProperties("grid-auto-flow")]
+    [EnumData("grid-auto-flow")]
     GridAutoFlow,
     /// <summary>
     /// Specifies a grid item's start position in the column direction.
     /// Docs: https://www.w3.org/TR/css-grid-1/#propdef-grid-column-start
     /// </summary>
-    [EnumRecordProperties("grid-column-start")]
+    [EnumData("grid-column-start")]
     GridColumnStart,
     /// <summary>
     /// Specifies a grid item's end position in the column direction.
     /// Docs: https://www.w3.org/TR/css-grid-1/#propdef-grid-column-end
     /// </summary>
-    [EnumRecordProperties("grid-column-end")]
+    [EnumData("grid-column-end")]
     GridColumnEnd,
     /// <summary>
     /// Specifies a grid item's start position in the row direction.
     /// Docs: https://www.w3.org/TR/css-grid-1/#propdef-grid-row-start
     /// </summary>
-    [EnumRecordProperties("grid-row-start")]
+    [EnumData("grid-row-start")]
     GridRowStart,
     /// <summary>
     /// Specifies a grid item's end position in the row direction.
     /// Docs: https://www.w3.org/TR/css-grid-1/#propdef-grid-row-end
     /// </summary>
-    [EnumRecordProperties("grid-row-end")]
+    [EnumData("grid-row-end")]
     GridRowEnd,
     #endregion
 
@@ -219,49 +219,49 @@ public enum ECssPropertyID : int
     /// Aligns flex lines or grid tracks within the container.
     /// Docs: https://www.w3.org/TR/css-align-3/#propdef-align-content
     /// </summary>
-    [EnumRecordProperties("align-content")]
+    [EnumData("align-content")]
     AlignContent,
     /// <summary>
     /// Justifies content along the main/inline axis.
     /// Docs: https://www.w3.org/TR/css-align-3/#propdef-justify-content
     /// </summary>
-    [EnumRecordProperties("justify-content")]
+    [EnumData("justify-content")]
     JustifyContent,
     /// <summary>
     /// Sets the default align-self for all items.
     /// Docs: https://www.w3.org/TR/css-align-3/#propdef-align-items
     /// </summary>
-    [EnumRecordProperties("align-items")]
+    [EnumData("align-items")]
     AlignItems,
     /// <summary>
     /// Overrides align-items for a specific item.
     /// Docs: https://www.w3.org/TR/css-align-3/#propdef-align-self
     /// </summary>
-    [EnumRecordProperties("align-self")]
+    [EnumData("align-self")]
     AlignSelf,
     /// <summary>
     /// Sets the default justify-self for all items.
     /// Docs: https://www.w3.org/TR/css-align-3/#propdef-justify-items
     /// </summary>
-    [EnumRecordProperties("justify-items")]
+    [EnumData("justify-items")]
     JustifyItems,
     /// <summary>
     /// Overrides justify-items for a specific item.
     /// Docs: https://www.w3.org/TR/css-align-3/#propdef-justify-self
     /// </summary>
-    [EnumRecordProperties("justify-self")]
+    [EnumData("justify-self")]
     JustifySelf,
     /// <summary>
     /// Sets the gap between rows.
     /// Docs: https://www.w3.org/TR/css-align-3/#propdef-row-gap
     /// </summary>
-    [EnumRecordProperties("row-gap")]
+    [EnumData("row-gap")]
     RowGap,
     /// <summary>
     /// Sets the gap between columns.
     /// Docs: https://www.w3.org/TR/css-align-3/#propdef-column-gap
     /// </summary>
-    [EnumRecordProperties("column-gap")]
+    [EnumData("column-gap")]
     ColumnGap,
     #endregion
 
@@ -270,39 +270,39 @@ public enum ECssPropertyID : int
     /// Specifies whether a box should break before the principal box.
     /// Docs: https://www.w3.org/TR/css-break-3/#propdef-break-before
     /// </summary>
-    [EnumRecordProperties("break-before")]
+    [EnumData("break-before")]
     BreakBefore,
     /// <summary>
     /// Specifies whether a box should break after the principal box.
     /// Docs: https://www.w3.org/TR/css-break-3/#propdef-break-after
     /// </summary>
-    [EnumRecordProperties("break-after")]
+    [EnumData("break-after")]
     BreakAfter,
     /// <summary>
     /// Specifies whether a box should avoid breaks inside.
     /// Docs: https://www.w3.org/TR/css-break-3/#propdef-break-inside
     /// </summary>
-    [EnumRecordProperties("break-inside")]
+    [EnumData("break-inside")]
     BreakInside,
     /// <summary>
-    /// Specifies the minimum number of lines in a block container 
+    /// Specifies the minimum number of lines in a block container
     /// that must be left before a fragmentation break.
     /// Docs: https://www.w3.org/TR/css-break-3/#propdef-orphans
     /// </summary>
-    [EnumRecordProperties("orphans")]
+    [EnumData("orphans")]
     Orphans,
     /// <summary>
-    /// Specifies the minimum number of lines in a block container 
+    /// Specifies the minimum number of lines in a block container
     /// that must be left after a fragmentation break.
     /// Docs: https://www.w3.org/TR/css-break-3/#propdef-widows
     /// </summary>
-    [EnumRecordProperties("widows")]
+    [EnumData("widows")]
     Widows,
     /// <summary>
     /// Specifies whether box decorations are cloned or sliced at fragment breaks.
     /// Docs: https://www.w3.org/TR/css-break-3/#propdef-box-decoration-break
     /// </summary>
-    [EnumRecordProperties("box-decoration-break")]
+    [EnumData("box-decoration-break")]
     BoxDecorationBreak,
     #endregion
 

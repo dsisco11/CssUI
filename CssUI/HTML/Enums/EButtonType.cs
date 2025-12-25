@@ -8,19 +8,19 @@ namespace CssUI.HTML
         /// <summary>
         /// Submits the form
         /// </summary>
-        [EnumRecordProperties("submit")]
+        [EnumData("submit")]
         Submit,
 
         /// <summary>
         /// Resets the form
         /// </summary>
-        [EnumRecordProperties("reset")]
+        [EnumData("reset")]
         Reset,
 
         /// <summary>
         /// Does nothing
         /// </summary>
-        [EnumRecordProperties("button")]
+        [EnumData("button")]
         Button,
     }
 }

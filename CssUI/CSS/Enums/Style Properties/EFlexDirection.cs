@@ -12,25 +12,25 @@ public enum EFlexDirection
     /// <summary>
     /// The flex container's main axis has the same orientation as the inline axis of the current writing mode.
     /// </summary>
-    [EnumRecordProperties("row")]
+    [EnumData("row")]
     Row,
 
     /// <summary>
     /// Same as row, but the main-start and main-end directions are swapped.
     /// </summary>
-    [EnumRecordProperties("row-reverse")]
+    [EnumData("row-reverse")]
     RowReverse,
 
     /// <summary>
     /// The flex container's main axis has the same orientation as the block axis of the current writing mode.
     /// </summary>
-    [EnumRecordProperties("column")]
+    [EnumData("column")]
     Column,
 
     /// <summary>
     /// Same as column, but the main-start and main-end directions are swapped.
     /// </summary>
-    [EnumRecordProperties("column-reverse")]
+    [EnumData("column-reverse")]
     ColumnReverse
 }
 

@@ -9,21 +9,21 @@ namespace CssUI.DOM.Enums;
 public enum EQuirksMode
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [EnumRecordProperties("quirks")]
+    [EnumData("quirks")]
     Quirks,
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [EnumRecordProperties("no-quirks")]
+    [EnumData("no-quirks")]
     NoQuirks,
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [EnumRecordProperties("limited-quirks")]
+    [EnumData("limited-quirks")]
     LimitedQuirks
 }
 

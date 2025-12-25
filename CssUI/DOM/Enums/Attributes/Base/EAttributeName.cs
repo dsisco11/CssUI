@@ -9,240 +9,240 @@ namespace CssUI.DOM;
 public enum EAttributeName : int
 {
 
-    /*[EnumRecordProperties("")]*/ // DO NOT GIVE NEGATIVE ENUM VALUES A KEYWORD
+    /*[EnumData("")]*/ // DO NOT GIVE NEGATIVE ENUM VALUES A KEYWORD
     CUSTOM = -1,
-    [EnumRecordProperties("id")]
+    [EnumData("id")]
     ID = 0,
-    [EnumRecordProperties("name")]
+    [EnumData("name")]
     Name,
-    [EnumRecordProperties("class")]
+    [EnumData("class")]
     Class,
-    [EnumRecordProperties("width")]
+    [EnumData("width")]
     Width,
-    [EnumRecordProperties("height")]
+    [EnumData("height")]
     Height,
 
-    [EnumRecordProperties("is")]
+    [EnumData("is")]
     IS,
 
 
     /* HTML Attributes */
-    [EnumRecordProperties("title")]
+    [EnumData("title")]
     Title,
-    [EnumRecordProperties("lang")]
+    [EnumData("lang")]
     Lang,
-    [EnumRecordProperties("dir")]
+    [EnumData("dir")]
     Dir,
-    [EnumRecordProperties("translate")]
+    [EnumData("translate")]
     Translate,
-    [EnumRecordProperties("nonce")]
+    [EnumData("nonce")]
     Nonce,
-    [EnumRecordProperties("text")]
+    [EnumData("text")]
     Text,
-    [EnumRecordProperties("label")]
+    [EnumData("label")]
     Label,
     /// <summary>
     /// Every HTML element may have an itemprop attribute specified, if doing so adds one or more properties to one or more items (as defined below).
     /// <para>ReadMore: https://html.spec.whatwg.org/multipage/microdata.html#names:-the-itemprop-attribute</para>
     /// </summary>
-    [EnumRecordProperties("itemprop")]
+    [EnumData("itemprop")]
     ItemProp,
 
 
-    [EnumRecordProperties("accesskey")]
+    [EnumData("accesskey")]
     AccessKey,
-    [EnumRecordProperties("spellcheck")]
+    [EnumData("spellcheck")]
     Spellcheck,
-    [EnumRecordProperties("autocapitalize")]
+    [EnumData("autocapitalize")]
     Autocapitalize,
 
-    [EnumRecordProperties("contenteditable")]
+    [EnumData("contenteditable")]
     ContentEditable,
-    [EnumRecordProperties("draggable")]
+    [EnumData("draggable")]
     Draggable,
-    [EnumRecordProperties("tabindex")]
+    [EnumData("tabindex")]
     TabIndex,
-    [EnumRecordProperties("disabled")]
+    [EnumData("disabled")]
     Disabled,
-    [EnumRecordProperties("hidden")]
+    [EnumData("hidden")]
     Hidden,
-    [EnumRecordProperties("type")]
+    [EnumData("type")]
     Type,
-    [EnumRecordProperties("slot")]
+    [EnumData("slot")]
     Slot,
-    [EnumRecordProperties("media")]
+    [EnumData("media")]
     Media,
 
 
-    [EnumRecordProperties("dropzone")]
+    [EnumData("dropzone")]
     Dropzone,
 
 
-    [EnumRecordProperties("alt")]
+    [EnumData("alt")]
     Alt,
-    [EnumRecordProperties("src")]
+    [EnumData("src")]
     Src,
-    [EnumRecordProperties("srcset")]
+    [EnumData("srcset")]
     SrcSet,
-    [EnumRecordProperties("href")]
+    [EnumData("href")]
     Href,
-    [EnumRecordProperties("hreflang")]
+    [EnumData("hreflang")]
     HrefLang,
-    [EnumRecordProperties("sizes")]
+    [EnumData("sizes")]
     Sizes,
-    [EnumRecordProperties("usemap")]
+    [EnumData("usemap")]
     UseMap,
-    [EnumRecordProperties("ismap")]
+    [EnumData("ismap")]
     IsMap,
-    [EnumRecordProperties("crossorigin")]
+    [EnumData("crossorigin")]
     CrossOrigin,
-    [EnumRecordProperties("referrerpolicy")]
+    [EnumData("referrerpolicy")]
     ReferrerPolicy,
-    [EnumRecordProperties("decoding")]
+    [EnumData("decoding")]
     Decoding,
 
-    [EnumRecordProperties("enctype")]
+    [EnumData("enctype")]
     EncType,
-    [EnumRecordProperties("method")]
+    [EnumData("method")]
     Method,
-    [EnumRecordProperties("novalidate")]
+    [EnumData("novalidate")]
     NoValidate,
-    [EnumRecordProperties("target")]
+    [EnumData("target")]
     Target,
 
     /* LINK ATTRIBUTES */
-    [EnumRecordProperties("rel")]
+    [EnumData("rel")]
     Rel,
 
     /* QUOTE ATTRIBUTES */
-    [EnumRecordProperties("cite")]
+    [EnumData("cite")]
     Cite,
 
     /* LABEL ATTRIBUTES */
-    [EnumRecordProperties("for")]
+    [EnumData("for")]
     For,
 
     /* DIALOG ATTRIBUTES */
-    [EnumRecordProperties("open")]
+    [EnumData("open")]
     Open,
 
 
     /* TABLE ATTRIBUTES */
-    [EnumRecordProperties("span")]
+    [EnumData("span")]
     Span,
-    [EnumRecordProperties("colspan")]
+    [EnumData("colspan")]
     ColSpan,
-    [EnumRecordProperties("rowspan")]
+    [EnumData("rowspan")]
     RowSpan,
-    [EnumRecordProperties("cols")]
+    [EnumData("cols")]
     Cols,
-    [EnumRecordProperties("rows")]
+    [EnumData("rows")]
     Rows,
 
-    [EnumRecordProperties("headers")]
+    [EnumData("headers")]
     Headers,
 
-    [EnumRecordProperties("scope")]
+    [EnumData("scope")]
     Scope,
-    [EnumRecordProperties("abbr")]
+    [EnumData("abbr")]
     Abbr,
 
     /* INPUT */
 
-    [EnumRecordProperties("checked")]
+    [EnumData("checked")]
     Checked,
-    [EnumRecordProperties("inputmode")]
+    [EnumData("inputmode")]
     InputMode,
-    [EnumRecordProperties("enterkeyhint")]
+    [EnumData("enterkeyhint")]
     EnterKeyHint,
-    [EnumRecordProperties("autocomplete")]
+    [EnumData("autocomplete")]
     Autocomplete,
-    [EnumRecordProperties("autofocus")]
+    [EnumData("autofocus")]
     Autofocus,
-    [EnumRecordProperties("multiple")]
+    [EnumData("multiple")]
     Multiple,
-    [EnumRecordProperties("required")]
+    [EnumData("required")]
     Required,
-    [EnumRecordProperties("size")]
+    [EnumData("size")]
     Size,
-    [EnumRecordProperties("placeholder")]
+    [EnumData("placeholder")]
     Placeholder,
 
-    [EnumRecordProperties("accept")]
+    [EnumData("accept")]
     Accept,
 
-    [EnumRecordProperties("action")]
+    [EnumData("action")]
     Action,
-    [EnumRecordProperties("formaction")]
+    [EnumData("formaction")]
     FormAction,
-    [EnumRecordProperties("formenctype")]
+    [EnumData("formenctype")]
     FormEncType,
-    [EnumRecordProperties("formmethod")]
+    [EnumData("formmethod")]
     FormMethod,
-    [EnumRecordProperties("formnovalidate")]
+    [EnumData("formnovalidate")]
     FormNoValidate,
-    [EnumRecordProperties("formtarget")]
+    [EnumData("formtarget")]
     FormTarget,
-    [EnumRecordProperties("list")]
+    [EnumData("list")]
     List,
-    [EnumRecordProperties("min")]
+    [EnumData("min")]
     Min,
-    [EnumRecordProperties("max")]
+    [EnumData("max")]
     Max,
-    [EnumRecordProperties("pattern")]
+    [EnumData("pattern")]
     Pattern,
-    [EnumRecordProperties("step")]
+    [EnumData("step")]
     Step,
 
     /* TEXTAREA */
-    [EnumRecordProperties("readonly")]
+    [EnumData("readonly")]
     ReadOnly,
-    [EnumRecordProperties("wrap")]
+    [EnumData("wrap")]
     Wrap,
 
-    [EnumRecordProperties("form")]
+    [EnumData("form")]
     Form,
-    [EnumRecordProperties("value")]
+    [EnumData("value")]
     Value,
-    [EnumRecordProperties("selected")]
+    [EnumData("selected")]
     Selected,
-    [EnumRecordProperties("dirname")]
+    [EnumData("dirname")]
     Dirname,
-    [EnumRecordProperties("minlength")]
+    [EnumData("minlength")]
     MinLength,
-    [EnumRecordProperties("maxlength")]
+    [EnumData("maxlength")]
     MaxLength,
 
 
     /* FORMS */
-    [EnumRecordProperties("accept-charset")]
+    [EnumData("accept-charset")]
     AcceptCharset,
 
 
     /* OBJECT */
-    [EnumRecordProperties("data")]
+    [EnumData("data")]
     Data,
 
     /* IFRAME */
-    [EnumRecordProperties("sandbox")]
+    [EnumData("sandbox")]
     Sandbox,
-    [EnumRecordProperties("srcdoc")]
+    [EnumData("srcdoc")]
     Srcdoc,
-    [EnumRecordProperties("allow")]
+    [EnumData("allow")]
     Allow,
 
     /* AREA */
-    [EnumRecordProperties("coords")]
+    [EnumData("coords")]
     Coords,
-    [EnumRecordProperties("shape")]
+    [EnumData("shape")]
     Shape,
-    [EnumRecordProperties("ping")]
+    [EnumData("ping")]
     Ping,
-    [EnumRecordProperties("download")]
+    [EnumData("download")]
     Download,
 
     /* SCRIPT/LINK INTEGRITY */
-    [EnumRecordProperties("integrity")]
+    [EnumData("integrity")]
     Integrity,
 }
 

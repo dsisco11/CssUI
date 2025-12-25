@@ -14,43 +14,43 @@ public enum EColorSpace : byte
     /// <summary>
     /// Standard sRGB color space (gamma-corrected).
     /// </summary>
-    [EnumRecordProperties("srgb")]
+    [EnumData("srgb")]
     sRGB = 0,
 
     /// <summary>
     /// Linear-light sRGB color space.
     /// </summary>
-    [EnumRecordProperties("srgb-linear")]
+    [EnumData("srgb-linear")]
     sRGBLinear = 1,
 
     /// <summary>
     /// Display P3 color space (wide gamut).
     /// </summary>
-    [EnumRecordProperties("display-p3")]
+    [EnumData("display-p3")]
     DisplayP3 = 2,
 
     /// <summary>
     /// CIE Lab color space.
     /// </summary>
-    [EnumRecordProperties("lab")]
+    [EnumData("lab")]
     Lab = 3,
 
     /// <summary>
     /// CIE LCH color space (cylindrical representation of Lab).
     /// </summary>
-    [EnumRecordProperties("lch")]
+    [EnumData("lch")]
     Lch = 4,
 
     /// <summary>
     /// OkLab perceptually uniform color space.
     /// </summary>
-    [EnumRecordProperties("oklab")]
+    [EnumData("oklab")]
     OkLab = 5,
 
     /// <summary>
     /// OkLCH color space (cylindrical representation of OkLab).
     /// </summary>
-    [EnumRecordProperties("oklch")]
+    [EnumData("oklch")]
     OkLCh = 6,
 
     /// <summary>
@@ -59,7 +59,7 @@ public enum EColorSpace : byte
     /// <remarks>
     /// Docs: https://www.w3.org/TR/css-color-4/#predefined-a98-rgb
     /// </remarks>
-    [EnumRecordProperties("a98-rgb")]
+    [EnumData("a98-rgb")]
     A98Rgb = 7,
 
     /// <summary>
@@ -68,7 +68,7 @@ public enum EColorSpace : byte
     /// <remarks>
     /// Docs: https://www.w3.org/TR/css-color-4/#predefined-prophoto-rgb
     /// </remarks>
-    [EnumRecordProperties("prophoto-rgb")]
+    [EnumData("prophoto-rgb")]
     ProPhotoRgb = 8,
 
     /// <summary>
@@ -77,7 +77,7 @@ public enum EColorSpace : byte
     /// <remarks>
     /// Docs: https://www.w3.org/TR/css-color-4/#predefined-rec2020
     /// </remarks>
-    [EnumRecordProperties("rec2020")]
+    [EnumData("rec2020")]
     Rec2020 = 9,
 
     /// <summary>
@@ -86,7 +86,7 @@ public enum EColorSpace : byte
     /// <remarks>
     /// Docs: https://www.w3.org/TR/css-color-4/#predefined-xyz
     /// </remarks>
-    [EnumRecordProperties("xyz-d50")]
+    [EnumData("xyz-d50")]
     XyzD50 = 10,
 
     /// <summary>
@@ -96,6 +96,6 @@ public enum EColorSpace : byte
     /// Docs: https://www.w3.org/TR/css-color-4/#predefined-xyz
     /// xyz is an alias for xyz-d65.
     /// </remarks>
-    [EnumRecordProperties("xyz-d65")]
+    [EnumData("xyz-d65")]
     XyzD65 = 11,
 }

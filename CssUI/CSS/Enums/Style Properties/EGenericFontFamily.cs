@@ -8,15 +8,15 @@ namespace CssUI.CSS;
 [EnumRecord<KeywordProperties>]
 public enum EGenericFontFamily
 {
-    [EnumRecordProperties("serif")]
+    [EnumData("serif")]
     Serif = 0,
-    [EnumRecordProperties("sans-serif")]
+    [EnumData("sans-serif")]
     SansSerif,
-    [EnumRecordProperties("cursive")]
+    [EnumData("cursive")]
     Cursive,
-    [EnumRecordProperties("fantasy")]
+    [EnumData("fantasy")]
     Fantasy,
-    [EnumRecordProperties("monospace")]
+    [EnumData("monospace")]
     Monospace
 }
 

@@ -12,43 +12,43 @@ namespace CssUI.HTML
         /// <summary>
         /// The user agent and input method should use make their own determination of whether or not to enable autocapitalization.
         /// </summary>
-        [EnumRecordProperties("")]
+        [EnumData("")]
         Default,
 
         /// <summary>
         /// No autocapitalization should be applied (all letters should default to lowercase).
         /// </summary>
-        [EnumRecordProperties("off")]
+        [EnumData("off")]
         Off,
 
         /// <summary>
         /// No autocapitalization should be applied (all letters should default to lowercase).
         /// </summary>
-        [EnumRecordProperties("none")]
+        [EnumData("none")]
         None,
 
         /// <summary>
         /// The first letter of each sentence should default to a capital letter; all other letters should default to lowercase.
         /// </summary>
-        [EnumRecordProperties("on")]
+        [EnumData("on")]
         On,
 
         /// <summary>
         /// The first letter of each sentence should default to a capital letter; all other letters should default to lowercase.
         /// </summary>
-        [EnumRecordProperties("sentences")]
+        [EnumData("sentences")]
         Sentences,
 
         /// <summary>
         /// The first letter of each word should default to a capital letter; all other letters should default to lowercase.
         /// </summary>
-        [EnumRecordProperties("words")]
+        [EnumData("words")]
         Words,
 
         /// <summary>
         /// All letters should default to uppercase.
         /// </summary>
-        [EnumRecordProperties("characters")]
+        [EnumData("characters")]
         Characters,
     }
 }

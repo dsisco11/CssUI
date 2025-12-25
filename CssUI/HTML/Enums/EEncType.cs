@@ -7,19 +7,19 @@ namespace CssUI.HTML
     {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#attr-fs-formenctype */
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
-        [EnumRecordProperties("application/x-www-form-urlencoded")]
+        [EnumData("application/x-www-form-urlencoded")]
         UrlEncoded,
         /// <summary>
-        /// 
+        ///
         /// </summary>
-        [EnumRecordProperties("multipart/form-data")]
+        [EnumData("multipart/form-data")]
         FormData,
         /// <summary>
-        /// 
+        ///
         /// </summary>
-        [EnumRecordProperties("text/plain")]
+        [EnumData("text/plain")]
         Plain,
 
     }

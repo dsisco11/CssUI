@@ -6,27 +6,27 @@ namespace CssUI.DOM.Enums;
 public enum EScrollLogicalPosition : int
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [EnumRecordProperties("start")]
+    [EnumData("start")]
     Start,
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [EnumRecordProperties("center")]
+    [EnumData("center")]
     Center,
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [EnumRecordProperties("end")]
+    [EnumData("end")]
     End,
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [EnumRecordProperties("nearest")]
+    [EnumData("nearest")]
     Nearest,
 }
 

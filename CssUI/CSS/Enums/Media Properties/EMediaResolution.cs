@@ -5,7 +5,7 @@ namespace CssUI.CSS.Media;
 [EnumRecord<KeywordProperties>]
 public enum EMediaResolution
 {
-    [EnumRecordProperties("infinite")]
+    [EnumData("infinite")]
     Infinite,
 }
 

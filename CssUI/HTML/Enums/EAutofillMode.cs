@@ -6,10 +6,10 @@ namespace CssUI.HTML
     public enum EAutofillMode
     {
 
-        [EnumRecordProperties("shipping")]
+        [EnumData("shipping")]
         Shipping,
 
-        [EnumRecordProperties("billing")]
+        [EnumData("billing")]
         Billing,
     }
 }

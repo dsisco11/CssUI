@@ -11,11 +11,11 @@ public enum EBoxSizingMode : int
     /// <summary>
     /// Width/Height describe the size of the content area, not including the padding, border, or margins
     /// </summary>
-    [EnumRecordProperties("content-box")]
+    [EnumData("content-box")]
     ContentBox,
     /// <summary>
     /// Width/Height describe the border area, including the content size, padding, and border size but not the margins
     /// </summary>
-    [EnumRecordProperties("border-box")]
+    [EnumData("border-box")]
     BorderBox,
 }

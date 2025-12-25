@@ -12,19 +12,19 @@ public enum EFlexWrap
     /// <summary>
     /// The flex container is single-line.
     /// </summary>
-    [EnumRecordProperties("nowrap")]
+    [EnumData("nowrap")]
     NoWrap,
 
     /// <summary>
     /// The flex container is multi-line.
     /// </summary>
-    [EnumRecordProperties("wrap")]
+    [EnumData("wrap")]
     Wrap,
 
     /// <summary>
     /// Same as wrap, but the cross-start and cross-end directions are swapped.
     /// </summary>
-    [EnumRecordProperties("wrap-reverse")]
+    [EnumData("wrap-reverse")]
     WrapReverse
 }
 

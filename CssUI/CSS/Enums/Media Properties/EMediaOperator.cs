@@ -8,16 +8,16 @@ namespace CssUI.CSS.Media;
 [EnumRecord<KeywordProperties>]
 public enum EMediaOperator : int
 {
-    [EnumRecordProperties("<")]
+    [EnumData("<")]
     LessThan,
-    [EnumRecordProperties("=")]
+    [EnumData("=")]
     EqualTo,
-    [EnumRecordProperties(">")]
+    [EnumData(">")]
     GreaterThan,
 
-    [EnumRecordProperties("<=")]
+    [EnumData("<=")]
     LessThanEq,
-    [EnumRecordProperties(">=")]
+    [EnumData(">=")]
     GreaterThanEq,
 }
 

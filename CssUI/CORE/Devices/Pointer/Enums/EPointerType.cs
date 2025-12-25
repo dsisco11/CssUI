@@ -5,11 +5,11 @@ namespace CssUI.Devices;
 [EnumRecord<KeywordProperties>]
 public enum EPointerType : short
 {/* Docs: https://w3c.github.io/pointerevents/#pointerevent-interface */
-    [EnumRecordProperties("mouse")]
+    [EnumData("mouse")]
     Mouse = 0,
-    [EnumRecordProperties("pen")]
+    [EnumData("pen")]
     PenStylus = 1,
-    [EnumRecordProperties("touch")]
+    [EnumData("touch")]
     TouchContact = 2,
 
 

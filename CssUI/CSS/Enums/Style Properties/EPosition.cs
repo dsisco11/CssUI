@@ -10,22 +10,22 @@ public enum EPosition : int
 
     /// <summary>
     /// </summary>
-    [EnumRecordProperties("left")]
+    [EnumData("left")]
     Left,
     /// <summary>
     /// </summary>
-    [EnumRecordProperties("center")]
+    [EnumData("center")]
     Center,
     /// <summary>
     /// </summary>
-    [EnumRecordProperties("right")]
+    [EnumData("right")]
     Right,
     /// <summary>
     /// </summary>
-    [EnumRecordProperties("top")]
+    [EnumData("top")]
     Top,
     /// <summary>
     /// </summary>
-    [EnumRecordProperties("bottom")]
+    [EnumData("bottom")]
     Bottom,
 }

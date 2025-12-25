@@ -10,39 +10,39 @@ public enum EMediaType : int
     /// <summary>
     /// Matches all devices
     /// </summary>
-    [EnumRecordProperties("all")]
+    [EnumData("all")]
     All,
     /// <summary>
     /// Matches printers, and devices intended to reproduce a printed display, such as a web browser showing a document in “Print Preview”.
     /// </summary>
-    [EnumRecordProperties("print")]
+    [EnumData("print")]
     Print,
     /// <summary>
     /// Matches all devices that aren’t matched by print or speech.
     /// </summary>
-    [EnumRecordProperties("screen")]
+    [EnumData("screen")]
     Screen,
     /// <summary>
     /// Matches devices that similar devices that “read out” a page.
     /// </summary>
-    [EnumRecordProperties("speech")]
+    [EnumData("speech")]
     Speech,
 
     /* The following are DEPRECIATED values. they must be recognized, but ignored. */
 
-    [EnumRecordProperties("tty")]
+    [EnumData("tty")]
     tty,
-    [EnumRecordProperties("tv")]
+    [EnumData("tv")]
     tv,
-    [EnumRecordProperties("projection")]
+    [EnumData("projection")]
     projection,
-    [EnumRecordProperties("handheld")]
+    [EnumData("handheld")]
     handheld,
-    [EnumRecordProperties("braille")]
+    [EnumData("braille")]
     braille,
-    [EnumRecordProperties("embossed")]
+    [EnumData("embossed")]
     embossed,
-    [EnumRecordProperties("aural")]
+    [EnumData("aural")]
     aural,
 }
 

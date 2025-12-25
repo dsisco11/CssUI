@@ -8,23 +8,23 @@ namespace CssUI.CSS.Media;
 [EnumRecord<KeywordProperties>]
 public enum EMediaCombinator
 {
-    [EnumRecordProperties("")]
+    [EnumData("")]
     None = 0x0,
     /// <summary>
     /// </summary>
-    [EnumRecordProperties("and")]
+    [EnumData("and")]
     AND,
 
     /// <summary>
     /// Instantly returns true for a match
     /// </summary>
-    [EnumRecordProperties("or")]
+    [EnumData("or")]
     OR,
 
     /// <summary>
     /// Negates the comparison result for a match
     /// </summary>
-    [EnumRecordProperties("not")]
+    [EnumData("not")]
     NOT,
 }
 

@@ -8,25 +8,25 @@ public enum EFontWeight : int
     /// <summary>
     /// Specifies a lighter weight than the inherited value.
     /// </summary>
-    [EnumRecordProperties("lighter")]
+    [EnumData("lighter")]
     Lighter,
 
     /// <summary>
     /// Same as '400'
     /// </summary>
-    [EnumRecordProperties("normal")]
+    [EnumData("normal")]
     Normal,
 
     /// <summary>
     /// Same as '700'
     /// </summary>
-    [EnumRecordProperties("bold")]
+    [EnumData("bold")]
     Bold,
 
     /// <summary>
     /// Specifies a bolder weight than the inherited value.
     /// </summary>
-    [EnumRecordProperties("bolder")]
+    [EnumData("bolder")]
     Bolder,
 }
 

@@ -7,16 +7,16 @@ namespace CssUI.HTML
     public enum EAreaShape : int
     {/* Docs: https://html.spec.whatwg.org/multipage/image-maps.html#attr-area-shape */
 
-        [EnumRecordProperties("default")]
+        [EnumData("default")]
         Default,
 
-        [EnumRecordProperties("circle")]
+        [EnumData("circle")]
         Circle,
 
-        [EnumRecordProperties("poly")]
+        [EnumData("poly")]
         Polygon,
 
-        [EnumRecordProperties("rect")]
+        [EnumData("rect")]
         Rectangle,
     }
 }

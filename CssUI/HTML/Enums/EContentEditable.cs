@@ -8,11 +8,11 @@ namespace CssUI.HTML
 
         Invalid = -1,
         Missing = 0,
-        [EnumRecordProperties("true")]
+        [EnumData("true")]
         True,
-        [EnumRecordProperties("false")]
+        [EnumData("false")]
         False,
-        [EnumRecordProperties("inherit")]
+        [EnumData("inherit")]
         Inherit
     }
 }

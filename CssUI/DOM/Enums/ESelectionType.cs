@@ -5,11 +5,11 @@ namespace CssUI.DOM;
 [EnumRecord<KeywordProperties>]
 public enum ESelectionType : int
 {
-    [EnumRecordProperties("None")]
+    [EnumData("None")]
     None,
-    [EnumRecordProperties("Caret")]
+    [EnumData("Caret")]
     Caret,
-    [EnumRecordProperties("Range")]
+    [EnumData("Range")]
     Range,
 }
 

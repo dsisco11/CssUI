@@ -14,15 +14,15 @@ var visualStudio = (this.Host as IServiceProvider).GetCOMService(typeof(EnvDTE.D
 var project = visualStudio.Solution.FindProjectItem(this.Host.TemplateFile).ContainingProject as EnvDTE.Project;
 List<Tuple<EnvDTE.CodeType, string>> allElements = new List<Tuple<EnvDTE.CodeType, string>>();
 #>
-<#  
-/* Compile a list of all classes marked with the MetaElement attribute */  
+<#
+/* Compile a list of all classes marked with the MetaElement attribute */
 var projectItems = GetProjectItemsRecursively(project.ProjectItems);
 foreach(EnvDTE.ProjectItem item in projectItems)
 	{
 		 // if (item == null || item.FileCodeModel == null) continue;
 		 if (item != null)
 		 {
-			if (item.FileCodeModel == null) 
+			if (item.FileCodeModel == null)
 				continue;
 			foreach(EnvDTE.CodeElement elem in item.FileCodeModel.CodeElements)
 			{
@@ -34,13 +34,13 @@ foreach(EnvDTE.ProjectItem item in projectItems)
 						{
 							var E = (EnvDTE.CodeType) child;
 							bool isTarget = false;
-							foreach(EnvDTE.CodeAttribute Attr in E.Attributes) 
-							{ 
-								if (Attr.Name == "MetaElement") 
-								{ 
+							foreach(EnvDTE.CodeAttribute Attr in E.Attributes)
+							{
+								if (Attr.Name == "MetaElement")
+								{
 									allElements.Add( new Tuple<EnvDTE.CodeType, string>(E, Attr.Value) );
 									break;
-								} 
+								}
 							}
 						}
 					}
@@ -50,9 +50,9 @@ foreach(EnvDTE.ProjectItem item in projectItems)
 	}
 #>
 
-/* 
+/*
 * =====================================================
-*		   	THIS CODE IS GENERATED, 
+*		   	THIS CODE IS GENERATED,
 *	ANY CHANGES ARE SUBJECT TO BEING OVERWRITTEN
 * =====================================================
 */
@@ -73,7 +73,7 @@ namespace CssUI
 
 			WriteLine("");
 			WriteLine($"///<summary> {className}</summary>");
-			WriteLine($"[EnumRecordProperties(\"{tagName}\")]");
+			WriteLine($"[EnumData(\"{tagName}\")]");
 			WriteLine($"{System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase( tagName )} = { index },");
 			index++;
 		}
@@ -82,7 +82,7 @@ namespace CssUI
 	}
 }
 
-<#+	
+<#+
 
 public List<EnvDTE.ProjectItem> GetProjectItemsRecursively(EnvDTE.ProjectItems items)
 {

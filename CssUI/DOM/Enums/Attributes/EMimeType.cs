@@ -6,139 +6,139 @@ namespace CssUI.DOM;
 public enum EMimeType : int
 {
 
-    [EnumRecordProperties("application/atom+xml")]
+    [EnumData("application/atom+xml")]
     Atom,
 
-    [EnumRecordProperties("application/octet-stream")]
+    [EnumData("application/octet-stream")]
     OctetStream,
 
-    [EnumRecordProperties("application/microdata+json")]
+    [EnumData("application/microdata+json")]
     JSON_Microdata,
 
-    [EnumRecordProperties("application/rss+xml")]
+    [EnumData("application/rss+xml")]
     RSS,
 
     /// <summary>
     /// </summary>
-    [EnumRecordProperties("application/x-www-form-urlencoded")]
+    [EnumData("application/x-www-form-urlencoded")]
     UrlEncoded,
 
-    [EnumRecordProperties("application/xhtml+xml")]
+    [EnumData("application/xhtml+xml")]
     XHTML,
 
-    [EnumRecordProperties("application/xml")]
+    [EnumData("application/xml")]
     XmlApplication,
 
     /// <summary>
     /// </summary>
-    [EnumRecordProperties("multipart/form-data")]
+    [EnumData("multipart/form-data")]
     FormData,
 
-    [EnumRecordProperties("multipart/mixed")]
+    [EnumData("multipart/mixed")]
     Mixed,
 
-    [EnumRecordProperties("multipart/x-mixed-replace")]
+    [EnumData("multipart/x-mixed-replace")]
     Streaming,
 
-    [EnumRecordProperties("text/cache-manifest")]
+    [EnumData("text/cache-manifest")]
     Cache,
 
-    [EnumRecordProperties("text/css")]
+    [EnumData("text/css")]
     CSS,
 
-    [EnumRecordProperties("text/event-stream")]
+    [EnumData("text/event-stream")]
     EventStream,
 
-    [EnumRecordProperties("text/javascript")]
+    [EnumData("text/javascript")]
     Javascript,
 
-    [EnumRecordProperties("text/json")]
+    [EnumData("text/json")]
     JSON,
 
     /// <summary>
     /// </summary>
-    [EnumRecordProperties("text/plain")]
+    [EnumData("text/plain")]
     Plain,
 
-    [EnumRecordProperties("text/html")]
+    [EnumData("text/html")]
     HTML,
 
-    [EnumRecordProperties("text/ping")]
+    [EnumData("text/ping")]
     Ping,
 
-    [EnumRecordProperties("text/uri-list")]
+    [EnumData("text/uri-list")]
     UriList,
 
-    [EnumRecordProperties("text/vcard")]
+    [EnumData("text/vcard")]
     vCard,
 
-    [EnumRecordProperties("text/vtt")]
+    [EnumData("text/vtt")]
     WebVTT,
 
-    [EnumRecordProperties("text/xml")]
+    [EnumData("text/xml")]
     XML,
 
-    [EnumRecordProperties("application/pdf")]
+    [EnumData("application/pdf")]
     PDF,
 
-    [EnumRecordProperties("application/postscript")]
+    [EnumData("application/postscript")]
     AdobePostscript,
 
 
 
-    [EnumRecordProperties("application/x-gzip")]
+    [EnumData("application/x-gzip")]
     GZIP,
-    [EnumRecordProperties("application/zip")]
+    [EnumData("application/zip")]
     ZIP,
-    [EnumRecordProperties("application/x-rar-compressed")]
+    [EnumData("application/x-rar-compressed")]
     RAR,
 
 
-    [EnumRecordProperties("audio/basic")]
+    [EnumData("audio/basic")]
     AudioBasic,
-    [EnumRecordProperties("audio/aiff")]
+    [EnumData("audio/aiff")]
     AIFF,
-    [EnumRecordProperties("audio/mpeg")]
+    [EnumData("audio/mpeg")]
     MP3,
-    [EnumRecordProperties("audio/ogg")]
+    [EnumData("audio/ogg")]
     OGG,
-    [EnumRecordProperties("audio/midi")]
+    [EnumData("audio/midi")]
     MIDI,
-    [EnumRecordProperties("audio/avi")]
+    [EnumData("audio/avi")]
     AVI,
-    [EnumRecordProperties("audio/wave")]
+    [EnumData("audio/wave")]
     WAVE,
 
 
 
-    [EnumRecordProperties("video/mp4")]
+    [EnumData("video/mp4")]
     MPEG4,
-    [EnumRecordProperties("video/webm")]
+    [EnumData("video/webm")]
     WEBM,
-    [EnumRecordProperties("video/mpeg")]
+    [EnumData("video/mpeg")]
     MPEG,
 
 
 
-    [EnumRecordProperties("image/x-icon")]
+    [EnumData("image/x-icon")]
     XIcon,
 
-    [EnumRecordProperties("image/bmp")]
+    [EnumData("image/bmp")]
     BMP,
 
-    [EnumRecordProperties("image/gif")]
+    [EnumData("image/gif")]
     GIF,
 
-    [EnumRecordProperties("image/webp")]
+    [EnumData("image/webp")]
     WebP,
 
-    [EnumRecordProperties("image/jpeg")]
+    [EnumData("image/jpeg")]
     JPEG,
 
-    [EnumRecordProperties("image/png")]
+    [EnumData("image/png")]
     PNG,
 
-    [EnumRecordProperties("image/svg+xml")]
+    [EnumData("image/svg+xml")]
     SVG,
 
 

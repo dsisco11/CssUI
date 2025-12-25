@@ -14,13 +14,13 @@ namespace CssUI.HTML
         /// <summary>
         /// The true state means the element is draggable
         /// </summary>
-        [EnumRecordProperties("true")]
+        [EnumData("true")]
         True,
 
         /// <summary>
         /// The false state means the element is not draggable
         /// </summary>
-        [EnumRecordProperties("false")]
+        [EnumData("false")]
         False,
     }
 }

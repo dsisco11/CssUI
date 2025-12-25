@@ -9,13 +9,13 @@ namespace CssUI.CSS;
 public enum EPositioningScheme
 {
     /// <summary>Object is positioned according to normal flow logic</summary>
-    [EnumRecordProperties("normal")]
+    [EnumData("normal")]
     Normal,
     /// <summary>Object is laid out like in normal flow but then moved as far left or right as possible</summary>
-    [EnumRecordProperties("float")]
+    [EnumData("float")]
     Float,
     /// <summary>Object is not positioned according to normal flow, it defines it's own position relative to a block other than its logical containing block</summary>
-    [EnumRecordProperties("absolute")]
+    [EnumData("absolute")]
     Absolute
 }
 

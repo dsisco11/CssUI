@@ -8,13 +8,13 @@ public enum EDirection : int
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("ltr")]
+    [EnumData("ltr")]
     LTR = 1,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("rtl")]
+    [EnumData("rtl")]
     RTL,
 }
 

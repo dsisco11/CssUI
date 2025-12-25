@@ -6,10 +6,10 @@ namespace CssUI.HTML
     public enum EAutoComplete : int
     {
 
-        [EnumRecordProperties("on")]
+        [EnumData("on")]
         On,
 
-        [EnumRecordProperties("off")]
+        [EnumData("off")]
         Off,
     }
 }

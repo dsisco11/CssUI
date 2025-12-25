@@ -9,17 +9,17 @@ namespace CssUI.HTML
         /// <summary>
         /// Indicates the HTTP GET method.
         /// </summary>
-        [EnumRecordProperties("get")]
+        [EnumData("get")]
         Get,
         /// <summary>
         /// Indicates the HTTP POST method.
         /// </summary>
-        [EnumRecordProperties("post")]
+        [EnumData("post")]
         Post,
         /// <summary>
         /// Indicates that submitting the form is intended to close the dialog box in which the form finds itself, if any, and otherwise not submit.
         /// </summary>
-        [EnumRecordProperties("dialog")]
+        [EnumData("dialog")]
         Dialog,
 
     }

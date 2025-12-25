@@ -9,19 +9,19 @@ public enum EFontStyle
     /// <summary>
     /// selects a face that is classified as a normal face, one that is neither italic or obliqued
     /// </summary>
-    [EnumRecordProperties("normal")]
+    [EnumData("normal")]
     Normal,
 
     /// <summary>
     /// selects a font that is labeled as an italic face, or an oblique face if one is not
     /// </summary>
-    [EnumRecordProperties("italic")]
+    [EnumData("italic")]
     Italic,
 
     /// <summary>
     /// selects a font that is labeled as an oblique face, or an italic face if one is not
     /// </summary>
-    [EnumRecordProperties("oblique")]
+    [EnumData("oblique")]
     Oblique,
 }
 

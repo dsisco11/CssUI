@@ -8,19 +8,19 @@ namespace CssUI.HTML
 
         /// <summary>
         /// </summary>
-        [EnumRecordProperties("_blank")]
+        [EnumData("_blank")]
         Blank,
         /// <summary>
         /// </summary>
-        [EnumRecordProperties("_self")]
+        [EnumData("_self")]
         Self,
         /// <summary>
         /// </summary>
-        [EnumRecordProperties("_parent")]
+        [EnumData("_parent")]
         Parent,
         /// <summary>
         /// </summary>
-        [EnumRecordProperties("_top")]
+        [EnumData("_top")]
         Top,
 
     }

@@ -10,19 +10,19 @@ public enum EBoxSize
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("min-content")]
+    [EnumData("min-content")]
     Min_Content,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("max-content")]
+    [EnumData("max-content")]
     Max_Content,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("fit-content")]
+    [EnumData("fit-content")]
     Fit_Content,
 }
 

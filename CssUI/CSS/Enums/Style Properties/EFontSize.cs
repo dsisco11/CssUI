@@ -10,43 +10,43 @@ public enum EFontSize : int
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("xx-small")]
+    [EnumData("xx-small")]
     XXSmall = 0,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("x-small")]
+    [EnumData("x-small")]
     XSmall,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("small")]
+    [EnumData("small")]
     Small,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("medium")]
+    [EnumData("medium")]
     Medium,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("large")]
+    [EnumData("large")]
     Large,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("x-large")]
+    [EnumData("x-large")]
     XLarge,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("xx-large")]
+    [EnumData("xx-large")]
     XXLarge,
 
 
@@ -56,13 +56,13 @@ public enum EFontSize : int
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("smaller")]
+    [EnumData("smaller")]
     Smaller,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("larger")]
+    [EnumData("larger")]
     Larger,
 
 }

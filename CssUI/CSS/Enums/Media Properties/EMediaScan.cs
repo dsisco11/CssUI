@@ -11,14 +11,14 @@ public enum EMediaScan
     /// exploiting various automatic mental image-correction abilities to produce smooth motion.
     /// This allowed them to simulate a higher FPS broadcast at half the bandwidth cost.
     /// </summary>
-    [EnumRecordProperties("interlace")]
+    [EnumData("interlace")]
     Interlace,
 
     /// <summary>
     /// A screen using “progressive” rendering displays each screen fully, and needs no special treatment.
     /// Most modern screens, and all computer screens, use progressive rendering.
     /// </summary>
-    [EnumRecordProperties("progressive")]
+    [EnumData("progressive")]
     Progressive,
 }
 

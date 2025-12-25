@@ -13,12 +13,12 @@ public enum EBoxDecorationBreak
     /// Box decorations are sliced at fragment boundaries.
     /// Each fragment is rendered as if the box were sliced at the break.
     /// </summary>
-    [EnumRecordProperties("slice")]
+    [EnumData("slice")]
     Slice,
 
     /// <summary>
     /// Each box fragment is independently wrapped with the border, padding, and background.
     /// </summary>
-    [EnumRecordProperties("clone")]
+    [EnumData("clone")]
     Clone
 }

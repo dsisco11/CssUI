@@ -12,28 +12,28 @@ public enum EBorderStyle : int
     /// <summary>
     /// No border, Color and width are ignored.
     /// </summary>
-    [EnumRecordProperties("none")]
+    [EnumData("none")]
     None = (1 << 0),
     /// <summary>
     /// Same as 'None' but with different conflict resolution for border-collapsed tables
     /// </summary>
-    [EnumRecordProperties("hidden")]
+    [EnumData("hidden")]
     Hidden = (1 << 1),
-    [EnumRecordProperties("dotted")]
+    [EnumData("dotted")]
     Dotted = (1 << 2),
-    [EnumRecordProperties("dashed")]
+    [EnumData("dashed")]
     Dashed = (1 << 3),
-    [EnumRecordProperties("solid")]
+    [EnumData("solid")]
     Solid = (1 << 4),
-    [EnumRecordProperties("double")]
+    [EnumData("double")]
     Double = (1 << 5),
-    [EnumRecordProperties("groove")]
+    [EnumData("groove")]
     Groove = (1 << 6),
-    [EnumRecordProperties("ridge")]
+    [EnumData("ridge")]
     Ridge = (1 << 7),
-    [EnumRecordProperties("inset")]
+    [EnumData("inset")]
     Inset = (1 << 8),
-    [EnumRecordProperties("outset")]
+    [EnumData("outset")]
     Outset = (1 << 9),
 };
 

@@ -8,28 +8,28 @@ namespace CssUI.DOM.CustomElements;
 [EnumRecord<KeywordProperties>]
 public enum EReactionName : int
 {
-    [EnumRecordProperties("attributeChangedCallback")]
+    [EnumData("attributeChangedCallback")]
     AttributeChanged,
 
-    [EnumRecordProperties("connectedCallback")]
+    [EnumData("connectedCallback")]
     Connected,
 
-    [EnumRecordProperties("disconnectedCallback")]
+    [EnumData("disconnectedCallback")]
     Disconnected,
 
-    [EnumRecordProperties("adoptedCallback")]
+    [EnumData("adoptedCallback")]
     Adopted,
 
-    [EnumRecordProperties("formAssociatedCallback")]
+    [EnumData("formAssociatedCallback")]
     FormAssociated,
 
-    [EnumRecordProperties("formDisabledCallback")]
+    [EnumData("formDisabledCallback")]
     FormDisabled,
 
-    [EnumRecordProperties("formResetCallback")]
+    [EnumData("formResetCallback")]
     FormReset,
 
-    [EnumRecordProperties("formStateRestoreCallback")]
+    [EnumData("formStateRestoreCallback")]
     FormStateRestore,
 
 }

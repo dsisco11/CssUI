@@ -8,19 +8,19 @@ public enum EBorderSize : int
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("thin")]
+    [EnumData("thin")]
     Thin,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("medium")]
+    [EnumData("medium")]
     Medium,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("thick")]
+    [EnumData("thick")]
     Thick,
 }
 

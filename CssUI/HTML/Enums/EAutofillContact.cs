@@ -5,19 +5,19 @@ namespace CssUI.HTML
     [EnumRecord<KeywordProperties>]
     public enum EAutofillContact
     {
-        [EnumRecordProperties("home")]
+        [EnumData("home")]
         Home,
 
-        [EnumRecordProperties("work")]
+        [EnumData("work")]
         Work,
 
-        [EnumRecordProperties("mobile")]
+        [EnumData("mobile")]
         Mobile,
 
-        [EnumRecordProperties("fax")]
+        [EnumData("fax")]
         Fax,
 
-        [EnumRecordProperties("pager")]
+        [EnumData("pager")]
         Pager,
     }
 }

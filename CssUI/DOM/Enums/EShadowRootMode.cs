@@ -5,9 +5,9 @@ namespace CssUI.DOM.Enums;
 [EnumRecord<KeywordProperties>]
 public enum EShadowRootMode : int
 {
-    [EnumRecordProperties("open")]
+    [EnumData("open")]
     Open,
-    [EnumRecordProperties("closed")]
+    [EnumData("closed")]
     Closed,
 }
 

@@ -52,15 +52,15 @@ All enums use **E-prefix**: `EDisplayMode`, `ECssUnit`, `EFlexDirection`, `ENode
 
 ### EnumRecords System for Keyword Mapping
 
-Enums with CSS keyword mappings use `[EnumRecord<KeywordProperties>]` + `[EnumRecordProperties]` attributes (via EnumRecords package):
+Enums with CSS keyword mappings use `[EnumRecord<KeywordProperties>]` + `[EnumData]` attributes (via EnumRecords package):
 
 ```csharp
 [Flags, EnumRecord<KeywordProperties>]
 public enum EDisplayMode : int
 {
-    [EnumRecordProperties("none")] NONE = (1 << 0),
-    [EnumRecordProperties("block")] BLOCK = (1 << 4),
-    [EnumRecordProperties("flex")] FLEX = (1 << 6),
+    [EnumData("none")] NONE = (1 << 0),
+    [EnumData("block")] BLOCK = (1 << 4),
+    [EnumData("flex")] FLEX = (1 << 6),
 }
 ```
 

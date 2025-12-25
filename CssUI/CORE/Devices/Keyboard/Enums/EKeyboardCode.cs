@@ -9,439 +9,439 @@ public enum EKeyboardCode : int
     /// <summary>
     /// This value code should be used when no other value given in this specification is appropriate.
     /// </summary>
-    [EnumRecordProperties("")]
+    [EnumData("")]
     Invalid = 0x0,
 
     /// <summary>
     /// `~ on a US keyboard. This is the 半角/全角/漢字 (hankaku/zenkaku/kanji) key on Japanese keyboards
     /// </summary>
-    [EnumRecordProperties("Backquote", UnicodeCommon.CHAR_BACKTICK)]
+    [EnumData("Backquote", UnicodeCommon.CHAR_BACKTICK)]
     Backquote,
 
     /// <summary>
     /// Used for both the US \| (on the 101-key layout) and also for the key    located between the " and Enter keys on row C of the 102-, 104- and 106-key layouts. Labelled #~ on a UK (102) keyboard.
     /// </summary>
-    [EnumRecordProperties("Backslash", UnicodeCommon.CHAR_REVERSE_SOLIDUS)]
+    [EnumData("Backslash", UnicodeCommon.CHAR_REVERSE_SOLIDUS)]
     Backslash,
 
     /// <summary>
     /// Backspace or ⌫.	Labelled Delete on Apple keyboards.
     /// </summary>
-    [EnumRecordProperties("Backspace", '⌫')]
+    [EnumData("Backspace", '⌫')]
     Backspace,
 
     /// <summary>
     /// [{ on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("BracketLeft", UnicodeCommon.CHAR_LEFT_SQUARE_BRACKET)]
+    [EnumData("BracketLeft", UnicodeCommon.CHAR_LEFT_SQUARE_BRACKET)]
     BracketLeft,
 
     /// <summary>
     /// ]} on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("BracketRight", UnicodeCommon.CHAR_RIGHT_SQUARE_BRACKET)]
+    [EnumData("BracketRight", UnicodeCommon.CHAR_RIGHT_SQUARE_BRACKET)]
     BracketRight,
 
     /// <summary>
     /// ,< on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("Comma", UnicodeCommon.CHAR_COMMA)]
+    [EnumData("Comma", UnicodeCommon.CHAR_COMMA)]
     Comma,
 
     /// <summary>
     /// 0 ) on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("Digit0", UnicodeCommon.CHAR_DIGIT_0)]
+    [EnumData("Digit0", UnicodeCommon.CHAR_DIGIT_0)]
     Digit0,
 
     /// <summary>
     /// 1 ! on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("Digit1", UnicodeCommon.CHAR_DIGIT_1)]
+    [EnumData("Digit1", UnicodeCommon.CHAR_DIGIT_1)]
     Digit1,
 
     /// <summary>
     /// 2 @ on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("Digit2", UnicodeCommon.CHAR_DIGIT_2)]
+    [EnumData("Digit2", UnicodeCommon.CHAR_DIGIT_2)]
     Digit2,
 
     /// <summary>
     /// 3 # on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("Digit3", UnicodeCommon.CHAR_DIGIT_3)]
+    [EnumData("Digit3", UnicodeCommon.CHAR_DIGIT_3)]
     Digit3,
 
     /// <summary>
     /// 4 $ on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("Digit4", UnicodeCommon.CHAR_DIGIT_4)]
+    [EnumData("Digit4", UnicodeCommon.CHAR_DIGIT_4)]
     Digit4,
 
     /// <summary>
     /// 5 % on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("Digit5", UnicodeCommon.CHAR_DIGIT_5)]
+    [EnumData("Digit5", UnicodeCommon.CHAR_DIGIT_5)]
     Digit5,
 
     /// <summary>
     /// 6 ^ on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("Digit6", UnicodeCommon.CHAR_DIGIT_6)]
+    [EnumData("Digit6", UnicodeCommon.CHAR_DIGIT_6)]
     Digit6,
 
     /// <summary>
     /// 7 & on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("Digit7", UnicodeCommon.CHAR_DIGIT_7)]
+    [EnumData("Digit7", UnicodeCommon.CHAR_DIGIT_7)]
     Digit7,
 
     /// <summary>
     /// 8 * on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("Digit8", UnicodeCommon.CHAR_DIGIT_8)]
+    [EnumData("Digit8", UnicodeCommon.CHAR_DIGIT_8)]
     Digit8,
 
     /// <summary>
     /// 9 ( on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("Digit9", UnicodeCommon.CHAR_DIGIT_9)]
+    [EnumData("Digit9", UnicodeCommon.CHAR_DIGIT_9)]
     Digit9,
 
     /// <summary>
     /// = + on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("Equal", UnicodeCommon.CHAR_EQUALS)]
+    [EnumData("Equal", UnicodeCommon.CHAR_EQUALS)]
     Equal,
 
     /// <summary>
     /// Located between the left Shift and Z keys.	Labelled \| on a UK keyboard.
     /// </summary>
-    [EnumRecordProperties("IntlBackslash", UnicodeCommon.CHAR_REVERSE_SOLIDUS)]
+    [EnumData("IntlBackslash", UnicodeCommon.CHAR_REVERSE_SOLIDUS)]
     IntlBackslash,
 
     /// <summary>
     /// Located between the / and right Shift keys.	Labelled \ (ro) on a Japanese keyboard.
     /// </summary>
-    [EnumRecordProperties("IntlRo", 'ろ')]
+    [EnumData("IntlRo", 'ろ')]
     IntlRo,
 
     /// <summary>
     /// Located between the = and Backspace keys.	Labelled  (yen) on a Japanese keyboard. \/ on a Russian keyboard.
     /// </summary>
-    [EnumRecordProperties("IntlYen", '¥')]
+    [EnumData("IntlYen", '¥')]
     IntlYen,
 
     /// <summary>
     /// a on a US keyboard.Labelled q on an AZERTY (e.g., French) keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyA", 'a')]
+    [EnumData("KeyA", 'a')]
     KeyA,
 
     /// <summary>
     /// b on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyB", 'b')]
+    [EnumData("KeyB", 'b')]
     KeyB,
 
     /// <summary>
     /// c on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyC", 'c')]
+    [EnumData("KeyC", 'c')]
     KeyC,
 
     /// <summary>
     /// d on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyD", 'd')]
+    [EnumData("KeyD", 'd')]
     KeyD,
 
     /// <summary>
     /// e on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyE", 'e')]
+    [EnumData("KeyE", 'e')]
     KeyE,
 
     /// <summary>
     /// f on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyF", 'f')]
+    [EnumData("KeyF", 'f')]
     KeyF,
 
     /// <summary>
     /// g on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyG", 'g')]
+    [EnumData("KeyG", 'g')]
     KeyG,
 
     /// <summary>
     /// h on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyH", 'h')]
+    [EnumData("KeyH", 'h')]
     KeyH,
 
     /// <summary>
     /// i on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyI", 'i')]
+    [EnumData("KeyI", 'i')]
     KeyI,
 
     /// <summary>
     /// j on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyJ", 'j')]
+    [EnumData("KeyJ", 'j')]
     KeyJ,
 
     /// <summary>
     /// k on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyK", 'k')]
+    [EnumData("KeyK", 'k')]
     KeyK,
 
     /// <summary>
     /// l on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyL", 'l')]
+    [EnumData("KeyL", 'l')]
     KeyL,
 
     /// <summary>
     /// m on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyM", 'm')]
+    [EnumData("KeyM", 'm')]
     KeyM,
 
     /// <summary>
     /// n on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyN", 'n')]
+    [EnumData("KeyN", 'n')]
     KeyN,
 
     /// <summary>
     /// o on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyO", 'o')]
+    [EnumData("KeyO", 'o')]
     KeyO,
 
     /// <summary>
     /// p on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyP", 'p')]
+    [EnumData("KeyP", 'p')]
     KeyP,
 
     /// <summary>
     /// q on a US keyboard.Labelled a on an AZERTY (e.g., French) keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyQ", 'q')]
+    [EnumData("KeyQ", 'q')]
     KeyQ,
 
     /// <summary>
     /// r on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyR", 'r')]
+    [EnumData("KeyR", 'r')]
     KeyR,
 
     /// <summary>
     /// s on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyS", 's')]
+    [EnumData("KeyS", 's')]
     KeyS,
 
     /// <summary>
     /// t on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyT", 't')]
+    [EnumData("KeyT", 't')]
     KeyT,
 
     /// <summary>
     /// u on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyU", 'u')]
+    [EnumData("KeyU", 'u')]
     KeyU,
 
     /// <summary>
     /// v on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyV", 'v')]
+    [EnumData("KeyV", 'v')]
     KeyV,
 
     /// <summary>
     /// w on a US keyboard.Labelled z on an AZERTY (e.g., French) keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyW", 'w')]
+    [EnumData("KeyW", 'w')]
     KeyW,
 
     /// <summary>
     /// x on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyX", 'x')]
+    [EnumData("KeyX", 'x')]
     KeyX,
 
     /// <summary>
     /// y on a US keyboard.Labelled z on a QWERTZ (e.g., German) keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyY", 'y')]
+    [EnumData("KeyY", 'y')]
     KeyY,
 
     /// <summary>
     /// z on a US keyboard.Labelled w on an AZERTY (e.g., French) keyboard, and y on a QWERTZ (e.g., German) keyboard.
     /// </summary>
-    [EnumRecordProperties("KeyZ", 'z')]
+    [EnumData("KeyZ", 'z')]
     KeyZ,
 
     /// <summary>
     /// -_ on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("Minus", UnicodeCommon.CHAR_HYPHEN_MINUS)]
+    [EnumData("Minus", UnicodeCommon.CHAR_HYPHEN_MINUS)]
     Minus,
 
     /// <summary>
     /// .> on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("Period", UnicodeCommon.CHAR_FULL_STOP)]
+    [EnumData("Period", UnicodeCommon.CHAR_FULL_STOP)]
     Period,
 
     /// <summary>
     /// '" on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("Quote", UnicodeCommon.CHAR_APOSTRAPHE)]
+    [EnumData("Quote", UnicodeCommon.CHAR_APOSTRAPHE)]
     Quote,
 
     /// <summary>
     /// ;: on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("Semicolon", UnicodeCommon.CHAR_SEMICOLON)]
+    [EnumData("Semicolon", UnicodeCommon.CHAR_SEMICOLON)]
     Semicolon,
 
     /// <summary>
     /// /? on a US keyboard.
     /// </summary>
-    [EnumRecordProperties("Slash", UnicodeCommon.CHAR_SOLIDUS)]
+    [EnumData("Slash", UnicodeCommon.CHAR_SOLIDUS)]
     Slash,
 
     /// <summary>
     /// Alt, Option or ⌥.
     /// </summary>
-    [EnumRecordProperties("AltLeft", UnicodeCommon.KEY_ALT_MODIFIER)]
+    [EnumData("AltLeft", UnicodeCommon.KEY_ALT_MODIFIER)]
     AltLeft,
 
     /// <summary>
     /// Alt, Option or ⌥.	This is labelled AltGr key on many keyboard layouts.
     /// </summary>
-    [EnumRecordProperties("AltRight", UnicodeCommon.KEY_ALT_MODIFIER)]
+    [EnumData("AltRight", UnicodeCommon.KEY_ALT_MODIFIER)]
     AltRight,
 
     /// <summary>
     /// CapsLock or ⇪
     /// </summary>
-    [EnumRecordProperties("CapsLock", UnicodeCommon.KEY_CAPSLOCK)]
+    [EnumData("CapsLock", UnicodeCommon.KEY_CAPSLOCK)]
     CapsLock,
 
     /// <summary>
     /// The application context menu key, which is typically found between the right Meta key and the right Control key.
     /// </summary>
-    [EnumRecordProperties("ContextMenu")]
+    [EnumData("ContextMenu")]
     ContextMenu,
 
     /// <summary>
     /// Control or ⌃
     /// </summary>
-    [EnumRecordProperties("ControlLeft", UnicodeCommon.KEY_CTRL_MODIFIER)]
+    [EnumData("ControlLeft", UnicodeCommon.KEY_CTRL_MODIFIER)]
     ControlLeft,
 
     /// <summary>
     /// Control or ⌃
     /// </summary>
-    [EnumRecordProperties("ControlRight", UnicodeCommon.KEY_CTRL_MODIFIER)]
+    [EnumData("ControlRight", UnicodeCommon.KEY_CTRL_MODIFIER)]
     ControlRight,
 
     /// <summary>
     /// Enter or ↵. Labelled Return on Apple keyboards.
     /// </summary>
-    [EnumRecordProperties("Enter", UnicodeCommon.KEY_ENTER)]
+    [EnumData("Enter", UnicodeCommon.KEY_ENTER)]
     Enter,
 
     /// <summary>
     /// The Windows, ⌘, Command or other OS symbol key.
     /// </summary>
-    [EnumRecordProperties("MetaLeft", UnicodeCommon.KEY_META_MODIFIER)]
+    [EnumData("MetaLeft", UnicodeCommon.KEY_META_MODIFIER)]
     MetaLeft,
 
     /// <summary>
     /// The Windows, ⌘, Command or other OS symbol key.
     /// </summary>
-    [EnumRecordProperties("MetaRight", UnicodeCommon.KEY_META_MODIFIER)]
+    [EnumData("MetaRight", UnicodeCommon.KEY_META_MODIFIER)]
     MetaRight,
 
     /// <summary>
     /// Shift or ⇧
     /// </summary>
-    [EnumRecordProperties("ShiftLeft", UnicodeCommon.KEY_SHIFT_MODIFIER)]
+    [EnumData("ShiftLeft", UnicodeCommon.KEY_SHIFT_MODIFIER)]
     ShiftLeft,
 
     /// <summary>
     /// Shift or ⇧
     /// </summary>
-    [EnumRecordProperties("ShiftRight", UnicodeCommon.KEY_SHIFT_MODIFIER)]
+    [EnumData("ShiftRight", UnicodeCommon.KEY_SHIFT_MODIFIER)]
     ShiftRight,
 
     /// <summary>
     /// (space)
     /// </summary>
-    [EnumRecordProperties("Space", UnicodeCommon.KEY_SPACE)]
+    [EnumData("Space", UnicodeCommon.KEY_SPACE)]
     Space,
 
     /// <summary>
     /// Tab or ⇥
     /// </summary>
-    [EnumRecordProperties("Tab", UnicodeCommon.KEY_TAB)]
+    [EnumData("Tab", UnicodeCommon.KEY_TAB)]
     Tab,
 
     /// <summary>
     /// Japanese: 変換 (henkan)
     /// </summary>
-    [EnumRecordProperties("Convert")]
+    [EnumData("Convert")]
     Convert,
 
     /// <summary>
     /// Japanese: カタカナ/ひらがな/ローマ字 (katakana/hiragana/romaji)
     /// </summary>
-    [EnumRecordProperties("KanaMode")]
+    [EnumData("KanaMode")]
     KanaMode,
 
     /// <summary>
     /// Korean: HangulMode 한/영 (han/yeong) Japanese (Mac keyboard): かな (kana)
     /// </summary>
-    [EnumRecordProperties("Lang1", '한', '영')]
+    [EnumData("Lang1", '한', '영')]
     Lang1,
 
     /// <summary>
     /// Korean: Hanja 한자 (hanja) Japanese (Mac keyboard): 英数 (eisu)
     /// </summary>
-    [EnumRecordProperties("Lang2")]
+    [EnumData("Lang2")]
     Lang2,
 
     /// <summary>
     /// Japanese (word-processing keyboard): Katakana
     /// </summary>
-    [EnumRecordProperties("Lang3")]
+    [EnumData("Lang3")]
     Lang3,
 
     /// <summary>
     /// Japanese (word-processing keyboard): Hiragana
     /// </summary>
-    [EnumRecordProperties("Lang4")]
+    [EnumData("Lang4")]
     Lang4,
 
     /// <summary>
     /// Japanese (word-processing keyboard): Zenkaku/Hankaku
     /// </summary>
-    [EnumRecordProperties("Lang5")]
+    [EnumData("Lang5")]
     Lang5,
 
     /// <summary>
     /// Japanese: 無変換 (muhenkan)
     /// </summary>
-    [EnumRecordProperties("NonConvert")]
+    [EnumData("NonConvert")]
     NonConvert,
 
 
@@ -449,43 +449,43 @@ public enum EKeyboardCode : int
     /// <summary>
     /// ⌦. The forward delete key.	Note that on Apple keyboards, the key labelled Delete on the main part of the keyboard should be encoded as "Backspace".
     /// </summary>
-    [EnumRecordProperties("Delete", UnicodeCommon.KEY_DELETE)]
+    [EnumData("Delete", UnicodeCommon.KEY_DELETE)]
     Delete,
 
     /// <summary>
     /// Page Down, End or ↘
     /// </summary>
-    [EnumRecordProperties("End", UnicodeCommon.KEY_END)]
+    [EnumData("End", UnicodeCommon.KEY_END)]
     End,
 
     /// <summary>
     /// Help. Not present on standard PC keyboards.
     /// </summary>
-    [EnumRecordProperties("Help")]
+    [EnumData("Help")]
     Help,
 
     /// <summary>
     /// Home or ↖
     /// </summary>
-    [EnumRecordProperties("Home", UnicodeCommon.KEY_HOME)]
+    [EnumData("Home", UnicodeCommon.KEY_HOME)]
     Home,
 
     /// <summary>
     /// Insert or Ins. Not present on Apple keyboards.
     /// </summary>
-    [EnumRecordProperties("Insert")]
+    [EnumData("Insert")]
     Insert,
 
     /// <summary>
     /// Page Down, PgDn or ⇟
     /// </summary>
-    [EnumRecordProperties("PageDown", UnicodeCommon.KEY_PGDOWN)]
+    [EnumData("PageDown", UnicodeCommon.KEY_PGDOWN)]
     PageDown,
 
     /// <summary>
     /// Page Up, PgUp or ⇞
     /// </summary>
-    [EnumRecordProperties("PageUp", UnicodeCommon.KEY_PGUP)]
+    [EnumData("PageUp", UnicodeCommon.KEY_PGUP)]
     PageUp,
 
 
@@ -495,25 +495,25 @@ public enum EKeyboardCode : int
     /// <summary>
     /// ↓
     /// </summary>
-    [EnumRecordProperties("ArrowDown", UnicodeCommon.KEY_DOWN)]
+    [EnumData("ArrowDown", UnicodeCommon.KEY_DOWN)]
     ArrowDown,
 
     /// <summary>
     /// ←
     /// </summary>
-    [EnumRecordProperties("ArrowLeft", UnicodeCommon.KEY_LEFT)]
+    [EnumData("ArrowLeft", UnicodeCommon.KEY_LEFT)]
     ArrowLeft,
 
     /// <summary>
     /// →
     /// </summary>
-    [EnumRecordProperties("ArrowRight", UnicodeCommon.KEY_RIGHT)]
+    [EnumData("ArrowRight", UnicodeCommon.KEY_RIGHT)]
     ArrowRight,
 
     /// <summary>
     /// ↑
     /// </summary>
-    [EnumRecordProperties("ArrowUp", UnicodeCommon.KEY_UP)]
+    [EnumData("ArrowUp", UnicodeCommon.KEY_UP)]
     ArrowUp,
 
 
@@ -524,186 +524,186 @@ public enum EKeyboardCode : int
     /// <summary>
     /// On the Mac, the "NumLock" code should be used for the numpad Clear key.
     /// </summary>
-    [EnumRecordProperties("NumLock")]
+    [EnumData("NumLock")]
     NumLock,
 
     /// <summary>
     /// 0 Ins on a keyboard 0 on a phone or remote control
     /// </summary>
-    [EnumRecordProperties("Numpad0", UnicodeCommon.CHAR_DIGIT_0)]
+    [EnumData("Numpad0", UnicodeCommon.CHAR_DIGIT_0)]
     Numpad0,
 
     /// <summary>
     /// 1 End on a keyboard 1 or 1 QZ on a phone or remote control
     /// </summary>
-    [EnumRecordProperties("Numpad1", UnicodeCommon.CHAR_DIGIT_1)]
+    [EnumData("Numpad1", UnicodeCommon.CHAR_DIGIT_1)]
     Numpad1,
 
     /// <summary>
     /// 2 ↓ on a keyboard 2 ABC on a phone or remote control
     /// </summary>
-    [EnumRecordProperties("Numpad2", UnicodeCommon.CHAR_DIGIT_2)]
+    [EnumData("Numpad2", UnicodeCommon.CHAR_DIGIT_2)]
     Numpad2,
 
     /// <summary>
     /// 3 PgDn on a keyboard 3 DEF on a phone or remote control
     /// </summary>
-    [EnumRecordProperties("Numpad3", UnicodeCommon.CHAR_DIGIT_3)]
+    [EnumData("Numpad3", UnicodeCommon.CHAR_DIGIT_3)]
     Numpad3,
 
     /// <summary>
     /// 4 ← on a keyboard 4 GHI on a phone or remote control
     /// </summary>
-    [EnumRecordProperties("Numpad4", UnicodeCommon.CHAR_DIGIT_4)]
+    [EnumData("Numpad4", UnicodeCommon.CHAR_DIGIT_4)]
     Numpad4,
 
     /// <summary>
     /// 5 on a keyboard 5 JKL on a phone or remote control
     /// </summary>
-    [EnumRecordProperties("Numpad5", UnicodeCommon.CHAR_DIGIT_5)]
+    [EnumData("Numpad5", UnicodeCommon.CHAR_DIGIT_5)]
     Numpad5,
 
     /// <summary>
     /// 6 → on a keyboard 6 MNO on a phone or remote control
     /// </summary>
-    [EnumRecordProperties("Numpad6", UnicodeCommon.CHAR_DIGIT_6)]
+    [EnumData("Numpad6", UnicodeCommon.CHAR_DIGIT_6)]
     Numpad6,
 
     /// <summary>
     /// 7 Home on a keyboard 7 PQRS or 7 PRS on a phone  or remote control
     /// </summary>
-    [EnumRecordProperties("Numpad7", UnicodeCommon.CHAR_DIGIT_7)]
+    [EnumData("Numpad7", UnicodeCommon.CHAR_DIGIT_7)]
     Numpad7,
 
     /// <summary>
     /// 8 ↑ on a keyboard 8 TUV on a phone or remote control
     /// </summary>
-    [EnumRecordProperties("Numpad8", UnicodeCommon.CHAR_DIGIT_8)]
+    [EnumData("Numpad8", UnicodeCommon.CHAR_DIGIT_8)]
     Numpad8,
 
     /// <summary>
     /// 9 PgUp on a keyboard 9 WXYZ or 9 WXY on a phone  or remote control
     /// </summary>
-    [EnumRecordProperties("Numpad9", UnicodeCommon.CHAR_DIGIT_9)]
+    [EnumData("Numpad9", UnicodeCommon.CHAR_DIGIT_9)]
     Numpad9,
 
     /// <summary>
     /// +
     /// </summary>
-    [EnumRecordProperties("NumpadAdd", UnicodeCommon.CHAR_PLUS_SIGN)]
+    [EnumData("NumpadAdd", UnicodeCommon.CHAR_PLUS_SIGN)]
     NumpadAdd,
 
     /// <summary>
     /// Found on the Microsoft Natural Keyboard.
     /// </summary>
-    [EnumRecordProperties("NumpadBackspace")]
+    [EnumData("NumpadBackspace")]
     NumpadBackspace,
 
     /// <summary>
     /// C or AC (All Clear). Also for use with numpads that have a Clear key that is separate from the NumLock key. On the Mac, the numpad Clear key should always be encoded as "NumLock".
     /// </summary>
-    [EnumRecordProperties("NumpadClear")]
+    [EnumData("NumpadClear")]
     NumpadClear,
 
     /// <summary>
     /// CE (Clear Entry)
     /// </summary>
-    [EnumRecordProperties("NumpadClearEntry")]
+    [EnumData("NumpadClearEntry")]
     NumpadClearEntry,
 
     /// <summary>
     /// , (thousands separator). For locales where the thousands separator	is a "." (e.g., Brazil), this key may generate a ..
     /// </summary>
-    [EnumRecordProperties("NumpadComma")]
+    [EnumData("NumpadComma")]
     NumpadComma,
 
     /// <summary>
     /// . Del. For locales where the decimal separator is "," (e.g., Brazil), this key may generate a,.
     /// </summary>
-    [EnumRecordProperties("NumpadDecimal")]
+    [EnumData("NumpadDecimal")]
     NumpadDecimal,
 
     /// <summary>
     /// /
     /// </summary>
-    [EnumRecordProperties("NumpadDivide")]
+    [EnumData("NumpadDivide")]
     NumpadDivide,
     /// <summary>
     /// Newline
     /// </summary>
-    [EnumRecordProperties("NumpadEnter")]
+    [EnumData("NumpadEnter")]
     NumpadEnter,
 
     /// <summary>
     /// =
     /// </summary>
-    [EnumRecordProperties("NumpadEqual")]
+    [EnumData("NumpadEqual")]
     NumpadEqual,
 
     /// <summary>
     /// # on a phone or remote control device. This key is typically found	below the 9 key and to the right of the 0 key.
     /// </summary>
-    [EnumRecordProperties("NumpadHash")]
+    [EnumData("NumpadHash")]
     NumpadHash,
 
     /// <summary>
     /// M+ Add current entry to the value stored in memory.
     /// </summary>
-    [EnumRecordProperties("NumpadMemoryAdd")]
+    [EnumData("NumpadMemoryAdd")]
     NumpadMemoryAdd,
 
     /// <summary>
     /// MC Clear the value stored in memory.
     /// </summary>
-    [EnumRecordProperties("NumpadMemoryClear")]
+    [EnumData("NumpadMemoryClear")]
     NumpadMemoryClear,
 
     /// <summary>
     /// MR Replace the current entry with the value stored in memory.
     /// </summary>
-    [EnumRecordProperties("NumpadMemoryRecall")]
+    [EnumData("NumpadMemoryRecall")]
     NumpadMemoryRecall,
 
     /// <summary>
     /// MS Replace the value stored in memory with the current entry.
     /// </summary>
-    [EnumRecordProperties("NumpadMemoryStore")]
+    [EnumData("NumpadMemoryStore")]
     NumpadMemoryStore,
 
     /// <summary>
     /// M- Subtract current entry from the value stored in memory.
     /// </summary>
-    [EnumRecordProperties("NumpadMemorySubtract")]
+    [EnumData("NumpadMemorySubtract")]
     NumpadMemorySubtract,
 
     /// <summary>
     /// * on a keyboard. For use with numpads that provide mathematical operations (+, -, * and /). Use "NumpadStar" for the * key on phones and remote controls.
     /// </summary>
-    [EnumRecordProperties("NumpadMultiply")]
+    [EnumData("NumpadMultiply")]
     NumpadMultiply,
 
     /// <summary>
     /// ( Found on the Microsoft Natural Keyboard.
     /// </summary>
-    [EnumRecordProperties("NumpadParenLeft")]
+    [EnumData("NumpadParenLeft")]
     NumpadParenLeft,
 
     /// <summary>
     /// ) Found on the Microsoft Natural Keyboard.
     /// </summary>
-    [EnumRecordProperties("NumpadParenRight")]
+    [EnumData("NumpadParenRight")]
     NumpadParenRight,
 
     /// <summary>
     /// * on a phone or remote control device.	This key is typically found below the 7 key and to the left of the 0 key. Use "NumpadMultiply" for the * key on numeric keypads.
     /// </summary>
-    [EnumRecordProperties("NumpadStar")]
+    [EnumData("NumpadStar")]
     NumpadStar,
 
     /// <summary>
     /// -
     /// </summary>
-    [EnumRecordProperties("NumpadSubtract")]
+    [EnumData("NumpadSubtract")]
     NumpadSubtract,
 
 
@@ -714,109 +714,109 @@ public enum EKeyboardCode : int
     /// <summary>
     /// Esc or ⎋
     /// </summary>
-    [EnumRecordProperties("Escape", UnicodeCommon.KEY_ESCAPE)]
+    [EnumData("Escape", UnicodeCommon.KEY_ESCAPE)]
     Escape,
 
     /// <summary>
     /// F1
     /// </summary>
-    [EnumRecordProperties("F1")]
+    [EnumData("F1")]
     F1,
 
     /// <summary>
     /// F2
     /// </summary>
-    [EnumRecordProperties("F2")]
+    [EnumData("F2")]
     F2,
 
     /// <summary>
     /// F3
     /// </summary>
-    [EnumRecordProperties("F3")]
+    [EnumData("F3")]
     F3,
 
     /// <summary>
     /// F4
     /// </summary>
-    [EnumRecordProperties("F4")]
+    [EnumData("F4")]
     F4,
 
     /// <summary>
     /// F5
     /// </summary>
-    [EnumRecordProperties("F5")]
+    [EnumData("F5")]
     F5,
 
     /// <summary>
     /// F6
     /// </summary>
-    [EnumRecordProperties("F6")]
+    [EnumData("F6")]
     F6,
 
     /// <summary>
     /// F7
     /// </summary>
-    [EnumRecordProperties("F7")]
+    [EnumData("F7")]
     F7,
 
     /// <summary>
     /// F8
     /// </summary>
-    [EnumRecordProperties("F8")]
+    [EnumData("F8")]
     F8,
 
     /// <summary>
     /// F9
     /// </summary>
-    [EnumRecordProperties("F9")]
+    [EnumData("F9")]
     F9,
 
     /// <summary>
     /// F10
     /// </summary>
-    [EnumRecordProperties("F10")]
+    [EnumData("F10")]
     F10,
 
     /// <summary>
     /// F11
     /// </summary>
-    [EnumRecordProperties("F11")]
+    [EnumData("F11")]
     F11,
 
     /// <summary>
     /// F12
     /// </summary>
-    [EnumRecordProperties("F12")]
+    [EnumData("F12")]
     F12,
 
     /// <summary>
     /// Fn This is typically a hardware key that does not generate a separate   code. Most keyboards do not place this key in the function section, but it is included here to keep it with related keys.
     /// </summary>
-    [EnumRecordProperties("Fn")]
+    [EnumData("Fn")]
     Fn,
 
     /// <summary>
     /// FLock or FnLock. Function Lock key. Found on the Microsoft  Natural Keyboard.
     /// </summary>
-    [EnumRecordProperties("FnLock")]
+    [EnumData("FnLock")]
     FnLock,
 
     /// <summary>
     /// PrtScr SysRq or Print Screen
     /// </summary>
-    [EnumRecordProperties("PrintScreen")]
+    [EnumData("PrintScreen")]
     PrintScreen,
 
     /// <summary>
     /// Scroll Lock
     /// </summary>
-    [EnumRecordProperties("ScrollLock")]
+    [EnumData("ScrollLock")]
     ScrollLock,
 
     /// <summary>
     /// Pause Break
     /// </summary>
-    [EnumRecordProperties("Pause")]
+    [EnumData("Pause")]
     Pause,
 
 
@@ -827,132 +827,132 @@ public enum EKeyboardCode : int
     /// <summary>
     /// Some laptops place this key to the left of the ↑ key.
     /// </summary>
-    [EnumRecordProperties("BrowserBack")]
+    [EnumData("BrowserBack")]
     BrowserBack,
     /// <summary>
     /// No definition
     /// </summary>
-    [EnumRecordProperties("BrowserFavorites")]
+    [EnumData("BrowserFavorites")]
     BrowserFavorites,
 
     /// <summary>
     /// Some laptops place this key to the right of the ↑ key.
     /// </summary>
-    [EnumRecordProperties("BrowserForward")]
+    [EnumData("BrowserForward")]
     BrowserForward,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("BrowserHome")]
+    [EnumData("BrowserHome")]
     BrowserHome,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("BrowserRefresh")]
+    [EnumData("BrowserRefresh")]
     BrowserRefresh,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("BrowserSearch")]
+    [EnumData("BrowserSearch")]
     BrowserSearch,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("BrowserStop")]
+    [EnumData("BrowserStop")]
     BrowserStop,
 
     /// <summary>
     /// Eject or ⏏. This key is placed in the function  section on some Apple keyboards.
     /// </summary>
-    [EnumRecordProperties("Eject")]
+    [EnumData("Eject")]
     Eject,
 
     /// <summary>
     /// Sometimes labelled My Computer on the keyboard
     /// </summary>
-    [EnumRecordProperties("LaunchApp1")]
+    [EnumData("LaunchApp1")]
     LaunchApp1,
 
     /// <summary>
     /// Sometimes labelled Calculator on the keyboard
     /// </summary>
-    [EnumRecordProperties("LaunchApp2")]
+    [EnumData("LaunchApp2")]
     LaunchApp2,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("LaunchMail")]
+    [EnumData("LaunchMail")]
     LaunchMail,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("MediaPlayPause")]
+    [EnumData("MediaPlayPause")]
     MediaPlayPause,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("MediaSelect")]
+    [EnumData("MediaSelect")]
     MediaSelect,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("MediaStop")]
+    [EnumData("MediaStop")]
     MediaStop,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("MediaTrackNext")]
+    [EnumData("MediaTrackNext")]
     MediaTrackNext,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("MediaTrackPrevious")]
+    [EnumData("MediaTrackPrevious")]
     MediaTrackPrevious,
 
     /// <summary>
     /// This key is placed in the function section on some Apple keyboards, replacing the Eject key.
     /// </summary>
-    [EnumRecordProperties("Power")]
+    [EnumData("Power")]
     Power,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("Sleep")]
+    [EnumData("Sleep")]
     Sleep,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("AudioVolumeDown")]
+    [EnumData("AudioVolumeDown")]
     AudioVolumeDown,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("AudioVolumeMute")]
+    [EnumData("AudioVolumeMute")]
     AudioVolumeMute,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("AudioVolumeUp")]
+    [EnumData("AudioVolumeUp")]
     AudioVolumeUp,
 
     /// <summary>
     ///
     /// </summary>
-    [EnumRecordProperties("WakeUp")]
+    [EnumData("WakeUp")]
     WakeUp,
 
 

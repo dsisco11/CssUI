@@ -12,73 +12,73 @@ public enum EJustifyContent
     /// <summary>
     /// Default alignment for the layout mode.
     /// </summary>
-    [EnumRecordProperties("normal")]
+    [EnumData("normal")]
     Normal,
 
     /// <summary>
     /// Pack items toward the start of the alignment container.
     /// </summary>
-    [EnumRecordProperties("start")]
+    [EnumData("start")]
     Start,
 
     /// <summary>
     /// Pack items toward the end of the alignment container.
     /// </summary>
-    [EnumRecordProperties("end")]
+    [EnumData("end")]
     End,
 
     /// <summary>
     /// Pack items toward the start of the flex container (flex-specific).
     /// </summary>
-    [EnumRecordProperties("flex-start")]
+    [EnumData("flex-start")]
     FlexStart,
 
     /// <summary>
     /// Pack items toward the end of the flex container (flex-specific).
     /// </summary>
-    [EnumRecordProperties("flex-end")]
+    [EnumData("flex-end")]
     FlexEnd,
 
     /// <summary>
     /// Pack items around the center.
     /// </summary>
-    [EnumRecordProperties("center")]
+    [EnumData("center")]
     Center,
 
     /// <summary>
     /// Align to the left edge.
     /// </summary>
-    [EnumRecordProperties("left")]
+    [EnumData("left")]
     Left,
 
     /// <summary>
     /// Align to the right edge.
     /// </summary>
-    [EnumRecordProperties("right")]
+    [EnumData("right")]
     Right,
 
     /// <summary>
     /// Distribute items evenly, first item at start, last at end.
     /// </summary>
-    [EnumRecordProperties("space-between")]
+    [EnumData("space-between")]
     SpaceBetween,
 
     /// <summary>
     /// Distribute items evenly with equal space around them.
     /// </summary>
-    [EnumRecordProperties("space-around")]
+    [EnumData("space-around")]
     SpaceAround,
 
     /// <summary>
     /// Distribute items evenly with equal space between them.
     /// </summary>
-    [EnumRecordProperties("space-evenly")]
+    [EnumData("space-evenly")]
     SpaceEvenly,
 
     /// <summary>
     /// Stretch items to fill the container.
     /// </summary>
-    [EnumRecordProperties("stretch")]
+    [EnumData("stretch")]
     Stretch
 }
 

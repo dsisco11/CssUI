@@ -16,7 +16,7 @@ Create new file CssUI/Common/EnumProperties.cs:
 Note: ECssUnit can use KeywordProperties (keyword IS the unit symbol)
 
 ### 8.3 Migrate Enums
-Replace `[MetaEnum]`/`[MetaKeyword]` with `[EnumRecord<T>]`/`[EnumRecordProperties]`:
+Replace `[MetaEnum]`/`[MetaKeyword]` with `[EnumRecord<T>]`/`[EnumData]`:
 - [x] CSS/Enums/ (~40 enums)
 - [x] DOM/Enums/ (~13 enums)
 - [x] HTML/Enums/ (~22 enums)
@@ -63,11 +63,11 @@ These determine enum type at runtime and cannot use compile-time extension metho
 - [ ] Update LookupTests.cs to verify new extension methods
 
 ### 8.7 EnumRecords 0.3.0 Upgrade (Breaking Changes)
-EnumRecords 0.3.0 requires ALL enum members to have `[EnumRecordProperties]` or use `Partial` mode.
+EnumRecords 0.3.0 requires ALL enum members to have `[EnumData]` or use `Partial` mode.
 Additionally, `KeywordProperties` now only accepts 1 argument (the keyword string).
 
 #### 8.7.1 Fix Missing Attribute Errors (ENUMREC002)
-Add `[EnumRecordIgnore]` or empty `[EnumRecordProperties]` to enum members without keywords:
+Add `[EnumRecord.Ignore]` or empty `[EnumData]` to enum members without keywords:
 - [ ] `EKeyboardCode.MAX` (CORE/Devices/Keyboard/Enums/)
 - [ ] `EPointerType.MAX` (CORE/Devices/Pointer/Enums/)
 - [ ] `EMediaCombinator.None` (CSS/Enums/Media Properties/)
@@ -83,7 +83,7 @@ Add `[EnumRecordIgnore]` or empty `[EnumRecordProperties]` to enum members witho
 - [ ] `EDraggable.Auto` (HTML/Enums/)
 
 #### 8.7.2 Fix Argument Count Errors (ENUMREC003)
-`EKeyboardCode` uses 2-arg attributes `[EnumRecordProperties("code", "key")]` but `KeywordProperties` only has 1 parameter.
+`EKeyboardCode` uses 2-arg attributes `[EnumData("code", "key")]` but `KeywordProperties` only has 1 parameter.
 Options:
 - [ ] Create `KeyboardCodeProperties(string Code, string Key)` record struct for EKeyboardCode
 - [ ] Update ~100+ EKeyboardCode members to use new property type
