@@ -551,7 +551,7 @@ internal static class CssCalcFunctionParser
             case ECssTokenType.Dimension:
                 {
                     var dimToken = (DimensionToken)stream.Consume();
-                    var unit = Lookup.Enum<ECssUnit>(dimToken.Unit);
+                    var unit = ECssUnitExtensions.FromKeyword(dimToken.Unit);
                     return new CssCalcValueNode(dimToken.AsNumber, unit);
                 }
 

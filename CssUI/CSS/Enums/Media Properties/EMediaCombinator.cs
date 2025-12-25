@@ -8,6 +8,7 @@ namespace CssUI.CSS.Media;
 [EnumRecord<KeywordProperties>]
 public enum EMediaCombinator
 {
+    [EnumRecordProperties("")]
     None = 0x0,
     /// <summary>
     /// </summary>

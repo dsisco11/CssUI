@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -368,15 +369,25 @@ public static class Lookup
 
         // Get all enum values and map to keywords
         var enumValues = System.Enum.GetValues(enumType);
-        var keywords = new string[enumValues.Length];
+        var keywords = new List<string>(enumValues.Length);
 
         for (int i = 0; i < enumValues.Length; i++)
         {
-            var result = keywordMethod.Invoke(null, new[] { enumValues.GetValue(i) });
-            keywords[i] = result?.ToString() ?? string.Empty;
+            try
+            {
+                var result = keywordMethod.Invoke(null, new[] { enumValues.GetValue(i) });
+                if (result is string keyword && !string.IsNullOrEmpty(keyword))
+                {
+                    keywords.Add(keyword);
+                }
+            }
+            catch
+            {
+                // Skip enum values that don't have a keyword defined
+            }
         }
 
-        return keywords.Where(static k => !string.IsNullOrEmpty(k)).ToArray();
+        return keywords.ToArray();
     }
 
     /// <summary>

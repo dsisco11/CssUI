@@ -290,7 +290,7 @@ internal static class CssEnvFunctionParser
         if (string.IsNullOrEmpty(unitStr))
             return ECssUnit.None;
 
-        return Lookup.Enum<ECssUnit>(unitStr);
+        return ECssUnitExtensions.FromKeyword(unitStr);
     }
 
     #endregion

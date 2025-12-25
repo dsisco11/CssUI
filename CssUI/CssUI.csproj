@@ -29,7 +29,7 @@
 
 
   <ItemGroup>
-    <PackageReference Include="EnumRecords" Version="0.2.0">
+    <PackageReference Include="EnumRecords" Version="0.3.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

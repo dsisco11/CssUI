@@ -292,13 +292,13 @@ public class Url : ISpanFormattable
                             if (stateOverride.HasValue)
                             {
                                 /* 1) If url’s scheme is a special scheme and buffer is not a special scheme, then return. */
-                                if (url.Scheme.EnumValue.HasValue && !Lookup.TryEnum<EUrlScheme>(buffer.ToString(), out _))
+                                if (url.Scheme.EnumValue.HasValue && !EUrlSchemeExtensions.TryFromKeyword(buffer.ToString(), out _))
                                 {
                                     outUrl = url;
                                     return true;
                                 }
                                 /* 2) If url’s scheme is not a special scheme and buffer is a special scheme, then return. */
-                                if (!url.Scheme.EnumValue.HasValue && Lookup.TryEnum<EUrlScheme>(buffer.ToString(), out _))
+                                if (!url.Scheme.EnumValue.HasValue && EUrlSchemeExtensions.TryFromKeyword(buffer.ToString(), out _))
                                 {
                                     outUrl = url;
                                     return true;

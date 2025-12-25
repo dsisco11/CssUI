@@ -62,6 +62,38 @@ These determine enum type at runtime and cannot use compile-time extension metho
 - [ ] Remove obsolete methods in Lookup.cs
 - [ ] Update LookupTests.cs to verify new extension methods
 
+### 8.7 EnumRecords 0.3.0 Upgrade (Breaking Changes)
+EnumRecords 0.3.0 requires ALL enum members to have `[EnumRecordProperties]` or use `Partial` mode.
+Additionally, `KeywordProperties` now only accepts 1 argument (the keyword string).
+
+#### 8.7.1 Fix Missing Attribute Errors (ENUMREC002)
+Add `[EnumRecordIgnore]` or empty `[EnumRecordProperties]` to enum members without keywords:
+- [ ] `EKeyboardCode.MAX` (CORE/Devices/Keyboard/Enums/)
+- [ ] `EPointerType.MAX` (CORE/Devices/Pointer/Enums/)
+- [ ] `EMediaCombinator.None` (CSS/Enums/Media Properties/)
+- [ ] `EMediaFeatureName.Unknown` (CSS/Enums/Media Properties/)
+- [ ] `EMediaQueryModifier.None` (CSS/Enums/Media Properties/)
+- [ ] `EMediaType.NONE` (CSS/Enums/Media Properties/)
+- [ ] `EScrollBehavior.Instant` (CSS/Enums/Style Properties/)
+- [ ] `ESelectorCombinator.None` (CSS/Enums/Style Properties/)
+- [ ] `ECssPropertyID.MAX_VALUE` (CSS/Properties/Enums/)
+- [ ] `EAttributeName.CUSTOM` (DOM/Enums/Attributes/Base/)
+- [ ] `EEventName.CUSTOM` (DOM/Events/Enums/)
+- [ ] `EContentEditable.Invalid`, `EContentEditable.Missing` (HTML/Enums/)
+- [ ] `EDraggable.Auto` (HTML/Enums/)
+
+#### 8.7.2 Fix Argument Count Errors (ENUMREC003)
+`EKeyboardCode` uses 2-arg attributes `[EnumRecordProperties("code", "key")]` but `KeywordProperties` only has 1 parameter.
+Options:
+- [ ] Create `KeyboardCodeProperties(string Code, string Key)` record struct for EKeyboardCode
+- [ ] Update ~100+ EKeyboardCode members to use new property type
+- [ ] Update `[EnumRecord<KeywordProperties>]` to `[EnumRecord<KeyboardCodeProperties>]` on EKeyboardCode
+
+#### 8.7.3 Update Lookup.Get_Keywords() to Use New API
+EnumRecords 0.3.0 provides `GetKeywords()` method on generated extensions:
+- [ ] Update `Lookup.Get_Keywords<T>()` to call `TExtensions.GetKeywords()` instead of reflection loop
+- [ ] Handle enums that may not have GetKeywords() gracefully
+
 ## Architecture & Design
 - [ ] IWindowingSystem (window creation, input events) - pending
 - [ ] Implement proper microtask queue system

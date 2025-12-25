@@ -450,7 +450,7 @@ namespace CssUI.HTML
                                 /* 14) If category is Contact and the indexth token in tokens is an ASCII case-insensitive match for one of the strings in the following list, then run the substeps that follow: */
                                 if (category == EAutofillCategory.Contact)
                                 {
-                                    if (Lookup.TryEnum(Stream.Next, out EAutofillContact hint))
+                                    if (EAutofillContactExtensions.TryFromKeyword(Stream.Next, out EAutofillContact hint))
                                     {
                                         /* 1) Let contact be the matching string from the list above. */
                                         string contact = Stream.Next;

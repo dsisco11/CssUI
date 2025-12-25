@@ -124,7 +124,7 @@ public class MediaFeature : IMediaCondition
                      * Otherwise, it evaluates to false.
                      */
                     CssValue value = Values[0];
-                    if (!Lookup.TryEnum(value.AsString(), out EMediaFeatureName nameLookup))
+                    if (!EMediaFeatureNameExtensions.TryFromKeyword(value.AsString(), out EMediaFeatureName nameLookup))
                     {/* This feature is not supported (or maybe valid) so we need to treat it as if it simply doesnt match */
                         IsValid = false;
                         return false;
@@ -185,7 +185,7 @@ public class MediaFeature : IMediaCondition
         {
             case EMediaFeatureName.Orientation:
                 {
-                    if (Lookup.TryEnum(keyword, out EMediaOrientation outOrientation))
+                    if (EMediaOrientationExtensions.TryFromKeyword(keyword, out EMediaOrientation outOrientation))
                     {
                         double width = (double)Resolve_Media_Name_Value(document, EMediaFeatureName.Width);
                         double height = (double)Resolve_Media_Name_Value(document, EMediaFeatureName.Height);
@@ -196,7 +196,7 @@ public class MediaFeature : IMediaCondition
                 break;
             case EMediaFeatureName.Update:
                 {
-                    if (Lookup.TryEnum(keyword, out EMediaUpdate outUpdateRate))
+                    if (EMediaUpdateExtensions.TryFromKeyword(keyword, out EMediaUpdate outUpdateRate))
                     {
                         double refreshRate = (double)Resolve_Media_Name_Value(document, Name);
                         switch (outUpdateRate)
@@ -273,7 +273,7 @@ public class MediaFeature : IMediaCondition
 
         if (ValueA.Type == ECssValueTypes.KEYWORD)
         {
-            if (!Lookup.TryEnum(ValueA.AsString(), out EMediaFeatureName _))
+            if (!EMediaFeatureNameExtensions.TryFromKeyword(ValueA.AsString(), out EMediaFeatureName _))
             {/* If we cant find this keyword then we treat it as if it were an unsupported feature */
                 return false;
             }
@@ -288,7 +288,7 @@ public class MediaFeature : IMediaCondition
 
         if (ValueB.Type == ECssValueTypes.KEYWORD)
         {
-            if (!Lookup.TryEnum(ValueB.AsString(), out EMediaFeatureName _))
+            if (!EMediaFeatureNameExtensions.TryFromKeyword(ValueB.AsString(), out EMediaFeatureName _))
             {/* If we cant find this keyword then we treat it as if it were an unsupported feature */
                 return false;
             }

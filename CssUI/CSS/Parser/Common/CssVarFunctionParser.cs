@@ -247,7 +247,7 @@ internal static class CssVarFunctionParser
         if (string.IsNullOrEmpty(unitStr))
             return ECssUnit.None;
 
-        return Lookup.Enum<ECssUnit>(unitStr);
+        return ECssUnitExtensions.FromKeyword(unitStr);
     }
 
     #endregion

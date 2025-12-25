@@ -195,9 +195,8 @@ public readonly record struct CssColor : IEquatable<CssColor>, ISpanFormattable,
         // CSS color keywords are case-insensitive
         // Create a lowercased string for lookup
         var loweredString = new string(keyword).ToLowerInvariant();
-        var atomicKeyword = new AtomicString(loweredString);
 
-        if (Lookup.TryEnum<EColor>(atomicKeyword, out EColor ecolor))
+        if (EColorExtensions.TryFromKeyword(loweredString, out EColor ecolor))
         {
             // Check for special keywords
             if (ecolor == EColor.CurrentColor)

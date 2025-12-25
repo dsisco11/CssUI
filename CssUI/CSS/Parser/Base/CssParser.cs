@@ -1034,7 +1034,7 @@ public class CssParser
 
                     if (!string.IsNullOrEmpty(tok.Unit))
                     {
-                        ECssUnit unitLookup = Lookup.Enum<ECssUnit>(tok.Unit);
+                        ECssUnit unitLookup = ECssUnitExtensions.FromKeyword(tok.Unit);
                         unit = unitLookup;
                     }
 
@@ -1327,7 +1327,7 @@ public class CssParser
         // Check for optional modifier (not | only)
         if (Stream.Next.Type == ECssTokenType.Ident)
         {
-            if (Lookup.TryEnum(((IdentToken)Stream.Next).Value, out EMediaQueryModifier mod))
+            if (EMediaQueryModifierExtensions.TryFromKeyword(((IdentToken)Stream.Next).Value, out EMediaQueryModifier mod))
             {
                 Stream.Consume();
                 modifier = mod;
@@ -1339,7 +1339,7 @@ public class CssParser
         if (Stream.Next.Type == ECssTokenType.Ident)
         {
             var typeIdent = (IdentToken)Stream.Consume();
-            if (!Lookup.TryEnum(typeIdent.Value, out EMediaType type))
+            if (!EMediaTypeExtensions.TryFromKeyword(typeIdent.Value, out EMediaType type))
             {
                 // Unknown media type - per spec, unknown media types don't match
                 // but we still parse them. Use NONE to indicate unknown.
@@ -1765,7 +1765,7 @@ public class CssParser
                     throw new CssParserException(CssErrors.EXPECTING_COMPARATOR, Stream);
                 }
 
-                if (!Lookup.TryEnum(comparatorStr, out EMediaOperator outComparator))
+                if (!EMediaOperatorExtensions.TryFromKeyword(comparatorStr, out EMediaOperator outComparator))
                 {
                     throw new CssParserException(CssErrors.EXPECTING_COMPARATOR, Stream);
                 }
@@ -1780,7 +1780,7 @@ public class CssParser
                 var identTok = (IdentToken)Stream.Consume();
 
                 // Try to resolve as media feature name
-                if (Lookup.TryEnum(identTok.Value, out EMediaFeatureName name))
+                if (EMediaFeatureNameExtensions.TryFromKeyword(identTok.Value, out EMediaFeatureName name))
                 {
                     featureName = name;
                     values.AddLast(CssValue.From(name));

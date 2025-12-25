@@ -136,6 +136,25 @@ public partial class CssValue : ISpanFormattable, IFormattable
         flags |= Get_Inherent_Value_Type_Flags(type, unit, in data);
     }
 
+    /// <summary>
+    /// Attempts to parse a CSS global keyword string to its corresponding ECssValueTypes.
+    /// This handles keywords like "inherit", "initial", "unset", "auto", "none", "default".
+    /// </summary>
+    private static bool TryParseCssGlobalKeyword(string keyword, out ECssValueTypes result)
+    {
+        result = keyword.ToLowerInvariant() switch
+        {
+            "inherit" => ECssValueTypes.INHERIT,
+            "initial" => ECssValueTypes.INITIAL,
+            "unset" => ECssValueTypes.UNSET,
+            "auto" => ECssValueTypes.AUTO,
+            "none" => ECssValueTypes.NONE,
+            "default" => ECssValueTypes.DEFAULT,
+            _ => ECssValueTypes.NULL
+        };
+        return result != ECssValueTypes.NULL;
+    }
+
     internal CssValue(ECssValueTypes type, CssValueData data) : this(type)
     {
         this.data = data;
@@ -155,7 +174,7 @@ public partial class CssValue : ISpanFormattable, IFormattable
         if (type == ECssValueTypes.KEYWORD)// Try and catch some common IMPORTANT keywords
         {
             /* If our keyword can be resolved to another ECssValueType then its an global keyword */
-            if (data.ObjectValue is string strValue && Lookup.TryEnum(strValue, out ECssValueTypes outKeyword))
+            if (data.ObjectValue is string strValue && TryParseCssGlobalKeyword(strValue, out ECssValueTypes outKeyword))
             {
                 this.type = outKeyword;
             }
@@ -220,7 +239,7 @@ public partial class CssValue : ISpanFormattable, IFormattable
             _ => CssValueData.FromObject(value)
         };
 
-        if (type == ECssValueTypes.KEYWORD && data.ObjectValue is string strValue && Lookup.TryEnum(strValue, out ECssValueTypes outKeyword))
+        if (type == ECssValueTypes.KEYWORD && data.ObjectValue is string strValue && TryParseCssGlobalKeyword(strValue, out ECssValueTypes outKeyword))
         {
             this.type = outKeyword;
         }
