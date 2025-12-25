@@ -3,6 +3,42 @@
 ## Pre-existing Issues
 - [ ] Fix nullable reference warnings (many throughout codebase)
 
+## Phase 8: Replace MetaEnum System with EnumRecords Package
+Migrate from the runtime reflection-based MetaEnum system to EnumRecords' compile-time source generation. The `Lookup.Get_Keywords<T>()` usages are for populating keyword whitelists at static initialization — these can be replaced with a simple helper using `Enum.GetValues<T>()`.
+
+### 8.1 Setup
+- [ ] Add EnumRecords NuGet package to CssUI.csproj — `dotnet add package EnumRecords`
+
+### 8.2 Create Shared Property Record Structs
+Create new file CssUI/Common/EnumProperties.cs:
+- [ ] `record struct KeywordProperties([ReverseLookup(IgnoreCase = true)] string Keyword)` — for ~60 keyword-only enums
+- [ ] `record struct CssUnitProperties([ReverseLookup(IgnoreCase = true)] string Keyword, string Symbol)` — for ECssUnit
+- [ ] `record struct ElementTagProperties([ReverseLookup(IgnoreCase = true)] string Keyword, ENamespace Namespace)` — for EElementTag
+- [ ] `record struct SchemeTypeProperties([ReverseLookup(IgnoreCase = true)] string Keyword, int DefaultPort)` — for ESchemeType
+
+### 8.3 Migrate Enums
+Replace `[MetaEnum]`/`[MetaKeyword]` with `[EnumRecord<T>]`/`[EnumRecordProperties]`:
+- [ ] CSS/Enums/ (~40 enums)
+- [ ] DOM/Enums/ (~13 enums)
+- [ ] HTML/Enums/ (~22 enums)
+- [ ] URL/ (ESchemeType)
+
+### 8.4 Update Lookup.cs Helper
+Add helper method to preserve existing API signature for 40+ call sites:
+- [ ] Add `Get_Keywords<T>()` implementation using `Enum.GetValues<T>().Select(v => v.Keyword()).ToArray()`
+
+### 8.5 Update Consumer Call Sites
+- [ ] `Lookup.Get_Keyword(enumValue)` → `enumValue.Keyword()`
+- [ ] `Lookup.TryGet_Enum<T>(keyword, out result)` → `TExtensions.TryFromKeyword(keyword, out result)`
+
+### 8.6 Cleanup
+- [ ] Delete MetaEnumAttribute.cs (CORE/MetaTables/)
+- [ ] Delete MetaKeywordAttribute.cs (CORE/MetaTables/)
+- [ ] Delete EnumMetaTable.cs (CORE/MetaTables/)
+- [ ] Delete EnumTables.cs (Common/)
+- [ ] Remove obsolete methods in Lookup.cs
+- [ ] Update LookupTests.cs to verify new extension methods
+
 ## Architecture & Design
 - [ ] IWindowingSystem (window creation, input events) - pending
 - [ ] Implement proper microtask queue system
