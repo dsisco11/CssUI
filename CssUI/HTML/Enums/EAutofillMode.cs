@@ -1,15 +1,15 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.HTML
 {
-    [MetaEnum]
+    [EnumRecord<KeywordProperties>]
     public enum EAutofillMode
     {
 
-        [MetaKeyword("shipping")]
+        [EnumRecordProperties("shipping")]
         Shipping,
 
-        [MetaKeyword("billing")]
+        [EnumRecordProperties("billing")]
         Billing,
     }
 }

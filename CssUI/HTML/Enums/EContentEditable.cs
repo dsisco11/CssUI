@@ -1,18 +1,18 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.HTML
 {
-    [MetaEnum]
+    [EnumRecord<KeywordProperties>]
     public enum EContentEditable : short
     {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#attr-contenteditable */
 
         Invalid = -1,
         Missing = 0,
-        [MetaKeyword("true")]
+        [EnumRecordProperties("true")]
         True,
-        [MetaKeyword("false")]
+        [EnumRecordProperties("false")]
         False,
-        [MetaKeyword("inherit")]
+        [EnumRecordProperties("inherit")]
         Inherit
     }
 }

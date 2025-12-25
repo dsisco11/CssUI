@@ -1,52 +1,52 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.CSS;
 
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EFontSize : int
 {/* Docs: https://www.w3.org/TR/css-fonts-3/#font-size-prop */
 
     /* ABSOLUTE SIZES */
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [MetaKeyword("xx-small")]
+    [EnumRecordProperties("xx-small")]
     XXSmall = 0,
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [MetaKeyword("x-small")]
+    [EnumRecordProperties("x-small")]
     XSmall,
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [MetaKeyword("small")]
+    [EnumRecordProperties("small")]
     Small,
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [MetaKeyword("medium")]
+    [EnumRecordProperties("medium")]
     Medium,
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [MetaKeyword("large")]
+    [EnumRecordProperties("large")]
     Large,
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [MetaKeyword("x-large")]
+    [EnumRecordProperties("x-large")]
     XLarge,
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [MetaKeyword("xx-large")]
+    [EnumRecordProperties("xx-large")]
     XXLarge,
 
 
@@ -54,15 +54,15 @@ public enum EFontSize : int
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [MetaKeyword("smaller")]
+    [EnumRecordProperties("smaller")]
     Smaller,
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [MetaKeyword("larger")]
+    [EnumRecordProperties("larger")]
     Larger,
 
 }

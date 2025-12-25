@@ -1,38 +1,38 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.CSS.Media;
 
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EMediaOverflowBlock
 {
 
     /// <summary>
-    /// There is no affordance for overflow in the block axis; any overflowing content is simply not displayed. 
+    /// There is no affordance for overflow in the block axis; any overflowing content is simply not displayed.
     /// Examples: billboards
     /// </summary>
-    [MetaKeyword("none")]
+    [EnumRecordProperties("none")]
     None,
 
     /// <summary>
-    /// Overflowing content in the block axis is exposed by allowing users to scroll to it. 
+    /// Overflowing content in the block axis is exposed by allowing users to scroll to it.
     /// Examples: computer screens
     /// </summary>
-    [MetaKeyword("scroll")]
+    [EnumRecordProperties("scroll")]
     Scroll,
 
     /// <summary>
-    /// Overflowing content in the block axis is exposed by allowing users to scroll to it, 
-    /// but page breaks can be manually triggered (such as via break-inside, etc) to cause the following content to display on the following page. 
+    /// Overflowing content in the block axis is exposed by allowing users to scroll to it,
+    /// but page breaks can be manually triggered (such as via break-inside, etc) to cause the following content to display on the following page.
     /// Examples: slideshows
     /// </summary>
-    [MetaKeyword("optional-paged")]
+    [EnumRecordProperties("optional-paged")]
     Optional_Paged,
 
     /// <summary>
-    /// Content is broken up into discrete pages; content that overflows one page in the block axis is displayed on the following page. 
+    /// Content is broken up into discrete pages; content that overflows one page in the block axis is displayed on the following page.
     /// Examples: printers, ebook readers
     /// </summary>
-    [MetaKeyword("paged")]
+    [EnumRecordProperties("paged")]
     Paged,
 }
 

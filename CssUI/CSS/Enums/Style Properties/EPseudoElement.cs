@@ -1,26 +1,26 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.CSS.Enums;
 
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EPseudoElement : int
 {
-    [MetaKeyword("::before")]
+    [EnumRecordProperties("::before")]
     Before,
 
-    [MetaKeyword("::after")]
+    [EnumRecordProperties("::after")]
     After,
 
-    [MetaKeyword("::first-letter")]
+    [EnumRecordProperties("::first-letter")]
     First_Letter,
 
-    [MetaKeyword("::first-line")]
+    [EnumRecordProperties("::first-line")]
     First_Line,
 
-    [MetaKeyword("::marker")]
+    [EnumRecordProperties("::marker")]
     Marker,
 
-    [MetaKeyword("::placeholder")]
+    [EnumRecordProperties("::placeholder")]
     Placeholder,
 }
 

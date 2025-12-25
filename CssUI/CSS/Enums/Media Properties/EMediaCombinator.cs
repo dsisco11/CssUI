@@ -1,29 +1,29 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.CSS.Media;
 
 /// <summary>
 /// Combinators specify how a media query determines if it's set of features cause it to match a given document
 /// </summary>
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EMediaCombinator
 {
     None = 0x0,
     /// <summary>
     /// </summary>
-    [MetaKeyword("and")]
+    [EnumRecordProperties("and")]
     AND,
 
     /// <summary>
     /// Instantly returns true for a match
     /// </summary>
-    [MetaKeyword("or")]
+    [EnumRecordProperties("or")]
     OR,
 
     /// <summary>
     /// Negates the comparison result for a match
     /// </summary>
-    [MetaKeyword("not")]
+    [EnumRecordProperties("not")]
     NOT,
 }
 

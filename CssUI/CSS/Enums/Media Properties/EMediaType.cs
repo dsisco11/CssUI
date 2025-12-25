@@ -1,8 +1,8 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.CSS.Media;
 
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EMediaType : int
 {/* Docs: https://drafts.csswg.org/mediaqueries-4/#media-types */
 
@@ -10,39 +10,39 @@ public enum EMediaType : int
     /// <summary>
     /// Matches all devices
     /// </summary>
-    [MetaKeyword("all")]
+    [EnumRecordProperties("all")]
     All,
     /// <summary>
     /// Matches printers, and devices intended to reproduce a printed display, such as a web browser showing a document in “Print Preview”.
     /// </summary>
-    [MetaKeyword("print")]
+    [EnumRecordProperties("print")]
     Print,
     /// <summary>
     /// Matches all devices that aren’t matched by print or speech.
     /// </summary>
-    [MetaKeyword("screen")]
+    [EnumRecordProperties("screen")]
     Screen,
     /// <summary>
     /// Matches devices that similar devices that “read out” a page.
     /// </summary>
-    [MetaKeyword("speech")]
+    [EnumRecordProperties("speech")]
     Speech,
 
     /* The following are DEPRECIATED values. they must be recognized, but ignored. */
 
-    [MetaKeyword("tty")]
+    [EnumRecordProperties("tty")]
     tty,
-    [MetaKeyword("tv")]
+    [EnumRecordProperties("tv")]
     tv,
-    [MetaKeyword("projection")]
+    [EnumRecordProperties("projection")]
     projection,
-    [MetaKeyword("handheld")]
+    [EnumRecordProperties("handheld")]
     handheld,
-    [MetaKeyword("braille")]
+    [EnumRecordProperties("braille")]
     braille,
-    [MetaKeyword("embossed")]
+    [EnumRecordProperties("embossed")]
     embossed,
-    [MetaKeyword("aural")]
+    [EnumRecordProperties("aural")]
     aural,
 }
 

@@ -1,233 +1,233 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.DOM.Events;
 
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EEventName : int
 {
     /// <summary>
     /// Represents all custom (end-user specified) event values
     /// </summary>
     CUSTOM = -1,
-    [MetaKeyword("")]
+    [EnumRecordProperties("")]
     None = 0x0,
-    [MetaKeyword("abort")]
+    [EnumRecordProperties("abort")]
     Abort,
-    [MetaKeyword("auxclick")]
+    [EnumRecordProperties("auxclick")]
     AuxClick,
-    [MetaKeyword("blur")]
+    [EnumRecordProperties("blur")]
     Blur,
-    [MetaKeyword("cancel")]
+    [EnumRecordProperties("cancel")]
     Cancel,
-    [MetaKeyword("canplay")]
+    [EnumRecordProperties("canplay")]
     CanPlay,
-    [MetaKeyword("canplaythrough")]
+    [EnumRecordProperties("canplaythrough")]
     CanPlayThrough,
-    [MetaKeyword("change")]
+    [EnumRecordProperties("change")]
     Change,
-    [MetaKeyword("click")]
+    [EnumRecordProperties("click")]
     Click,
-    [MetaKeyword("close")]
+    [EnumRecordProperties("close")]
     Close,
-    [MetaKeyword("contextmenu")]
+    [EnumRecordProperties("contextmenu")]
     ContextMenu,
-    [MetaKeyword("cuechange")]
+    [EnumRecordProperties("cuechange")]
     CueChange,
-    [MetaKeyword("dblclick")]
+    [EnumRecordProperties("dblclick")]
     DoubleClick,
 
     /* Drag drop */
-    [MetaKeyword("drag")]
+    [EnumRecordProperties("drag")]
     Drag,
-    [MetaKeyword("dragend")]
+    [EnumRecordProperties("dragend")]
     DragEnd,
-    [MetaKeyword("dragenter")]
+    [EnumRecordProperties("dragenter")]
     DragEnter,
-    [MetaKeyword("dragexit")]
+    [EnumRecordProperties("dragexit")]
     DragExit,
-    [MetaKeyword("dragleave")]
+    [EnumRecordProperties("dragleave")]
     DragLeave,
-    [MetaKeyword("dragover")]
+    [EnumRecordProperties("dragover")]
     DragOver,
-    [MetaKeyword("dragstart")]
+    [EnumRecordProperties("dragstart")]
     DragStart,
-    [MetaKeyword("drop")]
+    [EnumRecordProperties("drop")]
     Drop,
 
-    [MetaKeyword("durationchange")]
+    [EnumRecordProperties("durationchange")]
     DurationChange,
-    [MetaKeyword("emptied")]
+    [EnumRecordProperties("emptied")]
     Emptied,
-    [MetaKeyword("ended")]
+    [EnumRecordProperties("ended")]
     Ended,
 
-    [MetaKeyword("error")]
+    [EnumRecordProperties("error")]
     Error,
 
-    [MetaKeyword("focus")]
+    [EnumRecordProperties("focus")]
     Focus,
-    [MetaKeyword("formdata")]
+    [EnumRecordProperties("formdata")]
     FormData,
-    [MetaKeyword("input")]
+    [EnumRecordProperties("input")]
     Input,
-    [MetaKeyword("invalid")]
+    [EnumRecordProperties("invalid")]
     Invalid,
-    [MetaKeyword("keydown")]
+    [EnumRecordProperties("keydown")]
     KeyDown,
-    [MetaKeyword("keypress")]
+    [EnumRecordProperties("keypress")]
     KeyPress,
-    [MetaKeyword("keyup")]
+    [EnumRecordProperties("keyup")]
     KeyUp,
-    [MetaKeyword("load")]
+    [EnumRecordProperties("load")]
     Load,
-    [MetaKeyword("loadeddata")]
+    [EnumRecordProperties("loadeddata")]
     LoadedData,
-    [MetaKeyword("loadedmetadata")]
+    [EnumRecordProperties("loadedmetadata")]
     LoadedMetadata,
-    [MetaKeyword("loadend")]
+    [EnumRecordProperties("loadend")]
     LoadEnd,
-    [MetaKeyword("loadstart")]
+    [EnumRecordProperties("loadstart")]
     LoadStart,
 
     /* Mouse input */
-    [MetaKeyword("mousedown")]
+    [EnumRecordProperties("mousedown")]
     MouseDown,
-    [MetaKeyword("mouseenter")]
+    [EnumRecordProperties("mouseenter")]
     MouseEnter,
-    [MetaKeyword("mouseleave")]
+    [EnumRecordProperties("mouseleave")]
     MouseLeave,
-    [MetaKeyword("mousemove")]
+    [EnumRecordProperties("mousemove")]
     MouseMove,
-    [MetaKeyword("mouseout")]
+    [EnumRecordProperties("mouseout")]
     MouseOut,
-    [MetaKeyword("mouseover")]
+    [EnumRecordProperties("mouseover")]
     MouseOver,
-    [MetaKeyword("mouseup")]
+    [EnumRecordProperties("mouseup")]
     MouseUp,
-    [MetaKeyword("wheel")]
+    [EnumRecordProperties("wheel")]
     Wheel,
 
     /* Pointer input */
     /* Docs: https://w3c.github.io/pointerevents/#intro */
-    [MetaKeyword("pointerover")]
+    [EnumRecordProperties("pointerover")]
     PointerOver,
-    [MetaKeyword("pointerdown")]
+    [EnumRecordProperties("pointerdown")]
     PointerDown,
-    [MetaKeyword("pointermove")]
+    [EnumRecordProperties("pointermove")]
     PointerMove,
-    [MetaKeyword("pointerup")]
+    [EnumRecordProperties("pointerup")]
     PointerUp,
-    [MetaKeyword("pointercancel")]
+    [EnumRecordProperties("pointercancel")]
     PointerCancel,
-    [MetaKeyword("pointerout")]
+    [EnumRecordProperties("pointerout")]
     PointerOut,
-    [MetaKeyword("pointerleave")]
+    [EnumRecordProperties("pointerleave")]
     PointerLeave,
-    [MetaKeyword("gotpointercapture")]
+    [EnumRecordProperties("gotpointercapture")]
     GotPointerCapture,
-    [MetaKeyword("lostpointercapture")]
+    [EnumRecordProperties("lostpointercapture")]
     LostPointerCapture,
 
     /* Touch input */
     /* Docs: https://w3c.github.io/touch-events/#introduction */
-    [MetaKeyword("touchstart")]
+    [EnumRecordProperties("touchstart")]
     TouchStart,
-    [MetaKeyword("touchend")]
+    [EnumRecordProperties("touchend")]
     TouchEnd,
-    [MetaKeyword("touchmove")]
+    [EnumRecordProperties("touchmove")]
     TouchMove,
-    [MetaKeyword("touchcancel")]
+    [EnumRecordProperties("touchcancel")]
     TouchCancel,
 
 
     /* Media */
-    [MetaKeyword("pause")]
+    [EnumRecordProperties("pause")]
     Pause,
-    [MetaKeyword("play")]
+    [EnumRecordProperties("play")]
     Play,
-    [MetaKeyword("playing")]
+    [EnumRecordProperties("playing")]
     Playing,
-    [MetaKeyword("progress")]
+    [EnumRecordProperties("progress")]
     Progress,
-    [MetaKeyword("ratechange")]
+    [EnumRecordProperties("ratechange")]
     RateChange,
-    [MetaKeyword("reset")]
+    [EnumRecordProperties("reset")]
     Reset,
-    [MetaKeyword("resize")]
+    [EnumRecordProperties("resize")]
     Resize,
-    [MetaKeyword("scroll")]
+    [EnumRecordProperties("scroll")]
     Scroll,
-    [MetaKeyword("securitypolicyviolation")]
+    [EnumRecordProperties("securitypolicyviolation")]
     SecurityPolicyViolation,
-    [MetaKeyword("seeked")]
+    [EnumRecordProperties("seeked")]
     Seeked,
-    [MetaKeyword("seeking")]
+    [EnumRecordProperties("seeking")]
     Seeking,
-    [MetaKeyword("select")]
+    [EnumRecordProperties("select")]
     Select,
-    [MetaKeyword("stalled")]
+    [EnumRecordProperties("stalled")]
     Stalled,
-    [MetaKeyword("submit")]
+    [EnumRecordProperties("submit")]
     Submit,
-    [MetaKeyword("suspend")]
+    [EnumRecordProperties("suspend")]
     Suspend,
-    [MetaKeyword("timeupdate")]
+    [EnumRecordProperties("timeupdate")]
     TimeUpdate,
-    [MetaKeyword("toggle")]
+    [EnumRecordProperties("toggle")]
     Toggle,
-    [MetaKeyword("volumechange")]
+    [EnumRecordProperties("volumechange")]
     VolumeChange,
-    [MetaKeyword("waiting")]
+    [EnumRecordProperties("waiting")]
     Waiting,
 
-    [MetaKeyword("selectstart")]
+    [EnumRecordProperties("selectstart")]
     SelectStart,
-    [MetaKeyword("selectionchange")]
+    [EnumRecordProperties("selectionchange")]
     SelectionChange,
 
-    [MetaKeyword("copy")]
+    [EnumRecordProperties("copy")]
     Copy,
-    [MetaKeyword("cut")]
+    [EnumRecordProperties("cut")]
     Cut,
-    [MetaKeyword("paste")]
+    [EnumRecordProperties("paste")]
     Paste,
 
     /* Window events */
-    [MetaKeyword("afterprint")]
+    [EnumRecordProperties("afterprint")]
     AfterPrint,
-    [MetaKeyword("beforeprint")]
+    [EnumRecordProperties("beforeprint")]
     BeforePrint,
-    [MetaKeyword("beforeunload")]
+    [EnumRecordProperties("beforeunload")]
     BeforeUnload,
-    [MetaKeyword("hashchange")]
+    [EnumRecordProperties("hashchange")]
     HashChange,
-    [MetaKeyword("languagechange")]
+    [EnumRecordProperties("languagechange")]
     LanguageChange,
-    [MetaKeyword("message")]
+    [EnumRecordProperties("message")]
     Message,
-    [MetaKeyword("messageerror")]
+    [EnumRecordProperties("messageerror")]
     MessageError,
-    [MetaKeyword("offline")]
+    [EnumRecordProperties("offline")]
     Offline,
-    [MetaKeyword("online")]
+    [EnumRecordProperties("online")]
     Online,
-    [MetaKeyword("pagehide")]
+    [EnumRecordProperties("pagehide")]
     PageHide,
-    [MetaKeyword("pageshow")]
+    [EnumRecordProperties("pageshow")]
     PageShow,
-    [MetaKeyword("popstate")]
+    [EnumRecordProperties("popstate")]
     PopState,
-    [MetaKeyword("rejectionhandled")]
+    [EnumRecordProperties("rejectionhandled")]
     RejectionHandled,
-    [MetaKeyword("storage")]
+    [EnumRecordProperties("storage")]
     Storage,
-    [MetaKeyword("unhandledrejection")]
+    [EnumRecordProperties("unhandledrejection")]
     UnhandledRejection,
-    [MetaKeyword("unload")]
+    [EnumRecordProperties("unload")]
     Unload,
 
 
-    [MetaKeyword("slotchange")]
+    [EnumRecordProperties("slotchange")]
     SlotChange,
 
 }

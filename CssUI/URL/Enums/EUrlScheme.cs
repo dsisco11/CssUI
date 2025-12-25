@@ -1,33 +1,33 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.HTTP;
 
-[MetaEnum]
+[EnumRecord<UrlSchemeProperties>]
 public enum EUrlScheme : int
 {/* Docs: https://url.spec.whatwg.org/#special-scheme */
 
-    [MetaKeyword("ftp", 21)]
+    [EnumRecordProperties("ftp", 21)]
     Ftp,
 
-    [MetaKeyword("file")]
+    [EnumRecordProperties("file", -1)]
     File,
 
-    [MetaKeyword("blob")]
+    [EnumRecordProperties("blob", -1)]
     Blob,
 
-    [MetaKeyword("gopher", 70)]
+    [EnumRecordProperties("gopher", 70)]
     Gopher,
 
-    [MetaKeyword("http", 80)]
+    [EnumRecordProperties("http", 80)]
     Http,
 
-    [MetaKeyword("https", 443)]
+    [EnumRecordProperties("https", 443)]
     Https,
 
-    [MetaKeyword("ws", 80)]
+    [EnumRecordProperties("ws", 80)]
     Ws,
 
-    [MetaKeyword("wss", 443)]
+    [EnumRecordProperties("wss", 443)]
     Wss,
 }
 

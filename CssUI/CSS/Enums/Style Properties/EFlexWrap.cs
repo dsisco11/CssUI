@@ -1,4 +1,4 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.CSS;
 
@@ -6,25 +6,25 @@ namespace CssUI.CSS;
 /// Values for the flex-wrap property.
 /// Spec: https://www.w3.org/TR/css-flexbox-1/#propdef-flex-wrap
 /// </summary>
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EFlexWrap
 {
     /// <summary>
     /// The flex container is single-line.
     /// </summary>
-    [MetaKeyword("nowrap")]
+    [EnumRecordProperties("nowrap")]
     NoWrap,
 
     /// <summary>
     /// The flex container is multi-line.
     /// </summary>
-    [MetaKeyword("wrap")]
+    [EnumRecordProperties("wrap")]
     Wrap,
 
     /// <summary>
     /// Same as wrap, but the cross-start and cross-end directions are swapped.
     /// </summary>
-    [MetaKeyword("wrap-reverse")]
+    [EnumRecordProperties("wrap-reverse")]
     WrapReverse
 }
 

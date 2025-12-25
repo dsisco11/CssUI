@@ -1,447 +1,447 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.Devices;
 
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EKeyboardCode : int
 {/* Docs: https://www.w3.org/TR/uievents-code/#code-value-tables */
 
     /// <summary>
     /// This value code should be used when no other value given in this specification is appropriate.
     /// </summary>
-    [MetaKeyword("")]
+    [EnumRecordProperties("")]
     Invalid = 0x0,
 
     /// <summary>
     /// `~ on a US keyboard. This is the 半角/全角/漢字 (hankaku/zenkaku/kanji) key on Japanese keyboards
     /// </summary>
-    [MetaKeyword("Backquote", UnicodeCommon.CHAR_BACKTICK)]
+    [EnumRecordProperties("Backquote", UnicodeCommon.CHAR_BACKTICK)]
     Backquote,
 
     /// <summary>
     /// Used for both the US \| (on the 101-key layout) and also for the key    located between the " and Enter keys on row C of the 102-, 104- and 106-key layouts. Labelled #~ on a UK (102) keyboard.
     /// </summary>
-    [MetaKeyword("Backslash", UnicodeCommon.CHAR_REVERSE_SOLIDUS)]
+    [EnumRecordProperties("Backslash", UnicodeCommon.CHAR_REVERSE_SOLIDUS)]
     Backslash,
 
     /// <summary>
     /// Backspace or ⌫.	Labelled Delete on Apple keyboards.
     /// </summary>
-    [MetaKeyword("Backspace", '⌫')]
+    [EnumRecordProperties("Backspace", '⌫')]
     Backspace,
 
     /// <summary>
     /// [{ on a US keyboard.
     /// </summary>
-    [MetaKeyword("BracketLeft", UnicodeCommon.CHAR_LEFT_SQUARE_BRACKET)]
+    [EnumRecordProperties("BracketLeft", UnicodeCommon.CHAR_LEFT_SQUARE_BRACKET)]
     BracketLeft,
 
     /// <summary>
     /// ]} on a US keyboard.
     /// </summary>
-    [MetaKeyword("BracketRight", UnicodeCommon.CHAR_RIGHT_SQUARE_BRACKET)]
+    [EnumRecordProperties("BracketRight", UnicodeCommon.CHAR_RIGHT_SQUARE_BRACKET)]
     BracketRight,
 
     /// <summary>
     /// ,< on a US keyboard.
     /// </summary>
-    [MetaKeyword("Comma", UnicodeCommon.CHAR_COMMA)]
+    [EnumRecordProperties("Comma", UnicodeCommon.CHAR_COMMA)]
     Comma,
 
     /// <summary>
     /// 0 ) on a US keyboard.
     /// </summary>
-    [MetaKeyword("Digit0", UnicodeCommon.CHAR_DIGIT_0)]
+    [EnumRecordProperties("Digit0", UnicodeCommon.CHAR_DIGIT_0)]
     Digit0,
 
     /// <summary>
     /// 1 ! on a US keyboard.
     /// </summary>
-    [MetaKeyword("Digit1", UnicodeCommon.CHAR_DIGIT_1)]
+    [EnumRecordProperties("Digit1", UnicodeCommon.CHAR_DIGIT_1)]
     Digit1,
 
     /// <summary>
     /// 2 @ on a US keyboard.
     /// </summary>
-    [MetaKeyword("Digit2", UnicodeCommon.CHAR_DIGIT_2)]
+    [EnumRecordProperties("Digit2", UnicodeCommon.CHAR_DIGIT_2)]
     Digit2,
 
     /// <summary>
     /// 3 # on a US keyboard.
     /// </summary>
-    [MetaKeyword("Digit3", UnicodeCommon.CHAR_DIGIT_3)]
+    [EnumRecordProperties("Digit3", UnicodeCommon.CHAR_DIGIT_3)]
     Digit3,
 
     /// <summary>
     /// 4 $ on a US keyboard.
     /// </summary>
-    [MetaKeyword("Digit4", UnicodeCommon.CHAR_DIGIT_4)]
+    [EnumRecordProperties("Digit4", UnicodeCommon.CHAR_DIGIT_4)]
     Digit4,
 
     /// <summary>
     /// 5 % on a US keyboard.
     /// </summary>
-    [MetaKeyword("Digit5", UnicodeCommon.CHAR_DIGIT_5)]
+    [EnumRecordProperties("Digit5", UnicodeCommon.CHAR_DIGIT_5)]
     Digit5,
 
     /// <summary>
     /// 6 ^ on a US keyboard.
     /// </summary>
-    [MetaKeyword("Digit6", UnicodeCommon.CHAR_DIGIT_6)]
+    [EnumRecordProperties("Digit6", UnicodeCommon.CHAR_DIGIT_6)]
     Digit6,
 
     /// <summary>
     /// 7 & on a US keyboard.
     /// </summary>
-    [MetaKeyword("Digit7", UnicodeCommon.CHAR_DIGIT_7)]
+    [EnumRecordProperties("Digit7", UnicodeCommon.CHAR_DIGIT_7)]
     Digit7,
 
     /// <summary>
     /// 8 * on a US keyboard.
     /// </summary>
-    [MetaKeyword("Digit8", UnicodeCommon.CHAR_DIGIT_8)]
+    [EnumRecordProperties("Digit8", UnicodeCommon.CHAR_DIGIT_8)]
     Digit8,
 
     /// <summary>
     /// 9 ( on a US keyboard.
     /// </summary>
-    [MetaKeyword("Digit9", UnicodeCommon.CHAR_DIGIT_9)]
+    [EnumRecordProperties("Digit9", UnicodeCommon.CHAR_DIGIT_9)]
     Digit9,
 
     /// <summary>
     /// = + on a US keyboard.
     /// </summary>
-    [MetaKeyword("Equal", UnicodeCommon.CHAR_EQUALS)]
+    [EnumRecordProperties("Equal", UnicodeCommon.CHAR_EQUALS)]
     Equal,
 
     /// <summary>
     /// Located between the left Shift and Z keys.	Labelled \| on a UK keyboard.
     /// </summary>
-    [MetaKeyword("IntlBackslash", UnicodeCommon.CHAR_REVERSE_SOLIDUS)]
+    [EnumRecordProperties("IntlBackslash", UnicodeCommon.CHAR_REVERSE_SOLIDUS)]
     IntlBackslash,
 
     /// <summary>
     /// Located between the / and right Shift keys.	Labelled \ (ro) on a Japanese keyboard.
     /// </summary>
-    [MetaKeyword("IntlRo", 'ろ')]
+    [EnumRecordProperties("IntlRo", 'ろ')]
     IntlRo,
 
     /// <summary>
     /// Located between the = and Backspace keys.	Labelled  (yen) on a Japanese keyboard. \/ on a Russian keyboard.
     /// </summary>
-    [MetaKeyword("IntlYen", '¥')]
+    [EnumRecordProperties("IntlYen", '¥')]
     IntlYen,
 
     /// <summary>
     /// a on a US keyboard.Labelled q on an AZERTY (e.g., French) keyboard.
     /// </summary>
-    [MetaKeyword("KeyA", 'a')]
+    [EnumRecordProperties("KeyA", 'a')]
     KeyA,
 
     /// <summary>
     /// b on a US keyboard.
     /// </summary>
-    [MetaKeyword("KeyB", 'b')]
+    [EnumRecordProperties("KeyB", 'b')]
     KeyB,
 
     /// <summary>
     /// c on a US keyboard.
     /// </summary>
-    [MetaKeyword("KeyC", 'c')]
+    [EnumRecordProperties("KeyC", 'c')]
     KeyC,
 
     /// <summary>
     /// d on a US keyboard.
     /// </summary>
-    [MetaKeyword("KeyD", 'd')]
+    [EnumRecordProperties("KeyD", 'd')]
     KeyD,
 
     /// <summary>
     /// e on a US keyboard.
     /// </summary>
-    [MetaKeyword("KeyE", 'e')]
+    [EnumRecordProperties("KeyE", 'e')]
     KeyE,
 
     /// <summary>
     /// f on a US keyboard.
     /// </summary>
-    [MetaKeyword("KeyF", 'f')]
+    [EnumRecordProperties("KeyF", 'f')]
     KeyF,
 
     /// <summary>
     /// g on a US keyboard.
     /// </summary>
-    [MetaKeyword("KeyG", 'g')]
+    [EnumRecordProperties("KeyG", 'g')]
     KeyG,
 
     /// <summary>
     /// h on a US keyboard.
     /// </summary>
-    [MetaKeyword("KeyH", 'h')]
+    [EnumRecordProperties("KeyH", 'h')]
     KeyH,
 
     /// <summary>
     /// i on a US keyboard.
     /// </summary>
-    [MetaKeyword("KeyI", 'i')]
+    [EnumRecordProperties("KeyI", 'i')]
     KeyI,
 
     /// <summary>
     /// j on a US keyboard.
     /// </summary>
-    [MetaKeyword("KeyJ", 'j')]
+    [EnumRecordProperties("KeyJ", 'j')]
     KeyJ,
 
     /// <summary>
     /// k on a US keyboard.
     /// </summary>
-    [MetaKeyword("KeyK", 'k')]
+    [EnumRecordProperties("KeyK", 'k')]
     KeyK,
 
     /// <summary>
     /// l on a US keyboard.
     /// </summary>
-    [MetaKeyword("KeyL", 'l')]
+    [EnumRecordProperties("KeyL", 'l')]
     KeyL,
 
     /// <summary>
     /// m on a US keyboard.
     /// </summary>
-    [MetaKeyword("KeyM", 'm')]
+    [EnumRecordProperties("KeyM", 'm')]
     KeyM,
 
     /// <summary>
     /// n on a US keyboard.
     /// </summary>
-    [MetaKeyword("KeyN", 'n')]
+    [EnumRecordProperties("KeyN", 'n')]
     KeyN,
 
     /// <summary>
     /// o on a US keyboard.
     /// </summary>
-    [MetaKeyword("KeyO", 'o')]
+    [EnumRecordProperties("KeyO", 'o')]
     KeyO,
 
     /// <summary>
     /// p on a US keyboard.
     /// </summary>
-    [MetaKeyword("KeyP", 'p')]
+    [EnumRecordProperties("KeyP", 'p')]
     KeyP,
 
     /// <summary>
     /// q on a US keyboard.Labelled a on an AZERTY (e.g., French) keyboard.
     /// </summary>
-    [MetaKeyword("KeyQ", 'q')]
+    [EnumRecordProperties("KeyQ", 'q')]
     KeyQ,
 
     /// <summary>
     /// r on a US keyboard.
     /// </summary>
-    [MetaKeyword("KeyR", 'r')]
+    [EnumRecordProperties("KeyR", 'r')]
     KeyR,
 
     /// <summary>
     /// s on a US keyboard.
     /// </summary>
-    [MetaKeyword("KeyS", 's')]
+    [EnumRecordProperties("KeyS", 's')]
     KeyS,
 
     /// <summary>
     /// t on a US keyboard.
     /// </summary>
-    [MetaKeyword("KeyT", 't')]
+    [EnumRecordProperties("KeyT", 't')]
     KeyT,
 
     /// <summary>
     /// u on a US keyboard.
     /// </summary>
-    [MetaKeyword("KeyU", 'u')]
+    [EnumRecordProperties("KeyU", 'u')]
     KeyU,
 
     /// <summary>
     /// v on a US keyboard.
     /// </summary>
-    [MetaKeyword("KeyV", 'v')]
+    [EnumRecordProperties("KeyV", 'v')]
     KeyV,
 
     /// <summary>
     /// w on a US keyboard.Labelled z on an AZERTY (e.g., French) keyboard.
     /// </summary>
-    [MetaKeyword("KeyW", 'w')]
+    [EnumRecordProperties("KeyW", 'w')]
     KeyW,
 
     /// <summary>
     /// x on a US keyboard.
     /// </summary>
-    [MetaKeyword("KeyX", 'x')]
+    [EnumRecordProperties("KeyX", 'x')]
     KeyX,
 
     /// <summary>
     /// y on a US keyboard.Labelled z on a QWERTZ (e.g., German) keyboard.
     /// </summary>
-    [MetaKeyword("KeyY", 'y')]
+    [EnumRecordProperties("KeyY", 'y')]
     KeyY,
 
     /// <summary>
     /// z on a US keyboard.Labelled w on an AZERTY (e.g., French) keyboard, and y on a QWERTZ (e.g., German) keyboard.
     /// </summary>
-    [MetaKeyword("KeyZ", 'z')]
+    [EnumRecordProperties("KeyZ", 'z')]
     KeyZ,
 
     /// <summary>
     /// -_ on a US keyboard.
     /// </summary>
-    [MetaKeyword("Minus", UnicodeCommon.CHAR_HYPHEN_MINUS)]
+    [EnumRecordProperties("Minus", UnicodeCommon.CHAR_HYPHEN_MINUS)]
     Minus,
 
     /// <summary>
     /// .> on a US keyboard.
     /// </summary>
-    [MetaKeyword("Period", UnicodeCommon.CHAR_FULL_STOP)]
+    [EnumRecordProperties("Period", UnicodeCommon.CHAR_FULL_STOP)]
     Period,
 
     /// <summary>
     /// '" on a US keyboard.
     /// </summary>
-    [MetaKeyword("Quote", UnicodeCommon.CHAR_APOSTRAPHE)]
+    [EnumRecordProperties("Quote", UnicodeCommon.CHAR_APOSTRAPHE)]
     Quote,
 
     /// <summary>
     /// ;: on a US keyboard.
     /// </summary>
-    [MetaKeyword("Semicolon", UnicodeCommon.CHAR_SEMICOLON)]
+    [EnumRecordProperties("Semicolon", UnicodeCommon.CHAR_SEMICOLON)]
     Semicolon,
 
     /// <summary>
     /// /? on a US keyboard.
     /// </summary>
-    [MetaKeyword("Slash", UnicodeCommon.CHAR_SOLIDUS)]
+    [EnumRecordProperties("Slash", UnicodeCommon.CHAR_SOLIDUS)]
     Slash,
 
     /// <summary>
     /// Alt, Option or ⌥.
     /// </summary>
-    [MetaKeyword("AltLeft", UnicodeCommon.KEY_ALT_MODIFIER)]
+    [EnumRecordProperties("AltLeft", UnicodeCommon.KEY_ALT_MODIFIER)]
     AltLeft,
 
     /// <summary>
     /// Alt, Option or ⌥.	This is labelled AltGr key on many keyboard layouts.
     /// </summary>
-    [MetaKeyword("AltRight", UnicodeCommon.KEY_ALT_MODIFIER)]
+    [EnumRecordProperties("AltRight", UnicodeCommon.KEY_ALT_MODIFIER)]
     AltRight,
 
     /// <summary>
     /// CapsLock or ⇪
     /// </summary>
-    [MetaKeyword("CapsLock", UnicodeCommon.KEY_CAPSLOCK)]
+    [EnumRecordProperties("CapsLock", UnicodeCommon.KEY_CAPSLOCK)]
     CapsLock,
 
     /// <summary>
     /// The application context menu key, which is typically found between the right Meta key and the right Control key.
     /// </summary>
-    [MetaKeyword("ContextMenu")]
+    [EnumRecordProperties("ContextMenu")]
     ContextMenu,
 
     /// <summary>
     /// Control or ⌃
     /// </summary>
-    [MetaKeyword("ControlLeft", UnicodeCommon.KEY_CTRL_MODIFIER)]
+    [EnumRecordProperties("ControlLeft", UnicodeCommon.KEY_CTRL_MODIFIER)]
     ControlLeft,
 
     /// <summary>
     /// Control or ⌃
     /// </summary>
-    [MetaKeyword("ControlRight", UnicodeCommon.KEY_CTRL_MODIFIER)]
+    [EnumRecordProperties("ControlRight", UnicodeCommon.KEY_CTRL_MODIFIER)]
     ControlRight,
 
     /// <summary>
     /// Enter or ↵. Labelled Return on Apple keyboards.
     /// </summary>
-    [MetaKeyword("Enter", UnicodeCommon.KEY_ENTER)]
+    [EnumRecordProperties("Enter", UnicodeCommon.KEY_ENTER)]
     Enter,
 
     /// <summary>
     /// The Windows, ⌘, Command or other OS symbol key.
     /// </summary>
-    [MetaKeyword("MetaLeft", UnicodeCommon.KEY_META_MODIFIER)]
+    [EnumRecordProperties("MetaLeft", UnicodeCommon.KEY_META_MODIFIER)]
     MetaLeft,
 
     /// <summary>
     /// The Windows, ⌘, Command or other OS symbol key.
     /// </summary>
-    [MetaKeyword("MetaRight", UnicodeCommon.KEY_META_MODIFIER)]
+    [EnumRecordProperties("MetaRight", UnicodeCommon.KEY_META_MODIFIER)]
     MetaRight,
 
     /// <summary>
     /// Shift or ⇧
     /// </summary>
-    [MetaKeyword("ShiftLeft", UnicodeCommon.KEY_SHIFT_MODIFIER)]
+    [EnumRecordProperties("ShiftLeft", UnicodeCommon.KEY_SHIFT_MODIFIER)]
     ShiftLeft,
 
     /// <summary>
     /// Shift or ⇧
     /// </summary>
-    [MetaKeyword("ShiftRight", UnicodeCommon.KEY_SHIFT_MODIFIER)]
+    [EnumRecordProperties("ShiftRight", UnicodeCommon.KEY_SHIFT_MODIFIER)]
     ShiftRight,
 
     /// <summary>
     /// (space)
     /// </summary>
-    [MetaKeyword("Space", UnicodeCommon.KEY_SPACE)]
+    [EnumRecordProperties("Space", UnicodeCommon.KEY_SPACE)]
     Space,
 
     /// <summary>
     /// Tab or ⇥
     /// </summary>
-    [MetaKeyword("Tab", UnicodeCommon.KEY_TAB)]
+    [EnumRecordProperties("Tab", UnicodeCommon.KEY_TAB)]
     Tab,
 
     /// <summary>
     /// Japanese: 変換 (henkan)
     /// </summary>
-    [MetaKeyword("Convert")]
+    [EnumRecordProperties("Convert")]
     Convert,
 
     /// <summary>
     /// Japanese: カタカナ/ひらがな/ローマ字 (katakana/hiragana/romaji)
     /// </summary>
-    [MetaKeyword("KanaMode")]
+    [EnumRecordProperties("KanaMode")]
     KanaMode,
 
     /// <summary>
     /// Korean: HangulMode 한/영 (han/yeong) Japanese (Mac keyboard): かな (kana)
     /// </summary>
-    [MetaKeyword("Lang1", '한', '영')]
+    [EnumRecordProperties("Lang1", '한', '영')]
     Lang1,
 
     /// <summary>
     /// Korean: Hanja 한자 (hanja) Japanese (Mac keyboard): 英数 (eisu)
     /// </summary>
-    [MetaKeyword("Lang2")]
+    [EnumRecordProperties("Lang2")]
     Lang2,
 
     /// <summary>
     /// Japanese (word-processing keyboard): Katakana
     /// </summary>
-    [MetaKeyword("Lang3")]
+    [EnumRecordProperties("Lang3")]
     Lang3,
 
     /// <summary>
     /// Japanese (word-processing keyboard): Hiragana
     /// </summary>
-    [MetaKeyword("Lang4")]
+    [EnumRecordProperties("Lang4")]
     Lang4,
 
     /// <summary>
     /// Japanese (word-processing keyboard): Zenkaku/Hankaku
     /// </summary>
-    [MetaKeyword("Lang5")]
+    [EnumRecordProperties("Lang5")]
     Lang5,
 
     /// <summary>
     /// Japanese: 無変換 (muhenkan)
     /// </summary>
-    [MetaKeyword("NonConvert")]
+    [EnumRecordProperties("NonConvert")]
     NonConvert,
 
 
@@ -449,43 +449,43 @@ public enum EKeyboardCode : int
     /// <summary>
     /// ⌦. The forward delete key.	Note that on Apple keyboards, the key labelled Delete on the main part of the keyboard should be encoded as "Backspace".
     /// </summary>
-    [MetaKeyword("Delete", UnicodeCommon.KEY_DELETE)]
+    [EnumRecordProperties("Delete", UnicodeCommon.KEY_DELETE)]
     Delete,
 
     /// <summary>
     /// Page Down, End or ↘
     /// </summary>
-    [MetaKeyword("End", UnicodeCommon.KEY_END)]
+    [EnumRecordProperties("End", UnicodeCommon.KEY_END)]
     End,
 
     /// <summary>
     /// Help. Not present on standard PC keyboards.
     /// </summary>
-    [MetaKeyword("Help")]
+    [EnumRecordProperties("Help")]
     Help,
 
     /// <summary>
     /// Home or ↖
     /// </summary>
-    [MetaKeyword("Home", UnicodeCommon.KEY_HOME)]
+    [EnumRecordProperties("Home", UnicodeCommon.KEY_HOME)]
     Home,
 
     /// <summary>
     /// Insert or Ins. Not present on Apple keyboards.
     /// </summary>
-    [MetaKeyword("Insert")]
+    [EnumRecordProperties("Insert")]
     Insert,
 
     /// <summary>
     /// Page Down, PgDn or ⇟
     /// </summary>
-    [MetaKeyword("PageDown", UnicodeCommon.KEY_PGDOWN)]
+    [EnumRecordProperties("PageDown", UnicodeCommon.KEY_PGDOWN)]
     PageDown,
 
     /// <summary>
     /// Page Up, PgUp or ⇞
     /// </summary>
-    [MetaKeyword("PageUp", UnicodeCommon.KEY_PGUP)]
+    [EnumRecordProperties("PageUp", UnicodeCommon.KEY_PGUP)]
     PageUp,
 
 
@@ -495,25 +495,25 @@ public enum EKeyboardCode : int
     /// <summary>
     /// ↓
     /// </summary>
-    [MetaKeyword("ArrowDown", UnicodeCommon.KEY_DOWN)]
+    [EnumRecordProperties("ArrowDown", UnicodeCommon.KEY_DOWN)]
     ArrowDown,
 
     /// <summary>
     /// ←
     /// </summary>
-    [MetaKeyword("ArrowLeft", UnicodeCommon.KEY_LEFT)]
+    [EnumRecordProperties("ArrowLeft", UnicodeCommon.KEY_LEFT)]
     ArrowLeft,
 
     /// <summary>
     /// →
     /// </summary>
-    [MetaKeyword("ArrowRight", UnicodeCommon.KEY_RIGHT)]
+    [EnumRecordProperties("ArrowRight", UnicodeCommon.KEY_RIGHT)]
     ArrowRight,
 
     /// <summary>
     /// ↑
     /// </summary>
-    [MetaKeyword("ArrowUp", UnicodeCommon.KEY_UP)]
+    [EnumRecordProperties("ArrowUp", UnicodeCommon.KEY_UP)]
     ArrowUp,
 
 
@@ -524,186 +524,186 @@ public enum EKeyboardCode : int
     /// <summary>
     /// On the Mac, the "NumLock" code should be used for the numpad Clear key.
     /// </summary>
-    [MetaKeyword("NumLock")]
+    [EnumRecordProperties("NumLock")]
     NumLock,
 
     /// <summary>
     /// 0 Ins on a keyboard 0 on a phone or remote control
     /// </summary>
-    [MetaKeyword("Numpad0", UnicodeCommon.CHAR_DIGIT_0)]
+    [EnumRecordProperties("Numpad0", UnicodeCommon.CHAR_DIGIT_0)]
     Numpad0,
 
     /// <summary>
     /// 1 End on a keyboard 1 or 1 QZ on a phone or remote control
     /// </summary>
-    [MetaKeyword("Numpad1", UnicodeCommon.CHAR_DIGIT_1)]
+    [EnumRecordProperties("Numpad1", UnicodeCommon.CHAR_DIGIT_1)]
     Numpad1,
 
     /// <summary>
     /// 2 ↓ on a keyboard 2 ABC on a phone or remote control
     /// </summary>
-    [MetaKeyword("Numpad2", UnicodeCommon.CHAR_DIGIT_2)]
+    [EnumRecordProperties("Numpad2", UnicodeCommon.CHAR_DIGIT_2)]
     Numpad2,
 
     /// <summary>
     /// 3 PgDn on a keyboard 3 DEF on a phone or remote control
     /// </summary>
-    [MetaKeyword("Numpad3", UnicodeCommon.CHAR_DIGIT_3)]
+    [EnumRecordProperties("Numpad3", UnicodeCommon.CHAR_DIGIT_3)]
     Numpad3,
 
     /// <summary>
     /// 4 ← on a keyboard 4 GHI on a phone or remote control
     /// </summary>
-    [MetaKeyword("Numpad4", UnicodeCommon.CHAR_DIGIT_4)]
+    [EnumRecordProperties("Numpad4", UnicodeCommon.CHAR_DIGIT_4)]
     Numpad4,
 
     /// <summary>
     /// 5 on a keyboard 5 JKL on a phone or remote control
     /// </summary>
-    [MetaKeyword("Numpad5", UnicodeCommon.CHAR_DIGIT_5)]
+    [EnumRecordProperties("Numpad5", UnicodeCommon.CHAR_DIGIT_5)]
     Numpad5,
 
     /// <summary>
     /// 6 → on a keyboard 6 MNO on a phone or remote control
     /// </summary>
-    [MetaKeyword("Numpad6", UnicodeCommon.CHAR_DIGIT_6)]
+    [EnumRecordProperties("Numpad6", UnicodeCommon.CHAR_DIGIT_6)]
     Numpad6,
 
     /// <summary>
     /// 7 Home on a keyboard 7 PQRS or 7 PRS on a phone  or remote control
     /// </summary>
-    [MetaKeyword("Numpad7", UnicodeCommon.CHAR_DIGIT_7)]
+    [EnumRecordProperties("Numpad7", UnicodeCommon.CHAR_DIGIT_7)]
     Numpad7,
 
     /// <summary>
     /// 8 ↑ on a keyboard 8 TUV on a phone or remote control
     /// </summary>
-    [MetaKeyword("Numpad8", UnicodeCommon.CHAR_DIGIT_8)]
+    [EnumRecordProperties("Numpad8", UnicodeCommon.CHAR_DIGIT_8)]
     Numpad8,
 
     /// <summary>
     /// 9 PgUp on a keyboard 9 WXYZ or 9 WXY on a phone  or remote control
     /// </summary>
-    [MetaKeyword("Numpad9", UnicodeCommon.CHAR_DIGIT_9)]
+    [EnumRecordProperties("Numpad9", UnicodeCommon.CHAR_DIGIT_9)]
     Numpad9,
 
     /// <summary>
     /// +
     /// </summary>
-    [MetaKeyword("NumpadAdd", UnicodeCommon.CHAR_PLUS_SIGN)]
+    [EnumRecordProperties("NumpadAdd", UnicodeCommon.CHAR_PLUS_SIGN)]
     NumpadAdd,
 
     /// <summary>
     /// Found on the Microsoft Natural Keyboard.
     /// </summary>
-    [MetaKeyword("NumpadBackspace")]
+    [EnumRecordProperties("NumpadBackspace")]
     NumpadBackspace,
 
     /// <summary>
     /// C or AC (All Clear). Also for use with numpads that have a Clear key that is separate from the NumLock key. On the Mac, the numpad Clear key should always be encoded as "NumLock".
     /// </summary>
-    [MetaKeyword("NumpadClear")]
+    [EnumRecordProperties("NumpadClear")]
     NumpadClear,
 
     /// <summary>
     /// CE (Clear Entry)
     /// </summary>
-    [MetaKeyword("NumpadClearEntry")]
+    [EnumRecordProperties("NumpadClearEntry")]
     NumpadClearEntry,
 
     /// <summary>
     /// , (thousands separator). For locales where the thousands separator	is a "." (e.g., Brazil), this key may generate a ..
     /// </summary>
-    [MetaKeyword("NumpadComma")]
+    [EnumRecordProperties("NumpadComma")]
     NumpadComma,
 
     /// <summary>
     /// . Del. For locales where the decimal separator is "," (e.g., Brazil), this key may generate a,.
     /// </summary>
-    [MetaKeyword("NumpadDecimal")]
+    [EnumRecordProperties("NumpadDecimal")]
     NumpadDecimal,
 
     /// <summary>
     /// /
     /// </summary>
-    [MetaKeyword("NumpadDivide")]
+    [EnumRecordProperties("NumpadDivide")]
     NumpadDivide,
     /// <summary>
     /// Newline
     /// </summary>
-    [MetaKeyword("NumpadEnter")]
+    [EnumRecordProperties("NumpadEnter")]
     NumpadEnter,
 
     /// <summary>
     /// =
     /// </summary>
-    [MetaKeyword("NumpadEqual")]
+    [EnumRecordProperties("NumpadEqual")]
     NumpadEqual,
 
     /// <summary>
     /// # on a phone or remote control device. This key is typically found	below the 9 key and to the right of the 0 key.
     /// </summary>
-    [MetaKeyword("NumpadHash")]
+    [EnumRecordProperties("NumpadHash")]
     NumpadHash,
 
     /// <summary>
     /// M+ Add current entry to the value stored in memory.
     /// </summary>
-    [MetaKeyword("NumpadMemoryAdd")]
+    [EnumRecordProperties("NumpadMemoryAdd")]
     NumpadMemoryAdd,
 
     /// <summary>
     /// MC Clear the value stored in memory.
     /// </summary>
-    [MetaKeyword("NumpadMemoryClear")]
+    [EnumRecordProperties("NumpadMemoryClear")]
     NumpadMemoryClear,
 
     /// <summary>
     /// MR Replace the current entry with the value stored in memory.
     /// </summary>
-    [MetaKeyword("NumpadMemoryRecall")]
+    [EnumRecordProperties("NumpadMemoryRecall")]
     NumpadMemoryRecall,
 
     /// <summary>
     /// MS Replace the value stored in memory with the current entry.
     /// </summary>
-    [MetaKeyword("NumpadMemoryStore")]
+    [EnumRecordProperties("NumpadMemoryStore")]
     NumpadMemoryStore,
 
     /// <summary>
     /// M- Subtract current entry from the value stored in memory.
     /// </summary>
-    [MetaKeyword("NumpadMemorySubtract")]
+    [EnumRecordProperties("NumpadMemorySubtract")]
     NumpadMemorySubtract,
 
     /// <summary>
     /// * on a keyboard. For use with numpads that provide mathematical operations (+, -, * and /). Use "NumpadStar" for the * key on phones and remote controls.
     /// </summary>
-    [MetaKeyword("NumpadMultiply")]
+    [EnumRecordProperties("NumpadMultiply")]
     NumpadMultiply,
 
     /// <summary>
     /// ( Found on the Microsoft Natural Keyboard.
     /// </summary>
-    [MetaKeyword("NumpadParenLeft")]
+    [EnumRecordProperties("NumpadParenLeft")]
     NumpadParenLeft,
 
     /// <summary>
     /// ) Found on the Microsoft Natural Keyboard.
     /// </summary>
-    [MetaKeyword("NumpadParenRight")]
+    [EnumRecordProperties("NumpadParenRight")]
     NumpadParenRight,
 
     /// <summary>
     /// * on a phone or remote control device.	This key is typically found below the 7 key and to the left of the 0 key. Use "NumpadMultiply" for the * key on numeric keypads.
     /// </summary>
-    [MetaKeyword("NumpadStar")]
+    [EnumRecordProperties("NumpadStar")]
     NumpadStar,
 
     /// <summary>
     /// -
     /// </summary>
-    [MetaKeyword("NumpadSubtract")]
+    [EnumRecordProperties("NumpadSubtract")]
     NumpadSubtract,
 
 
@@ -714,109 +714,109 @@ public enum EKeyboardCode : int
     /// <summary>
     /// Esc or ⎋
     /// </summary>
-    [MetaKeyword("Escape", UnicodeCommon.KEY_ESCAPE)]
+    [EnumRecordProperties("Escape", UnicodeCommon.KEY_ESCAPE)]
     Escape,
 
     /// <summary>
     /// F1
     /// </summary>
-    [MetaKeyword("F1")]
+    [EnumRecordProperties("F1")]
     F1,
 
     /// <summary>
     /// F2
     /// </summary>
-    [MetaKeyword("F2")]
+    [EnumRecordProperties("F2")]
     F2,
 
     /// <summary>
     /// F3
     /// </summary>
-    [MetaKeyword("F3")]
+    [EnumRecordProperties("F3")]
     F3,
 
     /// <summary>
     /// F4
     /// </summary>
-    [MetaKeyword("F4")]
+    [EnumRecordProperties("F4")]
     F4,
 
     /// <summary>
     /// F5
     /// </summary>
-    [MetaKeyword("F5")]
+    [EnumRecordProperties("F5")]
     F5,
 
     /// <summary>
     /// F6
     /// </summary>
-    [MetaKeyword("F6")]
+    [EnumRecordProperties("F6")]
     F6,
 
     /// <summary>
     /// F7
     /// </summary>
-    [MetaKeyword("F7")]
+    [EnumRecordProperties("F7")]
     F7,
 
     /// <summary>
     /// F8
     /// </summary>
-    [MetaKeyword("F8")]
+    [EnumRecordProperties("F8")]
     F8,
 
     /// <summary>
     /// F9
     /// </summary>
-    [MetaKeyword("F9")]
+    [EnumRecordProperties("F9")]
     F9,
 
     /// <summary>
     /// F10
     /// </summary>
-    [MetaKeyword("F10")]
+    [EnumRecordProperties("F10")]
     F10,
 
     /// <summary>
     /// F11
     /// </summary>
-    [MetaKeyword("F11")]
+    [EnumRecordProperties("F11")]
     F11,
 
     /// <summary>
     /// F12
     /// </summary>
-    [MetaKeyword("F12")]
+    [EnumRecordProperties("F12")]
     F12,
 
     /// <summary>
     /// Fn This is typically a hardware key that does not generate a separate   code. Most keyboards do not place this key in the function section, but it is included here to keep it with related keys.
     /// </summary>
-    [MetaKeyword("Fn")]
+    [EnumRecordProperties("Fn")]
     Fn,
 
     /// <summary>
     /// FLock or FnLock. Function Lock key. Found on the Microsoft  Natural Keyboard.
     /// </summary>
-    [MetaKeyword("FnLock")]
+    [EnumRecordProperties("FnLock")]
     FnLock,
 
     /// <summary>
     /// PrtScr SysRq or Print Screen
     /// </summary>
-    [MetaKeyword("PrintScreen")]
+    [EnumRecordProperties("PrintScreen")]
     PrintScreen,
 
     /// <summary>
     /// Scroll Lock
     /// </summary>
-    [MetaKeyword("ScrollLock")]
+    [EnumRecordProperties("ScrollLock")]
     ScrollLock,
 
     /// <summary>
     /// Pause Break
     /// </summary>
-    [MetaKeyword("Pause")]
+    [EnumRecordProperties("Pause")]
     Pause,
 
 
@@ -827,132 +827,132 @@ public enum EKeyboardCode : int
     /// <summary>
     /// Some laptops place this key to the left of the ↑ key.
     /// </summary>
-    [MetaKeyword("BrowserBack")]
+    [EnumRecordProperties("BrowserBack")]
     BrowserBack,
     /// <summary>
     /// No definition
     /// </summary>
-    [MetaKeyword("BrowserFavorites")]
+    [EnumRecordProperties("BrowserFavorites")]
     BrowserFavorites,
 
     /// <summary>
     /// Some laptops place this key to the right of the ↑ key.
     /// </summary>
-    [MetaKeyword("BrowserForward")]
+    [EnumRecordProperties("BrowserForward")]
     BrowserForward,
 
     /// <summary>
     ///         
     /// </summary>
-    [MetaKeyword("BrowserHome")]
+    [EnumRecordProperties("BrowserHome")]
     BrowserHome,
 
     /// <summary>
     ///         
     /// </summary>
-    [MetaKeyword("BrowserRefresh")]
+    [EnumRecordProperties("BrowserRefresh")]
     BrowserRefresh,
 
     /// <summary>
     ///         
     /// </summary>
-    [MetaKeyword("BrowserSearch")]
+    [EnumRecordProperties("BrowserSearch")]
     BrowserSearch,
 
     /// <summary>
     ///         
     /// </summary>
-    [MetaKeyword("BrowserStop")]
+    [EnumRecordProperties("BrowserStop")]
     BrowserStop,
 
     /// <summary>
     /// Eject or ⏏. This key is placed in the function  section on some Apple keyboards.
     /// </summary>
-    [MetaKeyword("Eject")]
+    [EnumRecordProperties("Eject")]
     Eject,
 
     /// <summary>
     /// Sometimes labelled My Computer on the keyboard
     /// </summary>
-    [MetaKeyword("LaunchApp1")]
+    [EnumRecordProperties("LaunchApp1")]
     LaunchApp1,
 
     /// <summary>
     /// Sometimes labelled Calculator on the keyboard
     /// </summary>
-    [MetaKeyword("LaunchApp2")]
+    [EnumRecordProperties("LaunchApp2")]
     LaunchApp2,
 
     /// <summary>
     ///         
     /// </summary>
-    [MetaKeyword("LaunchMail")]
+    [EnumRecordProperties("LaunchMail")]
     LaunchMail,
 
     /// <summary>
     ///         
     /// </summary>
-    [MetaKeyword("MediaPlayPause")]
+    [EnumRecordProperties("MediaPlayPause")]
     MediaPlayPause,
 
     /// <summary>
     ///         
     /// </summary>
-    [MetaKeyword("MediaSelect")]
+    [EnumRecordProperties("MediaSelect")]
     MediaSelect,
 
     /// <summary>
     ///         
     /// </summary>
-    [MetaKeyword("MediaStop")]
+    [EnumRecordProperties("MediaStop")]
     MediaStop,
 
     /// <summary>
     ///         
     /// </summary>
-    [MetaKeyword("MediaTrackNext")]
+    [EnumRecordProperties("MediaTrackNext")]
     MediaTrackNext,
 
     /// <summary>
     ///         
     /// </summary>
-    [MetaKeyword("MediaTrackPrevious")]
+    [EnumRecordProperties("MediaTrackPrevious")]
     MediaTrackPrevious,
 
     /// <summary>
     /// This key is placed in the function section on some Apple keyboards, replacing the Eject key.
     /// </summary>
-    [MetaKeyword("Power")]
+    [EnumRecordProperties("Power")]
     Power,
 
     /// <summary>
     ///         
     /// </summary>
-    [MetaKeyword("Sleep")]
+    [EnumRecordProperties("Sleep")]
     Sleep,
 
     /// <summary>
     ///         
     /// </summary>
-    [MetaKeyword("AudioVolumeDown")]
+    [EnumRecordProperties("AudioVolumeDown")]
     AudioVolumeDown,
 
     /// <summary>
     ///         
     /// </summary>
-    [MetaKeyword("AudioVolumeMute")]
+    [EnumRecordProperties("AudioVolumeMute")]
     AudioVolumeMute,
 
     /// <summary>
     ///         
     /// </summary>
-    [MetaKeyword("AudioVolumeUp")]
+    [EnumRecordProperties("AudioVolumeUp")]
     AudioVolumeUp,
 
     /// <summary>
     /// 
     /// </summary>
-    [MetaKeyword("WakeUp")]
+    [EnumRecordProperties("WakeUp")]
     WakeUp,
 
 

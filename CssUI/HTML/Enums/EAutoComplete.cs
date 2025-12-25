@@ -1,15 +1,15 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.HTML
 {
-    [MetaEnum]
+    [EnumRecord<KeywordProperties>]
     public enum EAutoComplete : int
     {
 
-        [MetaKeyword("on")]
+        [EnumRecordProperties("on")]
         On,
 
-        [MetaKeyword("off")]
+        [EnumRecordProperties("off")]
         Off,
     }
 }

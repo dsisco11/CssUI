@@ -1,8 +1,8 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.HTML
 {
-    [MetaEnum]
+    [EnumRecord<KeywordProperties>]
     public enum EAutofillHint
     {
     }

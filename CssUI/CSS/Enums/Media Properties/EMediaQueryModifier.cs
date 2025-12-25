@@ -1,8 +1,8 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.CSS.Media;
 
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EMediaQueryModifier : int
 {/* Docs: https://drafts.csswg.org/mediaqueries-4/#media-query-modifier */
 
@@ -10,12 +10,12 @@ public enum EMediaQueryModifier : int
     /// <summary>
     /// Negates the media query result
     /// </summary>
-    [MetaKeyword("not")]
+    [EnumRecordProperties("not")]
     Not,
     /// <summary>
-    /// The only keyword has no effect on the media query’s result, but will cause the media query to be parsed by legacy user agents as specifying the unknown media type “only”, and thus be ignored.
+    /// The only keyword has no effect on the media query's result, but will cause the media query to be parsed by legacy user agents as specifying the unknown media type "only", and thus be ignored.
     /// </summary>
-    [MetaKeyword("only")]
+    [EnumRecordProperties("only")]
     Only,
 }
 

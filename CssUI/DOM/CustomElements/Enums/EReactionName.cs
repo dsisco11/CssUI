@@ -1,35 +1,35 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.DOM.CustomElements;
 
 /// <summary>
 /// Lists all of the possible custom element reactions
 /// </summary>
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EReactionName : int
 {
-    [MetaKeyword("attributeChangedCallback")]
+    [EnumRecordProperties("attributeChangedCallback")]
     AttributeChanged,
 
-    [MetaKeyword("connectedCallback")]
+    [EnumRecordProperties("connectedCallback")]
     Connected,
 
-    [MetaKeyword("disconnectedCallback")]
+    [EnumRecordProperties("disconnectedCallback")]
     Disconnected,
 
-    [MetaKeyword("adoptedCallback")]
+    [EnumRecordProperties("adoptedCallback")]
     Adopted,
 
-    [MetaKeyword("formAssociatedCallback")]
+    [EnumRecordProperties("formAssociatedCallback")]
     FormAssociated,
 
-    [MetaKeyword("formDisabledCallback")]
+    [EnumRecordProperties("formDisabledCallback")]
     FormDisabled,
 
-    [MetaKeyword("formResetCallback")]
+    [EnumRecordProperties("formResetCallback")]
     FormReset,
 
-    [MetaKeyword("formStateRestoreCallback")]
+    [EnumRecordProperties("formStateRestoreCallback")]
     FormStateRestore,
 
 }

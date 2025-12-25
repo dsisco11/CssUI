@@ -1,4 +1,4 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.CSS;
 
@@ -6,18 +6,18 @@ namespace CssUI.CSS;
 /// 
 /// </summary>
 /// Docs: https://www.w3.org/TR/css-writing-modes-4/#logical-to-physical
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EWritingMode : int
 {
-    [MetaKeyword("horizontal-tb")]
+    [EnumRecordProperties("horizontal-tb")]
     Horizontal_TB = 1,
-    [MetaKeyword("vertical-rl")]
+    [EnumRecordProperties("vertical-rl")]
     Vertical_RL,
-    [MetaKeyword("vertical-lr")]
+    [EnumRecordProperties("vertical-lr")]
     Vertical_LR,
-    [MetaKeyword("sideways-rl")]
+    [EnumRecordProperties("sideways-rl")]
     Sideways_RL,
-    [MetaKeyword("sideways-lr")]
+    [EnumRecordProperties("sideways-lr")]
     Sideways_LR,
 }
 

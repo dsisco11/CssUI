@@ -1,11 +1,11 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.CSS.Media;
 
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EMediaResolution
 {
-    [MetaKeyword("infinite")]
+    [EnumRecordProperties("infinite")]
     Infinite,
 }
 

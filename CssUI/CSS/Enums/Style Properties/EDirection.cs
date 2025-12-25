@@ -1,20 +1,20 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.CSS;
 
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EDirection : int
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [MetaKeyword("ltr")]
+    [EnumRecordProperties("ltr")]
     LTR = 1,
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [MetaKeyword("rtl")]
+    [EnumRecordProperties("rtl")]
     RTL,
 }
 

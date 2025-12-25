@@ -1,26 +1,26 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.HTML
 {
-    [MetaEnum]
+    [EnumRecord<KeywordProperties>]
     public enum EButtonType : int
     {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#attr-button-type */
         /// <summary>
         /// Submits the form
         /// </summary>
-        [MetaKeyword("submit")]
+        [EnumRecordProperties("submit")]
         Submit,
 
         /// <summary>
         /// Resets the form
         /// </summary>
-        [MetaKeyword("reset")]
+        [EnumRecordProperties("reset")]
         Reset,
 
         /// <summary>
         /// Does nothing
         /// </summary>
-        [MetaKeyword("button")]
+        [EnumRecordProperties("button")]
         Button,
     }
 }

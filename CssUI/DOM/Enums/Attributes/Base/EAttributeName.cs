@@ -1,248 +1,248 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.DOM;
 
 /// <summary>
 /// List of all common HTML attribute names
 /// </summary>
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EAttributeName : int
 {
 
-    /*[MetaKeyword("")]*/ // DO NOT GIVE NEGATIVE ENUM VALUES A KEYWORD
+    /*[EnumRecordProperties("")]*/ // DO NOT GIVE NEGATIVE ENUM VALUES A KEYWORD
     CUSTOM = -1,
-    [MetaKeyword("id")]
+    [EnumRecordProperties("id")]
     ID = 0,
-    [MetaKeyword("name")]
+    [EnumRecordProperties("name")]
     Name,
-    [MetaKeyword("class")]
+    [EnumRecordProperties("class")]
     Class,
-    [MetaKeyword("width")]
+    [EnumRecordProperties("width")]
     Width,
-    [MetaKeyword("height")]
+    [EnumRecordProperties("height")]
     Height,
 
-    [MetaKeyword("is")]
+    [EnumRecordProperties("is")]
     IS,
 
 
     /* HTML Attributes */
-    [MetaKeyword("title")]
+    [EnumRecordProperties("title")]
     Title,
-    [MetaKeyword("lang")]
+    [EnumRecordProperties("lang")]
     Lang,
-    [MetaKeyword("dir")]
+    [EnumRecordProperties("dir")]
     Dir,
-    [MetaKeyword("translate")]
+    [EnumRecordProperties("translate")]
     Translate,
-    [MetaKeyword("nonce")]
+    [EnumRecordProperties("nonce")]
     Nonce,
-    [MetaKeyword("text")]
+    [EnumRecordProperties("text")]
     Text,
-    [MetaKeyword("label")]
+    [EnumRecordProperties("label")]
     Label,
     /// <summary>
     /// Every HTML element may have an itemprop attribute specified, if doing so adds one or more properties to one or more items (as defined below).
     /// <para>ReadMore: https://html.spec.whatwg.org/multipage/microdata.html#names:-the-itemprop-attribute</para>
     /// </summary>
-    [MetaKeyword("itemprop")]
+    [EnumRecordProperties("itemprop")]
     ItemProp,
 
 
-    [MetaKeyword("accesskey")]
+    [EnumRecordProperties("accesskey")]
     AccessKey,
-    [MetaKeyword("spellcheck")]
+    [EnumRecordProperties("spellcheck")]
     Spellcheck,
-    [MetaKeyword("autocapitalize")]
+    [EnumRecordProperties("autocapitalize")]
     Autocapitalize,
 
-    [MetaKeyword("contenteditable")]
+    [EnumRecordProperties("contenteditable")]
     ContentEditable,
-    [MetaKeyword("draggable")]
+    [EnumRecordProperties("draggable")]
     Draggable,
-    [MetaKeyword("tabindex")]
+    [EnumRecordProperties("tabindex")]
     TabIndex,
-    [MetaKeyword("disabled")]
+    [EnumRecordProperties("disabled")]
     Disabled,
-    [MetaKeyword("hidden")]
+    [EnumRecordProperties("hidden")]
     Hidden,
-    [MetaKeyword("type")]
+    [EnumRecordProperties("type")]
     Type,
-    [MetaKeyword("slot")]
+    [EnumRecordProperties("slot")]
     Slot,
-    [MetaKeyword("media")]
+    [EnumRecordProperties("media")]
     Media,
 
 
-    [MetaKeyword("dropzone")]
+    [EnumRecordProperties("dropzone")]
     Dropzone,
 
 
-    [MetaKeyword("alt")]
+    [EnumRecordProperties("alt")]
     Alt,
-    [MetaKeyword("src")]
+    [EnumRecordProperties("src")]
     Src,
-    [MetaKeyword("srcset")]
+    [EnumRecordProperties("srcset")]
     SrcSet,
-    [MetaKeyword("href")]
+    [EnumRecordProperties("href")]
     Href,
-    [MetaKeyword("hreflang")]
+    [EnumRecordProperties("hreflang")]
     HrefLang,
-    [MetaKeyword("sizes")]
+    [EnumRecordProperties("sizes")]
     Sizes,
-    [MetaKeyword("usemap")]
+    [EnumRecordProperties("usemap")]
     UseMap,
-    [MetaKeyword("ismap")]
+    [EnumRecordProperties("ismap")]
     IsMap,
-    [MetaKeyword("crossorigin")]
+    [EnumRecordProperties("crossorigin")]
     CrossOrigin,
-    [MetaKeyword("referrerpolicy")]
+    [EnumRecordProperties("referrerpolicy")]
     ReferrerPolicy,
-    [MetaKeyword("decoding")]
+    [EnumRecordProperties("decoding")]
     Decoding,
 
-    [MetaKeyword("enctype")]
+    [EnumRecordProperties("enctype")]
     EncType,
-    [MetaKeyword("method")]
+    [EnumRecordProperties("method")]
     Method,
-    [MetaKeyword("novalidate")]
+    [EnumRecordProperties("novalidate")]
     NoValidate,
-    [MetaKeyword("target")]
+    [EnumRecordProperties("target")]
     Target,
 
     /* LINK ATTRIBUTES */
-    [MetaKeyword("rel")]
+    [EnumRecordProperties("rel")]
     Rel,
 
     /* QUOTE ATTRIBUTES */
-    [MetaKeyword("cite")]
+    [EnumRecordProperties("cite")]
     Cite,
 
     /* LABEL ATTRIBUTES */
-    [MetaKeyword("for")]
+    [EnumRecordProperties("for")]
     For,
 
     /* DIALOG ATTRIBUTES */
-    [MetaKeyword("open")]
+    [EnumRecordProperties("open")]
     Open,
 
 
     /* TABLE ATTRIBUTES */
-    [MetaKeyword("span")]
+    [EnumRecordProperties("span")]
     Span,
-    [MetaKeyword("colspan")]
+    [EnumRecordProperties("colspan")]
     ColSpan,
-    [MetaKeyword("rowspan")]
+    [EnumRecordProperties("rowspan")]
     RowSpan,
-    [MetaKeyword("cols")]
+    [EnumRecordProperties("cols")]
     Cols,
-    [MetaKeyword("rows")]
+    [EnumRecordProperties("rows")]
     Rows,
 
-    [MetaKeyword("headers")]
+    [EnumRecordProperties("headers")]
     Headers,
 
-    [MetaKeyword("scope")]
+    [EnumRecordProperties("scope")]
     Scope,
-    [MetaKeyword("abbr")]
+    [EnumRecordProperties("abbr")]
     Abbr,
 
     /* INPUT */
 
-    [MetaKeyword("checked")]
+    [EnumRecordProperties("checked")]
     Checked,
-    [MetaKeyword("inputmode")]
+    [EnumRecordProperties("inputmode")]
     InputMode,
-    [MetaKeyword("enterkeyhint")]
+    [EnumRecordProperties("enterkeyhint")]
     EnterKeyHint,
-    [MetaKeyword("autocomplete")]
+    [EnumRecordProperties("autocomplete")]
     Autocomplete,
-    [MetaKeyword("autofocus")]
+    [EnumRecordProperties("autofocus")]
     Autofocus,
-    [MetaKeyword("multiple")]
+    [EnumRecordProperties("multiple")]
     Multiple,
-    [MetaKeyword("required")]
+    [EnumRecordProperties("required")]
     Required,
-    [MetaKeyword("size")]
+    [EnumRecordProperties("size")]
     Size,
-    [MetaKeyword("placeholder")]
+    [EnumRecordProperties("placeholder")]
     Placeholder,
 
-    [MetaKeyword("accept")]
+    [EnumRecordProperties("accept")]
     Accept,
 
-    [MetaKeyword("action")]
+    [EnumRecordProperties("action")]
     Action,
-    [MetaKeyword("formaction")]
+    [EnumRecordProperties("formaction")]
     FormAction,
-    [MetaKeyword("formenctype")]
+    [EnumRecordProperties("formenctype")]
     FormEncType,
-    [MetaKeyword("formmethod")]
+    [EnumRecordProperties("formmethod")]
     FormMethod,
-    [MetaKeyword("formnovalidate")]
+    [EnumRecordProperties("formnovalidate")]
     FormNoValidate,
-    [MetaKeyword("formtarget")]
+    [EnumRecordProperties("formtarget")]
     FormTarget,
-    [MetaKeyword("list")]
+    [EnumRecordProperties("list")]
     List,
-    [MetaKeyword("min")]
+    [EnumRecordProperties("min")]
     Min,
-    [MetaKeyword("max")]
+    [EnumRecordProperties("max")]
     Max,
-    [MetaKeyword("pattern")]
+    [EnumRecordProperties("pattern")]
     Pattern,
-    [MetaKeyword("step")]
+    [EnumRecordProperties("step")]
     Step,
 
     /* TEXTAREA */
-    [MetaKeyword("readonly")]
+    [EnumRecordProperties("readonly")]
     ReadOnly,
-    [MetaKeyword("wrap")]
+    [EnumRecordProperties("wrap")]
     Wrap,
 
-    [MetaKeyword("form")]
+    [EnumRecordProperties("form")]
     Form,
-    [MetaKeyword("value")]
+    [EnumRecordProperties("value")]
     Value,
-    [MetaKeyword("selected")]
+    [EnumRecordProperties("selected")]
     Selected,
-    [MetaKeyword("dirname")]
+    [EnumRecordProperties("dirname")]
     Dirname,
-    [MetaKeyword("minlength")]
+    [EnumRecordProperties("minlength")]
     MinLength,
-    [MetaKeyword("maxlength")]
+    [EnumRecordProperties("maxlength")]
     MaxLength,
 
 
     /* FORMS */
-    [MetaKeyword("accept-charset")]
+    [EnumRecordProperties("accept-charset")]
     AcceptCharset,
 
 
     /* OBJECT */
-    [MetaKeyword("data")]
+    [EnumRecordProperties("data")]
     Data,
 
     /* IFRAME */
-    [MetaKeyword("sandbox")]
+    [EnumRecordProperties("sandbox")]
     Sandbox,
-    [MetaKeyword("srcdoc")]
+    [EnumRecordProperties("srcdoc")]
     Srcdoc,
-    [MetaKeyword("allow")]
+    [EnumRecordProperties("allow")]
     Allow,
 
     /* AREA */
-    [MetaKeyword("coords")]
+    [EnumRecordProperties("coords")]
     Coords,
-    [MetaKeyword("shape")]
+    [EnumRecordProperties("shape")]
     Shape,
-    [MetaKeyword("ping")]
+    [EnumRecordProperties("ping")]
     Ping,
-    [MetaKeyword("download")]
+    [EnumRecordProperties("download")]
     Download,
 
     /* SCRIPT/LINK INTEGRITY */
-    [MetaKeyword("integrity")]
+    [EnumRecordProperties("integrity")]
     Integrity,
 }
 

@@ -1,15 +1,15 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.DOM;
 
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EDesignMode : int
 {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#designMode */
 
-    [MetaKeyword("on")]
+    [EnumRecordProperties("on")]
     ON,
 
-    [MetaKeyword("off")]
+    [EnumRecordProperties("off")]
     OFF,
 }
 

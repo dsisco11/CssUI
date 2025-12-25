@@ -1,15 +1,15 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.Devices;
 
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EPointerType : short
 {/* Docs: https://w3c.github.io/pointerevents/#pointerevent-interface */
-    [MetaKeyword("mouse")]
+    [EnumRecordProperties("mouse")]
     Mouse = 0,
-    [MetaKeyword("pen")]
+    [EnumRecordProperties("pen")]
     PenStylus = 1,
-    [MetaKeyword("touch")]
+    [EnumRecordProperties("touch")]
     TouchContact = 2,
 
 

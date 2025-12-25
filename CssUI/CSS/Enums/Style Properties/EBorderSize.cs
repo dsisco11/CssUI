@@ -1,26 +1,26 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.CSS;
 
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EBorderSize : int
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [MetaKeyword("thin")]
+    [EnumRecordProperties("thin")]
     Thin,
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [MetaKeyword("medium")]
+    [EnumRecordProperties("medium")]
     Medium,
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [MetaKeyword("thick")]
+    [EnumRecordProperties("thick")]
     Thick,
 }
 

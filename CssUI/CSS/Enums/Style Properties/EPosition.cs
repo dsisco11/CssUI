@@ -1,31 +1,31 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.CSS;
 
 /// <summary>
 /// </summary>
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EPosition : int
 {/* Docs: https://www.w3.org/TR/css-backgrounds-3/#propdef-background-position */
 
     /// <summary>
     /// </summary>
-    [MetaKeyword("left")]
+    [EnumRecordProperties("left")]
     Left,
     /// <summary>
     /// </summary>
-    [MetaKeyword("center")]
+    [EnumRecordProperties("center")]
     Center,
     /// <summary>
     /// </summary>
-    [MetaKeyword("right")]
+    [EnumRecordProperties("right")]
     Right,
     /// <summary>
     /// </summary>
-    [MetaKeyword("top")]
+    [EnumRecordProperties("top")]
     Top,
     /// <summary>
     /// </summary>
-    [MetaKeyword("bottom")]
+    [EnumRecordProperties("bottom")]
     Bottom,
 }

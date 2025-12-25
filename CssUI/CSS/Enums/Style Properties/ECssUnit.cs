@@ -1,70 +1,70 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.CSS;
 
 /// <summary>
 /// Defines all of the CSS length unit types
 /// </summary>
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum ECssUnit : int
 {
     /// <summary>
     /// Specified no unit length
     /// </summary>
-    [MetaKeyword("")]
+    [EnumRecordProperties("")]
     None = 0,
     /* Physical Units */
     /// <summary>
     /// 1/96th of 1in
     /// </summary>
-    [MetaKeyword("px")]
+    [EnumRecordProperties("px")]
     PX,
     /// <summary>
     /// Points (1pt = 1/72th of 1in)
     /// </summary>
-    [MetaKeyword("pt")]
+    [EnumRecordProperties("pt")]
     PT,
     /// <summary>
     /// Picas (1pc = 1/6th of 1in)
     /// </summary>
-    [MetaKeyword("pc")]
+    [EnumRecordProperties("pc")]
     PC,
     /// <summary>
     /// Inches (1in = 2.54cm = 96px)
     /// </summary>
-    [MetaKeyword("in")]
+    [EnumRecordProperties("in")]
     IN,
     /// <summary>
     /// Quarter-Millimeters (1Q = 12/40th of 1cm)
     /// </summary>
-    [MetaKeyword("q")]
+    [EnumRecordProperties("q")]
     Q,
     /// <summary>
     /// Millimeters (1mm = 1/10th of 1cm)
     /// </summary>
-    [MetaKeyword("mm")]
+    [EnumRecordProperties("mm")]
     MM,
     /// <summary>
     /// Centimeters (1cm = 96px / 2.54)
     /// </summary>
-    [MetaKeyword("cm")]
+    [EnumRecordProperties("cm")]
     CM,
 
     /* <Resolution> Units */
     /// <summary>
     /// Dots per inch
     /// </summary>
-    [MetaKeyword("dpi")]
+    [EnumRecordProperties("dpi")]
     DPI,
     /// <summary>
     /// Dots per centimeter
     /// </summary>
-    [MetaKeyword("dpcm")]
+    [EnumRecordProperties("dpcm")]
     DPCM,
     /// <summary>
     /// Dots per 'px' unit
     /// </summary>
-    [MetaKeyword("dppx")]
+    [EnumRecordProperties("dppx")]
     DPPX,
 
     /* Time Units*/
@@ -72,12 +72,12 @@ public enum ECssUnit : int
     /// <summary>
     /// Seconds
     /// </summary>
-    [MetaKeyword("s")]
+    [EnumRecordProperties("s")]
     S,
     /// <summary>
     /// Milliseconds
     /// </summary>
-    [MetaKeyword("ms")]
+    [EnumRecordProperties("ms")]
     MS,
 
     /* Frequency Units*/
@@ -85,82 +85,82 @@ public enum ECssUnit : int
     /// <summary>
     /// Hertz
     /// </summary>
-    [MetaKeyword("hz")]
+    [EnumRecordProperties("hz")]
     HZ,
     /// <summary>
     /// KiloHertz
     /// </summary>
-    [MetaKeyword("khz")]
+    [EnumRecordProperties("khz")]
     KHZ,
 
     /* Font Units */
     /// <summary>
     /// Relative to font size
     /// </summary>
-    [MetaKeyword("em")]
+    [EnumRecordProperties("em")]
     EM,
     /// <summary>
     /// Relative to x-height of the elements font
     /// </summary>
-    [MetaKeyword("ex")]
+    [EnumRecordProperties("ex")]
     EX,
     /// <summary>
     /// Relative to the width of the "0" glyph in the elements font
     /// </summary>
-    [MetaKeyword("ch")]
+    [EnumRecordProperties("ch")]
     CH,
     /// <summary>
     /// Relative to font size of the root element
     /// </summary>
-    [MetaKeyword("rem")]
+    [EnumRecordProperties("rem")]
     REM,
     /// <summary>
     /// Relative to viewports width
     /// </summary>
-    [MetaKeyword("vw")]
+    [EnumRecordProperties("vw")]
     VW,
     /// <summary>
     /// Relative to viewports height
     /// </summary>
-    [MetaKeyword("vh")]
+    [EnumRecordProperties("vh")]
     VH,
     /// <summary>
     /// Relative to the minimum of the viewports height and width
     /// </summary>
-    [MetaKeyword("vmin")]
+    [EnumRecordProperties("vmin")]
     VMIN,
     /// <summary>
     /// Relative to the maximum of the viewports height and width
     /// </summary>
-    [MetaKeyword("vmax")]
+    [EnumRecordProperties("vmax")]
     VMAX,
 
     /// <summary>
     /// Degrees. There are 360 degrees in a full circle.
     /// </summary>
-    [MetaKeyword("deg")]
+    [EnumRecordProperties("deg")]
     DEG,
     /// <summary>
     /// Gradians, also known as 'gons' or 'grades'. There are 400 gradians in a full circle
     /// </summary>
-    [MetaKeyword("grad")]
+    [EnumRecordProperties("grad")]
     GRAD,
     /// <summary>
     /// Radians. There are 2PI radians in a full circle
     /// </summary>
-    [MetaKeyword("rad")]
+    [EnumRecordProperties("rad")]
     RAD,
     /// <summary>
     /// Turns. There is 1 turn in a full circle
     /// </summary>
-    [MetaKeyword("turn")]
+    [EnumRecordProperties("turn")]
     TURN,
 
     /* Grid Units */
     /// <summary>
     /// Flexible length unit for CSS Grid (fraction of remaining space)
     /// </summary>
-    [MetaKeyword("fr")]
+    [EnumRecordProperties("fr")]
     FR,
 
 }

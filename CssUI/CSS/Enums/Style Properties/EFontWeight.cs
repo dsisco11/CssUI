@@ -1,32 +1,32 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.CSS;
 
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EFontWeight : int
 {/* DOcs: https://www.w3.org/TR/2018/REC-css-fonts-3-20180920/#font-weight-prop */
     /// <summary>
     /// Specifies a lighter weight than the inherited value.
     /// </summary>
-    [MetaKeyword("lighter")]
+    [EnumRecordProperties("lighter")]
     Lighter,
 
     /// <summary>
     /// Same as '400'
     /// </summary>
-    [MetaKeyword("normal")]
+    [EnumRecordProperties("normal")]
     Normal,
 
     /// <summary>
     /// Same as '700'
     /// </summary>
-    [MetaKeyword("bold")]
+    [EnumRecordProperties("bold")]
     Bold,
 
     /// <summary>
     /// Specifies a bolder weight than the inherited value.
     /// </summary>
-    [MetaKeyword("bolder")]
+    [EnumRecordProperties("bolder")]
     Bolder,
 }
 

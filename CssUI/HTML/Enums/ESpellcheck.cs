@@ -1,26 +1,26 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.HTML
 {
-    [MetaEnum]
+    [EnumRecord<KeywordProperties>]
     public enum ESpellcheck : int
     {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#spelling-and-grammar-checking */
         /// <summary>
         /// 
         /// </summary>
-        [MetaKeyword("")]
+        [EnumRecordProperties("")]
         Default = 0,
 
         /// <summary>
         /// 
         /// </summary>
-        [MetaKeyword("true")]
+        [EnumRecordProperties("true")]
         True,
 
         /// <summary>
         /// 
         /// </summary>
-        [MetaKeyword("false")]
+        [EnumRecordProperties("false")]
         False,
     }
 }

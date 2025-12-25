@@ -18,3 +18,15 @@ public readonly record struct UrlSchemeProperties(
     [ReverseLookup(IgnoreCase = true)] string Keyword,
     int DefaultPort
 );
+
+/// <summary>
+/// Property record struct for named CSS colors (EColor).
+/// Includes keyword, hex value, and RGB components.
+/// </summary>
+public readonly record struct NamedColorProperties(
+    [ReverseLookup(IgnoreCase = true)] string Keyword,
+    int HexValue = 0,
+    byte R = 0,
+    byte G = 0,
+    byte B = 0
+);

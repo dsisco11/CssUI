@@ -1,22 +1,22 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.CSS;
 
 /// <summary>
 /// Provides values to reference the CSS defined generic font familys
 /// </summary>
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EGenericFontFamily
 {
-    [MetaKeyword("serif")]
+    [EnumRecordProperties("serif")]
     Serif = 0,
-    [MetaKeyword("sans-serif")]
+    [EnumRecordProperties("sans-serif")]
     SansSerif,
-    [MetaKeyword("cursive")]
+    [EnumRecordProperties("cursive")]
     Cursive,
-    [MetaKeyword("fantasy")]
+    [EnumRecordProperties("fantasy")]
     Fantasy,
-    [MetaKeyword("monospace")]
+    [EnumRecordProperties("monospace")]
     Monospace
 }
 

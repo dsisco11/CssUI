@@ -1,26 +1,26 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.HTML
 {
-    [MetaEnum]
+    [EnumRecord<KeywordProperties>]
     public enum EBrowsingTarget : int
     {/* Docs:  */
 
         /// <summary>
         /// </summary>
-        [MetaKeyword("_blank")]
+        [EnumRecordProperties("_blank")]
         Blank,
         /// <summary>
         /// </summary>
-        [MetaKeyword("_self")]
+        [EnumRecordProperties("_self")]
         Self,
         /// <summary>
         /// </summary>
-        [MetaKeyword("_parent")]
+        [EnumRecordProperties("_parent")]
         Parent,
         /// <summary>
         /// </summary>
-        [MetaKeyword("_top")]
+        [EnumRecordProperties("_top")]
         Top,
 
     }

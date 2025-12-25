@@ -1,20 +1,20 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.DOM;
 
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EDirName : int
 {
     /// <summary>
     /// Indicates that the contents of the element are explicitly directionally isolated left-to-right text.
     /// </summary>
-    [MetaKeyword("ltr")]
+    [EnumRecordProperties("ltr")]
     Ltr = 1,
 
     /// <summary>
     /// Indicates that the contents of the element are explicitly directionally isolated right-to-left text.
     /// </summary>
-    [MetaKeyword("rtl")]
+    [EnumRecordProperties("rtl")]
     Rtl,
 
 }

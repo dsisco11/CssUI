@@ -1,25 +1,25 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.HTML
 {
-    [MetaEnum]
+    [EnumRecord<KeywordProperties>]
     public enum EFormMethod : int
     {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#attr-fs-formmethod */
 
         /// <summary>
         /// Indicates the HTTP GET method.
         /// </summary>
-        [MetaKeyword("get")]
+        [EnumRecordProperties("get")]
         Get,
         /// <summary>
         /// Indicates the HTTP POST method.
         /// </summary>
-        [MetaKeyword("post")]
+        [EnumRecordProperties("post")]
         Post,
         /// <summary>
         /// Indicates that submitting the form is intended to close the dialog box in which the form finds itself, if any, and otherwise not submit.
         /// </summary>
-        [MetaKeyword("dialog")]
+        [EnumRecordProperties("dialog")]
         Dialog,
 
     }

@@ -1,4 +1,4 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.CSS;
 
@@ -6,19 +6,19 @@ namespace CssUI.CSS;
 /// Values for box-decoration-break property.
 /// Docs: https://www.w3.org/TR/css-break-3/#break-decoration
 /// </summary>
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EBoxDecorationBreak
 {
     /// <summary>
     /// Box decorations are sliced at fragment boundaries.
     /// Each fragment is rendered as if the box were sliced at the break.
     /// </summary>
-    [MetaKeyword("slice")]
+    [EnumRecordProperties("slice")]
     Slice,
 
     /// <summary>
     /// Each box fragment is independently wrapped with the border, padding, and background.
     /// </summary>
-    [MetaKeyword("clone")]
+    [EnumRecordProperties("clone")]
     Clone
 }

@@ -1,8 +1,8 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.HTML
 {
-    [MetaEnum]
+    [EnumRecord<KeywordProperties>]
     public enum EDraggable : int
     {/* Docs: https://html.spec.whatwg.org/multipage/dnd.html#the-draggable-attribute */
 
@@ -14,13 +14,13 @@ namespace CssUI.HTML
         /// <summary>
         /// The true state means the element is draggable
         /// </summary>
-        [MetaKeyword("true")]
+        [EnumRecordProperties("true")]
         True,
 
         /// <summary>
         /// The false state means the element is not draggable
         /// </summary>
-        [MetaKeyword("false")]
+        [EnumRecordProperties("false")]
         False,
     }
 }

@@ -1,15 +1,15 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.DOM;
 
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum ESelectionType : int
 {
-    [MetaKeyword("None")]
+    [EnumRecordProperties("None")]
     None,
-    [MetaKeyword("Caret")]
+    [EnumRecordProperties("Caret")]
     Caret,
-    [MetaKeyword("Range")]
+    [EnumRecordProperties("Range")]
     Range,
 }
 

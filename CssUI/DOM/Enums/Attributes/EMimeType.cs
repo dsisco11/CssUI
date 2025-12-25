@@ -1,144 +1,144 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.DOM;
 
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EMimeType : int
 {
 
-    [MetaKeyword("application/atom+xml")]
+    [EnumRecordProperties("application/atom+xml")]
     Atom,
 
-    [MetaKeyword("application/octet-stream")]
+    [EnumRecordProperties("application/octet-stream")]
     OctetStream,
 
-    [MetaKeyword("application/microdata+json")]
+    [EnumRecordProperties("application/microdata+json")]
     JSON_Microdata,
 
-    [MetaKeyword("application/rss+xml")]
+    [EnumRecordProperties("application/rss+xml")]
     RSS,
 
     /// <summary>
     /// </summary>
-    [MetaKeyword("application/x-www-form-urlencoded")]
+    [EnumRecordProperties("application/x-www-form-urlencoded")]
     UrlEncoded,
 
-    [MetaKeyword("application/xhtml+xml")]
+    [EnumRecordProperties("application/xhtml+xml")]
     XHTML,
 
-    [MetaKeyword("application/xml")]
+    [EnumRecordProperties("application/xml")]
     XmlApplication,
 
     /// <summary>
     /// </summary>
-    [MetaKeyword("multipart/form-data")]
+    [EnumRecordProperties("multipart/form-data")]
     FormData,
 
-    [MetaKeyword("multipart/mixed")]
+    [EnumRecordProperties("multipart/mixed")]
     Mixed,
 
-    [MetaKeyword("multipart/x-mixed-replace")]
+    [EnumRecordProperties("multipart/x-mixed-replace")]
     Streaming,
 
-    [MetaKeyword("text/cache-manifest")]
+    [EnumRecordProperties("text/cache-manifest")]
     Cache,
 
-    [MetaKeyword("text/css")]
+    [EnumRecordProperties("text/css")]
     CSS,
 
-    [MetaKeyword("text/event-stream")]
+    [EnumRecordProperties("text/event-stream")]
     EventStream,
 
-    [MetaKeyword("text/javascript")]
+    [EnumRecordProperties("text/javascript")]
     Javascript,
 
-    [MetaKeyword("text/json")]
+    [EnumRecordProperties("text/json")]
     JSON,
 
     /// <summary>
     /// </summary>
-    [MetaKeyword("text/plain")]
+    [EnumRecordProperties("text/plain")]
     Plain,
 
-    [MetaKeyword("text/html")]
+    [EnumRecordProperties("text/html")]
     HTML,
 
-    [MetaKeyword("text/ping")]
+    [EnumRecordProperties("text/ping")]
     Ping,
 
-    [MetaKeyword("text/uri-list")]
+    [EnumRecordProperties("text/uri-list")]
     UriList,
 
-    [MetaKeyword("text/vcard")]
+    [EnumRecordProperties("text/vcard")]
     vCard,
 
-    [MetaKeyword("text/vtt")]
+    [EnumRecordProperties("text/vtt")]
     WebVTT,
 
-    [MetaKeyword("text/xml")]
+    [EnumRecordProperties("text/xml")]
     XML,
 
-    [MetaKeyword("application/pdf")]
+    [EnumRecordProperties("application/pdf")]
     PDF,
 
-    [MetaKeyword("application/postscript")]
+    [EnumRecordProperties("application/postscript")]
     AdobePostscript,
 
 
 
-    [MetaKeyword("application/x-gzip")]
+    [EnumRecordProperties("application/x-gzip")]
     GZIP,
-    [MetaKeyword("application/zip")]
+    [EnumRecordProperties("application/zip")]
     ZIP,
-    [MetaKeyword("application/x-rar-compressed")]
+    [EnumRecordProperties("application/x-rar-compressed")]
     RAR,
 
 
-    [MetaKeyword("audio/basic")]
+    [EnumRecordProperties("audio/basic")]
     AudioBasic,
-    [MetaKeyword("audio/aiff")]
+    [EnumRecordProperties("audio/aiff")]
     AIFF,
-    [MetaKeyword("audio/mpeg")]
+    [EnumRecordProperties("audio/mpeg")]
     MP3,
-    [MetaKeyword("audio/ogg")]
+    [EnumRecordProperties("audio/ogg")]
     OGG,
-    [MetaKeyword("audio/midi")]
+    [EnumRecordProperties("audio/midi")]
     MIDI,
-    [MetaKeyword("audio/avi")]
+    [EnumRecordProperties("audio/avi")]
     AVI,
-    [MetaKeyword("audio/wave")]
+    [EnumRecordProperties("audio/wave")]
     WAVE,
 
 
 
-    [MetaKeyword("video/mp4")]
+    [EnumRecordProperties("video/mp4")]
     MPEG4,
-    [MetaKeyword("video/webm")]
+    [EnumRecordProperties("video/webm")]
     WEBM,
-    [MetaKeyword("video/mpeg")]
+    [EnumRecordProperties("video/mpeg")]
     MPEG,
 
 
 
-    [MetaKeyword("image/x-icon")]
+    [EnumRecordProperties("image/x-icon")]
     XIcon,
 
-    [MetaKeyword("image/bmp")]
+    [EnumRecordProperties("image/bmp")]
     BMP,
 
-    [MetaKeyword("image/gif")]
+    [EnumRecordProperties("image/gif")]
     GIF,
 
-    [MetaKeyword("image/webp")]
+    [EnumRecordProperties("image/webp")]
     WebP,
 
-    [MetaKeyword("image/jpeg")]
+    [EnumRecordProperties("image/jpeg")]
     JPEG,
 
-    [MetaKeyword("image/png")]
+    [EnumRecordProperties("image/png")]
     PNG,
 
-    [MetaKeyword("image/svg+xml")]
+    [EnumRecordProperties("image/svg+xml")]
     SVG,
 
 

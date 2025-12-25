@@ -1,23 +1,23 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.HTML
 {
-    [MetaEnum]
+    [EnumRecord<KeywordProperties>]
     public enum EAutofillContact
     {
-        [MetaKeyword("home")]
+        [EnumRecordProperties("home")]
         Home,
 
-        [MetaKeyword("work")]
+        [EnumRecordProperties("work")]
         Work,
 
-        [MetaKeyword("mobile")]
+        [EnumRecordProperties("mobile")]
         Mobile,
 
-        [MetaKeyword("fax")]
+        [EnumRecordProperties("fax")]
         Fax,
 
-        [MetaKeyword("pager")]
+        [EnumRecordProperties("pager")]
         Pager,
     }
 }

@@ -1,23 +1,23 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.CSS.Media;
 
 /// <summary>
 /// Describes the comparison logic for media a feature
 /// </summary>
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EMediaOperator : int
 {
-    [MetaKeyword("<")]
+    [EnumRecordProperties("<")]
     LessThan,
-    [MetaKeyword("=")]
+    [EnumRecordProperties("=")]
     EqualTo,
-    [MetaKeyword(">")]
+    [EnumRecordProperties(">")]
     GreaterThan,
 
-    [MetaKeyword("<=")]
+    [EnumRecordProperties("<=")]
     LessThanEq,
-    [MetaKeyword(">=")]
+    [EnumRecordProperties(">=")]
     GreaterThanEq,
 }
 

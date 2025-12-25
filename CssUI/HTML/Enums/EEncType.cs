@@ -1,25 +1,25 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.HTML
 {
-    [MetaEnum]
+    [EnumRecord<KeywordProperties>]
     public enum EEncType : int
     {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#attr-fs-formenctype */
 
         /// <summary>
         /// 
         /// </summary>
-        [MetaKeyword("application/x-www-form-urlencoded")]
+        [EnumRecordProperties("application/x-www-form-urlencoded")]
         UrlEncoded,
         /// <summary>
         /// 
         /// </summary>
-        [MetaKeyword("multipart/form-data")]
+        [EnumRecordProperties("multipart/form-data")]
         FormData,
         /// <summary>
         /// 
         /// </summary>
-        [MetaKeyword("text/plain")]
+        [EnumRecordProperties("text/plain")]
         Plain,
 
     }

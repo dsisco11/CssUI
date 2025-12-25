@@ -1,32 +1,32 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.DOM.Enums;
 
-[MetaEnum]
+[EnumRecord<KeywordProperties>]
 public enum EScrollLogicalPosition : int
 {
     /// <summary>
     /// 
     /// </summary>
-    [MetaKeyword("start")]
+    [EnumRecordProperties("start")]
     Start,
 
     /// <summary>
     /// 
     /// </summary>
-    [MetaKeyword("center")]
+    [EnumRecordProperties("center")]
     Center,
 
     /// <summary>
     /// 
     /// </summary>
-    [MetaKeyword("end")]
+    [EnumRecordProperties("end")]
     End,
 
     /// <summary>
     /// 
     /// </summary>
-    [MetaKeyword("nearest")]
+    [EnumRecordProperties("nearest")]
     Nearest,
 }
 

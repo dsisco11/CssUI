@@ -1,22 +1,22 @@
-using CssUI.Internal;
+using EnumRecords;
 
 namespace CssUI.HTML
 {
 
-    [MetaEnum]
+    [EnumRecord<KeywordProperties>]
     public enum EAreaShape : int
     {/* Docs: https://html.spec.whatwg.org/multipage/image-maps.html#attr-area-shape */
 
-        [MetaKeyword("default")]
+        [EnumRecordProperties("default")]
         Default,
 
-        [MetaKeyword("circle")]
+        [EnumRecordProperties("circle")]
         Circle,
 
-        [MetaKeyword("poly")]
+        [EnumRecordProperties("poly")]
         Polygon,
 
-        [MetaKeyword("rect")]
+        [EnumRecordProperties("rect")]
         Rectangle,
     }
 }
