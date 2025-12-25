@@ -17,10 +17,12 @@ Note: ECssUnit can use KeywordProperties (keyword IS the unit symbol)
 
 ### 8.3 Migrate Enums
 Replace `[MetaEnum]`/`[MetaKeyword]` with `[EnumRecord<T>]`/`[EnumRecordProperties]`:
-- [ ] CSS/Enums/ (~40 enums)
-- [ ] DOM/Enums/ (~13 enums)
-- [ ] HTML/Enums/ (~22 enums)
-- [ ] URL/ (ESchemeType)
+- [x] CSS/Enums/ (~40 enums)
+- [x] DOM/Enums/ (~13 enums)
+- [x] HTML/Enums/ (~22 enums)
+- [x] URL/ (EUrlScheme)
+- [x] CORE/Devices/ (EKeyboardCode, EPointerType)
+- [x] Added NamedColorProperties for EColor (keyword + hex + RGB)
 
 ### 8.4 Update Lookup.cs Helper
 Add helper method to preserve existing API signature for 40+ call sites:
