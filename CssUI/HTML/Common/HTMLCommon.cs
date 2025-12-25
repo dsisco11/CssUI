@@ -335,7 +335,7 @@ namespace CssUI.HTML
              *      font-face-uri
              *      font-face-format
              *      font-face-name
-             *      missing-glyph 
+             *      missing-glyph
              */
             for (int i = 0; i < FORBIDDEN_CUSTOM_ELEMENT_NAMES.Length; i++)
             {
@@ -389,22 +389,23 @@ namespace CssUI.HTML
                     /* 4) Let index be the index of the last token in tokens. */
                     //int index = tokens.Count - 1;
 
-                    /* 5) If the indexth token in tokens is not an ASCII case-insensitive match for one of the tokens given in the first column of the following table, 
-                     * or if the number of tokens in tokens is greater than the maximum number given in the cell in the second column of that token's row, then jump to the step labeled default. 
+                    /* 5) If the indexth token in tokens is not an ASCII case-insensitive match for one of the tokens given in the first column of the following table,
+                     * or if the number of tokens in tokens is greater than the maximum number given in the cell in the second column of that token's row, then jump to the step labeled default.
                      * Otherwise, let field be the string given in the cell of the first column of the matching row, and let category be the value of the cell in the third column of that same row. */
 
                     //var key = tokens[index];
                     string key = Stream.Next;
-                    EAutofill afValue = Lookup.Enum<EAutofill>(key);
-                    EnumData afData = Lookup.Data(afValue);
-                    int maxTokens = (int)afData[0];
-                    EAutofillCategory afCategory = (EAutofillCategory)afData[1];
+                    EAutofillCategory category = EAutofillCategory.Off;
+                    if (EAutofillExtensions.TryFromKeyword(key, out EAutofill afValue))
+                    {
+                        category = (EAutofillCategory)afValue.Category();
+                    }
+                    int maxTokens = afValue.MaxTokens();
 
                     /* ...if the number of tokens in tokens is greater than the maximum number given in the cell in the second column of that token's row, then jump to the step labeled default. */
                     if (Stream.Length <= maxTokens)
                     {
                         var field = afValue;
-                        var category = afCategory;
 
                         /* 6) If category is Off or Automatic but the element's autocomplete attribute is wearing the autofill anchor mantle, then jump to the step labeled default. */
                         if ((category == EAutofillCategory.Off || category == EAutofillCategory.Automatic) && afMantle == EAutofillMantle.Anchor)
@@ -437,7 +438,7 @@ namespace CssUI.HTML
                             /* 10) Let hint tokens be an empty set. */
                             LinkedList<string> hintTokens = new LinkedList<string>();
                             /* 11) Let IDL value have the same value as field. */
-                            string idlValue = Lookup.Keyword(field);
+                            string idlValue = field.Keyword();
 
                             /* 12) If the indexth token in tokens is the first entry, then skip to the step labeled done. */
                             //if (index == 0)

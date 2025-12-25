@@ -42,10 +42,10 @@ public readonly record struct KeyboardCodeProperties(
 
 /// <summary>
 /// Property record struct for autofill tokens (EAutofill).
-/// Includes keyword, max tokens allowed, and category name.
+/// Includes keyword, max tokens allowed, and category (as int matching EAutofillCategory).
 /// </summary>
 public readonly record struct AutofillProperties(
     [ReverseLookup(IgnoreCase = true)] string Keyword,
     int MaxTokens = 0,
-    string Category = ""
+    int Category = 0  // Maps to EAutofillCategory enum value
 );
