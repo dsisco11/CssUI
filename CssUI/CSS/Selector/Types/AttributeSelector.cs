@@ -184,5 +184,98 @@ public class AttributeSelector : SimpleSelector
                 throw new CssSelectorException($"Attribute selector operator ({Enum.GetName(typeof(ECssAttributeOperator), Operator)}) logic not implemented!");
         }
     }
+
+    #region Formatting
+    /// <inheritdoc/>
+    public override bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+    {
+        // Per CSSOM §5.2: attribute selector serializes as "[attr]" or "[attr=value]" etc.
+        charsWritten = 0;
+
+        // 1. Append "[" (U+005B)
+        if (destination.Length < 1)
+            return false;
+        destination[0] = '[';
+        charsWritten = 1;
+
+        // 2. If namespace prefix maps to non-null namespace, append "ns|"
+        if (Namespace is not null && !string.IsNullOrEmpty(Namespace.Value))
+        {
+            if (!Namespace.Value.AsSpan().TryCopyTo(destination[charsWritten..]))
+                return false;
+            charsWritten += Namespace.Value.Length;
+
+            if (destination.Length <= charsWritten)
+                return false;
+            destination[charsWritten] = '|';
+            charsWritten++;
+        }
+
+        // 3. Append the serialization of the attribute name as an identifier
+        var attrName = AttributeName.ToString();
+        if (!attrName.AsSpan().TryCopyTo(destination[charsWritten..]))
+            return false;
+        charsWritten += attrName.Length;
+
+        // 4. If there is an attribute value specified, append operator and value
+        if (Operator != ECssAttributeOperator.None && Operator != ECssAttributeOperator.Isset && Value is not null)
+        {
+            // Append operator
+            var operatorStr = Operator switch
+            {
+                ECssAttributeOperator.Equals => "=",
+                ECssAttributeOperator.Includes => "~=",
+                ECssAttributeOperator.PrefixedWith => "|=",
+                ECssAttributeOperator.StartsWith => "^=",
+                ECssAttributeOperator.EndsWith => "$=",
+                ECssAttributeOperator.Contains => "*=",
+                _ => "="
+            };
+
+            if (!operatorStr.AsSpan().TryCopyTo(destination[charsWritten..]))
+                return false;
+            charsWritten += operatorStr.Length;
+
+            // Serialize value as a string (with quotes)
+            if (destination.Length <= charsWritten)
+                return false;
+            destination[charsWritten] = '"';
+            charsWritten++;
+
+            // @todo: Proper string escaping per CSSOM §2.1
+            if (!Value.AsSpan().TryCopyTo(destination[charsWritten..]))
+                return false;
+            charsWritten += Value.Length;
+
+            if (destination.Length <= charsWritten)
+                return false;
+            destination[charsWritten] = '"';
+            charsWritten++;
+        }
+
+        // 5. If case-sensitivity flag present, append " i" or " s"
+        if (CaseSensitivity == EAttributeCaseSensitivity.CaseInsensitive)
+        {
+            if (!" i".TryCopyTo(destination[charsWritten..]))
+                return false;
+            charsWritten += 2;
+        }
+        else if (CaseSensitivity == EAttributeCaseSensitivity.CaseSensitive)
+        {
+            // Note: "s" is the default for most attributes, but we serialize it if explicitly set
+            if (!" s".TryCopyTo(destination[charsWritten..]))
+                return false;
+            charsWritten += 2;
+        }
+
+        // 6. Append "]" (U+005D)
+        if (destination.Length <= charsWritten)
+            return false;
+        destination[charsWritten] = ']';
+        charsWritten++;
+
+        return true;
+    }
+    #endregion
 }
 

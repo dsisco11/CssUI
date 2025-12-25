@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -15,7 +16,7 @@ namespace CssUI.CSS;
 /// Represents a CSS selector that can perform matching,
 /// consisting of one or more whole (complex) selectors parsed from a single definition.
 /// </summary>
-public class CssSelector : List<ComplexSelector>
+public class CssSelector : List<ComplexSelector>, ISpanFormattable
 {/* Docs: https://www.w3.org/TR/selectors-4 */
     #region Properties
     private static ILogger Logger = Log.GetLogger<CssSelector>();
@@ -187,6 +188,66 @@ public class CssSelector : List<ComplexSelector>
         return matchList.ToArray();
     }
 
+    #region Formatting (ISpanFormattable)
+    /// <inheritdoc/>
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+    {
+        // Per CSSOM §5.2: serialize a group of selectors as comma-separated list
+        charsWritten = 0;
 
+        if (Count == 0)
+            return true;
+
+        for (int i = 0; i < Count; i++)
+        {
+            // Serialize each complex selector
+            if (!this[i].TryFormat(destination[charsWritten..], out int written, format, provider))
+                return false;
+            charsWritten += written;
+
+            // Add ", " between selectors (not after the last one)
+            if (i < Count - 1)
+            {
+                if (!", ".TryCopyTo(destination[charsWritten..]))
+                    return false;
+                charsWritten += 2;
+            }
+        }
+
+        return true;
+    }
+
+    /// <inheritdoc/>
+    public string ToString(string? format, IFormatProvider? formatProvider)
+    {
+        int estimatedSize = Count * 128;
+        char[]? rented = null;
+        Span<char> buffer = estimatedSize <= 512
+            ? stackalloc char[512]
+            : (rented = ArrayPool<char>.Shared.Rent(estimatedSize));
+
+        try
+        {
+            if (TryFormat(buffer, out int charsWritten, format.AsSpan(), formatProvider))
+                return new string(buffer[..charsWritten]);
+
+            // Fallback for unexpectedly large output
+            rented = ArrayPool<char>.Shared.Rent(estimatedSize * 4);
+            buffer = rented;
+            if (TryFormat(buffer, out charsWritten, format.AsSpan(), formatProvider))
+                return new string(buffer[..charsWritten]);
+
+            throw new InvalidOperationException("Buffer too small for CssSelector serialization");
+        }
+        finally
+        {
+            if (rented != null)
+                ArrayPool<char>.Shared.Return(rented);
+        }
+    }
+
+    /// <inheritdoc/>
+    public override string ToString() => ToString(null, null);
+    #endregion
 }
 

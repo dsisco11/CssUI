@@ -24,5 +24,27 @@ public class IDSelector : SimpleSelector
         // Use case-insensitive comparison for HTML compatibility
         return MatchID.AsSpan().Equals(E.id.AsSpan(), StringComparison.OrdinalIgnoreCase);
     }
+
+    #region Formatting
+    /// <inheritdoc/>
+    public override bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+    {
+        // Per CSSOM §5.2: ID selector serializes as "#" followed by the ID as identifier
+        charsWritten = 0;
+
+        if (destination.Length < 1)
+            return false;
+        destination[0] = '#';
+        charsWritten = 1;
+
+        // Serialize the ID as an identifier
+        // @todo: Proper identifier escaping per CSSOM §2.1
+        if (!MatchID.AsSpan().TryCopyTo(destination[charsWritten..]))
+            return false;
+        charsWritten += MatchID.Length;
+
+        return true;
+    }
+    #endregion
 }
 

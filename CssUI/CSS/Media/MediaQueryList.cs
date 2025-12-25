@@ -1,12 +1,12 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using CssUI.CSS.Media;
-using CssUI.CSS.Serialization;
 using CssUI.DOM.Events;
 
 namespace CssUI.DOM.Media;
 
-public class MediaQueryList : EventTarget, ICssSerializeable, IDisposable
+public class MediaQueryList : EventTarget, ISpanFormattable, IDisposable
 {/* Docs: https://www.w3.org/TR/cssom-view-1/#mediaquerylist */
     #region Properties
     public readonly Document document;
@@ -50,7 +50,7 @@ public class MediaQueryList : EventTarget, ICssSerializeable, IDisposable
     {
         this.document = document;
         this.QueryList = queryList;
-        this.media = Serialize();
+        this.media = ToString();
         this.document._mediaQueryLists.AddLast(this);
     }
     #endregion
@@ -105,15 +105,64 @@ public class MediaQueryList : EventTarget, ICssSerializeable, IDisposable
     }
 
 
-    public string Serialize()
+    #region Formatting
+    /// <inheritdoc/>
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
     {
-        List<string> stringList = new List<string>();
-        foreach (MediaQuery Query in QueryList)
+        charsWritten = 0;
+        int written;
+        bool first = true;
+
+        foreach (MediaQuery query in QueryList)
         {
-            stringList.Add(Query.Serialize());
+            if (!first)
+            {
+                if (!", ".TryCopyTo(destination[charsWritten..]))
+                    return false;
+                charsWritten += 2;
+            }
+
+            if (!query.TryFormat(destination[charsWritten..], out written, format, provider))
+                return false;
+            charsWritten += written;
+            first = false;
         }
 
-        return Serializer.Serialize_Comma_List(stringList);
+        return true;
     }
+
+    /// <inheritdoc/>
+    public string ToString(string? format, IFormatProvider? formatProvider)
+    {
+        // Estimate buffer size based on query count
+        int estimatedSize = 64 + (QueryList.Count * 64);
+        char[]? rented = null;
+        Span<char> buffer = estimatedSize <= 512
+            ? stackalloc char[512]
+            : (rented = ArrayPool<char>.Shared.Rent(estimatedSize));
+
+        try
+        {
+            if (TryFormat(buffer, out int charsWritten, default, formatProvider))
+                return new string(buffer[..charsWritten]);
+
+            // Fallback for unexpectedly large output
+            rented = ArrayPool<char>.Shared.Rent(estimatedSize * 2);
+            buffer = rented;
+            if (TryFormat(buffer, out charsWritten, default, formatProvider))
+                return new string(buffer[..charsWritten]);
+
+            throw new InvalidOperationException("Buffer too small for MediaQueryList serialization");
+        }
+        finally
+        {
+            if (rented != null)
+                ArrayPool<char>.Shared.Return(rented);
+        }
+    }
+
+    /// <inheritdoc/>
+    public override string ToString() => ToString(null, null);
+    #endregion
 }
 

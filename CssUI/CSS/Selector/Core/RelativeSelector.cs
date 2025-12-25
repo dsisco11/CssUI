@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using CssUI.CSS.Internal;
@@ -139,11 +140,75 @@ public class RelativeSelector : CompoundSelector
             default:
                 throw new NotImplementedException($"[CSS][Selector] Unhandled selector-combinator({Enum.GetName(typeof(ESelectorCombinator), Combinator)})!");
         }
-
-
-
     }
 
+    #region Formatting (ISpanFormattable)
+    /// <summary>
+    /// Serializes the combinator to its CSS string representation.
+    /// </summary>
+    private static ReadOnlySpan<char> GetCombinatorString(ESelectorCombinator combinator) => combinator switch
+    {
+        ESelectorCombinator.Descendant => " ",
+        ESelectorCombinator.Child => " > ",
+        ESelectorCombinator.Sibling_Adjacent => " + ",
+        ESelectorCombinator.Sibling_Subsequent => " ~ ",
+        ESelectorCombinator.None => "",
+        _ => ""
+    };
 
+    /// <inheritdoc/>
+    public new bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+    {
+        // Per CSSOM §5.2: relative selector serializes as combinator + compound selector
+        charsWritten = 0;
+
+        // First, serialize the compound selector (base class)
+        if (!base.TryFormat(destination, out int compoundWritten, format, provider))
+            return false;
+        charsWritten += compoundWritten;
+
+        // Then append the combinator (if not None)
+        if (Combinator != ESelectorCombinator.None)
+        {
+            var combStr = GetCombinatorString(Combinator);
+            if (!combStr.TryCopyTo(destination[charsWritten..]))
+                return false;
+            charsWritten += combStr.Length;
+        }
+
+        return true;
+    }
+
+    /// <inheritdoc/>
+    public new string ToString(string? format, IFormatProvider? formatProvider)
+    {
+        int estimatedSize = Count * 32 + 4;
+        char[]? rented = null;
+        Span<char> buffer = estimatedSize <= 256
+            ? stackalloc char[256]
+            : (rented = ArrayPool<char>.Shared.Rent(estimatedSize));
+
+        try
+        {
+            if (TryFormat(buffer, out int charsWritten, format.AsSpan(), formatProvider))
+                return new string(buffer[..charsWritten]);
+
+            rented = ArrayPool<char>.Shared.Rent(estimatedSize * 4);
+            buffer = rented;
+            if (TryFormat(buffer, out charsWritten, format.AsSpan(), formatProvider))
+                return new string(buffer[..charsWritten]);
+
+            throw new InvalidOperationException("Buffer too small for RelativeSelector serialization");
+        }
+        finally
+        {
+            if (rented != null)
+                ArrayPool<char>.Shared.Return(rented);
+        }
+    }
+
+    /// <inheritdoc/>
+    public override string ToString() => ToString(null, null);
+    #endregion
 }
 

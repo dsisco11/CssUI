@@ -114,7 +114,7 @@ public class MediaQueryListTests
         var mql = new MediaQueryList(doc, queryList);
 
         // Act
-        var serialized = mql.Serialize();
+        var serialized = mql.ToString();
 
         // Assert
         Assert.Equal(string.Empty, serialized);

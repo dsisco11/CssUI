@@ -19,19 +19,25 @@ Migrate from ICssSerializeable.Serialize(StringBuilder) pattern to ISpanFormatta
 
 ### 9.2 Media Query Types (CSS/Media/)
 - [x] MediaFeature
-- [ ] MediaQuery
-- [ ] MediaQueryList
+- [x] MediaQuery
+- [x] MediaQueryList
 - [x] MediaCondition
 
 ### 9.3 CSS Selector Types (CSS/Selector/)
-- [ ] CssSelector
-- [ ] CssSelectorList
-- [ ] CssSimpleSelector
-- [ ] CssCompoundSelector
-- [ ] CssComplexSelector
-- [ ] CssPseudoClassSelector
-- [ ] CssPseudoElementSelector
-- [ ] CssAttributeSelector
+- [x] SimpleSelector (base class + ISpanFormattable)
+- [x] TypeSelector
+- [x] UniversalSelector
+- [x] IdSelector
+- [x] ClassSelector
+- [x] PseudoClassSelector
+- [x] PseudoClassSelectorFunctions
+- [x] PseudoElementSelector
+- [x] PseudoElementSelectorFunctions
+- [x] CompoundSelector
+- [x] RelativeSelector
+- [x] ComplexSelector
+- [x] CssSelector (selector list)
+- [x] Added SelectorSerializationTests (48 passing tests)
 
 ### 9.4 CSS Rule Types (CSS/Rules/)
 - [ ] CssStyleRule

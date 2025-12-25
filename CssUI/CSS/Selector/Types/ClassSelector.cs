@@ -26,5 +26,28 @@ public class ClassSelector : SimpleSelector
     {
         return E.classList.Contains(ClassName);
     }
+
+    #region Formatting
+    /// <inheritdoc/>
+    public override bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+    {
+        // Per CSSOM §5.2: class selector serializes as "." followed by the class name as identifier
+        charsWritten = 0;
+
+        if (destination.Length < 1)
+            return false;
+        destination[0] = '.';
+        charsWritten = 1;
+
+        // Serialize the class name as an identifier
+        // @todo: Proper identifier escaping per CSSOM §2.1
+        var classNameStr = ClassName.ToString();
+        if (!classNameStr.AsSpan().TryCopyTo(destination[charsWritten..]))
+            return false;
+        charsWritten += classNameStr.Length;
+
+        return true;
+    }
+    #endregion
 }
 

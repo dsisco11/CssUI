@@ -73,5 +73,25 @@ public class PseudoClassSelector : SimpleSelector
                 throw new CssSelectorException("Selector pseudo-class (", Name, ") logic not implemented!");
         }
     }
+
+    #region Formatting
+    /// <inheritdoc/>
+    public override bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+    {
+        // Per CSSOM §5.2: pseudo-class serializes as ":" followed by the name
+        charsWritten = 0;
+
+        if (destination.Length < 1)
+            return false;
+        destination[0] = ':';
+        charsWritten = 1;
+
+        if (!Name.AsSpan().TryCopyTo(destination[charsWritten..]))
+            return false;
+        charsWritten += Name.Length;
+
+        return true;
+    }
+    #endregion
 }
 

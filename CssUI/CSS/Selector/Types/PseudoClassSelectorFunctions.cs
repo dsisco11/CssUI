@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using CssUI.CSS.Parser;
@@ -30,6 +31,49 @@ public class PseudoClassSelectorFunction : PseudoClassSelector
                 throw new CssSelectorException("[CSS] Selector pseudo-class (", Name, ") logic not implemented!");
         }
     }
+
+    #region Formatting
+    /// <inheritdoc/>
+    public override bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+    {
+        // Per CSSOM §5.2: functional pseudo-class serializes as ":name(...)"
+        charsWritten = 0;
+
+        if (destination.Length < 1)
+            return false;
+        destination[0] = ':';
+        charsWritten = 1;
+
+        if (!Name.AsSpan().TryCopyTo(destination[charsWritten..]))
+            return false;
+        charsWritten += Name.Length;
+
+        if (destination.Length <= charsWritten)
+            return false;
+        destination[charsWritten] = '(';
+        charsWritten++;
+
+        // Serialize arguments
+        if (Args is not null)
+        {
+            for (int i = 0; i < Args.Count; i++)
+            {
+                var arg = Args[i];
+                var tokenStr = arg.ToString();
+                if (!tokenStr.AsSpan().TryCopyTo(destination[charsWritten..]))
+                    return false;
+                charsWritten += tokenStr.Length;
+            }
+        }
+
+        if (destination.Length <= charsWritten)
+            return false;
+        destination[charsWritten] = ')';
+        charsWritten++;
+
+        return true;
+    }
+    #endregion
 }
 
 public class PseudoClassSelectorAnBFunction : PseudoClassSelector
@@ -65,6 +109,53 @@ public class PseudoClassSelectorAnBFunction : PseudoClassSelector
                 throw new CssSelectorException("Selector pseudo-class function (", Name, ") logic not implemented!");
         }
     }
+
+    #region Formatting
+    /// <inheritdoc/>
+    public override bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+    {
+        // Per CSSOM §5.2: :nth-child() etc serialize using An+B serialization
+        charsWritten = 0;
+
+        if (destination.Length < 1)
+            return false;
+        destination[0] = ':';
+        charsWritten = 1;
+
+        if (!Name.AsSpan().TryCopyTo(destination[charsWritten..]))
+            return false;
+        charsWritten += Name.Length;
+
+        if (destination.Length <= charsWritten)
+            return false;
+        destination[charsWritten] = '(';
+        charsWritten++;
+
+        // Serialize An+B value (An+B format)
+        string anbStr;
+        if (AnB.A == 0)
+            anbStr = AnB.B.ToString();
+        else if (AnB.B == 0)
+            anbStr = AnB.A == 1 ? "n" : AnB.A == -1 ? "-n" : $"{AnB.A}n";
+        else
+            anbStr = AnB.A == 1 ? $"n{(AnB.B >= 0 ? "+" : "")}{AnB.B}" :
+                     AnB.A == -1 ? $"-n{(AnB.B >= 0 ? "+" : "")}{AnB.B}" :
+                     $"{AnB.A}n{(AnB.B >= 0 ? "+" : "")}{AnB.B}";
+
+        if (!anbStr.AsSpan().TryCopyTo(destination[charsWritten..]))
+            return false;
+        charsWritten += anbStr.Length;
+
+        // @todo: Serialize " of <selector-list>" if Selectors is not null
+
+        if (destination.Length <= charsWritten)
+            return false;
+        destination[charsWritten] = ')';
+        charsWritten++;
+
+        return true;
+    }
+    #endregion
 }
 
 public class PseudoClassSelectorNegationFunction : PseudoClassSelector
@@ -84,6 +175,41 @@ public class PseudoClassSelectorNegationFunction : PseudoClassSelector
     {
         return false == Selector.Match(E, scopeElements);
     }
+
+    #region Formatting
+    /// <inheritdoc/>
+    public override bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+    {
+        // Per CSSOM §5.2: :not() serializes as ":not(" + serialized selector list + ")"
+        charsWritten = 0;
+
+        if (destination.Length < 1)
+            return false;
+        destination[0] = ':';
+        charsWritten = 1;
+
+        if (!Name.AsSpan().TryCopyTo(destination[charsWritten..]))
+            return false;
+        charsWritten += Name.Length;
+
+        if (destination.Length <= charsWritten)
+            return false;
+        destination[charsWritten] = '(';
+        charsWritten++;
+
+        // Serialize the selector
+        if (!Selector.TryFormat(destination[charsWritten..], out int selectorWritten, format, provider))
+            return false;
+        charsWritten += selectorWritten;
+
+        if (destination.Length <= charsWritten)
+            return false;
+        destination[charsWritten] = ')';
+        charsWritten++;
+
+        return true;
+    }
+    #endregion
 }
 
 static class PseudoClassFunctions
@@ -114,10 +240,10 @@ static class PseudoClassFunctions
                     case "active":
                         if (!E.IsDropTarget) return false;
                         break;
-                    case "valid":// Matches if the drop-target CAN accept the type of object being dragged 
+                    case "valid":// Matches if the drop-target CAN accept the type of object being dragged
                         if (!E.Accepts_Current_DragItem()) return false;
                         break;
-                    case "invalid":// Matches if the drop-target CAN'T accept the type of object being dragged 
+                    case "invalid":// Matches if the drop-target CAN'T accept the type of object being dragged
                         if (E.Accepts_Current_DragItem()) return false;
                         break;
                 }

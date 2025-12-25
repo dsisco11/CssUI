@@ -1,3 +1,5 @@
+using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using CssUI.CSS.Internal;
@@ -10,7 +12,7 @@ namespace CssUI.CSS.Selectors;
 /// A Complex selector holds a set of one or more relative selectors.
 /// It is essentially the encapsulation of all content that defines an individual "selector"
 /// </summary>
-public class ComplexSelector : List<RelativeSelector>
+public class ComplexSelector : List<RelativeSelector>, ISpanFormattable
 {/* Docs: https://drafts.csswg.org/selectors-4/#typedef-complex-selector */
 
     #region Constructors
@@ -103,6 +105,85 @@ public class ComplexSelector : List<RelativeSelector>
         // Specificity: A is most significant (IDs), B is middle (classes), C is least (types)
         return ((A << 32) | (B << 16) | (C << 00));
     }
+    #endregion
+
+    #region Formatting (ISpanFormattable)
+    /// <summary>
+    /// Gets the combinator string for serialization.
+    /// </summary>
+    private static ReadOnlySpan<char> GetCombinatorString(ESelectorCombinator combinator) => combinator switch
+    {
+        ESelectorCombinator.Descendant => " ",
+        ESelectorCombinator.Child => " > ",
+        ESelectorCombinator.Sibling_Adjacent => " + ",
+        ESelectorCombinator.Sibling_Subsequent => " ~ ",
+        ESelectorCombinator.None => "",
+        _ => ""
+    };
+
+    /// <inheritdoc/>
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+    {
+        // Per CSSOM §5.2: complex selector serializes as chain of compound selectors with combinators
+        // The combinator comes BEFORE the compound selector in the chain (except for the first one)
+        charsWritten = 0;
+
+        if (Count == 0)
+            return true;
+
+        // Serialize each relative selector in order
+        for (int i = 0; i < Count; i++)
+        {
+            var relSelector = this[i];
+
+            // Serialize the compound selector part (base of RelativeSelector)
+            if (!((CompoundSelector)relSelector).TryFormat(destination[charsWritten..], out int compoundWritten, format, provider))
+                return false;
+            charsWritten += compoundWritten;
+
+            // If not the last selector, append the combinator
+            if (i < Count - 1)
+            {
+                var combStr = GetCombinatorString(relSelector.Combinator);
+                if (!combStr.TryCopyTo(destination[charsWritten..]))
+                    return false;
+                charsWritten += combStr.Length;
+            }
+        }
+
+        return true;
+    }
+
+    /// <inheritdoc/>
+    public string ToString(string? format, IFormatProvider? formatProvider)
+    {
+        int estimatedSize = Count * 64;
+        char[]? rented = null;
+        Span<char> buffer = estimatedSize <= 256
+            ? stackalloc char[256]
+            : (rented = ArrayPool<char>.Shared.Rent(estimatedSize));
+
+        try
+        {
+            if (TryFormat(buffer, out int charsWritten, format.AsSpan(), formatProvider))
+                return new string(buffer[..charsWritten]);
+
+            rented = ArrayPool<char>.Shared.Rent(estimatedSize * 4);
+            buffer = rented;
+            if (TryFormat(buffer, out charsWritten, format.AsSpan(), formatProvider))
+                return new string(buffer[..charsWritten]);
+
+            throw new InvalidOperationException("Buffer too small for ComplexSelector serialization");
+        }
+        finally
+        {
+            if (rented != null)
+                ArrayPool<char>.Shared.Return(rented);
+        }
+    }
+
+    /// <inheritdoc/>
+    public override string ToString() => ToString(null, null);
     #endregion
 }
 

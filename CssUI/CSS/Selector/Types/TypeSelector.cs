@@ -60,5 +60,36 @@ public class TypeSelector : SimpleSelector
 
         return TypeName.AsSpan().Equals(E.tagName.AsSpan(), StringComparison.OrdinalIgnoreCase);
     }
+
+    #region Formatting
+    /// <inheritdoc/>
+    public override bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+    {
+        // Per CSSOM §5.2: type selector serializes as the element name (lowercase)
+        // If namespace prefix maps to non-default namespace, prefix with "ns|"
+        charsWritten = 0;
+
+        // Handle namespace prefix (if not "*" which means any namespace / default)
+        if (Namespace is not null && !Namespace.Equals("*", StringComparison.Ordinal))
+        {
+            if (!Namespace.AsSpan().TryCopyTo(destination))
+                return false;
+            charsWritten += Namespace.Length;
+
+            if (destination.Length <= charsWritten)
+                return false;
+            destination[charsWritten] = '|';
+            charsWritten++;
+        }
+
+        // Serialize the element name (as identifier, lowercase)
+        var typeName = TypeName.ToLowerInvariant();
+        if (!typeName.AsSpan().TryCopyTo(destination[charsWritten..]))
+            return false;
+        charsWritten += typeName.Length;
+
+        return true;
+    }
+    #endregion
 }
 
