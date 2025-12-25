@@ -3,7 +3,7 @@ using EnumRecords;
 namespace CssUI.HTML
 {
 
-    [EnumRecord<KeywordProperties>]
+    [EnumRecord<AutofillProperties>]
     public enum EAutofill : int
     {
         [EnumRecordProperties("", 0, "")]

@@ -162,20 +162,13 @@ public readonly record struct CssColor : IEquatable<CssColor>, ISpanFormattable,
             return Transparent;
         }
 
-        // Get the RGB values from the MetaKeyword attribute data
-        if (Lookup.TryData(ecolor, out EnumData? data) && data is { Length: >= 4 } enumData)
-        {
-            // MetaKeyword format: keyword, hex, r, g, b
-            // Data[0] = hex value (unused), Data[1] = R, Data[2] = G, Data[3] = B
-            return new CssColor(
-                (byte)(int)enumData.Data[1],
-                (byte)(int)enumData.Data[2],
-                (byte)(int)enumData.Data[3],
-                255
-            );
-        }
-
-        return Transparent;
+        // Use the generated extension methods for R, G, B
+        return new CssColor(
+            ecolor.R(),
+            ecolor.G(),
+            ecolor.B(),
+            255
+        );
     }
 
     /// <summary>

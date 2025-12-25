@@ -51,7 +51,8 @@ public abstract class UIWindowBridge : Window
         bool shiftKey = Device.IsDown(EKeyboardCode.ShiftLeft) | Device.IsDown(EKeyboardCode.ShiftRight);
         bool ctrlKey = Device.IsDown(EKeyboardCode.ControlLeft) | Device.IsDown(EKeyboardCode.ControlRight);
         bool superKey = Device.IsDown(EKeyboardCode.MetaLeft) | Device.IsDown(EKeyboardCode.MetaRight);
-        string key = Key == 0 ? ((char)Lookup.Data(KeyCode).Data[1]).ToString() : Key.ToString();
+        // Use the keyboard code's keyword (e.g., "Enter", "Tab") when no char provided
+        string key = Key == 0 ? KeyCode.Keyword() : Key.ToString();
 
         return new KeyboardEventInit()
         {

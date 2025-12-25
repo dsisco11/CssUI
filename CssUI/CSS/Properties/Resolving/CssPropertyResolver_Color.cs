@@ -57,16 +57,12 @@ public static partial class CssPropertyResolver
                     }
                 default:
                     {
-                        if (!Lookup.TryData(keyword, out EnumData? outData))
-                        {
-                            throw new CssPropertyException($"No meta-enum data found for keyword '{keyword}'");
-                        }
-
+                        // Use generated extension methods for R, G, B
                         return CssValue.From(CssColor.FromRgba(
-                            Convert.ToByte(outData.Value.Data[0]), 
-                            Convert.ToByte(outData.Value.Data[1]), 
-                            Convert.ToByte(outData.Value.Data[2]), 
-                            Convert.ToByte(outData.Value.Data[3])));
+                            keyword.R(),
+                            keyword.G(),
+                            keyword.B(),
+                            255));
                     }
             }
         }

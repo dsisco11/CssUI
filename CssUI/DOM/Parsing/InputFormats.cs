@@ -1753,11 +1753,9 @@ public static partial class HTMLParserCommon
         /* Check and see if this is a named color */
         if (Lookup.TryEnum(StringCommon.Transform(mem, To_ASCII_Lower_Alpha), out EColor outEnumValue))
         {
-            if (Lookup.TryData(outEnumValue, out EnumData? outColorData))
-            {
-                outColor = new SimpleColor((byte)outColorData.Value.Data[1], (byte)outColorData.Value.Data[2], (byte)outColorData.Value.Data[3]);
-                return true;
-            }
+            // Use the generated extension methods for R, G, B
+            outColor = new SimpleColor(outEnumValue.R(), outEnumValue.G(), outEnumValue.B());
+            return true;
         }
 
         if (Stream.Length == 4 && Stream.Next == CHAR_HASH && !Stream.Scan(c => !Is_Ascii_Hex_Digit(c), out _, 1))

@@ -842,25 +842,25 @@ public enum EKeyboardCode : int
     BrowserForward,
 
     /// <summary>
-    ///         
+    ///
     /// </summary>
     [EnumRecordProperties("BrowserHome")]
     BrowserHome,
 
     /// <summary>
-    ///         
+    ///
     /// </summary>
     [EnumRecordProperties("BrowserRefresh")]
     BrowserRefresh,
 
     /// <summary>
-    ///         
+    ///
     /// </summary>
     [EnumRecordProperties("BrowserSearch")]
     BrowserSearch,
 
     /// <summary>
-    ///         
+    ///
     /// </summary>
     [EnumRecordProperties("BrowserStop")]
     BrowserStop,
@@ -884,37 +884,37 @@ public enum EKeyboardCode : int
     LaunchApp2,
 
     /// <summary>
-    ///         
+    ///
     /// </summary>
     [EnumRecordProperties("LaunchMail")]
     LaunchMail,
 
     /// <summary>
-    ///         
+    ///
     /// </summary>
     [EnumRecordProperties("MediaPlayPause")]
     MediaPlayPause,
 
     /// <summary>
-    ///         
+    ///
     /// </summary>
     [EnumRecordProperties("MediaSelect")]
     MediaSelect,
 
     /// <summary>
-    ///         
+    ///
     /// </summary>
     [EnumRecordProperties("MediaStop")]
     MediaStop,
 
     /// <summary>
-    ///         
+    ///
     /// </summary>
     [EnumRecordProperties("MediaTrackNext")]
     MediaTrackNext,
 
     /// <summary>
-    ///         
+    ///
     /// </summary>
     [EnumRecordProperties("MediaTrackPrevious")]
     MediaTrackPrevious,
@@ -926,31 +926,31 @@ public enum EKeyboardCode : int
     Power,
 
     /// <summary>
-    ///         
+    ///
     /// </summary>
     [EnumRecordProperties("Sleep")]
     Sleep,
 
     /// <summary>
-    ///         
+    ///
     /// </summary>
     [EnumRecordProperties("AudioVolumeDown")]
     AudioVolumeDown,
 
     /// <summary>
-    ///         
+    ///
     /// </summary>
     [EnumRecordProperties("AudioVolumeMute")]
     AudioVolumeMute,
 
     /// <summary>
-    ///         
+    ///
     /// </summary>
     [EnumRecordProperties("AudioVolumeUp")]
     AudioVolumeUp,
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     [EnumRecordProperties("WakeUp")]
     WakeUp,

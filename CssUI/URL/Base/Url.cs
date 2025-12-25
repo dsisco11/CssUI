@@ -153,12 +153,8 @@ public class Url : ISpanFormattable
         {
             if (Scheme.IsCustom || !Scheme.EnumValue.HasValue) return null;
 
-            if (Lookup.TryData(Scheme.EnumValue.Value, out EnumData? outData))
-            {
-                return (int)outData.Value.Data[0];
-            }
-
-            return null;
+            var port = Scheme.EnumValue.Value.DefaultPort();
+            return port >= 0 ? port : null;
         }
     }
 

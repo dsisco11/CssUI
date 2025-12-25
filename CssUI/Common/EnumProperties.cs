@@ -30,3 +30,22 @@ public readonly record struct NamedColorProperties(
     byte G = 0,
     byte B = 0
 );
+
+/// <summary>
+/// Property record struct for keyboard codes (EKeyboardCode).
+/// Includes the code string and the character it represents.
+/// </summary>
+public readonly record struct KeyboardCodeProperties(
+    [ReverseLookup(IgnoreCase = true)] string Keyword,
+    char KeyChar = '\0'
+);
+
+/// <summary>
+/// Property record struct for autofill tokens (EAutofill).
+/// Includes keyword, max tokens allowed, and category name.
+/// </summary>
+public readonly record struct AutofillProperties(
+    [ReverseLookup(IgnoreCase = true)] string Keyword,
+    int MaxTokens = 0,
+    string Category = ""
+);

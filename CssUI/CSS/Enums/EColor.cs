@@ -14,14 +14,14 @@ public enum EColor : int
     /// If the ‘currentColor’ keyword is set on the ‘color’ property itself, it is treated as ‘color: inherit’.
     /// </summary>
     /* Docs: https://www.w3.org/TR/css-color-3/#currentcolor */
-    [EnumRecordProperties("currentcolor")]
+    [EnumRecordProperties("currentcolor", 0x000000, 0, 0, 0)]
     CurrentColor,
 
     /// <summary>
     /// Fully transparent. This keyword can be considered a shorthand for transparent black, rgba(0,0,0,0), which is its computed value.
     /// </summary>
     /* Docs: https://www.w3.org/TR/css-color-3/#transparent-def */
-    [EnumRecordProperties("transparent")]
+    [EnumRecordProperties("transparent", 0x000000, 0, 0, 0)]
     Transparent,
 
     /// <summary>

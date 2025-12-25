@@ -77,34 +77,8 @@ public class LookupTests
         }
     }
 
-    [Fact()]
-    public void TryDataTest()
-    {
-        foreach (var enumType in metaEnumList)
-        {
-            /* Compile a list of all values from this enum */
-            var allValues = Enum.GetValues(enumType);
-            foreach (var value in allValues)
-            {
-                Assert.True(Lookup.TryData(enumType, (IConvertible)value, out EnumData? _));
-            }
-        }
-    }
-
-    [Fact()]
-    public void DataTest()
-    {
-        // Just make sure we wont ever get an exception thrown
-        foreach (var enumType in metaEnumList)
-        {
-            /* Compile a list of all values from this enum */
-            var allValues = Enum.GetValues(enumType);
-            foreach (var value in allValues)
-            {
-                Lookup.Data(enumType, (IConvertible)value);
-            }
-        }
-    }
+    // Note: TryData and Data tests removed - those methods were deprecated and removed
+    // as part of the EnumRecords migration. Use generated extension methods instead.
 
     [Fact()]
     public void TryEnumTest()
