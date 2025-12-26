@@ -13,12 +13,24 @@ namespace CssUI;
 /// Provides utility functions for looking up enum keywords and metadata.
 /// </summary>
 /// <remarks>
-/// After migration to EnumRecords, prefer using the generated extension methods directly:
+/// <para>
+/// This class supports both EnumRecords 0.5+ static record classes ({EnumName}Record)
+/// and the extension method pattern ({EnumName}Extensions). The Record class pattern
+/// is preferred when available as it provides a cleaner API for static access.
+/// </para>
+/// <para>
+/// For direct access without reflection, prefer using generated methods directly:
+/// </para>
 /// <list type="bullet">
-/// <item><c>enumValue.Keyword()</c> — Get keyword for an enum value</item>
-/// <item><c>TExtensions.TryFromKeyword(keyword, out result)</c> — Parse keyword to enum</item>
+/// <item><c>enumValue.Keyword()</c> — Extension method to get keyword for an enum value</item>
+/// <item><c>{EnumName}Record.GetKeyword(value)</c> — Static method (EnumRecords 0.5+)</item>
+/// <item><c>{EnumName}Record.TryFromKeyword(keyword, out result)</c> — Reverse lookup (EnumRecords 0.5+)</item>
+/// <item><c>{EnumName}Record.GetKeywords()</c> — Get all keywords (EnumRecords 0.5+)</item>
 /// </list>
-/// The methods in this class are retained for backward compatibility during migration.
+/// <para>
+/// The methods in this class use reflection and are retained for scenarios requiring
+/// runtime type dispatch (e.g., when the enum type is not known at compile time).
+/// </para>
 /// </remarks>
 public static class Lookup
 {
@@ -29,9 +41,19 @@ public static class Lookup
     private static readonly ConcurrentDictionary<Type, Type?> _extensionsTypeCache = new();
 
     /// <summary>
-    /// Cache for Keyword method lookups.
+    /// Cache for static record class type lookups (EnumRecords 0.5+ pattern: {EnumName}Record).
+    /// </summary>
+    private static readonly ConcurrentDictionary<Type, Type?> _recordTypeCache = new();
+
+    /// <summary>
+    /// Cache for Keyword method lookups (extension method pattern).
     /// </summary>
     private static readonly ConcurrentDictionary<Type, MethodInfo?> _keywordMethodCache = new();
+
+    /// <summary>
+    /// Cache for GetKeyword method lookups (static record class pattern).
+    /// </summary>
+    private static readonly ConcurrentDictionary<Type, MethodInfo?> _getKeywordMethodCache = new();
 
     /// <summary>
     /// Cache for TryFromKeyword method lookups.
@@ -44,7 +66,7 @@ public static class Lookup
     private static readonly ConcurrentDictionary<Type, MethodInfo?> _getKeywordsMethodCache = new();
 
     /// <summary>
-    /// Namespaces to search for generated extension classes.
+    /// Namespaces to search for generated classes.
     /// </summary>
     private static readonly string[] _searchNamespaces =
     [
@@ -61,7 +83,7 @@ public static class Lookup
     ];
 
     /// <summary>
-    /// Finds the generated extensions type for an enum.
+    /// Finds the generated extensions type for an enum ({EnumName}Extensions).
     /// </summary>
     private static Type? GetExtensionsType(Type enumType)
     {
@@ -87,7 +109,48 @@ public static class Lookup
     }
 
     /// <summary>
-    /// Gets the Keyword extension method for an enum type.
+    /// Finds the generated static record class for an enum ({EnumName}Record).
+    /// EnumRecords 0.5+ generates this class with direct static methods.
+    /// </summary>
+    private static Type? GetRecordType(Type enumType)
+    {
+        return _recordTypeCache.GetOrAdd(enumType, static et =>
+        {
+            var recordClassName = $"{et.Name}Record";
+            var assembly = et.Assembly;
+
+            // Try the enum's own namespace first
+            var candidate = assembly.GetType($"{et.Namespace}.{recordClassName}");
+            if (candidate is not null) return candidate;
+
+            // Search other namespaces
+            foreach (var ns in _searchNamespaces)
+            {
+                var fullName = string.IsNullOrEmpty(ns) ? recordClassName : $"{ns}.{recordClassName}";
+                candidate = assembly.GetType(fullName);
+                if (candidate is not null) return candidate;
+            }
+
+            return null;
+        });
+    }
+
+    /// <summary>
+    /// Gets the GetKeyword static method from the Record class (EnumRecords 0.5+ pattern).
+    /// Signature: public static string GetKeyword(TEnum value)
+    /// </summary>
+    private static MethodInfo? GetGetKeywordMethod(Type enumType)
+    {
+        return _getKeywordMethodCache.GetOrAdd(enumType, static et =>
+        {
+            var recordType = GetRecordType(et);
+            return recordType?.GetMethod("GetKeyword", [et]);
+        });
+    }
+
+    /// <summary>
+    /// Gets the Keyword extension method for an enum type (legacy pattern).
+    /// Signature: public static string Keyword(this TEnum value)
     /// </summary>
     private static MethodInfo? GetKeywordMethod(Type enumType)
     {
@@ -99,28 +162,43 @@ public static class Lookup
     }
 
     /// <summary>
-    /// Gets the TryFromKeyword extension method for an enum type.
+    /// Gets the TryFromKeyword method for an enum type.
+    /// Prefers {EnumName}Record.TryFromKeyword() over {EnumName}Extensions.TryFromKeyword().
     /// EnumRecords 0.5+ generates: TryFromKeyword(string value, out T? result)
     /// </summary>
     private static MethodInfo? GetTryFromKeywordMethod(Type enumType)
     {
         return _tryFromKeywordMethodCache.GetOrAdd(enumType, static et =>
         {
-            var extensionsType = GetExtensionsType(et);
             // EnumRecords 0.5+ uses nullable out parameter: out T? (Nullable<T>)
             var nullableType = typeof(Nullable<>).MakeGenericType(et);
-            return extensionsType?.GetMethod("TryFromKeyword", [typeof(string), nullableType.MakeByRefType()]);
+            var paramTypes = new[] { typeof(string), nullableType.MakeByRefType() };
+
+            // Try Record class first (preferred in 0.5+)
+            var recordType = GetRecordType(et);
+            var method = recordType?.GetMethod("TryFromKeyword", paramTypes);
+            if (method is not null) return method;
+
+            // Fallback to Extensions class
+            var extensionsType = GetExtensionsType(et);
+            return extensionsType?.GetMethod("TryFromKeyword", paramTypes);
         });
     }
 
     /// <summary>
-    /// Gets the GetKeywords extension method for an enum type.
-    /// EnumRecords generates Get{PropertyName}s() methods for each property.
+    /// Gets the GetKeywords method for an enum type.
+    /// Prefers {EnumName}Record.GetKeywords() over {EnumName}Extensions.GetKeywords().
     /// </summary>
     private static MethodInfo? GetGetKeywordsMethod(Type enumType)
     {
         return _getKeywordsMethodCache.GetOrAdd(enumType, static et =>
         {
+            // Try Record class first (preferred in 0.5+)
+            var recordType = GetRecordType(et);
+            var method = recordType?.GetMethod("GetKeywords", Type.EmptyTypes);
+            if (method is not null) return method;
+
+            // Fallback to Extensions class
             var extensionsType = GetExtensionsType(et);
             return extensionsType?.GetMethod("GetKeywords", Type.EmptyTypes);
         });
@@ -153,6 +231,22 @@ public static class Lookup
         ArgumentNullException.ThrowIfNull(Value);
         Contract.EndContractBlock();
 
+        // Try Record class GetKeyword() first (EnumRecords 0.5+ pattern)
+        var getKeywordMethod = GetGetKeywordMethod(enumType);
+        if (getKeywordMethod is not null)
+        {
+            try
+            {
+                outKeyword = getKeywordMethod.Invoke(null, [Value])?.ToString();
+                return outKeyword is not null;
+            }
+            catch
+            {
+                // Fall through to extension method pattern
+            }
+        }
+
+        // Fallback to extension method Keyword() pattern
         var keywordMethod = GetKeywordMethod(enumType);
         if (keywordMethod is null)
         {
@@ -198,6 +292,25 @@ public static class Lookup
         ArgumentNullException.ThrowIfNull(Value);
         Contract.EndContractBlock();
 
+        // Try Record class GetKeyword() first (EnumRecords 0.5+ pattern)
+        var getKeywordMethod = GetGetKeywordMethod(enumType);
+        if (getKeywordMethod is not null)
+        {
+            try
+            {
+                var result = getKeywordMethod.Invoke(null, [Value])?.ToString();
+                if (result is not null)
+                {
+                    return result;
+                }
+            }
+            catch
+            {
+                // Fall through to extension method pattern
+            }
+        }
+
+        // Fallback to extension method Keyword() pattern
         var keywordMethod = GetKeywordMethod(enumType);
         if (keywordMethod is not null)
         {
@@ -309,7 +422,7 @@ public static class Lookup
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool Is_Declared<T>() where T : struct
     {
-        return GetExtensionsType(typeof(T)) is not null;
+        return GetRecordType(typeof(T)) is not null || GetExtensionsType(typeof(T)) is not null;
     }
 
     /// <summary>
@@ -323,7 +436,7 @@ public static class Lookup
         ArgumentNullException.ThrowIfNull(enumType);
         Contract.EndContractBlock();
 
-        return GetExtensionsType(enumType) is not null;
+        return GetRecordType(enumType) is not null || GetExtensionsType(enumType) is not null;
     }
 
     /// <summary>

@@ -121,10 +121,10 @@ The `NamedColorProperties` with byte fields generates incorrect `ImmutableArray<
 
 #### 8.8.3 Update Lookup.cs to Use New Static Record Classes (Performance Optimization)
 Replace reflection-based method dispatch with direct static class calls where possible:
-- [ ] Update `Lookup.Keyword(Type, object)` to use `{EnumName}Record.Get{Property}()` pattern
-- [ ] Update `Lookup.TryKeyword<T>` to use `{EnumName}Record.TryFromKeyword()` pattern
-- [ ] Update `Lookup.Get_Keywords(Type)` to use `{EnumName}Record.GetKeywords()` pattern
-- [ ] Consider caching `MethodInfo` for fallback cases only
+- [x] Update `Lookup.Keyword(Type, object)` to use `{EnumName}Record.Get{Property}()` pattern
+- [x] Update `Lookup.TryKeyword<T>` to use `{EnumName}Record.TryFromKeyword()` pattern
+- [x] Update `Lookup.Get_Keywords(Type)` to use `{EnumName}Record.GetKeywords()` pattern
+- [x] Consider caching `MethodInfo` for fallback cases only
 
 #### 8.8.4 Adopt Static Record Classes for Type-Safe Access (Optional Modernization)
 Migrate direct extension method calls to static record class pattern where beneficial:
@@ -132,6 +132,7 @@ Migrate direct extension method calls to static record class pattern where benef
 - [ ] `DOMEnumList<EnumType>` — Use `TRecord.GetKeyword()` for serialization
 - [ ] `CSSValue.ToString()` — Use `EnumRecord.{EnumName}.GetKeyword()` for runtime dispatch
 - [ ] Document best practices for when to use static record classes vs extensions
+
 
 ## Architecture & Design
 - [ ] IWindowingSystem (window creation, input events) - pending
