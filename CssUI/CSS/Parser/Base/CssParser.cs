@@ -1116,7 +1116,7 @@ public class CssParser
                         return CssValue.From(envFunc);
                     }
 
-                    return new CssValue(func);
+                    return CssValue.From(func);
                 }
             case ECssTokenType.Function:
                 {
@@ -1158,7 +1158,7 @@ public class CssParser
                         return CssValue.From(envFunc2);
                     }
 
-                    return new CssValue(func!);
+                    return CssValue.From(func!);
                 }
             case ECssTokenType.Url:
                 {

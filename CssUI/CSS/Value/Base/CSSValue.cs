@@ -125,11 +125,14 @@ public partial class CssValue : ISpanFormattable, IFormattable, IParsable<CssVal
     #endregion
 
     #region Constructors
-    internal CssValue(CssFunction function)
-    {
-        type = ECssValueTypes.FUNCTION;
-        data = CssValueData.FromObject(function);
-    }
+    /// <summary>
+    /// Creates a CssValue from a CssFunction.
+    /// </summary>
+    /// <remarks>
+    /// This factory method returns a <see cref="CssFunctionValue"/> which stores the function directly
+    /// without boxing. Use this instead of the constructor for creating function values.
+    /// </remarks>
+    internal static CssValue From(CssFunction function) => new CssFunctionValue(function);
 
     /// <summary>
     /// Base constructor for creating a CssValue with only a type.

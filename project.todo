@@ -148,11 +148,12 @@ Strings are common in custom properties, `content`, quoted `font-family` names.
 - [x] Add tests for CssCalcValue
 - [x] Made `CssValue.AsCalcExpression()` virtual to allow override
 
-### 13.5 CssFunctionValue (FUNCTION) — Low Priority
-- [ ] Create `CssFunctionValue` subclass with direct `CssFunction` storage
-- [ ] Override serialization methods for function syntax
-- [ ] Update factory method to return `CssFunctionValue`
-- [ ] Add tests for CssFunctionValue
+### 13.5 CssFunctionValue (FUNCTION) — Low Priority ✓
+- [x] Create `CssFunctionValue` subclass with direct `CssFunction` storage
+- [x] Override serialization methods for function syntax
+- [x] Update factory method to return `CssFunctionValue`
+- [x] Add tests for CssFunctionValue
+- [x] Changed constructor to factory method `CssValue.From(CssFunction)`
 
 ### 13.6 Cleanup & Optimization
 - [ ] Audit remaining `data.ObjectValue` usages for potential subclass candidates
