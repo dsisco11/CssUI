@@ -185,7 +185,16 @@ public static class UnicodeCommon
     public const char CHAR_F_LOWER = '\u0066';
     public const char CHAR_G_LOWER = '\u0067';
     public const char CHAR_H_LOWER = '\u0068';
+    public const char CHAR_I_LOWER = '\u0069';
+    public const char CHAR_J_LOWER = '\u006A';
+    public const char CHAR_K_LOWER = '\u006B';
+    public const char CHAR_L_LOWER = '\u006C';
     public const char CHAR_M_LOWER = '\u006D';
+    public const char CHAR_N_LOWER = '\u006E';
+    public const char CHAR_O_LOWER = '\u006F';
+    public const char CHAR_P_LOWER = '\u0070';
+    public const char CHAR_Q_LOWER = '\u0071';
+    public const char CHAR_R_LOWER = '\u0072';
     public const char CHAR_S_LOWER = '\u0073';
     public const char CHAR_T_LOWER = '\u0074';
     public const char CHAR_U_LOWER = '\u0075';
@@ -251,6 +260,19 @@ public static class UnicodeCommon
     /// ;
     /// </summary>
     public const char CHAR_SEMICOLON = '\u003B';
+
+    /// <summary>
+    /// ¥ (Yen sign)
+    /// </summary>
+    public const char CHAR_YEN = '\u00A5';
+    /// <summary>
+    /// ろ (Hiragana RO)
+    /// </summary>
+    public const char CHAR_HIRAGANA_RO = '\u308D';
+    /// <summary>
+    /// 한 (Korean Han)
+    /// </summary>
+    public const char CHAR_KOREAN_HAN = '\uD55C';
 
     /// <summary>
     /// &nbsp

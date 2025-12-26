@@ -62,35 +62,34 @@ These determine enum type at runtime and cannot use compile-time extension metho
 - [ ] Remove obsolete methods in Lookup.cs
 - [ ] Update LookupTests.cs to verify new extension methods
 
-### 8.7 EnumRecords 0.3.0 Upgrade (Breaking Changes)
-EnumRecords 0.3.0 requires ALL enum members to have `[EnumData]` or use `Partial` mode.
-Additionally, `KeywordProperties` now only accepts 1 argument (the keyword string).
+### 8.7 EnumRecords 0.4.1 Upgrade (Breaking Changes)
+EnumRecords 0.4+ requires ALL enum members to have `[EnumData]` or `[Ignore]`.
+v0.4.1 fixes char literal escaping in generated code.
 
 #### 8.7.1 Fix Missing Attribute Errors (ENUMREC002)
-Add `[EnumRecord.Ignore]` or empty `[EnumData]` to enum members without keywords:
-- [ ] `EKeyboardCode.MAX` (CORE/Devices/Keyboard/Enums/)
-- [ ] `EPointerType.MAX` (CORE/Devices/Pointer/Enums/)
-- [ ] `EMediaCombinator.None` (CSS/Enums/Media Properties/)
-- [ ] `EMediaFeatureName.Unknown` (CSS/Enums/Media Properties/)
-- [ ] `EMediaQueryModifier.None` (CSS/Enums/Media Properties/)
-- [ ] `EMediaType.NONE` (CSS/Enums/Media Properties/)
-- [ ] `EScrollBehavior.Instant` (CSS/Enums/Style Properties/)
-- [ ] `ESelectorCombinator.None` (CSS/Enums/Style Properties/)
-- [ ] `ECssPropertyID.MAX_VALUE` (CSS/Properties/Enums/)
-- [ ] `EAttributeName.CUSTOM` (DOM/Enums/Attributes/Base/)
-- [ ] `EEventName.CUSTOM` (DOM/Events/Enums/)
-- [ ] `EContentEditable.Invalid`, `EContentEditable.Missing` (HTML/Enums/)
-- [ ] `EDraggable.Auto` (HTML/Enums/)
+Add `[Ignore]` to enum members without keywords:
+- [x] `EKeyboardCode.MAX` (CORE/Devices/Keyboard/Enums/)
+- [x] `EPointerType.MAX` (CORE/Devices/Pointer/Enums/)
+- [x] `EMediaFeatureName.Unknown` (CSS/Enums/Media Properties/)
+- [x] `EMediaQueryModifier.None` (CSS/Enums/Media Properties/)
+- [x] `EMediaType.NONE` (CSS/Enums/Media Properties/)
+- [x] `EScrollBehavior.Instant` (CSS/Enums/Style Properties/)
+- [x] `ESelectorCombinator.None` (CSS/Enums/Style Properties/)
+- [x] `ECssPropertyID.MAX_VALUE` (CSS/Properties/Enums/)
+- [x] `EAttributeName.CUSTOM` (DOM/Enums/Attributes/Base/)
+- [x] `EEventName.CUSTOM` (DOM/Events/Enums/)
+- [x] `EContentEditable.Invalid`, `EContentEditable.Missing` (HTML/Enums/)
+- [x] `EDraggable.Auto` (HTML/Enums/)
 
 #### 8.7.2 Fix Argument Count Errors (ENUMREC003)
-`EKeyboardCode` uses 2-arg attributes `[EnumData("code", "key")]` but `KeywordProperties` only has 1 parameter.
-Options:
-- [ ] Create `KeyboardCodeProperties(string Code, string Key)` record struct for EKeyboardCode
-- [ ] Update ~100+ EKeyboardCode members to use new property type
-- [ ] Update `[EnumRecord<KeywordProperties>]` to `[EnumRecord<KeyboardCodeProperties>]` on EKeyboardCode
+`EKeyboardCode` uses 2-arg attributes for `KeyboardCodeProperties(Keyword, KeyChar)`:
+- [x] `KeyboardCodeProperties` already defined in EnumProperties.cs
+- [x] Updated `[EnumRecord<KeywordProperties>]` to `[EnumRecord<KeyboardCodeProperties>]` on EKeyboardCode
+- [x] Added second argument (KeyChar) to all single-argument EnumData entries (~60 entries)
+- [x] Fixed `Lang1` which had 3 arguments (reduced to 2)
 
 #### 8.7.3 Update Lookup.Get_Keywords() to Use New API
-EnumRecords 0.3.0 provides `GetKeywords()` method on generated extensions:
+EnumRecords 0.4+ provides `GetKeywords()` method on generated extensions:
 - [ ] Update `Lookup.Get_Keywords<T>()` to call `TExtensions.GetKeywords()` instead of reflection loop
 - [ ] Handle enums that may not have GetKeywords() gracefully
 

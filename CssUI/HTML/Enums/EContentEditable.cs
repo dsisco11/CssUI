@@ -6,7 +6,9 @@ namespace CssUI.HTML
     public enum EContentEditable : short
     {/* Docs: https://html.spec.whatwg.org/multipage/interaction.html#attr-contenteditable */
 
+        [Ignore]
         Invalid = -1,
+        [Ignore]
         Missing = 0,
         [EnumData("true")]
         True,

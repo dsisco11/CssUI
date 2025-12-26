@@ -8,6 +8,7 @@ public enum EEventName : int
     /// <summary>
     /// Represents all custom (end-user specified) event values
     /// </summary>
+    [Ignore]
     CUSTOM = -1,
     [EnumData("")]
     None = 0x0,

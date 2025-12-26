@@ -13,6 +13,7 @@ public enum EPointerType : short
     TouchContact = 2,
 
 
+    [Ignore]
     MAX// Tracks the end of the enum
 }
 

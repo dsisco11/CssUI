@@ -17,6 +17,7 @@ public enum EScrollBehavior
     [EnumData("smooth")]
     Smooth,
     //[DomKeyword("instant")] /* Instant is not defined as a specifiable value, it is an internal value only */
+    [Ignore]
     Instant,
 }
 

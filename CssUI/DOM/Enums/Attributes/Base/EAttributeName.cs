@@ -10,6 +10,7 @@ public enum EAttributeName : int
 {
 
     /*[EnumData("")]*/ // DO NOT GIVE NEGATIVE ENUM VALUES A KEYWORD
+    [Ignore]
     CUSTOM = -1,
     [EnumData("id")]
     ID = 0,

@@ -6,6 +6,7 @@ namespace CssUI.CSS.Media;
 public enum EMediaFeatureName : int
 {/* Docs: https://drafts.csswg.org/mediaqueries-4/#mf-dimensions */
 
+    [Ignore]
     Unknown = 0x0,
 
     /// <summary>

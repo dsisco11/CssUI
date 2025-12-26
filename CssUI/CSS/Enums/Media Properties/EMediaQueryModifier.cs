@@ -6,6 +6,7 @@ namespace CssUI.CSS.Media;
 public enum EMediaQueryModifier : int
 {/* Docs: https://drafts.csswg.org/mediaqueries-4/#media-query-modifier */
 
+    [Ignore]
     None = 0x0,
     /// <summary>
     /// Negates the media query result

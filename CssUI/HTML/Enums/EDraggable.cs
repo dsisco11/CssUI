@@ -9,6 +9,7 @@ namespace CssUI.HTML
         /// <summary>
         /// The auto state uses the default behavior of the user agent to determine if an element is draggable.
         /// </summary>
+        [Ignore]
         Auto,
 
         /// <summary>

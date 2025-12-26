@@ -6,6 +6,7 @@ namespace CssUI.CSS.Media;
 public enum EMediaType : int
 {/* Docs: https://drafts.csswg.org/mediaqueries-4/#media-types */
 
+    [Ignore]
     NONE = 0x0,
     /// <summary>
     /// Matches all devices

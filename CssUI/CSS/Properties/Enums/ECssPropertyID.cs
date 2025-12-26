@@ -307,6 +307,7 @@ public enum ECssPropertyID : int
     #endregion
 
 
+    [Ignore]
     MAX_VALUE,
 }
 
