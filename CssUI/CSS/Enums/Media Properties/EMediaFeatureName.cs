@@ -132,15 +132,28 @@ public enum EMediaFeatureName : int
     [EnumData("color-gamut")]
     ColorGamut,
 
-    /*
-            [EnumData("pointer")]
-            Pointer,
-            [EnumData("hover")]
-            Hover,
-            [EnumData("any-pointer")]
-            AnyPointer,
-            [EnumData("any-hover")]
-            AnyHover,
-    */
+    /// <summary>
+    /// The pointer media feature is used to query the presence and accuracy of a pointing device such as a mouse.
+    /// </summary>
+    [EnumData("pointer")]
+    Pointer,
+
+    /// <summary>
+    /// The hover media feature is used to query the user's ability to hover over elements with the primary pointing device.
+    /// </summary>
+    [EnumData("hover")]
+    Hover,
+
+    /// <summary>
+    /// The any-pointer media feature is used to query the presence and accuracy of any available pointing device.
+    /// </summary>
+    [EnumData("any-pointer")]
+    AnyPointer,
+
+    /// <summary>
+    /// The any-hover media feature is used to query the ability of any available input mechanism to hover over elements.
+    /// </summary>
+    [EnumData("any-hover")]
+    AnyHover,
 }
 
