@@ -100,7 +100,7 @@ public partial class CssValue : ISpanFormattable, IFormattable
     /// <summary>
     /// Returns whether there is actually a set value
     /// </summary>
-    public bool HasValue
+    public virtual bool HasValue
     {
         get
         {
@@ -129,7 +129,11 @@ public partial class CssValue : ISpanFormattable, IFormattable
         data = CssValueData.FromObject(function);
     }
 
-    private CssValue(ECssValueTypes type)
+    /// <summary>
+    /// Base constructor for creating a CssValue with only a type.
+    /// </summary>
+    /// <param name="type">The CSS value type.</param>
+    protected CssValue(ECssValueTypes type)
     {
         this.type = type;
         this.data = default;
@@ -342,16 +346,13 @@ public partial class CssValue : ISpanFormattable, IFormattable
     /// <summary> Returns a new <see cref="CssValue"/> instance which is a copy of this one. </summary>
     public CssValue Clone() => new CssValue(this);
 
-    /// <summary>Create an keyword value</summary>
-    public static CssValue From<T>(T value) where T : struct, IConvertible
+    /// <summary>Create a keyword value from an enum.</summary>
+    /// <typeparam name="T">The enum type (must have EnumRecords keyword support).</typeparam>
+    /// <param name="value">The enum value.</param>
+    /// <returns>A strongly-typed <see cref="CssEnumValue{T}"/>.</returns>
+    public static CssValue From<T>(T value) where T : struct, Enum
     {
-        if (!Lookup.Is_Declared<T>())
-        {
-            throw new CssException($"Unable to find '{typeof(T).Name}' in CSS enum table");
-        }
-        Contract.EndContractBlock();
-
-        return new CssValue(ECssValueTypes.KEYWORD, CssValueData.FromObject(value));
+        return new CssEnumValue<T>(value);
     }
 
     /// <summary>Create an absolute integer value</summary>
@@ -887,11 +888,16 @@ public partial class CssValue : ISpanFormattable, IFormattable
 
     #region Converters
     /// <summary>
-    /// Returns the value as the specified enum type
+    /// Returns the value as the specified enum type.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">The enum type to cast to.</typeparam>
+    /// <returns>The enum value.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public T AsEnum<T>() where T : struct, IConvertible => (T)(data.ObjectValue ?? default(T));
+    public virtual T AsEnum<T>() where T : struct, Enum
+    {
+        // Base implementation: extract from boxed ObjectValue
+        return (T)(data.ObjectValue ?? default(T));
+    }
 
     /// <summary>
     /// Returns the value as a Point2f position if possible.
@@ -1110,7 +1116,8 @@ public partial class CssValue : ISpanFormattable, IFormattable
             case ECssValueTypes.STRING:
                 return string.Equals((string?)A.data.ObjectValue, (string?)B.data.ObjectValue, StringComparison.Ordinal);
             case ECssValueTypes.KEYWORD:
-                return Equals(A.data.ObjectValue, B.data.ObjectValue);
+                // Delegate to Equals which handles CssEnumValue<T> comparison
+                return A.Equals(B);
             default:
                 throw new NotImplementedException($"Equality comparison logic not implemented for type: {Enum.GetName(typeof(ECssValueTypes), A.Type)}");
         }
@@ -1144,7 +1151,7 @@ public partial class CssValue : ISpanFormattable, IFormattable
     #endregion
 
     #region ToString
-    public override string ToString()
+    public new virtual string ToString()
     {
         const string DECIMAL_FORMAT = "0.###";
         switch (Type)
@@ -1174,7 +1181,7 @@ public partial class CssValue : ISpanFormattable, IFormattable
     }
 
     /// <inheritdoc/>
-    public string ToString(string? format, IFormatProvider? formatProvider) => ToString();
+    public virtual string ToString(string? format, IFormatProvider? formatProvider) => ToString();
 
     /// <summary>
     /// Tries to format this CSS value into the provided span.
@@ -1184,7 +1191,7 @@ public partial class CssValue : ISpanFormattable, IFormattable
     /// <param name="format">The format string (ignored).</param>
     /// <param name="provider">The format provider (ignored for CSS values).</param>
     /// <returns>True if formatting succeeded; otherwise, false.</returns>
-    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+    public virtual bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
     {
         charsWritten = 0;
 
@@ -1370,7 +1377,7 @@ public partial class CssValue : ISpanFormattable, IFormattable
     #endregion
 
     #region Serialization
-    public string Serialize()
+    public virtual string Serialize()
     {
         switch (Type)
         {

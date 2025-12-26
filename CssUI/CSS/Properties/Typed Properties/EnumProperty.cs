@@ -7,7 +7,7 @@ namespace CssUI.CSS;
 /// Represents a styling property which holds an enum value
 /// </summary>
 /// <typeparam name="Ty">The enum type this property stores</typeparam>
-public class EnumProperty<Ty> : CssProperty where Ty : struct, IConvertible
+public class EnumProperty<Ty> : CssProperty where Ty : struct, Enum
 {
 
     #region Value Overrides
