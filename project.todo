@@ -161,7 +161,10 @@ Strings are common in custom properties, `content`, quoted `font-family` names.
   - Created `CssEnvValue` for ENV type (CssEnvFunction storage)
   - Created `CssUnicodeRangeValue` for UNICODE_RANGE type (CssUnicodeRange storage)
   - All ObjectValue-based types now have specialized subclasses
-- [ ] Consider sealing base `CssValue` class or making constructor internal-only
+- [x] Consider sealing base `CssValue` class or making constructor internal-only
+  - Changed `protected` constructor to `private protected` to prevent external subclassing
+  - All existing subclasses are `sealed` within the assembly
+  - External code must use factory methods (`From()`, etc.)
 - [-] Update documentation with subclass usage patterns - Not Applicable
 - [-] Performance benchmarks comparing old vs new implementations - Irrelevant
 

@@ -138,7 +138,11 @@ public partial class CssValue : ISpanFormattable, IFormattable, IParsable<CssVal
     /// Base constructor for creating a CssValue with only a type.
     /// </summary>
     /// <param name="type">The CSS value type.</param>
-    protected CssValue(ECssValueTypes type)
+    /// <remarks>
+    /// This constructor is <c>private protected</c> to prevent external assemblies from creating
+    /// custom <see cref="CssValue"/> subclasses. All value creation should go through factory methods.
+    /// </remarks>
+    private protected CssValue(ECssValueTypes type)
     {
         this.type = type;
         this.data = default;
