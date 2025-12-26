@@ -90,8 +90,44 @@ Add `[Ignore]` to enum members without keywords:
 
 #### 8.7.3 Update Lookup.Get_Keywords() to Use New API
 EnumRecords 0.4+ provides `GetKeywords()` method on generated extensions:
-- [ ] Update `Lookup.Get_Keywords<T>()` to call `TExtensions.GetKeywords()` instead of reflection loop
-- [ ] Handle enums that may not have GetKeywords() gracefully
+- [x] Update `Lookup.Get_Keywords<T>()` to call `TExtensions.GetKeywords()` instead of reflection loop
+- [x] Handle enums that may not have GetKeywords() gracefully
+
+### 8.8 EnumRecords 0.5.0 Upgrade (Breaking Changes)
+EnumRecords 0.5.0 introduces significant API changes:
+- **New static `{EnumName}Record` classes** with direct method access (no extension syntax needed)
+- **`TryFromKeyword` now outputs nullable** — `out T?` instead of `out T`
+- **Central `EnumRecord.{EnumName}` namespace** for unified access
+
+#### 8.8.1 Fix TryFromKeyword Nullable Output Parameter (~15 call sites)
+Generated `TryFrom{Property}` methods now use `out T?` instead of `out T`:
+- [ ] Update `EventName.cs` — `EEventNameExtensions.TryFromKeyword(Name, out EEventName? enumValue)`
+- [ ] Update `InputFormats.cs` — `EColorExtensions.TryFromKeyword(...)` for color parsing
+- [ ] Update `MediaFeature.cs` — `EMediaFeatureNameExtensions.TryFromKeyword(...)` (~3 call sites)
+- [ ] Update `CssParser.cs` — `EMediaQueryModifierExtensions.TryFromKeyword(...)`, `EMediaTypeExtensions.TryFromKeyword(...)`, `EMediaOperatorExtensions.TryFromKeyword(...)`
+- [ ] Update `CssCalcEvaluator.cs` — `ECssUnitExtensions.TryFromKeyword(...)`
+- [ ] Update `CssColor.cs` — `EColorExtensions.TryFromKeyword(...)`
+
+#### 8.8.2 Fix NamedColorProperties RGB Byte Array Generation
+The `NamedColorProperties` with byte fields generates incorrect `ImmutableArray<int>` instead of `ImmutableArray<byte>`:
+- [ ] Investigate generated code for `EColor` enum
+- [ ] Option A: Change `byte R, G, B` to `int R, G, B` in NamedColorProperties (workaround)
+- [ ] Option B: Report bug to EnumRecords if byte arrays aren't supported
+- [ ] Update all `[EnumData(...)]` entries for EColor if property types change
+
+#### 8.8.3 Update Lookup.cs to Use New Static Record Classes (Performance Optimization)
+Replace reflection-based method dispatch with direct static class calls where possible:
+- [ ] Update `Lookup.Keyword(Type, object)` to use `{EnumName}Record.Get{Property}()` pattern
+- [ ] Update `Lookup.TryKeyword<T>` to use `{EnumName}Record.TryFromKeyword()` pattern
+- [ ] Update `Lookup.Get_Keywords(Type)` to use `{EnumName}Record.GetKeywords()` pattern
+- [ ] Consider caching `MethodInfo` for fallback cases only
+
+#### 8.8.4 Adopt Static Record Classes for Type-Safe Access (Optional Modernization)
+Migrate direct extension method calls to static record class pattern where beneficial:
+- [ ] `AtomicName<T>` — Use `TRecord.TryFromKeyword()` instead of extension method
+- [ ] `DOMEnumList<EnumType>` — Use `TRecord.GetKeyword()` for serialization
+- [ ] `CSSValue.ToString()` — Use `EnumRecord.{EnumName}.GetKeyword()` for runtime dispatch
+- [ ] Document best practices for when to use static record classes vs extensions
 
 ## Architecture & Design
 - [ ] IWindowingSystem (window creation, input events) - pending

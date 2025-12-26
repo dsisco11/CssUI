@@ -39,6 +39,11 @@ public static class Lookup
     private static readonly ConcurrentDictionary<Type, MethodInfo?> _tryFromKeywordMethodCache = new();
 
     /// <summary>
+    /// Cache for GetKeywords method lookups.
+    /// </summary>
+    private static readonly ConcurrentDictionary<Type, MethodInfo?> _getKeywordsMethodCache = new();
+
+    /// <summary>
     /// Namespaces to search for generated extension classes.
     /// </summary>
     private static readonly string[] _searchNamespaces =
@@ -102,6 +107,19 @@ public static class Lookup
         {
             var extensionsType = GetExtensionsType(et);
             return extensionsType?.GetMethod("TryFromKeyword", [typeof(string), et.MakeByRefType()]);
+        });
+    }
+
+    /// <summary>
+    /// Gets the GetKeywords extension method for an enum type.
+    /// EnumRecords generates Get{PropertyName}s() methods for each property.
+    /// </summary>
+    private static MethodInfo? GetGetKeywordsMethod(Type enumType)
+    {
+        return _getKeywordsMethodCache.GetOrAdd(enumType, static et =>
+        {
+            var extensionsType = GetExtensionsType(et);
+            return extensionsType?.GetMethod("GetKeywords", Type.EmptyTypes);
         });
     }
     #endregion
@@ -338,8 +356,9 @@ public static class Lookup
     /// Returns ALL keywords defined for the given enum.
     /// </summary>
     /// <remarks>
-    /// This method uses reflection to invoke the EnumRecords-generated Keyword() extension method.
+    /// This method calls the EnumRecords-generated GetKeywords() extension method.
     /// For hot paths, consider caching the result or using the generated extension methods directly.
+    /// Falls back to iterating over enum values if GetKeywords() is not available.
     /// </remarks>
     /// <param name="enumType">The enum type</param>
     /// <returns>Array of keyword strings</returns>
@@ -348,24 +367,28 @@ public static class Lookup
         ArgumentNullException.ThrowIfNull(enumType);
         Contract.EndContractBlock();
 
-        // Find the generated extension class (e.g., EFlexDirectionExtensions)
-        var extensionsClassName = $"{enumType.Name}Extensions";
-        var extensionsType = enumType.Assembly.GetType($"{enumType.Namespace}.{extensionsClassName}")
-                          ?? enumType.Assembly.GetType($"CssUI.{extensionsClassName}")
-                          ?? enumType.Assembly.GetType($"CssUI.CSS.{extensionsClassName}")
-                          ?? enumType.Assembly.GetType($"CssUI.CSS.Media.{extensionsClassName}")
-                          ?? enumType.Assembly.GetType($"CssUI.CSS.Enums.{extensionsClassName}")
-                          ?? enumType.Assembly.GetType($"CssUI.CSS.Internal.{extensionsClassName}")
-                          ?? enumType.Assembly.GetType($"CssUI.DOM.{extensionsClassName}")
-                          ?? enumType.Assembly.GetType($"CssUI.HTTP.{extensionsClassName}");
+        // Try to use the EnumRecords-generated GetKeywords() method (0.4+)
+        var getKeywordsMethod = GetGetKeywordsMethod(enumType);
+        if (getKeywordsMethod is not null)
+        {
+            try
+            {
+                var result = getKeywordsMethod.Invoke(null, null);
+                if (result is IReadOnlyList<string> keywordList)
+                {
+                    return [.. keywordList];
+                }
+            }
+            catch
+            {
+                // Fall through to fallback implementation
+            }
+        }
 
-        if (extensionsType is null)
-            return Array.Empty<string>();
-
-        // Find the Keyword extension method
-        var keywordMethod = extensionsType.GetMethod("Keyword", new[] { enumType });
+        // Fallback: iterate over enum values and call Keyword() for each
+        var keywordMethod = GetKeywordMethod(enumType);
         if (keywordMethod is null)
-            return Array.Empty<string>();
+            return [];
 
         // Get all enum values and map to keywords
         var enumValues = System.Enum.GetValues(enumType);
@@ -375,7 +398,7 @@ public static class Lookup
         {
             try
             {
-                var result = keywordMethod.Invoke(null, new[] { enumValues.GetValue(i) });
+                var result = keywordMethod.Invoke(null, [enumValues.GetValue(i)]);
                 if (result is string keyword && !string.IsNullOrEmpty(keyword))
                 {
                     keywords.Add(keyword);
@@ -383,11 +406,11 @@ public static class Lookup
             }
             catch
             {
-                // Skip enum values that don't have a keyword defined
+                // Skip enum values that don't have a keyword defined (e.g., [Ignore] members)
             }
         }
 
-        return keywords.ToArray();
+        return [.. keywords];
     }
 
     /// <summary>
