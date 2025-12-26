@@ -415,7 +415,7 @@ public partial class CssValue : ISpanFormattable, IFormattable, IParsable<CssVal
     /// var() references custom properties and are resolved during computed value time.
     /// Docs: https://www.w3.org/TR/css-variables-1/#using-variables
     /// </remarks>
-    public static CssValue From(CssVarFunction value) => new CssValue(ECssValueTypes.VAR, CssValueData.FromObject(value));
+    public static CssValue From(CssVarFunction value) => new CssVarValue(value);
 
     /// <summary>Create an env() function reference value</summary>
     /// <remarks>
@@ -423,14 +423,14 @@ public partial class CssValue : ISpanFormattable, IFormattable, IParsable<CssVal
     /// Unlike var(), env() variables are global to a document.
     /// Docs: https://www.w3.org/TR/css-env-1/
     /// </remarks>
-    public static CssValue From(CssEnvFunction value) => new CssValue(ECssValueTypes.ENV, CssValueData.FromObject(value));
+    public static CssValue From(CssEnvFunction value) => new CssEnvValue(value);
 
     /// <summary>Create a unicode-range value</summary>
     /// <remarks>
     /// Unicode-ranges are used in @font-face rules to specify which characters a font supports.
     /// Docs: https://www.w3.org/TR/css-syntax-3/#urange
     /// </remarks>
-    public static CssValue From(CssUnicodeRange value) => new CssValue(ECssValueTypes.UNICODE_RANGE, CssValueData.FromObject(value));
+    public static CssValue From(CssUnicodeRange value) => new CssUnicodeRangeValue(value);
 
     /// <summary>Create a css-value by parsing the given string as CSS markup</summary>
     [Obsolete("Use CssValue.Parse(string, IFormatProvider?) or CssValue.TryParse() instead.")]
@@ -1038,7 +1038,7 @@ public partial class CssValue : ISpanFormattable, IFormattable, IParsable<CssVal
     /// Returns the value as a CssVarFunction.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public CssVarFunction AsVarFunction()
+    public virtual CssVarFunction AsVarFunction()
     {
         if (Type != ECssValueTypes.VAR) throw new CssException($"{nameof(CssValue)} is not a var() function! {this}");
         Contract.EndContractBlock();
@@ -1050,7 +1050,7 @@ public partial class CssValue : ISpanFormattable, IFormattable, IParsable<CssVal
     /// Returns the value as a CssEnvFunction.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public CssEnvFunction AsEnvFunction()
+    public virtual CssEnvFunction AsEnvFunction()
     {
         if (Type != ECssValueTypes.ENV) throw new CssException($"{nameof(CssValue)} is not an env() function! {this}");
         Contract.EndContractBlock();
@@ -1062,7 +1062,7 @@ public partial class CssValue : ISpanFormattable, IFormattable, IParsable<CssVal
     /// Returns the value as a CssUnicodeRange.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public CssUnicodeRange AsUnicodeRange()
+    public virtual CssUnicodeRange AsUnicodeRange()
     {
         if (Type != ECssValueTypes.UNICODE_RANGE) throw new CssException($"{nameof(CssValue)} is not a unicode-range! {this}");
         Contract.EndContractBlock();

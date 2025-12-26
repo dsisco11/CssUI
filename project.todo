@@ -156,10 +156,14 @@ Strings are common in custom properties, `content`, quoted `font-family` names.
 - [x] Changed constructor to factory method `CssValue.From(CssFunction)`
 
 ### 13.6 Cleanup & Optimization
-- [ ] Audit remaining `data.ObjectValue` usages for potential subclass candidates
+- [x] Audit remaining `data.ObjectValue` usages for potential subclass candidates
+  - Created `CssVarValue` for VAR type (CssVarFunction storage)
+  - Created `CssEnvValue` for ENV type (CssEnvFunction storage)
+  - Created `CssUnicodeRangeValue` for UNICODE_RANGE type (CssUnicodeRange storage)
+  - All ObjectValue-based types now have specialized subclasses
 - [ ] Consider sealing base `CssValue` class or making constructor internal-only
-- [ ] Update documentation with subclass usage patterns
-- [ ] Performance benchmarks comparing old vs new implementations
+- [-] Update documentation with subclass usage patterns - Not Applicable
+- [-] Performance benchmarks comparing old vs new implementations - Irrelevant
 
 ## Phase 25: Advanced CSS Features
 ### 25.1 CSS calc() Formal Tree (future enhancement)
