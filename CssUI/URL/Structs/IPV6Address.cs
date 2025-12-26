@@ -1,8 +1,9 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CssUI.HTTP;
 
-public struct IPV6Address : ISpanFormattable
+public struct IPV6Address : ISpanFormattable, IParsable<IPV6Address>, ISpanParsable<IPV6Address>
 {/* Docs: https://url.spec.whatwg.org/#concept-ipv6 */
 
     #region Properties
@@ -52,6 +53,147 @@ public struct IPV6Address : ISpanFormattable
 
         return address;
     }
+
+    #region Parsing (IParsable, ISpanParsable)
+    /// <summary>
+    /// Parses an IPv6 address from a string.
+    /// </summary>
+    /// <param name="s">The string to parse.</param>
+    /// <param name="provider">The format provider (ignored).</param>
+    /// <returns>The parsed IPv6 address.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="s"/> is null.</exception>
+    /// <exception cref="FormatException">Thrown when the string is not a valid IPv6 address.</exception>
+    public static IPV6Address Parse(string s, IFormatProvider? provider)
+    {
+        ArgumentNullException.ThrowIfNull(s);
+        return Parse(s.AsSpan(), provider);
+    }
+
+    /// <summary>
+    /// Parses an IPv6 address from a character span.
+    /// </summary>
+    /// <param name="s">The span to parse.</param>
+    /// <param name="provider">The format provider (ignored).</param>
+    /// <returns>The parsed IPv6 address.</returns>
+    /// <exception cref="FormatException">Thrown when the span is not a valid IPv6 address.</exception>
+    public static IPV6Address Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
+    {
+        if (!TryParse(s, provider, out IPV6Address result))
+        {
+            throw new FormatException($"Invalid IPv6 address: '{s.ToString()}'");
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Tries to parse an IPv6 address from a string.
+    /// </summary>
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out IPV6Address result)
+    {
+        result = default;
+        if (string.IsNullOrWhiteSpace(s))
+            return false;
+
+        return TryParse(s.AsSpan(), provider, out result);
+    }
+
+    /// <summary>
+    /// Tries to parse an IPv6 address from a character span.
+    /// </summary>
+    /// <remarks>
+    /// Simplified parser for standard colon-hex notation. For full WHATWG URL spec compliance,
+    /// use the Url.Parse_IPV6 method.
+    /// </remarks>
+    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out IPV6Address result)
+    {
+        result = default;
+        s = s.Trim();
+        if (s.IsEmpty)
+            return false;
+
+        ushort[] parts = new ushort[8];
+        int partIndex = 0;
+        int compressIndex = -1;
+        int currentValue = 0;
+        int digitCount = 0;
+
+        for (int i = 0; i < s.Length; i++)
+        {
+            char c = s[i];
+            if (UnicodeCommon.Is_Ascii_Hex_Digit(c))
+            {
+                currentValue = currentValue * 16 + UnicodeCommon.Ascii_Hex_To_Value(c);
+                if (currentValue > 0xFFFF)
+                    return false;
+                digitCount++;
+                if (digitCount > 4)
+                    return false;
+            }
+            else if (c == ':')
+            {
+                if (i + 1 < s.Length && s[i + 1] == ':')
+                {
+                    // Compression marker ::
+                    if (compressIndex >= 0)
+                        return false; // Only one :: allowed
+                    if (digitCount > 0)
+                    {
+                        if (partIndex >= 8) return false;
+                        parts[partIndex++] = (ushort)currentValue;
+                    }
+                    compressIndex = partIndex;
+                    currentValue = 0;
+                    digitCount = 0;
+                    i++; // Skip second colon
+                }
+                else
+                {
+                    if (digitCount == 0 && compressIndex < 0)
+                        return false;
+                    if (digitCount > 0)
+                    {
+                        if (partIndex >= 8) return false;
+                        parts[partIndex++] = (ushort)currentValue;
+                    }
+                    currentValue = 0;
+                    digitCount = 0;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        // Handle final part
+        if (digitCount > 0)
+        {
+            if (partIndex >= 8) return false;
+            parts[partIndex++] = (ushort)currentValue;
+        }
+
+        // Expand compression if present
+        if (compressIndex >= 0)
+        {
+            int zerosNeeded = 8 - partIndex;
+            if (zerosNeeded < 0) return false;
+
+            // Shift parts after compress point
+            for (int i = partIndex - 1; i >= compressIndex; i--)
+            {
+                parts[i + zerosNeeded] = parts[i];
+                parts[i] = 0;
+            }
+        }
+        else if (partIndex != 8)
+        {
+            return false;
+        }
+
+        result = new IPV6Address(parts);
+        return true;
+    }
+    #endregion
 
     #region ISpanFormattable
     /// <summary>

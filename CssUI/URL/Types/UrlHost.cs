@@ -1,9 +1,10 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CssUI.HTTP;
 
 
-public class UrlHost : ISpanFormattable
+public class UrlHost : ISpanFormattable, IParsable<UrlHost>
 {/* Docs: https://url.spec.whatwg.org/#concept-host */
 
     #region Properties
@@ -39,6 +40,62 @@ public class UrlHost : ISpanFormattable
     {
         Value = address;
         Type = EHostType.IPV6Address;
+    }
+    #endregion
+
+    #region Parsing (IParsable)
+    /// <summary>
+    /// Parses a host string into a <see cref="UrlHost"/>.
+    /// </summary>
+    /// <param name="s">The string to parse.</param>
+    /// <param name="provider">The format provider (ignored).</param>
+    /// <returns>The parsed host.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="s"/> is null.</exception>
+    /// <exception cref="FormatException">Thrown when the string is not a valid host.</exception>
+    public static UrlHost Parse(string s, IFormatProvider? provider)
+    {
+        ArgumentNullException.ThrowIfNull(s);
+        if (!TryParse(s, provider, out UrlHost? result) || result is null)
+        {
+            throw new FormatException($"Invalid host: '{s}'");
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Tries to parse a host string into a <see cref="UrlHost"/>.
+    /// </summary>
+    /// <param name="s">The string to parse.</param>
+    /// <param name="provider">The format provider (ignored).</param>
+    /// <param name="result">The parsed host if successful.</param>
+    /// <returns>True if parsing succeeded; otherwise, false.</returns>
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [NotNullWhen(true)] out UrlHost? result)
+    {
+        result = null;
+        if (string.IsNullOrEmpty(s))
+            return false;
+
+        // Check for IPv6 (bracketed)
+        if (s.StartsWith('[') && s.EndsWith(']'))
+        {
+            if (IPV6Address.TryParse(s.AsSpan(1, s.Length - 2), provider, out IPV6Address ipv6))
+            {
+                result = new UrlHost(ipv6);
+                return true;
+            }
+            return false;
+        }
+
+        // Check for IPv4
+        if (IPV4Address.TryParse(s, provider, out IPV4Address ipv4))
+        {
+            result = new UrlHost(ipv4);
+            return true;
+        }
+
+        // Otherwise treat as domain/opaque host
+        result = new UrlHost(s);
+        return true;
     }
     #endregion
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
@@ -10,7 +11,7 @@ using static CssUI.UnicodeCommon;
 namespace CssUI.HTTP;
 
 /* Docs: https://url.spec.whatwg.org/ */
-public class Url : ISpanFormattable
+public class Url : ISpanFormattable, IParsable<Url>
 {
     #region Static
     static ILogger Logger = CssUI.Log.GetLogger<Url>();
@@ -187,6 +188,40 @@ public class Url : ISpanFormattable
     #endregion
 
     #region Parsing
+    /// <summary>
+    /// Parses a URL string using the WHATWG URL Standard parser.
+    /// </summary>
+    /// <param name="s">The URL string to parse.</param>
+    /// <param name="provider">The format provider (ignored - URLs are locale-independent).</param>
+    /// <returns>The parsed URL.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="s"/> is null.</exception>
+    /// <exception cref="FormatException">Thrown when the string is not a valid URL.</exception>
+    public static Url Parse(string s, IFormatProvider? provider)
+    {
+        ArgumentNullException.ThrowIfNull(s);
+        if (!TryParse(s, provider, out Url? result) || result is null)
+        {
+            throw new FormatException($"Invalid URL: '{s}'");
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Tries to parse a URL string using the WHATWG URL Standard parser.
+    /// </summary>
+    /// <param name="s">The URL string to parse.</param>
+    /// <param name="provider">The format provider (ignored - URLs are locale-independent).</param>
+    /// <param name="result">The parsed URL if successful.</param>
+    /// <returns>True if parsing succeeded; otherwise, false.</returns>
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [NotNullWhen(true)] out Url? result)
+    {
+        result = null;
+        if (string.IsNullOrWhiteSpace(s))
+            return false;
+
+        return TryParse(s.AsMemory(), out result);
+    }
+
     public static Url? Parse(ReadOnlyMemory<char> input, in Url? urlBase = null, in Encoding? encodingOverride = null)
     {
         if (TryParse(input, out Url outUrl, urlBase, encodingOverride))

@@ -223,17 +223,16 @@ Migrate to standard .NET IParsable<T>/ISpanParsable<T> interfaces for consistent
   - [x] Mark CssUnicodeRangeParser.Parse(string) as [Obsolete]
 
 ### 10.2 URL Types
-- [ ] Url (URL/Base/)
-  - [ ] Implement IParsable<Url>, ISpanParsable<Url>
-  - [ ] Wrap existing Url.TryParse() logic
-- [ ] IPV4Address (URL/Types/)
-  - [ ] Implement IParsable<IPV4Address>, ISpanParsable<IPV4Address>
-- [ ] IPV6Address (URL/Types/)
-  - [ ] Implement IParsable<IPV6Address>, ISpanParsable<IPV6Address>
-- [ ] UrlHost (URL/Types/)
-  - [ ] Implement IParsable<UrlHost>, ISpanParsable<UrlHost>
-- [ ] UrlOrigin (URL/Types/)
-  - [ ] Implement IParsable<UrlOrigin>, ISpanParsable<UrlOrigin>
+- [x] Url (URL/Base/)
+  - [x] Implement IParsable<Url>
+  - [x] Wrap existing Url.TryParse() logic
+- [x] IPV4Address (URL/Structs/)
+  - [x] Implement IParsable<IPV4Address>, ISpanParsable<IPV4Address>
+- [x] IPV6Address (URL/Structs/)
+  - [x] Implement IParsable<IPV6Address>, ISpanParsable<IPV6Address>
+- [x] UrlHost (URL/Types/)
+  - [x] Implement IParsable<UrlHost>
+- [ ] UrlOrigin (URL/Types/) - Deferred: UrlOrigin is a computed property, not parsed from strings
 
 ### 10.3 Color Types
 - [ ] CssColorHdr (RenderEngine/Color/)
