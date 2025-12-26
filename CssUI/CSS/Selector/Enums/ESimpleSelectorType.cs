@@ -18,6 +18,14 @@ public enum ESimpleSelectorType
     /// <summary>Matches pseudo classes, which are element states based on information not contained within the UI system</summary>
     PseudoClassSelector,
     /// <summary>Matches pseudo element, which are elements that are not represented by a seperate element class instance, and are instead a sub-part of an element. EG: the "::first-line" or "::first-letter"</summary>
-    PseudoElementSelector
+    PseudoElementSelector,
+    /// <summary>
+    /// The nesting selector (&amp;) represents the parent rule's selector in CSS Nesting.
+    /// When used outside of nesting context, it matches the same elements as :scope.
+    /// </summary>
+    /// <remarks>
+    /// SEE: https://www.w3.org/TR/css-nesting-1/#nest-selector
+    /// </remarks>
+    NestingSelector
 }
 

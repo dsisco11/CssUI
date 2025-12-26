@@ -157,6 +157,7 @@ public class SelectorParser
     static bool Starts_Simple_Selector(CssToken A, CssToken B, CssToken C)
     {
         if (Starts_ID_Selector(A)) return true;
+        if (Starts_Nesting_Selector(A)) return true;
         if (Starts_Type_Selector(A, B, C)) return true;
         if (Starts_Class_Selector(A, B)) return true;
         if (Starts_Universal_Selector(A, B)) return true;
@@ -164,6 +165,16 @@ public class SelectorParser
         if (Starts_Pseudo_Class_Selector(A, B)) return true;
 
         return false;
+    }
+
+    /// <summary>
+    /// Checks if the token starts a nesting selector (&amp;).
+    /// Per CSS Nesting spec, the nesting selector is written as '&amp;' (U+0026 AMPERSAND).
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    static bool Starts_Nesting_Selector(CssToken A)
+    {
+        return Is_Char(A, '&');
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -398,6 +409,10 @@ public class SelectorParser
         {
             return Consume_ID_Selector(Stream);
         }
+        else if (Starts_Nesting_Selector(Stream.Next))
+        {
+            return Consume_Nesting_Selector(Stream);
+        }
         else if (Starts_Universal_Selector(Stream.Next, Stream.NextNext))
         {
             return Consume_Universal_Selector(Stream);
@@ -436,6 +451,22 @@ public class SelectorParser
         HashToken? Hash = (Stream.Consume() as HashToken);
         if (Hash?.HashType != EHashTokenType.ID) throw new CssParserException("Invalid Hash token, hash-type is not ID!");
         return new IDSelector(Hash.Value!);
+    }
+
+    /// <summary>
+    /// Consumes a nesting selector (&amp;) from the stream.
+    /// The nesting selector represents the parent rule's selector in CSS Nesting.
+    /// </summary>
+    /// <remarks>
+    /// Per CSS Nesting spec: https://www.w3.org/TR/css-nesting-1/#nest-selector
+    /// The parent selector is not set here during parsing; it will be resolved
+    /// during stylesheet processing when nested rules are encountered.
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    static NestingSelector Consume_Nesting_Selector(DataConsumer<CssToken> Stream)
+    {
+        Stream.Consume(); // Consume the '&' character
+        return new NestingSelector();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

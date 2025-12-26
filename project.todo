@@ -36,11 +36,12 @@
 Spec Reference: https://www.w3.org/TR/css-nesting-1/
 Prerequisites: Phase 6 (CSS Parser), Phase 11.7.2 (Consume_Style_Block_Contents)
 
-### 11.9.1 Nesting Selector (&)
-- [ ] Parse <delim-token> with value "&" as nesting selector
-- [ ] CssNestingSelector type (CSS/Selector/)
-- [ ] Nesting selector represents the parent rule's selector list
-- [ ] Handle & at any position in compound selector: &.class, .class&, &::before
+### 11.9.1 Nesting Selector (&) ✓
+- [x] Parse <delim-token> with value "&" as nesting selector
+- [x] NestingSelector type (CSS/Selector/)
+- [x] Nesting selector represents the parent rule's selector list
+- [x] Handle & at any position in compound selector: &.class, .class&, &::before
+- [x] Tests for NestingSelector (24 tests passing)
 
 ### 11.9.2 Nested Style Rules
 - [ ] Allow style rules inside other style rules

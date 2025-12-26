@@ -98,6 +98,20 @@ public class ComplexSelector : List<RelativeSelector>, ISpanFormattable
                     case ESimpleSelectorType.PseudoElementSelector:
                         C++;
                         break;
+                    case ESimpleSelectorType.NestingSelector:
+                        // Per CSS Nesting spec: The specificity of the nesting selector is equal to the
+                        // largest specificity among the complex selectors in the parent style rule's selector list
+                        // (identical to the behavior of :is()).
+                        // SEE: https://www.w3.org/TR/css-nesting-1/#nest-selector
+                        if (Simple is NestingSelector nestingSelector)
+                        {
+                            long nestingSpecificity = nestingSelector.GetSpecificity();
+                            // Extract A, B, C components from the nesting selector's specificity
+                            A += (nestingSpecificity >> 32) & 0xFFFF;
+                            B += (nestingSpecificity >> 16) & 0xFFFF;
+                            C += nestingSpecificity & 0xFFFF;
+                        }
+                        break;
                 }
             }
         }
