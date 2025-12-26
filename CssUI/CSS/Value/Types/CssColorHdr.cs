@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using CssUI.Rendering;
@@ -13,7 +14,7 @@ namespace CssUI.CSS;
 /// Docs: https://www.w3.org/TR/css-color-4/
 /// </remarks>
 [StructLayout(LayoutKind.Sequential)]
-public readonly record struct CssColorHdr : IEquatable<CssColorHdr>
+public readonly record struct CssColorHdr : IEquatable<CssColorHdr>, ISpanFormattable, IFormattable
 {
     #region Constants
     private const float ByteMaxF = 255f;
@@ -327,6 +328,79 @@ public readonly record struct CssColorHdr : IEquatable<CssColorHdr>
     #region Formatting
     /// <inheritdoc/>
     public override string ToString() => Serialization.CssColorSerializer.Serialize(this);
+
+    /// <inheritdoc/>
+    public string ToString(string? format, IFormatProvider? formatProvider) => ToString();
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// Serializes HDR colors per CSS Color Level 4 §15:
+    /// - lab(), lch() for Lab/LCH color spaces
+    /// - oklab(), oklch() for OkLab/OkLCH color spaces
+    /// - color() for other predefined color spaces
+    /// </remarks>
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+    {
+        charsWritten = 0;
+        ReadOnlySpan<char> funcName = _colorSpace switch
+        {
+            EColorSpace.Lab => "lab(",
+            EColorSpace.Lch => "lch(",
+            EColorSpace.OkLab => "oklab(",
+            EColorSpace.OkLCh => "oklch(",
+            EColorSpace.sRGB => "color(srgb ",
+            EColorSpace.sRGBLinear => "color(srgb-linear ",
+            EColorSpace.DisplayP3 => "color(display-p3 ",
+            _ => "color(unknown "
+        };
+
+        // Function name
+        if (!funcName.TryCopyTo(destination))
+            return false;
+        charsWritten += funcName.Length;
+
+        // C1 value
+        if (!_c1.TryFormat(destination[charsWritten..], out int c1Written, "G6", CultureInfo.InvariantCulture))
+            return false;
+        charsWritten += c1Written;
+
+        if (!" ".TryCopyTo(destination[charsWritten..]))
+            return false;
+        charsWritten += 1;
+
+        // C2 value
+        if (!_c2.TryFormat(destination[charsWritten..], out int c2Written, "G6", CultureInfo.InvariantCulture))
+            return false;
+        charsWritten += c2Written;
+
+        if (!" ".TryCopyTo(destination[charsWritten..]))
+            return false;
+        charsWritten += 1;
+
+        // C3 value
+        if (!_c3.TryFormat(destination[charsWritten..], out int c3Written, "G6", CultureInfo.InvariantCulture))
+            return false;
+        charsWritten += c3Written;
+
+        // Alpha (if not 1.0)
+        if (Math.Abs(_alpha - 1f) > Epsilon)
+        {
+            if (!" / ".TryCopyTo(destination[charsWritten..]))
+                return false;
+            charsWritten += 3;
+
+            if (!_alpha.TryFormat(destination[charsWritten..], out int alphaWritten, "G6", CultureInfo.InvariantCulture))
+                return false;
+            charsWritten += alphaWritten;
+        }
+
+        // Closing paren
+        if (!")".TryCopyTo(destination[charsWritten..]))
+            return false;
+        charsWritten += 1;
+
+        return true;
+    }
     #endregion
 
     #region Equality

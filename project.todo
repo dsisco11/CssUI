@@ -186,13 +186,14 @@ Migrate from ICssSerializeable.Serialize(StringBuilder) pattern to ISpanFormatta
 - [x] CssMarginRule (also updated)
 
 ### 9.5 CSS Value Types (CSS/Value/)
-- [ ] CssValue serialization modernization
-- [ ] CssColor/CssColorHdr ISpanFormattable
-- [ ] CssCalcExpression tree serialization
-- [ ] CssUrl serialization
-- [ ] CssVarFunction serialization
-- [ ] CssEnvFunction serialization
-- [ ] CssUnicodeRange serialization
+- [x] CssValue serialization modernization (already implemented)
+- [x] CssColor ISpanFormattable (already implemented)
+- [x] CssColorHdr ISpanFormattable
+- [x] CssUrl ISpanFormattable
+- [x] CssVarFunction ISpanFormattable
+- [x] CssEnvFunction ISpanFormattable
+- [x] CssUnicodeRange ISpanFormattable
+- [ ] CssCalcExpression tree serialization (defer - complex tree structure)
 
 ### 9.6 StringBuilder Call Site Migration
 - [ ] Identify all StringBuilder.Append(x.Serialize()) patterns

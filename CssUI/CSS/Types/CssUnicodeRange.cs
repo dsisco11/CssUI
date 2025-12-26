@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 
 namespace CssUI.CSS;
 
@@ -24,7 +25,7 @@ namespace CssUI.CSS;
 /// </para>
 /// </remarks>
 /// <seealso href="https://www.w3.org/TR/css-syntax-3/#urange"/>
-public readonly struct CssUnicodeRange
+public readonly struct CssUnicodeRange : IEquatable<CssUnicodeRange>, ISpanFormattable, IFormattable
 {
     /// <summary>
     /// The maximum allowed code point defined by Unicode: U+10FFFF.
@@ -126,9 +127,53 @@ public readonly struct CssUnicodeRange
     public override string ToString() => Serialize();
 
     /// <inheritdoc/>
+    public string ToString(string? format, IFormatProvider? formatProvider) => Serialize();
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// For a single code point, formats as "U+XXXX".
+    /// For a range, formats as "U+XXXX-YYYY".
+    /// Note: This does not use wildcard (?) syntax; canonical form uses explicit ranges.
+    /// </remarks>
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+    {
+        charsWritten = 0;
+
+        // U+
+        if (!"U+".TryCopyTo(destination))
+            return false;
+        charsWritten += 2;
+
+        // Start value (uppercase hex)
+        if (!Start.TryFormat(destination[charsWritten..], out int startWritten, "X", CultureInfo.InvariantCulture))
+            return false;
+        charsWritten += startWritten;
+
+        // If range (not single code point), add -End
+        if (!IsSingleCodePoint)
+        {
+            if (!"-".TryCopyTo(destination[charsWritten..]))
+                return false;
+            charsWritten += 1;
+
+            if (!End.TryFormat(destination[charsWritten..], out int endWritten, "X", CultureInfo.InvariantCulture))
+                return false;
+            charsWritten += endWritten;
+        }
+
+        return true;
+    }
+
+    /// <inheritdoc/>
     public override bool Equals(object? obj)
     {
-        return obj is CssUnicodeRange other && Start == other.Start && End == other.End;
+        return obj is CssUnicodeRange other && Equals(other);
+    }
+
+    /// <inheritdoc/>
+    public bool Equals(CssUnicodeRange other)
+    {
+        return Start == other.Start && End == other.End;
     }
 
     /// <inheritdoc/>

@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using CssUI.CSS.Parser;
 
 namespace CssUI.CSS;
@@ -32,7 +33,7 @@ namespace CssUI.CSS;
 /// - env(viewport-segment-width 0 0, 300px)
 /// - env(--custom-env, fallback)
 /// </remarks>
-public readonly struct CssEnvFunction : IEquatable<CssEnvFunction>
+public readonly struct CssEnvFunction : IEquatable<CssEnvFunction>, ISpanFormattable, IFormattable
 {
     #region Static
 
@@ -322,6 +323,67 @@ public readonly struct CssEnvFunction : IEquatable<CssEnvFunction>
 
         result += ")";
         return result;
+    }
+
+    /// <inheritdoc/>
+    public string ToString(string? format, IFormatProvider? formatProvider) => ToString();
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// Serializes as: env(name) or env(name index0 index1, fallback)
+    /// </remarks>
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+    {
+        charsWritten = 0;
+
+        // env(
+        if (!"env(".TryCopyTo(destination))
+            return false;
+        charsWritten += 4;
+
+        // Variable name
+        if (!string.IsNullOrEmpty(VariableName))
+        {
+            if (!VariableName.AsSpan().TryCopyTo(destination[charsWritten..]))
+                return false;
+            charsWritten += VariableName.Length;
+        }
+
+        // Indices
+        if (Indices.Length > 0)
+        {
+            var span = Indices.Span;
+            for (int i = 0; i < span.Length; i++)
+            {
+                if (!" ".TryCopyTo(destination[charsWritten..]))
+                    return false;
+                charsWritten += 1;
+
+                if (!span[i].TryFormat(destination[charsWritten..], out int indexWritten, default, CultureInfo.InvariantCulture))
+                    return false;
+                charsWritten += indexWritten;
+            }
+        }
+
+        // Fallback (if present)
+        if (Fallback is not null)
+        {
+            if (!", ".TryCopyTo(destination[charsWritten..]))
+                return false;
+            charsWritten += 2;
+
+            string fallbackStr = Fallback.ToString() ?? string.Empty;
+            if (!fallbackStr.AsSpan().TryCopyTo(destination[charsWritten..]))
+                return false;
+            charsWritten += fallbackStr.Length;
+        }
+
+        // )
+        if (!")".TryCopyTo(destination[charsWritten..]))
+            return false;
+        charsWritten += 1;
+
+        return true;
     }
 
     #endregion

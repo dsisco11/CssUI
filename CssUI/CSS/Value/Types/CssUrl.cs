@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 
 namespace CssUI.CSS;
 
@@ -12,7 +13,7 @@ namespace CssUI.CSS;
 /// Both forms are supported and normalized to this type.
 /// Docs: https://www.w3.org/TR/css-syntax-3/#url-token-diagram
 /// </remarks>
-public readonly record struct CssUrl : IEquatable<CssUrl>
+public readonly record struct CssUrl : IEquatable<CssUrl>, ISpanFormattable, IFormattable
 {
     #region Fields
     /// <summary>
@@ -87,6 +88,37 @@ public readonly record struct CssUrl : IEquatable<CssUrl>
     /// Returns just the URL string value.
     /// </summary>
     public override string ToString() => Value;
+
+    /// <inheritdoc/>
+    public string ToString(string? format, IFormatProvider? formatProvider) => ToCssString();
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// Per CSS Syntax Level 3 serialization rules, URLs are serialized
+    /// using the quoted form: url("...")
+    /// </remarks>
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+    {
+        charsWritten = 0;
+
+        // url("
+        if (!"url(\"".TryCopyTo(destination))
+            return false;
+        charsWritten += 5;
+
+        // Escape and write the URL value
+        string escaped = EscapeForCss(Value);
+        if (!escaped.AsSpan().TryCopyTo(destination[charsWritten..]))
+            return false;
+        charsWritten += escaped.Length;
+
+        // ")
+        if (!")\"".TryCopyTo(destination[charsWritten..]))
+            return false;
+        charsWritten += 2;
+
+        return true;
+    }
 
     /// <summary>
     /// Escapes special characters in a URL string for CSS serialization.

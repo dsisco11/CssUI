@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using CssUI.CSS.Parser;
 
 namespace CssUI.CSS;
@@ -24,7 +25,7 @@ namespace CssUI.CSS;
 /// - var(--spacing, 10px)
 /// - var(--nested, var(--other))
 /// </remarks>
-public readonly struct CssVarFunction : IEquatable<CssVarFunction>
+public readonly struct CssVarFunction : IEquatable<CssVarFunction>, ISpanFormattable, IFormattable
 {
     #region Static
 
@@ -245,6 +246,51 @@ public readonly struct CssVarFunction : IEquatable<CssVarFunction>
         }
 
         return $"var({PropertyName})";
+    }
+
+    /// <inheritdoc/>
+    public string ToString(string? format, IFormatProvider? formatProvider) => ToString();
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// Serializes as: var(--name) or var(--name, fallback)
+    /// </remarks>
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+    {
+        charsWritten = 0;
+
+        // var(
+        if (!"var(".TryCopyTo(destination))
+            return false;
+        charsWritten += 4;
+
+        // Property name
+        if (!string.IsNullOrEmpty(PropertyName))
+        {
+            if (!PropertyName.AsSpan().TryCopyTo(destination[charsWritten..]))
+                return false;
+            charsWritten += PropertyName.Length;
+        }
+
+        // Fallback (if present)
+        if (HasFallback)
+        {
+            if (!", ".TryCopyTo(destination[charsWritten..]))
+                return false;
+            charsWritten += 2;
+
+            string fallbackStr = Fallback?.ToString() ?? SerializeFallbackTokens();
+            if (!fallbackStr.AsSpan().TryCopyTo(destination[charsWritten..]))
+                return false;
+            charsWritten += fallbackStr.Length;
+        }
+
+        // )
+        if (!")".TryCopyTo(destination[charsWritten..]))
+            return false;
+        charsWritten += 1;
+
+        return true;
     }
 
     private string SerializeFallbackTokens()
