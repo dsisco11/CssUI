@@ -399,10 +399,10 @@ public partial class CssValue : ISpanFormattable, IFormattable, IParsable<CssVal
     public static CssValue From_String(string value) => new CssStringValue(value);
 
     /// <summary>Create a URL value</summary>
-    public static CssValue From(CssUrl value) => new CssValue(ECssValueTypes.URL, CssValueData.FromObject(value));
+    public static CssValue From(CssUrl value) => new CssUrlValue(value);
 
     /// <summary>Create a URL value from a string</summary>
-    public static CssValue From_Url(string url) => new CssValue(ECssValueTypes.URL, CssValueData.FromObject(new CssUrl(url)));
+    public static CssValue From_Url(string url) => new CssUrlValue(url);
 
     /// <summary>Create a calc() expression value</summary>
     public static CssValue From(CssCalcExpression value) => new CssValue(ECssValueTypes.CALC, CssValueData.FromObject(value));
@@ -1011,7 +1011,7 @@ public partial class CssValue : ISpanFormattable, IFormattable, IParsable<CssVal
     /// Returns the value as a CssUrl.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public CssUrl AsUrl()
+    public virtual CssUrl AsUrl()
     {
         if (Type != ECssValueTypes.URL) throw new CssException($"{nameof(CssValue)} is not a URL! {this}");
         Contract.EndContractBlock();

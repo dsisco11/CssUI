@@ -187,7 +187,7 @@ public readonly record struct CssUrl : IEquatable<CssUrl>, ISpanFormattable, IFo
         charsWritten += escaped.Length;
 
         // ")
-        if (!")\"".TryCopyTo(destination[charsWritten..]))
+        if (!"\")".TryCopyTo(destination[charsWritten..]))
             return false;
         charsWritten += 2;
 
