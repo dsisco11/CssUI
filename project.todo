@@ -271,9 +271,12 @@ These parse from token streams; IParsable facade delegates to CssValue.Parse int
 - [ ] Enable generic T.Parse<T>() usage in utilities - Deferred to future
 
 ### 10.6 Cleanup
-- [ ] Mark deprecated Parse methods with [Obsolete] pointing to IParsable
-- [ ] Keep internal TryParse(DataConsumer<CssToken>) overloads on parser classes
-- [ ] Update XML documentation
+- [x] Mark deprecated Parse methods with [Obsolete] pointing to IParsable
+  - [x] CssAnBParser.Parse(string) and TryParse(string) marked obsolete
+  - [x] CssUnicodeRangeParser.Parse(string) and TryParse(string) marked obsolete
+  - [x] CssValue.From_CSS(string) marked obsolete
+- [x] Keep internal TryParse(DataConsumer<CssToken>) overloads on parser classes
+- [x] Update XML documentation (completed during implementation)
 
 ## Phase 11: CSS Color Parsing & Serialization (W3C Compliance)
 ### Spec References
