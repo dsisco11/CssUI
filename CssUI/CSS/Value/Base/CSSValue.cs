@@ -405,7 +405,7 @@ public partial class CssValue : ISpanFormattable, IFormattable, IParsable<CssVal
     public static CssValue From_Url(string url) => new CssUrlValue(url);
 
     /// <summary>Create a calc() expression value</summary>
-    public static CssValue From(CssCalcExpression value) => new CssValue(ECssValueTypes.CALC, CssValueData.FromObject(value));
+    public static CssValue From(CssCalcExpression value) => new CssCalcValue(value);
 
     /// <summary>Create a var() function reference value</summary>
     /// <remarks>
@@ -1023,7 +1023,7 @@ public partial class CssValue : ISpanFormattable, IFormattable, IParsable<CssVal
     /// Returns the value as a CssCalcExpression.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public CssCalcExpression AsCalcExpression()
+    public virtual CssCalcExpression AsCalcExpression()
     {
         if (Type != ECssValueTypes.CALC) throw new CssException($"{nameof(CssValue)} is not a calc() expression! {this}");
         Contract.EndContractBlock();

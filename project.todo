@@ -140,12 +140,13 @@ Strings are common in custom properties, `content`, quoted `font-family` names.
 - [x] Made `CssValue.AsUrl()` virtual to allow override
 - [x] Fixed bug in `CssUrl.TryFormat()` closing quote order
 
-### 13.4 CssCalcValue (CALC) — Low Priority
-- [ ] Create `CssCalcValue` subclass with direct `CssCalcExpression` storage
-- [ ] Override `AsCalcExpression()` for direct access
-- [ ] Override serialization methods
-- [ ] Update factory method to return `CssCalcValue`
-- [ ] Add tests for CssCalcValue
+### 13.4 CssCalcValue (CALC) — Low Priority ✓
+- [x] Create `CssCalcValue` subclass with direct `CssCalcExpression` storage
+- [x] Override `AsCalcExpression()` for direct access
+- [x] Override serialization methods
+- [x] Update factory method to return `CssCalcValue`
+- [x] Add tests for CssCalcValue
+- [x] Made `CssValue.AsCalcExpression()` virtual to allow override
 
 ### 13.5 CssFunctionValue (FUNCTION) — Low Priority
 - [ ] Create `CssFunctionValue` subclass with direct `CssFunction` storage
