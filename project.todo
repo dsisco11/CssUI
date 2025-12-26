@@ -175,12 +175,14 @@ Migrate from ICssSerializeable.Serialize(StringBuilder) pattern to ISpanFormatta
 - [x] CssStyleRule
 - [x] CssMediaRule
 - [x] CssImportRule
-- [ ] CssFontFaceRule
-- [ ] CssKeyframesRule
-- [ ] CssSupportsRule
+- [x] CssFontFaceRule
+- [x] CssKeyframesRule
+- [x] CssKeyframeRule (also added)
+- [x] CssSupportsRule
 - [x] CssNamespaceRule
 - [x] CssPageRule
-- [ ] CssLayerRule
+- [x] CssLayerBlockRule
+- [x] CssLayerStatementRule (also added)
 - [x] CssMarginRule (also updated)
 
 ### 9.5 CSS Value Types (CSS/Value/)
