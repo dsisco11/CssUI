@@ -121,14 +121,15 @@ Lists are extremely common: `font-family`, `background`, `transition`, `transfor
 - [x] Add tests for CssListValue
 - [x] Fixed `CssValue.Serialize()` bug for CSS-wide keywords (AUTO, INHERIT, etc.)
 
-### 13.2 CssStringValue (STRING) — Medium Priority
+### 13.2 CssStringValue (STRING) — Medium Priority ✓
 Strings are common in custom properties, `content`, quoted `font-family` names.
-- [ ] Create `CssStringValue` subclass with direct `string` storage
-- [ ] Override `AsString()` for direct access (no cast)
-- [ ] Override `TryFormat()` with proper CSS string escaping/quoting
-- [ ] Override `Serialize()`, `Equals()`, `GetHashCode()`, `HasValue`
-- [ ] Update `CssValue.From_String()` to return `CssStringValue`
-- [ ] Add tests for CssStringValue
+- [x] Create `CssStringValue` subclass with direct `string` storage
+- [x] Override `AsString()` for direct access (no cast)
+- [x] Override `TryFormat()` with proper CSS string escaping/quoting
+- [x] Override `Serialize()`, `Equals()`, `GetHashCode()`, `HasValue`
+- [x] Update `CssValue.From_String()` to return `CssStringValue`
+- [x] Add tests for CssStringValue
+- [x] Made `CssValue.AsString()` virtual to allow override
 
 ### 13.3 CssUrlValue (URL) — Low Priority
 - [ ] Create `CssUrlValue` subclass with direct `CssUrl` storage

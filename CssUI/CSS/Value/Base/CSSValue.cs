@@ -396,7 +396,7 @@ public partial class CssValue : ISpanFormattable, IFormattable, IParsable<CssVal
     public static CssValue From(ReadOnlyColor value) => new CssValue(ECssValueTypes.COLOR, CssValueData.FromColor(new CssColor(value.R, value.G, value.B, value.A)));
 
     /// <summary>Create a string value</summary>
-    public static CssValue From_String(string value) => new CssValue(ECssValueTypes.STRING, CssValueData.FromObject(value));
+    public static CssValue From_String(string value) => new CssStringValue(value);
 
     /// <summary>Create a URL value</summary>
     public static CssValue From(CssUrl value) => new CssValue(ECssValueTypes.URL, CssValueData.FromObject(value));
@@ -1147,7 +1147,7 @@ public partial class CssValue : ISpanFormattable, IFormattable, IParsable<CssVal
     /// Returns the value as a string
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public string AsString() => (string)(data.ObjectValue ?? string.Empty);
+    public virtual string AsString() => (string)(data.ObjectValue ?? string.Empty);
 
     /// <summary>
     /// Returns the value as a CssFunction (for FUNCTION type values).
