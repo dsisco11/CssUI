@@ -235,9 +235,10 @@ Migrate to standard .NET IParsable<T>/ISpanParsable<T> interfaces for consistent
 - [ ] UrlOrigin (URL/Types/) - Deferred: UrlOrigin is a computed property, not parsed from strings
 
 ### 10.3 Color Types
-- [ ] CssColorHdr (RenderEngine/Color/)
-  - [ ] Implement IParsable<CssColorHdr>, ISpanParsable<CssColorHdr>
-  - [ ] Delegate to CssColorFunctionParser internally
+- [x] CssColorHdr (CSS/Value/Types/)
+  - [x] Implement IParsable<CssColorHdr>, ISpanParsable<CssColorHdr>
+  - [x] Delegate to CssColor.Parse() and convert via FromCssColor()
+  - Note: For true HDR precision, direct parsing in CssColorFunctionParser would be needed (future enhancement)
 
 ### 10.4 CSS Value Types (Token-Based - Facade Pattern)
 These parse from token streams; IParsable facade tokenizes string first, then delegates to parser.

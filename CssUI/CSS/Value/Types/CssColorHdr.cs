@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -14,7 +15,7 @@ namespace CssUI.CSS;
 /// Docs: https://www.w3.org/TR/css-color-4/
 /// </remarks>
 [StructLayout(LayoutKind.Sequential)]
-public readonly record struct CssColorHdr : IEquatable<CssColorHdr>, ISpanFormattable, IFormattable
+public readonly record struct CssColorHdr : IEquatable<CssColorHdr>, ISpanFormattable, IFormattable, IParsable<CssColorHdr>, ISpanParsable<CssColorHdr>
 {
     #region Constants
     private const float ByteMaxF = 255f;
@@ -156,6 +157,70 @@ public readonly record struct CssColorHdr : IEquatable<CssColorHdr>, ISpanFormat
     {
         var (r, g, b, a) = color.ToFloats();
         return new CssColorHdr(r, g, b, a, EColorSpace.sRGB);
+    }
+    #endregion
+
+    #region Parsing (IParsable, ISpanParsable)
+    /// <summary>
+    /// Parses a CSS color string into a <see cref="CssColorHdr"/>.
+    /// </summary>
+    /// <param name="s">The string to parse.</param>
+    /// <param name="provider">The format provider (ignored - CSS is locale-independent).</param>
+    /// <returns>The parsed color.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="s"/> is null.</exception>
+    /// <exception cref="FormatException">Thrown when the string is not a valid CSS color.</exception>
+    /// <remarks>
+    /// Parses via <see cref="CssColor"/> and converts to HDR.
+    /// Note: For true HDR color function parsing (e.g., oklab(), oklch()), the color is
+    /// first converted to sRGB 8-bit and then to HDR floating-point, which loses precision.
+    /// </remarks>
+    public static CssColorHdr Parse(string s, IFormatProvider? provider)
+    {
+        ArgumentNullException.ThrowIfNull(s);
+        return Parse(s.AsSpan(), provider);
+    }
+
+    /// <summary>
+    /// Parses a CSS color span into a <see cref="CssColorHdr"/>.
+    /// </summary>
+    public static CssColorHdr Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
+    {
+        if (!TryParse(s, provider, out CssColorHdr result))
+        {
+            throw new FormatException($"Invalid CSS color format: '{s.ToString()}'");
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Tries to parse a CSS color string into a <see cref="CssColorHdr"/>.
+    /// </summary>
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out CssColorHdr result)
+    {
+        result = Transparent;
+        if (string.IsNullOrWhiteSpace(s))
+            return false;
+
+        return TryParse(s.AsSpan(), provider, out result);
+    }
+
+    /// <summary>
+    /// Tries to parse a CSS color span into a <see cref="CssColorHdr"/>.
+    /// </summary>
+    /// <remarks>
+    /// Delegates to <see cref="CssColor.TryParse"/> and converts the result to HDR.
+    /// </remarks>
+    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out CssColorHdr result)
+    {
+        result = Transparent;
+
+        if (CssColor.TryParse(s, provider, out CssColor cssColor))
+        {
+            result = FromCssColor(cssColor);
+            return true;
+        }
+
+        return false;
     }
     #endregion
 
