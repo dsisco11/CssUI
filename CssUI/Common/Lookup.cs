@@ -100,13 +100,16 @@ public static class Lookup
 
     /// <summary>
     /// Gets the TryFromKeyword extension method for an enum type.
+    /// EnumRecords 0.5+ generates: TryFromKeyword(string value, out T? result)
     /// </summary>
     private static MethodInfo? GetTryFromKeywordMethod(Type enumType)
     {
         return _tryFromKeywordMethodCache.GetOrAdd(enumType, static et =>
         {
             var extensionsType = GetExtensionsType(et);
-            return extensionsType?.GetMethod("TryFromKeyword", [typeof(string), et.MakeByRefType()]);
+            // EnumRecords 0.5+ uses nullable out parameter: out T? (Nullable<T>)
+            var nullableType = typeof(Nullable<>).MakeGenericType(et);
+            return extensionsType?.GetMethod("TryFromKeyword", [typeof(string), nullableType.MakeByRefType()]);
         });
     }
 

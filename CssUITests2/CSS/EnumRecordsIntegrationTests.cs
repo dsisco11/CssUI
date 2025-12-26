@@ -8,7 +8,7 @@ public class EnumRecordsIntegrationTests
     [Fact]
     public void EColor_TryFromKeyword_FindsTransparent()
     {
-        var result = EColorExtensions.TryFromKeyword("transparent", out EColor color);
+        var result = EColorExtensions.TryFromKeyword("transparent", out EColor? color);
         Assert.True(result, $"TryFromKeyword should find 'transparent'. Transparent keyword is: '{EColor.Transparent.Keyword()}'");
         Assert.Equal(EColor.Transparent, color);
     }
@@ -16,7 +16,7 @@ public class EnumRecordsIntegrationTests
     [Fact]
     public void EColor_TryFromKeyword_FindsRed()
     {
-        var result = EColorExtensions.TryFromKeyword("red", out EColor color);
+        var result = EColorExtensions.TryFromKeyword("red", out EColor? color);
         Assert.True(result);
         Assert.Equal(EColor.Red, color);
     }

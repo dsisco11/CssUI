@@ -58,10 +58,11 @@ public static partial class CssPropertyResolver
                 default:
                     {
                         // Use generated extension methods for R, G, B
+                        // Cast from int to byte (EnumRecords workaround for byte type limitation)
                         return CssValue.From(CssColor.FromRgba(
-                            keyword.R(),
-                            keyword.G(),
-                            keyword.B(),
+                            (byte)keyword.R(),
+                            (byte)keyword.G(),
+                            (byte)keyword.B(),
                             255));
                     }
             }

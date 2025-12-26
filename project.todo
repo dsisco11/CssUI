@@ -101,19 +101,22 @@ EnumRecords 0.5.0 introduces significant API changes:
 
 #### 8.8.1 Fix TryFromKeyword Nullable Output Parameter (~15 call sites)
 Generated `TryFrom{Property}` methods now use `out T?` instead of `out T`:
-- [ ] Update `EventName.cs` — `EEventNameExtensions.TryFromKeyword(Name, out EEventName? enumValue)`
-- [ ] Update `InputFormats.cs` — `EColorExtensions.TryFromKeyword(...)` for color parsing
-- [ ] Update `MediaFeature.cs` — `EMediaFeatureNameExtensions.TryFromKeyword(...)` (~3 call sites)
-- [ ] Update `CssParser.cs` — `EMediaQueryModifierExtensions.TryFromKeyword(...)`, `EMediaTypeExtensions.TryFromKeyword(...)`, `EMediaOperatorExtensions.TryFromKeyword(...)`
-- [ ] Update `CssCalcEvaluator.cs` — `ECssUnitExtensions.TryFromKeyword(...)`
-- [ ] Update `CssColor.cs` — `EColorExtensions.TryFromKeyword(...)`
+- [x] Update `EventName.cs` — `EEventNameExtensions.TryFromKeyword(Name, out EEventName? enumValue)`
+- [x] Update `InputFormats.cs` — `EColorExtensions.TryFromKeyword(...)` for color parsing
+- [x] Update `MediaFeature.cs` — `EMediaFeatureNameExtensions.TryFromKeyword(...)` (~3 call sites)
+- [x] Update `CssParser.cs` — `EMediaQueryModifierExtensions.TryFromKeyword(...)`, `EMediaTypeExtensions.TryFromKeyword(...)`, `EMediaOperatorExtensions.TryFromKeyword(...)`
+- [x] Update `CssCalcEvaluator.cs` — `ECssUnitExtensions.TryFromKeyword(...)`
+- [x] Update `CssColor.cs` — `EColorExtensions.TryFromKeyword(...)`
+- [x] Update `HTMLCommon.cs` — `EAutofillExtensions.TryFromKeyword(...)`, `EAutofillContactExtensions.TryFromKeyword(...)`
+- [x] Update `Url.cs` — `EUrlSchemeExtensions.TryFromKeyword(...)`
+- [x] Update `EnumRecordsIntegrationTests.cs` — Test cases for nullable output
+- [x] Update `Lookup.cs` — Reflection lookup for nullable `Nullable<T>.MakeByRefType()`
 
 #### 8.8.2 Fix NamedColorProperties RGB Byte Array Generation
 The `NamedColorProperties` with byte fields generates incorrect `ImmutableArray<int>` instead of `ImmutableArray<byte>`:
-- [ ] Investigate generated code for `EColor` enum
-- [ ] Option A: Change `byte R, G, B` to `int R, G, B` in NamedColorProperties (workaround)
-- [ ] Option B: Report bug to EnumRecords if byte arrays aren't supported
-- [ ] Update all `[EnumData(...)]` entries for EColor if property types change
+- [x] Investigate generated code for `EColor` enum
+- [-] Option A: Change `byte R, G, B` to `int R, G, B` in NamedColorProperties (workaround) ✓
+- [x] Option B: Report bug to EnumRecords if byte arrays aren't supported (low priority)
 
 #### 8.8.3 Update Lookup.cs to Use New Static Record Classes (Performance Optimization)
 Replace reflection-based method dispatch with direct static class calls where possible:

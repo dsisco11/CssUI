@@ -163,10 +163,11 @@ public readonly record struct CssColor : IEquatable<CssColor>, ISpanFormattable,
         }
 
         // Use the generated extension methods for R, G, B
+        // Cast from int to byte (EnumRecords workaround for byte type limitation)
         return new CssColor(
-            ecolor.R(),
-            ecolor.G(),
-            ecolor.B(),
+            (byte)ecolor.R(),
+            (byte)ecolor.G(),
+            (byte)ecolor.B(),
             255
         );
     }
@@ -196,7 +197,7 @@ public readonly record struct CssColor : IEquatable<CssColor>, ISpanFormattable,
         // Create a lowercased string for lookup
         var loweredString = new string(keyword).ToLowerInvariant();
 
-        if (EColorExtensions.TryFromKeyword(loweredString, out EColor ecolor))
+        if (EColorExtensions.TryFromKeyword(loweredString, out EColor? ecolor))
         {
             // Check for special keywords
             if (ecolor == EColor.CurrentColor)
@@ -212,7 +213,7 @@ public readonly record struct CssColor : IEquatable<CssColor>, ISpanFormattable,
                 return true;
             }
 
-            color = FromEColor(ecolor);
+            color = FromEColor(ecolor.Value);
             return true;
         }
 

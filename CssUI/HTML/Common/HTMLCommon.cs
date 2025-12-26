@@ -396,8 +396,10 @@ namespace CssUI.HTML
                     //var key = tokens[index];
                     string key = Stream.Next;
                     EAutofillCategory category = EAutofillCategory.Off;
-                    if (EAutofillExtensions.TryFromKeyword(key, out EAutofill afValue))
+                    EAutofill afValue = default;
+                    if (EAutofillExtensions.TryFromKeyword(key, out EAutofill? afValueNullable))
                     {
+                        afValue = afValueNullable.Value;
                         category = (EAutofillCategory)afValue.Category();
                     }
                     int maxTokens = afValue.MaxTokens();
@@ -450,7 +452,7 @@ namespace CssUI.HTML
                                 /* 14) If category is Contact and the indexth token in tokens is an ASCII case-insensitive match for one of the strings in the following list, then run the substeps that follow: */
                                 if (category == EAutofillCategory.Contact)
                                 {
-                                    if (EAutofillContactExtensions.TryFromKeyword(Stream.Next, out EAutofillContact hint))
+                                    if (EAutofillContactExtensions.TryFromKeyword(Stream.Next, out EAutofillContact? hint))
                                     {
                                         /* 1) Let contact be the matching string from the list above. */
                                         string contact = Stream.Next;

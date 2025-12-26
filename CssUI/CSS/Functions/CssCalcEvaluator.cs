@@ -222,9 +222,9 @@ public static class CssCalcEvaluator
                         double numericValue = dimToken.AsNumber;
 
                         // Try to resolve the unit
-                        if (unitResolver != null && ECssUnitExtensions.TryFromKeyword(dimToken.Unit!, out ECssUnit unit))
+                        if (unitResolver != null && ECssUnitExtensions.TryFromKeyword(dimToken.Unit!, out ECssUnit? unit))
                         {
-                            double multiplier = unitResolver(unit);
+                            double multiplier = unitResolver(unit.Value);
                             return numericValue * multiplier;
                         }
                         return numericValue;

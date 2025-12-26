@@ -1751,10 +1751,10 @@ public static partial class HTMLParserCommon
         }
 
         /* Check and see if this is a named color */
-        if (EColorExtensions.TryFromKeyword(StringCommon.Transform(mem, To_ASCII_Lower_Alpha), out EColor outEnumValue))
+        if (EColorExtensions.TryFromKeyword(StringCommon.Transform(mem, To_ASCII_Lower_Alpha), out EColor? outEnumValue))
         {
             // Use the generated extension methods for R, G, B
-            outColor = new SimpleColor(outEnumValue.R(), outEnumValue.G(), outEnumValue.B());
+            outColor = new SimpleColor(outEnumValue.Value.R(), outEnumValue.Value.G(), outEnumValue.Value.B());
             return true;
         }
 

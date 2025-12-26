@@ -68,9 +68,9 @@ public class EventName
     #region Custom Registry
     private int Get_Or_Register_Name(AtomicString Name)
     {
-        if (EEventNameExtensions.TryFromKeyword(Name, out EEventName enumValue))
+        if (EEventNameExtensions.TryFromKeyword(Name, out EEventName? enumValue))
         {
-            return (int)enumValue;
+            return (int)enumValue.Value;
         }
 
         if (!CustomRegistry.TryGetValue(Name, out int Value))
