@@ -213,14 +213,14 @@ Migrate to standard .NET IParsable<T>/ISpanParsable<T> interfaces for consistent
 **Pattern:** Follow CssColor exemplar. Keep parser classes as internal implementation called by type's TryParse. IFormatProvider parameter ignored (CSS is locale-independent).
 
 ### 10.1 Simple Value Types
-- [ ] CssAnB (CSS/Types/)
-  - [ ] Implement IParsable<CssAnB>, ISpanParsable<CssAnB>
-  - [ ] Delegate to CssAnBParser internally
-  - [ ] Mark CssAnBParser.Parse(string) as [Obsolete]
-- [ ] CssUnicodeRange (CSS/Types/)
-  - [ ] Implement IParsable<CssUnicodeRange>, ISpanParsable<CssUnicodeRange>
-  - [ ] Delegate to CssUnicodeRangeParser internally
-  - [ ] Mark CssUnicodeRangeParser.Parse(string) as [Obsolete]
+- [x] CssAnB (CSS/Types/)
+  - [x] Implement IParsable<CssAnB>, ISpanParsable<CssAnB>
+  - [x] Delegate to CssAnBParser internally
+  - [x] Mark CssAnBParser.Parse(string) as [Obsolete]
+- [x] CssUnicodeRange (CSS/Types/)
+  - [x] Implement IParsable<CssUnicodeRange>, ISpanParsable<CssUnicodeRange>
+  - [x] Delegate to CssUnicodeRangeParser internally
+  - [x] Mark CssUnicodeRangeParser.Parse(string) as [Obsolete]
 
 ### 10.2 URL Types
 - [ ] Url (URL/Base/)

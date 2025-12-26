@@ -93,6 +93,7 @@ public static class CssUnicodeRangeParser
     /// <param name="input">The string to parse.</param>
     /// <returns>The parsed unicode range.</returns>
     /// <exception cref="CssParserException">Thrown when the input cannot be parsed as a unicode range.</exception>
+    [Obsolete("Use CssUnicodeRange.Parse(string, IFormatProvider?) instead.")]
     public static CssUnicodeRange Parse(string input)
     {
         if (string.IsNullOrWhiteSpace(input))
@@ -128,6 +129,7 @@ public static class CssUnicodeRangeParser
     /// <param name="input">The string to parse.</param>
     /// <param name="result">When this method returns, contains the parsed unicode range, if successful.</param>
     /// <returns>True if the unicode range was successfully parsed; otherwise, false.</returns>
+    [Obsolete("Use CssUnicodeRange.TryParse(string, IFormatProvider?, out CssUnicodeRange) instead.")]
     public static bool TryParse(string input, [NotNullWhen(true)] out CssUnicodeRange? result)
     {
         result = null;

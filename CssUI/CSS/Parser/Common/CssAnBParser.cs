@@ -430,6 +430,7 @@ public static class CssAnBParser
     /// <param name="input">The CSS string to parse.</param>
     /// <param name="result">When this method returns, contains the parsed An+B value, if successful.</param>
     /// <returns>True if the An+B value was successfully parsed; otherwise, false.</returns>
+    [Obsolete("Use CssAnB.TryParse(string, IFormatProvider?, out CssAnB) instead.")]
     public static bool TryParse(string input, [NotNullWhen(true)] out CssAnB? result)
     {
         result = null;
@@ -464,6 +465,7 @@ public static class CssAnBParser
     /// <param name="input">The CSS string to parse.</param>
     /// <returns>The parsed An+B value.</returns>
     /// <exception cref="CssSyntaxErrorException">Thrown when the input cannot be parsed as a valid An+B value.</exception>
+    [Obsolete("Use CssAnB.Parse(string, IFormatProvider?) instead.")]
     public static CssAnB Parse(string input)
     {
         if (TryParse(input, out var result))

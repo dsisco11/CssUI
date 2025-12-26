@@ -1,5 +1,7 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using CssUI.CSS.Parser;
 
 namespace CssUI.CSS;
 
@@ -25,7 +27,7 @@ namespace CssUI.CSS;
 /// </para>
 /// </remarks>
 /// <seealso href="https://www.w3.org/TR/css-syntax-3/#urange"/>
-public readonly struct CssUnicodeRange : IEquatable<CssUnicodeRange>, ISpanFormattable, IFormattable
+public readonly struct CssUnicodeRange : IEquatable<CssUnicodeRange>, ISpanFormattable, IFormattable, IParsable<CssUnicodeRange>, ISpanParsable<CssUnicodeRange>
 {
     /// <summary>
     /// The maximum allowed code point defined by Unicode: U+10FFFF.
@@ -100,6 +102,82 @@ public readonly struct CssUnicodeRange : IEquatable<CssUnicodeRange>, ISpanForma
         return codePoint >= Start && codePoint <= End;
     }
 
+    #region Parsing (IParsable, ISpanParsable)
+    /// <summary>
+    /// Parses a unicode-range value from a CSS string.
+    /// </summary>
+    /// <param name="s">The string to parse.</param>
+    /// <param name="provider">The format provider (ignored - CSS is locale-independent).</param>
+    /// <returns>The parsed unicode range.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="s"/> is null.</exception>
+    /// <exception cref="FormatException">Thrown when the string is not a valid unicode-range.</exception>
+    public static CssUnicodeRange Parse(string s, IFormatProvider? provider)
+    {
+        ArgumentNullException.ThrowIfNull(s);
+        return Parse(s.AsSpan(), provider);
+    }
+
+    /// <summary>
+    /// Parses a unicode-range value from a character span.
+    /// </summary>
+    /// <param name="s">The span to parse.</param>
+    /// <param name="provider">The format provider (ignored - CSS is locale-independent).</param>
+    /// <returns>The parsed unicode range.</returns>
+    /// <exception cref="FormatException">Thrown when the span is not a valid unicode-range.</exception>
+    public static CssUnicodeRange Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
+    {
+        if (!TryParse(s, provider, out CssUnicodeRange result))
+        {
+            throw new FormatException($"Invalid unicode-range syntax: '{s.ToString()}'");
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Tries to parse a unicode-range value from a CSS string.
+    /// </summary>
+    /// <param name="s">The string to parse.</param>
+    /// <param name="provider">The format provider (ignored - CSS is locale-independent).</param>
+    /// <param name="result">The parsed unicode range if successful.</param>
+    /// <returns>True if parsing succeeded; otherwise, false.</returns>
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out CssUnicodeRange result)
+    {
+        result = default;
+        if (string.IsNullOrWhiteSpace(s))
+            return false;
+
+        return TryParse(s.AsSpan(), provider, out result);
+    }
+
+    /// <summary>
+    /// Tries to parse a unicode-range value from a character span.
+    /// </summary>
+    /// <param name="s">The span to parse.</param>
+    /// <param name="provider">The format provider (ignored - CSS is locale-independent).</param>
+    /// <param name="result">The parsed unicode range if successful.</param>
+    /// <returns>True if parsing succeeded; otherwise, false.</returns>
+    /// <remarks>
+    /// Delegates to <see cref="CssUnicodeRangeParser"/> internally.
+    /// </remarks>
+    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out CssUnicodeRange result)
+    {
+        result = default;
+
+        if (s.IsEmpty || s.IsWhiteSpace())
+            return false;
+
+        // Delegate to the existing parser
+        if (CssUnicodeRangeParser.TryParse(s.ToString(), out CssUnicodeRange? parsed))
+        {
+            result = parsed.Value;
+            return true;
+        }
+
+        return false;
+    }
+    #endregion
+
+    #region Serialization
     /// <summary>
     /// Serializes this unicode range to its canonical CSS string representation.
     /// </summary>
@@ -163,7 +241,9 @@ public readonly struct CssUnicodeRange : IEquatable<CssUnicodeRange>, ISpanForma
 
         return true;
     }
+    #endregion
 
+    #region Equality
     /// <inheritdoc/>
     public override bool Equals(object? obj)
     {
@@ -184,4 +264,5 @@ public readonly struct CssUnicodeRange : IEquatable<CssUnicodeRange>, ISpanForma
 
     public static bool operator ==(CssUnicodeRange left, CssUnicodeRange right) => left.Equals(right);
     public static bool operator !=(CssUnicodeRange left, CssUnicodeRange right) => !left.Equals(right);
+    #endregion
 }

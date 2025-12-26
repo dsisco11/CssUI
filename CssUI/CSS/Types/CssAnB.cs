@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
+using CssUI.CSS.Parser;
 
 namespace CssUI.CSS;
 
@@ -17,7 +19,7 @@ namespace CssUI.CSS;
 /// </para>
 /// </remarks>
 /// <seealso href="https://www.w3.org/TR/css-syntax-3/#anb-microsyntax"/>
-public readonly struct CssAnB : ISpanFormattable
+public readonly struct CssAnB : ISpanFormattable, IEquatable<CssAnB>, IParsable<CssAnB>, ISpanParsable<CssAnB>
 {
     /// <summary>
     /// The step value (coefficient of n).
@@ -99,6 +101,82 @@ public readonly struct CssAnB : ISpanFormattable
         }
     }
 
+    #region Parsing (IParsable, ISpanParsable)
+    /// <summary>
+    /// Parses an An+B value from a CSS string.
+    /// </summary>
+    /// <param name="s">The string to parse.</param>
+    /// <param name="provider">The format provider (ignored - CSS is locale-independent).</param>
+    /// <returns>The parsed An+B value.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="s"/> is null.</exception>
+    /// <exception cref="FormatException">Thrown when the string is not a valid An+B value.</exception>
+    public static CssAnB Parse(string s, IFormatProvider? provider)
+    {
+        ArgumentNullException.ThrowIfNull(s);
+        return Parse(s.AsSpan(), provider);
+    }
+
+    /// <summary>
+    /// Parses an An+B value from a character span.
+    /// </summary>
+    /// <param name="s">The span to parse.</param>
+    /// <param name="provider">The format provider (ignored - CSS is locale-independent).</param>
+    /// <returns>The parsed An+B value.</returns>
+    /// <exception cref="FormatException">Thrown when the span is not a valid An+B value.</exception>
+    public static CssAnB Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
+    {
+        if (!TryParse(s, provider, out CssAnB result))
+        {
+            throw new FormatException($"Invalid An+B syntax: '{s.ToString()}'");
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Tries to parse an An+B value from a CSS string.
+    /// </summary>
+    /// <param name="s">The string to parse.</param>
+    /// <param name="provider">The format provider (ignored - CSS is locale-independent).</param>
+    /// <param name="result">The parsed An+B value if successful.</param>
+    /// <returns>True if parsing succeeded; otherwise, false.</returns>
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out CssAnB result)
+    {
+        result = default;
+        if (string.IsNullOrWhiteSpace(s))
+            return false;
+
+        return TryParse(s.AsSpan(), provider, out result);
+    }
+
+    /// <summary>
+    /// Tries to parse an An+B value from a character span.
+    /// </summary>
+    /// <param name="s">The span to parse.</param>
+    /// <param name="provider">The format provider (ignored - CSS is locale-independent).</param>
+    /// <param name="result">The parsed An+B value if successful.</param>
+    /// <returns>True if parsing succeeded; otherwise, false.</returns>
+    /// <remarks>
+    /// Delegates to <see cref="CssAnBParser"/> internally.
+    /// </remarks>
+    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out CssAnB result)
+    {
+        result = default;
+
+        if (s.IsEmpty || s.IsWhiteSpace())
+            return false;
+
+        // Delegate to the existing parser
+        if (CssAnBParser.TryParse(s.ToString(), out CssAnB? parsed))
+        {
+            result = parsed.Value;
+            return true;
+        }
+
+        return false;
+    }
+    #endregion
+
+    #region Serialization (ISpanFormattable)
     /// <summary>
     /// Serializes this An+B value to its canonical CSS string representation.
     /// </summary>
@@ -177,11 +255,16 @@ public readonly struct CssAnB : ISpanFormattable
 
     /// <inheritdoc/>
     public override string ToString() => ToString(null, null);
+    #endregion
+
+    #region Equality (IEquatable)
+    /// <inheritdoc/>
+    public bool Equals(CssAnB other) => A == other.A && B == other.B;
 
     /// <inheritdoc/>
     public override bool Equals(object? obj)
     {
-        return obj is CssAnB other && A == other.A && B == other.B;
+        return obj is CssAnB other && Equals(other);
     }
 
     /// <inheritdoc/>
@@ -192,4 +275,5 @@ public readonly struct CssAnB : ISpanFormattable
 
     public static bool operator ==(CssAnB left, CssAnB right) => left.Equals(right);
     public static bool operator !=(CssAnB left, CssAnB right) => !left.Equals(right);
+    #endregion
 }
