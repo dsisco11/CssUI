@@ -108,17 +108,18 @@ Prerequisites: Phase 6 (CSS Parser), Phase 11.7.2 (Consume_Style_Block_Contents)
 ## Phase 13: CssValue Subclass Specialization
 Introduce specialized `CssValue` subclasses to eliminate boxing, reduce allocations, and improve type safety for common value types. Follow the pattern established by `CssEnumValue<T>`.
 
-### 13.1 CssListValue (COLLECTION) — High Priority
+### 13.1 CssListValue (COLLECTION) — High Priority ✓
 Lists are extremely common: `font-family`, `background`, `transition`, `transform`, `box-shadow`, etc.
-- [ ] Create `CssListValue` subclass with direct `CssValue[]` storage
-- [ ] Add `ReadOnlySpan<CssValue> Values` property for allocation-free iteration
-- [ ] Add indexer `this[int index]` and `Count` property
-- [ ] Override `AsCollection()` to return existing array wrapped (or direct span access)
-- [ ] Override `TryFormat()` for space/comma-separated serialization
-- [ ] Override `Serialize()`, `Equals()`, `GetHashCode()`, `HasValue`
-- [ ] Support separator metadata (space vs comma-separated)
-- [ ] Update `CssValue.From(params CssValue[])` to return `CssListValue`
-- [ ] Add tests for CssListValue
+- [x] Create `CssListValue` subclass with direct `CssValue[]` storage
+- [x] Add `ReadOnlySpan<CssValue> Values` property for allocation-free iteration
+- [x] Add indexer `this[int index]` and `Count` property
+- [x] Override `AsCollection()` to return existing array wrapped (or direct span access)
+- [x] Override `TryFormat()` for space/comma-separated serialization
+- [x] Override `Serialize()`, `Equals()`, `GetHashCode()`, `HasValue`
+- [x] Support separator metadata (space vs comma-separated)
+- [x] Update `CssValue.From(params CssValue[])` to return `CssListValue`
+- [x] Add tests for CssListValue
+- [x] Fixed `CssValue.Serialize()` bug for CSS-wide keywords (AUTO, INHERIT, etc.)
 
 ### 13.2 CssStringValue (STRING) — Medium Priority
 Strings are common in custom properties, `content`, quoted `font-family` names.

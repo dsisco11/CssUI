@@ -482,13 +482,33 @@ public partial class CssValue : ISpanFormattable, IFormattable, IParsable<CssVal
     }
     #endregion
 
-    /// <summary>Create a css-value with a specific type and one or more values</summary>
+    /// <summary>
+    /// Creates a CSS list value containing the specified values.
+    /// </summary>
+    /// <param name="values">The values to include in the list.</param>
+    /// <returns>A <see cref="CssListValue"/> containing the specified values.</returns>
+    /// <exception cref="ArgumentException">Thrown when no values are specified.</exception>
     public static CssValue From(params CssValue[] values)
     {
         if (values.Length <= 0) throw new ArgumentException("One or more values must be specified");
         Contract.EndContractBlock();
 
-        return new CssValue(ECssValueTypes.COLLECTION, CssValueData.FromObject(values));
+        return new CssListValue(values);
+    }
+
+    /// <summary>
+    /// Creates a CSS list value with a specific separator.
+    /// </summary>
+    /// <param name="separator">The separator to use when serializing the list.</param>
+    /// <param name="values">The values to include in the list.</param>
+    /// <returns>A <see cref="CssListValue"/> containing the specified values.</returns>
+    /// <exception cref="ArgumentException">Thrown when no values are specified.</exception>
+    public static CssValue FromList(ECssListSeparator separator, params CssValue[] values)
+    {
+        if (values.Length <= 0) throw new ArgumentException("One or more values must be specified");
+        Contract.EndContractBlock();
+
+        return new CssListValue(values, separator);
     }
 
 
@@ -1087,7 +1107,7 @@ public partial class CssValue : ISpanFormattable, IFormattable, IParsable<CssVal
     /// Returns the value as a collection of CssValues.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ReadOnlyCollection<CssValue> AsCollection()
+    public virtual ReadOnlyCollection<CssValue> AsCollection()
     {
         if (!IsCollection) throw new CssException($"{nameof(CssValue)} is not a collection! {this}");
         Contract.EndContractBlock();
@@ -1434,14 +1454,17 @@ public partial class CssValue : ISpanFormattable, IFormattable, IParsable<CssVal
         switch (Type)
         {
             case ECssValueTypes.AUTO:
+                return "auto";
             case ECssValueTypes.INHERIT:
+                return "inherit";
             case ECssValueTypes.INITIAL:
+                return "initial";
             case ECssValueTypes.DEFAULT:
+                return "default";
             case ECssValueTypes.UNSET:
+                return "unset";
             case ECssValueTypes.NONE:
-                {
-                    return Lookup.Keyword(Type);
-                }
+                return "none";
             case ECssValueTypes.NULL:
                 {
                     return string.Empty;
