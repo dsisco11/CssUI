@@ -131,7 +131,8 @@ public class Attr : Node
 
             if (IsInvalidValue)
             {
-                _value_used = Definition.InvalidValueDefault;
+                // Use InvalidValueDefault if available, otherwise fall back to the assigned value
+                _value_used = Definition?.InvalidValueDefault ?? _value_assigned;
             }
             else
             {

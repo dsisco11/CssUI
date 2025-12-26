@@ -195,14 +195,25 @@ public class SelectorParser
         // Original check for raw tokens (legacy path)
         if (A.Type == ECssTokenType.SqBracket_Open && B.Type == ECssTokenType.QualifiedName)
             return true;
+        
+        // Also check for SqBracket_Open followed by Ident (simple attribute selector like [disabled])
+        if (A.Type == ECssTokenType.SqBracket_Open && B.Type == ECssTokenType.Ident)
+            return true;
 
         // Check for CssSimpleBlock created by component value parsing (W3C CSS Syntax Level 3)
         // When Parse_ComponentValue_List encounters '[...]', it wraps content in a CssSimpleBlock
         if (A is CssSimpleBlock block && block.StartToken.Type == ECssTokenType.SqBracket_Open)
         {
-            if (block.Values.Count > 1 && block.Values[1].Type == ECssTokenType.QualifiedName)
+            // Find the first non-whitespace token in the block
+            var firstContentToken = block.Values.FirstOrDefault(t => t.Type != ECssTokenType.Whitespace);
+            if (firstContentToken != null)
             {
-                return true;
+                // Attribute names can be QualifiedName (ns|attr) or just Ident (attr)
+                if (firstContentToken.Type == ECssTokenType.QualifiedName || 
+                    firstContentToken.Type == ECssTokenType.Ident)
+                {
+                    return true;
+                }
             }
         }
 

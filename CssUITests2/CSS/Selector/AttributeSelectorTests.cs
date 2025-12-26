@@ -40,8 +40,20 @@ public class AttributeSelectorTests
         input.setAttribute("disabled", AttributeValue.From(""));
         var selector = new CssSelector("[disabled]");
 
+        // Debug output
+        var selectorCount = selector.Count;
+        var complexSelectorCount = selectorCount > 0 ? selector[0].Count : -1;
+        var relativeSelectorCount = complexSelectorCount > 0 ? selector[0][0].Count : -1;
+        var simpleSelectorType = relativeSelectorCount > 0 ? selector[0][0][0].GetType().Name : "N/A";
+        
+        // Check if element has the attribute
+        var hasAttr = input.hasAttribute("disabled");
+        
         // Act & Assert
-        Assert.True(selector.Count > 0, "Attribute presence selector should parse");
+        Assert.True(selector.Count > 0, $"Attribute presence selector should parse. Count={selectorCount}");
+        Assert.True(selector[0].Count > 0, $"ComplexSelector should have RelativeSelectors. ComplexSelector.Count={complexSelectorCount}");
+        Assert.True(selector[0][0].Count > 0, $"RelativeSelector should have SimpleSelectors. RelativeSelector.Count={relativeSelectorCount}, Type={simpleSelectorType}");
+        Assert.True(hasAttr, "Element should have 'disabled' attribute");
         Assert.True(selector[0].Match(input), "[disabled] should match element with disabled attribute");
     }
 
