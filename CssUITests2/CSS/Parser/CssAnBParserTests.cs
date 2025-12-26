@@ -1,3 +1,4 @@
+#pragma warning disable CS0618 // Tests intentionally use obsolete CssAnBParser methods
 using CssUI.CSS;
 using CssUI.CSS.Parser;
 using Xunit;

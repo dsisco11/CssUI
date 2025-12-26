@@ -93,10 +93,10 @@ public class CssAnBMatcher
     /// </summary>
     /// <param name="input">The CSS string to parse.</param>
     /// <returns>A new <see cref="CssAnBMatcher"/> representing the parsed An+B value.</returns>
-    /// <exception cref="CssSyntaxErrorException">Thrown when the input is not a valid An+B syntax.</exception>
+    /// <exception cref="FormatException">Thrown when the input is not a valid An+B syntax.</exception>
     public static CssAnBMatcher Parse(string input)
     {
-        return new CssAnBMatcher(CssAnBParser.Parse(input));
+        return new CssAnBMatcher(CssAnB.Parse(input, null));
     }
 
     /// <summary>
@@ -107,9 +107,9 @@ public class CssAnBMatcher
     /// <returns>True if the An+B value was successfully parsed; otherwise, false.</returns>
     public static bool TryParse(string input, out CssAnBMatcher? matcher)
     {
-        if (CssAnBParser.TryParse(input, out var result))
+        if (CssAnB.TryParse(input, null, out var result))
         {
-            matcher = new CssAnBMatcher(result.Value);
+            matcher = new CssAnBMatcher(result);
             return true;
         }
 

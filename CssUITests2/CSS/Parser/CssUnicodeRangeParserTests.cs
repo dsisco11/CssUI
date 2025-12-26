@@ -1,3 +1,4 @@
+#pragma warning disable CS0618 // Tests intentionally use obsolete CssUnicodeRangeParser methods
 using System;
 using CssUI;
 using CssUI.CSS;

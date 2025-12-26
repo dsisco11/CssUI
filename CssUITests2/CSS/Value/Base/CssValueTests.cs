@@ -1,3 +1,4 @@
+#pragma warning disable CS0618 // Tests intentionally use obsolete CssValue.From_CSS method
 using CssUI.CSS;
 using CssUI.CSS.Internal;
 using CssUI.Rendering;

@@ -258,11 +258,17 @@ These parse from token streams; IParsable facade delegates to CssValue.Parse int
   - [x] Parse via CssValue → extract AsUrl()
 
 ### 10.5 Call Site Migration
-- [ ] Replace CssAnBParser.Parse(x) → CssAnB.Parse(x, null)
-- [ ] Replace CssUnicodeRangeParser.Parse(x) → CssUnicodeRange.Parse(x, null)
-- [ ] Replace CssValue.From_CSS(x) → CssValue.Parse(x, null)
-- [ ] Replace Url.TryParse(x, out y) → Url.TryParse(x, null, out y)
-- [ ] Enable generic T.Parse<T>() usage in utilities
+- [x] Replace CssAnBParser.Parse(x) → CssAnB.Parse(x, null)
+  - [x] CSSAnBMatcher.cs migrated
+  - [x] Test files use #pragma warning disable CS0618
+- [x] Replace CssUnicodeRangeParser.Parse(x) → CssUnicodeRange.Parse(x, null)
+  - [x] No production usages found
+  - [x] Test files use #pragma warning disable CS0618
+- [x] Replace CssValue.From_CSS(x) → CssValue.Parse(x, null)
+  - [x] CssVarResolver.cs migrated
+  - [x] Test files use #pragma warning disable CS0618
+- [ ] Replace Url.TryParse(x, out y) → Url.TryParse(x, null, out y) - No migration needed (signature compatible)
+- [ ] Enable generic T.Parse<T>() usage in utilities - Deferred to future
 
 ### 10.6 Cleanup
 - [ ] Mark deprecated Parse methods with [Obsolete] pointing to IParsable

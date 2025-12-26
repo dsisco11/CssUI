@@ -129,7 +129,7 @@ public static class CssVarResolver
                         if (token is DimensionToken dimToken)
                         {
                             // Create dimension value
-                            fallback = CssValue.From_CSS(dimToken.Encode());
+                            fallback = CssValue.Parse(dimToken.Encode(), null);
                         }
                         break;
                     case ECssTokenType.Percentage:
@@ -140,18 +140,18 @@ public static class CssVarResolver
                         break;
                     case ECssTokenType.Hash:
                         // Color value
-                        fallback = CssValue.From_CSS(token.Encode());
+                        fallback = CssValue.Parse(token.Encode(), null);
                         break;
                     case ECssTokenType.Ident:
                         if (token is IdentToken ident)
                         {
-                            fallback = CssValue.From_CSS(ident.Value!);
+                            fallback = CssValue.Parse(ident.Value!, null);
                         }
                         break;
                     case ECssTokenType.String:
                         if (token is StringToken strToken)
                         {
-                            fallback = CssValue.From_CSS($"\"{strToken.Value}\"");
+                            fallback = CssValue.Parse($"\"{strToken.Value}\"", null);
                         }
                         break;
                 }
