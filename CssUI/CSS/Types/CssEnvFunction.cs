@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using CssUI.CSS.Parser;
 
@@ -33,7 +34,7 @@ namespace CssUI.CSS;
 /// - env(viewport-segment-width 0 0, 300px)
 /// - env(--custom-env, fallback)
 /// </remarks>
-public readonly struct CssEnvFunction : IEquatable<CssEnvFunction>, ISpanFormattable, IFormattable
+public readonly struct CssEnvFunction : IEquatable<CssEnvFunction>, ISpanFormattable, IFormattable, IParsable<CssEnvFunction>
 {
     #region Static
 
@@ -205,6 +206,61 @@ public readonly struct CssEnvFunction : IEquatable<CssEnvFunction>, ISpanFormatt
         FallbackTokens = fallbackTokens;
     }
 
+    #endregion
+
+    #region Parsing (IParsable)
+    /// <summary>
+    /// Parses a CSS env() function string.
+    /// </summary>
+    /// <param name="s">The string to parse (e.g., "env(safe-area-inset-top)" or "env(--custom, 0px)").</param>
+    /// <param name="provider">The format provider (ignored - CSS is locale-independent).</param>
+    /// <returns>The parsed env function.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="s"/> is null.</exception>
+    /// <exception cref="FormatException">Thrown when the string is not a valid env() function.</exception>
+    public static CssEnvFunction Parse(string s, IFormatProvider? provider)
+    {
+        ArgumentNullException.ThrowIfNull(s);
+        if (!TryParse(s, provider, out CssEnvFunction result))
+        {
+            throw new FormatException($"Invalid env() function: '{s}'");
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Tries to parse a CSS env() function string.
+    /// </summary>
+    /// <param name="s">The string to parse.</param>
+    /// <param name="provider">The format provider (ignored - CSS is locale-independent).</param>
+    /// <param name="result">The parsed env function if successful.</param>
+    /// <returns>True if parsing succeeded; otherwise, false.</returns>
+    /// <remarks>
+    /// Parses via CssValue infrastructure and extracts the env function if the result is an ENV type.
+    /// </remarks>
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out CssEnvFunction result)
+    {
+        result = Empty;
+        if (string.IsNullOrWhiteSpace(s))
+            return false;
+
+        try
+        {
+            // Parse via CssValue which handles all CSS value syntax including env()
+            if (CssValue.TryParse(s, provider, out CssValue? value) && value is not null)
+            {
+                if (value.Type == ECssValueTypes.ENV)
+                {
+                    result = value.AsEnvFunction();
+                    return true;
+                }
+            }
+            return false;
+        }
+        catch
+        {
+            return false;
+        }
+    }
     #endregion
 
     #region IEquatable

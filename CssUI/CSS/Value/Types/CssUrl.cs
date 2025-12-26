@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace CssUI.CSS;
@@ -13,7 +14,7 @@ namespace CssUI.CSS;
 /// Both forms are supported and normalized to this type.
 /// Docs: https://www.w3.org/TR/css-syntax-3/#url-token-diagram
 /// </remarks>
-public readonly record struct CssUrl : IEquatable<CssUrl>, ISpanFormattable, IFormattable
+public readonly record struct CssUrl : IEquatable<CssUrl>, ISpanFormattable, IFormattable, IParsable<CssUrl>, ISpanParsable<CssUrl>
 {
     #region Fields
     /// <summary>
@@ -66,6 +67,79 @@ public readonly record struct CssUrl : IEquatable<CssUrl>, ISpanFormattable, IFo
     /// Creates an empty <see cref="CssUrl"/>.
     /// </summary>
     public static CssUrl Empty => new(string.Empty);
+    #endregion
+
+    #region Parsing (IParsable, ISpanParsable)
+    /// <summary>
+    /// Parses a CSS url() function string.
+    /// </summary>
+    /// <param name="s">The string to parse (e.g., 'url("image.png")' or 'url(image.png)').</param>
+    /// <param name="provider">The format provider (ignored - CSS is locale-independent).</param>
+    /// <returns>The parsed URL.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="s"/> is null.</exception>
+    /// <exception cref="FormatException">Thrown when the string is not a valid CSS url().</exception>
+    public static CssUrl Parse(string s, IFormatProvider? provider)
+    {
+        ArgumentNullException.ThrowIfNull(s);
+        return Parse(s.AsSpan(), provider);
+    }
+
+    /// <summary>
+    /// Parses a CSS url() function from a character span.
+    /// </summary>
+    public static CssUrl Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
+    {
+        if (!TryParse(s, provider, out CssUrl result))
+        {
+            throw new FormatException($"Invalid CSS url(): '{s.ToString()}'");
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Tries to parse a CSS url() function string.
+    /// </summary>
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out CssUrl result)
+    {
+        result = Empty;
+        if (string.IsNullOrWhiteSpace(s))
+            return false;
+
+        return TryParse(s.AsSpan(), provider, out result);
+    }
+
+    /// <summary>
+    /// Tries to parse a CSS url() function from a character span.
+    /// </summary>
+    /// <remarks>
+    /// Parses via CssValue infrastructure and extracts the URL if the result is a URL type.
+    /// </remarks>
+    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out CssUrl result)
+    {
+        result = Empty;
+
+        s = s.Trim();
+        if (s.IsEmpty)
+            return false;
+
+        try
+        {
+            // Parse via CssValue which handles all CSS value syntax including url()
+            if (CssValue.TryParse(s.ToString(), provider, out CssValue? value) && value is not null)
+            {
+                if (value.Type == ECssValueTypes.URL)
+                {
+                    result = value.AsUrl();
+                    return true;
+                }
+            }
+            return false;
+        }
+        catch
+        {
+            return false;
+        }
+    }
     #endregion
 
     #region Serialization

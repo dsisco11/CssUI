@@ -241,23 +241,21 @@ Migrate to standard .NET IParsable<T>/ISpanParsable<T> interfaces for consistent
   - Note: For true HDR precision, direct parsing in CssColorFunctionParser would be needed (future enhancement)
 
 ### 10.4 CSS Value Types (Token-Based - Facade Pattern)
-These parse from token streams; IParsable facade tokenizes string first, then delegates to parser.
-- [ ] CssValue (CSS/Value/)
-  - [ ] Implement IParsable<CssValue>, ISpanParsable<CssValue>
-  - [ ] Delegate to CssParser.Parse_CssValue() internally
-  - [ ] Mark From_CSS(string) as [Obsolete]
-- [ ] CssVarFunction (CSS/Types/)
-  - [ ] Implement IParsable<CssVarFunction>
-  - [ ] Tokenize → parse via CssVarFunctionParser
-- [ ] CssEnvFunction (CSS/Types/)
-  - [ ] Implement IParsable<CssEnvFunction>
-  - [ ] Tokenize → parse via CssEnvFunctionParser
-- [ ] CssCalcExpression (CSS/Types/)
-  - [ ] Implement IParsable<CssCalcExpression>
-  - [ ] Tokenize → parse via CssCalcFunctionParser
-- [ ] CssUrl (CSS/Types/)
-  - [ ] Implement IParsable<CssUrl>
-  - [ ] Tokenize → parse via CssUrlFunctionParser
+These parse from token streams; IParsable facade delegates to CssValue.Parse internally.
+- [x] CssValue (CSS/Value/)
+  - [x] Implement IParsable<CssValue>
+  - [x] Delegate to CssParser.Parse_CssValue() internally
+  - [x] Mark From_CSS(string) as [Obsolete]
+- [x] CssVarFunction (CSS/Types/)
+  - [x] Implement IParsable<CssVarFunction>
+  - [x] Parse via CssValue → extract AsVarFunction()
+- [x] CssEnvFunction (CSS/Types/)
+  - [x] Implement IParsable<CssEnvFunction>
+  - [x] Parse via CssValue → extract AsEnvFunction()
+- [ ] CssCalcExpression (CSS/Types/) - Deferred: Complex expression tree requires specialized parsing
+- [x] CssUrl (CSS/Types/)
+  - [x] Implement IParsable<CssUrl>, ISpanParsable<CssUrl>
+  - [x] Parse via CssValue → extract AsUrl()
 
 ### 10.5 Call Site Migration
 - [ ] Replace CssAnBParser.Parse(x) → CssAnB.Parse(x, null)

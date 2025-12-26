@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using CssUI.CSS.Parser;
 
@@ -25,7 +26,7 @@ namespace CssUI.CSS;
 /// - var(--spacing, 10px)
 /// - var(--nested, var(--other))
 /// </remarks>
-public readonly struct CssVarFunction : IEquatable<CssVarFunction>, ISpanFormattable, IFormattable
+public readonly struct CssVarFunction : IEquatable<CssVarFunction>, ISpanFormattable, IFormattable, IParsable<CssVarFunction>
 {
     #region Static
 
@@ -184,6 +185,61 @@ public readonly struct CssVarFunction : IEquatable<CssVarFunction>, ISpanFormatt
         FallbackValidation = validationResult;
     }
 
+    #endregion
+
+    #region Parsing (IParsable)
+    /// <summary>
+    /// Parses a CSS var() function string.
+    /// </summary>
+    /// <param name="s">The string to parse (e.g., "var(--color)" or "var(--font, sans-serif)").</param>
+    /// <param name="provider">The format provider (ignored - CSS is locale-independent).</param>
+    /// <returns>The parsed var function.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="s"/> is null.</exception>
+    /// <exception cref="FormatException">Thrown when the string is not a valid var() function.</exception>
+    public static CssVarFunction Parse(string s, IFormatProvider? provider)
+    {
+        ArgumentNullException.ThrowIfNull(s);
+        if (!TryParse(s, provider, out CssVarFunction result))
+        {
+            throw new FormatException($"Invalid var() function: '{s}'");
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Tries to parse a CSS var() function string.
+    /// </summary>
+    /// <param name="s">The string to parse.</param>
+    /// <param name="provider">The format provider (ignored - CSS is locale-independent).</param>
+    /// <param name="result">The parsed var function if successful.</param>
+    /// <returns>True if parsing succeeded; otherwise, false.</returns>
+    /// <remarks>
+    /// Parses via CssValue infrastructure and extracts the var function if the result is a VAR type.
+    /// </remarks>
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out CssVarFunction result)
+    {
+        result = Empty;
+        if (string.IsNullOrWhiteSpace(s))
+            return false;
+
+        try
+        {
+            // Parse via CssValue which handles all CSS value syntax including var()
+            if (CssValue.TryParse(s, provider, out CssValue? value) && value is not null)
+            {
+                if (value.Type == ECssValueTypes.VAR)
+                {
+                    result = value.AsVarFunction();
+                    return true;
+                }
+            }
+            return false;
+        }
+        catch
+        {
+            return false;
+        }
+    }
     #endregion
 
     #region IEquatable

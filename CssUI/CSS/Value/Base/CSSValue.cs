@@ -1,9 +1,11 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using CssUI.CSS.Internal;
+using CssUI.CSS.Parser;
 using CssUI.CSS.Serialization;
 using CssUI.Rendering;
 
@@ -12,7 +14,7 @@ namespace CssUI.CSS;
 /// <summary>
 /// Represents a CSS Value
 /// </summary>
-public partial class CssValue : ISpanFormattable, IFormattable
+public partial class CssValue : ISpanFormattable, IFormattable, IParsable<CssValue>
 {
     #region Delegates
     public delegate double StyleUnitResolverDelegate(ECssUnit unit);
@@ -428,7 +430,57 @@ public partial class CssValue : ISpanFormattable, IFormattable
     public static CssValue From(CssUnicodeRange value) => new CssValue(ECssValueTypes.UNICODE_RANGE, CssValueData.FromObject(value));
 
     /// <summary>Create a css-value by parsing the given string as CSS markup</summary>
+    [Obsolete("Use CssValue.Parse(string, IFormatProvider?) or CssValue.TryParse() instead.")]
     public static CssValue From_CSS(string css) => new CssParser(css).Parse_CssValue();
+
+    #region Parsing (IParsable)
+    /// <summary>
+    /// Parses a CSS value string.
+    /// </summary>
+    /// <param name="s">The CSS string to parse.</param>
+    /// <param name="provider">The format provider (ignored - CSS is locale-independent).</param>
+    /// <returns>The parsed CSS value.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="s"/> is null.</exception>
+    /// <exception cref="FormatException">Thrown when the string is not a valid CSS value.</exception>
+    public static CssValue Parse(string s, IFormatProvider? provider)
+    {
+        ArgumentNullException.ThrowIfNull(s);
+        if (!TryParse(s, provider, out CssValue? result) || result is null)
+        {
+            throw new FormatException($"Invalid CSS value: '{s}'");
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Tries to parse a CSS value string.
+    /// </summary>
+    /// <param name="s">The CSS string to parse.</param>
+    /// <param name="provider">The format provider (ignored - CSS is locale-independent).</param>
+    /// <param name="result">The parsed CSS value if successful.</param>
+    /// <returns>True if parsing succeeded; otherwise, false.</returns>
+    /// <remarks>
+    /// Delegates to <see cref="CssParser.Parse_CssValue"/> internally.
+    /// </remarks>
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [NotNullWhen(true)] out CssValue? result)
+    {
+        result = null;
+        if (string.IsNullOrWhiteSpace(s))
+            return false;
+
+        try
+        {
+            var parser = new CssParser(s);
+            result = parser.Parse_CssValue();
+            // Check if we got a valid, non-null result
+            return result is not null && result.Type != ECssValueTypes.NULL;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+    #endregion
 
     /// <summary>Create a css-value with a specific type and one or more values</summary>
     public static CssValue From(params CssValue[] values)
