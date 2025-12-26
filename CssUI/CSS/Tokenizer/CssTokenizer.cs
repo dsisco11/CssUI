@@ -454,8 +454,14 @@ public class CssTokenizer
                         return new BadUrlToken();
                     }
                 case EOF:
+                    {
+                        // Per spec §4.3.6: This is a parse error. Return the <url-token>.
+                        return new UrlToken(Result);
+                    }
                 case CHAR_RIGHT_PARENTHESES:
                     {
+                        // Per spec §4.3.6: Consume the ) and return the <url-token>.
+                        Stream.Consume();
                         return new UrlToken(Result);
                     }
                 case CHAR_QUOTATION_MARK:

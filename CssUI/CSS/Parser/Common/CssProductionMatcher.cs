@@ -103,10 +103,12 @@ public static class CssProductionMatcher
             }
 
             // Track opening brackets
+            // Note: ECssTokenType.Function and ECssTokenType.SimpleBlock tokens represent
+            // already-parsed, balanced blocks and should NOT affect depth tracking.
+            // Only raw bracket tokens from unparsed token streams should affect depth.
             switch (token.Type)
             {
                 case ECssTokenType.Parenth_Open:
-                case ECssTokenType.FunctionName:
                     parenDepth++;
                     break;
                 case ECssTokenType.SqBracket_Open:
@@ -114,6 +116,10 @@ public static class CssProductionMatcher
                     break;
                 case ECssTokenType.Bracket_Open:
                     braceDepth++;
+                    break;
+                // Function and SimpleBlock tokens are already balanced - no depth tracking needed
+                case ECssTokenType.Function:
+                case ECssTokenType.SimpleBlock:
                     break;
             }
 
@@ -231,10 +237,12 @@ public static class CssProductionMatcher
             // (this is the key difference from <declaration-value>)
 
             // Track opening brackets
+            // Note: ECssTokenType.Function and ECssTokenType.SimpleBlock tokens represent
+            // already-parsed, balanced blocks and should NOT affect depth tracking.
+            // Only raw bracket tokens from unparsed token streams should affect depth.
             switch (token.Type)
             {
                 case ECssTokenType.Parenth_Open:
-                case ECssTokenType.FunctionName:
                     parenDepth++;
                     break;
                 case ECssTokenType.SqBracket_Open:
@@ -242,6 +250,10 @@ public static class CssProductionMatcher
                     break;
                 case ECssTokenType.Bracket_Open:
                     braceDepth++;
+                    break;
+                // Function and SimpleBlock tokens are already balanced - no depth tracking needed
+                case ECssTokenType.Function:
+                case ECssTokenType.SimpleBlock:
                     break;
             }
 

@@ -502,7 +502,12 @@ public class CssDeclerationTests
 
         Assert.NotNull(decl);
         Assert.True(decl!.IsCustomProperty);
-        Assert.True(decl.IsValueValid);
+        
+        // Debug output
+        var tokenInfo = string.Join(", ", decl.Values.Select((t, i) => $"[{i}]{t.Type}({t.GetType().Name})"));
+        var validationInfo = $"IsMatch={decl.ValueValidation.IsMatch}, FailureType={decl.ValueValidation.FailureType}, FailureIndex={decl.ValueValidation.FailureIndex}, FailureMessage={decl.ValueValidation.FailureMessage}";
+        
+        Assert.True(decl.IsValueValid, $"Tokens: {tokenInfo}\nValidation: {validationInfo}");
     }
 
     [Fact]
