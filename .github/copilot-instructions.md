@@ -129,7 +129,7 @@ DOM errors inherit from `DOMException` with specific types: `HierarchyRequestErr
 | CSS property definitions | `CssUI/CSS/Properties/Definitions/CssDefinitions.cs`                        |
 | CSS value types          | `CssUI/CSS/Value/Base/CssValue.cs`                                          |
 | Layout algorithms        | `CssUI/CSS/Formatting/FlexFormattingContext.cs`, `GridFormattingContext.cs` |
-| Enum metadata system     | `CssUI/CORE/MetaTables/EnumMetaTable.cs`                                    |
+| Enum keyword lookup      | `CssUI/Common/Lookup.cs` (reflection bridge to EnumRecords)                 |
 | DOM Element base         | `CssUI/DOM/Elements/Base/Element.cs`                                        |
 | Service registration     | `CssUI/CORE/DependencyInjection/`                                           |
 

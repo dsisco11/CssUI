@@ -55,12 +55,12 @@ These determine enum type at runtime and cannot use compile-time extension metho
 - [x] `CSSValue.ToString()` (CSS/Value/Base/CSSValue.cs) - Uses Lookup.Keyword(Type, object), works via reflection bridge
 
 ### 8.6 Cleanup
-- [ ] Delete MetaEnumAttribute.cs (CORE/MetaTables/)
-- [ ] Delete MetaKeywordAttribute.cs (CORE/MetaTables/)
-- [ ] Delete EnumMetaTable.cs (CORE/MetaTables/)
-- [ ] Delete EnumTables.cs (Common/)
-- [ ] Remove obsolete methods in Lookup.cs
-- [ ] Update LookupTests.cs to verify new extension methods
+- [x] Delete MetaEnumAttribute.cs (CORE/MetaTables/) — was at Common/Code Attributes/MetaEnum.cs
+- [x] Delete MetaKeywordAttribute.cs (CORE/MetaTables/) — was at Common/Code Attributes/MetaKeyword.cs
+- [x] Delete EnumMetaTable.cs (CORE/MetaTables/)
+- [x] Delete EnumTables.cs (Common/) — file was already empty
+- [x] Remove obsolete methods in Lookup.cs — not needed, Lookup.cs now uses EnumRecords
+- [x] Update LookupTests.cs to verify new extension methods — uses EnumRecordAttribute detection
 
 ### 8.7 EnumRecords 0.4.1 Upgrade (Breaking Changes)
 EnumRecords 0.4+ requires ALL enum members to have `[EnumData]` or `[Ignore]`.
@@ -127,11 +127,12 @@ Replace reflection-based method dispatch with direct static class calls where po
 - [x] Consider caching `MethodInfo` for fallback cases only
 
 #### 8.8.4 Adopt Static Record Classes for Type-Safe Access (Optional Modernization)
-Migrate direct extension method calls to static record class pattern where beneficial:
-- [ ] `AtomicName<T>` — Use `TRecord.TryFromKeyword()` instead of extension method
-- [ ] `DOMEnumList<EnumType>` — Use `TRecord.GetKeyword()` for serialization
-- [ ] `CSSValue.ToString()` — Use `EnumRecord.{EnumName}.GetKeyword()` for runtime dispatch
-- [ ] Document best practices for when to use static record classes vs extensions
+**RESOLVED:** These items use generic type parameters or runtime type dispatch, which require reflection.
+The updated `Lookup.cs` (task 8.8.3) now prefers static record classes internally when available.
+- [x] `AtomicName<T>` — Generic type T unknown at compile-time; uses Lookup reflection bridge ✓
+- [x] `DOMEnumList<EnumType>` — Generic type unknown at compile-time; uses Lookup reflection bridge ✓
+- [x] `CSSValue.ToString()` — Runtime type dispatch; uses Lookup.Keyword(Type, object) ✓
+- [x] Document best practices: Use extension methods for compile-time types; use Lookup for generics/runtime
 
 
 ## Architecture & Design
