@@ -196,13 +196,15 @@ Migrate from ICssSerializeable.Serialize(StringBuilder) pattern to ISpanFormatta
 - [ ] CssCalcExpression tree serialization (defer - complex tree structure)
 
 ### 9.6 StringBuilder Call Site Migration
-- [ ] Identify all StringBuilder.Append(x.Serialize()) patterns
-- [ ] Replace with StringBuilder.Append(x) or string interpolation
-- [ ] Update property getters returning serialized strings
+- [x] Identify all StringBuilder.Append(x.Serialize()) patterns
+- [x] Replace with StringBuilder.Append(x) or string interpolation
+  - [x] HTTPCommon.cs: Use .Span instead of .ToString() for ReadOnlyMemory
+  - [x] GridTrackList.cs: Remove unnecessary .ToString() call
+- [x] Update property getters returning serialized strings (no changes needed)
 
 ### 9.7 Cleanup
-- [ ] Delete ICssSerializeable interface
-- [ ] Remove Serialize(StringBuilder) methods from migrated types
+- [x] Delete ICssSerializeable interface (deleted - was unused)
+- [x] Remove Serialize(StringBuilder) methods from migrated types (none found)
 - [ ] Update documentation
 
 ## Phase 10: IParsable<T> & Parsing Modernization

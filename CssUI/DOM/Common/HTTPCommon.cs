@@ -125,7 +125,7 @@ public static class HTTPCommon
         {
             /* 1) Append the result of collecting a sequence of code points that are not U+0022 (") or U+005C (\) from input, given position, to value. */
             Stream.Consume_While(c => c != CHAR_EQUALS && c != CHAR_REVERSE_SOLIDUS, out ReadOnlyMemory<char> outConsumed);
-            if (sb != null) sb.Append(outConsumed.ToString());
+            if (sb != null) sb.Append(outConsumed.Span);
 
             if (Stream.atEnd) break;
 

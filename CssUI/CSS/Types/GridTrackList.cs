@@ -497,7 +497,7 @@ public class GridTrackList
         for (int i = 0; i < _tracks.Count; i++)
         {
             if (i > 0) sb.Append(' ');
-            sb.Append(_tracks[i].ToString());
+            sb.Append(_tracks[i]); // GridTrackSize.ToString() called implicitly
         }
         return sb.ToString();
     }
