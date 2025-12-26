@@ -115,8 +115,8 @@ Generated `TryFrom{Property}` methods now use `out T?` instead of `out T`:
 #### 8.8.2 Fix NamedColorProperties RGB Byte Array Generation
 The `NamedColorProperties` with byte fields generates incorrect `ImmutableArray<int>` instead of `ImmutableArray<byte>`:
 - [x] Investigate generated code for `EColor` enum
-- [-] Option A: Change `byte R, G, B` to `int R, G, B` in NamedColorProperties (workaround) ✓
-- [x] Option B: Report bug to EnumRecords if byte arrays aren't supported (low priority)
+- [-] Option A: Change `byte R, G, B` to `int R, G, B` in NamedColorProperties (workaround)
+- [x] Option B: Report bug to EnumRecords if byte arrays aren't supported (low priority) ✓
 
 #### 8.8.3 Update Lookup.cs to Use New Static Record Classes (Performance Optimization)
 Replace reflection-based method dispatch with direct static class calls where possible:
