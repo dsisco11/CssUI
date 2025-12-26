@@ -354,6 +354,56 @@ Prerequisites: Phase 6 (CSS Parser), Phase 11.7.2 (Consume_Style_Block_Contents)
 - [ ] Float layout tests
 - [ ] Clear property tests
 
+## Phase 13: CssValue Subclass Specialization
+Introduce specialized `CssValue` subclasses to eliminate boxing, reduce allocations, and improve type safety for common value types. Follow the pattern established by `CssEnumValue<T>`.
+
+### 13.1 CssListValue (COLLECTION) — High Priority
+Lists are extremely common: `font-family`, `background`, `transition`, `transform`, `box-shadow`, etc.
+- [ ] Create `CssListValue` subclass with direct `CssValue[]` storage
+- [ ] Add `ReadOnlySpan<CssValue> Values` property for allocation-free iteration
+- [ ] Add indexer `this[int index]` and `Count` property
+- [ ] Override `AsCollection()` to return existing array wrapped (or direct span access)
+- [ ] Override `TryFormat()` for space/comma-separated serialization
+- [ ] Override `Serialize()`, `Equals()`, `GetHashCode()`, `HasValue`
+- [ ] Support separator metadata (space vs comma-separated)
+- [ ] Update `CssValue.From(params CssValue[])` to return `CssListValue`
+- [ ] Add tests for CssListValue
+
+### 13.2 CssStringValue (STRING) — Medium Priority
+Strings are common in custom properties, `content`, quoted `font-family` names.
+- [ ] Create `CssStringValue` subclass with direct `string` storage
+- [ ] Override `AsString()` for direct access (no cast)
+- [ ] Override `TryFormat()` with proper CSS string escaping/quoting
+- [ ] Override `Serialize()`, `Equals()`, `GetHashCode()`, `HasValue`
+- [ ] Update `CssValue.From_String()` to return `CssStringValue`
+- [ ] Add tests for CssStringValue
+
+### 13.3 CssUrlValue (URL) — Low Priority
+- [ ] Create `CssUrlValue` subclass with direct `CssUrl` storage
+- [ ] Override `AsUrl()` for direct access
+- [ ] Override serialization methods
+- [ ] Update `CssValue.From_Url()` to return `CssUrlValue`
+- [ ] Add tests for CssUrlValue
+
+### 13.4 CssCalcValue (CALC) — Low Priority
+- [ ] Create `CssCalcValue` subclass with direct `CssCalcExpression` storage
+- [ ] Override `AsCalcExpression()` for direct access
+- [ ] Override serialization methods
+- [ ] Update factory method to return `CssCalcValue`
+- [ ] Add tests for CssCalcValue
+
+### 13.5 CssFunctionValue (FUNCTION) — Low Priority
+- [ ] Create `CssFunctionValue` subclass with direct `CssFunction` storage
+- [ ] Override serialization methods for function syntax
+- [ ] Update factory method to return `CssFunctionValue`
+- [ ] Add tests for CssFunctionValue
+
+### 13.6 Cleanup & Optimization
+- [ ] Audit remaining `data.ObjectValue` usages for potential subclass candidates
+- [ ] Consider sealing base `CssValue` class or making constructor internal-only
+- [ ] Update documentation with subclass usage patterns
+- [ ] Performance benchmarks comparing old vs new implementations
+
 ## Phase 25: Advanced CSS Features
 ### 25.1 CSS calc() Formal Tree (future enhancement)
 - [ ] Sum/Product/Negate/Invert nodes (per spec)
