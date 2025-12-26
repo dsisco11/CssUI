@@ -117,6 +117,7 @@ The `NamedColorProperties` with byte fields generates incorrect `ImmutableArray<
 - [x] Investigate generated code for `EColor` enum
 - [-] Option A: Change `byte R, G, B` to `int R, G, B` in NamedColorProperties (workaround)
 - [x] Option B: Report bug to EnumRecords if byte arrays aren't supported (low priority) ✓
+- [x] Update to EnumRecords 0.5.1+ now that fix is released
 
 #### 8.8.3 Update Lookup.cs to Use New Static Record Classes (Performance Optimization)
 Replace reflection-based method dispatch with direct static class calls where possible:
