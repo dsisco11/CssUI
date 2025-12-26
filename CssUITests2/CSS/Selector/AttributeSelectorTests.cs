@@ -188,9 +188,7 @@ public class AttributeSelectorTests
     #endregion
 
     #region Attribute Contains Word Tests [attr~=value]
-    private const string AttributeContainsWordBugSkipReason = "Bug: DOMTokenList cannot be cast to AttributeTokenList<String> for class attribute";
-
-    [Fact(Skip = AttributeContainsWordBugSkipReason)]
+    [Fact]
     public void AttributeContainsWord_MatchesWordInSpaceSeparatedList()
     {
         // Arrange - [class~="warning"] matches class containing "warning" as a whole word
@@ -204,7 +202,7 @@ public class AttributeSelectorTests
         Assert.True(selector[0].Match(div), "[class~=\"warning\"] should match class containing warning as word");
     }
 
-    [Fact(Skip = AttributeContainsWordBugSkipReason)]
+    [Fact]
     public void AttributeContainsWord_DoesNotMatchPartialWord()
     {
         // Arrange - [class~="warn"] should not match "warning"
@@ -218,7 +216,7 @@ public class AttributeSelectorTests
         Assert.False(selector[0].Match(div), "[class~=\"warn\"] should not match partial word warning");
     }
 
-    [Fact(Skip = AttributeContainsWordBugSkipReason)]
+    [Fact]
     public void AttributeContainsWord_MatchesSingleWord()
     {
         // Arrange - [class~="active"] matches when class is exactly "active"

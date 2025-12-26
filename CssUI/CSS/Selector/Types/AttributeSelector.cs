@@ -140,11 +140,10 @@ public class AttributeSelector : SimpleSelector
                     /* First lets check the elements token-list map */
                     if (E.tokenListMap.TryGetValue(AttributeName, out IAttributeTokenList listMap))
                     {
-                        var TokenList = (AttributeTokenList<string>)listMap;
-                        // Need to check with case-sensitivity
-                        foreach (var item in TokenList)
+                        // IAttributeTokenList implements IEnumerable, iterate and compare using ToString()
+                        foreach (var item in listMap)
                         {
-                            if (StringEquals(Value, item)) return true;
+                            if (StringEquals(Value, item?.ToString() ?? string.Empty)) return true;
                         }
                         return false;
                     }
