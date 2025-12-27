@@ -27,16 +27,25 @@ public sealed class AtomicString
     #region Constructors
     public AtomicString(ReadOnlyMemory<char> Data, EAtomicStringFlags Flags)
     {
+        // Detect uppercase BEFORE creating lambdas so they capture the correct flags
+        if (StringCommon.Contains(Data.Span, c => char.IsUpper(c)))
+        {
+            Flags |= EAtomicStringFlags.HasUppercase;
+        }
+
+        this.Data = Data;
+        this.Flags = Flags;
+
         Hash = new CachedValue<int>(() =>
         {
-            if (0 != (Flags & EAtomicStringFlags.CaseInsensitive | EAtomicStringFlags.HasUppercase))
-            {// This atomic-string wants to always be compared case insensitevly, but has uppercase character in it's string
-                return StringCommon.Transform(Data, UnicodeCommon.To_ASCII_Lower_Alpha).GetHashCode(StringComparison.InvariantCulture);
+            if (0 != (Flags & (EAtomicStringFlags.CaseInsensitive | EAtomicStringFlags.HasUppercase)))
+            {// This atomic-string wants to always be compared case-insensitively, or has uppercase characters
+                return StringCommon.Transform(Data, UnicodeCommon.To_ASCII_Lower_Alpha).GetHashCode(StringComparison.Ordinal);
             }
             else
             {
-                // Compute hash from the actual string content
-                return string.GetHashCode(Data.Span);
+                // Compute hash from the actual string content using ordinal comparison for consistency
+                return Data.ToString().GetHashCode(StringComparison.Ordinal);
             }
         });
 
@@ -50,17 +59,6 @@ public sealed class AtomicString
 
             return GetHashCode();
         });
-
-        this.Data = Data;
-        /*this.Data = new Memory<char>(Data.Length);
-        Data.CopyTo(this.Data);*/
-
-        this.Flags = Flags;
-
-        if (StringCommon.Contains(Data.Span, c => char.IsUpper(c)))
-        {
-            Flags |= EAtomicStringFlags.HasUppercase;
-        }
     }
 
     public AtomicString(ReadOnlyMemory<char> Data) : this(Data, 0x0) { }
@@ -89,15 +87,19 @@ public sealed class AtomicString
 
     public bool Equals(AtomicString other)
     {
-        // Quick hash check first for performance
-        if (0 != ((other.Flags ^ Flags) & EAtomicStringFlags.CaseInsensitive))
-        {/* Flag mismatch: the XOR of both flags still returned CaseInsensitive, meaning only one of these atomic-strings is trying to be case-insensitive */
-            if (Hash_Lower != other.Hash_Lower) return false;
+        // Determine if case-insensitive comparison is needed (if EITHER side has the flag)
+        bool caseInsensitive = 0 != ((other.Flags | Flags) & EAtomicStringFlags.CaseInsensitive);
+
+        if (caseInsensitive)
+        {
+            // Quick hash check using case-insensitive hash
+            if (Hash_Lower!.Get() != other.Hash_Lower!.Get()) return false;
             // Hash match - verify with actual string comparison (case-insensitive)
             return Data.Span.Equals(other.Data.Span, StringComparison.OrdinalIgnoreCase);
         }
         else
         {
+            // Case-sensitive comparison
             if (other.GetHashCode() != GetHashCode()) return false;
             // Hash match - verify with actual string comparison
             return Data.Span.SequenceEqual(other.Data.Span);
