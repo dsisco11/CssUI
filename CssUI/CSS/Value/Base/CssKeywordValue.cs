@@ -77,6 +77,13 @@ public sealed record class CssKeywordValue : CssValue
     public override string AsKeyword() => _keyword;
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// Returns the keyword string. Keywords are identifiers that can be used as string values.
+    /// </remarks>
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+    public override string AsString() => _keyword;
+
+    /// <inheritdoc/>
     /// <exception cref="InvalidOperationException">
     /// Always thrown. <see cref="CssKeywordValue"/> stores untyped string keywords.
     /// Use <see cref="CssEnumValue{T}"/> for strongly-typed enum keywords.

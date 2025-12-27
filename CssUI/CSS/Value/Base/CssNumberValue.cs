@@ -56,7 +56,7 @@ public sealed record class CssNumberValue : CssValue
 
     /// <inheritdoc/>
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-    public override long AsInteger() => (long)_value;
+    public override long AsInteger() => (long)Math.Round(_value);
 
     /// <inheritdoc/>
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]

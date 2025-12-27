@@ -69,8 +69,8 @@ public class CssValueFormattableTests
         bool success = value.TryFormat(buffer, out int charsWritten);
 
         Assert.True(success);
-        // Format uses "0.###" so max 3 decimal places
-        Assert.Equal("3.142", buffer[..charsWritten].ToString());
+        // TryFormat produces full precision matching ToString()
+        Assert.Equal("3.14159", buffer[..charsWritten].ToString());
     }
 
     [Fact]

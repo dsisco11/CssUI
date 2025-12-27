@@ -64,14 +64,17 @@ public sealed record class CssDimensionValue : CssValue
     public override bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
     {
         // Format: {value}{unit}
+        // Use CSS-standard format: max 3 decimal places, no trailing zeros
+        var effectiveFormat = format.IsEmpty ? "0.###".AsSpan() : format;
         Span<char> buffer = stackalloc char[32];
-        if (!_value.TryFormat(buffer, out int numWritten, format, provider ?? CultureInfo.InvariantCulture))
+        if (!_value.TryFormat(buffer, out int numWritten, effectiveFormat, provider ?? CultureInfo.InvariantCulture))
         {
             charsWritten = 0;
             return false;
         }
 
-        var unitStr = _unit.Keyword();
+        // Special case: ECssUnit.None uses "<none>" marker for debugging
+        var unitStr = _unit == ECssUnit.None ? "<none>" : _unit.Keyword();
         int totalLength = numWritten + unitStr.Length;
         if (destination.Length < totalLength)
         {

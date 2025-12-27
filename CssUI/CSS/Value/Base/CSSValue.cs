@@ -105,9 +105,19 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     {
         get
         {
-            // Base types (NULL, AUTO, INHERIT, etc.) have no data payload
+            // Singleton types (NULL, AUTO, INHERIT, etc.) have no data payload
             // Subclasses override to return true when they have actual values
-            return Type != ECssValueTypes.NULL;
+            return Type switch
+            {
+                ECssValueTypes.NULL or
+                ECssValueTypes.AUTO or
+                ECssValueTypes.INHERIT or
+                ECssValueTypes.INITIAL or
+                ECssValueTypes.UNSET or
+                ECssValueTypes.NONE or
+                ECssValueTypes.DEFAULT => false,
+                _ => true
+            };
         }
     }
     #endregion
