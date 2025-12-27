@@ -528,10 +528,10 @@ public class CssTokenizer
             return new FunctionNameToken(Name);
         }
 
-        // Custom property names (dashed-idents starting with --) are case-sensitive per CSS spec
-        // Preserve case for these identifiers
-        bool preserveCase = Name.StartsWith("--", StringComparison.Ordinal);
-        return new IdentToken(Name, preserveCase);
+        // Per CSS Syntax Level 3 spec, the tokenizer should preserve original case of identifiers.
+        // Case-insensitivity for CSS keywords and property names should be handled at parsing/matching level.
+        // Class selectors (e.g., .ACTIVE) and ID selectors (#myId) need case-sensitive matching per CSS Selectors Level 4.
+        return new IdentToken(Name, preserveCase: true);
     }
 
     private static UnicodeRangeToken Consume_Unicode_Range_Token(DataConsumer<char> Stream)

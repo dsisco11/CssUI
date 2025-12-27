@@ -108,11 +108,11 @@ public class CssSelectorTests
     [InlineData(".btn", "btn btn-primary", true)]
     [InlineData(".btn-primary", "btn btn-primary", true)]
     [InlineData(".nonexistent", "btn btn-primary", false)]
-    // NOTE: Per CSS Selectors Level 4 § 6.6, class selectors should be case-sensitive
-    // except in quirks mode. However, the current implementation uses CaseInsensitive
-    // AtomicStrings for class selectors, making matching case-insensitive in both directions.
-    [InlineData(".ACTIVE", "active", true)]   // Selector ".ACTIVE" case-insensitively matches "active"
-    [InlineData(".active", "ACTIVE", true)]   // Element class "ACTIVE" case-insensitively matches ".active"
+    // Per CSS Selectors Level 4 § 6.6, class selectors are case-sensitive in standards mode.
+    // Only in quirks mode should class matching be case-insensitive.
+    [InlineData(".ACTIVE", "active", false)]   // Selector ".ACTIVE" does NOT match "active" (case-sensitive)
+    [InlineData(".active", "ACTIVE", false)]   // Element class "ACTIVE" does NOT match ".active" (case-sensitive)
+    [InlineData(".ACTIVE", "ACTIVE", true)]    // Exact case match works
     public void ClassSelector_MatchesElementByClassName(string selectorStr, string className, bool expected)
     {
         // Arrange
