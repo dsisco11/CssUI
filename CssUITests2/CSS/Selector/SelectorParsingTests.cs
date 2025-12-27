@@ -234,7 +234,7 @@ public class SelectorParsingTests
         Assert.Single(selector);
     }
 
-    [Fact(Skip = "Bug: CssParser.Consume_Function causes stack overflow with functional pseudo-classes")]
+    [Fact]
     public void Parse_PseudoClassWithFunction_ParsesSuccessfully()
     {
         // Arrange & Act
@@ -244,7 +244,7 @@ public class SelectorParsingTests
         Assert.Single(selector);
     }
 
-    [Fact(Skip = "Bug: CssParser.Consume_Function causes stack overflow with functional pseudo-classes")]
+    [Fact]
     public void Parse_NthChild_ParsesSuccessfully()
     {
         // Arrange & Act

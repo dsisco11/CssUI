@@ -238,7 +238,7 @@ public class StructuralPseudoClassTests
     #endregion
 
     #region :nth-child() Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void NthChild_MatchesSpecificPosition()
     {
         // Arrange
@@ -259,7 +259,7 @@ public class StructuralPseudoClassTests
         Assert.False(selector[0].Match(child3), ":nth-child(2) should not match third child");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void NthChild_OddKeyword()
     {
         // Arrange
@@ -283,7 +283,7 @@ public class StructuralPseudoClassTests
         Assert.False(selector[0].Match(child4), ":nth-child(odd) should not match 4th child");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void NthChild_EvenKeyword()
     {
         // Arrange
@@ -307,7 +307,7 @@ public class StructuralPseudoClassTests
         Assert.True(selector[0].Match(child4), ":nth-child(even) should match 4th child");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void NthChild_AnPlusB_Formula()
     {
         // Arrange
@@ -324,7 +324,7 @@ public class StructuralPseudoClassTests
         Assert.True(selector[0].Match(children[2]), "2n+1 should match 3rd");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void NthChild_NegativeOffset()
     {
         // Arrange: -n+3 matches first 3 children (3, 2, 1)
@@ -345,7 +345,7 @@ public class StructuralPseudoClassTests
     #endregion
 
     #region :nth-last-child() Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void NthLastChild_MatchesFromEnd()
     {
         // Arrange
@@ -365,7 +365,7 @@ public class StructuralPseudoClassTests
         Assert.False(selector[0].Match(child2), ":nth-last-child(1) should not match second to last");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void NthLastChild_MatchesSecondFromEnd()
     {
         // Arrange
@@ -486,7 +486,7 @@ public class StructuralPseudoClassTests
     #endregion
 
     #region :nth-of-type() Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void NthOfType_MatchesNthOfTypeAmongSiblings()
     {
         // Arrange
@@ -508,7 +508,7 @@ public class StructuralPseudoClassTests
         Assert.True(selector[0].Match(span2), "span:nth-of-type(2) should match second span");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void NthOfType_WithFormula()
     {
         // Arrange
@@ -534,7 +534,7 @@ public class StructuralPseudoClassTests
     #endregion
 
     #region :nth-last-of-type() Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void NthLastOfType_MatchesFromEndOfType()
     {
         // Arrange

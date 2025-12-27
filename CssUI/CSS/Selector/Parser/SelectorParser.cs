@@ -235,13 +235,17 @@ public class SelectorParser
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     static bool Starts_Pseudo_Class_Selector(CssToken A, CssToken B)
     {
-        return (A.Type == ECssTokenType.Colon && (B.Type == ECssTokenType.Ident || B.Type == ECssTokenType.FunctionName));
+        // After Parse_ComponentValue_List preprocessing, function tokens become ECssTokenType.Function (CssFunction)
+        // rather than ECssTokenType.FunctionName. We need to accept both.
+        return (A.Type == ECssTokenType.Colon && (B.Type == ECssTokenType.Ident || B.Type == ECssTokenType.FunctionName || B.Type == ECssTokenType.Function));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     static bool Starts_Pseudo_Element_Selector(CssToken A, CssToken B, CssToken C)
     {
-        return (A.Type == ECssTokenType.Colon && B.Type == ECssTokenType.Colon && (C.Type == ECssTokenType.Ident || C.Type == ECssTokenType.FunctionName));
+        // After Parse_ComponentValue_List preprocessing, function tokens become ECssTokenType.Function (CssFunction)
+        // rather than ECssTokenType.FunctionName. We need to accept both.
+        return (A.Type == ECssTokenType.Colon && B.Type == ECssTokenType.Colon && (C.Type == ECssTokenType.Ident || C.Type == ECssTokenType.FunctionName || C.Type == ECssTokenType.Function));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

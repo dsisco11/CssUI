@@ -100,9 +100,97 @@ public class PseudoClassSelectorAnBFunction : PseudoClassSelector
         switch (Name)
         {
             case "nth-child":
-                {// SEE: https://www.w3.org/TR/2011/REC-css3-selectors-20110929/#nth-child-pseudo
-                    // TODO: IMPLEMENT THIS!
+                {
+                    // :nth-child(An+B) matches elements based on their position among siblings
+                    // SEE: https://www.w3.org/TR/selectors-4/#nth-child-pseudo
+                    var parent = E.parentElement;
+                    if (parent == null) return false;
 
+                    int index = 1;
+                    foreach (var sibling in parent.children)
+                    {
+                        if (ReferenceEquals(sibling, E))
+                        {
+                            return AnB.Match(index);
+                        }
+                        index++;
+                    }
+                    return false;
+                }
+            case "nth-last-child":
+                {
+                    // :nth-last-child(An+B) matches elements counting from the end
+                    // SEE: https://www.w3.org/TR/selectors-4/#nth-last-child-pseudo
+                    var parent = E.parentElement;
+                    if (parent == null) return false;
+
+                    int totalChildren = parent.childElementCount;
+                    int index = 1;
+                    foreach (var sibling in parent.children)
+                    {
+                        if (ReferenceEquals(sibling, E))
+                        {
+                            // Convert to index from end (last child is 1)
+                            int indexFromEnd = totalChildren - index + 1;
+                            return AnB.Match(indexFromEnd);
+                        }
+                        index++;
+                    }
+                    return false;
+                }
+            case "nth-of-type":
+                {
+                    // :nth-of-type(An+B) matches elements based on their position among siblings of same type
+                    // SEE: https://www.w3.org/TR/selectors-4/#nth-of-type-pseudo
+                    var parent = E.parentElement;
+                    if (parent == null) return false;
+
+                    int typeIndex = 1;
+                    foreach (var sibling in parent.children)
+                    {
+                        if (sibling.localName == E.localName)
+                        {
+                            if (ReferenceEquals(sibling, E))
+                            {
+                                return AnB.Match(typeIndex);
+                            }
+                            typeIndex++;
+                        }
+                    }
+                    return false;
+                }
+            case "nth-last-of-type":
+                {
+                    // :nth-last-of-type(An+B) matches elements counting from end among siblings of same type
+                    // SEE: https://www.w3.org/TR/selectors-4/#nth-last-of-type-pseudo
+                    var parent = E.parentElement;
+                    if (parent == null) return false;
+
+                    // First count total siblings of same type
+                    int totalOfType = 0;
+                    foreach (var sibling in parent.children)
+                    {
+                        if (sibling.localName == E.localName)
+                        {
+                            totalOfType++;
+                        }
+                    }
+
+                    // Now find the element's position
+                    int typeIndex = 1;
+                    foreach (var sibling in parent.children)
+                    {
+                        if (sibling.localName == E.localName)
+                        {
+                            if (ReferenceEquals(sibling, E))
+                            {
+                                // Convert to index from end
+                                int indexFromEnd = totalOfType - typeIndex + 1;
+                                return AnB.Match(indexFromEnd);
+                            }
+                            typeIndex++;
+                        }
+                    }
                     return false;
                 }
             default:
