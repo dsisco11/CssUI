@@ -106,9 +106,12 @@ public static class CssProductionMatcher
             // Note: ECssTokenType.Function and ECssTokenType.SimpleBlock tokens represent
             // already-parsed, balanced blocks and should NOT affect depth tracking.
             // Only raw bracket tokens from unparsed token streams should affect depth.
+            // However, ECssTokenType.FunctionName tokens from the tokenizer include an
+            // implicit opening parenthesis (per CSS Syntax 3 §4.3.4) that must be balanced.
             switch (token.Type)
             {
                 case ECssTokenType.Parenth_Open:
+                case ECssTokenType.FunctionName: // <function-token> includes implicit '('
                     parenDepth++;
                     break;
                 case ECssTokenType.SqBracket_Open:
@@ -240,9 +243,12 @@ public static class CssProductionMatcher
             // Note: ECssTokenType.Function and ECssTokenType.SimpleBlock tokens represent
             // already-parsed, balanced blocks and should NOT affect depth tracking.
             // Only raw bracket tokens from unparsed token streams should affect depth.
+            // However, ECssTokenType.FunctionName tokens from the tokenizer include an
+            // implicit opening parenthesis (per CSS Syntax 3 §4.3.4) that must be balanced.
             switch (token.Type)
             {
                 case ECssTokenType.Parenth_Open:
+                case ECssTokenType.FunctionName: // <function-token> includes implicit '('
                     parenDepth++;
                     break;
                 case ECssTokenType.SqBracket_Open:
