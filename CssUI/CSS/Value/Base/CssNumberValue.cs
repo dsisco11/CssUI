@@ -15,8 +15,8 @@ namespace CssUI.CSS;
 /// Spec: https://www.w3.org/TR/css-values-4/#numbers
 /// </para>
 /// <para>
-/// This subclass stores the number directly as a <see cref="double"/>, eliminating
-/// the boxing overhead of <see cref="CssValueData"/>.
+/// This subclass stores the number directly as a <see cref="double"/>, providing
+/// type-safe access without boxing.
 /// </para>
 /// </remarks>
 public sealed record class CssNumberValue : CssValue

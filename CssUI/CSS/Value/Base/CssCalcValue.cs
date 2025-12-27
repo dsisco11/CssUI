@@ -14,8 +14,8 @@ namespace CssUI.CSS;
 /// Spec: https://www.w3.org/TR/css-values-4/#calc-func
 /// </para>
 /// <para>
-/// This subclass stores the <see cref="CssCalcExpression"/> directly, eliminating the boxing
-/// overhead of <see cref="CssValueData.ObjectValue"/>.
+/// This subclass stores the <see cref="CssCalcExpression"/> directly, providing
+/// type-safe access without boxing.
 /// </para>
 /// </remarks>
 public sealed record class CssCalcValue : CssValue

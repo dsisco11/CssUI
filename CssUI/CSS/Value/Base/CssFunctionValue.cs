@@ -11,8 +11,8 @@ namespace CssUI.CSS;
 /// gradients (linear-gradient()), transforms (rotate(), scale()), filters (blur()), etc.
 /// </para>
 /// <para>
-/// This subclass stores the <see cref="CssFunction"/> directly, eliminating the boxing
-/// overhead of <see cref="CssValueData.ObjectValue"/>.
+/// This subclass stores the <see cref="CssFunction"/> directly, providing
+/// type-safe access without boxing.
 /// </para>
 /// </remarks>
 internal sealed record class CssFunctionValue : CssValue

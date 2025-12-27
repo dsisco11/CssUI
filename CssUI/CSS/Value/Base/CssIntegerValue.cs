@@ -14,8 +14,8 @@ namespace CssUI.CSS;
 /// Spec: https://www.w3.org/TR/css-values-4/#integers
 /// </para>
 /// <para>
-/// This subclass stores the integer directly as a <see cref="long"/>, eliminating
-/// the boxing overhead of <see cref="CssValueData"/>.
+/// This subclass stores the integer directly as a <see cref="long"/>, providing
+/// type-safe access without boxing.
 /// </para>
 /// </remarks>
 public sealed record class CssIntegerValue : CssValue

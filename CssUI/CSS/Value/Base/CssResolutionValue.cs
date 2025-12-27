@@ -15,8 +15,8 @@ namespace CssUI.CSS;
 /// Spec: https://www.w3.org/TR/css-values-4/#resolution
 /// </para>
 /// <para>
-/// This subclass stores the numeric value and resolution unit directly, eliminating
-/// the boxing overhead of <see cref="CssValueData"/> and providing typed access.
+/// This subclass stores the numeric value and resolution unit directly, providing
+/// type-safe access without boxing.
 /// </para>
 /// </remarks>
 public sealed record class CssResolutionValue : CssValue

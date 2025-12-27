@@ -15,7 +15,7 @@ namespace CssUI.CSS;
 /// </para>
 /// <para>
 /// This subclass stores the string directly, eliminating the boxing overhead
-/// of <see cref="CssValueData.ObjectValue"/> and providing optimized serialization.
+/// and providing optimized serialization.
 /// </para>
 /// </remarks>
 public sealed record class CssStringValue : CssValue

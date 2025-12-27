@@ -14,8 +14,8 @@ namespace CssUI.CSS;
 /// Spec: https://www.w3.org/TR/css-syntax-3/#urange
 /// </para>
 /// <para>
-/// This subclass stores the <see cref="CssUnicodeRange"/> directly, eliminating the boxing
-/// overhead of <see cref="CssValueData.ObjectValue"/>.
+/// This subclass stores the <see cref="CssUnicodeRange"/> directly, providing
+/// type-safe access without boxing.
 /// </para>
 /// </remarks>
 public sealed record class CssUnicodeRangeValue : CssValue

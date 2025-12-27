@@ -16,7 +16,7 @@ namespace CssUI.CSS;
 /// </para>
 /// <para>
 /// This subclass stores the percentage directly as a <see cref="double"/> (0-100 range),
-/// eliminating the boxing overhead of <see cref="CssValueData"/>.
+/// providing type-safe access without boxing.
 /// </para>
 /// </remarks>
 public sealed record class CssPercentValue : CssValue
