@@ -256,7 +256,7 @@ public class PseudoElementSelectorTests
         Assert.Equal(typeSelector[0].Get_Specificity(), pseudoSelector[0].Get_Specificity());
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void PseudoElement_CombinedSpecificity()
     {
         // Arrange - p.class::before has specificity (0,1,2)

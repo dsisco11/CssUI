@@ -365,7 +365,7 @@ public class SelectorEdgeCaseTests
     #endregion
 
     #region Very Long/Complex Selector Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void Performance_VeryLongSelectorChain()
     {
         // Arrange - Create a deep selector chain

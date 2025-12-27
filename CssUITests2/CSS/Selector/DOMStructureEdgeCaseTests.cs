@@ -294,7 +294,7 @@ public class DOMStructureEdgeCaseTests
     #endregion
 
     #region Many Siblings Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void ManySiblings_FirstChild()
     {
         // Arrange - :first-child with many siblings
@@ -311,7 +311,7 @@ public class DOMStructureEdgeCaseTests
         Assert.False(selector[0].Match(children[50]), ":first-child should not match middle element");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void ManySiblings_LastChild()
     {
         // Arrange - :last-child with many siblings
@@ -396,7 +396,7 @@ public class DOMStructureEdgeCaseTests
     #endregion
 
     #region Mixed Content Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void MixedContent_TextNodesBetweenElements()
     {
         // Arrange - Sibling matching with text nodes between elements
@@ -416,7 +416,7 @@ public class DOMStructureEdgeCaseTests
         Assert.True(selector[0].Match(second), "Adjacent sibling should skip text nodes");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void MixedContent_CommentNodes()
     {
         // Arrange - Selector matching with comment nodes in tree
