@@ -102,13 +102,5 @@ public sealed record class CssResolutionValue : CssValue
     }
 
     /// <inheritdoc/>
-    public override bool Equals(CssValue? other)
-    {
-        if (other is CssResolutionValue resVal)
-            return Equals(resVal);
-        return false;
-    }
-
-    /// <inheritdoc/>
     public override int GetHashCode() => HashCode.Combine(Type, _value, _unit);
 }

@@ -102,13 +102,5 @@ public sealed record class CssDimensionValue : CssValue
     }
 
     /// <inheritdoc/>
-    public override bool Equals(CssValue? other)
-    {
-        if (other is CssDimensionValue dimVal)
-            return Equals(dimVal);
-        return false;
-    }
-
-    /// <inheritdoc/>
     public override int GetHashCode() => HashCode.Combine(Type, _value, _unit);
 }

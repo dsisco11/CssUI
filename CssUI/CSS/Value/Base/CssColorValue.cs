@@ -74,13 +74,5 @@ public sealed record class CssColorValue : CssValue
     }
 
     /// <inheritdoc/>
-    public override bool Equals(CssValue? other)
-    {
-        if (other is CssColorValue colorVal)
-            return Equals(colorVal);
-        return false;
-    }
-
-    /// <inheritdoc/>
     public override int GetHashCode() => HashCode.Combine(Type, _value);
 }

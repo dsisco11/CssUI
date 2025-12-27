@@ -187,7 +187,10 @@ public sealed record class CssListValue : CssValue
     /// Determines equality between this CssListValue and another CssListValue.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// Compares the values array element-by-element using CssValue equality.
+    /// This is necessary because arrays compare by reference in record equality.
+    /// </para>
     /// </remarks>
     public bool Equals(CssListValue? other)
     {
@@ -196,6 +199,10 @@ public sealed record class CssListValue : CssValue
 
         if (ReferenceEquals(this, other))
             return true;
+
+        // Check base type fields (type should be COLLECTION for both)
+        if (Type != other.Type)
+            return false;
 
         if (_separator != other._separator)
             return false;
