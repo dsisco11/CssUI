@@ -19,7 +19,7 @@ public static class CssPercentageResolvers
         else
         {
             var resolved = Percent * CssCommon.Get_Logical_Width(Property.Owner.Style.WritingMode, Property.Owner.Box.Containing_Box);
-            return CssValue.From(resolved, ECssUnit.PX);
+            return CssValue.From_Dimension(resolved, ECssUnit.PX);
         }
     }
 
@@ -32,7 +32,7 @@ public static class CssPercentageResolvers
         else
         {
             var resolved = Percent * CssCommon.Get_Logical_Height(Property.Owner.Style.WritingMode, Property.Owner.Box.Containing_Box);
-            return CssValue.From(resolved, ECssUnit.PX);
+            return CssValue.From_Dimension(resolved, ECssUnit.PX);
         }
     }
 }

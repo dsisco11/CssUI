@@ -135,7 +135,7 @@ public static partial class CssPropertyResolver
             case EFontWeight.Bolder:
                 {/* Docs: https://drafts.csswg.org/css-fonts-4/#relative-weights */
                     CssValue inherited = Property.Find_Inherited_Value();
-                    int w = inherited.AsInteger();
+                    int w = (int)inherited.AsInteger();
 
                     if (w < 100) Weight = 400;
                     else if (w >= 100 && w < 350) Weight = 400;
@@ -148,7 +148,7 @@ public static partial class CssPropertyResolver
             case EFontWeight.Lighter:
                 {/* Docs: https://drafts.csswg.org/css-fonts-4/#relative-weights */
                     CssValue inherited = Property.Find_Inherited_Value();
-                    int w = inherited.AsInteger();
+                    int w = (int)inherited.AsInteger();
 
                     if (w < 100) Weight = 100;
                     else if (w >= 100 && w < 350) Weight = 100;

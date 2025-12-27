@@ -10,8 +10,8 @@ namespace CssUI.CSS;
 
 /* PREFACE:
  * An explination for some of the inlining here.
- * Some of these functions are private and only called a few times by the other algorithms, 
- * a minor optimization is to remove a jmp call for these functions. 
+ * Some of these functions are private and only called a few times by the other algorithms,
+ * a minor optimization is to remove a jmp call for these functions.
  * Over the course of MANY nodes this could have a positive impact and the memory impact should be very negligable.
  * So I'm sacrificing a few KB of memory for a little speed since these functions are called a lot.
  */
@@ -113,9 +113,9 @@ public static class BoxModel
 
         /*
          * However, for replaced elements with an intrinsic ratio and both 'width' and 'height' specified as 'auto', the algorithm is as follows:
-         * Select from the table the resolved height and width values for the appropriate constraint violation. 
-         * Take the max-width and max-height as max(min, max) so that min ≤ max holds true. 
-         * In this table w and h stand for the results of the width and height computations ignoring the 'min-width', 'min-height', 'max-width' and 'max-height' properties. 
+         * Select from the table the resolved height and width values for the appropriate constraint violation.
+         * Take the max-width and max-height as max(min, max) so that min ≤ max holds true.
+         * In this table w and h stand for the results of the width and height computations ignoring the 'min-width', 'min-height', 'max-width' and 'max-height' properties.
          * Normally these are the intrinsic width and height, but they may not be in the case of replaced elements with intrinsic ratios.
          */
         bool autoWidth = Cascaded.Width.Computed.IsAuto;
@@ -169,8 +169,8 @@ public static class BoxModel
         CssValue MarginBottom = Cascaded.Margin_Bottom.Computed;
         CssValue Bottom = Cascaded.Bottom.Computed;
         /*
-         * However, for replaced elements with both 'width' and 'height' computed as 'auto', 
-         * use the algorithm under 'Minimum and maximum widths' above to find the used width and height. 
+         * However, for replaced elements with both 'width' and 'height' computed as 'auto',
+         * use the algorithm under 'Minimum and maximum widths' above to find the used width and height.
          * Then apply the rules under "Computing heights and margins" above, using the resulting width and height as if they were the computed values.
          */
         bool autoWidth = Cascaded.Width.Computed.IsAuto;
@@ -223,9 +223,9 @@ public static class BoxModel
     private static bool Constrain_Width_Height(CssComputedStyle Cascaded, ref CssValue Width, ref CssValue Height)
     {/* Docs: https://www.w3.org/TR/CSS22/visudet.html#min-max-widths */
         /*
-        * Select from the table the resolved height and width values for the appropriate constraint violation. 
-        * Take the max-width and max-height as max(min, max) so that min ≤ max holds true. 
-        * In this table w and h stand for the results of the width and height computations ignoring the 'min-width', 'min-height', 'max-width' and 'max-height' properties. 
+        * Select from the table the resolved height and width values for the appropriate constraint violation.
+        * Take the max-width and max-height as max(min, max) so that min ≤ max holds true.
+        * In this table w and h stand for the results of the width and height computations ignoring the 'min-width', 'min-height', 'max-width' and 'max-height' properties.
         * Normally these are the intrinsic width and height, but they may not be in the case of replaced elements with intrinsic ratios.
         */
 
@@ -328,7 +328,7 @@ public static class BoxModel
     {// Docs: https://www.w3.org/TR/CSS22/visudet.html#Computing_widths_and_margins
         /*
          * The values of an element's 'width', 'margin-left', 'margin-right', 'left' and 'right' properties as used for layout depend on the type of box generated and on each other. (The value used for layout is sometimes referred to as the used value.) In principle, the values used are the same as the computed values, with 'auto' replaced by some suitable value, and percentages calculated based on the containing block, but there are exceptions. The following situations need to be distinguished:
-         * 
+         *
          * inline, non-replaced elements
          * inline, replaced elements
          * block-level, non-replaced elements in normal flow
@@ -407,7 +407,7 @@ public static class BoxModel
                         }
                         else /* Otherwise, if 'width' has a computed value of 'auto', but none of the conditions above are met, then the used value of 'width' becomes 300px. If 300px is too wide to fit the device, UAs should use the width of the largest rectangle that has a 2:1 ratio and fits the device instead. */
                         {
-                            Width = CssValue.From(300, ECssUnit.PX);
+                            Width = CssValue.From_Dimension(300, ECssUnit.PX);
                         }
                     }
                 }
@@ -528,7 +528,7 @@ public static class BoxModel
                         }
                         else /* Otherwise, if 'width' has a computed value of 'auto', but none of the conditions above are met, then the used value of 'width' becomes 300px. If 300px is too wide to fit the device, UAs should use the width of the largest rectangle that has a 2:1 ratio and fits the device instead. */
                         {
-                            Width = CssValue.From(300, ECssUnit.PX);
+                            Width = CssValue.From_Dimension(300, ECssUnit.PX);
                         }
                         #endregion
 
@@ -598,9 +598,9 @@ public static class BoxModel
                         if (MarginLeft.IsAuto) MarginLeft = CssValue.Zero;
                         if (MarginRight.IsAuto) MarginRight = CssValue.Zero;
 
-                        /* 
+                        /*
                          * If 'width' is computed as 'auto', the used value is the "shrink-to-fit" width.
-                         * Calculation of the shrink-to-fit width is similar to calculating the width of a table cell using the automatic table layout algorithm. Roughly: calculate the preferred width by formatting the content without breaking lines other than where explicit line breaks occur, and also calculate the preferred minimum width, e.g., by trying all possible line breaks. CSS 2.1 does not define the exact algorithm. Thirdly, find the available width: in this case, this is the width of the containing block minus the used values of 'margin-left', 'border-left-width', 'padding-left', 'padding-right', 'border-right-width', 'margin-right', and the widths of any relevant scroll bars. 
+                         * Calculation of the shrink-to-fit width is similar to calculating the width of a table cell using the automatic table layout algorithm. Roughly: calculate the preferred width by formatting the content without breaking lines other than where explicit line breaks occur, and also calculate the preferred minimum width, e.g., by trying all possible line breaks. CSS 2.1 does not define the exact algorithm. Thirdly, find the available width: in this case, this is the width of the containing block minus the used values of 'margin-left', 'border-left-width', 'padding-left', 'padding-right', 'border-right-width', 'margin-right', and the widths of any relevant scroll bars.
                          */
                         if (Width.IsAuto)
                         {
@@ -652,7 +652,7 @@ public static class BoxModel
                         }
                         else /* Otherwise, if 'width' has a computed value of 'auto', but none of the conditions above are met, then the used value of 'width' becomes 300px. If 300px is too wide to fit the device, UAs should use the width of the largest rectangle that has a 2:1 ratio and fits the device instead. */
                         {
-                            Width = CssValue.From(300, ECssUnit.PX);
+                            Width = CssValue.From_Dimension(300, ECssUnit.PX);
                         }
                     }
                 }
@@ -662,9 +662,9 @@ public static class BoxModel
                     /* 10.3.7 Absolutely positioned, non-replaced elements */
                     if (!Box.IsReplacedElement)
                     {
-                        /* 
+                        /*
                          * The constraint that determines the used values for these elements is:
-                         * 'left' + 'margin-left' + 'border-left-width' + 'padding-left' + 'width' + 'padding-right' + 'border-right-width' + 'margin-right' + 'right' = width of containing block 
+                         * 'left' + 'margin-left' + 'border-left-width' + 'padding-left' + 'width' + 'padding-right' + 'border-right-width' + 'margin-right' + 'right' = width of containing block
                          */
 
                         if (Left.IsAuto && Width.IsAuto && Right.IsAuto)
@@ -861,7 +861,7 @@ public static class BoxModel
                         }
                         else /* Otherwise, if 'width' has a computed value of 'auto', but none of the conditions above are met, then the used value of 'width' becomes 300px. If 300px is too wide to fit the device, UAs should use the width of the largest rectangle that has a 2:1 ratio and fits the device instead. */
                         {
-                            Width = CssValue.From(300, ECssUnit.PX);
+                            Width = CssValue.From_Dimension(300, ECssUnit.PX);
                         }
 
                         if (Left.IsAuto && Right.IsAuto)
@@ -1016,7 +1016,7 @@ public static class BoxModel
                         }
                         else /* Otherwise, if 'width' has a computed value of 'auto', but none of the conditions above are met, then the used value of 'width' becomes 300px. If 300px is too wide to fit the device, UAs should use the width of the largest rectangle that has a 2:1 ratio and fits the device instead. */
                         {
-                            Width = CssValue.From(300, ECssUnit.PX);
+                            Width = CssValue.From_Dimension(300, ECssUnit.PX);
                         }
                     }
                 }
@@ -1056,7 +1056,7 @@ public static class BoxModel
     {// Docs: https://www.w3.org/TR/CSS22/visudet.html#Computing_heights_and_margins
         /*
          * The values of an element's 'width', 'margin-left', 'margin-right', 'left' and 'right' properties as used for layout depend on the type of box generated and on each other. (The value used for layout is sometimes referred to as the used value.) In principle, the values used are the same as the computed values, with 'auto' replaced by some suitable value, and percentages calculated based on the containing block, but there are exceptions. The following situations need to be distinguished:
-         * 
+         *
          * inline, non-replaced elements
          * inline, replaced elements
          * block-level, non-replaced elements in normal flow
@@ -1118,8 +1118,8 @@ public static class BoxModel
                         else if (Height.IsAuto)
                         {
                             /*
-                             * Otherwise, if 'height' has a computed value of 'auto', but none of the conditions above are met, 
-                             * then the used value of 'height' must be set to the height of the largest rectangle that has a 2:1 ratio, 
+                             * Otherwise, if 'height' has a computed value of 'auto', but none of the conditions above are met,
+                             * then the used value of 'height' must be set to the height of the largest rectangle that has a 2:1 ratio,
                              * has a height not greater than 150px, and has a width not greater than the device width.
                              */
                             /* Formula:  h = w * Min(2 (150/w)) */
@@ -1158,7 +1158,7 @@ public static class BoxModel
 
                             /*
                              * The element's height is the distance from its top content edge to the first applicable of the following:
-                             * 
+                             *
                              * 1) the bottom edge of the last line box, if the box establishes a inline formatting context with one or more lines
                              * 2) the bottom edge of the bottom (possibly collapsed) margin of its last in-flow child, if the child's bottom margin does not collapse with the element's bottom margin
                              * 3) the bottom border edge of the last in-flow child whose top margin doesn't collapse with the element's bottom margin
@@ -1189,9 +1189,9 @@ public static class BoxModel
                     /* 10.6.4 Absolutely positioned, non-replaced elements */
                     if (!Box.IsReplacedElement)
                     {
-                        /* 
+                        /*
                          * For absolutely positioned elements, the used values of the vertical dimensions must satisfy this constraint:
-                         * 'top' + 'margin-top' + 'border-top-width' + 'padding-top' + 'height' + 'padding-bottom' + 'border-bottom-width' + 'margin-bottom' + 'bottom' = height of containing block 
+                         * 'top' + 'margin-top' + 'border-top-width' + 'padding-top' + 'height' + 'padding-bottom' + 'border-bottom-width' + 'margin-bottom' + 'bottom' = height of containing block
                          */
 
                         if (Top.IsAuto && Height.IsAuto && Bottom.IsAuto)
@@ -1330,8 +1330,8 @@ public static class BoxModel
                         else if (Height.IsAuto)
                         {
                             /*
-                             * Otherwise, if 'height' has a computed value of 'auto', but none of the conditions above are met, 
-                             * then the used value of 'height' must be set to the height of the largest rectangle that has a 2:1 ratio, 
+                             * Otherwise, if 'height' has a computed value of 'auto', but none of the conditions above are met,
+                             * then the used value of 'height' must be set to the height of the largest rectangle that has a 2:1 ratio,
                              * has a height not greater than 150px, and has a width not greater than the device width.
                              */
                             /* Formula:  h = w * Min(2 (150/w)) */
@@ -1421,11 +1421,11 @@ public static class BoxModel
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static double Get_Height_For_Block_Formatting_Context(CssPrincipalBox Box)
     {
-        /* 
+        /*
          * If it only has inline-level children, the height is the distance between the top of the topmost line box and the bottom of the bottommost line box.
          * If it has block-level children, the height is the distance between the top margin-edge of the topmost block-level child box and the bottom margin-edge of the bottommost block-level child box.
          * Absolutely positioned children are ignored, and relatively positioned boxes are considered without their offset. Note that the child box may be an anonymous block box.
-         * In addition, if the element has any floating descendants whose bottom margin edge is below the element's bottom content edge, then the height is increased to include those edges. Only floats that participate in this block formatting context are taken into account, e.g., floats inside absolutely positioned descendants or other floats are not. 
+         * In addition, if the element has any floating descendants whose bottom margin edge is below the element's bottom content edge, then the height is increased to include those edges. Only floats that participate in this block formatting context are taken into account, e.g., floats inside absolutely positioned descendants or other floats are not.
          */
 
         if (!Box.HasBlockLevelChildren)

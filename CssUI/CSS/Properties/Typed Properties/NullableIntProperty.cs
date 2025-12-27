@@ -10,7 +10,7 @@ public class NullableIntProperty : CssProperty
 {
 
     #region Value Overrides
-    public new int? Actual => base.Actual.AsIntegerN();
+    public new int? Actual => (int?)base.Actual.AsIntegerN();
     #endregion
 
     #region Constructors

@@ -1038,22 +1038,27 @@ public class CssParser
                         unit = unitLookup;
                     }
 
-                    return new CssValue(ECssValueTypes.DIMENSION, tok.Number, unit);
+                    // Use resolution subclass for resolution units, dimension for others
+                    return unit switch
+                    {
+                        ECssUnit.DPI or ECssUnit.DPCM or ECssUnit.DPPX => new CssResolutionValue(tok.AsNumber, unit),
+                        _ => new CssDimensionValue(tok.AsNumber, unit)
+                    };
                 }
             case ECssTokenType.Number:
                 {
                     var tok = Stream.Consume() as NumberToken;
-                    return new CssValue(ECssValueTypes.NUMBER, tok.Number);
+                    return new CssNumberValue(tok.AsNumber);
                 }
             case ECssTokenType.Percentage:
                 {
                     var tok = Stream.Consume() as PercentageToken;
-                    return new CssValue(ECssValueTypes.PERCENT, tok.Number);
+                    return new CssPercentValue(tok.Number);
                 }
             case ECssTokenType.String:
                 {
                     var tok = Stream.Consume() as StringToken;
-                    return new CssValue(ECssValueTypes.STRING, tok!.Value);
+                    return new CssStringValue(tok!.Value);
                 }
             case ECssTokenType.Ident:// Keyword
                 {
@@ -1067,13 +1072,13 @@ public class CssParser
                         if (isCurrentColor)
                         {
                             // Return as a keyword for now; it will be resolved during cascade/inheritance
-                            return new CssValue(ECssValueTypes.KEYWORD, tok.Value);
+                            return new CssKeywordValue(tok.Value);
                         }
 
-                        return CssValue.From(namedColor);
+                        return new CssColorValue(namedColor);
                     }
 
-                    return new CssValue(ECssValueTypes.KEYWORD, tok!.Value);
+                    return new CssKeywordValue(tok!.Value);
                 }
             case ECssTokenType.FunctionName:
                 {
@@ -1849,12 +1854,12 @@ public class CssParser
                         Consume_All_Whitespace(Stream);
                         NumberToken? numTok2 = Stream.Consume() as NumberToken;
 
-                        double ratioValue = ((double)numTok.Number / (double)numTok2.Number);
-                        return new CssValue(ECssValueTypes.RATIO, ratioValue);
+                        double ratioValue = (numTok.AsNumber / numTok2.AsNumber);
+                        return new CssNumberValue(ratioValue); // Ratio stored as number
                     }
 
                     /* Nope, its just a number */
-                    return new CssValue(ECssValueTypes.NUMBER, numTok.Number);
+                    return new CssNumberValue(numTok.AsNumber);
                 }
             case ECssTokenType.Dimension:
             case ECssTokenType.Ident:

@@ -17,8 +17,8 @@ public class CssListValueTests
     public void From_WithMultipleValues_ReturnsCssListValue()
     {
         // Arrange
-        var v1 = CssValue.From(10, ECssUnit.PX);
-        var v2 = CssValue.From(20, ECssUnit.PX);
+        var v1 = CssValue.From_Dimension(10, ECssUnit.PX);
+        var v2 = CssValue.From_Dimension(20, ECssUnit.PX);
 
         // Act
         var result = CssValue.From(v1, v2);
@@ -103,8 +103,8 @@ public class CssListValueTests
     public void Serialize_SpaceSeparated_JoinsWithSpaces()
     {
         // Arrange
-        var v1 = CssValue.From(10, ECssUnit.PX);
-        var v2 = CssValue.From(20, ECssUnit.PX);
+        var v1 = CssValue.From_Dimension(10, ECssUnit.PX);
+        var v2 = CssValue.From_Dimension(20, ECssUnit.PX);
         var listValue = (CssListValue)CssValue.From(v1, v2);
 
         // Act
@@ -120,8 +120,8 @@ public class CssListValueTests
     public void Serialize_CommaSeparated_JoinsWithCommas()
     {
         // Arrange
-        var v1 = CssValue.From(10, ECssUnit.PX);
-        var v2 = CssValue.From(20, ECssUnit.PX);
+        var v1 = CssValue.From_Dimension(10, ECssUnit.PX);
+        var v2 = CssValue.From_Dimension(20, ECssUnit.PX);
         var listValue = (CssListValue)CssValue.FromList(ECssListSeparator.Comma, v1, v2);
 
         // Act
@@ -137,8 +137,8 @@ public class CssListValueTests
     public void Serialize_SlashSeparated_JoinsWithSlashes()
     {
         // Arrange
-        var v1 = CssValue.From(10, ECssUnit.PX);
-        var v2 = CssValue.From(20, ECssUnit.PX);
+        var v1 = CssValue.From_Dimension(10, ECssUnit.PX);
+        var v2 = CssValue.From_Dimension(20, ECssUnit.PX);
         var listValue = (CssListValue)CssValue.FromList(ECssListSeparator.Slash, v1, v2);
 
         // Act
@@ -169,7 +169,7 @@ public class CssListValueTests
     public void ToString_ReturnsSerializedValue()
     {
         // Arrange
-        var v1 = CssValue.From(10, ECssUnit.PX);
+        var v1 = CssValue.From_Dimension(10, ECssUnit.PX);
         var v2 = CssValue.Auto;
         var listValue = (CssListValue)CssValue.From(v1, v2);
 
@@ -190,8 +190,8 @@ public class CssListValueTests
     public void TryFormat_SpaceSeparated_FormatsCorrectly()
     {
         // Arrange
-        var v1 = CssValue.From(10, ECssUnit.PX);
-        var v2 = CssValue.From(20, ECssUnit.PX);
+        var v1 = CssValue.From_Dimension(10, ECssUnit.PX);
+        var v2 = CssValue.From_Dimension(20, ECssUnit.PX);
         var listValue = (CssListValue)CssValue.From(v1, v2);
         Span<char> buffer = stackalloc char[32];
 
@@ -209,8 +209,8 @@ public class CssListValueTests
     public void TryFormat_CommaSeparated_FormatsCorrectly()
     {
         // Arrange
-        var v1 = CssValue.From(10, ECssUnit.PX);
-        var v2 = CssValue.From(20, ECssUnit.PX);
+        var v1 = CssValue.From_Dimension(10, ECssUnit.PX);
+        var v2 = CssValue.From_Dimension(20, ECssUnit.PX);
         var listValue = (CssListValue)CssValue.FromList(ECssListSeparator.Comma, v1, v2);
         Span<char> buffer = stackalloc char[32];
 
@@ -228,8 +228,8 @@ public class CssListValueTests
     public void TryFormat_BufferTooSmall_ReturnsFalse()
     {
         // Arrange
-        var v1 = CssValue.From(10, ECssUnit.PX);
-        var v2 = CssValue.From(20, ECssUnit.PX);
+        var v1 = CssValue.From_Dimension(10, ECssUnit.PX);
+        var v2 = CssValue.From_Dimension(20, ECssUnit.PX);
         var listValue = (CssListValue)CssValue.From(v1, v2);
         Span<char> buffer = stackalloc char[5]; // Too small for "10px 20px"
 
@@ -331,9 +331,9 @@ public class CssListValueTests
         // Arrange - simulate a typical margin/padding value
         var values = new[]
         {
-            CssValue.From(10, ECssUnit.PX),
+            CssValue.From_Dimension(10, ECssUnit.PX),
             CssValue.Auto,
-            CssValue.From(5, ECssUnit.PX),
+            CssValue.From_Dimension(5, ECssUnit.PX),
             CssValue.Auto
         };
         var listValue = (CssListValue)CssValue.From(values);

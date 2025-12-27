@@ -108,7 +108,7 @@ public class CssValueTests
     [Trait("Category", "CssValue")]
     public void RecordClass_Dimension_WithExpressionCreatesNewInstance()
     {
-        var original = CssValue.From(100.0, ECssUnit.PX);
+        var original = CssValue.From_Dimension(100.0, ECssUnit.PX);
         // CssValue is now a record class, so it's immutable and supports 'with' expressions
         var copy = original with { };
 
@@ -207,7 +207,7 @@ public class CssValueTests
     [Trait("Category", "CssValue")]
     public void From_Dimension_PX()
     {
-        var value = CssValue.From(100.0, ECssUnit.PX);
+        var value = CssValue.From_Dimension(100.0, ECssUnit.PX);
 
         Assert.Equal(ECssValueTypes.DIMENSION, value.Type);
         Assert.Equal(ECssUnit.PX, value.Unit);
@@ -218,7 +218,7 @@ public class CssValueTests
     [Trait("Category", "CssValue")]
     public void From_Dimension_EM()
     {
-        var value = CssValue.From(2.0, ECssUnit.EM);
+        var value = CssValue.From_Dimension(2.0, ECssUnit.EM);
 
         Assert.Equal(ECssValueTypes.DIMENSION, value.Type);
         Assert.Equal(ECssUnit.EM, value.Unit);
@@ -229,7 +229,7 @@ public class CssValueTests
     [Trait("Category", "CssValue")]
     public void From_Dimension_REM()
     {
-        var value = CssValue.From(2.0, ECssUnit.REM);
+        var value = CssValue.From_Dimension(2.0, ECssUnit.REM);
 
         Assert.Equal(ECssValueTypes.DIMENSION, value.Type);
         Assert.Equal(ECssUnit.REM, value.Unit);
@@ -240,7 +240,7 @@ public class CssValueTests
     [Trait("Category", "CssValue")]
     public void From_Dimension_VW()
     {
-        var value = CssValue.From(50.0, ECssUnit.VW);
+        var value = CssValue.From_Dimension(50.0, ECssUnit.VW);
 
         Assert.Equal(ECssValueTypes.DIMENSION, value.Type);
         Assert.Equal(ECssUnit.VW, value.Unit);
@@ -253,7 +253,7 @@ public class CssValueTests
     [Trait("Category", "CssValue")]
     public void From_Resolution_DPI_Type()
     {
-        var value = CssValue.From(96.0, ECssUnit.DPI);
+        var value = CssValue.From_Dimension(96.0, ECssUnit.DPI);
 
         Assert.Equal(ECssValueTypes.RESOLUTION, value.Type);
         Assert.Equal(ECssUnit.DPI, value.Unit);
@@ -263,7 +263,7 @@ public class CssValueTests
     [Trait("Category", "CssValue")]
     public void From_Resolution_DPI_Unit()
     {
-        var value = CssValue.From(96.0, ECssUnit.DPI);
+        var value = CssValue.From_Dimension(96.0, ECssUnit.DPI);
 
         // Unit is correctly set even if type is DIMENSION instead of RESOLUTION
         Assert.Equal(ECssUnit.DPI, value.Unit);
@@ -274,7 +274,7 @@ public class CssValueTests
     [Trait("Category", "CssValue")]
     public void From_Resolution_DPPX_Type()
     {
-        var value = CssValue.From(2.0, ECssUnit.DPPX);
+        var value = CssValue.From_Dimension(2.0, ECssUnit.DPPX);
 
         Assert.Equal(ECssValueTypes.RESOLUTION, value.Type);
         Assert.Equal(ECssUnit.DPPX, value.Unit);
@@ -284,7 +284,7 @@ public class CssValueTests
     [Trait("Category", "CssValue")]
     public void From_Resolution_DPPX_Unit()
     {
-        var value = CssValue.From(2.0, ECssUnit.DPPX);
+        var value = CssValue.From_Dimension(2.0, ECssUnit.DPPX);
 
         Assert.Equal(ECssUnit.DPPX, value.Unit);
         Assert.Equal(2, value.AsInteger());
@@ -754,7 +754,7 @@ public class CssValueTests
     [Trait("Category", "CssValue")]
     public void ToString_Dimension_IncludesUnit()
     {
-        var value = CssValue.From(100.0, ECssUnit.PX);
+        var value = CssValue.From_Dimension(100.0, ECssUnit.PX);
         var str = value.ToString();
 
         Assert.NotNull(str);
@@ -785,7 +785,7 @@ public class CssValueTests
     [Trait("Category", "CssValue")]
     public void Serialize_DimensionPX()
     {
-        var value = CssValue.From(100.0, ECssUnit.PX);
+        var value = CssValue.From_Dimension(100.0, ECssUnit.PX);
         var serialized = value.ToString();
 
         Assert.Contains("100", serialized);
@@ -814,7 +814,7 @@ public class CssValueTests
     [Trait("Category", "CssValue")]
     public void IsDefinite_Dimension_ReturnsFalse()
     {
-        var value = CssValue.From(100.0, ECssUnit.PX);
+        var value = CssValue.From_Dimension(100.0, ECssUnit.PX);
         // Dimensions are not considered "definite" in the implementation
         Assert.False(value.IsDefinite);
     }

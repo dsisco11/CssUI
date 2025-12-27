@@ -264,7 +264,7 @@ public class PropertyInheritanceTests
         // Set parent width
         var parentProp = parent.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(parentProp);
-        parentProp.Set(CssValue.From(200.0, ECssUnit.PX));
+        parentProp.Set(CssValue.From_Dimension(200.0, ECssUnit.PX));
 
         // Set child to inherit (normally width doesn't inherit)
         var childProp = child.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
@@ -308,7 +308,7 @@ public class PropertyInheritanceTests
         Assert.NotNull(prop);
 
         // First set a value, then reset to initial
-        prop.Set(CssValue.From(100.0, ECssUnit.PX));
+        prop.Set(CssValue.From_Dimension(100.0, ECssUnit.PX));
         prop.Set(CssValue.Initial);
 
         // Property should now use initial value on resolution

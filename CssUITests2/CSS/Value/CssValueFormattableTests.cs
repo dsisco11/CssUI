@@ -156,7 +156,7 @@ public class CssValueFormattableTests
     [Trait("Category", "Formatting")]
     public void TryFormat_PixelDimension_WritesValueWithUnit()
     {
-        var value = CssValue.From(100.0, ECssUnit.PX);
+        var value = CssValue.From_Dimension(100.0, ECssUnit.PX);
         Span<char> buffer = stackalloc char[32];
 
         bool success = value.TryFormat(buffer, out int charsWritten);
@@ -170,7 +170,7 @@ public class CssValueFormattableTests
     [Trait("Category", "Formatting")]
     public void TryFormat_EmDimension_WritesValueWithUnit()
     {
-        var value = CssValue.From(1.5, ECssUnit.EM);
+        var value = CssValue.From_Dimension(1.5, ECssUnit.EM);
         Span<char> buffer = stackalloc char[32];
 
         bool success = value.TryFormat(buffer, out int charsWritten);
@@ -184,7 +184,7 @@ public class CssValueFormattableTests
     [Trait("Category", "Formatting")]
     public void TryFormat_RemDimension_WritesValueWithUnit()
     {
-        var value = CssValue.From(2.0, ECssUnit.REM);
+        var value = CssValue.From_Dimension(2.0, ECssUnit.REM);
         Span<char> buffer = stackalloc char[32];
 
         bool success = value.TryFormat(buffer, out int charsWritten);
@@ -198,7 +198,7 @@ public class CssValueFormattableTests
     [Trait("Category", "Formatting")]
     public void TryFormat_DimensionNoUnit_WritesNoneMarker()
     {
-        var value = CssValue.From(10.0, ECssUnit.None);
+        var value = CssValue.From_Dimension(10.0, ECssUnit.None);
         Span<char> buffer = stackalloc char[32];
 
         bool success = value.TryFormat(buffer, out int charsWritten);
@@ -342,7 +342,7 @@ public class CssValueFormattableTests
     [Trait("Category", "Formatting")]
     public void TryFormat_BufferTooSmall_ReturnsFalse()
     {
-        var value = CssValue.From(100.0, ECssUnit.PX); // "100px" = 5 chars
+        var value = CssValue.From_Dimension(100.0, ECssUnit.PX); // "100px" = 5 chars
         Span<char> buffer = stackalloc char[3]; // Too small
 
         bool success = value.TryFormat(buffer, out int charsWritten);
@@ -430,8 +430,8 @@ public class CssValueFormattableTests
             CssValue.From(-100),
             CssValue.From(3.14159),
             CssValue.From_Percent(50.0),
-            CssValue.From(100.0, ECssUnit.PX),
-            CssValue.From(1.5, ECssUnit.EM),
+            CssValue.From_Dimension(100.0, ECssUnit.PX),
+            CssValue.From_Dimension(1.5, ECssUnit.EM),
             CssValue.From(CssColor.FromRgba(255, 0, 0, 255)),
         };
 

@@ -180,6 +180,53 @@ public sealed record class CssListValue : CssValue
     }
 
     #endregion
+
+    #region Equality
+
+    /// <summary>
+    /// Determines equality between this CssListValue and another CssListValue.
+    /// </summary>
+    /// <remarks>
+    /// Compares the values array element-by-element using CssValue equality.
+    /// </remarks>
+    public bool Equals(CssListValue? other)
+    {
+        if (other is null)
+            return false;
+
+        if (ReferenceEquals(this, other))
+            return true;
+
+        if (_separator != other._separator)
+            return false;
+
+        if (_values.Length != other._values.Length)
+            return false;
+
+        for (int i = 0; i < _values.Length; i++)
+        {
+            // Use the instance Equals method to ensure proper virtual dispatch
+            if (!_values[i].Equals(other._values[i]))
+                return false;
+        }
+
+        return true;
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        var hash = new HashCode();
+        hash.Add(_separator);
+        hash.Add(_values.Length);
+        foreach (var value in _values)
+        {
+            hash.Add(value);
+        }
+        return hash.ToHashCode();
+    }
+
+    #endregion
 }
 
 /// <summary>

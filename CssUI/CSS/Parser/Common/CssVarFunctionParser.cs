@@ -211,11 +211,11 @@ internal static class CssVarFunctionParser
                 // Try to create a CssValue from a single token
                 return token switch
                 {
-                    NumberToken num => CssValue.From(num.AsNumber),
-                    DimensionToken dim => CssValue.From(dim.AsNumber, GetUnit(dim.Unit)),
-                    PercentageToken pct => CssValue.From_Percent(pct.Number),
-                    StringToken str => CssValue.From_String(str.Value ?? string.Empty),
-                    IdentToken ident => new CssValue(ECssValueTypes.KEYWORD, ident.Value),
+                    NumberToken num => new CssNumberValue(num.AsNumber),
+                    DimensionToken dim => CreateDimensionValue(dim.AsNumber, GetUnit(dim.Unit)),
+                    PercentageToken pct => new CssPercentValue(pct.Number),
+                    StringToken str => new CssStringValue(str.Value ?? string.Empty),
+                    IdentToken ident => new CssKeywordValue(ident.Value),
                     HashToken hash => TryParseHashColor(hash),
                     _ => null
                 };
@@ -227,13 +227,22 @@ internal static class CssVarFunctionParser
     }
 
     /// <summary>
+    /// Creates the appropriate dimension subclass based on unit type.
+    /// </summary>
+    private static CssValue CreateDimensionValue(double value, ECssUnit unit) => unit switch
+    {
+        ECssUnit.DPI or ECssUnit.DPCM or ECssUnit.DPPX => new CssResolutionValue(value, unit),
+        _ => new CssDimensionValue(value, unit)
+    };
+
+    /// <summary>
     /// Attempts to parse a hash token as a color value.
     /// </summary>
     private static CssValue? TryParseHashColor(HashToken token)
     {
         if (CssHexColorParser.TryParse(token.Value, out CssColor color))
         {
-            return CssValue.From(color);
+            return new CssColorValue(color);
         }
         return null;
     }

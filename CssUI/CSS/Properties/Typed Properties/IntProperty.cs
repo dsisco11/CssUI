@@ -13,7 +13,7 @@ public class IntProperty : LengthProperty
     {
         get
         {
-            return base.Actual.AsInteger();
+            return (int)base.Actual.AsInteger();
         }
     }
     #endregion

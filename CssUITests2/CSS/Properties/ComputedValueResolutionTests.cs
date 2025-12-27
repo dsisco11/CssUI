@@ -39,7 +39,7 @@ public class ComputedValueResolutionTests
         var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
-        prop.Set(CssValue.From(100.0, ECssUnit.PX));
+        prop.Set(CssValue.From_Dimension(100.0, ECssUnit.PX));
 
         // Assigned should be the value we set
         Assert.NotNull(prop.Assigned);
@@ -58,7 +58,7 @@ public class ComputedValueResolutionTests
         var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
-        prop.Set(CssValue.From(100.0, ECssUnit.PX));
+        prop.Set(CssValue.From_Dimension(100.0, ECssUnit.PX));
 
         // Specified should be available
         Assert.NotNull(prop.Specified);
@@ -77,7 +77,7 @@ public class ComputedValueResolutionTests
         var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
-        prop.Set(CssValue.From(100.0, ECssUnit.PX));
+        prop.Set(CssValue.From_Dimension(100.0, ECssUnit.PX));
 
         // Computed should be available
         Assert.NotNull(prop.Computed);
@@ -96,7 +96,7 @@ public class ComputedValueResolutionTests
         var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
-        prop.Set(CssValue.From(100.0, ECssUnit.PX));
+        prop.Set(CssValue.From_Dimension(100.0, ECssUnit.PX));
 
         // Used should be available
         Assert.NotNull(prop.Used);
@@ -115,7 +115,7 @@ public class ComputedValueResolutionTests
         var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
-        prop.Set(CssValue.From(100.0, ECssUnit.PX));
+        prop.Set(CssValue.From_Dimension(100.0, ECssUnit.PX));
 
         // Actual should be available
         Assert.NotNull(prop.Actual);
@@ -136,7 +136,7 @@ public class ComputedValueResolutionTests
         var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
-        prop.Set(CssValue.From(150.0, ECssUnit.PX));
+        prop.Set(CssValue.From_Dimension(150.0, ECssUnit.PX));
 
         // For a simple value, specified should match assigned
         Assert.NotNull(prop.Specified);
@@ -243,7 +243,7 @@ public class ComputedValueResolutionTests
         Assert.NotNull(prop);
 
         // Set a dimension value that should be resolved to px
-        prop.Set(CssValue.From(100.0, ECssUnit.PX));
+        prop.Set(CssValue.From_Dimension(100.0, ECssUnit.PX));
 
         // Computed should be resolved
         Assert.NotNull(prop.Computed);
@@ -447,11 +447,11 @@ public class ComputedValueResolutionTests
         Assert.NotNull(prop);
 
         // Set initial value
-        prop.Set(CssValue.From(100.0, ECssUnit.PX));
+        prop.Set(CssValue.From_Dimension(100.0, ECssUnit.PX));
         var firstComputed = prop.Computed;
 
         // Change value
-        prop.Set(CssValue.From(200.0, ECssUnit.PX));
+        prop.Set(CssValue.From_Dimension(200.0, ECssUnit.PX));
         var secondComputed = prop.Computed;
 
         // Computed should reflect the change
@@ -472,7 +472,7 @@ public class ComputedValueResolutionTests
         var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
-        prop.Set(CssValue.From(100.0, ECssUnit.PX));
+        prop.Set(CssValue.From_Dimension(100.0, ECssUnit.PX));
 
         // Force computation of all stages
         _ = prop.Actual;
@@ -549,7 +549,7 @@ public class ComputedValueResolutionTests
         var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
-        prop.Set(CssValue.From(100.0, ECssUnit.PX));
+        prop.Set(CssValue.From_Dimension(100.0, ECssUnit.PX));
 
         // All stages should be accessible
         Assert.NotNull(prop.Assigned);
@@ -572,7 +572,7 @@ public class ComputedValueResolutionTests
         var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
-        prop.Set(CssValue.From(100.0, ECssUnit.PX));
+        prop.Set(CssValue.From_Dimension(100.0, ECssUnit.PX));
 
         // Accessing Computed should trigger computation chain up to that point
         var computed = prop.Computed;

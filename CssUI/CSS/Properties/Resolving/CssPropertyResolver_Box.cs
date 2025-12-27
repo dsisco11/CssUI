@@ -44,30 +44,30 @@ public static partial class CssPropertyResolver
             case ECssPropertyID.BorderLeftWidth:
                 {
                     if (0 != (Property.Owner.Style.Border_Left_Style & ((EBorderStyle.None | EBorderStyle.Hidden))))
-                        return CssValue.From(0, ECssUnit.PX);
+                        return CssValue.From_Dimension(0, ECssUnit.PX);
                 }
                 break;
             case ECssPropertyID.BorderTopWidth:
                 {
                     if (0 != (Property.Owner.Style.Border_Top_Style & ((EBorderStyle.None | EBorderStyle.Hidden))))
-                        return CssValue.From(0, ECssUnit.PX);
+                        return CssValue.From_Dimension(0, ECssUnit.PX);
                 }
                 break;
             case ECssPropertyID.BorderRightWidth:
                 {
                     if (0 != (Property.Owner.Style.Border_Right_Style & ((EBorderStyle.None | EBorderStyle.Hidden))))
-                        return CssValue.From(0, ECssUnit.PX);
+                        return CssValue.From_Dimension(0, ECssUnit.PX);
                 }
                 break;
             case ECssPropertyID.BorderBottomWidth:
                 {
                     if (0 != (Property.Owner.Style.Border_Bottom_Style & ((EBorderStyle.None | EBorderStyle.Hidden))))
-                        return CssValue.From(0, ECssUnit.PX);
+                        return CssValue.From_Dimension(0, ECssUnit.PX);
                 }
                 break;
         }
 
-        return CssValue.From(Width, ECssUnit.PX);
+        return CssValue.From_Dimension(Width, ECssUnit.PX);
     }
 
 
@@ -108,10 +108,10 @@ public static partial class CssPropertyResolver
         }
         else if (Value.Type == ECssValueTypes.AUTO)
         {
-            /* 
-             * For min-width/min-height, specifies an automatic minimum size. 
-             * Unless otherwise defined by the relevant layout module, however, it resolves to a used value of 0. 
-             * For backwards-compatibility, the resolved value of this keyword is zero for boxes of all [CSS2] display types: block and inline boxes, inline blocks, and all the table layout boxes. 
+            /*
+             * For min-width/min-height, specifies an automatic minimum size.
+             * Unless otherwise defined by the relevant layout module, however, it resolves to a used value of 0.
+             * For backwards-compatibility, the resolved value of this keyword is zero for boxes of all [CSS2] display types: block and inline boxes, inline blocks, and all the table layout boxes.
              * It also resolves to zero when no box is generated.
              */
 
@@ -168,10 +168,10 @@ public static partial class CssPropertyResolver
         }
         else if (Value.Type == ECssValueTypes.AUTO)
         {
-            /* 
-             * For min-width/min-height, specifies an automatic minimum size. 
-             * Unless otherwise defined by the relevant layout module, however, it resolves to a used value of 0. 
-             * For backwards-compatibility, the resolved value of this keyword is zero for boxes of all [CSS2] display types: block and inline boxes, inline blocks, and all the table layout boxes. 
+            /*
+             * For min-width/min-height, specifies an automatic minimum size.
+             * Unless otherwise defined by the relevant layout module, however, it resolves to a used value of 0.
+             * For backwards-compatibility, the resolved value of this keyword is zero for boxes of all [CSS2] display types: block and inline boxes, inline blocks, and all the table layout boxes.
              * It also resolves to zero when no box is generated.
              */
 

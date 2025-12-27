@@ -124,7 +124,7 @@ public class CssPropertyTests
         var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
-        prop.Set(CssValue.From(100.0, ECssUnit.PX));
+        prop.Set(CssValue.From_Dimension(100.0, ECssUnit.PX));
 
         Assert.False(prop.IsAuto);
     }
@@ -162,7 +162,7 @@ public class CssPropertyTests
         var prop = element.Style.UserRules.Get(ECssPropertyID.Width) as CssProperty;
         Assert.NotNull(prop);
 
-        prop.Set(CssValue.From(50.0, ECssUnit.PX));
+        prop.Set(CssValue.From_Dimension(50.0, ECssUnit.PX));
 
         Assert.False(prop.IsInherited);
     }
@@ -327,7 +327,7 @@ public class CssPropertyTests
         Assert.NotNull(prop);
 
         // Width accepts dimensions
-        prop.Set(CssValue.From(100.0, ECssUnit.PX));
+        prop.Set(CssValue.From_Dimension(100.0, ECssUnit.PX));
 
         Assert.True(prop.HasValue);
     }
@@ -411,8 +411,8 @@ public class CssPropertyTests
         Assert.NotNull(prop1);
         Assert.NotNull(prop2);
 
-        prop1.Set(CssValue.From(100.0, ECssUnit.PX));
-        prop2.Set(CssValue.From(200.0, ECssUnit.PX));
+        prop1.Set(CssValue.From_Dimension(100.0, ECssUnit.PX));
+        prop2.Set(CssValue.From_Dimension(200.0, ECssUnit.PX));
 
         // Properties should be independent
         Assert.NotSame(prop1, prop2);

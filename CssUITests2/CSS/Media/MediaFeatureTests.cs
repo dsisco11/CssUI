@@ -81,7 +81,7 @@ public class MediaFeatureTests
         var values = new CssValue[]
         {
             CssValue.From(EMediaFeatureName.Width),
-            CssValue.From(800, ECssUnit.PX)
+            CssValue.From_Dimension(800, ECssUnit.PX)
         };
         var ops = Array.Empty<EMediaOperator>();
         var feature = new MediaFeature(values, ops);
@@ -101,7 +101,7 @@ public class MediaFeatureTests
         var values = new CssValue[]
         {
             CssValue.From(EMediaFeatureName.Min_Width),
-            CssValue.From(600, ECssUnit.PX)
+            CssValue.From_Dimension(600, ECssUnit.PX)
         };
         var ops = Array.Empty<EMediaOperator>();
         var feature = new MediaFeature(values, ops);
@@ -121,7 +121,7 @@ public class MediaFeatureTests
         var values = new CssValue[]
         {
             CssValue.From(EMediaFeatureName.Max_Height),
-            CssValue.From(1080, ECssUnit.PX)
+            CssValue.From_Dimension(1080, ECssUnit.PX)
         };
         var ops = Array.Empty<EMediaOperator>();
         var feature = new MediaFeature(values, ops);
@@ -176,7 +176,7 @@ public class MediaFeatureTests
         var values = new CssValue[]
         {
             CssValue.From(EMediaFeatureName.Width),
-            CssValue.From(800, ECssUnit.PX)
+            CssValue.From_Dimension(800, ECssUnit.PX)
         };
         var ops = Array.Empty<EMediaOperator>();
         var feature = new MediaFeature(values, ops);

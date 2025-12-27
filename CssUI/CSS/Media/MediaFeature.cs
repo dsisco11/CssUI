@@ -50,11 +50,11 @@ public class MediaFeature : IMediaCondition
             }
             else if (0 != (def.AllowedTypes & ECssValueTypes.DIMENSION))
             {
-                Values = new CssValue[] { CssValue.From(Name), CssValue.From(0, ECssUnit.PX) };
+                Values = new CssValue[] { CssValue.From(Name), CssValue.From_Dimension(0, ECssUnit.PX) };
             }
             else if (0 != (def.AllowedTypes & ECssValueTypes.RESOLUTION))
             {
-                Values = new CssValue[] { CssValue.From(Name), CssValue.From(0, ECssUnit.DPPX) };
+                Values = new CssValue[] { CssValue.From(Name), CssValue.From_Dimension(0, ECssUnit.DPPX) };
             }
         }
         else

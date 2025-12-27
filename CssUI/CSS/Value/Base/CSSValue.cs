@@ -68,16 +68,15 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     private readonly ECssValueFlags flags = ECssValueFlags.None;
     private readonly ECssValueTypes type = ECssValueTypes.NULL;
     private readonly ECssUnit unit = ECssUnit.None;
-    /// <summary>
-    /// Union storage for primitive values (numbers, integers, colors) without boxing.
-    /// </summary>
-    private readonly CssValueData data;
     #endregion
 
     #region Accessors
     public ECssValueFlags Flags => flags;
     public ECssValueTypes Type => type;
-    public ECssUnit Unit => unit;
+    /// <summary>
+    /// Gets the CSS unit for this value. Subclasses for dimension/resolution types override this.
+    /// </summary>
+    public virtual ECssUnit Unit => unit;
 
     /// <summary>
     /// Returns whether the value is 'Auto'
@@ -106,20 +105,9 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     {
         get
         {
-            if (Type == ECssValueTypes.NULL)
-                return false;
-
-            // For primitive types stored in the union, they always have a value
-            if (Type == ECssValueTypes.INTEGER || Type == ECssValueTypes.NUMBER ||
-                Type == ECssValueTypes.COLOR || Type == ECssValueTypes.COLOR_HDR ||
-                Type == ECssValueTypes.PERCENT || Type == ECssValueTypes.DIMENSION ||
-                Type == ECssValueTypes.RESOLUTION)
-            {
-                return true;
-            }
-
-            // For reference types, check if ObjectValue is set
-            return data.ObjectValue is not null;
+            // Base types (NULL, AUTO, INHERIT, etc.) have no data payload
+            // Subclasses override to return true when they have actual values
+            return Type != ECssValueTypes.NULL;
         }
     }
     #endregion
@@ -145,8 +133,7 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     private protected CssValue(ECssValueTypes type)
     {
         this.type = type;
-        this.data = default;
-        flags |= Get_Inherent_Value_Type_Flags(type, unit, in data);
+        flags |= Get_Inherent_Value_Type_Flags(type);
     }
 
     /// <summary>
@@ -167,103 +154,9 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
         };
         return result != ECssValueTypes.NULL;
     }
-
-    internal CssValue(ECssValueTypes type, CssValueData data) : this(type)
-    {
-        this.data = data;
-    }
-
-    internal CssValue(ECssValueTypes type, CssValueData data, ECssValueFlags flags) : this(type)
-    {
-        this.data = data;
-        this.flags |= flags;
-    }
-
-    internal CssValue(ECssValueTypes type, CssValueData data, ECssUnit unit) : this(type)
-    {
-        this.unit = unit;
-        this.data = data;
-
-        if (type == ECssValueTypes.KEYWORD)// Try and catch some common IMPORTANT keywords
-        {
-            /* If our keyword can be resolved to another ECssValueType then its an global keyword */
-            if (data.ObjectValue is string strValue && TryParseCssGlobalKeyword(strValue, out ECssValueTypes outKeyword))
-            {
-                this.type = outKeyword;
-            }
-        }
-        else if (type == ECssValueTypes.DIMENSION || type == ECssValueTypes.RESOLUTION)
-        {
-            /* Make sure to correct the value and distinguish whether we are a Dimension or a Resolution */
-            switch (unit)
-            {
-                case ECssUnit.DPI:
-                case ECssUnit.DPCM:
-                case ECssUnit.DPPX:
-                    this.type = ECssValueTypes.RESOLUTION;
-                    break;
-                default:
-                    this.type = ECssValueTypes.DIMENSION;
-                    break;
-            }
-        }
-    }
-
-    #region Legacy Constructors (for internal parser/resolver compatibility)
-    /// <summary>
-    /// Legacy constructor for parsers - creates a value from an object (will be boxed for non-primitives).
-    /// </summary>
-    internal CssValue(ECssValueTypes type, object? value) : this(type)
-    {
-        this.data = value switch
-        {
-            int i => CssValueData.FromInteger(i),
-            double d => CssValueData.FromNumber(d),
-            float f => CssValueData.FromNumber(f),
-            string s => CssValueData.FromObject(s),
-            CssColor c => CssValueData.FromColor(c),
-            CssColorHdr ch => CssValueData.FromColorHdr(ch),
-            _ => CssValueData.FromObject(value)
-        };
-    }
-
-    /// <summary>
-    /// Legacy constructor for parsers - creates a dimension value.
-    /// </summary>
-    internal CssValue(ECssValueTypes type, object? value, ECssUnit unit) : this(type)
-    {
-        this.unit = unit;
-        this.data = value switch
-        {
-            int i => CssValueData.FromNumber(i),
-            double d => CssValueData.FromNumber(d),
-            float f => CssValueData.FromNumber(f),
-            _ => CssValueData.FromObject(value)
-        };
-
-        if (type == ECssValueTypes.KEYWORD && data.ObjectValue is string strValue && TryParseCssGlobalKeyword(strValue, out ECssValueTypes outKeyword))
-        {
-            this.type = outKeyword;
-        }
-        else if (type == ECssValueTypes.DIMENSION || type == ECssValueTypes.RESOLUTION)
-        {
-            switch (unit)
-            {
-                case ECssUnit.DPI:
-                case ECssUnit.DPCM:
-                case ECssUnit.DPPX:
-                    this.type = ECssValueTypes.RESOLUTION;
-                    break;
-                default:
-                    this.type = ECssValueTypes.DIMENSION;
-                    break;
-            }
-        }
-    }
-    #endregion
     #endregion
 
-    private static ECssValueFlags Get_Inherent_Value_Type_Flags(ECssValueTypes Type, ECssUnit Unit, in CssValueData Data)
+    private static ECssValueFlags Get_Inherent_Value_Type_Flags(ECssValueTypes Type)
     {
         ECssValueFlags Flags = ECssValueFlags.None;
 
@@ -311,24 +204,10 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
                     Flags |= ECssValueFlags.Absolute;
                     break;
                 }
-            case ECssValueTypes.COLLECTION:// A collections flags are the combined flags of all it's sub-values
+            case ECssValueTypes.COLLECTION:// A collections flags are determined by the subclass (CssListValue)
                 {
-                    if (Data.ObjectValue is null)
-                        break;
-
-                    if (Data.ObjectValue is CssValue cssValue)
-                    {// we are a nested collection.
-                        Flags |= Get_Inherent_Value_Type_Flags(cssValue.Type, cssValue.Unit, in cssValue.data);
-                        break;
-                    }
-
-                    if (Data.ObjectValue is not CssValue[] valueArray)
-                        throw new CssException($"Expected an array of {nameof(CssValue)}s for a collection type!");
-
-                    foreach (CssValue val in valueArray)
-                    {
-                        Flags |= Get_Inherent_Value_Type_Flags(val.Type, val.Unit, in val.data);
-                    }
+                    // Collections calculate their flags during construction in subclass
+                    Flags |= ECssValueFlags.Absolute;
                     break;
                 }
             default:
@@ -351,53 +230,76 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     }
 
     /// <summary>Create an absolute integer value</summary>
-    public static CssValue From(int value) => new CssValue(ECssValueTypes.INTEGER, CssValueData.FromInteger(value));
+    [Obsolete("Use specific class constructor instead, eg: new CssIntegerValue(...)")]
+    public static CssValue From(int value) => new CssIntegerValue(value);
 
     /// <summary>Create an absolute integer value if not null, or return the given default value</summary>
-    public static CssValue From(int? value, CssValue defaultValue) => (!value.HasValue ? defaultValue : new CssValue(ECssValueTypes.INTEGER, CssValueData.FromInteger(value.Value)));
+    public static CssValue From(int? value, CssValue defaultValue) => (!value.HasValue ? defaultValue : new CssIntegerValue(value.Value));
 
     /// <summary>Create an absolute number value</summary>
-    public static CssValue From(double value) => new CssValue(ECssValueTypes.NUMBER, CssValueData.FromNumber(value));
+    [Obsolete("Use specific class constructor instead, eg: new CssNUmberValue(...)")]
+    public static CssValue From(double value) => new CssNumberValue(value);
 
     /// <summary>Create an absolute number value if not null, or return the given default value</summary>
-    public static CssValue From(double? value, CssValue defaultValue) => (!value.HasValue ? defaultValue : new CssValue(ECssValueTypes.NUMBER, CssValueData.FromNumber(value.Value)));
+    public static CssValue From(double? value, CssValue defaultValue) => (!value.HasValue ? defaultValue : new CssNumberValue(value.Value));
 
     /// <summary>Create a percentage value</summary>
     /// <param name="value">Floating-point value in the range [0 - 100]</param>
-    public static CssValue From_Percent(double value) => new CssValue(ECssValueTypes.PERCENT, CssValueData.FromNumber(value));
+    [Obsolete("Use specific class constructor instead, eg: new CssPercentValue(...)")]
+    public static CssValue From_Percent(double value) => new CssPercentValue(value);
 
     /// <summary>Create an absolute length value</summary>
-    public static CssValue From(double value, ECssUnit Unit) => new CssValue(ECssValueTypes.DIMENSION, CssValueData.FromNumber(value), Unit);
+    public static CssValue From_Dimension(double value, ECssUnit Unit) => Unit switch
+    {
+        ECssUnit.DPI or ECssUnit.DPCM or ECssUnit.DPPX => new CssResolutionValue(value, Unit),
+        _ => new CssDimensionValue(value, Unit)
+    };
 
     /// <summary>Create an absolute length value if not null, or return the given default value</summary>
-    public static CssValue From(double? value, ECssUnit Unit, CssValue defaultValue) => (!value.HasValue ? defaultValue : new CssValue(ECssValueTypes.DIMENSION, CssValueData.FromNumber(value.Value), Unit));
+    public static CssValue From(double? value, ECssUnit Unit, CssValue defaultValue) => (!value.HasValue ? defaultValue : From_Dimension(value.Value, Unit));
 
     /// <summary>Create an 8-bit RGBA CSS color value</summary>
-    public static CssValue From(CssColor value) => new CssValue(ECssValueTypes.COLOR, CssValueData.FromColor(value));
+    [Obsolete("Use specific class constructor instead, eg: new CssColorValue(...)")]
+    public static CssValue From(CssColor value) => new CssColorValue(value);
 
     /// <summary>Create an HDR (wide-gamut) CSS color value</summary>
-    public static CssValue From(CssColorHdr value) => new CssValue(ECssValueTypes.COLOR_HDR, CssValueData.FromColorHdr(value));
+    [Obsolete("Use specific class constructor instead, eg: new CssColorHdrValue(...)")]
+    public static CssValue From(CssColorHdr value) => new CssColorHdrValue(value);
 
     /// <summary>Create an RGBA color value from rendering Color class</summary>
-    public static CssValue From(Rendering.Color value) => new CssValue(ECssValueTypes.COLOR, CssValueData.FromColor(new CssColor(value.R, value.G, value.B, value.A)));
+    [Obsolete("Use specific class constructor instead, eg: new CssColorValue(...)")]
+    public static CssValue From(Rendering.Color value) => new CssColorValue(new CssColor(value.R, value.G, value.B, value.A));
 
     /// <summary>Create an RGBA color value from rendering Rgba struct</summary>
-    public static CssValue From(Rgba value) => new CssValue(ECssValueTypes.COLOR, CssValueData.FromColor(new CssColor(value.Red, value.Green, value.Blue, value.Alpha)));
+    [Obsolete("Use specific class constructor instead, eg: new CssColorValue(...)")]
+    public static CssValue From(Rgba value) => new CssColorValue(new CssColor(value.Red, value.Green, value.Blue, value.Alpha));
 
     /// <summary>Create an RGBA color value from a ReadOnlyColor (legacy)</summary>
     [Obsolete("Use CssValue.From(CssColor) instead")]
-    public static CssValue From(ReadOnlyColor value) => new CssValue(ECssValueTypes.COLOR, CssValueData.FromColor(new CssColor(value.R, value.G, value.B, value.A)));
+    public static CssValue From(ReadOnlyColor value) => new CssColorValue(new CssColor(value.R, value.G, value.B, value.A));
 
     /// <summary>Create a string value</summary>
+    [Obsolete("Use specific class constructor instead, eg: new CssStringValue(...)")]
     public static CssValue From_String(string value) => new CssStringValue(value);
 
+    /// <summary>Create a keyword (identifier) value from a string</summary>
+    /// <remarks>
+    /// Use this for untyped CSS identifiers. For strongly-typed enum keywords,
+    /// use <see cref="From{T}(T)"/> with an enum value instead.
+    /// </remarks>
+    [Obsolete("Use specific class constructor instead, eg: new CssKeywordValue(...)")]
+    public static CssValue From_Keyword(string keyword) => new CssKeywordValue(keyword);
+
     /// <summary>Create a URL value</summary>
+    [Obsolete("Use specific class constructor instead, eg: new CssUrlValue(...)")]
     public static CssValue From(CssUrl value) => new CssUrlValue(value);
 
     /// <summary>Create a URL value from a string</summary>
+    [Obsolete("Use specific class constructor instead, eg: new CssUrlValue(...)")]
     public static CssValue From_Url(string url) => new CssUrlValue(url);
 
     /// <summary>Create a calc() expression value</summary>
+    [Obsolete("Use specific class constructor instead, eg: new CssCalcValue(...)")]
     public static CssValue From(CssCalcExpression value) => new CssCalcValue(value);
 
     /// <summary>Create a var() function reference value</summary>
@@ -405,6 +307,7 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     /// var() references custom properties and are resolved during computed value time.
     /// Docs: https://www.w3.org/TR/css-variables-1/#using-variables
     /// </remarks>
+    [Obsolete("Use specific class constructor instead, eg: new CssVarValue(...)")]
     public static CssValue From(CssVarFunction value) => new CssVarValue(value);
 
     /// <summary>Create an env() function reference value</summary>
@@ -413,6 +316,7 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     /// Unlike var(), env() variables are global to a document.
     /// Docs: https://www.w3.org/TR/css-env-1/
     /// </remarks>
+    [Obsolete("Use specific class constructor instead, eg: new CssEnvValue(...)")]
     public static CssValue From(CssEnvFunction value) => new CssEnvValue(value);
 
     /// <summary>Create a unicode-range value</summary>
@@ -420,6 +324,7 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     /// Unicode-ranges are used in @font-face rules to specify which characters a font supports.
     /// Docs: https://www.w3.org/TR/css-syntax-3/#urange
     /// </remarks>
+    [Obsolete("Use specific class constructor instead, eg: new CssUnicodeRangeValue(...)")]
     public static CssValue From(CssUnicodeRange value) => new CssUnicodeRangeValue(value);
 
     /// <summary>Create a css-value by parsing the given string as CSS markup</summary>
@@ -957,47 +862,38 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     /// </summary>
     /// <typeparam name="T">The enum type to cast to.</typeparam>
     /// <returns>The enum value.</returns>
+    /// <exception cref="CssException">Thrown if the value is not a keyword type.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public virtual T AsEnum<T>() where T : struct, Enum
     {
-        // Base implementation: extract from boxed ObjectValue
-        return (T)(data.ObjectValue ?? default(T));
+        throw new CssException($"{nameof(CssValue)} base type does not support AsEnum. Use CssEnumValue<T> subclass.");
     }
 
     /// <summary>
     /// Returns the value as a Point2f position if possible.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Point2f AsPosition()
+    public virtual Point2f AsPosition()
     {
-        if (Type != ECssValueTypes.POSITION) throw new CssException($"{nameof(CssValue)} is not a Position! {this}");
-        Contract.EndContractBlock();
-
-        return (Point2f)(data.ObjectValue ?? default(Point2f));
+        throw new CssException($"{nameof(CssValue)} is not a Position! {this}");
     }
 
     /// <summary>
     /// Returns the value as a CssColor.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public CssColor AsCssColor()
+    public virtual CssColor AsCssColor()
     {
-        if (Type != ECssValueTypes.COLOR) throw new CssException($"{nameof(CssValue)} is not a Color! {this}");
-        Contract.EndContractBlock();
-
-        return data.ColorValue;
+        throw new CssException($"{nameof(CssValue)} is not a Color! {this}");
     }
 
     /// <summary>
     /// Returns the value as a CssColorHdr (wide-gamut HDR color).
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public CssColorHdr AsCssColorHdr()
+    public virtual CssColorHdr AsCssColorHdr()
     {
-        if (Type != ECssValueTypes.COLOR_HDR) throw new CssException($"{nameof(CssValue)} is not an HDR Color! {this}");
-        Contract.EndContractBlock();
-
-        return data.ColorHdrValue;
+        throw new CssException($"{nameof(CssValue)} is not an HDR Color! {this}");
     }
 
     /// <summary>
@@ -1006,10 +902,7 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public virtual CssUrl AsUrl()
     {
-        if (Type != ECssValueTypes.URL) throw new CssException($"{nameof(CssValue)} is not a URL! {this}");
-        Contract.EndContractBlock();
-
-        return (CssUrl)(data.ObjectValue ?? CssUrl.Empty);
+        throw new CssException($"{nameof(CssValue)} is not a URL! {this}");
     }
 
     /// <summary>
@@ -1018,10 +911,7 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public virtual CssCalcExpression AsCalcExpression()
     {
-        if (Type != ECssValueTypes.CALC) throw new CssException($"{nameof(CssValue)} is not a calc() expression! {this}");
-        Contract.EndContractBlock();
-
-        return (CssCalcExpression)(data.ObjectValue ?? throw new CssException("calc() expression is null"));
+        throw new CssException($"{nameof(CssValue)} is not a calc() expression! {this}");
     }
 
     /// <summary>
@@ -1030,10 +920,7 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public virtual CssVarFunction AsVarFunction()
     {
-        if (Type != ECssValueTypes.VAR) throw new CssException($"{nameof(CssValue)} is not a var() function! {this}");
-        Contract.EndContractBlock();
-
-        return (CssVarFunction)(data.ObjectValue ?? throw new CssException("var() function is null"));
+        throw new CssException($"{nameof(CssValue)} is not a var() function! {this}");
     }
 
     /// <summary>
@@ -1042,10 +929,7 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public virtual CssEnvFunction AsEnvFunction()
     {
-        if (Type != ECssValueTypes.ENV) throw new CssException($"{nameof(CssValue)} is not an env() function! {this}");
-        Contract.EndContractBlock();
-
-        return (CssEnvFunction)(data.ObjectValue ?? throw new CssException("env() function is null"));
+        throw new CssException($"{nameof(CssValue)} is not an env() function! {this}");
     }
 
     /// <summary>
@@ -1054,10 +938,7 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public virtual CssUnicodeRange AsUnicodeRange()
     {
-        if (Type != ECssValueTypes.UNICODE_RANGE) throw new CssException($"{nameof(CssValue)} is not a unicode-range! {this}");
-        Contract.EndContractBlock();
-
-        return (CssUnicodeRange)(data.ObjectValue ?? throw new CssException("unicode-range is null"));
+        throw new CssException($"{nameof(CssValue)} is not a unicode-range! {this}");
     }
 
     /// <summary>
@@ -1067,10 +948,7 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     [Obsolete("Use AsCssColor() instead")]
     public ReadOnlyColor AsColor()
     {
-        if (Type != ECssValueTypes.COLOR) throw new CssException($"{nameof(CssValue)} is not a Color! {this}");
-        Contract.EndContractBlock();
-
-        var color = data.ColorValue;
+        var color = AsCssColor();
         return new ReadOnlyColor(color.R, color.G, color.B, color.A);
     }
 
@@ -1080,18 +958,8 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     /// <param name="color">The color value if successful.</param>
     /// <returns>True if this is a color type.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool TryGetColor(out CssColor color)
+    public virtual bool TryGetColor(out CssColor color)
     {
-        if (Type == ECssValueTypes.COLOR)
-        {
-            color = data.ColorValue;
-            return true;
-        }
-        if (Type == ECssValueTypes.COLOR_HDR)
-        {
-            color = data.ColorHdrValue.ToCssColor();
-            return true;
-        }
         color = default;
         return false;
     }
@@ -1102,32 +970,34 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public virtual ReadOnlyCollection<CssValue> AsCollection()
     {
-        if (!IsCollection) throw new CssException($"{nameof(CssValue)} is not a collection! {this}");
-        Contract.EndContractBlock();
-
-        return new ReadOnlyCollection<CssValue>((CssValue[])(data.ObjectValue ?? Array.Empty<CssValue>()));
+        throw new CssException($"{nameof(CssValue)} is not a collection! {this}");
     }
 
     /// <summary>
     /// Returns the value as the preferred Integer type.
-    /// For INTEGER types, returns the stored integer. For NUMBER/DIMENSION/PERCENT, converts from double with banker's rounding.
     /// </summary>
+    /// <exception cref="CssException">Thrown if the value type does not support integer conversion.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int AsInteger() => Type == ECssValueTypes.INTEGER ? (int)data.IntegerValue : Convert.ToInt32(data.NumberValue);
+    public virtual long AsInteger()
+    {
+        throw new CssException($"{nameof(CssValue)} type {Type} does not support AsInteger.");
+    }
 
     /// <summary>
     /// Returns the value as the preferred (Nullable) Integer type
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int? AsIntegerN() => !HasValue ? null : AsInteger();
+    public long? AsIntegerN() => !HasValue ? null : AsInteger();
 
     /// <summary>
     /// Returns the value as the preferred Decimal type.
-    /// For INTEGER types, converts from int. For NUMBER/DIMENSION/PERCENT, returns the stored double.
     /// </summary>
-    /// <returns></returns>
+    /// <exception cref="CssException">Thrown if the value type does not support decimal conversion.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public double AsDecimal() => Type == ECssValueTypes.INTEGER ? data.IntegerValue : data.NumberValue;
+    public virtual double AsDecimal()
+    {
+        throw new CssException($"{nameof(CssValue)} type {Type} does not support AsDecimal.");
+    }
 
     /// <summary>
     /// Returns the value as the preferred (Nullable) Decimal type
@@ -1139,14 +1009,28 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     /// <summary>
     /// Returns the value as a string
     /// </summary>
+    /// <exception cref="CssException">Thrown if the value is not a string type.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public virtual string AsString() => (string)(data.ObjectValue ?? string.Empty);
+    public virtual string AsString()
+    {
+        throw new CssException($"{nameof(CssValue)} is not a String! {this}");
+    }
+
+    /// <summary>
+    /// Returns the value as a keyword string (for KEYWORD type values).
+    /// </summary>
+    /// <exception cref="CssException">Thrown if the value is not a keyword type.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public virtual string AsKeyword()
+    {
+        throw new CssException($"{nameof(CssValue)} is not a Keyword! {this}");
+    }
 
     /// <summary>
     /// Returns the value as a CssFunction (for FUNCTION type values).
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal CssFunction? AsFunction() => data.ObjectValue as CssFunction;
+    internal virtual CssFunction? AsFunction() => null;
     #endregion
 
     #region Equality
@@ -1154,8 +1038,10 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     /// Determines equality between this CssValue and another.
     /// </summary>
     /// <remarks>
-    /// Records use this method to implement == and != operators.
-    /// Custom comparison logic handles CSS value semantics.
+    /// <para>
+    /// Base implementation handles singleton types (NULL, AUTO, INHERIT, etc.) that have no data payload.
+    /// For value-carrying types, equality is handled by the record-generated equality in subclasses.
+    /// </para>
     /// </remarks>
     public virtual bool Equals(CssValue? other)
     {
@@ -1165,42 +1051,31 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
         if (ReferenceEquals(this, other))
             return true;
 
+        // For base CssValue instances (singleton types), compare by type and unit
         if (Type != other.Type) return false;
         if (Unit != other.Unit) return false;
 
-        switch (Type)
+        // Singleton types with matching Type are equal (they have no data payload)
+        return Type switch
         {
-            case ECssValueTypes.NULL:
-            case ECssValueTypes.UNSET:
-            case ECssValueTypes.AUTO:
-            case ECssValueTypes.INITIAL:
-            case ECssValueTypes.INHERIT:
-            case ECssValueTypes.NONE:
-                return true;// Types are already the same, meaning A/B are equal
-            case ECssValueTypes.COLOR:
-                return data.ColorValue == other.data.ColorValue;
-            case ECssValueTypes.COLOR_HDR:
-                return data.ColorHdrValue == other.data.ColorHdrValue;
-            case ECssValueTypes.INTEGER:
-                return data.IntegerValue == other.data.IntegerValue;
-            case ECssValueTypes.NUMBER:
-            case ECssValueTypes.DIMENSION:
-            case ECssValueTypes.PERCENT:
-                return data.NumberValue == other.data.NumberValue;
-            case ECssValueTypes.STRING:
-                return string.Equals((string?)data.ObjectValue, (string?)other.data.ObjectValue, StringComparison.Ordinal);
-            case ECssValueTypes.KEYWORD:
-                // For keyword types, compare via ObjectValue (boxed enum)
-                return Equals(data.ObjectValue, other.data.ObjectValue);
-            default:
-                // For complex types (COLLECTION, CALC, VAR, etc.), compare ObjectValue
-                return Equals(data.ObjectValue, other.data.ObjectValue);
-        }
+            ECssValueTypes.NULL or
+            ECssValueTypes.UNSET or
+            ECssValueTypes.AUTO or
+            ECssValueTypes.INITIAL or
+            ECssValueTypes.INHERIT or
+            ECssValueTypes.NONE or
+            ECssValueTypes.DEFAULT => true,
+            // For value-carrying types, we should never reach here since subclasses
+            // override Equals. But if we do, fallback to reference equality (already checked above).
+            _ => false
+        };
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(type, unit, data.NumberValue, data.ObjectValue);
+        // Base implementation: hash only type and unit (for singleton values)
+        // Subclasses override this via record-generated GetHashCode
+        return HashCode.Combine(type, unit);
     }
 
     #endregion
@@ -1229,7 +1104,7 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
             case ECssValueTypes.STRING:
                 return string.Concat(UnicodeCommon.CHAR_QUOTATION_MARK, AsString(), UnicodeCommon.CHAR_QUOTATION_MARK);
             case ECssValueTypes.KEYWORD:
-                return Lookup.Keyword(data.ObjectValue!.GetType(), data.ObjectValue);// Enum.GetName(value.GetType(), value)
+                return AsKeyword();
             default:
                 return string.Concat("[", Enum.GetName(typeof(ECssValueTypes), Type), "]");
         }
@@ -1286,7 +1161,7 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
 
             case ECssValueTypes.KEYWORD:
                 {
-                    var keyword = Lookup.Keyword(data.ObjectValue!.GetType(), data.ObjectValue);
+                    var keyword = AsKeyword();
                     return TryFormatFromString(keyword, destination, out charsWritten);
                 }
 
