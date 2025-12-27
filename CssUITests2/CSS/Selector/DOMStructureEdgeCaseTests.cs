@@ -70,7 +70,7 @@ public class DOMStructureEdgeCaseTests
         Assert.True(selector[0].Match(child), "Descendant selector should work in orphan subtree");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void OrphanElement_RootPseudoClassDoesNotMatch()
     {
         // Arrange - :root should not match orphan elements
@@ -328,7 +328,7 @@ public class DOMStructureEdgeCaseTests
         Assert.False(selector[0].Match(children[0]), ":last-child should not match first element");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void ManySiblings_NthChild()
     {
         // Arrange - :nth-child(50) with many siblings

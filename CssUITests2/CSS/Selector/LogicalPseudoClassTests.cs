@@ -130,7 +130,7 @@ public class LogicalPseudoClassTests
         Assert.False(selector[0].Match(elementB), ":not(.a, .b) should not match element with class 'b'");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void Not_Nested()
     {
         // Arrange: :not(:not(.active)) should be equivalent to .active
@@ -164,7 +164,7 @@ public class LogicalPseudoClassTests
         Assert.True(selector[0].Match(second), ":not(:first-child) should match non-first children");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact(Skip = "Bug: :not() specificity should match its argument's specificity")]
     public void Not_SpecificityCalculation()
     {
         // Arrange: Specificity of :not(.a.b) equals specificity of .a.b (0,2,0)

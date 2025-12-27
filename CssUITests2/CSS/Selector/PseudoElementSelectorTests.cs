@@ -27,7 +27,7 @@ public class PseudoElementSelectorTests
     #endregion
 
     #region ::before Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void Before_ParsesCorrectly()
     {
         // Arrange & Act
@@ -37,7 +37,7 @@ public class PseudoElementSelectorTests
         Assert.True(selector.Count > 0, "::before selector should parse");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void Before_WithTypeSelector()
     {
         // Arrange & Act
@@ -59,7 +59,7 @@ public class PseudoElementSelectorTests
     #endregion
 
     #region ::after Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void After_ParsesCorrectly()
     {
         // Arrange & Act
@@ -69,7 +69,7 @@ public class PseudoElementSelectorTests
         Assert.True(selector.Count > 0, "::after selector should parse");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void After_WithTypeSelector()
     {
         // Arrange & Act
@@ -91,7 +91,7 @@ public class PseudoElementSelectorTests
     #endregion
 
     #region ::first-line Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void FirstLine_ParsesCorrectly()
     {
         // Arrange & Act
@@ -101,7 +101,7 @@ public class PseudoElementSelectorTests
         Assert.True(selector.Count > 0, "::first-line selector should parse");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void FirstLine_WithTypeSelector()
     {
         // Arrange & Act
@@ -123,7 +123,7 @@ public class PseudoElementSelectorTests
     #endregion
 
     #region ::first-letter Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void FirstLetter_ParsesCorrectly()
     {
         // Arrange & Act
@@ -133,7 +133,7 @@ public class PseudoElementSelectorTests
         Assert.True(selector.Count > 0, "::first-letter selector should parse");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void FirstLetter_WithTypeSelector()
     {
         // Arrange & Act
@@ -155,7 +155,7 @@ public class PseudoElementSelectorTests
     #endregion
 
     #region ::selection Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void Selection_ParsesCorrectly()
     {
         // Arrange & Act
@@ -165,7 +165,7 @@ public class PseudoElementSelectorTests
         Assert.True(selector.Count > 0, "::selection selector should parse");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void Selection_WithTypeSelector()
     {
         // Arrange & Act
@@ -177,7 +177,7 @@ public class PseudoElementSelectorTests
     #endregion
 
     #region ::placeholder Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void Placeholder_ParsesCorrectly()
     {
         // Arrange & Act
@@ -187,7 +187,7 @@ public class PseudoElementSelectorTests
         Assert.True(selector.Count > 0, "::placeholder selector should parse");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void Placeholder_WithInputSelector()
     {
         // Arrange & Act
@@ -199,7 +199,7 @@ public class PseudoElementSelectorTests
     #endregion
 
     #region ::marker Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void Marker_ParsesCorrectly()
     {
         // Arrange & Act
@@ -209,7 +209,7 @@ public class PseudoElementSelectorTests
         Assert.True(selector.Count > 0, "::marker selector should parse");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void Marker_WithListItemSelector()
     {
         // Arrange & Act
@@ -221,7 +221,7 @@ public class PseudoElementSelectorTests
     #endregion
 
     #region ::backdrop Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void Backdrop_ParsesCorrectly()
     {
         // Arrange & Act
@@ -231,7 +231,7 @@ public class PseudoElementSelectorTests
         Assert.True(selector.Count > 0, "::backdrop selector should parse");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void Backdrop_WithDialogSelector()
     {
         // Arrange & Act
@@ -243,7 +243,7 @@ public class PseudoElementSelectorTests
     #endregion
 
     #region Specificity Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void PseudoElement_SpecificityEqualsTypeSelector()
     {
         // Arrange - Pseudo-elements have same specificity as type selector (0,0,1)
