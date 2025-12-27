@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace CssUI.CSS;
@@ -11,8 +12,8 @@ namespace CssUI.CSS;
 /// </summary>
 /// <remarks>
 /// <para>
-/// This subclass stores the values array directly without boxing through <c>CssValueData.ObjectValue</c>,
-/// providing allocation-free access via <see cref="Values"/> and efficient iteration.
+/// This subclass stores the values in an immutable array, providing efficient iteration
+/// and proper value equality semantics.
 /// </para>
 /// <para>
 /// CSS list values are used extensively for properties like:
@@ -29,7 +30,7 @@ public sealed record class CssListValue : CssValue
 {
     #region Fields
 
-    private readonly CssValue[] _values;
+    private readonly ImmutableArray<CssValue> _values;
     private readonly ECssListSeparator _separator;
 
     #endregion
@@ -69,12 +70,26 @@ public sealed record class CssListValue : CssValue
     /// <summary>
     /// Creates a new <see cref="CssListValue"/> with the specified values.
     /// </summary>
-    /// <param name="values">The array of values. This array is stored directly (not copied).</param>
+    /// <param name="values">The array of values to store.</param>
     /// <param name="separator">The separator to use when serializing. Default is space.</param>
     internal CssListValue(CssValue[] values, ECssListSeparator separator = ECssListSeparator.Space)
         : base(ECssValueTypes.COLLECTION)
     {
-        _values = values ?? Array.Empty<CssValue>();
+        _values = values is null || values.Length == 0
+            ? ImmutableArray<CssValue>.Empty
+            : ImmutableArray.Create(values);
+        _separator = separator;
+    }
+
+    /// <summary>
+    /// Creates a new <see cref="CssListValue"/> with the specified immutable array.
+    /// </summary>
+    /// <param name="values">The immutable array of values.</param>
+    /// <param name="separator">The separator to use when serializing. Default is space.</param>
+    internal CssListValue(ImmutableArray<CssValue> values, ECssListSeparator separator = ECssListSeparator.Space)
+        : base(ECssValueTypes.COLLECTION)
+    {
+        _values = values.IsDefault ? ImmutableArray<CssValue>.Empty : values;
         _separator = separator;
     }
 
@@ -86,7 +101,9 @@ public sealed record class CssListValue : CssValue
     internal CssListValue(ReadOnlySpan<CssValue> values, ECssListSeparator separator = ECssListSeparator.Space)
         : base(ECssValueTypes.COLLECTION)
     {
-        _values = values.ToArray();
+        _values = values.IsEmpty
+            ? ImmutableArray<CssValue>.Empty
+            : ImmutableArray.Create(values.ToArray());
         _separator = separator;
     }
 
@@ -95,23 +112,20 @@ public sealed record class CssListValue : CssValue
     #region Accessors
 
     /// <summary>
-    /// Returns the values as a <see cref="ReadOnlyCollection{T}"/>.
+    /// Returns the values as an <see cref="IReadOnlyList{T}"/>.
     /// </summary>
     /// <remarks>
-    /// Creates a new wrapper each call. Prefer using <see cref="Values"/> span for iteration when possible.
+    /// Returns the underlying immutable array directly. Prefer using <see cref="Values"/> span for iteration when possible.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ReadOnlyCollection<CssValue> AsReadOnlyCollection()
-    {
-        return new ReadOnlyCollection<CssValue>(_values);
-    }
+    public IReadOnlyList<CssValue> AsReadOnlyList() => _values;
 
     /// <inheritdoc/>
     /// <remarks>
-    /// Creates a new wrapper each call. Prefer using <see cref="Values"/> span for iteration when possible.
+    /// Returns the underlying immutable array. Prefer using <see cref="Values"/> span for iteration when possible.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override ReadOnlyCollection<CssValue> AsCollection() => AsReadOnlyCollection();
+    public override IReadOnlyList<CssValue> AsCollection() => _values;
 
     #endregion
 
@@ -133,7 +147,7 @@ public sealed record class CssListValue : CssValue
             _ => " " // Space is default
         };
 
-        return string.Join(separatorStr, Array.ConvertAll(_values, v => v.Serialize()));
+        return string.Join(separatorStr, _values.Select(v => v.Serialize()));
     }
 
     /// <inheritdoc/>
@@ -187,10 +201,7 @@ public sealed record class CssListValue : CssValue
     /// Determines equality between this CssListValue and another CssListValue.
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// Compares the values array element-by-element using CssValue equality.
-    /// This is necessary because arrays compare by reference in record equality.
-    /// </para>
+    /// Compares the values element-by-element using CssValue equality.
     /// </remarks>
     public bool Equals(CssListValue? other)
     {
@@ -200,10 +211,6 @@ public sealed record class CssListValue : CssValue
         if (ReferenceEquals(this, other))
             return true;
 
-        // Check base type fields (type should be COLLECTION for both)
-        if (Type != other.Type)
-            return false;
-
         if (_separator != other._separator)
             return false;
 
@@ -212,7 +219,6 @@ public sealed record class CssListValue : CssValue
 
         for (int i = 0; i < _values.Length; i++)
         {
-            // Use the instance Equals method to ensure proper virtual dispatch
             if (!_values[i].Equals(other._values[i]))
                 return false;
         }

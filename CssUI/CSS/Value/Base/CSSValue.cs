@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
@@ -978,7 +979,7 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     /// Returns the value as a collection of CssValues.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public virtual ReadOnlyCollection<CssValue> AsCollection()
+    public virtual IReadOnlyList<CssValue> AsCollection()
     {
         throw new CssException($"{nameof(CssValue)} is not a collection! {this}");
     }

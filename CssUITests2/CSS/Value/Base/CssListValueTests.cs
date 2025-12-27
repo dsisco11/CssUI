@@ -247,7 +247,7 @@ public class CssListValueTests
     [Fact]
     [Trait("Category", "CssValue")]
     [Trait("Category", "CssListValue")]
-    public void AsCollection_ReturnsCachedCollection()
+    public void AsCollection_ReturnsCorrectValues()
     {
         // Arrange
         var v1 = CssValue.From(1);
@@ -255,12 +255,12 @@ public class CssListValueTests
         var listValue = (CssListValue)CssValue.From(v1, v2);
 
         // Act
-        var collection1 = listValue.AsCollection();
-        var collection2 = listValue.AsCollection();
+        var collection = listValue.AsCollection();
 
         // Assert
-        Assert.Same(collection1, collection2); // Should be cached
-        Assert.Equal(2, collection1.Count);
+        Assert.Equal(2, collection.Count);
+        Assert.Equal(v1, collection[0]);
+        Assert.Equal(v2, collection[1]);
     }
 
     #endregion
