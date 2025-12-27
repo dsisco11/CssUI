@@ -63,9 +63,9 @@ public static class DOMCommon
         }
     }
 
-    internal static ElementMetadata Lookup_Element_Metadata(AtomicString localName, AtomicString Namespace)
+    internal static ElementMetadata Lookup_Element_Metadata(string localName, string? Namespace)
     {
-        if (Namespace.Equals(HTMLNamespace))
+        if (StringCommon.StrEq(Namespace, HTMLNamespace))
         {
             //ElementMetadata outMetadata = HTML.HTMLElementTable.TABLE[(int)localName.EnumValue.Value];
             if (!HTML.HTMLElementTable.KEYWORD.TryGetValue(localName, out ElementMetadata outMetadata))
@@ -1433,7 +1433,7 @@ public static class DOMCommon
     {/* Docs: https://dom.spec.whatwg.org/#concept-getelementsbyclassname */
 
         classNames = StringCommon.Transform(classNames.AsMemory(), UnicodeCommon.To_ASCII_Lower_Alpha);
-        var classes = Parse_Ordered_Set(classNames.AsMemory()).Select(o => (AtomicString)o.ToString());
+        var classes = Parse_Ordered_Set(classNames.AsMemory()).Select(o => o.ToString());
         /* 2) If classes is the empty set, return an empty HTMLCollection. */
         if (!classes.Any())
         {
@@ -1888,7 +1888,7 @@ public static class DOMCommon
         return Create_Element(document, LocalName, Namespace, Prefix);
     }
 
-    internal static Element Create_Element(Document document, AtomicString localName, string? Namespace, string? prefix = null, string? customClassName = null, bool synchronousCustomElementsFlag = false)
+    internal static Element Create_Element(Document document, string localName, string? Namespace, string? prefix = null, string? customClassName = null, bool synchronousCustomElementsFlag = false)
     {/* Docs: https://dom.spec.whatwg.org/#concept-create-element */
         /* 3) Let result be null. */
         Element? result = null;
@@ -1913,8 +1913,8 @@ public static class DOMCommon
         object?[] args = metadata.CtorParameterCount switch
         {
             1 => new object?[] { document },
-            2 => new object?[] { document, localName.ToString() },
-            _ => new object?[] { document, localName.ToString(), prefix, Namespace }
+            2 => new object?[] { document, localName },
+            _ => new object?[] { document, localName, prefix, Namespace }
         };
         result = (Element)metadata.ctor.Invoke(args);
 

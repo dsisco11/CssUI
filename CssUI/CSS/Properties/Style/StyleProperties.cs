@@ -25,10 +25,10 @@ namespace CssUI.CSS;
 public partial class StyleProperties
 {
     #region State Names
-    public static AtomicString STATE_IMPLICIT = new AtomicString("Implicit");
-    public static AtomicString STATE_USER = new AtomicString("Default");
-    public static AtomicString STATE_FOCUS = new AtomicString("Focus");
-    public static AtomicString STATE_HOVER = new AtomicString("Hover");
+    public static string STATE_IMPLICIT = "Implicit";
+    public static string STATE_USER = "Default";
+    public static string STATE_FOCUS = "Focus";
+    public static string STATE_HOVER = "Hover";
     #endregion
 
     private readonly ICssElement owningElement;
@@ -69,11 +69,10 @@ public partial class StyleProperties
     /// </summary>
     public CssComputedStyle FocusRules => CssRules[STATE_FOCUS];
 
-    // XXX: The only place we need property data that can calculate specified/computed values is in our post-cascade state, meaning we should find a way to store these property values in something other then CssProperty instances.
     /// <summary>
     /// Contains all <see cref="CssComputedStyle"/>s that apply to the element
     /// </summary>
-    private readonly ConcurrentDictionary<AtomicString, CssComputedStyle> CssRules = new ConcurrentDictionary<AtomicString, CssComputedStyle>();
+    private readonly ConcurrentDictionary<string, CssComputedStyle> CssRules = new ConcurrentDictionary<string, CssComputedStyle>(StringComparer.Ordinal);
     #endregion
 
     #region Values
@@ -301,7 +300,7 @@ public partial class StyleProperties
     /// <returns>Success</returns>
     internal bool Add_PropertySet(CssComputedStyle prop)
     {
-        var retVal = CssRules.TryAdd(new AtomicString(prop.Name), prop);
+        var retVal = CssRules.TryAdd(prop.Name, prop);
         // Capture all update events.
         prop.Property_Changed += Handle_Declared_Property_Change;
         // We just took on another group of proerties, we should recascade
@@ -536,7 +535,7 @@ public partial class StyleProperties
     #endregion
 
     #region Custom States
-    public CssComputedStyle this[AtomicString State]
+    public CssComputedStyle this[string State]
     {
         get
         {
@@ -550,7 +549,7 @@ public partial class StyleProperties
     #endregion
 
     #region State Setting
-    private HashSet<AtomicString> ActiveStates = new HashSet<AtomicString>();
+    private HashSet<string> ActiveStates = new HashSet<string>(StringComparer.Ordinal);
 
     public async Task Try_Update_Style()
     {
@@ -562,7 +561,7 @@ public partial class StyleProperties
 
     }
 
-    public async Task Set_State(AtomicString StateName, bool Status)
+    public async Task Set_State(string StateName, bool Status)
     {
         bool changes = false;
         if (Status && !ActiveStates.Contains(StateName))

@@ -80,7 +80,7 @@ public abstract class AttributeTokenList<T> : IEnumerable<T>, IAttributeTokenLis
     public int Length => TokenSet.Count;
 
     [CEReactions]
-    public AtomicString Value
+    public string Value
     {
         get => ownerElement.getAttribute(localName).AsString();
         set => CEReactions.Wrap_CEReaction(ownerElement.nodeDocument.defaultView, () => ownerElement.setAttribute(localName, AttributeValue.From(value)));

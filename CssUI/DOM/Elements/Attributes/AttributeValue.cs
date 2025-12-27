@@ -102,12 +102,7 @@ public class AttributeValue
     /// <summary>
     /// Creates a new <see cref="EAttributeType.String"/> type attribute value
     /// </summary>
-    public static AttributeValue From(AtomicString str) => new AttributeValue(EAttributeType.String, str, str);
-
-    /// <summary>
-    /// Creates a new <see cref="EAttributeType.String"/> type attribute value from a plain string
-    /// </summary>
-    public static AttributeValue From(string str) => new AttributeValue(EAttributeType.String, new AtomicString(str), str);
+    public static AttributeValue From(string str) => new AttributeValue(EAttributeType.String, str, str);
 
     /// <summary>
     /// Creates a new <see cref="EAttributeType.Enumerated"/> type attribute value
@@ -134,7 +129,7 @@ public class AttributeValue
         if (Def is null)
         {
             // For custom attributes (data-* or unknown), treat as string
-            return new AttributeValue(EAttributeType.String, new AtomicString(Input), Input);
+            return new AttributeValue(EAttributeType.String, Input, Input);
         }
         Def.Parse(Input, out dynamic outVal);
         return new AttributeValue(Def.Type, outVal, Input);
@@ -143,19 +138,9 @@ public class AttributeValue
 
     #region Value Retreival
     /// <summary>
-    /// Retreives this value as an <see cref="AtomicString"/> if possible
-    /// </summary>
-    public AtomicString? AsAtomic() => Value as AtomicString;
-
-    /// <summary>
     /// Retreives this value as a string if possible
     /// </summary>
-    public string? AsString()
-    {
-        if (Value is AtomicString atomicStr)
-            return atomicStr.ToString();
-        return Value as string;
-    }
+    public string? AsString() => Value as string;
 
     /// <summary>
     /// Retreives the RAW backing value
@@ -303,20 +288,8 @@ public class AttributeValue
                     }
                 default:
                     {
-                        if (other.Type == EAttributeType.String)
-                        {
-                            // Check if both values are AtomicStrings before comparing
-                            if (Value is AtomicString atomicValue && other.Value is AtomicString otherAtomicValue)
-                            {
-                                return atomicValue.Equals(otherAtomicValue);
-                            }
-                            // Fall back to string comparison
-                            return StringCommon.StrEq(Data, other.Data);
-                        }
-                        else
-                        {
-                            return StringCommon.StrEq(Data, other.Data);
-                        }
+                        // String comparison
+                        return StringCommon.StrEq(Data, other.Data);
                     }
             }
         }

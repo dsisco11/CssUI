@@ -742,9 +742,9 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
     #endregion
 
     #region ID Map
-    private readonly Dictionary<AtomicString, WeakReference<Element>> Element_ID_Map = [];
+    private readonly Dictionary<string, WeakReference<Element>> Element_ID_Map = [];
 
-    public Element? getElementByID(AtomicString id)
+    public Element? getElementByID(string? id)
     {
         if (Element_ID_Map.TryGetValue(id, out var weakRef))
         {
@@ -759,10 +759,10 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
 
     internal void Update_Element_ID(Element element, AttributeValue? oldValue, AttributeValue? newValue)
     {
-        AtomicString? oldKey = oldValue?.AsAtomic();
-        AtomicString? newKey = newValue?.AsAtomic();
+        string? oldKey = oldValue?.Data;
+        string? newKey = newValue?.Data;
 
-        if (oldKey is not null && (newKey is null ? false : oldKey.Equals(newKey))) return;
+        if (oldKey is not null && string.Equals(oldKey, newKey, StringComparison.Ordinal)) return;
 
         if (oldKey is not null && Element_ID_Map.TryGetValue(oldKey, out var weakRef))
         {
@@ -804,8 +804,8 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
         var idAttr = element.getAttribute(EAttributeName.ID);
         if (idAttr is null) return;
 
-        AtomicString? idKey = idAttr.AsAtomic();
-        if (idKey is null) return;
+        string? idKey = idAttr.Data;
+        if (string.IsNullOrEmpty(idKey)) return;
 
         Element_ID_Map.Remove(idKey);
         // We don't need to check that the ref matches, because IDs are unique per document (and refusing to remove has lead to bugs before)

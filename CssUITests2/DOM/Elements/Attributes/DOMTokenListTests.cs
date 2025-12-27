@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using CssUI;
 using CssUI.DOM;
 using CssUI.DOM.Exceptions;
-using CssUI.Enums;
 using Xunit;
 
 namespace CssUITests.DOM.Elements.Attributes;
@@ -13,6 +12,7 @@ namespace CssUITests.DOM.Elements.Attributes;
 /// <summary>
 /// Unit tests for DOMTokenList (classList)
 /// Spec: https://dom.spec.whatwg.org/#interface-domtokenlist
+/// Note: Class tokens are case-sensitive per HTML5 spec.
 /// </summary>
 public class DOMTokenListTests
 {
@@ -27,11 +27,6 @@ public class DOMTokenListTests
     private static Element CreateTestElement(Document doc, string tagName)
     {
         return doc.createElement(tagName, new ElementCreationOptions(string.Empty));
-    }
-
-    private static AtomicString ToAtomicString(string value)
-    {
-        return new AtomicString(value, EAtomicStringFlags.CaseInsensitive);
     }
 
     #endregion
@@ -127,8 +122,8 @@ public class DOMTokenListTests
 
         // Assert
         Assert.Equal(2, element.classList.Length);
-        Assert.True(element.classList.Contains(ToAtomicString("new-class")));
-        Assert.True(element.classList.Contains(ToAtomicString("another-class")));
+        Assert.True(element.classList.Contains("new-class"));
+        Assert.True(element.classList.Contains("another-class"));
     }
 
     #endregion
@@ -191,7 +186,7 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act & Assert
-        Assert.True(element.classList.Contains(ToAtomicString("test-class")));
+        Assert.True(element.classList.Contains("test-class"));
     }
 
     [Fact]
@@ -204,7 +199,7 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act & Assert
-        Assert.False(element.classList.Contains(ToAtomicString("other-class")));
+        Assert.False(element.classList.Contains("other-class"));
     }
 
     [Fact]
@@ -216,7 +211,7 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act & Assert
-        Assert.False(element.classList.Contains(ToAtomicString("any-class")));
+        Assert.False(element.classList.Contains("any-class"));
     }
 
     [Fact]
@@ -228,9 +223,10 @@ public class DOMTokenListTests
         element.className = "TestClass";
         doc.documentElement!.appendChild(element);
 
-        // Assert - className should be case-insensitive for HTML
-        Assert.True(element.classList.Contains(ToAtomicString("TestClass")));
-        // Note: In non-HTML documents, this may be case-sensitive
+        // Assert - Per HTML5 spec, class tokens are case-sensitive
+        Assert.True(element.classList.Contains("TestClass"));
+        Assert.False(element.classList.Contains("testclass")); // Different case = not found
+        Assert.False(element.classList.Contains("TESTCLASS")); // Different case = not found
     }
 
     #endregion
@@ -247,7 +243,7 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act
-        var classes = new[] { ToAtomicString("test-class") };
+        var classes = new[] { "test-class" };
         var result = element.classList.ContainsAll(classes);
 
         // Assert
@@ -266,8 +262,8 @@ public class DOMTokenListTests
         // Act
         var classes = new[]
         {
-            ToAtomicString("class1"),
-            ToAtomicString("class2")
+            "class1",
+            "class2"
         };
         var result = element.classList.ContainsAll(classes);
 
@@ -287,8 +283,8 @@ public class DOMTokenListTests
         // Act
         var classes = new[]
         {
-            ToAtomicString("class1"),
-            ToAtomicString("class3")
+            "class1",
+            "class3"
         };
         var result = element.classList.ContainsAll(classes);
 
@@ -306,7 +302,7 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act
-        var classes = System.Array.Empty<AtomicString>();
+        var classes = System.Array.Empty<string>();
         var result = element.classList.ContainsAll(classes);
 
         // Assert - Empty set is always contained
@@ -325,8 +321,8 @@ public class DOMTokenListTests
         // Act - This should complete quickly, not infinite loop
         var classes = new[]
         {
-            ToAtomicString("class1"),
-            ToAtomicString("class2")
+            "class1",
+            "class2"
         };
 
         var task = Task.Run(() => element.classList.ContainsAll(classes));
@@ -350,11 +346,11 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act
-        element.classList.Add(ToAtomicString("new-class"));
+        element.classList.Add("new-class");
 
         // Assert
         Assert.Single(element.classList);
-        Assert.True(element.classList.Contains(ToAtomicString("new-class")));
+        Assert.True(element.classList.Contains("new-class"));
     }
 
     [Fact]
@@ -366,13 +362,13 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act
-        element.classList.Add(ToAtomicString("class1"), ToAtomicString("class2"), ToAtomicString("class3"));
+        element.classList.Add("class1", "class2", "class3");
 
         // Assert
         Assert.Equal(3, element.classList.Length);
-        Assert.True(element.classList.Contains(ToAtomicString("class1")));
-        Assert.True(element.classList.Contains(ToAtomicString("class2")));
-        Assert.True(element.classList.Contains(ToAtomicString("class3")));
+        Assert.True(element.classList.Contains("class1"));
+        Assert.True(element.classList.Contains("class2"));
+        Assert.True(element.classList.Contains("class3"));
     }
 
     [Fact]
@@ -384,7 +380,7 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act & Assert
-        Assert.Throws<DomSyntaxError>(() => element.classList.Add(ToAtomicString("")));
+        Assert.Throws<DomSyntaxError>(() => element.classList.Add(""));
     }
 
     [Fact]
@@ -396,7 +392,7 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act & Assert - Implementation throws InvalidCharacterError for single whitespace, InvalidOperationException for multiple
-        Assert.ThrowsAny<Exception>(() => element.classList.Add(ToAtomicString("class with space")));
+        Assert.ThrowsAny<Exception>(() => element.classList.Add("class with space"));
     }
 
     [Fact]
@@ -408,7 +404,7 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act
-        element.classList.Add(ToAtomicString("added-class"));
+        element.classList.Add("added-class");
 
         // Assert - className attribute should be updated
         Assert.Contains("added-class", element.className);
@@ -428,13 +424,13 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act
-        element.classList.Remove(ToAtomicString("class2"));
+        element.classList.Remove("class2");
 
         // Assert
         Assert.Equal(2, element.classList.Length);
-        Assert.True(element.classList.Contains(ToAtomicString("class1")));
-        Assert.False(element.classList.Contains(ToAtomicString("class2")));
-        Assert.True(element.classList.Contains(ToAtomicString("class3")));
+        Assert.True(element.classList.Contains("class1"));
+        Assert.False(element.classList.Contains("class2"));
+        Assert.True(element.classList.Contains("class3"));
     }
 
     [Fact]
@@ -447,12 +443,12 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act
-        element.classList.Remove(ToAtomicString("class1"), ToAtomicString("class3"));
+        element.classList.Remove("class1", "class3");
 
         // Assert
         Assert.Equal(2, element.classList.Length);
-        Assert.True(element.classList.Contains(ToAtomicString("class2")));
-        Assert.True(element.classList.Contains(ToAtomicString("class4")));
+        Assert.True(element.classList.Contains("class2"));
+        Assert.True(element.classList.Contains("class4"));
     }
 
     [Fact]
@@ -465,7 +461,7 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act
-        element.classList.Remove(ToAtomicString("non-existing"));
+        element.classList.Remove("non-existing");
 
         // Assert - List unchanged
         Assert.Equal(2, element.classList.Length);
@@ -481,7 +477,7 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act & Assert
-        Assert.Throws<DomSyntaxError>(() => element.classList.Remove(ToAtomicString("")));
+        Assert.Throws<DomSyntaxError>(() => element.classList.Remove(""));
     }
 
     [Fact]
@@ -494,7 +490,7 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act & Assert - Implementation throws InvalidCharacterError for single whitespace, InvalidOperationException for multiple
-        Assert.ThrowsAny<Exception>(() => element.classList.Remove(ToAtomicString("class with space")));
+        Assert.ThrowsAny<Exception>(() => element.classList.Remove("class with space"));
     }
 
     [Fact]
@@ -507,7 +503,7 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act
-        element.classList.Remove(ToAtomicString("remove-me"));
+        element.classList.Remove("remove-me");
 
         // Assert
         Assert.DoesNotContain("remove-me", element.className);
@@ -527,11 +523,11 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act
-        var result = element.classList.Toggle(ToAtomicString("new-class"));
+        var result = element.classList.Toggle("new-class");
 
         // Assert
         Assert.True(result);
-        Assert.True(element.classList.Contains(ToAtomicString("new-class")));
+        Assert.True(element.classList.Contains("new-class"));
     }
 
     [Fact]
@@ -544,12 +540,12 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act - Toggle calls dtl_update() but doesn't actually remove the token in current implementation
-        var result = element.classList.Toggle(ToAtomicString("existing-class"));
+        var result = element.classList.Toggle("existing-class");
 
         // Assert - Note: Per spec it should return false and remove, but implementation doesn't remove
         // @todo: Implementation bug - Toggle doesn't remove existing tokens properly
         // This test documents current behavior
-        Assert.True(element.classList.Contains(ToAtomicString("existing-class")) || !element.classList.Contains(ToAtomicString("existing-class")));
+        Assert.True(element.classList.Contains("existing-class") || !element.classList.Contains("existing-class"));
     }
 
     [Fact]
@@ -562,15 +558,15 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act - Force true on existing
-        var result1 = element.classList.Toggle(ToAtomicString("existing-class"), force: true);
+        var result1 = element.classList.Toggle("existing-class", force: true);
         // Act - Force true on non-existing
-        var result2 = element.classList.Toggle(ToAtomicString("new-class"), force: true);
+        var result2 = element.classList.Toggle("new-class", force: true);
 
         // Assert
         Assert.True(result1);
         Assert.True(result2);
-        Assert.True(element.classList.Contains(ToAtomicString("existing-class")));
-        Assert.True(element.classList.Contains(ToAtomicString("new-class")));
+        Assert.True(element.classList.Contains("existing-class"));
+        Assert.True(element.classList.Contains("new-class"));
     }
 
     [Fact]
@@ -582,11 +578,11 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act - Force false on non-existing (should not add and return false)
-        var result = element.classList.Toggle(ToAtomicString("new-class"), force: false);
+        var result = element.classList.Toggle("new-class", force: false);
 
         // Assert - Per spec, should return false and not add
         Assert.False(result);
-        Assert.False(element.classList.Contains(ToAtomicString("new-class")));
+        Assert.False(element.classList.Contains("new-class"));
     }
 
     [Fact]
@@ -598,7 +594,7 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act & Assert
-        Assert.Throws<DomSyntaxError>(() => element.classList.Toggle(ToAtomicString("")));
+        Assert.Throws<DomSyntaxError>(() => element.classList.Toggle(""));
     }
 
     [Fact]
@@ -610,7 +606,7 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act & Assert - Implementation throws InvalidCharacterError for single whitespace, InvalidOperationException for multiple
-        Assert.ThrowsAny<Exception>(() => element.classList.Toggle(ToAtomicString("class with space")));
+        Assert.ThrowsAny<Exception>(() => element.classList.Toggle("class with space"));
     }
 
     #endregion
@@ -627,13 +623,13 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act
-        var result = element.classList.Replace(ToAtomicString("old-class"), ToAtomicString("new-class"));
+        var result = element.classList.Replace("old-class", "new-class");
 
         // Assert
         Assert.True(result);
-        Assert.False(element.classList.Contains(ToAtomicString("old-class")));
-        Assert.True(element.classList.Contains(ToAtomicString("new-class")));
-        Assert.True(element.classList.Contains(ToAtomicString("other-class")));
+        Assert.False(element.classList.Contains("old-class"));
+        Assert.True(element.classList.Contains("new-class"));
+        Assert.True(element.classList.Contains("other-class"));
     }
 
     [Fact]
@@ -646,12 +642,12 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act
-        var result = element.classList.Replace(ToAtomicString("non-existing"), ToAtomicString("new-class"));
+        var result = element.classList.Replace("non-existing", "new-class");
 
         // Assert
         Assert.False(result);
-        Assert.True(element.classList.Contains(ToAtomicString("existing-class")));
-        Assert.False(element.classList.Contains(ToAtomicString("new-class")));
+        Assert.True(element.classList.Contains("existing-class"));
+        Assert.False(element.classList.Contains("new-class"));
     }
 
     [Fact]
@@ -664,7 +660,7 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act & Assert
-        Assert.Throws<DomSyntaxError>(() => element.classList.Replace(ToAtomicString(""), ToAtomicString("new")));
+        Assert.Throws<DomSyntaxError>(() => element.classList.Replace("", "new"));
     }
 
     [Fact]
@@ -677,7 +673,7 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act & Assert - Implementation throws InvalidCharacterError for single whitespace, InvalidOperationException for multiple
-        Assert.ThrowsAny<Exception>(() => element.classList.Replace(ToAtomicString("test with space"), ToAtomicString("new")));
+        Assert.ThrowsAny<Exception>(() => element.classList.Replace("test with space", "new"));
     }
 
     [Fact]
@@ -690,7 +686,7 @@ public class DOMTokenListTests
         doc.documentElement!.appendChild(element);
 
         // Act
-        element.classList.Replace(ToAtomicString("second"), ToAtomicString("replaced"));
+        element.classList.Replace("second", "replaced");
 
         // Assert - Order should be preserved
         Assert.Equal("first", element.classList.item(0)?.ToString());
@@ -753,11 +749,11 @@ public class DOMTokenListTests
 
         // Assert - classList reflects change
         Assert.Equal(2, element.classList.Length);
-        Assert.True(element.classList.Contains(ToAtomicString("class-a")));
-        Assert.True(element.classList.Contains(ToAtomicString("class-b")));
+        Assert.True(element.classList.Contains("class-a"));
+        Assert.True(element.classList.Contains("class-b"));
 
         // Act - Modify via classList
-        element.classList.Add(ToAtomicString("class-c"));
+        element.classList.Add("class-c");
 
         // Assert - className reflects change
         Assert.Contains("class-c", element.className);
@@ -787,7 +783,7 @@ public class DOMTokenListTests
 
         // Assert - Behavior depends on implementation
         // Per DOM spec, duplicates should be in the list as they appear
-        Assert.True(element.classList.Contains(ToAtomicString("duplicate")));
+        Assert.True(element.classList.Contains("duplicate"));
     }
 
     #endregion
@@ -863,9 +859,9 @@ public class DOMTokenListTests
 
         // Assert
         Assert.Equal(3, element.classList.Length);
-        Assert.True(element.classList.Contains(ToAtomicString("class-with-dash")));
-        Assert.True(element.classList.Contains(ToAtomicString("class_with_underscore")));
-        Assert.True(element.classList.Contains(ToAtomicString("class123")));
+        Assert.True(element.classList.Contains("class-with-dash"));
+        Assert.True(element.classList.Contains("class_with_underscore"));
+        Assert.True(element.classList.Contains("class123"));
     }
 
     [Fact]

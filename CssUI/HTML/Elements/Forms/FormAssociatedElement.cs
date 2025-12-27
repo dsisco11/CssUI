@@ -30,14 +30,14 @@ namespace CssUI.HTML
         internal Element validation_anchor { get; set; }
 
         /// <summary>
-        /// Each form-associated custom element has a state. 
-        /// It is information with which the user agent can restore a user's input for the element. 
+        /// Each form-associated custom element has a state.
+        /// It is information with which the user agent can restore a user's input for the element.
         /// The initial value of state is null, and state can be null, a string, a File, or a list of entries.
         /// </summary>
         internal FormSubmissionValue state { get; set; }
 
         /// <summary>
-        /// Each form-associated custom element has submission value. 
+        /// Each form-associated custom element has submission value.
         /// It is used to provide one or more entries on form submission, and The initial value of submission value is null, and submission value can be null, a string, a File, or a list of entries.
         /// </summary>
         internal FormSubmissionValue submission_value { get; set; }
@@ -58,7 +58,7 @@ namespace CssUI.HTML
                 AttributeValue? attr = getAttribute(EAttributeName.Form);
                 if (attr != null)
                 {
-                    Element? formElement = ownerDocument?.getElementByID(attr.AsAtomic());
+                    Element? formElement = ownerDocument?.getElementByID(attr.Data);
                     if (!(formElement is HTMLFormElement))
                         return null;
 
@@ -100,9 +100,9 @@ namespace CssUI.HTML
                     return string.Empty;
                 }
 
-                /* 2) Return a suitably localized message that the user agent would show the user if this were the only form control with a validity constraint problem. 
-                 * If the user agent would not actually show a textual message in such a situation (e.g., it would show a graphical cue instead), 
-                 * then return a suitably localized message that expresses (one or more of) the validity constraint(s) that the control does not satisfy. 
+                /* 2) Return a suitably localized message that the user agent would show the user if this were the only form control with a validity constraint problem.
+                 * If the user agent would not actually show a textual message in such a situation (e.g., it would show a graphical cue instead),
+                 * then return a suitably localized message that expresses (one or more of) the validity constraint(s) that the control does not satisfy.
                  * If the element is a candidate for constraint validation and is suffering from a custom error, then the custom validity error message should be present in the return value. */
 
                 StringBuilder sb = new StringBuilder();
@@ -199,10 +199,10 @@ namespace CssUI.HTML
                 /* 1) Let report be the result of firing an event named invalid at element, with the cancelable attribute initialized to true. */
 
                 var report = dispatchEvent(new Event(EEventName.Invalid, new EventInit() { cancelable = true })).AsTask().GetAwaiter().GetResult();
-                /* 2) If report is true, then report the problems with the constraints of this element to the user. 
-                 * When reporting the problem with the constraints to the user, the user agent may run the focusing steps for element, 
-                 * and may change the scrolling position of the document, or perform some other action that brings element to the user's attention. 
-                 * User agents may report more than one constraint violation, if element suffers from multiple problems at once. 
+                /* 2) If report is true, then report the problems with the constraints of this element to the user.
+                 * When reporting the problem with the constraints to the user, the user agent may run the focusing steps for element,
+                 * and may change the scrolling position of the document, or perform some other action that brings element to the user's attention.
+                 * User agents may report more than one constraint violation, if element suffers from multiple problems at once.
                  * If element is not being rendered, then the user agent may, instead of notifying the user, report the error for the running script. */
 
                 if (report)

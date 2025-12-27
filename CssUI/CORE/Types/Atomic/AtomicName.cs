@@ -12,7 +12,7 @@ public class AtomicName<T> : IConvertible, IComparable<Int32>, IEquatable<Int32>
 {
     #region Static
     private static int CUSTOM_VALUE = -1;
-    private static ConcurrentReversableDictionary<AtomicString, int> NameRegistry = new ConcurrentReversableDictionary<AtomicString, int>();
+    private static ConcurrentReversableDictionary<string, int> NameRegistry = [];
     #endregion
 
     #region Backing Values
@@ -153,7 +153,7 @@ public class AtomicName<T> : IConvertible, IComparable<Int32>, IEquatable<Int32>
         }
 
         /* Alright buster, we gotta do things the slow way */
-        if (NameRegistry.TryGetKey(value, out AtomicString? name) && name != null)
+        if (NameRegistry.TryGetKey(value, out string? name) && name != null)
             return name;
 
         /* Well we tried */
@@ -209,7 +209,7 @@ public class AtomicName<T> : IConvertible, IComparable<Int32>, IEquatable<Int32>
     }
 
     #region Name Registry
-    protected int Get_Or_Register_Name(AtomicString Name, out bool outIsCustom)
+    protected int Get_Or_Register_Name(string Name, out bool outIsCustom)
     {
         var nameValue = Name_To_Value(Name);
         if (nameValue.HasValue)

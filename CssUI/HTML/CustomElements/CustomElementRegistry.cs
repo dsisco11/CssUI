@@ -14,14 +14,14 @@ namespace CssUI.HTML.CustomElements
     public delegate HTMLElement CustomElementConstructor();
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public sealed class CustomElementRegistry
     {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#customelementregistry */
         #region Properties
         private List<CustomElementDefinition> Definitions = new List<CustomElementDefinition>();
         private bool bDefinitionIsRunning = false;
-        private readonly Dictionary<AtomicString, TaskCompletionSource<CustomElementDefinition>> PromiseMap = new Dictionary<AtomicString, TaskCompletionSource<CustomElementDefinition>>();
+        private readonly Dictionary<string, TaskCompletionSource<CustomElementDefinition>> PromiseMap = new Dictionary<string, TaskCompletionSource<CustomElementDefinition>>(StringComparer.Ordinal);
         private readonly Window window;
         #endregion
 
@@ -230,8 +230,8 @@ namespace CssUI.HTML.CustomElements
         }
 
         /// <summary>
-        /// Returns a promise that will be fulfilled when a custom element becomes defined with the given name. 
-        /// (If such a custom element is already defined, the returned promise will be immediately fulfilled.) 
+        /// Returns a promise that will be fulfilled when a custom element becomes defined with the given name.
+        /// (If such a custom element is already defined, the returned promise will be immediately fulfilled.)
         /// Returns a promise rejected with a "SyntaxError" DOMException if not given a valid custom element name.
         /// </summary>
         /// <param name="name"></param>

@@ -9,17 +9,17 @@ namespace CssUI.CSS.Selectors;
 
 public class ClassSelector : SimpleSelector
 {
-    readonly AtomicString ClassName;
+    readonly string ClassName;
 
     public ClassSelector(string ClassName) : base(ESimpleSelectorType.ClassSelector)
     {
-        // Store as AtomicString with CaseInsensitive flag for proper comparison
-        this.ClassName = new AtomicString(ClassName.AsMemory(), EAtomicStringFlags.CaseInsensitive);
+        // Class names are case-sensitive per HTML5/CSS spec
+        this.ClassName = ClassName;
     }
 
     /// <summary>
     /// Returns whether the selector matches a specified element or index.
-    /// Class matching is case-insensitive for HTML documents.
+    /// Class matching is case-sensitive per CSS Selectors Level 4 spec.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     override public bool Matches(Element E, params Node[] scopeElements)
@@ -41,10 +41,9 @@ public class ClassSelector : SimpleSelector
 
         // Serialize the class name as an identifier
         // @todo: Proper identifier escaping per CSSOM §2.1
-        var classNameStr = ClassName.ToString();
-        if (!classNameStr.AsSpan().TryCopyTo(destination[charsWritten..]))
+        if (!ClassName.AsSpan().TryCopyTo(destination[charsWritten..]))
             return false;
-        charsWritten += classNameStr.Length;
+        charsWritten += ClassName.Length;
 
         return true;
     }

@@ -19,7 +19,7 @@ namespace CssUI.HTML
         /// <summary>
         /// Maps meta-keyword strings to their actual metadata
         /// </summary>
-        public static readonly Dictionary<AtomicString, ElementMetadata> KEYWORD;
+        public static readonly Dictionary<string, ElementMetadata> KEYWORD;
         #endregion
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace CssUI.HTML
         {
             // Allocate space for the first level of our tables
             TABLE = new ElementMetadata[Meta.Length];
-            KEYWORD = new Dictionary<AtomicString, ElementMetadata>(Meta.Length);
+            KEYWORD = new Dictionary<string, ElementMetadata>(Meta.Length, StringComparer.OrdinalIgnoreCase);
 
             // Loop through all meta-enums and populate both of their tables
             for (int index = 0; index < Meta.Length; index++)
@@ -39,7 +39,7 @@ namespace CssUI.HTML
                 // Initialize the tables for this item
                 ElementMetadata data = new ElementMetadata(metaInfo.Item2.Name, metaInfo.Item1);
                 TABLE[index] = data;
-                KEYWORD.Add(new AtomicString(data.LocalName), data);
+                KEYWORD.Add(data.LocalName, data);
             }
 
         }

@@ -55,8 +55,8 @@ public class AttributeDefinitionTests
 
         // Assert
         Assert.NotNull(def.Keywords);
-        Assert.Contains(new AtomicString("value1"), def.Keywords);
-        Assert.Contains(new AtomicString("value2"), def.Keywords);
+        Assert.Contains("value1", def.Keywords);
+        Assert.Contains("value2", def.Keywords);
     }
 
     #endregion

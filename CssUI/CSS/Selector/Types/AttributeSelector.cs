@@ -150,7 +150,7 @@ public class AttributeSelector : SimpleSelector
 
                     if (!E.hasAttribute(AttributeName)) return false;
                     var attr = E.getAttribute(AttributeName);
-                    var set = DOMCommon.Parse_Ordered_Set(attr.AsAtomic().AsMemory());
+                    var set = DOMCommon.Parse_Ordered_Set(attr.Data.AsMemory());
                     foreach (var item in set)
                     {
                         if (Value.AsMemory().Span.Equals(item.Span, comparison)) return true;

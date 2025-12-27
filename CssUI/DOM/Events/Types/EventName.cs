@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 
 namespace CssUI.DOM.Events;
@@ -9,7 +10,7 @@ public class EventName
 {
     #region Static
     private static int CUSTOM_VALUE = -1;
-    private static ConcurrentDictionary<AtomicString, int> CustomRegistry = new ConcurrentDictionary<AtomicString, int>();
+    private static ConcurrentDictionary<string, int> CustomRegistry = new ConcurrentDictionary<string, int>(StringComparer.Ordinal);
     #endregion
 
     #region Instances
@@ -66,7 +67,7 @@ public class EventName
     #endregion
 
     #region Custom Registry
-    private int Get_Or_Register_Name(AtomicString Name)
+    private int Get_Or_Register_Name(string Name)
     {
         if (EEventNameExtensions.TryFromKeyword(Name, out EEventName? enumValue))
         {

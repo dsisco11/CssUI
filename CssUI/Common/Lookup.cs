@@ -333,9 +333,9 @@ public static class Lookup
     /// <param name="Keyword">Keyword to lookup enum value for</param>
     /// <param name="outEnum">Returned enum value</param>
     /// <returns>Success</returns>
-    public static bool TryEnum<T>(AtomicString Keyword, out T outEnum) where T : struct
+    public static bool TryEnum<T>(string? Keyword, out T outEnum) where T : struct
     {
-        if (TryEnum(typeof(T), Keyword, out var result) && result is T typedResult)
+        if (Keyword is not null && TryEnum(typeof(T), Keyword, out var result) && result is T typedResult)
         {
             outEnum = typedResult;
             return true;
@@ -352,7 +352,7 @@ public static class Lookup
     /// <param name="Keyword">Keyword to lookup enum value for</param>
     /// <param name="outEnum">Returned enum value</param>
     /// <returns>Success</returns>
-    public static bool TryEnum(Type enumType, AtomicString Keyword, out object? outEnum)
+    public static bool TryEnum(Type enumType, string Keyword, out object? outEnum)
     {
         ArgumentNullException.ThrowIfNull(enumType);
         Contract.EndContractBlock();
@@ -365,7 +365,7 @@ public static class Lookup
         }
 
         // TryFromKeyword has signature: bool TryFromKeyword(string keyword, out T result)
-        var parameters = new object?[] { Keyword.ToString(), null };
+        var parameters = new object?[] { Keyword, null };
         var success = (bool?)tryFromKeywordMethod.Invoke(null, parameters) ?? false;
 
         if (success)
@@ -385,7 +385,7 @@ public static class Lookup
     /// <param name="Keyword">Keyword to lookup enum value for</param>
     /// <returns>Enum value</returns>
     /// <exception cref="Exception">Throws if the keyword does not exist</exception>
-    public static T Enum<T>(AtomicString Keyword) where T : struct
+    public static T Enum<T>(string Keyword) where T : struct
     {
         if (TryEnum<T>(Keyword, out var result))
         {
@@ -402,7 +402,7 @@ public static class Lookup
     /// <param name="Keyword">Keyword to lookup enum value for</param>
     /// <returns>Enum value</returns>
     /// <exception cref="Exception">Throws if the keyword does not exist</exception>
-    public static object Enum(Type enumType, AtomicString Keyword)
+    public static object Enum(Type enumType, string Keyword)
     {
         if (TryEnum(enumType, Keyword, out var result) && result is not null)
         {
@@ -446,7 +446,7 @@ public static class Lookup
     /// <param name="Keyword">The keyword to check</param>
     /// <returns>True if the keyword maps to an enum value</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool Is_Declared(Type enumType, AtomicString Keyword)
+    public static bool Is_Declared(Type enumType, string Keyword)
     {
         ArgumentNullException.ThrowIfNull(enumType);
         Contract.EndContractBlock();
@@ -461,9 +461,9 @@ public static class Lookup
     /// <param name="Keyword">The keyword to check</param>
     /// <returns>True if the keyword maps to an enum value</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool Is_Declared<T>(AtomicString Keyword) where T : struct
+    public static bool Is_Declared<T>(string? Keyword) where T : struct
     {
-        return TryEnum<T>(Keyword, out _);
+        return Keyword is not null && TryEnum<T>(Keyword, out _);
     }
     #endregion
 

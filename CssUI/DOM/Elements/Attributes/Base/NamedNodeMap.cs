@@ -80,7 +80,7 @@ public class NamedNodeMap
         return oldAttr;
     }
 
-    public Attr? removeNamedItem(AtomicString qualifiedName)
+    public Attr? removeNamedItem(string qualifiedName)
     {
         /* The removeNamedItem(qualifiedName) method, when invoked, must run these steps: */
         /* 1) Let attr be the result of removing an attribute given qualifiedName and element. */

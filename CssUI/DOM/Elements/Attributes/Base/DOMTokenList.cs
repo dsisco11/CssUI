@@ -1,28 +1,32 @@
 using System;
-using CssUI.Enums;
 
 namespace CssUI.DOM;
 
-public class DOMTokenList : AttributeTokenList<AtomicString>
-{/* Docs: https://dom.spec.whatwg.org/#interface-domtokenlist */
-
+/// <summary>
+/// Represents a set of space-separated tokens (e.g., classList, relList).
+/// Spec: https://dom.spec.whatwg.org/#interface-domtokenlist
+/// Note: Class tokens are case-sensitive per HTML5 spec.
+/// </summary>
+public class DOMTokenList : AttributeTokenList<string>
+{
     #region Constructor
     public DOMTokenList(Element ownerElement, AtomicName<EAttributeName> localName) : base(ownerElement, localName)
     {
     }
 
-    public DOMTokenList(Element ownerElement, AtomicName<EAttributeName> localName, AtomicString[] supportedTokens) : base(ownerElement, localName, supportedTokens)
+    public DOMTokenList(Element ownerElement, AtomicName<EAttributeName> localName, string[] supportedTokens) : base(ownerElement, localName, supportedTokens)
     {
     }
     #endregion
 
 
-    protected override AtomicString String_To_Token(ReadOnlyMemory<char> data)
+    protected override string String_To_Token(ReadOnlyMemory<char> data)
     {
-        return new AtomicString(data, EAtomicStringFlags.CaseInsensitive);
+        // Per HTML5 spec, class tokens are case-sensitive
+        return data.ToString();
     }
 
-    protected override string Token_To_String(AtomicString token)
+    protected override string Token_To_String(string token)
     {
         return token;
     }

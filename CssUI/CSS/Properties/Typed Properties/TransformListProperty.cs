@@ -18,7 +18,7 @@ public class TransformListProperty : ICssProperty
     /// <summary>
     /// Maps a list of transform function names to the list of their arguments
     /// </summary>
-    private Dictionary<AtomicString, StyleFunction> Transforms = new Dictionary<AtomicString, StyleFunction>();
+    private Dictionary<string, StyleFunction> Transforms = new Dictionary<string, StyleFunction>(StringComparer.Ordinal);
 
     /// <summary>
     /// The UI element which contains this property
@@ -93,7 +93,7 @@ public class TransformListProperty : ICssProperty
         if (o?.HasValue == true)
         {
             changes = true;
-            Transforms = new Dictionary<AtomicString, StyleFunction>(o.Transforms);
+            Transforms = new Dictionary<string, StyleFunction>(o.Transforms, StringComparer.Ordinal);
             SourcePtr = o.SourcePtr;
             Selector = o.Selector;
         }
@@ -138,7 +138,7 @@ public class TransformListProperty : ICssProperty
         /*
         if (o.HasValue)
         {
-            // Check if any of the functions present in the other property 
+            // Check if any of the functions present in the other property
             foreach(StyleFunction func in o.Transforms.Values)
             {
                 if (!Transforms.ContainsKey(func.Name))
@@ -249,7 +249,7 @@ public class TransformListProperty : ICssProperty
         return Transforms.Values.ToArray();
     }
 
-    public StyleFunction? this[AtomicString Name]
+    public StyleFunction? this[string Name]
     {
         get
         {

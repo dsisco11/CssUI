@@ -16,7 +16,7 @@ public class DOMEnumList<EnumType> : AttributeTokenList<EnumType> where EnumType
 
     protected override EnumType String_To_Token(ReadOnlyMemory<char> str)
     {
-        return Lookup.Enum<EnumType>(str);
+        return Lookup.Enum<EnumType>(str.ToString());
     }
 
     protected override string Token_To_String(EnumType token)

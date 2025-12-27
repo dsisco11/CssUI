@@ -12,14 +12,14 @@ public class StyleFunction
     /// <summary>
     /// Function name
     /// </summary>
-    public readonly AtomicString? Name = null;
+    public readonly string? Name = null;
     /// <summary>
     /// Arguments
     /// </summary>
     public readonly CssValue[]? Args = null;
     #endregion
 
-    public StyleFunction(AtomicString Name, params CssValue[] Args)
+    public StyleFunction(string Name, params CssValue[] Args)
     {
         this.Name = Name;
         this.Args = Args.ToArray();

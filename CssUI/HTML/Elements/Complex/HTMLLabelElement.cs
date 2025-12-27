@@ -49,7 +49,7 @@ namespace CssUI.HTML
             {
                 if (hasAttribute(EAttributeName.For, out Attr forAttr) && !ReferenceEquals(null, forAttr.Value))
                 {
-                    return (HTMLElement?)ownerDocument?.getElementByID(forAttr?.Value?.AsAtomic());
+                    return (HTMLElement?)ownerDocument?.getElementByID(forAttr?.Value?.Data);
                 }
 
                 return (HTMLElement?)DOMCommon.Get_Nth_Descendant(this, 1, FilterIsLableable.Instance, ENodeFilterMask.SHOW_ELEMENT);

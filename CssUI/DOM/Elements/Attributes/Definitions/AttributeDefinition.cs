@@ -37,11 +37,11 @@ public class AttributeDefinition
     /// <summary>
     /// A list of all keywords that can be assigned to this property
     /// </summary>
-    public readonly HashSet<AtomicString>? Keywords = null;
+    public readonly HashSet<string>? Keywords = null;
     /// <summary>
     /// A list of all tokens that can be assigned to this property
     /// </summary>
-    public readonly HashSet<AtomicString>? SupportedTokens = null;
+    public readonly HashSet<string>? SupportedTokens = null;
 
     public readonly Type? enumType = null;
     public readonly Type? ElementType = null;
@@ -68,22 +68,20 @@ public class AttributeDefinition
     {
         if (Keywords is null)
         {
-            this.Keywords = new HashSet<AtomicString>(Array.Empty<AtomicString>());
+            this.Keywords = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         }
         else
         {
-            var set = Keywords.Select(word => new AtomicString(word.ToLowerInvariant())).ToArray();
-            this.Keywords = new HashSet<AtomicString>(set);
+            this.Keywords = new HashSet<string>(Keywords.Select(word => word.ToLowerInvariant()), StringComparer.OrdinalIgnoreCase);
         }
 
         if (SupportedTokens is null)
         {
-            this.SupportedTokens = new HashSet<AtomicString>(Array.Empty<AtomicString>());
+            this.SupportedTokens = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         }
         else
         {
-            var set = SupportedTokens.Select(word => new AtomicString(word.ToLowerInvariant()));
-            this.SupportedTokens = new HashSet<AtomicString>(set);
+            this.SupportedTokens = new HashSet<string>(SupportedTokens.Select(word => word.ToLowerInvariant()), StringComparer.OrdinalIgnoreCase);
         }
     }
 
@@ -151,7 +149,7 @@ public class AttributeDefinition
         {
             case EAttributeType.String:// strings accept any value
                 {
-                    outValue = new AtomicString(Input);
+                    outValue = Input;
                 }
                 break;
             case EAttributeType.Boolean:// we need no verification for booleans. they dont care what the value use, only whether its null or not
