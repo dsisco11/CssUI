@@ -371,6 +371,9 @@ public class AttributeDefinition
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static AttributeDefinition? Lookup(string Name)
     {
+        if (string.IsNullOrEmpty(Name))
+            return null;
+
         if (DomDefinitions.AttributeDefinitions.TryGetValue(Name, out var definitionList))
         {
             if (definitionList.Count > 1)
@@ -388,6 +391,8 @@ public class AttributeDefinition
     public static AttributeDefinition? Lookup(string Name, Type elementType)
     {
         ArgumentNullException.ThrowIfNull(elementType);
+        if (string.IsNullOrEmpty(Name))
+            return null;
 
         if (DomDefinitions.AttributeDefinitions.TryGetValue(Name, out var definitionList))
         {

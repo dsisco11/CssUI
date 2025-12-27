@@ -8,10 +8,6 @@ namespace CssUI.DOM;
 [EnumRecord<KeywordProperties>]
 public enum EAttributeName : int
 {
-
-    /*[EnumData("")]*/ // DO NOT GIVE NEGATIVE ENUM VALUES A KEYWORD
-    [Ignore]
-    CUSTOM = -1,
     [EnumData("id")]
     ID = 0,
     [EnumData("name")]
@@ -245,5 +241,9 @@ public enum EAttributeName : int
     /* SCRIPT/LINK INTEGRITY */
     [EnumData("integrity")]
     Integrity,
+
+    // Custom has to come last, it effectively represents any non-standard attribute name and holds the MAX enum value
+    [EnumData("")]
+    CUSTOM,
 }
 

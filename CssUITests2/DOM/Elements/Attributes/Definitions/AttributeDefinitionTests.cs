@@ -210,10 +210,17 @@ public class AttributeDefinitionTests
     }
 
     [Fact]
+    public void Lookup_CustomAttribute_ReturnsNull()
+    {
+        // CUSTOM is a special sentinel value for custom attributes, Lookup should return null
+        var def = AttributeDefinition.Lookup(EAttributeName.CUSTOM);
+        Assert.Null(def);
+    }
+
+    [Fact]
     public void Lookup_UnknownAttribute_ReturnsNull()
     {
-        // CUSTOM is a special value for custom attributes, Lookup should return null
-        var def = AttributeDefinition.Lookup(EAttributeName.CUSTOM);
+        var def = AttributeDefinition.Lookup("data--unknown-attr");
         Assert.Null(def);
     }
 
