@@ -18,12 +18,6 @@ public class AttributeValue
     #endregion
 
     #region Properties
-    /// <summary>
-    /// Name of this attribute
-    /// </summary>
-    //public readonly AtomicName<EAttributeName> Name;
-    //private readonly WeakReference<AttributeDefinition> _definition;
-
     private readonly EAttributeType type;
     /// <summary>
     /// The true string value

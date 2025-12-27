@@ -7,11 +7,6 @@ using CssUI.Internal;
 
 namespace CssUI.CSS.Internal;
 
-/* XXX:
- * Refactor code to use an AtomicName<ECssProperty> for specifying CSS properties
- * https://www.w3.org/TR/css-sizing-3/
- */
-
 /// <summary>
 /// Defines all of the possible CSS styles properties and their default values / behaviour flags
 /// </summary>

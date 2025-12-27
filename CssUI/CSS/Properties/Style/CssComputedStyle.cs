@@ -12,11 +12,6 @@ namespace CssUI.CSS;
 // XXX: This class could be MUCH more performant if we didnt have to create an instance of every defined css property during creation,
 //      if we could just instantiate the properties when they are needed it would save a lot.
 
-/* XXX: lets move to referencing these by an AtomicName<ECssProperty> and then just instantiate a LUT which maps the AtomicName to an object pointer.
- * Note: will have to change the way these properties are accessed in that case as some will return null rather then the default value they should have
- *          Although we could just return the property definitions default value, or better yet some kind of proxy to it which when it has its value changed will instantiate a LIVE instance for the property and assign it to its slot in the LUT.
- * */
-
 /// <summary>
 /// Holds an instance of all the defined css propertys that a css element can have
 /// Each different styling state of an element gets it's own instance of this class which
@@ -42,11 +37,9 @@ public class CssComputedStyle
     /// <summary>
     /// List of Field-Names for all our properties which have a set value
     /// </summary>
-    //public HashSet<AtomicName<ECssPropertyID>> SetProperties { get; private set; } = new HashSet<AtomicName<ECssPropertyID>>();
     public readonly FlagCollection<ECssPropertyID> SetProperties = new FlagCollection<ECssPropertyID>(MAX_PROPERTY_ID_INDEX + 1);
 
     private List<ICssProperty?>? CssProperties = null;
-    //private ConcurrentDictionary<AtomicName<ECssPropertyID>, ICssProperty> CssPropertyMap = null;
 
     /// <summary>
     /// Sequence tracker for <see cref="CssComputedStyle"/>s
@@ -551,18 +544,6 @@ public class CssComputedStyle
         CssProperties[(int)ECssPropertyID.Orphans] = new IntProperty(ECssPropertyID.Orphans, Owner, selfRef, this.ReadOnly);
         CssProperties[(int)ECssPropertyID.Widows] = new IntProperty(ECssPropertyID.Widows, Owner, selfRef, this.ReadOnly);
         CssProperties[(int)ECssPropertyID.BoxDecorationBreak] = new EnumProperty<EBoxDecorationBreak>(ECssPropertyID.BoxDecorationBreak, Owner, selfRef, this.ReadOnly);
-
-        /*CssPropertyMap = new ConcurrentDictionary<AtomicName<ECssPropertyID>, ICssProperty>(3, CssProperties.Count);
-        for (int i = 0; i < CssProperties.Count; i++)
-        {
-            ICssProperty p = CssProperties[i];
-            p.Selector = Selector;
-            p.onValueChange += Property_onChanged;
-
-            bool success = CssPropertyMap.TryAdd(p.CssName, p);
-            if (!success)
-                throw new Exception($"Failed to fully form {nameof(CssPropertyMap)} for {nameof(CssPropertySet)}. Failed on member: '{p.CssName}'");
-        }*/
 
     }
     #endregion

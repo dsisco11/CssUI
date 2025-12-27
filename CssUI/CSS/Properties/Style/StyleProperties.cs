@@ -386,15 +386,10 @@ public partial class StyleProperties
 
         // Get a list of only the properties with an Assigned value
         AsyncCountdownEvent? ctdn = null;
-        /*
-        HashSet<AtomicName<ECssPropertyID>> targetFields = new HashSet<AtomicName<ECssPropertyID>>();
-        List<HashSet<AtomicName<ECssPropertyID>>> allFields = CssRules.Values.Select(x => { return x.SetProperties; }).ToList();
-        */
         var targetFields = new FlagCollection<ECssPropertyID>((int)ECssPropertyID.MAX_VALUE);
         List<FlagCollection<ECssPropertyID>> allFields = CssRules.Values.Select(x => { return x.SetProperties; }).ToList();
 
         // Remove duplicates
-        //foreach (HashSet<AtomicName<ECssPropertyID>> fields in allFields)
         foreach (FlagCollection<ECssPropertyID> fields in allFields)
         {
             targetFields.And(fields);
@@ -407,7 +402,6 @@ public partial class StyleProperties
 
             // Loop over all target properties
             foreach (int flagIndex in targetFields)
-            //Parallel.ForEach(targetFields, async (AtomicString propName) =>
             {
                 try
                 {

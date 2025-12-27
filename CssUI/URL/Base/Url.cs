@@ -123,7 +123,7 @@ public class Url : ISpanFormattable, IParsable<Url>
                 return UrlOrigin.Opaque;
             }
 
-            if (Scheme.TryParseUrlScheme(out var schemeEnum))
+            if (EUrlSchemeExtensions.TryFromKeyword(Scheme, out var schemeEnum))
             {
                 switch (schemeEnum)
                 {
@@ -152,9 +152,9 @@ public class Url : ISpanFormattable, IParsable<Url>
     {
         get
         {
-            if (!Scheme.TryParseUrlScheme(out var schemeEnum)) return null;
+            if (!EUrlSchemeExtensions.TryFromKeyword(Scheme, out var schemeEnum)) return null;
 
-            var port = schemeEnum.DefaultPort();
+            var port = schemeEnum.Value.DefaultPort();
             return port >= 0 ? port : null;
         }
     }
@@ -164,7 +164,7 @@ public class Url : ISpanFormattable, IParsable<Url>
     /// </summary>
     public bool IsSpecial
     {/* Docs: https://url.spec.whatwg.org/#is-special */
-        get => Scheme.TryParseUrlScheme(out _);
+        get => EUrlSchemeExtensions.TryFromKeyword(Scheme, out _);
     }
 
     /// <summary>
@@ -327,13 +327,13 @@ public class Url : ISpanFormattable, IParsable<Url>
                             if (stateOverride.HasValue)
                             {
                                 /* 1) If url’s scheme is a special scheme and buffer is not a special scheme, then return. */
-                                if (url.Scheme.TryParseUrlScheme(out _) && !EUrlSchemeExtensions.TryFromKeyword(buffer.ToString(), out _))
+                                if (EUrlSchemeExtensions.TryFromKeyword(url.Scheme, out _) && !EUrlSchemeExtensions.TryFromKeyword(buffer.ToString(), out _))
                                 {
                                     outUrl = url;
                                     return true;
                                 }
                                 /* 2) If url’s scheme is not a special scheme and buffer is a special scheme, then return. */
-                                if (!url.Scheme.TryParseUrlScheme(out _) && EUrlSchemeExtensions.TryFromKeyword(buffer.ToString(), out _))
+                                if (!EUrlSchemeExtensions.TryFromKeyword(url.Scheme, out _) && EUrlSchemeExtensions.TryFromKeyword(buffer.ToString(), out _))
                                 {
                                     outUrl = url;
                                     return true;
