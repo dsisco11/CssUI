@@ -175,6 +175,7 @@ public class SelectorParser
         if (Starts_Universal_Selector(A, B)) return true;
         if (Starts_Attribute_Selector(A, B)) return true;
         if (Starts_Pseudo_Class_Selector(A, B)) return true;
+        if (Starts_Pseudo_Element_Selector(A, B, C)) return true;
 
         return false;
     }

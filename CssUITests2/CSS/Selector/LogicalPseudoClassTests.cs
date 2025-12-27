@@ -90,7 +90,7 @@ public class LogicalPseudoClassTests
         Assert.False(selector[0].Match(hidden), ":not(.hidden) should not match element with 'hidden' class");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void Not_CombinedWithTypeSelector()
     {
         // Arrange
@@ -146,7 +146,7 @@ public class LogicalPseudoClassTests
         Assert.False(selector[0].Match(inactive), ":not(:not(.active)) should not match non-.active element");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void Not_WithPseudoClass()
     {
         // Arrange

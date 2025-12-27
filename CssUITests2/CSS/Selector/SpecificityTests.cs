@@ -254,7 +254,7 @@ public class SpecificityTests
     #endregion
 
     #region Pseudo-Element Specificity (same as type)
-    [Fact(Skip = "Bug: Pseudo-element selectors (::before) not recognized by parser")]
+    [Fact]
     public void Specificity_PseudoElement_SameAsType()
     {
         // ::before has same specificity as type (C=1)
@@ -265,7 +265,7 @@ public class SpecificityTests
         Assert.Equal(typeSpec, beforeSpec);
     }
 
-    [Fact(Skip = "Bug: Pseudo-element selectors (::first-line) not recognized by parser")]
+    [Fact]
     public void Specificity_TypeAndPseudoElement()
     {
         // p::first-line: A=0, B=0, C=2
