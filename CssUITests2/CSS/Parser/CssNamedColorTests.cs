@@ -300,8 +300,8 @@ public class CssNamedColorTests
 
         // Assert
         Assert.Equal(ECssValueTypes.KEYWORD, value.Type);
-        // Keywords are normalized to lowercase
-        Assert.Equal("currentcolor", value.AsString());
+        // Keywords preserve their original case per CSS spec
+        Assert.Equal("currentColor", value.AsString());
     }
 
     [Fact]

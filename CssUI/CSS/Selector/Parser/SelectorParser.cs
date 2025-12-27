@@ -104,6 +104,18 @@ public class SelectorParser
         string Value = string.Empty;
         if (Stream.Next.Type == ECssTokenType.Delim)
         {
+            // Only consume delim tokens that are valid combinators (>, +, ~)
+            char delimValue = (Stream.Next as DelimToken)!.Value;
+            if (delimValue != '>' && delimValue != '+' && delimValue != '~')
+            {
+                // Not a valid combinator character - if we had whitespace, that's the combinator
+                if (bHasWhitespace)
+                {
+                    return new CombinatorToken(">>");
+                }
+                return null;
+            }
+
             Value = string.Concat((Stream.Consume() as DelimToken)!.Value);
             if (Stream.Next.Type == ECssTokenType.Delim)
             {
@@ -195,7 +207,7 @@ public class SelectorParser
         // Original check for raw tokens (legacy path)
         if (A.Type == ECssTokenType.SqBracket_Open && B.Type == ECssTokenType.QualifiedName)
             return true;
-        
+
         // Also check for SqBracket_Open followed by Ident (simple attribute selector like [disabled])
         if (A.Type == ECssTokenType.SqBracket_Open && B.Type == ECssTokenType.Ident)
             return true;
@@ -209,7 +221,7 @@ public class SelectorParser
             if (firstContentToken != null)
             {
                 // Attribute names can be QualifiedName (ns|attr) or just Ident (attr)
-                if (firstContentToken.Type == ECssTokenType.QualifiedName || 
+                if (firstContentToken.Type == ECssTokenType.QualifiedName ||
                     firstContentToken.Type == ECssTokenType.Ident)
                 {
                     return true;
