@@ -15,32 +15,32 @@ namespace CssUI.CSS;
 /// We use offset 24 for the object reference to ensure proper alignment on 64-bit systems.
 /// </remarks>
 [StructLayout(LayoutKind.Explicit, Size = 32)]
-internal struct CssValueData
+internal readonly struct CssValueData
 {
     #region Overlapped Fields (Offset 0)
     /// <summary>
     /// Storage for double/number values.
     /// </summary>
     [FieldOffset(0)]
-    public double NumberValue;
+    public readonly double NumberValue;
 
     /// <summary>
     /// Storage for integer values.
     /// </summary>
     [FieldOffset(0)]
-    public long IntegerValue;
+    public readonly long IntegerValue;
 
     /// <summary>
     /// Storage for 8-bit RGBA color values.
     /// </summary>
     [FieldOffset(0)]
-    public CssColor ColorValue;
+    public readonly CssColor ColorValue;
 
     /// <summary>
     /// Storage for HDR color values (wide gamut).
     /// </summary>
     [FieldOffset(0)]
-    public CssColorHdr ColorHdrValue;
+    public readonly CssColorHdr ColorHdrValue;
     #endregion
 
     #region Reference Field (Offset 24)
@@ -48,7 +48,7 @@ internal struct CssValueData
     /// Storage for reference types (strings, arrays, complex objects).
     /// </summary>
     [FieldOffset(24)]
-    public object? ObjectValue;
+    public readonly object? ObjectValue;
     #endregion
 
     #region Factory Methods
@@ -57,8 +57,8 @@ internal struct CssValueData
     /// </summary>
     public static CssValueData FromNumber(double value)
     {
-        var data = new CssValueData();
-        data.NumberValue = value;
+        var data = default(CssValueData);
+        System.Runtime.CompilerServices.Unsafe.AsRef(in data.NumberValue) = value;
         return data;
     }
 
@@ -67,8 +67,8 @@ internal struct CssValueData
     /// </summary>
     public static CssValueData FromInteger(long value)
     {
-        var data = new CssValueData();
-        data.IntegerValue = value;
+        var data = default(CssValueData);
+        System.Runtime.CompilerServices.Unsafe.AsRef(in data.IntegerValue) = value;
         return data;
     }
 
@@ -77,8 +77,8 @@ internal struct CssValueData
     /// </summary>
     public static CssValueData FromColor(CssColor value)
     {
-        var data = new CssValueData();
-        data.ColorValue = value;
+        var data = default(CssValueData);
+        System.Runtime.CompilerServices.Unsafe.AsRef(in data.ColorValue) = value;
         return data;
     }
 
@@ -87,8 +87,8 @@ internal struct CssValueData
     /// </summary>
     public static CssValueData FromColorHdr(CssColorHdr value)
     {
-        var data = new CssValueData();
-        data.ColorHdrValue = value;
+        var data = default(CssValueData);
+        System.Runtime.CompilerServices.Unsafe.AsRef(in data.ColorHdrValue) = value;
         return data;
     }
 
@@ -97,8 +97,8 @@ internal struct CssValueData
     /// </summary>
     public static CssValueData FromObject(object? value)
     {
-        var data = new CssValueData();
-        data.ObjectValue = value;
+        var data = default(CssValueData);
+        System.Runtime.CompilerServices.Unsafe.AsRef(in data.ObjectValue) = value;
         return data;
     }
     #endregion

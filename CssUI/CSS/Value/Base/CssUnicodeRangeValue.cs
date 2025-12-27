@@ -18,7 +18,7 @@ namespace CssUI.CSS;
 /// overhead of <see cref="CssValueData.ObjectValue"/>.
 /// </para>
 /// </remarks>
-public sealed class CssUnicodeRangeValue : CssValue
+public sealed record class CssUnicodeRangeValue : CssValue
 {
     private readonly CssUnicodeRange _value;
 
@@ -65,19 +65,4 @@ public sealed class CssUnicodeRangeValue : CssValue
     {
         return _value.TryFormat(destination, out charsWritten, format, provider);
     }
-
-    /// <inheritdoc/>
-    public override bool Equals(object? obj)
-    {
-        if (obj is CssUnicodeRangeValue other)
-            return _value.Equals(other._value);
-
-        if (obj is CssValue cssVal && cssVal.Type == ECssValueTypes.UNICODE_RANGE)
-            return _value.Equals(cssVal.AsUnicodeRange());
-
-        return false;
-    }
-
-    /// <inheritdoc/>
-    public override int GetHashCode() => _value.GetHashCode();
 }

@@ -18,7 +18,7 @@ namespace CssUI.CSS;
 /// of <see cref="CssValueData.ObjectValue"/> and providing optimized serialization.
 /// </para>
 /// </remarks>
-public sealed class CssStringValue : CssValue
+public sealed record class CssStringValue : CssValue
 {
     private readonly string _value;
 
@@ -98,21 +98,6 @@ public sealed class CssStringValue : CssValue
         charsWritten = serialized.Length;
         return true;
     }
-
-    /// <inheritdoc/>
-    public override bool Equals(object? obj)
-    {
-        if (obj is CssStringValue other)
-            return string.Equals(_value, other._value, StringComparison.Ordinal);
-
-        if (obj is CssValue cssVal && cssVal.Type == ECssValueTypes.STRING)
-            return string.Equals(_value, cssVal.AsString(), StringComparison.Ordinal);
-
-        return false;
-    }
-
-    /// <inheritdoc/>
-    public override int GetHashCode() => _value.GetHashCode();
 
     /// <summary>
     /// Serializes the string with CSS-compliant quoting and escaping.

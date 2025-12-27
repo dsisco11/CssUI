@@ -15,7 +15,7 @@ namespace CssUI.CSS;
 /// overhead of <see cref="CssValueData.ObjectValue"/>.
 /// </para>
 /// </remarks>
-internal sealed class CssFunctionValue : CssValue
+internal sealed record class CssFunctionValue : CssValue
 {
     private readonly CssFunction _function;
 
@@ -72,25 +72,4 @@ internal sealed class CssFunctionValue : CssValue
         charsWritten = serialized.Length;
         return true;
     }
-
-    /// <inheritdoc/>
-    public override bool Equals(object? obj)
-    {
-        if (obj is CssFunctionValue other)
-            return ReferenceEquals(_function, other._function) ||
-                   string.Equals(_function.Encode(), other._function.Encode(), StringComparison.Ordinal);
-
-        if (obj is CssValue cssVal && cssVal.Type == ECssValueTypes.FUNCTION)
-        {
-            var otherFunc = cssVal.AsFunction();
-            if (otherFunc is null) return false;
-            return ReferenceEquals(_function, otherFunc) ||
-                   string.Equals(_function.Encode(), otherFunc.Encode(), StringComparison.Ordinal);
-        }
-
-        return false;
-    }
-
-    /// <inheritdoc/>
-    public override int GetHashCode() => _function.Encode().GetHashCode();
 }

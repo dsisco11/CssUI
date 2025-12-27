@@ -29,14 +29,15 @@ public class CssValueList : IEnumerable<CssValue>
     }
 
     /// <summary>
-    /// Creates a new <see cref="CssValueList"/> as a deep copy of another
+    /// Creates a new <see cref="CssValueList"/> from another list.
+    /// Since <see cref="CssValue"/> is immutable, values are shared (not copied).
     /// </summary>
     /// <param name="cssValues"></param>
     public CssValueList(CssValueList cssValues)
     {
         foreach (CssValue cssValue in cssValues)
         {
-            this.Items.Add(new CssValue(cssValue));
+            this.Items.Add(cssValue);
         }
     }
 

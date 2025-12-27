@@ -126,13 +126,13 @@ public abstract class CssPropertyBase : ICssProperty
             var def = Definition;
             if (def is null)
                 return CssValue.Null;
-            return new CssValue(def.Initial);
+            return def.Initial;
         }
         else
         {// Take our parents computed value
             ICssProperty? prop = Owner.parentElement.Style?.Cascaded?.Get(CssName);
             if (prop is CssProperty cssProp)
-                return new CssValue(cssProp.Computed!);
+                return cssProp.Computed!;
             else
                 throw new CssPropertyException($"Cannot read parent element property: {CssName}");
         }

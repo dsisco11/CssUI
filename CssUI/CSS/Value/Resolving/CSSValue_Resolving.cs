@@ -4,7 +4,7 @@ using CssUI.CSS.Internal;
 
 namespace CssUI.CSS;
 
-public partial class CssValue
+public partial record class CssValue
 {
 
     /// <summary>
@@ -31,7 +31,7 @@ public partial class CssValue
                             return Property.Find_Inherited_Value();
                         }
                         // Not inherited, treat this situation like INITIAL
-                        return new CssValue(Def.Initial);
+                        return Def.Initial;
                     }
                 case ECssValueTypes.INHERIT:
                     {
@@ -136,7 +136,8 @@ public partial class CssValue
             return (CssValue)ResolutionDelegate.Invoke(Property);
         }
 
-        return new CssValue(this);
+        // CssValue is immutable - no need to copy
+        return this;
     }
 
     /// <summary>
@@ -155,7 +156,8 @@ public partial class CssValue
             return (CssValue)ResolutionDelegate(Property);
         }
 
-        return new CssValue(this);
+        // CssValue is immutable - no need to copy
+        return this;
     }
 }
 

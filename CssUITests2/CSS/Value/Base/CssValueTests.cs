@@ -90,28 +90,32 @@ public class CssValueTests
     }
     #endregion
 
-    #region Clone Tests
+    #region Immutability Tests
     [Fact]
     [Trait("Category", "CssValue")]
-    public void Clone_Integer_ReturnsSameValue()
+    public void RecordClass_Integer_WithExpressionCreatesNewInstance()
     {
         var original = CssValue.From(42);
-        var clone = original.Clone();
+        // CssValue is now a record class, so it's immutable and supports 'with' expressions
+        var copy = original with { };
 
-        Assert.Equal(original.Type, clone.Type);
-        Assert.Equal(original.AsInteger(), clone.AsInteger());
+        Assert.Equal(original.Type, copy.Type);
+        Assert.Equal(original.AsInteger(), copy.AsInteger());
+        Assert.Equal(original, copy); // Records have value equality
     }
 
     [Fact]
     [Trait("Category", "CssValue")]
-    public void Clone_Dimension_ReturnsSameValue()
+    public void RecordClass_Dimension_WithExpressionCreatesNewInstance()
     {
         var original = CssValue.From(100.0, ECssUnit.PX);
-        var clone = original.Clone();
+        // CssValue is now a record class, so it's immutable and supports 'with' expressions
+        var copy = original with { };
 
-        Assert.Equal(original.Type, clone.Type);
-        Assert.Equal(original.Unit, clone.Unit);
-        Assert.Equal(original.AsInteger(), clone.AsInteger());
+        Assert.Equal(original.Type, copy.Type);
+        Assert.Equal(original.Unit, copy.Unit);
+        Assert.Equal(original.AsInteger(), copy.AsInteger());
+        Assert.Equal(original, copy); // Records have value equality
     }
     #endregion
 

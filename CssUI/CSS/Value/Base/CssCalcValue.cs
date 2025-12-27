@@ -18,7 +18,7 @@ namespace CssUI.CSS;
 /// overhead of <see cref="CssValueData.ObjectValue"/>.
 /// </para>
 /// </remarks>
-public sealed class CssCalcValue : CssValue
+public sealed record class CssCalcValue : CssValue
 {
     private readonly CssCalcExpression _expression;
 
@@ -75,19 +75,4 @@ public sealed class CssCalcValue : CssValue
         charsWritten = serialized.Length;
         return true;
     }
-
-    /// <inheritdoc/>
-    public override bool Equals(object? obj)
-    {
-        if (obj is CssCalcValue other)
-            return _expression.Equals(other._expression);
-
-        if (obj is CssValue cssVal && cssVal.Type == ECssValueTypes.CALC)
-            return _expression.Equals(cssVal.AsCalcExpression());
-
-        return false;
-    }
-
-    /// <inheritdoc/>
-    public override int GetHashCode() => _expression.GetHashCode();
 }

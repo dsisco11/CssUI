@@ -264,7 +264,7 @@ public abstract class CssMultiValueProperty : CssPropertyBase, ICssProperty
                             return null;
                         }
                         // Not inherited, treat this situation like INITIAL
-                        return new CssValue(Def.Initial);
+                        return Def.Initial;
                     }
                 case ECssValueTypes.INHERIT:
                     {
@@ -273,11 +273,11 @@ public abstract class CssMultiValueProperty : CssPropertyBase, ICssProperty
                     }
                 case ECssValueTypes.INITIAL:
                     {// If the Assigned value is the CssValue.Initial literal, then we use our definitions default
-                        return new CssValue(Def.Initial);
+                        return Def.Initial;
                     }
                 default:
                     {
-                        return new CssValue(AssignedValue);
+                        return AssignedValue;
                     }
             }
 
@@ -293,7 +293,7 @@ public abstract class CssMultiValueProperty : CssPropertyBase, ICssProperty
         {
             if (Owner.parentNode is null)
             {// Root elements cannot inherit, they use the INITIAL value
-                return new CssValue(Def.Initial);
+                return Def.Initial;
             }
 
             Inherited = true;
@@ -303,7 +303,7 @@ public abstract class CssMultiValueProperty : CssPropertyBase, ICssProperty
         * CSS Specs:
         * 3. Otherwise use the property's initial value. The initial value of each property is indicated in the property's definition.
         */
-        return new CssValue(Def.Initial);
+        return Def.Initial;
     }
     #endregion
 

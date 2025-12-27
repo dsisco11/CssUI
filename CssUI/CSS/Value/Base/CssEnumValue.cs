@@ -11,7 +11,7 @@ namespace CssUI.CSS;
 /// This subclass stores the enum value unboxed and pre-computes the keyword string
 /// at construction time, eliminating reflection during serialization.
 /// </remarks>
-public sealed class CssEnumValue<T> : CssValue where T : struct, Enum
+public sealed record class CssEnumValue<T> : CssValue where T : struct, Enum
 {
     private readonly T _value;
     private readonly string _keyword;
@@ -63,31 +63,6 @@ public sealed class CssEnumValue<T> : CssValue where T : struct, Enum
 
     /// <inheritdoc/>
     public override string Serialize() => _keyword;
-
-    /// <inheritdoc/>
-    public override bool Equals(object? obj)
-    {
-        if (obj is CssEnumValue<T> other)
-            return EqualityComparer<T>.Default.Equals(_value, other._value);
-
-        if (obj is CssValue cssVal && cssVal.Type == ECssValueTypes.KEYWORD)
-        {
-            // Fallback: compare with boxed enum via AsEnum<T>()
-            try
-            {
-                return EqualityComparer<T>.Default.Equals(_value, cssVal.AsEnum<T>());
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        return false;
-    }
-
-    /// <inheritdoc/>
-    public override int GetHashCode() => _value.GetHashCode();
 
     /// <inheritdoc/>
     /// <remarks>

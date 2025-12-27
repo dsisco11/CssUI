@@ -14,7 +14,7 @@ namespace CssUI.CSS;
 /// <summary>
 /// Represents a CSS Value
 /// </summary>
-public partial class CssValue : ISpanFormattable, IFormattable, IParsable<CssValue>
+public partial record class CssValue : ISpanFormattable, IFormattable, IParsable<CssValue>
 {
     #region Delegates
     public delegate double StyleUnitResolverDelegate(ECssUnit unit);
@@ -209,17 +209,6 @@ public partial class CssValue : ISpanFormattable, IFormattable, IParsable<CssVal
         }
     }
 
-    /// <summary>
-    /// Clones an already existing <see cref="CssValue"/>
-    /// </summary>
-    internal CssValue(CssValue sv)
-    {
-        type = sv.Type;
-        data = sv.data;
-        unit = sv.Unit;
-        flags = sv.Flags;
-    }
-
     #region Legacy Constructors (for internal parser/resolver compatibility)
     /// <summary>
     /// Legacy constructor for parsers - creates a value from an object (will be boxed for non-primitives).
@@ -352,9 +341,6 @@ public partial class CssValue : ISpanFormattable, IFormattable, IParsable<CssVal
     }
 
     #region Instantiation
-    /// <summary> Returns a new <see cref="CssValue"/> instance which is a copy of this one. </summary>
-    public CssValue Clone() => new CssValue(this);
-
     /// <summary>Create a keyword value from an enum.</summary>
     /// <typeparam name="T">The enum type (must have EnumRecords keyword support).</typeparam>
     /// <param name="value">The enum value.</param>
@@ -1163,17 +1149,26 @@ public partial class CssValue : ISpanFormattable, IFormattable, IParsable<CssVal
     internal CssFunction? AsFunction() => data.ObjectValue as CssFunction;
     #endregion
 
-    #region Operators
-    public static bool operator ==(in CssValue? A, in CssValue? B)
+    #region Equality
+    /// <summary>
+    /// Determines equality between this CssValue and another.
+    /// </summary>
+    /// <remarks>
+    /// Records use this method to implement == and != operators.
+    /// Custom comparison logic handles CSS value semantics.
+    /// </remarks>
+    public virtual bool Equals(CssValue? other)
     {
-        // If either object is null return whether they are BOTH null
-        if (A is null || B is null)
-            return (A is null && B is null);
+        if (other is null)
+            return false;
 
-        if (A.Type != B.Type) return false;
-        if (A.Unit != B.Unit) return false;
+        if (ReferenceEquals(this, other))
+            return true;
 
-        switch (A.Type)
+        if (Type != other.Type) return false;
+        if (Unit != other.Unit) return false;
+
+        switch (Type)
         {
             case ECssValueTypes.NULL:
             case ECssValueTypes.UNSET:
@@ -1183,54 +1178,35 @@ public partial class CssValue : ISpanFormattable, IFormattable, IParsable<CssVal
             case ECssValueTypes.NONE:
                 return true;// Types are already the same, meaning A/B are equal
             case ECssValueTypes.COLOR:
-                return A.data.ColorValue == B.data.ColorValue;
+                return data.ColorValue == other.data.ColorValue;
             case ECssValueTypes.COLOR_HDR:
-                return A.data.ColorHdrValue == B.data.ColorHdrValue;
+                return data.ColorHdrValue == other.data.ColorHdrValue;
             case ECssValueTypes.INTEGER:
-                return A.data.IntegerValue == B.data.IntegerValue;
+                return data.IntegerValue == other.data.IntegerValue;
             case ECssValueTypes.NUMBER:
             case ECssValueTypes.DIMENSION:
             case ECssValueTypes.PERCENT:
-                return A.data.NumberValue == B.data.NumberValue;
+                return data.NumberValue == other.data.NumberValue;
             case ECssValueTypes.STRING:
-                return string.Equals((string?)A.data.ObjectValue, (string?)B.data.ObjectValue, StringComparison.Ordinal);
+                return string.Equals((string?)data.ObjectValue, (string?)other.data.ObjectValue, StringComparison.Ordinal);
             case ECssValueTypes.KEYWORD:
-                // Delegate to Equals which handles CssEnumValue<T> comparison
-                return A.Equals(B);
+                // For keyword types, compare via ObjectValue (boxed enum)
+                return Equals(data.ObjectValue, other.data.ObjectValue);
             default:
-                throw new NotImplementedException($"Equality comparison logic not implemented for type: {Enum.GetName(typeof(ECssValueTypes), A.Type)}");
+                // For complex types (COLLECTION, CALC, VAR, etc.), compare ObjectValue
+                return Equals(data.ObjectValue, other.data.ObjectValue);
         }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(in CssValue? A, in CssValue? B)
-    {
-        return !(A == B);
-    }
-
-
-    public override bool Equals(object? o)
-    {
-        if (o is null)
-            return false;
-
-        if (o is CssValue cssVal)
-        {
-            return this == cssVal;
-        }
-
-        return false;
     }
 
     public override int GetHashCode()
     {
-        return ToString().GetHashCode();
+        return HashCode.Combine(type, unit, data.NumberValue, data.ObjectValue);
     }
 
     #endregion
 
     #region ToString
-    public new virtual string ToString()
+    public override string ToString()
     {
         const string DECIMAL_FORMAT = "0.###";
         switch (Type)

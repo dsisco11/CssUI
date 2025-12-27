@@ -18,7 +18,7 @@ namespace CssUI.CSS;
 /// overhead of <see cref="CssValueData.ObjectValue"/>.
 /// </para>
 /// </remarks>
-public sealed class CssVarValue : CssValue
+public sealed record class CssVarValue : CssValue
 {
     private readonly CssVarFunction _value;
 
@@ -65,19 +65,4 @@ public sealed class CssVarValue : CssValue
     {
         return _value.TryFormat(destination, out charsWritten, format, provider);
     }
-
-    /// <inheritdoc/>
-    public override bool Equals(object? obj)
-    {
-        if (obj is CssVarValue other)
-            return _value.Equals(other._value);
-
-        if (obj is CssValue cssVal && cssVal.Type == ECssValueTypes.VAR)
-            return _value.Equals(cssVal.AsVarFunction());
-
-        return false;
-    }
-
-    /// <inheritdoc/>
-    public override int GetHashCode() => _value.GetHashCode();
 }

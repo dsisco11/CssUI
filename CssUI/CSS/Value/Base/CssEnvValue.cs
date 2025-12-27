@@ -23,7 +23,7 @@ namespace CssUI.CSS;
 /// overhead of <see cref="CssValueData.ObjectValue"/>.
 /// </para>
 /// </remarks>
-public sealed class CssEnvValue : CssValue
+public sealed record class CssEnvValue : CssValue
 {
     private readonly CssEnvFunction _value;
 
@@ -70,19 +70,4 @@ public sealed class CssEnvValue : CssValue
     {
         return _value.TryFormat(destination, out charsWritten, format, provider);
     }
-
-    /// <inheritdoc/>
-    public override bool Equals(object? obj)
-    {
-        if (obj is CssEnvValue other)
-            return _value.Equals(other._value);
-
-        if (obj is CssValue cssVal && cssVal.Type == ECssValueTypes.ENV)
-            return _value.Equals(cssVal.AsEnvFunction());
-
-        return false;
-    }
-
-    /// <inheritdoc/>
-    public override int GetHashCode() => _value.GetHashCode();
 }

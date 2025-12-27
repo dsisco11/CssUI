@@ -25,13 +25,12 @@ namespace CssUI.CSS;
 /// </list>
 /// </para>
 /// </remarks>
-public sealed class CssListValue : CssValue
+public sealed record class CssListValue : CssValue
 {
     #region Fields
 
     private readonly CssValue[] _values;
     private readonly ECssListSeparator _separator;
-    private ReadOnlyCollection<CssValue>? _cachedCollection;
 
     #endregion
 
@@ -99,18 +98,17 @@ public sealed class CssListValue : CssValue
     /// Returns the values as a <see cref="ReadOnlyCollection{T}"/>.
     /// </summary>
     /// <remarks>
-    /// The collection is cached after first access for efficiency.
-    /// Prefer using <see cref="Values"/> span for iteration when possible.
+    /// Creates a new wrapper each call. Prefer using <see cref="Values"/> span for iteration when possible.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ReadOnlyCollection<CssValue> AsReadOnlyCollection()
     {
-        return _cachedCollection ??= new ReadOnlyCollection<CssValue>(_values);
+        return new ReadOnlyCollection<CssValue>(_values);
     }
 
     /// <inheritdoc/>
     /// <remarks>
-    /// Returns the cached collection, avoiding repeated wrapping.
+    /// Creates a new wrapper each call. Prefer using <see cref="Values"/> span for iteration when possible.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override ReadOnlyCollection<CssValue> AsCollection() => AsReadOnlyCollection();
@@ -179,58 +177,6 @@ public sealed class CssListValue : CssValue
         }
 
         return true;
-    }
-
-    #endregion
-
-    #region Equality
-
-    /// <inheritdoc/>
-    public override bool Equals(object? obj)
-    {
-        if (obj is CssListValue other)
-        {
-            if (_values.Length != other._values.Length)
-                return false;
-
-            for (int i = 0; i < _values.Length; i++)
-            {
-                if (!Equals(_values[i], other._values[i]))
-                    return false;
-            }
-
-            return true;
-        }
-
-        if (obj is CssValue cssVal && cssVal.Type == ECssValueTypes.COLLECTION)
-        {
-            // Compare with base CssValue collection
-            var otherCollection = cssVal.AsCollection();
-            if (_values.Length != otherCollection.Count)
-                return false;
-
-            for (int i = 0; i < _values.Length; i++)
-            {
-                if (!Equals(_values[i], otherCollection[i]))
-                    return false;
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /// <inheritdoc/>
-    public override int GetHashCode()
-    {
-        var hash = new HashCode();
-        hash.Add(_values.Length);
-        foreach (var value in _values)
-        {
-            hash.Add(value);
-        }
-        return hash.ToHashCode();
     }
 
     #endregion
