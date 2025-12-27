@@ -1039,8 +1039,13 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Base implementation handles singleton types (NULL, AUTO, INHERIT, etc.) that have no data payload.
-    /// For value-carrying types, equality is handled by the record-generated equality in subclasses.
+    /// This method handles base type comparison (Type and Unit fields).
+    /// For singleton types (NULL, AUTO, INHERIT, etc.) that have no data payload,
+    /// this is sufficient for equality.
+    /// </para>
+    /// <para>
+    /// For value-carrying types, derived record classes extend this check with
+    /// their own field comparisons via the record-generated equality chain.
     /// </para>
     /// </remarks>
     public virtual bool Equals(CssValue? other)
@@ -1051,24 +1056,13 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
         if (ReferenceEquals(this, other))
             return true;
 
-        // For base CssValue instances (singleton types), compare by type and unit
+        // Compare base type fields - Type and Unit must match
         if (Type != other.Type) return false;
         if (Unit != other.Unit) return false;
 
-        // Singleton types with matching Type are equal (they have no data payload)
-        return Type switch
-        {
-            ECssValueTypes.NULL or
-            ECssValueTypes.UNSET or
-            ECssValueTypes.AUTO or
-            ECssValueTypes.INITIAL or
-            ECssValueTypes.INHERIT or
-            ECssValueTypes.NONE or
-            ECssValueTypes.DEFAULT => true,
-            // For value-carrying types, we should never reach here since subclasses
-            // override Equals. But if we do, fallback to reference equality (already checked above).
-            _ => false
-        };
+        // For the base CssValue type, type matching is sufficient
+        // Derived records will add their own field comparisons
+        return true;
     }
 
     public override int GetHashCode()
