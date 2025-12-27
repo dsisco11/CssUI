@@ -375,7 +375,7 @@ public class CssProperty : CssPropertyBase, ICssProperty
     #endregion
 
     #region Serialization
-    public override string Serialize() { return $"{CssName}: {Assigned.ToString()}"; }
+    public override string Serialize() { return $"{CssName.Keyword()}: {Assigned.ToString()}"; }
     #endregion
 
     #region Updating
