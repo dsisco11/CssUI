@@ -27,7 +27,7 @@ public class LogicalPseudoClassTests
     #endregion
 
     #region :not() Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void Not_MatchesElementNotMatchingInnerSelector()
     {
         // Arrange
@@ -41,7 +41,7 @@ public class LogicalPseudoClassTests
         Assert.True(selector[0].Match(element), ":not(.active) should match element without class 'active'");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact(Skip = "Debugging :not() issue")]
     public void Not_WithTypeSelector()
     {
         // Arrange
@@ -56,7 +56,7 @@ public class LogicalPseudoClassTests
         Assert.False(selector[0].Match(div), ":not(div) should not match div");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact(Skip = "Debugging :not() issue")]
     public void Not_WithIdSelector()
     {
         // Arrange
@@ -73,7 +73,7 @@ public class LogicalPseudoClassTests
         Assert.False(selector[0].Match(main), ":not(#main) should not match element with id='main'");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact(Skip = "Debugging :not() issue")]
     public void Not_WithClassSelector()
     {
         // Arrange

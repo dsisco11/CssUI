@@ -66,8 +66,81 @@ public class PseudoClassSelector : SimpleSelector
                 return !E.hasChildNodes();
             case "root":
                 {
-                    var root = E.getRootNode();
-                    return (root == null || ReferenceEquals(E, root));
+                    // Per CSS Selectors Level 4: :root matches the root element of the document
+                    // For HTML documents, this is the <html> element (the documentElement)
+                    var ownerDocument = E.ownerDocument;
+                    if (ownerDocument == null)
+                    {
+                        // If no owner document, check if this element has no parent (is its own root)
+                        return E.parentNode == null || E.parentNode is Document;
+                    }
+                    return ReferenceEquals(E, ownerDocument.documentElement);
+                }
+            case "first-child":
+                {
+                    // Per CSS Selectors Level 4: :first-child matches element that is the first child of its parent
+                    var parent = E.parentElement;
+                    if (parent == null) return false;
+                    return ReferenceEquals(E, parent.firstElementChild);
+                }
+            case "last-child":
+                {
+                    // Per CSS Selectors Level 4: :last-child matches element that is the last child of its parent
+                    var parent = E.parentElement;
+                    if (parent == null) return false;
+                    return ReferenceEquals(E, parent.lastElementChild);
+                }
+            case "only-child":
+                {
+                    // Per CSS Selectors Level 4: :only-child matches element that is the only child of its parent
+                    var parent = E.parentElement;
+                    if (parent == null) return false;
+                    return ReferenceEquals(E, parent.firstElementChild) && ReferenceEquals(E, parent.lastElementChild);
+                }
+            case "first-of-type":
+                {
+                    // Per CSS Selectors Level 4: :first-of-type matches element that is first sibling of its type
+                    var parent = E.parentElement;
+                    if (parent == null) return false;
+                    foreach (var sibling in parent.children)
+                    {
+                        if (sibling.localName == E.localName)
+                        {
+                            return ReferenceEquals(E, sibling);
+                        }
+                    }
+                    return false;
+                }
+            case "last-of-type":
+                {
+                    // Per CSS Selectors Level 4: :last-of-type matches element that is last sibling of its type
+                    var parent = E.parentElement;
+                    if (parent == null) return false;
+                    Element? lastOfType = null;
+                    foreach (var sibling in parent.children)
+                    {
+                        if (sibling.localName == E.localName)
+                        {
+                            lastOfType = sibling;
+                        }
+                    }
+                    return ReferenceEquals(E, lastOfType);
+                }
+            case "only-of-type":
+                {
+                    // Per CSS Selectors Level 4: :only-of-type matches element that is only sibling of its type
+                    var parent = E.parentElement;
+                    if (parent == null) return false;
+                    int count = 0;
+                    foreach (var sibling in parent.children)
+                    {
+                        if (sibling.localName == E.localName)
+                        {
+                            count++;
+                            if (count > 1) return false;
+                        }
+                    }
+                    return count == 1;
                 }
             default:
                 throw new CssSelectorException("Selector pseudo-class (", Name, ") logic not implemented!");

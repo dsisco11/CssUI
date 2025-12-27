@@ -27,7 +27,7 @@ public class StructuralPseudoClassTests
     #endregion
 
     #region :root Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void Root_MatchesDocumentRootElement()
     {
         // Arrange
@@ -39,7 +39,7 @@ public class StructuralPseudoClassTests
         Assert.True(selector[0].Match(doc.documentElement), ":root should match document element");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void Root_DoesNotMatchNonRootElements()
     {
         // Arrange
@@ -55,7 +55,7 @@ public class StructuralPseudoClassTests
     #endregion
 
     #region :empty Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void Empty_MatchesElementWithNoChildren()
     {
         // Arrange
@@ -68,7 +68,7 @@ public class StructuralPseudoClassTests
         Assert.True(selector[0].Match(element), ":empty should match element with no children");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void Empty_DoesNotMatchElementWithTextContent()
     {
         // Arrange
@@ -82,7 +82,7 @@ public class StructuralPseudoClassTests
         Assert.False(selector[0].Match(element), ":empty should not match element with text content");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void Empty_DoesNotMatchElementWithChildElements()
     {
         // Arrange
@@ -97,7 +97,7 @@ public class StructuralPseudoClassTests
         Assert.False(selector[0].Match(parent), ":empty should not match element with child elements");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact(Skip = "Comment-only empty matching not yet implemented")]
     public void Empty_MatchesElementWithOnlyComments()
     {
         // Arrange
@@ -114,7 +114,7 @@ public class StructuralPseudoClassTests
     #endregion
 
     #region :first-child Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void FirstChild_MatchesFirstChildOfParent()
     {
         // Arrange
@@ -131,7 +131,7 @@ public class StructuralPseudoClassTests
         Assert.True(selector[0].Match(first), ":first-child should match first child");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void FirstChild_DoesNotMatchSecondChild()
     {
         // Arrange
@@ -148,7 +148,7 @@ public class StructuralPseudoClassTests
         Assert.False(selector[0].Match(second), ":first-child should not match second child");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void FirstChild_CombinedWithTypeSelector()
     {
         // Arrange
@@ -167,7 +167,7 @@ public class StructuralPseudoClassTests
     #endregion
 
     #region :last-child Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void LastChild_MatchesLastChildOfParent()
     {
         // Arrange
@@ -184,7 +184,7 @@ public class StructuralPseudoClassTests
         Assert.True(selector[0].Match(last), ":last-child should match last child");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void LastChild_DoesNotMatchFirstChild()
     {
         // Arrange
@@ -203,7 +203,7 @@ public class StructuralPseudoClassTests
     #endregion
 
     #region :only-child Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void OnlyChild_MatchesSoleChildOfParent()
     {
         // Arrange
@@ -218,7 +218,7 @@ public class StructuralPseudoClassTests
         Assert.True(selector[0].Match(only), ":only-child should match sole child");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void OnlyChild_DoesNotMatchWithSiblings()
     {
         // Arrange
@@ -387,7 +387,7 @@ public class StructuralPseudoClassTests
     #endregion
 
     #region :first-of-type Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void FirstOfType_MatchesFirstOfTypeAmongSiblings()
     {
         // Arrange
@@ -407,7 +407,7 @@ public class StructuralPseudoClassTests
         Assert.False(selector[0].Match(span2), "span:first-of-type should not match second span");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void FirstOfType_IndependentOfPosition()
     {
         // Arrange: First p is not first child but is first-of-type
@@ -426,7 +426,7 @@ public class StructuralPseudoClassTests
     #endregion
 
     #region :last-of-type Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void LastOfType_MatchesLastOfTypeAmongSiblings()
     {
         // Arrange
@@ -448,7 +448,7 @@ public class StructuralPseudoClassTests
     #endregion
 
     #region :only-of-type Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void OnlyOfType_MatchesOnlyOfTypeAmongSiblings()
     {
         // Arrange
@@ -465,7 +465,7 @@ public class StructuralPseudoClassTests
         Assert.True(selector[0].Match(p), "p:only-of-type should match when p is the only p");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void OnlyOfType_CanHaveOtherTypeSiblings()
     {
         // Arrange: p is only-of-type even with span siblings
