@@ -579,7 +579,7 @@ public class CssComputedStyle
     #endregion
 
     #region Getters
-    public ICssProperty? this[AtomicName<ECssPropertyID> CssName] => Get(CssName);
+    public ICssProperty? this[ECssPropertyID CssName] => Get(CssName);
 
     internal ICssProperty? Get_ByIndex(int index) => CssProperties[index];
 
@@ -597,16 +597,16 @@ public class CssComputedStyle
         return Get(Property.CssName);
     }
 
-    internal ICssProperty? Get(AtomicName<ECssPropertyID> CssName)
+    internal ICssProperty? Get(ECssPropertyID CssName)
     {
-        ArgumentNullException.ThrowIfNull(CssName);
-        if (CssName.Value < 0) throw new ArgumentOutOfRangeException($"Invalid CSS property ID (negative value): {CssName}");
+        int value = (int)CssName;
+        if (value < 0) throw new ArgumentOutOfRangeException($"Invalid CSS property ID (negative value): {CssName}");
 
         Contract.EndContractBlock();
 
-        if (CssName.Value >= CssProperties.Count) return null;
+        if (value >= CssProperties.Count) return null;
 
-        return CssProperties[CssName.Value];
+        return CssProperties[value];
 
         /*
          if (CssPropertyMap.TryGetValue(CssName, out ICssProperty prop))
@@ -655,23 +655,23 @@ public class CssComputedStyle
         Set(Property.CssName, Value);
     }
 
-    internal void Set(AtomicName<ECssPropertyID> CssName, ICssProperty Value)
+    internal void Set(ECssPropertyID CssName, ICssProperty Value)
     {
-        ArgumentNullException.ThrowIfNull(CssName);
-        if (CssName.Value < 0) throw new ArgumentOutOfRangeException($"Invalid CSS property ID (negative value): {CssName}");
+        int value = (int)CssName;
+        if (value < 0) throw new ArgumentOutOfRangeException($"Invalid CSS property ID (negative value): {CssName}");
 
         Contract.EndContractBlock();
 
-        if (CssName.Value >= CssProperties.Count)
+        if (value >= CssProperties.Count)
         {// Make more room
-            int diff = CssName.Value - CssProperties.Count;
+            int diff = value - CssProperties.Count;
             for (int i = 0; i < diff; i++)
             {
                 CssProperties.Add(null);
             }
         }
 
-        CssProperties[CssName.Value] = Value;
+        CssProperties[value] = Value;
         return;
 
         /*

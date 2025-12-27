@@ -58,7 +58,7 @@ public class CssPropertyTests
         var prop = element.Style.Cascaded.Get(ECssPropertyID.Width);
 
         Assert.NotNull(prop?.Definition);
-        Assert.Equal(ECssPropertyID.Width, prop.Definition.Name.EnumValue);
+        Assert.Equal(ECssPropertyID.Width, prop.Definition.Name);
     }
 
     [Fact]
@@ -73,7 +73,7 @@ public class CssPropertyTests
         var prop = element.Style.Cascaded.Get(ECssPropertyID.MarginTop);
 
         Assert.NotNull(prop);
-        Assert.Equal(ECssPropertyID.MarginTop, prop.CssName.EnumValue);
+        Assert.Equal(ECssPropertyID.MarginTop, prop.CssName);
     }
 
     [Fact]

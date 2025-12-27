@@ -39,7 +39,7 @@ public static partial class CssPropertyResolver
                 }
         }
 
-        switch (Property.CssName.EnumValue)
+        switch (Property.CssName)
         {
             case ECssPropertyID.BorderLeftWidth:
                 {

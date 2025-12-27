@@ -11,7 +11,7 @@ public class PositionProperty : CssProperty
     #endregion
 
     #region Constructor
-    public PositionProperty(AtomicName<ECssPropertyID> CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked) : base(CssName, Owner, Source, Locked)
+    public PositionProperty(ECssPropertyID CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked) : base(CssName, Owner, Source, Locked)
     {
     }
     #endregion

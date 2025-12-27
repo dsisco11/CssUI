@@ -10,11 +10,20 @@ namespace CssUI.DOM;
 public class DOMTokenList : AttributeTokenList<string>
 {
     #region Constructor
-    public DOMTokenList(Element ownerElement, AtomicName<EAttributeName> localName) : base(ownerElement, localName)
+    public DOMTokenList(Element ownerElement, string localName) : base(ownerElement, localName)
     {
     }
 
-    public DOMTokenList(Element ownerElement, AtomicName<EAttributeName> localName, string[] supportedTokens) : base(ownerElement, localName, supportedTokens)
+    public DOMTokenList(Element ownerElement, string localName, string[] supportedTokens) : base(ownerElement, localName, supportedTokens)
+    {
+    }
+
+    // Convenience overloads for EAttributeName enum
+    public DOMTokenList(Element ownerElement, EAttributeName localName) : base(ownerElement, localName)
+    {
+    }
+
+    public DOMTokenList(Element ownerElement, EAttributeName localName, string[] supportedTokens) : base(ownerElement, localName, supportedTokens)
     {
     }
     #endregion

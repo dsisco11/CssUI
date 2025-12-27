@@ -42,7 +42,7 @@ public interface ICssProperty
     /// The properties identifier token in stylesheets.
     /// <para>EG; "box-sizing", "margin-left", "margin-top", etc </para>
     /// </summary>
-    AtomicName<ECssPropertyID> CssName { get; }
+    ECssPropertyID CssName { get; }
     /// <summary>
     /// Tracks which styling rule block this property came from
     /// </summary>

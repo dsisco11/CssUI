@@ -15,7 +15,7 @@ namespace CssUI.CSS.Selectors;
 public class AttributeSelector : SimpleSelector
 {
     readonly NamespacePrefixToken? Namespace;
-    readonly AtomicName<EAttributeName> AttributeName;
+    readonly string AttributeName;
     readonly ECssAttributeOperator Operator = ECssAttributeOperator.None;
     readonly string? Value = null;
     readonly EAttributeCaseSensitivity CaseSensitivity = EAttributeCaseSensitivity.Default;

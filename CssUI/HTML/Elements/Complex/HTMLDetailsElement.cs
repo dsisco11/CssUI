@@ -39,13 +39,13 @@ namespace CssUI.HTML
         #endregion
 
         #region Overrides
-        internal override void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue newValue, ReadOnlyMemory<char> Namespace)
+        internal override void run_attribute_change_steps(Element element, string localName, AttributeValue oldValue, AttributeValue newValue, ReadOnlyMemory<char> Namespace)
         {
             base.run_attribute_change_steps(element, localName, oldValue, newValue, Namespace);
 
-            /* Whenever the open attribute is added to or removed from a details element, the user agent must queue a task that runs the following steps, 
+            /* Whenever the open attribute is added to or removed from a details element, the user agent must queue a task that runs the following steps,
              * which are known as the details notification task steps, for this details element: */
-            if (localName == EAttributeName.Open)
+            if (localName.Equals(EAttributeName.Open.Keyword(), StringComparison.OrdinalIgnoreCase))
             {
                 Task.Factory.StartNew(() => dispatchEvent(new Event(EEventName.Toggle)));
             }

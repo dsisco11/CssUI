@@ -201,7 +201,7 @@ namespace CssUI.HTML
         {/* Docs: https://html.spec.whatwg.org/multipage/form-elements.html#dom-option-text */
             get
             {
-                /* The text IDL attribute, on getting, must return the result of stripping and collapsing ASCII whitespace from the concatenation of data of all the Text node descendants of the option element, 
+                /* The text IDL attribute, on getting, must return the result of stripping and collapsing ASCII whitespace from the concatenation of data of all the Text node descendants of the option element,
                  * in tree order, excluding any that are descendants of descendants of the option element that are themselves script or SVG script elements. */
                 StringBuilder sb = new StringBuilder();
                 LinkedList<Text> textList = new LinkedList<Text>();
@@ -253,13 +253,13 @@ namespace CssUI.HTML
         #region Overrides
         internal override bool has_activation_behaviour => true;
 
-        internal override void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue newValue, ReadOnlyMemory<char> Namespace)
+        internal override void run_attribute_change_steps(Element element, string localName, AttributeValue oldValue, AttributeValue newValue, ReadOnlyMemory<char> Namespace)
         {
             base.run_attribute_change_steps(element, localName, oldValue, newValue, Namespace);
 
-            /* Whenever an option element's selected attribute is added, if its dirtiness is false, its selectedness must be set to true. 
+            /* Whenever an option element's selected attribute is added, if its dirtiness is false, its selectedness must be set to true.
              * Whenever an option element's selected attribute is removed, if its dirtiness is false, its selectedness must be set to false. */
-            if (localName == EAttributeName.Selected)
+            if (localName.Equals(EAttributeName.Selected.Keyword(), StringComparison.OrdinalIgnoreCase))
             {
                 if (oldValue == null)// Added
                 {

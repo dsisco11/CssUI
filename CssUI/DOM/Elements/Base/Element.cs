@@ -24,8 +24,8 @@ namespace CssUI.DOM;
 public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssElement
 {/* Docs: https://dom.spec.whatwg.org/#interface-element */
     #region Internal Properties
-    internal OrderedDictionary<AtomicName<EAttributeName>, Attr> AttributeList { get; private set; } = new OrderedDictionary<AtomicName<EAttributeName>, Attr>();
-    internal OrderedDictionary<AtomicName<EAttributeName>, IAttributeTokenList> tokenListMap = new OrderedDictionary<AtomicName<EAttributeName>, IAttributeTokenList>();
+    internal OrderedDictionary<string, Attr> AttributeList { get; private set; } = new OrderedDictionary<string, Attr>();
+    internal OrderedDictionary<string, IAttributeTokenList> tokenListMap = new OrderedDictionary<string, IAttributeTokenList>();
     #endregion
 
 
@@ -533,7 +533,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
 
     #region Customizable Steps
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal virtual void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue newValue, ReadOnlyMemory<char> Namespace)
+    internal virtual void run_attribute_change_steps(Element element, string localName, AttributeValue oldValue, AttributeValue newValue, ReadOnlyMemory<char> Namespace)
     {
         if (tokenListMap.Count > 0)
         {
@@ -543,26 +543,16 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
             }
         }
 
-
-        if (localName.IsCustom)
+        if (localName == EAttributeName.ID.Keyword())
         {
-            return;
-        }
-
-        switch (localName.EnumValue)
-        {
-            case EAttributeName.ID:
-                {
-                    ownerDocument.Update_Element_ID(element, oldValue, newValue);
-                }
-                break;
+            ownerDocument.Update_Element_ID(element, oldValue, newValue);
         }
     }
     #endregion
 
     #region Internal Utility
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal bool find_attribute(AtomicName<EAttributeName> Name, [MaybeNullWhen(false)] out Attr? outAttrib)
+    internal bool find_attribute(string Name, [MaybeNullWhen(false)] out Attr? outAttrib)
     {/* Docs: https://dom.spec.whatwg.org/#concept-element-attributes-get-by-namespace */
         if (!AttributeList.TryGetValue(Name, out Attr attr))
         {
@@ -575,22 +565,9 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal bool find_attribute(AtomicName<EAttributeName> Name, string Namespace, [MaybeNullWhen(false)] out Attr? outAttrib)
+    internal bool find_attribute(string Name, string Namespace, [MaybeNullWhen(false)] out Attr? outAttrib)
     {/* Docs: https://dom.spec.whatwg.org/#concept-element-attributes-get-by-namespace */
-        if (!AttributeList.TryGetValue(Name, out Attr attr))
-        {
-            outAttrib = null;
-            return false;
-        }
-
-        outAttrib = attr;
-        return true;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal bool find_attribute(string qualifiedName, [MaybeNullWhen(false)] out Attr? outAttrib)
-    {/* Docs: https://dom.spec.whatwg.org/#concept-element-attributes-get-by-namespace */
-        qualifiedName = qualifiedName.ToLowerInvariant();
+        var qualifiedName = string.Concat(Namespace, ":", Name.ToLowerInvariant());
         if (!AttributeList.TryGetValue(qualifiedName, out Attr attr))
         {
             outAttrib = null;
@@ -601,20 +578,13 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
         return true;
     }
 
+    // Convenience overloads for EAttributeName enum
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal bool find_attribute(string localName, string Namespace, out Attr? outAttrib)
-    {/* Docs: https://dom.spec.whatwg.org/#concept-element-attributes-get-by-namespace */
-        localName = string.Concat(Namespace, ":", localName.ToLowerInvariant());
-        if (!AttributeList.TryGetValue(localName, out Attr attr))
-        {
-            outAttrib = null;
-            return false;
-        }
-
-        outAttrib = attr;
-        return true;
-    }
-
+    internal bool find_attribute(EAttributeName Name, [MaybeNullWhen(false)] out Attr? outAttrib)
+        => find_attribute(Name.Keyword(), out outAttrib);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal bool find_attribute(EAttributeName Name, string Namespace, [MaybeNullWhen(false)] out Attr? outAttrib)
+        => find_attribute(Name.Keyword(), Namespace, out outAttrib);
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal void change_attribute(Attr attr, AttributeValue? oldValue, AttributeValue? newValue)
     {
@@ -699,7 +669,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
 
 
     #region Attribute Management
-    public AttributeValue? getAttribute(AtomicName<EAttributeName> Name)
+    public AttributeValue? getAttribute(string Name)
     {
         if (!AttributeList.TryGetValue(Name, out Attr outAttr))
             return null;
@@ -708,7 +678,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
         /* 3) Return attr’s value. */
         return outAttr.Value;
     }
-    public Attr? getAttributeNode(AtomicName<EAttributeName> Name)
+    public Attr? getAttributeNode(string Name)
     {
         if (!AttributeList.TryGetValue(Name, out Attr outAttr))
             return null;
@@ -718,7 +688,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
 
 
     [CEReactions]
-    public void setAttribute(AtomicName<EAttributeName> Name, AttributeValue value)
+    public void setAttribute(string Name, AttributeValue value)
     {
         CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
         {
@@ -726,7 +696,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
 
             if (attr is null)
             {
-                Attr newAttr = new Attr(Name.Name, this);
+                Attr newAttr = new Attr(Name, this);
                 newAttr.Value = value;
                 append_attribute(newAttr);
                 return;
@@ -759,7 +729,7 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
 
 
     [CEReactions]
-    public void removeAttribute(AtomicName<EAttributeName> Name)
+    public void removeAttribute(string Name)
     {
         CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
         {
@@ -787,14 +757,14 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
 
 
     [CEReactions]
-    public bool toggleAttribute(AtomicName<EAttributeName> Name, bool? force = null)
+    public bool toggleAttribute(string Name, bool? force = null)
     {
         return CEReactions.Wrap_CEReaction(nodeDocument.defaultView, () =>
         {
             /* 1) If qualifiedName does not match the Name production in XML, then throw an "InvalidCharacterError" DOMException. */
-            if (!XMLCommon.Is_Valid(Name.Name))
+            if (!XMLCommon.Is_Valid(Name))
             {
-                throw new InvalidCharacterError($"The given name is not a valid XML name: \"{Name.Name}\"");
+                throw new InvalidCharacterError($"The given name is not a valid XML name: \"{Name}\"");
             }
 
             /* 2) If the context object is in the HTML namespace and its node document is an HTML document, then set qualifiedName to qualifiedName in ASCII lowercase. */
@@ -827,14 +797,14 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
     }
 
 
-    public bool hasAttribute(AtomicName<EAttributeName> Name)
+    public bool hasAttribute(string Name)
     {
         if (AttributeList.TryGetValue(Name, out Attr attr))
             return attr.Value != null;
 
         return false;
     }
-    public bool hasAttribute(AtomicName<EAttributeName> Name, out Attr? outAttr)
+    public bool hasAttribute(string Name, out Attr? outAttr)
     {
         if (AttributeList.TryGetValue(Name, out Attr attr))
         {
@@ -845,6 +815,22 @@ public class Element : ParentNode, INonDocumentTypeChildNode, ISlottable, ICssEl
         outAttr = null;
         return false;
     }
+
+    // Convenience overloads that accept EAttributeName enum
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public AttributeValue? getAttribute(EAttributeName Name) => getAttribute(Name.Keyword());
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Attr? getAttributeNode(EAttributeName Name) => getAttributeNode(Name.Keyword());
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void setAttribute(EAttributeName Name, AttributeValue value) => setAttribute(Name.Keyword(), value);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void removeAttribute(EAttributeName Name) => removeAttribute(Name.Keyword());
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool toggleAttribute(EAttributeName Name, bool? force = null) => toggleAttribute(Name.Keyword(), force);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool hasAttribute(EAttributeName Name) => hasAttribute(Name.Keyword());
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool hasAttribute(EAttributeName Name, out Attr? outAttr) => hasAttribute(Name.Keyword(), out outAttr);
     #endregion
 
     #region Element Matching / CSS Selectors

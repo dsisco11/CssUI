@@ -197,7 +197,7 @@ public abstract class CssMultiValueProperty : CssPropertyBase, ICssProperty
     #endregion
 
     #region Constructor
-    public CssMultiValueProperty(AtomicName<ECssPropertyID> CssName, bool Locked, WeakReference<CssComputedStyle> Source, ICssElement Owner)
+    public CssMultiValueProperty(ECssPropertyID CssName, bool Locked, WeakReference<CssComputedStyle> Source, ICssElement Owner)
         : base(CssName, Owner, Source, Locked)
     {
     }

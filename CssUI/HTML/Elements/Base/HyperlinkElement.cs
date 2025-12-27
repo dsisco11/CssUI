@@ -66,7 +66,7 @@ namespace CssUI.HTML
             {
                 reinitialize_url();
                 if (url == null) return ":";
-                return string.Concat(url.Scheme.NameLower, ":");
+                return string.Concat(url.Scheme, ":");
             }
             set
             {
@@ -333,11 +333,11 @@ namespace CssUI.HTML
         #endregion
 
         #region Internal Overrides
-        internal override void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue newValue, ReadOnlyMemory<char> Namespace)
+        internal override void run_attribute_change_steps(Element element, string localName, AttributeValue oldValue, AttributeValue newValue, ReadOnlyMemory<char> Namespace)
         {
             base.run_attribute_change_steps(element, localName, oldValue, newValue, Namespace);
 
-            if (localName == EAttributeName.Href)
+            if (localName.Equals(EAttributeName.Href.Keyword(), StringComparison.OrdinalIgnoreCase))
             {
                 set_url();
             }

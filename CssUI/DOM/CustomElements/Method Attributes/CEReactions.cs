@@ -136,7 +136,7 @@ public class CEReactions : Attribute
     }
 
 
-    public static void Enqueue_Reaction(Element element, AtomicName<EReactionName> Reaction, params object?[] Args)
+    public static void Enqueue_Reaction(Element element, EReactionName Reaction, params object?[] Args)
     {/* Docs: https://html.spec.whatwg.org/multipage/custom-elements.html#enqueue-a-custom-element-callback-reaction */
         if (!element.isCustom)
             return;
@@ -155,7 +155,7 @@ public class CEReactions : Attribute
         if (Reaction == EReactionName.AttributeChanged)
         {
             /* 1) Let attributeName be the first element of args. */
-            AtomicName<EAttributeName>? attributeName = Args[0] as AtomicName<EAttributeName>;
+            string? attributeName = Args[0] as string;
             /* 2) If definition's observed attributes does not contain attributeName, then return. */
             if (!def.observedAttributes.Contains(attributeName!))
                 return;

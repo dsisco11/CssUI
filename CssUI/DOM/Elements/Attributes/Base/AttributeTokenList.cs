@@ -18,12 +18,12 @@ public abstract class AttributeTokenList<T> : IEnumerable<T>, IAttributeTokenLis
     /// <summary>
     /// Name of the attribute this token list represents
     /// </summary>
-    public readonly AtomicName<EAttributeName> localName;
+    public readonly string localName;
     private readonly HashSet<T>? SupportedTokens = null;
     #endregion
 
     #region Constructor
-    public AttributeTokenList(Element ownerElement, AtomicName<EAttributeName> localName, T[]? supportedTokens)
+    public AttributeTokenList(Element ownerElement, string localName, T[]? supportedTokens)
     {
         SupportedTokens = new HashSet<T>(supportedTokens ?? Array.Empty<T>());
         /* 1) Let element be associated element. */
@@ -49,9 +49,15 @@ public abstract class AttributeTokenList<T> : IEnumerable<T>, IAttributeTokenLis
         }
     }
 
-    public AttributeTokenList(Element ownerElement, AtomicName<EAttributeName> localName) : this(ownerElement, localName, null)
+    public AttributeTokenList(Element ownerElement, string localName) : this(ownerElement, localName, null)
     {
     }
+
+    // Convenience overloads for EAttributeName enum
+    public AttributeTokenList(Element ownerElement, EAttributeName localName, T[]? supportedTokens)
+        : this(ownerElement, localName.Keyword(), supportedTokens) { }
+    public AttributeTokenList(Element ownerElement, EAttributeName localName)
+        : this(ownerElement, localName.Keyword(), null) { }
 
     ~AttributeTokenList()
     {
@@ -104,7 +110,7 @@ public abstract class AttributeTokenList<T> : IEnumerable<T>, IAttributeTokenLis
     protected abstract string Token_To_String(T token);
     #endregion
 
-    public void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue? oldValue, AttributeValue? newValue, ReadOnlyMemory<char>? Namespace)
+    public void run_attribute_change_steps(Element element, string localName, AttributeValue? oldValue, AttributeValue? newValue, ReadOnlyMemory<char>? Namespace)
     {
         if (localName != this.localName) return;
         // Per spec, only process if namespace is null or empty (no namespace)

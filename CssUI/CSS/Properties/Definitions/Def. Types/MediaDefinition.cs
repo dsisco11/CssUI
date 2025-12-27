@@ -17,7 +17,7 @@ public class MediaDefinition
     /// <summary>
     /// Name of the property
     /// </summary>
-    public AtomicName<EMediaFeatureName> Name { get; }
+    public EMediaFeatureName Name { get; }
     /// <summary>
     /// Specifies if this feature name is a Discreet or Range type
     /// </summary>
@@ -46,7 +46,7 @@ public class MediaDefinition
     /// <param name="DisallowedTypes">Bitmask of all value data types which cannot be assigned to this property</param>
     /// <param name="Keywords">List of keywords which can be assigned to this property</param>
     /// <param name="IsPrivate">If TRUE then this property cannot be set from style-sheets</param>
-    public MediaDefinition(AtomicName<EMediaFeatureName> Name, EMediaFeatureType Type, ECssValueTypes AllowedTypes, string[]? Keywords = null)
+    public MediaDefinition(EMediaFeatureName Name, EMediaFeatureType Type, ECssValueTypes AllowedTypes, string[]? Keywords = null)
     {
         this.Name = Name;
         this.Type = Type;
@@ -114,7 +114,7 @@ public class MediaDefinition
         Contract.EndContractBlock();
 
         if (!Is_Valid_Value_Type(Value.Type))
-            throw new CssException($"The property({Enum.GetName(typeof(EMediaFeatureName), Name.Value)}) cannot be set to an {Enum.GetName(typeof(ECssValueTypes), Value.Type)}!");
+            throw new CssException($"The property({Enum.GetName(typeof(EMediaFeatureName), Name)}) cannot be set to an {Enum.GetName(typeof(ECssValueTypes), Value.Type)}!");
 
         switch (Value.Type)
         {
@@ -124,7 +124,7 @@ public class MediaDefinition
                     {
                         //if (!Array.Exists(keywordWhitelist, x => x.Equals(Value.AsString(), StringComparison.InvariantCultureIgnoreCase)))
                         if (!KeywordWhitelist.Contains(Value.AsString()))
-                            throw new CssException($"Property({Enum.GetName(typeof(EMediaFeatureName), Name.Value)}) does not accept '{Value.AsString()}' as a value!");
+                            throw new CssException($"Property({Enum.GetName(typeof(EMediaFeatureName), Name)}) does not accept '{Value.AsString()}' as a value!");
                     }
                 }
                 break;

@@ -554,7 +554,7 @@ namespace CssUI.HTML
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#concept-input-list */
             get
             {
-                /* The suggestions source element is the first element in the tree in tree order to have an ID equal to the value of the list attribute, if that element is a datalist element. 
+                /* The suggestions source element is the first element in the tree in tree order to have an ID equal to the value of the list attribute, if that element is a datalist element.
                  * If there is no list attribute, or if there is no element with that ID, or if the first element with that ID is not a datalist element, then there is no suggestions source element. */
                 if (hasAttribute(EAttributeName.List, out Attr outList))
                 {
@@ -758,7 +758,7 @@ namespace CssUI.HTML
                 patternCompiled = null;
                 setAttribute(EAttributeName.Pattern, AttributeValue.From(value));
                 /* The compiled pattern regular expression, when matched against a string, must have its start anchored to the start of the string and its end anchored to the end of the string. */
-                /* This implies that the regular expression language used for this attribute is the same as that used in JavaScript, except that the pattern attribute is matched against the entire value, 
+                /* This implies that the regular expression language used for this attribute is the same as that used in JavaScript, except that the pattern attribute is matched against the entire value,
                  * not just any subset (somewhat as if it implied a ^(?: at the start of the pattern and a )$ at the end). */
                 if (!string.IsNullOrEmpty(value))
                 {
@@ -1101,7 +1101,7 @@ namespace CssUI.HTML
                 if (StringCommon.StriEq(@"any", value))
                     return null;
 
-                /* 3) Otherwise, if the rules for parsing floating-point number values, when they are applied to the attribute's value, 
+                /* 3) Otherwise, if the rules for parsing floating-point number values, when they are applied to the attribute's value,
                  * return an error, zero, or a number less than zero, then the allowed value step is the default step multiplied by the step scale factor. */
                 if (!HTMLParserCommon.Try_Parse_FloatingPoint(value.AsMemory(), out double outParsed) || MathExt.Flteq(outParsed, 0.0))
                 {
@@ -1147,7 +1147,7 @@ namespace CssUI.HTML
                 if (min > max)
                     return;
 
-                /* 4) If the element has a minimum and a maximum and there is no value greater than or equal to the element's minimum and less than or equal to the element's maximum that, 
+                /* 4) If the element has a minimum and a maximum and there is no value greater than or equal to the element's minimum and less than or equal to the element's maximum that,
                  * when subtracted from the step base, is an integral multiple of the allowed value step, then return. */
                 var mn = step_base - min.Value;
                 var mx = step_base - max.Value;
@@ -1164,7 +1164,7 @@ namespace CssUI.HTML
             }
 
             double value = 0;
-            /* 5) If applying the algorithm to convert a string to a number to the string given by the element's value does not result in an error, 
+            /* 5) If applying the algorithm to convert a string to a number to the string given by the element's value does not result in an error,
              * then let value be the result of that algorithm. Otherwise, let value be zero. */
             if (convert_string_to_number(_value.AsMemory(), out double outValue))
             {
@@ -1173,8 +1173,8 @@ namespace CssUI.HTML
 
             /* 6) Let valueBeforeStepping be value. */
             var valueBeforeStepping = value;
-            /* 7) If value subtracted from the step base is not an integral multiple of the allowed value step, 
-             * then set value to the nearest value that, when subtracted from the step base, is an integral multiple of the allowed value step, 
+            /* 7) If value subtracted from the step base is not an integral multiple of the allowed value step,
+             * then set value to the nearest value that, when subtracted from the step base, is an integral multiple of the allowed value step,
              * and that is less than value if the method invoked was the stepDown() method, and more than value otherwise. */
             //double deltaValueStepBase = step_base - value;
             double mult = allowed_step / value;
@@ -1196,8 +1196,8 @@ namespace CssUI.HTML
                 value += delta;
             }
 
-            /* 8) If the element has a minimum, and value is less than that minimum, 
-             * then set value to the smallest value that, when subtracted from the step base, 
+            /* 8) If the element has a minimum, and value is less than that minimum,
+             * then set value to the smallest value that, when subtracted from the step base,
              * is an integral multiple of the allowed value step, and that is more than or equal to minimum. */
             if (min.HasValue && value < min)
             {
@@ -1206,8 +1206,8 @@ namespace CssUI.HTML
                 value += allowed_step * diffMult;
             }
 
-            /* 9) If the element has a maximum, and value is greater than that maximum, 
-             * then set value to the largest value that, when subtracted from the step base, 
+            /* 9) If the element has a maximum, and value is greater than that maximum,
+             * then set value to the largest value that, when subtracted from the step base,
              * is an integral multiple of the allowed value step, and that is less than or equal to maximum. */
             if (max.HasValue && value > max)
             {
@@ -1216,7 +1216,7 @@ namespace CssUI.HTML
                 value -= allowed_step * diffMult;
             }
 
-            /* 10) If either the method invoked was the stepDown() method and value is greater than valueBeforeStepping, 
+            /* 10) If either the method invoked was the stepDown() method and value is greater than valueBeforeStepping,
              * or the method invoked was the stepUp() method and value is less than valueBeforeStepping, then return. */
             if (value < valueBeforeStepping)
                 return;
@@ -1259,7 +1259,7 @@ namespace CssUI.HTML
                 if (min > max)
                     return;
 
-                /* 4) If the element has a minimum and a maximum and there is no value greater than or equal to the element's minimum and less than or equal to the element's maximum that, 
+                /* 4) If the element has a minimum and a maximum and there is no value greater than or equal to the element's minimum and less than or equal to the element's maximum that,
                  * when subtracted from the step base, is an integral multiple of the allowed value step, then return. */
                 var mn = step_base - min.Value;
                 var mx = step_base - max.Value;
@@ -1276,7 +1276,7 @@ namespace CssUI.HTML
             }
 
             double value = 0;
-            /* 5) If applying the algorithm to convert a string to a number to the string given by the element's value does not result in an error, 
+            /* 5) If applying the algorithm to convert a string to a number to the string given by the element's value does not result in an error,
              * then let value be the result of that algorithm. Otherwise, let value be zero. */
             if (convert_string_to_number(_value.AsMemory(), out double outValue))
             {
@@ -1286,8 +1286,8 @@ namespace CssUI.HTML
             /* 6) Let valueBeforeStepping be value. */
             var valueBeforeStepping = value;
 
-            /* 7) If value subtracted from the step base is not an integral multiple of the allowed value step, 
-             * then set value to the nearest value that, when subtracted from the step base, is an integral multiple of the allowed value step, 
+            /* 7) If value subtracted from the step base is not an integral multiple of the allowed value step,
+             * then set value to the nearest value that, when subtracted from the step base, is an integral multiple of the allowed value step,
              * and that is less than value if the method invoked was the stepDown() method, and more than value otherwise. */
             double deltaValueStepBase = step_base - value;
             double mult = allowed_step / value;
@@ -1309,8 +1309,8 @@ namespace CssUI.HTML
                 value -= delta;
             }
 
-            /* 8) If the element has a minimum, and value is less than that minimum, 
-             * then set value to the smallest value that, when subtracted from the step base, 
+            /* 8) If the element has a minimum, and value is less than that minimum,
+             * then set value to the smallest value that, when subtracted from the step base,
              * is an integral multiple of the allowed value step, and that is more than or equal to minimum. */
             if (min.HasValue && value < min)
             {
@@ -1319,8 +1319,8 @@ namespace CssUI.HTML
                 value += allowed_step * diffMult;
             }
 
-            /* 9) If the element has a maximum, and value is greater than that maximum, 
-             * then set value to the largest value that, when subtracted from the step base, 
+            /* 9) If the element has a maximum, and value is greater than that maximum,
+             * then set value to the largest value that, when subtracted from the step base,
              * is an integral multiple of the allowed value step, and that is less than or equal to maximum. */
             if (max.HasValue && value > max)
             {
@@ -1329,7 +1329,7 @@ namespace CssUI.HTML
                 value -= allowed_step * diffMult;
             }
 
-            /* 10) If either the method invoked was the stepDown() method and value is greater than valueBeforeStepping, 
+            /* 10) If either the method invoked was the stepDown() method and value is greater than valueBeforeStepping,
              * or the method invoked was the stepUp() method and value is less than valueBeforeStepping, then return. */
             if (value > valueBeforeStepping)
                 return;
@@ -1492,10 +1492,10 @@ namespace CssUI.HTML
         #region State Determined Algorithms
         double? get_minimum()
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#attr-input-min */
-            /* If the element has a min attribute, 
-             * and the result of applying the algorithm to convert a string to a number to the value of the min attribute is a number, 
-             * then that number is the element's minimum; otherwise, 
-             * if the type attribute's current state defines a default minimum, then that is the minimum; otherwise, 
+            /* If the element has a min attribute,
+             * and the result of applying the algorithm to convert a string to a number to the value of the min attribute is a number,
+             * then that number is the element's minimum; otherwise,
+             * if the type attribute's current state defines a default minimum, then that is the minimum; otherwise,
              * the element has no minimum. */
             if (hasAttribute(EAttributeName.Min, out Attr outAttr) && outAttr.Value != null && convert_string_to_number(outAttr.Value.AsString().AsMemory(), out double outValue))
             {
@@ -1513,11 +1513,11 @@ namespace CssUI.HTML
         }
         double? get_maximum()
         {/* Docs: https://html.spec.whatwg.org/multipage/input.html#attr-input-max */
-         /* If the element has a max attribute, 
-          * and the result of applying the algorithm to convert a string to a number to the value of the max attribute is a number, 
-          * then that number is the element's maximum; otherwise, 
-          * if the type attribute's current state defines a default maximum, then that is the maximum; otherwise, 
-          * the element has no maximum. */
+            /* If the element has a max attribute,
+             * and the result of applying the algorithm to convert a string to a number to the value of the max attribute is a number,
+             * then that number is the element's maximum; otherwise,
+             * if the type attribute's current state defines a default maximum, then that is the maximum; otherwise,
+             * the element has no maximum. */
             if (hasAttribute(EAttributeName.Max, out Attr outAttr) && outAttr.Value != null && convert_string_to_number(outAttr.Value.AsString().AsMemory(), out double outValue))
             {
                 return outValue;
@@ -1790,8 +1790,8 @@ namespace CssUI.HTML
                         }
                         else
                         {/* The value sanitization algorithm is as follows: */
-                         /* 1) Split on commas the element's value, strip leading and trailing ASCII whitespace from each resulting token, 
-                          * if any, and let the element's values be the (possibly empty) resulting list of (possibly empty) tokens, maintaining the original order. */
+                            /* 1) Split on commas the element's value, strip leading and trailing ASCII whitespace from each resulting token,
+                             * if any, and let the element's values be the (possibly empty) resulting list of (possibly empty) tokens, maintaining the original order. */
                             var list = DOMCommon.Parse_Comma_Seperated_List(_value.AsMemory());
                             var newList = new ReadOnlyMemory<char>[list.Count];
                             for (int i = 0; i < list.Count; i++)
@@ -2067,9 +2067,9 @@ namespace CssUI.HTML
                 flags |= EValidityState.tooShort;
             }
 
-            /* Constraint validation: When the element has an allowed value step, 
-             * and the result of applying the algorithm to convert a string to a number to the string given by the element's value is a number, 
-             * and that number subtracted from the step base is not an integral multiple of the allowed value step, 
+            /* Constraint validation: When the element has an allowed value step,
+             * and the result of applying the algorithm to convert a string to a number to the string given by the element's value is a number,
+             * and that number subtracted from the step base is not an integral multiple of the allowed value step,
              * the element is suffering from a step mismatch. */
             if (allowed_value_step.HasValue)
             {
@@ -2085,9 +2085,9 @@ namespace CssUI.HTML
                         {
                             case EInputType.Range:
                                 {
-                                    /* When the element is suffering from a step mismatch, the user agent must round the element's value to the nearest number for which the element would not suffer from a step mismatch, 
-                                     * and which is greater than or equal to the minimum, and, if the maximum is not less than the minimum, 
-                                     * which is less than or equal to the maximum, if there is a number that matches these constraints. If two numbers match these constraints, 
+                                    /* When the element is suffering from a step mismatch, the user agent must round the element's value to the nearest number for which the element would not suffer from a step mismatch,
+                                     * and which is greater than or equal to the minimum, and, if the maximum is not less than the minimum,
+                                     * which is less than or equal to the maximum, if there is a number that matches these constraints. If two numbers match these constraints,
                                      * then user agents must use the one nearest to positive infinity. */
                                     double multiple = Math.Floor(stepSize / delta);
 
@@ -2401,7 +2401,7 @@ namespace CssUI.HTML
 
         public void setSelectionRange(int? start, int? end, ESelectionDirection? direction = null)
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#dom-textarea/input-setselectionrange */
-         /* 1) If this element is an input element, and selectionStart does not apply to this element, throw an "InvalidStateError" DOMException. */
+            /* 1) If this element is an input element, and selectionStart does not apply to this element, throw an "InvalidStateError" DOMException. */
             if (this is HTMLInputElement inputElement)
             {
                 switch (inputElement.type)
@@ -2430,9 +2430,9 @@ namespace CssUI.HTML
                 end = 0;
             }
 
-            /* 3) Set the selection of the text control to the sequence of characters within the relevant value starting with the character at the startth position (in logical order) and ending with the character at the (end-1)th position. 
-             * \Arguments greater than the length of the relevant value of the text control (including the special value infinity) must be treated as pointing at the end of the text control. 
-             * If end is less than or equal to start then the start of the selection and the end of the selection must both be placed immediately before the character with offset end. 
+            /* 3) Set the selection of the text control to the sequence of characters within the relevant value starting with the character at the startth position (in logical order) and ending with the character at the (end-1)th position.
+             * \Arguments greater than the length of the relevant value of the text control (including the special value infinity) must be treated as pointing at the end of the text control.
+             * If end is less than or equal to start then the start of the selection and the end of the selection must both be placed immediately before the character with offset end.
              * In UAs where there is no concept of an empty selection, this must set the cursor to be just before the character with offset end. */
 
             TextSelection oldSelection = new TextSelection(selection);
@@ -2465,7 +2465,7 @@ namespace CssUI.HTML
         }
         public void setRangeText(string replacement)
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#dom-textarea/input-setrangetext */
-         /* 1) If this element is an input element, and selectionStart does not apply to this element, throw an "InvalidStateError" DOMException. */
+            /* 1) If this element is an input element, and selectionStart does not apply to this element, throw an "InvalidStateError" DOMException. */
             if (this is HTMLInputElement inputElement)
             {
                 switch (inputElement.type)
@@ -2540,7 +2540,7 @@ namespace CssUI.HTML
         }
         public void setRangeText(string replacement, int start, int end, ESelectionMode selectionMode = ESelectionMode.Preserve)
         {/* Docs: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#dom-textarea/input-setrangetext */
-         /* 1) If this element is an input element, and selectionStart does not apply to this element, throw an "InvalidStateError" DOMException. */
+            /* 1) If this element is an input element, and selectionStart does not apply to this element, throw an "InvalidStateError" DOMException. */
             if (this is HTMLInputElement inputElement)
             {
                 switch (inputElement.type)
@@ -2726,19 +2726,19 @@ namespace CssUI.HTML
         }
 
 
-        internal override void run_attribute_change_steps(Element element, AtomicName<EAttributeName> localName, AttributeValue oldValue, AttributeValue newValue, ReadOnlyMemory<char> Namespace)
+        internal override void run_attribute_change_steps(Element element, string localName, AttributeValue oldValue, AttributeValue newValue, ReadOnlyMemory<char> Namespace)
         {
             base.run_attribute_change_steps(element, localName, oldValue, newValue, Namespace);
 
 
-            if (!localName.EnumValue.HasValue)
+            if (!EAttributeNameExtensions.TryFromKeyword(localName, out var enumValue))
                 return;
-            switch (localName.EnumValue.Value)
+            switch (enumValue)
             {
                 case EAttributeName.Value:/* Universal logic */
                     {
-                        /* When the value content attribute is added, set, or removed, 
-                         * if the control's dirty value flag is false, the user agent must set the value of the element to the value of the value content attribute, 
+                        /* When the value content attribute is added, set, or removed,
+                         * if the control's dirty value flag is false, the user agent must set the value of the element to the value of the value content attribute,
                          * if there is one, or the empty string otherwise, and then run the current value sanitization algorithm, if one is defined. */
                         if (!bDirtyValueFlag)
                         {
@@ -2749,9 +2749,9 @@ namespace CssUI.HTML
                     break;
                 case EAttributeName.Type:/* Universal logic */
                     {/* Docs: https://html.spec.whatwg.org/multipage/input.html#input-type-change */
-                     /* 1) If the previous state of the element's type attribute put the value IDL attribute in the value mode, 
-                      * and the element's value is not the empty string, and the new state of the element's type attribute puts the value IDL attribute in either the default mode or the default/on mode, 
-                      * then set the element's value content attribute to the element's value. */
+                        /* 1) If the previous state of the element's type attribute put the value IDL attribute in the value mode,
+                         * and the element's value is not the empty string, and the new state of the element's type attribute puts the value IDL attribute in either the default mode or the default/on mode,
+                         * then set the element's value content attribute to the element's value. */
                         EInputType oldType = oldValue.AsEnum<EInputType>();
                         EInputType newType = newValue.AsEnum<EInputType>();
                         var oldMode = Get_Input_Value_Mode(oldType);
@@ -2760,9 +2760,9 @@ namespace CssUI.HTML
                         {
                             setAttribute(EAttributeName.Value, AttributeValue.From(_value));
                         }
-                        /* 2) Otherwise, if the previous state of the element's type attribute put the value IDL attribute in any mode other than the value mode, 
-                        * and the new state of the element's type attribute puts the value IDL attribute in the value mode, 
-                        * then set the value of the element to the value of the value content attribute, 
+                        /* 2) Otherwise, if the previous state of the element's type attribute put the value IDL attribute in any mode other than the value mode,
+                        * and the new state of the element's type attribute puts the value IDL attribute in the value mode,
+                        * then set the value of the element to the value of the value content attribute,
                         * if there is one, or the empty string otherwise, and then set the control's dirty value flag to false. */
                         else if (oldMode != EInputValueMode.Value && newMode == EInputValueMode.Value)
                         {
@@ -2770,7 +2770,7 @@ namespace CssUI.HTML
                             _value = getAttribute(EAttributeName.Value)?.AsString() ?? string.Empty;
                             bDirtyValueFlag = false;
                         }
-                        /* 3) Otherwise, if the previous state of the element's type attribute put the value IDL attribute in any mode other than the filename mode, 
+                        /* 3) Otherwise, if the previous state of the element's type attribute put the value IDL attribute in any mode other than the filename mode,
                          * and the new state of the element's type attribute puts the value IDL attribute in the filename mode, then set the value of the element to the empty string. */
                         else if (oldMode != EInputValueMode.Filename && newMode == EInputValueMode.Filename)
                         {
@@ -2878,7 +2878,7 @@ namespace CssUI.HTML
             if (!isMutable)
                 return;
 
-            /* 2) If this element's type attribute is in the Checkbox state, 
+            /* 2) If this element's type attribute is in the Checkbox state,
              * then set this element's checkedness to its opposite value (i.e. true if it is false, false if it is true) and set this element's indeterminate IDL attribute to false. */
             if (type == EInputType.Checkbox)
             {
@@ -2888,7 +2888,7 @@ namespace CssUI.HTML
                 checkedness = !checkedness;
                 indeterminate = false;
             }
-            /* 3) If this element's type attribute is in the Radio Button state, 
+            /* 3) If this element's type attribute is in the Radio Button state,
              * then get a reference to the element in this element's radio button group that has its checkedness set to true, if any, and then set this element's checkedness to true. */
             else if (type == EInputType.Radio)
             {
@@ -2905,17 +2905,17 @@ namespace CssUI.HTML
             if (!isMutable)
                 return;
 
-            /* 2) If the element's type attribute is in the Checkbox state, 
+            /* 2) If the element's type attribute is in the Checkbox state,
              * then set the element's checkedness and the element's indeterminate IDL attribute back to the values they had before the legacy-pre-activation behavior was run. */
             if (type == EInputType.Checkbox)
             {
                 checkedness = legacyPreActivation_Checkedness;
                 indeterminate = legacyPreActivation_Indeterminate;
             }
-            /* 3) If this element's type attribute is in the Radio Button state, 
-             * then if the element to which a reference was obtained in the legacy-pre-activation behavior, 
-             * if any, is still in what is now this element's radio button group, if it still has one, and if so, setting that element's checkedness to true; 
-             * or else, if there was no such element, or that element is no longer in this element's radio button group, 
+            /* 3) If this element's type attribute is in the Radio Button state,
+             * then if the element to which a reference was obtained in the legacy-pre-activation behavior,
+             * if any, is still in what is now this element's radio button group, if it still has one, and if so, setting that element's checkedness to true;
+             * or else, if there was no such element, or that element is no longer in this element's radio button group,
              * or if this element no longer has a radio button group, setting this element's checkedness to false. */
             else if (type == EInputType.Radio)
             {

@@ -317,7 +317,7 @@ public class AttributeValueFromTests
     public void Parse_ValidInput_CreatesValue()
     {
         // Arrange
-        var attrName = new AtomicName<EAttributeName>("data-test");
+        var attrName = "data-test";
 
         // Act
         var value = AttributeValue.Parse(attrName, "test-value");
@@ -330,7 +330,7 @@ public class AttributeValueFromTests
     public void Parse_EmptyString_CreatesValue()
     {
         // Arrange
-        var attrName = new AtomicName<EAttributeName>("data-test");
+        var attrName = "data-test";
 
         // Act
         var value = AttributeValue.Parse(attrName, string.Empty);

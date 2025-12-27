@@ -8,6 +8,7 @@ namespace CssUI;
 /// This is used for things like DOM element attributes, and CSS property names.
 /// <para>AtomicNames can effectively be thought of as self indexing strings, Maps and lists of AtomicNames cease being indexed by strings and instead are effectively indexed by their self assigned integer values</para>
 /// </summary>
+[Obsolete("AtomicName<T> is deprecated due to performance issues. Use string or enum directly.")]
 public class AtomicName<T> : IConvertible, IComparable<Int32>, IEquatable<Int32> where T : struct
 {
     #region Static

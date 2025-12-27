@@ -202,7 +202,7 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
         // This represents a placeholder document URL.
         document_url = new Url
         {
-            Scheme = HTTP.EUrlScheme.Http,
+            Scheme = HTTP.EUrlScheme.Http.Keyword(),
             Host = new HTTP.UrlHost("localhost"),
             Path = new System.Collections.Generic.List<string> { "" }
         };

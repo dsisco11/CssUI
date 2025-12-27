@@ -19,7 +19,7 @@ public class IntProperty : LengthProperty
     #endregion
 
     #region Constructors
-    public IntProperty(AtomicName<ECssPropertyID> CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
+    public IntProperty(ECssPropertyID CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
         : base(CssName, Owner, Source, Locked)
     {
     }

@@ -196,7 +196,7 @@ public class CssProperty : CssPropertyBase, ICssProperty
     #endregion
 
     #region Constructor
-    public CssProperty(AtomicName<ECssPropertyID> CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
+    public CssProperty(ECssPropertyID CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
         : base(CssName, Owner, Source, Locked)
     {
     }

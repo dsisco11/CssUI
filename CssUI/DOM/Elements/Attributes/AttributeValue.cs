@@ -123,7 +123,7 @@ public class AttributeValue
     #endregion
 
     #region Parsing
-    public static AttributeValue Parse(AtomicName<EAttributeName> Name, string Input)
+    public static AttributeValue Parse(string Name, string Input)
     {
         var Def = AttributeDefinition.Lookup(Name);
         if (Def is null)
@@ -134,6 +134,9 @@ public class AttributeValue
         Def.Parse(Input, out dynamic outVal);
         return new AttributeValue(Def.Type, outVal, Input);
     }
+
+    // Convenience overload for EAttributeName enum
+    public static AttributeValue Parse(EAttributeName Name, string Input) => Parse(Name.Keyword(), Input);
     #endregion
 
     #region Value Retreival

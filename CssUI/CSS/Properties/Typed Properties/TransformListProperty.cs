@@ -27,7 +27,7 @@ public class TransformListProperty : ICssProperty
     /// <summary>
     /// The propertys identifier token in stylesheets.
     /// </summary>
-    public AtomicName<ECssPropertyID> CssName { get; protected set; } = null!;
+    public ECssPropertyID CssName { get; protected set; }
     /// <summary>
     /// Callback for when any value stage of this property changes
     /// </summary>
@@ -74,9 +74,7 @@ public class TransformListProperty : ICssProperty
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get
         {
-            if (CssName is null)
-                return null;
-            return CssDefinitions.StyleDefinitions[CssName];
+            return CssDefinitions.StyleDefinitions.TryGetValue(CssName, out var def) ? def : null;
         }
     }
     #endregion
@@ -268,7 +266,7 @@ public class TransformListProperty : ICssProperty
 
     #region Constructors
     // TODO: Finish the logic for when 'Unset' = TRUE
-    public TransformListProperty(AtomicName<ECssPropertyID> CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
+    public TransformListProperty(ECssPropertyID CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
     {
         this.CssName = CssName;
         this.Owner = Owner!;

@@ -411,7 +411,7 @@ public partial class StyleProperties
             {
                 try
                 {
-                    AtomicName<ECssPropertyID> propName = new AtomicName<ECssPropertyID>(flagIndex);
+                    ECssPropertyID propName = (ECssPropertyID)flagIndex;
                     // Extract this property from every CssPropertySet that has a value for it
                     var propertyList = CssRules.Values.Select(x => { return x.Get(propName); }).ToList();
 

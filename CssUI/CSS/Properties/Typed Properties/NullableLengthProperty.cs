@@ -13,7 +13,7 @@ public class NullableLengthProperty : CssProperty
     #endregion
 
     #region Constructors
-    public NullableLengthProperty(AtomicName<ECssPropertyID> CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
+    public NullableLengthProperty(ECssPropertyID CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
         : base(CssName, Owner, Source, Locked)
     {
     }

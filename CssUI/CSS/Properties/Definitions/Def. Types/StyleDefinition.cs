@@ -16,7 +16,7 @@ public class StyleDefinition
     /// <summary>
     /// CSS Name of the property
     /// </summary>
-    public AtomicName<ECssPropertyID> Name { get; }
+    public ECssPropertyID Name { get; }
     /// <summary>
     /// Value for this property which is treated as the 'specified' value if the property definition does not have 'Inherited' (inherited by default) set to true or if the owning elements has no parent elements.
     /// </summary>
@@ -78,7 +78,7 @@ public class StyleDefinition
     /// <param name="Initial">Default value for the property</param>
     /// <param name="Keywords">List of keywords which can be assigned to this property</param>
     /// <param name="IsPrivate">If TRUE then this property cannot be set from style-sheets</param>
-    public StyleDefinition(AtomicName<ECssPropertyID> Name, bool Inherited, EPropertyDirtFlags Flags, CssValue Initial, ECssValueTypes AllowedTypes = 0x0, string[]? Keywords = null, bool IsPrivate = false, CssPercentageResolver? Percentage_Resolver = null, params Tuple<EPropertyStage, PropertyResolverFunc>[] Resolvers)
+    public StyleDefinition(ECssPropertyID Name, bool Inherited, EPropertyDirtFlags Flags, CssValue Initial, ECssValueTypes AllowedTypes = 0x0, string[]? Keywords = null, bool IsPrivate = false, CssPercentageResolver? Percentage_Resolver = null, params Tuple<EPropertyStage, PropertyResolverFunc>[] Resolvers)
     {
         this.Name = Name;
         this.Flags = Flags;

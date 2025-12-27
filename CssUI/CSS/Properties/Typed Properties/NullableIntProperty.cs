@@ -14,7 +14,7 @@ public class NullableIntProperty : CssProperty
     #endregion
 
     #region Constructors
-    public NullableIntProperty(AtomicName<ECssPropertyID> CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
+    public NullableIntProperty(ECssPropertyID CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
         : base(CssName, Owner, Source, Locked)
     {
     }

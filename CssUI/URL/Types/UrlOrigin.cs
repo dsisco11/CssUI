@@ -12,7 +12,7 @@ public class UrlOrigin : ISpanFormattable
 
     #region Properties
     public readonly EOriginType Type;
-    public readonly AtomicName<EUrlScheme>? Scheme = null;
+    public readonly string? Scheme = null;
     public readonly UrlHost? Host = null;
     public readonly ushort? Port = null;
     public readonly string? Domain = null;
@@ -24,7 +24,7 @@ public class UrlOrigin : ISpanFormattable
         Type = EOriginType.Opaque;
     }
 
-    public UrlOrigin(AtomicName<EUrlScheme>? scheme, UrlHost? host, ushort? port, string? domain)
+    public UrlOrigin(string? scheme, UrlHost? host, ushort? port, string? domain)
     {
         Type = EOriginType.Tuple;
         Scheme = scheme;
@@ -52,7 +52,7 @@ public class UrlOrigin : ISpanFormattable
         }
 
         // Append scheme
-        var schemeName = Scheme!.NameLower;
+        var schemeName = Scheme!;
         if (destination.Length < schemeName.Length) return false;
         schemeName.AsSpan().CopyTo(destination);
         charsWritten = schemeName.Length;

@@ -123,7 +123,7 @@ public class CssUnitResolver
                      * these units refer to the computed font metrics corresponding to the initial values of the font property.
                      */
 
-                    if (Property.CssName == "font-size" && ReferenceEquals(Property.Owner, Owner))
+                    if (Property.CssName == ECssPropertyID.FontSize && ReferenceEquals(Property.Owner, Owner))
                     {// We are being called from the font-size property
 
                         if (Property.Owner.parentElement is not null)

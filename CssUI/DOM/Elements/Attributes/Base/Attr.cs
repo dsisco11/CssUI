@@ -18,7 +18,7 @@ public class Attr : Node
     /// Namespace prefix
     /// </summary>
     public string? prefix { get; private set; } = null;
-    public AtomicName<EAttributeName>? localName { get; private set; } = null;
+    public string? localName { get; private set; } = null;
 
     /// <summary>
     /// The actual value assigned to this attribute by the user
@@ -143,7 +143,7 @@ public class Attr : Node
     #endregion
 
     #region Constructors
-    public Attr(AtomicName<EAttributeName> localName, Element Owner, string? Namespace = null)
+    public Attr(string localName, Element Owner, string? Namespace = null)
     {
         this.localName = localName;
         this.ownerElement = Owner;
@@ -151,7 +151,7 @@ public class Attr : Node
         this.namespaceURI = Namespace;
     }
 
-    public Attr(AtomicName<EAttributeName> localName, Element Owner, Document document, string? Namespace = null)
+    public Attr(string localName, Element Owner, Document document, string? Namespace = null)
     {
         this.localName = localName;
         this.ownerElement = Owner;
@@ -159,12 +159,20 @@ public class Attr : Node
         this.namespaceURI = Namespace;
     }
 
-    public Attr(AtomicName<EAttributeName> localName, Document document, string? Namespace = null)
+    public Attr(string localName, Document document, string? Namespace = null)
     {
         this.localName = localName;
         this.nodeDocument = document;
         this.namespaceURI = Namespace;
     }
+
+    // Convenience overloads for EAttributeName enum
+    public Attr(EAttributeName localName, Element Owner, string? Namespace = null)
+        : this(localName.Keyword(), Owner, Namespace) { }
+    public Attr(EAttributeName localName, Element Owner, Document document, string? Namespace = null)
+        : this(localName.Keyword(), Owner, document, Namespace) { }
+    public Attr(EAttributeName localName, Document document, string? Namespace = null)
+        : this(localName.Keyword(), document, Namespace) { }
     #endregion
 
     public override bool Equals(object? obj)

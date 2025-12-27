@@ -13,7 +13,7 @@ public class NumberProperty : LengthProperty
     #endregion
 
     #region Constructors
-    public NumberProperty(AtomicName<ECssPropertyID> CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
+    public NumberProperty(ECssPropertyID CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
         : base(CssName, Owner, Source, Locked)
     {
     }

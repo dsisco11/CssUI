@@ -12,7 +12,7 @@ public class FilterAttribute : NodeFilter
     /// <summary>
     /// Name of the attribute to check
     /// </summary>
-    public readonly AtomicName<EAttributeName> Name;
+    public readonly string Name;
     /// <summary>
     /// Value to check the attribute for
     /// </summary>
@@ -28,7 +28,7 @@ public class FilterAttribute : NodeFilter
     /// Creates a new attribute filter that matches a BOOLEAN attribute
     /// </summary>
     /// <param name="Name">Athe attribute to check</param>
-    public FilterAttribute(AtomicName<EAttributeName> Name)
+    public FilterAttribute(string Name)
     {
         this.Name = Name;
         IsBoolean = true;
@@ -38,11 +38,15 @@ public class FilterAttribute : NodeFilter
     /// Creates a new attribute filter that matches a BOOLEAN attribute
     /// </summary>
     /// <param name="Name">Athe attribute to check</param>
-    public FilterAttribute(AtomicName<EAttributeName> Name, AttributeValue Value)
+    public FilterAttribute(string Name, AttributeValue Value)
     {
         this.Name = Name;
         this.Value = Value;
     }
+
+    // Convenience overloads for EAttributeName enum
+    public FilterAttribute(EAttributeName Name) : this(Name.Keyword()) { }
+    public FilterAttribute(EAttributeName Name, AttributeValue Value) : this(Name.Keyword(), Value) { }
     #endregion
 
     public override ENodeFilterResult acceptNode(Node node)

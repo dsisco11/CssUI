@@ -23,7 +23,7 @@ public class StyleDefinitionTests
             EPropertyDirtFlags.Content_Area,
             CssValue.Auto);
 
-        Assert.Equal(ECssPropertyID.Width, def.Name.EnumValue);
+        Assert.Equal(ECssPropertyID.Width, def.Name);
     }
 
     [Fact]

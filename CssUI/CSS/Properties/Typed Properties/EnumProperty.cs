@@ -22,7 +22,7 @@ public class EnumProperty<Ty> : CssProperty where Ty : struct, Enum
 
     #region Constructors
 
-    public EnumProperty(AtomicName<ECssPropertyID> CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
+    public EnumProperty(ECssPropertyID CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
         : base(CssName, Owner, Source, Locked)
     {
     }

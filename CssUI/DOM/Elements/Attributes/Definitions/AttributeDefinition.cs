@@ -18,7 +18,7 @@ public class AttributeDefinition
     /// <summary>
     /// Name of the attribute
     /// </summary>
-    public readonly AtomicName<EAttributeName>? Name;
+    public readonly string? Name;
 
     public readonly EAttributeFlags Flags = 0x0;
     /// <summary>
@@ -92,7 +92,7 @@ public class AttributeDefinition
     /// <param name="Flags">Indicates what aspects of an element this property affects</param>
     /// <param name="MissingValueDefault">Default value for the attribute</param>
     /// <param name="Keywords">List of keywords which can be assigned to this attribute</param>
-    public AttributeDefinition(AtomicName<EAttributeName> Name, EAttributeType Type = 0x0, AttributeValue? MissingValueDefault = null, AttributeValue? InvalidValueDefault = null, EAttributeFlags Flags = 0x0, string[]? Keywords = null, Type? enumType = null, dynamic? lowerRange = null, dynamic? upperRange = null, string[]? SupportedTokens = null)
+    public AttributeDefinition(string Name, EAttributeType Type = 0x0, AttributeValue? MissingValueDefault = null, AttributeValue? InvalidValueDefault = null, EAttributeFlags Flags = 0x0, string[]? Keywords = null, Type? enumType = null, dynamic? lowerRange = null, dynamic? upperRange = null, string[]? SupportedTokens = null)
         : this(Keywords, SupportedTokens)
     {
         this.ElementType = typeof(Element);
@@ -115,7 +115,7 @@ public class AttributeDefinition
     /// <param name="Flags">Indicates what aspects of an element this property affects</param>
     /// <param name="MissingValueDefault">Default value for the attribute</param>
     /// <param name="Keywords">List of keywords which can be assigned to this attribute</param>
-    public AttributeDefinition(Type ElementType, AtomicName<EAttributeName> Name, EAttributeType Type = 0x0, AttributeValue? MissingValueDefault = null, AttributeValue? InvalidValueDefault = null, EAttributeFlags Flags = 0x0, string[]? Keywords = null, Type? enumType = null, dynamic? lowerRange = null, dynamic? upperRange = null, string[]? SupportedTokens = null)
+    public AttributeDefinition(Type ElementType, string Name, EAttributeType Type = 0x0, AttributeValue? MissingValueDefault = null, AttributeValue? InvalidValueDefault = null, EAttributeFlags Flags = 0x0, string[]? Keywords = null, Type? enumType = null, dynamic? lowerRange = null, dynamic? upperRange = null, string[]? SupportedTokens = null)
         : this(Keywords, SupportedTokens)
     {
         this.ElementType = ElementType;
@@ -130,6 +130,13 @@ public class AttributeDefinition
         // Append the specified allowed types to our defaults
         this.Type |= Type;
     }
+
+    // Convenience overloads for EAttributeName enum
+    public AttributeDefinition(EAttributeName Name, EAttributeType Type = 0x0, AttributeValue? MissingValueDefault = null, AttributeValue? InvalidValueDefault = null, EAttributeFlags Flags = 0x0, string[]? Keywords = null, Type? enumType = null, object? lowerRange = null, object? upperRange = null, string[]? SupportedTokens = null)
+        : this(Name.Keyword(), Type, MissingValueDefault, InvalidValueDefault, Flags, Keywords, enumType, lowerRange, upperRange, SupportedTokens) { }
+
+    public AttributeDefinition(Type ElementType, EAttributeName Name, EAttributeType Type = 0x0, AttributeValue? MissingValueDefault = null, AttributeValue? InvalidValueDefault = null, EAttributeFlags Flags = 0x0, string[]? Keywords = null, Type? enumType = null, object? lowerRange = null, object? upperRange = null, string[]? SupportedTokens = null)
+        : this(ElementType, Name.Keyword(), Type, MissingValueDefault, InvalidValueDefault, Flags, Keywords, enumType, lowerRange, upperRange, SupportedTokens) { }
 
     #endregion
 
@@ -362,7 +369,7 @@ public class AttributeDefinition
     #endregion
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static AttributeDefinition? Lookup(AtomicName<EAttributeName> Name)
+    public static AttributeDefinition? Lookup(string Name)
     {
         if (DomDefinitions.AttributeDefinitions.TryGetValue(Name, out var definitionList))
         {
@@ -378,7 +385,7 @@ public class AttributeDefinition
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static AttributeDefinition? Lookup(AtomicName<EAttributeName> Name, Type elementType)
+    public static AttributeDefinition? Lookup(string Name, Type elementType)
     {
         ArgumentNullException.ThrowIfNull(elementType);
 
@@ -397,5 +404,11 @@ public class AttributeDefinition
 
         return null;
     }
+
+    // Convenience overloads for EAttributeName enum
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static AttributeDefinition? Lookup(EAttributeName Name) => Lookup(Name.Keyword());
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static AttributeDefinition? Lookup(EAttributeName Name, Type elementType) => Lookup(Name.Keyword(), elementType);
 }
 

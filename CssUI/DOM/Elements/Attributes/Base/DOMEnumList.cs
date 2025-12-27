@@ -6,13 +6,23 @@ public class DOMEnumList<EnumType> : AttributeTokenList<EnumType> where EnumType
 {
 
     #region Constructor
-    public DOMEnumList(Element ownerElement, AtomicName<EAttributeName> localName) : base(ownerElement, localName)
+    public DOMEnumList(Element ownerElement, string localName) : base(ownerElement, localName)
     {
     }
 
-    public DOMEnumList(Element ownerElement, AtomicName<EAttributeName> localName, EnumType[] supportedTokens) : base(ownerElement, localName, supportedTokens)
+    public DOMEnumList(Element ownerElement, string localName, EnumType[] supportedTokens) : base(ownerElement, localName, supportedTokens)
     {
     }
+
+    // Convenience overloads for EAttributeName enum
+    public DOMEnumList(Element ownerElement, EAttributeName localName) : base(ownerElement, localName)
+    {
+    }
+
+    public DOMEnumList(Element ownerElement, EAttributeName localName, EnumType[] supportedTokens) : base(ownerElement, localName, supportedTokens)
+    {
+    }
+    #endregion
 
     protected override EnumType String_To_Token(ReadOnlyMemory<char> str)
     {
@@ -23,9 +33,6 @@ public class DOMEnumList<EnumType> : AttributeTokenList<EnumType> where EnumType
     {
         return Lookup.Keyword(token);
     }
-    #endregion
-
-
 
 }
 

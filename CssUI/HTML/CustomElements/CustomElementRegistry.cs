@@ -132,8 +132,8 @@ namespace CssUI.HTML.CustomElements
             bool disableInternals = false;
             bool disableShadow = false;
             bool observeAllAttributes = false;
-            HashSet<AtomicName<EAttributeName>> observedAttributes = new HashSet<AtomicName<EAttributeName>>();
-            Dictionary<AtomicName<EReactionName>, ReactionHandler> lifecycleCallbacks = CustomElementDefinition.New_LifecycleCallbacks_Dictionary();
+            HashSet<string> observedAttributes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            Dictionary<EReactionName, ReactionHandler> lifecycleCallbacks = CustomElementDefinition.New_LifecycleCallbacks_Dictionary();
 
             /* 14) Run the following substeps while catching any exceptions: */
             /* Note: the method for this whole process was written with the intention that it would be used by javascript, however we are using custom elements in a very different implementation scenario.

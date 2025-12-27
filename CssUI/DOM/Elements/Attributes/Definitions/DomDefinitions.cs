@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using CssUI.DOM.Enums;
@@ -7,13 +8,13 @@ namespace CssUI.DOM;
 
 public static class DomDefinitions
 {
-    internal static readonly ReadOnlyDictionary<AtomicName<EAttributeName>, List<AttributeDefinition>> AttributeDefinitions;
+    internal static readonly ReadOnlyDictionary<string, List<AttributeDefinition>> AttributeDefinitions;
 
     static DomDefinitions()
     {
         var AttrDefs = Create_Attribute_Definitions();
         // Add all of our definitions to a backing dictionary
-        var AttrDict = new Dictionary<AtomicName<EAttributeName>, List<AttributeDefinition>>();
+        var AttrDict = new Dictionary<string, List<AttributeDefinition>>(StringComparer.OrdinalIgnoreCase);
         foreach (var def in AttrDefs)
         {
             if (!AttrDict.ContainsKey(def.Name!))
@@ -24,7 +25,7 @@ public static class DomDefinitions
             AttrDict[def.Name!].Add(def);
         }
         // Finally all of our definitions go into this global readonly map of attribute definitions!
-        AttributeDefinitions = new ReadOnlyDictionary<AtomicName<EAttributeName>, List<AttributeDefinition>>(AttrDict);
+        AttributeDefinitions = new ReadOnlyDictionary<string, List<AttributeDefinition>>(AttrDict);
     }
 
 
@@ -51,7 +52,7 @@ public static class DomDefinitions
             new AttributeDefinition(EAttributeName.Hidden, EAttributeType.Boolean, null, null, EAttributeFlags.None),
 
             new AttributeDefinition(EAttributeName.AccessKey, EAttributeType.KeyCombo, null, null, EAttributeFlags.None),
-            
+
             /* HTML Element Attributes */
             new AttributeDefinition(EAttributeName.Lang, EAttributeType.String, null, null, EAttributeFlags.None),
             new AttributeDefinition(EAttributeName.Translate, EAttributeType.Boolean, null, null, EAttributeFlags.None),
@@ -98,10 +99,10 @@ public static class DomDefinitions
             new AttributeDefinition(EAttributeName.IsMap, EAttributeType.Boolean, null, null, EAttributeFlags.None),
             new AttributeDefinition(EAttributeName.Decoding, EAttributeType.String, null, null, EAttributeFlags.None),
 
-            
+
             /* LABEL ATTRIBUTES */
             new AttributeDefinition(EAttributeName.For, EAttributeType.String, null, null, EAttributeFlags.None),
-            
+
             /* QUOTE ATTRIBUTES */
             new AttributeDefinition(EAttributeName.Cite, EAttributeType.String, null, null, EAttributeFlags.None),
 

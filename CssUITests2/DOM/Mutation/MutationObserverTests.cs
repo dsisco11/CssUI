@@ -40,14 +40,12 @@ public class MutationObserverTests
 
     private static void SetAttribute(Element element, string name, string value)
     {
-        var attrName = new AtomicName<EAttributeName>(name);
-        element.setAttribute(attrName, AttributeValue.From(value));
+        element.setAttribute(name, AttributeValue.From(value));
     }
 
     private static void RemoveAttribute(Element element, string name)
     {
-        var attrName = new AtomicName<EAttributeName>(name);
-        element.removeAttribute(attrName);
+        element.removeAttribute(name);
     }
 
     #endregion
@@ -571,7 +569,7 @@ public class MutationObserverTests
         var records3 = observer.TakeRecords();
         Assert.True(records3.Count > 0,
             $"Step 3: removeAttribute should create records but got {records3.Count}. " +
-            $"Attribute still exists: {div.hasAttribute(new AtomicName<EAttributeName>("attr1"))}");
+            $"Attribute still exists: {div.hasAttribute("attr1")}");
     }
 
     [Fact]

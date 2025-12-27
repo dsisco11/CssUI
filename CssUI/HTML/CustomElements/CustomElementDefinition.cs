@@ -13,9 +13,9 @@ namespace CssUI.HTML.CustomElements
         /// returns a new dictionary for custom element lifecycle callbacks
         /// </summary>
         /// <returns></returns>
-        public static Dictionary<AtomicName<EReactionName>, ReactionHandler> New_LifecycleCallbacks_Dictionary()
+        public static Dictionary<EReactionName, ReactionHandler> New_LifecycleCallbacks_Dictionary()
         {
-            return new Dictionary<AtomicName<EReactionName>, ReactionHandler>() { { EReactionName.Connected, null }, { EReactionName.Disconnected, null }, { EReactionName.Adopted, null }, { EReactionName.AttributeChanged, null }, { EReactionName.FormAssociated, null }, { EReactionName.FormDisabled, null }, { EReactionName.FormReset, null }, { EReactionName.FormStateRestore, null } };
+            return new Dictionary<EReactionName, ReactionHandler>() { { EReactionName.Connected, null }, { EReactionName.Disconnected, null }, { EReactionName.Adopted, null }, { EReactionName.AttributeChanged, null }, { EReactionName.FormAssociated, null }, { EReactionName.FormDisabled, null }, { EReactionName.FormReset, null }, { EReactionName.FormStateRestore, null } };
         }
 
 
@@ -30,8 +30,8 @@ namespace CssUI.HTML.CustomElements
         public readonly string localName;
         public readonly CustomElementConstructor constructor;
         public readonly bool observeAllAttributes = false;
-        public readonly HashSet<AtomicName<EAttributeName>> observedAttributes;
-        public readonly Dictionary<AtomicName<EReactionName>, ReactionHandler> lifecycleCallbacks = New_LifecycleCallbacks_Dictionary();
+        public readonly HashSet<string> observedAttributes;
+        public readonly Dictionary<EReactionName, ReactionHandler> lifecycleCallbacks = New_LifecycleCallbacks_Dictionary();
         public readonly Stack<WeakReference<Element>> constructionStack = new Stack<WeakReference<Element>>();
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace CssUI.HTML.CustomElements
         #endregion
 
         #region Constructor
-        public CustomElementDefinition(string name, string localName, CustomElementConstructor constructor, HashSet<AtomicName<EAttributeName>> observedAttributes, Dictionary<AtomicName<EReactionName>, ReactionHandler> lifecycleCallbacks, bool observeAllAttributes, bool bFormAssociated, bool bDisableInternals, bool bDisableShadow)
+        public CustomElementDefinition(string name, string localName, CustomElementConstructor constructor, HashSet<string> observedAttributes, Dictionary<EReactionName, ReactionHandler> lifecycleCallbacks, bool observeAllAttributes, bool bFormAssociated, bool bDisableInternals, bool bDisableShadow)
         {
             this.name = name;
             this.localName = localName;

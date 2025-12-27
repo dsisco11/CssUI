@@ -9,7 +9,7 @@ namespace CssUI.CSS;
 public abstract class LengthProperty : CssProperty
 {
     #region Constructors
-    public LengthProperty(AtomicName<ECssPropertyID> CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
+    public LengthProperty(ECssPropertyID CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
         : base(CssName, Owner, Source, Locked)
     {
     }

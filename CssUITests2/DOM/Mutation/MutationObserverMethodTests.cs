@@ -242,7 +242,7 @@ public class MutationObserverMethodTests
         mo.Observe(target, new MutationObserverInit { attributes = true });
 
         // Generate some records
-        target.setAttribute(new AtomicName<EAttributeName>("test"), AttributeValue.From("value"));
+        target.setAttribute("test", AttributeValue.From("value"));
 
         mo.Disconnect();
 
@@ -281,11 +281,11 @@ public class MutationObserverMethodTests
         mo.Observe(target, new MutationObserverInit { attributes = true });
 
         // Set attribute
-        target.setAttribute(new AtomicName<EAttributeName>("test"), AttributeValue.From("value"));
+        target.setAttribute("test", AttributeValue.From("value"));
         var setRecords = mo.TakeRecords();
 
         // Remove attribute
-        target.removeAttribute(new AtomicName<EAttributeName>("test"));
+        target.removeAttribute("test");
         var removeRecords = mo.TakeRecords();
 
         Assert.True(setRecords.Count > 0, $"setAttribute should create records, got {setRecords.Count}");
@@ -302,9 +302,9 @@ public class MutationObserverMethodTests
         var mo = new MutationObserver(window, (r, o) => { });
         mo.Observe(target, new MutationObserverInit { attributes = true });
 
-        target.setAttribute(new AtomicName<EAttributeName>("attr1"), AttributeValue.From("value1"));
-        target.setAttribute(new AtomicName<EAttributeName>("attr2"), AttributeValue.From("value2"));
-        target.setAttribute(new AtomicName<EAttributeName>("attr3"), AttributeValue.From("value3"));
+        target.setAttribute("attr1", AttributeValue.From("value1"));
+        target.setAttribute("attr2", AttributeValue.From("value2"));
+        target.setAttribute("attr3", AttributeValue.From("value3"));
         var records = mo.TakeRecords();
 
         // Should have records for all 3 (possibly more due to internal change_attribute calls)
@@ -320,13 +320,13 @@ public class MutationObserverMethodTests
         doc.documentElement!.appendChild(target);
 
         // Set attribute before observing
-        target.setAttribute(new AtomicName<EAttributeName>("test"), AttributeValue.From("original"));
+        target.setAttribute("test", AttributeValue.From("original"));
 
         var mo = new MutationObserver(window, (r, o) => { });
         mo.Observe(target, new MutationObserverInit { attributes = true });
 
         // Modify existing attribute
-        target.setAttribute(new AtomicName<EAttributeName>("test"), AttributeValue.From("modified"));
+        target.setAttribute("test", AttributeValue.From("modified"));
         var records = mo.TakeRecords();
 
         Assert.NotEmpty(records);
@@ -344,7 +344,7 @@ public class MutationObserverMethodTests
         var mo = new MutationObserver(window, (r, o) => { });
         mo.Observe(target, new MutationObserverInit { attributes = true });
 
-        target.setAttribute(new AtomicName<EAttributeName>("test"), AttributeValue.From("value"));
+        target.setAttribute("test", AttributeValue.From("value"));
         var records = mo.TakeRecords();
 
         Assert.NotEmpty(records);
@@ -376,7 +376,7 @@ public class MutationObserverMethodTests
         var mo = new MutationObserver(window, (r, o) => { });
         mo.Observe(target, new MutationObserverInit { attributes = true });
 
-        target.setAttribute(new AtomicName<EAttributeName>("test"), AttributeValue.From("value"));
+        target.setAttribute("test", AttributeValue.From("value"));
         var records = mo.TakeRecords();
 
         Assert.NotEmpty(records);
@@ -392,7 +392,7 @@ public class MutationObserverMethodTests
         var mo = new MutationObserver(window, (r, o) => { });
         mo.Observe(target, new MutationObserverInit { attributes = true });
 
-        target.setAttribute(new AtomicName<EAttributeName>("test"), AttributeValue.From("value"));
+        target.setAttribute("test", AttributeValue.From("value"));
         var records1 = mo.TakeRecords();
         var records2 = mo.TakeRecords();
 
@@ -410,7 +410,7 @@ public class MutationObserverMethodTests
         var mo = new MutationObserver(window, (r, o) => { });
         mo.Observe(target, new MutationObserverInit { attributes = true });
 
-        target.setAttribute(new AtomicName<EAttributeName>("test"), AttributeValue.From("value"));
+        target.setAttribute("test", AttributeValue.From("value"));
         mo.TakeRecords();
 
         // Observer should still be registered
@@ -428,10 +428,10 @@ public class MutationObserverMethodTests
         var mo = new MutationObserver(window, (r, o) => { });
         mo.Observe(target, new MutationObserverInit { attributes = true });
 
-        target.setAttribute(new AtomicName<EAttributeName>("test1"), AttributeValue.From("value1"));
+        target.setAttribute("test1", AttributeValue.From("value1"));
         mo.TakeRecords();
 
-        target.setAttribute(new AtomicName<EAttributeName>("test2"), AttributeValue.From("value2"));
+        target.setAttribute("test2", AttributeValue.From("value2"));
         var records = mo.TakeRecords();
 
         Assert.NotEmpty(records);
@@ -453,7 +453,7 @@ public class MutationObserverMethodTests
         mo.Observe(target, new MutationObserverInit { attributes = true });
 
         // Trigger a mutation which internally calls Enqueue
-        target.setAttribute(new AtomicName<EAttributeName>("test"), AttributeValue.From("value"));
+        target.setAttribute("test", AttributeValue.From("value"));
 
         var records = mo.TakeRecords();
         Assert.NotEmpty(records);
@@ -476,7 +476,7 @@ public class MutationObserverMethodTests
         mo1.Observe(target, new MutationObserverInit { attributes = true });
         mo2.Observe(target, new MutationObserverInit { attributes = true });
 
-        target.setAttribute(new AtomicName<EAttributeName>("test"), AttributeValue.From("value"));
+        target.setAttribute("test", AttributeValue.From("value"));
 
         var records1 = mo1.TakeRecords();
         var records2 = mo2.TakeRecords();
@@ -498,7 +498,7 @@ public class MutationObserverMethodTests
 
         mo.Observe(parent, new MutationObserverInit { attributes = true, subtree = true });
 
-        child.setAttribute(new AtomicName<EAttributeName>("data-test"), AttributeValue.From("value"));
+        child.setAttribute("data-test", AttributeValue.From("value"));
 
         var records = mo.TakeRecords();
         Assert.NotEmpty(records);
@@ -518,7 +518,7 @@ public class MutationObserverMethodTests
 
         mo.Observe(parent, new MutationObserverInit { attributes = true, subtree = false });
 
-        child.setAttribute(new AtomicName<EAttributeName>("test"), AttributeValue.From("value"));
+        child.setAttribute("test", AttributeValue.From("value"));
 
         var records = mo.TakeRecords();
         Assert.Empty(records);
@@ -539,8 +539,8 @@ public class MutationObserverMethodTests
             attributeFilter = new List<string> { "data-class" }
         });
 
-        target.setAttribute(new AtomicName<EAttributeName>("data-other"), AttributeValue.From("test-other"));
-        target.setAttribute(new AtomicName<EAttributeName>("data-class"), AttributeValue.From("test-class"));
+        target.setAttribute("data-other", AttributeValue.From("test-other"));
+        target.setAttribute("data-class", AttributeValue.From("test-class"));
 
         var records = mo.TakeRecords();
 

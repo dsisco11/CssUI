@@ -26,7 +26,7 @@ public class Url : ISpanFormattable, IParsable<Url>
     /// <summary>
     ///
     /// </summary>
-    public AtomicName<EUrlScheme> Scheme = string.Empty;
+    public string Scheme = string.Empty;
 
     public UrlHost? Host = null;
     public ushort? Port = null;
@@ -108,7 +108,7 @@ public class Url : ISpanFormattable, IParsable<Url>
     {/* Docs: https://url.spec.whatwg.org/#concept-url-origin */
         get
         {
-            if (Scheme == EUrlScheme.Blob)
+            if (Scheme == EUrlScheme.Blob.Keyword())
             {
                 if (blobURLEntry != null)
                 {
@@ -123,9 +123,9 @@ public class Url : ISpanFormattable, IParsable<Url>
                 return UrlOrigin.Opaque;
             }
 
-            if (Scheme.EnumValue.HasValue)
+            if (Scheme.TryParseUrlScheme(out var schemeEnum))
             {
-                switch (Scheme.EnumValue.Value)
+                switch (schemeEnum)
                 {
                     case EUrlScheme.Ftp:
                     case EUrlScheme.Gopher:
@@ -152,9 +152,9 @@ public class Url : ISpanFormattable, IParsable<Url>
     {
         get
         {
-            if (Scheme.IsCustom || !Scheme.EnumValue.HasValue) return null;
+            if (!Scheme.TryParseUrlScheme(out var schemeEnum)) return null;
 
-            var port = Scheme.EnumValue.Value.DefaultPort();
+            var port = schemeEnum.DefaultPort();
             return port >= 0 ? port : null;
         }
     }
@@ -164,7 +164,7 @@ public class Url : ISpanFormattable, IParsable<Url>
     /// </summary>
     public bool IsSpecial
     {/* Docs: https://url.spec.whatwg.org/#is-special */
-        get => Scheme.EnumValue.HasValue;
+        get => Scheme.TryParseUrlScheme(out _);
     }
 
     /// <summary>
@@ -182,7 +182,7 @@ public class Url : ISpanFormattable, IParsable<Url>
     {/* Docs: https://url.spec.whatwg.org/#cannot-have-a-username-password-port */
         get
         {
-            return Host == null || Host.Value is string hostString && hostString.Length <= 0 || bCannotBeBaseURLFlag || Scheme == EUrlScheme.File;
+            return Host == null || Host.Value is string hostString && hostString.Length <= 0 || bCannotBeBaseURLFlag || Scheme == EUrlScheme.File.Keyword();
         }
     }
     #endregion
@@ -246,7 +246,7 @@ public class Url : ISpanFormattable, IParsable<Url>
             return false;
         }
 
-        if (parsedUrl.Scheme != EUrlScheme.Blob)
+        if (parsedUrl.Scheme != EUrlScheme.Blob.Keyword())
         {
             outUrl = parsedUrl;
             return true;
@@ -327,13 +327,13 @@ public class Url : ISpanFormattable, IParsable<Url>
                             if (stateOverride.HasValue)
                             {
                                 /* 1) If url’s scheme is a special scheme and buffer is not a special scheme, then return. */
-                                if (url.Scheme.EnumValue.HasValue && !EUrlSchemeExtensions.TryFromKeyword(buffer.ToString(), out _))
+                                if (url.Scheme.TryParseUrlScheme(out _) && !EUrlSchemeExtensions.TryFromKeyword(buffer.ToString(), out _))
                                 {
                                     outUrl = url;
                                     return true;
                                 }
                                 /* 2) If url’s scheme is not a special scheme and buffer is a special scheme, then return. */
-                                if (!url.Scheme.EnumValue.HasValue && EUrlSchemeExtensions.TryFromKeyword(buffer.ToString(), out _))
+                                if (!url.Scheme.TryParseUrlScheme(out _) && EUrlSchemeExtensions.TryFromKeyword(buffer.ToString(), out _))
                                 {
                                     outUrl = url;
                                     return true;
@@ -345,7 +345,7 @@ public class Url : ISpanFormattable, IParsable<Url>
                                     return true;
                                 }
                                 /* 4) If url’s scheme is "file" and its host is an empty host or null, then return. */
-                                if (url.Scheme == EUrlScheme.File && url.Host.Type != EHostType.Empty && string.IsNullOrEmpty(url.Host.Value))
+                                if (url.Scheme == EUrlScheme.File.Keyword() && url.Host.Type != EHostType.Empty && string.IsNullOrEmpty(url.Host.Value))
                                 {
                                     outUrl = url;
                                     return true;
@@ -366,7 +366,7 @@ public class Url : ISpanFormattable, IParsable<Url>
                             }
                             buffer.Clear();
                             /* 5) If url’s scheme is "file", then: */
-                            if (url.Scheme == EUrlScheme.File)
+                            if (url.Scheme == EUrlScheme.File.Keyword())
                             {
                                 var slash = new char[2] { CHAR_REVERSE_SOLIDUS, CHAR_REVERSE_SOLIDUS };
                                 if (!Stream.Slice(1, 2).Equals(slash))
@@ -429,7 +429,7 @@ public class Url : ISpanFormattable, IParsable<Url>
                             url.bCannotBeBaseURLFlag = true;
                             state = ESchemeState.Fragment;
                         }
-                        else if (Base.Scheme != EUrlScheme.File)
+                        else if (Base.Scheme != EUrlScheme.File.Keyword())
                         {
                             state = ESchemeState.Relative;
                             continue;/* Decrease pointer by one */
@@ -646,7 +646,7 @@ public class Url : ISpanFormattable, IParsable<Url>
                     break;
                 case ESchemeState.Hostname:
                     {
-                        if (stateOverride.HasValue && url.Scheme == EUrlScheme.File)
+                        if (stateOverride.HasValue && url.Scheme == EUrlScheme.File.Keyword())
                         {
                             state = ESchemeState.FileHost;
                             continue;/* Decrease pointer by one */
@@ -765,7 +765,7 @@ public class Url : ISpanFormattable, IParsable<Url>
                     break;
                 case ESchemeState.File:
                     {
-                        url.Scheme = EUrlScheme.File;
+                        url.Scheme = EUrlScheme.File.Keyword();
                         if (Stream.Next == CHAR_SOLIDUS || Stream.Next == CHAR_REVERSE_SOLIDUS)
                         {
                             if (Stream.Next == CHAR_REVERSE_SOLIDUS)
@@ -774,7 +774,7 @@ public class Url : ISpanFormattable, IParsable<Url>
                             }
                             state = ESchemeState.FileSlash;
                         }
-                        else if (Base != null && Base.Scheme == EUrlScheme.File)
+                        else if (Base != null && Base.Scheme == EUrlScheme.File.Keyword())
                         {
                             switch (Stream.Next)
                             {
@@ -840,7 +840,7 @@ public class Url : ISpanFormattable, IParsable<Url>
                         }
                         else
                         {
-                            if (Base != null && Base.Scheme == EUrlScheme.File && !Starts_With_Windows_Drive_Letter(Stream.Slice()))
+                            if (Base != null && Base.Scheme == EUrlScheme.File.Keyword() && !Starts_With_Windows_Drive_Letter(Stream.Slice()))
                             {
                                 if (Is_Normalized_Windows_Drive_Letter(Base.Path[0].AsMemory()))
                                 {
@@ -968,7 +968,7 @@ public class Url : ISpanFormattable, IParsable<Url>
                             }
                             else if (!Is_Single_Dot_Path_Segment(buffer.ToString().AsMemory()))
                             {
-                                if (url.Scheme == EUrlScheme.File && url.Path.Count <= 0 && Is_Windows_Drive_Letter(buffer.ToString().AsMemory()))
+                                if (url.Scheme == EUrlScheme.File.Keyword() && url.Path.Count <= 0 && Is_Windows_Drive_Letter(buffer.ToString().AsMemory()))
                                 {
                                     if (url.Host.Type != EHostType.Empty)//!string.IsNullOrEmpty(url.Host.Value))
                                     {
@@ -984,7 +984,7 @@ public class Url : ISpanFormattable, IParsable<Url>
 
                             buffer.Clear();
 
-                            if (url.Scheme == EUrlScheme.File && (Stream.atEOF || Stream.Next == CHAR_QUESTION_MARK || Stream.Next == CHAR_HASH))
+                            if (url.Scheme == EUrlScheme.File.Keyword() && (Stream.atEOF || Stream.Next == CHAR_QUESTION_MARK || Stream.Next == CHAR_HASH))
                             {
                                 while (url.Path.Count > 1 && url.Path[0].Length <= 0)
                                 {
@@ -1052,7 +1052,7 @@ public class Url : ISpanFormattable, IParsable<Url>
                     break;
                 case ESchemeState.Query:
                     {
-                        if (encoding != Encoding.UTF8 && (!url.IsSpecial || url.Scheme == EUrlScheme.Ws || url.Scheme == EUrlScheme.Wss))
+                        if (encoding != Encoding.UTF8 && (!url.IsSpecial || url.Scheme == EUrlScheme.Ws.Keyword() || url.Scheme == EUrlScheme.Wss.Keyword()))
                         {
                             encoding = Encoding.UTF8;
                         }
@@ -1145,7 +1145,7 @@ public class Url : ISpanFormattable, IParsable<Url>
     public string Serialize(bool bExcludeFragmentFlag = false)
     {/* Docs: https://url.spec.whatwg.org/#concept-url-serializer */
         StringBuilder output = new StringBuilder();
-        output.Append(Scheme.NameLower);
+        output.Append(Scheme);
         output.Append(CHAR_COLON);
 
         if (Host != null)
@@ -1173,7 +1173,7 @@ public class Url : ISpanFormattable, IParsable<Url>
                 output.Append(Port.Value);
             }
         }
-        else if (Host == null && Scheme == EUrlScheme.File)
+        else if (Host == null && Scheme == EUrlScheme.File.Keyword())
         {
             output.Append(CHAR_SOLIDUS);
             output.Append(CHAR_SOLIDUS);
@@ -1216,7 +1216,7 @@ public class Url : ISpanFormattable, IParsable<Url>
         charsWritten = 0;
 
         // Scheme
-        var schemeName = Scheme.NameLower;
+        var schemeName = Scheme;
         if (destination.Length < schemeName.Length + 1) return false;
         schemeName.AsSpan().CopyTo(destination);
         charsWritten = schemeName.Length;
@@ -1259,7 +1259,7 @@ public class Url : ISpanFormattable, IParsable<Url>
                 charsWritten += portWritten;
             }
         }
-        else if (Host == null && Scheme == EUrlScheme.File)
+        else if (Host == null && Scheme == EUrlScheme.File.Keyword())
         {
             if (destination.Length < charsWritten + 2) return false;
             destination[charsWritten++] = CHAR_SOLIDUS;
@@ -1926,7 +1926,7 @@ public class Url : ISpanFormattable, IParsable<Url>
     public static void Shorten_Url_Path(ref Url url)
     {/* Docs: https://url.spec.whatwg.org/#shorten-a-urls-path */
         if (url.Path.Count <= 0) return;
-        if (url.Scheme == EUrlScheme.File && url.Path.Count == 1 && Is_Normalized_Windows_Drive_Letter(url.Path[0].AsMemory())) return;
+        if (url.Scheme == EUrlScheme.File.Keyword() && url.Path.Count == 1 && Is_Normalized_Windows_Drive_Letter(url.Path[0].AsMemory())) return;
         url.Path.RemoveAt(url.Path.Count - 1);
     }
     #endregion

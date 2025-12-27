@@ -17,7 +17,7 @@ public abstract class CssPropertyBase : ICssProperty
     /// The propertys identifier token in stylesheets.
     /// <para>EG; "box-sizing", "margin-left", "margin-top", etc </para>
     /// </summary>
-    public AtomicName<ECssPropertyID> CssName { get; protected set; } = null!;
+    public ECssPropertyID CssName { get; protected set; }
 
     /// <summary>
     /// Tracks which styling rule block this property came from
@@ -60,8 +60,6 @@ public abstract class CssPropertyBase : ICssProperty
     {
         get
         {
-            if (CssName is null)
-                return null;
             return CssDefinitions.StyleDefinitions.TryGetValue(CssName, out StyleDefinition? def) ? def : null;
         }
     }
@@ -142,7 +140,7 @@ public abstract class CssPropertyBase : ICssProperty
     #endregion
 
     #region Constructor
-    public CssPropertyBase(AtomicName<ECssPropertyID> CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
+    public CssPropertyBase(ECssPropertyID CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
     {
         this.CssName = CssName;
         this.Owner = Owner;

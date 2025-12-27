@@ -17,12 +17,12 @@ namespace CssUI.CSS.Internal;
 /// </summary>
 internal class CssDefinitions
 {
-    internal static readonly ReadOnlyDictionary<AtomicName<ECssPropertyID>, StyleDefinition> StyleDefinitions = new(Create_Style_Definitions());
-    internal static readonly ReadOnlyDictionary<AtomicName<EMediaFeatureName>, MediaDefinition> MediaDefinitions = new(Create_Media_Definitions());
+    internal static readonly ReadOnlyDictionary<ECssPropertyID, StyleDefinition> StyleDefinitions = new(Create_Style_Definitions());
+    internal static readonly ReadOnlyDictionary<EMediaFeatureName, MediaDefinition> MediaDefinitions = new(Create_Media_Definitions());
 
 
     #region Media Definitions
-    static Dictionary<AtomicName<EMediaFeatureName>, MediaDefinition> Create_Media_Definitions()
+    static Dictionary<EMediaFeatureName, MediaDefinition> Create_Media_Definitions()
     {
         var Definitions = new MediaDefinition[]
         {
@@ -65,7 +65,7 @@ internal class CssDefinitions
         };
 
         // Add all of our definitions to a backing dictionary
-        var Dict = new Dictionary<AtomicName<EMediaFeatureName>, MediaDefinition>();
+        var Dict = new Dictionary<EMediaFeatureName, MediaDefinition>();
         foreach (var def in Definitions) { Dict.Add(def.Name, def); }
 
         return Dict;
@@ -74,7 +74,7 @@ internal class CssDefinitions
 
 
     #region Style Definitions
-    static Dictionary<AtomicName<ECssPropertyID>, StyleDefinition> Create_Style_Definitions()
+    static Dictionary<ECssPropertyID, StyleDefinition> Create_Style_Definitions()
     {
         //Create a linked list we can populate with property definitions
         LinkedList<StyleDefinition> Definitions = new LinkedList<StyleDefinition>();
@@ -90,7 +90,7 @@ internal class CssDefinitions
         foreach (var def in Create_Fragmentation_Property_Definitions()) { Definitions.AddLast(def); }
 
         // Add all of our definitions to a backing dictionary
-        var Dict = new Dictionary<AtomicName<ECssPropertyID>, StyleDefinition>();
+        var Dict = new Dictionary<ECssPropertyID, StyleDefinition>();
         foreach (var def in Definitions)
         {
             if (!Dict.TryAdd(def.Name, def))

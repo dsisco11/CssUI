@@ -21,7 +21,7 @@ public class AttributeDefinitionTests
         var def = new AttributeDefinition("test-attr", EAttributeType.String);
 
         // Assert
-        Assert.Equal("test-attr", def.Name!.Name);
+        Assert.Equal("test-attr", def.Name);
     }
 
     [Fact]
@@ -199,7 +199,7 @@ public class AttributeDefinitionTests
         // Common attributes that should have definitions
         var def = AttributeDefinition.Lookup(EAttributeName.ID);
         Assert.NotNull(def);
-        Assert.Equal(EAttributeName.ID, def.Name!.EnumValue);
+        Assert.Equal(EAttributeName.ID.Keyword(), def.Name);
     }
 
     [Fact]

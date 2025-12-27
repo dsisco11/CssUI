@@ -14,7 +14,7 @@ public class MultiStringProperty : CssMultiValueProperty
     #endregion
 
     #region Constructors
-    public MultiStringProperty(AtomicName<ECssPropertyID> CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
+    public MultiStringProperty(ECssPropertyID CssName, ICssElement Owner, WeakReference<CssComputedStyle> Source, bool Locked)
         : base(CssName, Locked, Source, Owner)
     {
     }

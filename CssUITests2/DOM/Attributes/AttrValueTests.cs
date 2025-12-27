@@ -35,7 +35,7 @@ public class AttrValueTests
         // Arrange
         var doc = CreateTestDocument();
         var element = CreateTestElement(doc, "div");
-        var attrName = new AtomicName<EAttributeName>("data-test");
+        var attrName = "data-test";
 
         // Act
         var attr = new Attr(attrName, element);
@@ -50,7 +50,7 @@ public class AttrValueTests
         // Arrange
         var doc = CreateTestDocument();
         var element = CreateTestElement(doc, "div");
-        var attrName = new AtomicName<EAttributeName>("data-test");
+        var attrName = "data-test";
 
         // Act
         var attr = new Attr(attrName, element);
@@ -65,7 +65,7 @@ public class AttrValueTests
         // Arrange
         var doc = CreateTestDocument();
         var element = CreateTestElement(doc, "div");
-        var attrName = new AtomicName<EAttributeName>("data-test");
+        var attrName = "data-test";
 
         // Act
         var attr = new Attr(attrName, element);
@@ -84,7 +84,7 @@ public class AttrValueTests
         // Arrange
         var doc = CreateTestDocument();
         var element = CreateTestElement(doc, "div");
-        var attrName = new AtomicName<EAttributeName>("data-test");
+        var attrName = "data-test";
         var attr = new Attr(attrName, element);
         var value = AttributeValue.From("test-value");
 
@@ -102,7 +102,7 @@ public class AttrValueTests
         // Arrange
         var doc = CreateTestDocument();
         var element = CreateTestElement(doc, "div");
-        var attrName = new AtomicName<EAttributeName>("data-test");
+        var attrName = "data-test";
         var attr = new Attr(attrName, element);
         var value = AttributeValue.From(string.Empty);
 
@@ -120,7 +120,7 @@ public class AttrValueTests
         // Arrange
         var doc = CreateTestDocument();
         var element = CreateTestElement(doc, "div");
-        var attrName = new AtomicName<EAttributeName>("data-count");
+        var attrName = "data-count";
         var attr = new Attr(attrName, element);
         var value = AttributeValue.From(42);
 
@@ -138,7 +138,7 @@ public class AttrValueTests
         // Arrange
         var doc = CreateTestDocument();
         var element = CreateTestElement(doc, "div");
-        var attrName = new AtomicName<EAttributeName>("data-test");
+        var attrName = "data-test";
         var attr = new Attr(attrName, element);
         var value = AttributeValue.From("original");
 
@@ -160,7 +160,7 @@ public class AttrValueTests
         // Arrange
         var doc = CreateTestDocument();
         var element = CreateTestElement(doc, "div");
-        var attrName = new AtomicName<EAttributeName>("data-test");
+        var attrName = "data-test";
         var attr = new Attr(attrName, element);
         attr.Value = AttributeValue.From("test-value");
 
@@ -174,7 +174,7 @@ public class AttrValueTests
         // Arrange
         var doc = CreateTestDocument();
         var element = CreateTestElement(doc, "div");
-        var attrName = new AtomicName<EAttributeName>("data-test");
+        var attrName = "data-test";
         var attr = new Attr(attrName, element);
         attr.Value = AttributeValue.From("test-value");
 
@@ -188,7 +188,7 @@ public class AttrValueTests
         // Arrange
         var doc = CreateTestDocument();
         var element = CreateTestElement(doc, "div");
-        var attrName = new AtomicName<EAttributeName>("data-test");
+        var attrName = "data-test";
         var attr = new Attr(attrName, element);
 
         // Act
@@ -208,7 +208,7 @@ public class AttrValueTests
         // Arrange
         var doc = CreateTestDocument();
         var element = CreateTestElement(doc, "div");
-        var attrName = new AtomicName<EAttributeName>("data-test");
+        var attrName = "data-test";
         var attr = new Attr(attrName, element);
 
         // Assert
@@ -221,7 +221,7 @@ public class AttrValueTests
         // Arrange
         var doc = CreateTestDocument();
         var element = CreateTestElement(doc, "div");
-        var attrName = new AtomicName<EAttributeName>("data-test");
+        var attrName = "data-test";
         var attr = new Attr(attrName, element);
 
         // Act
@@ -237,7 +237,7 @@ public class AttrValueTests
         // Arrange
         var doc = CreateTestDocument();
         var element = CreateTestElement(doc, "div");
-        var attrName = new AtomicName<EAttributeName>("data-test");
+        var attrName = "data-test";
         var attr = new Attr(attrName, element);
         attr.Value = AttributeValue.From("valid");
 
@@ -251,7 +251,7 @@ public class AttrValueTests
         // Arrange
         var doc = CreateTestDocument();
         var element = CreateTestElement(doc, "div");
-        var attrName = new AtomicName<EAttributeName>("data-test");
+        var attrName = "data-test";
         var attr = new Attr(attrName, element);
 
         // Assert
@@ -268,7 +268,7 @@ public class AttrValueTests
         // Arrange
         var doc = CreateTestDocument();
         var element = CreateTestElement(doc, "div");
-        var attrName = new AtomicName<EAttributeName>("data-test");
+        var attrName = "data-test";
         element.setAttribute(attrName, AttributeValue.From("test-value"));
 
         // Act
@@ -285,7 +285,7 @@ public class AttrValueTests
         // Arrange
         var doc = CreateTestDocument();
         var element = CreateTestElement(doc, "div");
-        var attrName = new AtomicName<EAttributeName>("data-nonexistent");
+        var attrName = "data-nonexistent";
 
         // Act
         var attr = element.getAttributeNode(attrName);
@@ -300,7 +300,7 @@ public class AttrValueTests
         // Arrange
         var doc = CreateTestDocument();
         var element = CreateTestElement(doc, "div");
-        var attrName = new AtomicName<EAttributeName>("data-test");
+        var attrName = "data-test";
         var attr = new Attr(attrName, element);
         attr.Value = AttributeValue.From("value");
 
@@ -318,7 +318,7 @@ public class AttrValueTests
         // Arrange
         var doc = CreateTestDocument();
         var element = CreateTestElement(doc, "div");
-        var attrName = new AtomicName<EAttributeName>("data-test");
+        var attrName = "data-test";
         element.setAttribute(attrName, AttributeValue.From("old-value"));
 
         var newAttr = new Attr(attrName, element);
@@ -339,7 +339,7 @@ public class AttrValueTests
         // Arrange
         var doc = CreateTestDocument();
         var element = CreateTestElement(doc, "div");
-        var attrName = new AtomicName<EAttributeName>("data-test");
+        var attrName = "data-test";
         element.setAttribute(attrName, AttributeValue.From("value"));
         var attr = element.getAttributeNode(attrName);
 
