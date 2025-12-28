@@ -241,38 +241,68 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
         /* XXX: Event loop */
         evaluate_media_queries_and_report_changes();
 
-        // Check if any nodes need updates
-        const ENodeFlags UPDATE_MASK = ENodeFlags.NeedsBoxUpdate | ENodeFlags.NeedsStyleUpdate | ENodeFlags.NeedsReflow;
-        if (body.GetFlag(UPDATE_MASK))
+        // Check if any nodes need updates (including child-needs flags)
+        const ENodeFlags UPDATE_MASK = ENodeFlags.NeedsBoxUpdate | ENodeFlags.NeedsStyleUpdate | ENodeFlags.NeedsReflow
+            | ENodeFlags.ChildNeedsBoxUpdate | ENodeFlags.ChildNeedsStyleUpdate | ENodeFlags.DirectChildNeedsStyleUpdate | ENodeFlags.ChildNeedsReflow;
+
+        if (body is null || !body.GetFlag(UPDATE_MASK))
+            return;
+
+        // Safety limit to prevent infinite loops during development
+        int iterationCount = 0;
+        const int MAX_ITERATIONS = 50;  // Low limit for debugging
+
+        TreeWalker Tree = new TreeWalker(body, ENodeFilterMask.SHOW_ALL, FilterNodeUpdate.Instance);
+        Node? current = Tree.nextNode();
+        while (current is not null)
         {
-            TreeWalker Tree = new TreeWalker(body, ENodeFilterMask.SHOW_ALL, FilterNodeUpdate.Instance);
-            Node current = Tree.nextNode();
-            while (current is not null)
+            iterationCount++;
+            if (iterationCount > MAX_ITERATIONS)
             {
-                if (current.GetFlag(ENodeFlags.NeedsBoxUpdate))
-                {
-                    CssBoxTree.Generate_Tree(current);
-                    // Don't unset the child-needs-box-update flags here. the box-tree already handles that
-                }
-
-                if (current is Element currentAsElement)
-                {
-                    if (current.GetFlag(ENodeFlags.NeedsStyleUpdate))
-                    {
-                        //BoxModel.Resolve(currentAsElement.Box, current.Style.Cascaded);
-                        current.Unpropagate_Flag(ENodeFlags.ChildNeedsStyleUpdate | ENodeFlags.DirectChildNeedsStyleUpdate, ENodeFlags.NeedsStyleUpdate, false);
-                    }
-
-                    if (current.GetFlag(ENodeFlags.NeedsReflow))
-                    {
-                        Element flowContainer = CssCommon.Find_Formatting_Container(currentAsElement);
-                        flowContainer.Box.FormattingContext.Flow(flowContainer.Box);
-                        // Do not unset any flags here, the flow process does this.
-                    }
-                }
-
-                current = Tree.nextNode();
+                System.Diagnostics.Debug.WriteLine($"Layout pipeline exceeded {MAX_ITERATIONS} iterations - breaking. Last node: {current.nodeName}");
+                break;
             }
+
+            if (current.GetFlag(ENodeFlags.NeedsBoxUpdate))
+            {
+                CssBoxTree.Generate_Tree(current);
+                // Generate_Tree clears NeedsBoxUpdate and ChildNeedsBoxUpdate internally
+            }
+
+            if (current is Element currentAsElement)
+            {
+                if (current.GetFlag(ENodeFlags.NeedsStyleUpdate))
+                {
+                    // Phase 14.1: Re-enable BoxModel.Resolve with null checks
+                    if (currentAsElement.Box is not null && current.Style?.Cascaded is not null)
+                    {
+                        BoxModel.Resolve(currentAsElement.Box, current.Style.Cascaded);
+                    }
+                    // Clear NeedsStyleUpdate from this node
+                    current.ClearFlag(ENodeFlags.NeedsStyleUpdate);
+                    // Unpropagate the child-needs flags from ancestors
+                    current.Unpropagate_Flag(ENodeFlags.ChildNeedsStyleUpdate | ENodeFlags.DirectChildNeedsStyleUpdate, ENodeFlags.NeedsStyleUpdate, exclude_self: true);
+                }
+
+                if (current.GetFlag(ENodeFlags.NeedsReflow))
+                {
+                    Element? flowContainer = CssCommon.Find_Formatting_Container(currentAsElement);
+                    if (flowContainer?.Box?.FormattingContext is not null)
+                    {
+                        flowContainer.Box.FormattingContext.Flow(flowContainer.Box);
+                    }
+                    // Clear NeedsReflow to prevent infinite loop
+                    current.ClearFlag(ENodeFlags.NeedsReflow);
+                    current.Unpropagate_Flag(ENodeFlags.ChildNeedsReflow, ENodeFlags.NeedsReflow, exclude_self: true);
+                }
+            }
+            else
+            {
+                // For non-Element nodes (e.g., Text), clear any update flags they might have
+                current.ClearFlag(ENodeFlags.NeedsStyleUpdate | ENodeFlags.NeedsReflow);
+            }
+
+            current = Tree.nextNode();
         }
     }
 

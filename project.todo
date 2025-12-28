@@ -207,10 +207,14 @@ Prerequisites: Phase 12 (Box Model tests), Phase 13 (CssValue specialization)
 
 ### 14.1 Re-enable BoxModel.Resolve() in Event Loop
 The BoxModel calculations exist but are commented out in Document.cs.
-- [ ] Uncomment BoxModel.Resolve() call in Document.Run_Event_Loop()
+- [x] Uncomment BoxModel.Resolve() call in Document.Run_Event_Loop()
+- [x] Add null checks for Box and Style.Cascaded before calling BoxModel.Resolve()
+- [x] Add safety iteration limit to prevent infinite loops during development
+- [x] Clear NeedsStyleUpdate flag after processing
+- [x] Clear NeedsReflow flag after processing (was missing)
+- [ ] Fix root cause of infinite loop (CssBoxTree.Generate_Tree propagates ChildNeedsReflow during iteration)
 - [ ] Verify NeedsToResolveBlock flag triggers resolution
 - [ ] Add integration test for style change → box update pipeline
-- [ ] Fix any runtime issues from enabling the code path
 
 ### 14.2 Layout Test Fixture Infrastructure
 Create test helpers to enable BoxModel and layout testing.
@@ -219,7 +223,8 @@ Create test helpers to enable BoxModel and layout testing.
 - [x] SetContainingBlockSize via CreateContainingBlock() helper
 - [x] ForceCascade/ForceBoxGeneration/ForceLayoutUpdate helpers
 - [x] Margin helpers (CreateBlockWithMargins, CreateCenteredBlock)
-- [ ] Fix infinite loop in layout pipeline (blocks test execution)
+- [x] Created LayoutPipelineIntegrationTests.cs with basic tests
+- [ ] Fix infinite loop in layout pipeline (ForceCascade triggers flag propagation that causes infinite loop)
 - [ ] Enable LayoutTestFixtureTests once pipeline is connected
 - [-] Add documentation for test fixture usage (not needed)
 
