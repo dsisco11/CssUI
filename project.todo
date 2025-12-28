@@ -29,7 +29,7 @@
 - [ ] Handle unmatched <}-token>, <)-token>, <]-token> (TODO: needs deeper parser integration)
 
 ### 11.7.7 Production Matching Integration
-- [ ] Integrate with CSS Nesting (future)
+- [ ] Integrate with CSS Nesting (Phase 11.9)
   - [ ] Use ECssBlockContentsType for nested rule parsing
   - [ ] Distinguish style-block vs rule-list contexts
 
