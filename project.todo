@@ -11,7 +11,7 @@
   - [ ] Update Window.QueueObserverMicroTask() to use new system
   - [ ] Ensure MutationObserver callbacks fire at correct timing per W3C spec
 
-## Test Coverage — Total: 3940 passing, 144 skipped, 0 failing = 4084 tests
+## Test Coverage — Total: 4065 passing, 144 skipped, 0 failing = 4209 tests
 ### DOM Tests: 518 passing, 3 skipped = 521 total
 ### Selector Tests: 307 passing, 143 skipped = 450 total
 
@@ -110,32 +110,32 @@ Prerequisites: Phase 6 (CSS Parser), Phase 11.7.2 (Consume_Style_Block_Contents)
 - [x] Shorthand property expansion tests (40 tests passing)
 
 ### 12.2 CSS Box Model (CSS/Box Model/)
-- [ ] CssPrincipalBox tests
-- [ ] BoxModel calculation tests
-- [ ] Margin collapsing tests
-- [ ] Containing block tests
+- [x] CssPrincipalBox tests (63 tests: DisplayType, Rect4f, IntrinsicSize, BoxDimensions, CssRect, CssBoxArea, enums)
+- [ ] BoxModel calculation tests (requires integration tests with full element/style setup)
+- [ ] Margin collapsing tests (requires layout pipeline)
+- [ ] Containing block tests (requires layout pipeline)
 
 ### 12.3 CSS Parser Integration (CSS/Parser/)
-- [ ] Stylesheet parsing tests
-- [ ] Rule parsing tests
-- [ ] Declaration parsing tests
-- [ ] Error recovery tests
+- [x] Stylesheet parsing tests (covered in CssParseErrorRecoveryTests, CssBlockContentsTypeTests, CssNestingSerializationRoundTripTests)
+- [x] Rule parsing tests (covered in CssBlockContentsTypeTests, CssNestingTests, NestedGroupRuleTests)
+- [x] Declaration parsing tests (covered in multiple parser test files)
+- [x] Error recovery tests (CssParseErrorRecoveryTests - 10+ tests)
 
 ### 12.4 CSS Stylesheet/Rules (CSS/Stylesheet/, CSS/Rules/)
-- [ ] @media rule tests
-- [ ] @import rule tests
-- [ ] @font-face rule tests
-- [ ] Cascade and specificity tests
+- [x] @media rule tests (covered in CssParserTests, NestedGroupRuleTests)
+- [x] @import rule tests (covered in CssParserTests)
+- [x] @font-face rule tests (covered in CssParserTests)
+- [x] Cascade and specificity tests (59 tests in SpecificityTests, PseudoElementSelectorTests)
 
 ### 12.5 CSS Custom Properties (CSS/Functions/)
-- [ ] var() resolution tests
-- [ ] Custom property inheritance tests
-- [ ] Cycle detection tests
+- [x] var() resolution tests (CssVarFunctionParserTests - 590 lines of tests)
+- [ ] Custom property inheritance tests (requires full style cascade implementation)
+- [ ] Cycle detection tests (requires full style cascade implementation)
 
 ### 12.6 Block Formatting Context (CSS/Formatting/)
-- [ ] BlockFormattingContext tests
-- [ ] Float layout tests
-- [ ] Clear property tests
+- [x] BlockFormattingContext tests (4 tests: instantiation, interface compliance, null safety)
+- [ ] Float layout tests (requires full layout pipeline)
+- [ ] Clear property tests (requires full layout pipeline)
 
 ## Phase 13: CssValue Subclass Specialization
 Introduce specialized `CssValue` subclasses to eliminate boxing, reduce allocations, and improve type safety for common value types. Follow the pattern established by `CssEnumValue<T>`.
