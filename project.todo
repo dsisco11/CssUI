@@ -245,6 +245,83 @@ Verify containing block discovery and resolution.
 - [ ] Test percentage resolution through containing block chain
 - [ ] Test viewport as initial containing block
 
+### 14.5 Multi-Pass Layout Pipeline Architecture
+Refactor Run_Event_Loop from single TreeWalker pass into three distinct passes.
+This fixes the infinite loop caused by flag propagation during TreeWalker iteration.
+Spec Reference: https://www.w3.org/TR/CSS2/visudet.html (width/height calculation order)
+
+#### 14.5.1 Collect-Then-Process Infrastructure
+- [ ] Create CollectDirtyNodes() helper that snapshots nodes with given flags into List<Node>
+- [ ] Use tree-order traversal for top-down passes (parents before children)
+- [ ] Create depth-sorted list helper for bottom-up passes (deepest first)
+- [ ] Remove FilterNodeUpdate usage from event loop (no longer needed with snapshots)
+
+#### 14.5.2 Pass 1: Box Generation (Top-Down)
+- [ ] Create Pass_BoxGeneration() method in Document.cs
+- [ ] Collect nodes with NeedsBoxUpdate | ChildNeedsBoxUpdate flags
+- [ ] Process in tree order (parents before children)
+- [ ] Call CssBoxTree.Generate_Tree() for each dirty node
+- [ ] Clear NeedsBoxUpdate and ChildNeedsBoxUpdate after processing each node
+
+#### 14.5.3 Pass 2: Style Cascade (Top-Down)
+- [ ] Create Pass_StyleCascade() method in Document.cs
+- [ ] Collect nodes with NeedsStyleUpdate | ChildNeedsStyleUpdate | DirectChildNeedsStyleUpdate flags
+- [ ] Process in tree order (parents before children)
+- [ ] Call Style.Cascade() for each dirty element to recompute CSS computed values
+- [ ] Clear NeedsStyleUpdate, ChildNeedsStyleUpdate, DirectChildNeedsStyleUpdate after processing
+
+#### 14.5.4 Pass 3: Layout/Reflow (Width Top-Down, Height Bottom-Up)
+- [ ] Create Pass_Layout() method in Document.cs
+- [ ] Collect nodes with NeedsReflow | ChildNeedsReflow flags
+- [ ] Sub-pass 3a (Width Resolution - Top-Down):
+  - [ ] Process in tree order (parents before children)
+  - [ ] Call BoxModel.ResolveWidth() for each element with box
+  - [ ] Wire IntrinsicSizeCalculator.Calculate() for width: auto (shrink-to-fit)
+- [ ] Sub-pass 3b (Height Resolution + Flow - Bottom-Up):
+  - [ ] Process depth-sorted (deepest nodes first)
+  - [ ] Call FormattingContext.Flow() to position children, get content size
+  - [ ] Call BoxModel.ResolveHeight() using content height for height: auto
+- [ ] Clear NeedsReflow and ChildNeedsReflow after processing
+
+#### 14.5.5 BoxModel.Resolve() Refactoring
+- [ ] Extract BoxModel.ResolveWidth() from existing Resolve() method
+  - [ ] Resolve horizontal dimensions: width, margin-left, margin-right, left, right
+  - [ ] Handle all display types (inline, block, inline-block, absolute, etc.)
+  - [ ] Integrate IntrinsicSizeCalculator for shrink-to-fit width
+- [ ] Extract BoxModel.ResolveHeight() from existing Resolve() method
+  - [ ] Resolve vertical dimensions: height, margin-top, margin-bottom, top, bottom
+  - [ ] Accept contentHeight parameter for height: auto resolution
+- [ ] Keep existing Resolve() as convenience method calling both
+
+#### 14.5.6 FormattingContext.Flow() Return Type
+- [ ] Change IFormattingContext.Flow() return type from void to Size2f
+- [ ] Update FlexFormattingContext.Flow() to return content dimensions
+- [ ] Update GridFormattingContext.Flow() to return content dimensions
+- [ ] Update BlockFormattingContext.Flow() to return content dimensions
+- [ ] Use returned height for resolving container's height: auto
+
+#### 14.5.7 Run_Event_Loop() Orchestration
+- [ ] Refactor Run_Event_Loop() to call passes in sequence:
+  - [ ] Pass_BoxGeneration() - generates box tree from DOM
+  - [ ] Pass_StyleCascade() - recomputes CSS computed values
+  - [ ] Pass_Layout() - resolves used values and positions boxes
+- [ ] Remove safety iteration limit (no longer needed with snapshot approach)
+- [ ] Remove single TreeWalker loop
+
+#### 14.5.8 Layout Cycle Detection
+- [ ] Add cycle detection for layout calculations (e.g., percentage height with auto parent)
+- [ ] Track which boxes are currently being resolved
+- [ ] Break cycles with fallback (treat cyclic percentage as auto)
+- [ ] Log warning when cycle is detected
+
+#### 14.5.9 Multi-Pass Layout Tests
+- [ ] Test that box generation completes before style cascade
+- [ ] Test that style cascade completes before layout
+- [ ] Test width resolution happens before height resolution
+- [ ] Test bottom-up height resolution with nested elements
+- [ ] Test content-based auto height flows up to ancestors
+- [ ] Re-enable skipped LayoutPipelineIntegrationTests
+
 ## Phase 15: Float and Clear Properties
 Spec Reference: https://www.w3.org/TR/CSS2/visuren.html#floats
 Prerequisites: Phase 14 (Layout Pipeline Integration)
