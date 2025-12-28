@@ -11,7 +11,7 @@
   - [ ] Update Window.QueueObserverMicroTask() to use new system
   - [ ] Ensure MutationObserver callbacks fire at correct timing per W3C spec
 
-## Test Coverage — Total: 4065 passing, 144 skipped, 0 failing = 4209 tests
+## Test Coverage — Total: 4082 passing, 149 skipped, 0 failing = 4231 tests
 ### DOM Tests: 518 passing, 3 skipped = 521 total
 ### Selector Tests: 307 passing, 143 skipped = 450 total
 
@@ -214,11 +214,14 @@ The BoxModel calculations exist but are commented out in Document.cs.
 
 ### 14.2 Layout Test Fixture Infrastructure
 Create test helpers to enable BoxModel and layout testing.
-- [ ] Create LayoutTestFixture class in CssUITests2/Common/
-- [ ] CreateElementWithStyle() helper - creates Document→Element→Box chain
-- [ ] SetContainingBlockSize() helper - configure parent dimensions
-- [ ] ForceLayoutUpdate() helper - trigger full layout pass
-- [ ] Add documentation for test fixture usage
+- [x] Create LayoutTestFixture class in CssUITests2/Fixtures/
+- [x] CreateElement/CreateBlock/CreateChild helpers
+- [x] SetContainingBlockSize via CreateContainingBlock() helper
+- [x] ForceCascade/ForceBoxGeneration/ForceLayoutUpdate helpers
+- [x] Margin helpers (CreateBlockWithMargins, CreateCenteredBlock)
+- [ ] Fix infinite loop in layout pipeline (blocks test execution)
+- [ ] Enable LayoutTestFixtureTests once pipeline is connected
+- [-] Add documentation for test fixture usage (not needed)
 
 ### 14.3 BoxModel Integration Tests
 Use test fixture to verify existing BoxModel calculations.
