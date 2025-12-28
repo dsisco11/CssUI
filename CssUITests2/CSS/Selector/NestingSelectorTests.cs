@@ -408,4 +408,262 @@ public class NestingSelectorTests
         Assert.Equal(ESimpleSelectorType.NestingSelector, selector.Type);
     }
     #endregion
+
+    #region Multiple Nesting Selector Tests (Phase 11.9.4)
+    /// <summary>
+    /// Tests that "&&" parses correctly as two nesting selectors.
+    /// Per CSS Nesting spec: .foo { && { padding: 2ch; } } is equivalent to .foo.foo { padding: 2ch; }
+    /// </summary>
+    [Fact]
+    public void NestingSelector_ParsesDoubleAmpersand()
+    {
+        // Arrange & Act - "&&" should parse as two nesting selectors in compound
+        var selector = new CssSelector("&&");
+
+        // Assert
+        Assert.NotEmpty(selector);
+        Assert.Single(selector); // One complex selector
+        Assert.Single(selector[0]); // One relative selector
+        Assert.Equal(2, selector[0][0].Count); // Two nesting selectors in compound
+        Assert.IsType<NestingSelector>(selector[0][0][0]);
+        Assert.IsType<NestingSelector>(selector[0][0][1]);
+    }
+
+    /// <summary>
+    /// Tests specificity of "&&" - should be double the parent specificity.
+    /// Per CSS Nesting spec: each & has the specificity of the parent's max specificity.
+    /// </summary>
+    [Fact]
+    public void NestingSelector_DoubleAmpersand_DoubleSpecificity()
+    {
+        // Arrange - Parse "&&", then manually set parent on both nesting selectors
+        var selector = new CssSelector("&&");
+        var parentSelector = new CssSelector(".foo"); // Specificity (0,1,0)
+
+        // Set parent on both nesting selectors
+        foreach (var relativeSelector in selector[0])
+        {
+            foreach (var simple in relativeSelector)
+            {
+                if (simple is NestingSelector nesting)
+                {
+                    nesting.SetParentSelector(parentSelector);
+                }
+            }
+        }
+
+        // Act
+        long specificity = selector[0].Get_Specificity();
+
+        // Assert - Should be (0,2,0) = 2 * (1 << 16) for two class-level specificities
+        long expected = 2L << 16;
+        Assert.Equal(expected, specificity);
+    }
+
+    /// <summary>
+    /// Tests "& .bar &" - multiple & in same selector with descendant combinator.
+    /// Per spec: .foo { & .bar & { color: red; } } is equivalent to .foo .bar .foo { color: red; }
+    /// </summary>
+    [Fact]
+    public void NestingSelector_ParsesMultipleAmpersandWithDescendant()
+    {
+        // Arrange & Act
+        var selector = new CssSelector("& .bar &");
+
+        // Assert - Should have 3 relative selectors: "&", ".bar", "&"
+        Assert.NotEmpty(selector);
+        Assert.Single(selector);
+        Assert.Equal(3, selector[0].Count); // Three relative selectors
+
+        // First is nesting selector
+        Assert.IsType<NestingSelector>(selector[0][0][0]);
+
+        // Second is class selector
+        Assert.IsType<ClassSelector>(selector[0][1][0]);
+
+        // Third is nesting selector
+        Assert.IsType<NestingSelector>(selector[0][2][0]);
+    }
+
+    /// <summary>
+    /// Tests specificity of "& .bar &" with a class parent.
+    /// Each & contributes (0,1,0), .bar contributes (0,1,0) = total (0,3,0)
+    /// </summary>
+    [Fact]
+    public void NestingSelector_MultipleAmpersand_StacksSpecificity()
+    {
+        // Arrange
+        var selector = new CssSelector("& .bar &");
+        var parentSelector = new CssSelector(".foo"); // Specificity (0,1,0)
+
+        // Set parent on all nesting selectors
+        foreach (var relativeSelector in selector[0])
+        {
+            foreach (var simple in relativeSelector)
+            {
+                if (simple is NestingSelector nesting)
+                {
+                    nesting.SetParentSelector(parentSelector);
+                }
+            }
+        }
+
+        // Act
+        long specificity = selector[0].Get_Specificity();
+
+        // Assert - Should be (0,3,0): two & each with (0,1,0) + one .bar (0,1,0)
+        long expected = 3L << 16;
+        Assert.Equal(expected, specificity);
+    }
+
+    /// <summary>
+    /// Tests "& .bar & .baz & .qux" - per spec example.
+    /// Three & selectors plus three class selectors.
+    /// </summary>
+    [Fact]
+    public void NestingSelector_ParsesComplexMultipleAmpersand()
+    {
+        // Arrange & Act - .foo { & .bar & .baz & .qux { color: red; } }
+        var selector = new CssSelector("& .bar & .baz & .qux");
+
+        // Assert
+        Assert.NotEmpty(selector);
+        Assert.Single(selector);
+
+        // Count nesting selectors
+        int nestingCount = 0;
+        int classCount = 0;
+        foreach (var relative in selector[0])
+        {
+            foreach (var simple in relative)
+            {
+                if (simple is NestingSelector) nestingCount++;
+                if (simple is ClassSelector) classCount++;
+            }
+        }
+
+        Assert.Equal(3, nestingCount);
+        Assert.Equal(3, classCount);
+    }
+
+    /// <summary>
+    /// Tests that parent with selector list uses max specificity per :is() behavior.
+    /// "#a, b" has max specificity from #a (1,0,0), not b (0,0,1).
+    /// </summary>
+    [Fact]
+    public void NestingSelector_IsWrapping_UsesMaxSpecificity()
+    {
+        // Arrange - Per spec example: "#a, b { & c { color: blue; } }"
+        // The & should have specificity (1,0,0) from #a, not (0,0,1) from b
+        var parentSelector = new CssSelector("#a, b");
+        var nestingSelector = new NestingSelector(parentSelector);
+
+        // Act
+        long specificity = nestingSelector.GetSpecificity();
+
+        // Assert - Should use max specificity from #a: (1,0,0)
+        long expected = 1L << 32;
+        Assert.Equal(expected, specificity);
+    }
+
+    /// <summary>
+    /// Tests "& c" specificity with "#a, b" parent.
+    /// Should be (1,0,1) = (1,0,0) from & + (0,0,1) from c.
+    /// </summary>
+    [Fact]
+    public void NestingSelector_InComplexSelector_CombinesSpecificity()
+    {
+        // Arrange - "#a, b { & c { color: blue; } }" 
+        var selector = new CssSelector("& c");
+        var parentSelector = new CssSelector("#a, b");
+
+        // Set parent on the nesting selector
+        foreach (var relative in selector[0])
+        {
+            foreach (var simple in relative)
+            {
+                if (simple is NestingSelector nesting)
+                {
+                    nesting.SetParentSelector(parentSelector);
+                }
+            }
+        }
+
+        // Act
+        long specificity = selector[0].Get_Specificity();
+
+        // Assert - Should be (1,0,1): (1,0,0) from & + (0,0,1) from c
+        long expected = (1L << 32) + 1;
+        Assert.Equal(expected, specificity);
+    }
+
+    /// <summary>
+    /// Tests "&.bar" where parent has complex specificity.
+    /// "#id.class" parent has (1,1,0), so & contributes that.
+    /// </summary>
+    [Fact]
+    public void NestingSelector_WithComplexParent_InheritsFullSpecificity()
+    {
+        // Arrange
+        var parentSelector = new CssSelector("#id.class"); // (1,1,0)
+        var selector = new CssSelector("&.foo"); // & + .foo
+
+        // Set parent
+        foreach (var relative in selector[0])
+        {
+            foreach (var simple in relative)
+            {
+                if (simple is NestingSelector nesting)
+                {
+                    nesting.SetParentSelector(parentSelector);
+                }
+            }
+        }
+
+        // Act
+        long specificity = selector[0].Get_Specificity();
+
+        // Assert - Should be (1,2,0): (1,1,0) from & + (0,1,0) from .foo
+        long expected = (1L << 32) + (2L << 16);
+        Assert.Equal(expected, specificity);
+    }
+
+    /// <summary>
+    /// Tests that empty parent selector list has (0,0,0) specificity.
+    /// Edge case where parent parses to an empty complex selector.
+    /// </summary>
+    [Fact]
+    public void NestingSelector_WithEmptyParent_HasZeroSpecificity()
+    {
+        // Arrange - Empty string parses to a CssSelector with an empty complex selector
+        var parentSelector = new CssSelector("");
+        var nestingSelector = new NestingSelector(parentSelector);
+
+        // Act
+        long specificity = nestingSelector.GetSpecificity();
+
+        // Assert - Empty selector has specificity (0,0,0)
+        // Note: This differs from null parent which gets :scope specificity
+        Assert.Equal(0L, specificity);
+    }
+
+    /// <summary>
+    /// Tests that null parent selector falls back to :scope specificity.
+    /// </summary>
+    [Fact]
+    public void NestingSelector_WithNullParent_HasScopeSpecificity()
+    {
+        // Arrange
+        var nestingSelector = new NestingSelector();
+        // Explicitly ensure no parent is set
+        Assert.Null(nestingSelector.ParentSelector);
+
+        // Act
+        long specificity = nestingSelector.GetSpecificity();
+
+        // Assert - Falls back to :scope specificity (0,1,0)
+        long expected = 1L << 16;
+        Assert.Equal(expected, specificity);
+    }
+    #endregion
 }

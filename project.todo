@@ -11,7 +11,7 @@
   - [ ] Update Window.QueueObserverMicroTask() to use new system
   - [ ] Ensure MutationObserver callbacks fire at correct timing per W3C spec
 
-## Test Coverage — Total: 3881 passing, 143 skipped, 0 failing = 4024 tests
+## Test Coverage — Total: 3891 passing, 143 skipped, 0 failing = 4034 tests
 ### DOM Tests: 518 passing, 3 skipped = 521 total
 ### Selector Tests: 307 passing, 143 skipped = 450 total
 
@@ -67,10 +67,10 @@ Prerequisites: Phase 6 (CSS Parser), Phase 11.7.2 (Consume_Style_Block_Contents)
 - [x] Parser handles pre-parsed CssSimpleBlock in at-rules and qualified rules
 - [x] Tests for nested group rules (23 tests passing)
 
-### 11.9.4 Selector Specificity
-- [ ] & inherits specificity of parent selector
-- [ ] :is() wrapping for implicit & (specificity calculation)
-- [ ] Multiple & in same selector (specificity stacking)
+### 11.9.4 Selector Specificity ✓
+- [x] & inherits specificity of parent selector
+- [x] :is() wrapping for implicit & (specificity calculation)
+- [x] Multiple & in same selector (specificity stacking)
 
 ### 11.9.5 Serialization
 - [ ] Serialize nested rules with proper indentation
@@ -83,7 +83,7 @@ Prerequisites: Phase 6 (CSS Parser), Phase 11.7.2 (Consume_Style_Block_Contents)
 - [x] Nested @media tests (in NestedGroupRuleTests)
 - [x] Nested @supports tests (in NestedGroupRuleTests)
 - [x] Nested @layer tests (in NestedGroupRuleTests)
-- [ ] Specificity calculation tests
+- [x] Specificity calculation tests (10 tests in NestingSelectorTests)
 - [ ] Serialization round-trip tests
 - [ ] Edge cases: deeply nested rules, multiple & usage
 
