@@ -303,6 +303,180 @@ public class CssParseErrorRecoveryTests
 
     #endregion
 
+    #region Unmatched Closing Bracket Error Tests (§5 Parsing)
+
+    /// <summary>
+    /// Per CSS Syntax Level 3: "The tokens &lt;}-token&gt;, &lt;)-token&gt;, &lt;]-token&gt;,
+    /// &lt;bad-string-token&gt;, and &lt;bad-url-token&gt; are always parse errors, but they
+    /// are preserved in the token stream."
+    /// </summary>
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "ErrorRecovery")]
+    public void CssParser_UnmatchedClosingBrace_ReportsError_InStylesheet()
+    {
+        // Arrange - unmatched } at top level
+        var css = "body { color: red; } } .class { color: blue; }";
+        var reporter = new CssParseErrorReporter();
+        var parser = new CssParser(css.AsSpan(), reporter);
+
+        // Act
+        var result = parser.Parse_Stylesheet();
+
+        // Assert - should report unmatched closing bracket error
+        Assert.True(reporter.HasErrors);
+        Assert.Contains(reporter.Errors, e => e.ErrorType == ECssParseErrorType.UnmatchedClosingBracket);
+        Assert.Contains(reporter.Errors, e => e.Context == "}");
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "ErrorRecovery")]
+    public void CssParser_UnmatchedClosingParen_ReportsError_InStylesheet()
+    {
+        // Arrange - unmatched ) at top level
+        var css = "body { color: red; } ) .class { color: blue; }";
+        var reporter = new CssParseErrorReporter();
+        var parser = new CssParser(css.AsSpan(), reporter);
+
+        // Act
+        var result = parser.Parse_Stylesheet();
+
+        // Assert - should report unmatched closing bracket error
+        Assert.True(reporter.HasErrors);
+        Assert.Contains(reporter.Errors, e => e.ErrorType == ECssParseErrorType.UnmatchedClosingBracket);
+        Assert.Contains(reporter.Errors, e => e.Context == ")");
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "ErrorRecovery")]
+    public void CssParser_UnmatchedClosingSquareBracket_ReportsError_InStylesheet()
+    {
+        // Arrange - unmatched ] at top level
+        var css = "body { color: red; } ] .class { color: blue; }";
+        var reporter = new CssParseErrorReporter();
+        var parser = new CssParser(css.AsSpan(), reporter);
+
+        // Act
+        var result = parser.Parse_Stylesheet();
+
+        // Assert - should report unmatched closing bracket error
+        Assert.True(reporter.HasErrors);
+        Assert.Contains(reporter.Errors, e => e.ErrorType == ECssParseErrorType.UnmatchedClosingBracket);
+        Assert.Contains(reporter.Errors, e => e.Context == "]");
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "ErrorRecovery")]
+    public void CssParser_UnmatchedClosingBracket_RecoversContinuesParsing()
+    {
+        // Arrange - unmatched } followed by valid rule
+        var css = "} .valid { color: green; }";
+        var reporter = new CssParseErrorReporter();
+        var parser = new CssParser(css.AsSpan(), reporter);
+
+        // Act
+        var result = parser.Parse_Stylesheet();
+
+        // Assert - should recover and parse the valid rule
+        Assert.True(reporter.HasErrors);
+        Assert.NotEmpty(result.Rules);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "ErrorRecovery")]
+    public void CssParser_MultipleUnmatchedClosingBrackets_ReportsMultipleErrors()
+    {
+        // Arrange - multiple unmatched closing brackets
+        var css = "} ) ] .valid { color: green; }";
+        var reporter = new CssParseErrorReporter();
+        var parser = new CssParser(css.AsSpan(), reporter);
+
+        // Act
+        var result = parser.Parse_Stylesheet();
+
+        // Assert - should report all three errors
+        Assert.True(reporter.HasErrors);
+        var unmatchedErrors = reporter.Errors.Where(e => e.ErrorType == ECssParseErrorType.UnmatchedClosingBracket).ToList();
+        Assert.Equal(3, unmatchedErrors.Count);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "ErrorRecovery")]
+    public void CssParser_UnmatchedClosingBrace_InDeclarationList_ReportsError()
+    {
+        // Arrange - unmatched } in declaration list context
+        var css = "color: red; } background: blue;";
+        var reporter = new CssParseErrorReporter();
+        var parser = new CssParser(css.AsSpan(), reporter);
+
+        // Act
+        var result = parser.Parse_Decleration_List().ToList();
+
+        // Assert - should report unmatched closing bracket error
+        Assert.True(reporter.HasErrors);
+        Assert.Contains(reporter.Errors, e => e.ErrorType == ECssParseErrorType.UnmatchedClosingBracket);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "ErrorRecovery")]
+    public void CssParser_UnmatchedClosingBrace_InStyleBlockContents_ReportsError()
+    {
+        // Arrange - unmatched } in style block contents
+        var css = "color: red; } background: blue;";
+        var reporter = new CssParseErrorReporter();
+        var parser = new CssParser(css.AsSpan(), reporter);
+
+        // Act
+        var result = parser.Parse_Style_Block_Contents().ToList();
+
+        // Assert - should report unmatched closing bracket error
+        Assert.True(reporter.HasErrors);
+        Assert.Contains(reporter.Errors, e => e.ErrorType == ECssParseErrorType.UnmatchedClosingBracket);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "ErrorRecovery")]
+    public void CssParser_MatchedBrackets_NoError()
+    {
+        // Arrange - properly matched brackets
+        var css = "body { color: rgb(255, 0, 0); content: '[test]'; }";
+        var reporter = new CssParseErrorReporter();
+        var parser = new CssParser(css.AsSpan(), reporter);
+
+        // Act
+        var result = parser.Parse_Stylesheet();
+
+        // Assert - no errors for properly matched brackets
+        Assert.False(reporter.HasErrors);
+    }
+
+    [Fact]
+    [Trait("Category", "Parser")]
+    [Trait("Category", "ErrorRecovery")]
+    public void CssParser_UnterminatedBlock_ReportsError()
+    {
+        // Arrange - unterminated block (missing closing brace)
+        var css = "body { color: red;";
+        var reporter = new CssParseErrorReporter();
+        var parser = new CssParser(css.AsSpan(), reporter);
+
+        // Act
+        var result = parser.Parse_Stylesheet();
+
+        // Assert - should report unterminated block error
+        Assert.True(reporter.HasErrors);
+        Assert.Contains(reporter.Errors, e => e.ErrorType == ECssParseErrorType.UnterminatedBlock);
+    }
+
+    #endregion
+
     #region ECssParseErrorType Enum Tests
 
     [Fact]

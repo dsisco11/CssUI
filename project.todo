@@ -25,8 +25,12 @@
 ### Spec References
 - CSS Syntax Level 3: https://www.w3.org/TR/css-syntax-3/
 
-### 11.7.5 Error Recovery and Parse Errors
-- [ ] Handle unmatched <}-token>, <)-token>, <]-token> (TODO: needs deeper parser integration)
+### 11.7.5 Error Recovery and Parse Errors ✓
+- [x] Handle unmatched <}-token>, <)-token>, <]-token> via parser error reporting
+- [x] CheckUnmatchedClosingBracket() and CheckBadToken() static helpers
+- [x] Updated Consume_Rule_List, Consume_Style_Block_Contents, Consume_Decleration_List
+- [x] Error reporter propagation through all Consume_* methods
+- [x] Tests for unmatched closing bracket error reporting (12 new tests)
 
 ### 11.7.7 Production Matching Integration
 - [ ] Integrate with CSS Nesting (Phase 11.9)

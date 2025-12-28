@@ -287,7 +287,7 @@ public class CssParser
 
         // Consume a list of rules with the top-level flag set
         TopLevel = true;
-        var rules = Consume_Rule_List(Stream, TopLevel);
+        var rules = Consume_Rule_List(Stream, TopLevel, ErrorReporter);
 
         // Return the stylesheet with its location
         return new CssParsedStylesheet(rules, location);
@@ -317,7 +317,7 @@ public class CssParser
     public IEnumerable<CssComponent> Parse_Style_Block_Contents()
     {
         // Input normalization is handled by the tokenizer
-        return Consume_Style_Block_Contents(Stream);
+        return Consume_Style_Block_Contents(Stream, ErrorReporter);
     }
 
     /// <summary>
@@ -341,10 +341,10 @@ public class CssParser
     {
         return contentsType switch
         {
-            ECssBlockContentsType.StyleBlock => Consume_Style_Block_Contents(Stream),
-            ECssBlockContentsType.DeclarationList => Consume_Decleration_List(Stream),
-            ECssBlockContentsType.RuleList => Consume_Rule_List(Stream, TopLevel: false),
-            ECssBlockContentsType.Stylesheet => Consume_Rule_List(Stream, TopLevel: true),
+            ECssBlockContentsType.StyleBlock => Consume_Style_Block_Contents(Stream, ErrorReporter),
+            ECssBlockContentsType.DeclarationList => Consume_Decleration_List(Stream, ErrorReporter),
+            ECssBlockContentsType.RuleList => Consume_Rule_List(Stream, TopLevel: false, ErrorReporter),
+            ECssBlockContentsType.Stylesheet => Consume_Rule_List(Stream, TopLevel: true, ErrorReporter),
             _ => throw new ArgumentOutOfRangeException(nameof(contentsType), contentsType, "Unknown block contents type")
         };
     }
@@ -356,7 +356,7 @@ public class CssParser
     public IEnumerable<CssComponent> Parse_Rule_List()
     {
         TopLevel = false;
-        return Consume_Rule_List(Stream, TopLevel);
+        return Consume_Rule_List(Stream, TopLevel, ErrorReporter);
     }
     #endregion
 
@@ -372,11 +372,11 @@ public class CssParser
         if (Stream.Next.Type == ECssTokenType.EOF) throw new CssSyntaxErrorException(CssErrors.UNEXPECTED_EOF, Stream);
         else if (Stream.Next.Type == ECssTokenType.At_Keyword)
         {
-            Rule = Consume_AtRule(Stream);
+            Rule = Consume_AtRule(Stream, ErrorReporter);
         }
         else
         {
-            Rule = Consume_QualifiedRule(Stream);
+            Rule = Consume_QualifiedRule(Stream, ErrorReporter);
             if (Rule is null) throw new CssSyntaxErrorException(CssErrors.CANT_CONSUME_QUALIFIED_RULE, Stream);
         }
 
@@ -392,7 +392,7 @@ public class CssParser
         Consume_All_Whitespace(Stream);
         if (Stream.Next.Type != ECssTokenType.Ident) throw new CssSyntaxErrorException(CssErrors.EXPECTING_IDENT, Stream);
 
-        CssDecleration? Dec = Consume_Decleration(Stream);
+        CssDecleration? Dec = Consume_Decleration(Stream, ErrorReporter);
         if (Dec is null) throw new CssSyntaxErrorException(CssErrors.CANT_CONSUME_DECLERATION, Stream);
 
         return Dec;
@@ -401,7 +401,7 @@ public class CssParser
     public IEnumerable<CssComponent> Parse_Decleration_List()
     {
         if (Stream is null) throw new System.InvalidOperationException("Stream is null - parser not properly initialized");
-        return Consume_Decleration_List(Stream);
+        return Consume_Decleration_List(Stream, ErrorReporter);
     }
 
     public CssToken Parse_ComponentValue()
@@ -410,7 +410,7 @@ public class CssParser
         if (Stream.Next.Type == ECssTokenType.EOF) throw new CssSyntaxErrorException(CssErrors.UNEXPECTED_EOF);
 
         CssToken Res;
-        Res = Consume_ComponentValue(Stream);
+        Res = Consume_ComponentValue(Stream, ErrorReporter);
         if (Res is null) throw new CssSyntaxErrorException(CssErrors.CANT_CONSUME_COMPONENT_VALUE);
 
         Consume_All_Whitespace(Stream);
@@ -426,7 +426,7 @@ public class CssParser
         CssToken Value;
         do
         {
-            Value = Consume_ComponentValue(Stream);
+            Value = Consume_ComponentValue(Stream, ErrorReporter);
             //if (Value.Type == ECssComponent.PreservedToken && (Value as CssPreservedToken).Value.Type == ECssTokenType.EOF)
             if (Value.Type == ECssTokenType.EOF)
                 return List;
@@ -459,6 +459,64 @@ public class CssParser
     }
 
     /// <summary>
+    /// Checks if a token is an unmatched closing bracket and reports a parse error if so.
+    /// </summary>
+    /// <remarks>
+    /// Per CSS Syntax Level 3: "The tokens &lt;}-token&gt;, &lt;)-token&gt;, &lt;]-token&gt;,
+    /// &lt;bad-string-token&gt;, and &lt;bad-url-token&gt; are always parse errors, but they
+    /// are preserved in the token stream by this specification to allow other specs, such
+    /// as Media Queries, to define more fine-grained error-handling than just dropping an
+    /// entire declaration or block."
+    /// </remarks>
+    /// <param name="token">The token to check.</param>
+    /// <param name="errorReporter">The error reporter to use, or null to skip reporting.</param>
+    /// <param name="tokenIndex">The position in the token stream for error reporting.</param>
+    /// <returns>True if the token is an unmatched closing bracket; false otherwise.</returns>
+    /// <seealso href="https://www.w3.org/TR/css-syntax-3/#parsing"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    static bool CheckUnmatchedClosingBracket(CssToken token, ICssParseErrorReporter? errorReporter, int tokenIndex)
+    {
+        char bracketChar = token.Type switch
+        {
+            ECssTokenType.Bracket_Close => '}',
+            ECssTokenType.Parenth_Close => ')',
+            ECssTokenType.SqBracket_Close => ']',
+            _ => '\0'
+        };
+
+        if (bracketChar != '\0')
+        {
+            errorReporter?.ReportError(CssParseError.UnmatchedClosingBracket(tokenIndex, bracketChar));
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Checks if a token is a "bad" token type (bad-string or bad-url) and reports a parse error if so.
+    /// </summary>
+    /// <param name="token">The token to check.</param>
+    /// <param name="errorReporter">The error reporter to use, or null to skip reporting.</param>
+    /// <param name="tokenIndex">The position in the token stream for error reporting.</param>
+    /// <returns>True if the token is a bad token; false otherwise.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    static bool CheckBadToken(CssToken token, ICssParseErrorReporter? errorReporter, int tokenIndex)
+    {
+        switch (token.Type)
+        {
+            case ECssTokenType.Bad_String:
+                errorReporter?.ReportError(CssParseError.BadStringToken(tokenIndex));
+                return true;
+            case ECssTokenType.Bad_Url:
+                errorReporter?.ReportError(CssParseError.BadUrlToken(tokenIndex));
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /// <summary>
     /// Determines if a delimiter character can start a nested style rule.
     /// Per CSS Nesting spec §2.1, these include:
     /// '&amp;' (nesting selector), '.' (class), '*' (universal), '&gt;' '+' '~' (combinators)
@@ -480,7 +538,7 @@ public class CssParser
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    static IEnumerable<CssComponent> Consume_Rule_List(DataConsumer<CssToken> Stream, bool TopLevel = false)
+    static IEnumerable<CssComponent> Consume_Rule_List(DataConsumer<CssToken> Stream, bool TopLevel = false, ICssParseErrorReporter? errorReporter = null)
     {
         if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
         Contract.EndContractBlock();
@@ -497,26 +555,43 @@ public class CssParser
                     continue;
                 case ECssTokenType.EOF:
                     return Rules;
+
+                // Per CSS Syntax Level 3: unmatched closing brackets are always parse errors
+                // but are preserved in the token stream. Report error and continue.
+                case ECssTokenType.Bracket_Close:
+                case ECssTokenType.Parenth_Close:
+                case ECssTokenType.SqBracket_Close:
+                    CheckUnmatchedClosingBracket(Token, errorReporter, Stream.Position);
+                    // Continue parsing - the token is discarded per error recovery
+                    continue;
+
+                // Similarly, bad-string and bad-url tokens are always parse errors
+                case ECssTokenType.Bad_String:
+                case ECssTokenType.Bad_Url:
+                    CheckBadToken(Token, errorReporter, Stream.Position);
+                    // Continue parsing - the token is preserved but error is reported
+                    continue;
+
                 case ECssTokenType.CDO:
                 case ECssTokenType.CDC:
                     {
                         if (TopLevel) continue;
                         Stream.Reconsume();
-                        var rule = Consume_QualifiedRule(Stream);
+                        var rule = Consume_QualifiedRule(Stream, errorReporter);
                         if (rule is not null) Rules.AddLast(rule);
                     }
                     break;
                 case ECssTokenType.At_Keyword:
                     {
                         Stream.Reconsume();
-                        var rule = Consume_AtRule(Stream);
+                        var rule = Consume_AtRule(Stream, errorReporter);
                         if (rule is not null) Rules.AddLast(rule);
                     }
                     break;
                 default:
                     {
                         Stream.Reconsume();
-                        var rule = Consume_QualifiedRule(Stream);
+                        var rule = Consume_QualifiedRule(Stream, errorReporter);
                         if (rule is not null) Rules.AddLast(rule);
                     }
                     break;
@@ -528,7 +603,7 @@ public class CssParser
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
-    static CssAtRule Consume_AtRule(DataConsumer<CssToken> Stream)
+    static CssAtRule Consume_AtRule(DataConsumer<CssToken> Stream, ICssParseErrorReporter? errorReporter = null)
     {
         if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
         // Consume the at-keyword token and get its name
@@ -545,7 +620,7 @@ public class CssParser
                 case ECssTokenType.EOF:
                     return Rule;
                 case ECssTokenType.Bracket_Open:
-                    Rule.Block = Consume_SimpleBlock(Stream, Token);
+                    Rule.Block = Consume_SimpleBlock(Stream, Token, errorReporter);
                     return Rule;
                 case ECssTokenType.SimpleBlock:
                     {
@@ -563,7 +638,7 @@ public class CssParser
                 default:
                     {
                         Stream.Reconsume();
-                        Rule.Prelude.Add(Consume_ComponentValue(Stream));
+                        Rule.Prelude.Add(Consume_ComponentValue(Stream, errorReporter));
                     }
                     break;
             }
@@ -573,7 +648,7 @@ public class CssParser
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]// Private static function called in loops, inline it
-    static CssQualifiedRule? Consume_QualifiedRule(DataConsumer<CssToken> Stream)
+    static CssQualifiedRule? Consume_QualifiedRule(DataConsumer<CssToken> Stream, ICssParseErrorReporter? errorReporter = null)
     {
         if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
         CssQualifiedRule Rule = new CssQualifiedRule();
@@ -587,7 +662,7 @@ public class CssParser
                     return null;
                 case ECssTokenType.Bracket_Open:
                     {
-                        Rule.Block = Consume_SimpleBlock(Stream, Token);
+                        Rule.Block = Consume_SimpleBlock(Stream, Token, errorReporter);
                         return Rule;
                     }
                 case ECssTokenType.SimpleBlock:
@@ -606,7 +681,7 @@ public class CssParser
                 default:
                     {
                         Stream.Reconsume();
-                        Rule.Prelude.Add(Consume_ComponentValue(Stream));
+                        Rule.Prelude.Add(Consume_ComponentValue(Stream, errorReporter));
                     }
                     break;
             }
@@ -633,7 +708,7 @@ public class CssParser
     /// </para>
     /// </remarks>
     /// <seealso href="https://www.w3.org/TR/css-syntax-3/#consume-style-block"/>
-    static IEnumerable<CssComponent> Consume_Style_Block_Contents(DataConsumer<CssToken> Stream)
+    static IEnumerable<CssComponent> Consume_Style_Block_Contents(DataConsumer<CssToken> Stream, ICssParseErrorReporter? errorReporter = null)
     {
         if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
 
@@ -662,11 +737,26 @@ public class CssParser
                     }
                     return decls;
 
+                // Per CSS Syntax Level 3: unmatched closing brackets are always parse errors
+                case ECssTokenType.Bracket_Close:
+                case ECssTokenType.Parenth_Close:
+                case ECssTokenType.SqBracket_Close:
+                    CheckUnmatchedClosingBracket(Token, errorReporter, Stream.Position);
+                    // Continue parsing - error recovery discards the token
+                    continue;
+
+                // Similarly, bad-string and bad-url tokens are always parse errors
+                case ECssTokenType.Bad_String:
+                case ECssTokenType.Bad_Url:
+                    CheckBadToken(Token, errorReporter, Stream.Position);
+                    // Continue parsing - error is reported but token is discarded
+                    continue;
+
                 // <at-keyword-token>: Reconsume the current input token.
                 // Consume an at-rule, and append the result to rules.
                 case ECssTokenType.At_Keyword:
                     Stream.Reconsume();
-                    rules.AddLast(Consume_AtRule(Stream));
+                    rules.AddLast(Consume_AtRule(Stream, errorReporter));
                     break;
 
                 // <ident-token>: Initialize a temporary list initially filled with the current input token.
@@ -680,11 +770,11 @@ public class CssParser
                                next.Type != ECssTokenType.EOF &&
                                next.Type != ECssTokenType.Semicolon)
                         {
-                            tmp.Add(Consume_ComponentValue(Stream));
+                            tmp.Add(Consume_ComponentValue(Stream, errorReporter));
                         }
                         tmp.Add(EOFToken.Instance);
 
-                        var decl = Consume_Decleration(new DataConsumer<CssToken>(tmp.ToArray(), CssToken.EOF));
+                        var decl = Consume_Decleration(new DataConsumer<CssToken>(tmp.ToArray(), CssToken.EOF), errorReporter);
                         if (decl is not null)
                         {
                             decls.AddLast(decl);
@@ -708,7 +798,7 @@ public class CssParser
                 case ECssTokenType.Delim when Token is DelimToken delimToken && Starts_Nested_Rule_Delim(delimToken.Value):
                     {
                         Stream.Reconsume();
-                        var qualifiedRule = Consume_QualifiedRule(Stream);
+                        var qualifiedRule = Consume_QualifiedRule(Stream, errorReporter);
                         if (qualifiedRule is not null)
                         {
                             rules.AddLast(qualifiedRule);
@@ -720,7 +810,7 @@ public class CssParser
                 case ECssTokenType.Hash:
                     {
                         Stream.Reconsume();
-                        var hashRule = Consume_QualifiedRule(Stream);
+                        var hashRule = Consume_QualifiedRule(Stream, errorReporter);
                         if (hashRule is not null)
                         {
                             rules.AddLast(hashRule);
@@ -732,7 +822,7 @@ public class CssParser
                 case ECssTokenType.Colon:
                     {
                         Stream.Reconsume();
-                        var colonRule = Consume_QualifiedRule(Stream);
+                        var colonRule = Consume_QualifiedRule(Stream, errorReporter);
                         if (colonRule is not null)
                         {
                             rules.AddLast(colonRule);
@@ -744,7 +834,7 @@ public class CssParser
                 case ECssTokenType.SqBracket_Open:
                     {
                         Stream.Reconsume();
-                        var attrRule = Consume_QualifiedRule(Stream);
+                        var attrRule = Consume_QualifiedRule(Stream, errorReporter);
                         if (attrRule is not null)
                         {
                             rules.AddLast(attrRule);
@@ -761,7 +851,7 @@ public class CssParser
                            nextToken.Type != ECssTokenType.EOF &&
                            nextToken.Type != ECssTokenType.Semicolon)
                     {
-                        Consume_ComponentValue(Stream);
+                        Consume_ComponentValue(Stream, errorReporter);
                     }
                     break;
             }
@@ -776,7 +866,7 @@ public class CssParser
         return decls;
     }
 
-    static IEnumerable<CssComponent> Consume_Decleration_List(DataConsumer<CssToken> Stream)
+    static IEnumerable<CssComponent> Consume_Decleration_List(DataConsumer<CssToken> Stream, ICssParseErrorReporter? errorReporter = null)
     {// SEE:  https://www.w3.org/TR/css-syntax-3/#consume-a-list-of-declarations0
         if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
         LinkedList<CssComponent> List = new LinkedList<CssComponent>();
@@ -793,9 +883,25 @@ public class CssParser
                     continue;
                 case ECssTokenType.EOF:
                     return List;
+
+                // Per CSS Syntax Level 3: unmatched closing brackets are always parse errors
+                case ECssTokenType.Bracket_Close:
+                case ECssTokenType.Parenth_Close:
+                case ECssTokenType.SqBracket_Close:
+                    CheckUnmatchedClosingBracket(Token, errorReporter, Stream.Position);
+                    // Error recovery: discard the token and continue
+                    continue;
+
+                // Similarly, bad-string and bad-url tokens are always parse errors
+                case ECssTokenType.Bad_String:
+                case ECssTokenType.Bad_Url:
+                    CheckBadToken(Token, errorReporter, Stream.Position);
+                    // Error recovery: discard the token and continue
+                    continue;
+
                 case ECssTokenType.At_Keyword:
                     Stream.Reconsume();
-                    List.AddLast(Consume_AtRule(Stream));
+                    List.AddLast(Consume_AtRule(Stream, errorReporter));
                     break;
                 case ECssTokenType.Ident:
                     {
@@ -809,7 +915,7 @@ public class CssParser
                         // Add EOF token so sub-stream has proper termination
                         tmp.Add(EOFToken.Instance);
 
-                        var decl = Consume_Decleration(new DataConsumer<CssToken>(tmp.ToArray(), CssToken.EOF));
+                        var decl = Consume_Decleration(new DataConsumer<CssToken>(tmp.ToArray(), CssToken.EOF), errorReporter);
                         if (decl is not null)
                         {
                             List.AddLast(decl);
@@ -845,7 +951,7 @@ public class CssParser
     /// </remarks>
     /// <seealso href="https://www.w3.org/TR/css-syntax-3/#consume-a-declaration"/>
     /// <seealso href="https://www.w3.org/TR/css-variables-1/#defining-variables"/>
-    static CssDecleration? Consume_Decleration(DataConsumer<CssToken> Stream)
+    static CssDecleration? Consume_Decleration(DataConsumer<CssToken> Stream, ICssParseErrorReporter? errorReporter = null)
     {
         if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
 
@@ -870,7 +976,7 @@ public class CssParser
         // consume a component value and append it to the declaration's value.
         while (Stream.Next.Type != ECssTokenType.EOF)
         {
-            var componentValue = Consume_ComponentValue(Stream);
+            var componentValue = Consume_ComponentValue(Stream, errorReporter);
             Decleration.Values.Add(componentValue);
         }
 
@@ -949,10 +1055,11 @@ public class CssParser
     /// </remarks>
     /// <param name="Stream">The token stream.</param>
     /// <param name="startToken">The already-consumed opening bracket token.</param>
+    /// <param name="errorReporter">Optional error reporter for parse errors.</param>
     /// <returns>A simple block containing the consumed tokens.</returns>
     /// <seealso href="https://www.w3.org/TR/css-syntax-3/#consume-simple-block"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    static CssSimpleBlock Consume_SimpleBlock(DataConsumer<CssToken> Stream, CssToken startToken)
+    static CssSimpleBlock Consume_SimpleBlock(DataConsumer<CssToken> Stream, CssToken startToken, ICssParseErrorReporter? errorReporter = null)
     {
         if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
 
@@ -981,13 +1088,20 @@ public class CssParser
             if (token.Type == ECssTokenType.EOF)
             {
                 // EOF: This is a parse error. Return the block.
+                errorReporter?.ReportError(CssParseError.UnterminatedBlock(Stream.Position, startToken.Type switch
+                {
+                    ECssTokenType.Bracket_Open => '{',
+                    ECssTokenType.Parenth_Open => '(',
+                    ECssTokenType.SqBracket_Open => '[',
+                    _ => '?'
+                }));
                 return block;
             }
 
             // anything else: Reconsume the current input token.
             // Consume a component value and append it to the value of the block.
             Stream.Reconsume();
-            block.Values.Add(Consume_ComponentValue(Stream));
+            block.Values.Add(Consume_ComponentValue(Stream, errorReporter));
         }
     }
 
@@ -1001,10 +1115,11 @@ public class CssParser
     /// </remarks>
     /// <param name="Stream">The token stream.</param>
     /// <param name="functionToken">The already-consumed function-name token.</param>
+    /// <param name="errorReporter">Optional error reporter for parse errors.</param>
     /// <returns>A function containing the consumed tokens.</returns>
     /// <seealso href="https://www.w3.org/TR/css-syntax-3/#consume-function"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    static CssFunction Consume_Function(DataConsumer<CssToken> Stream, FunctionNameToken functionToken)
+    static CssFunction Consume_Function(DataConsumer<CssToken> Stream, FunctionNameToken functionToken, ICssParseErrorReporter? errorReporter = null)
     {
         if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
 
@@ -1024,13 +1139,14 @@ public class CssParser
 
                 case ECssTokenType.EOF:
                     // EOF: This is a parse error. Return the function.
+                    errorReporter?.ReportError(CssParseError.UnterminatedFunction(Stream.Position, functionToken.Value));
                     return func;
 
                 default:
                     // anything else: Reconsume the current input token.
                     // Consume a component value and append the returned value to the function's value.
                     Stream.Reconsume();
-                    func.Arguments.Add(Consume_ComponentValue(Stream));
+                    func.Arguments.Add(Consume_ComponentValue(Stream, errorReporter));
                     break;
             }
         }
@@ -1044,10 +1160,11 @@ public class CssParser
     /// or a function, and otherwise just returns the next token.
     /// </remarks>
     /// <param name="Stream">The token stream.</param>
+    /// <param name="errorReporter">Optional error reporter for parse errors.</param>
     /// <returns>The consumed component value (token, simple block, or function).</returns>
     /// <seealso href="https://www.w3.org/TR/css-syntax-3/#consume-component-value"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    static CssToken Consume_ComponentValue(DataConsumer<CssToken> Stream)
+    static CssToken Consume_ComponentValue(DataConsumer<CssToken> Stream, ICssParseErrorReporter? errorReporter = null)
     {
         if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
 
@@ -1061,12 +1178,12 @@ public class CssParser
             case ECssTokenType.Bracket_Open:
             case ECssTokenType.SqBracket_Open:
             case ECssTokenType.Parenth_Open:
-                return Consume_SimpleBlock(Stream, token);
+                return Consume_SimpleBlock(Stream, token, errorReporter);
 
             // Otherwise, if the current input token is a <function-token>,
             // consume a function and return it.
             case ECssTokenType.FunctionName:
-                return Consume_Function(Stream, (FunctionNameToken)token);
+                return Consume_Function(Stream, (FunctionNameToken)token, errorReporter);
 
             // Otherwise, return the current input token.
             default:
