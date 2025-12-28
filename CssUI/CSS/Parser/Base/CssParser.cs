@@ -547,6 +547,19 @@ public class CssParser
                 case ECssTokenType.Bracket_Open:
                     Rule.Block = Consume_SimpleBlock(Stream, Token);
                     return Rule;
+                case ECssTokenType.SimpleBlock:
+                    {
+                        // Already-parsed simple block (from component values)
+                        // Use it directly if it's a curly-brace block
+                        if (Token is CssSimpleBlock block && block.StartToken.Type == ECssTokenType.Bracket_Open)
+                        {
+                            Rule.Block = block;
+                            return Rule;
+                        }
+                        // Otherwise treat as part of prelude
+                        Rule.Prelude.Add(Token);
+                    }
+                    break;
                 default:
                     {
                         Stream.Reconsume();
@@ -577,6 +590,19 @@ public class CssParser
                         Rule.Block = Consume_SimpleBlock(Stream, Token);
                         return Rule;
                     }
+                case ECssTokenType.SimpleBlock:
+                    {
+                        // Already-parsed simple block (from component values)
+                        // Use it directly if it's a curly-brace block
+                        if (Token is CssSimpleBlock block && block.StartToken.Type == ECssTokenType.Bracket_Open)
+                        {
+                            Rule.Block = block;
+                            return Rule;
+                        }
+                        // Otherwise treat as part of prelude
+                        Rule.Prelude.Add(Token);
+                    }
+                    break;
                 default:
                     {
                         Stream.Reconsume();

@@ -40,7 +40,12 @@ public class CSSStyleDeclaration : List<CssDecleration>
     public void setPropertyPriority(string property, string priority) { throw new NotImplementedException(); }
     public string removeProperty(string property) { throw new NotImplementedException(); }
 
-    public CSSStyleDeclaration(CSSRule parentRule)
+    public CSSStyleDeclaration()
+    {
+        this.parentRule = null;
+    }
+
+    public CSSStyleDeclaration(CSSRule? parentRule)
     {
         this.parentRule = parentRule;
     }

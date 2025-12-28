@@ -11,7 +11,7 @@
   - [ ] Update Window.QueueObserverMicroTask() to use new system
   - [ ] Ensure MutationObserver callbacks fire at correct timing per W3C spec
 
-## Test Coverage — Total: 3834 passing, 143 skipped, 0 failing = 3977 tests
+## Test Coverage — Total: 3881 passing, 143 skipped, 0 failing = 4024 tests
 ### DOM Tests: 518 passing, 3 skipped = 521 total
 ### Selector Tests: 307 passing, 143 skipped = 450 total
 
@@ -59,10 +59,13 @@ Prerequisites: Phase 6 (CSS Parser), Phase 11.7.2 (Consume_Style_Block_Contents)
 - [x] Serialization with nested rules (proper indentation)
 - [x] Tests for nested style rules (24 tests passing)
 
-### 11.9.3 Nested Group Rules
-- [ ] Allow @media, @supports, @layer, @scope inside style rules
-- [ ] Conditional rules inherit parent's selector context
-- [ ] Proper scoping of nested conditional rules
+### 11.9.3 Nested Group Rules ✓
+- [x] Allow @media, @supports, @layer, @scope inside style rules
+- [x] Conditional rules inherit parent's selector context
+- [x] Proper scoping of nested conditional rules
+- [x] CSSRuleFactory for building CSSOM rules from parsed components
+- [x] Parser handles pre-parsed CssSimpleBlock in at-rules and qualified rules
+- [x] Tests for nested group rules (23 tests passing)
 
 ### 11.9.4 Selector Specificity
 - [ ] & inherits specificity of parent selector
@@ -75,10 +78,11 @@ Prerequisites: Phase 6 (CSS Parser), Phase 11.7.2 (Consume_Style_Block_Contents)
 - [ ] Flatten nested rules to non-nested form (optional)
 
 ### 11.9.6 Tests
-- [ ] Nesting selector parsing tests
-- [ ] Nested style rule tests
-- [ ] Nested @media tests
-- [ ] Nested @supports tests
+- [x] Nesting selector parsing tests (24 tests)
+- [x] Nested style rule tests (24 tests)  
+- [x] Nested @media tests (in NestedGroupRuleTests)
+- [x] Nested @supports tests (in NestedGroupRuleTests)
+- [x] Nested @layer tests (in NestedGroupRuleTests)
 - [ ] Specificity calculation tests
 - [ ] Serialization round-trip tests
 - [ ] Edge cases: deeply nested rules, multiple & usage
