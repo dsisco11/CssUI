@@ -200,6 +200,194 @@ Strings are common in custom properties, `content`, quoted `font-family` names.
 - [-] Update documentation with subclass usage patterns - Not Applicable
 - [-] Performance benchmarks comparing old vs new implementations - Irrelevant
 
+## Phase 14: Layout Pipeline Integration
+Connect existing layout components and enable end-to-end layout testing.
+Spec Reference: https://www.w3.org/TR/CSS2/visuren.html
+Prerequisites: Phase 12 (Box Model tests), Phase 13 (CssValue specialization)
+
+### 14.1 Re-enable BoxModel.Resolve() in Event Loop
+The BoxModel calculations exist but are commented out in Document.cs.
+- [ ] Uncomment BoxModel.Resolve() call in Document.Run_Event_Loop()
+- [ ] Verify NeedsToResolveBlock flag triggers resolution
+- [ ] Add integration test for style change → box update pipeline
+- [ ] Fix any runtime issues from enabling the code path
+
+### 14.2 Layout Test Fixture Infrastructure
+Create test helpers to enable BoxModel and layout testing.
+- [ ] Create LayoutTestFixture class in CssUITests2/Common/
+- [ ] CreateElementWithStyle() helper - creates Document→Element→Box chain
+- [ ] SetContainingBlockSize() helper - configure parent dimensions
+- [ ] ForceLayoutUpdate() helper - trigger full layout pass
+- [ ] Add documentation for test fixture usage
+
+### 14.3 BoxModel Integration Tests
+Use test fixture to verify existing BoxModel calculations.
+- [ ] Test auto margin centering (margin-left: auto; margin-right: auto)
+- [ ] Test percentage width resolution against containing block
+- [ ] Test min-width/max-width constraint application
+- [ ] Test height: auto calculation
+- [ ] Test absolutely positioned element constraint equation
+- [ ] Test replaced element intrinsic size handling
+
+### 14.4 Containing Block Chain Tests
+Verify containing block discovery and resolution.
+- [ ] Test Get_Containing_Block() for static positioned elements
+- [ ] Test Get_Containing_Block() for absolutely positioned elements
+- [ ] Test Get_Containing_Block() for fixed positioned elements
+- [ ] Test percentage resolution through containing block chain
+- [ ] Test viewport as initial containing block
+
+## Phase 15: Float and Clear Properties
+Spec Reference: https://www.w3.org/TR/CSS2/visuren.html#floats
+Prerequisites: Phase 14 (Layout Pipeline Integration)
+
+### 15.1 Float Property Definition
+- [ ] Add ECssPropertyID.Float to property enum
+- [ ] Add EFloat enum (None, Left, Right, InlineStart, InlineEnd)
+- [ ] Create StyleDefinition for float property in CssDefinitions.cs
+- [ ] Add Float property to StyleProperties class
+- [ ] Add CssPrincipalBox.Float property accessor
+- [ ] Update CssPrincipalBox.IsFloated to use actual property value
+
+### 15.2 Clear Property Definition
+- [ ] Add ECssPropertyID.Clear to property enum
+- [ ] Add EClear enum (None, Left, Right, Both, InlineStart, InlineEnd)
+- [ ] Create StyleDefinition for clear property in CssDefinitions.cs
+- [ ] Add Clear property to StyleProperties class
+- [ ] Add CssPrincipalBox.Clear property accessor
+
+### 15.3 Float Layout Algorithm
+Implement float positioning in BlockFormattingContext.
+- [ ] Track float areas (left floats, right floats) per BFC
+- [ ] Calculate available width accounting for floats
+- [ ] Position floats at current line position
+- [ ] Handle float stacking (multiple floats)
+- [ ] Implement float intrusion into line boxes
+
+### 15.4 Clear Layout Algorithm
+- [ ] Calculate clearance for elements with clear property
+- [ ] Move element below relevant floats
+- [ ] Handle clear: both
+- [ ] Update vertical position after clearance
+
+### 15.5 Float/Clear Tests
+- [ ] Test float: left positions element to left
+- [ ] Test float: right positions element to right
+- [ ] Test content flows around floats
+- [ ] Test clear: left moves below left floats
+- [ ] Test clear: right moves below right floats
+- [ ] Test clear: both moves below all floats
+- [ ] Test float stacking behavior
+- [ ] Test negative margins on floats
+
+## Phase 16: Margin Collapsing
+Spec Reference: https://www.w3.org/TR/CSS2/box.html#collapsing-margins
+Prerequisites: Phase 14 (Layout Pipeline Integration)
+
+### 16.1 Margin Collapse Detection
+Implement adjoining margin detection per CSS 2.2 §8.3.1.
+- [ ] Add MarginCollapseState tracking to BlockFormattingContext
+- [ ] Detect adjacent sibling margins (vertical only)
+- [ ] Detect parent/first-child margin adjacency
+- [ ] Detect parent/last-child margin adjacency
+- [ ] Detect empty block margins (top meets bottom)
+
+### 16.2 Margin Collapse Calculation
+- [ ] Calculate collapsed margin = max(margin1, margin2) for positive
+- [ ] Handle negative margins: most negative wins
+- [ ] Handle mixed positive/negative: max(positive) + min(negative)
+- [ ] Track collapsed margin through to positioning
+
+### 16.3 Margin Collapse Prevention
+Margins don't collapse in certain cases:
+- [ ] Floats don't collapse with anything
+- [ ] Absolutely/fixed positioned elements don't collapse
+- [ ] Inline-block elements don't collapse
+- [ ] Elements with overflow != visible don't collapse (create new BFC)
+- [ ] Elements with padding/border between margins don't collapse
+
+### 16.4 Margin Collapsing Tests
+- [ ] Test adjacent sibling margin collapse
+- [ ] Test parent/first-child collapse (no padding/border)
+- [ ] Test parent/first-child NO collapse (with padding)
+- [ ] Test parent/first-child NO collapse (with border)
+- [ ] Test empty block collapse
+- [ ] Test negative margin collapse
+- [ ] Test mixed positive/negative collapse
+- [ ] Test float prevents collapse
+- [ ] Test overflow:hidden prevents collapse
+
+## Phase 17: Block Formatting Context Implementation
+Spec Reference: https://www.w3.org/TR/CSS2/visuren.html#block-formatting
+Prerequisites: Phase 15 (Float/Clear), Phase 16 (Margin Collapsing)
+
+### 17.1 BFC Flow Algorithm
+Rewrite BlockFormattingContext.Flow() with complete implementation.
+- [ ] Separate block-level and inline-level children
+- [ ] Stack block-level boxes vertically
+- [ ] Apply margin collapsing during stacking
+- [ ] Account for floats when positioning blocks
+- [ ] Handle clear property on blocks
+
+### 17.2 Anonymous Block Boxes
+- [ ] Wrap inline content in anonymous block boxes when needed
+- [ ] Handle mixed block/inline children correctly
+- [ ] Preserve text runs in anonymous boxes
+
+### 17.3 BFC Establishment
+Track when new BFCs are created:
+- [ ] Root element creates BFC
+- [ ] Floats create new BFC
+- [ ] Absolutely positioned elements create new BFC
+- [ ] Inline-blocks create new BFC
+- [ ] overflow != visible creates new BFC
+- [ ] display: flow-root creates new BFC
+
+### 17.4 BFC Integration Tests
+- [ ] Test vertical block stacking
+- [ ] Test block width fills containing block
+- [ ] Test nested BFC isolation
+- [ ] Test BFC contains floats
+- [ ] Test anonymous block generation
+
+## Phase 18: Inline Formatting Context
+Spec Reference: https://www.w3.org/TR/CSS2/visuren.html#inline-formatting
+Prerequisites: Phase 17 (Block Formatting Context)
+
+### 18.1 Line Box Infrastructure
+- [ ] Create LineBox class for horizontal line layout
+- [ ] Track line box height (strut + content)
+- [ ] Track available width (accounting for floats)
+- [ ] Track current horizontal position
+
+### 18.2 Inline Box Layout
+- [ ] Position inline boxes horizontally in line box
+- [ ] Handle inline box line breaking
+- [ ] Calculate inline box dimensions
+- [ ] Handle replaced inline elements
+
+### 18.3 Text Layout Integration
+- [ ] Integrate with IFontService for text measurement
+- [ ] Calculate text runs and break opportunities
+- [ ] Handle white-space property
+- [ ] Handle word-wrap/overflow-wrap
+
+### 18.4 Vertical Alignment
+- [ ] Implement vertical-align property
+- [ ] baseline alignment
+- [ ] top/bottom alignment
+- [ ] middle alignment
+- [ ] sub/super alignment
+- [ ] Length/percentage values
+
+### 18.5 IFC Tests
+- [ ] Test inline boxes flow horizontally
+- [ ] Test line wrapping at container edge
+- [ ] Test line wrapping at float edge
+- [ ] Test vertical-align: baseline
+- [ ] Test vertical-align: middle
+- [ ] Test mixed inline content
+
 ## Phase 25: Advanced CSS Features
 ### 25.1 CSS calc() Formal Tree (future enhancement)
 - [ ] Sum/Product/Negate/Invert nodes (per spec)
