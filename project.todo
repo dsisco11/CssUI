@@ -3,6 +3,15 @@
 ## Pre-existing Issues
 - [ ] Fix nullable reference warnings (many throughout codebase)
 
+## Code Cleanup & Deprecation
+- [ ] Deprecate CssUI.BitOperations class (CORE/Types/Bit Types/BitOperations.cs)
+  - [ ] Replace usages with System.Numerics.BitOperations (available in .NET Core 3.0+)
+  - [ ] PopulationCount → BitOperations.PopCount
+  - [ ] CountLeadingZeros → BitOperations.LeadingZeroCount
+  - [ ] CountTrailingZeros → BitOperations.TrailingZeroCount
+  - [ ] Mark class [Obsolete] after migration
+  - [ ] Remove class in future version
+
 ## Architecture & Design
 - [ ] IWindowingSystem (window creation, input events) - pending
 - [ ] Implement proper microtask queue system
