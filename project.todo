@@ -90,7 +90,7 @@ Prerequisites: Phase 6 (CSS Parser), Phase 11.7.2 (Consume_Style_Block_Contents)
 ## Phase 12: CSS Properties System
 
 ### 12.1 CSS Properties (CSS/Properties/)
-- [ ] Shorthand property expansion tests (pending)
+- [x] Shorthand property expansion tests (40 tests passing)
 
 ### 12.2 CSS Box Model (CSS/Box Model/)
 - [ ] CssPrincipalBox tests
