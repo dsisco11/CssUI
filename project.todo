@@ -11,8 +11,9 @@
   - [ ] Update Window.QueueObserverMicroTask() to use new system
   - [ ] Ensure MutationObserver callbacks fire at correct timing per W3C spec
 
-## Test Coverage — Total: 3736 passing, 0 skipped, 239 failing = 3975 tests
+## Test Coverage — Total: 3834 passing, 143 skipped, 0 failing = 3977 tests
 ### DOM Tests: 518 passing, 3 skipped = 521 total
+### Selector Tests: 307 passing, 143 skipped = 450 total
 
 ## Deferred Items
 - [ ] CssCalcExpression tree serialization (complex tree structure)
@@ -193,3 +194,211 @@ Strings are common in custom properties, `content`, quoted `font-family` names.
   - [ ] Computed style access
   - [ ] Layout calculation
   - [ ] Custom render engine integration
+
+## Phase 26: Logical Pseudo-Class Selectors
+Spec Reference: https://www.w3.org/TR/selectors-4/#logical-combination
+Prerequisites: Phase 11.9.1 (Nesting Selector complete)
+
+### 26.1 :is() Pseudo-Class (16 tests blocked)
+The `:is()` pseudo-class matches any element that matches one of the selectors in its argument list.
+- [ ] Implement `PseudoClassSelectorIs` in CSS/Selector/Types/
+- [ ] Parse selector list argument using existing `SelectorParser`
+- [ ] Match returns true if element matches ANY selector in the list
+- [ ] Forgiving selector list: invalid selectors are ignored, not entire selector
+- [ ] Specificity: takes the HIGHEST specificity of any argument
+- [ ] Update `PseudoClassSelector.Create_Function()` to dispatch "is"
+- [ ] Add tests for :is() matching and specificity
+
+### 26.2 :where() Pseudo-Class
+Similar to `:is()` but with ZERO specificity contribution.
+- [ ] Implement `PseudoClassSelectorWhere` in CSS/Selector/Types/
+- [ ] Same matching logic as :is()
+- [ ] Specificity: always contributes (0,0,0) regardless of arguments
+- [ ] Forgiving selector list behavior
+- [ ] Update `PseudoClassSelector.Create_Function()` to dispatch "where"
+- [ ] Add tests for :where() matching and specificity
+
+### 26.3 :has() Pseudo-Class (Relational)
+Matches elements that have descendants/siblings matching the argument.
+Prerequisites: 26.1 (:is() as reference implementation)
+- [ ] Implement `PseudoClassSelectorHas` in CSS/Selector/Types/
+- [ ] Support relative selectors (>, +, ~) in argument
+- [ ] Match requires walking DOM tree to find matching descendants
+- [ ] Performance consideration: may need to cache results
+- [ ] Subject invalidation when DOM changes
+- [ ] Add tests for :has() with various combinators
+
+### 26.4 Enhanced :not() Specificity
+Bug: :not() currently counts as single pseudo-class instead of argument's specificity.
+- [ ] Fix `PseudoClassSelectorNot.Get_Specificity()` to return argument's specificity
+- [ ] Handle multiple selectors: :not(.a, .b) takes highest specificity
+- [ ] Add test: `Not_SpecificityCalculation` (currently skipped)
+
+## Phase 27: Form/Input Pseudo-Class Selectors
+Spec Reference: https://www.w3.org/TR/selectors-4/#ui-pseudos
+Prerequisites: DOM HTMLInputElement, HTMLButtonElement, HTMLSelectElement implementation
+
+### 27.1 Form Element Infrastructure
+Prerequisites: HTML module form controls
+- [ ] Verify `HTMLInputElement` has `disabled`, `checked`, `required` properties
+- [ ] Verify `HTMLButtonElement` has `disabled` property
+- [ ] Verify `HTMLSelectElement` has `disabled` property
+- [ ] Verify `HTMLTextAreaElement` has `disabled`, `required` properties
+- [ ] Add `IFormAssociatedElement` interface if not present
+- [ ] Ensure `validity` state object exists for validation pseudo-classes
+
+### 27.2 Enabled/Disabled State (6 tests blocked)
+- [ ] Implement `:enabled` matching in `PseudoClassSelector.Matches()`
+  - Returns true for form elements that are NOT disabled
+  - Must check parent fieldset disabled state
+- [ ] Implement `:disabled` matching
+  - Returns true for form elements with `disabled` attribute
+  - Or within disabled fieldset
+- [ ] Only applies to form-associated elements
+- [ ] Add tests for :enabled/:disabled
+
+### 27.3 Checked/Indeterminate State (6 tests blocked)
+Prerequisites: 27.1 (Form Element Infrastructure)
+- [ ] Implement `:checked` matching
+  - checkbox/radio inputs with `checked` property true
+  - option elements that are selected
+- [ ] Implement `:indeterminate` matching
+  - checkbox with `indeterminate` property true
+  - radio buttons with no selection in group
+  - progress elements with no value
+- [ ] Add tests for :checked/:indeterminate
+
+### 27.4 Validity State (12 tests blocked)
+Prerequisites: 27.1 (Form Element Infrastructure), HTMLInputElement.validity
+- [ ] Implement `:valid` matching
+  - Form elements that satisfy validation constraints
+- [ ] Implement `:invalid` matching
+  - Form elements that do NOT satisfy validation constraints
+- [ ] Implement `:required` / `:optional` matching
+  - Based on `required` attribute
+- [ ] Implement `:in-range` / `:out-of-range` matching
+  - For number/date inputs with min/max
+- [ ] Add tests for validation pseudo-classes
+
+### 27.5 Read/Write State (4 tests blocked)
+Prerequisites: 27.1 (Form Element Infrastructure)
+- [ ] Implement `:read-only` matching
+  - readonly attribute OR not an editable element
+- [ ] Implement `:read-write` matching
+  - Editable inputs/textareas without readonly
+  - contenteditable elements
+- [ ] Add tests for :read-only/:read-write
+
+### 27.6 Placeholder/Default State (4 tests blocked)
+Prerequisites: 27.1 (Form Element Infrastructure)
+- [ ] Implement `:placeholder-shown` matching
+  - Input/textarea showing placeholder text
+- [ ] Implement `:default` matching
+  - Default button in form
+  - Default option in select
+  - Checked checkbox/radio with checked attribute
+- [ ] Add tests for :placeholder-shown/:default
+
+### 27.7 Focus State (8 tests blocked)
+Prerequisites: Event/Focus system
+- [ ] Implement `:focus` matching
+  - Element is the current focus target
+- [ ] Implement `:focus-within` matching
+  - Element or descendant has focus
+- [ ] Implement `:focus-visible` matching
+  - Focus should be visibly indicated (keyboard navigation)
+- [ ] Add tests for focus pseudo-classes
+
+## Phase 28: User Action Pseudo-Class Selectors
+Spec Reference: https://www.w3.org/TR/selectors-4/#useraction-pseudos
+Prerequisites: Event system, input device state tracking
+
+### 28.1 Hover/Active State (14 tests blocked)
+Prerequisites: Mouse/pointer event system
+- [ ] Add `Element.IsHovered` property (set by event handlers)
+- [ ] Add `Element.IsActive` property (mousedown/touchstart active)
+- [ ] Implement `:hover` matching in `PseudoClassSelector.Matches()`
+- [ ] Implement `:active` matching
+- [ ] Bubble state: parent of hovered element is also :hover
+- [ ] Add tests for :hover/:active
+
+### 28.2 Target Pseudo-Class (4 tests blocked)
+Prerequisites: URL fragment handling, Document.location
+- [ ] Implement `:target` matching
+  - Element whose ID matches URL fragment
+- [ ] Update on hashchange events
+- [ ] Add tests for :target
+
+### 28.3 Visited/Link State (4 tests blocked)
+Prerequisites: Link history tracking (privacy considerations)
+- [ ] Implement `:link` matching
+  - Unvisited hyperlinks (a, area with href)
+- [ ] Implement `:visited` matching
+  - Visited hyperlinks
+  - Note: Must limit queryable styles for privacy
+- [ ] Implement `:any-link` matching
+  - Any hyperlink (visited or not)
+- [ ] Add tests for link pseudo-classes
+
+## Phase 29: Selector Edge Cases & Escaping
+Spec Reference: https://www.w3.org/TR/css-syntax-3/#escaping
+Prerequisites: CSS Tokenizer escape sequence handling
+
+### 29.1 Escaped Character Parsing (10 tests blocked)
+- [ ] Verify tokenizer handles `\:` escape in identifiers
+- [ ] Verify tokenizer handles `\.` escape in class names
+- [ ] Verify tokenizer handles `\#` escape in identifiers
+- [ ] Verify tokenizer handles `\ ` (escaped space) in identifiers
+- [ ] Verify tokenizer handles `\\` (escaped backslash)
+- [ ] Add tests: `Parse_EscapedColon_InId`, `Parse_EscapedDot_InClassName`
+
+### 29.2 Unicode Escapes (4 tests blocked)
+Prerequisites: 29.1 (Escaped Character Parsing)
+- [ ] Verify tokenizer handles `\XXXXXX` hex escapes (1-6 hex digits)
+- [ ] Space after hex escape terminates the escape
+- [ ] Verify `\41 ` → "A" (hex 41)
+- [ ] Add tests: `Parse_UnicodeEscape`
+
+### 29.3 Unicode Identifiers (4 tests blocked)
+- [ ] Verify non-ASCII characters work in identifiers
+- [ ] Test CJK characters in class names: `.日本語`
+- [ ] Test emoji in class names: `.🎉`
+- [ ] Add tests for unicode selectors
+
+### 29.4 Legacy Single-Colon Pseudo-Elements (4 tests blocked)
+For backwards compatibility, `:before`, `:after`, `:first-line`, `:first-letter` should parse as pseudo-elements.
+- [ ] Add legacy pseudo-element name check in `Consume_Pseudo_Class_Selector`
+- [ ] Convert `:before` → `::before` etc. during parsing
+- [ ] Add tests: `Before_SingleColonLegacy`, `After_SingleColonLegacy`
+
+## Phase 30: Advanced DOM Selector Contexts
+Spec Reference: https://dom.spec.whatwg.org/#interface-documentfragment
+Prerequisites: DocumentFragment implementation
+
+### 30.1 DocumentFragment Selector Matching (3 tests blocked)
+- [ ] Verify selector matching works inside DocumentFragment
+- [ ] `:root` should NOT match elements in fragment (no document root)
+- [ ] Descendant selectors should work within fragment subtree
+- [ ] Add tests for DocumentFragment matching
+
+### 30.2 Shadow DOM Selectors (6 tests blocked)
+Prerequisites: Shadow DOM implementation (attachShadow, ShadowRoot)
+- [ ] Implement `:host` pseudo-class
+  - Matches shadow host from inside shadow tree
+- [ ] Implement `:host()` functional pseudo-class
+  - Matches shadow host if it matches argument
+- [ ] Implement `:host-context()` pseudo-class
+  - Matches if ancestor matches argument
+- [ ] Implement `::slotted()` pseudo-element
+  - Matches slotted content
+- [ ] Verify selectors don't pierce shadow boundary
+- [ ] Add tests for shadow DOM selectors
+
+### 30.3 Namespace Selectors (4 tests blocked)
+Prerequisites: XML namespace support
+- [ ] Parse `namespace|element` syntax
+- [ ] Parse `*|element` (any namespace)
+- [ ] Parse `|element` (no namespace)
+- [ ] Handle @namespace at-rule for prefix declaration
+- [ ] Add tests for namespace selectors
+
