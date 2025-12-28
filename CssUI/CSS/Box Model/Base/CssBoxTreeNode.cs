@@ -22,10 +22,16 @@ public class CssBoxTreeNode : TreeNode
     /// Layout position
     /// </summary>
     public Point2f Position { get; set; }
+
+    /// <summary>
+    /// Backing field for Size property
+    /// </summary>
+    private Rect2f _size;
+
     /// <summary>
     /// Layout dimensions
     /// </summary>
-    public virtual Rect2f Size { get; set; }
+    public virtual Rect2f Size { get => _size; set => _size = value; }
 
     #region TreeNode Overrides
     /// <inheritdoc/>
@@ -46,7 +52,8 @@ public class CssBoxTreeNode : TreeNode
     public CssBoxTreeNode(CssBoxTreeNode? parent) : base(parent!)
     {
         Position = Point2f.Zero;
-        Size = Rect2f.Zero;
+        // Use backing field directly to avoid virtual call in constructor
+        _size = Rect2f.Zero;
     }
 
     /// <summary>

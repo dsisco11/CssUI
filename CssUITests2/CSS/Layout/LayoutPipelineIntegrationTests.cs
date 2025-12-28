@@ -12,7 +12,6 @@ namespace CssUITests.CSS.Layout;
 /// <summary>
 /// Integration tests for the layout pipeline (Phase 14.1).
 /// Tests the BoxModel.Resolve integration in the event loop.
-/// NOTE: These tests are temporarily skipped due to layout pipeline freeze issues.
 /// </summary>
 public class LayoutPipelineIntegrationTests
 {
@@ -21,7 +20,7 @@ public class LayoutPipelineIntegrationTests
     /// <summary>
     /// Tests that BoxModel.Resolve can be called directly with valid inputs.
     /// </summary>
-    [Fact(Skip = "Skipped: ForceCascade causes freeze - needs investigation")]
+    [Fact]
     [Trait("Category", "Layout")]
     [Trait("Category", "Integration")]
     public void BoxModel_Resolve_WithValidInputs_DoesNotThrow()
@@ -50,7 +49,7 @@ public class LayoutPipelineIntegrationTests
     /// <summary>
     /// Tests that BoxModel.Resolve handles null checks as expected.
     /// </summary>
-    [Fact(Skip = "Skipped: ForceCascade causes freeze - needs investigation")]
+    [Fact]
     [Trait("Category", "Layout")]
     [Trait("Category", "Integration")]
     public void BoxModel_Resolve_WithNullBox_ThrowsArgumentNullException()
@@ -68,7 +67,7 @@ public class LayoutPipelineIntegrationTests
     /// <summary>
     /// Tests that BoxModel.Resolve handles null cascaded style.
     /// </summary>
-    [Fact(Skip = "Skipped: ForceCascade causes freeze - needs investigation")]
+    [Fact]
     [Trait("Category", "Layout")]
     [Trait("Category", "Integration")]
     public void BoxModel_Resolve_WithNullCascaded_ThrowsArgumentNullException()
@@ -95,7 +94,7 @@ public class LayoutPipelineIntegrationTests
     /// <summary>
     /// Tests that elements get NeedsStyleUpdate flag when style changes.
     /// </summary>
-    [Fact(Skip = "Skipped: ForceCascade causes freeze - needs investigation")]
+    [Fact]
     [Trait("Category", "Layout")]
     [Trait("Category", "Integration")]
     public void Element_StyleChange_SetsNeedsStyleUpdateFlag()
@@ -130,7 +129,7 @@ public class LayoutPipelineIntegrationTests
     /// <summary>
     /// Tests that ClearFlag correctly clears NeedsStyleUpdate.
     /// </summary>
-    [Fact(Skip = "Skipped: ForceCascade causes freeze - needs investigation")]
+    [Fact]
     [Trait("Category", "Layout")]
     [Trait("Category", "Integration")]
     public void ClearFlag_ClearsNeedsStyleUpdate()
@@ -157,7 +156,7 @@ public class LayoutPipelineIntegrationTests
     /// <summary>
     /// Tests that ForceCascade processes element styles.
     /// </summary>
-    [Fact(Skip = "Skipped: ForceCascade causes freeze - needs investigation")]
+    [Fact]
     [Trait("Category", "Layout")]
     [Trait("Category", "Integration")]
     public void ForceCascade_ProcessesElementStyles()
@@ -210,7 +209,7 @@ public class LayoutPipelineIntegrationTests
     /// Tests that Run_Event_Loop processes elements without infinite loop.
     /// Uses a timeout to detect potential infinite loops.
     /// </summary>
-    [Fact(Skip = "Test freezes due to layout pipeline issue - needs investigation")]
+    [Fact(Timeout = 5000)] // 5 second timeout
     [Trait("Category", "Layout")]
     [Trait("Category", "Integration")]
     public void Run_Event_Loop_WithElements_CompletesWithinTimeout()

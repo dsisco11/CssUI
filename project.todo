@@ -20,7 +20,7 @@
   - [ ] Update Window.QueueObserverMicroTask() to use new system
   - [ ] Ensure MutationObserver callbacks fire at correct timing per W3C spec
 
-## Test Coverage — Total: 4082 passing, 149 skipped, 0 failing = 4231 tests
+## Test Coverage — Total: 4151 passing, 149 skipped, 0 failing = 4300 tests
 ### DOM Tests: 518 passing, 3 skipped = 521 total
 ### Selector Tests: 307 passing, 143 skipped = 450 total
 
@@ -237,22 +237,23 @@ Create test helpers to enable BoxModel and layout testing.
 - [ ] Enable LayoutTestFixtureTests once pipeline is connected
 - [-] Add documentation for test fixture usage (not needed)
 
-### 14.3 BoxModel Integration Tests
+### 14.3 BoxModel Integration Tests ✓
 Use test fixture to verify existing BoxModel calculations.
-- [ ] Test auto margin centering (margin-left: auto; margin-right: auto)
-- [ ] Test percentage width resolution against containing block
-- [ ] Test min-width/max-width constraint application
-- [ ] Test height: auto calculation
-- [ ] Test absolutely positioned element constraint equation
-- [ ] Test replaced element intrinsic size handling
+- [x] Test auto margin centering (margin-left: auto; margin-right: auto)
+- [x] Test percentage width resolution against containing block
+- [x] Test min-width/max-width constraint application
+- [x] Test height: auto calculation
+- [x] Test absolutely positioned element constraint equation
+- [x] Test block with auto width fills available space
 
-### 14.4 Containing Block Chain Tests
+### 14.4 Containing Block Chain Tests ✓
 Verify containing block discovery and resolution.
-- [ ] Test Get_Containing_Block() for static positioned elements
-- [ ] Test Get_Containing_Block() for absolutely positioned elements
-- [ ] Test Get_Containing_Block() for fixed positioned elements
-- [ ] Test percentage resolution through containing block chain
-- [ ] Test viewport as initial containing block
+- [x] Test Get_Containing_Block() for static positioned elements
+- [x] Test Get_Containing_Block() for absolutely positioned elements
+- [x] Test Get_Containing_Block() for fixed positioned elements
+- [x] Test percentage resolution through containing block chain
+- [x] Test viewport as initial containing block
+- [x] Test deeply nested percentage resolution
 
 ### 14.5 Multi-Pass Layout Pipeline Architecture
 Refactor Run_Event_Loop from single TreeWalker pass into three distinct passes.

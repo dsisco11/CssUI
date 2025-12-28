@@ -223,11 +223,23 @@ public class LayoutTestFixture : IDisposable
     /// </summary>
     public void ForceBoxGeneration()
     {
-        // Set flags to trigger box generation
-        DocumentElement.SetFlag(ENodeFlags.NeedsBoxUpdate);
+        // Set flags recursively on all elements to trigger box generation
+        SetBoxUpdateFlagsRecursive(DocumentElement);
 
-        // Generate box tree
-        CssBoxTree.Generate_Tree(Document);
+        // Generate box tree starting from document element
+        CssBoxTree.Generate_Tree(DocumentElement);
+    }
+
+    private void SetBoxUpdateFlagsRecursive(Element element)
+    {
+        element.SetFlag(ENodeFlags.NeedsBoxUpdate);
+
+        var child = element.firstElementChild;
+        while (child != null)
+        {
+            SetBoxUpdateFlagsRecursive(child);
+            child = child.nextElementSibling;
+        }
     }
 
     /// <summary>

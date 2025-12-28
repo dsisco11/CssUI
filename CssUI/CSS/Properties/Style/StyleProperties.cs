@@ -386,13 +386,14 @@ public partial class StyleProperties
 
         // Get a list of only the properties with an Assigned value
         AsyncCountdownEvent? ctdn = null;
-        var targetFields = new FlagCollection<ECssPropertyID>((int)ECssPropertyID.MAX_VALUE);
+        // Use MAX_VALUE + 1 to match the length used by CssComputedStyle.SetProperties
+        var targetFields = new FlagCollection<ECssPropertyID>((int)ECssPropertyID.MAX_VALUE + 1);
         List<FlagCollection<ECssPropertyID>> allFields = CssRules.Values.Select(x => { return x.SetProperties; }).ToList();
 
-        // Remove duplicates
+        // Collect all unique property IDs that are set in any rule set (union)
         foreach (FlagCollection<ECssPropertyID> fields in allFields)
         {
-            targetFields.And(fields);
+            targetFields.Or(fields);
         }
 
         if (targetFields.ActiveFlags > 0)
@@ -443,22 +444,11 @@ public partial class StyleProperties
         // Recalculate ALL properties
         var PropList = Cascaded.GetAll().ToList();
 
-        /*ctdn = new AsyncCountdownEvent(PropList.Count);
-        Parallel.For(0, PropList.Count, (int i) =>
-        {
-            ICssProperty prop = PropList[i];
-            // We always want to compute these now to get their values resolved. otherwise any with just assigned values will not interpret and output computed values.
-            prop.Update(ComputeNow: true);
-            ctdn.Signal();
-        });
-        ctdn.WaitAsync().Wait();*/
-
-
         for (int i = 0; i < PropList.Count; i++)
         {
-            ICssProperty prop = PropList[i];
+            ICssProperty? prop = PropList[i];
             // We always want to compute these now to get their values resolved. otherwise any with just assigned values will not interpret and output computed values.
-            prop.Update(ComputeNow: true);
+            prop?.Update(ComputeNow: true);
         }
 
 
