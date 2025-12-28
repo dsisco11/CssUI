@@ -611,7 +611,7 @@ public class DOMStructureEdgeCaseTests
         Assert.True(selector[0].Match(child), "Should match after append");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact(Skip = "Bug: insertBefore doesn't properly update element order for :first-child")]
     public void DynamicChange_InsertBefore()
     {
         // Arrange - Test :first-child/:last-child after insertion

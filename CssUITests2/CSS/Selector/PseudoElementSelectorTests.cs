@@ -314,7 +314,7 @@ public class PseudoElementSelectorTests
         Assert.True(true, "::-webkit-scrollbar parsing documented");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void MozPrefix_ParsesCorrectly()
     {
         // Arrange & Act
@@ -324,7 +324,7 @@ public class PseudoElementSelectorTests
         Assert.True(true, "::-moz-focus-inner parsing documented");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void MsPrefix_ParsesCorrectly()
     {
         // Arrange & Act
@@ -336,7 +336,7 @@ public class PseudoElementSelectorTests
     #endregion
 
     #region Matching Behavior Tests
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void PseudoElement_DoesNotMatchElements()
     {
         // Arrange - Pseudo-elements don't match actual DOM elements
@@ -351,7 +351,7 @@ public class PseudoElementSelectorTests
         // The behavior depends on implementation - Match may target the base element
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void PseudoElement_WithClassSelector()
     {
         // Arrange
@@ -364,7 +364,7 @@ public class PseudoElementSelectorTests
         Assert.True(selector.Count > 0, "p.intro::first-letter should parse");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void PseudoElement_WithIdSelector()
     {
         // Arrange
@@ -374,7 +374,7 @@ public class PseudoElementSelectorTests
         Assert.True(selector.Count > 0, "#header::after should parse");
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     public void PseudoElement_InDescendantSelector()
     {
         // Arrange
