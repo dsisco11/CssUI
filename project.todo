@@ -11,7 +11,7 @@
   - [ ] Update Window.QueueObserverMicroTask() to use new system
   - [ ] Ensure MutationObserver callbacks fire at correct timing per W3C spec
 
-## Test Coverage — Total: 3914 passing, 144 skipped, 0 failing = 4058 tests
+## Test Coverage — Total: 3940 passing, 144 skipped, 0 failing = 4084 tests
 ### DOM Tests: 518 passing, 3 skipped = 521 total
 ### Selector Tests: 307 passing, 143 skipped = 450 total
 
@@ -77,7 +77,7 @@ Prerequisites: Phase 6 (CSS Parser), Phase 11.7.2 (Consume_Style_Block_Contents)
 - [x] Round-trip: parse → serialize → parse = same result (23 tests)
 - [-] Flatten nested rules to non-nested form (skipped)
 
-### 11.9.6 Tests
+### 11.9.6 Tests ✓
 - [x] Nesting selector parsing tests (24 tests)
 - [x] Nested style rule tests (24 tests)
 - [x] Nested @media tests (in NestedGroupRuleTests)
@@ -85,7 +85,7 @@ Prerequisites: Phase 6 (CSS Parser), Phase 11.7.2 (Consume_Style_Block_Contents)
 - [x] Nested @layer tests (in NestedGroupRuleTests)
 - [x] Specificity calculation tests (10 tests in NestingSelectorTests)
 - [x] Serialization round-trip tests (24 tests in CssNestingSerializationRoundTripTests)
-- [ ] Edge cases: deeply nested rules, multiple & usage
+- [x] Edge cases: deeply nested rules, multiple & usage (26 tests in NestingEdgeCaseTests)
 
 ## Phase 12: CSS Properties System
 
