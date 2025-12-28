@@ -1,148 +1,138 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Threading;
+using System.Runtime.Intrinsics;
+using System.Runtime.Intrinsics.X86;
 
 namespace CssUI.CSS;
 
 /// <summary>
-/// Manages multiple boolean values as single bits which allows for atomic operations and quick comparisons between large sets of boolean values
+/// Manages multiple boolean values as single bits which allows for atomic operations and quick comparisons between large sets of boolean values.
+/// Uses SIMD (Vector256) for hardware-accelerated bitwise operations when available.
 /// </summary>
-public class FlagCollection<FlagType> : IDisposable, IEnumerable<FlagType> where FlagType : struct
+public sealed class FlagCollection<FlagType> : IEnumerable<FlagType> where FlagType : struct
 {
-    private struct FlagOffset { public int Chunk, Bit; public uint Mask; }
-    const int CHUNK_SIZE = sizeof(int) * 8;
+    private readonly record struct FlagOffset(int Chunk, int Bit, uint Mask);
+    private const int CHUNK_SIZE = sizeof(uint) * 8; // 32 bits per chunk
+    private const int VECTOR_UINT_COUNT = 8; // Vector256<uint> holds 8 uints
 
     #region Properties
     /// <summary>
     /// Number of fields (bits) in this collection
     /// </summary>
-    public readonly int Length;
+    public int Length { get; }
+
     /// <summary>
-    /// Size in bytes of collection
+    /// Number of chunks (uint values) in this collection
     /// </summary>
-    private readonly uint Size;
-    private unsafe uint* ChunkData;
+    private int ChunkCount { get; }
+
     /// <summary>
-    /// Number of flags currently set to an active(true) state
+    /// The underlying chunk data storage (aligned for SIMD)
+    /// </summary>
+    private readonly uint[] _chunks;
+
+    /// <summary>
+    /// Number of flags currently set to an active (true) state
     /// </summary>
     public int ActiveFlags { get; private set; }
+
+    /// <summary>
+    /// Whether AVX2 SIMD operations are available on this hardware
+    /// </summary>
+    private static bool IsAvx2Supported => Avx2.IsSupported;
     #endregion
 
     #region Constructors
     public FlagCollection(int length)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(length);
+
         Length = length;
-        Size = (uint)Math.Ceiling((double)Length / CHUNK_SIZE);
-        unsafe
-        {
-            ChunkData = (uint*)Marshal.AllocHGlobal((int)Size);
-        }
+        // Calculate number of uint chunks needed (each chunk holds 32 bits)
+        // Pad to multiple of VECTOR_UINT_COUNT for SIMD alignment
+        int minChunks = (length + CHUNK_SIZE - 1) / CHUNK_SIZE;
+        ChunkCount = ((minChunks + VECTOR_UINT_COUNT - 1) / VECTOR_UINT_COUNT) * VECTOR_UINT_COUNT;
+
+        // Array is automatically zero-initialized
+        _chunks = GC.AllocateArray<uint>(ChunkCount, pinned: false);
     }
 
-    #region IDisposable Support
-    private int Disposed = 0;
-
-    protected virtual void Dispose(bool userInitiated)
+    /// <summary>
+    /// Private constructor for creating copies with existing data
+    /// </summary>
+    private FlagCollection(int length, int chunkCount, ReadOnlySpan<uint> sourceChunks)
     {
-        if (Interlocked.Exchange(ref Disposed, 1) == 0)
-        {
-            if (userInitiated)
-            {
-                unsafe
-                {
-                    Marshal.FreeHGlobal((IntPtr)ChunkData);
-                    ChunkData = null;
-                }
-            }
-        }
+        Length = length;
+        ChunkCount = chunkCount;
+        _chunks = GC.AllocateArray<uint>(ChunkCount, pinned: false);
+        sourceChunks.CopyTo(_chunks);
+        ActiveFlags = TallyActiveSimd();
     }
-
-    ~FlagCollection()
-    {
-        Dispose(false);
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-    #endregion
     #endregion
 
     #region Flag Accessors
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private uint Get_Chunk_Data(int Chunk)
+    private FlagOffset GetFlagOffset(int flagNum)
     {
-        unsafe
+        ArgumentOutOfRangeException.ThrowIfNegative(flagNum);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(flagNum, Length);
+
+        int bitNum = flagNum % CHUNK_SIZE;
+        return new FlagOffset(
+            Chunk: flagNum / CHUNK_SIZE,
+            Bit: bitNum,
+            Mask: 1u << bitNum
+        );
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool GetFlag(int flagNum)
+    {
+        var pos = GetFlagOffset(flagNum);
+        return (_chunks[pos.Chunk] & pos.Mask) != 0;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetFlag(int flagNum)
+    {
+        var pos = GetFlagOffset(flagNum);
+        ref uint chunk = ref _chunks[pos.Chunk];
+        if ((chunk & pos.Mask) == 0)
         {
-            return ChunkData[Chunk];
+            ActiveFlags++;
+            chunk |= pos.Mask;
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private FlagOffset Get_Flag_Offset(int FlagNum)
+    public void SetFlag(int flagNum, bool state)
     {
-        Contract.Requires<ArgumentOutOfRangeException>(FlagNum < Length, nameof(FlagNum));
-        var BitNum = FlagNum % CHUNK_SIZE;
-        return new FlagOffset()
+        var pos = GetFlagOffset(flagNum);
+        ref uint chunk = ref _chunks[pos.Chunk];
+        bool current = (chunk & pos.Mask) != 0;
+        if (current != state)
         {
-            Chunk = FlagNum / CHUNK_SIZE,
-            Bit = BitNum,
-            Mask = 1u << BitNum
-        };
-    }
-
-    public bool GetFlag(int FlagNum)
-    {
-        var pos = Get_Flag_Offset(FlagNum);
-        unsafe
-        {
-            return (ChunkData[pos.Chunk] & pos.Mask) != 0;
+            ActiveFlags += state ? 1 : -1;
+            if (state)
+                chunk |= pos.Mask;
+            else
+                chunk &= ~pos.Mask;
         }
     }
 
-    public void SetFlag(int FlagNum)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void ClearFlag(int flagNum)
     {
-        var pos = Get_Flag_Offset(FlagNum);
-        unsafe
+        var pos = GetFlagOffset(flagNum);
+        ref uint chunk = ref _chunks[pos.Chunk];
+        if ((chunk & pos.Mask) != 0)
         {
-            if ((ChunkData[pos.Chunk] & pos.Mask) == 0)
-            {
-                ActiveFlags += 1;
-                ChunkData[pos.Chunk] |= pos.Mask;
-            }
-        }
-    }
-
-    public void SetFlag(int FlagNum, bool State)
-    {
-        var pos = Get_Flag_Offset(FlagNum);
-        unsafe
-        {
-            bool current = (ChunkData[pos.Chunk] & pos.Mask) != 0;
-            if (current != State)
-            {// Flag is going to change state
-                ActiveFlags += State ? 1 : -1;
-                ChunkData[pos.Chunk] = (ChunkData[pos.Chunk] & ~pos.Mask) | ((uint)(-(State ? 1 : 0)) & pos.Mask);
-            }
-        }
-    }
-
-    public void ClearFlag(int FlagNum)
-    {
-        var pos = Get_Flag_Offset(FlagNum);
-        unsafe
-        {
-            if ((ChunkData[pos.Chunk] & pos.Mask) != 0)
-            {
-                ActiveFlags -= 1;
-                ChunkData[pos.Chunk] &= ~pos.Mask;
-            }
+            ActiveFlags--;
+            chunk &= ~pos.Mask;
         }
     }
 
@@ -154,27 +144,50 @@ public class FlagCollection<FlagType> : IDisposable, IEnumerable<FlagType> where
         if (ActiveFlags != 0)
         {
             ActiveFlags = 0;
-            unsafe
-            {
-                Unsafe.InitBlock(((void*)ChunkData), 0x0, Size);
-            }
+            Array.Clear(_chunks);
         }
     }
 
     /// <summary>
-    /// Manually tallys all of the set flags
+    /// Tallies all set flags using SIMD PopCount when available
     /// </summary>
-    private int Tally_Active()
+    private int TallyActiveSimd()
     {
-        int RetVal = 0;
-        for (int i = 0; i < Length; i++)
+        int count = 0;
+        ReadOnlySpan<uint> chunks = _chunks;
+
+        if (IsAvx2Supported && ChunkCount >= VECTOR_UINT_COUNT)
         {
-            if (GetFlag(i))
+            // Use SIMD for bulk processing
+            ref uint chunksRef = ref MemoryMarshal.GetReference(chunks);
+            int vectorizedLength = ChunkCount - (ChunkCount % VECTOR_UINT_COUNT);
+
+            for (int i = 0; i < vectorizedLength; i += VECTOR_UINT_COUNT)
             {
-                RetVal++;
+                Vector256<uint> vec = Vector256.LoadUnsafe(ref chunksRef, (nuint)i);
+                // Sum popcount of each element
+                for (int j = 0; j < VECTOR_UINT_COUNT; j++)
+                {
+                    count += System.Numerics.BitOperations.PopCount(vec.GetElement(j));
+                }
+            }
+
+            // Handle remainder
+            for (int i = vectorizedLength; i < ChunkCount; i++)
+            {
+                count += System.Numerics.BitOperations.PopCount(chunks[i]);
             }
         }
-        return RetVal;
+        else
+        {
+            // Scalar fallback
+            foreach (uint chunk in chunks)
+            {
+                count += System.Numerics.BitOperations.PopCount(chunk);
+            }
+        }
+
+        return count;
     }
     #endregion
 
@@ -182,70 +195,67 @@ public class FlagCollection<FlagType> : IDisposable, IEnumerable<FlagType> where
     /// <summary>
     /// Returns <c>True</c> if this collection has no set flags
     /// </summary>
-    /// <returns></returns>
-    public bool IsEmpty()
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool IsEmpty() => ActiveFlags == 0;
+
+    public override bool Equals(object? obj)
     {
-        return ActiveFlags == 0;
-        unsafe
+        if (obj is FlagCollection<FlagType> other && Length == other.Length)
         {
-            for (int i = 0; i < Size; i++)
+            return EqualsSimd(other);
+        }
+        return false;
+    }
+
+    private bool EqualsSimd(FlagCollection<FlagType> other)
+    {
+        if (IsAvx2Supported && ChunkCount >= VECTOR_UINT_COUNT)
+        {
+            ref uint leftRef = ref MemoryMarshal.GetArrayDataReference(_chunks);
+            ref uint rightRef = ref MemoryMarshal.GetArrayDataReference(other._chunks);
+            int vectorizedLength = ChunkCount - (ChunkCount % VECTOR_UINT_COUNT);
+
+            for (int i = 0; i < vectorizedLength; i += VECTOR_UINT_COUNT)
             {
-                if (ChunkData[i] != 0)
+                Vector256<uint> left = Vector256.LoadUnsafe(ref leftRef, (nuint)i);
+                Vector256<uint> right = Vector256.LoadUnsafe(ref rightRef, (nuint)i);
+                if (!left.Equals(right))
+                    return false;
+            }
+
+            // Handle remainder
+            for (int i = vectorizedLength; i < ChunkCount; i++)
+            {
+                if (_chunks[i] != other._chunks[i])
                     return false;
             }
             return true;
         }
-    }
-
-    public override bool Equals(object? obj)
-    {
-        if (obj is FlagCollection<FlagType> other)
+        else
         {
-            if (Size == other.Size)
-            {
-                unsafe
-                {
-                    for (int i = 0; i < Size; i++)
-                    {
-                        if (ChunkData[i] != other.ChunkData[i])
-                            return false;
-                    }
-                    return true;
-                }
-            }
+            return _chunks.AsSpan().SequenceEqual(other._chunks);
         }
-
-        return false;
     }
 
-    public static bool operator ==(FlagCollection<FlagType> Left, FlagCollection<FlagType> Right)
+    public static bool operator ==(FlagCollection<FlagType>? left, FlagCollection<FlagType>? right)
     {
-        if (Left.Size == Right.Size)
-        {
-            unsafe
-            {
-                for (int i = 0; i < Left.Size; i++)
-                {
-                    if (Left.ChunkData[i] != Right.ChunkData[i])
-                        return false;
-                }
-                return true;
-            }
-        }
-        return false;
+        if (left is null) return right is null;
+        if (right is null) return false;
+        if (left.Length != right.Length) return false;
+        return left.EqualsSimd(right);
     }
 
-    public static bool operator !=(FlagCollection<FlagType> Left, FlagCollection<FlagType> Right)
+    public static bool operator !=(FlagCollection<FlagType>? left, FlagCollection<FlagType>? right)
     {
-        return !(Left == Right);
+        return !(left == right);
     }
 
     /// <summary>
-    /// Returns <c>True</c> if the given collection also has all of this collections active flags set
+    /// Returns <c>True</c> if the given collection also has all of this collection's active flags set
     /// </summary>
-    public bool IsSubsetOf(FlagCollection<FlagType> Right)
+    public bool IsSubsetOf(FlagCollection<FlagType> right)
     {
-        return (this & Right) == this;
+        return (this & right) == this;
     }
     #endregion
 
@@ -253,140 +263,338 @@ public class FlagCollection<FlagType> : IDisposable, IEnumerable<FlagType> where
     /// <summary>
     /// Returns the inverse of this collection
     /// </summary>
-    public static FlagCollection<FlagType> operator ~(FlagCollection<FlagType> Left)
+    public static FlagCollection<FlagType> operator ~(FlagCollection<FlagType> left)
     {
-        var RetVal = new FlagCollection<FlagType>(Left.Length);
-        unsafe
+        var result = new FlagCollection<FlagType>(left.Length);
+
+        if (IsAvx2Supported && left.ChunkCount >= VECTOR_UINT_COUNT)
         {
-            for (int i = 0; i < Left.Size; i++)
+            ref uint srcRef = ref MemoryMarshal.GetArrayDataReference(left._chunks);
+            ref uint dstRef = ref MemoryMarshal.GetArrayDataReference(result._chunks);
+            int vectorizedLength = left.ChunkCount - (left.ChunkCount % VECTOR_UINT_COUNT);
+
+            for (int i = 0; i < vectorizedLength; i += VECTOR_UINT_COUNT)
             {
-                RetVal.ChunkData[i] = ~Left.ChunkData[i];
+                Vector256<uint> vec = Vector256.LoadUnsafe(ref srcRef, (nuint)i);
+                Vector256<uint> inverted = ~vec;
+                inverted.StoreUnsafe(ref dstRef, (nuint)i);
+            }
+
+            for (int i = vectorizedLength; i < left.ChunkCount; i++)
+            {
+                result._chunks[i] = ~left._chunks[i];
             }
         }
-        return RetVal;
+        else
+        {
+            for (int i = 0; i < left.ChunkCount; i++)
+            {
+                result._chunks[i] = ~left._chunks[i];
+            }
+        }
+
+        result.ActiveFlags = left.Length - left.ActiveFlags;
+        return result;
     }
 
     /// <summary>
     /// Returns a new collection with all flags that are in both this and the other collection
     /// </summary>
-    public static FlagCollection<FlagType> operator &(FlagCollection<FlagType> Left, FlagCollection<FlagType> Right)
+    public static FlagCollection<FlagType> operator &(FlagCollection<FlagType> left, FlagCollection<FlagType> right)
     {
-        var RetVal = new FlagCollection<FlagType>(Left.Length);
-        unsafe
+        var result = new FlagCollection<FlagType>(left.Length);
+        int minCount = Math.Min(left.ChunkCount, right.ChunkCount);
+
+        if (IsAvx2Supported && minCount >= VECTOR_UINT_COUNT)
         {
-            for (int i = 0; i < Left.Size; i++)
+            ref uint leftRef = ref MemoryMarshal.GetArrayDataReference(left._chunks);
+            ref uint rightRef = ref MemoryMarshal.GetArrayDataReference(right._chunks);
+            ref uint dstRef = ref MemoryMarshal.GetArrayDataReference(result._chunks);
+            int vectorizedLength = minCount - (minCount % VECTOR_UINT_COUNT);
+
+            for (int i = 0; i < vectorizedLength; i += VECTOR_UINT_COUNT)
             {
-                RetVal.ChunkData[i] = Left.ChunkData[i] & Right.ChunkData[i];
+                Vector256<uint> l = Vector256.LoadUnsafe(ref leftRef, (nuint)i);
+                Vector256<uint> r = Vector256.LoadUnsafe(ref rightRef, (nuint)i);
+                Vector256<uint> res = l & r;
+                res.StoreUnsafe(ref dstRef, (nuint)i);
+            }
+
+            for (int i = vectorizedLength; i < minCount; i++)
+            {
+                result._chunks[i] = left._chunks[i] & right._chunks[i];
             }
         }
-        return RetVal;
+        else
+        {
+            for (int i = 0; i < minCount; i++)
+            {
+                result._chunks[i] = left._chunks[i] & right._chunks[i];
+            }
+        }
+
+        result.ActiveFlags = result.TallyActiveSimd();
+        return result;
     }
 
     /// <summary>
     /// Returns a new collection with all flags that are in either this or the other collection
     /// </summary>
-    public static FlagCollection<FlagType> operator |(FlagCollection<FlagType> Left, FlagCollection<FlagType> Right)
+    public static FlagCollection<FlagType> operator |(FlagCollection<FlagType> left, FlagCollection<FlagType> right)
     {
-        var RetVal = new FlagCollection<FlagType>(Left.Length);
-        unsafe
+        var result = new FlagCollection<FlagType>(left.Length);
+        int minCount = Math.Min(left.ChunkCount, right.ChunkCount);
+
+        if (IsAvx2Supported && minCount >= VECTOR_UINT_COUNT)
         {
-            for (int i = 0; i < Left.Size; i++)
+            ref uint leftRef = ref MemoryMarshal.GetArrayDataReference(left._chunks);
+            ref uint rightRef = ref MemoryMarshal.GetArrayDataReference(right._chunks);
+            ref uint dstRef = ref MemoryMarshal.GetArrayDataReference(result._chunks);
+            int vectorizedLength = minCount - (minCount % VECTOR_UINT_COUNT);
+
+            for (int i = 0; i < vectorizedLength; i += VECTOR_UINT_COUNT)
             {
-                RetVal.ChunkData[i] = Left.ChunkData[i] | Right.ChunkData[i];
+                Vector256<uint> l = Vector256.LoadUnsafe(ref leftRef, (nuint)i);
+                Vector256<uint> r = Vector256.LoadUnsafe(ref rightRef, (nuint)i);
+                Vector256<uint> res = l | r;
+                res.StoreUnsafe(ref dstRef, (nuint)i);
+            }
+
+            for (int i = vectorizedLength; i < minCount; i++)
+            {
+                result._chunks[i] = left._chunks[i] | right._chunks[i];
             }
         }
-        return RetVal;
+        else
+        {
+            for (int i = 0; i < minCount; i++)
+            {
+                result._chunks[i] = left._chunks[i] | right._chunks[i];
+            }
+        }
+
+        // Copy remaining from longer collection
+        if (left.ChunkCount > minCount)
+        {
+            left._chunks.AsSpan(minCount).CopyTo(result._chunks.AsSpan(minCount));
+        }
+
+        result.ActiveFlags = result.TallyActiveSimd();
+        return result;
     }
 
     /// <summary>
     /// Returns a new collection with all flags that are in either this or the other collection but not both
     /// </summary>
-    public static FlagCollection<FlagType> operator ^(FlagCollection<FlagType> Left, FlagCollection<FlagType> Right)
+    public static FlagCollection<FlagType> operator ^(FlagCollection<FlagType> left, FlagCollection<FlagType> right)
     {
-        var RetVal = new FlagCollection<FlagType>(Left.Length);
-        unsafe
+        var result = new FlagCollection<FlagType>(left.Length);
+        int minCount = Math.Min(left.ChunkCount, right.ChunkCount);
+
+        if (IsAvx2Supported && minCount >= VECTOR_UINT_COUNT)
         {
-            for (int i = 0; i < Left.Size; i++)
+            ref uint leftRef = ref MemoryMarshal.GetArrayDataReference(left._chunks);
+            ref uint rightRef = ref MemoryMarshal.GetArrayDataReference(right._chunks);
+            ref uint dstRef = ref MemoryMarshal.GetArrayDataReference(result._chunks);
+            int vectorizedLength = minCount - (minCount % VECTOR_UINT_COUNT);
+
+            for (int i = 0; i < vectorizedLength; i += VECTOR_UINT_COUNT)
             {
-                RetVal.ChunkData[i] = Left.ChunkData[i] ^ Right.ChunkData[i];
+                Vector256<uint> l = Vector256.LoadUnsafe(ref leftRef, (nuint)i);
+                Vector256<uint> r = Vector256.LoadUnsafe(ref rightRef, (nuint)i);
+                Vector256<uint> res = l ^ r;
+                res.StoreUnsafe(ref dstRef, (nuint)i);
+            }
+
+            for (int i = vectorizedLength; i < minCount; i++)
+            {
+                result._chunks[i] = left._chunks[i] ^ right._chunks[i];
             }
         }
-        return RetVal;
+        else
+        {
+            for (int i = 0; i < minCount; i++)
+            {
+                result._chunks[i] = left._chunks[i] ^ right._chunks[i];
+            }
+        }
+
+        result.ActiveFlags = result.TallyActiveSimd();
+        return result;
     }
     #endregion
 
     #region Bitwise Assignments
 
     /// <summary>
-    /// Inverts this collections flags
+    /// Inverts this collection's flags
     /// </summary>
     public void Invert()
     {
-        unsafe
+        if (IsAvx2Supported && ChunkCount >= VECTOR_UINT_COUNT)
         {
-            for (int i = 0; i < Size; i++)
+            ref uint chunksRef = ref MemoryMarshal.GetArrayDataReference(_chunks);
+            int vectorizedLength = ChunkCount - (ChunkCount % VECTOR_UINT_COUNT);
+
+            for (int i = 0; i < vectorizedLength; i += VECTOR_UINT_COUNT)
             {
-                ChunkData[i] = ~ChunkData[i];
+                Vector256<uint> vec = Vector256.LoadUnsafe(ref chunksRef, (nuint)i);
+                Vector256<uint> inverted = ~vec;
+                inverted.StoreUnsafe(ref chunksRef, (nuint)i);
             }
-            ActiveFlags = (Length - ActiveFlags);
+
+            for (int i = vectorizedLength; i < ChunkCount; i++)
+            {
+                _chunks[i] = ~_chunks[i];
+            }
         }
+        else
+        {
+            for (int i = 0; i < ChunkCount; i++)
+            {
+                _chunks[i] = ~_chunks[i];
+            }
+        }
+
+        ActiveFlags = Length - ActiveFlags;
     }
 
     /// <summary>
-    /// Adds all of the set flags from the given collection to this one
+    /// Keeps only flags that are set in BOTH this collection and the given collection (intersection).
+    /// Flags beyond the shorter collection's length are cleared.
     /// </summary>
-    public void And(FlagCollection<FlagType> Right)
+    public void And(FlagCollection<FlagType> right)
     {
-        unsafe
+        int minCount = Math.Min(ChunkCount, right.ChunkCount);
+
+        if (IsAvx2Supported && minCount >= VECTOR_UINT_COUNT)
         {
-            for (int i = 0; i < Size; i++)
+            ref uint leftRef = ref MemoryMarshal.GetArrayDataReference(_chunks);
+            ref uint rightRef = ref MemoryMarshal.GetArrayDataReference(right._chunks);
+            int vectorizedLength = minCount - (minCount % VECTOR_UINT_COUNT);
+
+            for (int i = 0; i < vectorizedLength; i += VECTOR_UINT_COUNT)
             {
-                ChunkData[i] &= Right.ChunkData[i];
+                Vector256<uint> l = Vector256.LoadUnsafe(ref leftRef, (nuint)i);
+                Vector256<uint> r = Vector256.LoadUnsafe(ref rightRef, (nuint)i);
+                Vector256<uint> res = l & r;
+                res.StoreUnsafe(ref leftRef, (nuint)i);
             }
-            /// There's no smart way to determine this, we have to do it manually
-            ActiveFlags = Tally_Active();
+
+            for (int i = vectorizedLength; i < minCount; i++)
+            {
+                _chunks[i] &= right._chunks[i];
+            }
         }
+        else
+        {
+            for (int i = 0; i < minCount; i++)
+            {
+                _chunks[i] &= right._chunks[i];
+            }
+        }
+
+        // Clear chunks beyond the right collection's size
+        for (int i = minCount; i < ChunkCount; i++)
+        {
+            _chunks[i] = 0;
+        }
+
+        ActiveFlags = TallyActiveSimd();
     }
 
-
     /// <summary>
-    /// Returns all of the set flags
+    /// Adds all of the set flags from the given collection to this one (union).
+    /// Only processes flags up to the shorter of the two collections.
+    /// </summary>
+    public void Or(FlagCollection<FlagType> right)
+    {
+        int minCount = Math.Min(ChunkCount, right.ChunkCount);
+
+        if (IsAvx2Supported && minCount >= VECTOR_UINT_COUNT)
+        {
+            ref uint leftRef = ref MemoryMarshal.GetArrayDataReference(_chunks);
+            ref uint rightRef = ref MemoryMarshal.GetArrayDataReference(right._chunks);
+            int vectorizedLength = minCount - (minCount % VECTOR_UINT_COUNT);
+
+            for (int i = 0; i < vectorizedLength; i += VECTOR_UINT_COUNT)
+            {
+                Vector256<uint> l = Vector256.LoadUnsafe(ref leftRef, (nuint)i);
+                Vector256<uint> r = Vector256.LoadUnsafe(ref rightRef, (nuint)i);
+                Vector256<uint> res = l | r;
+                res.StoreUnsafe(ref leftRef, (nuint)i);
+            }
+
+            for (int i = vectorizedLength; i < minCount; i++)
+            {
+                _chunks[i] |= right._chunks[i];
+            }
+        }
+        else
+        {
+            for (int i = 0; i < minCount; i++)
+            {
+                _chunks[i] |= right._chunks[i];
+            }
+        }
+
+        ActiveFlags = TallyActiveSimd();
+    }
+    #endregion
+
+    #region Enumeration
+    /// <summary>
+    /// Returns all of the set flag indices
     /// </summary>
     public IEnumerator<FlagType> GetEnumerator()
     {
         if (ActiveFlags <= 0) yield break;
 
-        int FlagNum = 0;
-        for (int i = 0; i < Size; i++)
+        int flagNum = 0;
+        int actualChunkCount = (Length + CHUNK_SIZE - 1) / CHUNK_SIZE;
+
+        for (int i = 0; i < actualChunkCount; i++)
         {
-            uint mask = unchecked((uint)-1);
-            for (int j = 0; j < CHUNK_SIZE; j++)
+            uint chunkData = _chunks[i];
+
+            // Skip empty chunks entirely
+            if (chunkData == 0)
             {
-                mask <<= 1;
-                if ((Get_Chunk_Data(i) & mask) != 0)
-                {
-                    yield return CastTo<FlagType>.From(FlagNum);
-                }
-                FlagNum++;
+                flagNum += CHUNK_SIZE;
+                if (flagNum >= Length) yield break;
+                continue;
             }
+
+            // Use trailing zero count to find set bits quickly
+            while (chunkData != 0)
+            {
+                int trailingZeros = System.Numerics.BitOperations.TrailingZeroCount(chunkData);
+                int currentFlag = flagNum + trailingZeros;
+
+                if (currentFlag >= Length) yield break;
+
+                yield return CastTo<FlagType>.From(currentFlag);
+
+                // Clear the lowest set bit
+                chunkData &= chunkData - 1;
+            }
+
+            flagNum += CHUNK_SIZE;
+            if (flagNum >= Length) yield break;
         }
-
-        yield break;
     }
 
-    /// <summary>
-    /// Returns all of the set flags
-    /// </summary>
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     public override int GetHashCode()
     {
-        throw new NotImplementedException();
+        var hash = new HashCode();
+        int actualChunkCount = (Length + CHUNK_SIZE - 1) / CHUNK_SIZE;
+        for (int i = 0; i < actualChunkCount; i++)
+        {
+            hash.Add(_chunks[i]);
+        }
+        return hash.ToHashCode();
     }
     #endregion
-
 }
-
