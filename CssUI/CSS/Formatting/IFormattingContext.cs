@@ -11,13 +11,21 @@ public interface IFormattingContext
     /// Performs layout on all elements within the target.
     /// </summary>
     /// <param name="node">The box tree node to layout.</param>
-    void Flow(CssBoxTreeNode node);
+    /// <returns>
+    /// The content dimensions (width, height) of the laid out content.
+    /// Used for resolving 'auto' height on the container during bottom-up height resolution.
+    /// </returns>
+    Rect2f Flow(CssBoxTreeNode node);
 
     /// <summary>
     /// Performs layout with fragmentation support.
     /// </summary>
     /// <param name="node">The box tree node to layout.</param>
     /// <param name="fragmentationContext">The fragmentation context for break handling.</param>
-    void Flow(CssBoxTreeNode node, FragmentationContext fragmentationContext) => Flow(node);
+    /// <returns>
+    /// The content dimensions (width, height) of the laid out content.
+    /// Used for resolving 'auto' height on the container during bottom-up height resolution.
+    /// </returns>
+    Rect2f Flow(CssBoxTreeNode node, FragmentationContext fragmentationContext) => Flow(node);
 }
 

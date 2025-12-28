@@ -143,15 +143,17 @@ public class GridFormattingContext : IFormattingContext
     /// <summary>
     /// Performs grid layout on the container and its children.
     /// </summary>
-    public void Flow(CssBoxTreeNode? node)
+    /// <returns>The content dimensions (width, height) of the laid out content.</returns>
+    public Rect2f Flow(CssBoxTreeNode? node)
     {
-        Flow(node, new FragmentationContext());
+        return Flow(node, new FragmentationContext());
     }
 
     /// <summary>
     /// Performs grid layout with fragmentation support.
     /// </summary>
-    public void Flow(CssBoxTreeNode? node, FragmentationContext fragmentationContext)
+    /// <returns>The content dimensions (width, height) of the laid out content.</returns>
+    public Rect2f Flow(CssBoxTreeNode? node, FragmentationContext fragmentationContext)
     {
         ArgumentNullException.ThrowIfNull(node);
         Contract.EndContractBlock();
@@ -159,7 +161,7 @@ public class GridFormattingContext : IFormattingContext
         _container = node as CssPrincipalBox;
         if (_container is null)
         {
-            return;
+            return Rect2f.Zero;
         }
 
         _fragmentationContext = fragmentationContext;
@@ -182,7 +184,7 @@ public class GridFormattingContext : IFormattingContext
 
         if (_gridItems!.Count == 0)
         {
-            return;
+            return Rect2f.Zero;
         }
 
         // §7.2 Define the explicit grid
@@ -205,6 +207,31 @@ public class GridFormattingContext : IFormattingContext
 
         // Apply positions to elements
         ApplyFinalPositions();
+
+        // Calculate and return content dimensions
+        return CalculateContentDimensions();
+    }
+
+    /// <summary>
+    /// Calculates the content dimensions after layout.
+    /// </summary>
+    private Rect2f CalculateContentDimensions()
+    {
+        if (_gridItems is null || _gridItems.Count == 0)
+            return Rect2f.Zero;
+
+        float maxWidth = 0;
+        float maxHeight = 0;
+
+        foreach (var item in _gridItems)
+        {
+            float rightEdge = item.X + item.Width;
+            float bottomEdge = item.Y + item.Height;
+            maxWidth = Math.Max(maxWidth, rightEdge);
+            maxHeight = Math.Max(maxHeight, bottomEdge);
+        }
+
+        return new Rect2f(maxWidth, maxHeight);
     }
 
     #region §7.1 Grid Item Generation

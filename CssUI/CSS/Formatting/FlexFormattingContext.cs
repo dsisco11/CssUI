@@ -101,15 +101,17 @@ public class FlexFormattingContext : IFormattingContext
     /// <summary>
     /// Performs flex layout on the container and its children.
     /// </summary>
-    public void Flow(CssBoxTreeNode? node)
+    /// <returns>The content dimensions (width, height) of the laid out content.</returns>
+    public Rect2f Flow(CssBoxTreeNode? node)
     {
-        Flow(node, new FragmentationContext());
+        return Flow(node, new FragmentationContext());
     }
 
     /// <summary>
     /// Performs flex layout with fragmentation support.
     /// </summary>
-    public void Flow(CssBoxTreeNode? node, FragmentationContext fragmentationContext)
+    /// <returns>The content dimensions (width, height) of the laid out content.</returns>
+    public Rect2f Flow(CssBoxTreeNode? node, FragmentationContext fragmentationContext)
     {
         ArgumentNullException.ThrowIfNull(node);
         Contract.EndContractBlock();
@@ -117,7 +119,7 @@ public class FlexFormattingContext : IFormattingContext
         _container = node as CssPrincipalBox;
         if (_container is null)
         {
-            return;
+            return Rect2f.Zero;
         }
 
         _fragmentationContext = fragmentationContext;
@@ -151,7 +153,7 @@ public class FlexFormattingContext : IFormattingContext
 
         if (_flexItems!.Count == 0)
         {
-            return;
+            return Rect2f.Zero;
         }
 
         // §9.2 Determine main size and collect into lines
@@ -180,6 +182,39 @@ public class FlexFormattingContext : IFormattingContext
 
         // Apply final positions
         ApplyFinalPositions();
+
+        // Calculate and return content dimensions
+        return CalculateContentDimensions();
+    }
+
+    /// <summary>
+    /// Calculates the content dimensions after layout.
+    /// </summary>
+    private Rect2f CalculateContentDimensions()
+    {
+        if (_flexItems is null || _flexItems.Count == 0)
+            return Rect2f.Zero;
+
+        float maxMainAxis = 0;
+        float maxCrossAxis = 0;
+
+        foreach (var item in _flexItems)
+        {
+            float mainEnd = item.MainAxisPosition + item.TargetMainSize;
+            float crossEnd = item.CrossAxisPosition + item.UsedCrossSize;
+            maxMainAxis = Math.Max(maxMainAxis, mainEnd);
+            maxCrossAxis = Math.Max(maxCrossAxis, crossEnd);
+        }
+
+        // Convert from main/cross to width/height based on flex direction
+        if (IsMainAxisHorizontal)
+        {
+            return new Rect2f(maxMainAxis, maxCrossAxis);
+        }
+        else
+        {
+            return new Rect2f(maxCrossAxis, maxMainAxis);
+        }
     }
 
     #region §9.1 Initial Setup

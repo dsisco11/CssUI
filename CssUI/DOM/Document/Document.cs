@@ -5,6 +5,7 @@ using System.Diagnostics.Contracts;
 using System.Text;
 using System.Threading;
 using CssUI.CSS;
+using CssUI.CSS.BoxTree;
 using CssUI.CSS.Internal;
 using CssUI.DOM.CustomElements;
 using CssUI.DOM.Enums;
@@ -430,11 +431,9 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
             if (node is Element element && node.GetFlag(ENodeFlags.NeedsReflow))
             {
                 // Resolve width using containing block (parent's width)
-                if (element.Box is not null && node.Style?.Cascaded is not null)
+                if (element.Box is CssPrincipalBox principalBox && node.Style?.Cascaded is not null)
                 {
-                    // TODO: Call BoxModel.ResolveWidth() when split is implemented
-                    // For now, call the full Resolve() which handles both axes
-                    BoxModel.Resolve(element.Box, node.Style.Cascaded);
+                    BoxModel.ResolveWidth(principalBox, node.Style.Cascaded);
                 }
             }
         }
@@ -448,14 +447,19 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
             if (node is Element element && node.GetFlag(ENodeFlags.NeedsReflow))
             {
                 // Call Flow() to position children and get content height
+                double? contentHeight = null;
                 Element? flowContainer = CssCommon.Find_Formatting_Container(element);
                 if (flowContainer?.Box?.FormattingContext is not null)
                 {
-                    flowContainer.Box.FormattingContext.Flow(flowContainer.Box);
+                    var contentDimensions = flowContainer.Box.FormattingContext.Flow(flowContainer.Box);
+                    contentHeight = contentDimensions.Height;
                 }
 
-                // TODO: Call BoxModel.ResolveHeight() with content height when split is implemented
-                // For now, height is already resolved in the Resolve() call above
+                // Resolve height using content height from Flow()
+                if (element.Box is CssPrincipalBox principalBox && node.Style?.Cascaded is not null)
+                {
+                    BoxModel.ResolveHeight(principalBox, node.Style.Cascaded, contentHeight);
+                }
 
                 // Clear NeedsReflow from this node
                 node.ClearFlag(ENodeFlags.NeedsReflow);

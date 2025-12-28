@@ -40,6 +40,10 @@ public static class BoxModel
 
     #endregion
 
+    /// <summary>
+    /// Resolves used values for all box properties (width, height, margins, and offsets).
+    /// This is the original combined method that calls both ResolveWidth and ResolveHeight.
+    /// </summary>
     public static void Resolve(CssPrincipalBox Box, CssComputedStyle Cascaded)
     {
         ArgumentNullException.ThrowIfNull(Box);
@@ -62,6 +66,70 @@ public static class BoxModel
         Cascaded.Margin_Bottom.Set_Computed_Value(MarginBottom);
         Cascaded.Margin_Left.Set_Computed_Value(MarginLeft);
     }
+
+    /// <summary>
+    /// Resolves used values for horizontal properties only: width, margin-left, margin-right, left, right.
+    /// This should be called during the top-down width resolution pass.
+    /// </summary>
+    /// <remarks>
+    /// Width resolution is top-down because percentages resolve against the containing block's width,
+    /// which is determined by the parent element.
+    /// See: https://www.w3.org/TR/CSS2/visudet.html#Computing_widths_and_margins
+    /// </remarks>
+    public static void ResolveWidth(CssPrincipalBox Box, CssComputedStyle Cascaded)
+    {
+        ArgumentNullException.ThrowIfNull(Box);
+        ArgumentNullException.ThrowIfNull(Cascaded);
+        Contract.EndContractBlock();
+
+        Resolve_Horizontal(Box, Cascaded, out CssValue Left, out CssValue MarginLeft, out CssValue Width, out CssValue MarginRight, out CssValue Right);
+
+        Cascaded.Width.Set_Computed_Value(Width);
+        Cascaded.Left.Set_Computed_Value(Left);
+        Cascaded.Right.Set_Computed_Value(Right);
+        Cascaded.Margin_Left.Set_Computed_Value(MarginLeft);
+        Cascaded.Margin_Right.Set_Computed_Value(MarginRight);
+    }
+
+    /// <summary>
+    /// Resolves used values for vertical properties only: height, margin-top, margin-bottom, top, bottom.
+    /// This should be called during the bottom-up height resolution pass, after Flow() has been called.
+    /// </summary>
+    /// <param name="Box">The principal box to resolve</param>
+    /// <param name="Cascaded">The computed style</param>
+    /// <param name="contentHeight">
+    /// Optional content height from Flow(). When height is 'auto', this value is used instead of
+    /// calculating height from the box's Content_Height property. This allows proper bottom-up
+    /// height resolution where children's heights inform parent's height.
+    /// </param>
+    /// <remarks>
+    /// Height resolution is bottom-up because 'height: auto' depends on the content height,
+    /// which is only known after child elements have been laid out.
+    /// See: https://www.w3.org/TR/CSS2/visudet.html#Computing_heights_and_margins
+    /// </remarks>
+    public static void ResolveHeight(CssPrincipalBox Box, CssComputedStyle Cascaded, double? contentHeight = null)
+    {
+        ArgumentNullException.ThrowIfNull(Box);
+        ArgumentNullException.ThrowIfNull(Cascaded);
+        Contract.EndContractBlock();
+
+        // If contentHeight is provided and height is auto, set Content_Height
+        // so the height resolution algorithm can use it
+        if (contentHeight.HasValue && Cascaded.Height.Computed.IsAuto)
+        {
+            // Set_Content_Height takes int?, so we convert from double
+            Box.Set_Content_Height((int)contentHeight.Value);
+        }
+
+        Resolve_Vertical(Box, Cascaded, out CssValue Top, out CssValue MarginTop, out CssValue Height, out CssValue MarginBottom, out CssValue Bottom);
+
+        Cascaded.Height.Set_Computed_Value(Height);
+        Cascaded.Top.Set_Computed_Value(Top);
+        Cascaded.Bottom.Set_Computed_Value(Bottom);
+        Cascaded.Margin_Top.Set_Computed_Value(MarginTop);
+        Cascaded.Margin_Bottom.Set_Computed_Value(MarginBottom);
+    }
+
     /// <summary>
     /// Resolves 'Used' values for the following properties:
     /// Width, Height, Top, Right, Bottom, Left, Margin-Left, Margin-Right
