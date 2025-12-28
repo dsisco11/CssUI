@@ -408,11 +408,12 @@ internal static class CssCommon
         {
             if (Current is Element currentAsElement)
             {
-                if (currentAsElement.Box.IsParticipatingInFlow)
+                if (currentAsElement.Box?.IsParticipatingInFlow == true)
                 {
                     return currentAsElement;
                 }
             }
+            Current = Tree.parentNode(); // Advance to next ancestor
         }
 
         return null;

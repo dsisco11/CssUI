@@ -315,12 +315,18 @@ Spec Reference: https://www.w3.org/TR/CSS2/visudet.html (width/height calculatio
 - [ ] Log warning when cycle is detected
 
 #### 14.5.9 Multi-Pass Layout Tests
-- [ ] Test that box generation completes before style cascade
-- [ ] Test that style cascade completes before layout
-- [ ] Test width resolution happens before height resolution
-- [ ] Test bottom-up height resolution with nested elements
-- [ ] Test content-based auto height flows up to ancestors
-- [ ] Re-enable skipped LayoutPipelineIntegrationTests
+- [x] Test that box generation completes before style cascade
+- [x] Test that style cascade completes before layout
+- [x] Test width resolution happens before height resolution
+- [x] Test bottom-up height resolution with nested elements
+- [x] Test content-based auto height flows up to ancestors
+- [ ] Re-enable skipped LayoutPipelineIntegrationTests (ForceCascade freeze issue)
+
+#### 14.5.10 Known Issues
+- [ ] ForceCascade() in tests causes infinite loop/freeze - needs investigation
+  - Affects: LayoutPipelineIntegrationTests (7 tests skipped)
+  - Root cause: Likely in StyleProperties.Cascade() async patterns
+  - Workaround: Tests are skipped for now
 
 ## Phase 15: Float and Clear Properties
 Spec Reference: https://www.w3.org/TR/CSS2/visuren.html#floats
