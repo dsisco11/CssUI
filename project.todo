@@ -250,38 +250,38 @@ Refactor Run_Event_Loop from single TreeWalker pass into three distinct passes.
 This fixes the infinite loop caused by flag propagation during TreeWalker iteration.
 Spec Reference: https://www.w3.org/TR/CSS2/visudet.html (width/height calculation order)
 
-#### 14.5.1 Collect-Then-Process Infrastructure
-- [ ] Create CollectDirtyNodes() helper that snapshots nodes with given flags into List<Node>
-- [ ] Use tree-order traversal for top-down passes (parents before children)
-- [ ] Create depth-sorted list helper for bottom-up passes (deepest first)
-- [ ] Remove FilterNodeUpdate usage from event loop (no longer needed with snapshots)
+#### 14.5.1 Collect-Then-Process Infrastructure ✓
+- [x] Create CollectDirtyNodes() helper that snapshots nodes with given flags into List<Node>
+- [x] Use tree-order traversal for top-down passes (parents before children)
+- [x] Create depth-sorted list helper for bottom-up passes (deepest first)
+- [x] Remove FilterNodeUpdate usage from event loop (no longer needed with snapshots)
 
-#### 14.5.2 Pass 1: Box Generation (Top-Down)
-- [ ] Create Pass_BoxGeneration() method in Document.cs
-- [ ] Collect nodes with NeedsBoxUpdate | ChildNeedsBoxUpdate flags
-- [ ] Process in tree order (parents before children)
-- [ ] Call CssBoxTree.Generate_Tree() for each dirty node
-- [ ] Clear NeedsBoxUpdate and ChildNeedsBoxUpdate after processing each node
+#### 14.5.2 Pass 1: Box Generation (Top-Down) ✓
+- [x] Create Pass_BoxGeneration() method in Document.cs
+- [x] Collect nodes with NeedsBoxUpdate | ChildNeedsBoxUpdate flags
+- [x] Process in tree order (parents before children)
+- [x] Call CssBoxTree.Generate_Tree() for each dirty node
+- [x] Clear NeedsBoxUpdate and ChildNeedsBoxUpdate after processing each node
 
-#### 14.5.3 Pass 2: Style Cascade (Top-Down)
-- [ ] Create Pass_StyleCascade() method in Document.cs
-- [ ] Collect nodes with NeedsStyleUpdate | ChildNeedsStyleUpdate | DirectChildNeedsStyleUpdate flags
-- [ ] Process in tree order (parents before children)
+#### 14.5.3 Pass 2: Style Cascade (Top-Down) ✓
+- [x] Create Pass_StyleCascade() method in Document.cs
+- [x] Collect nodes with NeedsStyleUpdate | ChildNeedsStyleUpdate | DirectChildNeedsStyleUpdate flags
+- [x] Process in tree order (parents before children)
 - [ ] Call Style.Cascade() for each dirty element to recompute CSS computed values
-- [ ] Clear NeedsStyleUpdate, ChildNeedsStyleUpdate, DirectChildNeedsStyleUpdate after processing
+- [x] Clear NeedsStyleUpdate, ChildNeedsStyleUpdate, DirectChildNeedsStyleUpdate after processing
 
-#### 14.5.4 Pass 3: Layout/Reflow (Width Top-Down, Height Bottom-Up)
-- [ ] Create Pass_Layout() method in Document.cs
-- [ ] Collect nodes with NeedsReflow | ChildNeedsReflow flags
-- [ ] Sub-pass 3a (Width Resolution - Top-Down):
-  - [ ] Process in tree order (parents before children)
+#### 14.5.4 Pass 3: Layout/Reflow (Width Top-Down, Height Bottom-Up) ✓
+- [x] Create Pass_Layout() method in Document.cs
+- [x] Collect nodes with NeedsReflow | ChildNeedsReflow flags
+- [x] Sub-pass 3a (Width Resolution - Top-Down):
+  - [x] Process in tree order (parents before children)
   - [ ] Call BoxModel.ResolveWidth() for each element with box
   - [ ] Wire IntrinsicSizeCalculator.Calculate() for width: auto (shrink-to-fit)
-- [ ] Sub-pass 3b (Height Resolution + Flow - Bottom-Up):
-  - [ ] Process depth-sorted (deepest nodes first)
-  - [ ] Call FormattingContext.Flow() to position children, get content size
+- [x] Sub-pass 3b (Height Resolution + Flow - Bottom-Up):
+  - [x] Process depth-sorted (deepest nodes first)
+  - [x] Call FormattingContext.Flow() to position children, get content size
   - [ ] Call BoxModel.ResolveHeight() using content height for height: auto
-- [ ] Clear NeedsReflow and ChildNeedsReflow after processing
+- [x] Clear NeedsReflow and ChildNeedsReflow after processing
 
 #### 14.5.5 BoxModel.Resolve() Refactoring
 - [ ] Extract BoxModel.ResolveWidth() from existing Resolve() method
@@ -300,13 +300,13 @@ Spec Reference: https://www.w3.org/TR/CSS2/visudet.html (width/height calculatio
 - [ ] Update BlockFormattingContext.Flow() to return content dimensions
 - [ ] Use returned height for resolving container's height: auto
 
-#### 14.5.7 Run_Event_Loop() Orchestration
-- [ ] Refactor Run_Event_Loop() to call passes in sequence:
-  - [ ] Pass_BoxGeneration() - generates box tree from DOM
-  - [ ] Pass_StyleCascade() - recomputes CSS computed values
-  - [ ] Pass_Layout() - resolves used values and positions boxes
-- [ ] Remove safety iteration limit (no longer needed with snapshot approach)
-- [ ] Remove single TreeWalker loop
+#### 14.5.7 Run_Event_Loop() Orchestration ✓
+- [x] Refactor Run_Event_Loop() to call passes in sequence:
+  - [x] Pass_BoxGeneration() - generates box tree from DOM
+  - [x] Pass_StyleCascade() - recomputes CSS computed values
+  - [x] Pass_Layout() - resolves used values and positions boxes
+- [x] Remove safety iteration limit (no longer needed with snapshot approach)
+- [x] Remove single TreeWalker loop
 
 #### 14.5.8 Layout Cycle Detection
 - [ ] Add cycle detection for layout calculations (e.g., percentage height with auto parent)

@@ -234,77 +234,246 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
 
     #region Event Loops
     /// <summary>
-    /// Performs main-loop processing
+    /// Performs main-loop processing using a multi-pass layout pipeline.
+    /// Pass 1: Box Generation (top-down) - generates box tree from DOM
+    /// Pass 2: Style Cascade (top-down) - recomputes CSS computed values
+    /// Pass 3: Layout/Reflow - resolves used values and positions boxes
+    ///   - Pass 3a: Width resolution (top-down, using containing block)
+    ///   - Pass 3b: Height resolution + Flow (bottom-up, using content heights)
     /// </summary>
     public void Run_Event_Loop()
     {
         /* XXX: Event loop */
         evaluate_media_queries_and_report_changes();
 
-        // Check if any nodes need updates (including child-needs flags)
-        const ENodeFlags UPDATE_MASK = ENodeFlags.NeedsBoxUpdate | ENodeFlags.NeedsStyleUpdate | ENodeFlags.NeedsReflow
-            | ENodeFlags.ChildNeedsBoxUpdate | ENodeFlags.ChildNeedsStyleUpdate | ENodeFlags.DirectChildNeedsStyleUpdate | ENodeFlags.ChildNeedsReflow;
-
-        if (body is null || !body.GetFlag(UPDATE_MASK))
+        if (body is null)
             return;
 
-        // Safety limit to prevent infinite loops during development
-        int iterationCount = 0;
-        const int MAX_ITERATIONS = 50;  // Low limit for debugging
+        // Pass 1: Box Generation (top-down)
+        // Generates box tree nodes from DOM elements
+        Pass_BoxGeneration();
 
-        TreeWalker Tree = new TreeWalker(body, ENodeFilterMask.SHOW_ALL, FilterNodeUpdate.Instance);
-        Node? current = Tree.nextNode();
-        while (current is not null)
+        // Pass 2: Style Cascade (top-down)
+        // Recomputes CSS computed values via Style.Cascade()
+        Pass_StyleCascade();
+
+        // Pass 3: Layout/Reflow
+        // Resolves used values and positions boxes
+        // 3a: Width resolution (top-down)
+        // 3b: Height resolution + Flow (bottom-up)
+        Pass_Layout();
+    }
+
+    #region Layout Pipeline Passes
+    /// <summary>
+    /// Collects all nodes with the specified flags into a list, traversing in tree order (parents before children).
+    /// This creates a snapshot to avoid issues with flag changes during iteration.
+    /// </summary>
+    /// <param name="root">The root node to start traversal from</param>
+    /// <param name="nodeFlags">The flags to check (any flag present triggers inclusion)</param>
+    /// <param name="childFlags">The child-needs flags to follow down the tree</param>
+    /// <returns>List of nodes with the specified flags, in tree order</returns>
+    private List<Node> CollectDirtyNodes(Node root, ENodeFlags nodeFlags, ENodeFlags childFlags)
+    {
+        var result = new List<Node>();
+        var queue = new Queue<Node>();
+        queue.Enqueue(root);
+
+        while (queue.Count > 0)
         {
-            iterationCount++;
-            if (iterationCount > MAX_ITERATIONS)
+            Node node = queue.Dequeue();
+
+            // Add to result if this node has the target flags
+            if (node.GetFlag(nodeFlags))
             {
-                System.Diagnostics.Debug.WriteLine($"Layout pipeline exceeded {MAX_ITERATIONS} iterations - breaking. Last node: {current.nodeName}");
-                break;
+                result.Add(node);
             }
 
-            if (current.GetFlag(ENodeFlags.NeedsBoxUpdate))
+            // Queue children if this node or its descendants need processing
+            if (node.GetFlag(nodeFlags | childFlags))
             {
-                CssBoxTree.Generate_Tree(current);
+                foreach (var child in node.childNodes)
+                {
+                    queue.Enqueue(child);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Collects nodes and sorts them by depth (deepest first) for bottom-up processing.
+    /// </summary>
+    /// <param name="root">The root node to start traversal from</param>
+    /// <param name="nodeFlags">The flags to check (any flag present triggers inclusion)</param>
+    /// <param name="childFlags">The child-needs flags to follow down the tree</param>
+    /// <returns>List of nodes sorted by depth descending (deepest first)</returns>
+    private List<Node> CollectDirtyNodesDepthSorted(Node root, ENodeFlags nodeFlags, ENodeFlags childFlags)
+    {
+        var nodesWithDepth = new List<(Node node, int depth)>();
+        var queue = new Queue<(Node node, int depth)>();
+        queue.Enqueue((root, 0));
+
+        while (queue.Count > 0)
+        {
+            var (node, depth) = queue.Dequeue();
+
+            // Add to result if this node has the target flags
+            if (node.GetFlag(nodeFlags))
+            {
+                nodesWithDepth.Add((node, depth));
+            }
+
+            // Queue children if this node or its descendants need processing
+            if (node.GetFlag(nodeFlags | childFlags))
+            {
+                foreach (var child in node.childNodes)
+                {
+                    queue.Enqueue((child, depth + 1));
+                }
+            }
+        }
+
+        // Sort by depth descending (deepest first)
+        nodesWithDepth.Sort((a, b) => b.depth.CompareTo(a.depth));
+
+        // Extract just the nodes
+        var result = new List<Node>(nodesWithDepth.Count);
+        foreach (var (node, _) in nodesWithDepth)
+        {
+            result.Add(node);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Pass 1: Box Generation (top-down)
+    /// Generates box tree nodes from DOM elements that need box updates.
+    /// </summary>
+    private void Pass_BoxGeneration()
+    {
+        const ENodeFlags NODE_FLAGS = ENodeFlags.NeedsBoxUpdate;
+        const ENodeFlags CHILD_FLAGS = ENodeFlags.ChildNeedsBoxUpdate;
+
+        if (!body!.GetFlag(NODE_FLAGS | CHILD_FLAGS))
+            return;
+
+        // Snapshot dirty nodes in tree order
+        var dirtyNodes = CollectDirtyNodes(body!, NODE_FLAGS, CHILD_FLAGS);
+
+        // Process each node (parents before children due to tree-order collection)
+        foreach (var node in dirtyNodes)
+        {
+            if (node.GetFlag(ENodeFlags.NeedsBoxUpdate))
+            {
+                CssBoxTree.Generate_Tree(node);
                 // Generate_Tree clears NeedsBoxUpdate and ChildNeedsBoxUpdate internally
             }
+        }
+    }
 
-            if (current is Element currentAsElement)
+    /// <summary>
+    /// Pass 2: Style Cascade (top-down)
+    /// Recomputes CSS computed values via Style.Cascade() for elements that need style updates.
+    /// </summary>
+    private void Pass_StyleCascade()
+    {
+        const ENodeFlags NODE_FLAGS = ENodeFlags.NeedsStyleUpdate;
+        const ENodeFlags CHILD_FLAGS = ENodeFlags.ChildNeedsStyleUpdate | ENodeFlags.DirectChildNeedsStyleUpdate;
+
+        if (!body!.GetFlag(NODE_FLAGS | CHILD_FLAGS))
+            return;
+
+        // Snapshot dirty nodes in tree order
+        var dirtyNodes = CollectDirtyNodes(body!, NODE_FLAGS, CHILD_FLAGS);
+
+        // Process each node (parents before children for proper inheritance)
+        foreach (var node in dirtyNodes)
+        {
+            if (node.GetFlag(ENodeFlags.NeedsStyleUpdate))
             {
-                if (current.GetFlag(ENodeFlags.NeedsStyleUpdate))
+                // TODO: Call Style.Cascade() when implemented
+                // For now, just clear the flags to prevent re-processing
+
+                // Clear NeedsStyleUpdate from this node
+                node.ClearFlag(ENodeFlags.NeedsStyleUpdate);
+            }
+        }
+
+        // Clear child-needs flags from all processed nodes
+        foreach (var node in dirtyNodes)
+        {
+            node.ClearFlag(CHILD_FLAGS);
+        }
+    }
+
+    /// <summary>
+    /// Pass 3: Layout/Reflow
+    /// Resolves used values (widths first top-down, then heights bottom-up) and positions boxes.
+    /// </summary>
+    private void Pass_Layout()
+    {
+        const ENodeFlags NODE_FLAGS = ENodeFlags.NeedsReflow;
+        const ENodeFlags CHILD_FLAGS = ENodeFlags.ChildNeedsReflow;
+
+        if (!body!.GetFlag(NODE_FLAGS | CHILD_FLAGS))
+            return;
+
+        // Pass 3a: Width Resolution (top-down)
+        // Collect in tree order (parents before children)
+        var dirtyNodesTopDown = CollectDirtyNodes(body!, NODE_FLAGS, CHILD_FLAGS);
+
+        foreach (var node in dirtyNodesTopDown)
+        {
+            if (node is Element element && node.GetFlag(ENodeFlags.NeedsReflow))
+            {
+                // Resolve width using containing block (parent's width)
+                if (element.Box is not null && node.Style?.Cascaded is not null)
                 {
-                    // Phase 14.1: Re-enable BoxModel.Resolve with null checks
-                    if (currentAsElement.Box is not null && current.Style?.Cascaded is not null)
-                    {
-                        BoxModel.Resolve(currentAsElement.Box, current.Style.Cascaded);
-                    }
-                    // Clear NeedsStyleUpdate from this node
-                    current.ClearFlag(ENodeFlags.NeedsStyleUpdate);
-                    // Unpropagate the child-needs flags from ancestors
-                    current.Unpropagate_Flag(ENodeFlags.ChildNeedsStyleUpdate | ENodeFlags.DirectChildNeedsStyleUpdate, ENodeFlags.NeedsStyleUpdate, exclude_self: true);
+                    // TODO: Call BoxModel.ResolveWidth() when split is implemented
+                    // For now, call the full Resolve() which handles both axes
+                    BoxModel.Resolve(element.Box, node.Style.Cascaded);
+                }
+            }
+        }
+
+        // Pass 3b: Height Resolution + Flow (bottom-up)
+        // Collect sorted by depth (deepest first)
+        var dirtyNodesBottomUp = CollectDirtyNodesDepthSorted(body!, NODE_FLAGS, CHILD_FLAGS);
+
+        foreach (var node in dirtyNodesBottomUp)
+        {
+            if (node is Element element && node.GetFlag(ENodeFlags.NeedsReflow))
+            {
+                // Call Flow() to position children and get content height
+                Element? flowContainer = CssCommon.Find_Formatting_Container(element);
+                if (flowContainer?.Box?.FormattingContext is not null)
+                {
+                    flowContainer.Box.FormattingContext.Flow(flowContainer.Box);
                 }
 
-                if (current.GetFlag(ENodeFlags.NeedsReflow))
-                {
-                    Element? flowContainer = CssCommon.Find_Formatting_Container(currentAsElement);
-                    if (flowContainer?.Box?.FormattingContext is not null)
-                    {
-                        flowContainer.Box.FormattingContext.Flow(flowContainer.Box);
-                    }
-                    // Clear NeedsReflow to prevent infinite loop
-                    current.ClearFlag(ENodeFlags.NeedsReflow);
-                    current.Unpropagate_Flag(ENodeFlags.ChildNeedsReflow, ENodeFlags.NeedsReflow, exclude_self: true);
-                }
+                // TODO: Call BoxModel.ResolveHeight() with content height when split is implemented
+                // For now, height is already resolved in the Resolve() call above
+
+                // Clear NeedsReflow from this node
+                node.ClearFlag(ENodeFlags.NeedsReflow);
             }
             else
             {
                 // For non-Element nodes (e.g., Text), clear any update flags they might have
-                current.ClearFlag(ENodeFlags.NeedsStyleUpdate | ENodeFlags.NeedsReflow);
+                node.ClearFlag(ENodeFlags.NeedsReflow);
             }
+        }
 
-            current = Tree.nextNode();
+        // Clear child-needs flags from all processed nodes
+        foreach (var node in dirtyNodesTopDown)
+        {
+            node.ClearFlag(CHILD_FLAGS);
         }
     }
+    #endregion
 
     internal void evaluate_media_queries_and_report_changes()
     {/* Docs: https://www.w3.org/TR/cssom-view-1/#evaluate-media-queries-and-report-changes */
