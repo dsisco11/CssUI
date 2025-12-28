@@ -8,6 +8,17 @@ namespace CssUI.CSS.Media;
 
 public class MediaQuery : ISpanFormattable
 {/* https://drafts.csswg.org/mediaqueries-4/#media */
+    #region Static Properties
+    /// <summary>
+    /// Gets a MediaQuery that never matches (equivalent to "not all").
+    /// Per CSS Media Queries Level 4, invalid media queries evaluate to "not all".
+    /// </summary>
+    public static MediaQuery NotAll { get; } = new MediaQuery(
+        EMediaQueryModifier.Not,
+        EMediaType.All,
+        new LinkedList<IMediaCondition>());
+    #endregion
+
     #region Properties
     public EMediaQueryModifier Modifier { get; private set; }
     public EMediaType MediaType { get; private set; }

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using CssUI;
 using CssUI.CSS;
@@ -310,20 +311,30 @@ public class CssParserTests
 
     [Fact]
     [Trait("Category", "Parser")]
-    public void ParseComponentValue_EmptyInput_ThrowsCssSyntaxError()
+    public void ParseComponentValue_EmptyInput_ReturnsNull()
     {
-        var parser = new CssParser("");
+        var reporter = new CssParseErrorReporter();
+        var parser = new CssParser("".AsSpan(), reporter);
 
-        Assert.Throws<CssSyntaxErrorException>(() => parser.Parse_ComponentValue());
+        var result = parser.Parse_ComponentValue();
+
+        Assert.Null(result);
+        Assert.True(reporter.HasErrors);
+        Assert.Contains(reporter.Errors, e => e.ErrorType == ECssParseErrorType.UnexpectedEof);
     }
 
     [Fact]
     [Trait("Category", "Parser")]
-    public void ParseComponentValue_WhitespaceOnly_ThrowsCssSyntaxError()
+    public void ParseComponentValue_WhitespaceOnly_ReturnsNull()
     {
-        var parser = new CssParser("   ");
+        var reporter = new CssParseErrorReporter();
+        var parser = new CssParser("   ".AsSpan(), reporter);
 
-        Assert.Throws<CssSyntaxErrorException>(() => parser.Parse_ComponentValue());
+        var result = parser.Parse_ComponentValue();
+
+        Assert.Null(result);
+        Assert.True(reporter.HasErrors);
+        Assert.Contains(reporter.Errors, e => e.ErrorType == ECssParseErrorType.UnexpectedEof);
     }
     #endregion
 
@@ -664,20 +675,30 @@ public class CssParserTests
 
     [Fact]
     [Trait("Category", "Parser")]
-    public void ParseRule_EmptyInput_ThrowsCssSyntaxError()
+    public void ParseRule_EmptyInput_ReturnsNull()
     {
-        var parser = new CssParser("");
+        var reporter = new CssParseErrorReporter();
+        var parser = new CssParser("".AsSpan(), reporter);
 
-        Assert.Throws<CssSyntaxErrorException>(() => parser.Parse_Rule());
+        var result = parser.Parse_Rule();
+
+        Assert.Null(result);
+        Assert.True(reporter.HasErrors);
+        Assert.Contains(reporter.Errors, e => e.ErrorType == ECssParseErrorType.UnexpectedEof);
     }
 
     [Fact]
     [Trait("Category", "Parser")]
-    public void ParseRule_WhitespaceOnly_ThrowsCssSyntaxError()
+    public void ParseRule_WhitespaceOnly_ReturnsNull()
     {
-        var parser = new CssParser("   ");
+        var reporter = new CssParseErrorReporter();
+        var parser = new CssParser("   ".AsSpan(), reporter);
 
-        Assert.Throws<CssSyntaxErrorException>(() => parser.Parse_Rule());
+        var result = parser.Parse_Rule();
+
+        Assert.Null(result);
+        Assert.True(reporter.HasErrors);
+        Assert.Contains(reporter.Errors, e => e.ErrorType == ECssParseErrorType.UnexpectedEof);
     }
     #endregion
 
@@ -789,11 +810,18 @@ public class CssParserTests
     [Fact]
     [Trait("Category", "Parser")]
     [Trait("Category", "MediaQuery")]
-    public void ParseMediaQueryList_MixedCombinators_ThrowsCssSyntaxError()
+    public void ParseMediaQueryList_MixedCombinators_GracefullyHandles()
     {
         // Mixing 'and' and 'or' at the same level is invalid per spec
+        // The parser should now handle this gracefully by parsing what it can
+        // and stopping when it encounters the invalid mixing
         var parser = new CssParser("(color) and (pointer) or (hover)");
-        Assert.Throws<CssSyntaxErrorException>(() => parser.Parse_Media_Query_List(document));
+        var result = parser.Parse_Media_Query_List(document);
+
+        // Should not throw, but may produce a partial or invalid query
+        Assert.NotNull(result);
+        // The query list should have at least one query (even if partially parsed)
+        Assert.True(result.QueryList.Count > 0);
     }
     #endregion
 

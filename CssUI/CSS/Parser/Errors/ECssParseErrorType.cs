@@ -137,4 +137,51 @@ public enum ECssParseErrorType
     /// </summary>
     UnhandledTokenType,
     #endregion
+
+    #region Entry Point Parse Errors
+    /// <summary>
+    /// Unexpected EOF was encountered when a token was expected.
+    /// </summary>
+    UnexpectedEof,
+
+    /// <summary>
+    /// Extra content was found after what should have been the end of input.
+    /// </summary>
+    ExtraContentAfterRule,
+
+    /// <summary>
+    /// An identifier token was expected but not found.
+    /// </summary>
+    ExpectedIdentifier,
+
+    /// <summary>
+    /// Failed to consume a valid declaration.
+    /// </summary>
+    InvalidDeclaration,
+
+    /// <summary>
+    /// Failed to consume a valid component value.
+    /// </summary>
+    InvalidComponentValue,
+
+    /// <summary>
+    /// An invalid media query was encountered.
+    /// </summary>
+    InvalidMediaQuery,
+
+    /// <summary>
+    /// An invalid media feature was encountered.
+    /// </summary>
+    InvalidMediaFeature,
+
+    /// <summary>
+    /// A comparator was expected but not found.
+    /// </summary>
+    ExpectedComparator,
+
+    /// <summary>
+    /// An unexpected token was encountered.
+    /// </summary>
+    UnexpectedToken,
+    #endregion
 }

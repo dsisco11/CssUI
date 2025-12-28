@@ -361,15 +361,23 @@ public class CssParser
     #endregion
 
     /// <summary>
-    /// Parses and returns a single rule
+    /// Parses and returns a single rule.
     /// </summary>
-    /// <returns></returns>
-    public CssComponent Parse_Rule()
+    /// <returns>The parsed rule, or null if parsing failed.</returns>
+    /// <remarks>
+    /// This method reports parse errors via the error reporter and returns null on failure,
+    /// rather than throwing exceptions for malformed CSS input.
+    /// </remarks>
+    public CssComponent? Parse_Rule()
     {
-        CssComponent Rule;
+        CssComponent? Rule;
         Consume_All_Whitespace(Stream);// Consume all whitespace
 
-        if (Stream.Next.Type == ECssTokenType.EOF) throw new CssSyntaxErrorException(CssErrors.UNEXPECTED_EOF, Stream);
+        if (Stream.Next.Type == ECssTokenType.EOF)
+        {
+            ReportError(CssParseError.UnexpectedEof(Stream.Position));
+            return null;
+        }
         else if (Stream.Next.Type == ECssTokenType.At_Keyword)
         {
             Rule = Consume_AtRule(Stream, ErrorReporter);
@@ -377,23 +385,46 @@ public class CssParser
         else
         {
             Rule = Consume_QualifiedRule(Stream, ErrorReporter);
-            if (Rule is null) throw new CssSyntaxErrorException(CssErrors.CANT_CONSUME_QUALIFIED_RULE, Stream);
+            if (Rule is null)
+            {
+                ReportError(CssParseError.UnterminatedQualifiedRule(Stream.Position));
+                return null;
+            }
         }
 
         Consume_All_Whitespace(Stream);// Consume all whitespace
         if (Stream.Next.Type == ECssTokenType.EOF)
             return Rule;
         else
-            throw new CssSyntaxErrorException(CssErrors.EOF_EXPECTED, Stream);
+        {
+            ReportError(CssParseError.ExtraContentAfterRule(Stream.Position));
+            return Rule; // Still return the rule, but report the error
+        }
     }
 
+    /// <summary>
+    /// Parses and returns a single declaration.
+    /// </summary>
+    /// <returns>The parsed declaration, or null if parsing failed.</returns>
+    /// <remarks>
+    /// This method reports parse errors via the error reporter and returns null on failure,
+    /// rather than throwing exceptions for malformed CSS input.
+    /// </remarks>
     public CssDecleration? Parse_Decleration()
     {
         Consume_All_Whitespace(Stream);
-        if (Stream.Next.Type != ECssTokenType.Ident) throw new CssSyntaxErrorException(CssErrors.EXPECTING_IDENT, Stream);
+        if (Stream.Next.Type != ECssTokenType.Ident)
+        {
+            ReportError(CssParseError.ExpectedIdentifier(Stream.Position, Stream.Next.Type.ToString()));
+            return null;
+        }
 
         CssDecleration? Dec = Consume_Decleration(Stream, ErrorReporter);
-        if (Dec is null) throw new CssSyntaxErrorException(CssErrors.CANT_CONSUME_DECLERATION, Stream);
+        if (Dec is null)
+        {
+            ReportError(CssParseError.InvalidDeclaration(Stream.Position));
+            return null;
+        }
 
         return Dec;
     }
@@ -404,20 +435,39 @@ public class CssParser
         return Consume_Decleration_List(Stream, ErrorReporter);
     }
 
-    public CssToken Parse_ComponentValue()
+    /// <summary>
+    /// Parses and returns a single component value.
+    /// </summary>
+    /// <returns>The parsed component value, or null if parsing failed.</returns>
+    /// <remarks>
+    /// This method reports parse errors via the error reporter and returns null on failure,
+    /// rather than throwing exceptions for malformed CSS input.
+    /// </remarks>
+    public CssToken? Parse_ComponentValue()
     {
         Consume_All_Whitespace(Stream);
-        if (Stream.Next.Type == ECssTokenType.EOF) throw new CssSyntaxErrorException(CssErrors.UNEXPECTED_EOF);
+        if (Stream.Next.Type == ECssTokenType.EOF)
+        {
+            ReportError(CssParseError.UnexpectedEof(Stream.Position));
+            return null;
+        }
 
-        CssToken Res;
+        CssToken? Res;
         Res = Consume_ComponentValue(Stream, ErrorReporter);
-        if (Res is null) throw new CssSyntaxErrorException(CssErrors.CANT_CONSUME_COMPONENT_VALUE);
+        if (Res is null)
+        {
+            ReportError(CssParseError.InvalidComponentValue(Stream.Position));
+            return null;
+        }
 
         Consume_All_Whitespace(Stream);
         if (Stream.Next.Type == ECssTokenType.EOF)
             return Res;
         else
-            throw new CssSyntaxErrorException(CssErrors.EOF_EXPECTED);
+        {
+            ReportError(CssParseError.ExtraContentAfterRule(Stream.Position));
+            return Res; // Still return the value, but report the error
+        }
     }
 
     public LinkedList<CssToken> Parse_ComponentValue_List()
@@ -441,7 +491,7 @@ public class CssParser
     public CssValue Parse_CssValue()
     {
         Consume_All_Whitespace(Stream);
-        return Consume_CssValue(Stream);
+        return Consume_CssValue(Stream, ErrorReporter);
     }
     #endregion
 
@@ -1230,7 +1280,13 @@ public class CssParser
     #endregion
 
     #region CSS Values
-    public static CssValue Consume_CssValue(DataConsumer<CssToken> Stream)
+    /// <summary>
+    /// Consumes a CSS value from the token stream.
+    /// </summary>
+    /// <param name="Stream">The token stream.</param>
+    /// <param name="errorReporter">Optional error reporter for parse errors.</param>
+    /// <returns>The parsed CSS value, or <see cref="CssValue.Null"/> if parsing failed.</returns>
+    public static CssValue Consume_CssValue(DataConsumer<CssToken> Stream, ICssParseErrorReporter? errorReporter = null)
     {
         if (Stream is null) throw new CssParserException(CssErrors.STREAM_IS_NULL);
         Contract.EndContractBlock();
@@ -1383,7 +1439,9 @@ public class CssParser
                     // Per CSS Syntax Level 3, <url-token> contains the URL value directly
                     if (Stream.Consume() is not UrlToken tok)
                     {
-                        throw new CssParserException("Expected UrlToken but received null", Stream);
+                        // This should never happen if the tokenizer works correctly
+                        errorReporter?.ReportError(CssParseError.InvalidUrlSyntax(Stream.Position));
+                        return CssValue.Null;
                     }
                     return CssValue.From(new CssUrl(tok.Value ?? string.Empty));
                 }
@@ -1391,14 +1449,17 @@ public class CssParser
                 {
                     // Bad URL tokens are parse errors per CSS Syntax Level 3
                     Stream.Consume(); // Consume the bad token
-                    throw new CssParserException("Invalid URL syntax (bad-url-token)", Stream);
+                    errorReporter?.ReportError(CssParseError.InvalidUrlSyntax(Stream.Position));
+                    return CssValue.Null;
                 }
             case ECssTokenType.Hash:
                 {
                     // Parse hex color values: #RGB, #RGBA, #RRGGBB, #RRGGBBAA
                     if (Stream.Consume() is not HashToken tok)
                     {
-                        throw new CssParserException("Expected HashToken but received null", Stream);
+                        // This should never happen if the tokenizer works correctly
+                        errorReporter?.ReportError(CssParseError.InvalidHexColor(Stream.Position));
+                        return CssValue.Null;
                     }
 
                     // Attempt to parse the hash value as a color
@@ -1408,8 +1469,9 @@ public class CssParser
                         return CssValue.From(color);
                     }
 
-                    // If not a valid hex color, treat as a parse error
-                    throw new CssParserException($"Invalid hex color value: #{tok.Value}", Stream);
+                    // If not a valid hex color, report the error and return null
+                    errorReporter?.ReportError(CssParseError.InvalidHexColor(Stream.Position, tok.Value));
+                    return CssValue.Null;
                 }
             case ECssTokenType.EOF:
                 {
@@ -1417,7 +1479,10 @@ public class CssParser
                 }
             default:
                 {
-                    throw new CssParserException(String.Format(CultureInfo.InvariantCulture, CssErrors.UNHANDLED_TOKEN_FOR_CSS_VALUE, Token.Type), Stream);
+                    // Unhandled token type - consume it and report an error
+                    Stream.Consume();
+                    errorReporter?.ReportError(CssParseError.UnhandledTokenType(Stream.Position, Token.Type.ToString()));
+                    return CssValue.Null;
                 }
         }
 
@@ -1569,8 +1634,9 @@ public class CssParser
         }
         else if (modifier != EMediaQueryModifier.None)
         {
-            // Had a modifier but no media type following - syntax error
-            throw new CssSyntaxErrorException(CssErrors.EXPECTING_IDENT, Stream);
+            // Had a modifier but no media type following - return invalid query
+            // Per spec, invalid media queries evaluate to "not all"
+            return MediaQuery.NotAll;
         }
 
         Consume_All_Whitespace(Stream);
@@ -1618,7 +1684,8 @@ public class CssParser
                         else if (combIdent.Value.Equals("or", StringComparison.OrdinalIgnoreCase))
                         {
                             // 'or' not allowed in <media-condition-without-or>
-                            throw new CssSyntaxErrorException(CssErrors.INVALID_MULTIPLE_COMBINATORS_ON_MEDIARULE, Stream);
+                            // Invalid syntax - stop parsing but return what we have
+                            break;
                         }
                         else
                         {
@@ -1679,7 +1746,8 @@ public class CssParser
                 var innerCondition = Consume_Media_In_Parens(Stream, allowOr);
                 if (innerCondition is null)
                 {
-                    throw new CssSyntaxErrorException(CssErrors.EXPECTING_OPENING_PARENTHESES, Stream);
+                    // Invalid 'not' without proper following condition - return null
+                    return null;
                 }
 
                 // Wrap in a MediaCondition with NOT combinator
@@ -1718,7 +1786,8 @@ public class CssParser
                 if (!allowOr)
                 {
                     // 'or' not allowed in <media-condition-without-or>
-                    throw new CssSyntaxErrorException(CssErrors.INVALID_MULTIPLE_COMBINATORS_ON_MEDIARULE, Stream);
+                    // Invalid syntax - return what we have so far
+                    break;
                 }
                 currentCombinator = EMediaCombinator.OR;
             }
@@ -1735,7 +1804,8 @@ public class CssParser
             }
             else if (combinator != currentCombinator)
             {
-                throw new CssSyntaxErrorException(CssErrors.INVALID_MULTIPLE_COMBINATORS_ON_MEDIARULE, Stream);
+                // Invalid mixing of 'and' and 'or' - return what we have so far
+                break;
             }
 
             Stream.Consume(); // consume combinator
@@ -1744,7 +1814,8 @@ public class CssParser
             var nextCondition = Consume_Media_In_Parens(Stream, allowOr);
             if (nextCondition is null)
             {
-                throw new CssSyntaxErrorException(CssErrors.EXPECTING_OPENING_PARENTHESES, Stream);
+                // Missing condition after combinator - return what we have so far
+                break;
             }
 
             conditionList.AddLast(nextCondition);
@@ -1979,12 +2050,14 @@ public class CssParser
                 }
                 else
                 {
-                    throw new CssParserException(CssErrors.EXPECTING_COMPARATOR, Stream);
+                    // Unexpected token type for comparator - return null
+                    return null;
                 }
 
                 if (!EMediaOperatorExtensions.TryFromKeyword(comparatorStr, out EMediaOperator? outComparator))
                 {
-                    throw new CssParserException(CssErrors.EXPECTING_COMPARATOR, Stream);
+                    // Invalid comparator - return null
+                    return null;
                 }
                 ops.AddLast(outComparator.Value);
                 expectValue = true;
@@ -2079,8 +2152,8 @@ public class CssParser
                     return Consume_CssValue(Stream);
                 }
         }
-        // throw new CssSyntaxErrorException($"Expected Number/Dimension/Keyword token but got: \"{Enum.GetName(typeof(ECssTokenType), Stream.Next.Type)}\"");
-        throw new CssSyntaxErrorException(CssErrors.UNEXPECTED_TOKEN, Stream);
+        // Unexpected token - return null value
+        return CssValue.Null;
     }
 
 

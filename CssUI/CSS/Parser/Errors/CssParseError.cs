@@ -180,6 +180,66 @@ public readonly struct CssParseError
     /// </summary>
     public static CssParseError InvalidUrlSyntax(int tokenIndex) =>
         new(ECssParseErrorType.InvalidUrlSyntax, "Invalid URL syntax", tokenIndex: tokenIndex);
+
+    /// <summary>
+    /// Creates a parse error for an unhandled token type.
+    /// </summary>
+    public static CssParseError UnhandledTokenType(int tokenIndex, string? tokenType = null) =>
+        new(ECssParseErrorType.UnhandledTokenType, $"Unhandled token type: {tokenType ?? "unknown"}", tokenIndex: tokenIndex, context: tokenType);
+
+    /// <summary>
+    /// Creates a parse error for unexpected EOF.
+    /// </summary>
+    public static CssParseError UnexpectedEof(int tokenIndex) =>
+        new(ECssParseErrorType.UnexpectedEof, "Unexpected end of input", tokenIndex: tokenIndex);
+
+    /// <summary>
+    /// Creates a parse error for extra content after what should be the end of input.
+    /// </summary>
+    public static CssParseError ExtraContentAfterRule(int tokenIndex) =>
+        new(ECssParseErrorType.ExtraContentAfterRule, "Extra content found after rule (expected EOF)", tokenIndex: tokenIndex);
+
+    /// <summary>
+    /// Creates a parse error for when an identifier was expected but not found.
+    /// </summary>
+    public static CssParseError ExpectedIdentifier(int tokenIndex, string? found = null) =>
+        new(ECssParseErrorType.ExpectedIdentifier, $"Expected identifier{(found != null ? $", found '{found}'" : "")}", tokenIndex: tokenIndex, context: found);
+
+    /// <summary>
+    /// Creates a parse error for an invalid declaration.
+    /// </summary>
+    public static CssParseError InvalidDeclaration(int tokenIndex, string? propertyName = null) =>
+        new(ECssParseErrorType.InvalidDeclaration, $"Failed to parse declaration{(propertyName != null ? $" for '{propertyName}'" : "")}", tokenIndex: tokenIndex, context: propertyName);
+
+    /// <summary>
+    /// Creates a parse error for an invalid component value.
+    /// </summary>
+    public static CssParseError InvalidComponentValue(int tokenIndex) =>
+        new(ECssParseErrorType.InvalidComponentValue, "Failed to parse component value", tokenIndex: tokenIndex);
+
+    /// <summary>
+    /// Creates a parse error for an invalid media query.
+    /// </summary>
+    public static CssParseError InvalidMediaQuery(int tokenIndex, string? context = null) =>
+        new(ECssParseErrorType.InvalidMediaQuery, $"Invalid media query{(context != null ? $": {context}" : "")}", tokenIndex: tokenIndex, context: context);
+
+    /// <summary>
+    /// Creates a parse error for an invalid media feature.
+    /// </summary>
+    public static CssParseError InvalidMediaFeature(int tokenIndex, string? featureName = null) =>
+        new(ECssParseErrorType.InvalidMediaFeature, $"Invalid media feature{(featureName != null ? $": {featureName}" : "")}", tokenIndex: tokenIndex, context: featureName);
+
+    /// <summary>
+    /// Creates a parse error for when a comparator was expected.
+    /// </summary>
+    public static CssParseError ExpectedComparator(int tokenIndex) =>
+        new(ECssParseErrorType.ExpectedComparator, "Expected comparator (=, <, >, <=, >=)", tokenIndex: tokenIndex);
+
+    /// <summary>
+    /// Creates a parse error for an unexpected token.
+    /// </summary>
+    public static CssParseError UnexpectedToken(int tokenIndex, string? tokenType = null) =>
+        new(ECssParseErrorType.UnexpectedToken, $"Unexpected token{(tokenType != null ? $": {tokenType}" : "")}", tokenIndex: tokenIndex, context: tokenType);
     #endregion
 
     #region Object Overrides

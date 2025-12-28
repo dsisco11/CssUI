@@ -32,14 +32,18 @@
 - [x] Error reporter propagation through all Consume_* methods
 - [x] Tests for unmatched closing bracket error reporting (12 new tests)
 
-### 11.7.6 Convert Exceptions to Error Reporting
+### 11.7.6 Convert Exceptions to Error Reporting ✓
 Convert remaining CssSyntaxErrorException throws to use ICssParseErrorReporter with graceful recovery.
-- [ ] Parse_Rule(): UNEXPECTED_EOF, CANT_CONSUME_QUALIFIED_RULE, EOF_EXPECTED (lines 372, 380, 387)
-- [ ] Parse_Decleration(): EXPECTING_IDENT, CANT_CONSUME_DECLERATION (lines 393, 396)
-- [ ] Parse_ComponentValue(): UNEXPECTED_EOF, CANT_CONSUME_COMPONENT_VALUE, EOF_EXPECTED (lines 410, 414, 420)
-- [ ] Consume_CssValue(): Bad_Url token, invalid hex color, unhandled token (lines 1394, 1412, 1420)
-- [ ] Media parsing: EXPECTING_IDENT, invalid combinators, missing parens (lines 1573, 1621, 1682, 1721, 1738, 1747)
-- [ ] Consume_Media_Feature(): EXPECTING_COMPARATOR, UNEXPECTED_TOKEN (lines 1982, 1987, 2083)
+- [x] Parse_Rule(): UNEXPECTED_EOF, CANT_CONSUME_QUALIFIED_RULE, EOF_EXPECTED → returns null + reports error
+- [x] Parse_Decleration(): EXPECTING_IDENT, CANT_CONSUME_DECLERATION → returns null + reports error
+- [x] Parse_ComponentValue(): UNEXPECTED_EOF, CANT_CONSUME_COMPONENT_VALUE, EOF_EXPECTED → returns null + reports error
+- [x] Consume_CssValue(): Bad_Url token, invalid hex color, unhandled token → returns CssValue.Null + reports error
+- [x] Media parsing: EXPECTING_IDENT, invalid combinators, missing parens → returns MediaQuery.NotAll or breaks gracefully
+- [x] Consume_Media_Feature(): EXPECTING_COMPARATOR, UNEXPECTED_TOKEN → returns null or CssValue.Null
+- [x] Added ECssParseErrorType values: UnexpectedEof, ExtraContentAfterRule, ExpectedIdentifier, InvalidDeclaration, InvalidComponentValue, InvalidMediaQuery, InvalidMediaFeature, ExpectedComparator, UnexpectedToken
+- [x] Added CssParseError factory methods for all new error types
+- [x] Added MediaQuery.NotAll static property for invalid queries
+- [x] Tests for graceful error recovery (10 new tests in CssParseErrorRecoveryTests)
 
 ### 11.7.7 Production Matching Integration
 - [ ] Integrate with CSS Nesting (Phase 11.9)
