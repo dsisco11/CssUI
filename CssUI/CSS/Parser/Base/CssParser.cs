@@ -458,6 +458,27 @@ public class CssParser
         while (Stream.Next != null && Stream.Next != CssToken.EOF && Stream.Next.Type == ECssTokenType.Whitespace) { Stream.Consume(); }
     }
 
+    /// <summary>
+    /// Determines if a delimiter character can start a nested style rule.
+    /// Per CSS Nesting spec §2.1, these include:
+    /// '&amp;' (nesting selector), '.' (class), '*' (universal), '&gt;' '+' '~' (combinators)
+    /// </summary>
+    /// <seealso href="https://www.w3.org/TR/css-nesting-1/#syntax"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    static bool Starts_Nested_Rule_Delim(char delimValue)
+    {
+        return delimValue switch
+        {
+            UnicodeCommon.CHAR_AMPERSAND => true,   // & - nesting selector
+            UnicodeCommon.CHAR_FULL_STOP => true,   // . - class selector
+            UnicodeCommon.CHAR_ASTERISK => true,    // * - universal selector
+            UnicodeCommon.CHAR_RIGHT_CHEVRON => true, // > - child combinator
+            UnicodeCommon.CHAR_PLUS_SIGN => true,                            // + - adjacent sibling combinator
+            UnicodeCommon.CHAR_TILDE => true,       // ~ - general sibling combinator
+            _ => false
+        };
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     static IEnumerable<CssComponent> Consume_Rule_List(DataConsumer<CssToken> Stream, bool TopLevel = false)
     {
@@ -645,15 +666,63 @@ public class CssParser
                     }
                     break;
 
-                // <delim-token> with a value of "&" (U+0026 AMPERSAND):
-                // Reconsume the current input token. Consume a qualified rule.
-                // If anything was returned, append it to rules.
-                case ECssTokenType.Delim when Token is DelimToken delimToken && delimToken.Value == UnicodeCommon.CHAR_AMPERSAND:
-                    Stream.Reconsume();
-                    var qualifiedRule = Consume_QualifiedRule(Stream);
-                    if (qualifiedRule is not null)
+                // CSS Nesting: Tokens that can start a nested style rule.
+                // Per CSS Nesting spec §2.1, nested selectors cannot start with an identifier
+                // (to avoid ambiguity with declarations), but can start with:
+                // - '&' (nesting selector)
+                // - '.' (class selector - parsed as delim)
+                // - '*' (universal selector - parsed as delim)
+                // - '>' '+' '~' (relative combinators - parsed as delim)
+                // - '#' (ID selector - parsed as hash token)
+                // - ':' (pseudo-class/element)
+                // - '[' (attribute selector)
+                // SEE: https://www.w3.org/TR/css-nesting-1/#syntax
+
+                // <delim-token> with nesting-rule-starting value: '&', '.', '*', '>', '+', '~'
+                case ECssTokenType.Delim when Token is DelimToken delimToken && Starts_Nested_Rule_Delim(delimToken.Value):
                     {
-                        rules.AddLast(qualifiedRule);
+                        Stream.Reconsume();
+                        var qualifiedRule = Consume_QualifiedRule(Stream);
+                        if (qualifiedRule is not null)
+                        {
+                            rules.AddLast(qualifiedRule);
+                        }
+                    }
+                    break;
+
+                // <hash-token>: ID selector (#id), consume as nested rule
+                case ECssTokenType.Hash:
+                    {
+                        Stream.Reconsume();
+                        var hashRule = Consume_QualifiedRule(Stream);
+                        if (hashRule is not null)
+                        {
+                            rules.AddLast(hashRule);
+                        }
+                    }
+                    break;
+
+                // <colon-token>: Pseudo-class or pseudo-element (:hover, ::before)
+                case ECssTokenType.Colon:
+                    {
+                        Stream.Reconsume();
+                        var colonRule = Consume_QualifiedRule(Stream);
+                        if (colonRule is not null)
+                        {
+                            rules.AddLast(colonRule);
+                        }
+                    }
+                    break;
+
+                // <[-token>: Attribute selector ([type="text"])
+                case ECssTokenType.SqBracket_Open:
+                    {
+                        Stream.Reconsume();
+                        var attrRule = Consume_QualifiedRule(Stream);
+                        if (attrRule is not null)
+                        {
+                            rules.AddLast(attrRule);
+                        }
                     }
                     break;
 

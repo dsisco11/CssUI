@@ -44,11 +44,20 @@ Prerequisites: Phase 6 (CSS Parser), Phase 11.7.2 (Consume_Style_Block_Contents)
 - [x] Handle & at any position in compound selector: &.class, .class&, &::before
 - [x] Tests for NestingSelector (24 tests passing)
 
-### 11.9.2 Nested Style Rules
-- [ ] Allow style rules inside other style rules
-- [ ] Nested rule parsing in Consume_Style_Block_Contents
-- [ ] Implicit & prepending when nested selector doesn't start with &
-- [ ] Relative selector handling (> .child, + .sibling)
+### 11.9.2 Nested Style Rules ✓
+- [x] Allow style rules inside other style rules
+- [x] Nested rule parsing in Consume_Style_Block_Contents
+  - [x] Parse '&' as nested rule start
+  - [x] Parse '.' (class selector) as nested rule start
+  - [x] Parse '#' (ID selector/hash token) as nested rule start
+  - [x] Parse ':' (pseudo-class/element) as nested rule start
+  - [x] Parse '[' (attribute selector) as nested rule start
+  - [x] Parse '*' (universal selector) as nested rule start
+  - [x] Parse '>' '+' '~' (relative combinators) as nested rule start
+- [x] CSSStyleRule.cssRules property for nested rules (CSSOM)
+- [x] CSSStyleRule.insertRule() and deleteRule() methods
+- [x] Serialization with nested rules (proper indentation)
+- [x] Tests for nested style rules (24 tests passing)
 
 ### 11.9.3 Nested Group Rules
 - [ ] Allow @media, @supports, @layer, @scope inside style rules
