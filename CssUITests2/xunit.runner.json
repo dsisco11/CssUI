@@ -7,7 +7,6 @@
   "diagnosticMessages": true,
   "internalDiagnosticMessages": true,
   "preEnumerateTheories": true,
-  "parallelAlgorithm": "aggressive",
   "parallelizeAssembly": true,
   "parallelizeTestCollections": true,
   "failSkips": false
