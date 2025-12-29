@@ -196,11 +196,11 @@ Current: 53 tests passing
 - [x] Test Cascaded style is ReadOnly by default
 - [x] Test UserRules style is not ReadOnly
 
-#### 12.8.4 Cascade at Style Level
-- [ ] Test Cascade() merges properties from source style
-- [ ] Test Cascade() only copies properties with values
-- [ ] Test Cascade() preserves existing values not in source
-- [ ] Test CascadeAsync() behaves same as Cascade()
+#### 12.8.4 Cascade at Style Level ✓
+- [x] Test Cascade() merges properties from source style
+- [x] Test Cascade() only copies properties with values
+- [x] Test Cascade() preserves existing values not in source
+- [x] Test CascadeAsync() behaves same as Cascade()
 
 #### 12.8.5 Selector and Origin
 - [ ] Test Selector property stores CSS selector

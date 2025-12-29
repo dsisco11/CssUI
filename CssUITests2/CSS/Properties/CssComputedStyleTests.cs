@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using CssUI;
 using CssUI.CSS;
 using CssUI.CSS.Enums;
@@ -1448,6 +1449,121 @@ public class CssComputedStyleTests
 
         // Verify the exception message indicates the property is locked
         Assert.Contains("locked", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+    #endregion
+
+    #region 12.8.4 Cascade at Style Level Tests
+
+    [Fact]
+    [Trait("Category", "CssComputedStyle")]
+    [Trait("Category", "Cascade")]
+    public void Cascade_MergesPropertiesFromSource()
+    {
+        // Arrange - Create two elements with their own styles
+        var doc = CreateTestDocument();
+        var element1 = CreateTestElement(doc, "div");
+        var element2 = CreateTestElement(doc, "span");
+
+        var targetStyle = GetUserRulesStyle(element1);
+        var sourceStyle = GetUserRulesStyle(element2);
+
+        // Set up source with a value
+        sourceStyle.Width.Assigned = CssValue.From_Dimension(200.0, ECssUnit.PX);
+
+        // Act - Cascade source property into target property
+        var targetProp = targetStyle.Width;
+        var sourceProp = sourceStyle.Width;
+        bool result = targetProp.Cascade(sourceProp);
+
+        // Assert - Value was cascaded
+        Assert.True(result);
+        Assert.Equal(CssValue.From_Dimension(200.0, ECssUnit.PX), targetStyle.Width.Assigned);
+    }
+
+    [Fact]
+    [Trait("Category", "CssComputedStyle")]
+    [Trait("Category", "Cascade")]
+    public void Cascade_OnlyCopiesPropertiesWithValues()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var element1 = CreateTestElement(doc, "div");
+        var element2 = CreateTestElement(doc, "span");
+
+        var targetStyle = GetUserRulesStyle(element1);
+        var sourceStyle = GetUserRulesStyle(element2);
+
+        // Set target with an initial value
+        targetStyle.Width.Assigned = CssValue.From_Dimension(100.0, ECssUnit.PX);
+
+        // Source has NO value assigned (Assigned is CssValue.Null or has no value)
+        // Don't set anything on sourceStyle.Height - it should have no value
+
+        // Act - Cascade source property (with no value) into target property
+        var targetProp = targetStyle.Height;
+        var sourceProp = sourceStyle.Height;
+
+        // Store original to verify no change
+        var originalAssigned = targetProp.Assigned;
+
+        bool result = targetProp.Cascade(sourceProp);
+
+        // Assert - No cascade occurred because source has no value
+        Assert.False(result);
+        Assert.Equal(originalAssigned, targetProp.Assigned);
+    }
+
+    [Fact]
+    [Trait("Category", "CssComputedStyle")]
+    [Trait("Category", "Cascade")]
+    public void Cascade_PreservesExistingValuesNotInSource()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var element1 = CreateTestElement(doc, "div");
+        var element2 = CreateTestElement(doc, "span");
+
+        var targetStyle = GetUserRulesStyle(element1);
+        var sourceStyle = GetUserRulesStyle(element2);
+
+        // Set target with an initial value for Width
+        targetStyle.Width.Assigned = CssValue.From_Dimension(100.0, ECssUnit.PX);
+
+        // Source only sets Height, not Width
+        sourceStyle.Height.Assigned = CssValue.From_Dimension(50.0, ECssUnit.PX);
+
+        // Act - Cascade Height from source (Width not cascaded)
+        targetStyle.Height.Cascade(sourceStyle.Height);
+
+        // Assert - Target's Width preserved, Height updated
+        Assert.Equal(CssValue.From_Dimension(100.0, ECssUnit.PX), targetStyle.Width.Assigned);
+        Assert.Equal(CssValue.From_Dimension(50.0, ECssUnit.PX), targetStyle.Height.Assigned);
+    }
+
+    [Fact]
+    [Trait("Category", "CssComputedStyle")]
+    [Trait("Category", "Cascade")]
+    public async Task CascadeAsync_BehavesSameAsCascade()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var element1 = CreateTestElement(doc, "div");
+        var element2 = CreateTestElement(doc, "span");
+
+        var targetStyle = GetUserRulesStyle(element1);
+        var sourceStyle = GetUserRulesStyle(element2);
+
+        // Set up source with a value
+        sourceStyle.Width.Assigned = CssValue.From_Dimension(300.0, ECssUnit.PX);
+
+        // Act - Cascade asynchronously
+        var targetProp = targetStyle.Width;
+        var sourceProp = sourceStyle.Width;
+        bool result = await targetProp.CascadeAsync(sourceProp);
+
+        // Assert - Value was cascaded (same behavior as sync version)
+        Assert.True(result);
+        Assert.Equal(CssValue.From_Dimension(300.0, ECssUnit.PX), targetStyle.Width.Assigned);
     }
     #endregion
 
