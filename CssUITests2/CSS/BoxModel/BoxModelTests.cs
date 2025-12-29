@@ -372,7 +372,7 @@ public class BoxModelTests : IDisposable
         var child = _fixture.CreateChild(container, "div", style =>
         {
             style.Display.Set(EDisplayMode.BLOCK);
-            style.Max_Width.Set(CssValue.From(200, ECssUnit.PX));
+            style.Max_Width.Set(200);
             // Width defaults to auto (would fill 400)
         });
 
@@ -615,7 +615,7 @@ public class BoxModelTests : IDisposable
             style.Display.Set(EDisplayMode.BLOCK);
             style.Width.Set(200);
             style.Height.Set(300);
-            style.Max_Height.Set(CssValue.From(150, ECssUnit.PX));
+            style.Max_Height.Set(150);
         });
         _fixture.ForceLayoutUpdate();
 
