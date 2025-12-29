@@ -469,11 +469,25 @@ Tests accessor properties not covered elsewhere.
 - [x] Combined: Percent value correct boolean states
 - [x] Combined: None value correct boolean states
 
-#### 12.10.8 Locked Property Tests
-Test locked property behavior (read-only properties).
-- [ ] Test setting Assigned on locked property throws InvalidOperationException
-- [ ] Test Cascade() bypasses lock (internal operation)
-- [ ] Test reading values from locked property works normally
+#### 12.10.8 Locked Property Tests ✓
+Test file: CssPropertyLockedTests.cs (16 tests)
+Tests locked property behavior (read-only properties).
+- [x] Locked property on Cascaded style is true
+- [x] Locked property on UserRules style is false
+- [x] Setting Assigned on locked property throws InvalidOperationException
+- [x] Setting Assigned on unlocked property succeeds
+- [x] Cascade() bypasses lock (internal operation)
+- [x] Overwrite() bypasses lock (internal operation)
+- [x] Reading Assigned from locked property works
+- [x] Reading Specified from locked property works
+- [x] Reading Computed from locked property works
+- [x] Reading Used from locked property works
+- [x] Reading Actual from locked property works
+- [x] Locked property after cascade has correct values
+- [x] Locked property accessors work
+- [x] Locked IntProperty throws on set
+- [x] Locked NumberProperty throws on set
+- [x] Locked EnumProperty throws on set
 
 #### 12.10.9 Change Event Tests
 Test FireValueChangeEvent for all stages.
