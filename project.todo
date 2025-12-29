@@ -141,7 +141,188 @@ Prerequisites: Phase 6 (CSS Parser), Phase 11.7.2 (Consume_Style_Block_Contents)
 - [ ] Custom property inheritance tests (requires full style cascade implementation)
 - [ ] Cycle detection tests (requires full style cascade implementation)
 
-### 12.6 Block Formatting Context (CSS/Formatting/)
+### 12.7 ValueTracker<T> Tests (CSS/Types/ValueTracker/)
+Unit tests for the generic value change detection system used by CssProperty.
+Current: 0 tests
+
+#### 12.7.1 Hash-Based Change Detection
+- [ ] Test constructor with value sets initial hash
+- [ ] Test constructor without value has HasValue=false
+- [ ] Test Update() with new value changes Hash
+- [ ] Test Update() with same value does not change Hash
+- [ ] Test Update() with null clears Hash to 0
+- [ ] Test HasValue becomes true after Update() with value
+- [ ] Test HasValue becomes false after Update() with null
+
+#### 12.7.2 Change Count Tracking
+- [ ] Test ChangeCount starts at 0
+- [ ] Test ChangeCount increments on each change
+- [ ] Test ChangeCount does not increment when value unchanged
+- [ ] Test ChangeCount increments even when suppressed
+
+#### 12.7.3 Event Firing
+- [ ] Test onChange event fires when hash changes
+- [ ] Test onChange event provides old and new hash values
+- [ ] Test onChange event provides change count and HasValue
+- [ ] Test Update(suppress: true) does not fire onChange
+- [ ] Test Update(suppress: false) fires onChange
+- [ ] Test multiple subscribers receive event
+
+### 12.8 CssComputedStyle Tests (CSS/Properties/Style/)
+Unit tests for the property collection container.
+Current: 0 tests (properties tested indirectly through element.Style)
+
+#### 12.8.1 Property Access
+- [ ] Test Get() returns correct property instance for valid ECssPropertyID
+- [ ] Test Get() returns null for unregistered property ID
+- [ ] Test property accessors (Width, Height, etc.) return typed properties
+- [ ] Test same property instance returned on multiple Get() calls
+
+#### 12.8.2 SetProperties Flag Tracking
+- [ ] Test SetProperties empty initially
+- [ ] Test SetProperties flag set when property assigned value
+- [ ] Test SetProperties flag not set for unassigned properties
+- [ ] Test SetProperties cleared correctly on property reset
+
+#### 12.8.3 ReadOnly Enforcement
+- [ ] Test ReadOnly=true prevents property value changes
+- [ ] Test ReadOnly=false allows property value changes
+- [ ] Test Cascaded style is ReadOnly by default
+- [ ] Test UserRules style is not ReadOnly
+
+#### 12.8.4 Cascade at Style Level
+- [ ] Test Cascade() merges properties from source style
+- [ ] Test Cascade() only copies properties with values
+- [ ] Test Cascade() preserves existing values not in source
+- [ ] Test CascadeAsync() behaves same as Cascade()
+
+#### 12.8.5 Selector and Origin
+- [ ] Test Selector property stores CSS selector
+- [ ] Test Origin property indicates source (user, author, UA)
+- [ ] Test Name property for debugging
+
+### 12.9 CssValue Derive Methods Tests (CSS/Value/Resolving/)
+Direct unit tests for value stage derivation methods.
+Current: Tested indirectly through property tests, need direct coverage.
+
+#### 12.9.1 Derive_SpecifiedValue Tests
+- [ ] Test UNSET keyword on inheritable property returns inherited value
+- [ ] Test UNSET keyword on non-inheritable property returns initial value
+- [ ] Test INHERIT keyword returns parent's computed value
+- [ ] Test INITIAL keyword returns definition's initial value
+- [ ] Test explicit value passes through unchanged
+- [ ] Test NULL assigned value on inheritable property returns inherited
+- [ ] Test NULL assigned value on non-inheritable property returns initial
+- [ ] Test custom PropertyStageResolver invoked when defined
+
+#### 12.9.2 Derive_ComputedValue Tests
+- [ ] Test INHERIT keyword resolved to parent's computed value
+- [ ] Test PERCENT type preserved (not resolved during cascade)
+- [ ] Test DIMENSION type resolved via CssUnitResolver
+- [ ] Test custom PropertyStageResolver invoked when defined
+- [ ] Test value without resolver passes through unchanged
+
+#### 12.9.3 Derive_UsedValue Tests
+- [ ] Test custom PropertyStageResolver invoked when defined
+- [ ] Test value without resolver passes through unchanged
+- [ ] Test immutable CssValue returned (no copy needed)
+
+#### 12.9.4 Derive_ActualValue Tests
+- [ ] Test custom PropertyStageResolver invoked when defined
+- [ ] Test value without resolver passes through unchanged
+- [ ] Test platform restrictions applied (future)
+
+### 12.10 CssProperty Class Tests (CSS/Properties/Base/)
+Comprehensive unit tests for the CssProperty value pipeline and lifecycle.
+Current: 26 tests passing (basic accessors, assignment, global keywords)
+Spec Reference: https://www.w3.org/TR/css-cascade-3/
+
+#### 12.10.1 Value Stage Pipeline Tests — High Priority
+Test the Assigned → Specified → Computed → Used → Actual value derivation chain.
+- [ ] Test Assigned value triggers Specified derivation
+- [ ] Test Specified value triggers Computed derivation
+- [ ] Test Computed value triggers Used derivation
+- [ ] Test Used value triggers Actual derivation
+- [ ] Test lazy evaluation (values computed on first access)
+- [ ] Test change propagation through all stages
+- [ ] Test Derive_SpecifiedValue() handles inherit keyword
+- [ ] Test Derive_ComputedValue() resolves relative values
+- [ ] Test Derive_UsedValue() applies property-specific resolution
+- [ ] Test Derive_ActualValue() applies platform restrictions
+
+#### 12.10.2 Set_Computed_Value() Tests — High Priority
+Test the method added for BoxModel integration during layout.
+- [ ] Test Set_Computed_Value() updates Computed value directly
+- [ ] Test Set_Computed_Value() triggers Used/Actual re-derivation
+- [ ] Test Set_Computed_Value() fires change events
+- [ ] Test Set_Computed_Value() with numeric values
+- [ ] Test Set_Computed_Value() with CssValue.Auto (edge case)
+
+#### 12.10.3 Revert() Tests
+Test reverting property to computed stage for re-resolution.
+- [ ] Test Revert() clears Used and Actual values
+- [ ] Test Revert(suppress: true) suppresses change events
+- [ ] Test Revert(suppress: false) fires change events
+- [ ] Test values are re-derived on next access after Revert()
+
+#### 12.10.4 Update() Method Tests
+Test the Update() and conditional update methods.
+- [ ] Test Update() clears all derived values (Specified, Computed, Used, Actual)
+- [ ] Test Update(ComputeNow: true) immediately re-derives all values
+- [ ] Test Update(ComputeNow: false) defers re-derivation
+- [ ] Test Update() fires Assigned change event
+- [ ] Test UpdateDependent() only updates if IsDependent is true
+- [ ] Test UpdateDependentOrAuto() only updates if IsDependent or IsAuto
+- [ ] Test UpdatePercentageOrAuto() only updates if IsPercentage or IsAuto
+
+#### 12.10.5 Cascade() and Overwrite() Tests
+Test cascade merging and value overwriting.
+- [ ] Test Cascade() copies Assigned value from source property
+- [ ] Test Cascade() returns true when value changed
+- [ ] Test Cascade() returns false when source has no value
+- [ ] Test Cascade() copies SourcePtr and Selector metadata
+- [ ] Test CascadeAsync() behaves same as Cascade()
+- [ ] Test Overwrite() only copies if values differ
+- [ ] Test Overwrite() returns true when value changed
+- [ ] Test Overwrite() returns false when values are same
+- [ ] Test OverwriteAsync() behaves same as Overwrite()
+
+#### 12.10.6 Handle_Unit_Change() Tests
+Test unit scale change notifications.
+- [ ] Test Handle_Unit_Change() fires event when property uses that unit
+- [ ] Test Handle_Unit_Change() does nothing when property uses different unit
+- [ ] Test Handle_Unit_Change() with ECssUnit.PX
+- [ ] Test Handle_Unit_Change() with ECssUnit.EM (relative unit)
+
+#### 12.10.7 Additional Accessor Tests
+Test accessors not covered by existing tests.
+- [ ] Test IsNone returns true for ECssValueTypes.NONE
+- [ ] Test IsNone returns false for other types
+- [ ] Test IsDependent returns true when Depends flag is set
+- [ ] Test IsDependent returns false when Depends flag is not set
+- [ ] Test IsDependentOrAuto returns true for Auto
+- [ ] Test IsDependentOrAuto returns true for Dependent
+- [ ] Test IsDependentOrAuto returns false for explicit values
+- [ ] Test IsPercentageOrAuto returns true for percentages
+- [ ] Test IsPercentageOrAuto returns true for Auto
+- [ ] Test IsPercentageOrAuto returns false for explicit values
+- [ ] Test Flags property returns combined flags from Specified value
+
+#### 12.10.8 Locked Property Tests
+Test locked property behavior (read-only properties).
+- [ ] Test setting Assigned on locked property throws InvalidOperationException
+- [ ] Test Cascade() bypasses lock (internal operation)
+- [ ] Test reading values from locked property works normally
+
+#### 12.10.9 Change Event Tests
+Test FireValueChangeEvent for all stages.
+- [ ] Test Assigned change fires event with EPropertyStage.Assigned
+- [ ] Test Computed change fires event with EPropertyStage.Computed
+- [ ] Test Actual change fires event with EPropertyStage.Actual
+- [ ] Test event contains correct property reference
+- [ ] Test multiple rapid changes coalesce correctly
+
+### 12.11 Block Formatting Context (CSS/Formatting/)
 - [x] BlockFormattingContext tests (4 tests: instantiation, interface compliance, null safety)
 - [ ] Float layout tests (requires full layout pipeline)
 - [ ] Clear property tests (requires full layout pipeline)
