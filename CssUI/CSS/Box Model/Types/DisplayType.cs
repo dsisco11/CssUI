@@ -52,6 +52,12 @@ public struct DisplayType
                 Outer = EOuterDisplayType.None;
                 Inner = EInnerDisplayType.None;
                 break;
+            case EDisplayMode.CONTENT:
+                // display: contents - element generates no box but children do
+                // Per spec, has no inner/outer display type since it generates no boxes
+                Outer = EOuterDisplayType.Contents;
+                Inner = EInnerDisplayType.None;
+                break;
             case EDisplayMode.BLOCK:
                 Outer = EOuterDisplayType.Block;
                 Inner = EInnerDisplayType.Flow_Root;

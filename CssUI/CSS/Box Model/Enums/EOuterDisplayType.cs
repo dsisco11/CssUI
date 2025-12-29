@@ -12,8 +12,8 @@ public enum EOuterDisplayType : byte
     /// </summary>
     None = 0x0,
     /// <summary>
-    /// Block-level elements – those elements of the source document that are formatted visually as blocks (e.g., paragraphs) – are elements which generate a block-level principal box. 
-    /// Values of the 'display' property that make an element block-level include: 'block', 'list-item', and 'table'. 
+    /// Block-level elements – those elements of the source document that are formatted visually as blocks (e.g., paragraphs) – are elements which generate a block-level principal box.
+    /// Values of the 'display' property that make an element block-level include: 'block', 'list-item', and 'table'.
     /// Block-level boxes are boxes that participate in a block formatting context.
     /// </summary>
     Block,
@@ -25,5 +25,14 @@ public enum EOuterDisplayType : byte
     /// The element generates an run-in box, which is a type of inline-level box with special behavior that attempts to merge it into a subsequent block container. See § 3 Run-In Layout for details.
     /// </summary>
     Run_In,
+    /// <summary>
+    /// The element itself does not generate any boxes, but its children and pseudo-elements still generate boxes and text sequences as normal.
+    /// For the purposes of box generation and layout, the element must be treated as if it had been replaced in the element tree by its contents.
+    /// </summary>
+    /// <remarks>
+    /// Docs: https://www.w3.org/TR/css-display-3/#valdef-display-contents
+    /// Note: display: contents computes to display: none on replaced elements and other elements whose rendering is not entirely controlled by CSS.
+    /// </remarks>
+    Contents,
 }
 

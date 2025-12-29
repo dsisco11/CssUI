@@ -59,12 +59,32 @@ public class CssBoxTreeNode : TreeNode
     /// <summary>
     /// Unlinks a series or chain of nodes starting at this one and traversing upwards before finally ending at the given <paramref name="TerminationPoint"/>
     /// </summary>
-    /// <returns>Root of the unlinked chain</returns>
+    /// <returns>Root of the unlinked chain, or this node if no junction found</returns>
     public ITreeNode Unlink(TreeNode TerminationPoint)
     {
         var Junction = Tree.Get_Junction(this, TerminationPoint);
+        
+        // Handle case where no junction is found (e.g., newly created nodes not yet in tree)
+        if (Junction is null)
+        {
+            // Just detach this node from any parent it might have
+            if (parentNode is TreeNode parent && parent.childNodes.Contains(this))
+            {
+                index = parent.IndexOf(this);
+                parent.Remove(this);
+            }
+            parentNode = null;
+            return this;
+        }
+        
         index = Junction.index;
-        ((TreeNode)Junction.parentNode).Remove(Junction);
+        
+        // Handle case where Junction.parentNode is null (node is at root level)
+        // Also verify the junction is actually a child before trying to remove
+        if (Junction.parentNode is TreeNode parent2 && parent2.childNodes.Contains(Junction))
+        {
+            parent2.Remove(Junction);
+        }
         Junction.parentNode = null;
 
         // Walk the chain to unlink all nodes so they are dereferenced

@@ -59,8 +59,18 @@ public static class CssBoxTree
                 int index = -1;
                 if (Box is not null)
                 {
-                    var ChainRoot = Box.Unlink(nearestAncestor!.Box!);
-                    index = ChainRoot.index;
+                    // Only unlink if we have a parent box to unlink from
+                    // Root elements have no ancestor, so they don't need unlinking
+                    if (nearestAncestor?.Box is not null)
+                    {
+                        var ChainRoot = Box.Unlink(nearestAncestor.Box);
+                        index = ChainRoot.index;
+                    }
+                    else
+                    {
+                        // Root element - just detach from any existing parent
+                        Box.parentNode = null;
+                    }
                 }
 
                 CssBoxTreeNode? nextBox = null;
@@ -69,14 +79,37 @@ public static class CssBoxTree
                 {
                     case DOM.Enums.ENodeType.TEXT_NODE:
                         {
-                            // Texts runs encompass all of the contiguous sibling text-nodes, skip those contiguous nodes in the queue
-                            var TextNodes = new List<Text>(node.parentNode.childNodes.Count);
-                            while (Queue.Peek().nodeType == DOM.Enums.ENodeType.TEXT_NODE && ReferenceEquals(Queue.Peek().parentNode, node.parentNode))
+                            // Text runs encompass all of the contiguous sibling text-nodes, skip those contiguous nodes in the queue
+                            // Per CSS Display 3 §1: "If the sequence contains no text, however, it does not generate a text sequence."
+                            var TextNodes = new List<Text>(node.parentNode?.childNodes.Count ?? 4);
+
+                            // Add the current text node first
+                            TextNodes.Add((Text)node);
+
+                            // Collect contiguous sibling text nodes (must check Queue.Count before Peek to avoid InvalidOperationException)
+                            while (Queue.Count > 0 &&
+                                   Queue.Peek().nodeType == DOM.Enums.ENodeType.TEXT_NODE &&
+                                   ReferenceEquals(Queue.Peek().parentNode, node.parentNode))
                             {
                                 TextNodes.Add((Text)Queue.Dequeue());
                             }
 
-                            nextBox = new CssTextRun(TextNodes.ToArray());
+                            // Only generate text run if there's actual text content
+                            // Per spec: empty text nodes do not generate text sequences
+                            bool hasContent = false;
+                            foreach (var textNode in TextNodes)
+                            {
+                                if (!string.IsNullOrEmpty(textNode.data))
+                                {
+                                    hasContent = true;
+                                    break;
+                                }
+                            }
+
+                            if (hasContent)
+                            {
+                                nextBox = new CssTextRun(TextNodes.ToArray());
+                            }
                         }
                         break;
                     case DOM.Enums.ENodeType.ELEMENT_NODE:
@@ -98,11 +131,8 @@ public static class CssBoxTree
                     }
                 }
 
-                // Assign the new box to the node
-                if (nextBox is not null)
-                {
-                    node.Box = nextBox;
-                }
+                // Assign the new box to the node (or clear it if no box generated)
+                node.Box = nextBox;
 
                 // 5) Insert the new box-node into tree (skip for root elements which have no parent)
                 // Also skip if the box already has a parent set (from constructor)
@@ -119,21 +149,57 @@ public static class CssBoxTree
             }
 
             node.ClearFlag(ENodeFlags.NeedsBoxUpdate | ENodeFlags.ChildNeedsBoxUpdate);
+            
             // 6) Queue all children of node.
-            foreach (var n in node.childNodes)
+            // Per CSS Display 3 §2.5: display: none elements and their descendants generate no boxes.
+            // Skip queueing children if this element has display: none.
+            bool skipChildren = false;
+            if (node is Element element)
             {
-                // Only add items which we KNOW will need an update
-                if (n.GetFlag(ENodeFlags.NeedsBoxUpdate | ENodeFlags.ChildNeedsBoxUpdate))
-                    Queue.Enqueue(n);
+                var displayType = new DisplayType(element.Style.Display);
+                if (displayType.Outer == EOuterDisplayType.None)
+                {
+                    skipChildren = true;
+                    // Clear boxes from all descendants since they won't be processed
+                    ClearDescendantBoxes(node);
+                }
+            }
+
+            if (!skipChildren)
+            {
+                foreach (var n in node.childNodes)
+                {
+                    // Only add items which we KNOW will need an update
+                    if (n.GetFlag(ENodeFlags.NeedsBoxUpdate | ENodeFlags.ChildNeedsBoxUpdate))
+                        Queue.Enqueue(n);
+                }
             }
         }
     }
 
     /// <summary>
-    /// Generates an appropriate CSS principal-box object for the given element
+    /// Recursively clears boxes from all descendants of a node.
+    /// Used when an ancestor has display: none, which means descendants generate no boxes.
     /// </summary>
-    /// <param name="Node"></param>
-    /// <returns></returns>
+    private static void ClearDescendantBoxes(Node node)
+    {
+        foreach (var child in node.childNodes)
+        {
+            child.Box = null;
+            child.ClearFlag(ENodeFlags.NeedsBoxUpdate | ENodeFlags.ChildNeedsBoxUpdate);
+            ClearDescendantBoxes(child);
+        }
+    }
+
+    /// <summary>
+    /// Generates an appropriate CSS principal-box object for the given element.
+    /// Implements CSS Display 3 box generation rules.
+    /// </summary>
+    /// <param name="Node">The element to generate a box for.</param>
+    /// <returns>The generated box, or null if the element generates no box.</returns>
+    /// <remarks>
+    /// Docs: https://www.w3.org/TR/css-display-3/#box-generation
+    /// </remarks>
     private static CssBoxTreeNode? Generate_Box(in Element Node)
     {
         if (Node is null)
@@ -141,43 +207,192 @@ public static class CssBoxTree
             return null;
         }
 
-        // Check if display is none - these elements don't generate boxes
         var displayType = new DisplayType(Node.Style.Display);
+
+        // Check if display is none - these elements don't generate boxes
+        // Per CSS Display 3 §2.5: "The element and its descendants generate no boxes or text sequences."
         if (displayType.Outer == EOuterDisplayType.None)
         {
             return null;
         }
 
-        if (Node!.isRoot || Node.parentElement is null)
-        {// Root-nodes always generate block-level boxes
-            Node.Style!.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
-            CssPrincipalBox box = new CssPrincipalBox(Node, null!);
-            return box;
-        }
-        else
+        // Check for display: contents - element generates no box but children still do
+        // Per CSS Display 3 §2.5: "The element itself does not generate any boxes, 
+        // but its children and pseudo-elements still generate boxes and text sequences as normal."
+        if (displayType.Outer == EOuterDisplayType.Contents)
         {
-            CssBox? parentBox = Node.parentElement.Box;
-            CssBox box = new CssPrincipalBox(Node, parentBox!);
+            // Return null for this element's box, but children will still be processed
+            // Note: For replaced elements, display: contents computes to display: none (handled at style level)
+            return null;
+        }
 
-            if (!Is_Compatable_Parent_Box(Node, Node.parentElement))
+        // Apply automatic box type transformations (blockification/inlinification)
+        // Per CSS Display 3 §2.7
+        displayType = ApplyBoxTypeTransformations(Node, displayType);
+
+        if (Node.isRoot || Node.parentElement is null)
+        {
+            // Root-nodes always generate block-level boxes
+            // Per CSS Display 3 §2.8: "The root element's display type is always blockified"
+            Node.Style!.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
+            return new CssPrincipalBox(Node, null!);
+        }
+
+        CssBox? parentBox = Node.parentElement.Box;
+        CssPrincipalBox box = new CssPrincipalBox(Node, parentBox!);
+
+        // Handle anonymous box generation for block-in-inline and inline-in-block scenarios
+        // Per CSS 2.2 §9.2.1.1: A block container either contains only inline-level boxes 
+        // or only block-level boxes
+        HandleAnonymousBoxGeneration(Node, box, parentBox);
+
+        return box;
+    }
+
+    /// <summary>
+    /// Applies automatic box type transformations (blockification/inlinification) per CSS Display 3 §2.7.
+    /// </summary>
+    /// <remarks>
+    /// Blockification occurs for:
+    /// - Floated elements (float != none)
+    /// - Absolutely/fixed positioned elements
+    /// - Children of flex/grid containers
+    /// 
+    /// Inlinification occurs for:
+    /// - Children of ruby containers (not implemented yet)
+    /// </remarks>
+    private static DisplayType ApplyBoxTypeTransformations(in Element Node, DisplayType displayType)
+    {
+        // Skip if already has no box or contents
+        if (displayType.Outer == EOuterDisplayType.None || displayType.Outer == EOuterDisplayType.Contents)
+        {
+            return displayType;
+        }
+
+        bool shouldBlockify = false;
+
+        // Check for blockification triggers
+        // 1. Absolutely positioned elements (position: absolute or fixed)
+        if (Node.Style.Positioning == EBoxPositioning.Absolute || Node.Style.Positioning == EBoxPositioning.Fixed)
+        {
+            shouldBlockify = true;
+        }
+
+        // 2. Floated elements (when float property is implemented)
+        // @todo: Check float property when implemented
+
+        // 3. Children of flex/grid containers
+        if (Node.parentElement is not null)
+        {
+            var parentDisplay = Node.parentElement.Style.Display;
+            if (parentDisplay == EDisplayMode.FLEX || parentDisplay == EDisplayMode.INLINE_FLEX ||
+                parentDisplay == EDisplayMode.GRID || parentDisplay == EDisplayMode.INLINE_GRID)
             {
-                // If a block container box has a block-level box inside it, then force it to ONLY have block-level boxes inside it
-                if (HasBlockLevelChildren(Node.parentElement))
+                shouldBlockify = true;
+            }
+        }
+
+        // Apply blockification if needed
+        if (shouldBlockify && displayType.IsInlineLevel)
+        {
+            // Per CSS Display 3 §2.7: blockification sets outer display to block
+            // For inline flow-root (inline-block), it becomes block (losing flow-root) for legacy reasons
+            if (displayType.Inner == EInnerDisplayType.Flow_Root)
+            {
+                // inline-block → block (per spec, loses flow-root for legacy reasons)
+                Node.Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
+                return new DisplayType(EOuterDisplayType.Block, EInnerDisplayType.Flow_Root);
+            }
+            else
+            {
+                // Other inline types → block flow-root
+                Node.Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
+                return new DisplayType(EOuterDisplayType.Block, displayType.Inner);
+            }
+        }
+
+        return displayType;
+    }
+
+    /// <summary>
+    /// Handles anonymous box generation for mixed block/inline content per CSS 2.2 §9.2.1.1.
+    /// </summary>
+    /// <remarks>
+    /// When a block-level box is inserted into a block container that has inline-level children,
+    /// all inline content before and after the block must be wrapped in anonymous block boxes.
+    /// 
+    /// Note: The current implementation is simplified. Full implementation requires:
+    /// - Walking all existing children and wrapping inline runs
+    /// - Handling text nodes properly
+    /// - Maintaining proper box ordering
+    /// </remarks>
+    private static void HandleAnonymousBoxGeneration(in Element Node, CssPrincipalBox box, CssBox? parentBox)
+    {
+        if (parentBox is null || Node.parentElement is null)
+        {
+            return;
+        }
+
+        var parentDisplay = DisplayType.From(Node.parentElement.Style.Display);
+        var childDisplay = DisplayType.From(Node.Style.Display);
+
+        // Only apply anonymous box rules for block containers (flow layout)
+        if (!parentDisplay.IsBlockContainer)
+        {
+            return;
+        }
+
+        // Check if we're inserting a block-level box into a container with inline content
+        if (childDisplay.IsBlockLevel && HasInlineLevelContent(Node.parentElement, Node))
+        {
+            // Per CSS 2.2 §9.2.1.1: When an inline box contains an in-flow block-level box,
+            // the inline box (and its inline ancestors within the same line box) is broken
+            // around the block-level box, and the inline boxes are wrapped in anonymous block boxes.
+            
+            // @todo: Full implementation requires walking the parent's children and:
+            // 1. Collecting all inline content before this block into an anonymous block
+            // 2. Collecting all inline content after this block into an anonymous block
+            // 3. Rebuilding the box tree structure
+            
+            // For now, we detect the situation and mark it for future handling
+            // The parent's formatting context will need to handle this during flow
+        }
+    }
+
+    /// <summary>
+    /// Checks if the parent element has inline-level content (excluding the specified node).
+    /// </summary>
+    private static bool HasInlineLevelContent(Element parent, Element excludeNode)
+    {
+        // Check for inline-level element children
+        Element? current = parent.firstElementChild;
+        while (current != null)
+        {
+            if (!ReferenceEquals(current, excludeNode))
+            {
+                var childDisplay = DisplayType.From(current.Style.Display);
+                if (childDisplay.IsInlineLevel)
                 {
-                    CssAnonymousBox wrapper = CssAnonymousBox.Create_Block(parentBox!);
-                    wrapper.Add(box);
-                    box = wrapper;
-                }
-                else if (HasInlineLevelChildren(Node.parentElement))
-                {
-                    CssAnonymousBox wrapper = CssAnonymousBox.Create_Inline(parentBox!);
-                    wrapper.Add(box);
-                    box = wrapper;
+                    return true;
                 }
             }
-
-            return box;
+            current = current.nextElementSibling;
         }
+
+        // Check for text node children (these are inline-level content)
+        foreach (var child in parent.childNodes)
+        {
+            if (child.nodeType == DOM.Enums.ENodeType.TEXT_NODE)
+            {
+                var textNode = (Text)child;
+                if (!string.IsNullOrWhiteSpace(textNode.data))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -235,10 +450,16 @@ public static class CssBoxTree
     {
         var current = node.parentNode;
         while (current is not null)
-        {// Find the nearest ancestor element which has a box
-            if (current is Element element && element.Box is not null)
+        {
+            // Find the nearest ancestor element which has a box
+            if (current is Element element)
             {
-                return element;
+                // Skip elements with display: contents as they don't generate boxes
+                var displayType = new DisplayType(element.Style.Display);
+                if (displayType.Outer != EOuterDisplayType.Contents && element.Box is not null)
+                {
+                    return element;
+                }
             }
 
             current = current.parentElement;
