@@ -206,6 +206,33 @@ public class CssPrincipalBox : CssBox
     }
 
     /// <summary>
+    /// Invalidates the cached containing block value.
+    /// Should be called when layout changes might affect the containing block dimensions.
+    /// </summary>
+    internal void InvalidateContainingBlock()
+    {
+        _containing_box = null;
+    }
+
+    /// <summary>
+    /// Invalidates the containing block cache for all descendant boxes.
+    /// Called after a box's content dimensions change during top-down width resolution.
+    /// </summary>
+    internal void InvalidateDescendantContainingBlocks()
+    {
+        var element = Owner?.firstElementChild;
+        while (element is not null)
+        {
+            if (element.Box is CssPrincipalBox childBox)
+            {
+                childBox.InvalidateContainingBlock();
+                childBox.InvalidateDescendantContainingBlocks();
+            }
+            element = element.nextElementSibling;
+        }
+    }
+
+    /// <summary>
     /// Returns whether or not our containing block depends on our size
     /// </summary>
     internal bool Containing_Box_Dependent
@@ -467,6 +494,10 @@ public class CssPrincipalBox : CssBox
         // This is a partial update to support the two-pass layout algorithm
         var width = Style.Width;
         Content = new Rect4f(Content.Top, Content.Left + width, Content.Bottom, Content.Left);
+
+        // Invalidate descendant containing block caches since this box's Content changed
+        // Children's containing block is based on this box's Content rect
+        InvalidateDescendantContainingBlocks();
     }
 
     /// <summary>
