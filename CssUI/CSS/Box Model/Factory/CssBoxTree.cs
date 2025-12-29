@@ -38,9 +38,12 @@ public static class CssBoxTree
          * 4) Generate a new principal-box or text-run.
          * 5) Insert the new box-node into tree.
          * 6) Queue all children of element.
+         * 7) After processing children, normalize block containers to ensure only block-level children.
          */
 
         var Queue = new Queue<Node>();
+        // Track elements that need anonymous box normalization after their children are processed
+        var BlockContainersToNormalize = new HashSet<Element>();
         Queue.Enqueue(StartNode);
         while (Queue.Count > 0)
         {
@@ -138,10 +141,18 @@ public static class CssBoxTree
                 // Also skip if the box already has a parent set (from constructor)
                 if (nearestAncestor?.Box is not null && nextBox is not null && nextBox.parentNode is null)
                 {
-                    if (index > -1)
+                    // Only use the saved index if it's valid for the current child count
+                    // The index might be stale if the parent's children were modified (e.g., by normalization)
+                    if (index > -1 && index < nearestAncestor.Box.childNodes.Count)
                         nearestAncestor.Box.Insert(index, nextBox);
                     else
                         nearestAncestor.Box.Add(nextBox);
+
+                    // Mark parent block container for normalization after children are processed
+                    if (nearestAncestor.Box.IsBlockContainer)
+                    {
+                        BlockContainersToNormalize.Add(nearestAncestor);
+                    }
                 }
 
                 // Notify the tree that we need to be reflowed
@@ -149,7 +160,7 @@ public static class CssBoxTree
             }
 
             node.ClearFlag(ENodeFlags.NeedsBoxUpdate | ENodeFlags.ChildNeedsBoxUpdate);
-            
+
             // 6) Queue all children of node.
             // Per CSS Display 3 §2.5: display: none elements and their descendants generate no boxes.
             // Skip queueing children if this element has display: none.
@@ -175,6 +186,117 @@ public static class CssBoxTree
                 }
             }
         }
+
+        // 7) Normalize all block containers to ensure they contain only block-level children
+        // Per CSS 2.2 §9.2.1.1: A block container either contains only inline-level boxes
+        // or only block-level boxes (wrapped in anonymous blocks if mixed)
+        foreach (var container in BlockContainersToNormalize)
+        {
+            if (container.Box is CssBox box)
+            {
+                NormalizeBlockContainerChildren(box);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Normalizes a block container's children per CSS 2.2 §9.2.1.1.
+    /// If the container has mixed block-level and inline-level children,
+    /// all runs of consecutive inline content are wrapped in anonymous block boxes.
+    /// </summary>
+    /// <remarks>
+    /// Docs: https://www.w3.org/TR/CSS22/visuren.html#anonymous-block-level
+    ///
+    /// "if a block container box has a block-level box inside it, then we force it
+    /// to have only block-level boxes inside it."
+    ///
+    /// The algorithm:
+    /// 1. Check if children are mixed (both block and inline level boxes)
+    /// 2. If not mixed, no action needed
+    /// 3. If mixed, iterate children and wrap consecutive inline runs in anonymous block boxes
+    /// </remarks>
+    private static void NormalizeBlockContainerChildren(CssBox container)
+    {
+        if (container.childNodes.Count == 0)
+            return;
+
+        // Take a snapshot of children to avoid modification during iteration
+        var children = new List<ITreeNode>(container.childNodes);
+
+        // First pass: determine if we have mixed content
+        bool hasBlockLevel = false;
+        bool hasInlineLevel = false;
+
+        foreach (var child in children)
+        {
+            if (child is CssBox childBox)
+            {
+                if (childBox.IsBlockLevel)
+                    hasBlockLevel = true;
+                else if (childBox.IsInlineLevel)
+                    hasInlineLevel = true;
+            }
+            else if (child is CssTextRun)
+            {
+                // Text runs are inline-level
+                hasInlineLevel = true;
+            }
+        }
+
+        // If not mixed, no normalization needed
+        if (!(hasBlockLevel && hasInlineLevel))
+            return;
+
+        // Clear the container's children FIRST, before building new list
+        // This ensures all children have parentNode = null before we re-parent them
+        container.childNodes.Clear();
+
+        // Second pass: wrap inline runs in anonymous block boxes
+        var currentInlineRun = new List<ITreeNode>();
+
+        void FlushInlineRun()
+        {
+            if (currentInlineRun.Count == 0)
+                return;
+
+            // Create anonymous block box to wrap the inline run
+            // Pass null as parent - we'll add it to the container
+            var anonymousBlock = CssAnonymousBox.Create_Block(null!);
+            foreach (var inlineChild in currentInlineRun)
+            {
+                // parentNode is already null from Clear() above
+                anonymousBlock.Add(inlineChild);
+            }
+            // Add the anonymous block to the container
+            container.Add(anonymousBlock);
+            currentInlineRun.Clear();
+        }
+
+        foreach (var child in children)
+        {
+            bool isBlockLevel = false;
+            if (child is CssBox childBox)
+            {
+                isBlockLevel = childBox.IsBlockLevel;
+            }
+
+            if (isBlockLevel)
+            {
+                // Flush any pending inline content
+                FlushInlineRun();
+                // Add block-level child directly to container
+                // parentNode is already null from Clear() above
+                container.Add(child);
+            }
+            else
+            {
+                // Collect inline-level content
+                currentInlineRun.Add(child);
+            }
+        }
+
+        // Flush any remaining inline content
+        FlushInlineRun();
     }
 
     /// <summary>
@@ -217,7 +339,7 @@ public static class CssBoxTree
         }
 
         // Check for display: contents - element generates no box but children still do
-        // Per CSS Display 3 §2.5: "The element itself does not generate any boxes, 
+        // Per CSS Display 3 §2.5: "The element itself does not generate any boxes,
         // but its children and pseudo-elements still generate boxes and text sequences as normal."
         if (displayType.Outer == EOuterDisplayType.Contents)
         {
@@ -238,13 +360,12 @@ public static class CssBoxTree
             return new CssPrincipalBox(Node, null!);
         }
 
-        CssBox? parentBox = Node.parentElement.Box;
-        CssPrincipalBox box = new CssPrincipalBox(Node, parentBox!);
+        // Create box without parent - Generate_Tree() will add it to the parent's children
+        // This avoids the parentNode != null check in Generate_Tree that would skip tree insertion
+        CssPrincipalBox box = new CssPrincipalBox(Node, null!);
 
-        // Handle anonymous box generation for block-in-inline and inline-in-block scenarios
-        // Per CSS 2.2 §9.2.1.1: A block container either contains only inline-level boxes 
-        // or only block-level boxes
-        HandleAnonymousBoxGeneration(Node, box, parentBox);
+        // Note: Anonymous box normalization is handled in Generate_Tree() after all
+        // children of block containers are processed (per CSS 2.2 §9.2.1.1)
 
         return box;
     }
@@ -257,7 +378,7 @@ public static class CssBoxTree
     /// - Floated elements (float != none)
     /// - Absolutely/fixed positioned elements
     /// - Children of flex/grid containers
-    /// 
+    ///
     /// Inlinification occurs for:
     /// - Children of ruby containers (not implemented yet)
     /// </remarks>
@@ -312,87 +433,6 @@ public static class CssBoxTree
         }
 
         return displayType;
-    }
-
-    /// <summary>
-    /// Handles anonymous box generation for mixed block/inline content per CSS 2.2 §9.2.1.1.
-    /// </summary>
-    /// <remarks>
-    /// When a block-level box is inserted into a block container that has inline-level children,
-    /// all inline content before and after the block must be wrapped in anonymous block boxes.
-    /// 
-    /// Note: The current implementation is simplified. Full implementation requires:
-    /// - Walking all existing children and wrapping inline runs
-    /// - Handling text nodes properly
-    /// - Maintaining proper box ordering
-    /// </remarks>
-    private static void HandleAnonymousBoxGeneration(in Element Node, CssPrincipalBox box, CssBox? parentBox)
-    {
-        if (parentBox is null || Node.parentElement is null)
-        {
-            return;
-        }
-
-        var parentDisplay = DisplayType.From(Node.parentElement.Style.Display);
-        var childDisplay = DisplayType.From(Node.Style.Display);
-
-        // Only apply anonymous box rules for block containers (flow layout)
-        if (!parentDisplay.IsBlockContainer)
-        {
-            return;
-        }
-
-        // Check if we're inserting a block-level box into a container with inline content
-        if (childDisplay.IsBlockLevel && HasInlineLevelContent(Node.parentElement, Node))
-        {
-            // Per CSS 2.2 §9.2.1.1: When an inline box contains an in-flow block-level box,
-            // the inline box (and its inline ancestors within the same line box) is broken
-            // around the block-level box, and the inline boxes are wrapped in anonymous block boxes.
-            
-            // @todo: Full implementation requires walking the parent's children and:
-            // 1. Collecting all inline content before this block into an anonymous block
-            // 2. Collecting all inline content after this block into an anonymous block
-            // 3. Rebuilding the box tree structure
-            
-            // For now, we detect the situation and mark it for future handling
-            // The parent's formatting context will need to handle this during flow
-        }
-    }
-
-    /// <summary>
-    /// Checks if the parent element has inline-level content (excluding the specified node).
-    /// </summary>
-    private static bool HasInlineLevelContent(Element parent, Element excludeNode)
-    {
-        // Check for inline-level element children
-        Element? current = parent.firstElementChild;
-        while (current != null)
-        {
-            if (!ReferenceEquals(current, excludeNode))
-            {
-                var childDisplay = DisplayType.From(current.Style.Display);
-                if (childDisplay.IsInlineLevel)
-                {
-                    return true;
-                }
-            }
-            current = current.nextElementSibling;
-        }
-
-        // Check for text node children (these are inline-level content)
-        foreach (var child in parent.childNodes)
-        {
-            if (child.nodeType == DOM.Enums.ENodeType.TEXT_NODE)
-            {
-                var textNode = (Text)child;
-                if (!string.IsNullOrWhiteSpace(textNode.data))
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     /// <summary>

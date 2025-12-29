@@ -354,15 +354,29 @@ Spec Reference: https://www.w3.org/TR/CSS22/visuren.html#box-gen
 - [x] Add tests for box tree regeneration (CssBoxTreeTests)
   - [x] Skip tests dependent on Phase 14.6.2-14.6.6 work with appropriate markers
 
-#### 14.6.1 Anonymous Block Box Generation (CSS 2.2 §9.2.1.1)
-Currently inverted: code wraps the NEW box instead of sibling inline content.
-- [ ] Fix Generate_Box() to wrap INLINE SIBLINGS in anonymous block, not the block child
-- [ ] When block-level box inserted into block container with inline children:
-  - [ ] Wrap all preceding inline content in anonymous block box
-  - [ ] Wrap all following inline content in anonymous block box
-- [ ] Anonymous boxes inherit from enclosing non-anonymous box
-- [ ] Add AnonymousBlockBox wrapper creation helper
-- [ ] Tests for mixed block/inline children producing anonymous blocks
+#### 14.6.1 Anonymous Block Box Generation (CSS 2.2 §9.2.1.1) ✓
+CSS 2.2 §9.2.1.1: When a block container has mixed block-level and inline-level children,
+anonymous block boxes wrap consecutive runs of inline content.
+Spec Reference: https://www.w3.org/TR/CSS22/visuren.html#anonymous-block-level
+- [x] Implement NormalizeBlockContainerChildren() in CssBoxTree
+  - [x] Detect mixed block/inline content in block containers
+  - [x] Wrap consecutive inline runs in CssAnonymousBox.Create_Block()
+  - [x] Maintain block-level children directly in container
+- [x] Track block containers needing normalization during Generate_Tree()
+  - [x] Add BlockContainersToNormalize HashSet<Element>
+  - [x] Add containers when inserting children into block containers
+  - [x] Normalize all tracked containers after BFS processing completes
+- [x] Update CssAnonymousBox.Create_Block() to use Flow_Root inner display type
+- [x] Add index bounds check for Insert() to handle stale indices from shared fixtures
+- [x] Tests for anonymous block box generation (7 tests)
+  - [x] BlockInBlockContainer_HasInlineSiblings_WrapsInlineInAnonymousBox
+  - [x] BlockOnlyChildren_NoAnonymousBoxNeeded
+  - [x] InlineOnlyChildren_NoAnonymousBoxNeeded
+  - [x] MultipleInlineSiblings_WrappedInSingleAnonymousBox
+  - [x] AnonymousBox_IsTypeOfCssAnonymousBox
+  - [x] BlockBetweenInlines_CreatesTwoAnonymousBoxes
+  - [x] InlineBlockWithBlock_InlineBlockIsWrapped
+- [x] Updated tests to use ForceLayoutUpdate() for proper cascade/box generation
 
 #### 14.6.2 display: contents Support (CSS Display 3 §2.5)
 Element generates no box, but children render normally.
