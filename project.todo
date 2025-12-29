@@ -441,19 +441,33 @@ Tests unit scale change notifications.
 - [x] Handle_Unit_Change() different properties same unit
 - [x] Handle_Unit_Change() different properties different units
 
-#### 12.10.7 Additional Accessor Tests
-Test accessors not covered by existing tests.
-- [ ] Test IsNone returns true for ECssValueTypes.NONE
-- [ ] Test IsNone returns false for other types
-- [ ] Test IsDependent returns true when Depends flag is set
-- [ ] Test IsDependent returns false when Depends flag is not set
-- [ ] Test IsDependentOrAuto returns true for Auto
-- [ ] Test IsDependentOrAuto returns true for Dependent
-- [ ] Test IsDependentOrAuto returns false for explicit values
-- [ ] Test IsPercentageOrAuto returns true for percentages
-- [ ] Test IsPercentageOrAuto returns true for Auto
-- [ ] Test IsPercentageOrAuto returns false for explicit values
-- [ ] Test Flags property returns combined flags from Specified value
+#### 12.10.7 Additional Accessor Tests ✓
+Test file: CssPropertyAccessorTests.cs (24 tests)
+Tests accessor properties not covered elsewhere.
+- [x] IsNone returns true for ECssValueTypes.NONE
+- [x] IsNone returns false for number
+- [x] IsNone returns false for Auto
+- [x] IsNone returns false for keyword
+- [x] IsDependent returns true when Depends flag is set
+- [x] IsDependent returns false for plain number
+- [x] IsDependent returns false for dimension
+- [x] IsDependent returns false for Auto
+- [x] IsDependentOrAuto returns true for Auto
+- [x] IsDependentOrAuto returns true for Dependent
+- [x] IsDependentOrAuto returns false for explicit dimension
+- [x] IsDependentOrAuto returns false for number
+- [x] IsPercentageOrAuto returns true for percentages
+- [x] IsPercentageOrAuto returns true for Auto
+- [x] IsPercentageOrAuto returns false for dimension
+- [x] IsPercentageOrAuto returns false for number
+- [x] IsPercentageOrAuto returns false for keyword
+- [x] Flags property returns Specified value's flags
+- [x] Flags returns None when Specified null (triggers computation)
+- [x] Flags returns correct flags for percentage
+- [x] Combined: Auto value correct boolean states
+- [x] Combined: Dimension value correct boolean states
+- [x] Combined: Percent value correct boolean states
+- [x] Combined: None value correct boolean states
 
 #### 12.10.8 Locked Property Tests
 Test locked property behavior (read-only properties).
