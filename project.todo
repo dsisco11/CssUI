@@ -284,10 +284,26 @@ Tests directly call the internal CssValue.Derive_UsedValue() method.
 - [x] With resolver returns resolver result
 - [x] Without resolver returns same instance
 
-#### 12.9.4 Derive_ActualValue Tests
-- [ ] Test custom PropertyStageResolver invoked when defined
-- [ ] Test value without resolver passes through unchanged
-- [ ] Test platform restrictions applied (future)
+#### 12.9.4 Derive_ActualValue Tests ✓
+Test file: DeriveActualValueTests.cs (17 tests)
+Tests directly call the internal CssValue.Derive_ActualValue() method.
+- [x] Custom PropertyStageResolver invoked when defined
+- [x] No resolver - value passes through unchanged
+- [x] Immutable CssValue returns same reference (no copy needed)
+- [x] Multiple invocations return same reference
+- [x] NUMBER value passes through unchanged
+- [x] KEYWORD value passes through unchanged
+- [x] AUTO value passes through unchanged
+- [x] NONE value passes through unchanged
+- [x] PERCENT value passes through unchanged
+- [x] Zero value passes through unchanged
+- [x] Different properties with same value - consistent behavior
+- [x] INHERIT keyword passes through at Actual stage
+- [x] INITIAL keyword passes through at Actual stage
+- [x] UNSET keyword passes through at Actual stage
+- [x] With resolver returns resolver result
+- [x] Without resolver returns same instance
+- [x] Actual value is restriction not resolution (per CSS spec)
 
 ### 12.10 CssProperty Class Tests (CSS/Properties/Base/)
 Comprehensive unit tests for the CssProperty value pipeline and lifecycle.
