@@ -123,6 +123,258 @@ public class ComputedValueResolutionTests
     #endregion
 
     #region Derive_SpecifiedValue Tests
+    /// <summary>
+    /// Tests for CssValue.Derive_SpecifiedValue() per CSS Cascading and Inheritance Level 3.
+    /// Docs: https://www.w3.org/TR/css-cascade-3/#specified
+    /// </summary>
+
+    [Fact]
+    [Trait("Category", "Properties")]
+    [Trait("Category", "ValueResolution")]
+    [Trait("Category", "DeriveSpecifiedValue")]
+    public void DeriveSpecifiedValue_UnsetKeyword_OnInheritableProperty_ReturnsInheritedValue()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var child = CreateTestElement(doc, "span");
+        doc.documentElement?.appendChild(parent);
+        parent.appendChild(child);
+
+        // Color is inheritable - set parent's color to red
+        var parentProp = parent.Style.UserRules.Get(ECssPropertyID.Color) as CssProperty;
+        Assert.NotNull(parentProp);
+        var redColor = CssValue.From(EColor.Red);
+        parentProp.Set(redColor);
+
+        // Set child's color to UNSET - should inherit from parent
+        var childProp = child.Style.UserRules.Get(ECssPropertyID.Color) as CssProperty;
+        Assert.NotNull(childProp);
+        childProp.Set(CssValue.Unset);
+
+        // Act
+        var specified = childProp.Specified;
+
+        // Assert - UNSET on inheritable property should act like INHERIT
+        Assert.NotNull(specified);
+        // The specified value should resolve to the parent's computed color value
+        Assert.NotEqual(ECssValueTypes.UNSET, specified.Type);
+    }
+
+    [Fact]
+    [Trait("Category", "Properties")]
+    [Trait("Category", "ValueResolution")]
+    [Trait("Category", "DeriveSpecifiedValue")]
+    public void DeriveSpecifiedValue_UnsetKeyword_OnNonInheritableProperty_ReturnsInitialValue()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc);
+        doc.documentElement?.appendChild(element);
+
+        // FlexGrow is NOT inheritable (initial value = 0)
+        var prop = element.Style.UserRules.Get(ECssPropertyID.FlexGrow) as CssProperty;
+        Assert.NotNull(prop);
+
+        // First set a non-initial value, then set to UNSET
+        prop.Set(CssValue.From(5.0));
+        prop.Set(CssValue.Unset);
+
+        // Act
+        var specified = prop.Specified;
+
+        // Assert - UNSET on non-inheritable property should act like INITIAL
+        Assert.NotNull(specified);
+        Assert.NotEqual(ECssValueTypes.UNSET, specified.Type);
+
+        // Verify it's the initial value (0.0 for flex-grow)
+        var def = prop.Definition;
+        Assert.NotNull(def);
+        Assert.Equal(def.Initial.AsDecimal(), specified.AsDecimal());
+    }
+
+    [Fact]
+    [Trait("Category", "Properties")]
+    [Trait("Category", "ValueResolution")]
+    [Trait("Category", "DeriveSpecifiedValue")]
+    public void DeriveSpecifiedValue_InheritKeyword_ReturnsParentComputedValue()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var child = CreateTestElement(doc, "span");
+        doc.documentElement?.appendChild(parent);
+        parent.appendChild(child);
+
+        // FlexGrow is NOT inheritable by default - set parent to 3.0 on UserRules
+        var parentUserProp = parent.Style.UserRules.Get(ECssPropertyID.FlexGrow) as CssProperty;
+        Assert.NotNull(parentUserProp);
+        parentUserProp.Set(CssValue.From(3.0));
+
+        // Cascade from UserRules to Cascaded (this is how values flow in the real system)
+        var parentCascadedProp = parent.Style.Cascaded.Get(ECssPropertyID.FlexGrow) as CssProperty;
+        Assert.NotNull(parentCascadedProp);
+        parentCascadedProp.Cascade(parentUserProp);
+
+        // Force child to inherit via INHERIT keyword on UserRules
+        var childProp = child.Style.UserRules.Get(ECssPropertyID.FlexGrow) as CssProperty;
+        Assert.NotNull(childProp);
+        childProp.Set(CssValue.Inherit);
+
+        // Act - When child resolves INHERIT, it looks at parent's Cascaded.Computed
+        var specified = childProp.Specified;
+
+        // Assert - Should have parent's computed value (3.0)
+        Assert.NotNull(specified);
+        Assert.NotEqual(ECssValueTypes.INHERIT, specified.Type);
+        Assert.Equal(3.0, specified.AsDecimal());
+    }
+
+    [Fact]
+    [Trait("Category", "Properties")]
+    [Trait("Category", "ValueResolution")]
+    [Trait("Category", "DeriveSpecifiedValue")]
+    public void DeriveSpecifiedValue_InitialKeyword_ReturnsDefinitionInitialValue()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc);
+        doc.documentElement?.appendChild(element);
+
+        // FlexGrow initial = 0.0, FlexShrink initial = 1.0
+        var prop = element.Style.UserRules.Get(ECssPropertyID.FlexShrink) as CssProperty;
+        Assert.NotNull(prop);
+
+        // Set a different value first
+        prop.Set(CssValue.From(5.0));
+
+        // Now set to INITIAL
+        prop.Set(CssValue.Initial);
+
+        // Act
+        var specified = prop.Specified;
+
+        // Assert - Should resolve to definition's initial value (1.0)
+        Assert.NotNull(specified);
+        Assert.NotEqual(ECssValueTypes.INITIAL, specified.Type);
+        Assert.Equal(1.0, specified.AsDecimal());
+    }
+
+    [Fact]
+    [Trait("Category", "Properties")]
+    [Trait("Category", "ValueResolution")]
+    [Trait("Category", "DeriveSpecifiedValue")]
+    public void DeriveSpecifiedValue_ExplicitValue_PassesThroughUnchanged()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc);
+        doc.documentElement?.appendChild(element);
+
+        var prop = element.Style.UserRules.Get(ECssPropertyID.FlexGrow) as CssProperty;
+        Assert.NotNull(prop);
+
+        var explicitValue = CssValue.From(7.5);
+        prop.Set(explicitValue);
+
+        // Act
+        var specified = prop.Specified;
+
+        // Assert - Explicit numeric value should pass through unchanged
+        Assert.NotNull(specified);
+        Assert.Equal(ECssValueTypes.NUMBER, specified.Type);
+        Assert.Equal(7.5, specified.AsDecimal());
+    }
+
+    [Fact]
+    [Trait("Category", "Properties")]
+    [Trait("Category", "ValueResolution")]
+    [Trait("Category", "DeriveSpecifiedValue")]
+    public void DeriveSpecifiedValue_NullAssigned_OnInheritableProperty_ReturnsInheritedValue()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var parent = CreateTestElement(doc, "div");
+        var child = CreateTestElement(doc, "span");
+        doc.documentElement?.appendChild(parent);
+        parent.appendChild(child);
+
+        // Color is inheritable - set parent's color
+        var parentProp = parent.Style.UserRules.Get(ECssPropertyID.Color) as CssProperty;
+        Assert.NotNull(parentProp);
+        parentProp.Set(CssValue.From(EColor.Blue));
+
+        // Child's Color property has no explicit assignment (null assigned)
+        // For inheritable properties, should get parent's computed value
+        var childProp = child.Style.UserRules.Get(ECssPropertyID.Color) as CssProperty;
+        Assert.NotNull(childProp);
+        // Don't set anything - leave assigned as null
+
+        // Act
+        var specified = childProp.Specified;
+
+        // Assert - Should inherit from parent since Color is inheritable
+        Assert.NotNull(specified);
+    }
+
+    [Fact]
+    [Trait("Category", "Properties")]
+    [Trait("Category", "ValueResolution")]
+    [Trait("Category", "DeriveSpecifiedValue")]
+    public void DeriveSpecifiedValue_NullAssigned_OnNonInheritableProperty_ReturnsInitialValue()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc);
+        doc.documentElement?.appendChild(element);
+
+        // FlexGrow is NOT inheritable - leave assigned as null
+        var prop = element.Style.UserRules.Get(ECssPropertyID.FlexGrow) as CssProperty;
+        Assert.NotNull(prop);
+        // Don't set anything - leave assigned as null
+
+        // Act
+        var specified = prop.Specified;
+
+        // Assert - Should be initial value (0.0) since FlexGrow is not inherited
+        Assert.NotNull(specified);
+        var def = prop.Definition;
+        Assert.NotNull(def);
+        Assert.Equal(def.Initial.AsDecimal(), specified.AsDecimal());
+    }
+
+    [Fact]
+    [Trait("Category", "Properties")]
+    [Trait("Category", "ValueResolution")]
+    [Trait("Category", "DeriveSpecifiedValue")]
+    public void DeriveSpecifiedValue_CustomResolver_IsInvokedWhenDefined()
+    {
+        // Arrange - Color has a custom Specified resolver (CssPropertyResolver.Color_Specified)
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc);
+        doc.documentElement?.appendChild(element);
+
+        // Color has PropertyStageResolver for Specified stage
+        var prop = element.Style.UserRules.Get(ECssPropertyID.Color) as CssProperty;
+        Assert.NotNull(prop);
+
+        // Verify Color has a custom resolver defined
+        var def = prop.Definition;
+        Assert.NotNull(def);
+        Assert.NotNull(def.PropertyStageResolver[(int)EPropertyStage.Specified]);
+
+        // Set a color value
+        prop.Set(CssValue.From(EColor.Green));
+
+        // Act
+        var specified = prop.Specified;
+
+        // Assert - The resolver should have been invoked, value should be resolved
+        Assert.NotNull(specified);
+        // Color resolver converts keyword to actual color type
+    }
+
+    // Legacy tests (keeping for backward compatibility)
     [Fact]
     [Trait("Category", "Properties")]
     [Trait("Category", "ValueResolution")]

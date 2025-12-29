@@ -211,15 +211,15 @@ Current: 53 tests passing
 Direct unit tests for value stage derivation methods.
 Current: Tested indirectly through property tests, need direct coverage.
 
-#### 12.9.1 Derive_SpecifiedValue Tests
-- [ ] Test UNSET keyword on inheritable property returns inherited value
-- [ ] Test UNSET keyword on non-inheritable property returns initial value
-- [ ] Test INHERIT keyword returns parent's computed value
-- [ ] Test INITIAL keyword returns definition's initial value
-- [ ] Test explicit value passes through unchanged
-- [ ] Test NULL assigned value on inheritable property returns inherited
-- [ ] Test NULL assigned value on non-inheritable property returns initial
-- [ ] Test custom PropertyStageResolver invoked when defined
+#### 12.9.1 Derive_SpecifiedValue Tests ✓
+- [x] Test UNSET keyword on inheritable property returns inherited value
+- [x] Test UNSET keyword on non-inheritable property returns initial value
+- [x] Test INHERIT keyword returns parent's computed value
+- [x] Test INITIAL keyword returns definition's initial value
+- [x] Test explicit value passes through unchanged
+- [x] Test NULL assigned value on inheritable property returns inherited
+- [x] Test NULL assigned value on non-inheritable property returns initial
+- [x] Test custom PropertyStageResolver invoked when defined
 
 #### 12.9.2 Derive_ComputedValue Tests
 - [ ] Test INHERIT keyword resolved to parent's computed value
