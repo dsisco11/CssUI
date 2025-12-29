@@ -97,6 +97,9 @@ public sealed class FlagCollection<FlagType> : IEnumerable<FlagType> where FlagT
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool GetFlag(FlagType flag) => GetFlag(CastTo<int>.From(flag));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetFlag(int flagNum)
     {
         var pos = GetFlagOffset(flagNum);
@@ -107,6 +110,9 @@ public sealed class FlagCollection<FlagType> : IEnumerable<FlagType> where FlagT
             chunk |= pos.Mask;
         }
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetFlag(FlagType flag) => SetFlag(CastTo<int>.From(flag));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetFlag(int flagNum, bool state)
@@ -125,6 +131,9 @@ public sealed class FlagCollection<FlagType> : IEnumerable<FlagType> where FlagT
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetFlag(FlagType flag, bool state) => SetFlag(CastTo<int>.From(flag), state);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void ClearFlag(int flagNum)
     {
         var pos = GetFlagOffset(flagNum);
@@ -135,6 +144,9 @@ public sealed class FlagCollection<FlagType> : IEnumerable<FlagType> where FlagT
             chunk &= ~pos.Mask;
         }
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void ClearFlag(FlagType flag) => ClearFlag(CastTo<int>.From(flag));
 
     /// <summary>
     /// Clears all flags
