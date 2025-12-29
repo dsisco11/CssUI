@@ -457,6 +457,19 @@ public class CssPrincipalBox : CssBox
     }
 
     /// <summary>
+    /// Updates only the Content area's width dimension.
+    /// Called during top-down width resolution to allow child percentage calculations
+    /// before full box bounds are calculated.
+    /// </summary>
+    internal void UpdateContentWidth()
+    {
+        // Update the Content rect's width while preserving other dimensions
+        // This is a partial update to support the two-pass layout algorithm
+        var width = Style.Width;
+        Content = new Rect4f(Content.Top, Content.Left + width, Content.Bottom, Content.Left);
+    }
+
+    /// <summary>
     /// Recalculates the coordinates for all sides of the replaced-content area
     /// </summary>
     private void Update_Replaced_Bounds()

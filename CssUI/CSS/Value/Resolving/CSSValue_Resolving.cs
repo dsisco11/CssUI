@@ -98,12 +98,14 @@ public partial record class CssValue
                 }
             case ECssValueTypes.PERCENT:
                 {
-                    if (Def.Percentage_Resolver != null)
-                    {
-                        return Def.Percentage_Resolver(Property, AsDecimal());
-                    }
+                    // CSS Values Level 4 §5.1.1: "The computed value of a percentage is the 
+                    // specified percentage value. Resolution of percentages is deferred to 
+                    // the layout phase."
+                    // Percentages are NOT resolved during cascade - they stay as percentages.
+                    // Resolution happens during BoxModel.Resolve_Horizontal/Resolve_Vertical
+                    // when boxes are guaranteed to exist.
+                    return this;
                 }
-                break;
             case ECssValueTypes.DIMENSION:
                 {
                     double nv = Resolve(Property.Owner.ownerDocument.cssUnitResolver);

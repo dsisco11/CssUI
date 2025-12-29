@@ -89,6 +89,10 @@ public static class BoxModel
         Cascaded.Right.Set_Computed_Value(Right);
         Cascaded.Margin_Left.Set_Computed_Value(MarginLeft);
         Cascaded.Margin_Right.Set_Computed_Value(MarginRight);
+
+        // Update the box's Content area width so children can use it as their containing block
+        // during the top-down width resolution pass.
+        Box.UpdateContentWidth();
     }
 
     /// <summary>
@@ -171,11 +175,13 @@ public static class BoxModel
     /// </summary>
     private static void Resolve_Horizontal(CssPrincipalBox Box, CssComputedStyle Cascaded, out CssValue outLeft, out CssValue outMarginLeft, out CssValue outWidth, out CssValue outMarginRight, out CssValue outRight)
     {
-        CssValue Left = Cascaded.Left.Computed;
-        CssValue MarginLeft = Cascaded.Margin_Left.Computed;
-        CssValue Width = Cascaded.Width.Computed;
-        CssValue MarginRight = Cascaded.Margin_Right.Computed;
-        CssValue Right = Cascaded.Right.Computed;
+        // Resolve percentages using each property's defined Percentage_Resolver (CSS Values 4 §5.1.1)
+        // This is done during layout phase when boxes are guaranteed to exist.
+        CssValue Left = CssPercentageResolvers.ResolvePercentageIfNeeded(Cascaded.Left);
+        CssValue MarginLeft = CssPercentageResolvers.ResolvePercentageIfNeeded(Cascaded.Margin_Left);
+        CssValue Width = CssPercentageResolvers.ResolvePercentageIfNeeded(Cascaded.Width);
+        CssValue MarginRight = CssPercentageResolvers.ResolvePercentageIfNeeded(Cascaded.Margin_Right);
+        CssValue Right = CssPercentageResolvers.ResolvePercentageIfNeeded(Cascaded.Right);
 
         Calculate_Horizontal(Box, Cascaded, ref Left, ref MarginLeft, ref Width, ref MarginRight, ref Right);
 
@@ -231,18 +237,21 @@ public static class BoxModel
     /// </summary>
     private static void Resolve_Vertical(CssPrincipalBox Box, CssComputedStyle Cascaded, out CssValue outTop, out CssValue outMarginTop, out CssValue outHeight, out CssValue outMarginBottom, out CssValue outBottom)
     {
-        CssValue Top = Cascaded.Top.Computed;
-        CssValue MarginTop = Cascaded.Margin_Top.Computed;
-        CssValue Height = Cascaded.Height.Computed;
-        CssValue MarginBottom = Cascaded.Margin_Bottom.Computed;
-        CssValue Bottom = Cascaded.Bottom.Computed;
+        // Resolve percentages using each property's defined Percentage_Resolver (CSS Values 4 §5.1.1)
+        // This is done during layout phase when boxes are guaranteed to exist.
+        CssValue Top = CssPercentageResolvers.ResolvePercentageIfNeeded(Cascaded.Top);
+        CssValue MarginTop = CssPercentageResolvers.ResolvePercentageIfNeeded(Cascaded.Margin_Top);
+        CssValue Height = CssPercentageResolvers.ResolvePercentageIfNeeded(Cascaded.Height);
+        CssValue MarginBottom = CssPercentageResolvers.ResolvePercentageIfNeeded(Cascaded.Margin_Bottom);
+        CssValue Bottom = CssPercentageResolvers.ResolvePercentageIfNeeded(Cascaded.Bottom);
+
         /*
          * However, for replaced elements with both 'width' and 'height' computed as 'auto',
          * use the algorithm under 'Minimum and maximum widths' above to find the used width and height.
          * Then apply the rules under "Computing heights and margins" above, using the resulting width and height as if they were the computed values.
          */
         bool autoWidth = Cascaded.Width.Computed.IsAuto;
-        bool autoHeight = Cascaded.Height.Computed.IsAuto;
+        bool autoHeight = Height.IsAuto;
 
         var Min_Height = Cascaded.Min_Height.Actual;
         var Max_Height = Cascaded.Max_Height.Actual;
@@ -255,21 +264,20 @@ public static class BoxModel
         }
         else
         {
-            if (Max_Height.HasValue)
+            // Only apply min/max constraints if Height is not auto
+            if (!Height.IsAuto)
             {
-                //if (Max_Height.Value.CompareTo(Height.AsDecimal()) < 0)// Height.AsDecimal() > Max_Height.Value
-                if (Height.AsDecimal() > Max_Height.Value)// Height.AsDecimal() > Max_Height.Value
+                if (Max_Height.HasValue && Height.AsDecimal() > Max_Height.Value)
                 {
                     Height = CssValue.From(Max_Height.Value);
                     Calculate_Vertical(Box, Cascaded, ref Top, ref MarginTop, ref Height, ref MarginBottom, ref Bottom);
                 }
-            }
 
-            //if (Min_Height.CompareTo(Height.AsDecimal()) > 0)// Height.AsDecimal() < Min_Height
-            if (Height.AsDecimal() < Min_Height)// Height.AsDecimal() < Min_Height
-            {
-                Height = CssValue.From(Min_Height);
-                Calculate_Vertical(Box, Cascaded, ref Top, ref MarginTop, ref Height, ref MarginBottom, ref Bottom);
+                if (Height.AsDecimal() < Min_Height)
+                {
+                    Height = CssValue.From(Min_Height);
+                    Calculate_Vertical(Box, Cascaded, ref Top, ref MarginTop, ref Height, ref MarginBottom, ref Bottom);
+                }
             }
         }
 
