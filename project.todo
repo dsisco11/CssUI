@@ -359,12 +359,24 @@ Tests the method for BoxModel integration during layout.
 - [x] Set_Computed_Value() with None
 - [x] Set_Computed_Value() calls Revert internally
 
-#### 12.10.3 Revert() Tests
-Test reverting property to computed stage for re-resolution.
-- [ ] Test Revert() clears Used and Actual values
-- [ ] Test Revert(suppress: true) suppresses change events
-- [ ] Test Revert(suppress: false) fires change events
-- [ ] Test values are re-derived on next access after Revert()
+#### 12.10.3 Revert() Tests ✓
+Test file: CssPropertyRevertTests.cs (15 tests)
+Tests reverting property to computed stage for re-resolution.
+- [x] Revert() clears Used value
+- [x] Revert() clears Actual value
+- [x] Revert() preserves Computed value
+- [x] Revert() preserves Specified value
+- [x] Revert() preserves Assigned value
+- [x] Revert(suppress: true) updates oldUsed tracker
+- [x] Revert(suppress: false) does not update tracker (allows events)
+- [x] Revert() default parameter is suppress=false
+- [x] Used re-derived on next access after Revert()
+- [x] Actual re-derived on next access after Revert()
+- [x] Lazy re-derivation only when accessed
+- [x] Multiple Revert() calls safe
+- [x] Revert after value change re-derives from new computed
+- [x] Revert with Set_Computed_Value re-derives from direct value
+- [x] Different value types handled correctly
 
 #### 12.10.4 Update() Method Tests
 Test the Update() and conditional update methods.
