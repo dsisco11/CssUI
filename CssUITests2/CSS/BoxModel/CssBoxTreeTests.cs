@@ -52,7 +52,7 @@ public class CssBoxTreeTests : IDisposable
         Assert.Equal(EInnerDisplayType.None, displayType.Inner);
     }
 
-    [Fact(Skip = "Phase 14.6.2: display: contents box suppression requires style cascade integration")]
+    [Fact]
     [Trait("Category", "BoxModel")]
     [Trait("Category", "BoxGeneration")]
     public void DisplayContents_Element_GeneratesNoBox()
@@ -64,8 +64,8 @@ public class CssBoxTreeTests : IDisposable
         contentsDiv!.Style.UserRules.Display.Set(EDisplayMode.CONTENT);
         parent.appendChild(contentsDiv);
 
-        // Act
-        _fixture.ForceBoxGeneration();
+        // Act - use ForceLayoutUpdate to ensure cascade happens for Display property
+        _fixture.ForceLayoutUpdate();
 
         // Assert - element with display: contents should have no box
         Assert.Null(contentsDiv.Box);
@@ -619,7 +619,7 @@ public class CssBoxTreeTests : IDisposable
 
     #region Closest Box Generating Ancestor Tests
 
-    [Fact(Skip = "Phase 14.6.5: Test requires investigation into cascade/box generation interaction")]
+    [Fact]
     [Trait("Category", "BoxModel")]
     [Trait("Category", "BoxGeneration")]
     public void NestedElements_BoxParentIsNearestAncestorWithBox()
@@ -631,9 +631,8 @@ public class CssBoxTreeTests : IDisposable
         child!.Style.UserRules.Display.Set(EDisplayMode.BLOCK);
         parent.appendChild(child);
 
-        // Act - cascade first to ensure Display property is computed, then generate boxes
-        _fixture.ForceCascade();
-        _fixture.ForceBoxGeneration();
+        // Act
+        _fixture.ForceLayoutUpdate();
 
         // Assert
         Assert.NotNull(child.Box);
@@ -642,29 +641,37 @@ public class CssBoxTreeTests : IDisposable
         Assert.Same(parent.Box, child.Box.parentNode);
     }
 
-    [Fact(Skip = "Phase 14.6.2: display: contents box suppression requires style cascade integration")]
+    [Fact]
     [Trait("Category", "BoxModel")]
     [Trait("Category", "BoxGeneration")]
     public void DisplayContents_SkippedForBoxParent()
     {
-        // Arrange
+        // Arrange - test display: contents behavior
         var doc = _fixture.Document;
         var grandparent = _fixture.CreateBlock(200, 100);
 
+        // Create a parent with display: contents (generates no box)
         var contentsParent = doc.createElement("div", DefaultOptions);
         contentsParent!.Style.UserRules.Display.Set(EDisplayMode.CONTENT);
         grandparent.appendChild(contentsParent);
 
+        // Create child that should skip display: contents parent
         var child = doc.createElement("div", DefaultOptions);
         child!.Style.UserRules.Display.Set(EDisplayMode.BLOCK);
         contentsParent.appendChild(child);
 
-        // Act
-        _fixture.ForceBoxGeneration();
+        // Verify DOM structure
+        Assert.Same(grandparent, contentsParent.parentElement);
+        Assert.Same(contentsParent, child.parentElement);
 
-        // Assert
-        Assert.Null(contentsParent.Box);
+        // Act
+        _fixture.ForceLayoutUpdate();
+
+        // Verify display: contents behavior
+        Assert.NotNull(grandparent.Box);
+        Assert.Null(contentsParent.Box); // display: contents generates no box
         Assert.NotNull(child.Box);
+
         // Child's box parent should skip display: contents and go to grandparent
         Assert.Same(grandparent.Box, child.Box.parentNode);
     }

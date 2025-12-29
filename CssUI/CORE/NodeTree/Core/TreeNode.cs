@@ -35,7 +35,7 @@ public class TreeNode : ITreeNode
     public TreeNode(ITreeNode parentNode)
     {
         this.parentNode = parentNode;
-        childNodes = new TreeNodeList(parentNode);
+        childNodes = new TreeNodeList(this);  // Owner should be this node, not the parent
     }
     #endregion
 

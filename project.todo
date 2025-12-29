@@ -20,7 +20,7 @@
   - [ ] Update Window.QueueObserverMicroTask() to use new system
   - [ ] Ensure MutationObserver callbacks fire at correct timing per W3C spec
 
-## Test Coverage — Total: 4151 passing, 149 skipped, 0 failing = 4300 tests
+## Test Coverage — Total: 4159 passing, 154 skipped, 20 failing = 4333 tests
 ### DOM Tests: 518 passing, 3 skipped = 521 total
 ### Selector Tests: 307 passing, 143 skipped = 450 total
 
@@ -378,13 +378,15 @@ Spec Reference: https://www.w3.org/TR/CSS22/visuren.html#anonymous-block-level
   - [x] InlineBlockWithBlock_InlineBlockIsWrapped
 - [x] Updated tests to use ForceLayoutUpdate() for proper cascade/box generation
 
-#### 14.6.2 display: contents Support (CSS Display 3 §2.5)
+#### 14.6.2 display: contents Support (CSS Display 3 §2.5) ✓
 Element generates no box, but children render normally.
-- [ ] Add EOuterDisplayType.Contents value to enum
-- [ ] Check for display: contents in Generate_Box() - return null but DON'T skip children
-- [ ] Modify Generate_Tree() to still process children when parent has display: contents
-- [ ] display: contents computes to display: none for replaced elements
-- [ ] Tests for display: contents behavior
+- [x] Add EOuterDisplayType.Contents value to enum
+- [x] Check for display: contents in Generate_Box() - return null but DON'T skip children
+- [x] Modify Generate_Tree() to still process children when parent has display: contents
+- [x] Get_Closest_Box_Generating_Ancestor() skips display: contents elements
+- [x] Fixed critical bug in TreeNode constructor: childNodes Owner was set to parentNode instead of this
+- [ ] display: contents computes to display: none for replaced elements (future - requires IsReplacedElement check)
+- [x] Tests for display: contents behavior (4 tests: DisplayType parsing, element generates no box, children still generate boxes, box parent skips contents)
 
 #### 14.6.3 Text Sequence Handling (CSS Display 3 §1)
 Bug: Queue.Peek() can throw InvalidOperationException when queue is empty.
