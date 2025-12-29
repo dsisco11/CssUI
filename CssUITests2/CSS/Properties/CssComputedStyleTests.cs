@@ -1426,6 +1426,29 @@ public class CssComputedStyleTests
         // Verify the value was set
         Assert.Equal(CssValue.From_Dimension(100.0, ECssUnit.PX), style.Width.Assigned);
     }
+
+    [Fact]
+    [Trait("Category", "CssComputedStyle")]
+    [Trait("Category", "ReadOnly")]
+    public void ReadOnly_True_PreventsPropertyChanges()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc);
+        var style = GetCascadedStyle(element);
+
+        // Ensure read-only
+        Assert.True(style.ReadOnly);
+
+        // Act & Assert - Should throw InvalidOperationException when trying to modify
+        var exception = Assert.Throws<InvalidOperationException>(() =>
+        {
+            style.Width.Assigned = CssValue.From_Dimension(100.0, ECssUnit.PX);
+        });
+
+        // Verify the exception message indicates the property is locked
+        Assert.Contains("locked", exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
     #endregion
 
     #region 12.8.5 Selector and Origin Tests

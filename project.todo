@@ -190,11 +190,11 @@ Current: 53 tests passing
 - [x] Test SetProperties flag persists when assigning Initial/Unset/Inherit (explicit assignment)
 - [x] Test ClearFlag required to truly reset property tracking
 
-#### 12.8.3 ReadOnly Enforcement
-- [ ] Test ReadOnly=true prevents property value changes
-- [ ] Test ReadOnly=false allows property value changes
-- [ ] Test Cascaded style is ReadOnly by default
-- [ ] Test UserRules style is not ReadOnly
+#### 12.8.3 ReadOnly Enforcement ✓
+- [x] Test ReadOnly=true prevents property value changes
+- [x] Test ReadOnly=false allows property value changes
+- [x] Test Cascaded style is ReadOnly by default
+- [x] Test UserRules style is not ReadOnly
 
 #### 12.8.4 Cascade at Style Level
 - [ ] Test Cascade() merges properties from source style
