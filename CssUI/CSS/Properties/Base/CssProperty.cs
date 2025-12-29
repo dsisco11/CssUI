@@ -472,13 +472,31 @@ public class CssProperty : CssPropertyBase, ICssProperty
 
     /// <summary>
     /// Allows us to overwrite the computed value in special circumstances such as with Box calculation.
+    /// This directly sets the computed value and triggers re-interpretation of Used and Actual values.
     /// </summary>
-    /// <param name="Used"></param>
-    internal void Set_Computed_Value(CssValue Used)
+    /// <param name="newComputed">The new computed value to set</param>
+    internal void Set_Computed_Value(CssValue newComputed)
     {
+        // Clear downstream values and suppress change events during the update
         Revert(true);
-        _computed = Used;
-        Update(true);
+
+        // Set the computed value directly (bypassing normal derivation from Specified)
+        _computed = newComputed;
+
+        // Now derive Used and Actual from our new Computed value
+        // (don't call Update which would clear _computed)
+        if (_computed is not null)
+        {
+            Reinterpret_Used();
+            // Actual is derived from Used in Reinterpret_Used -> Reinterpret_Actual
+        }
+
+        // Fire change event for computed stage
+        if (oldComputed is null || oldComputed != _computed)
+        {
+            oldComputed?.Update(_computed);
+            FireValueChangeEvent(EPropertyStage.Computed);
+        }
     }
     #endregion
 
