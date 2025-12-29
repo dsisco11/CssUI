@@ -339,6 +339,78 @@ Spec Reference: https://www.w3.org/TR/CSS2/visudet.html (width/height calculatio
   - Fix 2: Added null check for Box.firstChild access
   - Fix 3: Added null check for nearestAncestor?.Box for root elements
 
+### 14.6 Box Generation Spec Compliance
+Fix CssBoxTree.Generate_Tree() and Generate_Box() to comply with W3C CSS Display 3 and CSS 2.2.
+Spec Reference: https://www.w3.org/TR/css-display-3/#box-generation
+Spec Reference: https://www.w3.org/TR/CSS22/visuren.html#box-gen
+
+#### 14.6.1 Anonymous Block Box Generation (CSS 2.2 §9.2.1.1)
+Currently inverted: code wraps the NEW box instead of sibling inline content.
+- [ ] Fix Generate_Box() to wrap INLINE SIBLINGS in anonymous block, not the block child
+- [ ] When block-level box inserted into block container with inline children:
+  - [ ] Wrap all preceding inline content in anonymous block box
+  - [ ] Wrap all following inline content in anonymous block box
+- [ ] Anonymous boxes inherit from enclosing non-anonymous box
+- [ ] Add AnonymousBlockBox wrapper creation helper
+- [ ] Tests for mixed block/inline children producing anonymous blocks
+
+#### 14.6.2 display: contents Support (CSS Display 3 §2.5)
+Element generates no box, but children render normally.
+- [ ] Add EOuterDisplayType.Contents value to enum
+- [ ] Check for display: contents in Generate_Box() - return null but DON'T skip children
+- [ ] Modify Generate_Tree() to still process children when parent has display: contents
+- [ ] display: contents computes to display: none for replaced elements
+- [ ] Tests for display: contents behavior
+
+#### 14.6.3 Text Sequence Handling (CSS Display 3 §1)
+Bug: Queue.Peek() can throw InvalidOperationException when queue is empty.
+- [ ] Fix text run collection loop to check Queue.Count > 0 before Peek()
+- [ ] Handle empty text nodes (generate no text sequence per spec)
+- [ ] Handle whitespace-only text nodes per white-space property
+- [ ] Tests for text sequence generation
+
+#### 14.6.4 List Item Marker Boxes (CSS Display 3 §2.3)
+display: list-item generates principal box + ::marker pseudo-element.
+- [ ] Detect EDisplayMode.LIST_ITEM in Generate_Box()
+- [ ] Generate marker box in addition to principal box
+- [ ] Position marker box according to list-style-position
+- [ ] Marker content from list-style-type property
+- [ ] Tests for list-item marker generation
+
+#### 14.6.5 Table Internal Box Fixup (CSS Display 3 §2.4, CSS 2.2 §17.2)
+Table cells/rows in wrong parent generate anonymous wrapper boxes.
+- [ ] Detect table-internal display types (table-cell, table-row, etc.)
+- [ ] Generate anonymous table-row around orphaned table-cell
+- [ ] Generate anonymous table-row-group around orphaned table-row
+- [ ] Generate anonymous table around orphaned table-row-group
+- [ ] Chain all necessary wrappers (cell → row → row-group → table)
+- [ ] Tests for table anonymous box generation
+
+#### 14.6.6 Automatic Box Type Transformations (CSS Display 3 §2.7)
+Blockification/inlinification based on position/float/parent context.
+- [ ] Blockify floated elements (float != none → outer display: block)
+- [ ] Blockify absolutely/fixed positioned elements
+- [ ] Blockify children of flex/grid containers
+- [ ] Inlinify children of ruby containers
+- [ ] Apply transformations in Generate_Box() before creating CssPrincipalBox
+- [ ] Tests for blockification scenarios
+
+#### 14.6.7 Run-In Boxes (CSS Display 3 §5) — Low Priority
+Run-in boxes merge into subsequent block.
+- [ ] Detect display: run-in
+- [ ] If followed by block box, insert as inline at start of block
+- [ ] Otherwise generate anonymous block wrapper
+- [ ] Handle run-in sequence (consecutive run-ins)
+- [ ] Tests for run-in behavior
+
+#### 14.6.8 Multiple Box Generation — Low Priority
+Some display types generate multiple boxes.
+- [ ] Table elements: table wrapper box + table grid box
+- [ ] List items: principal box + marker box (covered in 14.6.4)
+- [ ] Return list of boxes from Generate_Box() instead of single box
+- [ ] Update Generate_Tree() to handle multiple boxes per element
+- [ ] Tests for multi-box generation
+
 ## Phase 15: Float and Clear Properties
 Spec Reference: https://www.w3.org/TR/CSS2/visuren.html#floats
 Prerequisites: Phase 14 (Layout Pipeline Integration)
