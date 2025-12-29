@@ -424,12 +424,22 @@ Tests cascade merging and value overwriting.
 - [x] Overwrite() both null returns false
 - [x] Cascade() multiple times - last wins
 
-#### 12.10.6 Handle_Unit_Change() Tests
-Test unit scale change notifications.
-- [ ] Test Handle_Unit_Change() fires event when property uses that unit
-- [ ] Test Handle_Unit_Change() does nothing when property uses different unit
-- [ ] Test Handle_Unit_Change() with ECssUnit.PX
-- [ ] Test Handle_Unit_Change() with ECssUnit.EM (relative unit)
+#### 12.10.6 Handle_Unit_Change() Tests ✓
+Test file: CssPropertyHandleUnitChangeTests.cs (13 tests)
+Tests unit scale change notifications.
+- [x] Handle_Unit_Change() when property uses matching unit
+- [x] Handle_Unit_Change() different unit has no effect
+- [x] Handle_Unit_Change() property with no unit (number) - no effect
+- [x] Handle_Unit_Change() with ECssUnit.PX
+- [x] Handle_Unit_Change() with ECssUnit.EM (relative unit)
+- [x] Handle_Unit_Change() with ECssUnit.REM
+- [x] Handle_Unit_Change() with Percent (no unit, own type)
+- [x] Handle_Unit_Change() null specified - no exception
+- [x] Handle_Unit_Change() multiple units - only matching affects
+- [x] Handle_Unit_Change() keyword value - no unit
+- [x] Handle_Unit_Change() Auto value - no unit
+- [x] Handle_Unit_Change() different properties same unit
+- [x] Handle_Unit_Change() different properties different units
 
 #### 12.10.7 Additional Accessor Tests
 Test accessors not covered by existing tests.
