@@ -371,6 +371,43 @@ Correct approach: Percentages should NOT resolve during cascade at all.
 - [ ] Update tests to use ForceFullLayout() which runs complete pipeline in correct order
 - [ ] Add integration tests verifying percentage resolution happens during layout, not cascade
 
+#### 14.5.12 BoxModel.Resolve() Bugs (from BoxModelTests)
+Bugs discovered by comprehensive BoxModel unit tests (29 tests: 14 passing, 15 failing).
+Spec Reference: https://www.w3.org/TR/CSS2/visudet.html
+
+**Auto Width Resolution:**
+- [ ] Fix AsDecimal() called on AUTO values in Resolve_Horizontal() - throws exception
+- [ ] Block with width: auto should fill containing block minus margins
+- [ ] Inline-block with width: auto should shrink-to-fit (requires intrinsic sizing)
+
+**Auto Margin Centering (CSS 2.2 §10.3.3):**
+- [ ] Fix margin-left: auto + margin-right: auto centering returns 0 instead of calculated value
+- [ ] Single auto margin (left or right) should absorb remaining horizontal space
+- [ ] Verify auto margins work with explicit width
+
+**Min/Max Constraints (CSS 2.2 §10.4, §10.7):**
+- [ ] Fix min-width not clamping resolved width upward
+- [ ] Fix max-width not clamping resolved width downward
+- [ ] Fix min-height not clamping resolved height upward
+- [ ] Fix max-height not clamping resolved height downward
+- [ ] Apply constraints AFTER percentage/auto resolution
+
+**Over-Constrained Horizontal (CSS 2.2 §10.3.3):**
+- [ ] When width + margins + padding + border > containing block width
+- [ ] LTR: margin-right becomes auto (absorbs overflow)
+- [ ] RTL: margin-left becomes auto (absorbs overflow)
+
+**Absolute Positioning Constraint Equation (CSS 2.2 §10.3.7):**
+- [ ] Fix left: auto calculation (should position based on static position)
+- [ ] Fix right: auto calculation
+- [ ] Fix top: auto calculation
+- [ ] Fix bottom: auto calculation
+- [ ] Verify constraint equation: left + margin-left + border-left + padding-left + width + padding-right + border-right + margin-right + right = containing block width
+
+**UpdateContentWidth() Crash:**
+- [ ] Fix crash when width is still AUTO after resolution
+- [ ] Ensure width is always resolved to a numeric value before accessing
+
 ### 14.6 Box Generation Spec Compliance
 Fix CssBoxTree.Generate_Tree() and Generate_Box() to comply with W3C CSS Display 3 and CSS 2.2.
 Spec Reference: https://www.w3.org/TR/css-display-3/#box-generation
