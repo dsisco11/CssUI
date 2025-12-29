@@ -170,7 +170,7 @@ Current: 38 tests passing
 
 ### 12.8 CssComputedStyle Tests (CSS/Properties/Style/)
 Unit tests for the property collection container.
-Current: 49 tests passing
+Current: 53 tests passing
 
 #### 12.8.1 Property Access ✓
 - [x] Test Get() returns correct property instance for valid ECssPropertyID
@@ -182,11 +182,13 @@ Current: 49 tests passing
 - [x] Test typed accessors for margin, padding, position, flexbox, grid, border, font properties
 - [x] Test GetAll() returns all property instances
 
-#### 12.8.2 SetProperties Flag Tracking
-- [ ] Test SetProperties empty initially
-- [ ] Test SetProperties flag set when property assigned value
-- [ ] Test SetProperties flag not set for unassigned properties
-- [ ] Test SetProperties cleared correctly on property reset
+#### 12.8.2 SetProperties Flag Tracking ✓
+- [x] Test SetProperties empty initially
+- [x] Test SetProperties flag set when property assigned value
+- [x] Test SetProperties flag not set for unassigned properties
+- [x] Test SetProperties cleared correctly on property reset
+- [x] Test SetProperties flag persists when assigning Initial/Unset/Inherit (explicit assignment)
+- [x] Test ClearFlag required to truly reset property tracking
 
 #### 12.8.3 ReadOnly Enforcement
 - [ ] Test ReadOnly=true prevents property value changes

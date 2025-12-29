@@ -1275,6 +1275,102 @@ public class CssComputedStyleTests
         Assert.True(style.SetProperties.IsEmpty());
         Assert.Equal(0, style.SetProperties.ActiveFlags);
     }
+
+    [Fact]
+    [Trait("Category", "CssComputedStyle")]
+    [Trait("Category", "SetProperties")]
+    public void SetProperties_AssignInitial_FlagStillSet()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc);
+        var style = GetUserRulesStyle(element);
+
+        // Set property to a value first
+        style.Width.Assigned = CssValue.From_Dimension(100.0, ECssUnit.PX);
+        Assert.True(style.SetProperties.GetFlag(ECssPropertyID.Width));
+
+        // Act - Assign CssValue.Initial (CSS "initial" keyword)
+        // This is still an explicit assignment, so the flag should remain set
+        style.Width.Assigned = CssValue.Initial;
+
+        // Assert - Flag is still set (property was explicitly set, even to initial)
+        Assert.True(style.SetProperties.GetFlag(ECssPropertyID.Width));
+        Assert.Equal(CssValue.Initial, style.Width.Assigned);
+    }
+
+    [Fact]
+    [Trait("Category", "CssComputedStyle")]
+    [Trait("Category", "SetProperties")]
+    public void SetProperties_AssignUnset_FlagStillSet()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc);
+        var style = GetUserRulesStyle(element);
+
+        // Set property to a value first
+        style.Width.Assigned = CssValue.From_Dimension(100.0, ECssUnit.PX);
+        Assert.True(style.SetProperties.GetFlag(ECssPropertyID.Width));
+
+        // Act - Assign CssValue.Unset (CSS "unset" keyword)
+        // This is still an explicit assignment, so the flag should remain set
+        style.Width.Assigned = CssValue.Unset;
+
+        // Assert - Flag is still set (property was explicitly set, even to unset)
+        Assert.True(style.SetProperties.GetFlag(ECssPropertyID.Width));
+        Assert.Equal(CssValue.Unset, style.Width.Assigned);
+    }
+
+    [Fact]
+    [Trait("Category", "CssComputedStyle")]
+    [Trait("Category", "SetProperties")]
+    public void SetProperties_AssignInherit_FlagStillSet()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc);
+        var style = GetUserRulesStyle(element);
+
+        // Set property to a value first
+        style.Width.Assigned = CssValue.From_Dimension(100.0, ECssUnit.PX);
+        Assert.True(style.SetProperties.GetFlag(ECssPropertyID.Width));
+
+        // Act - Assign CssValue.Inherit (CSS "inherit" keyword)
+        // This is still an explicit assignment, so the flag should remain set
+        style.Width.Assigned = CssValue.Inherit;
+
+        // Assert - Flag is still set (property was explicitly set, even to inherit)
+        Assert.True(style.SetProperties.GetFlag(ECssPropertyID.Width));
+        Assert.Equal(CssValue.Inherit, style.Width.Assigned);
+    }
+
+    [Fact]
+    [Trait("Category", "CssComputedStyle")]
+    [Trait("Category", "SetProperties")]
+    public void SetProperties_ClearFlagAfterAssignment_PropertyResetComplete()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc);
+        var style = GetUserRulesStyle(element);
+
+        // Set property
+        style.Width.Assigned = CssValue.From_Dimension(100.0, ECssUnit.PX);
+        Assert.True(style.SetProperties.GetFlag(ECssPropertyID.Width));
+        Assert.Equal(1, style.SetProperties.ActiveFlags);
+
+        // Act - Clear the flag to truly "reset" the property tracking
+        style.SetProperties.ClearFlag(ECssPropertyID.Width);
+
+        // Assert - Property no longer tracked as set
+        Assert.False(style.SetProperties.GetFlag(ECssPropertyID.Width));
+        Assert.Equal(0, style.SetProperties.ActiveFlags);
+        Assert.True(style.SetProperties.IsEmpty());
+
+        // Note: The property's Assigned value is still there (CssProperty doesn't clear),
+        // but the tracking flag is cleared, which matters for cascade processing
+    }
     #endregion
 
     #region 12.8.3 ReadOnly Enforcement Tests
