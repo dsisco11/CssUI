@@ -401,17 +401,28 @@ Tests the Update() and conditional update methods.
 - [x] Update() with null Assigned handles gracefully
 - [x] Update() with different value types handles correctly
 
-#### 12.10.5 Cascade() and Overwrite() Tests
-Test cascade merging and value overwriting.
-- [ ] Test Cascade() copies Assigned value from source property
-- [ ] Test Cascade() returns true when value changed
-- [ ] Test Cascade() returns false when source has no value
-- [ ] Test Cascade() copies SourcePtr and Selector metadata
-- [ ] Test CascadeAsync() behaves same as Cascade()
-- [ ] Test Overwrite() only copies if values differ
-- [ ] Test Overwrite() returns true when value changed
-- [ ] Test Overwrite() returns false when values are same
-- [ ] Test OverwriteAsync() behaves same as Overwrite()
+#### 12.10.5 Cascade() and Overwrite() Tests ✓
+Test file: CssPropertyCascadeOverwriteTests.cs (19 tests)
+Tests cascade merging and value overwriting.
+- [x] Cascade() copies Assigned value from source property
+- [x] Cascade() returns true when value changed
+- [x] Cascade() returns false when source has no value
+- [x] Cascade() copies SourcePtr and Selector metadata
+- [x] Cascade() triggers Update
+- [x] CascadeAsync() behaves same as Cascade (returns true)
+- [x] CascadeAsync() returns false when no value
+- [x] Overwrite() copies value when different
+- [x] Overwrite() returns true when value changed
+- [x] Overwrite() returns false when values are same
+- [x] Overwrite() copies SourcePtr
+- [x] Overwrite() triggers Update when changed
+- [x] OverwriteAsync() behaves same as Overwrite
+- [x] OverwriteAsync() returns false when same
+- [x] Cascade() with dimension types
+- [x] Cascade() with keyword
+- [x] Cascade() with AUTO returns false (AUTO HasValue=false)
+- [x] Overwrite() both null returns false
+- [x] Cascade() multiple times - last wins
 
 #### 12.10.6 Handle_Unit_Change() Tests
 Test unit scale change notifications.
