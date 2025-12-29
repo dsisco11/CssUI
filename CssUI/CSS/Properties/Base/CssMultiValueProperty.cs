@@ -87,6 +87,14 @@ public abstract class CssMultiValueProperty : CssPropertyBase, ICssProperty
             Definition.CheckAndThrow(this, value);
             // Translate a value of NULL to CSSValue.Null
             _assigned = value;
+
+            // Mark this property as set in the owning CssComputedStyle's SetProperties collection
+            // This is required for the cascade algorithm to know which properties to process
+            if (Source is CssComputedStyle computedStyle)
+            {
+                computedStyle.SetProperties.SetFlag((int)CssName);
+            }
+
             //our assigned value has changed, this means our specified and computed valued are now incorrect.
             Update();
         }

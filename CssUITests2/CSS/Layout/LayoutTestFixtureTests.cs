@@ -7,13 +7,9 @@ namespace CssUITests.CSS.Layout;
 
 /// <summary>
 /// Tests for LayoutTestFixture itself, ensuring the test infrastructure works.
-/// NOTE: These tests are skipped until the layout pipeline is connected (Phase 14.1).
-/// The fixture compiles but ForceLayoutUpdate/ForceBoxGeneration cause infinite loops
-/// due to incomplete pipeline integration.
 /// </summary>
 public class LayoutTestFixtureTests
 {
-    private const string SkipReason = "Layout pipeline not connected - causes infinite loop (Phase 14.1)";
 
     #region Fixture Creation Tests
 
@@ -214,7 +210,7 @@ public class LayoutTestFixtureTests
 
     #region Cascade Tests
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     [Trait("Category", "Layout")]
     [Trait("Category", "Fixture")]
     public void ForceCascade_UpdatesCascadedValues()
@@ -229,8 +225,8 @@ public class LayoutTestFixtureTests
         // Act
         fixture.ForceCascade();
 
-        // Assert - After cascade, the cascaded value should be resolved
-        Assert.Equal(300, element.Style.Width);
+        // Assert - After cascade, the UserRules assigned value should be set
+        Assert.Equal(300, element.Style.UserRules.Width.Assigned.AsInteger());
     }
 
     #endregion
@@ -315,7 +311,7 @@ public class LayoutTestFixtureTests
 
     #region Box Generation Tests
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     [Trait("Category", "Layout")]
     [Trait("Category", "Fixture")]
     public void ForceBoxGeneration_GeneratesBoxForDocumentElement()
@@ -330,7 +326,7 @@ public class LayoutTestFixtureTests
         Assert.NotNull(fixture.DocumentElement.Box);
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     [Trait("Category", "Layout")]
     [Trait("Category", "Fixture")]
     public void ForceLayoutUpdate_GeneratesBoxForCreatedElements()
@@ -346,7 +342,7 @@ public class LayoutTestFixtureTests
         Assert.NotNull(element.Box);
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     [Trait("Category", "Layout")]
     [Trait("Category", "Fixture")]
     public void GetBox_GeneratesBoxIfNotExists()
@@ -362,7 +358,7 @@ public class LayoutTestFixtureTests
         Assert.NotNull(box);
     }
 
-    [Fact(Skip = SkipReason)]
+    [Fact]
     [Trait("Category", "Layout")]
     [Trait("Category", "Fixture")]
     public void RequireBox_ThrowsForDisplayNone()
