@@ -98,7 +98,7 @@ public class CssBoxTreeTests : IDisposable
 
     #region Text Sequence Handling Tests
 
-    [Fact(Skip = "Phase 14.6.3: Text sequence handling requires inline formatting context integration")]
+    [Fact]
     [Trait("Category", "BoxModel")]
     [Trait("Category", "TextSequence")]
     public void TextNode_WithContent_GeneratesTextRun()
@@ -110,14 +110,14 @@ public class CssBoxTreeTests : IDisposable
         parent.appendChild(textNode);
 
         // Act
-        _fixture.ForceBoxGeneration();
+        _fixture.ForceLayoutUpdate();
 
         // Assert
         Assert.NotNull(textNode.Box);
         Assert.IsType<CssTextRun>(textNode.Box);
     }
 
-    [Fact(Skip = "Phase 14.6.3: Text sequence handling requires inline formatting context integration")]
+    [Fact]
     [Trait("Category", "BoxModel")]
     [Trait("Category", "TextSequence")]
     public void TextNode_EmptyContent_GeneratesNoTextRun()
@@ -129,13 +129,13 @@ public class CssBoxTreeTests : IDisposable
         parent.appendChild(textNode);
 
         // Act
-        _fixture.ForceBoxGeneration();
+        _fixture.ForceLayoutUpdate();
 
         // Assert - empty text nodes should not generate text runs per spec
         Assert.Null(textNode.Box);
     }
 
-    [Fact(Skip = "Phase 14.6.3: Text sequence handling requires inline formatting context integration")]
+    [Fact]
     [Trait("Category", "BoxModel")]
     [Trait("Category", "TextSequence")]
     public void ContiguousTextNodes_GenerateSingleTextRun()
@@ -149,12 +149,79 @@ public class CssBoxTreeTests : IDisposable
         parent.appendChild(text2);
 
         // Act
-        _fixture.ForceBoxGeneration();
+        _fixture.ForceLayoutUpdate();
 
-        // Assert - contiguous text nodes should be combined
-        // First text node gets the text run, subsequent ones may not have their own
+        // Assert - contiguous text nodes should be combined into single text run
+        // First text node gets the text run, subsequent ones share it
         Assert.NotNull(text1.Box);
         Assert.IsType<CssTextRun>(text1.Box);
+        // Both text nodes should reference the same text run
+        Assert.Same(text1.Box, text2.Box);
+    }
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "TextSequence")]
+    public void WhitespaceOnlyTextNode_GeneratesTextRun()
+    {
+        // Arrange - whitespace-only text nodes DO generate text runs (white-space property controls rendering)
+        var doc = _fixture.Document;
+        var parent = _fixture.CreateBlock(200, 100);
+        var textNode = doc.createTextNode("   ");
+        parent.appendChild(textNode);
+
+        // Act
+        _fixture.ForceLayoutUpdate();
+
+        // Assert - whitespace content is not empty, so it generates a text run
+        Assert.NotNull(textNode.Box);
+        Assert.IsType<CssTextRun>(textNode.Box);
+    }
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "TextSequence")]
+    public void TextNodesBetweenElements_GenerateSeparateTextRuns()
+    {
+        // Arrange - text nodes separated by elements should generate separate text runs
+        var doc = _fixture.Document;
+        var parent = _fixture.CreateBlock(200, 100);
+        var text1 = doc.createTextNode("Before ");
+        var element = doc.createElement("span", DefaultOptions);
+        var text2 = doc.createTextNode(" After");
+        parent.appendChild(text1);
+        parent.appendChild(element);
+        parent.appendChild(text2);
+
+        // Act
+        _fixture.ForceLayoutUpdate();
+
+        // Assert - text nodes are not contiguous (separated by element)
+        Assert.NotNull(text1.Box);
+        Assert.NotNull(text2.Box);
+        Assert.IsType<CssTextRun>(text1.Box);
+        Assert.IsType<CssTextRun>(text2.Box);
+        // They should be different text runs
+        Assert.NotSame(text1.Box, text2.Box);
+    }
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "TextSequence")]
+    public void TextRun_ParentIsContainerBox()
+    {
+        // Arrange
+        var doc = _fixture.Document;
+        var parent = _fixture.CreateBlock(200, 100);
+        var textNode = doc.createTextNode("Hello");
+        parent.appendChild(textNode);
+
+        // Act
+        _fixture.ForceLayoutUpdate();
+
+        // Assert - text run's parent should be the parent element's box
+        Assert.NotNull(textNode.Box);
+        Assert.Same(parent.Box, textNode.Box.parentNode);
     }
 
     #endregion

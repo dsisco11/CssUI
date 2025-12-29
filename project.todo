@@ -20,7 +20,7 @@
   - [ ] Update Window.QueueObserverMicroTask() to use new system
   - [ ] Ensure MutationObserver callbacks fire at correct timing per W3C spec
 
-## Test Coverage — Total: 4159 passing, 154 skipped, 20 failing = 4333 tests
+## Test Coverage — Total: 4165 passing, 151 skipped, 20 failing = 4336 tests
 ### DOM Tests: 518 passing, 3 skipped = 521 total
 ### Selector Tests: 307 passing, 143 skipped = 450 total
 
@@ -388,12 +388,15 @@ Element generates no box, but children render normally.
 - [ ] display: contents computes to display: none for replaced elements (future - requires IsReplacedElement check)
 - [x] Tests for display: contents behavior (4 tests: DisplayType parsing, element generates no box, children still generate boxes, box parent skips contents)
 
-#### 14.6.3 Text Sequence Handling (CSS Display 3 §1)
-Bug: Queue.Peek() can throw InvalidOperationException when queue is empty.
-- [ ] Fix text run collection loop to check Queue.Count > 0 before Peek()
-- [ ] Handle empty text nodes (generate no text sequence per spec)
-- [ ] Handle whitespace-only text nodes per white-space property
-- [ ] Tests for text sequence generation
+#### 14.6.3 Text Sequence Handling (CSS Display 3 §1) ✓
+Text nodes combine into text runs for rendering.
+- [x] Fix text run collection loop to check Queue.Count > 0 before Peek() (already fixed)
+- [x] Handle empty text nodes (generate no text sequence per spec)
+- [x] Set Box property on all text nodes in a combined run
+- [x] Clear NeedsBoxUpdate flag on contiguous text nodes when dequeued
+- [x] Fixed test fixture to set NeedsBoxUpdate on text nodes (not just elements)
+- [ ] Handle whitespace-only text nodes per white-space property (future - requires white-space property cascade)
+- [x] Tests for text sequence generation (6 tests: content generates run, empty generates none, contiguous combine, whitespace-only, separated by elements, parent relationship)
 
 #### 14.6.4 List Item Marker Boxes (CSS Display 3 §2.3)
 display: list-item generates principal box + ::marker pseudo-element.

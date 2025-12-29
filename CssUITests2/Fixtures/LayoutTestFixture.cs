@@ -234,11 +234,14 @@ public class LayoutTestFixture : IDisposable
     {
         element.SetFlag(ENodeFlags.NeedsBoxUpdate);
 
-        var child = element.firstElementChild;
-        while (child != null)
+        // Set flag on all child nodes (including text nodes, not just elements)
+        foreach (var child in element.childNodes)
         {
-            SetBoxUpdateFlagsRecursive(child);
-            child = child.nextElementSibling;
+            child.SetFlag(ENodeFlags.NeedsBoxUpdate);
+            if (child is Element childElement)
+            {
+                SetBoxUpdateFlagsRecursive(childElement);
+            }
         }
     }
 

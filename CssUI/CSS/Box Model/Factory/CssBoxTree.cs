@@ -94,7 +94,10 @@ public static class CssBoxTree
                                    Queue.Peek().nodeType == DOM.Enums.ENodeType.TEXT_NODE &&
                                    ReferenceEquals(Queue.Peek().parentNode, node.parentNode))
                             {
-                                TextNodes.Add((Text)Queue.Dequeue());
+                                var contiguousTextNode = (Text)Queue.Dequeue();
+                                TextNodes.Add(contiguousTextNode);
+                                // Clear the update flag since we're processing this node now
+                                contiguousTextNode.ClearFlag(ENodeFlags.NeedsBoxUpdate | ENodeFlags.ChildNeedsBoxUpdate);
                             }
 
                             // Only generate text run if there's actual text content
@@ -111,7 +114,21 @@ public static class CssBoxTree
 
                             if (hasContent)
                             {
-                                nextBox = new CssTextRun(TextNodes.ToArray());
+                                var textRun = new CssTextRun(TextNodes.ToArray());
+                                nextBox = textRun;
+                                // Set the box reference on all text nodes in the run
+                                foreach (var textNode in TextNodes)
+                                {
+                                    textNode.Box = textRun;
+                                }
+                            }
+                            else
+                            {
+                                // Clear box reference on all text nodes if no content
+                                foreach (var textNode in TextNodes)
+                                {
+                                    textNode.Box = null;
+                                }
                             }
                         }
                         break;
