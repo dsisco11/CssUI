@@ -170,13 +170,17 @@ Current: 38 tests passing
 
 ### 12.8 CssComputedStyle Tests (CSS/Properties/Style/)
 Unit tests for the property collection container.
-Current: 0 tests (properties tested indirectly through element.Style)
+Current: 49 tests passing
 
-#### 12.8.1 Property Access
-- [ ] Test Get() returns correct property instance for valid ECssPropertyID
-- [ ] Test Get() returns null for unregistered property ID
-- [ ] Test property accessors (Width, Height, etc.) return typed properties
-- [ ] Test same property instance returned on multiple Get() calls
+#### 12.8.1 Property Access ✓
+- [x] Test Get() returns correct property instance for valid ECssPropertyID
+- [x] Test Get() returns null for unregistered property ID
+- [x] Test Get() throws ArgumentOutOfRangeException for negative property ID
+- [x] Test property accessors (Width, Height, etc.) return typed properties
+- [x] Test same property instance returned on multiple Get() calls
+- [x] Test indexer returns same instance as Get()
+- [x] Test typed accessors for margin, padding, position, flexbox, grid, border, font properties
+- [x] Test GetAll() returns all property instances
 
 #### 12.8.2 SetProperties Flag Tracking
 - [ ] Test SetProperties empty initially
