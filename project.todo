@@ -202,10 +202,10 @@ Current: 53 tests passing
 - [x] Test Cascade() preserves existing values not in source
 - [x] Test CascadeAsync() behaves same as Cascade()
 
-#### 12.8.5 Selector and Origin
-- [ ] Test Selector property stores CSS selector
-- [ ] Test Origin property indicates source (user, author, UA)
-- [ ] Test Name property for debugging
+#### 12.8.5 Selector and Origin ✓
+- [x] Test Selector property stores CSS selector
+- [x] Test Origin property indicates source (user, author, UA)
+- [x] Test Name property for debugging
 
 ### 12.9 CssValue Derive Methods Tests (CSS/Value/Resolving/)
 Direct unit tests for value stage derivation methods.

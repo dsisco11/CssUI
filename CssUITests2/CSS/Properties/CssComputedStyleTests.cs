@@ -1598,10 +1598,11 @@ public class CssComputedStyleTests
         // Act
         var name = style.Name;
 
-        // Assert - Name should be a non-empty string
+        // Assert - Name should be a non-empty string (default is a GUID)
         Assert.NotNull(name);
         Assert.NotEmpty(name);
-        Assert.Contains("CssComputedStyle", name);
+        // When no name is provided, constructor generates a GUID
+        Assert.True(Guid.TryParse(name, out _), "Default Name should be a valid GUID");
     }
 
     [Fact]
@@ -1619,6 +1620,84 @@ public class CssComputedStyleTests
 
         // Assert
         Assert.Equal("TestStyle", style.Name);
+    }
+
+    [Fact]
+    [Trait("Category", "CssComputedStyle")]
+    [Trait("Category", "Selector")]
+    public void Selector_StoresCssSelector_WhenCreatedWithSelector()
+    {
+        // Arrange - Create a selector and a style with it
+        var selector = new CssSelector(".test-class");
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc);
+
+        // Create a style with an explicit selector
+        var style = new CssComputedStyle(selector, element, ReadOnly: false);
+
+        // Assert - Selector is stored
+        Assert.NotNull(style.Selector);
+        Assert.Same(selector, style.Selector);
+    }
+
+    [Fact]
+    [Trait("Category", "CssComputedStyle")]
+    [Trait("Category", "Origin")]
+    public void Origin_IndicatesAuthor_ByDefault()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc);
+
+        // Create a style without specifying origin (defaults to Author)
+        var style = new CssComputedStyle("TestStyle", element, ReadOnly: false);
+
+        // Assert - Origin defaults to Author
+        Assert.Equal(EPropertySetOrigin.Author, style.Origin);
+    }
+
+    [Fact]
+    [Trait("Category", "CssComputedStyle")]
+    [Trait("Category", "Origin")]
+    public void Origin_IndicatesUserAgent_WhenSpecified()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc);
+
+        // Create a style with UserAgent origin
+        var style = new CssComputedStyle(
+            Name: "UA-Style",
+            Selector: null,
+            Owner: element,
+            ReadOnly: true,
+            Unset: false,
+            Origin: EPropertySetOrigin.UserAgent);
+
+        // Assert - Origin is UserAgent
+        Assert.Equal(EPropertySetOrigin.UserAgent, style.Origin);
+    }
+
+    [Fact]
+    [Trait("Category", "CssComputedStyle")]
+    [Trait("Category", "Origin")]
+    public void Origin_IndicatesUser_WhenSpecified()
+    {
+        // Arrange
+        var doc = CreateTestDocument();
+        var element = CreateTestElement(doc);
+
+        // Create a style with User origin
+        var style = new CssComputedStyle(
+            Name: "User-Style",
+            Selector: null,
+            Owner: element,
+            ReadOnly: false,
+            Unset: false,
+            Origin: EPropertySetOrigin.User);
+
+        // Assert - Origin is User
+        Assert.Equal(EPropertySetOrigin.User, style.Origin);
     }
 
     [Fact]
