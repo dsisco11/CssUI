@@ -255,6 +255,37 @@ public class LayoutTestFixture : IDisposable
     }
 
     /// <summary>
+    /// Forces a complete layout update using the actual Document layout pipeline.
+    /// This includes: box generation, style cascade, and layout resolution (widths + heights).
+    /// </summary>
+    public void ForceFullLayout()
+    {
+        // Set reflow flags on all elements
+        SetReflowFlagsRecursive(DocumentElement);
+        
+        // Run the actual layout pipeline
+        Document.Run_Event_Loop();
+    }
+
+    private void SetReflowFlagsRecursive(Element element)
+    {
+        element.SetFlag(ENodeFlags.NeedsBoxUpdate | ENodeFlags.NeedsReflow);
+        element.SetFlag(ENodeFlags.ChildNeedsBoxUpdate | ENodeFlags.ChildNeedsReflow);
+
+        foreach (var child in element.childNodes)
+        {
+            if (child is Element childElement)
+            {
+                SetReflowFlagsRecursive(childElement);
+            }
+            else
+            {
+                child.SetFlag(ENodeFlags.NeedsBoxUpdate | ENodeFlags.NeedsReflow);
+            }
+        }
+    }
+
+    /// <summary>
     /// Gets the principal box for an element, generating it if necessary.
     /// </summary>
     /// <param name="element">The element.</param>

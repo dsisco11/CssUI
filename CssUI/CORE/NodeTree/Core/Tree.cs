@@ -1022,7 +1022,8 @@ public static class Tree
             return null;
         }
 
-        if (node.index < ((ITreeNode)node.parentNode).childNodes.Count)
+        // Check if there's a next sibling (index + 1 must be valid)
+        if (node.index + 1 < ((ITreeNode)node.parentNode).childNodes.Count)
         {
             return ((ITreeNode)node.parentNode).childNodes[node.index + 1];
         }

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using CssUI.CSS.BoxTree;
 using CssUI.CSS.Enums;
 using CssUI.DOM;
 using CssUI.DOM.Nodes;
@@ -295,25 +296,25 @@ internal static class CssCommon
                      * For other elements, if the element's position is 'relative' or 'static', 
                      * the containing block is formed by the content edge of the nearest ancestor box that is a block container or which establishes a formatting context. 
                      */
-                    var Tree = new DOM.TreeWalker(Target, DOM.Enums.ENodeFilterMask.SHOW_ELEMENT);
-                    var Current = Tree.parentNode();
-                    while (Current is not null)
+                    var current = Target.parentElement;
+                    while (current is not null)
                     {
-                        if (Current is DOM.Element element)
+                        if (current.Box is CssPrincipalBox box)
                         {
-                            if (element.Box.DisplayType.Outer == EOuterDisplayType.Block || element.Box.FormattingContext is object)
+                            if (box.DisplayType.Outer == EOuterDisplayType.Block || box.FormattingContext is object)
                             {
-                                return element.Box.Content;
+                                return box.Content;
                             }
                         }
-                        Current = Tree.parentNode();
+                        current = current.parentElement;
                     }
-                    throw new CssException($"Cant find containing-block for element: {Target.ToString()}");
+                    // Fallback to viewport if no containing block found (boxes may not be generated yet)
+                    return Target.ownerDocument.Viewport?.getBoundingClientRect() ?? default;
                 }
             case EBoxPositioning.Fixed:
                 {/* If the element has 'position: fixed', the containing block is established by the viewport in the case of continuous media or the page area in the case of paged media. */
-                    Viewport view = Target.ownerDocument.Viewport!;
-                    return view.getBoundingClientRect();
+                    Viewport? view = Target.ownerDocument.Viewport;
+                    return view?.getBoundingClientRect() ?? default;
                 }
             case EBoxPositioning.Absolute:
                 {
@@ -324,15 +325,14 @@ internal static class CssCommon
                      * Otherwise, the containing block is formed by the padding edge of the ancestor.
                      * 
                      */
-                    var Tree = new DOM.TreeWalker(Target, DOM.Enums.ENodeFilterMask.SHOW_ELEMENT);
-                    var Current = Tree.parentNode();
-                    while (Current is not null)
+                    var ancestor = Target.parentElement;
+                    while (ancestor is not null)
                     {
-                        if (Current is DOM.Element ancestor)
+                        if (ancestor.Box is CssPrincipalBox ancestorBox)
                         {
                             if (ancestor.Style.Positioning == EBoxPositioning.Absolute || ancestor.Style.Positioning == EBoxPositioning.Relative || ancestor.Style.Positioning == EBoxPositioning.Fixed)
                             {
-                                if (ancestor.Box.DisplayType.Outer == EOuterDisplayType.Inline)
+                                if (ancestorBox.DisplayType.Outer == EOuterDisplayType.Inline)
                                 {
                                     double top = 0, right = 0, bottom = 0, left = 0;
                                     Element? child;
@@ -341,10 +341,10 @@ internal static class CssCommon
                                     child = ancestor.firstElementChild;
                                     while (child is not null)
                                     {
-                                        if (child.Box.DisplayType.Outer == EOuterDisplayType.Inline)
+                                        if (child.Box is CssPrincipalBox childBox && childBox.DisplayType.Outer == EOuterDisplayType.Inline)
                                         {
-                                            top = child.Box.Padding.Top;
-                                            left = child.Box.Padding.Left;
+                                            top = childBox.Padding.Top;
+                                            left = childBox.Padding.Left;
                                             break;
                                         }
 
@@ -355,10 +355,10 @@ internal static class CssCommon
                                     child = ancestor.lastElementChild;
                                     while (child is not null)
                                     {
-                                        if (child.Box.DisplayType.Outer == EOuterDisplayType.Inline)
+                                        if (child.Box is CssPrincipalBox lastChildBox && lastChildBox.DisplayType.Outer == EOuterDisplayType.Inline)
                                         {
-                                            right = child.Box.Padding.Right;
-                                            bottom = child.Box.Padding.Bottom;
+                                            right = lastChildBox.Padding.Right;
+                                            bottom = lastChildBox.Padding.Bottom;
                                             break;
                                         }
 
@@ -370,19 +370,27 @@ internal static class CssCommon
                                 }
                                 else
                                 {
-                                    return ancestor.Box.Padding;
+                                    return ancestorBox.Padding;
                                 }
                             }
                         }
-                        Current = Tree.parentNode();
+                        ancestor = ancestor.parentElement;
                     }
                     /* If there is no such ancestor, the containing block is the initial containing block. */
                     Node rootNode = Target.getRootNode();
-                    return (rootNode as Element).Box.Content;
+                    if (rootNode is Element rootElement && rootElement.Box is CssPrincipalBox rootBox)
+                    {
+                        return rootBox.Content;
+                    }
+                    return Target.ownerDocument.Viewport?.getBoundingClientRect() ?? default;
                 }
             default:
                 {
-                    return Target.parentElement?.Box.Content ?? default;
+                    if (Target.parentElement?.Box is CssPrincipalBox parentBox)
+                    {
+                        return parentBox.Content;
+                    }
+                    return default;
                 }
         }
 
