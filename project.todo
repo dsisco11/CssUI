@@ -239,12 +239,30 @@ Tests directly call the internal CssValue.Derive_SpecifiedValue() method.
 - [x] Definition.Inherited affects inheritance path
 - [x] Owner.isRoot affects null value path
 
-#### 12.9.2 Derive_ComputedValue Tests
-- [ ] Test INHERIT keyword resolved to parent's computed value
-- [ ] Test PERCENT type preserved (not resolved during cascade)
-- [ ] Test DIMENSION type resolved via CssUnitResolver
-- [ ] Test custom PropertyStageResolver invoked when defined
-- [ ] Test value without resolver passes through unchanged
+#### 12.9.2 Derive_ComputedValue Tests ✓
+Test file: DeriveComputedValueTests.cs (21 tests)
+Tests directly call the internal CssValue.Derive_ComputedValue() method.
+- [x] INHERIT keyword resolved via Find_Inherited_Value
+- [x] INHERIT on root element returns initial
+- [x] PERCENT type preserved (not resolved during cascade)
+- [x] PERCENT different values all preserved
+- [x] DIMENSION type resolved via CssUnitResolver to NUMBER
+- [x] DIMENSION em unit resolved
+- [x] DIMENSION rem unit resolved
+- [x] DIMENSION result is new CssValue (not same reference)
+- [x] Custom PropertyStageResolver invoked when defined
+- [x] No resolver - explicit value passes through unchanged
+- [x] NUMBER value passes through unchanged
+- [x] KEYWORD value passes through unchanged
+- [x] AUTO value passes through unchanged
+- [x] NONE value passes through unchanged
+- [x] Zero value passes through unchanged
+- [x] Multiple invocations return consistent results
+- [x] Different types route to different branches
+- [x] INITIAL keyword passes through default path
+- [x] UNSET keyword passes through default path
+- [x] Switch statement covers all special cases
+- [x] Default path checks for resolver
 
 #### 12.9.3 Derive_UsedValue Tests
 - [ ] Test custom PropertyStageResolver invoked when defined
