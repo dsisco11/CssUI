@@ -12,6 +12,7 @@
   <!-- Make internals visible to test project -->
   <ItemGroup>
     <InternalsVisibleTo Include="CssUITests" />
+    <InternalsVisibleTo Include="CssUITests2" />
   </ItemGroup>
 
   <!-- Debug configuration -->

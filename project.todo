@@ -210,16 +210,34 @@ Current: 53 tests passing
 ### 12.9 CssValue Derive Methods Tests (CSS/Value/Resolving/)
 Direct unit tests for value stage derivation methods.
 Current: Tested indirectly through property tests, need direct coverage.
+Location: CssUITests2/CSS/Value/Resolving/
 
 #### 12.9.1 Derive_SpecifiedValue Tests ✓
-- [x] Test UNSET keyword on inheritable property returns inherited value
-- [x] Test UNSET keyword on non-inheritable property returns initial value
-- [x] Test INHERIT keyword returns parent's computed value
-- [x] Test INITIAL keyword returns definition's initial value
-- [x] Test explicit value passes through unchanged
-- [x] Test NULL assigned value on inheritable property returns inherited
-- [x] Test NULL assigned value on non-inheritable property returns initial
-- [x] Test custom PropertyStageResolver invoked when defined
+Test file: DeriveSpecifiedValueTests.cs (23 tests)
+Tests directly call the internal CssValue.Derive_SpecifiedValue() method.
+- [x] UNSET on inheritable property calls Find_Inherited_Value
+- [x] UNSET on non-inheritable property returns Def.Initial
+- [x] INHERIT keyword calls Find_Inherited_Value
+- [x] INHERIT on root element returns initial (via Find_Inherited_Value)
+- [x] INITIAL keyword returns Def.Initial
+- [x] INITIAL ignores parent value
+- [x] Explicit value with no resolver returns same reference (return this)
+- [x] Explicit value with resolver invokes resolver
+- [x] Explicit dimension passes through unchanged
+- [x] Explicit percentage passes through unchanged
+- [x] Explicit auto passes through unchanged
+- [x] Explicit keyword passes through unchanged
+- [x] NULL value on inheritable property (non-root) returns initial
+- [x] NULL value on inheritable property (root) calls Find_Inherited_Value
+- [x] NULL value on non-inheritable property returns Def.Initial
+- [x] Multiple invocations return consistent results
+- [x] Different CSS-wide keywords route to different branches
+- [x] Zero value is valid explicit value
+- [x] Deep inheritance works with INHERIT keyword
+- [x] None value passes through as explicit value
+- [x] IsNull true skips switch statement
+- [x] Definition.Inherited affects inheritance path
+- [x] Owner.isRoot affects null value path
 
 #### 12.9.2 Derive_ComputedValue Tests
 - [ ] Test INHERIT keyword resolved to parent's computed value
