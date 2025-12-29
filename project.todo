@@ -310,18 +310,34 @@ Comprehensive unit tests for the CssProperty value pipeline and lifecycle.
 Current: 26 tests passing (basic accessors, assignment, global keywords)
 Spec Reference: https://www.w3.org/TR/css-cascade-3/
 
-#### 12.10.1 Value Stage Pipeline Tests — High Priority
-Test the Assigned → Specified → Computed → Used → Actual value derivation chain.
-- [ ] Test Assigned value triggers Specified derivation
-- [ ] Test Specified value triggers Computed derivation
-- [ ] Test Computed value triggers Used derivation
-- [ ] Test Used value triggers Actual derivation
-- [ ] Test lazy evaluation (values computed on first access)
-- [ ] Test change propagation through all stages
-- [ ] Test Derive_SpecifiedValue() handles inherit keyword
-- [ ] Test Derive_ComputedValue() resolves relative values
-- [ ] Test Derive_UsedValue() applies property-specific resolution
-- [ ] Test Derive_ActualValue() applies platform restrictions
+#### 12.10.1 Value Stage Pipeline Tests ✓ — High Priority
+Test file: CssPropertyValuePipelineTests.cs (25 tests)
+Tests the Assigned → Specified → Computed → Used → Actual derivation chain.
+- [x] Assigned value triggers Specified derivation
+- [x] Assigned INHERIT resolves to parent value
+- [x] Assigned INITIAL resolves to definition initial
+- [x] Assigned UNSET on non-inheritable resolves to initial
+- [x] Specified value triggers Computed derivation
+- [x] Specified DIMENSION computed resolves to NUMBER
+- [x] Specified PERCENT computed preserves percent
+- [x] Computed value triggers Used derivation
+- [x] Used no resolver passes through Computed
+- [x] Used value triggers Actual derivation
+- [x] Actual no resolver passes through Used
+- [x] Lazy evaluation - Specified computed on first access
+- [x] Lazy evaluation - Computed computed on first access
+- [x] Lazy evaluation - Actual computed on first access
+- [x] Update ComputeNow=true computes all stages
+- [x] Changing Assigned propagates through all stages
+- [x] Multiple changes each propagate correctly
+- [x] Changing to same value does not recompute
+- [x] Full pipeline Assigned to Actual
+- [x] Full pipeline with INHERIT
+- [x] Full pipeline with DIMENSION
+- [x] Full pipeline with KEYWORD
+- [x] NULL assigned resolves to initial
+- [x] Zero value propagates correctly
+- [x] Auto value propagates correctly
 
 #### 12.10.2 Set_Computed_Value() Tests — High Priority
 Test the method added for BoxModel integration during layout.
