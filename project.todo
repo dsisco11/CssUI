@@ -339,13 +339,25 @@ Tests the Assigned → Specified → Computed → Used → Actual derivation cha
 - [x] Zero value propagates correctly
 - [x] Auto value propagates correctly
 
-#### 12.10.2 Set_Computed_Value() Tests — High Priority
-Test the method added for BoxModel integration during layout.
-- [ ] Test Set_Computed_Value() updates Computed value directly
-- [ ] Test Set_Computed_Value() triggers Used/Actual re-derivation
-- [ ] Test Set_Computed_Value() fires change events
-- [ ] Test Set_Computed_Value() with numeric values
-- [ ] Test Set_Computed_Value() with CssValue.Auto (edge case)
+#### 12.10.2 Set_Computed_Value() Tests ✓ — High Priority
+Test file: CssPropertySetComputedValueTests.cs (16 tests)
+Tests the method for BoxModel integration during layout.
+- [x] Set_Computed_Value() updates Computed value directly
+- [x] Set_Computed_Value() bypasses Specified derivation
+- [x] Set_Computed_Value() triggers Used re-derivation
+- [x] Set_Computed_Value() triggers Actual re-derivation
+- [x] Set_Computed_Value() full derivation chain (Computed→Used→Actual)
+- [x] Set_Computed_Value() with numeric value
+- [x] Set_Computed_Value() with zero
+- [x] Set_Computed_Value() with negative value
+- [x] Set_Computed_Value() with large value
+- [x] Set_Computed_Value() with CssValue.Auto (edge case)
+- [x] Set_Computed_Value() from Auto to numeric (layout resolution)
+- [x] Set_Computed_Value() multiple calls each updates
+- [x] Set_Computed_Value() then Set() - Assigned overrides
+- [x] Set_Computed_Value() with keyword
+- [x] Set_Computed_Value() with None
+- [x] Set_Computed_Value() calls Revert internally
 
 #### 12.10.3 Revert() Tests
 Test reverting property to computed stage for re-resolution.
