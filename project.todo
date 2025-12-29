@@ -378,15 +378,28 @@ Tests reverting property to computed stage for re-resolution.
 - [x] Revert with Set_Computed_Value re-derives from direct value
 - [x] Different value types handled correctly
 
-#### 12.10.4 Update() Method Tests
-Test the Update() and conditional update methods.
-- [ ] Test Update() clears all derived values (Specified, Computed, Used, Actual)
-- [ ] Test Update(ComputeNow: true) immediately re-derives all values
-- [ ] Test Update(ComputeNow: false) defers re-derivation
-- [ ] Test Update() fires Assigned change event
-- [ ] Test UpdateDependent() only updates if IsDependent is true
-- [ ] Test UpdateDependentOrAuto() only updates if IsDependent or IsAuto
-- [ ] Test UpdatePercentageOrAuto() only updates if IsPercentage or IsAuto
+#### 12.10.4 Update() Method Tests ✓
+Test file: CssPropertyUpdateTests.cs (19 tests)
+Tests the Update() and conditional update methods.
+- [x] Update() clears Specified value
+- [x] Update() clears Computed value
+- [x] Update() clears Used value
+- [x] Update() clears Actual value
+- [x] Update() preserves Assigned value
+- [x] Update(ComputeNow: true) immediately re-derives all values
+- [x] Update(ComputeNow: false) defers re-derivation
+- [x] Update() default parameter is ComputeNow=false
+- [x] UpdateDependent() calls Update when IsDependent is true
+- [x] UpdateDependent() does not update when not dependent
+- [x] UpdateDependentOrAuto() calls Update when IsAuto
+- [x] UpdateDependentOrAuto() does not update when neither
+- [x] UpdatePercentageOrAuto() calls Update when IsPercentage
+- [x] UpdatePercentageOrAuto() calls Update when IsAuto
+- [x] UpdatePercentageOrAuto() does not update when neither
+- [x] Multiple Update() calls safe
+- [x] Update() after value change reflects new value
+- [x] Update() with null Assigned handles gracefully
+- [x] Update() with different value types handles correctly
 
 #### 12.10.5 Cascade() and Overwrite() Tests
 Test cascade merging and value overwriting.
