@@ -166,8 +166,12 @@ Spec Reference: https://www.w3.org/TR/CSS2/visudet.html (width/height calculatio
 - [x] When EPropertyDirtFlags.Flow or Box changes, propagate ChildNeedsReflow to ancestors
 - [x] Enable skipped test: StylePropertyChange_SetsNeedsReflow_OnElement
 
-#### 14.5.4 Pass 3: Layout/Reflow (Width Top-Down, Height Bottom-Up)
-- [ ] Wire IntrinsicSizeCalculator.Calculate() for width: auto (shrink-to-fit)
+#### 14.5.4 Pass 3: Layout/Reflow (Width Top-Down, Height Bottom-Up) ✓
+- [x] Wire IntrinsicSizeCalculator.Calculate() for width: auto (shrink-to-fit)
+- [x] BoxModel.CalculateShrinkToFitWidth() calls box.GetIntrinsicSize() → IntrinsicSizeCalculator.Calculate()
+- [x] Shrink-to-fit wired for: INLINE_BLOCK, ABSOLUTELY_POSITIONED display groups
+- [x] FLOATING display group has shrink-to-fit code but Float property pending (Phase 15.1)
+- [x] Added ShrinkToFitIntegrationTests with 11 passing tests
 
 #### 14.5.5 BoxModel.Resolve() Refactoring ✓
 
