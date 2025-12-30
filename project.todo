@@ -489,13 +489,24 @@ Tests locked property behavior (read-only properties).
 - [x] Locked NumberProperty throws on set
 - [x] Locked EnumProperty throws on set
 
-#### 12.10.9 Change Event Tests
-Test FireValueChangeEvent for all stages.
-- [ ] Test Assigned change fires event with EPropertyStage.Assigned
-- [ ] Test Computed change fires event with EPropertyStage.Computed
-- [ ] Test Actual change fires event with EPropertyStage.Actual
-- [ ] Test event contains correct property reference
-- [ ] Test multiple rapid changes coalesce correctly
+#### 12.10.9 Change Event Tests ✓
+Test file: CssPropertyChangeEventTests.cs (15 tests)
+Tests FireValueChangeEvent for all stages.
+- [x] Assigned change fires event with EPropertyStage.Assigned
+- [x] Assigned change event contains correct property reference
+- [x] Assigned change multiple times fires multiple events
+- [x] Computed change fires event when unit changes
+- [x] Actual change fires event when derived
+- [x] Event can add multiple handlers
+- [x] Event can remove handler
+- [x] No handlers - no exception
+- [x] Event stage parameter is correct
+- [x] Event property parameter is correct
+- [x] IntProperty fires event on change
+- [x] NumberProperty fires event on change
+- [x] EnumProperty fires event on change
+- [x] Update fires Assigned event when value changed
+- [x] Update with ComputeNow fires Actual event
 
 ### 12.11 Block Formatting Context (CSS/Formatting/)
 - [x] BlockFormattingContext tests (4 tests: instantiation, interface compliance, null safety)
