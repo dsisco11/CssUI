@@ -62,18 +62,15 @@ Spec Reference: https://www.w3.org/TR/css-nesting-1/
 
 ### 12.1 CSS Properties (CSS/Properties/) ✓
 
-### 12.2 CSS Box Model (CSS/Box Model/)
-- [ ] BoxModel calculation tests (requires integration tests with full element/style setup)
-- [ ] Margin collapsing tests (requires layout pipeline)
-- [ ] Containing block tests (requires layout pipeline)
+### 12.2 CSS Box Model (CSS/Box Model/) ✓
+(Remaining tests deferred to Phase 17 - require layout pipeline)
 
 ### 12.3 CSS Parser Integration (CSS/Parser/) ✓
 
 ### 12.4 CSS Stylesheet/Rules (CSS/Stylesheet/, CSS/Rules/) ✓
 
-### 12.5 CSS Custom Properties (CSS/Functions/)
-- [ ] Custom property inheritance tests (requires full style cascade implementation)
-- [ ] Cycle detection tests (requires full style cascade implementation)
+### 12.5 CSS Custom Properties (CSS/Functions/) ✓
+(Remaining tests deferred to Phase 17 - require style cascade)
 
 ### 12.7 ValueTracker<T> Tests (CSS/Types/ValueTracker/) ✓
 
@@ -124,10 +121,6 @@ Spec Reference: https://www.w3.org/TR/css-nesting-1/
 #### 12.10.8 Locked Property Tests ✓
 
 #### 12.10.9 Change Event Tests ✓
-
-### 12.11 Block Formatting Context (CSS/Formatting/)
-- [ ] Float layout tests (requires full layout pipeline)
-- [ ] Clear property tests (requires full layout pipeline)
 
 ## Phase 13: CssValue Subclass Specialization ✓
 
@@ -188,11 +181,7 @@ Spec Reference: https://www.w3.org/TR/CSS2/visudet.html (width/height calculatio
 - [ ] Break cycles with fallback (treat cyclic percentage as auto)
 - [ ] Log warning when cycle is detected
 
-#### 14.5.9 Multi-Pass Layout Tests ✓
-
-#### 14.5.10 Fixed Issues ✓
-
-#### 14.5.11 Spec-Compliant Percentage Resolution
+#### 14.5.9 Spec-Compliant Percentage Resolution
 Refactor percentage resolution to follow CSS Values Level 4 §5.1.1:
 "The computed value of a percentage is the specified percentage value. Resolution is deferred to layout."
 Spec Reference: https://www.w3.org/TR/css-values-4/#percentages
@@ -213,6 +202,13 @@ Spec Reference: https://www.w3.org/TR/css-values-4/#percentages
 - [ ] If box is null during layout, throw InvalidOperationException (indicates pipeline bug)
 - [ ] Update tests to use ForceFullLayout() which runs complete pipeline in correct order
 - [ ] Add integration tests verifying percentage resolution happens during layout, not cascade
+
+#### 14.5.10 Multi-Pass Layout Tests
+Prerequisites: 14.5.9 (Spec-Compliant Percentage Resolution)
+- [ ] Re-validate all layout tests after percentage resolution refactor
+- [ ] Ensure tests use ForceFullLayout() not workaround methods
+
+#### 14.5.11 Fixed Issues ✓
 
 #### 14.5.12 BoxModel.Resolve() Bugs (from BoxModelTests)
 Bugs discovered by comprehensive BoxModel unit tests (29 tests: 14 passing, 15 failing).
@@ -285,7 +281,7 @@ Table cells/rows in wrong parent generate anonymous wrapper boxes.
 
 #### 14.6.6 Automatic Box Type Transformations (CSS Display 3 §2.7)
 Blockification/inlinification based on position/float/parent context.
-- [ ] Blockify floated elements (float != none → outer display: block)
+- [ ] Blockify floated elements (float != none → outer display: block) — requires Phase 15
 - [ ] Blockify absolutely/fixed positioned elements
 - [ ] Blockify children of flex/grid containers
 - [ ] Inlinify children of ruby containers
@@ -392,6 +388,16 @@ Margins don't collapse in certain cases:
 Spec Reference: https://www.w3.org/TR/CSS2/visuren.html#block-formatting
 Prerequisites: Phase 15 (Float/Clear), Phase 16 (Margin Collapsing)
 
+### 17.0 Deferred Tests from Phase 12
+These tests were deferred from Phase 12 because they require the layout pipeline.
+- [ ] BoxModel calculation tests (from 12.2)
+- [ ] Margin collapsing tests (from 12.2)
+- [ ] Containing block tests (from 12.2)
+- [ ] Custom property inheritance tests (from 12.5)
+- [ ] Cycle detection tests (from 12.5)
+- [ ] Float layout tests (requires Phase 15)
+- [ ] Clear property tests (requires Phase 15)
+
 ### 17.1 BFC Flow Algorithm
 Rewrite BlockFormattingContext.Flow() with complete implementation.
 - [ ] Separate block-level and inline-level children
@@ -459,6 +465,114 @@ Prerequisites: Phase 17 (Block Formatting Context)
 - [ ] Test vertical-align: middle
 - [ ] Test mixed inline content
 
+## Phase 19: HTML Form Elements
+Spec Reference: https://html.spec.whatwg.org/multipage/forms.html
+Prerequisites: None (DOM properties can be implemented independently of layout)
+Note: Form control *layout/rendering* requires Phase 18, but DOM properties do not.
+
+### 19.1 Form Control Base Infrastructure
+- [ ] Implement `IFormAssociatedElement` interface
+- [ ] Add form owner tracking (form attribute, ancestor form)
+- [ ] Implement `ValidityState` class for constraint validation
+- [ ] Add `willValidate`, `validity`, `validationMessage` properties
+
+### 19.2 HTMLInputElement Enhancement
+- [ ] Add `disabled` property with attribute reflection
+- [ ] Add `checked` property for checkbox/radio types
+- [ ] Add `required` property with attribute reflection
+- [ ] Add `readOnly` property with attribute reflection
+- [ ] Add `indeterminate` property (checkbox only)
+- [ ] Add `placeholder` property
+- [ ] Implement `checkValidity()` and `reportValidity()`
+- [ ] Add `min`, `max` properties for range validation
+
+### 19.3 HTMLButtonElement Enhancement
+- [ ] Add `disabled` property with attribute reflection
+- [ ] Add `type` property (submit, reset, button)
+- [ ] Implement form submission behavior
+
+### 19.4 HTMLSelectElement Enhancement
+- [ ] Add `disabled` property with attribute reflection
+- [ ] Add `required` property
+- [ ] Add `selectedIndex` and `selectedOptions` properties
+- [ ] Implement constraint validation
+
+### 19.5 HTMLTextAreaElement Enhancement
+- [ ] Add `disabled` property with attribute reflection
+- [ ] Add `required` property
+- [ ] Add `readOnly` property
+- [ ] Add `placeholder` property
+- [ ] Implement constraint validation
+
+### 19.6 HTMLFieldSetElement
+- [ ] Implement `disabled` property (disables all descendants)
+- [ ] Add `elements` property (HTMLFormControlsCollection)
+
+### 19.7 Form Element Tests
+- [ ] Test disabled state propagation from fieldset
+- [ ] Test constraint validation API
+- [ ] Test form association
+
+## Phase 20: Event System
+Spec Reference: https://dom.spec.whatwg.org/#events
+Prerequisites: DOM implementation (existing)
+
+### 20.1 Focus Management
+- [ ] Implement `Document.activeElement` property
+- [ ] Implement `Element.focus()` method
+- [ ] Implement `Element.blur()` method
+- [ ] Add focus event dispatching (focus, blur, focusin, focusout)
+- [ ] Track focus within shadow trees
+
+### 20.2 Focus State Tracking
+- [ ] Add `Element.IsFocused` internal property
+- [ ] Add `Element.HasFocusWithin` internal property
+- [ ] Track keyboard vs pointer focus for :focus-visible
+
+### 20.3 Mouse/Pointer Events
+- [ ] Add `Element.IsHovered` internal property
+- [ ] Add `Element.IsActive` internal property
+- [ ] Implement hover state bubbling to ancestors
+- [ ] Implement mousedown/mouseup active state
+
+### 20.4 Event System Tests
+- [ ] Test focus/blur event sequence
+- [ ] Test focusin/focusout bubbling
+- [ ] Test hover state propagation
+- [ ] Test active state on mousedown/mouseup
+
+## Phase 21: Shadow DOM
+Spec Reference: https://dom.spec.whatwg.org/#shadow-trees
+Prerequisites: DOM implementation, Event System (Phase 20)
+
+### 21.1 Shadow Root
+- [ ] Implement `ShadowRoot` class extending `DocumentFragment`
+- [ ] Add `mode` property (open, closed)
+- [ ] Add `host` property
+- [ ] Add `delegatesFocus` property
+
+### 21.2 Element Shadow Host
+- [ ] Implement `Element.attachShadow()` method
+- [ ] Add `Element.shadowRoot` property (null for closed)
+- [ ] Restrict attachShadow to valid elements
+
+### 21.3 Slot Distribution
+- [ ] Implement `HTMLSlotElement`
+- [ ] Add `name` property for named slots
+- [ ] Implement `assignedNodes()` and `assignedElements()`
+- [ ] Add `slotchange` event
+
+### 21.4 Shadow DOM Event Retargeting
+- [ ] Implement event path calculation through shadow boundaries
+- [ ] Retarget events crossing shadow boundary
+- [ ] Implement `composedPath()`
+
+### 21.5 Shadow DOM Tests
+- [ ] Test attachShadow open/closed modes
+- [ ] Test slot distribution
+- [ ] Test event retargeting
+- [ ] Test selector boundary (selectors don't pierce shadow)
+
 ## Phase 25: Advanced CSS Features
 ### 25.1 CSS calc() Formal Tree (future enhancement)
 - [ ] Sum/Product/Negate/Invert nodes (per spec)
@@ -525,10 +639,10 @@ Bug: :not() currently counts as single pseudo-class instead of argument's specif
 
 ## Phase 27: Form/Input Pseudo-Class Selectors
 Spec Reference: https://www.w3.org/TR/selectors-4/#ui-pseudos
-Prerequisites: DOM HTMLInputElement, HTMLButtonElement, HTMLSelectElement implementation
+Prerequisites: Phase 19 (HTML Form Elements)
 
 ### 27.1 Form Element Infrastructure
-Prerequisites: HTML module form controls
+Prerequisites: Phase 19 (HTML Form Elements)
 - [ ] Verify `HTMLInputElement` has `disabled`, `checked`, `required` properties
 - [ ] Verify `HTMLButtonElement` has `disabled` property
 - [ ] Verify `HTMLSelectElement` has `disabled` property
@@ -589,7 +703,7 @@ Prerequisites: 27.1 (Form Element Infrastructure)
 - [ ] Add tests for :placeholder-shown/:default
 
 ### 27.7 Focus State (8 tests blocked)
-Prerequisites: Event/Focus system
+Prerequisites: Phase 20 (Event System)
 - [ ] Implement `:focus` matching
   - Element is the current focus target
 - [ ] Implement `:focus-within` matching
@@ -600,10 +714,10 @@ Prerequisites: Event/Focus system
 
 ## Phase 28: User Action Pseudo-Class Selectors
 Spec Reference: https://www.w3.org/TR/selectors-4/#useraction-pseudos
-Prerequisites: Event system, input device state tracking
+Prerequisites: Phase 20 (Event System)
 
 ### 28.1 Hover/Active State (14 tests blocked)
-Prerequisites: Mouse/pointer event system
+Prerequisites: Phase 20.3 (Mouse/Pointer Events)
 - [ ] Add `Element.IsHovered` property (set by event handlers)
 - [ ] Add `Element.IsActive` property (mousedown/touchstart active)
 - [ ] Implement `:hover` matching in `PseudoClassSelector.Matches()`
@@ -671,7 +785,7 @@ Prerequisites: DocumentFragment implementation
 - [ ] Add tests for DocumentFragment matching
 
 ### 30.2 Shadow DOM Selectors (6 tests blocked)
-Prerequisites: Shadow DOM implementation (attachShadow, ShadowRoot)
+Prerequisites: Phase 21 (Shadow DOM)
 - [ ] Implement `:host` pseudo-class
   - Matches shadow host from inside shadow tree
 - [ ] Implement `:host()` functional pseudo-class
