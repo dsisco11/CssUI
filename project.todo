@@ -20,7 +20,7 @@
   - [ ] Update Window.QueueObserverMicroTask() to use new system
   - [ ] Ensure MutationObserver callbacks fire at correct timing per W3C spec
 
-## Test Coverage — Total: 4165 passing, 151 skipped, 20 failing = 4336 tests
+## Test Coverage — Total: 4659 passing, 151 skipped, 27 failing = 4837 tests
 ### DOM Tests: 518 passing, 3 skipped = 521 total
 ### Selector Tests: 307 passing, 143 skipped = 450 total
 
