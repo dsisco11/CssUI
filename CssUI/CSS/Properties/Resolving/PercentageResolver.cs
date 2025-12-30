@@ -1,4 +1,6 @@
 using System;
+using CssUI.CSS.BoxTree;
+using CssUI.CSS.Layout;
 
 namespace CssUI.CSS.Internal;
 
@@ -53,8 +55,28 @@ public static class CssPercentageResolvers
     /// Resolves a percentage against the containing block's logical width.
     /// Used for: width, margin-left, margin-right, padding-left, padding-right, left, right.
     /// </summary>
+    /// <remarks>
+    /// If a layout cycle is detected (ancestor being resolved), returns zero to break the cycle.
+    /// See CSS 2.2 §10.5 for percentage height resolution rules.
+    /// </remarks>
     public static CssValue Containing_Block_Logical_Width(ICssProperty Property, double Percent)
     {
+        // Check for layout cycle
+        var box = Property.Owner.Box;
+        if (box is CssPrincipalBox principalBox)
+        {
+            var tracker = LayoutCycleTracker.Current;
+            var resolvingAncestor = tracker.FindResolvingAncestor(principalBox);
+            if (resolvingAncestor is not null)
+            {
+                Log.Warn($"[LayoutCycle] Width percentage cycle detected: " +
+                    $"<{principalBox.Owner?.localName ?? "unknown"}> depends on ancestor " +
+                    $"<{resolvingAncestor.Owner?.localName ?? "unknown"}> which is being resolved. " +
+                    $"Treating as zero.");
+                return CssValue.Zero;
+            }
+        }
+
         if (!Property.Owner.Box.Containing_Box_Explicit_Width)
         {
             return CssValue.Zero;
@@ -71,8 +93,30 @@ public static class CssPercentageResolvers
     /// Used for: height, top, bottom.
     /// Note: Per CSS 2.1, vertical margin/padding percentages resolve against WIDTH, not height.
     /// </summary>
+    /// <remarks>
+    /// If a layout cycle is detected (ancestor being resolved), returns zero to break the cycle.
+    /// Per CSS 2.2 §10.5: "If the height of the containing block is not specified explicitly
+    /// (i.e., it depends on content height), and this element is not absolutely positioned,
+    /// the value computes to 'auto'."
+    /// </remarks>
     public static CssValue Containing_Block_Logical_Height(ICssProperty Property, double Percent)
     {
+        // Check for layout cycle
+        var box = Property.Owner.Box;
+        if (box is CssPrincipalBox principalBox)
+        {
+            var tracker = LayoutCycleTracker.Current;
+            var resolvingAncestor = tracker.FindResolvingAncestor(principalBox);
+            if (resolvingAncestor is not null)
+            {
+                Log.Warn($"[LayoutCycle] Height percentage cycle detected: " +
+                    $"<{principalBox.Owner?.localName ?? "unknown"}> depends on ancestor " +
+                    $"<{resolvingAncestor.Owner?.localName ?? "unknown"}> which is being resolved. " +
+                    $"Treating as zero.");
+                return CssValue.Zero;
+            }
+        }
+
         if (!Property.Owner.Box.Containing_Box_Explicit_Height)
         {
             return CssValue.Zero;

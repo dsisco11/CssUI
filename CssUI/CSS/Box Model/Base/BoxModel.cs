@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using CssUI.CSS.BoxTree;
 using CssUI.CSS.Enums;
 using CssUI.CSS.Internal;
+using CssUI.CSS.Layout;
 using CssUI.DOM;
 
 namespace CssUI.CSS;
@@ -82,17 +83,32 @@ public static class BoxModel
         ArgumentNullException.ThrowIfNull(Cascaded);
         Contract.EndContractBlock();
 
-        Resolve_Horizontal(Box, Cascaded, out CssValue Left, out CssValue MarginLeft, out CssValue Width, out CssValue MarginRight, out CssValue Right);
+        var tracker = LayoutCycleTracker.Current;
+        if (!tracker.BeginWidthResolution(Box))
+        {
+            // Cycle detected - use auto for width
+            Cascaded.Width.Set_Computed_Value(CssValue.Auto);
+            return;
+        }
 
-        Cascaded.Width.Set_Computed_Value(Width);
-        Cascaded.Left.Set_Computed_Value(Left);
-        Cascaded.Right.Set_Computed_Value(Right);
-        Cascaded.Margin_Left.Set_Computed_Value(MarginLeft);
-        Cascaded.Margin_Right.Set_Computed_Value(MarginRight);
+        try
+        {
+            Resolve_Horizontal(Box, Cascaded, out CssValue Left, out CssValue MarginLeft, out CssValue Width, out CssValue MarginRight, out CssValue Right);
 
-        // Update the box's Content area width so children can use it as their containing block
-        // during the top-down width resolution pass.
-        Box.UpdateContentWidth();
+            Cascaded.Width.Set_Computed_Value(Width);
+            Cascaded.Left.Set_Computed_Value(Left);
+            Cascaded.Right.Set_Computed_Value(Right);
+            Cascaded.Margin_Left.Set_Computed_Value(MarginLeft);
+            Cascaded.Margin_Right.Set_Computed_Value(MarginRight);
+
+            // Update the box's Content area width so children can use it as their containing block
+            // during the top-down width resolution pass.
+            Box.UpdateContentWidth();
+        }
+        finally
+        {
+            tracker.EndWidthResolution(Box);
+        }
     }
 
     /// <summary>
@@ -117,21 +133,36 @@ public static class BoxModel
         ArgumentNullException.ThrowIfNull(Cascaded);
         Contract.EndContractBlock();
 
-        // If contentHeight is provided and height is auto, set Content_Height
-        // so the height resolution algorithm can use it
-        if (contentHeight.HasValue && Cascaded.Height.Computed.IsAuto)
+        var tracker = LayoutCycleTracker.Current;
+        if (!tracker.BeginHeightResolution(Box))
         {
-            // Set_Content_Height takes int?, so we convert from double
-            Box.Set_Content_Height((int)contentHeight.Value);
+            // Cycle detected - use auto for height
+            Cascaded.Height.Set_Computed_Value(CssValue.Auto);
+            return;
         }
 
-        Resolve_Vertical(Box, Cascaded, out CssValue Top, out CssValue MarginTop, out CssValue Height, out CssValue MarginBottom, out CssValue Bottom);
+        try
+        {
+            // If contentHeight is provided and height is auto, set Content_Height
+            // so the height resolution algorithm can use it
+            if (contentHeight.HasValue && Cascaded.Height.Computed.IsAuto)
+            {
+                // Set_Content_Height takes int?, so we convert from double
+                Box.Set_Content_Height((int)contentHeight.Value);
+            }
 
-        Cascaded.Height.Set_Computed_Value(Height);
-        Cascaded.Top.Set_Computed_Value(Top);
-        Cascaded.Bottom.Set_Computed_Value(Bottom);
-        Cascaded.Margin_Top.Set_Computed_Value(MarginTop);
-        Cascaded.Margin_Bottom.Set_Computed_Value(MarginBottom);
+            Resolve_Vertical(Box, Cascaded, out CssValue Top, out CssValue MarginTop, out CssValue Height, out CssValue MarginBottom, out CssValue Bottom);
+
+            Cascaded.Height.Set_Computed_Value(Height);
+            Cascaded.Top.Set_Computed_Value(Top);
+            Cascaded.Bottom.Set_Computed_Value(Bottom);
+            Cascaded.Margin_Top.Set_Computed_Value(MarginTop);
+            Cascaded.Margin_Bottom.Set_Computed_Value(MarginBottom);
+        }
+        finally
+        {
+            tracker.EndHeightResolution(Box);
+        }
     }
 
     /// <summary>

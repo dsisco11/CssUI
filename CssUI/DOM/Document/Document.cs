@@ -7,6 +7,7 @@ using System.Threading;
 using CssUI.CSS;
 using CssUI.CSS.BoxTree;
 using CssUI.CSS.Internal;
+using CssUI.CSS.Layout;
 using CssUI.DOM.CustomElements;
 using CssUI.DOM.Enums;
 using CssUI.DOM.Events;
@@ -249,6 +250,9 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
 
         if (body is null)
             return;
+
+        // Reset the layout cycle tracker for this pass
+        LayoutCycleTracker.Current.Reset();
 
         // Pass 1: Box Generation (top-down)
         // Generates box tree nodes from DOM elements

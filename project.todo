@@ -179,11 +179,11 @@ Spec Reference: https://www.w3.org/TR/CSS2/visudet.html (width/height calculatio
 
 #### 14.5.7 Run_Event_Loop() Orchestration ✓
 
-#### 14.5.8 Layout Cycle Detection
-- [ ] Add cycle detection for layout calculations (e.g., percentage height with auto parent)
-- [ ] Track which boxes are currently being resolved
-- [ ] Break cycles with fallback (treat cyclic percentage as auto)
-- [ ] Log warning when cycle is detected
+#### 14.5.8 Layout Cycle Detection ✓
+- [x] Add cycle detection for layout calculations (e.g., percentage height with auto parent)
+- [x] Track which boxes are currently being resolved
+- [x] Break cycles with fallback (treat cyclic percentage as auto)
+- [x] Log warning when cycle is detected
 
 #### 14.5.9 Spec-Compliant Percentage Resolution
 Refactor percentage resolution to follow CSS Values Level 4 §5.1.1:
