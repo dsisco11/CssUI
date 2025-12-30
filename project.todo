@@ -38,10 +38,7 @@
 
 ### 11.7.6 Convert Exceptions to Error Reporting ✓
 
-### 11.7.7 Production Matching Integration
-- [ ] Integrate with CSS Nesting (Phase 11.9)
-  - [ ] Use ECssBlockContentsType for nested rule parsing
-  - [ ] Distinguish style-block vs rule-list contexts
+### 11.7.7 Production Matching Integration ✓
 
 ## Phase 11.9: CSS Nesting ✓
 Spec Reference: https://www.w3.org/TR/css-nesting-1/

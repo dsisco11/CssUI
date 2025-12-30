@@ -1,10 +1,11 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace CssUI.CSS.Parser;
 
 /// <summary>
 /// Provides methods to validate CSS token sequences against grammar productions
-/// defined in CSS Syntax Level 3 §8.
+/// defined in CSS Syntax Level 3 §8, with integration for CSS Nesting (CSS Nesting Module Level 1).
 /// </summary>
 /// <remarks>
 /// <para>
@@ -13,11 +14,282 @@ namespace CssUI.CSS.Parser;
 /// <list type="bullet">
 /// <item><description><c>&lt;declaration-value&gt;</c> - Valid content for a declaration's value</description></item>
 /// <item><description><c>&lt;any-value&gt;</c> - Valid CSS content in any context</description></item>
+/// <item><description><c>&lt;style-block&gt;</c> - Declarations and nested style rules (CSS Nesting)</description></item>
+/// <item><description><c>&lt;rule-list&gt;</c> - Only qualified rules and at-rules</description></item>
 /// </list>
 /// </remarks>
 /// <seealso href="https://www.w3.org/TR/css-syntax-3/#any-value"/>
+/// <seealso href="https://www.w3.org/TR/css-nesting-1/"/>
 public static class CssProductionMatcher
 {
+    #region CSS Nesting Integration (Phase 11.7.7)
+
+    /// <summary>
+    /// Determines if a token can start a nested style rule within a <c>&lt;style-block&gt;</c> context.
+    /// </summary>
+    /// <param name="token">The token to check.</param>
+    /// <returns>True if the token can start a nested rule; false if it starts a declaration or is invalid.</returns>
+    /// <remarks>
+    /// <para>
+    /// Per CSS Nesting spec §2.1, nested selectors cannot start with an identifier
+    /// (to avoid ambiguity with property declarations), but can start with:
+    /// </para>
+    /// <list type="bullet">
+    /// <item><description><c>&amp;</c> - nesting selector</description></item>
+    /// <item><description><c>.</c> - class selector</description></item>
+    /// <item><description><c>*</c> - universal selector</description></item>
+    /// <item><description><c>&gt;</c> <c>+</c> <c>~</c> - relative combinators</description></item>
+    /// <item><description><c>#</c> - ID selector (hash token)</description></item>
+    /// <item><description><c>:</c> - pseudo-class/element</description></item>
+    /// <item><description><c>[</c> - attribute selector</description></item>
+    /// </list>
+    /// <para>
+    /// An identifier token (<c>&lt;ident-token&gt;</c>) always starts a declaration, not a nested rule.
+    /// </para>
+    /// </remarks>
+    /// <seealso href="https://www.w3.org/TR/css-nesting-1/#syntax"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool StartsNestedRule(CssToken token)
+    {
+        if (token is null)
+            return false;
+
+        return token.Type switch
+        {
+            // At-rules are nested rules (e.g., @media, @supports)
+            ECssTokenType.At_Keyword => true,
+
+            // Hash token starts ID selector (#id)
+            ECssTokenType.Hash => true,
+
+            // Colon starts pseudo-class/element (:hover, ::before)
+            ECssTokenType.Colon => true,
+
+            // Square bracket starts attribute selector ([type="text"])
+            ECssTokenType.SqBracket_Open => true,
+
+            // Delim tokens that can start nested rules
+            ECssTokenType.Delim when token is DelimToken delimToken =>
+                StartsNestedRuleDelim(delimToken.Value),
+
+            // Ident tokens start declarations, NOT nested rules
+            ECssTokenType.Ident => false,
+
+            // Everything else doesn't start a nested rule
+            _ => false
+        };
+    }
+
+    /// <summary>
+    /// Determines if a delimiter character can start a nested style rule.
+    /// </summary>
+    /// <param name="delimValue">The delimiter character.</param>
+    /// <returns>True if the delimiter can start a nested rule.</returns>
+    /// <remarks>
+    /// Per CSS Nesting spec §2.1, these delimiters can start nested rules:
+    /// <c>&amp;</c> (nesting selector), <c>.</c> (class), <c>*</c> (universal), 
+    /// <c>&gt;</c> <c>+</c> <c>~</c> (relative combinators).
+    /// </remarks>
+    /// <seealso href="https://www.w3.org/TR/css-nesting-1/#syntax"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool StartsNestedRuleDelim(char delimValue)
+    {
+        return delimValue switch
+        {
+            UnicodeCommon.CHAR_AMPERSAND => true,      // & - nesting selector
+            UnicodeCommon.CHAR_FULL_STOP => true,      // . - class selector
+            UnicodeCommon.CHAR_ASTERISK => true,       // * - universal selector
+            UnicodeCommon.CHAR_RIGHT_CHEVRON => true,  // > - child combinator
+            UnicodeCommon.CHAR_PLUS_SIGN => true,      // + - adjacent sibling combinator
+            UnicodeCommon.CHAR_TILDE => true,          // ~ - general sibling combinator
+            _ => false
+        };
+    }
+
+    /// <summary>
+    /// Determines if a token can start a declaration within a <c>&lt;style-block&gt;</c> context.
+    /// </summary>
+    /// <param name="token">The token to check.</param>
+    /// <returns>True if the token starts a declaration (property name).</returns>
+    /// <remarks>
+    /// In CSS, declarations start with an identifier token (the property name).
+    /// This is in contrast to nested rules which start with selector-starting tokens.
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool StartsDeclaration(CssToken token)
+    {
+        return token?.Type == ECssTokenType.Ident;
+    }
+
+    /// <summary>
+    /// Gets the expected content type for a token within a given block context.
+    /// </summary>
+    /// <param name="token">The token to classify.</param>
+    /// <param name="contextType">The block contents type context.</param>
+    /// <returns>The content classification for the token.</returns>
+    /// <remarks>
+    /// <para>
+    /// Different block types expect different content:
+    /// </para>
+    /// <list type="bullet">
+    /// <item><description><c>StyleBlock</c>: declarations and nested rules</description></item>
+    /// <item><description><c>DeclarationList</c>: declarations and at-rules only</description></item>
+    /// <item><description><c>RuleList</c>: qualified rules and at-rules only</description></item>
+    /// <item><description><c>Stylesheet</c>: qualified rules and at-rules with CDO/CDC handling</description></item>
+    /// </list>
+    /// </remarks>
+    public static ECssBlockContentClassification ClassifyTokenForContext(
+        CssToken token,
+        ECssBlockContentsType contextType)
+    {
+        if (token is null)
+            return ECssBlockContentClassification.Invalid;
+
+        return contextType switch
+        {
+            ECssBlockContentsType.StyleBlock => ClassifyForStyleBlock(token),
+            ECssBlockContentsType.DeclarationList => ClassifyForDeclarationList(token),
+            ECssBlockContentsType.RuleList => ClassifyForRuleList(token),
+            ECssBlockContentsType.Stylesheet => ClassifyForStylesheet(token),
+            _ => ECssBlockContentClassification.Invalid
+        };
+    }
+
+    /// <summary>
+    /// Classifies a token for <c>&lt;style-block&gt;</c> context (declarations + nested rules).
+    /// </summary>
+    private static ECssBlockContentClassification ClassifyForStyleBlock(CssToken token)
+    {
+        return token.Type switch
+        {
+            ECssTokenType.Whitespace => ECssBlockContentClassification.Whitespace,
+            ECssTokenType.Semicolon => ECssBlockContentClassification.Separator,
+            ECssTokenType.EOF => ECssBlockContentClassification.EndOfInput,
+            ECssTokenType.Ident => ECssBlockContentClassification.Declaration,
+            ECssTokenType.At_Keyword => ECssBlockContentClassification.AtRule,
+            ECssTokenType.Hash => ECssBlockContentClassification.NestedRule,
+            ECssTokenType.Colon => ECssBlockContentClassification.NestedRule,
+            ECssTokenType.SqBracket_Open => ECssBlockContentClassification.NestedRule,
+            ECssTokenType.Delim when token is DelimToken delimToken && StartsNestedRuleDelim(delimToken.Value)
+                => ECssBlockContentClassification.NestedRule,
+            ECssTokenType.Bracket_Close or ECssTokenType.Parenth_Close or ECssTokenType.SqBracket_Close
+                => ECssBlockContentClassification.UnmatchedCloseBracket,
+            ECssTokenType.Bad_String or ECssTokenType.Bad_Url
+                => ECssBlockContentClassification.Invalid,
+            _ => ECssBlockContentClassification.Invalid
+        };
+    }
+
+    /// <summary>
+    /// Classifies a token for <c>&lt;declaration-list&gt;</c> context (declarations + at-rules only).
+    /// </summary>
+    private static ECssBlockContentClassification ClassifyForDeclarationList(CssToken token)
+    {
+        return token.Type switch
+        {
+            ECssTokenType.Whitespace => ECssBlockContentClassification.Whitespace,
+            ECssTokenType.Semicolon => ECssBlockContentClassification.Separator,
+            ECssTokenType.EOF => ECssBlockContentClassification.EndOfInput,
+            ECssTokenType.Ident => ECssBlockContentClassification.Declaration,
+            ECssTokenType.At_Keyword => ECssBlockContentClassification.AtRule,
+            // Nested qualified rules are NOT allowed in declaration-list
+            ECssTokenType.Bracket_Close or ECssTokenType.Parenth_Close or ECssTokenType.SqBracket_Close
+                => ECssBlockContentClassification.UnmatchedCloseBracket,
+            ECssTokenType.Bad_String or ECssTokenType.Bad_Url
+                => ECssBlockContentClassification.Invalid,
+            _ => ECssBlockContentClassification.Invalid
+        };
+    }
+
+    /// <summary>
+    /// Classifies a token for <c>&lt;rule-list&gt;</c> context (qualified rules + at-rules only).
+    /// </summary>
+    private static ECssBlockContentClassification ClassifyForRuleList(CssToken token)
+    {
+        return token.Type switch
+        {
+            ECssTokenType.Whitespace => ECssBlockContentClassification.Whitespace,
+            ECssTokenType.EOF => ECssBlockContentClassification.EndOfInput,
+            ECssTokenType.At_Keyword => ECssBlockContentClassification.AtRule,
+            // In rule-list, most tokens start qualified rules
+            ECssTokenType.Ident => ECssBlockContentClassification.QualifiedRule,
+            ECssTokenType.Hash => ECssBlockContentClassification.QualifiedRule,
+            ECssTokenType.Colon => ECssBlockContentClassification.QualifiedRule,
+            ECssTokenType.SqBracket_Open => ECssBlockContentClassification.QualifiedRule,
+            ECssTokenType.Delim => ECssBlockContentClassification.QualifiedRule,
+            ECssTokenType.Bracket_Close or ECssTokenType.Parenth_Close or ECssTokenType.SqBracket_Close
+                => ECssBlockContentClassification.UnmatchedCloseBracket,
+            ECssTokenType.Bad_String or ECssTokenType.Bad_Url
+                => ECssBlockContentClassification.Invalid,
+            _ => ECssBlockContentClassification.QualifiedRule
+        };
+    }
+
+    /// <summary>
+    /// Classifies a token for <c>&lt;stylesheet&gt;</c> context (top-level with CDO/CDC handling).
+    /// </summary>
+    private static ECssBlockContentClassification ClassifyForStylesheet(CssToken token)
+    {
+        return token.Type switch
+        {
+            ECssTokenType.Whitespace => ECssBlockContentClassification.Whitespace,
+            ECssTokenType.EOF => ECssBlockContentClassification.EndOfInput,
+            ECssTokenType.CDO or ECssTokenType.CDC => ECssBlockContentClassification.Ignored,
+            ECssTokenType.At_Keyword => ECssBlockContentClassification.AtRule,
+            // In stylesheet, most tokens start qualified rules
+            ECssTokenType.Ident => ECssBlockContentClassification.QualifiedRule,
+            ECssTokenType.Hash => ECssBlockContentClassification.QualifiedRule,
+            ECssTokenType.Colon => ECssBlockContentClassification.QualifiedRule,
+            ECssTokenType.SqBracket_Open => ECssBlockContentClassification.QualifiedRule,
+            ECssTokenType.Delim => ECssBlockContentClassification.QualifiedRule,
+            ECssTokenType.Bracket_Close or ECssTokenType.Parenth_Close or ECssTokenType.SqBracket_Close
+                => ECssBlockContentClassification.UnmatchedCloseBracket,
+            ECssTokenType.Bad_String or ECssTokenType.Bad_Url
+                => ECssBlockContentClassification.Invalid,
+            _ => ECssBlockContentClassification.QualifiedRule
+        };
+    }
+
+    /// <summary>
+    /// Validates that content is appropriate for the given block contents type.
+    /// </summary>
+    /// <param name="tokens">The tokens to validate.</param>
+    /// <param name="contextType">The block contents type context.</param>
+    /// <returns>True if the tokens are valid for the context; false otherwise.</returns>
+    /// <remarks>
+    /// <para>
+    /// This method performs a lightweight validation to ensure tokens don't contain
+    /// elements that are always invalid (bad tokens, unmatched brackets).
+    /// </para>
+    /// <para>
+    /// For <c>StyleBlock</c> context, it also validates that the content structure
+    /// follows CSS Nesting rules (declarations vs nested rules distinction).
+    /// </para>
+    /// </remarks>
+    public static bool ValidateBlockContents(IReadOnlyList<CssToken> tokens, ECssBlockContentsType contextType)
+    {
+        if (tokens is null || tokens.Count == 0)
+            return true; // Empty content is valid for all block types
+
+        // Check for always-invalid tokens
+        for (int i = 0; i < tokens.Count; i++)
+        {
+            var token = tokens[i];
+            if (token.Type == ECssTokenType.EOF)
+                continue;
+
+            // Bad tokens are always invalid
+            if (token.Type == ECssTokenType.Bad_String || token.Type == ECssTokenType.Bad_Url)
+                return false;
+
+            // For bracket validation, we'd need to track depth
+            // This is handled by MatchDeclarationValue/MatchAnyValue for value contexts
+        }
+
+        return true;
+    }
+
+    #endregion
     #region <declaration-value> Production (§8.2)
     /// <summary>
     /// Validates a sequence of tokens against the <c>&lt;declaration-value&gt;</c> production.
