@@ -319,7 +319,9 @@ public class CssProperty : CssPropertyBase, ICssProperty
             //_value = new CssValue(o.Assigned);
             _assigned = o.Assigned;
 
-            SourcePtr = o.SourcePtr;
+            // NOTE: Do NOT copy SourcePtr here. SourcePtr tracks the owning CssComputedStyle
+            // for event propagation. Copying it would break FirePropertyChanged routing.
+            // Selector can be copied to track cascade origin if needed.
             Selector = o.Selector;
         }
 
@@ -355,7 +357,9 @@ public class CssProperty : CssPropertyBase, ICssProperty
             // Don't make a copy of the value, they are readonly anyhow
             _assigned = o.Assigned;
 
-            SourcePtr = o.SourcePtr;
+            // NOTE: Do NOT copy SourcePtr here. SourcePtr tracks the owning CssComputedStyle
+            // for event propagation. Copying it would break FirePropertyChanged routing.
+            // Selector can be copied to track cascade origin if needed.
             Selector = o.Selector;
         }
 

@@ -557,6 +557,20 @@ public class CssComputedStyle
     #endregion
     #region Change Handlers
 
+    /// <summary>
+    /// Fires the Property_Changed event for a property contained in this style set.
+    /// Called by individual properties when their values change.
+    /// </summary>
+    /// <param name="stage">The property stage that changed.</param>
+    /// <param name="property">The property that changed.</param>
+    internal void FirePropertyChanged(EPropertyStage stage, ICssProperty property)
+    {
+        // Get the dirt flags from the property definition
+        var flags = property.Definition?.Flags ?? default;
+        var stack = new StackTrace();
+        Property_Changed?.Invoke(stage, property, flags, stack);
+    }
+
     #endregion
 
     #region Getters

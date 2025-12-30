@@ -109,6 +109,9 @@ public abstract class CssPropertyBase : ICssProperty
     protected void FireValueChangeEvent(EPropertyStage Stage)
     {
         onValueChange?.Invoke(Stage, this);
+        
+        // Also fire the containing CssComputedStyle's Property_Changed event
+        Source?.FirePropertyChanged(Stage, this);
     }
     #endregion
 

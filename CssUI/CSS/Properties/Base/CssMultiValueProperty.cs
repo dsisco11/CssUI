@@ -481,7 +481,9 @@ public abstract class CssMultiValueProperty : CssPropertyBase, ICssProperty
         {
             changes = true;
             _assigned = new CssValueList(Property.Assigned);
-            SourcePtr = Property.SourcePtr;
+            // NOTE: Do NOT copy SourcePtr here. SourcePtr tracks the owning CssComputedStyle
+            // for event propagation. Copying it would break FirePropertyChanged routing.
+            // Selector can be copied to track cascade origin if needed.
             Selector = Property.Selector;
         }
 
@@ -515,7 +517,9 @@ public abstract class CssMultiValueProperty : CssPropertyBase, ICssProperty
             changes = true;
             _assigned = new CssValueList(Property.Assigned);
 
-            SourcePtr = Property.SourcePtr;
+            // NOTE: Do NOT copy SourcePtr here. SourcePtr tracks the owning CssComputedStyle
+            // for event propagation. Copying it would break FirePropertyChanged routing.
+            // Selector can be copied to track cascade origin if needed.
             Selector = Property.Selector;
         }
 
