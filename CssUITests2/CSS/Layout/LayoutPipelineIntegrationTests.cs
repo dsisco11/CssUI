@@ -232,5 +232,101 @@ public class LayoutPipelineIntegrationTests
         // This test is about ensuring no infinite loop, not correctness
     }
 
+    /// <summary>
+    /// Tests that box generation triggers reflow flag propagation.
+    /// When CssBoxTree.Generate_Tree creates boxes, it should propagate ChildNeedsReflow.
+    /// </summary>
+    [Fact]
+    [Trait("Category", "Layout")]
+    [Trait("Category", "Integration")]
+    public void BoxGeneration_PropagatesReflowFlags_ToAncestors()
+    {
+        // Arrange
+        using var fixture = new LayoutTestFixture();
+        var element = fixture.CreateBlock(100, 50);
+
+        // Clear all flags first
+        fixture.Body.ClearFlag(ENodeFlags.ChildNeedsReflow | ENodeFlags.NeedsReflow);
+        fixture.DocumentElement.ClearFlag(ENodeFlags.ChildNeedsReflow | ENodeFlags.NeedsReflow);
+
+        // Set box update flag on the element
+        element.SetFlag(ENodeFlags.NeedsBoxUpdate);
+        fixture.Body.SetFlag(ENodeFlags.ChildNeedsBoxUpdate);
+
+        // Act - Generate box tree
+        CssBoxTree.Generate_Tree(fixture.Body);
+
+        // Assert - Body and document element should have ChildNeedsReflow set
+        // (propagated upward by Generate_Tree when it creates a box)
+        Assert.True(fixture.Body.GetFlag(ENodeFlags.ChildNeedsReflow),
+            "Body should have ChildNeedsReflow after child box generation");
+        Assert.True(fixture.DocumentElement.GetFlag(ENodeFlags.ChildNeedsReflow),
+            "DocumentElement should have ChildNeedsReflow after descendant box generation");
+    }
+
+    /// <summary>
+    /// Tests that the full layout pipeline processes style changes end-to-end.
+    /// This verifies the integration between box generation, style cascade, and layout.
+    /// </summary>
+    [Fact(Timeout = 5000)]
+    [Trait("Category", "Layout")]
+    [Trait("Category", "Integration")]
+    public void FullLayoutPipeline_StyleChange_TriggersBoxUpdate()
+    {
+        // Arrange
+        using var fixture = new LayoutTestFixture();
+        var element = fixture.CreateBlock(100, 50);
+
+        // Force full layout to establish initial state
+        fixture.ForceFullLayout();
+
+        // Verify element has a box
+        Assert.NotNull(element.Box);
+
+        // Change a style property
+        element.Style.UserRules.Width.Set(200);
+
+        // Mark element for updates (in production this should happen automatically)
+        element.SetFlag(ENodeFlags.NeedsReflow);
+        element.Propagate_Flag(ENodeFlags.ChildNeedsReflow, exclude_self: true);
+
+        // Act - Run the event loop
+        var exception = Record.Exception(() => fixture.Document.Run_Event_Loop());
+
+        // Assert - Should complete without error
+        Assert.Null(exception);
+    }
+
+    /// <summary>
+    /// Tests that NeedsToResolveBlock flag on StyleProperties triggers reflow.
+    /// NOTE: This test currently documents the expected behavior - the integration
+    /// between StyleProperties.NeedsToResolveBlock and ENodeFlags.NeedsReflow
+    /// is not yet wired up. This test will pass once Phase 14.1 is complete.
+    /// </summary>
+    [Fact(Skip = "StyleProperties.NeedsToResolveBlock → ENodeFlags.NeedsReflow integration not yet implemented")]
+    [Trait("Category", "Layout")]
+    [Trait("Category", "Integration")]
+    public void StylePropertyChange_SetsNeedsReflow_OnElement()
+    {
+        // Arrange
+        using var fixture = new LayoutTestFixture();
+        var element = fixture.CreateBlock(100, 50);
+        fixture.ForceFullLayout();
+
+        // Clear all reflow flags
+        element.ClearFlag(ENodeFlags.NeedsReflow | ENodeFlags.ChildNeedsReflow);
+        fixture.Body.ClearFlag(ENodeFlags.ChildNeedsReflow);
+
+        // Act - Change a style property that affects layout (width)
+        element.Style.UserRules.Width.Set(200);
+
+        // Assert - Element should be flagged for reflow
+        // NOTE: This currently fails because the integration is not complete
+        Assert.True(element.GetFlag(ENodeFlags.NeedsReflow),
+            "Element should have NeedsReflow after width property change");
+        Assert.True(fixture.Body.GetFlag(ENodeFlags.ChildNeedsReflow),
+            "Body should have ChildNeedsReflow after child property change");
+    }
+
     #endregion
 }

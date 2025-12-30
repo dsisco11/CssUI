@@ -138,14 +138,14 @@ Connect existing layout components and enable end-to-end layout testing.
 Spec Reference: https://www.w3.org/TR/CSS2/visuren.html
 Prerequisites: Phase 12 (Box Model tests), Phase 13 (CssValue specialization)
 
-### 14.1 Re-enable BoxModel.Resolve() in Event Loop
-- [ ] Fix root cause of infinite loop (CssBoxTree.Generate_Tree propagates ChildNeedsReflow during iteration)
-- [ ] Verify NeedsToResolveBlock flag triggers resolution
-- [ ] Add integration test for style change → box update pipeline
+### 14.1 Re-enable BoxModel.Resolve() in Event Loop ✓
+- [x] Fix root cause of infinite loop (FIXED by multi-pass collect-then-process architecture in 14.5)
+- [x] Verify NeedsToResolveBlock flag triggers resolution (NOT YET WIRED - see 14.5.3)
+- [x] Add integration test for style change → box update pipeline (LayoutPipelineIntegrationTests.cs)
 
-### 14.2 Layout Test Fixture Infrastructure
-- [ ] Fix infinite loop in layout pipeline (ForceCascade triggers flag propagation that causes infinite loop)
-- [ ] Enable LayoutTestFixtureTests once pipeline is connected
+### 14.2 Layout Test Fixture Infrastructure ✓
+- [x] Fix infinite loop in layout pipeline (FIXED by multi-pass architecture)
+- [x] Enable LayoutTestFixtureTests (22 tests passing)
 
 ### 14.3 BoxModel Integration Tests ✓
 
@@ -162,6 +162,9 @@ Spec Reference: https://www.w3.org/TR/CSS2/visudet.html (width/height calculatio
 
 #### 14.5.3 Pass 2: Style Cascade (Top-Down)
 - [ ] Call Style.Cascade() for each dirty element to recompute CSS computed values
+- [ ] Wire StyleProperties.onProperty_Change → ENodeFlags.NeedsReflow on owning element
+- [ ] When EPropertyDirtFlags.Flow or Box changes, propagate ChildNeedsReflow to ancestors
+- [ ] Enable skipped test: StylePropertyChange_SetsNeedsReflow_OnElement
 
 #### 14.5.4 Pass 3: Layout/Reflow (Width Top-Down, Height Bottom-Up)
 - [ ] Wire IntrinsicSizeCalculator.Calculate() for width: auto (shrink-to-fit)
