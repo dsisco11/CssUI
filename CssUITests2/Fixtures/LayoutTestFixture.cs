@@ -14,15 +14,23 @@ namespace CssUITests.Fixtures;
 /// Provides helpers to create Document→Element→Box chains with configured styles.
 /// </summary>
 /// <remarks>
-/// Usage:
+/// <para>
+/// <b>Recommended Usage:</b> Use <see cref="ForceFullLayout()"/> for tests that require
+/// complete layout resolution (percentage resolution, auto widths, margins, positioning).
+/// This runs the complete multi-pass layout pipeline via Document.Run_Event_Loop().
+/// </para>
+/// <para>
+/// Use <see cref="ForceLayoutUpdate()"/> only for tests that need box generation
+/// and style cascade, but don't need layout calculations (e.g., box tree structure tests).
+/// </para>
 /// <code>
-/// var fixture = new LayoutTestFixture();
+/// using var fixture = new LayoutTestFixture();
 /// var div = fixture.CreateElement("div", style => {
-///     style.Width.Set(200);
-///     style.Height.Set(100);
+///     style.Width.Set(CssValue.From_Percent(50.0));
 /// });
-/// fixture.ForceLayoutUpdate();
-/// Assert.Equal(200, div.Box.Content.Width);
+/// fixture.ForceFullLayout();
+/// // Width is now resolved: 50% of viewport (800) = 400
+/// Assert.Equal(400, div.Style.Cascaded.Width.Computed.AsDecimal());
 /// </code>
 /// </remarks>
 public class LayoutTestFixture : IDisposable

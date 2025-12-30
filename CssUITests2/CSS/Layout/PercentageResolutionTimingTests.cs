@@ -4,7 +4,6 @@ using CssUI.CSS.Internal;
 using CssUI.DOM.Nodes;
 using CssUITests.Fixtures;
 using Xunit;
-using CssBoxModel = CssUI.CSS.BoxModel;
 
 namespace CssUITests.CSS.Layout;
 
@@ -16,7 +15,7 @@ namespace CssUITests.CSS.Layout;
 /// Spec Reference: https://www.w3.org/TR/css-values-4/#percentages
 /// These tests ensure:
 /// 1. Cascade phase keeps percentages as percentage values (not resolved)
-/// 2. Layout phase resolves percentages against containing block
+/// 2. Layout phase (via ForceFullLayout) resolves percentages against containing block
 /// 3. Box must exist during layout for percentage resolution
 /// </remarks>
 [Trait("Category", "Integration")]
@@ -129,6 +128,7 @@ public class PercentageResolutionTimingTests : IDisposable
 
     /// <summary>
     /// Tests that percentage width is resolved during layout phase.
+    /// Uses ForceFullLayout() to run the complete multi-pass layout pipeline.
     /// </summary>
     [Fact]
     [Trait("Category", "Layout")]
@@ -142,8 +142,8 @@ public class PercentageResolutionTimingTests : IDisposable
             style.Width.Set(CssValue.From_Percent(50.0));
         });
 
-        // Act - Run full layout
-        _fixture.ForceLayoutUpdate();
+        // Act - Run full layout pipeline
+        _fixture.ForceFullLayout();
 
         // Assert - After layout, width should be resolved to pixels
         var childBox = child.Box;
@@ -151,9 +151,6 @@ public class PercentageResolutionTimingTests : IDisposable
 
         Assert.NotNull(childBox);
         Assert.NotNull(childCascaded);
-
-        // Resolve widths (this is what the layout pass does)
-        CssBoxModel.ResolveWidth(childBox, childCascaded);
 
         // The computed value should now be resolved (50% of 400 = 200)
         var resolvedWidth = childCascaded.Width.Computed;
@@ -178,8 +175,8 @@ public class PercentageResolutionTimingTests : IDisposable
             style.Height.Set(CssValue.From_Percent(25.0));
         });
 
-        // Act - Run full layout
-        _fixture.ForceLayoutUpdate();
+        // Act - Run full layout pipeline
+        _fixture.ForceFullLayout();
 
         // Assert
         var childBox = child.Box;
@@ -187,9 +184,6 @@ public class PercentageResolutionTimingTests : IDisposable
 
         Assert.NotNull(childBox);
         Assert.NotNull(childCascaded);
-
-        // Resolve heights
-        CssBoxModel.ResolveHeight(childBox, childCascaded);
 
         // 25% of 400 = 100
         var resolvedHeight = childCascaded.Height.Computed;
@@ -220,31 +214,24 @@ public class PercentageResolutionTimingTests : IDisposable
             style.Width.Set(CssValue.From_Percent(50.0));
         });
 
-        // Act - Full layout
-        _fixture.ForceLayoutUpdate();
+        // Act - Run full layout pipeline
+        _fixture.ForceFullLayout();
 
-        // Assert - Resolve in order (parent before child)
-        var box1 = level1.Box;
-        var box2 = level2.Box;
-        var box3 = level3.Box;
+        // Assert
         var cascaded1 = level1.Style?.Cascaded;
         var cascaded2 = level2.Style?.Cascaded;
         var cascaded3 = level3.Style?.Cascaded;
 
-        if (box1 is not null && box2 is not null && box3 is not null &&
-            cascaded1 is not null && cascaded2 is not null && cascaded3 is not null)
-        {
-            CssBoxModel.ResolveWidth(box1, cascaded1);
-            CssBoxModel.ResolveWidth(box2, cascaded2);
-            CssBoxModel.ResolveWidth(box3, cascaded3);
+        Assert.NotNull(cascaded1);
+        Assert.NotNull(cascaded2);
+        Assert.NotNull(cascaded3);
 
-            // 50% of 800 = 400
-            Assert.Equal(400, cascaded1.Width.Computed.AsDecimal(), precision: 1);
-            // 50% of 400 = 200
-            Assert.Equal(200, cascaded2.Width.Computed.AsDecimal(), precision: 1);
-            // 50% of 200 = 100
-            Assert.Equal(100, cascaded3.Width.Computed.AsDecimal(), precision: 1);
-        }
+        // 50% of 800 = 400
+        Assert.Equal(400, cascaded1.Width.Computed.AsDecimal(), precision: 1);
+        // 50% of 400 = 200
+        Assert.Equal(200, cascaded2.Width.Computed.AsDecimal(), precision: 1);
+        // 50% of 200 = 100
+        Assert.Equal(100, cascaded3.Width.Computed.AsDecimal(), precision: 1);
     }
 
     #endregion
@@ -266,18 +253,14 @@ public class PercentageResolutionTimingTests : IDisposable
             style.Width.Set(CssValue.From_Percent(0.0));
         });
 
-        // Act
-        _fixture.ForceLayoutUpdate();
-        var childBox = child.Box;
+        // Act - Run full layout pipeline
+        _fixture.ForceFullLayout();
         var childCascaded = child.Style?.Cascaded;
 
-        if (childBox is not null && childCascaded is not null)
-        {
-            CssBoxModel.ResolveWidth(childBox, childCascaded);
+        Assert.NotNull(childCascaded);
 
-            // Assert
-            Assert.Equal(0, childCascaded.Width.Computed.AsDecimal(), precision: 1);
-        }
+        // Assert
+        Assert.Equal(0, childCascaded.Width.Computed.AsDecimal(), precision: 1);
     }
 
     /// <summary>
@@ -295,18 +278,14 @@ public class PercentageResolutionTimingTests : IDisposable
             style.Width.Set(CssValue.From_Percent(100.0));
         });
 
-        // Act
-        _fixture.ForceLayoutUpdate();
-        var childBox = child.Box;
+        // Act - Run full layout pipeline
+        _fixture.ForceFullLayout();
         var childCascaded = child.Style?.Cascaded;
 
-        if (childBox is not null && childCascaded is not null)
-        {
-            CssBoxModel.ResolveWidth(childBox, childCascaded);
+        Assert.NotNull(childCascaded);
 
-            // Assert - 100% of 350 = 350
-            Assert.Equal(350, childCascaded.Width.Computed.AsDecimal(), precision: 1);
-        }
+        // Assert - 100% of 350 = 350
+        Assert.Equal(350, childCascaded.Width.Computed.AsDecimal(), precision: 1);
     }
 
     /// <summary>
@@ -325,20 +304,18 @@ public class PercentageResolutionTimingTests : IDisposable
             style.Margin_Top.Set(CssValue.From_Percent(10.0)); // 10% of width = 40, NOT height
         });
 
-        // Act
-        _fixture.ForceLayoutUpdate();
-        var childBox = child.Box;
+        // Act - Run full layout pipeline
+        _fixture.ForceFullLayout();
         var childCascaded = child.Style?.Cascaded;
 
-        if (childBox is not null && childCascaded is not null)
-        {
-            // Note: This tests the percentage resolver's behavior
-            // margin percentages resolve against containing block width
-            var resolvedMarginTop = CssPercentageResolvers.ResolvePercentageIfNeeded(childCascaded.Margin_Top);
+        Assert.NotNull(childCascaded);
 
-            // 10% of 400 (width) = 40
-            Assert.Equal(40, resolvedMarginTop.AsDecimal(), precision: 1);
-        }
+        // Note: This tests the percentage resolver's behavior
+        // margin percentages resolve against containing block width
+        var resolvedMarginTop = CssPercentageResolvers.ResolvePercentageIfNeeded(childCascaded.Margin_Top);
+
+        // 10% of 400 (width) = 40
+        Assert.Equal(40, resolvedMarginTop.AsDecimal(), precision: 1);
     }
 
     #endregion
@@ -354,7 +331,7 @@ public class PercentageResolutionTimingTests : IDisposable
     {
         // Arrange
         var element = _fixture.CreateBlock(100, 100);
-        _fixture.ForceLayoutUpdate();
+        _fixture.ForceFullLayout();
 
         var cascaded = element.Style?.Cascaded;
         Assert.NotNull(cascaded);
@@ -388,7 +365,7 @@ public class PercentageResolutionTimingTests : IDisposable
             style.Display.Set(EDisplayMode.BLOCK);
             style.Width.Set(CssValue.From_Percent(50.0));
         });
-        _fixture.ForceLayoutUpdate();
+        _fixture.ForceFullLayout();
 
         var cascaded = element.Style?.Cascaded;
         Assert.NotNull(cascaded);

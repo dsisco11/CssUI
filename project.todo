@@ -210,10 +210,22 @@ The implementation is ALREADY spec-compliant. No workarounds needed reverting - 
 - ResolveWidthsTopDown() - does not exist
 - Manual percentage resolution in Resolve_Horizontal() - uses ResolvePercentageIfNeeded properly
 
-#### 14.5.10 Multi-Pass Layout Tests
+#### 14.5.10 Multi-Pass Layout Tests ✓
 Prerequisites: 14.5.9 (Spec-Compliant Percentage Resolution)
-- [ ] Re-validate all layout tests after percentage resolution refactor
-- [ ] Ensure tests use ForceFullLayout() not workaround methods
+
+**Completed:**
+- [x] Re-validate all layout tests after percentage resolution refactor
+- [x] Updated BoxModelIntegrationTests to use ForceFullLayout() (12 tests: 10 passing, 2 failing due to known bugs)
+- [x] Updated ContainingBlockTests to use ForceFullLayout() (9 tests: 8 passing, 1 failing due to known bugs)
+- [x] Updated PercentageResolutionTimingTests to use ForceFullLayout() for layout phase tests
+- [x] Updated LayoutTestFixture documentation to recommend ForceFullLayout() as default
+- [x] Removed manual CssBoxModel.ResolveWidth/Height/Resolve calls from tests
+- [x] Tests now assert on computed values directly after ForceFullLayout()
+
+**Test Results:**
+- Total layout tests: 134 (122 passing, 12 failing)
+- Full test suite: 4837 total (4659 passing, 27 failing, 151 skipped)
+- Failing tests expose pre-existing bugs documented in 14.5.12
 
 #### 14.5.11 Fixed Issues ✓
 

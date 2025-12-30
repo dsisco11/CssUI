@@ -4,13 +4,13 @@ using CssUI.CSS.Enums;
 using CssUI.DOM.Nodes;
 using CssUITests.Fixtures;
 using Xunit;
-using CssBoxModel = CssUI.CSS.BoxModel;
 
 namespace CssUITests.CSS.Layout;
 
 /// <summary>
 /// Integration tests for Containing Block discovery and resolution (Phase 14.4).
 /// Tests how elements find their containing block for percentage resolution.
+/// Uses ForceFullLayout() to run the complete multi-pass layout pipeline.
 /// </summary>
 public class ContainingBlockTests
 {
@@ -39,20 +39,20 @@ public class ContainingBlockTests
             style.Height.Set(100);
         });
 
-        // Act
-        fixture.ForceLayoutUpdate();
+        // Act - Use full layout pipeline
+        fixture.ForceFullLayout();
 
         // Assert
         var parentBox = parent.Box;
         var childBox = child.Box;
 
-        if (parentBox is not null && childBox is not null)
-        {
-            var containingBox = childBox.Containing_Box;
+        Assert.NotNull(parentBox);
+        Assert.NotNull(childBox);
 
-            // Containing block should be parent's content area
-            Assert.Equal(parentBox.Content.Width, containingBox.Width, precision: 1);
-        }
+        var containingBox = childBox.Containing_Box;
+
+        // Containing block should be parent's content area
+        Assert.Equal(parentBox.Content.Width, containingBox.Width, precision: 1);
     }
 
     /// <summary>
@@ -76,19 +76,19 @@ public class ContainingBlockTests
             style.Left.Set(20);
         });
 
-        // Act
-        fixture.ForceLayoutUpdate();
+        // Act - Use full layout pipeline
+        fixture.ForceFullLayout();
 
         // Assert
         var parentBox = parent.Box;
         var childBox = child.Box;
 
-        if (parentBox is not null && childBox is not null)
-        {
-            // Relative positioning doesn't change containing block
-            var containingBox = childBox.Containing_Box;
-            Assert.Equal(parentBox.Content.Width, containingBox.Width, precision: 1);
-        }
+        Assert.NotNull(parentBox);
+        Assert.NotNull(childBox);
+
+        // Relative positioning doesn't change containing block
+        var containingBox = childBox.Containing_Box;
+        Assert.Equal(parentBox.Content.Width, containingBox.Width, precision: 1);
     }
 
     #endregion
@@ -133,23 +133,23 @@ public class ContainingBlockTests
             style.Height.Set(50);
         });
 
-        // Act
-        fixture.ForceLayoutUpdate();
+        // Act - Use full layout pipeline
+        fixture.ForceFullLayout();
 
         // Assert
         var absoluteBox = absolute.Box;
         var positionedBox = positioned.Box;
 
-        if (absoluteBox is not null && positionedBox is not null)
-        {
-            // Containing block should skip staticInner and use positioned ancestor
-            var containingBox = absoluteBox.Containing_Box;
+        Assert.NotNull(absoluteBox);
+        Assert.NotNull(positionedBox);
 
-            // Should be based on positioned element's padding box (300px width)
-            // Note: For absolute positioning, containing block is padding edge not content edge
-            Assert.True(containingBox.Width <= 300 + 1, // Allow small tolerance
-                $"Containing block width ({containingBox.Width}) should be based on positioned ancestor (300)");
-        }
+        // Containing block should skip staticInner and use positioned ancestor
+        var containingBox = absoluteBox.Containing_Box;
+
+        // Should be based on positioned element's padding box (300px width)
+        // Note: For absolute positioning, containing block is padding edge not content edge
+        Assert.True(containingBox.Width <= 300 + 1, // Allow small tolerance
+            $"Containing block width ({containingBox.Width}) should be based on positioned ancestor (300)");
     }
 
     /// <summary>
@@ -179,21 +179,19 @@ public class ContainingBlockTests
             style.Height.Set(50);
         });
 
-        // Act
-        fixture.ForceLayoutUpdate();
+        // Act - Use full layout pipeline
+        fixture.ForceFullLayout();
 
         // Assert
         var absoluteBox = absolute.Box;
+        Assert.NotNull(absoluteBox);
 
-        if (absoluteBox is not null)
-        {
-            var containingBox = absoluteBox.Containing_Box;
+        var containingBox = absoluteBox.Containing_Box;
 
-            // Should be viewport dimensions (or document element)
-            // Initial containing block should be viewport-sized
-            Assert.True(containingBox.Width >= 300,
-                "Without positioned ancestor, containing block should be initial (viewport)");
-        }
+        // Should be viewport dimensions (or document element)
+        // Initial containing block should be viewport-sized
+        Assert.True(containingBox.Width >= 300,
+            "Without positioned ancestor, containing block should be initial (viewport)");
     }
 
     #endregion
@@ -225,21 +223,19 @@ public class ContainingBlockTests
             style.Height.Set(100);
         });
 
-        // Act
-        fixture.ForceLayoutUpdate();
+        // Act - Use full layout pipeline
+        fixture.ForceFullLayout();
 
         // Assert
         var fixedBox = fixedElement.Box;
+        Assert.NotNull(fixedBox);
 
-        if (fixedBox is not null)
-        {
-            var containingBox = fixedBox.Containing_Box;
+        var containingBox = fixedBox.Containing_Box;
 
-            // Should be viewport dimensions, not positioned ancestor
-            // Viewport is 800x600 by default
-            Assert.True(containingBox.Width >= fixture.ViewportWidth - 1,
-                $"Fixed element containing block ({containingBox.Width}) should be viewport width ({fixture.ViewportWidth})");
-        }
+        // Should be viewport dimensions, not positioned ancestor
+        // Viewport is 800x600 by default
+        Assert.True(containingBox.Width >= fixture.ViewportWidth - 1,
+            $"Fixed element containing block ({containingBox.Width}) should be viewport width ({fixture.ViewportWidth})");
     }
 
     #endregion
@@ -264,24 +260,18 @@ public class ContainingBlockTests
             style.Height.Set(100);
         });
 
-        // Act
-        fixture.ForceLayoutUpdate();
+        // Act - Use full layout pipeline
+        fixture.ForceFullLayout();
 
         // Assert
-        var containerBox = container.Box;
         var childBox = child.Box;
+        Assert.NotNull(childBox);
 
-        if (containerBox is not null && childBox is not null)
-        {
-            var childCascaded = child.Style?.Cascaded;
-            if (childCascaded is not null)
-            {
-                CssBoxModel.ResolveWidth(childBox, childCascaded);
+        var childCascaded = child.Style?.Cascaded;
+        Assert.NotNull(childCascaded);
 
-                // 50% of 400 = 200
-                Assert.Equal(200, childCascaded.Width.Computed.AsDecimal(), precision: 1);
-            }
-        }
+        // 50% of 400 = 200
+        Assert.Equal(200, childCascaded.Width.Computed.AsDecimal(), precision: 1);
     }
 
     /// <summary>
@@ -311,31 +301,27 @@ public class ContainingBlockTests
             style.Width.Set(CssValue.From_Percent(50.0)); // 100
         });
 
-        // Act
-        fixture.ForceLayoutUpdate();
+        // Act - Use full layout pipeline
+        fixture.ForceFullLayout();
 
         // Assert
         var box1 = level1.Box;
         var box2 = level2.Box;
         var box3 = level3.Box;
+        Assert.NotNull(box1);
+        Assert.NotNull(box2);
+        Assert.NotNull(box3);
 
-        if (box1 is not null && box2 is not null && box3 is not null)
-        {
-            var cascaded1 = level1.Style?.Cascaded;
-            var cascaded2 = level2.Style?.Cascaded;
-            var cascaded3 = level3.Style?.Cascaded;
+        var cascaded1 = level1.Style?.Cascaded;
+        var cascaded2 = level2.Style?.Cascaded;
+        var cascaded3 = level3.Style?.Cascaded;
+        Assert.NotNull(cascaded1);
+        Assert.NotNull(cascaded2);
+        Assert.NotNull(cascaded3);
 
-            if (cascaded1 is not null && cascaded2 is not null && cascaded3 is not null)
-            {
-                CssBoxModel.ResolveWidth(box1, cascaded1);
-                CssBoxModel.ResolveWidth(box2, cascaded2);
-                CssBoxModel.ResolveWidth(box3, cascaded3);
-
-                Assert.Equal(400, cascaded1.Width.Computed.AsDecimal(), precision: 1);
-                Assert.Equal(200, cascaded2.Width.Computed.AsDecimal(), precision: 1);
-                Assert.Equal(100, cascaded3.Width.Computed.AsDecimal(), precision: 1);
-            }
-        }
+        Assert.Equal(400, cascaded1.Width.Computed.AsDecimal(), precision: 1);
+        Assert.Equal(200, cascaded2.Width.Computed.AsDecimal(), precision: 1);
+        Assert.Equal(100, cascaded3.Width.Computed.AsDecimal(), precision: 1);
     }
 
     #endregion
@@ -353,20 +339,18 @@ public class ContainingBlockTests
         // Arrange
         using var fixture = new LayoutTestFixture();
 
-        // Act
-        fixture.ForceLayoutUpdate();
+        // Act - Use full layout pipeline
+        fixture.ForceFullLayout();
 
         // Assert
         var htmlBox = fixture.DocumentElement.Box;
+        Assert.NotNull(htmlBox);
 
-        if (htmlBox is not null)
-        {
-            var containingBox = htmlBox.Containing_Box;
+        var containingBox = htmlBox.Containing_Box;
 
-            // Should be viewport dimensions
-            Assert.Equal(fixture.ViewportWidth, containingBox.Width, precision: 1);
-            Assert.Equal(fixture.ViewportHeight, containingBox.Height, precision: 1);
-        }
+        // Should be viewport dimensions
+        Assert.Equal(fixture.ViewportWidth, containingBox.Width, precision: 1);
+        Assert.Equal(fixture.ViewportHeight, containingBox.Height, precision: 1);
     }
 
     /// <summary>
@@ -380,20 +364,20 @@ public class ContainingBlockTests
         // Arrange
         using var fixture = new LayoutTestFixture();
 
-        // Act
-        fixture.ForceLayoutUpdate();
+        // Act - Use full layout pipeline
+        fixture.ForceFullLayout();
 
         // Assert
         var bodyBox = fixture.Body.Box;
         var htmlBox = fixture.DocumentElement.Box;
 
-        if (bodyBox is not null && htmlBox is not null)
-        {
-            var bodyContainingBox = bodyBox.Containing_Box;
+        Assert.NotNull(bodyBox);
+        Assert.NotNull(htmlBox);
 
-            // Body's containing block should match html's content area
-            Assert.Equal(htmlBox.Content.Width, bodyContainingBox.Width, precision: 1);
-        }
+        var bodyContainingBox = bodyBox.Containing_Box;
+
+        // Body's containing block should match html's content area
+        Assert.Equal(htmlBox.Content.Width, bodyContainingBox.Width, precision: 1);
     }
 
     #endregion
