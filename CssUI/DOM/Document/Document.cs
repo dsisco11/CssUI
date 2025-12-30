@@ -395,8 +395,11 @@ public class Document : ParentNode, IGlobalEventCallbacks, IDocumentAndElementEv
         {
             if (node.GetFlag(ENodeFlags.NeedsStyleUpdate))
             {
-                // TODO: Call Style.Cascade() when implemented
-                // For now, just clear the flags to prevent re-processing
+                // Call Style.Cascade() to recompute CSS computed values
+                if (node is Element element && element.Style is not null)
+                {
+                    element.Style.Cascade();
+                }
 
                 // Clear NeedsStyleUpdate from this node
                 node.ClearFlag(ENodeFlags.NeedsStyleUpdate);

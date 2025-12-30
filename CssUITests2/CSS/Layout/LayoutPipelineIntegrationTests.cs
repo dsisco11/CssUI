@@ -298,12 +298,11 @@ public class LayoutPipelineIntegrationTests
     }
 
     /// <summary>
-    /// Tests that NeedsToResolveBlock flag on StyleProperties triggers reflow.
-    /// NOTE: This test currently documents the expected behavior - the integration
-    /// between StyleProperties.NeedsToResolveBlock and ENodeFlags.NeedsReflow
-    /// is not yet wired up. This test will pass once Phase 14.1 is complete.
+    /// Tests that style property changes trigger reflow flag setting.
+    /// When a cascaded property with Flow or Box flags changes, NeedsReflow should be set
+    /// on the element and ChildNeedsReflow should propagate to ancestors.
     /// </summary>
-    [Fact(Skip = "StyleProperties.NeedsToResolveBlock → ENodeFlags.NeedsReflow integration not yet implemented")]
+    [Fact]
     [Trait("Category", "Layout")]
     [Trait("Category", "Integration")]
     public void StylePropertyChange_SetsNeedsReflow_OnElement()
@@ -321,7 +320,6 @@ public class LayoutPipelineIntegrationTests
         element.Style.UserRules.Width.Set(200);
 
         // Assert - Element should be flagged for reflow
-        // NOTE: This currently fails because the integration is not complete
         Assert.True(element.GetFlag(ENodeFlags.NeedsReflow),
             "Element should have NeedsReflow after width property change");
         Assert.True(fixture.Body.GetFlag(ENodeFlags.ChildNeedsReflow),

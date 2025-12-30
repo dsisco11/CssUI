@@ -160,11 +160,11 @@ Spec Reference: https://www.w3.org/TR/CSS2/visudet.html (width/height calculatio
 
 #### 14.5.2 Pass 1: Box Generation (Top-Down) ✓
 
-#### 14.5.3 Pass 2: Style Cascade (Top-Down)
-- [ ] Call Style.Cascade() for each dirty element to recompute CSS computed values
-- [ ] Wire StyleProperties.onProperty_Change → ENodeFlags.NeedsReflow on owning element
-- [ ] When EPropertyDirtFlags.Flow or Box changes, propagate ChildNeedsReflow to ancestors
-- [ ] Enable skipped test: StylePropertyChange_SetsNeedsReflow_OnElement
+#### 14.5.3 Pass 2: Style Cascade (Top-Down) ✓
+- [x] Call Style.Cascade() for each dirty element to recompute CSS computed values
+- [x] Wire StyleProperties.onProperty_Change → ENodeFlags.NeedsReflow on owning element
+- [x] When EPropertyDirtFlags.Flow or Box changes, propagate ChildNeedsReflow to ancestors
+- [x] Enable skipped test: StylePropertyChange_SetsNeedsReflow_OnElement
 
 #### 14.5.4 Pass 3: Layout/Reflow (Width Top-Down, Height Bottom-Up)
 - [ ] Wire IntrinsicSizeCalculator.Calculate() for width: auto (shrink-to-fit)

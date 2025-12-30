@@ -352,6 +352,20 @@ public partial class StyleProperties
         if (IsFlow || IsVisual) SetFlag(EPropertySystemDirtFlags.NeedsToResolveBlock);
         if (IsFont) SetFlag(EPropertySystemDirtFlags.NeedsToResolveFont);
 
+        // Wire property changes to the layout pipeline via node flags
+        // When Flow or Box properties change, the element needs to be reflowed
+        if (IsFlow || IsBlock)
+        {
+            // Set NeedsReflow on the owning element
+            owningElement.SetFlag(ENodeFlags.NeedsReflow);
+
+            // Propagate ChildNeedsReflow up to ancestors
+            if (owningElement is Node node)
+            {
+                node.Propagate_Flag(ENodeFlags.ChildNeedsReflow, exclude_self: true);
+            }
+        }
+
         //Logging.Log.Info("[Property Changed]: {0}", Prop.FieldName);
         onProperty_Change?.Invoke(Property, Flags, Stack);
     }
@@ -460,15 +474,12 @@ public partial class StyleProperties
     }
 
     /// <summary>
-    ///
+    /// Cascades a single property from all declared rule sources into the Cascaded property set.
     /// </summary>
-    /// <param name="Property"></param>
-    /// <returns></returns>
+    /// <param name="Property">The property that changed.</param>
     private void CascadeProperty(ICssProperty Property)
     {
         // Extract this property from every CssPropertySet that has a value for it
-        //var propertyList = CssRules.Values.Select(propSet => { return propSet[Property.CssName]; }).ToList();
-
         var propertyList = new List<ICssProperty>(4);
         foreach (var propSet in CssRules.Values)
         {
@@ -479,18 +490,23 @@ public partial class StyleProperties
         propertyList.Sort(CssPropertyComparator.Instance);
 
         // Cascade this list and get what CSS calls the 'Specified' value
-        ICssProperty Value = Property;
+        ICssProperty? winningValue = null;
         foreach (ICssProperty o in propertyList)
         {
-            /*var cascade = Value.CascadeAsync(o);
-            Task.WhenAll(cascade).Wait();// we HAVE to wait here
-            if (cascade.Result) break;// stop cascading the instant we find a set value*/
-            var changed = Value.Cascade(o);
-            if (changed) break;// stop cascading the instant we find a set value
+            if (o.HasValue)
+            {
+                winningValue = o;
+                break; // Stop cascading - first property with value wins
+            }
         }
 
-        string SourceState = Value.Source.ToString();
-        Cascaded.Set(Property.CssName, Value);
+        // Get the cascaded property and overwrite it with the winning value
+        var cascadedProperty = Cascaded[Property.CssName];
+        if (cascadedProperty is not null && winningValue is not null)
+        {
+            // Overwrite triggers the property's change event, which propagates to Cascaded.Property_Changed
+            cascadedProperty.Overwrite(winningValue);
+        }
     }
     #endregion
 
