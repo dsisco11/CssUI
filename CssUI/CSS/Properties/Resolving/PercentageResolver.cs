@@ -28,13 +28,13 @@ public static class CssPercentageResolvers
         {
             return CssValue.Null;
         }
-        
+
         // Not a percentage - return as-is
         if (computed.Type != ECssValueTypes.PERCENT)
         {
             return computed;
         }
-        
+
         // Get the property's percentage resolver
         var resolver = property.Definition?.Percentage_Resolver;
         if (resolver is null)
@@ -44,10 +44,10 @@ public static class CssPercentageResolvers
                 $"Property {property.CssName} has percentage value but no Percentage_Resolver defined. " +
                 $"Definition is {(property.Definition is null ? "null" : "not null")}");
         }
-        
+
         // CssPercentValue stores values in 0-100 range, convert to 0-1 range for resolver
         double percentDecimal = computed.AsDecimal() / 100.0;
-        
+
         return resolver(property, percentDecimal);
     }
 
@@ -61,8 +61,14 @@ public static class CssPercentageResolvers
     /// </remarks>
     public static CssValue Containing_Block_Logical_Width(ICssProperty Property, double Percent)
     {
+        // Validate that the box exists - percentage resolution only happens during layout
+        // when boxes are guaranteed to exist. If box is null, it indicates a pipeline bug.
+        var box = Property.Owner.Box ?? throw new InvalidOperationException(
+            $"Cannot resolve percentage for property '{Property.CssName}' on element " +
+            $"<{Property.Owner.nodeName ?? "unknown"}>: Box is null. " +
+            $"Percentage resolution should only occur during layout phase when boxes exist.");
+
         // Check for layout cycle
-        var box = Property.Owner.Box;
         if (box is CssPrincipalBox principalBox)
         {
             var tracker = LayoutCycleTracker.Current;
@@ -70,20 +76,20 @@ public static class CssPercentageResolvers
             if (resolvingAncestor is not null)
             {
                 Log.Warn($"[LayoutCycle] Width percentage cycle detected: " +
-                    $"<{principalBox.Owner?.localName ?? "unknown"}> depends on ancestor " +
-                    $"<{resolvingAncestor.Owner?.localName ?? "unknown"}> which is being resolved. " +
+                    $"<{principalBox.Owner?.nodeName ?? "unknown"}> depends on ancestor " +
+                    $"<{resolvingAncestor.Owner?.nodeName ?? "unknown"}> which is being resolved. " +
                     $"Treating as zero.");
                 return CssValue.Zero;
             }
         }
 
-        if (!Property.Owner.Box.Containing_Box_Explicit_Width)
+        if (!box.Containing_Box_Explicit_Width)
         {
             return CssValue.Zero;
         }
         else
         {
-            var resolved = Percent * CssCommon.Get_Logical_Width(Property.Owner.Style.WritingMode, Property.Owner.Box.Containing_Box);
+            var resolved = Percent * CssCommon.Get_Logical_Width(Property.Owner.Style.WritingMode, box.Containing_Box);
             return CssValue.From_Dimension(resolved, ECssUnit.PX);
         }
     }
@@ -101,8 +107,14 @@ public static class CssPercentageResolvers
     /// </remarks>
     public static CssValue Containing_Block_Logical_Height(ICssProperty Property, double Percent)
     {
+        // Validate that the box exists - percentage resolution only happens during layout
+        // when boxes are guaranteed to exist. If box is null, it indicates a pipeline bug.
+        var box = Property.Owner.Box ?? throw new InvalidOperationException(
+            $"Cannot resolve percentage for property '{Property.CssName}' on element " +
+            $"<{Property.Owner.nodeName ?? "unknown"}>: Box is null. " +
+            $"Percentage resolution should only occur during layout phase when boxes exist.");
+
         // Check for layout cycle
-        var box = Property.Owner.Box;
         if (box is CssPrincipalBox principalBox)
         {
             var tracker = LayoutCycleTracker.Current;
@@ -110,20 +122,20 @@ public static class CssPercentageResolvers
             if (resolvingAncestor is not null)
             {
                 Log.Warn($"[LayoutCycle] Height percentage cycle detected: " +
-                    $"<{principalBox.Owner?.localName ?? "unknown"}> depends on ancestor " +
-                    $"<{resolvingAncestor.Owner?.localName ?? "unknown"}> which is being resolved. " +
+                    $"<{principalBox.Owner?.nodeName ?? "unknown"}> depends on ancestor " +
+                    $"<{resolvingAncestor.Owner?.nodeName ?? "unknown"}> which is being resolved. " +
                     $"Treating as zero.");
                 return CssValue.Zero;
             }
         }
 
-        if (!Property.Owner.Box.Containing_Box_Explicit_Height)
+        if (!box.Containing_Box_Explicit_Height)
         {
             return CssValue.Zero;
         }
         else
         {
-            var resolved = Percent * CssCommon.Get_Logical_Height(Property.Owner.Style.WritingMode, Property.Owner.Box.Containing_Box);
+            var resolved = Percent * CssCommon.Get_Logical_Height(Property.Owner.Style.WritingMode, box.Containing_Box);
             return CssValue.From_Dimension(resolved, ECssUnit.PX);
         }
     }
