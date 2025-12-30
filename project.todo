@@ -35,546 +35,113 @@
 - CSS Syntax Level 3: https://www.w3.org/TR/css-syntax-3/
 
 ### 11.7.5 Error Recovery and Parse Errors ✓
-- [x] Handle unmatched <}-token>, <)-token>, <]-token> via parser error reporting
-- [x] CheckUnmatchedClosingBracket() and CheckBadToken() static helpers
-- [x] Updated Consume_Rule_List, Consume_Style_Block_Contents, Consume_Decleration_List
-- [x] Error reporter propagation through all Consume_* methods
-- [x] Tests for unmatched closing bracket error reporting (12 new tests)
 
 ### 11.7.6 Convert Exceptions to Error Reporting ✓
-Convert remaining CssSyntaxErrorException throws to use ICssParseErrorReporter with graceful recovery.
-- [x] Parse_Rule(): UNEXPECTED_EOF, CANT_CONSUME_QUALIFIED_RULE, EOF_EXPECTED → returns null + reports error
-- [x] Parse_Decleration(): EXPECTING_IDENT, CANT_CONSUME_DECLERATION → returns null + reports error
-- [x] Parse_ComponentValue(): UNEXPECTED_EOF, CANT_CONSUME_COMPONENT_VALUE, EOF_EXPECTED → returns null + reports error
-- [x] Consume_CssValue(): Bad_Url token, invalid hex color, unhandled token → returns CssValue.Null + reports error
-- [x] Media parsing: EXPECTING_IDENT, invalid combinators, missing parens → returns MediaQuery.NotAll or breaks gracefully
-- [x] Consume_Media_Feature(): EXPECTING_COMPARATOR, UNEXPECTED_TOKEN → returns null or CssValue.Null
-- [x] Added ECssParseErrorType values: UnexpectedEof, ExtraContentAfterRule, ExpectedIdentifier, InvalidDeclaration, InvalidComponentValue, InvalidMediaQuery, InvalidMediaFeature, ExpectedComparator, UnexpectedToken
-- [x] Added CssParseError factory methods for all new error types
-- [x] Added MediaQuery.NotAll static property for invalid queries
-- [x] Tests for graceful error recovery (10 new tests in CssParseErrorRecoveryTests)
 
 ### 11.7.7 Production Matching Integration
 - [ ] Integrate with CSS Nesting (Phase 11.9)
   - [ ] Use ECssBlockContentsType for nested rule parsing
   - [ ] Distinguish style-block vs rule-list contexts
 
-## Phase 11.9: CSS Nesting
+## Phase 11.9: CSS Nesting ✓
 Spec Reference: https://www.w3.org/TR/css-nesting-1/
-Prerequisites: Phase 6 (CSS Parser), Phase 11.7.2 (Consume_Style_Block_Contents)
 
 ### 11.9.1 Nesting Selector (&) ✓
-- [x] Parse <delim-token> with value "&" as nesting selector
-- [x] NestingSelector type (CSS/Selector/)
-- [x] Nesting selector represents the parent rule's selector list
-- [x] Handle & at any position in compound selector: &.class, .class&, &::before
-- [x] Tests for NestingSelector (24 tests passing)
 
 ### 11.9.2 Nested Style Rules ✓
-- [x] Allow style rules inside other style rules
-- [x] Nested rule parsing in Consume_Style_Block_Contents
-  - [x] Parse '&' as nested rule start
-  - [x] Parse '.' (class selector) as nested rule start
-  - [x] Parse '#' (ID selector/hash token) as nested rule start
-  - [x] Parse ':' (pseudo-class/element) as nested rule start
-  - [x] Parse '[' (attribute selector) as nested rule start
-  - [x] Parse '*' (universal selector) as nested rule start
-  - [x] Parse '>' '+' '~' (relative combinators) as nested rule start
-- [x] CSSStyleRule.cssRules property for nested rules (CSSOM)
-- [x] CSSStyleRule.insertRule() and deleteRule() methods
-- [x] Serialization with nested rules (proper indentation)
-- [x] Tests for nested style rules (24 tests passing)
 
 ### 11.9.3 Nested Group Rules ✓
-- [x] Allow @media, @supports, @layer, @scope inside style rules
-- [x] Conditional rules inherit parent's selector context
-- [x] Proper scoping of nested conditional rules
-- [x] CSSRuleFactory for building CSSOM rules from parsed components
-- [x] Parser handles pre-parsed CssSimpleBlock in at-rules and qualified rules
-- [x] Tests for nested group rules (23 tests passing)
 
 ### 11.9.4 Selector Specificity ✓
-- [x] & inherits specificity of parent selector
-- [x] :is() wrapping for implicit & (specificity calculation)
-- [x] Multiple & in same selector (specificity stacking)
 
-### 11.9.5 Serialization
-- [x] Serialize nested rules with proper indentation
-- [x] Round-trip: parse → serialize → parse = same result (23 tests)
-- [-] Flatten nested rules to non-nested form (skipped)
+### 11.9.5 Serialization ✓
 
 ### 11.9.6 Tests ✓
-- [x] Nesting selector parsing tests (24 tests)
-- [x] Nested style rule tests (24 tests)
-- [x] Nested @media tests (in NestedGroupRuleTests)
-- [x] Nested @supports tests (in NestedGroupRuleTests)
-- [x] Nested @layer tests (in NestedGroupRuleTests)
-- [x] Specificity calculation tests (10 tests in NestingSelectorTests)
-- [x] Serialization round-trip tests (24 tests in CssNestingSerializationRoundTripTests)
-- [x] Edge cases: deeply nested rules, multiple & usage (26 tests in NestingEdgeCaseTests)
 
 ## Phase 12: CSS Properties System
 
-### 12.1 CSS Properties (CSS/Properties/)
-- [x] Shorthand property expansion tests (40 tests passing)
+### 12.1 CSS Properties (CSS/Properties/) ✓
 
 ### 12.2 CSS Box Model (CSS/Box Model/)
-- [x] CssPrincipalBox tests (63 tests: DisplayType, Rect4f, IntrinsicSize, BoxDimensions, CssRect, CssBoxArea, enums)
 - [ ] BoxModel calculation tests (requires integration tests with full element/style setup)
 - [ ] Margin collapsing tests (requires layout pipeline)
 - [ ] Containing block tests (requires layout pipeline)
 
-### 12.3 CSS Parser Integration (CSS/Parser/)
-- [x] Stylesheet parsing tests (covered in CssParseErrorRecoveryTests, CssBlockContentsTypeTests, CssNestingSerializationRoundTripTests)
-- [x] Rule parsing tests (covered in CssBlockContentsTypeTests, CssNestingTests, NestedGroupRuleTests)
-- [x] Declaration parsing tests (covered in multiple parser test files)
-- [x] Error recovery tests (CssParseErrorRecoveryTests - 10+ tests)
+### 12.3 CSS Parser Integration (CSS/Parser/) ✓
 
-### 12.4 CSS Stylesheet/Rules (CSS/Stylesheet/, CSS/Rules/)
-- [x] @media rule tests (covered in CssParserTests, NestedGroupRuleTests)
-- [x] @import rule tests (covered in CssParserTests)
-- [x] @font-face rule tests (covered in CssParserTests)
-- [x] Cascade and specificity tests (59 tests in SpecificityTests, PseudoElementSelectorTests)
+### 12.4 CSS Stylesheet/Rules (CSS/Stylesheet/, CSS/Rules/) ✓
 
 ### 12.5 CSS Custom Properties (CSS/Functions/)
-- [x] var() resolution tests (CssVarFunctionParserTests - 590 lines of tests)
 - [ ] Custom property inheritance tests (requires full style cascade implementation)
 - [ ] Cycle detection tests (requires full style cascade implementation)
 
 ### 12.7 ValueTracker<T> Tests (CSS/Types/ValueTracker/) ✓
-Unit tests for the generic value change detection system used by CssProperty.
-Current: 38 tests passing
 
 #### 12.7.1 Hash-Based Change Detection ✓
-- [x] Test constructor with value sets initial hash
-- [x] Test constructor without value has HasValue=false
-- [x] Test Update() with new value changes Hash
-- [x] Test Update() with same value does not change Hash
-- [x] Test Update() with null clears Hash to 0
-- [x] Test HasValue becomes true after Update() with value
-- [x] Test HasValue becomes false after Update() with null
 
 #### 12.7.2 Change Count Tracking ✓
-- [x] Test ChangeCount starts at 0
-- [x] Test ChangeCount increments on each change
-- [x] Test ChangeCount does not increment when value unchanged
-- [x] Test ChangeCount increments even when suppressed
 
 #### 12.7.3 Event Firing ✓
-- [x] Test onChange event fires when hash changes
-- [x] Test onChange event provides old and new hash values
-- [x] Test onChange event provides change count and HasValue
-- [x] Test Update(suppress: true) does not fire onChange
-- [x] Test Update(suppress: false) fires onChange
-- [x] Test multiple subscribers receive event
 
-### 12.8 CssComputedStyle Tests (CSS/Properties/Style/)
-Unit tests for the property collection container.
-Current: 53 tests passing
+### 12.8 CssComputedStyle Tests (CSS/Properties/Style/) ✓
 
 #### 12.8.1 Property Access ✓
-- [x] Test Get() returns correct property instance for valid ECssPropertyID
-- [x] Test Get() returns null for unregistered property ID
-- [x] Test Get() throws ArgumentOutOfRangeException for negative property ID
-- [x] Test property accessors (Width, Height, etc.) return typed properties
-- [x] Test same property instance returned on multiple Get() calls
-- [x] Test indexer returns same instance as Get()
-- [x] Test typed accessors for margin, padding, position, flexbox, grid, border, font properties
-- [x] Test GetAll() returns all property instances
 
 #### 12.8.2 SetProperties Flag Tracking ✓
-- [x] Test SetProperties empty initially
-- [x] Test SetProperties flag set when property assigned value
-- [x] Test SetProperties flag not set for unassigned properties
-- [x] Test SetProperties cleared correctly on property reset
-- [x] Test SetProperties flag persists when assigning Initial/Unset/Inherit (explicit assignment)
-- [x] Test ClearFlag required to truly reset property tracking
 
 #### 12.8.3 ReadOnly Enforcement ✓
-- [x] Test ReadOnly=true prevents property value changes
-- [x] Test ReadOnly=false allows property value changes
-- [x] Test Cascaded style is ReadOnly by default
-- [x] Test UserRules style is not ReadOnly
 
 #### 12.8.4 Cascade at Style Level ✓
-- [x] Test Cascade() merges properties from source style
-- [x] Test Cascade() only copies properties with values
-- [x] Test Cascade() preserves existing values not in source
-- [x] Test CascadeAsync() behaves same as Cascade()
 
 #### 12.8.5 Selector and Origin ✓
-- [x] Test Selector property stores CSS selector
-- [x] Test Origin property indicates source (user, author, UA)
-- [x] Test Name property for debugging
 
-### 12.9 CssValue Derive Methods Tests (CSS/Value/Resolving/)
-Direct unit tests for value stage derivation methods.
-Current: Tested indirectly through property tests, need direct coverage.
-Location: CssUITests2/CSS/Value/Resolving/
+### 12.9 CssValue Derive Methods Tests (CSS/Value/Resolving/) ✓
 
 #### 12.9.1 Derive_SpecifiedValue Tests ✓
-Test file: DeriveSpecifiedValueTests.cs (23 tests)
-Tests directly call the internal CssValue.Derive_SpecifiedValue() method.
-- [x] UNSET on inheritable property calls Find_Inherited_Value
-- [x] UNSET on non-inheritable property returns Def.Initial
-- [x] INHERIT keyword calls Find_Inherited_Value
-- [x] INHERIT on root element returns initial (via Find_Inherited_Value)
-- [x] INITIAL keyword returns Def.Initial
-- [x] INITIAL ignores parent value
-- [x] Explicit value with no resolver returns same reference (return this)
-- [x] Explicit value with resolver invokes resolver
-- [x] Explicit dimension passes through unchanged
-- [x] Explicit percentage passes through unchanged
-- [x] Explicit auto passes through unchanged
-- [x] Explicit keyword passes through unchanged
-- [x] NULL value on inheritable property (non-root) returns initial
-- [x] NULL value on inheritable property (root) calls Find_Inherited_Value
-- [x] NULL value on non-inheritable property returns Def.Initial
-- [x] Multiple invocations return consistent results
-- [x] Different CSS-wide keywords route to different branches
-- [x] Zero value is valid explicit value
-- [x] Deep inheritance works with INHERIT keyword
-- [x] None value passes through as explicit value
-- [x] IsNull true skips switch statement
-- [x] Definition.Inherited affects inheritance path
-- [x] Owner.isRoot affects null value path
 
 #### 12.9.2 Derive_ComputedValue Tests ✓
-Test file: DeriveComputedValueTests.cs (21 tests)
-Tests directly call the internal CssValue.Derive_ComputedValue() method.
-- [x] INHERIT keyword resolved via Find_Inherited_Value
-- [x] INHERIT on root element returns initial
-- [x] PERCENT type preserved (not resolved during cascade)
-- [x] PERCENT different values all preserved
-- [x] DIMENSION type resolved via CssUnitResolver to NUMBER
-- [x] DIMENSION em unit resolved
-- [x] DIMENSION rem unit resolved
-- [x] DIMENSION result is new CssValue (not same reference)
-- [x] Custom PropertyStageResolver invoked when defined
-- [x] No resolver - explicit value passes through unchanged
-- [x] NUMBER value passes through unchanged
-- [x] KEYWORD value passes through unchanged
-- [x] AUTO value passes through unchanged
-- [x] NONE value passes through unchanged
-- [x] Zero value passes through unchanged
-- [x] Multiple invocations return consistent results
-- [x] Different types route to different branches
-- [x] INITIAL keyword passes through default path
-- [x] UNSET keyword passes through default path
-- [x] Switch statement covers all special cases
-- [x] Default path checks for resolver
 
 #### 12.9.3 Derive_UsedValue Tests ✓
-Test file: DeriveUsedValueTests.cs (16 tests)
-Tests directly call the internal CssValue.Derive_UsedValue() method.
-- [x] Custom PropertyStageResolver invoked when defined
-- [x] No resolver - value passes through unchanged
-- [x] Immutable CssValue returns same reference (no copy needed)
-- [x] Multiple invocations return same reference
-- [x] NUMBER value passes through unchanged
-- [x] KEYWORD value passes through unchanged
-- [x] AUTO value passes through unchanged
-- [x] NONE value passes through unchanged
-- [x] PERCENT value passes through unchanged
-- [x] Zero value passes through unchanged
-- [x] Different properties with same value - consistent behavior
-- [x] INHERIT keyword passes through at Used stage
-- [x] INITIAL keyword passes through at Used stage
-- [x] UNSET keyword passes through at Used stage
-- [x] With resolver returns resolver result
-- [x] Without resolver returns same instance
 
 #### 12.9.4 Derive_ActualValue Tests ✓
-Test file: DeriveActualValueTests.cs (17 tests)
-Tests directly call the internal CssValue.Derive_ActualValue() method.
-- [x] Custom PropertyStageResolver invoked when defined
-- [x] No resolver - value passes through unchanged
-- [x] Immutable CssValue returns same reference (no copy needed)
-- [x] Multiple invocations return same reference
-- [x] NUMBER value passes through unchanged
-- [x] KEYWORD value passes through unchanged
-- [x] AUTO value passes through unchanged
-- [x] NONE value passes through unchanged
-- [x] PERCENT value passes through unchanged
-- [x] Zero value passes through unchanged
-- [x] Different properties with same value - consistent behavior
-- [x] INHERIT keyword passes through at Actual stage
-- [x] INITIAL keyword passes through at Actual stage
-- [x] UNSET keyword passes through at Actual stage
-- [x] With resolver returns resolver result
-- [x] Without resolver returns same instance
-- [x] Actual value is restriction not resolution (per CSS spec)
 
-### 12.10 CssProperty Class Tests (CSS/Properties/Base/)
-Comprehensive unit tests for the CssProperty value pipeline and lifecycle.
-Current: 26 tests passing (basic accessors, assignment, global keywords)
-Spec Reference: https://www.w3.org/TR/css-cascade-3/
+### 12.10 CssProperty Class Tests (CSS/Properties/Base/) ✓
 
-#### 12.10.1 Value Stage Pipeline Tests ✓ — High Priority
-Test file: CssPropertyValuePipelineTests.cs (25 tests)
-Tests the Assigned → Specified → Computed → Used → Actual derivation chain.
-- [x] Assigned value triggers Specified derivation
-- [x] Assigned INHERIT resolves to parent value
-- [x] Assigned INITIAL resolves to definition initial
-- [x] Assigned UNSET on non-inheritable resolves to initial
-- [x] Specified value triggers Computed derivation
-- [x] Specified DIMENSION computed resolves to NUMBER
-- [x] Specified PERCENT computed preserves percent
-- [x] Computed value triggers Used derivation
-- [x] Used no resolver passes through Computed
-- [x] Used value triggers Actual derivation
-- [x] Actual no resolver passes through Used
-- [x] Lazy evaluation - Specified computed on first access
-- [x] Lazy evaluation - Computed computed on first access
-- [x] Lazy evaluation - Actual computed on first access
-- [x] Update ComputeNow=true computes all stages
-- [x] Changing Assigned propagates through all stages
-- [x] Multiple changes each propagate correctly
-- [x] Changing to same value does not recompute
-- [x] Full pipeline Assigned to Actual
-- [x] Full pipeline with INHERIT
-- [x] Full pipeline with DIMENSION
-- [x] Full pipeline with KEYWORD
-- [x] NULL assigned resolves to initial
-- [x] Zero value propagates correctly
-- [x] Auto value propagates correctly
+#### 12.10.1 Value Stage Pipeline Tests ✓
 
-#### 12.10.2 Set_Computed_Value() Tests ✓ — High Priority
-Test file: CssPropertySetComputedValueTests.cs (16 tests)
-Tests the method for BoxModel integration during layout.
-- [x] Set_Computed_Value() updates Computed value directly
-- [x] Set_Computed_Value() bypasses Specified derivation
-- [x] Set_Computed_Value() triggers Used re-derivation
-- [x] Set_Computed_Value() triggers Actual re-derivation
-- [x] Set_Computed_Value() full derivation chain (Computed→Used→Actual)
-- [x] Set_Computed_Value() with numeric value
-- [x] Set_Computed_Value() with zero
-- [x] Set_Computed_Value() with negative value
-- [x] Set_Computed_Value() with large value
-- [x] Set_Computed_Value() with CssValue.Auto (edge case)
-- [x] Set_Computed_Value() from Auto to numeric (layout resolution)
-- [x] Set_Computed_Value() multiple calls each updates
-- [x] Set_Computed_Value() then Set() - Assigned overrides
-- [x] Set_Computed_Value() with keyword
-- [x] Set_Computed_Value() with None
-- [x] Set_Computed_Value() calls Revert internally
+#### 12.10.2 Set_Computed_Value() Tests ✓
 
 #### 12.10.3 Revert() Tests ✓
-Test file: CssPropertyRevertTests.cs (15 tests)
-Tests reverting property to computed stage for re-resolution.
-- [x] Revert() clears Used value
-- [x] Revert() clears Actual value
-- [x] Revert() preserves Computed value
-- [x] Revert() preserves Specified value
-- [x] Revert() preserves Assigned value
-- [x] Revert(suppress: true) updates oldUsed tracker
-- [x] Revert(suppress: false) does not update tracker (allows events)
-- [x] Revert() default parameter is suppress=false
-- [x] Used re-derived on next access after Revert()
-- [x] Actual re-derived on next access after Revert()
-- [x] Lazy re-derivation only when accessed
-- [x] Multiple Revert() calls safe
-- [x] Revert after value change re-derives from new computed
-- [x] Revert with Set_Computed_Value re-derives from direct value
-- [x] Different value types handled correctly
 
 #### 12.10.4 Update() Method Tests ✓
-Test file: CssPropertyUpdateTests.cs (19 tests)
-Tests the Update() and conditional update methods.
-- [x] Update() clears Specified value
-- [x] Update() clears Computed value
-- [x] Update() clears Used value
-- [x] Update() clears Actual value
-- [x] Update() preserves Assigned value
-- [x] Update(ComputeNow: true) immediately re-derives all values
-- [x] Update(ComputeNow: false) defers re-derivation
-- [x] Update() default parameter is ComputeNow=false
-- [x] UpdateDependent() calls Update when IsDependent is true
-- [x] UpdateDependent() does not update when not dependent
-- [x] UpdateDependentOrAuto() calls Update when IsAuto
-- [x] UpdateDependentOrAuto() does not update when neither
-- [x] UpdatePercentageOrAuto() calls Update when IsPercentage
-- [x] UpdatePercentageOrAuto() calls Update when IsAuto
-- [x] UpdatePercentageOrAuto() does not update when neither
-- [x] Multiple Update() calls safe
-- [x] Update() after value change reflects new value
-- [x] Update() with null Assigned handles gracefully
-- [x] Update() with different value types handles correctly
 
 #### 12.10.5 Cascade() and Overwrite() Tests ✓
-Test file: CssPropertyCascadeOverwriteTests.cs (19 tests)
-Tests cascade merging and value overwriting.
-- [x] Cascade() copies Assigned value from source property
-- [x] Cascade() returns true when value changed
-- [x] Cascade() returns false when source has no value
-- [x] Cascade() copies SourcePtr and Selector metadata
-- [x] Cascade() triggers Update
-- [x] CascadeAsync() behaves same as Cascade (returns true)
-- [x] CascadeAsync() returns false when no value
-- [x] Overwrite() copies value when different
-- [x] Overwrite() returns true when value changed
-- [x] Overwrite() returns false when values are same
-- [x] Overwrite() copies SourcePtr
-- [x] Overwrite() triggers Update when changed
-- [x] OverwriteAsync() behaves same as Overwrite
-- [x] OverwriteAsync() returns false when same
-- [x] Cascade() with dimension types
-- [x] Cascade() with keyword
-- [x] Cascade() with AUTO returns false (AUTO HasValue=false)
-- [x] Overwrite() both null returns false
-- [x] Cascade() multiple times - last wins
 
 #### 12.10.6 Handle_Unit_Change() Tests ✓
-Test file: CssPropertyHandleUnitChangeTests.cs (13 tests)
-Tests unit scale change notifications.
-- [x] Handle_Unit_Change() when property uses matching unit
-- [x] Handle_Unit_Change() different unit has no effect
-- [x] Handle_Unit_Change() property with no unit (number) - no effect
-- [x] Handle_Unit_Change() with ECssUnit.PX
-- [x] Handle_Unit_Change() with ECssUnit.EM (relative unit)
-- [x] Handle_Unit_Change() with ECssUnit.REM
-- [x] Handle_Unit_Change() with Percent (no unit, own type)
-- [x] Handle_Unit_Change() null specified - no exception
-- [x] Handle_Unit_Change() multiple units - only matching affects
-- [x] Handle_Unit_Change() keyword value - no unit
-- [x] Handle_Unit_Change() Auto value - no unit
-- [x] Handle_Unit_Change() different properties same unit
-- [x] Handle_Unit_Change() different properties different units
 
 #### 12.10.7 Additional Accessor Tests ✓
-Test file: CssPropertyAccessorTests.cs (24 tests)
-Tests accessor properties not covered elsewhere.
-- [x] IsNone returns true for ECssValueTypes.NONE
-- [x] IsNone returns false for number
-- [x] IsNone returns false for Auto
-- [x] IsNone returns false for keyword
-- [x] IsDependent returns true when Depends flag is set
-- [x] IsDependent returns false for plain number
-- [x] IsDependent returns false for dimension
-- [x] IsDependent returns false for Auto
-- [x] IsDependentOrAuto returns true for Auto
-- [x] IsDependentOrAuto returns true for Dependent
-- [x] IsDependentOrAuto returns false for explicit dimension
-- [x] IsDependentOrAuto returns false for number
-- [x] IsPercentageOrAuto returns true for percentages
-- [x] IsPercentageOrAuto returns true for Auto
-- [x] IsPercentageOrAuto returns false for dimension
-- [x] IsPercentageOrAuto returns false for number
-- [x] IsPercentageOrAuto returns false for keyword
-- [x] Flags property returns Specified value's flags
-- [x] Flags returns None when Specified null (triggers computation)
-- [x] Flags returns correct flags for percentage
-- [x] Combined: Auto value correct boolean states
-- [x] Combined: Dimension value correct boolean states
-- [x] Combined: Percent value correct boolean states
-- [x] Combined: None value correct boolean states
 
 #### 12.10.8 Locked Property Tests ✓
-Test file: CssPropertyLockedTests.cs (16 tests)
-Tests locked property behavior (read-only properties).
-- [x] Locked property on Cascaded style is true
-- [x] Locked property on UserRules style is false
-- [x] Setting Assigned on locked property throws InvalidOperationException
-- [x] Setting Assigned on unlocked property succeeds
-- [x] Cascade() bypasses lock (internal operation)
-- [x] Overwrite() bypasses lock (internal operation)
-- [x] Reading Assigned from locked property works
-- [x] Reading Specified from locked property works
-- [x] Reading Computed from locked property works
-- [x] Reading Used from locked property works
-- [x] Reading Actual from locked property works
-- [x] Locked property after cascade has correct values
-- [x] Locked property accessors work
-- [x] Locked IntProperty throws on set
-- [x] Locked NumberProperty throws on set
-- [x] Locked EnumProperty throws on set
 
 #### 12.10.9 Change Event Tests ✓
-Test file: CssPropertyChangeEventTests.cs (15 tests)
-Tests FireValueChangeEvent for all stages.
-- [x] Assigned change fires event with EPropertyStage.Assigned
-- [x] Assigned change event contains correct property reference
-- [x] Assigned change multiple times fires multiple events
-- [x] Computed change fires event when unit changes
-- [x] Actual change fires event when derived
-- [x] Event can add multiple handlers
-- [x] Event can remove handler
-- [x] No handlers - no exception
-- [x] Event stage parameter is correct
-- [x] Event property parameter is correct
-- [x] IntProperty fires event on change
-- [x] NumberProperty fires event on change
-- [x] EnumProperty fires event on change
-- [x] Update fires Assigned event when value changed
-- [x] Update with ComputeNow fires Actual event
 
 ### 12.11 Block Formatting Context (CSS/Formatting/)
-- [x] BlockFormattingContext tests (4 tests: instantiation, interface compliance, null safety)
 - [ ] Float layout tests (requires full layout pipeline)
 - [ ] Clear property tests (requires full layout pipeline)
 
-## Phase 13: CssValue Subclass Specialization
-Introduce specialized `CssValue` subclasses to eliminate boxing, reduce allocations, and improve type safety for common value types. Follow the pattern established by `CssEnumValue<T>`.
+## Phase 13: CssValue Subclass Specialization ✓
 
-### 13.1 CssListValue (COLLECTION) — High Priority ✓
-Lists are extremely common: `font-family`, `background`, `transition`, `transform`, `box-shadow`, etc.
-- [x] Create `CssListValue` subclass with direct `CssValue[]` storage
-- [x] Add `ReadOnlySpan<CssValue> Values` property for allocation-free iteration
-- [x] Add indexer `this[int index]` and `Count` property
-- [x] Override `AsCollection()` to return existing array wrapped (or direct span access)
-- [x] Override `TryFormat()` for space/comma-separated serialization
-- [x] Override `Serialize()`, `Equals()`, `GetHashCode()`, `HasValue`
-- [x] Support separator metadata (space vs comma-separated)
-- [x] Update `CssValue.From(params CssValue[])` to return `CssListValue`
-- [x] Add tests for CssListValue
-- [x] Fixed `CssValue.Serialize()` bug for CSS-wide keywords (AUTO, INHERIT, etc.)
+### 13.1 CssListValue (COLLECTION) ✓
 
-### 13.2 CssStringValue (STRING) — Medium Priority ✓
-Strings are common in custom properties, `content`, quoted `font-family` names.
-- [x] Create `CssStringValue` subclass with direct `string` storage
-- [x] Override `AsString()` for direct access (no cast)
-- [x] Override `TryFormat()` with proper CSS string escaping/quoting
-- [x] Override `Serialize()`, `Equals()`, `GetHashCode()`, `HasValue`
-- [x] Update `CssValue.From_String()` to return `CssStringValue`
-- [x] Add tests for CssStringValue
-- [x] Made `CssValue.AsString()` virtual to allow override
+### 13.2 CssStringValue (STRING) ✓
 
-### 13.3 CssUrlValue (URL) — Low Priority ✓
-- [x] Create `CssUrlValue` subclass with direct `CssUrl` storage
-- [x] Override `AsUrl()` for direct access
-- [x] Override serialization methods
-- [x] Update `CssValue.From_Url()` to return `CssUrlValue`
-- [x] Add tests for CssUrlValue
-- [x] Made `CssValue.AsUrl()` virtual to allow override
-- [x] Fixed bug in `CssUrl.TryFormat()` closing quote order
+### 13.3 CssUrlValue (URL) ✓
 
-### 13.4 CssCalcValue (CALC) — Low Priority ✓
-- [x] Create `CssCalcValue` subclass with direct `CssCalcExpression` storage
-- [x] Override `AsCalcExpression()` for direct access
-- [x] Override serialization methods
-- [x] Update factory method to return `CssCalcValue`
-- [x] Add tests for CssCalcValue
-- [x] Made `CssValue.AsCalcExpression()` virtual to allow override
+### 13.4 CssCalcValue (CALC) ✓
 
-### 13.5 CssFunctionValue (FUNCTION) — Low Priority ✓
-- [x] Create `CssFunctionValue` subclass with direct `CssFunction` storage
-- [x] Override serialization methods for function syntax
-- [x] Update factory method to return `CssFunctionValue`
-- [x] Add tests for CssFunctionValue
-- [x] Changed constructor to factory method `CssValue.From(CssFunction)`
+### 13.5 CssFunctionValue (FUNCTION) ✓
 
-### 13.6 Cleanup & Optimization
-- [x] Audit remaining `data.ObjectValue` usages for potential subclass candidates
-  - Created `CssVarValue` for VAR type (CssVarFunction storage)
-  - Created `CssEnvValue` for ENV type (CssEnvFunction storage)
-  - Created `CssUnicodeRangeValue` for UNICODE_RANGE type (CssUnicodeRange storage)
-  - All ObjectValue-based types now have specialized subclasses
-- [x] Consider sealing base `CssValue` class or making constructor internal-only
-  - Changed `protected` constructor to `private protected` to prevent external subclassing
-  - All existing subclasses are `sealed` within the assembly
-  - External code must use factory methods (`From()`, etc.)
-- [-] Update documentation with subclass usage patterns - Not Applicable
-- [-] Performance benchmarks comparing old vs new implementations - Irrelevant
+### 13.6 Cleanup & Optimization ✓
 
 ## Phase 14: Layout Pipeline Integration
 Connect existing layout components and enable end-to-end layout testing.
@@ -582,45 +149,17 @@ Spec Reference: https://www.w3.org/TR/CSS2/visuren.html
 Prerequisites: Phase 12 (Box Model tests), Phase 13 (CssValue specialization)
 
 ### 14.1 Re-enable BoxModel.Resolve() in Event Loop
-The BoxModel calculations exist but are commented out in Document.cs.
-- [x] Uncomment BoxModel.Resolve() call in Document.Run_Event_Loop()
-- [x] Add null checks for Box and Style.Cascaded before calling BoxModel.Resolve()
-- [x] Add safety iteration limit to prevent infinite loops during development
-- [x] Clear NeedsStyleUpdate flag after processing
-- [x] Clear NeedsReflow flag after processing (was missing)
 - [ ] Fix root cause of infinite loop (CssBoxTree.Generate_Tree propagates ChildNeedsReflow during iteration)
 - [ ] Verify NeedsToResolveBlock flag triggers resolution
 - [ ] Add integration test for style change → box update pipeline
 
 ### 14.2 Layout Test Fixture Infrastructure
-Create test helpers to enable BoxModel and layout testing.
-- [x] Create LayoutTestFixture class in CssUITests2/Fixtures/
-- [x] CreateElement/CreateBlock/CreateChild helpers
-- [x] SetContainingBlockSize via CreateContainingBlock() helper
-- [x] ForceCascade/ForceBoxGeneration/ForceLayoutUpdate helpers
-- [x] Margin helpers (CreateBlockWithMargins, CreateCenteredBlock)
-- [x] Created LayoutPipelineIntegrationTests.cs with basic tests
 - [ ] Fix infinite loop in layout pipeline (ForceCascade triggers flag propagation that causes infinite loop)
 - [ ] Enable LayoutTestFixtureTests once pipeline is connected
-- [-] Add documentation for test fixture usage (not needed)
 
 ### 14.3 BoxModel Integration Tests ✓
-Use test fixture to verify existing BoxModel calculations.
-- [x] Test auto margin centering (margin-left: auto; margin-right: auto)
-- [x] Test percentage width resolution against containing block
-- [x] Test min-width/max-width constraint application
-- [x] Test height: auto calculation
-- [x] Test absolutely positioned element constraint equation
-- [x] Test block with auto width fills available space
 
 ### 14.4 Containing Block Chain Tests ✓
-Verify containing block discovery and resolution.
-- [x] Test Get_Containing_Block() for static positioned elements
-- [x] Test Get_Containing_Block() for absolutely positioned elements
-- [x] Test Get_Containing_Block() for fixed positioned elements
-- [x] Test percentage resolution through containing block chain
-- [x] Test viewport as initial containing block
-- [x] Test deeply nested percentage resolution
 
 ### 14.5 Multi-Pass Layout Pipeline Architecture
 Refactor Run_Event_Loop from single TreeWalker pass into three distinct passes.
@@ -628,62 +167,20 @@ This fixes the infinite loop caused by flag propagation during TreeWalker iterat
 Spec Reference: https://www.w3.org/TR/CSS2/visudet.html (width/height calculation order)
 
 #### 14.5.1 Collect-Then-Process Infrastructure ✓
-- [x] Create CollectDirtyNodes() helper that snapshots nodes with given flags into List<Node>
-- [x] Use tree-order traversal for top-down passes (parents before children)
-- [x] Create depth-sorted list helper for bottom-up passes (deepest first)
-- [x] Remove FilterNodeUpdate usage from event loop (no longer needed with snapshots)
 
 #### 14.5.2 Pass 1: Box Generation (Top-Down) ✓
-- [x] Create Pass_BoxGeneration() method in Document.cs
-- [x] Collect nodes with NeedsBoxUpdate | ChildNeedsBoxUpdate flags
-- [x] Process in tree order (parents before children)
-- [x] Call CssBoxTree.Generate_Tree() for each dirty node
-- [x] Clear NeedsBoxUpdate and ChildNeedsBoxUpdate after processing each node
 
-#### 14.5.3 Pass 2: Style Cascade (Top-Down) ✓
-- [x] Create Pass_StyleCascade() method in Document.cs
-- [x] Collect nodes with NeedsStyleUpdate | ChildNeedsStyleUpdate | DirectChildNeedsStyleUpdate flags
-- [x] Process in tree order (parents before children)
+#### 14.5.3 Pass 2: Style Cascade (Top-Down)
 - [ ] Call Style.Cascade() for each dirty element to recompute CSS computed values
-- [x] Clear NeedsStyleUpdate, ChildNeedsStyleUpdate, DirectChildNeedsStyleUpdate after processing
 
-#### 14.5.4 Pass 3: Layout/Reflow (Width Top-Down, Height Bottom-Up) ✓
-- [x] Create Pass_Layout() method in Document.cs
-- [x] Collect nodes with NeedsReflow | ChildNeedsReflow flags
-- [x] Sub-pass 3a (Width Resolution - Top-Down):
-  - [x] Process in tree order (parents before children)
-  - [x] Call BoxModel.ResolveWidth() for each element with box
-  - [ ] Wire IntrinsicSizeCalculator.Calculate() for width: auto (shrink-to-fit)
-- [x] Sub-pass 3b (Height Resolution + Flow - Bottom-Up):
-  - [x] Process depth-sorted (deepest nodes first)
-  - [x] Call FormattingContext.Flow() to position children, get content size
-  - [x] Call BoxModel.ResolveHeight() using content height for height: auto
-- [x] Clear NeedsReflow and ChildNeedsReflow after processing
+#### 14.5.4 Pass 3: Layout/Reflow (Width Top-Down, Height Bottom-Up)
+- [ ] Wire IntrinsicSizeCalculator.Calculate() for width: auto (shrink-to-fit)
 
 #### 14.5.5 BoxModel.Resolve() Refactoring ✓
-- [x] Extract BoxModel.ResolveWidth() from existing Resolve() method
-  - [x] Resolve horizontal dimensions: width, margin-left, margin-right, left, right
-  - [x] Handle all display types (inline, block, inline-block, absolute, etc.)
-  - [x] Integrate IntrinsicSizeCalculator for shrink-to-fit width
-- [x] Extract BoxModel.ResolveHeight() from existing Resolve() method
-  - [x] Resolve vertical dimensions: height, margin-top, margin-bottom, top, bottom
-  - [x] Accept contentHeight parameter for height: auto resolution
-- [x] Keep existing Resolve() as convenience method calling both
 
 #### 14.5.6 FormattingContext.Flow() Return Type ✓
-- [x] Change IFormattingContext.Flow() return type from void to Rect2f
-- [x] Update FlexFormattingContext.Flow() to return content dimensions
-- [x] Update GridFormattingContext.Flow() to return content dimensions
-- [x] Update BlockFormattingContext.Flow() to return content dimensions
-- [x] Use returned height for resolving container's height: auto
 
 #### 14.5.7 Run_Event_Loop() Orchestration ✓
-- [x] Refactor Run_Event_Loop() to call passes in sequence:
-  - [x] Pass_BoxGeneration() - generates box tree from DOM
-  - [x] Pass_StyleCascade() - recomputes CSS computed values
-  - [x] Pass_Layout() - resolves used values and positions boxes
-- [x] Remove safety iteration limit (no longer needed with snapshot approach)
-- [x] Remove single TreeWalker loop
 
 #### 14.5.8 Layout Cycle Detection
 - [ ] Add cycle detection for layout calculations (e.g., percentage height with auto parent)
@@ -692,34 +189,13 @@ Spec Reference: https://www.w3.org/TR/CSS2/visudet.html (width/height calculatio
 - [ ] Log warning when cycle is detected
 
 #### 14.5.9 Multi-Pass Layout Tests ✓
-- [x] Test that box generation completes before style cascade
-- [x] Test that style cascade completes before layout
-- [x] Test width resolution happens before height resolution
-- [x] Test bottom-up height resolution with nested elements
-- [x] Test content-based auto height flows up to ancestors
-- [x] LayoutPipelineIntegrationTests working (freeze issue resolved)
 
 #### 14.5.10 Fixed Issues ✓
-- [x] ForceCascade() freeze - RESOLVED
-  - Root cause: Null reference exceptions in CssBoxTree.Generate_Tree()
-  - Fix 1: CssBoxTreeNode constructor used backing field for Size to avoid virtual call
-  - Fix 2: Added null check for Box.firstChild access
-  - Fix 3: Added null check for nearestAncestor?.Box for root elements
 
 #### 14.5.11 Spec-Compliant Percentage Resolution
 Refactor percentage resolution to follow CSS Values Level 4 §5.1.1:
 "The computed value of a percentage is the specified percentage value. Resolution is deferred to layout."
 Spec Reference: https://www.w3.org/TR/css-values-4/#percentages
-
-Current state: Percentage resolvers try to resolve during cascade, but boxes don't exist yet.
-Wrong approach: Adding null checks and deferring resolution with CssValue.Null hacks.
-Correct approach: Percentages should NOT resolve during cascade at all.
-
-**Legitimate bug fixes to KEEP:**
-- [x] Fix Tree.Get_Next_Sibling() bounds check (index + 1 < Count, not index < Count)
-- [x] Fix Find_Containing_Block() TreeWalker bug (was using Target as root, parentNode() always returned null)
-- [x] Fix Resolve_Vertical() AUTO height check (can't call AsDecimal on AUTO)
-- [x] Fix percentage normalization (0-100 range to 0-1 range when resolving)
 
 **Workarounds to REVERT:**
 - [ ] Remove null check hack in Containing_Block_Logical_Width() - should throw if box is null
@@ -781,58 +257,14 @@ Spec Reference: https://www.w3.org/TR/css-display-3/#box-generation
 Spec Reference: https://www.w3.org/TR/CSS22/visuren.html#box-gen
 
 #### 14.6.0 Box Tree Regeneration Bug Fixes ✓
-- [x] Fix CssBoxTree.Generate_Tree() not clearing previous box on regeneration
-  - [x] Set node.Box = null at start of Generate_Box() to clear stale box references
-  - [x] Prevents parent's firstChild from pointing to orphaned old boxes
-- [x] Skip descendants when element has display: none
-  - [x] Add EDisplayMode.NONE check in Generate_Tree()
-  - [x] Return early to avoid processing children that won't render
-- [x] Add tests for box tree regeneration (CssBoxTreeTests)
-  - [x] Skip tests dependent on Phase 14.6.2-14.6.6 work with appropriate markers
 
 #### 14.6.1 Anonymous Block Box Generation (CSS 2.2 §9.2.1.1) ✓
-CSS 2.2 §9.2.1.1: When a block container has mixed block-level and inline-level children,
-anonymous block boxes wrap consecutive runs of inline content.
-Spec Reference: https://www.w3.org/TR/CSS22/visuren.html#anonymous-block-level
-- [x] Implement NormalizeBlockContainerChildren() in CssBoxTree
-  - [x] Detect mixed block/inline content in block containers
-  - [x] Wrap consecutive inline runs in CssAnonymousBox.Create_Block()
-  - [x] Maintain block-level children directly in container
-- [x] Track block containers needing normalization during Generate_Tree()
-  - [x] Add BlockContainersToNormalize HashSet<Element>
-  - [x] Add containers when inserting children into block containers
-  - [x] Normalize all tracked containers after BFS processing completes
-- [x] Update CssAnonymousBox.Create_Block() to use Flow_Root inner display type
-- [x] Add index bounds check for Insert() to handle stale indices from shared fixtures
-- [x] Tests for anonymous block box generation (7 tests)
-  - [x] BlockInBlockContainer_HasInlineSiblings_WrapsInlineInAnonymousBox
-  - [x] BlockOnlyChildren_NoAnonymousBoxNeeded
-  - [x] InlineOnlyChildren_NoAnonymousBoxNeeded
-  - [x] MultipleInlineSiblings_WrappedInSingleAnonymousBox
-  - [x] AnonymousBox_IsTypeOfCssAnonymousBox
-  - [x] BlockBetweenInlines_CreatesTwoAnonymousBoxes
-  - [x] InlineBlockWithBlock_InlineBlockIsWrapped
-- [x] Updated tests to use ForceLayoutUpdate() for proper cascade/box generation
 
-#### 14.6.2 display: contents Support (CSS Display 3 §2.5) ✓
-Element generates no box, but children render normally.
-- [x] Add EOuterDisplayType.Contents value to enum
-- [x] Check for display: contents in Generate_Box() - return null but DON'T skip children
-- [x] Modify Generate_Tree() to still process children when parent has display: contents
-- [x] Get_Closest_Box_Generating_Ancestor() skips display: contents elements
-- [x] Fixed critical bug in TreeNode constructor: childNodes Owner was set to parentNode instead of this
+#### 14.6.2 display: contents Support (CSS Display 3 §2.5)
 - [ ] display: contents computes to display: none for replaced elements (future - requires IsReplacedElement check)
-- [x] Tests for display: contents behavior (4 tests: DisplayType parsing, element generates no box, children still generate boxes, box parent skips contents)
 
-#### 14.6.3 Text Sequence Handling (CSS Display 3 §1) ✓
-Text nodes combine into text runs for rendering.
-- [x] Fix text run collection loop to check Queue.Count > 0 before Peek() (already fixed)
-- [x] Handle empty text nodes (generate no text sequence per spec)
-- [x] Set Box property on all text nodes in a combined run
-- [x] Clear NeedsBoxUpdate flag on contiguous text nodes when dequeued
-- [x] Fixed test fixture to set NeedsBoxUpdate on text nodes (not just elements)
+#### 14.6.3 Text Sequence Handling (CSS Display 3 §1)
 - [ ] Handle whitespace-only text nodes per white-space property (future - requires white-space property cascade)
-- [x] Tests for text sequence generation (6 tests: content generates run, empty generates none, contiguous combine, whitespace-only, separated by elements, parent relationship)
 
 #### 14.6.4 List Item Marker Boxes (CSS Display 3 §2.3)
 display: list-item generates principal box + ::marker pseudo-element.
@@ -1258,4 +690,5 @@ Prerequisites: XML namespace support
 - [ ] Parse `|element` (no namespace)
 - [ ] Handle @namespace at-rule for prefix declaration
 - [ ] Add tests for namespace selectors
+
 
