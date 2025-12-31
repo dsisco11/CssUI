@@ -9,11 +9,11 @@ namespace CssUI.CSS.BoxTree;
 
 /* Docs: https://www.w3.org/TR/2019/CR-css-display-3-20190711/ */
 
-/* 
+/*
 * Docs: https://www.w3.org/TR/CSS22/visuren.html#containing-block
 * Docs: https://www.w3.org/TR/CSS22/visuren.html#box-gen
 * Docs: https://www.w3.org/TR/css-box-3/#box-model
-* 
+*
 * Docs: https://www.w3.org/TR/css-break-3/
 */
 
@@ -47,20 +47,32 @@ public class CssPrincipalBox : CssBox
                 return EBoxDisplayGroup.ABSOLUTELY_POSITIONED;
             }
 
+            // TODO: Add float check once Float property is implemented
+            // if (Style.Float != EFloat.None)
+            // {
+            //     return EBoxDisplayGroup.FLOATING;
+            // }
+
             switch (Style.Display)
             {
                 case EDisplayMode.BLOCK:
+                case EDisplayMode.FLEX:
+                case EDisplayMode.GRID:
+                case EDisplayMode.FLOW:
+                case EDisplayMode.FLOW_ROOT:
+                case EDisplayMode.LIST_ITEM:
+                case EDisplayMode.TABLE:
                     {
                         return EBoxDisplayGroup.BLOCK;
                     }
                 case EDisplayMode.INLINE_BLOCK:
+                case EDisplayMode.INLINE_FLEX:
+                case EDisplayMode.INLINE_GRID:
+                case EDisplayMode.INLINE_TABLE:
                     {
                         return EBoxDisplayGroup.INLINE_BLOCK;
                     }
                 case EDisplayMode.INLINE:
-                case EDisplayMode.INLINE_FLEX:
-                case EDisplayMode.INLINE_GRID:
-                case EDisplayMode.INLINE_TABLE:
                     {
                         return EBoxDisplayGroup.INLINE;
                     }
@@ -104,23 +116,23 @@ public class CssPrincipalBox : CssBox
 
     #region Box Areas
     /// <summary>
-    /// The edge positions of the Replaced-Content-Area 
+    /// The edge positions of the Replaced-Content-Area
     /// </summary>
     public Rect4f? Replaced { get; protected set; }
     /// <summary>
-    /// The edge positions of the Content-Area 
+    /// The edge positions of the Content-Area
     /// </summary>
     public Rect4f Content { get; protected set; }
     /// <summary>
-    /// The edge positions of the Padding-Area 
+    /// The edge positions of the Padding-Area
     /// </summary>
     public Rect4f Padding { get; protected set; }
     /// <summary>
-    /// The edge positions of the Border-Area 
+    /// The edge positions of the Border-Area
     /// </summary>
     public Rect4f Border { get; protected set; }
     /// <summary>
-    /// The edge positions of the Margin-Area 
+    /// The edge positions of the Margin-Area
     /// </summary>
     public Rect4f Margin { get; protected set; }
     /// <summary>
@@ -490,6 +502,16 @@ public class CssPrincipalBox : CssBox
     /// </summary>
     internal void UpdateContentWidth()
     {
+        // Safety check: Width must be resolved (not auto) before updating Content rect
+        var widthValue = Style.Cascaded.Width.Computed;
+        if (widthValue.IsAuto)
+        {
+            // Width was not resolved - this is a bug in the resolution code
+            // Log warning but don't crash
+            Log.Warn($"UpdateContentWidth called but width is still AUTO for element {Owner?.nodeName}");
+            return;
+        }
+
         // Update the Content rect's width while preserving other dimensions
         // This is a partial update to support the two-pass layout algorithm
         var width = Style.Width;
