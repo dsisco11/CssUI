@@ -78,7 +78,7 @@ public class BoxModelTestFixture : IDisposable
         Body = Document.createElement("body", DefaultOptions);
         html.appendChild(Body);
 
-        // Configure root element styles
+        // Configure root element styles and boxes
         ConfigureRootStyles();
     }
 
@@ -88,10 +88,29 @@ public class BoxModelTestFixture : IDisposable
         DocumentElement.Style.UserRules.Display.Set(EDisplayMode.BLOCK);
         DocumentElement.Style.UserRules.Width.Set(DefaultContainingBlockWidth);
         DocumentElement.Style.UserRules.Height.Set(DefaultContainingBlockHeight);
+        DocumentElement.Style.Cascade();
+
+        // Create and assign box for document element
+        var htmlBox = new CssPrincipalBox(DocumentElement, null);
+        DocumentElement.Box = htmlBox;
+        // Document element's containing block is the viewport
+        SetContainingBlock(htmlBox, new Rect4f(0, DefaultContainingBlockWidth, DefaultContainingBlockHeight, 0));
+        // Set explicit dimensions on the html box Content
+        SetContentArea(htmlBox, new Rect4f(0, DefaultContainingBlockWidth, DefaultContainingBlockHeight, 0));
 
         // Body fills the viewport by default
         Body.Style.UserRules.Display.Set(EDisplayMode.BLOCK);
         Body.Style.UserRules.Width.Set(DefaultContainingBlockWidth);
+        Body.Style.UserRules.Height.Set(DefaultContainingBlockHeight);
+        Body.Style.Cascade();
+
+        // Create and assign box for body
+        var bodyBox = new CssPrincipalBox(Body, htmlBox);
+        Body.Box = bodyBox;
+        // Body's containing block is the document element
+        SetContainingBlock(bodyBox, new Rect4f(0, DefaultContainingBlockWidth, DefaultContainingBlockHeight, 0));
+        // Set explicit dimensions on the body box Content
+        SetContentArea(bodyBox, new Rect4f(0, DefaultContainingBlockWidth, DefaultContainingBlockHeight, 0));
     }
 
     #endregion
@@ -106,6 +125,16 @@ public class BoxModelTestFixture : IDisposable
     {
         var field = typeof(CssPrincipalBox).GetField("_containing_box", BindingFlags.NonPublic | BindingFlags.Instance);
         field?.SetValue(box, containingBlock);
+    }
+
+    /// <summary>
+    /// Sets the Content area on a CssPrincipalBox using reflection.
+    /// This is necessary because Content has a protected setter.
+    /// </summary>
+    private static void SetContentArea(CssPrincipalBox box, Rect4f content)
+    {
+        var prop = typeof(CssPrincipalBox).GetProperty("Content", BindingFlags.Public | BindingFlags.Instance);
+        prop?.SetValue(box, content);
     }
 
     /// <summary>

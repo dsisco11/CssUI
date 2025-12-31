@@ -568,11 +568,15 @@ public static class BoxModel
                             if (totalNonAuto > containingWidth)
                             {
                                 if (MarginLeft.IsAuto)
+                                {
                                     MarginLeft = CssValue.Zero;
+                                    marginLeft = 0;
+                                }
                                 if (MarginRight.IsAuto)
+                                {
                                     MarginRight = CssValue.Zero;
-                                marginLeft = 0;
-                                marginRight = 0;
+                                    marginRight = 0;
+                                }
                             }
                         }
 
@@ -1345,21 +1349,23 @@ public static class BoxModel
                             if (MarginTop.IsAuto) MarginTop = CssValue.Zero;
                             if (MarginBottom.IsAuto) MarginBottom = CssValue.Zero;
 
-                            // XXX: Yea, implement this logic later.
-
-                            /*
-                             * The element's height is the distance from its top content edge to the first applicable of the following:
-                             *
-                             * 1) the bottom edge of the last line box, if the box establishes a inline formatting context with one or more lines
-                             * 2) the bottom edge of the bottom (possibly collapsed) margin of its last in-flow child, if the child's bottom margin does not collapse with the element's bottom margin
-                             * 3) the bottom border edge of the last in-flow child whose top margin doesn't collapse with the element's bottom margin
-                             * 4) zero, otherwise
-                             */
-
-                            if (Box.Content_Height.HasValue)
-                                Height = CssValue.From(Box.Content_Height.Value);
-                            else
-                                Height = CssValue.Zero;
+                            // Per CSS 2.1 §10.6.3: Only compute height when 'height' is 'auto'
+                            // Specified heights should be used as-is
+                            if (Height.IsAuto)
+                            {
+                                /*
+                                 * The element's height is the distance from its top content edge to the first applicable of the following:
+                                 *
+                                 * 1) the bottom edge of the last line box, if the box establishes a inline formatting context with one or more lines
+                                 * 2) the bottom edge of the bottom (possibly collapsed) margin of its last in-flow child, if the child's bottom margin does not collapse with the element's bottom margin
+                                 * 3) the bottom border edge of the last in-flow child whose top margin doesn't collapse with the element's bottom margin
+                                 * 4) zero, otherwise
+                                 */
+                                if (Box.Content_Height.HasValue)
+                                    Height = CssValue.From(Box.Content_Height.Value);
+                                else
+                                    Height = CssValue.Zero;
+                            }
                         }
                         else
                         {

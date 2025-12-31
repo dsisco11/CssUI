@@ -33,6 +33,171 @@ public class BoxModelInternalTests : IDisposable
         _fixture.Dispose();
     }
 
+    #region Diagnostic Test
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Diagnostic")]
+    public void Diagnostic_ContainingBlock_IsSetCorrectly()
+    {
+        // Arrange - Create element with specific containing block dimensions
+        var (element, box, cascaded) = _fixture.CreateTestElement(style =>
+        {
+            style.Display.Set(EDisplayMode.BLOCK);
+            style.Width.Set(200);
+            style.Margin_Left.Set(CssValue.From_Percent(10));
+        }, containingBlockWidth: 400, containingBlockHeight: 300);
+
+        // Act - Check the containing block
+        var containingBox = box.Containing_Box;
+        var cbWidth = containingBox.Width;
+        var cbHeight = containingBox.Height;
+
+        // Also check the element reference
+        var elementBox = element.Box;
+        var elementCbWidth = elementBox!.Containing_Box.Width;
+
+        // And check the property owner's box
+        var marginLeftProperty = cascaded.Margin_Left;
+        var propertyOwner = marginLeftProperty.Owner;
+        var ownerBox = propertyOwner.Box;
+        var ownerCbWidth = ownerBox!.Containing_Box.Width;
+
+        // Check if element and owner are the same
+        var sameElement = ReferenceEquals(element, propertyOwner);
+        var sameBox = ReferenceEquals(box, ownerBox);
+
+        // Assert
+        Assert.True(sameElement, "Property owner should be the same element");
+        Assert.True(sameBox, "Property owner's box should be the same box");
+        Assert.Equal(400, cbWidth); // Direct box access
+        Assert.Equal(400, elementCbWidth); // Through element
+        Assert.Equal(400, ownerCbWidth); // Through property owner
+    }
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Diagnostic")]
+    public void Diagnostic_PercentageResolver_GetsCorrectContainingBlock()
+    {
+        // Arrange - Create element with specific containing block dimensions
+        var (element, box, cascaded) = _fixture.CreateTestElement(style =>
+        {
+            style.Display.Set(EDisplayMode.BLOCK);
+            style.Width.Set(200);
+            style.Margin_Left.Set(CssValue.From_Percent(10));
+        }, containingBlockWidth: 400, containingBlockHeight: 300);
+
+        // Act - Call the resolver directly
+        var marginLeftProperty = cascaded.Margin_Left;
+        
+        // Get the computed value (should be the percentage)
+        var computed = marginLeftProperty.Computed;
+        Assert.Equal(ECssValueTypes.PERCENT, computed!.Type);
+        Assert.Equal(10, computed.AsDecimal(), 0.01); // 10%
+        
+        // Now call ResolvePercentageIfNeeded
+        var resolved = CssUI.CSS.Internal.CssPercentageResolvers.ResolvePercentageIfNeeded(marginLeftProperty);
+        
+        // Should be 10% of 400 = 40
+        Assert.Equal(40, resolved.AsDecimal(), 1);
+    }
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Diagnostic")]
+    public void Diagnostic_ResolveHorizontal_MarginResolution()
+    {
+        // Arrange - Containing block 400px, element with 10% margins
+        var (element, box, cascaded) = _fixture.CreateTestElement(style =>
+        {
+            style.Display.Set(EDisplayMode.BLOCK);
+            style.Width.Set(200);
+            style.Margin_Left.Set(CssValue.From_Percent(10));
+            style.Margin_Right.Set(CssValue.From_Percent(10));
+        }, containingBlockWidth: 400, containingBlockHeight: 300);
+
+        // First, verify the raw resolved percentage
+        var rawResolvedMarginLeft = CssUI.CSS.Internal.CssPercentageResolvers.ResolvePercentageIfNeeded(cascaded.Margin_Left);
+        Assert.Equal(40, rawResolvedMarginLeft.AsDecimal(), 1); // 10% of 400
+
+        // Now call Resolve_Horizontal
+        CssUI.CSS.BoxModel.Resolve_Horizontal(box, cascaded,
+            out CssValue outLeft, out CssValue outMarginLeft, out CssValue outWidth,
+            out CssValue outMarginRight, out CssValue outRight);
+
+        // Log what we got
+        // MarginLeft should be 40 (10% of 400), unless Calculate_Horizontal changed it
+        // Calculate_Horizontal might change margins for over-constrained case
+        
+        // Check what the constraint equation gives us:
+        // marginLeft + border + padding + width + padding + border + marginRight = containingWidth
+        // 40 + 0 + 0 + 200 + 0 + 0 + 40 = 280 < 400
+        // So there's remaining space: 400 - 280 = 120
+        // For block elements with no auto values, this goes to margin-right
+        // Since margin-right is specified as 10% = 40, the system is over-constrained
+        // Per CSS 2.1, margin-right should be adjusted: 400 - (40 + 0 + 0 + 200 + 0 + 0) = 160
+        
+        // So we expect: marginLeft = 40, marginRight = 160
+        Assert.Equal(40, outMarginLeft.AsDecimal(), 1);
+        Assert.Equal(160, outMarginRight.AsDecimal(), 1); // This is the over-constrained adjustment
+    }
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Diagnostic")]
+    public void Diagnostic_OverConstrained_ChecksValues()
+    {
+        // Arrange - Over-constrained block in LTR should adjust margin-right
+        var (element, box, cascaded) = _fixture.CreateTestElement(style =>
+        {
+            style.Display.Set(EDisplayMode.BLOCK);
+            style.Width.Set(300);
+            style.Margin_Left.Set(50);
+            style.Margin_Right.Set(100);
+            style.Direction.Set(EDirection.LTR);
+        }, containingBlockWidth: 400, containingBlockHeight: 300);
+
+        // Verify CssValue.From() doesn't return auto values
+        var testMarginLeft = CssValue.From(50);
+        var testMarginRight = CssValue.From(100);
+        var testWidth = CssValue.From(300);
+        
+        // CRITICAL: These must NOT be auto
+        Assert.False(testMarginLeft.IsAuto, $"MarginLeft Type={testMarginLeft.Type} should not be auto");
+        Assert.False(testMarginRight.IsAuto, $"MarginRight Type={testMarginRight.Type} should not be auto");
+        Assert.False(testWidth.IsAuto, $"Width Type={testWidth.Type} should not be auto");
+
+        // Check preconditions
+        Assert.Equal(EBoxDisplayGroup.BLOCK, box.DisplayGroup);
+        Assert.False(box.IsReplacedElement);
+        Assert.Equal(EDirection.LTR, cascaded.Direction.Actual);
+        Assert.Equal(400, box.Containing_Box.Width, 1);
+
+        // Call the function
+        CssUI.CSS.BoxModel.Calculate_Horizontal(box, cascaded,
+            CssValue.Auto,
+            testMarginLeft,
+            testWidth,
+            testMarginRight,
+            CssValue.Auto,
+            out CssValue outLeft,
+            out CssValue outMarginLeft,
+            out CssValue outWidth,
+            out CssValue outMarginRight,
+            out CssValue outRight);
+
+        // If outWidth changed from 300, it means Width.IsAuto evaluated to true inside
+        // If outWidth is still 300, Width.IsAuto was false (correct)
+        Assert.Equal(300, outWidth.AsDecimal(), 1);
+        
+        // Check margins
+        Assert.Equal(50, outMarginLeft.AsDecimal(), 1);
+        Assert.Equal(50, outMarginRight.AsDecimal(), 1);
+    }
+
+    #endregion
+
     #region Resolve_Horizontal Tests
 
     [Fact]
@@ -75,9 +240,15 @@ public class BoxModelInternalTests : IDisposable
             out CssValue outLeft, out CssValue outMarginLeft, out CssValue outWidth,
             out CssValue outMarginRight, out CssValue outRight);
 
-        // Assert - 10% of 400 = 40 each
+        // Assert - margin-left: 10% of 400 = 40
         Assert.Equal(40, outMarginLeft.AsDecimal(), precision: 1);
-        Assert.Equal(40, outMarginRight.AsDecimal(), precision: 1);
+        
+        // NOTE: margin-right is adjusted per CSS 2.1 §10.3.3 (over-constrained case)
+        // Total specified: 40 + 0 + 0 + 200 + 0 + 0 + 40 = 280
+        // Containing block: 400
+        // Since no margin is auto, this is over-constrained
+        // Per spec, margin-right is adjusted to: 400 - (40 + 0 + 0 + 200 + 0 + 0) = 160
+        Assert.Equal(160, outMarginRight.AsDecimal(), precision: 1);
     }
 
     [Fact]
