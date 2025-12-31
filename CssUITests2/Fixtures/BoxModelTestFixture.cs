@@ -231,6 +231,60 @@ public class BoxModelTestFixture : IDisposable
         }, containingBlockWidth, containingBlockHeight);
     }
 
+    /// <summary>
+    /// Creates a replaced element (e.g., img) with intrinsic dimensions for testing
+    /// the CSS 2.1 §10.4 constraint table for replaced elements with intrinsic ratios.
+    /// </summary>
+    /// <param name="intrinsicWidth">The intrinsic width of the replaced element.</param>
+    /// <param name="intrinsicHeight">The intrinsic height of the replaced element.</param>
+    /// <param name="configureStyle">Optional additional style configuration.</param>
+    /// <param name="containingBlockWidth">The containing block width to use.</param>
+    /// <param name="containingBlockHeight">The containing block height to use.</param>
+    /// <returns>A tuple of (Element, CssPrincipalBox, CssComputedStyle).</returns>
+    /// <remarks>
+    /// This method creates an img element which is a replaced element per CSS spec.
+    /// The intrinsic dimensions are set on the box to simulate an image with known dimensions.
+    /// Note: The actual intrinsic ratio handling in Constrain_Width_Height may need to be
+    /// implemented separately as it requires tracking whether the element is replaced and
+    /// its intrinsic ratio.
+    /// </remarks>
+    public (Element element, CssPrincipalBox box, CssComputedStyle cascaded) CreateReplacedElement(
+        int intrinsicWidth,
+        int intrinsicHeight,
+        Action<CssComputedStyle>? configureStyle = null,
+        int? containingBlockWidth = null,
+        int? containingBlockHeight = null)
+    {
+        // Create an img element (replaced element per CSS spec)
+        var element = Document.createElement("img", DefaultOptions);
+        Body.appendChild(element);
+
+        // Configure the user rules
+        element.Style.UserRules.Display.Set(EDisplayMode.INLINE); // img default display
+        configureStyle?.Invoke(element.Style.UserRules);
+
+        // Trigger style cascade
+        element.Style.Cascade();
+
+        // Create box directly, bypassing tree generation
+        var box = new CssPrincipalBox(element, null);
+
+        // Set the element's box reference
+        element.Box = box;
+
+        // Set containing block dimensions directly via reflection
+        var cbWidth = containingBlockWidth ?? DefaultContainingBlockWidth;
+        var cbHeight = containingBlockHeight ?? DefaultContainingBlockHeight;
+        SetContainingBlock(box, new Rect4f(0, cbWidth, cbHeight, 0));
+
+        // Set the intrinsic dimensions on the box content area to simulate replaced element
+        // Note: Real replaced element handling would also set IntrinsicWidth/IntrinsicHeight
+        // properties if available on the box type
+        SetContentArea(box, new Rect4f(0, intrinsicWidth, intrinsicHeight, 0));
+
+        return (element, box, element.Style.Cascaded);
+    }
+
     #endregion
 
     #region Style Helpers

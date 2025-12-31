@@ -1074,4 +1074,306 @@ public class BoxModelInternalTests : IDisposable
     }
 
     #endregion
+
+    #region Negative Margin Centering Tests (§10.3.7)
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Internal")]
+    [Trait("Category", "Pending")]
+    public void CalculateHorizontal_Absolute_NegativeCenteringMargins_LTR_MarginLeftBecomesZero()
+    {
+        // Arrange - Per CSS 2.1 §10.3.7: If centering auto margins would be negative,
+        // in LTR the equation is solved by setting margin-left to zero and solving for margin-right.
+        // Scenario: element wider than available space between left and right offsets
+        var (_, box, cascaded) = _fixture.CreateAbsoluteElement(style =>
+        {
+            style.Positioning.Set(EBoxPositioning.Absolute);
+            style.Direction.Set(EDirection.LTR);
+            style.Left.Set(50);
+            style.Right.Set(50);
+            style.Width.Set(400); // Wider than 400-50-50=300 available
+            style.Margin_Left.Set(CssValue.Auto);
+            style.Margin_Right.Set(CssValue.Auto);
+        }, containingBlockWidth: 400, containingBlockHeight: 300);
+
+        CssValue Left = CssValue.From(50);
+        CssValue MarginLeft = CssValue.Auto;
+        CssValue Width = CssValue.From(400);
+        CssValue MarginRight = CssValue.Auto;
+        CssValue Right = CssValue.From(50);
+
+        // Act
+        CssUI.CSS.BoxModel.Calculate_Horizontal(box, cascaded,
+            ref Left, ref MarginLeft, ref Width, ref MarginRight, ref Right);
+
+        // Assert - margin-left becomes 0, margin-right absorbs the overflow (negative)
+        // Per spec: "solve the equation under the extra constraint that margin-left = 0"
+        // margin-right = 400 - 50 - 0 - 400 - 50 = -100
+        Assert.Equal(0, MarginLeft.AsDecimal(), precision: 1);
+        Assert.Equal(-100, MarginRight.AsDecimal(), precision: 1);
+    }
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Internal")]
+    [Trait("Category", "Pending")]
+    public void CalculateHorizontal_Absolute_NegativeCenteringMargins_RTL_MarginRightBecomesZero()
+    {
+        // Arrange - Per CSS 2.1 §10.3.7: For RTL, if centering would be negative,
+        // margin-right is set to zero and the equation is solved for margin-left.
+        var (_, box, cascaded) = _fixture.CreateAbsoluteElement(style =>
+        {
+            style.Positioning.Set(EBoxPositioning.Absolute);
+            style.Direction.Set(EDirection.RTL);
+            style.Left.Set(50);
+            style.Right.Set(50);
+            style.Width.Set(400); // Wider than available
+            style.Margin_Left.Set(CssValue.Auto);
+            style.Margin_Right.Set(CssValue.Auto);
+        }, containingBlockWidth: 400, containingBlockHeight: 300);
+
+        CssValue Left = CssValue.From(50);
+        CssValue MarginLeft = CssValue.Auto;
+        CssValue Width = CssValue.From(400);
+        CssValue MarginRight = CssValue.Auto;
+        CssValue Right = CssValue.From(50);
+
+        // Act
+        CssUI.CSS.BoxModel.Calculate_Horizontal(box, cascaded,
+            ref Left, ref MarginLeft, ref Width, ref MarginRight, ref Right);
+
+        // Assert - margin-right becomes 0, margin-left absorbs the overflow (negative)
+        // margin-left = 400 - 50 - 400 - 0 - 50 = -100
+        Assert.Equal(-100, MarginLeft.AsDecimal(), precision: 1);
+        Assert.Equal(0, MarginRight.AsDecimal(), precision: 1);
+    }
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Internal")]
+    [Trait("Category", "Pending")]
+    public void CalculateVertical_Absolute_NegativeCenteringMargins_MarginTopBecomesZero()
+    {
+        // Arrange - Per CSS 2.1 §10.6.4: If centering auto margins would be negative,
+        // set margin-top to zero and solve for margin-bottom.
+        var (_, box, cascaded) = _fixture.CreateAbsoluteElement(style =>
+        {
+            style.Positioning.Set(EBoxPositioning.Absolute);
+            style.Top.Set(50);
+            style.Bottom.Set(50);
+            style.Height.Set(600); // Taller than 600-50-50=500 available
+            style.Margin_Top.Set(CssValue.Auto);
+            style.Margin_Bottom.Set(CssValue.Auto);
+        }, containingBlockWidth: 400, containingBlockHeight: 600);
+
+        CssValue Top = CssValue.From(50);
+        CssValue MarginTop = CssValue.Auto;
+        CssValue Height = CssValue.From(600);
+        CssValue MarginBottom = CssValue.Auto;
+        CssValue Bottom = CssValue.From(50);
+        CssValue Width = CssValue.Auto;
+
+        // Act
+        CssUI.CSS.BoxModel.Calculate_Vertical(box, cascaded,
+            ref Top, ref MarginTop, ref Height, ref MarginBottom, ref Bottom, Width);
+
+        // Assert - margin-top becomes 0, margin-bottom absorbs the overflow (negative)
+        // margin-bottom = 600 - 50 - 0 - 600 - 50 = -100
+        Assert.Equal(0, MarginTop.AsDecimal(), precision: 1);
+        Assert.Equal(-100, MarginBottom.AsDecimal(), precision: 1);
+    }
+
+    #endregion
+
+    #region Percentage Height with Auto Containing Block (§10.5)
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Internal")]
+    [Trait("Category", "Pending")]
+    public void ResolveVertical_PercentageHeight_AutoContainingBlockHeight_BecomesAuto()
+    {
+        // Arrange - Per CSS 2.1 §10.5: "If the height of the containing block is not 
+        // specified explicitly (i.e., it depends on content height), and this element 
+        // is not absolutely positioned, the percentage value is treated as 'auto'."
+        // 
+        // When the containing block has auto height, percentage heights cannot be resolved.
+        var (_, box, cascaded) = _fixture.CreateTestElement(style =>
+        {
+            style.Display.Set(EDisplayMode.BLOCK);
+            style.Height.Set(CssValue.From_Percent(50)); // 50% of auto = auto
+        }, containingBlockWidth: 400, containingBlockHeight: 0); // 0 or auto-height containing block
+
+        // Act
+        CssUI.CSS.BoxModel.Resolve_Vertical(box, cascaded,
+            out CssValue outTop, out CssValue outMarginTop, out CssValue outHeight,
+            out CssValue outMarginBottom, out CssValue outBottom);
+
+        // Assert - percentage height with auto/zero containing block height should become auto
+        Assert.True(outHeight.IsAuto, "Percentage height with auto containing block height should resolve to auto");
+    }
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Internal")]
+    [Trait("Category", "Pending")]
+    public void ResolveVertical_PercentageHeight_AbsoluteWithAutoContainingBlock_StillResolves()
+    {
+        // Arrange - Per CSS 2.1 §10.5: Absolutely positioned elements CAN use percentage 
+        // heights even when the containing block height depends on content, because the 
+        // containing block is the padding box of the positioned ancestor.
+        var (_, box, cascaded) = _fixture.CreateAbsoluteElement(style =>
+        {
+            style.Positioning.Set(EBoxPositioning.Absolute);
+            style.Height.Set(CssValue.From_Percent(50));
+            style.Top.Set(0);
+            style.Bottom.Set(CssValue.Auto);
+        }, containingBlockWidth: 400, containingBlockHeight: 600);
+
+        // Act
+        CssUI.CSS.BoxModel.Resolve_Vertical(box, cascaded,
+            out CssValue outTop, out CssValue outMarginTop, out CssValue outHeight,
+            out CssValue outMarginBottom, out CssValue outBottom);
+
+        // Assert - absolute elements can resolve percentage heights: 50% of 600 = 300
+        Assert.Equal(300, outHeight.AsDecimal(), precision: 1);
+    }
+
+    #endregion
+
+    #region Replaced Element Intrinsic Ratio Tests (§10.4)
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Internal")]
+    [Trait("Category", "Pending")]
+    public void ConstrainWidthHeight_ReplacedElement_IntrinsicRatio_MaxWidthAffectsHeight()
+    {
+        // Arrange - Per CSS 2.1 §10.4 constraint table for replaced elements:
+        // When a replaced element has an intrinsic ratio and max-width constrains the width,
+        // height should be scaled proportionally to maintain the intrinsic ratio.
+        // 
+        // Example: Image with intrinsic 400x200 (2:1 ratio), max-width: 200
+        // Result should be width: 200, height: 100 (maintaining 2:1 ratio)
+        var (_, box, cascaded) = _fixture.CreateReplacedElement(
+            intrinsicWidth: 400, 
+            intrinsicHeight: 200, 
+            configureStyle: style =>
+            {
+                style.Max_Width.Set(CssValue.From_Dimension(200, ECssUnit.PX));
+                // Height is auto, should scale with intrinsic ratio
+            });
+
+        CssValue Width = CssValue.From(400);  // Intrinsic width
+        CssValue Height = CssValue.From(200); // Intrinsic height
+
+        // Act
+        bool changed = CssUI.CSS.BoxModel.Constrain_Width_Height(cascaded, ref Width, ref Height);
+
+        // Assert - width constrained to 200, height scaled to maintain 2:1 ratio
+        Assert.True(changed);
+        Assert.Equal(200, Width.AsDecimal(), precision: 1);
+        Assert.Equal(100, Height.AsDecimal(), precision: 1); // Scaled proportionally
+    }
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Internal")]
+    [Trait("Category", "Pending")]
+    public void ConstrainWidthHeight_ReplacedElement_IntrinsicRatio_MaxHeightAffectsWidth()
+    {
+        // Arrange - Per CSS 2.1 §10.4: When max-height constrains height,
+        // width should scale proportionally for replaced elements with intrinsic ratio.
+        // 
+        // Example: Image with intrinsic 400x200 (2:1 ratio), max-height: 50
+        // Result should be width: 100, height: 50 (maintaining 2:1 ratio)
+        var (_, box, cascaded) = _fixture.CreateReplacedElement(
+            intrinsicWidth: 400, 
+            intrinsicHeight: 200, 
+            configureStyle: style =>
+            {
+                style.Max_Height.Set(CssValue.From_Dimension(50, ECssUnit.PX));
+                // Width is auto, should scale with intrinsic ratio
+            });
+
+        CssValue Width = CssValue.From(400);  // Intrinsic width
+        CssValue Height = CssValue.From(200); // Intrinsic height
+
+        // Act
+        bool changed = CssUI.CSS.BoxModel.Constrain_Width_Height(cascaded, ref Width, ref Height);
+
+        // Assert - height constrained to 50, width scaled to maintain 2:1 ratio
+        Assert.True(changed);
+        Assert.Equal(100, Width.AsDecimal(), precision: 1); // Scaled proportionally
+        Assert.Equal(50, Height.AsDecimal(), precision: 1);
+    }
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Internal")]
+    [Trait("Category", "Pending")]
+    public void ConstrainWidthHeight_ReplacedElement_IntrinsicRatio_BothConstraintsApplied()
+    {
+        // Arrange - Per CSS 2.1 §10.4 constraint table:
+        // When both max-width and max-height apply, use the one that results in 
+        // the smaller dimensions while maintaining the intrinsic ratio.
+        // 
+        // Example: Image 400x200 (2:1), max-width: 300, max-height: 100
+        // max-width alone → 300x150 (but 150 > max-height 100)
+        // max-height alone → 200x100 (200 < max-width 300) ✓
+        // Result: 200x100
+        var (_, box, cascaded) = _fixture.CreateReplacedElement(
+            intrinsicWidth: 400, 
+            intrinsicHeight: 200, 
+            configureStyle: style =>
+            {
+                style.Max_Width.Set(CssValue.From_Dimension(300, ECssUnit.PX));
+                style.Max_Height.Set(CssValue.From_Dimension(100, ECssUnit.PX));
+            });
+
+        CssValue Width = CssValue.From(400);  // Intrinsic width
+        CssValue Height = CssValue.From(200); // Intrinsic height
+
+        // Act
+        bool changed = CssUI.CSS.BoxModel.Constrain_Width_Height(cascaded, ref Width, ref Height);
+
+        // Assert - the tighter constraint wins while maintaining ratio
+        Assert.True(changed);
+        Assert.Equal(200, Width.AsDecimal(), precision: 1);
+        Assert.Equal(100, Height.AsDecimal(), precision: 1);
+    }
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Internal")]
+    [Trait("Category", "Pending")]
+    public void ConstrainWidthHeight_ReplacedElement_IntrinsicRatio_MinWidthScalesHeightUp()
+    {
+        // Arrange - Per CSS 2.1 §10.4: When min-width causes width to increase,
+        // height should scale up proportionally for replaced elements.
+        // 
+        // Example: Image 100x50 (2:1 ratio), min-width: 200
+        // Result: 200x100
+        var (_, box, cascaded) = _fixture.CreateReplacedElement(
+            intrinsicWidth: 100, 
+            intrinsicHeight: 50, 
+            configureStyle: style =>
+            {
+                style.Min_Width.Set(CssValue.From_Dimension(200, ECssUnit.PX));
+            });
+
+        CssValue Width = CssValue.From(100);  // Intrinsic width
+        CssValue Height = CssValue.From(50);  // Intrinsic height
+
+        // Act
+        bool changed = CssUI.CSS.BoxModel.Constrain_Width_Height(cascaded, ref Width, ref Height);
+
+        // Assert - width increased to 200, height scaled proportionally to 100
+        Assert.True(changed);
+        Assert.Equal(200, Width.AsDecimal(), precision: 1);
+        Assert.Equal(100, Height.AsDecimal(), precision: 1);
+    }
+
+    #endregion
 }
