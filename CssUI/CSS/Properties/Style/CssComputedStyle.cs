@@ -143,11 +143,11 @@ public class CssComputedStyle
     /// <summary>
     /// The maximum Width of an elements content-area
     /// </summary>
-    public NullableIntProperty Max_Width => (NullableIntProperty)Get(ECssPropertyID.MaxWidth)!;
+    public NullableLengthProperty Max_Width => (NullableLengthProperty)Get(ECssPropertyID.MaxWidth)!;
     /// <summary>
     /// The maximum Height of an elements content-area
     /// </summary>
-    public NullableIntProperty Max_Height => (NullableIntProperty)Get(ECssPropertyID.MaxHeight)!;
+    public NullableLengthProperty Max_Height => (NullableLengthProperty)Get(ECssPropertyID.MaxHeight)!;
     #endregion
 
     #region Position
@@ -468,8 +468,8 @@ public class CssComputedStyle
         CssProperties[(int)ECssPropertyID.MinWidth] = new IntProperty(ECssPropertyID.MinWidth, Owner, selfRef, this.ReadOnly);
         CssProperties[(int)ECssPropertyID.MinHeight] = new IntProperty(ECssPropertyID.MinHeight, Owner, selfRef, this.ReadOnly);
 
-        CssProperties[(int)ECssPropertyID.MaxWidth] = new NullableIntProperty(ECssPropertyID.MaxWidth, Owner, selfRef, this.ReadOnly);
-        CssProperties[(int)ECssPropertyID.MaxHeight] = new NullableIntProperty(ECssPropertyID.MaxHeight, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.MaxWidth] = new NullableLengthProperty(ECssPropertyID.MaxWidth, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.MaxHeight] = new NullableLengthProperty(ECssPropertyID.MaxHeight, Owner, selfRef, this.ReadOnly);
 
         CssProperties[(int)ECssPropertyID.MarginTop] = new IntProperty(ECssPropertyID.MarginTop, Owner, selfRef, this.ReadOnly);
         CssProperties[(int)ECssPropertyID.MarginRight] = new IntProperty(ECssPropertyID.MarginRight, Owner, selfRef, this.ReadOnly);

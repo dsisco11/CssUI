@@ -110,7 +110,7 @@ public class CssPropertyCascadeOverwriteTests
     [Fact]
     [Trait("Category", "CssProperty")]
     [Trait("Category", "Cascade")]
-    public void Cascade_CopiesSourcePtrAndSelector()
+    public void Cascade_CopiesSelector_ButNotSourcePtr()
     {
         var doc = CreateTestDocument();
         var element = CreateTestElement(doc);
@@ -118,15 +118,19 @@ public class CssPropertyCascadeOverwriteTests
 
         var sourceProp = GetProperty(element, ECssPropertyID.FlexGrow);
         sourceProp.Set(CssValue.From(7.0));
-        // SourcePtr and Selector are metadata that gets copied
+        // Store original target SourcePtr
+        var originalTargetSourcePtr = GetCascadedProperty(element, ECssPropertyID.FlexGrow).SourcePtr;
 
         var targetProp = GetCascadedProperty(element, ECssPropertyID.FlexGrow);
 
         // Act
         targetProp.Cascade(sourceProp);
 
-        // Assert - Metadata copied (SourcePtr may be null but should match)
-        Assert.Equal(sourceProp.SourcePtr, targetProp.SourcePtr);
+        // Assert - SourcePtr is NOT copied (tracks owning CssComputedStyle for event routing)
+        // This is by design per the comment in CssProperty.Cascade()
+        Assert.Same(originalTargetSourcePtr, targetProp.SourcePtr);
+        // Selector IS copied
+        Assert.Equal(sourceProp.Selector, targetProp.Selector);
     }
 
     [Fact]
@@ -276,7 +280,7 @@ public class CssPropertyCascadeOverwriteTests
     [Fact]
     [Trait("Category", "CssProperty")]
     [Trait("Category", "Overwrite")]
-    public void Overwrite_CopiesSourcePtrAndSelector()
+    public void Overwrite_CopiesSelector_ButNotSourcePtr()
     {
         var doc = CreateTestDocument();
         var element1 = CreateTestElement(doc, "div");
@@ -286,16 +290,20 @@ public class CssPropertyCascadeOverwriteTests
 
         var sourceProp = GetProperty(element1, ECssPropertyID.FlexGrow);
         sourceProp.Set(CssValue.From(35.0));
-        // SourcePtr and Selector are metadata that gets copied
 
         var targetProp = GetProperty(element2, ECssPropertyID.FlexGrow);
         targetProp.Set(CssValue.From(1.0)); // Different
+        // Store original target SourcePtr
+        var originalTargetSourcePtr = targetProp.SourcePtr;
 
         // Act
         targetProp.Overwrite(sourceProp);
 
-        // Assert - SourcePtr copied
-        Assert.Equal(sourceProp.SourcePtr, targetProp.SourcePtr);
+        // Assert - SourcePtr is NOT copied (tracks owning CssComputedStyle for event routing)
+        // This is by design per the comment in CssProperty.Overwrite()
+        Assert.Same(originalTargetSourcePtr, targetProp.SourcePtr);
+        // Selector IS copied
+        Assert.Equal(sourceProp.Selector, targetProp.Selector);
     }
 
     [Fact]
@@ -425,10 +433,11 @@ public class CssPropertyCascadeOverwriteTests
     [Fact]
     [Trait("Category", "CssProperty")]
     [Trait("Category", "Cascade")]
-    public void Cascade_WithAuto_ReturnsFalse_BecauseAutoHasNoValue()
+    public void Cascade_WithAuto_ReturnsTrue_BecauseAutoIsValidCssValue()
     {
-        // AUTO, INHERIT, INITIAL, etc. are sentinel types with HasValue = false
-        // Cascade only copies when source HasValue == true
+        // AUTO is a valid CSS keyword that should cascade.
+        // While it has no backing numeric value (HasBackingValue = false),
+        // it does have a value in the CSS sense (HasValue = true).
         var doc = CreateTestDocument();
         var element = CreateTestElement(doc);
         doc.documentElement?.appendChild(element);
@@ -436,16 +445,17 @@ public class CssPropertyCascadeOverwriteTests
         var sourceProp = GetProperty(element, ECssPropertyID.Width);
         sourceProp.Set(CssValue.Auto);
 
-        // Verify Auto has no value payload
-        Assert.False(sourceProp.Assigned.HasValue);
+        // Verify Auto has a CSS value but no backing numeric value
+        Assert.True(sourceProp.Assigned.HasValue);
+        Assert.False(sourceProp.Assigned.HasBackingValue);
 
         var targetProp = GetCascadedProperty(element, ECssPropertyID.Width);
 
         // Act
         var result = targetProp.Cascade(sourceProp);
 
-        // Assert - AUTO doesn't cascade because HasValue is false
-        Assert.False(result);
+        // Assert - AUTO cascades because it's a valid CSS value
+        Assert.True(result);
     }
 
     [Fact]

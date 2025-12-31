@@ -692,8 +692,10 @@ public class BoxModelTests : IDisposable
     [Trait("Category", "BoxModel")]
     public void Resolve_Block_WithAllMargins_SetsAllValues()
     {
-        // Arrange
-        var element = _fixture.CreateElement("div", style =>
+        // Arrange - Create container with exact width needed to avoid over-constraint adjustment
+        // Total: margin-left(40) + width(200) + margin-right(20) = 260
+        var container = _fixture.CreateContainingBlock(260, 300);
+        var element = _fixture.CreateChild(container, "div", style =>
         {
             style.Display.Set(EDisplayMode.BLOCK);
             style.Width.Set(200);
@@ -705,16 +707,21 @@ public class BoxModelTests : IDisposable
         });
         _fixture.ForceLayoutUpdate();
 
+        var containerBox = container.Box;
         var box = element.Box;
+        var containerCascaded = container.Style?.Cascaded;
         var cascaded = element.Style?.Cascaded;
 
+        Assert.NotNull(containerBox);
         Assert.NotNull(box);
+        Assert.NotNull(containerCascaded);
         Assert.NotNull(cascaded);
 
-        // Act
+        // Act - Resolve container first, then element
+        CssUI.CSS.BoxModel.Resolve(containerBox, containerCascaded);
         CssUI.CSS.BoxModel.Resolve(box, cascaded);
 
-        // Assert - All margins should be set
+        // Assert - All margins should be set (no over-constraint since container is exact size)
         Assert.Equal(10, cascaded.Margin_Top.Computed.AsDecimal(), precision: 1);
         Assert.Equal(20, cascaded.Margin_Right.Computed.AsDecimal(), precision: 1);
         Assert.Equal(30, cascaded.Margin_Bottom.Computed.AsDecimal(), precision: 1);

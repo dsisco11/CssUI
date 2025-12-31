@@ -805,7 +805,7 @@ public class CssComputedStyleTests
     [Fact]
     [Trait("Category", "CssComputedStyle")]
     [Trait("Category", "PropertyAccess")]
-    public void MaxSize_Properties_ReturnNullableIntProperties()
+    public void MaxSize_Properties_ReturnNullableLengthProperties()
     {
         // Arrange
         var doc = CreateTestDocument();
@@ -816,11 +816,11 @@ public class CssComputedStyleTests
         var maxWidth = style.Max_Width;
         var maxHeight = style.Max_Height;
 
-        // Assert
+        // Assert - Max sizes are lengths (accept DIMENSION|PERCENT|NONE)
         Assert.NotNull(maxWidth);
         Assert.NotNull(maxHeight);
-        Assert.IsType<NullableIntProperty>(maxWidth);
-        Assert.IsType<NullableIntProperty>(maxHeight);
+        Assert.IsType<NullableLengthProperty>(maxWidth);
+        Assert.IsType<NullableLengthProperty>(maxHeight);
     }
     #endregion
 

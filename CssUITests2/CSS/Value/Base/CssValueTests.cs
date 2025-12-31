@@ -35,7 +35,7 @@ public class CssValueTests
     {
         Assert.Equal(ECssValueTypes.NONE, CssValue.None.Type);
         // Note: None doesn't have a backing value, only a type flag
-        Assert.False(CssValue.None.HasValue);
+        Assert.False(CssValue.None.HasBackingValue);
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class CssValueTests
     {
         Assert.Equal(ECssValueTypes.INHERIT, CssValue.Inherit.Type);
         // Note: Inherit doesn't have a backing value, only a type flag
-        Assert.False(CssValue.Inherit.HasValue);
+        Assert.False(CssValue.Inherit.HasBackingValue);
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public class CssValueTests
     {
         Assert.Equal(ECssValueTypes.INITIAL, CssValue.Initial.Type);
         // Note: Initial doesn't have a backing value, only a type flag
-        Assert.False(CssValue.Initial.HasValue);
+        Assert.False(CssValue.Initial.HasBackingValue);
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public class CssValueTests
     {
         Assert.Equal(ECssValueTypes.UNSET, CssValue.Unset.Type);
         // Note: Unset doesn't have a backing value, only a type flag
-        Assert.False(CssValue.Unset.HasValue);
+        Assert.False(CssValue.Unset.HasBackingValue);
     }
 
     [Fact]

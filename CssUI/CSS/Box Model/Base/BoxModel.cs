@@ -66,6 +66,10 @@ public static class BoxModel
         Cascaded.Margin_Right.Set_Computed_Value(MarginRight);
         Cascaded.Margin_Bottom.Set_Computed_Value(MarginBottom);
         Cascaded.Margin_Left.Set_Computed_Value(MarginLeft);
+
+        // Update the box's Content/Padding areas so children can use it as their containing block
+        Box.UpdateContentWidth();
+        Box.UpdateContentHeight();
     }
 
     /// <summary>
@@ -158,6 +162,10 @@ public static class BoxModel
             Cascaded.Bottom.Set_Computed_Value(Bottom);
             Cascaded.Margin_Top.Set_Computed_Value(MarginTop);
             Cascaded.Margin_Bottom.Set_Computed_Value(MarginBottom);
+
+            // Update the box's Content area height so children can use it as their containing block
+            // for percentage calculations and absolute positioning.
+            Box.UpdateContentHeight();
         }
         finally
         {

@@ -100,8 +100,11 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     public bool IsNull => (Type == ECssValueTypes.NULL);
 
     /// <summary>
-    /// Returns whether there is actually a set value
+    /// Returns whether there is actually a set value (not NULL).
+    /// Note: This returns true for CSS keywords like AUTO, INHERIT, INITIAL, UNSET, NONE
+    /// because they are valid CSS values that should cascade.
     /// </summary>
+    /// <seealso cref="HasBackingValue"/>
     public virtual bool HasValue
     {
         get
@@ -110,6 +113,31 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
             // AUTO, INHERIT, INITIAL, UNSET, NONE, and DEFAULT are valid CSS keywords
             // that should cascade and be treated as "having a value"
             return Type != ECssValueTypes.NULL;
+        }
+    }
+
+    /// <summary>
+    /// Returns whether this value has a concrete backing value (not just a keyword type flag).
+    /// Returns false for keyword-only values like INHERIT, INITIAL, UNSET, NONE, AUTO, DEFAULT.
+    /// These keyword values only have a type flag but no underlying data to resolve.
+    /// </summary>
+    /// <seealso cref="HasValue"/>
+    /// <seealso cref="HasNumericValue"/>
+    public virtual bool HasBackingValue
+    {
+        get
+        {
+            return Type switch
+            {
+                ECssValueTypes.NULL or
+                ECssValueTypes.AUTO or
+                ECssValueTypes.INHERIT or
+                ECssValueTypes.INITIAL or
+                ECssValueTypes.UNSET or
+                ECssValueTypes.NONE or
+                ECssValueTypes.DEFAULT => false,
+                _ => true
+            };
         }
     }
 

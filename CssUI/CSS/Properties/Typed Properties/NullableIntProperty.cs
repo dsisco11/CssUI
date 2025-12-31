@@ -4,7 +4,7 @@ using CssUI.DOM.Nodes;
 namespace CssUI.CSS;
 
 /// <summary>
-/// Represents a styling property which always resolves to an integer
+/// Represents a styling property which always resolves to an integer (not a length)
 /// </summary>
 public class NullableIntProperty : CssProperty
 {

@@ -20,7 +20,7 @@
   - [ ] Update Window.QueueObserverMicroTask() to use new system
   - [ ] Ensure MutationObserver callbacks fire at correct timing per W3C spec
 
-## Test Coverage — Total: 4722 passing, 151 skipped, 21 failing = 4894 tests
+## Test Coverage — Total: 4738 passing, 151 skipped, 5 failing = 4894 tests
 ### DOM Tests: 518 passing, 3 skipped = 521 total
 ### Selector Tests: 307 passing, 143 skipped = 450 total
 
@@ -253,42 +253,24 @@ Spec Reference: https://www.w3.org/TR/CSS2/visudet.html
 - Get_Height_For_BFC with children → Phase 17 (Block Formatting Context)
 - Margin collapsing edge cases → Phase 16 (Margin Collapsing)
 
-#### 14.5.13 BoxModel.Resolve() Bugs (from BoxModelTests)
-Bugs discovered by comprehensive BoxModel unit tests (29 tests: 14 passing, 15 failing).
-Spec Reference: https://www.w3.org/TR/CSS2/visudet.html
+#### 14.5.13 BoxModel.Resolve() Bugs (from BoxModelTests) ✓
+All 29 BoxModelTests now pass after fixing:
+- UpdateContentWidth() to also update Padding area for absolute positioning
+- Added UpdateContentHeight() method for height resolution
+- BoxModel.Resolve() now calls UpdateContentWidth/Height
+- Fixed test setup for Resolve_Block_WithAllMargins_SetsAllValues
 
-**Auto Width Resolution:**
-- [ ] Fix AsDecimal() called on AUTO values in Resolve_Horizontal() - throws exception
-- [ ] Block with width: auto should fill containing block minus margins
-- [ ] Inline-block with width: auto should shrink-to-fit (requires intrinsic sizing)
+**Fixed Issues:**
+- [x] Absolutely positioned children couldn't find containing block (Padding was 0,0,0,0)
+- [x] Height resolution didn't update Padding area for absolute positioning
+- [x] BoxModel.Resolve() didn't update Content/Padding areas
 
-**Auto Margin Centering (CSS 2.2 §10.3.3):**
-- [ ] Fix margin-left: auto + margin-right: auto centering returns 0 instead of calculated value
-- [ ] Single auto margin (left or right) should absorb remaining horizontal space
-- [ ] Verify auto margins work with explicit width
-
-**Min/Max Constraints (CSS 2.2 §10.4, §10.7):**
-- [ ] Fix min-width not clamping resolved width upward
-- [ ] Fix max-width not clamping resolved width downward
-- [ ] Fix min-height not clamping resolved height upward
-- [ ] Fix max-height not clamping resolved height downward
-- [ ] Apply constraints AFTER percentage/auto resolution
-
-**Over-Constrained Horizontal (CSS 2.2 §10.3.3):**
-- [ ] When width + margins + padding + border > containing block width
-- [ ] LTR: margin-right becomes auto (absorbs overflow)
-- [ ] RTL: margin-left becomes auto (absorbs overflow)
-
-**Absolute Positioning Constraint Equation (CSS 2.2 §10.3.7):**
-- [ ] Fix left: auto calculation (should position based on static position)
-- [ ] Fix right: auto calculation
-- [ ] Fix top: auto calculation
-- [ ] Fix bottom: auto calculation
-- [ ] Verify constraint equation: left + margin-left + border-left + padding-left + width + padding-right + border-right + margin-right + right = containing block width
-
-**UpdateContentWidth() Crash:**
-- [ ] Fix crash when width is still AUTO after resolution
-- [ ] Ensure width is always resolved to a numeric value before accessing
+**Previously Working (no changes needed):**
+- Auto Width Resolution - already working
+- Auto Margin Centering - already working
+- Min/Max Constraints - already working (after INTEGER→DIMENSION fix)
+- Over-Constrained Horizontal - already working
+- Absolute Positioning Constraint Equation - already working (after Padding fix)
 
 **Percentage Height with Auto Containing Block (CSS 2.2 §10.5):** ✓
 - [x] Percentage height with auto containing block height should compute to auto

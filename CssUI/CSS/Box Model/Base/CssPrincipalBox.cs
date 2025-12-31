@@ -521,8 +521,40 @@ public class CssPrincipalBox : CssBox
         var width = Style.Width;
         Content = new Rect4f(Content.Top, Content.Left + width, Content.Bottom, Content.Left);
 
+        // Also update Padding area so absolutely positioned children can find their containing block
+        // Per CSS 2.1 §10.1, the containing block for absolutely positioned elements is the 
+        // padding edge of the positioned ancestor.
+        Padding = Create_Rect_Around(Content, Style.Get_Padding_Size());
+
         // Invalidate descendant containing block caches since this box's Content changed
         // Children's containing block is based on this box's Content rect
+        InvalidateDescendantContainingBlocks();
+    }
+
+    /// <summary>
+    /// Updates the Content area's height dimension.
+    /// Called during bottom-up height resolution to update the box bounds.
+    /// </summary>
+    internal void UpdateContentHeight()
+    {
+        // Safety check: Height must be resolved (not auto) before updating Content rect
+        var heightValue = Style.Cascaded.Height.Computed;
+        if (heightValue.IsAuto)
+        {
+            // Height was not resolved - this can be normal for auto-height elements
+            return;
+        }
+
+        // Update the Content rect's height while preserving other dimensions
+        var height = Style.Height;
+        Content = new Rect4f(Content.Top, Content.Right, Content.Top + height, Content.Left);
+
+        // Also update Padding area so absolutely positioned children can find their containing block
+        // Per CSS 2.1 §10.1, the containing block for absolutely positioned elements is the 
+        // padding edge of the positioned ancestor.
+        Padding = Create_Rect_Around(Content, Style.Get_Padding_Size());
+
+        // Invalidate descendant containing block caches since this box's Content changed
         InvalidateDescendantContainingBlocks();
     }
 
