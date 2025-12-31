@@ -106,8 +106,20 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     {
         get
         {
-            // Singleton types (NULL, AUTO, INHERIT, etc.) have no data payload
-            // Subclasses override to return true when they have actual values
+            // Only NULL means "no value" - all other types represent an explicit CSS value
+            // AUTO, INHERIT, INITIAL, UNSET, NONE, and DEFAULT are valid CSS keywords
+            // that should cascade and be treated as "having a value"
+            return Type != ECssValueTypes.NULL;
+        }
+    }
+
+    /// <summary>
+    /// Returns whether there is actually a resolvable numeric value
+    /// </summary>
+    public virtual bool HasNumericValue
+    {
+        get
+        {
             return Type switch
             {
                 ECssValueTypes.NULL or
@@ -995,10 +1007,21 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     }
 
     /// <summary>
-    /// Returns the value as the preferred (Nullable) Integer type
+    /// Returns the value as the preferred (Nullable) Integer type.
+    /// Returns null for NONE, NULL, or other non-numeric types.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public long? AsIntegerN() => !HasValue ? null : AsInteger();
+    public long? AsIntegerN()
+    {
+        // Return null for types that don't have a numeric value
+        if (Type == ECssValueTypes.NULL ||
+            Type == ECssValueTypes.NONE ||
+            Type == ECssValueTypes.AUTO)
+        {
+            return null;
+        }
+        return AsInteger();
+    }
 
     /// <summary>
     /// Returns the value as the preferred Decimal type.
@@ -1011,11 +1034,21 @@ public partial record class CssValue : ISpanFormattable, IFormattable, IParsable
     }
 
     /// <summary>
-    /// Returns the value as the preferred (Nullable) Decimal type
+    /// Returns the value as the preferred (Nullable) Decimal type.
+    /// Returns null for NONE, NULL, or other non-numeric types.
     /// </summary>
-    /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public double? AsDecimalN() => !HasValue ? null : AsDecimal();
+    public double? AsDecimalN()
+    {
+        // Return null for types that don't have a numeric value
+        if (Type == ECssValueTypes.NULL ||
+            Type == ECssValueTypes.NONE ||
+            Type == ECssValueTypes.AUTO)
+        {
+            return null;
+        }
+        return AsDecimal();
+    }
 
     /// <summary>
     /// Returns the value as a string
