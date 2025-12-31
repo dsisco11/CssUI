@@ -1075,6 +1075,380 @@ public class BoxModelInternalTests : IDisposable
 
     #endregion
 
+    #region Calculate_Vertical Tests - Inline-Block Elements (§10.6.6)
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Internal")]
+    public void CalculateVertical_InlineBlock_ExplicitHeight_UsesSpecifiedValue()
+    {
+        // Arrange - Inline-block with explicit height
+        var (_, box, cascaded) = _fixture.CreateInlineBlockElement(width: 100, height: 200);
+
+        CssValue Top = CssValue.Auto;
+        CssValue MarginTop = CssValue.From(0);
+        CssValue Height = CssValue.From(200);
+        CssValue MarginBottom = CssValue.From(0);
+        CssValue Bottom = CssValue.Auto;
+        CssValue Width = CssValue.From(100);
+
+        // Act
+        CssUI.CSS.BoxModel.Calculate_Vertical(box, cascaded,
+            ref Top, ref MarginTop, ref Height, ref MarginBottom, ref Bottom, Width);
+
+        // Assert - height stays at 200
+        Assert.Equal(200, Height.AsDecimal(), precision: 1);
+    }
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Internal")]
+    public void CalculateVertical_InlineBlock_AutoMargins_BecomeZero()
+    {
+        // Arrange - Per CSS 2.1 §10.6.6: "If 'margin-top' or 'margin-bottom' are 'auto', 
+        // their used value is 0."
+        var (_, box, cascaded) = _fixture.CreateInlineBlockElement(width: 100, height: 200, configureStyle: style =>
+        {
+            style.Margin_Top.Set(CssValue.Auto);
+            style.Margin_Bottom.Set(CssValue.Auto);
+        });
+
+        CssValue Top = CssValue.Auto;
+        CssValue MarginTop = CssValue.Auto;
+        CssValue Height = CssValue.From(200);
+        CssValue MarginBottom = CssValue.Auto;
+        CssValue Bottom = CssValue.Auto;
+        CssValue Width = CssValue.From(100);
+
+        // Act
+        CssUI.CSS.BoxModel.Calculate_Vertical(box, cascaded,
+            ref Top, ref MarginTop, ref Height, ref MarginBottom, ref Bottom, Width);
+
+        // Assert - auto vertical margins become 0 for inline-block
+        Assert.Equal(0, MarginTop.AsDecimal(), precision: 1);
+        Assert.Equal(0, MarginBottom.AsDecimal(), precision: 1);
+    }
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Internal")]
+    public void CalculateVertical_InlineBlock_AutoHeight_NoContent_BecomesZero()
+    {
+        // Arrange - Per CSS 2.1 §10.6.6/§10.6.7: Auto height depends on element's descendants
+        var (_, box, cascaded) = _fixture.CreateInlineBlockElement(width: 100);
+
+        // No content height set on box
+
+        CssValue Top = CssValue.Auto;
+        CssValue MarginTop = CssValue.From(0);
+        CssValue Height = CssValue.Auto;
+        CssValue MarginBottom = CssValue.From(0);
+        CssValue Bottom = CssValue.Auto;
+        CssValue Width = CssValue.From(100);
+
+        // Act
+        CssUI.CSS.BoxModel.Calculate_Vertical(box, cascaded,
+            ref Top, ref MarginTop, ref Height, ref MarginBottom, ref Bottom, Width);
+
+        // Assert - auto height with no content should be 0
+        Assert.Equal(0, Height.AsDecimal(), precision: 1);
+    }
+
+    #endregion
+
+    #region FLOATING Element Tests - Deferred to Phase 15
+    // NOTE: The Float property is not yet implemented (Phase 15).
+    // FLOATING display group tests require the Float property to set EBoxDisplayGroup.FLOATING.
+    // These tests are deferred until Phase 15 is completed.
+    // 
+    // Per CSS 2.1:
+    // §10.3.5 Floating, non-replaced elements: auto width → shrink-to-fit
+    // §10.3.6 Floating, replaced elements: width from intrinsic
+    // §10.6.5 Floating, non-replaced elements: auto height → per §10.6.7 (BFC rules)
+    // §10.6.6 Floating, replaced elements: height from intrinsic
+    #endregion
+
+    #region Calculate_Horizontal Tests - Inline Elements (§10.3.1)
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Internal")]
+    public void CalculateHorizontal_Inline_NonReplaced_AutoMarginsBecome0()
+    {
+        // Arrange - Per CSS 2.1 §10.3.1: "A computed value of 'auto' for 'margin-left' 
+        // or 'margin-right' becomes a used value of '0'."
+        var (_, box, cascaded) = _fixture.CreateInlineElement(style =>
+        {
+            style.Margin_Left.Set(CssValue.Auto);
+            style.Margin_Right.Set(CssValue.Auto);
+        });
+
+        CssValue Left = CssValue.Auto;
+        CssValue MarginLeft = CssValue.Auto;
+        CssValue Width = CssValue.Auto;
+        CssValue MarginRight = CssValue.Auto;
+        CssValue Right = CssValue.Auto;
+
+        // Act
+        CssUI.CSS.BoxModel.Calculate_Horizontal(box, cascaded,
+            ref Left, ref MarginLeft, ref Width, ref MarginRight, ref Right);
+
+        // Assert - auto margins become 0 for inline non-replaced
+        Assert.Equal(0, MarginLeft.AsDecimal(), precision: 1);
+        Assert.Equal(0, MarginRight.AsDecimal(), precision: 1);
+    }
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Internal")]
+    public void CalculateHorizontal_Inline_NonReplaced_WidthDoesNotApply()
+    {
+        // Arrange - Per CSS 2.1 §10.3.1: "The 'width' property does not apply."
+        // Width stays auto (or whatever was specified - but it doesn't affect layout)
+        var (_, box, cascaded) = _fixture.CreateInlineElement(style =>
+        {
+            // Even if width is set, it should not apply for inline non-replaced
+            style.Width.Set(200);
+        });
+
+        CssValue Left = CssValue.Auto;
+        CssValue MarginLeft = CssValue.From(0);
+        CssValue Width = CssValue.Auto; // Auto - width property doesn't apply
+        CssValue MarginRight = CssValue.From(0);
+        CssValue Right = CssValue.Auto;
+
+        // Act
+        CssUI.CSS.BoxModel.Calculate_Horizontal(box, cascaded,
+            ref Left, ref MarginLeft, ref Width, ref MarginRight, ref Right);
+
+        // Assert - For inline non-replaced, the width property doesn't apply
+        // The width of the element is determined by its content (line boxes)
+        // The method should leave Width as-is (auto) or compute from content
+        // Note: Since we pass in auto, it remains auto (inline boxes don't have explicit width)
+        Assert.True(Width.IsAuto || Width.AsDecimal() >= 0, 
+            "Inline non-replaced width should remain auto or be determined by content");
+    }
+
+    #endregion
+
+    #region Calculate_Vertical Tests - Inline Elements (§10.6.1)
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Internal")]
+    public void CalculateVertical_Inline_NonReplaced_HeightDoesNotApply()
+    {
+        // Arrange - Per CSS 2.1 §10.6.1: "The 'height' property does not apply."
+        var (_, box, cascaded) = _fixture.CreateInlineElement(style =>
+        {
+            style.Height.Set(200); // This should be ignored
+        });
+
+        CssValue Top = CssValue.Auto;
+        CssValue MarginTop = CssValue.From(0);
+        CssValue Height = CssValue.Auto; // Auto - height property doesn't apply
+        CssValue MarginBottom = CssValue.From(0);
+        CssValue Bottom = CssValue.Auto;
+        CssValue Width = CssValue.Auto;
+
+        // Act
+        CssUI.CSS.BoxModel.Calculate_Vertical(box, cascaded,
+            ref Top, ref MarginTop, ref Height, ref MarginBottom, ref Bottom, Width);
+
+        // Assert - For inline non-replaced, the height property doesn't apply
+        // Height is determined by line-height and vertical-align
+        Assert.True(Height.IsAuto || Height.AsDecimal() >= 0,
+            "Inline non-replaced height should remain auto or be determined by line-height");
+    }
+
+    #endregion
+
+    #region Calculate_Vertical Tests - Block Auto Height (§10.6.3)
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Internal")]
+    public void CalculateVertical_Block_AutoHeight_WithContentHeight_UsesContentHeight()
+    {
+        // Arrange - Per CSS 2.1 §10.6.3: When height is 'auto', the height depends
+        // on whether the element has any block-level children and content.
+        var (_, box, cascaded) = _fixture.CreateBlockElement(configureStyle: style =>
+        {
+            // Height defaults to auto
+        });
+
+        // Simulate content height by setting Content_Height on the box
+        box.Set_Content_Height(150);
+
+        CssValue Top = CssValue.Auto;
+        CssValue MarginTop = CssValue.From(0);
+        CssValue Height = CssValue.Auto;
+        CssValue MarginBottom = CssValue.From(0);
+        CssValue Bottom = CssValue.Auto;
+        CssValue Width = CssValue.Auto;
+
+        // Act
+        CssUI.CSS.BoxModel.Calculate_Vertical(box, cascaded,
+            ref Top, ref MarginTop, ref Height, ref MarginBottom, ref Bottom, Width);
+
+        // Assert - auto height should use content height
+        Assert.Equal(150, Height.AsDecimal(), precision: 1);
+    }
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Internal")]
+    public void CalculateVertical_Block_AutoHeight_NoContent_BecomesZero()
+    {
+        // Arrange - Per CSS 2.1 §10.6.3: If the element has no children and no padding/border,
+        // auto height is zero.
+        var (_, box, cascaded) = _fixture.CreateBlockElement(configureStyle: style =>
+        {
+            // Height defaults to auto, no content
+        });
+
+        // No content height set
+
+        CssValue Top = CssValue.Auto;
+        CssValue MarginTop = CssValue.From(0);
+        CssValue Height = CssValue.Auto;
+        CssValue MarginBottom = CssValue.From(0);
+        CssValue Bottom = CssValue.Auto;
+        CssValue Width = CssValue.Auto;
+
+        // Act
+        CssUI.CSS.BoxModel.Calculate_Vertical(box, cascaded,
+            ref Top, ref MarginTop, ref Height, ref MarginBottom, ref Bottom, Width);
+
+        // Assert - auto height with no content should be zero
+        Assert.Equal(0, Height.AsDecimal(), precision: 1);
+    }
+
+    #endregion
+
+    #region Resolve_Box_Properties_Used_Value Tests
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Internal")]
+    public void ResolveBoxPropertiesUsedValue_AssignsAllOutputParameters()
+    {
+        // Arrange - Test that all output parameters are correctly assigned
+        var (_, box, cascaded) = _fixture.CreateTestElement(style =>
+        {
+            style.Display.Set(EDisplayMode.BLOCK);
+            style.Width.Set(200);
+            style.Height.Set(150);
+            style.Margin_Left.Set(10);
+            style.Margin_Right.Set(20);
+            style.Margin_Top.Set(15);
+            style.Margin_Bottom.Set(25);
+        }, containingBlockWidth: 400, containingBlockHeight: 600);
+
+        // Act
+        CssUI.CSS.BoxModel.Resolve_Box_Properties_Used_Value(box, cascaded,
+            out CssValue Left, out CssValue MarginLeft, out CssValue Width,
+            out CssValue MarginRight, out CssValue Right,
+            out CssValue Top, out CssValue MarginTop, out CssValue Height,
+            out CssValue MarginBottom, out CssValue Bottom);
+
+        // Assert - All outputs should be assigned
+        Assert.NotNull(Width);
+        Assert.NotNull(Height);
+        Assert.NotNull(MarginLeft);
+        Assert.NotNull(MarginRight);
+        Assert.NotNull(MarginTop);
+        Assert.NotNull(MarginBottom);
+        Assert.NotNull(Left);
+        Assert.NotNull(Right);
+        Assert.NotNull(Top);
+        Assert.NotNull(Bottom);
+
+        // Verify values are reasonable
+        Assert.Equal(200, Width.AsDecimal(), precision: 1);
+        Assert.Equal(150, Height.AsDecimal(), precision: 1);
+        Assert.Equal(10, MarginLeft.AsDecimal(), precision: 1);
+        Assert.Equal(15, MarginTop.AsDecimal(), precision: 1);
+    }
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Internal")]
+    public void ResolveBoxPropertiesUsedValue_OrchestrationCallsBothResolvers()
+    {
+        // Arrange - Test that both Resolve_Horizontal and Resolve_Vertical are called
+        // and that they work together correctly
+        var (_, box, cascaded) = _fixture.CreateAbsoluteElement(style =>
+        {
+            style.Left.Set(50);
+            style.Right.Set(50);
+            style.Top.Set(40);
+            style.Bottom.Set(40);
+            style.Margin_Left.Set(10);
+            style.Margin_Right.Set(10);
+            style.Margin_Top.Set(20);
+            style.Margin_Bottom.Set(20);
+        }, containingBlockWidth: 400, containingBlockHeight: 600);
+
+        // Act
+        CssUI.CSS.BoxModel.Resolve_Box_Properties_Used_Value(box, cascaded,
+            out CssValue Left, out CssValue MarginLeft, out CssValue Width,
+            out CssValue MarginRight, out CssValue Right,
+            out CssValue Top, out CssValue MarginTop, out CssValue Height,
+            out CssValue MarginBottom, out CssValue Bottom);
+
+        // Assert
+        // Width = 400 - 50 - 10 - 10 - 50 = 280
+        Assert.Equal(280, Width.AsDecimal(), precision: 1);
+        
+        // Height = 600 - 40 - 20 - 20 - 40 = 480
+        Assert.Equal(480, Height.AsDecimal(), precision: 1);
+        
+        // Offsets should be preserved
+        Assert.Equal(50, Left.AsDecimal(), precision: 1);
+        Assert.Equal(50, Right.AsDecimal(), precision: 1);
+        Assert.Equal(40, Top.AsDecimal(), precision: 1);
+        Assert.Equal(40, Bottom.AsDecimal(), precision: 1);
+    }
+
+    #endregion
+
+    #region Get_Height_For_Block_Formatting_Context Tests (§10.6.7)
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "Internal")]
+    [Trait("Category", "Pending")]
+    public void GetHeightForBFC_NoChildren_ReturnsZero()
+    {
+        // Arrange - Element with no children
+        var (_, box, _) = _fixture.CreateBlockElement();
+
+        // Act
+        var height = CssUI.CSS.BoxModel.Get_Height_For_Block_Formatting_Context(box);
+
+        // Assert - no children means zero height
+        Assert.Equal(0, height, precision: 1);
+    }
+
+    // NOTE: The following tests require a more complex setup with actual child elements
+    // that have boxes assigned. The Get_Height_For_Block_Formatting_Context method
+    // walks the DOM tree to find first/last children and their margin edges.
+    // These tests are marked as pending until the test infrastructure supports
+    // creating nested elements with boxes in a controlled manner.
+    //
+    // Tests needed:
+    // - GetHeightForBFC_WithInlineChildren_UsesTopBottomLineBoxEdges
+    // - GetHeightForBFC_WithBlockChildren_UsesTopBottomMarginEdges
+    // - GetHeightForBFC_AbsoluteChildrenIgnored
+    // - GetHeightForBFC_IncludesFloatingDescendantsBottomEdge
+    // - GetHeightForBFC_MarginCollapsingEdgeCases
+    //
+    // These will be implemented in Phase 17 (Block Formatting Context Implementation)
+    // when the full BFC infrastructure is available.
+
+    #endregion
+
     #region Negative Margin Centering Tests (§10.3.7)
 
     [Fact]

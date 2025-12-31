@@ -197,6 +197,26 @@ public class BoxModelTestFixture : IDisposable
     }
 
     /// <summary>
+    /// Creates an inline element (display: inline).
+    /// </summary>
+    /// <remarks>
+    /// Per CSS 2.1 §10.3.1: The 'width' property does not apply to inline non-replaced elements.
+    /// Per CSS 2.1 §10.6.1: The 'height' property does not apply to inline non-replaced elements.
+    /// Auto margins become 0.
+    /// </remarks>
+    public (Element element, CssPrincipalBox box, CssComputedStyle cascaded) CreateInlineElement(
+        Action<CssComputedStyle>? configureStyle = null,
+        int? containingBlockWidth = null,
+        int? containingBlockHeight = null)
+    {
+        return CreateTestElement(style =>
+        {
+            style.Display.Set(EDisplayMode.INLINE);
+            configureStyle?.Invoke(style);
+        }, containingBlockWidth, containingBlockHeight);
+    }
+
+    /// <summary>
     /// Creates an inline-block element with specified dimensions.
     /// </summary>
     public (Element element, CssPrincipalBox box, CssComputedStyle cascaded) CreateInlineBlockElement(
@@ -213,6 +233,38 @@ public class BoxModelTestFixture : IDisposable
                 style.Height.Set(height.Value);
             configureStyle?.Invoke(style);
         });
+    }
+
+    /// <summary>
+    /// Creates a floating element.
+    /// </summary>
+    /// <remarks>
+    /// Per CSS 2.1 §10.3.5: Auto margins become 0. Auto width uses shrink-to-fit.
+    /// Note: Float property is not yet implemented (Phase 15), so this simulates
+    /// floating behavior by setting display group. The Float property would normally
+    /// trigger blockification and FLOATING display group.
+    /// </remarks>
+    public (Element element, CssPrincipalBox box, CssComputedStyle cascaded) CreateFloatingElement(
+        int? width = null,
+        int? height = null,
+        Action<CssComputedStyle>? configureStyle = null,
+        int? containingBlockWidth = null,
+        int? containingBlockHeight = null)
+    {
+        // NOTE: Since Float property is not implemented (Phase 15), we cannot truly create
+        // a floating element. The box's DisplayGroup is derived from computed styles.
+        // For now, we create a block element. Tests for FLOATING DisplayGroup will need
+        // to either mock the box or wait for Phase 15 implementation.
+        return CreateTestElement(style =>
+        {
+            style.Display.Set(EDisplayMode.BLOCK);
+            // Float property would go here when implemented
+            if (width.HasValue)
+                style.Width.Set(width.Value);
+            if (height.HasValue)
+                style.Height.Set(height.Value);
+            configureStyle?.Invoke(style);
+        }, containingBlockWidth, containingBlockHeight);
     }
 
     /// <summary>
