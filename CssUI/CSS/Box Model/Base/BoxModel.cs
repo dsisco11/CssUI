@@ -169,7 +169,7 @@ public static class BoxModel
     /// Resolves 'Used' values for the following properties:
     /// Width, Height, Top, Right, Bottom, Left, Margin-Left, Margin-Right
     /// </summary>
-    private static void Resolve_Box_Properties_Used_Value(CssPrincipalBox Box, CssComputedStyle Cascaded, out CssValue Left, out CssValue MarginLeft, out CssValue Width, out CssValue MarginRight, out CssValue Right, out CssValue Top, out CssValue MarginTop, out CssValue Height, out CssValue MarginBottom, out CssValue Bottom)
+    internal static void Resolve_Box_Properties_Used_Value(CssPrincipalBox Box, CssComputedStyle Cascaded, out CssValue Left, out CssValue MarginLeft, out CssValue Width, out CssValue MarginRight, out CssValue Right, out CssValue Top, out CssValue MarginTop, out CssValue Height, out CssValue MarginBottom, out CssValue Bottom)
     {
         Resolve_Horizontal(Box, Cascaded, out CssValue outLeft, out CssValue outMarginLeft, out CssValue outWidth, out CssValue outMarginRight, out CssValue outRight);
         Resolve_Vertical(Box, Cascaded, out CssValue outTop, out CssValue outMarginTop, out CssValue outHeight, out CssValue outMarginBottom, out CssValue outBottom);
@@ -204,7 +204,7 @@ public static class BoxModel
     /// <summary>
     /// Resolves all horizontal sizing properties
     /// </summary>
-    private static void Resolve_Horizontal(CssPrincipalBox Box, CssComputedStyle Cascaded, out CssValue outLeft, out CssValue outMarginLeft, out CssValue outWidth, out CssValue outMarginRight, out CssValue outRight)
+    internal static void Resolve_Horizontal(CssPrincipalBox Box, CssComputedStyle Cascaded, out CssValue outLeft, out CssValue outMarginLeft, out CssValue outWidth, out CssValue outMarginRight, out CssValue outRight)
     {
         // Resolve percentages using each property's defined Percentage_Resolver (CSS Values 4 §5.1.1)
         // This is done during layout phase when boxes are guaranteed to exist.
@@ -214,6 +214,7 @@ public static class BoxModel
         CssValue MarginRight = CssPercentageResolvers.ResolvePercentageIfNeeded(Cascaded.Margin_Right);
         CssValue Right = CssPercentageResolvers.ResolvePercentageIfNeeded(Cascaded.Right);
 
+        // First pass: resolve auto values
         Calculate_Horizontal(Box, Cascaded, ref Left, ref MarginLeft, ref Width, ref MarginRight, ref Right);
 
         /*
@@ -237,21 +238,30 @@ public static class BoxModel
         }
         else
         {
-            if (Max_Width.HasValue)
+            // Only apply min/max constraints if width is no longer auto
+            // (auto should have been resolved by Calculate_Horizontal)
+            if (!Width.IsAuto)
             {
-                //if (Max_Width.Value.CompareTo(Width.AsDecimal()) < 0)// Width > Max_Width
-                if (Width.AsDecimal() > Max_Width.Value)// Width > Max_Width
+                bool needsRecalc = false;
+
+                if (Max_Width.HasValue && Width.AsDecimal() > Max_Width.Value)
                 {
                     Width = CssValue.From(Max_Width.Value);
+                    needsRecalc = true;
+                }
+
+                // Per CSS 2.1 §10.4: If min-width > max-width, max-width is ignored (min wins)
+                if (Width.AsDecimal() < Min_Width)
+                {
+                    Width = CssValue.From(Min_Width);
+                    needsRecalc = true;
+                }
+
+                // Recalculate margins if width was constrained
+                if (needsRecalc)
+                {
                     Calculate_Horizontal(Box, Cascaded, ref Left, ref MarginLeft, ref Width, ref MarginRight, ref Right);
                 }
-            }
-
-            //if (Min_Width.CompareTo(Width.AsDecimal()) > 0)// Width < Min_Width
-            if (Width.AsDecimal() < Min_Width)// Width < Min_Width
-            {
-                Width = CssValue.From(Min_Width);
-                Calculate_Horizontal(Box, Cascaded, ref Left, ref MarginLeft, ref Width, ref MarginRight, ref Right);
             }
         }
 
@@ -266,7 +276,7 @@ public static class BoxModel
     /// <summary>
     /// Resolves all vertical sizing properties
     /// </summary>
-    private static void Resolve_Vertical(CssPrincipalBox Box, CssComputedStyle Cascaded, out CssValue outTop, out CssValue outMarginTop, out CssValue outHeight, out CssValue outMarginBottom, out CssValue outBottom)
+    internal static void Resolve_Vertical(CssPrincipalBox Box, CssComputedStyle Cascaded, out CssValue outTop, out CssValue outMarginTop, out CssValue outHeight, out CssValue outMarginBottom, out CssValue outBottom)
     {
         // Resolve percentages using each property's defined Percentage_Resolver (CSS Values 4 §5.1.1)
         // This is done during layout phase when boxes are guaranteed to exist.
@@ -295,18 +305,29 @@ public static class BoxModel
         }
         else
         {
-            // Only apply min/max constraints if Height is not auto
+            // First pass: resolve auto values
+            Calculate_Vertical(Box, Cascaded, ref Top, ref MarginTop, ref Height, ref MarginBottom, ref Bottom);
+
+            // Only apply min/max constraints if Height is no longer auto
             if (!Height.IsAuto)
             {
+                bool needsRecalc = false;
+
                 if (Max_Height.HasValue && Height.AsDecimal() > Max_Height.Value)
                 {
                     Height = CssValue.From(Max_Height.Value);
-                    Calculate_Vertical(Box, Cascaded, ref Top, ref MarginTop, ref Height, ref MarginBottom, ref Bottom);
+                    needsRecalc = true;
                 }
 
+                // Per CSS 2.1 §10.7: If min-height > max-height, max-height is ignored (min wins)
                 if (Height.AsDecimal() < Min_Height)
                 {
                     Height = CssValue.From(Min_Height);
+                    needsRecalc = true;
+                }
+
+                if (needsRecalc)
+                {
                     Calculate_Vertical(Box, Cascaded, ref Top, ref MarginTop, ref Height, ref MarginBottom, ref Bottom);
                 }
             }
@@ -327,7 +348,7 @@ public static class BoxModel
     /// <param name="outWidth"></param>
     /// <param name="outHeight"></param>
     /// <returns><c>True</c> is the values changed</returns>
-    private static bool Constrain_Width_Height(CssComputedStyle Cascaded, ref CssValue Width, ref CssValue Height)
+    internal static bool Constrain_Width_Height(CssComputedStyle Cascaded, ref CssValue Width, ref CssValue Height)
     {/* Docs: https://www.w3.org/TR/CSS22/visudet.html#min-max-widths */
         /*
         * Select from the table the resolved height and width values for the appropriate constraint violation.
@@ -417,7 +438,7 @@ public static class BoxModel
     /// <summary>
     /// Calculates all horizontal property values using the ones given
     /// </summary>
-    private static void Calculate_Horizontal(CssPrincipalBox Box, CssComputedStyle Cascaded, ref CssValue Left, ref CssValue MarginLeft, ref CssValue Width, ref CssValue MarginRight, ref CssValue Right)
+    internal static void Calculate_Horizontal(CssPrincipalBox Box, CssComputedStyle Cascaded, ref CssValue Left, ref CssValue MarginLeft, ref CssValue Width, ref CssValue MarginRight, ref CssValue Right)
     {
         Calculate_Horizontal(Box, Cascaded, Left, MarginLeft, Width, MarginRight, Right, out CssValue outLeft, out CssValue outMarginLeft, out CssValue outWidth, out CssValue outMarginRight, out CssValue outRight);
 
@@ -431,7 +452,7 @@ public static class BoxModel
     /// <summary>
     /// Calculates all horizontal property values using the ones given
     /// </summary>
-    private static void Calculate_Horizontal(CssPrincipalBox Box, CssComputedStyle Cascaded, CssValue Left, CssValue MarginLeft, CssValue Width, CssValue MarginRight, CssValue Right, out CssValue outLeft, out CssValue outMarginLeft, out CssValue outWidth, out CssValue outMarginRight, out CssValue outRight)
+    internal static void Calculate_Horizontal(CssPrincipalBox Box, CssComputedStyle Cascaded, CssValue Left, CssValue MarginLeft, CssValue Width, CssValue MarginRight, CssValue Right, out CssValue outLeft, out CssValue outMarginLeft, out CssValue outWidth, out CssValue outMarginRight, out CssValue outRight)
     {// Docs: https://www.w3.org/TR/CSS22/visudet.html#Computing_widths_and_margins
         /*
          * The values of an element's 'width', 'margin-left', 'margin-right', 'left' and 'right' properties as used for layout depend on the type of box generated and on each other. (The value used for layout is sometimes referred to as the used value.) In principle, the values used are the same as the computed values, with 'auto' replaced by some suitable value, and percentages calculated based on the containing block, but there are exceptions. The following situations need to be distinguished:
@@ -524,78 +545,95 @@ public static class BoxModel
                     /* 10.3.3 Block-level, non-replaced elements in normal flow */
                     if (!Box.IsReplacedElement)
                     {/* 10.3.3 Block-level, non-replaced elements in normal flow */
-                        /* If 'width' is not 'auto' and 'border-left-width' + 'padding-left' + 'width' + 'padding-right' + 'border-right-width' (plus any of 'margin-left' or 'margin-right' that are not 'auto') is larger than the width of the containing block, then any 'auto' values for 'margin-left' or 'margin-right' are, for the following rules, treated as zero. */
-                        bool Exceeds = (!Width.IsAuto && CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) < (marginLeft + BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight + marginRight));
-                        // I suppose the specs want us to ignore this auto section and just set the margins to 0?
-                        if (Exceeds)
+                        /*
+                         * The constraint equation is:
+                         * 'margin-left' + 'border-left-width' + 'padding-left' + 'width' + 'padding-right' + 'border-right-width' + 'margin-right' = width of containing block
+                         *
+                         * Per CSS 2.1 §10.3.3, the resolution order is:
+                         * 1. If 'width' is not 'auto' and exceeds container, set auto margins to 0
+                         * 2. If 'width' is 'auto', set auto margins to 0 and solve for width
+                         * 3. If both margins are 'auto' (and width is not), they're equal (centering)
+                         * 4. If one margin is 'auto', it gets remaining space
+                         * 5. If over-constrained (no autos), adjust margin-right (LTR) or margin-left (RTL)
+                         */
+
+                        var containingWidth = CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box);
+
+                        // Step 1: Handle exceeds case
+                        /* If 'width' is not 'auto' and the total exceeds the containing block width,
+                           then any 'auto' values for margins are treated as zero. */
+                        if (!Width.IsAuto)
                         {
-                            if (MarginLeft.IsAuto)
-                                MarginLeft = CssValue.Zero;
-                            if (MarginRight.IsAuto)
-                                MarginRight = CssValue.Zero;
+                            var totalNonAuto = (marginLeft + BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight + marginRight);
+                            if (totalNonAuto > containingWidth)
+                            {
+                                if (MarginLeft.IsAuto)
+                                    MarginLeft = CssValue.Zero;
+                                if (MarginRight.IsAuto)
+                                    MarginRight = CssValue.Zero;
+                                marginLeft = 0;
+                                marginRight = 0;
+                            }
                         }
 
-                        bool singleAuto = (MarginLeft.IsAuto ^ Width.IsAuto ^ MarginRight.IsAuto);
-                        bool OverConstrained = !(MarginLeft.IsAuto && Width.IsAuto && MarginRight.IsAuto);
-
-                        /* If all of the above have a computed value other than 'auto', the values are said to be "over-constrained" and one of the used values will have to be different from its computed value. If the 'direction' property of the containing block has the value 'ltr', the specified value of 'margin-right' is ignored and the value is calculated so as to make the equality true. If the value of 'direction' is 'rtl', this happens to 'margin-left' instead. */
-                        if (OverConstrained)
+                        // Step 2: Handle width: auto
+                        if (Width.IsAuto)
                         {
+                            // If 'width' is set to 'auto', any other 'auto' values become '0'
+                            if (MarginLeft.IsAuto)
+                            {
+                                MarginLeft = CssValue.Zero;
+                                marginLeft = 0;
+                            }
+                            if (MarginRight.IsAuto)
+                            {
+                                MarginRight = CssValue.Zero;
+                                marginRight = 0;
+                            }
+                            // Width follows from the equality
+                            var total = marginLeft + BorderLeft + PaddingLeft + PaddingRight + BorderRight + marginRight;
+                            Width = CssValue.From(Math.Max(0, containingWidth - total));
+                        }
+                        // Step 3: Both margins auto (and width is not) - centering
+                        else if (MarginLeft.IsAuto && MarginRight.IsAuto)
+                        {
+                            var usedSpace = BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight;
+                            var availableSpace = containingWidth - usedSpace;
+                            var eachMargin = availableSpace / 2.0;
+                            MarginLeft = CssValue.From(eachMargin);
+                            MarginRight = CssValue.From(eachMargin);
+                        }
+                        // Step 4: Single auto margin
+                        else if (MarginLeft.IsAuto)
+                        {
+                            var usedSpace = BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight + marginRight;
+                            MarginLeft = CssValue.From(Math.Max(0, containingWidth - usedSpace));
+                        }
+                        else if (MarginRight.IsAuto)
+                        {
+                            var usedSpace = marginLeft + BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight;
+                            MarginRight = CssValue.From(Math.Max(0, containingWidth - usedSpace));
+                        }
+                        // Step 5: Over-constrained (no autos)
+                        else
+                        {
+                            // All values are specified - over-constrained
+                            // Adjust margin-right (LTR) or margin-left (RTL) to satisfy constraint
                             switch (Direction)
                             {
                                 case EDirection.LTR:
                                     {
-                                        var eqRes = (marginLeft + BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight);
-                                        MarginRight = CssValue.From(CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes);
+                                        var usedSpace = marginLeft + BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight;
+                                        MarginRight = CssValue.From(containingWidth - usedSpace);
                                     }
                                     break;
                                 case EDirection.RTL:
                                     {
-                                        var eqRes = (BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight + marginRight);
-                                        MarginLeft = CssValue.From(CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes);
+                                        var usedSpace = BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight + marginRight;
+                                        MarginLeft = CssValue.From(containingWidth - usedSpace);
                                     }
                                     break;
                             }
-                        }
-                        else if (singleAuto)
-                        {/* If there is exactly one value specified as 'auto', its used value follows from the equality. */
-                            if (Width.IsAuto)
-                            {
-                                var eqRes = (marginLeft + BorderLeft + PaddingLeft + 0 + PaddingRight + BorderRight + marginRight);
-                                Width = CssValue.From(CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes);
-                            }
-                            else if (MarginLeft.IsAuto)
-                            {
-                                var eqRes = (BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight + marginRight);
-                                MarginLeft = CssValue.From(CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes);
-                            }
-                            else if (MarginRight.IsAuto)
-                            {
-                                var eqRes = (marginLeft + BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight);
-                                MarginRight = CssValue.From(CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes);
-                            }
-                        }
-
-                        if (Width.IsAuto)
-                        {// If 'width' is set to 'auto', any other 'auto' values become '0' and 'width' follows from the resulting equality.
-                            double total = 0;
-                            total += (MarginLeft.IsAuto ? 0 : MarginLeft.AsDecimal());
-                            total += BorderLeft;
-                            total += PaddingLeft;
-
-                            total += PaddingRight;
-                            total += BorderRight;
-                            total += (MarginRight.IsAuto ? 0 : MarginRight.AsDecimal());
-
-                            Width = CssValue.From(CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - total);
-                        }
-
-                        if (MarginLeft.IsAuto && MarginRight.IsAuto)
-                        {/* If both 'margin-left' and 'margin-right' are 'auto', their used values are equal. This horizontally centers the element with respect to the edges of the containing block. */
-                            var eqRes = (BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight);
-                            var avail = (CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes);
-                            MarginLeft = CssValue.From(avail / 2);
-                            MarginRight = CssValue.From(avail / 2);
                         }
                     }
                     /* 10.3.4 Block-level, replaced elements in normal flow */
@@ -639,59 +677,66 @@ public static class BoxModel
                         }
                         #endregion
 
-                        /* If 'width' is not 'auto' and 'border-left-width' + 'padding-left' + 'width' + 'padding-right' + 'border-right-width' (plus any of 'margin-left' or 'margin-right' that are not 'auto') is larger than the width of the containing block, then any 'auto' values for 'margin-left' or 'margin-right' are, for the following rules, treated as zero. */
-                        bool Exceeds = (!Width.IsAuto && CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) < (marginLeft + BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight + marginRight));
-                        // I suppose the specs want us to ignore this auto section and just set the margins to 0?
-                        if (Exceeds)
+                        /* Apply margin rules for block-level replaced elements (same as non-replaced) */
+                        var containingWidth = CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box);
+
+                        // Handle exceeds case
+                        if (!Width.IsAuto)
                         {
-                            if (MarginLeft.IsAuto)
-                                MarginLeft = CssValue.Zero;
-                            if (MarginRight.IsAuto)
-                                MarginRight = CssValue.Zero;
+                            var totalNonAuto = (marginLeft + BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight + marginRight);
+                            if (totalNonAuto > containingWidth)
+                            {
+                                if (MarginLeft.IsAuto)
+                                {
+                                    MarginLeft = CssValue.Zero;
+                                    marginLeft = 0;
+                                }
+                                if (MarginRight.IsAuto)
+                                {
+                                    MarginRight = CssValue.Zero;
+                                    marginRight = 0;
+                                }
+                            }
                         }
 
-                        bool singleAuto = (MarginLeft.IsAuto ^ Width.IsAuto ^ MarginRight.IsAuto);
-                        bool OverConstrained = !(MarginLeft.IsAuto && Width.IsAuto && MarginRight.IsAuto);
-
-                        /* If all of the above have a computed value other than 'auto', the values are said to be "over-constrained" and one of the used values will have to be different from its computed value. If the 'direction' property of the containing block has the value 'ltr', the specified value of 'margin-right' is ignored and the value is calculated so as to make the equality true. If the value of 'direction' is 'rtl', this happens to 'margin-left' instead. */
-                        if (OverConstrained)
+                        // Both margins auto - centering
+                        if (MarginLeft.IsAuto && MarginRight.IsAuto)
+                        {
+                            var usedSpace = BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight;
+                            var availableSpace = containingWidth - usedSpace;
+                            var eachMargin = availableSpace / 2.0;
+                            MarginLeft = CssValue.From(eachMargin);
+                            MarginRight = CssValue.From(eachMargin);
+                        }
+                        // Single auto margin
+                        else if (MarginLeft.IsAuto)
+                        {
+                            var usedSpace = BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight + marginRight;
+                            MarginLeft = CssValue.From(Math.Max(0, containingWidth - usedSpace));
+                        }
+                        else if (MarginRight.IsAuto)
+                        {
+                            var usedSpace = marginLeft + BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight;
+                            MarginRight = CssValue.From(Math.Max(0, containingWidth - usedSpace));
+                        }
+                        // Over-constrained (no autos)
+                        else
                         {
                             switch (Direction)
                             {
                                 case EDirection.LTR:
                                     {
-                                        var eqRes = (marginLeft + BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight);
-                                        MarginRight = CssValue.From(CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes);
+                                        var usedSpace = marginLeft + BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight;
+                                        MarginRight = CssValue.From(containingWidth - usedSpace);
                                     }
                                     break;
                                 case EDirection.RTL:
                                     {
-                                        var eqRes = (BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight + marginRight);
-                                        MarginLeft = CssValue.From(CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes);
+                                        var usedSpace = BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight + marginRight;
+                                        MarginLeft = CssValue.From(containingWidth - usedSpace);
                                     }
                                     break;
                             }
-                        }
-                        else if (singleAuto)
-                        {
-                            if (MarginLeft.IsAuto)
-                            {
-                                var eqRes = (BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight + marginRight);
-                                MarginLeft = CssValue.From(CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes);
-                            }
-                            else if (MarginRight.IsAuto)
-                            {
-                                var eqRes = (marginLeft + BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight);
-                                MarginRight = CssValue.From(CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes);
-                            }
-                        }
-
-                        if (MarginLeft.IsAuto && MarginRight.IsAuto)
-                        {/* If both 'margin-left' and 'margin-right' are 'auto', their used values are equal. This horizontally centers the element with respect to the edges of the containing block. */
-                            var eqRes = (BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight);
-                            var avail = (CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - eqRes);
-                            MarginLeft = CssValue.From(avail / 2);
-                            MarginRight = CssValue.From(avail / 2);
                         }
                     }
                 }
@@ -1128,6 +1173,45 @@ public static class BoxModel
                     }
                 }
                 break;
+
+            default:
+                {
+                    // INVALID or unhandled display type - treat as block for width calculation
+                    // This ensures we don't leave width/margins unresolved
+                    if (Width.IsAuto)
+                    {
+                        if (MarginLeft.IsAuto)
+                            MarginLeft = CssValue.Zero;
+                        if (MarginRight.IsAuto)
+                            MarginRight = CssValue.Zero;
+
+                        var total = (MarginLeft.AsDecimal() + BorderLeft + PaddingLeft + PaddingRight + BorderRight + MarginRight.AsDecimal());
+                        Width = CssValue.From(Math.Max(0, CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - total));
+                    }
+                    else
+                    {
+                        // Both margins auto - centering
+                        if (MarginLeft.IsAuto && MarginRight.IsAuto)
+                        {
+                            var usedSpace = BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight;
+                            var availableSpace = CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - usedSpace;
+                            var eachMargin = availableSpace / 2.0;
+                            MarginLeft = CssValue.From(eachMargin);
+                            MarginRight = CssValue.From(eachMargin);
+                        }
+                        else if (MarginLeft.IsAuto)
+                        {
+                            var usedSpace = BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight + marginRight;
+                            MarginLeft = CssValue.From(Math.Max(0, CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - usedSpace));
+                        }
+                        else if (MarginRight.IsAuto)
+                        {
+                            var usedSpace = marginLeft + BorderLeft + PaddingLeft + Width.AsDecimal() + PaddingRight + BorderRight;
+                            MarginRight = CssValue.From(Math.Max(0, CssCommon.Get_Logical_Width(WritingMode, Box.Containing_Box) - usedSpace));
+                        }
+                    }
+                }
+                break;
         }
 
         outLeft = Left;
@@ -1144,7 +1228,7 @@ public static class BoxModel
     /// Calculates all horizontal property values using the ones given
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Calculate_Vertical(CssPrincipalBox Box, CssComputedStyle Cascaded, ref CssValue Top, ref CssValue MarginTop, ref CssValue Height, ref CssValue MarginBottom, ref CssValue Bottom, CssValue? WidthOverride = null)
+    internal static void Calculate_Vertical(CssPrincipalBox Box, CssComputedStyle Cascaded, ref CssValue Top, ref CssValue MarginTop, ref CssValue Height, ref CssValue MarginBottom, ref CssValue Bottom, CssValue? WidthOverride = null)
     {
         Calculate_Vertical(Box, Cascaded, Top, MarginTop, Height, MarginBottom, Bottom, WidthOverride!, out CssValue outTop, out CssValue outMarginTop, out CssValue outHeight, out CssValue outMarginBottom, out CssValue outBottom);
 
@@ -1159,7 +1243,7 @@ public static class BoxModel
     /// Calculates all horizontal property values using the ones given
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Calculate_Vertical(CssPrincipalBox Box, CssComputedStyle Cascaded, CssValue Top, CssValue MarginTop, CssValue Height, CssValue MarginBottom, CssValue Bottom, CssValue Width, out CssValue outTop, out CssValue outMarginTop, out CssValue outHeight, out CssValue outMarginBottom, out CssValue outBottom)
+    internal static void Calculate_Vertical(CssPrincipalBox Box, CssComputedStyle Cascaded, CssValue Top, CssValue MarginTop, CssValue Height, CssValue MarginBottom, CssValue Bottom, CssValue Width, out CssValue outTop, out CssValue outMarginTop, out CssValue outHeight, out CssValue outMarginBottom, out CssValue outBottom)
     {// Docs: https://www.w3.org/TR/CSS22/visudet.html#Computing_heights_and_margins
         /*
          * The values of an element's 'width', 'margin-left', 'margin-right', 'left' and 'right' properties as used for layout depend on the type of box generated and on each other. (The value used for layout is sometimes referred to as the used value.) In principle, the values used are the same as the computed values, with 'auto' replaced by some suitable value, and percentages calculated based on the containing block, but there are exceptions. The following situations need to be distinguished:
@@ -1526,7 +1610,7 @@ public static class BoxModel
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static double Get_Height_For_Block_Formatting_Context(CssPrincipalBox Box)
+    internal static double Get_Height_For_Block_Formatting_Context(CssPrincipalBox Box)
     {
         /*
          * If it only has inline-level children, the height is the distance between the top of the topmost line box and the bottom of the bottommost line box.
@@ -1605,6 +1689,4 @@ public static class BoxModel
         }
     }
     #endregion
-
 }
-
