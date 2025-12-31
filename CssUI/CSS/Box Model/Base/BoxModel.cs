@@ -286,12 +286,28 @@ public static class BoxModel
         CssValue MarginBottom = CssPercentageResolvers.ResolvePercentageIfNeeded(Cascaded.Margin_Bottom);
         CssValue Bottom = CssPercentageResolvers.ResolvePercentageIfNeeded(Cascaded.Bottom);
 
+        // CSS 2.1 §10.5: If the height of the containing block is not specified explicitly
+        // (i.e., it depends on content height), and this element is not absolutely positioned,
+        // a percentage height is treated as 'auto'.
+        // Check if height was originally a percentage and CB height is not explicit
+        bool isAbsolutelyPositioned = Box.DisplayGroup == EBoxDisplayGroup.ABSOLUTELY_POSITIONED;
+        bool percentageResolvedToAuto = false;
+        if (!isAbsolutelyPositioned && Cascaded.Height.Computed?.Type == ECssValueTypes.PERCENT)
+        {
+            // Only treat as auto if the containing block doesn't have explicit height
+            if (!Box.Containing_Box_Explicit_Height)
+            {
+                Height = CssValue.Auto;
+                percentageResolvedToAuto = true;
+            }
+        }
+
         /*
          * However, for replaced elements with both 'width' and 'height' computed as 'auto',
          * use the algorithm under 'Minimum and maximum widths' above to find the used width and height.
          * Then apply the rules under "Computing heights and margins" above, using the resulting width and height as if they were the computed values.
          */
-        bool autoWidth = Cascaded.Width.Computed.IsAuto;
+        bool autoWidth = Cascaded.Width.Computed?.IsAuto ?? true;
         bool autoHeight = Height.IsAuto;
 
         var Min_Height = Cascaded.Min_Height.Actual;
@@ -299,9 +315,18 @@ public static class BoxModel
 
         if (Box.IsReplacedElement && autoWidth && autoHeight)
         {
-            CssValue Width = Cascaded.Width.Computed;
+            CssValue Width = Cascaded.Width.Computed ?? CssValue.Auto;
             Constrain_Width_Height(Cascaded, ref Width, ref Height);
             Calculate_Vertical(Box, Cascaded, ref Top, ref MarginTop, ref Height, ref MarginBottom, ref Bottom, Width);
+        }
+        else if (percentageResolvedToAuto)
+        {
+            // CSS 2.1 §10.5: Percentage height resolved to auto because containing block
+            // has auto height. We only resolve margins here, not the height itself.
+            // The height stays 'auto' until content dimensions are known.
+            if (MarginTop.IsAuto) MarginTop = CssValue.Zero;
+            if (MarginBottom.IsAuto) MarginBottom = CssValue.Zero;
+            // Height stays CssValue.Auto - it was set above and should remain auto
         }
         else
         {
@@ -315,14 +340,14 @@ public static class BoxModel
 
                 if (Max_Height.HasValue && Height.AsDecimal() > Max_Height.Value)
                 {
-                    Height = CssValue.From(Max_Height.Value);
+                    Height = new CssIntegerValue(Max_Height.Value);
                     needsRecalc = true;
                 }
 
                 // Per CSS 2.1 §10.7: If min-height > max-height, max-height is ignored (min wins)
                 if (Height.AsDecimal() < Min_Height)
                 {
-                    Height = CssValue.From(Min_Height);
+                    Height = new CssIntegerValue(Min_Height);
                     needsRecalc = true;
                 }
 
@@ -358,76 +383,134 @@ public static class BoxModel
         */
 
         var Min_Width = Cascaded.Min_Width.Actual;
-        var Max_Width = Math.Max(Min_Width, Cascaded.Max_Width.Actual ?? 0);
+        // When max-width/max-height is not set (null), use double.MaxValue to indicate no constraint
+        var Max_Width = Cascaded.Max_Width.Actual.HasValue
+            ? Math.Max(Min_Width, Cascaded.Max_Width.Actual.Value)
+            : double.MaxValue;
 
         var Min_Height = Cascaded.Min_Height.Actual;
-        var Max_Height = Math.Max(Min_Height, Cascaded.Max_Height.Actual ?? 0);
+        var Max_Height = Cascaded.Max_Height.Actual.HasValue
+            ? Math.Max(Min_Height, Cascaded.Max_Height.Actual.Value)
+            : double.MaxValue;
 
-        var width = Width.AsDecimal();
-        var height = Height.AsDecimal();
+        var w = Width.AsDecimal();
+        var h = Height.AsDecimal();
 
-        var fwidth = (float)width;
-        var fheight = (float)height;
+        // Calculate the intrinsic ratio (width/height)
+        var ratio = h > 0 ? w / h : 1.0;
 
-        var wMinRatio = (Min_Width / fwidth);
-        var wMaxRatio = (Max_Width / fwidth);
-        var hMinRatio = (Min_Height / fheight);
-        var hMaxRatio = (Max_Height / fheight);
+        // Determine constraint violations
+        bool wViolatesMax = w > Max_Width;
+        bool wViolatesMin = w < Min_Width;
+        bool hViolatesMax = h > Max_Height;
+        bool hViolatesMin = h < Min_Height;
 
-        bool valuesChanged = true;
-        if (width > Max_Width) // W > max-width
+        double newWidth = w;
+        double newHeight = h;
+        bool valuesChanged = false;
+
+        // CSS 2.1 §10.4 constraint violation table:
+        // Check each case and apply the appropriate constraint while maintaining ratio
+
+        if (wViolatesMax && hViolatesMax)
         {
-            Width = CssValue.From(Max_Width);
-            Height = CssValue.From(Math.Max(Max_Width * (fheight / fwidth), Min_Height));
+            // Both exceed max - scale down to fit within both constraints
+            double wScaled = Max_Width;
+            double hForWScaled = Max_Width / ratio;
+            double hScaled = Max_Height;
+            double wForHScaled = Max_Height * ratio;
+
+            // Use the more constrained dimension
+            if (hForWScaled <= Max_Height)
+            {
+                newWidth = wScaled;
+                newHeight = Math.Max(Min_Height, hForWScaled);
+            }
+            else
+            {
+                newWidth = Math.Max(Min_Width, wForHScaled);
+                newHeight = hScaled;
+            }
+            valuesChanged = true;
         }
-        else if (width < Min_Width) // W < min-width
+        else if (wViolatesMin && hViolatesMin)
         {
-            Width = CssValue.From(Min_Width);
-            Height = CssValue.From(Math.Min(Min_Width * (fheight / fwidth), Max_Height));
+            // Both below min - scale up to meet both constraints
+            double wScaled = Min_Width;
+            double hForWScaled = Min_Width / ratio;
+            double hScaled = Min_Height;
+            double wForHScaled = Min_Height * ratio;
+
+            // Use the more constraining dimension (which results in larger size)
+            if (hForWScaled >= Min_Height)
+            {
+                newWidth = Math.Min(Max_Width, wScaled);
+                newHeight = Math.Min(Max_Height, hForWScaled);
+            }
+            else
+            {
+                newWidth = Math.Min(Max_Width, wForHScaled);
+                newHeight = Math.Min(Max_Height, hScaled);
+            }
+            valuesChanged = true;
         }
-        else if (height > Max_Height) // H > max-height
+        else if (wViolatesMax && hViolatesMin)
         {
-            Width = CssValue.From(Math.Max(Max_Height * fwidth / fheight, Min_Width));
-            Height = CssValue.From(Max_Height);
+            // Width too big, height too small - conflicting constraints
+            newWidth = Max_Width;
+            newHeight = Min_Height;
+            valuesChanged = true;
         }
-        else if (height < Min_Height)// H < min-height
+        else if (wViolatesMin && hViolatesMax)
         {
-            Width = CssValue.From(Math.Min(Min_Height * fwidth / fheight, Max_Width));
-            Height = CssValue.From(Min_Height);
+            // Width too small, height too big - conflicting constraints
+            newWidth = Min_Width;
+            newHeight = Max_Height;
+            valuesChanged = true;
         }
-        else if (width > Max_Width && height > Max_Height && wMaxRatio <= hMaxRatio)
+        else if (wViolatesMax)
         {
-            Width = CssValue.From(Max_Width);
-            Height = CssValue.From(Math.Max(Min_Height, Max_Width * (fheight / fwidth)));
+            // Only width exceeds max - scale down width and proportionally scale height
+            newWidth = Max_Width;
+            newHeight = Math.Max(Min_Height, Max_Width / ratio);
+            valuesChanged = true;
         }
-        else if (width > Max_Width && height > Max_Height && wMaxRatio > hMaxRatio)
+        else if (wViolatesMin)
         {
-            Width = CssValue.From(Math.Max(Min_Width, Max_Height * fwidth / fheight));
-            Height = CssValue.From(Max_Height);
+            // Only width below min - scale up width and proportionally scale height
+            newWidth = Min_Width;
+            newHeight = Min_Width / ratio;
+            // Clamp height to max if it exceeds
+            if (Max_Height < double.MaxValue && newHeight > Max_Height)
+            {
+                newHeight = Max_Height;
+            }
+            valuesChanged = true;
         }
-        else if (width < Min_Width && height < Min_Height && wMinRatio <= hMinRatio)
+        else if (hViolatesMax)
         {
-            Width = CssValue.From(Math.Min(Max_Width, Min_Height * fwidth / fheight));
-            Height = CssValue.From(Min_Height);
+            // Only height exceeds max - scale down height and proportionally scale width
+            newHeight = Max_Height;
+            newWidth = Math.Max(Min_Width, Max_Height * ratio);
+            valuesChanged = true;
         }
-        else if (width < Min_Width && height < Min_Height && wMinRatio > hMinRatio)
+        else if (hViolatesMin)
         {
-            Width = CssValue.From(Min_Width);
-            Height = CssValue.From(Math.Min(Max_Height, Min_Width * (fheight / fwidth)));
+            // Only height below min - scale up height and proportionally scale width
+            newHeight = Min_Height;
+            newWidth = Min_Height * ratio;
+            // Clamp width to max if it exceeds
+            if (Max_Width < double.MaxValue && newWidth > Max_Width)
+            {
+                newWidth = Max_Width;
+            }
+            valuesChanged = true;
         }
-        else if (width < Min_Width && height > Max_Height)
+
+        if (valuesChanged)
         {
-            Width = CssValue.From(Min_Width);
-            Height = CssValue.From(Max_Height);
-        }
-        else if (width > Max_Width && height < Min_Height)
-        {
-            Width = CssValue.From(Max_Width);
-            Height = CssValue.From(Max_Height);
-        }
-        else
-        {/* Width / Height do not change */
-            valuesChanged = false;
+            Width = new CssNumberValue(newWidth);
+            Height = new CssNumberValue(newHeight);
         }
 
         return valuesChanged;
@@ -1411,9 +1494,24 @@ public static class BoxModel
                             var heightVal = (Height.IsAuto ? 0 : Height.AsDecimal());
                             if (MarginTop.IsAuto && MarginBottom.IsAuto)
                             {
-                                var eqRes = (Top.AsDecimal() + 0 + BorderTop + PaddingTop + heightVal + PaddingBottom + BorderBottom + 0 + Bottom.AsDecimal());
-                                var avail = (CssCommon.Get_Logical_Height(WritingMode, Box.Containing_Box) - eqRes);
-                                MarginTop = MarginBottom = CssValue.From(avail / 2);
+                                // Calculate space used by everything except margins
+                                var usedSpace = Top.AsDecimal() + BorderTop + PaddingTop + heightVal + PaddingBottom + BorderBottom + Bottom.AsDecimal();
+                                var containingHeight = CssCommon.Get_Logical_Height(WritingMode, Box.Containing_Box);
+                                var availForMargins = containingHeight - usedSpace;
+
+                                // Per CSS 2.1 §10.6.4: If centering would result in negative margins,
+                                // set margin-top to zero and solve for margin-bottom
+                                if (availForMargins < 0)
+                                {
+                                    MarginTop = CssValue.Zero;
+                                    // Solve constraint: top + 0 + borders/padding + height + margin-bottom + bottom = CB height
+                                    // margin-bottom = CB height - top - borders/padding - height - bottom
+                                    MarginBottom = CssValue.From(availForMargins);
+                                }
+                                else
+                                {
+                                    MarginTop = MarginBottom = CssValue.From(availForMargins / 2);
+                                }
                             }
                             else if (MarginTop.IsAuto ^ MarginBottom.IsAuto)
                             {/* Only a single margin is 'auto' */

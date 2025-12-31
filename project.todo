@@ -20,7 +20,7 @@
   - [ ] Update Window.QueueObserverMicroTask() to use new system
   - [ ] Ensure MutationObserver callbacks fire at correct timing per W3C spec
 
-## Test Coverage — Total: 4659 passing, 151 skipped, 27 failing = 4837 tests
+## Test Coverage — Total: 4722 passing, 151 skipped, 21 failing = 4894 tests
 ### DOM Tests: 518 passing, 3 skipped = 521 total
 ### Selector Tests: 307 passing, 143 skipped = 450 total
 
@@ -139,13 +139,8 @@ Spec Reference: https://www.w3.org/TR/CSS2/visuren.html
 Prerequisites: Phase 12 (Box Model tests), Phase 13 (CssValue specialization)
 
 ### 14.1 Re-enable BoxModel.Resolve() in Event Loop ✓
-- [x] Fix root cause of infinite loop (FIXED by multi-pass collect-then-process architecture in 14.5)
-- [x] Verify NeedsToResolveBlock flag triggers resolution (NOT YET WIRED - see 14.5.3)
-- [x] Add integration test for style change → box update pipeline (LayoutPipelineIntegrationTests.cs)
 
 ### 14.2 Layout Test Fixture Infrastructure ✓
-- [x] Fix infinite loop in layout pipeline (FIXED by multi-pass architecture)
-- [x] Enable LayoutTestFixtureTests (22 tests passing)
 
 ### 14.3 BoxModel Integration Tests ✓
 
@@ -161,17 +156,8 @@ Spec Reference: https://www.w3.org/TR/CSS2/visudet.html (width/height calculatio
 #### 14.5.2 Pass 1: Box Generation (Top-Down) ✓
 
 #### 14.5.3 Pass 2: Style Cascade (Top-Down) ✓
-- [x] Call Style.Cascade() for each dirty element to recompute CSS computed values
-- [x] Wire StyleProperties.onProperty_Change → ENodeFlags.NeedsReflow on owning element
-- [x] When EPropertyDirtFlags.Flow or Box changes, propagate ChildNeedsReflow to ancestors
-- [x] Enable skipped test: StylePropertyChange_SetsNeedsReflow_OnElement
 
 #### 14.5.4 Pass 3: Layout/Reflow (Width Top-Down, Height Bottom-Up) ✓
-- [x] Wire IntrinsicSizeCalculator.Calculate() for width: auto (shrink-to-fit)
-- [x] BoxModel.CalculateShrinkToFitWidth() calls box.GetIntrinsicSize() → IntrinsicSizeCalculator.Calculate()
-- [x] Shrink-to-fit wired for: INLINE_BLOCK, ABSOLUTELY_POSITIONED display groups
-- [x] FLOATING display group has shrink-to-fit code but Float property pending (Phase 15.1)
-- [x] Added ShrinkToFitIntegrationTests with 11 passing tests
 
 #### 14.5.5 BoxModel.Resolve() Refactoring ✓
 
@@ -180,52 +166,14 @@ Spec Reference: https://www.w3.org/TR/CSS2/visudet.html (width/height calculatio
 #### 14.5.7 Run_Event_Loop() Orchestration ✓
 
 #### 14.5.8 Layout Cycle Detection ✓
-- [x] Add cycle detection for layout calculations (e.g., percentage height with auto parent)
-- [x] Track which boxes are currently being resolved
-- [x] Break cycles with fallback (treat cyclic percentage as auto)
-- [x] Log warning when cycle is detected
 
 #### 14.5.9 Spec-Compliant Percentage Resolution ✓
 Refactor percentage resolution to follow CSS Values Level 4 §5.1.1:
 "The computed value of a percentage is the specified percentage value. Resolution is deferred to layout."
 Spec Reference: https://www.w3.org/TR/css-values-4/#percentages
 
-**Analysis Summary:**
-The implementation is ALREADY spec-compliant. No workarounds needed reverting - the code correctly:
-1. Keeps percentages as-is during cascade phase (Derive_ComputedValue returns `this` for PERCENT type)
-2. Resolves percentages during layout via CssPercentageResolvers.ResolvePercentageIfNeeded()
-3. Throws InvalidOperationException if box is null during layout (added proper validation)
-
-**Completed:**
-- [x] Cascade phase: Derive_ComputedValue keeps percentages as-is (computed value = percentage)
-- [x] Layout phase: BoxModel.Resolve_Horizontal() resolves percentages against containing block
-- [x] Layout phase: BoxModel.Resolve_Vertical() resolves percentages against containing block
-- [x] Percentage resolvers ONLY called during layout (boxes guaranteed to exist)
-- [x] If box is null during layout, throw InvalidOperationException (indicates pipeline bug)
-- [x] Add integration tests verifying percentage resolution happens during layout, not cascade
-      (PercentageResolutionTimingTests.cs - 6 passing cascade tests, 5 failing layout tests due to pre-existing BoxModel bugs)
-
-**NOT NEEDED (already correct):**
-- CssValue.Null deferral - not present in current code
-- ResolveWidthsTopDown() - does not exist
-- Manual percentage resolution in Resolve_Horizontal() - uses ResolvePercentageIfNeeded properly
-
 #### 14.5.10 Multi-Pass Layout Tests ✓
 Prerequisites: 14.5.9 (Spec-Compliant Percentage Resolution)
-
-**Completed:**
-- [x] Re-validate all layout tests after percentage resolution refactor
-- [x] Updated BoxModelIntegrationTests to use ForceFullLayout() (12 tests: 10 passing, 2 failing due to known bugs)
-- [x] Updated ContainingBlockTests to use ForceFullLayout() (9 tests: 8 passing, 1 failing due to known bugs)
-- [x] Updated PercentageResolutionTimingTests to use ForceFullLayout() for layout phase tests
-- [x] Updated LayoutTestFixture documentation to recommend ForceFullLayout() as default
-- [x] Removed manual CssBoxModel.ResolveWidth/Height/Resolve calls from tests
-- [x] Tests now assert on computed values directly after ForceFullLayout()
-
-**Test Results:**
-- Total layout tests: 134 (122 passing, 12 failing)
-- Full test suite: 4837 total (4659 passing, 27 failing, 151 skipped)
-- Failing tests expose pre-existing bugs documented in 14.5.13
 
 #### 14.5.11 Fixed Issues ✓
 
@@ -292,7 +240,12 @@ Spec Reference: https://www.w3.org/TR/CSS2/visudet.html
 - [x] Test orchestration of Resolve_Horizontal and Resolve_Vertical
 - [x] Test all output parameters are correctly assigned
 
-**Test Summary:** 57 total tests (52 passing, 5 failing - all failures are "Pending" tests documenting known bugs)
+**Test Summary:** 57 total tests passing ✓
+
+**Fixed Issues (from Pending tests):**
+- [x] CalculateVertical_Absolute_NegativeCenteringMargins - Fixed negative margin centering for absolutely positioned elements
+- [x] Constrain_Width_Height intrinsic ratio tests (3 tests) - Fixed else-if chain and proper constraint handling
+- [x] ResolveVertical_PercentageHeight_AutoContainingBlockHeight - Implemented CSS 2.1 §10.5 percentage height with auto CB
 
 **Deferred Items:**
 - Replaced element intrinsic ratio tests → Phase 19 (HTML Form Elements)
@@ -337,9 +290,9 @@ Spec Reference: https://www.w3.org/TR/CSS2/visudet.html
 - [ ] Fix crash when width is still AUTO after resolution
 - [ ] Ensure width is always resolved to a numeric value before accessing
 
-**Percentage Height with Auto Containing Block (CSS 2.2 §10.5):**
-- [ ] Percentage height with auto containing block height should compute to auto
-- [ ] Exception: absolutely positioned elements can still resolve percentage height
+**Percentage Height with Auto Containing Block (CSS 2.2 §10.5):** ✓
+- [x] Percentage height with auto containing block height should compute to auto
+- [x] Exception: absolutely positioned elements can still resolve percentage height
 
 ### 14.6 Box Generation Spec Compliance
 Fix CssBoxTree.Generate_Tree() and Generate_Box() to comply with W3C CSS Display 3 and CSS 2.2.

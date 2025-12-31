@@ -1565,7 +1565,6 @@ public class BoxModelInternalTests : IDisposable
     [Fact]
     [Trait("Category", "BoxModel")]
     [Trait("Category", "Internal")]
-    [Trait("Category", "Pending")]
     public void ResolveVertical_PercentageHeight_AutoContainingBlockHeight_BecomesAuto()
     {
         // Arrange - Per CSS 2.1 §10.5: "If the height of the containing block is not 
@@ -1573,6 +1572,10 @@ public class BoxModelInternalTests : IDisposable
         // is not absolutely positioned, the percentage value is treated as 'auto'."
         // 
         // When the containing block has auto height, percentage heights cannot be resolved.
+        // We need to set the parent (body) to have auto height for this test to work correctly.
+        _fixture.Body.Style.UserRules.Height.Set(CssValue.Auto);
+        _fixture.Body.Style.Cascade();
+        
         var (_, box, cascaded) = _fixture.CreateTestElement(style =>
         {
             style.Display.Set(EDisplayMode.BLOCK);
