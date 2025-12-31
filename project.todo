@@ -225,11 +225,73 @@ Prerequisites: 14.5.9 (Spec-Compliant Percentage Resolution)
 **Test Results:**
 - Total layout tests: 134 (122 passing, 12 failing)
 - Full test suite: 4837 total (4659 passing, 27 failing, 151 skipped)
-- Failing tests expose pre-existing bugs documented in 14.5.12
+- Failing tests expose pre-existing bugs documented in 14.5.13
 
 #### 14.5.11 Fixed Issues ✓
 
-#### 14.5.12 BoxModel.Resolve() Bugs (from BoxModelTests)
+#### 14.5.12 BoxModel Internal Method Unit Tests
+Add comprehensive unit tests for all internal methods in BoxModel.cs.
+These methods have been made internal (from private) to enable direct unit testing.
+Spec Reference: https://www.w3.org/TR/CSS2/visudet.html
+
+**Infrastructure:**
+- [ ] Add [assembly: InternalsVisibleTo("CssUITests")] to CssUI.csproj AssemblyInfo
+- [ ] Create BoxModelInternalTests.cs test class
+
+**Resolve_Horizontal Tests (§10.3):**
+- [ ] Test percentage width resolution against containing block
+- [ ] Test percentage margin resolution against containing block width
+- [ ] Test min/max width constraint application
+- [ ] Test replaced element with intrinsic ratio handling
+- [ ] Test output values are correctly assigned
+
+**Resolve_Vertical Tests (§10.6):**
+- [ ] Test percentage height resolution against containing block
+- [ ] Test percentage margin resolution against containing block width (per spec)
+- [ ] Test min/max height constraint application  
+- [ ] Test replaced element with intrinsic ratio handling
+- [ ] Test output values are correctly assigned
+
+**Calculate_Horizontal Tests (§10.3.3-10.3.8):**
+- [ ] INLINE non-replaced: margins auto → 0, width does not apply
+- [ ] INLINE replaced: intrinsic width handling
+- [ ] BLOCK non-replaced: constraint equation (margin + border + padding + width = containing)
+- [ ] BLOCK non-replaced: auto width fills remaining space
+- [ ] BLOCK non-replaced: both auto margins center element
+- [ ] BLOCK non-replaced: single auto margin absorbs remaining space
+- [ ] BLOCK non-replaced: over-constrained LTR adjusts margin-right
+- [ ] BLOCK non-replaced: over-constrained RTL adjusts margin-left
+- [ ] BLOCK replaced: width from intrinsic then margin rules
+- [ ] FLOATING: auto width → shrink-to-fit
+- [ ] ABSOLUTELY_POSITIONED: all constraint equation combinations
+- [ ] INLINE_BLOCK: auto width → shrink-to-fit
+
+**Calculate_Vertical Tests (§10.6.1-10.6.7):**
+- [ ] INLINE non-replaced: auto margins → 0, height does not apply
+- [ ] INLINE replaced: intrinsic height handling
+- [ ] BLOCK non-replaced: auto height → content height
+- [ ] BLOCK non-replaced: auto margins → 0 (vertical centering not automatic)
+- [ ] BLOCK replaced: height from intrinsic
+- [ ] FLOATING: auto height → content height
+- [ ] ABSOLUTELY_POSITIONED: constraint equation for top/bottom/height
+- [ ] INLINE_BLOCK: auto height → content height
+
+**Constrain_Width_Height Tests (§10.4):**
+- [ ] Test all 10+ constraint violation cases from spec table
+- [ ] Test min > max resolves to min (per spec)
+- [ ] Test intrinsic ratio preservation during constraint
+- [ ] Test return value indicates whether values changed
+
+**Get_Height_For_Block_Formatting_Context Tests:**
+- [ ] Test height calculation for block formatting context root
+- [ ] Test inclusion of floated descendants in height
+- [ ] Test margin collapsing edge cases
+
+**Resolve_Box_Properties_Used_Value Tests:**
+- [ ] Test orchestration of Resolve_Horizontal and Resolve_Vertical
+- [ ] Test all output parameters are correctly assigned
+
+#### 14.5.13 BoxModel.Resolve() Bugs (from BoxModelTests)
 Bugs discovered by comprehensive BoxModel unit tests (29 tests: 14 passing, 15 failing).
 Spec Reference: https://www.w3.org/TR/CSS2/visudet.html
 
