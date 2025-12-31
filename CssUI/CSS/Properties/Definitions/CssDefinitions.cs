@@ -208,7 +208,8 @@ internal class CssDefinitions
         return [
 
             /// XXX: Update 'Display' property to modern specifications (Docs: https://www.w3.org/TR/css-display-3/#the-display-properties)
-            new StyleDefinition(ECssPropertyID.Display, false, EPropertyDirtFlags.Box, CssValue.From(EDisplayMode.INLINE_BLOCK), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EDisplayMode>()),
+            // Per CSS Display 3 §2.5: display: contents computes to display: none for replaced elements
+            new StyleDefinition(ECssPropertyID.Display, false, EPropertyDirtFlags.Box, CssValue.From(EDisplayMode.INLINE_BLOCK), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EDisplayMode>(), false, null, new Tuple<EPropertyStage, PropertyResolverFunc>(EPropertyStage.Computed, CssPropertyResolver.Display_Computed)),
             new StyleDefinition(ECssPropertyID.BoxSizing, false, EPropertyDirtFlags.Content_Area | EPropertyDirtFlags.Border_Area, CssValue.From(EBoxSizingMode.BorderBox), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EBoxSizingMode>()),
 
             new StyleDefinition(ECssPropertyID.Positioning, false, EPropertyDirtFlags.Margin_Area, CssValue.From(EBoxPositioning.Relative), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EBoxPositioning>()),

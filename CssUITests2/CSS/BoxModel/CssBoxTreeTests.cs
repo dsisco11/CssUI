@@ -94,6 +94,109 @@ public class CssBoxTreeTests : IDisposable
         Assert.NotNull(child.Box);
     }
 
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "BoxGeneration")]
+    [Trait("Category", "DisplayContents")]
+    public void DisplayContents_ReplacedElement_ComputesToDisplayNone()
+    {
+        // Arrange - Per CSS Display 3 §2.5: "display: contents" computes to "display: none"
+        // on replaced elements and other elements whose rendering is not entirely controlled by CSS.
+        // Spec: https://www.w3.org/TR/css-display-3/#valdef-display-contents
+        var doc = _fixture.Document;
+        var parent = _fixture.CreateBlock(200, 100);
+
+        // Create an img element (replaced element per HTML spec)
+        var img = doc.createElement("img", DefaultOptions);
+        img!.SetFlag(ENodeFlags.IsReplaced, true); // Mark as replaced element
+        img.Style.UserRules.Display.Set(EDisplayMode.CONTENT);
+        parent.appendChild(img);
+
+        // Act - trigger style cascade
+        img.Style.Cascade();
+
+        // Assert - for replaced elements, display: contents should compute to display: none
+        Assert.Equal(EDisplayMode.NONE, img.Style.Display);
+    }
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "BoxGeneration")]
+    [Trait("Category", "DisplayContents")]
+    public void DisplayContents_ReplacedElement_GeneratesNoBox()
+    {
+        // Arrange - Per CSS Display 3 §2.5: replaced elements with display: contents
+        // should be treated as display: none and generate no boxes
+        var doc = _fixture.Document;
+        var parent = _fixture.CreateBlock(200, 100);
+
+        // Create an img element (replaced element per HTML spec)
+        var img = doc.createElement("img", DefaultOptions);
+        img!.SetFlag(ENodeFlags.IsReplaced, true); // Mark as replaced element
+        img.Style.UserRules.Display.Set(EDisplayMode.CONTENT);
+        parent.appendChild(img);
+
+        // Act - use ForceLayoutUpdate to ensure cascade and box generation
+        _fixture.ForceLayoutUpdate();
+
+        // Assert - replaced element with display: contents should generate no box
+        Assert.Null(img.Box);
+    }
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "BoxGeneration")]
+    [Trait("Category", "DisplayContents")]
+    public void DisplayContents_NonReplacedElement_StaysAsContents()
+    {
+        // Arrange - Non-replaced elements should NOT have display: contents converted
+        var doc = _fixture.Document;
+        var parent = _fixture.CreateBlock(200, 100);
+
+        // Create a div element (non-replaced element)
+        var div = doc.createElement("div", DefaultOptions);
+        div!.Style.UserRules.Display.Set(EDisplayMode.CONTENT);
+        parent.appendChild(div);
+
+        // Act - trigger style cascade
+        div.Style.Cascade();
+
+        // Assert - non-replaced elements should keep display: contents
+        Assert.Equal(EDisplayMode.CONTENT, div.Style.Display);
+    }
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "BoxGeneration")]
+    [Trait("Category", "DisplayContents")]
+    public void DisplayContents_ReplacedElement_ChildrenAlsoHidden()
+    {
+        // Arrange - Per CSS Display 3 §2.5: When display: contents computes to display: none
+        // on replaced elements, the element AND its descendants generate no boxes.
+        // This is different from non-replaced elements where children still generate boxes.
+        var doc = _fixture.Document;
+        var parent = _fixture.CreateBlock(200, 100);
+
+        // Create an object element (replaced element that can have fallback content)
+        var objectEl = doc.createElement("object", DefaultOptions);
+        objectEl!.SetFlag(ENodeFlags.IsReplaced, true); // Mark as replaced element
+        objectEl.Style.UserRules.Display.Set(EDisplayMode.CONTENT);
+        parent.appendChild(objectEl);
+
+        // Add a fallback child element
+        var fallback = doc.createElement("div", DefaultOptions);
+        fallback!.Style.UserRules.Display.Set(EDisplayMode.BLOCK);
+        objectEl.appendChild(fallback);
+
+        // Act - use ForceLayoutUpdate to ensure cascade and box generation
+        _fixture.ForceLayoutUpdate();
+
+        // Assert - because display: contents computes to display: none for replaced elements,
+        // both the element and its descendants should have no boxes (like display: none)
+        Assert.Null(objectEl.Box);
+        Assert.Null(fallback.Box);
+    }
+
     #endregion
 
     #region Text Sequence Handling Tests

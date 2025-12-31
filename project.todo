@@ -285,8 +285,8 @@ Spec Reference: https://www.w3.org/TR/CSS22/visuren.html#box-gen
 
 #### 14.6.1 Anonymous Block Box Generation (CSS 2.2 §9.2.1.1) ✓
 
-#### 14.6.2 display: contents Support (CSS Display 3 §2.5)
-- [ ] display: contents computes to display: none for replaced elements (future - requires IsReplacedElement check)
+#### 14.6.2 display: contents Support (CSS Display 3 §2.5) ✓
+- [x] display: contents computes to display: none for replaced elements (IsReplacedElement check in Display_Computed resolver)
 
 #### 14.6.3 Text Sequence Handling (CSS Display 3 §1)
 - [ ] Handle whitespace-only text nodes per white-space property (future - requires white-space property cascade)

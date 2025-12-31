@@ -374,5 +374,43 @@ public static partial class CssPropertyResolver
         }
         return Value;
     }
+
+    /// <summary>
+    /// Computes the display property value, handling special cases per CSS Display 3.
+    /// </summary>
+    /// <remarks>
+    /// Per CSS Display 3 §2.5: "display: contents" computes to "display: none" on replaced
+    /// elements and other elements whose rendering is not entirely controlled by CSS.
+    /// This includes: img, video, canvas, audio, iframe, embed, object, input, textarea, 
+    /// select, br, wbr, meter, progress, frame, frameset.
+    /// Spec: https://www.w3.org/TR/css-display-3/#valdef-display-contents
+    /// </remarks>
+    public static CssValue Display_Computed(ICssProperty Property)
+    {
+        ArgumentNullException.ThrowIfNull(Property);
+        Contract.EndContractBlock();
+
+        var prop = (Property as CssProperty);
+        CssValue specifiedValue = prop.Specified!;
+
+        // Check if the specified value is display: contents (EDisplayMode.CONTENT)
+        if (specifiedValue.Type == ECssValueTypes.INTEGER || specifiedValue.Type == ECssValueTypes.KEYWORD)
+        {
+            var displayMode = specifiedValue.AsEnum<EDisplayMode>();
+            if (displayMode == EDisplayMode.CONTENT)
+            {
+                // Per CSS Display 3 §2.5: display: contents computes to display: none
+                // for replaced elements and other elements whose rendering is not
+                // entirely controlled by CSS.
+                if (Property.Owner.Style.IsReplacedElement)
+                {
+                    return CssValue.From(EDisplayMode.NONE);
+                }
+            }
+        }
+
+        // For all other cases, return the specified value unchanged
+        return specifiedValue;
+    }
 }
 
