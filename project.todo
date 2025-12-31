@@ -235,8 +235,8 @@ These methods have been made internal (from private) to enable direct unit testi
 Spec Reference: https://www.w3.org/TR/CSS2/visudet.html
 
 **Infrastructure:**
-- [ ] Add [assembly: InternalsVisibleTo("CssUITests")] to CssUI.csproj AssemblyInfo
-- [ ] Create BoxModelInternalTests.cs test class
+- [x] Add [assembly: InternalsVisibleTo("CssUITests")] to CssUI.csproj AssemblyInfo
+- [x] Create BoxModelInternalTests.cs test class
 
 **Resolve_Horizontal Tests (§10.3):**
 - [ ] Test percentage width resolution against containing block
@@ -248,7 +248,7 @@ Spec Reference: https://www.w3.org/TR/CSS2/visudet.html
 **Resolve_Vertical Tests (§10.6):**
 - [ ] Test percentage height resolution against containing block
 - [ ] Test percentage margin resolution against containing block width (per spec)
-- [ ] Test min/max height constraint application  
+- [ ] Test min/max height constraint application
 - [ ] Test replaced element with intrinsic ratio handling
 - [ ] Test output values are correctly assigned
 
@@ -327,6 +327,10 @@ Spec Reference: https://www.w3.org/TR/CSS2/visudet.html
 **UpdateContentWidth() Crash:**
 - [ ] Fix crash when width is still AUTO after resolution
 - [ ] Ensure width is always resolved to a numeric value before accessing
+
+**Percentage Height with Auto Containing Block (CSS 2.2 §10.5):**
+- [ ] Percentage height with auto containing block height should compute to auto
+- [ ] Exception: absolutely positioned elements can still resolve percentage height
 
 ### 14.6 Box Generation Spec Compliance
 Fix CssBoxTree.Generate_Tree() and Generate_Box() to comply with W3C CSS Display 3 and CSS 2.2.
