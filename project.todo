@@ -243,7 +243,6 @@ Spec Reference: https://www.w3.org/TR/CSS2/visudet.html
 - [x] Test percentage margin resolution against containing block width
 - [x] Test min/max width constraint application
 - [x] Test min > max resolves to min (per spec)
-- [ ] Test replaced element with intrinsic ratio handling (Pending - requires intrinsic dimension infrastructure)
 - [x] Test output values are correctly assigned
 - [x] Test fixed width with padding
 
@@ -252,32 +251,25 @@ Spec Reference: https://www.w3.org/TR/CSS2/visudet.html
 - [x] Test percentage margin resolution against containing block width (per spec)
 - [x] Test min/max height constraint application
 - [x] Test min > max resolves to min (per spec)
-- [ ] Test replaced element with intrinsic ratio handling (Pending - requires intrinsic dimension infrastructure)
 - [x] Test output values are correctly assigned
 
 **Calculate_Horizontal Tests (§10.3.3-10.3.8):**
 - [x] INLINE non-replaced: margins auto → 0, width does not apply
-- [ ] INLINE replaced: intrinsic width handling (Deferred to Phase 19)
 - [x] BLOCK non-replaced: constraint equation (margin + border + padding + width = containing)
 - [x] BLOCK non-replaced: auto width fills remaining space
 - [x] BLOCK non-replaced: both auto margins center element
 - [x] BLOCK non-replaced: single auto margin absorbs remaining space
 - [x] BLOCK non-replaced: over-constrained LTR adjusts margin-right
 - [x] BLOCK non-replaced: over-constrained RTL adjusts margin-left
-- [ ] BLOCK replaced: width from intrinsic then margin rules (Deferred to Phase 19)
-- [ ] FLOATING: auto width → shrink-to-fit (Deferred to Phase 15 - Float property)
 - [x] ABSOLUTELY_POSITIONED: all constraint equation combinations
 - [x] INLINE_BLOCK: explicit width uses specified value
 - [x] INLINE_BLOCK: auto margins become 0
 
 **Calculate_Vertical Tests (§10.6.1-10.6.7):**
 - [x] INLINE non-replaced: height does not apply
-- [ ] INLINE replaced: intrinsic height handling (Deferred to Phase 19)
 - [x] BLOCK non-replaced: auto height → content height (when set)
 - [x] BLOCK non-replaced: auto height → 0 (no content)
 - [x] BLOCK non-replaced: auto margins → 0 (vertical centering not automatic)
-- [ ] BLOCK replaced: height from intrinsic (Deferred to Phase 19)
-- [ ] FLOATING: auto height → content height (Deferred to Phase 15 - Float property)
 - [x] ABSOLUTELY_POSITIONED: constraint equation for top/bottom/height
 - [x] ABSOLUTELY_POSITIONED: auto margins centering
 - [x] INLINE_BLOCK: explicit height uses specified value
@@ -291,21 +283,22 @@ Spec Reference: https://www.w3.org/TR/CSS2/visudet.html
 - [x] Height below min → clamps to min
 - [x] No constraint violation → returns false
 - [x] Test min > max resolves to min (per spec)
-- [ ] Test all 10+ constraint violation cases from spec table (Pending - requires intrinsic ratio)
-- [ ] Test intrinsic ratio preservation during constraint (Pending - requires intrinsic ratio)
 - [x] Test return value indicates whether values changed
 
 **Get_Height_For_Block_Formatting_Context Tests:**
 - [x] Test height calculation for empty element (returns 0)
-- [ ] Test with inline/block children (Deferred to Phase 17 - requires nested elements with boxes)
-- [ ] Test inclusion of floated descendants in height (Deferred to Phase 17)
-- [ ] Test margin collapsing edge cases (Deferred to Phase 16)
 
 **Resolve_Box_Properties_Used_Value Tests:**
 - [x] Test orchestration of Resolve_Horizontal and Resolve_Vertical
 - [x] Test all output parameters are correctly assigned
 
 **Test Summary:** 57 total tests (52 passing, 5 failing - all failures are "Pending" tests documenting known bugs)
+
+**Deferred Items:**
+- Replaced element intrinsic ratio tests → Phase 19 (HTML Form Elements)
+- FLOATING element tests → Phase 15 (Float and Clear Properties)
+- Get_Height_For_BFC with children → Phase 17 (Block Formatting Context)
+- Margin collapsing edge cases → Phase 16 (Margin Collapsing)
 
 #### 14.5.13 BoxModel.Resolve() Bugs (from BoxModelTests)
 Bugs discovered by comprehensive BoxModel unit tests (29 tests: 14 passing, 15 failing).
@@ -448,6 +441,10 @@ Implement float positioning in BlockFormattingContext.
 - [ ] Test float stacking behavior
 - [ ] Test negative margins on floats
 
+### 15.6 Deferred BoxModel Tests (from Phase 14.5.12)
+- [ ] FLOATING: auto width → shrink-to-fit
+- [ ] FLOATING: auto height → content height
+
 ## Phase 16: Margin Collapsing
 Spec Reference: https://www.w3.org/TR/CSS2/box.html#collapsing-margins
 Prerequisites: Phase 14 (Layout Pipeline Integration)
@@ -485,12 +482,15 @@ Margins don't collapse in certain cases:
 - [ ] Test float prevents collapse
 - [ ] Test overflow:hidden prevents collapse
 
+### 16.5 Deferred BoxModel Tests (from Phase 14.5.12)
+- [ ] Test margin collapsing edge cases in Get_Height_For_Block_Formatting_Context
+
 ## Phase 17: Block Formatting Context Implementation
 Spec Reference: https://www.w3.org/TR/CSS2/visuren.html#block-formatting
 Prerequisites: Phase 15 (Float/Clear), Phase 16 (Margin Collapsing)
 
-### 17.0 Deferred Tests from Phase 12
-These tests were deferred from Phase 12 because they require the layout pipeline.
+### 17.0 Deferred Tests from Phase 12 and 14.5.12
+These tests were deferred from earlier phases because they require the layout pipeline.
 - [ ] BoxModel calculation tests (from 12.2)
 - [ ] Margin collapsing tests (from 12.2)
 - [ ] Containing block tests (from 12.2)
@@ -498,6 +498,8 @@ These tests were deferred from Phase 12 because they require the layout pipeline
 - [ ] Cycle detection tests (from 12.5)
 - [ ] Float layout tests (requires Phase 15)
 - [ ] Clear property tests (requires Phase 15)
+- [ ] Get_Height_For_BFC with inline/block children (from 14.5.12)
+- [ ] Get_Height_For_BFC inclusion of floated descendants (from 14.5.12)
 
 ### 17.1 BFC Flow Algorithm
 Rewrite BlockFormattingContext.Flow() with complete implementation.
@@ -613,6 +615,17 @@ Note: Form control *layout/rendering* requires Phase 18, but DOM properties do n
 - [ ] Test disabled state propagation from fieldset
 - [ ] Test constraint validation API
 - [ ] Test form association
+
+### 19.8 Deferred BoxModel Tests (from Phase 14.5.12)
+Replaced element layout tests require intrinsic dimension infrastructure.
+- [ ] Test replaced element with intrinsic ratio handling (Resolve_Horizontal)
+- [ ] Test replaced element with intrinsic ratio handling (Resolve_Vertical)
+- [ ] INLINE replaced: intrinsic width handling
+- [ ] INLINE replaced: intrinsic height handling
+- [ ] BLOCK replaced: width from intrinsic then margin rules
+- [ ] BLOCK replaced: height from intrinsic
+- [ ] Test all 10+ constraint violation cases from spec table (requires intrinsic ratio)
+- [ ] Test intrinsic ratio preservation during constraint
 
 ## Phase 20: Event System
 Spec Reference: https://dom.spec.whatwg.org/#events
