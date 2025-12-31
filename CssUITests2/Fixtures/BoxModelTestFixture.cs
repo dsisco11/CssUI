@@ -1,5 +1,4 @@
 using System;
-using System.Reflection;
 using CssUI;
 using CssUI.CSS;
 using CssUI.CSS.BoxTree;
@@ -22,8 +21,8 @@ namespace CssUITests.Fixtures;
 /// <para>
 /// Key differences from LayoutTestFixture:
 /// <list type="bullet">
-/// <item>Uses direct box creation instead of tree generation</item>
-/// <item>Manually sets containing block dimensions</item>
+/// <item>Uses <see cref="MockPrincipalBox"/> for direct control over box dimensions</item>
+/// <item>Manually sets containing block dimensions without reflection</item>
 /// <item>Allows direct manipulation of cascaded style values</item>
 /// <item>Does not trigger the problematic TreeNodeList.Remove code path</item>
 /// </list>
@@ -90,13 +89,13 @@ public class BoxModelTestFixture : IDisposable
         DocumentElement.Style.UserRules.Height.Set(DefaultContainingBlockHeight);
         DocumentElement.Style.Cascade();
 
-        // Create and assign box for document element
-        var htmlBox = new CssPrincipalBox(DocumentElement, null);
+        // Create and assign mock box for document element
+        var htmlBox = new MockPrincipalBox(DocumentElement, null);
         DocumentElement.Box = htmlBox;
         // Document element's containing block is the viewport
-        SetContainingBlock(htmlBox, new Rect4f(0, DefaultContainingBlockWidth, DefaultContainingBlockHeight, 0));
+        htmlBox.SetContainingBlock(DefaultContainingBlockWidth, DefaultContainingBlockHeight);
         // Set explicit dimensions on the html box Content
-        SetContentArea(htmlBox, new Rect4f(0, DefaultContainingBlockWidth, DefaultContainingBlockHeight, 0));
+        htmlBox.SetContent(DefaultContainingBlockWidth, DefaultContainingBlockHeight);
 
         // Body fills the viewport by default
         Body.Style.UserRules.Display.Set(EDisplayMode.BLOCK);
@@ -104,38 +103,18 @@ public class BoxModelTestFixture : IDisposable
         Body.Style.UserRules.Height.Set(DefaultContainingBlockHeight);
         Body.Style.Cascade();
 
-        // Create and assign box for body
-        var bodyBox = new CssPrincipalBox(Body, htmlBox);
+        // Create and assign mock box for body
+        var bodyBox = new MockPrincipalBox(Body, htmlBox);
         Body.Box = bodyBox;
         // Body's containing block is the document element
-        SetContainingBlock(bodyBox, new Rect4f(0, DefaultContainingBlockWidth, DefaultContainingBlockHeight, 0));
+        bodyBox.SetContainingBlock(DefaultContainingBlockWidth, DefaultContainingBlockHeight);
         // Set explicit dimensions on the body box Content
-        SetContentArea(bodyBox, new Rect4f(0, DefaultContainingBlockWidth, DefaultContainingBlockHeight, 0));
+        bodyBox.SetContent(DefaultContainingBlockWidth, DefaultContainingBlockHeight);
     }
 
     #endregion
 
     #region Element Creation
-
-    /// <summary>
-    /// Sets the containing block dimensions on a CssPrincipalBox using reflection.
-    /// This is necessary because the _containing_box field is private.
-    /// </summary>
-    private static void SetContainingBlock(CssPrincipalBox box, Rect4f containingBlock)
-    {
-        var field = typeof(CssPrincipalBox).GetField("_containing_box", BindingFlags.NonPublic | BindingFlags.Instance);
-        field?.SetValue(box, containingBlock);
-    }
-
-    /// <summary>
-    /// Sets the Content area on a CssPrincipalBox using reflection.
-    /// This is necessary because Content has a protected setter.
-    /// </summary>
-    private static void SetContentArea(CssPrincipalBox box, Rect4f content)
-    {
-        var prop = typeof(CssPrincipalBox).GetProperty("Content", BindingFlags.Public | BindingFlags.Instance);
-        prop?.SetValue(box, content);
-    }
 
     /// <summary>
     /// Creates a simple element with configured styles, appends it to the body,
@@ -144,8 +123,8 @@ public class BoxModelTestFixture : IDisposable
     /// <param name="configureStyle">Action to configure the element's cascaded styles.</param>
     /// <param name="containingBlockWidth">The containing block width to use.</param>
     /// <param name="containingBlockHeight">The containing block height to use.</param>
-    /// <returns>A tuple of (Element, CssPrincipalBox, CssComputedStyle).</returns>
-    public (Element element, CssPrincipalBox box, CssComputedStyle cascaded) CreateTestElement(
+    /// <returns>A tuple of (Element, MockPrincipalBox, CssComputedStyle).</returns>
+    public (Element element, MockPrincipalBox box, CssComputedStyle cascaded) CreateTestElement(
         Action<CssComputedStyle> configureStyle,
         int? containingBlockWidth = null,
         int? containingBlockHeight = null)
@@ -159,16 +138,16 @@ public class BoxModelTestFixture : IDisposable
         // Trigger style cascade
         element.Style.Cascade();
 
-        // Create box directly, bypassing tree generation
-        var box = new CssPrincipalBox(element, null);
+        // Create mock box directly, bypassing tree generation
+        var box = new MockPrincipalBox(element, null);
 
         // Set the element's box reference (Node.Box has internal set)
         element.Box = box;
 
-        // Set containing block dimensions directly via reflection
+        // Set containing block dimensions directly
         var cbWidth = containingBlockWidth ?? DefaultContainingBlockWidth;
         var cbHeight = containingBlockHeight ?? DefaultContainingBlockHeight;
-        SetContainingBlock(box, new Rect4f(0, cbWidth, cbHeight, 0));
+        box.SetContainingBlock(cbWidth, cbHeight);
 
         return (element, box, element.Style.Cascaded);
     }
@@ -179,8 +158,8 @@ public class BoxModelTestFixture : IDisposable
     /// <param name="width">Initial width in pixels.</param>
     /// <param name="height">Initial height in pixels.</param>
     /// <param name="configureStyle">Optional additional style configuration.</param>
-    /// <returns>A tuple of (Element, CssPrincipalBox, CssComputedStyle).</returns>
-    public (Element element, CssPrincipalBox box, CssComputedStyle cascaded) CreateBlockElement(
+    /// <returns>A tuple of (Element, MockPrincipalBox, CssComputedStyle).</returns>
+    public (Element element, MockPrincipalBox box, CssComputedStyle cascaded) CreateBlockElement(
         int? width = null,
         int? height = null,
         Action<CssComputedStyle>? configureStyle = null)
@@ -204,7 +183,7 @@ public class BoxModelTestFixture : IDisposable
     /// Per CSS 2.1 §10.6.1: The 'height' property does not apply to inline non-replaced elements.
     /// Auto margins become 0.
     /// </remarks>
-    public (Element element, CssPrincipalBox box, CssComputedStyle cascaded) CreateInlineElement(
+    public (Element element, MockPrincipalBox box, CssComputedStyle cascaded) CreateInlineElement(
         Action<CssComputedStyle>? configureStyle = null,
         int? containingBlockWidth = null,
         int? containingBlockHeight = null)
@@ -219,7 +198,7 @@ public class BoxModelTestFixture : IDisposable
     /// <summary>
     /// Creates an inline-block element with specified dimensions.
     /// </summary>
-    public (Element element, CssPrincipalBox box, CssComputedStyle cascaded) CreateInlineBlockElement(
+    public (Element element, MockPrincipalBox box, CssComputedStyle cascaded) CreateInlineBlockElement(
         int? width = null,
         int? height = null,
         Action<CssComputedStyle>? configureStyle = null)
@@ -244,7 +223,7 @@ public class BoxModelTestFixture : IDisposable
     /// floating behavior by setting display group. The Float property would normally
     /// trigger blockification and FLOATING display group.
     /// </remarks>
-    public (Element element, CssPrincipalBox box, CssComputedStyle cascaded) CreateFloatingElement(
+    public (Element element, MockPrincipalBox box, CssComputedStyle cascaded) CreateFloatingElement(
         int? width = null,
         int? height = null,
         Action<CssComputedStyle>? configureStyle = null,
@@ -270,7 +249,7 @@ public class BoxModelTestFixture : IDisposable
     /// <summary>
     /// Creates an absolutely positioned element.
     /// </summary>
-    public (Element element, CssPrincipalBox box, CssComputedStyle cascaded) CreateAbsoluteElement(
+    public (Element element, MockPrincipalBox box, CssComputedStyle cascaded) CreateAbsoluteElement(
         Action<CssComputedStyle>? configureStyle = null,
         int? containingBlockWidth = null,
         int? containingBlockHeight = null)
@@ -292,7 +271,7 @@ public class BoxModelTestFixture : IDisposable
     /// <param name="configureStyle">Optional additional style configuration.</param>
     /// <param name="containingBlockWidth">The containing block width to use.</param>
     /// <param name="containingBlockHeight">The containing block height to use.</param>
-    /// <returns>A tuple of (Element, CssPrincipalBox, CssComputedStyle).</returns>
+    /// <returns>A tuple of (Element, MockPrincipalBox, CssComputedStyle).</returns>
     /// <remarks>
     /// This method creates an img element which is a replaced element per CSS spec.
     /// The intrinsic dimensions are set on the box to simulate an image with known dimensions.
@@ -300,7 +279,7 @@ public class BoxModelTestFixture : IDisposable
     /// implemented separately as it requires tracking whether the element is replaced and
     /// its intrinsic ratio.
     /// </remarks>
-    public (Element element, CssPrincipalBox box, CssComputedStyle cascaded) CreateReplacedElement(
+    public (Element element, MockPrincipalBox box, CssComputedStyle cascaded) CreateReplacedElement(
         int intrinsicWidth,
         int intrinsicHeight,
         Action<CssComputedStyle>? configureStyle = null,
@@ -318,21 +297,21 @@ public class BoxModelTestFixture : IDisposable
         // Trigger style cascade
         element.Style.Cascade();
 
-        // Create box directly, bypassing tree generation
-        var box = new CssPrincipalBox(element, null);
+        // Create mock box directly, bypassing tree generation
+        var box = new MockPrincipalBox(element, null);
 
         // Set the element's box reference
         element.Box = box;
 
-        // Set containing block dimensions directly via reflection
+        // Set containing block dimensions directly
         var cbWidth = containingBlockWidth ?? DefaultContainingBlockWidth;
         var cbHeight = containingBlockHeight ?? DefaultContainingBlockHeight;
-        SetContainingBlock(box, new Rect4f(0, cbWidth, cbHeight, 0));
+        box.SetContainingBlock(cbWidth, cbHeight);
 
         // Set the intrinsic dimensions on the box content area to simulate replaced element
         // Note: Real replaced element handling would also set IntrinsicWidth/IntrinsicHeight
         // properties if available on the box type
-        SetContentArea(box, new Rect4f(0, intrinsicWidth, intrinsicHeight, 0));
+        box.SetContent(intrinsicWidth, intrinsicHeight);
 
         return (element, box, element.Style.Cascaded);
     }

@@ -205,7 +205,7 @@ public class CssPrincipalBox : CssBox
     /// <para>If the control has an ancestor this will be said ancestors content-area block</para>
     /// <para>Otherwise, if the element is a root element, this should have the dimensions of the viewport</para>
     /// </summary>
-    public Rect4f Containing_Box
+    public virtual Rect4f Containing_Box
     {
         get
         {
@@ -214,6 +214,10 @@ public class CssPrincipalBox : CssBox
                 _containing_box = CssCommon.Find_Containing_Block(Owner!);
             }
             return _containing_box.Value;
+        }
+        protected set
+        {
+            _containing_box = value;
         }
     }
 
