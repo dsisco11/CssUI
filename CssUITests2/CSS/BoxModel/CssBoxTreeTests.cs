@@ -267,7 +267,12 @@ public class CssBoxTreeTests : IDisposable
     [Trait("Category", "TextSequence")]
     public void WhitespaceOnlyTextNode_GeneratesTextRun()
     {
-        // Arrange - whitespace-only text nodes DO generate text runs (white-space property controls rendering)
+        // Per CSS Display 3 §1: "If the sequence contains no text, however, it does not generate a text sequence."
+        // Whitespace IS text content (not "no text"), so whitespace-only nodes correctly generate text sequences.
+        // The white-space property (CSS Text 3 §4) controls how whitespace is rendered/collapsed during layout,
+        // but that's handled separately from box tree generation.
+        // @todo Phase 18.3: When white-space property is implemented, whitespace collapsing will be handled
+        // during inline formatting context layout, not during box generation.
         var doc = _fixture.Document;
         var parent = _fixture.CreateBlock(200, 100);
         var textNode = doc.createTextNode("   ");
@@ -277,6 +282,25 @@ public class CssBoxTreeTests : IDisposable
         _fixture.ForceLayoutUpdate();
 
         // Assert - whitespace content is not empty, so it generates a text run
+        Assert.NotNull(textNode.Box);
+        Assert.IsType<CssTextRun>(textNode.Box);
+    }
+
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "TextSequence")]
+    public void MixedWhitespaceAndContent_GeneratesTextRun()
+    {
+        // Arrange - text nodes with mixed whitespace and content generate text runs
+        var doc = _fixture.Document;
+        var parent = _fixture.CreateBlock(200, 100);
+        var textNode = doc.createTextNode("  Hello  ");
+        parent.appendChild(textNode);
+
+        // Act
+        _fixture.ForceLayoutUpdate();
+
+        // Assert
         Assert.NotNull(textNode.Box);
         Assert.IsType<CssTextRun>(textNode.Box);
     }

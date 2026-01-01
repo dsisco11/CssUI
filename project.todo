@@ -288,8 +288,16 @@ Spec Reference: https://www.w3.org/TR/CSS22/visuren.html#box-gen
 #### 14.6.2 display: contents Support (CSS Display 3 §2.5) ✓
 - [x] display: contents computes to display: none for replaced elements (IsReplacedElement check in Display_Computed resolver)
 
-#### 14.6.3 Text Sequence Handling (CSS Display 3 §1)
-- [ ] Handle whitespace-only text nodes per white-space property (future - requires white-space property cascade)
+#### 14.6.3 Text Sequence Handling (CSS Display 3 §1) ✓
+Box generation for text sequences is complete. Per CSS Display 3 §1:
+- Empty text nodes (zero characters) do NOT generate text sequences ✓
+- Whitespace-only text nodes DO generate text sequences (whitespace is text content) ✓
+- Contiguous sibling text nodes are combined into a single text sequence ✓
+Note: Whitespace collapsing/trimming is controlled by the white-space property during
+inline formatting context layout (phase 18.3), not during box generation.
+- [x] Empty text nodes generate no box
+- [x] Whitespace-only text nodes generate text run (correct per spec)
+- [x] Documented future white-space property dependency in code comments
 
 #### 14.6.4 List Item Marker Boxes (CSS Display 3 §2.3)
 display: list-item generates principal box + ::marker pseudo-element.

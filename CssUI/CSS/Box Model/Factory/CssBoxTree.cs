@@ -83,7 +83,13 @@ public static class CssBoxTree
                     case DOM.Enums.ENodeType.TEXT_NODE:
                         {
                             // Text runs encompass all of the contiguous sibling text-nodes, skip those contiguous nodes in the queue
-                            // Per CSS Display 3 §1: "If the sequence contains no text, however, it does not generate a text sequence."
+                            // Per CSS Display 3 §1: "each contiguous sequence of sibling text nodes generates a text sequence 
+                            // containing their text contents... If the sequence contains no text, however, it does not generate a text sequence."
+                            //
+                            // Note: Whitespace-only text nodes DO generate text sequences because whitespace IS text content.
+                            // The white-space property (CSS Text 3 §4) controls whitespace collapsing during layout,
+                            // which is handled separately during inline formatting context layout (phase 18.3).
+                            // @todo Phase 18.3: Implement white-space property to handle whitespace collapsing/trimming.
                             var TextNodes = new List<Text>(node.parentNode?.childNodes.Count ?? 4);
 
                             // Add the current text node first
@@ -100,8 +106,9 @@ public static class CssBoxTree
                                 contiguousTextNode.ClearFlag(ENodeFlags.NeedsBoxUpdate | ENodeFlags.ChildNeedsBoxUpdate);
                             }
 
-                            // Only generate text run if there's actual text content
-                            // Per spec: empty text nodes do not generate text sequences
+                            // Only generate text run if there's actual text content (including whitespace)
+                            // Per spec: EMPTY text nodes (zero characters) do not generate text sequences
+                            // Whitespace-only nodes DO generate text sequences (whitespace is content)
                             bool hasContent = false;
                             foreach (var textNode in TextNodes)
                             {
