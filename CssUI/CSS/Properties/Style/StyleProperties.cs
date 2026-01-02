@@ -166,6 +166,10 @@ public partial class StyleProperties
     public int Orphans => Cascaded.Orphans.Actual;
     public int Widows => Cascaded.Widows.Actual;
     public EBoxDecorationBreak BoxDecorationBreak => Cascaded.BoxDecorationBreak.Actual;
+
+    // List style properties
+    public EListStyleType ListStyleType => Cascaded.ListStyleType.Actual;
+    public EListStylePosition ListStylePosition => Cascaded.ListStylePosition.Actual;
     #endregion
 
     #region Block Values

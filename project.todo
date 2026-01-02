@@ -299,13 +299,13 @@ inline formatting context layout (phase 18.3), not during box generation.
 - [x] Whitespace-only text nodes generate text run (correct per spec)
 - [x] Documented future white-space property dependency in code comments
 
-#### 14.6.4 List Item Marker Boxes (CSS Display 3 §2.3)
+#### 14.6.4 List Item Marker Boxes (CSS Display 3 §2.3) ✓
 display: list-item generates principal box + ::marker pseudo-element.
-- [ ] Detect EDisplayMode.LIST_ITEM in Generate_Box()
-- [ ] Generate marker box in addition to principal box
-- [ ] Position marker box according to list-style-position
-- [ ] Marker content from list-style-type property
-- [ ] Tests for list-item marker generation
+- [x] Detect EDisplayMode.LIST_ITEM in Generate_Box()
+- [x] Generate marker box in addition to principal box
+- [x] Position marker box according to list-style-position
+- [x] Marker content from list-style-type property
+- [x] Tests for list-item marker generation (43 tests)
 
 #### 14.6.5 Table Internal Box Fixup (CSS Display 3 §2.4, CSS 2.2 §17.2)
 Table cells/rows in wrong parent generate anonymous wrapper boxes.

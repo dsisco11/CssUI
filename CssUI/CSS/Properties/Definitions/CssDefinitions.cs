@@ -83,6 +83,7 @@ internal class CssDefinitions
         foreach (var def in Create_Grid_Property_Definitions()) { Definitions.AddLast(def); }
         foreach (var def in Create_Alignment_Property_Definitions()) { Definitions.AddLast(def); }
         foreach (var def in Create_Fragmentation_Property_Definitions()) { Definitions.AddLast(def); }
+        foreach (var def in Create_List_Style_Property_Definitions()) { Definitions.AddLast(def); }
 
         // Add all of our definitions to a backing dictionary
         var Dict = new Dictionary<ECssPropertyID, StyleDefinition>();
@@ -406,6 +407,27 @@ internal class CssDefinitions
 
             // box-decoration-break: slice | clone (default slice)
             new StyleDefinition(ECssPropertyID.BoxDecorationBreak, false, EPropertyDirtFlags.Flow, CssValue.From(EBoxDecorationBreak.Slice), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EBoxDecorationBreak>())
+        ];
+    }
+
+    /// <summary>
+    /// Properties for CSS Lists styling.
+    /// Docs: https://www.w3.org/TR/css-lists-3/
+    /// </summary>
+    static IEnumerable<StyleDefinition> Create_List_Style_Property_Definitions()
+    {
+        return [
+            // list-style-type: <counter-style> | <string> | none (default disc)
+            // Applies to list items, inherited
+            new StyleDefinition(ECssPropertyID.ListStyleType, true, EPropertyDirtFlags.Flow, CssValue.From(EListStyleType.Disc), ECssValueTypes.KEYWORD | ECssValueTypes.STRING, Lookup.Get_Keywords<EListStyleType>()),
+
+            // list-style-image: <image> | none (default none)
+            // Applies to list items, inherited
+            new StyleDefinition(ECssPropertyID.ListStyleImage, true, EPropertyDirtFlags.Flow, CssValue.None, ECssValueTypes.KEYWORD | ECssValueTypes.URL),
+
+            // list-style-position: inside | outside (default outside)
+            // Applies to list items, inherited
+            new StyleDefinition(ECssPropertyID.ListStylePosition, true, EPropertyDirtFlags.Flow, CssValue.From(EListStylePosition.Outside), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EListStylePosition>())
         ];
     }
     #endregion

@@ -388,10 +388,80 @@ public static class CssBoxTree
         // This avoids the parentNode != null check in Generate_Tree that would skip tree insertion
         CssPrincipalBox box = new CssPrincipalBox(Node, null!);
 
+        // Per CSS Display 3 §2.3: list-item generates a ::marker pseudo-element
+        // The marker box is the list item's first child, before ::before pseudo-element
+        if (Node.Style.Display == EDisplayMode.LIST_ITEM)
+        {
+            Generate_Marker_Box(Node, box);
+        }
+
         // Note: Anonymous box normalization is handled in Generate_Tree() after all
         // children of block containers are processed (per CSS 2.2 §9.2.1.1)
 
         return box;
+    }
+
+    /// <summary>
+    /// Generates a marker box for a list item element.
+    /// Per CSS Display 3 §2.3 and CSS Lists 3 §3.1.
+    /// </summary>
+    /// <param name="listItem">The list item element.</param>
+    /// <param name="principalBox">The principal box of the list item.</param>
+    private static void Generate_Marker_Box(Element listItem, CssPrincipalBox principalBox)
+    {
+        // Only generate marker if list-style-type is not 'none' (and no list-style-image)
+        // Per CSS Lists 3 §3.2: if no marker content, ::marker does not generate a box
+        var markerType = listItem.Style.ListStyleType;
+        if (markerType == Enums.EListStyleType.None)
+        {
+            return;
+        }
+
+        // Create the marker box without a parent (will be inserted at position 0)
+        var markerBox = new CssMarkerBox(listItem);
+
+        // Calculate counter value based on position among siblings
+        int counterValue = Calculate_List_Item_Counter(listItem);
+        markerBox.SetCounterValue(counterValue);
+
+        // Insert marker box as first child of the principal box
+        principalBox.Insert(0, markerBox);
+    }
+
+    /// <summary>
+    /// Calculates the list-item counter value for a list item element.
+    /// Per CSS Lists 3 §4.6: list items automatically increment a special 'list-item' counter.
+    /// </summary>
+    /// <param name="listItem">The list item element.</param>
+    /// <returns>The 1-based counter value for this list item.</returns>
+    private static int Calculate_List_Item_Counter(Element listItem)
+    {
+        // Find the parent list container and count preceding list item siblings
+        var parent = listItem.parentElement;
+        if (parent is null)
+        {
+            return 1;
+        }
+
+        int counter = 0;
+        Element? current = parent.firstElementChild;
+        while (current is not null)
+        {
+            // Count list items (elements with display: list-item)
+            if (current.Style.Display == EDisplayMode.LIST_ITEM)
+            {
+                counter++;
+            }
+
+            if (ReferenceEquals(current, listItem))
+            {
+                break;
+            }
+
+            current = current.nextElementSibling;
+        }
+
+        return counter > 0 ? counter : 1;
     }
 
     /// <summary>

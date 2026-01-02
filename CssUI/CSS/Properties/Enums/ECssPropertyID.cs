@@ -306,6 +306,27 @@ public enum ECssPropertyID : int
     BoxDecorationBreak,
     #endregion
 
+    #region List Style Properties
+    /// <summary>
+    /// Specifies the marker string for list items (disc, decimal, etc.).
+    /// Docs: https://www.w3.org/TR/css-lists-3/#text-markers
+    /// </summary>
+    [EnumData("list-style-type")]
+    ListStyleType,
+    /// <summary>
+    /// Specifies the marker image for list items.
+    /// Docs: https://www.w3.org/TR/css-lists-3/#image-markers
+    /// </summary>
+    [EnumData("list-style-image")]
+    ListStyleImage,
+    /// <summary>
+    /// Specifies whether the marker is inside or outside the principal box.
+    /// Docs: https://www.w3.org/TR/css-lists-3/#list-style-position-property
+    /// </summary>
+    [EnumData("list-style-position")]
+    ListStylePosition,
+    #endregion
+
 
     [Ignore]
     MAX_VALUE,

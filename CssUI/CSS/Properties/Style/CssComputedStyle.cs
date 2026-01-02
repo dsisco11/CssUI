@@ -396,6 +396,26 @@ public class CssComputedStyle
     /// </summary>
     public EnumProperty<EBoxDecorationBreak> BoxDecorationBreak => (EnumProperty<EBoxDecorationBreak>)Get(ECssPropertyID.BoxDecorationBreak)!;
     #endregion
+
+    #region List Style
+    /// <summary>
+    /// Specifies the marker string for list items (disc, decimal, etc.).
+    /// Docs: https://www.w3.org/TR/css-lists-3/#text-markers
+    /// </summary>
+    public EnumProperty<EListStyleType> ListStyleType => (EnumProperty<EListStyleType>)Get(ECssPropertyID.ListStyleType)!;
+
+    /// <summary>
+    /// Specifies whether the marker is inside or outside the principal box.
+    /// Docs: https://www.w3.org/TR/css-lists-3/#list-style-position-property
+    /// </summary>
+    public EnumProperty<EListStylePosition> ListStylePosition => (EnumProperty<EListStylePosition>)Get(ECssPropertyID.ListStylePosition)!;
+
+    /// <summary>
+    /// Specifies the marker image for list items.
+    /// Docs: https://www.w3.org/TR/css-lists-3/#image-markers
+    /// </summary>
+    public ICssProperty ListStyleImage => Get(ECssPropertyID.ListStyleImage)!;
+    #endregion
     #endregion
 
     #region Constructors
@@ -544,6 +564,12 @@ public class CssComputedStyle
         CssProperties[(int)ECssPropertyID.Orphans] = new IntProperty(ECssPropertyID.Orphans, Owner, selfRef, this.ReadOnly);
         CssProperties[(int)ECssPropertyID.Widows] = new IntProperty(ECssPropertyID.Widows, Owner, selfRef, this.ReadOnly);
         CssProperties[(int)ECssPropertyID.BoxDecorationBreak] = new EnumProperty<EBoxDecorationBreak>(ECssPropertyID.BoxDecorationBreak, Owner, selfRef, this.ReadOnly);
+
+        // List Style Properties
+        // https://www.w3.org/TR/css-lists-3/
+        CssProperties[(int)ECssPropertyID.ListStyleType] = new EnumProperty<EListStyleType>(ECssPropertyID.ListStyleType, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.ListStyleImage] = new CssProperty(ECssPropertyID.ListStyleImage, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.ListStylePosition] = new EnumProperty<EListStylePosition>(ECssPropertyID.ListStylePosition, Owner, selfRef, this.ReadOnly);
 
     }
     #endregion
