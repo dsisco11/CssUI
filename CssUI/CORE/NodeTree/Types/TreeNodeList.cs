@@ -73,7 +73,8 @@ public class TreeNodeList : ICollection<ITreeNode>, IEnumerable<ITreeNode>, ILis
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void Update_Node_Links(int index)
     {
-        if (index > Count) throw new IndexOutOfRangeException();
+        // If no more items or index is past the end, nothing to update
+        if (index >= Count) return;
 
         var node = Items[index];
 

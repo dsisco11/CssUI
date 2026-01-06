@@ -20,7 +20,7 @@
   - [ ] Update Window.QueueObserverMicroTask() to use new system
   - [ ] Ensure MutationObserver callbacks fire at correct timing per W3C spec
 
-## Test Coverage — Total: 4738 passing, 151 skipped, 5 failing = 4894 tests
+## Test Coverage — Total: 4821 passing, 151 skipped, 5 failing = 4977 tests
 ### DOM Tests: 518 passing, 3 skipped = 521 total
 ### Selector Tests: 307 passing, 143 skipped = 450 total
 
@@ -307,14 +307,14 @@ display: list-item generates principal box + ::marker pseudo-element.
 - [x] Marker content from list-style-type property
 - [x] Tests for list-item marker generation (43 tests)
 
-#### 14.6.5 Table Internal Box Fixup (CSS Display 3 §2.4, CSS 2.2 §17.2)
+#### 14.6.5 Table Internal Box Fixup (CSS Display 3 §2.4, CSS 2.2 §17.2) ✓
 Table cells/rows in wrong parent generate anonymous wrapper boxes.
-- [ ] Detect table-internal display types (table-cell, table-row, etc.)
-- [ ] Generate anonymous table-row around orphaned table-cell
-- [ ] Generate anonymous table-row-group around orphaned table-row
-- [ ] Generate anonymous table around orphaned table-row-group
-- [ ] Chain all necessary wrappers (cell → row → row-group → table)
-- [ ] Tests for table anonymous box generation
+- [x] Detect table-internal display types (table-cell, table-row, etc.)
+- [x] Generate anonymous table-row around orphaned table-cell
+- [x] Generate anonymous table-row-group around orphaned table-row
+- [x] Generate anonymous table around orphaned table-row-group
+- [x] Chain all necessary wrappers (cell → row → row-group → table)
+- [x] Tests for table anonymous box generation (35 tests)
 
 #### 14.6.6 Automatic Box Type Transformations (CSS Display 3 §2.7)
 Blockification/inlinification based on position/float/parent context.

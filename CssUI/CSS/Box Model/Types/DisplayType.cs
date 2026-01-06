@@ -106,6 +106,27 @@ public struct DisplayType
                 Outer = EOuterDisplayType.Inline;
                 Inner = EInnerDisplayType.Table;
                 break;
+            // Table-internal display types per CSS Display 3 §2.4
+            // These are "layout-internal" types that generate internal table boxes
+            // Per spec: "both the inner display type and the outer display type of elements 
+            // using these display values are set to the given keyword"
+            case EDisplayMode.TABLE_ROW_GROUP:
+            case EDisplayMode.TABLE_HEADER_GROUP:
+            case EDisplayMode.TABLE_FOOTER_GROUP:
+            case EDisplayMode.TABLE_ROW:
+            case EDisplayMode.TABLE_COLUMN_GROUP:
+            case EDisplayMode.TABLE_COLUMN:
+                // Table-internal types participate in table formatting context
+                Outer = EOuterDisplayType.Block; // Acts block-level within table layout
+                Inner = EInnerDisplayType.None; // No inner display type per spec
+                break;
+            case EDisplayMode.TABLE_CELL:
+            case EDisplayMode.TABLE_CAPTION:
+                // table-cell and table-caption have flow-root inner display type
+                // Per CSS Display 3 §2.4: "table-cell boxes have a flow-root inner display type"
+                Outer = EOuterDisplayType.Block;
+                Inner = EInnerDisplayType.Flow_Root;
+                break;
             default:
                 throw new NotImplementedException($"Display type \"{Lookup.Keyword(DisplayMode)}\" has not been implemented yet");
         }

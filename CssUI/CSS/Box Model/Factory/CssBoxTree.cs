@@ -14,6 +14,7 @@ public static class CssBoxTree
     /*
      * Docs: https://www.w3.org/TR/css-display-3/#intro
      * Docs: https://www.w3.org/TR/CSS22/visuren.html#box-gen
+     * Docs: https://www.w3.org/TR/CSS22/tables.html#anonymous-boxes (Table anonymous boxes)
      */
 
     /// <summary>
@@ -39,11 +40,14 @@ public static class CssBoxTree
          * 5) Insert the new box-node into tree.
          * 6) Queue all children of element.
          * 7) After processing children, normalize block containers to ensure only block-level children.
+         * 8) After processing children, fix up table-internal boxes per CSS 2.2 §17.2.1.
          */
 
         var Queue = new Queue<Node>();
         // Track elements that need anonymous box normalization after their children are processed
         var BlockContainersToNormalize = new HashSet<Element>();
+        // Track boxes that may need table internal fixup
+        var BoxesRequiringTableFixup = new HashSet<CssBox>();
         Queue.Enqueue(StartNode);
         while (Queue.Count > 0)
         {
@@ -83,7 +87,7 @@ public static class CssBoxTree
                     case DOM.Enums.ENodeType.TEXT_NODE:
                         {
                             // Text runs encompass all of the contiguous sibling text-nodes, skip those contiguous nodes in the queue
-                            // Per CSS Display 3 §1: "each contiguous sequence of sibling text nodes generates a text sequence 
+                            // Per CSS Display 3 §1: "each contiguous sequence of sibling text nodes generates a text sequence
                             // containing their text contents... If the sequence contains no text, however, it does not generate a text sequence."
                             //
                             // Note: Whitespace-only text nodes DO generate text sequences because whitespace IS text content.
@@ -177,6 +181,17 @@ public static class CssBoxTree
                     {
                         BlockContainersToNormalize.Add(nearestAncestor);
                     }
+
+                    // Track boxes that may need table internal fixup
+                    // Per CSS 2.2 §17.2.1: table-internal boxes generate anonymous wrappers if misparented
+                    if (nextBox is CssBox childBox && node is Element nodeElement)
+                    {
+                        var childDisplay = nodeElement.Style.Display;
+                        if (TableInternalDisplayType.IsTableInternal(childDisplay))
+                        {
+                            BoxesRequiringTableFixup.Add((CssBox)nearestAncestor.Box);
+                        }
+                    }
                 }
 
                 // Notify the tree that we need to be reflowed
@@ -220,6 +235,13 @@ public static class CssBoxTree
             {
                 NormalizeBlockContainerChildren(box);
             }
+        }
+
+        // 8) Fix up table-internal boxes per CSS 2.2 §17.2.1
+        // Misparented table-internal boxes generate anonymous wrapper boxes
+        foreach (var parentBox in BoxesRequiringTableFixup)
+        {
+            FixupTableInternalBoxes(parentBox);
         }
     }
 
@@ -322,6 +344,265 @@ public static class CssBoxTree
         // Flush any remaining inline content
         FlushInlineRun();
     }
+
+    #region Table Internal Box Fixup (CSS 2.2 §17.2.1)
+    /*
+     * Docs: https://www.w3.org/TR/CSS22/tables.html#anonymous-boxes
+     * Docs: https://www.w3.org/TR/css-display-3/#layout-specific-display
+     *
+     * Per CSS 2.2 §17.2.1: Any table element will automatically generate necessary
+     * anonymous table objects around itself, consisting of at least three nested
+     * objects corresponding to a 'table'/'inline-table' element, a 'table-row'
+     * element, and a 'table-cell' element.
+     *
+     * The fixup algorithm has three stages:
+     * 1. Remove irrelevant boxes (whitespace between table elements)
+     * 2. Generate missing child wrappers
+     * 3. Generate missing parents (wrap misparented table-internal boxes)
+     */
+
+    /// <summary>
+    /// Fixes up table-internal boxes that are misparented.
+    /// Per CSS 2.2 §17.2.1: Generates anonymous wrapper boxes when table-internal
+    /// boxes don't have the required parent type.
+    /// </summary>
+    /// <remarks>
+    /// Example transformations:
+    /// - table-cell in block → anonymous table-row → anonymous table-row-group → anonymous table → table-cell
+    /// - table-row in block → anonymous table-row-group → anonymous table → table-row
+    /// - table-row in table (not row-group) → anonymous table-row-group → table-row
+    /// </remarks>
+    private static void FixupTableInternalBoxes(CssBox parentBox)
+    {
+        if (parentBox.childNodes.Count == 0)
+            return;
+
+        // Get the parent's display mode
+        EDisplayMode parentDisplay = GetBoxDisplayMode(parentBox);
+
+        // Take a snapshot of children to avoid modification during iteration
+        var children = new List<ITreeNode>(parentBox.childNodes);
+
+        // Track indices of children that need fixup and their wrapper chains
+        var replacements = new List<(int Index, ITreeNode OriginalChild, CssAnonymousBox OutermostWrapper, CssAnonymousBox InnermostWrapper)>();
+
+        // Process each child that needs fixup
+        for (int i = 0; i < children.Count; i++)
+        {
+            var child = children[i];
+
+            if (child is not CssPrincipalBox childPrincipalBox)
+                continue;
+
+            EDisplayMode childDisplay = GetBoxDisplayMode(childPrincipalBox);
+
+            // Check if this child is a misparented table-internal box
+            if (!TableInternalDisplayType.IsMisparented(parentDisplay, childDisplay))
+                continue;
+
+            // Generate the necessary anonymous wrapper boxes
+            var (outermost, innermost) = GenerateTableWrapperChain(parentBox, childPrincipalBox, parentDisplay, childDisplay);
+            if (outermost is not null && innermost is not null)
+            {
+                replacements.Add((i, child, outermost, innermost));
+            }
+        }
+
+        // Apply replacements in reverse order to maintain correct indices
+        for (int i = replacements.Count - 1; i >= 0; i--)
+        {
+            var (index, originalChild, outermostWrapper, innermostWrapper) = replacements[i];
+
+            // Remove the original child at its index (this also unparents it)
+            parentBox.childNodes.RemoveAt(index);
+
+            // Add the original child to the innermost wrapper
+            innermostWrapper.Add(originalChild);
+
+            // Insert the outermost wrapper at the same position
+            parentBox.Insert(index, outermostWrapper);
+        }
+
+        // If we made changes, recursively check the new structure
+        // (newly created anonymous boxes may themselves need fixup)
+        if (replacements.Count > 0)
+        {
+            foreach (var child in parentBox.childNodes)
+            {
+                if (child is CssBox childBox)
+                {
+                    FixupTableInternalBoxes(childBox);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Generates a chain of anonymous table wrapper boxes to properly parent a misparented table-internal box.
+    /// </summary>
+    /// <param name="parentBox">The current (incompatible) parent box.</param>
+    /// <param name="childBox">The misparented table-internal child box.</param>
+    /// <param name="parentDisplay">The display mode of the parent.</param>
+    /// <param name="childDisplay">The display mode of the child.</param>
+    /// <returns>A tuple of (outermost wrapper, innermost wrapper) where the child should be added to innermost.</returns>
+    private static (CssAnonymousBox? Outermost, CssAnonymousBox? Innermost) GenerateTableWrapperChain(
+        CssBox parentBox,
+        CssPrincipalBox childBox,
+        EDisplayMode parentDisplay,
+        EDisplayMode childDisplay)
+    {
+        /*
+         * Per CSS 2.2 §17.2.1, the wrapper chain depends on the child type:
+         *
+         * table-cell → needs table-row → needs table-row-group → needs table
+         * table-row → needs table-row-group → needs table
+         * table-row-group/header-group/footer-group → needs table
+         * table-column → needs table-column-group → needs table
+         * table-column-group → needs table
+         * table-caption → needs table
+         *
+         * The chain stops when we reach a valid parent type.
+         */
+
+        // Determine if we should use inline-table based on parent context
+        // Per CSS 2.2 §17.2.1: "If C's parent is an 'inline' box, then T must be an 'inline-table' box"
+        bool useInlineTable = parentBox.IsInlineLevel;
+
+        // Build the wrapper chain from outside (table) to inside (immediate parent of child)
+        CssAnonymousBox? outermostWrapper = null;
+        CssAnonymousBox? innermostWrapper = null;
+
+        // Helper to add a wrapper layer
+        void AddWrapper(CssAnonymousBox wrapper)
+        {
+            if (outermostWrapper is null)
+            {
+                outermostWrapper = wrapper;
+                innermostWrapper = wrapper;
+            }
+            else
+            {
+                innermostWrapper!.Add(wrapper);
+                innermostWrapper = wrapper;
+            }
+        }
+
+        // Generate wrappers based on what's needed
+        switch (childDisplay)
+        {
+            case EDisplayMode.TABLE_CELL:
+                // table-cell needs: table-row → table-row-group → table
+                if (!TableInternalDisplayType.IsTableBox(parentDisplay))
+                {
+                    AddWrapper(useInlineTable
+                        ? CssAnonymousBox.Create_InlineTable(null!)
+                        : CssAnonymousBox.Create_Table(null!));
+                }
+                if (!TableInternalDisplayType.IsRowGroupBox(parentDisplay) && !TableInternalDisplayType.IsTableBox(parentDisplay))
+                {
+                    AddWrapper(CssAnonymousBox.Create_TableRowGroup(null!));
+                }
+                if (parentDisplay != EDisplayMode.TABLE_ROW)
+                {
+                    AddWrapper(CssAnonymousBox.Create_TableRow(null!));
+                }
+                break;
+
+            case EDisplayMode.TABLE_ROW:
+                // table-row needs: table-row-group → table
+                if (!TableInternalDisplayType.IsTableBox(parentDisplay))
+                {
+                    AddWrapper(useInlineTable
+                        ? CssAnonymousBox.Create_InlineTable(null!)
+                        : CssAnonymousBox.Create_Table(null!));
+                }
+                if (!TableInternalDisplayType.IsRowGroupBox(parentDisplay) && !TableInternalDisplayType.IsTableBox(parentDisplay))
+                {
+                    AddWrapper(CssAnonymousBox.Create_TableRowGroup(null!));
+                }
+                break;
+
+            case EDisplayMode.TABLE_ROW_GROUP:
+            case EDisplayMode.TABLE_HEADER_GROUP:
+            case EDisplayMode.TABLE_FOOTER_GROUP:
+                // row groups need: table
+                if (!TableInternalDisplayType.IsTableBox(parentDisplay))
+                {
+                    AddWrapper(useInlineTable
+                        ? CssAnonymousBox.Create_InlineTable(null!)
+                        : CssAnonymousBox.Create_Table(null!));
+                }
+                break;
+
+            case EDisplayMode.TABLE_COLUMN:
+                // table-column needs: table-column-group → table
+                if (!TableInternalDisplayType.IsTableBox(parentDisplay))
+                {
+                    AddWrapper(useInlineTable
+                        ? CssAnonymousBox.Create_InlineTable(null!)
+                        : CssAnonymousBox.Create_Table(null!));
+                }
+                if (parentDisplay != EDisplayMode.TABLE_COLUMN_GROUP && !TableInternalDisplayType.IsTableBox(parentDisplay))
+                {
+                    AddWrapper(CssAnonymousBox.Create_TableColumnGroup(null!));
+                }
+                break;
+
+            case EDisplayMode.TABLE_COLUMN_GROUP:
+            case EDisplayMode.TABLE_CAPTION:
+                // column groups and captions need: table
+                if (!TableInternalDisplayType.IsTableBox(parentDisplay))
+                {
+                    AddWrapper(useInlineTable
+                        ? CssAnonymousBox.Create_InlineTable(null!)
+                        : CssAnonymousBox.Create_Table(null!));
+                }
+                break;
+        }
+
+        // The innermost wrapper is where the child should be added
+        // NOTE: We do NOT add the child here - that's done by the caller
+        // after removing the child from its current parent
+
+        return (outermostWrapper, innermostWrapper);
+    }
+
+    /// <summary>
+    /// Gets the display mode for a box. For principal boxes, returns the owning element's display.
+    /// For anonymous boxes, returns the SourceDisplayMode property.
+    /// </summary>
+    private static EDisplayMode GetBoxDisplayMode(CssBox box)
+    {
+        if (box is CssPrincipalBox principalBox && principalBox.Owner is Element element)
+        {
+            return element.Style.Display;
+        }
+
+        if (box is CssAnonymousBox anonymousBox)
+        {
+            return anonymousBox.SourceDisplayMode;
+        }
+
+        // For other cases, infer from DisplayType
+        var displayType = box.DisplayType;
+
+        if (displayType.Inner == EInnerDisplayType.Table)
+        {
+            return displayType.Outer == EOuterDisplayType.Inline
+                ? EDisplayMode.INLINE_TABLE
+                : EDisplayMode.TABLE;
+        }
+
+        // Default based on outer/inner display
+        if (displayType.Outer == EOuterDisplayType.Block && displayType.Inner == EInnerDisplayType.Flow_Root)
+            return EDisplayMode.BLOCK;
+        if (displayType.Outer == EOuterDisplayType.Inline && displayType.Inner == EInnerDisplayType.Flow)
+            return EDisplayMode.INLINE;
+
+        return EDisplayMode.BLOCK; // Default fallback
+    }
+
+    #endregion
 
     /// <summary>
     /// Recursively clears boxes from all descendants of a node.
