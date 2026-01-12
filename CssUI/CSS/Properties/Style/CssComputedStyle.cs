@@ -481,6 +481,8 @@ public class CssComputedStyle
         CssProperties[(int)ECssPropertyID.Direction] = new EnumProperty<EDirection>(ECssPropertyID.Direction, Owner, selfRef, this.ReadOnly);
         CssProperties[(int)ECssPropertyID.WritingMode] = new EnumProperty<EWritingMode>(ECssPropertyID.WritingMode, Owner, selfRef, this.ReadOnly);
         CssProperties[(int)ECssPropertyID.Display] = new EnumProperty<EDisplayMode>(ECssPropertyID.Display, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.Float] = new EnumProperty<EFloat>(ECssPropertyID.Float, Owner, selfRef, this.ReadOnly);
+        CssProperties[(int)ECssPropertyID.Clear] = new EnumProperty<EClear>(ECssPropertyID.Clear, Owner, selfRef, this.ReadOnly);
         CssProperties[(int)ECssPropertyID.BoxSizing] = new EnumProperty<EBoxSizingMode>(ECssPropertyID.BoxSizing, Owner, selfRef, this.ReadOnly);
         CssProperties[(int)ECssPropertyID.Positioning] = new EnumProperty<EBoxPositioning>(ECssPropertyID.Positioning, Owner, selfRef, this.ReadOnly);
 
