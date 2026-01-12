@@ -65,6 +65,11 @@ public enum ECssPropertyID : int
     /// </summary>
     [EnumData("float")]
     Float,
+    /// <summary>
+    /// Docs: https://www.w3.org/TR/CSS2/visuren.html#propdef-clear
+    /// </summary>
+    [EnumData("clear")]
+    Clear,
     [EnumData("box-sizing")]
     BoxSizing,
     [EnumData("positioning")]

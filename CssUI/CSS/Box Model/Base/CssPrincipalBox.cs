@@ -170,6 +170,12 @@ public class CssPrincipalBox : CssBox
     public bool IsFloating => Float != EFloat.None;
 
     /// <summary>
+    /// Gets the clear value for this box.
+    /// Per CSS 2.2 §9.5.2: Indicates which sides may not be adjacent to an earlier floating box.
+    /// </summary>
+    public EClear Clear => Style.Clear;
+
+    /// <summary>
     /// Is this box absolutely positioned? (eg. <see cref="EBoxPositioning.Absolute"/> or <see cref="EBoxPositioning.Fixed"/>)
     /// </summary>
     public bool IsAbsolutelyPositioned => Style.Positioning == EBoxPositioning.Absolute | Style.Positioning == EBoxPositioning.Fixed;

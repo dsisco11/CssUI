@@ -218,6 +218,12 @@ internal class CssDefinitions
             // Float causes blockification per CSS Display 3 §2.7 (handled in blockification resolver when implemented)
             new StyleDefinition(ECssPropertyID.Float, false, EPropertyDirtFlags.Flow, CssValue.From(EFloat.None), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EFloat>()),
 
+            /// Clear property per CSS 2.2 §9.5.2
+            // Docs: https://www.w3.org/TR/CSS2/visuren.html#propdef-clear
+            // Initial value: none, Inherited: no, Applies to: block-level elements
+            // Indicates which sides of an element's box(es) may not be adjacent to an earlier floating box
+            new StyleDefinition(ECssPropertyID.Clear, false, EPropertyDirtFlags.Flow, CssValue.From(EClear.None), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EClear>()),
+
             new StyleDefinition(ECssPropertyID.BoxSizing, false, EPropertyDirtFlags.Content_Area | EPropertyDirtFlags.Border_Area, CssValue.From(EBoxSizingMode.BorderBox), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EBoxSizingMode>()),
 
             new StyleDefinition(ECssPropertyID.Positioning, false, EPropertyDirtFlags.Margin_Area, CssValue.From(EBoxPositioning.Relative), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EBoxPositioning>()),

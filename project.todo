@@ -381,12 +381,13 @@ Prerequisites: Phase 14 (Layout Pipeline Integration)
 - [x] Add CssPrincipalBox.Float property accessor
 - [x] Update CssPrincipalBox.IsFloating to use actual property value
 
-### 15.2 Clear Property Definition
-- [ ] Add ECssPropertyID.Clear to property enum
-- [ ] Add EClear enum (None, Left, Right, Both, InlineStart, InlineEnd)
-- [ ] Create StyleDefinition for clear property in CssDefinitions.cs
-- [ ] Add Clear property to StyleProperties class
-- [ ] Add CssPrincipalBox.Clear property accessor
+### 15.2 Clear Property Definition ✓
+- [x] Add ECssPropertyID.Clear to property enum
+- [x] Add EClear enum (None, Left, Right, Both, InlineStart, InlineEnd) with EnumRecords
+- [x] Create StyleDefinition for clear property in CssDefinitions.cs
+- [x] Add Clear property to StyleProperties class
+- [x] Add Clear property to CssComputedStyle class
+- [x] Add CssPrincipalBox.Clear property accessor
 
 ### 15.3 Float Layout Algorithm
 Implement float positioning in BlockFormattingContext.

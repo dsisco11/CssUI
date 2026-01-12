@@ -91,6 +91,12 @@ public class CssComputedStyle
     public EnumProperty<EFloat> Float => (EnumProperty<EFloat>)Get(ECssPropertyID.Float)!;
 
     /// <summary>
+    /// Clear property for this element per CSS 2.2 §9.5.2.
+    /// Indicates which sides of an element's box(es) may not be adjacent to an earlier floating box.
+    /// </summary>
+    public EnumProperty<EClear> Clear => (EnumProperty<EClear>)Get(ECssPropertyID.Clear)!;
+
+    /// <summary>
     /// Current BoxSizing mode for this element.
     /// (Defaults to <see cref="EBoxSizingMode.BorderBox"/>)
     /// </summary>
