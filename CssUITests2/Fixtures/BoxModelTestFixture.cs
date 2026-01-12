@@ -219,9 +219,7 @@ public class BoxModelTestFixture : IDisposable
     /// </summary>
     /// <remarks>
     /// Per CSS 2.1 §10.3.5: Auto margins become 0. Auto width uses shrink-to-fit.
-    /// Note: Float property is not yet implemented (Phase 15), so this simulates
-    /// floating behavior by setting display group. The Float property would normally
-    /// trigger blockification and FLOATING display group.
+    /// Float property implemented in Phase 15.1-15.2.
     /// </remarks>
     public (Element element, MockPrincipalBox box, CssComputedStyle cascaded) CreateFloatingElement(
         int? width = null,
@@ -230,14 +228,10 @@ public class BoxModelTestFixture : IDisposable
         int? containingBlockWidth = null,
         int? containingBlockHeight = null)
     {
-        // NOTE: Since Float property is not implemented (Phase 15), we cannot truly create
-        // a floating element. The box's DisplayGroup is derived from computed styles.
-        // For now, we create a block element. Tests for FLOATING DisplayGroup will need
-        // to either mock the box or wait for Phase 15 implementation.
         return CreateTestElement(style =>
         {
             style.Display.Set(EDisplayMode.BLOCK);
-            // Float property would go here when implemented
+            // Float property is set in configureStyle callback by the test
             if (width.HasValue)
                 style.Width.Set(width.Value);
             if (height.HasValue)
