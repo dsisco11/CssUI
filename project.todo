@@ -434,13 +434,23 @@ Implement float positioning in BlockFormattingContext.
 Spec Reference: https://www.w3.org/TR/CSS2/box.html#collapsing-margins
 Prerequisites: Phase 14 (Layout Pipeline Integration)
 
-### 16.1 Margin Collapse Detection
+### 16.1 Margin Collapse Detection ✓
 Implement adjoining margin detection per CSS 2.2 §8.3.1.
-- [ ] Add MarginCollapseState tracking to BlockFormattingContext
-- [ ] Detect adjacent sibling margins (vertical only)
-- [ ] Detect parent/first-child margin adjacency
-- [ ] Detect parent/last-child margin adjacency
-- [ ] Detect empty block margins (top meets bottom)
+- [x] Add MarginCollapseState tracking to BlockFormattingContext
+- [x] Detect adjacent sibling margins (vertical only)
+- [x] Detect parent/first-child margin adjacency
+- [x] Detect parent/last-child margin adjacency
+- [x] Detect empty block margins (top meets bottom)
+
+**Implementation Complete:**
+- MarginCollapseState class with positive/negative margin tracking
+- CalculateCollapsedMargin() implementing CSS 2.2 collapse algorithm
+- IsTopMarginAdjoining() and IsBottomMarginAdjoining() adjacency checks
+- HandleAdjacentSiblingCollapse() for sibling collapse detection
+- HandleParentFirstChildCollapse() for parent/first-child detection
+- HandleParentLastChildCollapse() for parent/last-child detection
+- IsEmptyBox() for detecting empty blocks where margins collapse through
+- Proper handling of floats, absolutely positioned, and cleared elements
 
 ### 16.2 Margin Collapse Calculation
 - [ ] Calculate collapsed margin = max(margin1, margin2) for positive
