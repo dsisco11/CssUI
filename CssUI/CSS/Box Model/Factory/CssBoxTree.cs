@@ -749,63 +749,29 @@ public static class CssBoxTree
     /// Applies automatic box type transformations (blockification/inlinification) per CSS Display 3 §2.7.
     /// </summary>
     /// <remarks>
-    /// Blockification occurs for:
-    /// - Floated elements (float != none)
+    /// As of Phase 14.6.6, blockification is handled during style cascade via the Display_Computed resolver.
+    /// This method now serves as a passthrough that returns the computed display type directly,
+    /// which already has blockification applied for:
     /// - Absolutely/fixed positioned elements
     /// - Children of flex/grid containers
+    /// - Root elements (per CSS Display 3 §2.8)
+    /// - Floated elements (when Float property is implemented in Phase 15)
     ///
-    /// Inlinification occurs for:
-    /// - Children of ruby containers (not implemented yet)
+    /// Inlinification (for ruby containers) is not yet implemented.
     /// </remarks>
     private static DisplayType ApplyBoxTypeTransformations(in Element Node, DisplayType displayType)
     {
+        // Blockification is now handled in the Display computed value resolver (CssPropertyResolver.Display_Computed)
+        // The displayType parameter already reflects the computed display value with blockification applied.
+        // This method is kept for potential future inlinification logic (e.g., ruby containers).
+
         // Skip if already has no box or contents
         if (displayType.Outer == EOuterDisplayType.None || displayType.Outer == EOuterDisplayType.Contents)
         {
             return displayType;
         }
 
-        bool shouldBlockify = false;
-
-        // Check for blockification triggers
-        // 1. Absolutely positioned elements (position: absolute or fixed)
-        if (Node.Style.Positioning == EBoxPositioning.Absolute || Node.Style.Positioning == EBoxPositioning.Fixed)
-        {
-            shouldBlockify = true;
-        }
-
-        // 2. Floated elements (when float property is implemented)
-        // @todo: Check float property when implemented
-
-        // 3. Children of flex/grid containers
-        if (Node.parentElement is not null)
-        {
-            var parentDisplay = Node.parentElement.Style.Display;
-            if (parentDisplay == EDisplayMode.FLEX || parentDisplay == EDisplayMode.INLINE_FLEX ||
-                parentDisplay == EDisplayMode.GRID || parentDisplay == EDisplayMode.INLINE_GRID)
-            {
-                shouldBlockify = true;
-            }
-        }
-
-        // Apply blockification if needed
-        if (shouldBlockify && displayType.IsInlineLevel)
-        {
-            // Per CSS Display 3 §2.7: blockification sets outer display to block
-            // For inline flow-root (inline-block), it becomes block (losing flow-root) for legacy reasons
-            if (displayType.Inner == EInnerDisplayType.Flow_Root)
-            {
-                // inline-block → block (per spec, loses flow-root for legacy reasons)
-                Node.Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
-                return new DisplayType(EOuterDisplayType.Block, EInnerDisplayType.Flow_Root);
-            }
-            else
-            {
-                // Other inline types → block flow-root
-                Node.Style.ImplicitRules.Display.Set(EDisplayMode.BLOCK);
-                return new DisplayType(EOuterDisplayType.Block, displayType.Inner);
-            }
-        }
+        // @todo: Add inlinification for ruby container children when ruby is implemented
 
         return displayType;
     }

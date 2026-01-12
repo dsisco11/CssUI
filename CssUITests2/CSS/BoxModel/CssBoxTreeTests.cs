@@ -355,7 +355,7 @@ public class CssBoxTreeTests : IDisposable
 
     #region Blockification Tests
 
-    [Fact(Skip = "Phase 14.6.6: Blockification requires style cascade integration to persist computed display")]
+    [Fact]
     [Trait("Category", "BoxModel")]
     [Trait("Category", "Blockification")]
     public void AbsolutelyPositioned_InlineElement_IsBlockified()
@@ -372,11 +372,13 @@ public class CssBoxTreeTests : IDisposable
         _fixture.ForceBoxGeneration();
 
         // Assert - absolutely positioned inline should be blockified
+        // The computed display value should have block outer display
         var displayType = new DisplayType(inline.Style.Display);
-        Assert.True(displayType.IsBlockLevel || inline.Style.Positioning == EBoxPositioning.Absolute);
+        Assert.Equal(EOuterDisplayType.Block, displayType.Outer);
+        Assert.NotNull(inline.Box);
     }
 
-    [Fact(Skip = "Phase 14.6.6: Blockification requires style cascade integration to persist computed display")]
+    [Fact]
     [Trait("Category", "BoxModel")]
     [Trait("Category", "Blockification")]
     public void FixedPositioned_InlineElement_IsBlockified()
@@ -392,10 +394,12 @@ public class CssBoxTreeTests : IDisposable
         _fixture.ForceBoxGeneration();
 
         // Assert - fixed positioned inline should be blockified
+        var displayType = new DisplayType(inline.Style.Display);
+        Assert.Equal(EOuterDisplayType.Block, displayType.Outer);
         Assert.NotNull(inline.Box);
     }
 
-    [Fact(Skip = "Phase 14.6.6: Blockification requires style cascade integration to persist computed display")]
+    [Fact]
     [Trait("Category", "BoxModel")]
     [Trait("Category", "Blockification")]
     public void FlexContainer_InlineChild_IsBlockified()
@@ -411,10 +415,12 @@ public class CssBoxTreeTests : IDisposable
         _fixture.ForceBoxGeneration();
 
         // Assert - inline children of flex containers should be blockified
+        var displayType = new DisplayType(inline.Style.Display);
+        Assert.Equal(EOuterDisplayType.Block, displayType.Outer);
         Assert.NotNull(inline.Box);
     }
 
-    [Fact(Skip = "Phase 14.6.6: Blockification requires style cascade integration to persist computed display")]
+    [Fact]
     [Trait("Category", "BoxModel")]
     [Trait("Category", "Blockification")]
     public void GridContainer_InlineChild_IsBlockified()
@@ -430,10 +436,12 @@ public class CssBoxTreeTests : IDisposable
         _fixture.ForceBoxGeneration();
 
         // Assert - inline children of grid containers should be blockified
+        var displayType = new DisplayType(inline.Style.Display);
+        Assert.Equal(EOuterDisplayType.Block, displayType.Outer);
         Assert.NotNull(inline.Box);
     }
 
-    [Fact(Skip = "Phase 14.6.6: Box outer display type requires style cascade integration")]
+    [Fact]
     [Trait("Category", "BoxModel")]
     [Trait("Category", "Blockification")]
     public void BlockElement_NotBlockified_RemainsBlock()

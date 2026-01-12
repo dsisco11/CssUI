@@ -316,14 +316,14 @@ Table cells/rows in wrong parent generate anonymous wrapper boxes.
 - [x] Chain all necessary wrappers (cell → row → row-group → table)
 - [x] Tests for table anonymous box generation (35 tests)
 
-#### 14.6.6 Automatic Box Type Transformations (CSS Display 3 §2.7)
+#### 14.6.6 Automatic Box Type Transformations (CSS Display 3 §2.7) ✓
 Blockification/inlinification based on position/float/parent context.
 - [ ] Blockify floated elements (float != none → outer display: block) — requires Phase 15
-- [ ] Blockify absolutely/fixed positioned elements
-- [ ] Blockify children of flex/grid containers
+- [x] Blockify absolutely/fixed positioned elements
+- [x] Blockify children of flex/grid containers
 - [ ] Inlinify children of ruby containers
-- [ ] Apply transformations in Generate_Box() before creating CssPrincipalBox
-- [ ] Tests for blockification scenarios
+- [x] Apply transformations during cascade (Display_Computed resolver)
+- [x] Tests for blockification scenarios (5 tests passing)
 
 #### 14.6.7 Run-In Boxes (CSS Display 3 §5) — Low Priority
 Run-in boxes merge into subsequent block.

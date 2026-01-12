@@ -22,12 +22,12 @@ public struct DisplayType
 
     #region Accessors
     /// <summary>
-    /// A block container either contains only inline-level boxes participating in an inline formatting context, 
+    /// A block container either contains only inline-level boxes participating in an inline formatting context,
     /// or contains only block-level boxes participating in a block formatting context (possibly generating anonymous block boxes to ensure this constraint, as defined in CSS2§9.2.1.1).
     /// </summary>
     public bool IsBlockContainer => (Inner == EInnerDisplayType.Flow_Root);
 
-    /// <summary> 
+    /// <summary>
     /// Content that participates in block layout. Specifically, block-level boxes have an Outer display type of 'Block'
     /// </summary>
     public bool IsBlockLevel => (Outer == EOuterDisplayType.Block);
@@ -35,6 +35,15 @@ public struct DisplayType
     /// Content that participates in inline layout. Specifically, inline-level boxes and text runs.
     /// </summary>
     public bool IsInlineLevel => (Outer == EOuterDisplayType.Inline || Outer == EOuterDisplayType.Run_In);
+
+    /// <summary>
+    /// Returns true if this is a layout-internal display type (table-*, ruby-*).
+    /// Per CSS Display 3 §2.4: "Some layout models, such as table and ruby, have a complex
+    /// internal structure, with several different roles that their children and descendants can fill."
+    /// </summary>
+    public bool IsLayoutInternal => Inner == EInnerDisplayType.None &&
+                                     Outer != EOuterDisplayType.None &&
+                                     Outer != EOuterDisplayType.Contents;
     #endregion
 
     #region Constructors
@@ -108,7 +117,7 @@ public struct DisplayType
                 break;
             // Table-internal display types per CSS Display 3 §2.4
             // These are "layout-internal" types that generate internal table boxes
-            // Per spec: "both the inner display type and the outer display type of elements 
+            // Per spec: "both the inner display type and the outer display type of elements
             // using these display values are set to the given keyword"
             case EDisplayMode.TABLE_ROW_GROUP:
             case EDisplayMode.TABLE_HEADER_GROUP:
