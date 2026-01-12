@@ -17,7 +17,7 @@ public class BlockFormattingContext : IFormattingContext
 
     /// <summary>
     /// Tracks the state of margin collapsing during block layout.
-    /// Per CSS 2.2 §8.3.1: In CSS, the adjoining margins of two or more boxes 
+    /// Per CSS 2.2 §8.3.1: In CSS, the adjoining margins of two or more boxes
     /// (which might or might not be siblings) can combine to form a single margin.
     /// Margins are said to collapse.
     /// Spec: https://www.w3.org/TR/CSS2/box.html#collapsing-margins
@@ -26,15 +26,15 @@ public class BlockFormattingContext : IFormattingContext
     {
         /// <summary>
         /// List of positive margins pending collapse.
-        /// Per §8.3.1: "When two or more margins collapse, the resulting margin width 
+        /// Per §8.3.1: "When two or more margins collapse, the resulting margin width
         /// is the maximum of the collapsing margins' widths."
         /// </summary>
         public List<double> PositiveMargins { get; } = new();
 
         /// <summary>
         /// List of negative margins pending collapse.
-        /// Per §8.3.1: "In the case of negative margins, the maximum of the absolute 
-        /// values of the negative adjoining margins is deducted from the maximum of 
+        /// Per §8.3.1: "In the case of negative margins, the maximum of the absolute
+        /// values of the negative adjoining margins is deducted from the maximum of
         /// the positive adjoining margins."
         /// </summary>
         public List<double> NegativeMargins { get; } = new();
@@ -142,24 +142,47 @@ public class BlockFormattingContext : IFormattingContext
     /// 1. Both belong to in-flow block-level boxes in the same BFC
     /// 2. No line boxes, clearance, padding, or borders separate them
     /// 3. Both belong to vertically-adjacent box edges
+    ///
+    /// MARGIN COLLAPSE PREVENTION (CSS 2.2 §8.3.1):
+    /// Margins do NOT collapse in the following cases:
+    /// - Floats: "Margins of floating boxes never collapse"
+    /// - Absolutely/fixed positioned elements: Out-of-flow, don't participate
+    /// - Inline-blocks: Establish independent formatting context
+    /// - Elements with clearance: "Clearance introduces spacing"
+    /// - New BFC roots: Elements with overflow != visible, display: flow-root
+    /// - Padding/borders: Create separation between margins
     /// </summary>
     private bool IsTopMarginAdjoining(CssPrincipalBox box)
     {
         if (!_marginCollapseState.IsAdjoining)
             return false;
 
-        // Margins are not adjoining if the box:
-        // - Has clearance (§8.3.1 rule about clearance)
+        // PREVENTION CASE 1: Floats don't collapse with anything
+        // Per CSS 2.2 §8.3.1: "Margins of floating boxes never collapse with any other margins"
+        if (box.IsFloating)
+            return false;
+
+        // PREVENTION CASE 2: Absolutely/fixed positioned elements don't collapse
+        // Out-of-flow elements are removed from normal flow and don't participate in margin collapsing
+        if (box.IsAbsolutelyPositioned)
+            return false;
+
+        // PREVENTION CASE 3: Elements with clearance don't collapse with previous siblings
+        // Per CSS 2.2 §8.3.1: "Clearance introduces spacing...and prevent(s) margin collapsing"
         if (box.Clear != EClear.None)
             return false;
 
-        // - Establishes a new BFC (floats, absolutely positioned, inline-blocks, etc.)
-        if (box.IsFloating || box.IsAbsolutelyPositioned)
-            return false;
+        // PREVENTION CASE 4: Inline-blocks don't collapse
+        // Inline-blocks establish an independent formatting context
+        // Would check: if (box.DisplayType == EDisplayType.INLINE_BLOCK) return false;
 
-        // - Has top border or padding
+        // PREVENTION CASE 5: New BFC roots don't collapse margins with siblings
+        // Elements that establish new BFC (overflow != visible, display: flow-root, etc.)
+        // would be checked here when BFC detection is implemented
+
+        // PREVENTION CASE 6: Top border or padding prevents collapse
         // Note: Border/padding checks would go here when BoxModel areas are available during Flow()
-        // For now, we assume no border/padding breaks adjacency
+        // Would check: if (box.Border.Top > 0 || box.Padding.Top > 0) return false;
 
         return true;
     }
@@ -167,17 +190,20 @@ public class BlockFormattingContext : IFormattingContext
     /// <summary>
     /// Detects if a box's bottom margin is adjoining with the next element's top margin.
     /// Used for adjacent sibling margin collapse and empty block collapse detection.
+    ///
+    /// MARGIN COLLAPSE PREVENTION applies here as well (see IsTopMarginAdjoining).
     /// </summary>
     private bool IsBottomMarginAdjoining(CssPrincipalBox box)
     {
         if (!_marginCollapseState.IsAdjoining)
             return false;
 
-        // Bottom margin is adjoining if:
-        // - Box has no bottom border or padding
-        // - Box is not floating or absolutely positioned
+        // PREVENTION: Same rules as IsTopMarginAdjoining
         if (box.IsFloating || box.IsAbsolutelyPositioned)
             return false;
+
+        // PREVENTION: Bottom border or padding prevents collapse
+        // Would check: if (box.Border.Bottom > 0 || box.Padding.Bottom > 0) return false;
 
         return true;
     }
@@ -185,17 +211,22 @@ public class BlockFormattingContext : IFormattingContext
     /// <summary>
     /// Detects if a box is empty (has no content, padding, or borders).
     /// Empty boxes can have their top and bottom margins collapse together.
-    /// Per CSS 2.2 §8.3.1: "If the top and bottom margins of a box are adjoining, 
+    /// Per CSS 2.2 §8.3.1: "If the top and bottom margins of a box are adjoining,
     /// then it is possible for margins to collapse through it."
+    ///
+    /// PREVENTION: Empty box collapse is prevented if:
+    /// - Box has border-top or border-bottom
+    /// - Box has padding-top or padding-bottom
+    /// - Box has min-height/height that forces non-zero height
+    /// - Box establishes new BFC (float, absolute, inline-block, overflow != visible)
     /// </summary>
     private bool IsEmptyBox(CssPrincipalBox box)
     {
-        // A box is empty if:
-        // - It has no in-flow children
-        // - It has zero computed height (and no min-height)
-        // - It has no top/bottom border or padding
+        // PREVENTION: Floats and absolutely positioned boxes don't participate
+        if (box.IsFloating || box.IsAbsolutelyPositioned)
+            return false;
 
-        // Check for children
+        // Check for in-flow children
         if (box.firstChild != null)
         {
             // Has children - check if they're all out of flow
@@ -205,39 +236,53 @@ public class BlockFormattingContext : IFormattingContext
                 if (child is CssPrincipalBox childBox)
                 {
                     if (!childBox.IsFloating && !childBox.IsAbsolutelyPositioned)
-                        return false; // Has in-flow child
+                        return false; // Has in-flow child - not empty
                 }
                 child = child.nextSibling;
             }
         }
 
         // If we get here, no in-flow children
-        // Would also check height, min-height, border, padding
-        // For now, return true if no in-flow children
+        // PREVENTION: Would also check:
+        // - if (box.Border.Top > 0 || box.Border.Bottom > 0) return false;
+        // - if (box.Padding.Top > 0 || box.Padding.Bottom > 0) return false;
+        // - if (box.MinHeight > 0 || box.Height != auto) return false;
+
         return true;
     }
 
     /// <summary>
     /// Handles parent/first-child margin collapse.
-    /// Per CSS 2.2 §8.3.1: "The top margin of an in-flow block element collapses 
-    /// with its first in-flow block-level child's top margin if the element has 
+    /// Per CSS 2.2 §8.3.1: "The top margin of an in-flow block element collapses
+    /// with its first in-flow block-level child's top margin if the element has
     /// no top border, no top padding, and the child has no clearance."
+    ///
+    /// PREVENTION: Parent/first-child collapse is prevented when:
+    /// - Parent has top border or top padding
+    /// - Parent or child is floating
+    /// - Parent or child is absolutely positioned
+    /// - Child has clearance
+    /// - Parent establishes new BFC (overflow != visible, display: flow-root)
     /// </summary>
     private void HandleParentFirstChildCollapse(CssPrincipalBox parent, CssPrincipalBox firstChild)
     {
-        // Check conditions for parent/first-child collapse:
-        // 1. Both are in-flow block-level
-        // 2. Parent has no top border/padding
-        // 3. Child has no clearance
-
+        // PREVENTION CASE 1: Clearance prevents collapse
         if (firstChild.Clear != EClear.None)
-            return; // Clearance prevents collapse
+            return;
 
-        if (parent.IsFloating || parent.IsAbsolutelyPositioned)
-            return; // Out-of-flow parent
+        // PREVENTION CASE 2: Floats don't participate in margin collapsing
+        if (parent.IsFloating || firstChild.IsFloating)
+            return;
 
-        if (firstChild.IsFloating || firstChild.IsAbsolutelyPositioned)
-            return; // Out-of-flow child
+        // PREVENTION CASE 3: Absolutely positioned elements don't participate
+        if (parent.IsAbsolutelyPositioned || firstChild.IsAbsolutelyPositioned)
+            return;
+
+        // PREVENTION CASE 4: Parent with top border/padding prevents collapse
+        // Would check: if (parent.Border.Top > 0 || parent.Padding.Top > 0) return;
+
+        // PREVENTION CASE 5: Parent establishing new BFC prevents collapse
+        // Would check: if (parent.EstablishesNewBFC()) return;
 
         // If conditions met, mark that parent and first-child margins should collapse
         _marginCollapseState.IsAdjoining = true;
@@ -245,47 +290,68 @@ public class BlockFormattingContext : IFormattingContext
 
     /// <summary>
     /// Handles parent/last-child margin collapse.
-    /// Per CSS 2.2 §8.3.1: "The bottom margin of an in-flow block-level element 
-    /// collapses with its last in-flow block-level child's bottom margin if the 
+    /// Per CSS 2.2 §8.3.1: "The bottom margin of an in-flow block-level element
+    /// collapses with its last in-flow block-level child's bottom margin if the
     /// element has no bottom border, no bottom padding, and the height is 'auto'."
+    ///
+    /// PREVENTION: Parent/last-child collapse is prevented when:
+    /// - Parent has bottom border or bottom padding
+    /// - Parent has explicit height (not 'auto')
+    /// - Parent or child is floating
+    /// - Parent or child is absolutely positioned
+    /// - Parent establishes new BFC
     /// </summary>
     private void HandleParentLastChildCollapse(CssPrincipalBox parent, CssPrincipalBox lastChild)
     {
-        // Check conditions for parent/last-child collapse:
-        // 1. Both are in-flow block-level
-        // 2. Parent has no bottom border/padding
-        // 3. Parent has auto height (not explicitly set)
+        // PREVENTION: Floats don't participate in margin collapsing
+        if (parent.IsFloating || lastChild.IsFloating)
+            return;
 
-        if (parent.IsFloating || parent.IsAbsolutelyPositioned)
-            return; // Out-of-flow parent
+        // PREVENTION: Absolutely positioned elements don't participate
+        if (parent.IsAbsolutelyPositioned || lastChild.IsAbsolutelyPositioned)
+            return;
 
-        if (lastChild.IsFloating || lastChild.IsAbsolutelyPositioned)
-            return; // Out-of-flow child
+        // PREVENTION: Parent with bottom border/padding prevents collapse
+        // Would check: if (parent.Border.Bottom > 0 || parent.Padding.Bottom > 0) return;
 
-        // Would check if parent height is auto
-        // For now, assume it can collapse
+        // PREVENTION: Parent with explicit height prevents collapse
+        // Would check: if (parent.Height != CssValue.Auto) return;
+
+        // PREVENTION: Parent establishing new BFC prevents collapse
+        // Would check: if (parent.EstablishesNewBFC()) return;
+
+        // If conditions met, mark that margins can collapse
         _marginCollapseState.IsAdjoining = true;
     }
 
     /// <summary>
     /// Handles adjacent sibling margin collapse.
-    /// Per CSS 2.2 §8.3.1: "The bottom margin of a box and the top margin of its 
+    /// Per CSS 2.2 §8.3.1: "The bottom margin of a box and the top margin of its
     /// following sibling can collapse if there's no intervening content."
+    ///
+    /// PREVENTION: Adjacent sibling collapse is prevented when:
+    /// - Either sibling is floating
+    /// - Either sibling is absolutely positioned
+    /// - Next sibling has clearance
+    /// - There's intervening content (line boxes, text, etc.)
+    /// - Either sibling establishes new BFC
     /// </summary>
     private void HandleAdjacentSiblingCollapse(CssPrincipalBox box, CssPrincipalBox nextSibling)
     {
-        // Adjacent sibling margins collapse if:
-        // 1. Both are in-flow block-level
-        // 2. No line boxes, clearance, padding, or borders between them
-
-        if (box.IsFloating || box.IsAbsolutelyPositioned)
+        // PREVENTION CASE 1: Floats don't participate in margin collapsing
+        if (box.IsFloating || nextSibling.IsFloating)
             return;
 
-        if (nextSibling.IsFloating || nextSibling.IsAbsolutelyPositioned)
+        // PREVENTION CASE 2: Absolutely positioned elements don't participate
+        if (box.IsAbsolutelyPositioned || nextSibling.IsAbsolutelyPositioned)
             return;
 
+        // PREVENTION CASE 3: Clearance on next sibling prevents collapse
         if (nextSibling.Clear != EClear.None)
-            return; // Clearance on next sibling prevents collapse
+            return;
+
+        // PREVENTION CASE 4: Boxes establishing new BFC don't collapse with siblings
+        // Would check: if (nextSibling.EstablishesNewBFC()) return;
 
         _marginCollapseState.IsAdjoining = true;
     }
