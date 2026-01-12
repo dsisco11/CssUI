@@ -22,8 +22,13 @@ public enum EOuterDisplayType : byte
     /// </summary>
     Inline,
     /// <summary>
-    /// The element generates an run-in box, which is a type of inline-level box with special behavior that attempts to merge it into a subsequent block container. See § 3 Run-In Layout for details.
+    /// The element generates a run-in box, which is a type of inline-level box with special behavior that attempts to merge it into a subsequent block container.
+    /// See CSS Display 3 § 5 Run-In Layout for details.
     /// </summary>
+    /// <remarks>
+    /// DEFERRED: Run-in is marked "at-risk" in CSS Display Level 3 and has no modern browser support.
+    /// Implementation deferred per Phase 14.6.7. Currently treated as inline-level (fallback behavior).
+    /// </remarks>
     Run_In,
     /// <summary>
     /// The element itself does not generate any boxes, but its children and pseudo-elements still generate boxes and text sequences as normal.

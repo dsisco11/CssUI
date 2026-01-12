@@ -1000,4 +1000,54 @@ public class CssBoxTreeTests : IDisposable
     }
 
     #endregion
+
+    #region Run-In Box Tests (Phase 14.6.7 - DEFERRED)
+
+    /// <summary>
+    /// Tests that run-in display mode is recognized by the parser.
+    /// Implementation of run-in box merging is deferred per Phase 14.6.7.
+    /// Run-in is marked "at-risk" in CSS Display Level 3 and has no browser support.
+    /// </summary>
+    [Fact]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "BoxGeneration")]
+    [Trait("Category", "RunIn")]
+    [Trait("Category", "Deferred")]
+    public void RunIn_DisplayMode_IsRecognizedByParser()
+    {
+        // Arrange & Act
+        var displayType = new DisplayType(EDisplayMode.RUN_IN);
+
+        // Assert - run-in is recognized and has Run_In outer display type
+        Assert.Equal(EOuterDisplayType.Run_In, displayType.Outer);
+    }
+
+    /// <summary>
+    /// Documents that run-in box merging behavior is not yet implemented.
+    /// Run-in boxes should merge into subsequent block containers, but this is deferred.
+    /// For now, run-in elements generate boxes without special merging behavior.
+    /// </summary>
+    [Fact(Skip = "Run-in box merging is deferred per Phase 14.6.7 (at-risk feature)")]
+    [Trait("Category", "BoxModel")]
+    [Trait("Category", "BoxGeneration")]
+    [Trait("Category", "RunIn")]
+    [Trait("Category", "Deferred")]
+    public void RunIn_MergesIntoSubsequentBlock_WhenImplemented()
+    {
+        // This test documents the expected behavior when run-in is implemented:
+        // <div style="display: run-in">Run-in</div>
+        // <div style="display: block">Block content</div>
+        //
+        // Expected result: Run-in content appears at the start of the block,
+        // as if the markup was: <div style="display: block"><span>Run-in</span> Block content</div>
+        //
+        // Implementation requirements per CSS Display 3 §5:
+        // 1. Detect run-in sequences (consecutive run-in boxes + whitespace/out-of-flow)
+        // 2. If followed by block box that doesn't establish BFC, reparent run-in as first inline child
+        // 3. Insert after ::marker (if any), before other content including ::before
+        // 4. Otherwise generate anonymous block wrapper around run-in sequence
+        Assert.True(false, "Run-in merging not implemented - deferred per Phase 14.6.7");
+    }
+
+    #endregion
 }

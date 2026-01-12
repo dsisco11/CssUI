@@ -325,13 +325,28 @@ Blockification/inlinification based on position/float/parent context.
 - [x] Apply transformations during cascade (Display_Computed resolver)
 - [x] Tests for blockification scenarios (5 tests passing)
 
-#### 14.6.7 Run-In Boxes (CSS Display 3 §5) — Low Priority
-Run-in boxes merge into subsequent block.
-- [ ] Detect display: run-in
-- [ ] If followed by block box, insert as inline at start of block
-- [ ] Otherwise generate anonymous block wrapper
-- [ ] Handle run-in sequence (consecutive run-ins)
-- [ ] Tests for run-in behavior
+#### 14.6.7 Run-In Boxes (CSS Display 3 §5) — DEFERRED ⊗
+**Status:** Deferred indefinitely due to spec instability and minimal browser support.
+- [x] Documented rationale for deferral
+- [x] Added code comments explaining at-risk status
+- [x] Created test documenting deferred status
+- [x] Verified parser recognizes display: run-in
+
+**Rationale:**
+- CSS Display Level 3 marks 'display: run-in' as **"at-risk"**, meaning the CSS WG believes
+  it "may have difficulty being interoperably implemented in a timely manner"
+- The spec explicitly allows this feature to be dropped without publishing a new CR
+- Browser support: None (Chrome/Firefox/Safari all removed support)
+- Complex implementation: Requires post-generation tree manipulation and special ::first-letter handling
+- EDisplayMode.RUN_IN enum value exists for parser compatibility but generates no special boxes
+
+**If implementing in future:**
+- [ ] Detect display: run-in and inlinify contents (if inner type is 'flow')
+- [ ] Detect run-in sequences (maximal consecutive siblings + intervening whitespace/out-of-flow)
+- [ ] If followed by block box that doesn't establish BFC, reparent run-in as first inline child (after ::marker, before ::before)
+- [ ] Otherwise generate anonymous block wrapper around run-in sequence
+- [ ] Handle ::first-letter interaction (run-in provides first letter to containing block)
+- [ ] Tests for basic/orphaned/multiple run-ins, BFC boundary prevention
 
 #### 14.6.8 Multiple Box Generation — Low Priority
 Some display types generate multiple boxes.

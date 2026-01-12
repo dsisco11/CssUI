@@ -889,6 +889,12 @@ public static class CssBoxTree
                 break;
             case EOuterDisplayType.Run_In:
                 {
+                    // Run-in boxes are DEFERRED per Phase 14.6.7
+                    // CSS Display Level 3 marks 'display: run-in' as "at-risk" and may be dropped from the spec.
+                    // No modern browsers support run-in (Chrome/Firefox/Safari all removed support).
+                    // Complex implementation requires post-generation tree manipulation for box merging/reparenting.
+                    // For now, treat run-in as inline-level (fallback behavior).
+                    // @todo Future: Implement run-in sequence detection and merging if spec stabilizes
                 }
                 break;
             case EOuterDisplayType.None:
