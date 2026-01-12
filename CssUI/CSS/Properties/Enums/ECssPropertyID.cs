@@ -60,6 +60,11 @@ public enum ECssPropertyID : int
     ObjectFit,
     [EnumData("display")]
     Display,
+    /// <summary>
+    /// Docs: https://www.w3.org/TR/CSS2/visuren.html#propdef-float
+    /// </summary>
+    [EnumData("float")]
+    Float,
     [EnumData("box-sizing")]
     BoxSizing,
     [EnumData("positioning")]

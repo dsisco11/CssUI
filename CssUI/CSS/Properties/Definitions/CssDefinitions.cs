@@ -211,6 +211,13 @@ internal class CssDefinitions
             /// XXX: Update 'Display' property to modern specifications (Docs: https://www.w3.org/TR/css-display-3/#the-display-properties)
             // Per CSS Display 3 §2.5: display: contents computes to display: none for replaced elements
             new StyleDefinition(ECssPropertyID.Display, false, EPropertyDirtFlags.Box, CssValue.From(EDisplayMode.INLINE_BLOCK), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EDisplayMode>(), false, null, new Tuple<EPropertyStage, PropertyResolverFunc>(EPropertyStage.Computed, CssPropertyResolver.Display_Computed)),
+
+            /// Float property per CSS 2.2 §9.5
+            // Docs: https://www.w3.org/TR/CSS2/visuren.html#float-position
+            // Initial value: none, Inherited: no, Applies to: all elements (but see 9.7 regarding positioned elements)
+            // Float causes blockification per CSS Display 3 §2.7 (handled in blockification resolver when implemented)
+            new StyleDefinition(ECssPropertyID.Float, false, EPropertyDirtFlags.Flow, CssValue.From(EFloat.None), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EFloat>()),
+
             new StyleDefinition(ECssPropertyID.BoxSizing, false, EPropertyDirtFlags.Content_Area | EPropertyDirtFlags.Border_Area, CssValue.From(EBoxSizingMode.BorderBox), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EBoxSizingMode>()),
 
             new StyleDefinition(ECssPropertyID.Positioning, false, EPropertyDirtFlags.Margin_Area, CssValue.From(EBoxPositioning.Relative), ECssValueTypes.KEYWORD, Lookup.Get_Keywords<EBoxPositioning>()),

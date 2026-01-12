@@ -80,6 +80,7 @@ public partial class StyleProperties
     public EWritingMode WritingMode => Cascaded.WritingMode.Actual;
 
     public EDisplayMode Display => Cascaded.Display.Actual;
+    public EFloat Float => Cascaded.Float.Actual;
     public EBoxSizingMode BoxSizing => Cascaded.BoxSizing.Actual;
     public EBoxPositioning Positioning => Cascaded.Positioning.Actual;
 

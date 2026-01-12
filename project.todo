@@ -372,13 +372,14 @@ Table elements generate multiple boxes per CSS Display 3 §2.2.
 Spec Reference: https://www.w3.org/TR/CSS2/visuren.html#floats
 Prerequisites: Phase 14 (Layout Pipeline Integration)
 
-### 15.1 Float Property Definition
-- [ ] Add ECssPropertyID.Float to property enum
-- [ ] Add EFloat enum (None, Left, Right, InlineStart, InlineEnd)
-- [ ] Create StyleDefinition for float property in CssDefinitions.cs
-- [ ] Add Float property to StyleProperties class
-- [ ] Add CssPrincipalBox.Float property accessor
-- [ ] Update CssPrincipalBox.IsFloated to use actual property value
+### 15.1 Float Property Definition ✓
+- [x] Add ECssPropertyID.Float to property enum
+- [x] Add EFloat enum (None, Left, Right, InlineStart, InlineEnd) with EnumRecords
+- [x] Create StyleDefinition for float property in CssDefinitions.cs
+- [x] Add Float property to StyleProperties class
+- [x] Add Float property to CssComputedStyle class
+- [x] Add CssPrincipalBox.Float property accessor
+- [x] Update CssPrincipalBox.IsFloating to use actual property value
 
 ### 15.2 Clear Property Definition
 - [ ] Add ECssPropertyID.Clear to property enum

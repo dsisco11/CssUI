@@ -85,6 +85,12 @@ public class CssComputedStyle
     public EnumProperty<EDisplayMode> Display => (EnumProperty<EDisplayMode>)Get(ECssPropertyID.Display)!;
 
     /// <summary>
+    /// Float property for this element per CSS 2.2 §9.5.
+    /// Specifies whether a box should float to the left, right, or not float at all.
+    /// </summary>
+    public EnumProperty<EFloat> Float => (EnumProperty<EFloat>)Get(ECssPropertyID.Float)!;
+
+    /// <summary>
     /// Current BoxSizing mode for this element.
     /// (Defaults to <see cref="EBoxSizingMode.BorderBox"/>)
     /// </summary>

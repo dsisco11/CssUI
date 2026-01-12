@@ -157,7 +157,18 @@ public class CssPrincipalBox : CssBox
 
     public override DisplayType DisplayType => new DisplayType(Style.Display);
 
-    public bool IsFloating => false;
+    /// <summary>
+    /// Gets the float value for this box.
+    /// Per CSS 2.2 §9.5: Floats shift a box to the left or right on the current line.
+    /// </summary>
+    public EFloat Float => Style.Float;
+
+    /// <summary>
+    /// Returns true if this box has a float value other than 'none'.
+    /// Per CSS 2.2 §9.5: A floated box is shifted to the left or right.
+    /// </summary>
+    public bool IsFloating => Float != EFloat.None;
+
     /// <summary>
     /// Is this box absolutely positioned? (eg. <see cref="EBoxPositioning.Absolute"/> or <see cref="EBoxPositioning.Fixed"/>)
     /// </summary>
