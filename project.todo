@@ -389,19 +389,21 @@ Prerequisites: Phase 14 (Layout Pipeline Integration)
 - [x] Add Clear property to CssComputedStyle class
 - [x] Add CssPrincipalBox.Clear property accessor
 
-### 15.3 Float Layout Algorithm
+### 15.3 Float Layout Algorithm ✓
 Implement float positioning in BlockFormattingContext.
-- [ ] Track float areas (left floats, right floats) per BFC
-- [ ] Calculate available width accounting for floats
-- [ ] Position floats at current line position
-- [ ] Handle float stacking (multiple floats)
-- [ ] Implement float intrusion into line boxes
+- [x] Track float areas (left floats, right floats) per BFC
+- [x] Calculate available width accounting for floats (GetAvailableWidth method)
+- [x] Position floats at current line position (PositionFloat method)
+- [x] Handle float stacking (multiple floats) - moves down when width exhausted
+- [x] Implement float intrusion into line boxes
+- [x] Add FloatArea struct to track positioned floats
+- [x] Implement GetClearancePosition for clear property support
 
-### 15.4 Clear Layout Algorithm
-- [ ] Calculate clearance for elements with clear property
-- [ ] Move element below relevant floats
-- [ ] Handle clear: both
-- [ ] Update vertical position after clearance
+### 15.4 Clear Layout Algorithm ✓
+- [x] Calculate clearance for elements with clear property (GetClearancePosition method)
+- [x] Move element below relevant floats (implemented in Flow method)
+- [x] Handle clear: both (checks both left and right floats)
+- [x] Update vertical position after clearance (currentY updated in Flow)
 
 ### 15.5 Float/Clear Tests
 - [ ] Test float: left positions element to left
