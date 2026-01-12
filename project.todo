@@ -348,13 +348,25 @@ Blockification/inlinification based on position/float/parent context.
 - [ ] Handle ::first-letter interaction (run-in provides first letter to containing block)
 - [ ] Tests for basic/orphaned/multiple run-ins, BFC boundary prevention
 
-#### 14.6.8 Multiple Box Generation — Low Priority
-Some display types generate multiple boxes.
-- [ ] Table elements: table wrapper box + table grid box
-- [ ] List items: principal box + marker box (covered in 14.6.4)
-- [ ] Return list of boxes from Generate_Box() instead of single box
-- [ ] Update Generate_Tree() to handle multiple boxes per element
-- [ ] Tests for multi-box generation
+#### 14.6.8 Multiple Box Generation ✓
+Table elements generate multiple boxes per CSS Display 3 §2.2.
+- [x] Create CssTableWrapperBox class (inherits from CssPrincipalBox)
+- [x] Create CssTableGridBox class (inherits from CssBox)
+- [x] Detect display:table in Generate_Box() and call Generate_Table_Boxes()
+- [x] Generate table wrapper box (principal) + grid box (child)
+- [x] Add Get_Container_Box() helper to route table children to grid box
+- [x] Override DisplayType in CssTableWrapperBox to return Flow_Root
+- [x] Handle box tree child transfer (skip grid box during regeneration)
+- [x] Tests for table wrapper+grid generation (16 tests passing)
+  - Table generates wrapper box with correct type
+  - Wrapper contains grid box as child
+  - Grid box has table inner display type
+  - Children are added to grid box, not wrapper
+  - Multiple children all routed to grid box
+  - Box tree structure is correct
+  - Originating element references work
+  - Non-table elements unaffected
+- [x] Note: List-item marker boxes already implemented in 14.6.4
 
 ## Phase 15: Float and Clear Properties
 Spec Reference: https://www.w3.org/TR/CSS2/visuren.html#floats

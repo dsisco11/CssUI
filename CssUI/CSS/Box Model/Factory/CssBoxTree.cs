@@ -151,14 +151,30 @@ public static class CssBoxTree
                 }
 
                 // Transfer child nodes from old box to the new box (they will remove themselves if needed)
+                // Special handling for table wrapper boxes: don't transfer the grid box
                 if (Box is not null)
                 {
                     ITreeNode? current = Box.firstChild;
                     while (current is object)
                     {
-                        current.parentNode = null;
-                        nextBox!.childNodes.Add(current);
-                        current = current.nextSibling;
+                        var next = current.nextSibling; // Save next before we modify the tree
+
+                        // Skip the grid box for table wrappers - it's already set up
+                        bool skipTransfer = false;
+                        if (nextBox is CssTableWrapperBox nextWrapperBox && current is CssTableGridBox)
+                        {
+                            skipTransfer = true;
+                        }
+
+                        if (!skipTransfer)
+                        {
+                            current.parentNode = null;
+                            // Get the actual container (grid box for tables, else the box itself)
+                            var containerBox = Get_Container_Box(nextBox!);
+                            containerBox.childNodes.Add(current);
+                        }
+
+                        current = next;
                     }
                 }
 
@@ -169,15 +185,18 @@ public static class CssBoxTree
                 // Also skip if the box already has a parent set (from constructor)
                 if (nearestAncestor?.Box is not null && nextBox is not null && nextBox.parentNode is null)
                 {
+                    // Get the actual container box - for table wrappers, this is the grid box
+                    var containerBox = Get_Container_Box(nearestAncestor.Box);
+
                     // Only use the saved index if it's valid for the current child count
                     // The index might be stale if the parent's children were modified (e.g., by normalization)
-                    if (index > -1 && index < nearestAncestor.Box.childNodes.Count)
-                        nearestAncestor.Box.Insert(index, nextBox);
+                    if (index > -1 && index < containerBox.childNodes.Count)
+                        containerBox.Insert(index, nextBox);
                     else
-                        nearestAncestor.Box.Add(nextBox);
+                        containerBox.Add(nextBox);
 
                     // Mark parent block container for normalization after children are processed
-                    if (nearestAncestor.Box.IsBlockContainer)
+                    if (containerBox is CssBox containerCssBox && containerCssBox.IsBlockContainer)
                     {
                         BlockContainersToNormalize.Add(nearestAncestor);
                     }
@@ -189,7 +208,7 @@ public static class CssBoxTree
                         var childDisplay = nodeElement.Style.Display;
                         if (TableInternalDisplayType.IsTableInternal(childDisplay))
                         {
-                            BoxesRequiringTableFixup.Add((CssBox)nearestAncestor.Box);
+                            BoxesRequiringTableFixup.Add((CssBox)containerBox);
                         }
                     }
                 }
@@ -665,6 +684,15 @@ public static class CssBoxTree
             return new CssPrincipalBox(Node, null!);
         }
 
+        // Check for display: table - generates TWO boxes (wrapper + grid)
+        // Per CSS Display 3 §2.2: "The element generates a principal table wrapper box that
+        // establishes a block formatting context, and which contains an additionally-generated
+        // table grid box that establishes a table formatting context."
+        if (displayType.Inner == EInnerDisplayType.Table)
+        {
+            return Generate_Table_Boxes(Node);
+        }
+
         // Create box without parent - Generate_Tree() will add it to the parent's children
         // This avoids the parentNode != null check in Generate_Tree that would skip tree insertion
         CssPrincipalBox box = new CssPrincipalBox(Node, null!);
@@ -743,6 +771,56 @@ public static class CssBoxTree
         }
 
         return counter > 0 ? counter : 1;
+    }
+
+    /// <summary>
+    /// Generates both the table wrapper box and table grid box for a table element.
+    /// Per CSS Display 3 §2.2 and CSS Tables 3 §4.
+    /// </summary>
+    /// <param name="tableElement">The element with display: table.</param>
+    /// <returns>The table wrapper box (principal box) with grid box as its child.</returns>
+    /// <remarks>
+    /// Per CSS Display 3 §2.2:
+    /// "The element generates a principal table wrapper box that establishes a block formatting
+    /// context, and which contains an additionally-generated table grid box that establishes a
+    /// table formatting context."
+    ///
+    /// The table wrapper box is the principal box that:
+    /// - Is returned from this method (becomes the element's box)
+    /// - Establishes a block formatting context
+    /// - Contains the table grid box as a child
+    /// - Receives inherited properties from the element
+    ///
+    /// The table grid box:
+    /// - Is an additionally-generated box (not the principal)
+    /// - Establishes a table formatting context
+    /// - Contains the table's internal structure (rows, cells, etc.)
+    /// - Receives certain non-inherited properties (border, padding, etc.)
+    ///
+    /// Note: For simplicity, both boxes reference the same originating element.
+    /// Property application is handled by the layout and rendering algorithms.
+    /// </remarks>
+    private static CssTableWrapperBox Generate_Table_Boxes(Element tableElement)
+    {
+        // Create the table wrapper box (principal box) without parent
+        // Generate_Tree() will handle adding it to the parent
+        var wrapperBox = new CssTableWrapperBox(tableElement, parent: null);
+
+        // Create the table grid box WITHOUT parent first
+        // We'll add it to the wrapper in the next step
+        var gridBox = new CssTableGridBox(tableElement, parent: null);
+
+        // Establish the bidirectional relationship
+        wrapperBox.SetGridBox(gridBox);
+
+        // Add the grid box as a child of the wrapper
+        // This will set gridBox.parentNode = wrapperBox
+        wrapperBox.Add(gridBox);
+
+        // The table element's box tree children (table-row-groups, table-rows, etc.)
+        // will be added to the grid box during Generate_Tree()'s child processing
+
+        return wrapperBox;
     }
 
     /// <summary>
@@ -849,7 +927,29 @@ public static class CssBoxTree
         return null;
     }
 
+    /// <summary>
+    /// Gets the appropriate container box for inserting children.
+    /// For table wrapper boxes, returns the grid box.
+    /// For all other boxes, returns the box itself.
+    /// </summary>
+    /// <param name="box">The parent element's box.</param>
+    /// <returns>The box that should receive children.</returns>
+    /// <remarks>
+    /// Per CSS Display 3 §2.2 and CSS Tables 3 §4:
+    /// Table elements generate two boxes - a wrapper and a grid.
+    /// The wrapper is the principal box, but children are added to the grid.
+    /// </remarks>
+    private static CssBoxTreeNode Get_Container_Box(CssBoxTreeNode box)
+    {
+        // If this is a table wrapper box, children go into the grid box
+        if (box is CssTableWrapperBox wrapperBox && wrapperBox.GridBox is not null)
+        {
+            return wrapperBox.GridBox;
+        }
 
+        // For all other boxes, children are added directly
+        return box;
+    }
 
     /// <summary>
     /// Returns <c>True</c> if the parent box is a valid container for the given child
