@@ -452,11 +452,27 @@ Implement adjoining margin detection per CSS 2.2 §8.3.1.
 - IsEmptyBox() for detecting empty blocks where margins collapse through
 - Proper handling of floats, absolutely positioned, and cleared elements
 
-### 16.2 Margin Collapse Calculation
-- [ ] Calculate collapsed margin = max(margin1, margin2) for positive
-- [ ] Handle negative margins: most negative wins
-- [ ] Handle mixed positive/negative: max(positive) + min(negative)
-- [ ] Track collapsed margin through to positioning
+### 16.2 Margin Collapse Calculation ✓
+- [x] Calculate collapsed margin = max(margin1, margin2) for positive
+- [x] Handle negative margins: most negative wins
+- [x] Handle mixed positive/negative: max(positive) + min(negative)
+- [x] Track collapsed margin through to positioning
+
+**Implementation Complete:**
+- Integrated CalculateCollapsedMargin() into Flow() method
+- Track pending margins using AddMargin() for each scenario
+- Apply collapsed margin offset to currentY before positioning boxes
+- Handle parent/first-child collapse (add child top margin to pending at BFC start)
+- Handle adjacent sibling collapse (add current top margin to pending after previous bottom)
+- Handle empty box collapse (add bottom margin without advancing currentY)
+- Handle parent/last-child collapse (detect last child and track for parent)
+- Reset margin state after applying collapsed margins
+- Break adjacency on clearance, non-principal boxes, and content
+
+**Algorithm per CSS 2.2 §8.3.1:**
+- Positive margins: max of all positive values
+- Negative margins: min of all negative values (most negative)
+- Mixed: max(positive) + min(negative)
 
 ### 16.3 Margin Collapse Prevention
 Margins don't collapse in certain cases:

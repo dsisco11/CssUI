@@ -512,7 +512,7 @@ public class BlockFormattingContext : IFormattingContext
 
     /// <summary>
     /// Performs block layout on the container and its children.
-    /// Implements CSS 2.2 §9.4.1 (Block Formatting Contexts) and §9.5 (Floats).
+    /// Implements CSS 2.2 §9.4.1 (Block Formatting Contexts), §9.5 (Floats), and §8.3.1 (Margin Collapsing).
     /// </summary>
     /// <returns>The content dimensions (width, height) of the laid out content.</returns>
     public Rect2f Flow(CssBoxTreeNode Node)
@@ -524,11 +524,17 @@ public class BlockFormattingContext : IFormattingContext
         _leftFloats.Clear();
         _rightFloats.Clear();
 
+        // Reset margin collapse state
+        _marginCollapseState.Reset();
+        _marginCollapseState.IsAtBfcStart = true;
+
         double maxWidth = 0;
         double currentY = 0;
         double containerWidth = Node is CssPrincipalBox principalContainer ? principalContainer.Size.Width : 0;
 
         CssBoxTreeNode? current = Node.firstChild;
+        CssPrincipalBox? previousBox = null;
+
         while (current is not null)
         {
             // Check if this box is floated
@@ -536,6 +542,17 @@ public class BlockFormattingContext : IFormattingContext
 
             if (isFloated)
             {
+                // Floats don't participate in margin collapsing
+                // Per CSS 2.2 §8.3.1: "Margins of floating boxes never collapse"
+
+                // Apply any pending collapsed margin before positioning float
+                if (_marginCollapseState.IsAdjoining)
+                {
+                    double collapsedMargin = _marginCollapseState.CalculateCollapsedMargin();
+                    currentY += collapsedMargin;
+                    _marginCollapseState.Reset();
+                }
+
                 // Position float at current line position
                 PositionFloat(current, currentY, containerWidth);
 
@@ -543,29 +560,130 @@ public class BlockFormattingContext : IFormattingContext
                 var floatSize = current.Size;
                 var floatPos = current.Position;
                 maxWidth = Math.Max(maxWidth, floatPos.X + floatSize.Width);
-                currentY = Math.Max(currentY, floatPos.Y + floatSize.Height);
+                // Note: Don't update currentY - floats are out of flow
+            }
+            else if (current is CssPrincipalBox currentPrincipal)
+            {
+                // In-flow block-level box - handle margin collapsing
+
+                // Get the top and bottom margins (would come from BoxModel in real implementation)
+                // For now, we'll work with the collapse state infrastructure
+                double topMargin = 0;    // Would get from currentPrincipal.BoxModel.Margin.Top
+                double bottomMargin = 0; // Would get from currentPrincipal.BoxModel.Margin.Bottom
+
+                // Handle clear property - breaks margin collapsing
+                if (currentPrincipal.Clear != EClear.None)
+                {
+                    // Apply any pending collapsed margin
+                    if (_marginCollapseState.IsAdjoining)
+                    {
+                        double collapsedMargin = _marginCollapseState.CalculateCollapsedMargin();
+                        currentY += collapsedMargin;
+                        _marginCollapseState.Reset();
+                    }
+
+                    // Move below floats due to clear
+                    currentY = GetClearancePosition(currentY, currentPrincipal.Clear);
+
+                    // Clear breaks adjacency
+                    _marginCollapseState.BreakAdjacency();
+                }
+
+                // Check if this is the first in-flow child (parent/first-child collapse)
+                if (_marginCollapseState.IsAtBfcStart && IsTopMarginAdjoining(currentPrincipal))
+                {
+                    // Parent/first-child: parent's top margin collapses with child's top margin
+                    // Add child's top margin to pending margins
+                    _marginCollapseState.AddMargin(topMargin);
+                    _marginCollapseState.IsAtBfcStart = false;
+                }
+                else if (previousBox != null && _marginCollapseState.IsAdjoining)
+                {
+                    // Adjacent sibling collapse: previous bottom + current top
+                    _marginCollapseState.AddMargin(topMargin);
+                }
+                else
+                {
+                    // No collapse - apply pending collapsed margin then add current top margin
+                    if (_marginCollapseState.IsAdjoining)
+                    {
+                        double collapsedMargin = _marginCollapseState.CalculateCollapsedMargin();
+                        currentY += collapsedMargin;
+                        _marginCollapseState.Reset();
+                    }
+                    currentY += topMargin;
+                }
+
+                // Check for empty box (top and bottom margins collapse through)
+                if (IsEmptyBox(currentPrincipal))
+                {
+                    // Empty box: top and bottom margins collapse together
+                    _marginCollapseState.AddMargin(bottomMargin);
+                    // Don't position the box or advance currentY - it has no height
+                }
+                else
+                {
+                    // Apply collapsed margin and position box
+                    if (_marginCollapseState.IsAdjoining)
+                    {
+                        double collapsedMargin = _marginCollapseState.CalculateCollapsedMargin();
+                        currentY += collapsedMargin;
+                        _marginCollapseState.Reset();
+                    }
+
+                    // Position normal flow box
+                    GetAvailableWidth(currentY, containerWidth, out double leftOffset, out double availableWidth);
+                    current.Position = new Point2f(leftOffset, currentY);
+
+                    // Track content dimensions
+                    var currentSize = current.Size;
+                    var currentPos = current.Position;
+                    maxWidth = Math.Max(maxWidth, currentPos.X + currentSize.Width);
+                    currentY = currentPos.Y + currentSize.Height;
+
+                    // Add bottom margin to pending collapse state
+                    _marginCollapseState.AddMargin(bottomMargin);
+                    _marginCollapseState.IsAdjoining = true;
+
+                    // Check if this is the last child for parent/last-child collapse
+                    if (current.nextSibling == null && Node is CssPrincipalBox parentBox)
+                    {
+                        HandleParentLastChildCollapse(parentBox, currentPrincipal);
+                    }
+                }
+
+                previousBox = currentPrincipal;
             }
             else
             {
-                // Handle clear property
-                if (current is CssPrincipalBox principalNonFloat && principalNonFloat.Clear != EClear.None)
+                // Non-principal box (shouldn't happen in block formatting context)
+                // Position it and break adjacency
+                if (_marginCollapseState.IsAdjoining)
                 {
-                    currentY = GetClearancePosition(currentY, principalNonFloat.Clear);
+                    double collapsedMargin = _marginCollapseState.CalculateCollapsedMargin();
+                    currentY += collapsedMargin;
+                    _marginCollapseState.Reset();
                 }
 
-                // Position normal flow box
                 GetAvailableWidth(currentY, containerWidth, out double leftOffset, out double availableWidth);
-
                 current.Position = new Point2f(leftOffset, currentY);
 
-                // Track content dimensions
                 var currentSize = current.Size;
                 var currentPos = current.Position;
                 maxWidth = Math.Max(maxWidth, currentPos.X + currentSize.Width);
                 currentY = currentPos.Y + currentSize.Height;
+
+                _marginCollapseState.BreakAdjacency();
             }
 
             current = current.nextSibling;
+        }
+
+        // Apply any final pending collapsed margin
+        if (_marginCollapseState.IsAdjoining)
+        {
+            double collapsedMargin = _marginCollapseState.CalculateCollapsedMargin();
+            currentY += collapsedMargin;
         }
 
         // Ensure content height includes all floats
